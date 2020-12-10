@@ -40,7 +40,12 @@
         $("#loginButton").on('click', function(evt){
           var username = $("#username").val();
           var password = $("#password").val();
-          var url = URL_DOMAIN + '/services/scripts/gettunepadid';
+
+          var lmcDevHost = 'https://earsketch-dev.lmc.gatech.edu';
+          var WSURLDOMAIN = window.location.origin.indexOf('localhost') >= 0 ? lmcDevHost : window.location.origin;
+          var WSROUTE = "/EarSketchWS/";
+
+          var url = WSURLDOMAIN + WSROUTE + 'services/scripts/gettunepadid';
 
           var payload = new FormData();
           payload.append('username', username);

@@ -224,6 +224,8 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
             $scope.layoutLoaded = true;
             updateSplitBars();
         });
+
+        angular.element('#screen').fadeOut(100);
     });
 
     $scope.$on('openConsoleOnCodeCompileError', function() {

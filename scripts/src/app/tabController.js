@@ -2,10 +2,8 @@
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'colorTheme', 'collaboration', 'tabs', 'layout', 'websocket', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, colorTheme, collaboration, tabs, layout, websocket) {
+app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'colorTheme', 'collaboration', 'tabs', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, colorTheme, collaboration, tabs, $ngRedux) {
     $scope.tabContextMenu = [];
-
-    window.tabScope = $scope;
 
     $scope.openContextMenu = function (index) {
         $scope.swapTab(index);
@@ -468,8 +466,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             }
 
-            $rootScope.$broadcast('reloadRecommendations');
-
             tabs.ignoreOnChange = false;
 
             $scope.editor.clearHistory();
@@ -484,7 +480,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
     $scope.$on('reloadRecommendations', function(event){
         $rootScope.$broadcast('recommenderScript',$scope.tabs[$scope.activeTab]);
-        $rootScope.$broadcast('setNumTabsOpen', $scope.tabs.length);
+        // $rootScope.$broadcast('setNumTabsOpen', $scope.tabs.length);
     });
 
     /**

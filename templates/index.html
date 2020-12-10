@@ -48,8 +48,7 @@
 
 <div id="screen" class="loader">
     <br/><br/><br/><br/><br/><br/>
-    <h1>Loading EarSketch...</h1>
-    <br/><br/>
+    <div class="text-5xl text-center pb-16">Loading EarSketch...</div>
     <div class="loading-spinner"></div>
 </div>
 <script>
@@ -143,8 +142,8 @@
         </div>
 
         <div id="top-header-nav-links" class="pull-left" style="max-width: 500px;">
-            <a href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">Help / Contact</a>
-            <a href="https://www.teachers.earsketch.org" target="_blank">Teachers</a>
+            <a href="http://earsketch.gatech.edu/landing/#/contact" target="_blank">Help / Contact</a>
+            <a href="#" ng-show="showTeachersLink" ng-click="openLMSPage()">Teachers</a>
             <div id="app-title-container" class="pull-left" style="display: block; margin-top: 5px;">
                 <div><a href="https://www.amazonfutureengineer.com/earsketch" target='_blank' ng-show="showAmazonBanner" id="app-title" style="color:yellow; text-shadow: 1px 1px #FF0000; line-height: 21px;">
                     <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style="margin-left: 17px; margin-right: 0px; height: 13px;"></div>
@@ -294,7 +293,7 @@
                     <uib-tabset class="sidebar-inner" active="layout.browser">
                         <uib-tab id="tab-soundbrowser" index="0" select="openSidebarTab('sound');">
                             <!--<uib-tab-heading>Sounds</uib-tab-heading>-->
-                            <div soundbrowser></div>
+                            <sound-collections></sound-collections>
                         </uib-tab>
                         <uib-tab id="tab-scriptbrowser" index="1" select="openSidebarTab('script')">
                             <!--<uib-tab-heading>Scripts</uib-tab-heading>-->
@@ -306,7 +305,7 @@
                         </uib-tab>
                         <uib-tab id="tab-apibrowser" index="3" select="openSidebarTab('api')">
                             <!--<uib-tab-heading>API</uib-tab-heading>-->
-                            <div apibrowser></div>
+                            <api-browser></api-browser>
                         </uib-tab>
                     </uib-tabset>
                 </div>
@@ -459,6 +458,6 @@
         </div> <!-- ui-layout -->
     </div> <!-- layoutController -->
 </div> <!-- end of container -->
-<hot-bubble />
+<hot-bubble></hot-bubble>
 </body>
 </html>

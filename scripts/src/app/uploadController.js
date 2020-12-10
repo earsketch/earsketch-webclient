@@ -1,4 +1,6 @@
-app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','RecorderService','userProject','userConsole','userNotification','audioLibrary','ESUtils','esconsole', '$sce', '$timeout', '$http', 'audioContext', function($scope, $rootScope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, audioLibrary, ESUtils, esconsole, $sce, $timeout, $http, audioContext) {
+import * as sounds from '../browser/soundsState';
+
+app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','RecorderService','userProject','userConsole','userNotification','audioLibrary','ESUtils','esconsole', '$sce', '$timeout', '$http', 'audioContext', '$ngRedux' , function($scope, $rootScope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, audioLibrary, ESUtils, esconsole, $sce, $timeout, $http, audioContext, $ngRedux) {
     $scope.file = {
         data: null,
         key: null,
@@ -201,18 +203,17 @@ app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','Re
         }
 
         try {
-            if (typeof(key) == 'undefined') {
+            if (typeof(key) === 'undefined') {
                 esconsole('Key Undefined ...', 'warning');
                 userConsole.warn(ESMessages.uploadcontroller.undefinedconstant);
                 $scope.uploadError = ESMessages.uploadcontroller.undefinedconstant;
                 flagerr = true;
             } else {
-                var jsstr = key + '=5';
+                var jsstr = 'let ' + key + '=5';
                 esconsole(jsstr, 'debug');
-                eval(jsstr);
-                if (audioLibrary.getCache().some(function (item) {
-                        return item.file_key === (userProject.getUsername() + '_' + key).toUpperCase();
-                    })) {
+                eval(jsstr); // TODO: This is a truly horrible hack.
+                const fileKeys = sounds.selectAllFileKeys($ngRedux.getState());
+                if (fileKeys.some(fileKey => fileKey === (userProject.getUsername() + '_' + key).toUpperCase())) {
                     esconsole('Key Already Exists ...', 'info');
                     userConsole.warn(key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused);
                     $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused;
@@ -266,6 +267,9 @@ app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','Re
                 // clear the cache so it gets reloaded
                 audioLibrary.clearAudioTagCache();
 
+                $ngRedux.dispatch(sounds.resetUserSounds());
+                $ngRedux.dispatch(sounds.getUserSounds(userProject.getUsername()));
+
                 $scope.close();
                 //console.log('Freesound file uploaded', result); //AVN log
             }).catch(function(err) {
@@ -291,7 +295,12 @@ app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','Re
 
       var username = userProject.getUsername();
       var encodedPassword = userProject.getEncodedPassword();
-      var url = URL_DOMAIN + '/services/scripts/getembeddedtunepadid';
+
+      var lmcDevHost = 'https://earsketch-dev.lmc.gatech.edu';
+      var WSURLDOMAIN = window.location.origin.indexOf('localhost') >= 0 ? lmcDevHost : window.location.origin;
+      var WSROUTE = "/EarSketchWS/";
+
+      var url = WSURLDOMAIN + WSROUTE + 'services/scripts/getembeddedtunepadid';
 
       var payload = new FormData();
       payload.append('username', username);
@@ -520,12 +529,11 @@ app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','Re
                         $scope.uploadError = ESMessages.uploadcontroller.undefinedconstant;
                         flagerr = true;
                     } else {
-                        var jsstr = key + '=5';
+                        var jsstr = 'let ' + key + '=5';
                         esconsole(jsstr, 'debug');
-                        eval(jsstr);
-                        if (audioLibrary.getCache().some(function (item) {
-                            return item.file_key === (userProject.getUsername() + '_' + key).toUpperCase();
-                        })) {
+                        eval(jsstr); // TODO: This is a truly horrible hack.
+                        const fileKeys = sounds.selectAllFileKeys($ngRedux.getState());
+                        if (fileKeys.some(fileKey => fileKey === (userProject.getUsername() + '_' + key).toUpperCase())) {
                             esconsole('Key Already Exists ...', 'info');
                             // userConsole.warn(key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused);
                             $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused;
@@ -611,6 +619,9 @@ app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','Re
 
                                 // clear the cache so it gets reloaded
                                 audioLibrary.clearAudioTagCache();
+
+                                $ngRedux.dispatch(sounds.resetUserSounds());
+                                $ngRedux.dispatch(sounds.getUserSounds(userProject.getUsername()));
                             } else {
                                 esconsole('Error Sending Custom Sound...', 'error');
                                 esconsole(request.statusText, 'error');

@@ -1,12 +1,25 @@
-import * as bubbleState from '../bubble/bubbleState';
+import * as user from '../user/userState';
+import * as bubble from '../bubble/bubbleState';
+import * as sounds from '../browser/soundsState';
+import * as appState from '../app/appState';
+import * as recommenderState from '../browser/recommenderState';
+import * as helpers from '../helpers';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'layout', 'collaboration','tabs', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, layout, collaboration, tabs, $document, audioContext, audioLibrary, timesync, $ngRedux) {
+app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'layout', 'collaboration','tabs', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', 'recommender', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, layout, collaboration, tabs, $document, audioContext, audioLibrary, timesync, $ngRedux, recommender) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
+
+    $ngRedux.dispatch(sounds.getDefaultSounds());
+    if (FLAGS.SHOW_FEATURED_SOUNDS) {
+        $ngRedux.dispatch(sounds.setFeaturedSoundVisibility(true));
+    }
+    if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
+        $ngRedux.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS));
+    }
 
     $scope.loggedIn = false;
     $scope.showIDE = true;
@@ -233,12 +246,23 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
      *
      */
     $scope.login = function () {
+        $ngRedux.dispatch(user.login({
+            username: $scope.username,
+            password: $scope.password
+        }));
+
         esconsole('Logging in', ['DEBUG','MAIN']);
 
         //save all unsaved open scripts (don't need no promises)
         userProject.saveAll();
 
         return userProject.getUserInfo($scope.username, $scope.password).then(function (userInfo) {
+            $ngRedux.dispatch(sounds.getUserSounds($scope.username));
+            $ngRedux.dispatch(sounds.getFavorites({
+                username: $scope.username,
+                password: $scope.password
+            }));
+
             // userInfo !== undefined if user exists.
             if (userInfo) {
                 // Always override with the returned username in case the letter cases mismatch.
@@ -318,6 +342,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.logout = function () {
+        $ngRedux.dispatch(user.logout());
+        $ngRedux.dispatch(sounds.resetUserSounds());
+        $ngRedux.dispatch(sounds.resetFavorites());
+        $ngRedux.dispatch(sounds.resetAllFilters());
+
+        // TODO: reset appState:numOpenTabs
+
         // save all unsaved open scripts
         var promises = userProject.saveAll();
 
@@ -433,7 +464,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             }
         });
     } else {
-        $ngRedux.dispatch(bubbleState.resume());
+        $ngRedux.dispatch(bubble.resume());
     }
 
 
@@ -503,10 +534,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         // $scope.setColorTheme(localStorage.get('colorTheme'));
 
         // fetch broadcast message (pinned notifications) from admins
-
-
-
-
+    });
+    
+    $scope.$on('setNumTabsOpen', (event, numTabs) => {
+        $ngRedux.dispatch(appState.setNumTabsOpen(numTabs));
     });
 
     $scope.showNotification = false;
@@ -600,19 +631,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
      * @param fontSize {number}
      */
     $scope.$on('initFontSize', function (event, val) {
-        
-            $scope.selectedFont = val;
-        
+        $scope.selectedFont = val;
     });
 
     $scope.setFontSize = function (fontSize) {
         esconsole('resizing global font size to ' + fontSize, 'debug');
-        
-        
-            $scope.selectedFont = fontSize;
-            $rootScope.$broadcast('fontSizeChanged', fontSize);
-    
-        
+        $scope.selectedFont = fontSize;
+        $rootScope.$broadcast('fontSizeChanged', fontSize);
     };
 
     $scope.enterKeySubmit = function (event) {
@@ -736,9 +761,55 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.resumeQuickTour = () => {
-        $ngRedux.dispatch(bubbleState.reset());
-        $ngRedux.dispatch(bubbleState.resume());
+        $ngRedux.dispatch(bubble.reset());
+        $ngRedux.dispatch(bubble.resume());
     };
+
+    $scope.renameSound = function (sound) {
+        $uibModal.open({
+            templateUrl: 'templates/rename-sound.html',
+            controller: 'renameSoundController',
+            size: 'sm',
+            resolve: {
+                sound() { return sound; }
+            }
+        });
+    };
+
+    $scope.deleteSound = function (sound) {
+        $confirm({text: "Do you really want to delete sound " + sound.file_key + "?",
+            ok: "Delete"}).then(function () {
+            userProject.deleteAudio(sound.file_key).then(function () {
+                $ngRedux.dispatch(sounds.deleteLocalUserSound(sound.file_key));
+                audioLibrary.clearAudioTagCache();
+            });
+        });
+    };
+
+    $scope.$on('recommenderScript', (event, script) => {
+        if (script) {
+            let input = recommender.addRecInput([], script);
+            let res = [];
+            if (input.length === 0) {
+                const filteredScripts = Object.values(helpers.getNgDirective('scriptbrowser').scope().filteredScripts);
+                if (filteredScripts.length) {
+                    const lim = Math.min(5, filteredScripts.length);
+
+                    for (let i = 0; i < lim; i++) {
+                        input = recommender.addRecInput(input, filteredScripts[i]);
+                    }
+                }
+            }
+            [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
+                res = recommender.recommend(res, input, ...v);
+            });
+            $ngRedux.dispatch(recommenderState.setRecommendations(res));
+        }
+    });
+
+    $scope.$on('language', (event, language) => {
+        $ngRedux.dispatch(appState.setScriptLanguage(language));
+    })
 
     // for Chrome 66+ web-audio restriction
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=807017

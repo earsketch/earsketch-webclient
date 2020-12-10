@@ -1,5 +1,5 @@
 beforeAll(() => {
-  browser.get('https://api.ersktch.gatech.edu/earsketch2/');
+  browser.get('https://earsketch.gatech.edu/earsketch2/');
 });
 
 describe('time stretch task', () => {

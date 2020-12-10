@@ -6,7 +6,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import rootReducer from './reducers';
 
 const store = configureStore({
-    reducer: rootReducer
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) => {
+        return getDefaultMiddleware({
+            // Toggle these on for sanity checks.
+            // See: https://redux-toolkit.js.org/api/getDefaultMiddleware#included-default-middleware
+            immutableCheck: false,
+            serializableCheck: false
+        });
+    }
 });
 
 require('jquery');
@@ -161,6 +169,8 @@ require(['angular'], () => {
 
     // React components
     require('./bubble/Bubble');
+    require('./browser/API');
+    require('./browser/Sounds');
 
     // Autograders
     require('autograderController');

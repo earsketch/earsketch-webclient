@@ -129,7 +129,7 @@ function audioLibraryFactory($http, ctx, $q, $cacheFactory, esconsole) {
                             ['DEBUG', 'AUDIOLIBRARY']
                         );
 
-                        if (!FLAGS.USE_CLIENT_TS || clipOrigTempo === -1) {
+                        if (!FLAGS.USE_CLIENT_TS || clipOrigTempo===-1 || tempo===-1) {
                             esconsole('Using the server (sox) time stretcher.', ['debug','audiolibrary']);
                             resolve(buffer);
                         } else {
