@@ -263,7 +263,7 @@
                 <!--</button>-->
 
                 <!-- Curriculum -->
-                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': (!layout.curriculum || showChatWindow)}" ng-click="toggleLayout('curriculum')" id="sidenav-curriculum" data-toggle="tooltip" title="Curriculum">
+                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': (!layout.curriculum || showChatWindow || showCAIWindow)}" ng-click="toggleLayout('curriculum')" id="sidenav-curriculum" data-toggle="tooltip" title="Curriculum">
                     <i class="icon icon-book3"></i>
                 </button>
 
@@ -271,6 +271,12 @@
                 <button ng-if="enableChat" class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': !showChatWindow}" ng-click="toggleLayout('chat')" id="sidenav-chat" data-toggle="tooltip" title="Chat">
                     <i class="icon icon-bubbles"></i>
                 </button>
+
+                <!-- CAI User Interface -->
+                <button ng-if="enableCAI" class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': !showCAIWindow}" ng-click="toggleLayout('cai')" id="sidenav-cai" data-toggle="tooltip" title="CAI">
+                    <i class="icon icon-bubbles"></i>
+                </button>
+
             </ul>
 
             <div>
@@ -451,10 +457,11 @@
             </div> <!-- end of #content -->
 
             <div ui-layout-container size="440px" collapsed="!layout.curriculum" min-size="360px" id="curriculum-container" ng-style="{'z-index':bubble.active&&bubble.currentPage>=8?35:0}"> <!-- curriculum -->
-                <div id="curriculum" ng-show="!showChatWindow">
+                <div id="curriculum" ng-show="!showChatWindow && !showCAIWindow">
                     <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div>
                 </div>
                 <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
+                <div caiwindow id="chat-window" ng-show="showCAIWindow"></div>
             </div> <!-- end of #curriculum -->
         </div> <!-- ui-layout -->
     </div> <!-- layoutController -->

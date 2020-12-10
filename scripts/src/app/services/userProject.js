@@ -309,6 +309,9 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             // Clear Recommendations in Sound Browser
             $rootScope.$broadcast('clearRecommender');
 
+            // Close CAI
+            $rootScope.$broadcast('caiClose');
+
             // Copy scripts local storage to the web service.
             if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
                 var saved = JSON.parse(localStorage.get(LS_SCRIPTS_KEY));
@@ -727,6 +730,9 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
         // Clear Recommendations in Sound Browser
         $rootScope.$broadcast('clearRecommender');
+
+        // Close CAI
+        $rootScope.$broadcast('caiClose');
 
         websocket.close();
     }
@@ -1866,6 +1872,27 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         });
     }
 
+function uploadCAIHistory(projectName, node) {
+    var url = URL_DOMAIN + '/services/scripts/uploadcaihistory';
+
+    var opts = {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+    };
+
+    var body = new FormData();
+    body.append('username', getUsername());
+    body.append('project', projectName)
+    body.append('node', JSON.stringify(node));
+
+    $http.post(url, body, opts).then(function(result) {
+        console.log('saved to CAI history:', projectName);
+    }).catch(function(err) {
+        console.log('could not save to cai', projectName);
+        throw err;
+    });
+}
+
     self = {
         login: login,
         storeUser: storeUser,
@@ -1922,6 +1949,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         setPasswordForUser: setPasswordForUser,
         shareWithPeople: shareWithPeople,
         getTutoringRecord: getTutoringRecord,
+        uploadCAIHistory: uploadCAIHistory,
         // export constants
         STATUS_UNKNOWN: STATUS_UNKNOWN,
         STATUS_SUCCESSFUL: STATUS_SUCCESSFUL,

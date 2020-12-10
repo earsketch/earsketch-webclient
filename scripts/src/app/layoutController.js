@@ -120,7 +120,10 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
             angular.element("#zoom-container").show();
         } else if (pane === 'chat') {
             $scope.showChatWindow = !$scope.showChatWindow;
-            $scope.layout['curriculum'] = $scope.showChatWindow;
+            if ($scope.showChatWindow)
+                $scope.showCAIWindow = false;
+            if(!$scope.showCAIWindow)
+                $scope.layout['curriculum'] = $scope.showChatWindow;
 
             if ($scope.showChatWindow) {
                 collaboration.joinTutoring();
@@ -128,6 +131,14 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
                 // collaboration.leaveTutoring();
             }
             layout.set('chat', $scope.showChatWindow, true);
+        } else if (pane == 'cai') {
+            $scope.showCAIWindow = !$scope.showCAIWindow;
+            if ($scope.showCAIWindow)
+                $scope.showChatWindow = false;
+            if (!$scope.showChatWindow)
+                $scope.layout['curriculum'] = $scope.showCAIWindow;
+
+            layout.set('cai', $scope.showCAIWindow, true);
         } else if (pane === 'curriculum') {
             $scope.layout[pane] = $scope.showChatWindow ? true : !$scope.layout[pane];
             $scope.showChatWindow = false; 

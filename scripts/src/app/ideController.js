@@ -606,6 +606,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                     }
                     
                     console.log("autograder", report);
+
+                    $rootScope.$broadcast('compileCAI', [result, language, code]);
                 }, 0);
             }
 

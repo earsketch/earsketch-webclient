@@ -14,7 +14,7 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
     $scope.useSeed = true;
 
     // TEMPORAARY - SOUND PROFILE TEST EXAMPLES
-    var soundProfileTests = true;
+    var soundProfileTests = false;
 
     // overwrite userConsole javascript prompt with a hijackable one
     var nativePrompt = userConsole.prompt;
@@ -60,6 +60,7 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
       "COMPLEXITY": true,
       "EFFECTS": false,
       "MEASUREVIEW": false,
+      "GENRE": false,
       "SOUNDPROFILE": false,
       "RECOMMENDATIONS": false,
       "MIXING": false,

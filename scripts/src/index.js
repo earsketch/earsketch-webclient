@@ -170,9 +170,14 @@ require(['angular'], () => {
     require('inputsController');
 
     // CAI
+    require('caiWindowDirective');
     require('autograder');
     require('caiAnalysisModule');
     require('complexityCalculator');
+    require('complexityCalculatorHelperFunctions');
+    require('caiDialogue');
+    require('caiErrorHandling');
+    require('codeSuggestion');
     require('recommender');
 
     // TODO: Use a module.
