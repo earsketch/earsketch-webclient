@@ -10,7 +10,7 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
 
     //variable init
     // var studentCode;
-
+    var sampleLines = [];
     /**
       * Build the abstract syntax tree for Python. Useful for analyzing script
       * complexity or looking for specific function call e.g. onLoop().
@@ -3531,11 +3531,9 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
     /*Checks each line of student code for originality. This is stored for later use.
     */
     function checkOriginality() {
-        var sampleLines = [];
-        for (var sampleLine = 0; sampleLine < sampleCode.length; sampleLine++) {
-            var thisSample = sampleCode[sampleLine];
-            thisSample = complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(thisSample);
-            if (thisSample != "") {
+        if (sampleLines == []) {
+            for (var sampleLine = 0; sampleLine < sampleCode.length; sampleLine++) {
+                var thisSample = complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(sampleCode[sampleLine]);
                 sampleLines.push(thisSample);
             }
         }
@@ -3546,7 +3544,7 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
 
             if (thisLine != "") {
                 //check against all lines of sample code, also trimmed
-                for (var sampleLine = 0; sampleLine < sampleCode.length; sampleLine++) {
+                for (var sampleLine = 0; sampleLine < sampleLines.length; sampleLine++) {
                     var thisSample = sampleLines[sampleLine];
                     if (complexityCalculatorHelperFunctions.checkForMatch(thisLine, thisSample, 5)) {
                         isOriginal = false;
