@@ -87,7 +87,7 @@ app.directive('curriculumpane', function () {
                 }
                 //==========================================
 
-                var curriculumDir = 'curriculum/';
+                var curriculumDir = '../curriculum/';
 
                 function preloadModifiedHTML(url) {
                     url = curriculumDir + url;
