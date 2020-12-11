@@ -24,6 +24,11 @@ phases:
       - echo $ES_SCRIPT_HOME
       - echo $CODEBUILD_SOURCE_VERSION
       - echo $LOCAL_STAGING_DIR
+      - echo $ES_VERSION
+      - echo $NPM_BUILD_COMMAND
+      - echo $ENV_FLAGS_FILE
+      - echo $ES_VERSION_MAJOR
+      - echo $ES_VERSION_MINOR
       - echo Finished printing variables
       - echo "Entered the build phase..."
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
@@ -31,7 +36,7 @@ phases:
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - grunt less
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
-      - npm run $NPM_BUILD_COMMAND -- --env.release=${ES_VERSION} --env.flags=config/$ENV_FLAGS_FILE
+      - npm run $NPM_BUILD_COMMAND -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - echo "Copying the client files to local distribution folder..."
