@@ -19,15 +19,20 @@ phases:
       - export ES_VERSION="$ES_VERSION_MAJOR.$ES_VERSION_MINOR.$CODEBUILD_BUILD_NUMBER"
   build:
     commands:
+      - start_time="$(date -u +%s)"
       - du -sh $CODEBUILD_SRC_DIR
       - echo $ES_SCRIPT_HOME
       - echo $CODEBUILD_SOURCE_VERSION
       - echo $LOCAL_STAGING_DIR
       - echo Finished printing variables
       - echo "Entered the build phase..."
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm install
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - grunt less
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm run $NPM_BUILD_COMMAND -- --env.release=${ES_VERSION} --env.flags=config/$ENV_FLAGS_FILE
+      - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
