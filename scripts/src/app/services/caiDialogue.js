@@ -38,6 +38,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     var recommendationHistory = {};
     var chattiness = 0;
     var currentNoSuggRuns = 0;
+    var recentScripts = {};
 
     var studentInteracted = false;
     var currentDropup = "";
@@ -753,6 +754,28 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    function checkForCodeUpdates(code) {
+        console.log(activeProject);
+        console.log("student code", code);
+        if (code.length > 0) {
+            if (activeProject in recentScripts) {
+                if (recentScripts[activeProject] != code) {
+                    console.log("previous code state, which is different from the current one");
+                    console.log(recentScripts[activeProject]);
+                    userProject.saveScript();
+                    recentScripts[activeProject] = code;
+                    if (FLAGS.UPLOAD_CAI_HISTORY)
+                        userProject.uploadCAIHistory(activeProject,nodeHistory[activeProject][nodeHistory[activeProject].length-1]);
+                }
+
+            }
+            else {
+                console.log("new project addded to history")
+                recentScripts[activeProject] = code;
+            }
+        }
+    };
+
     return {
         processCodeRun: processCodeRun,
         generateOutput: generateOutput,
@@ -768,7 +791,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         setActiveProject: setActiveProject,
         getNodeHistory: getNodeHistory,
         activeWaits: activeWaits,
-        studentInteractedValue: studentInteractedValue
+        studentInteractedValue: studentInteractedValue,
+        checkForCodeUpdates: checkForCodeUpdates
     };
 
 }]);

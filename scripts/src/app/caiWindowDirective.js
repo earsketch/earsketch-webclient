@@ -381,6 +381,12 @@ app.directive('caiwindow', [function () {
                 return message;
             };
 
+            $scope.$on("reloadRecommendations", function (evt, data) {
+                console.log("running check update");
+                var editorCode = $scope.editor.ace.session.doc.$lines.join("\n");
+                caiDialogue.checkForCodeUpdates(editorCode);
+            });
+
         }]
     };
 }]);
