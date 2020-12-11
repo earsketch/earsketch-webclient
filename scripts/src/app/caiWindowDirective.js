@@ -171,7 +171,7 @@ app.directive('caiwindow', [function () {
                     }
                     autoScrollCAI();
                     $scope.dropupLabel = caiDialogue.getDropup();
-                }, 2000);
+                }, 200);
             });
 
 
@@ -189,7 +189,7 @@ app.directive('caiwindow', [function () {
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
                         autoScrollCAI();
-                    }, 2000);
+                    }, 200);
                 }
             });
 
@@ -272,7 +272,7 @@ app.directive('caiwindow', [function () {
 
                         $scope.dropupLabel = caiDialogue.getDropup();
                         autoScrollCAI();
-                    }, 1000);
+                    }, 100);
                 }
             };
 
