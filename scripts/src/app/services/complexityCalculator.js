@@ -3544,12 +3544,14 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
             //trim
             var thisLine = complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(studentCode[studentLine]);
 
-            //check against all lines of sample code, also trimmed
-            for (var sampleLine = 0; sampleLine < sampleCode.length; sampleLine++) {
-                var thisSample = sampleLines[sampleLine];
-                if (complexityCalculatorHelperFunctions.checkForMatch(thisLine, thisSample, 5)) {
-                    isOriginal = false;
-                    break;
+            if (thisLine != "") {
+                //check against all lines of sample code, also trimmed
+                for (var sampleLine = 0; sampleLine < sampleCode.length; sampleLine++) {
+                    var thisSample = sampleLines[sampleLine];
+                    if (complexityCalculatorHelperFunctions.checkForMatch(thisLine, thisSample, 5)) {
+                        isOriginal = false;
+                        break;
+                    }
                 }
             }
 
