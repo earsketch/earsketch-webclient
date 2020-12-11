@@ -762,10 +762,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 if (recentScripts[activeProject] != code) {
                     console.log("previous code state, which is different from the current one");
                     console.log(recentScripts[activeProject]);
-                    userProject.saveScript();
+                    userProject.saveScript(activeProject, code);
                     recentScripts[activeProject] = code;
                     if (FLAGS.UPLOAD_CAI_HISTORY)
-                        userProject.uploadCAIHistory(activeProject,nodeHistory[activeProject][nodeHistory[activeProject].length-1]);
+                        userProject.uploadCAIHistory(activeProject,[]);
                 }
 
             }
