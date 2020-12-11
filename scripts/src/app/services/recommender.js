@@ -7,8 +7,6 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
  */
 app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) {
 
-    // var PAGE_LOADED = false;
-
     var keyGenreDict = {};
     var keyInstrumentDict = {};
 
@@ -128,10 +126,10 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
 
 
     function genreRecommendations(recs) {
-        genres = [];
+        var genres = [];
 
         Object.keys(recs).forEach(function(rec) {
-            genre = keyGenreDict[rec];
+            var genre = keyGenreDict[rec];
             if (!genres.includes(genre))
                 genres.push(genre);
         });
@@ -140,10 +138,10 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     }
 
     function instrumentRecommendations(recs) {
-        instruments = [];
+        var instruments = [];
 
         Object.keys(recs).forEach(function(rec) {
-            instrument = keyInstrumentDict[rec];
+            var instrument = keyInstrumentDict[rec];
             if (!instruments.includes(instrument))
                 instruments.push(instrument);
         });
