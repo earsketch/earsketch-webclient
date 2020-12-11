@@ -327,7 +327,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else if (utterance.includes("[SUGGESTION]")) {
             utteranceObj = actions["[SUGGESTION]"]();
-            if(utteranceObj.id != 1){
+            if (utteranceObj.id != 1 && utteranceObj != 6) {
                 parameters.push(["SUGGESTION", utteranceObj.id]);
             }
             else{
