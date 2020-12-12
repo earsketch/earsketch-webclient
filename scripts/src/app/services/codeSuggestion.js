@@ -603,7 +603,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', func
         }
         else {
             sugg = Object.assign({utterance: "", explain: "", example: ""});
-            sugg.utterance = randomNucleus(history);
+            sugg = randomNucleus(history);
         }
 
 
@@ -611,7 +611,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', func
 
         if (sugg.utterance === "[DELTALOOKUP]") {
             sugg = Object.assign({}, sugg);
-            sugg.utterance = deltaSugg();
+            sugg = deltaSugg();
             //if cai already suggested this, return empty
             for (var i in history) {
                 if (history[i].length > 1) {
@@ -626,7 +626,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', func
         }
         if (sugg.utterance === "[NUCLEUS]") {
             sugg = Object.assign({}, sugg);
-            sugg.utterance = randomNucleus(history);
+            sugg = randomNucleus(history);
 
         }
         return sugg;
@@ -645,7 +645,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', func
             if (threshold < 0) {
                 return "I don't have any suggestions right now. if you add something, i can work off that.";
             }
-            newNucleus = CAI_NUCLEI[getRandomInt(0, CAI_NUCLEI.length - 1)].utterance;
+            newNucleus = CAI_NUCLEI[getRandomInt(0, CAI_NUCLEI.length - 1)];
             isAlreadySaid = false;
             for (var i in history) {
                 //get utterance
@@ -854,7 +854,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', func
 
     function deltaSugg() {
         var deltaInd = getRandomInt(0, possibleDeltaSuggs.length - 1);
-        return possibleDeltaSuggs[deltaInd].utterance;
+        return possibleDeltaSuggs[deltaInd];
     }
 
     return {

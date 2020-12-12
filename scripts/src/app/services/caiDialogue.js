@@ -1,4 +1,4 @@
-﻿import {CAI_TREE_NODES, CAI_TREES} from 'caiTree';
+﻿import { CAI_TREE_NODES, CAI_TREES } from 'caiTree';
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
@@ -235,7 +235,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
-            if('dropup' in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Genres"){
+            if ('dropup' in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Genres") {
                 //filter the button options
                 var availableGenres = [];
                 var allSamples = recommender.addRecInput([], { source_code: studentCodeObj });
@@ -255,12 +255,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
-                    if(availableGenres.includes(CAI_TREE_NODES[nextNode].title.toUpperCase())){
+                    if (availableGenres.includes(CAI_TREE_NODES[nextNode].title.toUpperCase())) {
                         buttons.push({ label: CAI_TREE_NODES[nextNode].title, value: nextNode });
                     }
                 }
             }
-            else if('dropup' in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Instruments"){
+            else if ('dropup' in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Instruments") {
                 //filter the button options
                 var availableInstruments = [];
 
@@ -281,12 +281,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
-                    if(availableInstruments.includes(CAI_TREE_NODES[nextNode].title.toUpperCase())){
+                    if (availableInstruments.includes(CAI_TREE_NODES[nextNode].title.toUpperCase())) {
                         buttons.push({ label: CAI_TREE_NODES[nextNode].title, value: nextNode });
                     }
                 }
             }
-            else{
+            else {
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
                     buttons.push({ label: CAI_TREE_NODES[nextNode].title, value: nextNode });
@@ -328,20 +328,20 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else if (utterance.includes("[SUGGESTION]")) {
             utteranceObj = actions["[SUGGESTION]"]();
-            if (utteranceObj.id != 1 && utteranceObj != 6) {
-                parameters.push(["SUGGESTION", utteranceObj.id]);
-            }
-            else{
-                parameters.push(["SUGGESTION", utteranceObj.utterance]);
-            }
+            // if (utteranceObj.id != 1 && utteranceObj.id != 6) {
+            parameters.push(["SUGGESTION", utteranceObj.id]);
+            // }
+            // else{
+            //    parameters.push(["SUGGESTION", utteranceObj.utterance]);
+            // }
             utterance = utteranceObj.utterance;
         }
         else if (currentTreeNode[activeProject].utterance in actions) {
             utterance = actions[currentTreeNode[activeProject].utterance]();
-            if(currentTreeNode[activeProject].utterance == "[SUGGESTIONEXPLAIN]" ||currentTreeNode[activeProject].utterance == "[SUGGESTIONEXAMPLE]"){
+            if (currentTreeNode[activeProject].utterance == "[SUGGESTIONEXPLAIN]" || currentTreeNode[activeProject].utterance == "[SUGGESTIONEXAMPLE]") {
                 parameters.push([currentTreeNode[activeProject].utterance, utteranceObj.id]);
             }
-            else{
+            else {
                 parameters.push([currentTreeNode[activeProject].utterance, utterance]);
             }
         }
@@ -404,10 +404,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     recIndex++;
                 }
             }
-            
-            
-           // if (utterance.includes("undefined")) {
-           //     utterance = codeSuggestion.randomNucleus(nodeHistory[activeProject]).utterance;
+
+
+            // if (utterance.includes("undefined")) {
+            //     utterance = codeSuggestion.randomNucleus(nodeHistory[activeProject]).utterance;
             //}
 
             if (utterance.includes("[SOUNDWAIT")) {
@@ -459,14 +459,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 //select form at random
                 var newForm = validForms[randomIntFromInterval(0, validForms.length - 1)];
                 utterance = utterance.replace("[FORM]", newForm);
-                if(newForm.includes("undefined")){
+                if (newForm.includes("undefined")) {
                     utterance = codeSuggestion.randomNucleus();
                 }
             }
             else {
                 //return random form from allForms
                 utterance = utterance.replace("[FORM]", allForms[randomIntFromInterval(0, allForms.length - 1)]);
-                if(utterance.includes("undefined")){
+                if (utterance.includes("undefined")) {
                     utterance = codeSuggestion.randomNucleus();
                 }
             }
@@ -537,37 +537,37 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 nodeHistory[activeProject].push([0, utterance, parameters])
             }
 
-            if (FLAGS.UPLOAD_CAI_HISTORY) 
-                userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length-1]);
+            if (FLAGS.UPLOAD_CAI_HISTORY)
+                userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
 
             console.log("node history", nodeHistory);
-           // reconstituteNodeHistory();
+            // reconstituteNodeHistory();
         }
         return utterance;
     }
 
-    function reconstituteNodeHistory(){
+    function reconstituteNodeHistory() {
         var newVersion = [];
-        for(var i in nodeHistory[activeProject]){
-            if(nodeHistory[activeProject][i][0] != 0 || i == "0"){
+        for (var i in nodeHistory[activeProject]) {
+            if (nodeHistory[activeProject][i][0] != 0 || i == "0") {
                 var newItem = nodeHistory[activeProject][i].slice();
                 newItem[0] = CAI_TREE_NODES[newItem[0]].utterance;
 
 
                 //now, we go through the parameters and replace things like sound recs, section, 
-                if(newItem[0].includes("sound_rec")){
+                if (newItem[0].includes("sound_rec")) {
                     //find recs
                     var soundRecs = [];
-                    for(var i in newItem){
+                    for (var i in newItem) {
                         var val = newItem[i][0][0];
-                        if(val == "sound_rec"){
+                        if (val == "sound_rec") {
                             soundRecs = newItem[i][0][1];
                             break;
                         }
                     }
-                    if(soundRecs.length > 0){
+                    if (soundRecs.length > 0) {
                         var index = 0;
-                        while(newItem[0].includes("sound_rec")){
+                        while (newItem[0].includes("sound_rec")) {
                             newItem[0] = newItem[0].replace("[sound_rec]", soundRecs[index]);
                             index++;
                         }
@@ -716,10 +716,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (outputObj != null) {
 
             if (outputObj.utterance == "" && isPrompted) {
-                outputObj.utterance = codeSuggestion.randomNucleus(nodeHistory[activeProject]);
+                outputObj = codeSuggestion.randomNucleus(nodeHistory[activeProject]);
             }
 
-            if(outputObj.utterance.includes("[STARTTREE|")){
+            if (outputObj.utterance.includes("[STARTTREE|")) {
                 //what tree are we starting?
                 var treeName = outputObj.utterance.substring(outputObj.utterance.indexOf("[STARTTREE|") + 11);
                 treeName = treeName.substring(0, treeName.lastIndexOf("]"));
@@ -765,7 +765,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     userProject.saveScript();
                     recentScripts[activeProject] = code;
                     if (FLAGS.UPLOAD_CAI_HISTORY)
-                        userProject.uploadCAIHistory(activeProject,nodeHistory[activeProject][nodeHistory[activeProject].length-1]);
+                        userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
                 }
 
             }
