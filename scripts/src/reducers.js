@@ -7,6 +7,7 @@ import bubble from './bubble/bubbleState';
 import sounds from './browser/soundsState';
 import scripts from './browser/scriptsState';
 import api from './browser/apiState';
+import curriculum from './browser/curriculumState';
 import recommender from './browser/recommenderState';
 
 export default combineReducers({
@@ -17,5 +18,6 @@ export default combineReducers({
     sounds,
     scripts,
     api,
+    curriculum,
     recommender
 });
