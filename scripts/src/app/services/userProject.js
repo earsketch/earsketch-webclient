@@ -1646,11 +1646,13 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             status = 0;
         }
 
+        var n = null;
+
         if (overwrite) {
-            var n = scriptname;
+            n = scriptname;
         } else {
             // avoid overwriting scripts by suffixing the name with a number
-            var n = nextName(scriptname);
+            n = nextName(scriptname);
         }
 
         if (isLogged()) {
