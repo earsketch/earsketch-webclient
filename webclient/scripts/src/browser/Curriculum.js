@@ -11,7 +11,6 @@ const theme = 'light'
 
 // TODO TEMP
 const currentSection = 'Table of Contents'
-const language = 'python'
 const toc = ESCurr_TOC
 
 let clipboard = null

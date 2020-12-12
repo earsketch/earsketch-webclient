@@ -1,19 +1,12 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
-import { selectScriptLanguage } from '../app/appState';
 
 export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch }) => {
-    console.log("WOO", url, location)
     const {href: _url, loc: _location} = fixLocation(_url, location)
-    console.log("hmm", _url, _location)
     dispatch(loadChapter({href: _url, loc: _location}))
     console.log(url, _location);
-    console.log("YO")
     const response = await fetch(_url);
-    console.log("HEY")
     const html = await response.text();
-    console.log("HI")
     return { location: _location, html };
-    // dispatch(...)
 })
 
 const curriculumSlice = createSlice({
@@ -36,11 +29,16 @@ const curriculumSlice = createSlice({
             state.currentLocation = payload
         },
         loadChapter(state, { payload: { href, loc } }) {
-            // let { href, loc } = payload
-            // console.log("payload", payload)
-            console.log("href", href)
-            console.log("loc", loc)
-            _loadChapter(state, href, loc)
+            state.currentLocation = loc;
+
+            // update the pageIdx for the pagination if necessary
+            state.pageIdx = tocPages.map(function(v) {
+                return v.toString();
+            }).indexOf(loc.toString());
+
+            state.popoverIsOpen = false;
+            state.popover2IsOpen = false;
+            state.showURLButton = true;
         }
     },
     extraReducers: {
@@ -100,7 +98,6 @@ const findLocFromTocUrl = (url) => {
 }
 
 const fixLocation = (href, loc) => {
-    console.log("whee")
     if (typeof(loc) === 'undefined') {
         var url = href.split('/').slice(-1)[0].split('#').slice(0, 1)[0];
         var sectionDiv = href.split('/').slice(-1)[0].split('#')[1];
@@ -140,20 +137,6 @@ const fixLocation = (href, loc) => {
         }
     }
 
-    console.log("woo", href, loc)
     const curriculumDir = 'curriculum/'
     return {href: curriculumDir + href, loc}
 }
-
-const _loadChapter = (state, href, loc) => {
-    state.currentLocation = loc;
-
-    // update the pageIdx for the pagination if necessary
-    state.pageIdx = tocPages.map(function(v) {
-        return v.toString();
-    }).indexOf(loc.toString());
-
-    state.popoverIsOpen = false;
-    state.popover2IsOpen = false;
-    state.showURLButton = true;
-};
