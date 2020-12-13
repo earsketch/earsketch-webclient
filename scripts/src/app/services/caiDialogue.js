@@ -229,7 +229,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
 
-        if (currentSuggestion[activeProject] != null && currentTreeNode[activeProject].options[0] == 35 && currentSuggestion[activeProject].explain == "") {
+        if (currentSuggestion[activeProject] != null && currentTreeNode[activeProject].options[0] == 35 && (currentSuggestion[activeProject].explain == null || currentSuggestion[activeProject].explain == "")) {
             currentSuggestion[activeProject] = null;
             return [];
         }
