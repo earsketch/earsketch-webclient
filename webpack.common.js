@@ -13,7 +13,6 @@ const servicesDir = 'scripts/src/app/services';
 const apiDir = 'scripts/src/api';
 const dataDir = 'scripts/src/data';
 const modelDir = 'scripts/src/model';
-const curriculumDir = '../curriculum';
 
 module.exports = {
     entry: {
@@ -137,11 +136,10 @@ module.exports = {
             apiDoc: path.resolve(__dirname,`${dataDir}/api_doc.js`),
             numSlides: path.resolve(__dirname,`${dataDir}/num_slides.js`),
             
-
             // Curriculum Data
-            currToC: path.resolve(__dirname,`${curriculumDir}/curr_toc.js`),
-            currPages: path.resolve(__dirname,`${curriculumDir}/curr_pages.js`),
-            currSearchDoc: path.resolve(__dirname,`${curriculumDir}/curr_searchdoc.js`),
+            // currToC: path.resolve(__dirname,`${dataDir}/curr_toc.js`),
+            // currPages: path.resolve(__dirname,`${dataDir}/curr_pages.js`),
+            // currSearchDoc: path.resolve(__dirname,`${dataDir}/curr_searchdoc.js`),
 
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
@@ -240,10 +238,10 @@ module.exports = {
             EarSketch: 'exports-loader?type=commonjs&exports=single EarSketch!modules',
             ESMessages: 'exports-loader?type=commonjs&exports=single ESMessages!messages',
             ESApiDoc: 'exports-loader?type=commonjs&exports=single ESApiDoc!apiDoc',
-            ESCurr_TOC: 'exports-loader?type=commonjs&exports=single ESCurr_TOC!currToC',
-            ESCurr_Pages: 'exports-loader?type=commonjs&exports=single ESCurr_Pages!currPages',
+            // ESCurr_TOC: 'exports-loader?type=commonjs&exports=single ESCurr_TOC!currToC',
+            // ESCurr_Pages: 'exports-loader?type=commonjs&exports=single ESCurr_Pages!currPages',
             ESNum_Slides: 'exports-loader?type=commonjs&exports=single ESNum_Slides!numSlides',
-            ESCurr_SearchDoc: 'exports-loader?type=commonjs&exports=single ESCurr_SearchDoc!currSearchDoc',
+            // ESCurr_SearchDoc: 'exports-loader?type=commonjs&exports=single ESCurr_SearchDoc!currSearchDoc',
             
             AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
             NUMBERS_AUDIOKEYS: 'exports-loader?type=commonjs&exports=single NUMBERS_AUDIOKEYS!numbersAudiokeys',
