@@ -13,6 +13,7 @@ const servicesDir = 'scripts/src/app/services';
 const apiDir = 'scripts/src/api';
 const dataDir = 'scripts/src/data';
 const modelDir = 'scripts/src/model';
+const curriculumDir = '../curriculum';
 
 module.exports = {
     entry: {
@@ -134,10 +135,13 @@ module.exports = {
             // Data
             messages: path.resolve(__dirname,`${dataDir}/messages.js`),
             apiDoc: path.resolve(__dirname,`${dataDir}/api_doc.js`),
-            currToC: path.resolve(__dirname,`${dataDir}/curr_toc.js`),
-            currPages: path.resolve(__dirname,`${dataDir}/curr_pages.js`),
             numSlides: path.resolve(__dirname,`${dataDir}/num_slides.js`),
-            currSearchDoc: path.resolve(__dirname,`${dataDir}/curr_searchdoc.js`),
+            
+
+            // Curriculum Data
+            currToC: path.resolve(__dirname,`${curriculumDir}/curr_toc.js`),
+            currPages: path.resolve(__dirname,`${curriculumDir}/curr_pages.js`),
+            currSearchDoc: path.resolve(__dirname,`${curriculumDir}/curr_searchdoc.js`),
 
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
