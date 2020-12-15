@@ -1,4 +1,4 @@
-﻿import { CAI_TREE_NODES, CAI_TREES } from 'caiTree';
+﻿import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS} from 'caiTree';
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
@@ -120,7 +120,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     function explainError() {
 
-        return errors[String(currentError[0]).split(':')[0]];
+        return CAI_ERRORS[String(currentError[0]).split(':')[0]];
     }
 
 

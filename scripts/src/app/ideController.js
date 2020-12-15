@@ -639,7 +639,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             // auto-opens the user console if there is an error and if the console is currently closed
             $rootScope.$broadcast('openConsoleOnCodeCompileError');
-
+            $rootScope.$broadcast("compileError", [err]);
             if (collaboration.active && collaboration.tutoring) {
                 collaboration.sendCompilationRecord(errType);
             }
