@@ -68,27 +68,26 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         var recs = {};
         for (var idx = 0; idx < inputSamples.length; idx++) {
             var audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx]);
-            if (audioNumber === undefined) {
-                break;
-            }
-            var audioRec = AUDIOKEYS_RECOMMENDATIONS[String(audioNumber)];
-            for (var num in audioRec) {
-                if (!audioRec.hasOwnProperty(num)) {
-                    throw new Error('Error enumerating the recommendation audioKeys');
+            if (audioNumber !== undefined) {
+                var audioRec = AUDIOKEYS_RECOMMENDATIONS[String(audioNumber)];
+                for (var num in audioRec) {
+                    if (!audioRec.hasOwnProperty(num)) {
+                        throw new Error('Error enumerating the recommendation audioKeys');
+                    }
+                    var value = audioRec[num];
+                    var valA = value[0];
+                    var valB = value[1];
+                    var valC = value[2];
+
+                    var full_val = valA + coUsage * valB + similarity * valC;
+
+                    var key = NUMBERS_AUDIOKEYS[num];
+
+                    if (Object.keys(recs).includes(key))
+                        recs[key] = (full_val + recs[key]) / 1.41;
+                    else
+                        recs[key] = full_val;
                 }
-                var value = audioRec[num];
-                var valA = value[0];
-                var valB = value[1];
-                var valC = value[2];
-
-                var full_val = valA + coUsage * valB + similarity * valC;
-
-                var key = NUMBERS_AUDIOKEYS[num];
-
-                if (Object.keys(recs).includes(key))
-                    recs[key] = (full_val + recs[key]) / 1.41;
-                else
-                    recs[key] = full_val;
             }
         }
 
