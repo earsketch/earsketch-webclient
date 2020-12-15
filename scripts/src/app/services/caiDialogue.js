@@ -394,7 +394,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
                     var file = musicResults.RECOMMENDATIONS[measureIndex][recIndex];
 
-                    if (file != "undefined" && !utterance.includes(file)) {
+
+                    if (file != null && file != "undefined" && !utterance.includes(file)) {
                         newRecString = file + " in the section between measures " + bounds[0] + " and " + bounds[1];
                     }
                 }
