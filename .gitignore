@@ -6,6 +6,8 @@ node_modules/*
 npm-debug.log
 karma_html/
 earsketch.min.js*
+dist/
+index.html
 
 # EarSketchWS
 EarSketchWS/build
