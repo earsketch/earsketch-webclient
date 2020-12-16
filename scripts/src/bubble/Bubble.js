@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import PropTypes from 'prop-types';
 import { hot } from 'react-hot-loader/root';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { react2angular } from 'react2angular';
@@ -49,7 +48,7 @@ const MessageFooter = () => {
     } else if (currentPage === 9) {
         buttons = (
             <Fragment>
-                <div className='w-40'></div>
+                <div className='w-40' />
                 <NavButton name='Close' tag='dismiss' primary/>
             </Fragment>
         );
@@ -68,7 +67,12 @@ const MessageFooter = () => {
                 { currentPage===0 && (
                     <div>
                         <div className='text-sm'>Default programming language</div>
-                        <select className='border-0 border-b-2 border-black outline-none' name="lang" id="lang" onChange={e => dispatch(setLanguage(e.currentTarget.value))}>
+                        <select
+                            className='border-0 border-b-2 border-black outline-none'
+                            name="lang"
+                            id="lang"
+                            onChange={e => dispatch(setLanguage(e.currentTarget.value))}
+                        >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>
                         </select>
@@ -86,8 +90,11 @@ const DismissButton = () => {
     const dispatch = useDispatch();
 
     return (
-        <div className='absolute top-0 right-0 m-4 text-3xl cursor-pointer' onClick={() => dispatch(dismissBubble())}>
-            <span className="icon icon-cross2"></span>
+        <div
+            className='absolute top-0 right-0 m-4 text-3xl cursor-pointer'
+            onClick={() => dispatch(dismissBubble())}
+        >
+            <span className="icon icon-cross2" />
         </div>
     );
 };
@@ -179,9 +186,11 @@ const MessageBox = () => {
     }, [currentPage]);
 
     return (
-        <div className={`absolute z-40 w-1/3 h-1/6 bg-white p-8`}
-             ref={setPopperElement} style={pages[currentPage].ref===null?{}:styles.popper}
-             { ...attributes.popper }
+        <div
+            className={`absolute z-40 w-1/3 h-1/6 bg-white p-8`}
+            ref={setPopperElement}
+            style={pages[currentPage].ref===null?{}:styles.popper}
+            { ...attributes.popper }
         >
             { [0,9].includes(currentPage) && <DismissButton /> }
             <div className='text-3xl font-black mb-4'>
@@ -195,7 +204,11 @@ const MessageBox = () => {
                 { parse(pages[currentPage].body) }
             </div>
             <MessageFooter />
-            <div className='w-0 h-0' ref={setArrowElement} style={pages[currentPage].ref===null ? {} : arrowStyle} />
+            <div
+                className='w-0 h-0'
+                ref={setArrowElement}
+                style={pages[currentPage].ref===null ? {} : arrowStyle}
+            />
         </div>
     );
 };

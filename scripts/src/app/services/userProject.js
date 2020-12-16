@@ -257,9 +257,6 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             esconsole(ESMessages.user.scriptsuccess, ['DEBUG', 'USER']);
 
-            // load scripts in shared browser
-            getSharedScripts(username, password);
-
             var storedScripts;
 
             if (result.data === null) {
@@ -339,7 +336,8 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 localStorage.remove(LS_TABS_KEY);
             }
 
-            return storedScripts;
+            // load scripts in shared browser
+            return getSharedScripts(username, password);
 
         }, function(err) {
             esconsole('Login failure', ['DEBUG','ERROR']);
@@ -565,18 +563,10 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                  sharedScripts[script.shareid] = script;
              }
 
-             refreshLoadedSharedScript();
-
              sharedScriptsReady = true;
              return r;
          });
      }
-
-    function refreshLoadedSharedScript() {
-        if (tabs.sharedScriptLoaded) {
-            tabs.loadedSharedScript = sharedScripts[tabs.loadedSharedScript.shareid];
-        }
-    }
 
      /**
      * Get shared id for locked version of latest script.
@@ -1427,6 +1417,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             // User is not logged in, update local storage
             scripts[scriptid].name = newName;
             localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+            return Promise.resolve(null);
         }
     }
 

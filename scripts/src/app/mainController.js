@@ -1,17 +1,30 @@
-import * as bubbleState from '../bubble/bubbleState';
+import * as appState from '../app/appState';
+import * as user from '../user/userState';
+import * as scripts from '../browser/scriptsState';
+import * as sounds from '../browser/soundsState';
+import * as recommenderState from '../browser/recommenderState';
+import * as bubble from '../bubble/bubbleState';
+import * as tabs from '../editor/tabState';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'layout', 'collaboration','tabs', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, layout, collaboration, tabs, $document, audioContext, audioLibrary, timesync, $ngRedux) {
+app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'layout', 'collaboration', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, layout, collaboration, $document, audioContext, audioLibrary, timesync, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
 
+    $ngRedux.dispatch(sounds.getDefaultSounds());
+    if (FLAGS.SHOW_FEATURED_SOUNDS) {
+        $ngRedux.dispatch(sounds.setFeaturedSoundVisibility(true));
+    }
+    if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
+        $ngRedux.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS));
+    }
+
     $scope.loggedIn = false;
     $scope.showIDE = true;
     $scope.showAll = false;
-    $scope.soundsLoaded = false;
     $scope.colorTheme = localStorage.get('colorTheme', 'dark');
     $scope.hljsTheme = 'monokai-sublime';
     $scope.selectedFont = 14;
@@ -26,11 +39,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     // TEMPORARY FOR GM TESTING
     $scope.showGM = FLAGS.SHOW_GM;
 
-    if ($scope.showAmazon == true) {
+    if ($scope.showAmazon) {
         $rootScope.$broadcast('showAmazon');
     }
 
-    if ($scope.showAmazonSounds == true) {
+    if ($scope.showAmazonSounds) {
         $rootScope.$broadcast('showAmazonSounds');
     }
 
@@ -49,12 +62,12 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     esconsole.getURLParameters();
 
-    // ask all scopes that need to to get the list of sounds now
-    $rootScope.$broadcast('refreshSounds');
-
     var trustedHtml = {};
 
     $scope.isEmbedded = $location.search()["embedded"] === "true";
+    $scope.embeddedScriptName = '';
+
+    $scope.activeTabID = null;
 
     /**
      * get trusted HTML content for Popover
@@ -241,6 +254,27 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         return userProject.getUserInfo($scope.username, $scope.password).then(function (userInfo) {
             // userInfo !== undefined if user exists.
             if (userInfo) {
+                $ngRedux.dispatch(user.login({
+                    username: $scope.username,
+                    password: $scope.password
+                }));
+
+                $ngRedux.dispatch(sounds.getUserSounds($scope.username));
+                $ngRedux.dispatch(sounds.getFavorites({
+                    username: $scope.username,
+                    password: $scope.password
+                }));
+
+                // $ngRedux.dispatch(scripts.getRegularScripts({
+                //     username: $scope.username,
+                //     password: $scope.password
+                // }));
+                //
+                // $ngRedux.dispatch(scripts.getSharedScripts({
+                //     username: $scope.username,
+                //     password: $scope.password
+                // }));
+
                 // Always override with the returned username in case the letter cases mismatch.
                 $scope.username = userInfo.username;
 
@@ -273,6 +307,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                     // load user scripts
                     $scope.scripts = result;
 
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
+
                     var url = $location.absUrl();
                     var competitionMode = url.includes('competition');
                     if (competitionMode) {
@@ -302,22 +338,30 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
                         $scope.loggedInUserName = $scope.username;
                         $rootScope.$broadcast('scriptsLoaded');
+                        $rootScope.$broadcast('swapTabAfterIDEinit');
                     }
 
-                    // load Sounds
-                    $rootScope.$broadcast('refreshSounds');
-                    colorTheme.load();
+                    const theme = colorTheme.load();
+                    $ngRedux.dispatch(appState.setColorTheme(theme));
                 });
             } else {
-                // login failure -- clear username/password
-                // $scope.username = '';
-                // $scope.password = '';
-                userNotification.show(ESMessages.general.loginfailure, 'failure1',  3.5);
+
             }
+        }).catch(error => {
+            userNotification.show(ESMessages.general.loginfailure, 'failure1',  3.5);
+            esconsole(error, ['main','login']);
         });
     };
 
     $scope.logout = function () {
+        $ngRedux.dispatch(user.logout());
+        $ngRedux.dispatch(sounds.resetUserSounds());
+        $ngRedux.dispatch(sounds.resetFavorites());
+        $ngRedux.dispatch(sounds.resetAllFilters());
+
+        // $ngRedux.dispatch(scripts.resetRegularScripts());
+        // $ngRedux.dispatch(scripts.resetSharedScripts());
+
         // save all unsaved open scripts
         var promises = userProject.saveAll();
 
@@ -326,35 +370,31 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                 userNotification.show(ESMessages.user.allscriptscloud);
             }
 
-            if (tabs.activeTabIndex > -1) {
-                if (tabs.activeTabScript && tabs.activeTabScript.collaborative){
-                    collaboration.leaveSession(tabs.activeTabScript.shareid);
+            const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+            if (activeTabID) {
+                const allScriptEntities = scripts.selectAllScriptEntities($ngRedux.getState());
+                if (allScriptEntities[activeTabID].collaborative) {
+                    collaboration.leaveSession(activeTabID);
                 }
             }
 
             // once all scripts have been saved, clear scripts
             $scope.scripts = [];
 
-            // tabs.closeAll();
-            tabs.unloadSharedScript();
             userProject.clearUser();
             userNotification.clearHistory();
             $scope.notificationList = [];
             reporter.logout();
+
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
         }).catch(function (err) {
             $confirm({text: ESMessages.idecontroller.saveallfailed,
                 cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
                 $scope.scripts = [];
-                tabs.unloadSharedScript();
                 userProject.clearUser();
             });
         });
 
-        // unload user specific sounds
-        $rootScope.$broadcast('unloadUserSounds');
-
-        // 
-        
         // clear out all the values set at login
         $scope.username = '';
         $scope.password = '';
@@ -433,7 +473,14 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             }
         });
     } else {
-        $ngRedux.dispatch(bubbleState.resume());
+        const theme = colorTheme.load();
+        $ngRedux.dispatch(appState.setColorTheme(theme));
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
+
+        // Show bubble tutorial when not opening a share link.
+        if (!$location.search()['sharing']) {
+            $ngRedux.dispatch(bubble.resume());
+        }
     }
 
 
@@ -495,19 +542,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             angular.element('.license').removeClass('combined-view');
         }
     };
-
-    $rootScope.$on('soundsLoaded', function () {
-        $scope.soundsLoaded = true;
-        userNotification.isInLoadingScreen = false;
-        colorTheme.load();
-        // $scope.setColorTheme(localStorage.get('colorTheme'));
-
-        // fetch broadcast message (pinned notifications) from admins
-
-
-
-
-    });
 
     $scope.showNotification = false;
     $scope.notificationList = userNotification.history;
@@ -575,7 +609,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $scope.openSharedScript = function (shareid) {
         esconsole('opening a shared script: ' + shareid, 'main');
-        angular.element('[ng-controller=ideController]').scope().openShare(shareid);
+        angular.element('[ng-controller=ideController]').scope().openShare(shareid).then(() => {
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
+        });
         $scope.showNotification = false;
         $scope.showNotificationHistory = false;
     };
@@ -600,19 +636,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
      * @param fontSize {number}
      */
     $scope.$on('initFontSize', function (event, val) {
-        
-            $scope.selectedFont = val;
-        
+        $scope.selectedFont = val;
     });
 
     $scope.setFontSize = function (fontSize) {
         esconsole('resizing global font size to ' + fontSize, 'debug');
-        
-        
-            $scope.selectedFont = fontSize;
-            $rootScope.$broadcast('fontSizeChanged', fontSize);
-    
-        
+        $scope.selectedFont = fontSize;
+        $rootScope.$broadcast('fontSizeChanged', fontSize);
     };
 
     $scope.enterKeySubmit = function (event) {
@@ -633,7 +663,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.toggleColorTheme = function () {
-        colorTheme.toggle();
+        const theme = colorTheme.toggle();
+        $ngRedux.dispatch(appState.setColorTheme(theme));
         reporter.toggleColorTheme();
     };
 
@@ -723,10 +754,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         return layout.get('chat') && collaboration.scriptID === script.shareid;
     };
 
-    $scope.activeTabIsCollaborative = function () {
-        return tabs.activeTabScript && tabs.activeTabScript.collaborative;
-    };
-
     $scope.openFacebook = function () {
         window.open('https://www.facebook.com/EarSketch/', '_blank');
     };
@@ -736,9 +763,204 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.resumeQuickTour = () => {
-        $ngRedux.dispatch(bubbleState.reset());
-        $ngRedux.dispatch(bubbleState.resume());
+        $ngRedux.dispatch(bubble.reset());
+        $ngRedux.dispatch(bubble.resume());
     };
+
+    $scope.renameSound = sound => {
+        $uibModal.open({
+            templateUrl: 'templates/rename-sound.html',
+            controller: 'renameSoundController',
+            size: 'sm',
+            resolve: {
+                sound() { return sound; }
+            }
+        });
+    };
+
+    $scope.deleteSound = sound => {
+        $confirm({text: "Do you really want to delete sound " + sound.file_key + "?",
+            ok: "Delete"}).then(() => {
+            userProject.deleteAudio(sound.file_key).then(() => {
+                $ngRedux.dispatch(sounds.deleteLocalUserSound(sound.file_key));
+                audioLibrary.clearAudioTagCache();
+            });
+        });
+    };
+
+    $scope.licenses = {};
+    userProject.getLicenses().then(licenses => {
+        angular.forEach(licenses,  license => {
+            $scope.licenses[license.id] = license;
+        });
+    });
+
+    $scope.copyScript = script => {
+        userProject.saveScript(script.name, script.source_code, false)
+            .then(() => {
+                userNotification.show(ESMessages.user.scriptcopied);
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+            });
+    };
+
+    $scope.shareScript = script => {
+        $uibModal.open({
+            templateUrl: 'templates/share-script.html',
+            controller: 'shareScriptController',
+            size: 'lg',
+            resolve: {
+                script() { return script; },
+                quality() { return $scope.audioQuality; },
+                licenses() { return $scope.licenses; }
+            }
+        });
+    };
+
+    $scope.renameScript = script => {
+        // userProject, etc. will try to mutate the immutable redux script  state.
+        const scriptCopy = Object.assign({}, script);
+
+        const modal = $uibModal.open({
+            templateUrl: 'templates/rename-script.html',
+            controller: 'renameController',
+            size: 100,
+            resolve: {
+                script() { return scriptCopy; }
+            }
+        });
+
+        modal.result.then(async newScript => {
+            await userProject.renameScript(scriptCopy.shareid, newScript.name);
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
+            reporter.renameScript();
+        });
+    };
+
+    $scope.downloadScript = script => {
+        $uibModal.open({
+            templateUrl: 'templates/download.html',
+            controller: 'downloadController',
+            resolve: {
+                script() { return script; },
+                quality() { return $scope.audioQuality; }
+            }
+        });
+    };
+
+    $scope.printScript = script => {
+        exporter.print(script);
+    }
+
+    $scope.openScriptHistory = (script, allowRevert) => {
+        $uibModal.open({
+            templateUrl: 'templates/script-versions.html',
+            controller: 'scriptVersionController',
+            size: 'lg',
+            resolve: {
+                script() { return script; },
+                allowRevert: allowRevert
+            }
+        });
+        reporter.openHistory();
+    };
+
+    $scope.openCodeIndicator = script => {
+        $uibModal.open({
+            templateUrl: 'templates/script-analysis.html',
+            controller: 'analyzeScriptController',
+            size: 100,
+            resolve: {
+                script() { return script; }
+            }
+        });
+    };
+
+    $scope.deleteScript = script => {
+        $confirm({
+            text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
+            ok: "Delete"
+        }).then(async () => {
+            if (script.shareid === collaboration.scriptID && collaboration.active) {
+                collaboration.closeScript(script.shareid);
+            }
+            await userProject.deleteScript(script.shareid);
+            reporter.deleteScript();
+
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
+        });
+    };
+
+    $scope.deleteSharedScript = script => {
+        if (script.collaborative) {
+            $confirm({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(async () => {
+                if (script.shareid === collaboration.scriptID && collaboration.active) {
+                    collaboration.closeScript(script.shareid, userProject.getUsername());
+                    userProject.closeSharedScript(script.shareid);
+                }
+                await collaboration.leaveCollaboration(script.shareid, userProject.getUsername());
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+            })
+        } else {
+            $confirm({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(async () => {
+                await userProject.deleteSharedScript(script.shareid);
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+            });
+        }
+    };
+
+    $scope.submitToCompetition = script => {
+        $uibModal.open({
+            templateUrl: 'templates/submit-script-aws.html',
+            controller: 'submitAWSController',
+            size: 'lg',
+            resolve: {
+                script() { return script; },
+                quality() { return $scope.audioQuality; },
+                licenses() { return $scope.licenses; }
+            }
+        });
+    };
+
+    $scope.importScript = async script => {
+        const imported = await userProject.importScript(Object.assign({},script));
+        await userProject.refreshCodeBrowser();
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
+
+        const openTabs = tabs.selectOpenTabs($ngRedux.getState());
+        if (openTabs.includes(script.shareid)) {
+            userProject.openScript(imported.shareid);
+            $rootScope.$broadcast('selectScript', script.shareid);
+        }
+    };
+
+    $scope.$on('createScript', () => {
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
+    });
+
+    $scope.$on('recommenderScript', (event, script) => {
+        if (script) {
+            let input = recommender.addRecInput([], script);
+            let res = [];
+            if (input.length === 0) {
+                const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities($ngRedux.getState()));
+                if (filteredScripts.length) {
+                    const lim = Math.min(5, filteredScripts.length);
+
+                    for (let i = 0; i < lim; i++) {
+                        input = recommender.addRecInput(input, filteredScripts[i]);
+                    }
+                }
+            }
+            [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
+                res = recommender.recommend(res, input, ...v);
+            });
+            $ngRedux.dispatch(recommenderState.setRecommendations(res));
+        }
+    });
+
+    $scope.$on('language', (event, language) => {
+        $ngRedux.dispatch(appState.setScriptLanguage(language));
+    })
 
     // for Chrome 66+ web-audio restriction
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=807017
