@@ -30,6 +30,7 @@ persistStore(store);
 
 require('jquery');
 require('jqueryUI');
+window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
 
 import 'angularjs-slider/dist/rzslider.css';
 
