@@ -34,17 +34,13 @@ app.factory('colorTheme', ['localStorage', '$rootScope', 'esconsole', function (
         set: setTheme,
 
         toggle: function () {
-            if (currentTheme === 'dark') {
-                setTheme('light');
-            } else {
-                setTheme('dark');
-            }
-
-            return currentTheme;
+            const newTheme = currentTheme==='dark' ? 'light' : 'dark';
+            return setTheme(newTheme);
         },
         
         load: function () {
-            setTheme(localStorage.get('colorTheme'));
+            const theme = localStorage.get('colorTheme');
+            return setTheme(theme);
         }
     }
 }]);

@@ -1,10 +1,12 @@
+import * as scripts from '../../browser/scriptsState';
+
 /**
  * Manages client-side collaboration session. Single instance.
  *
  * @module collaboration
  * @author Takahiko Tsuchiya
  */
-app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esconsole', 'tabs', 'reporter', '$rootScope', function (userNotification, $uibModal, websocket, esconsole, tabs, reporter, $rootScope) {
+app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esconsole', 'reporter', '$rootScope', '$ngRedux', function (userNotification, $uibModal, websocket, esconsole, reporter, $rootScope, $ngRedux) {
     var self = this;
     this.script = null; // script object: only used for the off-line mode
     this.scriptID = null; // collaboration session identity (both local and remote)
@@ -761,6 +763,8 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     this.onScriptSaved = function (data) {
         if (!userIsCAI(data.sender))
             userNotification.show(data.sender + ' saved the current version of the script.', 'success');
+
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
     };
 
     this.onAlreadySaved = function () {
@@ -1136,7 +1140,7 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         }
     }
 
-    this.onUserAddedToCollaboration = function (data) {
+    this.onUserAddedToCollaboration = async function (data) {
         // userNotification.show(data.sender + ' added you as a collaborator on ' + data.scriptName, 'collaboration');
 
         if (this.active && this.scriptID === data.scriptID) {
@@ -1149,20 +1153,17 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         }
 
         if (this.refreshSharedScriptBrowser) {
-            this.refreshSharedScriptBrowser();
+            await this.refreshSharedScriptBrowser();
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
         }
     };
 
-    this.onUserRemovedFromCollaboration = function (data) {
+    this.onUserRemovedFromCollaboration = async function (data) {
         // userNotification.show(data.sender + ' removed you from collaboration on ' + data.scriptName, 'collaboration');
 
         if (data.removedMembers.indexOf(this.userName) !== -1) {
             if (this.closeSharedScriptIfOpen) {
                 this.closeSharedScriptIfOpen(data.scriptID);
-            }
-
-            if (tabs.sharedScriptLoaded && tabs.loadedSharedScript.shareid === data.scriptID) {
-                tabs.unloadSharedScript();
             }
         } else if (this.active && this.scriptID === data.scriptID) {
             data.removedMembers.forEach(function (member) {
@@ -1171,7 +1172,8 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         }
 
         if (this.refreshSharedScriptBrowser) {
-            this.refreshSharedScriptBrowser();
+            await this.refreshSharedScriptBrowser();
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
         }
     };
 
@@ -1183,11 +1185,13 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         websocket.send(message);
 
         if (this.refreshSharedScriptBrowser) {
-            this.refreshSharedScriptBrowser();
+            return this.refreshSharedScriptBrowser();
+        } else {
+            return Promise.resolve(null);
         }
     };
 
-    this.onUserLeftCollaboration = function (data) {
+    this.onUserLeftCollaboration = async function (data) {
         // userNotification.show(data.sender + ' left the collaboration on ' + data.scriptName, 'collaboration');
 
         if (this.active && this.scriptID === data.scriptID) {
@@ -1200,11 +1204,12 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         }
 
         if (this.refreshScriptBrowser) {
-            this.refreshScriptBrowser();
+            await this.refreshScriptBrowser();
         }
         if (this.refreshSharedScriptBrowser) {
-            this.refreshSharedScriptBrowser();
+            await this.refreshSharedScriptBrowser();
         }
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
     };
 
     this.renameScript = function (scriptID, scriptName, userName) {
@@ -1217,17 +1222,17 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         websocket.send(message);
     };
 
-    this.onScriptRenamed = function (data) {
+    this.onScriptRenamed = async function (data) {
         esconsole(data.sender + ' renamed a collaborative script ' + data.scriptID, 'collab');
         // userNotification.show('Collaborative script "' + data.oldName + '" was renamed to "' + data.newName + '"', 'collaboration');
 
         if (this.refreshSharedScriptBrowser) {
-            this.refreshSharedScriptBrowser().then(function () {
-                if (self.refreshTabStateForSharedScripts) {
-                    // TODO: tab refreshing for collab script is not working right
-                    self.refreshTabStateForSharedScripts();
-                }
-            });
+            await this.refreshSharedScriptBrowser();
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
+
+            if (self.refreshTabStateForSharedScripts) {
+                self.refreshTabStateForSharedScripts();
+            }
         }
     };
 

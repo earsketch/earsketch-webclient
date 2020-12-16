@@ -534,7 +534,7 @@ var ESApiDoc = {
             },
             "effectParameter": {
                 "type": "Effect Parameter Constant",
-                "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='var layout = angular.element(\"[ng-controller=layoutController]\").scope(); layout.toggleLayoutToState(\"curriculum\",\"open\"); layout.loadChapter(\"ch_30.html\");'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+                "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='var layout = angular.element(\"[ng-controller=layoutController]\").scope(); layout.toggleLayoutToState(\"curriculum\",\"open\"); layout.loadChapter(\"ch_28.html\");'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
             },
             "effectList": {
                 "type": "List/array",
@@ -575,7 +575,7 @@ var ESApiDoc = {
 
     "setEffect": [
         {
-            "description": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='var layout = angular.element(\"[ng-controller=layoutController]\").scope(); layout.toggleLayoutToState(\"curriculum\",\"open\"); layout.loadChapter(\"ch_30.html\");'>Every Effect Explained in Detail</a> in the curriculum.",
+            "description": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='var layout = angular.element(\"[ng-controller=layoutController]\").scope(); layout.toggleLayoutToState(\"curriculum\",\"open\"); layout.loadChapter(\"ch_28.html\");'>Every Effect Explained in Detail</a> in the curriculum.",
             "parameters": {
                 "track": {
                     "type": "Integer",
@@ -602,7 +602,7 @@ var ESApiDoc = {
             "autocomplete": "setEffect(track, effectType, effectParameter, effectValue)"
         },
         {
-            "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='var layout = angular.element(\"[ng-controller=layoutController]\").scope(); layout.toggleLayoutToState(\"curriculum\",\"open\"); layout.loadChapter(\"ch_30.html\");'>Every Effect Explained in Detail</a>",
+            "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='var layout = angular.element(\"[ng-controller=layoutController]\").scope(); layout.toggleLayoutToState(\"curriculum\",\"open\"); layout.loadChapter(\"ch_28.html\");'>Every Effect Explained in Detail</a>",
             "parameters": {
                 "track": {
                     "type": "Integer",

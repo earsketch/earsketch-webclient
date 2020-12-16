@@ -1,10 +1,11 @@
 import { setReady, dismissBubble } from "../bubble/bubbleState";
+import * as scripts from '../browser/scriptsState';
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', 'tabs', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, caiAnalysisModule, colorTheme, collaboration, tabs, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -201,12 +202,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             if ($scope.editor.ace.curOp && $scope.editor.ace.curOp.command.name) {
                 $scope.$broadcast('markCurrentTabDirty');
             }
-
-            // TODO: This might solve the ace editor swaptab-related problems. In which case, the above curOp check and onPaste won't be necessary
-            if (!tabs.ignoreOnChange) {
-                $scope.$broadcast('markCurrentTabDirty');
-            }
-            // }
         });
 
         $scope.editor.ace.on('paste', function () {
@@ -222,13 +217,17 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         var shareID = $location.search()['sharing'];
         if (typeof(shareID) !== 'undefined') {
             userProject.shareid = shareID;
-            $scope.openShare(shareID);
+            $scope.openShare(shareID).then(() => {
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+            });
         }
 
         $scope.editor.setReadOnly($scope.isEmbedded);
 
         $rootScope.$broadcast("swapTabAfterIDEinit");
         $rootScope.$broadcast('editorLoaded');
+
+        colorTheme.load();
     };
 
     
@@ -290,13 +289,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                         if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
                         if (result.username !== $scope.username) {
                             // the shared script doesn't belong to the logged-in user
-                            userProject.saveSharedScript(shareid, result.name, result.source_code, result.username).then(function () {
-                                userProject.getSharedScripts($scope.username, $scope.password).then(function () {
+                            $scope.switchToShareMode();
+
+                            return userProject.saveSharedScript(shareid, result.name, result.source_code, result.username).then(function () {
+                                return userProject.getSharedScripts($scope.username, $scope.password).then(function () {
                                     $scope.selectSharedScript(result);
                                 });
                             });
 
-                            $scope.switchToShareMode();
                         } else {
                             // the shared script belongs to the logged-in user
                             // TODO: use broadcast or service
@@ -310,7 +310,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                             // Manually removing the user-owned shared script from the browser.
                             // TODO: Better to have refreshShareBrowser or something.
                             delete userProject.sharedScripts[shareid];
-                            tabs.unloadSharedScript();
                         }
                     }, function (err) {
                         esconsole(err, ['share', 'ide']);
@@ -327,6 +326,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                         $scope.switchToShareMode();
                     }
                 }
+
+                return promise;
             });
         } else {
             // User is not logged in
@@ -347,13 +348,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
     $scope.switchToShareMode = function() {
         $scope.editor.ace.focus();
-
-       $rootScope.$broadcast('switchToShareMode');
+        $ngRedux.dispatch(scripts.setFeatureSharedScript(true));
     };
 
     // listens to the broadcast message sent by mainController on clicking login button
     $rootScope.$on('openShareAfterLogin', function() {
-        $scope.openShare(userProject.shareid);
+        $scope.openShare(userProject.shareid).then(() => {
+            $ngRedux.dispatch(scripts.syncToNgUserProject());
+        });
     });
 
     $scope.openCollabScript = function (scriptID) {
@@ -387,16 +389,17 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             }
         });
 
-        modalInstance.result.then(function (filename) {
+        reporter.createScript();
+
+        return modalInstance.result.then(function (filename) {
             userProject.closeScript(filename);
             return userProject.createScript(filename);
         }, () => {
             esconsole('Modal dismissed.', ['IDE','debug']);
         }).then(function (script) {
             // script saved and opened
-            script && $scope.$broadcast('createScript', script.shareid);
+            script && $rootScope.$broadcast('createScript', script.shareid);
         });
-        reporter.createScript();
     };
 
     //note - select script is used via inheritance in tabController

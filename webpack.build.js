@@ -22,10 +22,7 @@ module.exports = env => {
             // Generate JS files to...
             path: path.resolve(__dirname,'dist/'),
             filename: 'bundle.js',
-            // For testing with localhost, specify the build.js location from the localhost root. E.g.:
-            // $ npm run build-dev -- --env.path=/path/to/dist/
-            // The empty "--" is required for appending arguments. The path may need to be modified.
-            publicPath: env.path ? env.path : 'dist/'
+            publicPath: 'dist/'
         },
         plugins: [
             // Environment variables
