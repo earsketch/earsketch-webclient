@@ -14,7 +14,7 @@ env:
 phases:
   pre_build:
     commands:
-      - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/scripts/earsketch-deployment/scripts"
+      - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
       - export LOCAL_STAGING_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}"
       - export LOCAL_STAGING_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_DIR_NAME"
       - export ES_VERSION="$ES_VERSION_MAJOR.$ES_VERSION_MINOR.$CODEBUILD_BUILD_NUMBER"
@@ -43,6 +43,16 @@ phases:
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
       # - python "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN $CODEBUILD_RESOLVED_SOURCE_VERSION $LOCAL_STAGING_DIR_NAME
+  post_build:
+    commands:
+      - |
+        if [$ES_BUILD_ENVIRONMENT = "production"] 
+        then
+          echo "Tagging production build with version $ES_VERSION"
+          python "$ES_SCRIPT_HOME/github_create_release.py" $GITHUB_USER $GITHUB_TOKEN $CODEBUILD_RESOLVED_SOURCE_VERSION $ES_VERSION
+        else
+          echo "Not applying git tag. Non-production environment: $ES_BUILD_ENVIRONMENT"
+        fi
 artifacts:
   files:
     - '**/*'
