@@ -46,7 +46,7 @@ phases:
   post_build:
     commands:
       - |
-        if [$ES_BUILD_ENVIRONMENT = "production"] 
+        if [ "$ES_BUILD_ENVIRONMENT" = "production" ]; 
         then
           echo "Tagging production build with version $ES_VERSION"
           python "$ES_SCRIPT_HOME/github_create_release.py" $GITHUB_USER $GITHUB_TOKEN $CODEBUILD_RESOLVED_SOURCE_VERSION $ES_VERSION
