@@ -24,7 +24,7 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
             studentCode = source.split("\n");
             return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags);
         } catch (error) {
-            userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
+            //userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
             throw error;
         }
     }
@@ -145,9 +145,6 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
 
         //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
         userFunctionReturns = starterReturns.slice(0);
-
-        var ast = pythonAst(source);
-        replaceNumericUnaryOps(ast.body);
         //initialize the results object
         var resultsObject = {
             userFunc: 0,
@@ -166,6 +163,17 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
             mathematicalOperators: 0,
             consoleInput: 0
         };
+
+        try {
+            var ast = pythonAst(source);
+        }
+        catch (error) {
+            return resultsObject
+        }
+        
+        replaceNumericUnaryOps(ast.body);
+        
+        
         isJavascript = false;
 
         //PASS 0: efficient originality
@@ -10174,9 +10182,32 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
         allConditionals = [];
         variableAssignments = [];
 
-        var ast = acorn.parse(source, {
-            locations: true
-        });
+        //initialize the results object
+        var resultsObject = {
+            userFunc: 0,
+            conditionals: 0,
+            forLoops: 0,
+            lists: 0,
+            strings: 0,
+            ints: 0,
+            floats: 0,
+            booleans: 0,
+            variables: 0,
+            listOps: 0,
+            strOps: 0,
+            boolOps: 0,
+            comparisons: 0,
+            mathematicalOperators: 0,
+            consoleInput: 0
+        };
+        try {
+            var ast = acorn.parse(source, {
+                locations: true
+            });
+        }
+        catch (error) {
+            return resultsObject;
+        }
 
 
         listFuncs = JS_LIST_FUNCS;
@@ -10205,24 +10236,6 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
         userFunctionReturns = starterReturns.slice(0);
         allVariables = [];
 
-        //initialize the results object
-        var resultsObject = {
-            userFunc: 0,
-            conditionals: 0,
-            forLoops: 0,
-            lists: 0,
-            strings: 0,
-            ints: 0,
-            floats: 0,
-            booleans: 0,
-            variables: 0,
-            listOps: 0,
-            strOps: 0,
-            boolOps: 0,
-            comparisons: 0,
-            mathematicalOperators: 0,
-            consoleInput: 0
-        };
 
 
         isJavascript = true;

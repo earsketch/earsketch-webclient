@@ -2,7 +2,7 @@ app.directive('caiwindow', [function () {
 
     return {
         templateUrl: 'templates/cai-window.html',
-        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion) {
+        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', 'caiStudentHistoryModule', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion, caiStudentHistoryModule) {
 
             $scope.activeProject = 'No Project'
 
@@ -93,6 +93,10 @@ app.directive('caiwindow', [function () {
                         $scope.$applyAsync();
                     }
                 }
+
+                setTimeout(() => {
+                    caiStudentHistoryModule.calculateAggregateCodeScore();
+                }, 1000);
             }
 
 
@@ -149,7 +153,7 @@ app.directive('caiwindow', [function () {
                 else {
                     results = complexityCalculator.analyzeJavascript(code);
                 }
-
+                caiStudentHistoryModule.addScoreToAggregate(code, language);
                 codeSuggestion.generateResults(code, language);
 
                 setTimeout(() => {
@@ -238,6 +242,9 @@ app.directive('caiwindow', [function () {
                     $scope.inputTextCAI.label = '';
                     $scope.inputTextCAI.value = '';
 
+                    
+                    
+
                     setTimeout(() => {
                         if (msgText != "") {
                             var messages = [];
@@ -272,7 +279,10 @@ app.directive('caiwindow', [function () {
 
                         $scope.dropupLabel = caiDialogue.getDropup();
                         autoScrollCAI();
+
+                        
                     }, 0);
+
                 }
             };
 
