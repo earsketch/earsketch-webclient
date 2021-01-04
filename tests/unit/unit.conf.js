@@ -5,6 +5,8 @@
  * @author Creston Bunch
  */
 
+const webpackConf = require('../webpack.tests.js');
+
 module.exports = function(config) {
     var sourcePreprocessors = [];
 
@@ -13,40 +15,28 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
 
         files: [
-            {pattern: 'scripts/vendor/bower_components/angular/angular.js', included:true},
-            {pattern: 'scripts/vendor/bower_components/angular-mocks/angular-mocks.js', included:true},
-            {pattern: 'scripts/src/app/app.js', included: true},
-            {pattern: 'scripts/src/data/messages.js', included: true},
-            {pattern: 'scripts/src/model/esutils.js', included: true},
-            {pattern: 'scripts/src/app/services/audiocontext.js', included: true},
-            {pattern: 'scripts/src/app/services/audiolibrary.js', included: true},
-            {pattern: 'scripts/src/app/services/pitchshifter.js', included: true},
-            {pattern: 'scripts/src/app/services/userconsole.js', included: true},
-            {pattern: 'scripts/src/app/services/esconsole.js', included: true},
-            {pattern: 'scripts/src/app/services/compiler.js', included: true},
-            {pattern: 'scripts/src/app/services/renderer.js', included: true},
-            {pattern: 'scripts/src/app/services/reporter.js', included: true},
-            {pattern: 'scripts/src/app/services/reader.js', included: true},
-            {pattern: 'scripts/src/app/services/userNotification.js', included: true},
-            {pattern: 'scripts/src/app/services/localStorage.js', included: true},
-
-            {pattern: 'scripts/src/api/angular-wrappers.js', included: true},
-            {pattern: 'scripts/src/api/passthrough.js', included: true},
-
+            {pattern: 'scripts/lib/earsketch-dsp.js', included: true},
+            {pattern: 'scripts/src/api/earsketch.js.js', included: true},
+            {pattern: 'scripts/src/api/earsketch.py.js', served: true},
+            {pattern: 'tests/setup.js', included: true},
             {pattern: 'tests/unit/hello.js', included:true},
             {pattern: 'tests/unit/*.spec.js', included:true}
         ],
 
         preprocessors: {
-            'index.js': sourcePreprocessors
+            'index.js': sourcePreprocessors,
+            'tests/setup.js': ['webpack']
         },
+
+        webpack: webpackConf,
 
         plugins: [
             'karma-chrome-launcher',
             'karma-safari-launcher',
             'karma-firefox-launcher',
             'karma-jasmine',
-            'karma-html-reporter'
+            'karma-html-reporter',
+            'karma-webpack'
         ],
 
         captureTimeout: 20000,

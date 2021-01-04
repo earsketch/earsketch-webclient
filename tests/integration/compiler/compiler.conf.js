@@ -5,6 +5,8 @@
  * @author Creston Bunch
  */
 
+const webpackConf = require('../../webpack.tests.js');
+
 module.exports = function(config) {
     var sourcePreprocessors = [];
 
@@ -13,60 +15,29 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
 
         files: [
-            {pattern: 'scripts/vendor/angular/angular.min.js', included:true},
-            {pattern: 'scripts/vendor/angular/angular-mocks.js', included:true},
-            {pattern: 'node_modules/ng-midway-tester/src/ngMidwayTester.js', included:true},
-            {pattern: 'scripts/vendor/skulpt/skulpt.min.js', included:true},
-            {pattern: 'scripts/vendor/skulpt/skulpt-stdlib.js', included:true},
-            {pattern: 'scripts/vendor/js-interpreter/acorn.js', included:true},
-            {pattern: 'scripts/vendor/js-interpreter/interpreter.js', included:true},
-            {pattern: 'scripts/src/app/app.js', included: true},
-            {pattern: 'scripts/src/data/messages.js', included: true},
-            {pattern: 'scripts/src/model/esutils.js', included: true},
-            {pattern: 'scripts/lib/dsp.js', included: true},
             {pattern: 'scripts/lib/earsketch-dsp.js', included: true},
-            {pattern: 'scripts/lib/earsketch-appdsp.js', included: true},
-            {pattern: 'scripts/src/model/analysis.js', included: true},
-            {pattern: 'scripts/src/model/applyeffects.js', included: true},
-            {pattern: 'scripts/src/api/angular-wrappers.js', included: true},
-            {pattern: 'scripts/src/api/passthrough.js', included: true},
             {pattern: 'scripts/src/api/earsketch.js.js', included: true},
             {pattern: 'scripts/src/api/earsketch.py.js', served: true},
-            {pattern: 'scripts/src/app/services/audiocontext.js', included: true},
-            {pattern: 'scripts/src/app/services/audiolibrary.js', included: true},
-            {pattern: 'scripts/src/app/services/pitchshifter.js', included: true},
-            {pattern: 'scripts/src/app/services/userconsole.js', included: true},
-            {pattern: 'scripts/src/app/services/esconsole.js', included: true},
-            {pattern: 'scripts/src/app/services/compiler.js', included: true},
-            {pattern: 'scripts/src/app/services/renderer.js', included: true},
-            {pattern: 'scripts/src/app/services/userProject.js', included: true},
-            {pattern: 'scripts/src/app/services/localStorage.js', included: true},
-            {pattern: 'scripts/src/app/services/colorTheme.js', included: true},
-            {pattern: 'scripts/src/app/services/reporter.js', included: true},
-            {pattern: 'scripts/src/app/services/reader.js', included: true},
-            {pattern: 'scripts/src/app/services/autograder.js', included: true},
-            {pattern: 'scripts/src/app/services/userNotification.js', included: true},
-            {pattern: 'scripts/src/app/services/websocket.js', included: true},
-            {pattern: 'scripts/src/app/services/collaboration.js', included: true},
-            {pattern: 'scripts/src/app/services/tabs.js', included: true},
-
-            {pattern: 'tests/integration/settings.js', included:true},
-            {pattern: 'tests/integration/helpers.js', included:true},
-            {pattern: 'tests/integration/compiler/*.spec.js', included:true},
-            {pattern: 'tests/integration/compiler/*.scripts.js', included:true},
-            {pattern: 'tests/integration/compiler/*.results.js', included:true}
+            {pattern: 'tests/setup.js', included: true},
+            {pattern: 'tests/integration/compiler/*.spec.js', included: true},
+            {pattern: 'tests/integration/compiler/*.scripts.js', included: true},
+            {pattern: 'tests/integration/compiler/*.results.js', included: true},
         ],
 
         preprocessors: {
-            'index.js': sourcePreprocessors
+            'index.js': sourcePreprocessors,
+            'tests/setup.js': ['webpack']
         },
+
+        webpack: webpackConf,
 
         plugins: [
             'karma-chrome-launcher',
             'karma-safari-launcher',
             'karma-firefox-launcher',
             'karma-jasmine',
-            'karma-html-reporter'
+            'karma-html-reporter',
+            'karma-webpack'
         ],
 
         captureTimeout: 20000,
