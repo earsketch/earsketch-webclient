@@ -28,6 +28,9 @@ const curriculumSlice = createSlice({
         setCurrentLocation(state, { payload }) {
             state.currentLocation = payload
         },
+        togglePopover(state) {
+            state.popoverIsOpen = !state.popoverIsOpen
+        },
         loadChapter(state, { payload: { href, loc } }) {
             state.currentLocation = loc;
 
@@ -53,6 +56,7 @@ export default curriculumSlice.reducer;
 export const {
     setSearchText,
     setCurrentLocation,
+    togglePopover,
     loadChapter,
 } = curriculumSlice.actions;
 
@@ -63,6 +67,8 @@ export const selectCurrentLocation = state => state.curriculum.currentLocation
 export const selectShowURLButton = state => state.curriculum.showURLButton
 
 export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
+
+export const selectPopoverIsOpen = state => state.curriculum.popoverIsOpen
 
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages

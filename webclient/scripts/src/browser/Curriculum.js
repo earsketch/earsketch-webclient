@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
+
+import { usePopper } from 'react-popper';
+
 import * as curriculum from './curriculumState'
-
-import * as helpers from 'helpers'
-import { selectScriptLanguage } from '../app/appState'
-
-const theme = 'light'
+import * as appState from '../app/appState'
 
 // TODO TEMP
+const theme = 'light'
 const currentSection = 'Table of Contents'
 const toc = ESCurr_TOC
 
@@ -23,8 +23,6 @@ const getChNumberForDisplay = function(unitIdx, chIdx) {
     }
 }
 
-const chNumForDisplay = getChNumberForDisplay(0, 0)
-
 const copyURL = (language, currentLocation) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
     clipboard.copyText(url)
@@ -36,10 +34,10 @@ const TableOfContents = () => {
     return (
         <ul id="toc">
         {Object.entries(toc).map(([unitIdx, unit]) => (
-            <li class="toc-items"  ng-click="toggleFocus($event);">
-                <div class="toc-item">
-                    <span ng-if="focus[0]!==unitIdx" ng-show="unit.chapters.length > 0" class="caret-container"><i class="icon icon-arrow-right"></i></span>
-                    <span ng-if="focus[0]===unitIdx" ng-show="unit.chapters.length > 0" class="caret-container"><i class="icon icon-arrow-down"></i></span>
+            <li key={unitIdx} className="toc-items"  ng-click="toggleFocus($event);">
+                <div className="toc-item">
+                    <span ng-if="focus[0]!==unitIdx" ng-show="unit.chapters.length > 0" className="caret-container"><i className="icon icon-arrow-right"></i></span>
+                    <span ng-if="focus[0]===unitIdx" ng-show="unit.chapters.length > 0" className="caret-container"><i className="icon icon-arrow-down"></i></span>
                     <a href="#" onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
                 </div>
                 <ul>
@@ -47,19 +45,19 @@ const TableOfContents = () => {
                     Object.entries(unit.chapters).map(([chIdx, ch]) => {
                         const chNumForDisplay = getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
                         return (
-                            <li class="toc-chapters" ng-show="focus[0]===unitIdx" ng-repeat="(chIdx, ch) in unit.chapters" ng-init="chNumForDisplay = getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)">
-                                <div class="toc-item">
+                            <li className="toc-chapters" ng-show="focus[0]===unitIdx" ng-repeat="(chIdx, ch) in unit.chapters" ng-init="chNumForDisplay = getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)">
+                                <div className="toc-item">
                                     &emsp;
-                                    <span ng-if="focus[1]!==chIdx" ng-show="ch.sections.length > 0" class="caret-container"><i class="icon icon-arrow-right"></i></span>
-                                    <span ng-if="focus[1]===chIdx" ng-show="ch.sections.length > 0" class="caret-container"><i class="icon icon-arrow-down"></i></span>
-                                    <span ng-show="ch.sections.length == 0" class="empty-caret-container"><i class="icon icon-arrow-right"></i></span>
+                                    <span ng-if="focus[1]!==chIdx" ng-show="ch.sections.length > 0" className="caret-container"><i className="icon icon-arrow-right"></i></span>
+                                    <span ng-if="focus[1]===chIdx" ng-show="ch.sections.length > 0" className="caret-container"><i className="icon icon-arrow-down"></i></span>
+                                    <span ng-show="ch.sections.length == 0" className="empty-caret-container"><i className="icon icon-arrow-right"></i></span>
                                     <a href="#" ng-click="loadChapter(ch.URL, [unitIdx, chIdx]);">
                                         {chNumForDisplay}<span ng-show="chNumForDisplay">. </span>{ch.title}
                                     </a>
                                 </div>
                                 <ul>
-                                    <li class="toc-sections" ng-show="focus[1]===chIdx" ng-repeat="(secIdx, sec) in ch.sections">
-                                        <div class="toc-item">
+                                    <li className="toc-sections" ng-show="focus[1]===chIdx" ng-repeat="(secIdx, sec) in ch.sections">
+                                        <div className="toc-item">
                                             &emsp;&emsp;
                                             <a href="#" ng-click="loadChapter(sec.URL, [unitIdx, chIdx, secIdx]);">
                                                 {chNumForDisplay}<span ng-show="chNumForDisplay">.</span>{secIdx+1} {sec.title}
@@ -78,43 +76,43 @@ const TableOfContents = () => {
 }
 
 const CurriculumHeader = () => {
-    const language = useSelector(selectScriptLanguage)
+    const dispatch = useDispatch()
+    const language = useSelector(appState.selectScriptLanguage)
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const showURLButton = useSelector(curriculum.selectShowURLButton)
+    const showDropdownMenu = useSelector(curriculum.selectPopoverIsOpen)
+    const theme = useSelector(appState.selectColorTheme)
+
+    const [referenceElement, setReferenceElement] = useState(null)
+    const [popperElement, setPopperElement] = useState(null)
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom-end' })
+
     return (
         <div id="curriculum-header">
-            <div class="labels">
+            <div className="labels">
                 <div id="layout-title">
-                    <i class="icon icon-book3"></i><span> Curriculum</span>
+                    <i className="icon icon-book3"></i><span> Curriculum</span>
                 </div>
 
                 <div id="header-buttons">
-                    <span class="btn-toc">
-                        <button uib-popover-template="'tocPopoverTemplate.html'" popover-placement="bottom-right" popover-trigger="outsideClick" popover-is-open="popoverIsOpen" type="button" class="btn btn-xs btn-action">
-                            <i class="icon icon-menu3" title="Show Table of Contents"></i>
+                    <span className="btn-toc">
+                        <button ref={setReferenceElement} onClick={() => { update(); dispatch(curriculum.togglePopover()) }} className="btn btn-xs btn-action">
+                            <i className="icon icon-menu3" title="Show Table of Contents"></i>
                         </button>
                     </span>
 
-                    <span class="btn-fullscreen">
+                    <span className="btn-fullscreen">
                         <button ng-click="toggleMaximization()">
-                            <i class="icon-zoom-in" ng-show="!curriculumMaximized" title="Maximize curriculum"></i>
-                            <i class="icon-zoom-out" ng-show="curriculumMaximized" title="Un-maximize curriculum"></i>
+                            <i className="icon-zoom-in" ng-show="!curriculumMaximized" title="Maximize curriculum"></i>
+                            <i className="icon-zoom-out" ng-show="curriculumMaximized" title="Un-maximize curriculum"></i>
                         </button>
                     </span>
-
-                    {/* slide view: not getting ported
-                    <span class="btn-slides">
-                        <button ng-show="showSlideButton" ng-click="toggleSlides()">
-                            <i class="icon-display2" ng-show="!showSlides" title="Show slides"></i>
-                            <i class="icon-paragraph-center3" ng-show="showSlides" title="Show curriculum"></i>
-                        </button>
-                    </span>*/}
 
                     {/* copy-URL button */}
-                    <span class="btn-copy-url">
+                    <span className="btn-copy-url">
                         {showURLButton &&
                         <button onClick={() => copyURL(language, currentLocation)} uib-popover="Curriculum URL Copied!" popover-placement="bottom" popover-animation="true" popover-trigger="outsideClick">
-                            <i class="icon-share22" title="Copy the chapter URL to clipboard"></i>
+                            <i className="icon-share22" title="Copy the chapter URL to clipboard"></i>
                         </button>}
                     </span>
 
@@ -125,26 +123,14 @@ const CurriculumHeader = () => {
 
             </div>
 
-            {/* note: popover-trigger="outsideClick" to remain open when arrows are clicked; auto-close after loadChapter using the popoverIsOpen value */}
-
-            {/*<script type="text/ng-template" id="tocPopoverTemplate.html">*/}
-            <TableOfContents></TableOfContents>
-            {/*</script>*/}
-
-            {/* Slide stuff, probably won't be ported over:
-
-            <script type="text/ng-template" id="mySlideTemplate.html">
-                <br>
-                <div ng-repeat="url in slides">
-                    <div class="slide-container">
-                        <img ng-src="{{url}}">
-                        <br>
-                    </div>
-                </div>
-            </script>*/}
+            <div ref={setPopperElement}
+                 style={{backgroundColor: "#333333", ...(showDropdownMenu ? styles.popper : { display: 'none' })}}
+                 { ...attributes.popper }
+                 className="border border-black p-5 bg-gray-800 z-50 rounded-lg">
+                <TableOfContents></TableOfContents>
+            </div>
 
             <div style={{clear: "both"}}></div>
-            <div curriculumsearch id="curriculum-search"></div>
         </div>
     )
 }
@@ -159,12 +145,12 @@ const CurriculumPane = () => {
 
             <div id="curriculum-body">
                 <div id="curriculum-atlas">
-                    <div ng-include="templateURL" onload="chapterLoaded()" dangerouslySetInnerHTML={{__html: (content || `Loading... ${currentLocation}`)}}></div>
+                    <div ng-include="templateURL" /*onload="chapterLoaded()"*/ dangerouslySetInnerHTML={{__html: (content || `Loading... ${currentLocation}`)}}></div>
                 </div>
             </div>
 
             <div id="curriculum-footer">
-                <div id="navigator" class="unselectable">
+                <div id="navigator" className="unselectable">
                     <span id="left-button" ng-click="prevPage()" title="Previous Page">&lt;</span>
                     <span id="current-section" title={currentSection} uib-popover-template="'tocPopoverTemplate.html'" popover-placement="top" popover-trigger="outsideClick" popover-append-to-body="true" popover-is-open="popover2IsOpen">{currentSection}</span>
                     <span id="right-button" ng-click="nextPage()" title="Next Page">&gt;</span>
