@@ -67,7 +67,13 @@ app.directive('caiwindow', [function () {
                 $scope.dropupLabel = "Dropup";
             });
 
+            $scope.$on("PageChanged", function (event, data) {
+                caiStudentHistoryModule.addCurriculumPage(data);
+                caiDialogue.accessCurriculum(data);
+            });
+
             $scope.introduceCAI = function () {
+                caiStudentHistoryModule.retrievePagesViewed();
                 var msgText = caiDialogue.generateOutput("Chat with CAI");
                 caiDialogue.studentInteract(false);
                 $scope.inputOptions = caiDialogue.createButtons();

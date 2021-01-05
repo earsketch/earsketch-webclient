@@ -61,6 +61,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     };
 
+    function accessCurriculum(page) {
+        nodeHistory[activeProject].push(["access curriculum", page]);
+    }
+
     function studentInteractedValue() {
         return studentInteracted;
     }
@@ -793,7 +797,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         getNodeHistory: getNodeHistory,
         activeWaits: activeWaits,
         studentInteractedValue: studentInteractedValue,
-        checkForCodeUpdates: checkForCodeUpdates
+        checkForCodeUpdates: checkForCodeUpdates,
+            accessCurriculum: accessCurriculum
     };
 
 }]);

@@ -458,6 +458,8 @@ app.directive('curriculumpane', function () {
                     if (collaboration.active && collaboration.tutoring) {
                         collaboration.sendCurriculumOpenRecord($scope.currentSection);
                     }
+
+                    $rootscope.$broadcast("PageChanged", $scope.currentLocation);
                 };
 
                 function loadPageFromIdx(idx) {
