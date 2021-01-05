@@ -150,7 +150,9 @@ module.exports = {
 
             // CAI
             complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
-            complexityCalculatorHelperFunctions: path.resolve(__dirname,`${servicesDir}/complexityCalculatorHelperFunctions.js`),
+            complexityCalculatorHelperFunctions: path.resolve(__dirname, `${servicesDir}/complexityCalculatorHelperFunctions.js`),
+
+            caiStudentModel: path.resolve(__dirname, `${servicesDir}/caiStudentModel.js`),
             caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
             caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
             caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
@@ -158,7 +160,6 @@ module.exports = {
             recommender: path.resolve(__dirname, `${servicesDir}/recommender.js`),
             caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
             caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
-            caiStudentModel: path.resolve(__dirname, `${servicesDir}/caiStudentModel.js`)
 
         }
     },
