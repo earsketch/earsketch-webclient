@@ -149,7 +149,7 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
 
     //returns array of all curriculum pages viewed
     function retrievePagesViewed() {
-
+        return curriculumPagesViewed;
     }
 
     return {

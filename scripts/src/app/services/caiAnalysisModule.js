@@ -13,7 +13,8 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
   var keyInstrumentDict = {};
   var genreDist = [];
   var soundsLoaded = false;
-  var savedReport = {};
+    var savedReport = {};
+    var savedAnalysis = {};
 
   // Load lists of numbers and keys
   var AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS);
@@ -132,7 +133,8 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
    */
    function analyzeCodeAndMusic(language, script, trackListing) {
     var codeComplexity = analyzeCode(language, script);
-    var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.apiCalls());
+       var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.apiCalls());
+       savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis });
     return Object.assign({}, {'Code':codeComplexity}, {'Music':musicAnalysis});
    }
 
@@ -755,7 +757,8 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
       analyzeMusic: analyzeMusic,
       analyzeCodeAndMusic: analyzeCodeAndMusic,
       soundProfileLookup: soundProfileLookup,
-      getReport: getReport
+      getReport: getReport,
+      savedAnalysis: savedAnalysis
   };
 
 }]);

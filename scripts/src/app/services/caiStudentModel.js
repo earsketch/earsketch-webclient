@@ -6,9 +6,23 @@
  */
 app.factory('caiStudentModel', ['caiStudentHistoryModule', 'caiAnalysisModule', function (caiStudentHistoryModule, caiAnalysisModule) {
 
+    var currentModel = {};
 
     function studentModel() {
-        return {};
+        var codeKnowledge = {};
+        var musicAttributes = {};
+        var studentPreferences = {};
+        currentModel = {};
+
+        codeKnowledge["curriculum"] = caiStudentHistoryModule.retrievePagesViewed().slice(0);
+        codeKnowledge["aggregateComplexity"] = Object.assign({}, caiStudentHistoryModule.aggregateScore);
+        codeKnowledge["currentComplexity"] = Object.assign({}, caiAnalysisModule.savedAnalysis.Code);
+
+        musicAttributes["soundProfile"] = Object.assign({}, caiAnalysisModule.savedAnalysis.Music);
+
+        currentModel = { code: codeKnowledge, music: musicAttributes, preferences: studentPreferences };
+
+        return currentModel;
     }
 
     return {
