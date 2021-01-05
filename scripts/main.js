@@ -159,7 +159,9 @@ require.config({
         complexityCalculator: 'src/app/services/complexityCalculator',
         caiAnalysisModule: 'src/app/services/caiAnalysisModule',
         caiStudentHistoryModule: 'src/app/services/caiStudentHistoryModule',
+        caiStudentPreferenceModule: 'src/app/services/caiStudentPreferenceModule',
         caiStudentModel: 'src/app/services/caiStudentModel',
+
 
         // Recommender system 
         recommender: 'src/app/services/recommender',

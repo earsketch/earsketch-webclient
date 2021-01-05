@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentModel', ['caiStudentHistoryModule', 'caiAnalysisModule', function (caiStudentHistoryModule, caiAnalysisModule) {
+app.factory('caiStudentModel', ['caiStudentHistoryModule', 'caiAnalysisModule', 'caiStudentPreferenceModule', function (caiStudentHistoryModule, caiAnalysisModule, caiStudentPreferenceModule) {
 
     var currentModel = {};
 

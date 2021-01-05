@@ -157,6 +157,7 @@ module.exports = {
             codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
             recommender: path.resolve(__dirname, `${servicesDir}/recommender.js`),
             caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
+            caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
             caiStudentModel: path.resolve(__dirname, `${servicesDir}/caiStudentModel.js`)
 
         }
