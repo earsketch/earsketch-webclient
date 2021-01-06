@@ -253,7 +253,7 @@ module.exports = {
             ESCurr_Pages: 'exports-loader?type=commonjs&exports=single ESCurr_Pages!currPages',
             ESNum_Slides: 'exports-loader?type=commonjs&exports=single ESNum_Slides!numSlides',
             ESCurr_SearchDoc: 'exports-loader?type=commonjs&exports=single ESCurr_SearchDoc!currSearchDoc',
-            
+
             AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
             NUMBERS_AUDIOKEYS: 'exports-loader?type=commonjs&exports=single NUMBERS_AUDIOKEYS!numbersAudiokeys',
             AUDIOKEYS_RECOMMENDATIONS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_RECOMMENDATIONS!audiokeysRecommendations',

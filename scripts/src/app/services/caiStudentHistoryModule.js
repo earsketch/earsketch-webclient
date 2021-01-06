@@ -7,13 +7,10 @@
 app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', function (userProject, complexityCalculator) {
 
     var aggregateScore;
-    var curriculumPagesViewed = [];
 
-    //called once to calculate aggregate score of all of a student's past projects
     function calculateAggregateCodeScore() {
         if (aggregateScore == null) {
-
-            //variable init
+            console.log("Script List Received: ");
             var savedScripts = [];
             var scriptTypes = [];
             var savedNames = [];
@@ -40,7 +37,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
                 };
             }
 
-            //get only the most recent version of each script
             for (var i = 0; i < keys.length; i++) {
                 if (!savedNames.includes(userProject.scripts[keys[i]].name)) {
                     savedNames.push(userProject.scripts[keys[i]].name);
@@ -55,7 +51,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
 
                 var output;
 
-                //calculate complexity, catching errors (code won't run, etc.)
                 try {
                     if (ty == "py") {
                         output = Object.assign({}, complexityCalculator.analyzePython(sc));
@@ -67,8 +62,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
                 catch (error) {
                     output = null;
                 }
-
-                //convert string values to int values
                 if (output != null) {
                     if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
                         output["userFunc"] = 3;
@@ -96,13 +89,10 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
 
     }
 
-    //to call when code is run, to add individual code score to aggregate score
     function addScoreToAggregate(script, scriptType) {
-        //if we haven't calculated an aggregate score yet, do that here
         if (aggregateScore == null) {
             calculateAggregateCodeScore();
         }
-
         var newOutput;
 
         //analyze new code
@@ -154,10 +144,7 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
 
     return {
         addScoreToAggregate: addScoreToAggregate,
-        calculateAggregateCodeScore: calculateAggregateCodeScore,
-        addCurriculumPage: addCurriculumPage,
-        retrievePagesViewed: retrievePagesViewed,
-        aggregateScore: aggregateScore
+        calculateAggregateCodeScore: calculateAggregateCodeScore
     };
 
 }]);

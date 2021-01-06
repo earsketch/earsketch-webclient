@@ -10921,6 +10921,7 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
                 }
             }
         }
+        console.log(levels);
 
         for (var i in levels) {
             for (var j = 0; j < levels[i].length; j++) {
