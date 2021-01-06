@@ -5,7 +5,7 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
  *
  * @author Jason Smith
  */
-app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommender', 'audioLibrary', 'ESUtils', 'caiStudent', function (esconsole, complexityCalculator, recommender, audioLibrary, ESUtils, caiStudent) {
+app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommender', 'audioLibrary', 'ESUtils',  function (esconsole, complexityCalculator, recommender, audioLibrary, ESUtils) {
 
   var librarySounds = [];
   var librarySoundGenres = [];
