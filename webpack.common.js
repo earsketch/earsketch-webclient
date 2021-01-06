@@ -157,9 +157,7 @@ module.exports = {
             caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
             caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
             codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
-            recommender: path.resolve(__dirname, `${servicesDir}/recommender.js`),
-            caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
-            caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
+            recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`)
 
         }
     },

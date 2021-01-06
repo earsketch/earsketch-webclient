@@ -157,13 +157,9 @@ require.config({
 
         // CAI (Co-creative AI) utilities
         complexityCalculator: 'src/app/services/complexityCalculator',
-        caiStudentHistoryModule: 'src/app/services/caiStudentHistoryModule',
-        caiStudentPreferenceModule: 'src/app/services/caiStudentPreferenceModule',
-        caiStudent: 'src/app/services/caiStudent',
         caiAnalysisModule: 'src/app/services/caiAnalysisModule',
 
-
-        // Recommender system 
+        // Recommender system
         recommender: 'src/app/services/recommender',
 
         // Recommendation JSON/js file
