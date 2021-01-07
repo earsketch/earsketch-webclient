@@ -4,9 +4,16 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentPreferenceModule', [ function () {
+app.factory('caiStudentPreferenceModule', [ 'caiStudent', function (caiStudent) {
 
-    
+    var suggestionsAccepted = 0;
+    var suggestionsRejected = 0;
+
+    var codeSuggestionsMade = [];
+    var sampleSuggestionsMade = [];
+
+    var numberOfRuns = 3;
+
 
     return {
     };
