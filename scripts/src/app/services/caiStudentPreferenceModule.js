@@ -60,8 +60,6 @@ app.factory('caiStudentPreferenceModule', [ 'caiStudent', function (caiStudent) 
 
     function addCodeSuggestion(complexityObj) {
         codeSuggestionsMade.push([numberOfRuns, complexityObj]);
-        console.log("PREFERENCE CODE SUGGS: ");
-        console.log(codeSuggestionsMade);
     }
 
     function runCode(complexityOutput) {
@@ -99,8 +97,6 @@ app.factory('caiStudentPreferenceModule', [ 'caiStudent', function (caiStudent) 
         }
 
         codeSuggestionsMade = newArray.slice(0);
-        console.log("PREFERENCE CODE SUGGS: ");
-        console.log(codeSuggestionsMade);
     }
 
     function updateAcceptanceRatio() {
