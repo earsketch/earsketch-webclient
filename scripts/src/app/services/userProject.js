@@ -124,7 +124,9 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 });
             }
 
-            if (saving) return true; // Show warning popover.
+            if (saving) {
+                return true; // Show warning popover.
+            }
         } else {
             if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
                 localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
