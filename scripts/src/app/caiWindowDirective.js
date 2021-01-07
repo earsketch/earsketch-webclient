@@ -2,7 +2,7 @@ app.directive('caiwindow', [function () {
 
     return {
         templateUrl: 'templates/cai-window.html',
-        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion) {
+        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', 'caiStudentHistoryModule', 'caiStudentPreferenceModule', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion, caiStudentHistoryModule, caiStudentPreferenceModule) {
 
             $scope.activeProject = 'No Project'
 
@@ -151,7 +151,7 @@ app.directive('caiwindow', [function () {
                 }
 
                 codeSuggestion.generateResults(code, language);
-
+                caiStudentHistoryModule.addScoreToAggregate(code, language);
                 setTimeout(() => {
                     var output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results);
                     if (output != null && output != "") {
@@ -275,6 +275,10 @@ app.directive('caiwindow', [function () {
                     }, 0);
                 }
             };
+
+            $scope.$on("PageChanged", function(evt, data) {
+                caiStudentHistoryModule.addCurriculumPage(data);
+            });
 
             function onPeriodicCheck() {
                 var message = sendCAIOutputMessage("Looking at your code updates...");

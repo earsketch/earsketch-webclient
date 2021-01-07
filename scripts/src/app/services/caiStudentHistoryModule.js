@@ -4,9 +4,10 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', function (userProject, complexityCalculator) {
+app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', 'caiStudent', function (userProject, complexityCalculator, caiStudent) {
 
     var aggregateScore;
+    var curriculumPagesViewed;
 
     function calculateAggregateCodeScore() {
         if (aggregateScore == null) {
@@ -125,15 +126,19 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
             }
         }
 
-
+        caiStudent.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput})
 
     }
 
     //called when the student accesses a curriculum page from broadcast listener in caiWindowDirective
     function addCurriculumPage(page) {
+        if (curriculumPagesViewed == null) {
+            curriculumPagesViewed = [];
+        }
         if (!curriculumPagesViewed.includes(page)) {
             curriculumPagesViewed.push(page);
             console.log(curriculumPagesViewed);
+            caiStudent.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed})
         }
     }
 
@@ -144,7 +149,8 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', f
 
     return {
         addScoreToAggregate: addScoreToAggregate,
-        calculateAggregateCodeScore: calculateAggregateCodeScore
+        calculateAggregateCodeScore: calculateAggregateCodeScore,
+        addCurriculumPage: addCurriculumPage
     };
 
 }]);

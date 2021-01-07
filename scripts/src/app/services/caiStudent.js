@@ -19,10 +19,10 @@ app.factory('caiStudent', [function () {
                 studentModel.codeKnowledge["curriculum"] = value.curriculum;
             }
             if (value.aggregateComplexity != null) {
-                studentModel.aggregateComplexity["curriculum"] = value.aggregateComplexity;
+                studentModel.codeKnowledge["aggregateComplexity"] = value.aggregateComplexity;
             }
             if (value.currentComplexity != null) {
-                studentModel.currentComplexity["curriculum"] = value.currentComplexity;
+                studentModel.codeKnowledge["currentComplexity"] = value.currentComplexity;
             }
         }
 

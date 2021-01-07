@@ -156,6 +156,10 @@ require.config({
         analytics: 'src/app/services/reporter',
 
         // CAI (Co-creative AI) utilities
+
+        caiStudent: 'src/app/services/caiStudent',
+        caiStudentPreferenceModule: 'src/app/services/caiStudentPreferenceModule',
+        caiStudentHistoryModule: 'src/app/services/caiStudentHistoryModule',
         complexityCalculator: 'src/app/services/complexityCalculator',
         caiAnalysisModule: 'src/app/services/caiAnalysisModule',
 

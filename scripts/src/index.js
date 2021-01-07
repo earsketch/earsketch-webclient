@@ -171,8 +171,11 @@ require(['angular'], () => {
 
     // CAI
     require('caiWindowDirective');
+    require('caiStudent');
     require('autograder');
     require('caiAnalysisModule');
+    require('caiStudentPreferenceModule');
+    require('caiStudentHistoryModule');
     require('complexityCalculator');
     require('complexityCalculatorHelperFunctions');
     require('caiDialogue');
