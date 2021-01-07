@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudent', function () {
+app.factory('caiStudent', [function () {
 
     var studentModel = {};
 
@@ -41,4 +41,4 @@ app.factory('caiStudent', function () {
         updateModel: updateModel
     };
 
-});
+}]);
