@@ -80,8 +80,7 @@ const CurriculumHeader = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const showURLButton = useSelector(curriculum.selectShowURLButton)
-    const showDropdownMenu = useSelector(curriculum.selectPopoverIsOpen)
-    const theme = useSelector(appState.selectColorTheme)
+    const showPopover = useSelector(curriculum.selectPopoverIsOpen)
 
     const [referenceElement, setReferenceElement] = useState(null)
     const [popperElement, setPopperElement] = useState(null)
@@ -124,17 +123,41 @@ const CurriculumHeader = () => {
             </div>
 
             <div ref={setPopperElement}
-                 style={{backgroundColor: "#333333", ...(showDropdownMenu ? styles.popper : { display: 'none' })}}
+                 style={{backgroundColor: "#333333", ...(showPopover ? styles.popper : { display: 'none' })}}
                  { ...attributes.popper }
-                 className="border border-black p-5 bg-gray-800 z-50 rounded-lg">
+                 className="border border-black p-5 z-50 rounded-lg">
                 <TableOfContents></TableOfContents>
             </div>
 
             <div style={{clear: "both"}}></div>
+            <CurriculumSearch></CurriculumSearch>
         </div>
     )
 }
 
+// TODO: use the common component instead
+const CurriculumSearch = () => {
+    return (
+        <div>
+            <div className="input-group" style={{width: "100%", paddingLeft: "18px"}}>
+                <form>
+                    <i className="icon icon-search browser-icon-search"></i>
+                    <input type="search" name="Search" placeholder="Search" className="search-bar ng-pristine ng-untouched ng-valid" style={{height: "2em"}} ng-model="query" ng-click="recallResults()" />
+                </form>
+                <button id="search-clear" className="btn btn-xs btn-primary" style={{position: "absolute", right: "-10px", top: "2px", width: "27px"}} ng-click="query=''">X</button>
+            </div>
+            <div className="curriculum-search-results">
+                <div ng-repeat="result in results">
+                    <a href="#" ng-click="loadChapter(result.id); closeSearchResults();">
+                        <div className="search-item">
+                            <span>TODO</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const CurriculumPane = () => {
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
@@ -149,14 +172,35 @@ const CurriculumPane = () => {
                 </div>
             </div>
 
+            <CurriculumFooter></CurriculumFooter>
+        </div>
+    )
+}
+
+const CurriculumFooter = () => {
+    const dispatch = useDispatch()
+    const showPopover = useSelector(curriculum.selectPopover2IsOpen)
+
+    const [referenceElement, setReferenceElement] = useState(null)
+    const [popperElement, setPopperElement] = useState(null)
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'top' })
+
+    return (
+        <>
             <div id="curriculum-footer">
                 <div id="navigator" className="unselectable">
                     <span id="left-button" ng-click="prevPage()" title="Previous Page">&lt;</span>
-                    <span id="current-section" title={currentSection} uib-popover-template="'tocPopoverTemplate.html'" popover-placement="top" popover-trigger="outsideClick" popover-append-to-body="true" popover-is-open="popover2IsOpen">{currentSection}</span>
+                    <span ref={setReferenceElement} id="current-section" title={currentSection} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{currentSection}</span>
                     <span id="right-button" ng-click="nextPage()" title="Next Page">&gt;</span>
                 </div>
             </div>
-        </div>
+            <div ref={setPopperElement}
+                 style={{backgroundColor: "#fff", ...(showPopover ? styles.popper : { display: 'none' })}}
+                 { ...attributes.popper }
+                 className="border border-black p-5 z-50 rounded-lg">
+                <TableOfContents></TableOfContents>
+            </div>
+        </>
     )
 }
 
