@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', function (codeSuggestion, caiErrorHandling, recommender, userProject) {
+app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};
@@ -130,6 +130,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         caiErrorHandling.updateNames(variables, functions);
         //resultsObj, lineDict, musicAnalysis
         studentCodeObj = studentCode;
+
+        var allSamples = recommender.addRecInput([], { source_code: studentCodeObj });
+        caiStudentPreferenceModule.runSound(allSamples);
 
         if (complexityResults != null) {
             currentComplexity = Object.assign({}, complexityResults);
@@ -418,6 +421,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 utterance = utterance.substring(0, addSoundsIndex) + newString;
             }
             parameters.push(["sound_rec", recs])
+            caiStudentPreferenceModule.addSoundSuggestion(recs);
 
         }
         while (utterance.includes("[SECTION]")) {

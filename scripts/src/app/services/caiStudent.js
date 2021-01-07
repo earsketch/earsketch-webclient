@@ -36,10 +36,10 @@ app.factory('caiStudent', [function () {
 
         if (property == "preferences") {
             if (studentModel.preferences == null) {
-                studentModel.preferences = {};
+                studentModel["preferences"] = {};
             }
             if (value.acceptanceRatio != null) {
-                studentModel.preferences[acceptanceRatio] = value.acceptanceRatio;
+                studentModel.preferences['acceptanceRatio'] = value.acceptanceRatio;
             }
         }
 
