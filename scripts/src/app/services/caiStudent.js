@@ -32,6 +32,17 @@ app.factory('caiStudent', [function () {
             }
             studentModel.musicAttributes["soundProfile"] = value;
         }
+
+
+        if (property == "preferences") {
+            if (studentModel.preferences == null) {
+                studentModel.preferences = {};
+            }
+            if (value.acceptanceRatio != null) {
+                studentModel.preferences[acceptanceRatio] = value.acceptanceRatio;
+            }
+        }
+
         console.log(studentModel);
 
     }
