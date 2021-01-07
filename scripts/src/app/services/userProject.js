@@ -1,3 +1,5 @@
+import xml2js from 'xml2js';
+
 app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', 'tabs', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, tabs) {
     var self = {};
 
@@ -52,56 +54,55 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         }
     }
 
-    // automatically save all scripts when the page is closed
-    // NOTE: this uses jQuery and SYNCHRONOUS AJAX which is deprecated
-    // There is a new thing: navigator.sendBeacon() which is still unsupported
-    // by IE and Safari. We should switch to it as soon as support for it is
-    // more widespread.
-    $window.onunload = function() {
-        if (isLogged()) {
-            var username = getUsername();
-            var password = getPassword();
-            var url = WSURLDOMAIN + '/services/scripts/save';
-            url += '?username='+username+'&password='+encodeURIComponent(btoa(password));
-            if (password !== null) {
-                for (var i in openScripts) {
-                    var shareid = openScripts[i];
-                    if (shareid in scripts && !scripts[shareid].saved) {
-                        var sourcecode = scripts[shareid].source_code;
-                        var name = scripts[shareid].name;
-                        var content = '<scripts><username>' + getUsername() + '</username>'
-                        + '<name>' + name + '</name>'
-                        + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
-                        $.ajax(url, {
-                            method: 'POST',
-                            async: false,
-                            contentType: 'application/xml;charset=UTF-8',
-                            data: content
-                        });
-                    }
-                }
-            }
-        } else {
-            if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-                localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
-            }
-        }
-    };
-
     // websocket gets closed before onunload in FF
-    $window.onbeforeunload = function () {
+    $window.onbeforeunload = function (e) {
         if (isLogged()) {
-            var userName = getUsername();
+            let saving = false;
+            const username = getUsername();
+            const password = getPassword();
+            const saveScriptURL = URL_DOMAIN + '/services/scripts/save'
+                +'?username='+username+'&password='+encodeURIComponent(btoa(password));
 
             openScripts.forEach(function (shareID) {
                 if (scripts[shareID] && scripts[shareID].collaborative) {
-                    collaboration.leaveSession(shareID, userName);
+                    collaboration.leaveSession(shareID, username);
+                }
+
+                if (scripts[shareID] && !scripts[shareID].saved) {
+                    saving = true;
+                    const sourcecode = scripts[shareID].source_code;
+                    const name = scripts[shareID].name;
+                    const body = '<scripts><username>' + getUsername() + '</username>'
+                        + '<name>' + name + '</name>'
+                        + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
+
+                    // const headers = { type: 'application/xml;charset=UTF-8' };
+                    // const blob = new Blob([JSON.stringify(body)], headers);
+                    // const res = navigator.sendBeacon(saveScriptURL, blob);
+
+                    fetch(saveScriptURL, {
+                        method: 'POST',
+                        headers: new Headers({ 'Content-Type': 'application/xml' }),
+                        body
+                    })
+                        .then(response => response.text())
+                        .then(xml => xml2js.parseStringPromise(xml, { explicitArray: false }))
+                        .then(data => {
+                            const script = data.scripts;
+                            script.modified = Date.now();
+                            script.saved = true;
+                            script.tooltipText = '';
+                            postProcessCollaborators(script);
+                            scripts[script.shareid] = script;
+                            $rootScope.$broadcast('refreshTabState');
+                            userNotification.show(ESMessages.user.scriptcloud, 'success');
+                        });
                 }
             });
 
             openSharedScripts.forEach(function (shareID) {
                 if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-                    collaboration.leaveSession(shareID, userName);
+                    collaboration.leaveSession(shareID, username);
                 }
             });
 
@@ -116,11 +117,17 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 notificationsMarkedAsRead.forEach(function (notificationID) {
                     esconsole('marking notification ' + notificationID + ' as read', 'user');
                     var body = new FormData();
-                    body.append('username', getUsername());
+                    body.append('username', username);
                     body.append('password', getEncodedPassword());
                     body.append('notification_id', notificationID);
                     $http.post(url, body, opts);
                 });
+            }
+
+            if (saving) return true; // Show warning popover.
+        } else {
+            if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
+                localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
             }
         }
     };

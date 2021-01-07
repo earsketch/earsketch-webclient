@@ -226,6 +226,10 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $scope.selectSharedScript(script);
     });
 
+    $scope.$on('refreshTabState', () => {
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
+        refreshTabState();
+    });
 
     // TODO: move this to tabs service?
     /**
@@ -339,7 +343,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         // TODO: not working well with collaborative scripts
         var script = $scope.tabs[$scope.activeTab];
 
-        if (script && script.saved && !script.collaborative) {
+        if (script && !script.collaborative) {
             // the script has been modified -- flag the script
             script.saved = false;
             script.tooltipText = ESMessages.idecontroller.unsavedScript;
