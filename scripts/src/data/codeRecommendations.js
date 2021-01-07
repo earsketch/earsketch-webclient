@@ -16,627 +16,165 @@ var CAI_DELTA_LIBRARY = [
         start: { userFunc: 0 },
         end: { userFunc: 1 },
         id: 53,
-        utterance: "using a function to make our code modular is a good idea. let's make sure we call it"
+        utterance: "using a function to make our code modular is a good idea. let's make sure we call it",
+        complexity: {userFunc:3}
     },
     {
         start: { userFunc: 0 },
         end: { userFunc: 2 },
         id: 54,
-        utterance: "using a function to make our code modular is a good idea. let's make sure we call it"
+        utterance: "using a function to make our code modular is a good idea. let's make sure we call it",
+        complexity: {userFunc:3}
     },
     {
         start: { userFunc: 2 },
         end: { userFunc: 3 },
         id: 33,
-        utterance: "we can use both parameters and return values to make our function more sophisticated"
+        utterance: "we can use both parameters and return values to make our function more sophisticated",
+        complexity: {userFunc:5}
     },
     {
         start: { lists: 0 },
         end: { lists: 1 },
         id: 34,
-        utterance: "what if we used makeBeat with a list to make our own beat?"
+        utterance: "what if we used makeBeat with a list to make our own beat?",
+        complexity: {lists:4, strings:3}
     },
     {
         start: { lists: 0 },
         end: { lists: 2 },
         id: 35,
-        utterance: "what if we used makeBeat with a list to make our own beat?"
+        utterance: "what if we used makeBeat with a list to make our own beat?",
+        complexity: { lists: 4, strings: 3 }
     },
     {
         start: { lists: 1 },
         end: { lists: 2 },
         id: 36,
-        utterance: "what if we used makeBeat with a list to make our own beat?"
+        utterance: "what if we used makeBeat with a list to make our own beat?",
+        complexity: { lists: 4, strings: 3 }
     },
     {
         start: { variables: 0 },
         end: { variables: 1 },
         id: 37,
-        utterance: "let's use the variable we've just defined in a fitMedia statement"
+        utterance: "let's use the variable we've just defined in a fitMedia statement",
+        complexity: {variables:3}
     },
     {
         start: { variables: 0 },
         end: { variables: 2 },
-        utterance: "let's use the variable we've just defined in a fitMedia statement"
+        utterance: "let's use the variable we've just defined in a fitMedia statement",
+        complexity: { variables: 3 }
     },
     {
         start: { variables: 1 },
         end: { variables: 2 },
         id: 38,
-        utterance: "let's use the variable we've just defined in a fitMedia statement"
+        utterance: "let's use the variable we've just defined in a fitMedia statement",
+        complexity: { variables: 3 }
     },
     {
         start: { consoleInput: 0 },
         end: { consoleInput: 1 },
         id: 39,
-        utterance: "we can use the console input when we make our song to give the user some input"
+        utterance: "we can use the console input when we make our song to give the user some input",
+        complexity: {consoleInput: 1}
     },
     {
         start: { consoleInput: 0 },
         end: { consoleInput: 2 },
         id: 40,
-        utterance: "we can use the console input when we make our song to give the user some input"
+        utterance: "we can use the console input when we make our song to give the user some input",
+        complexity: { consoleInput: 1 }
     },
     {
         start: { consoleInput: 1 },
         end: { consoleInput: 2 },
         id: 41,
-        utterance: "we can use the console input when we make our song to give the user some input"
+        utterance: "we can use the console input when we make our song to give the user some input",
+        complexity: { consoleInput: 1 }
     },
     {
         start: { variables: 0 },
         end: { variables: 3 },
         id: 42,
-        utterance: "since we're storing values in variables, we should take advantage of that and change the value"
+        utterance: "since we're storing values in variables, we should take advantage of that and change the value",
+        complexity: {variables: 4}
     },
     {
         start: { variables: 1 },
         end: { variables: 3 },
         id: 43,
-        utterance: "since we're storing values in variables, we should take advantage of that and change the value"
+        utterance: "since we're storing values in variables, we should take advantage of that and change the value",
+        complexity: { variables: 4 }
     },
     {
         start: { variables: 2 },
         end: { variables: 3 },
         id: 44,
-        utterance: "since we're storing values in variables, we should take advantage of that and change the value"
+        utterance: "since we're storing values in variables, we should take advantage of that and change the value",
+        complexity: { variables: 4 }
     },
     {
         start: { conditionals: 0 },
         end: { conditionals: 2 },
         id: 45,
-        utterance: "we should add an else portion to our if statement"
+        utterance: "we should add an else portion to our if statement",
+        complexity: {conditionals:3}
     },
     {
         start: { conditionals: 1 },
         end: { conditionals: 2 },
         id: 46,
-        utterance: "we should add an else portion to our if statement"
+        utterance: "we should add an else portion to our if statement",
+        complexity: { conditionals: 3 }
     },
     {
         start: { conditionals: 2 },
         end: { conditionals: 3 },
         id: 47,
-        utterance: "we can use elif to add more options to our conditional"
+        utterance: "we can use elif to add more options to our conditional",
+        complexity: { conditionals: 3 }
     },
     {
         start: { forLoops: 0 },
         end: { forLoops: 2 },
         id: 48,
-        utterance: "let's use a minimum and maximum with our loop"
+        utterance: "let's use a minimum and maximum with our loop",
+        complexity: {forLoops: 3}
     },
     {
         start: { forLoops: 1 },
         end: { forLoops: 2 },
         id: 49,
-        utterance: "let's use a minimum and maximum with our loop"
+        utterance: "let's use a minimum and maximum with our loop",
+        complexity: { forLoops: 3 }
     },
     {
         start: { forLoops: 2 },
         end: { forLoops: 3 },
         id: 50,
-        utterance: "we can add a step value here"
+        utterance: "we can add a step value here",
+        complexity: { forLoops: 4 }
     },
     {
         start: { forLoops: 0 },
         end: { forLoops: 3 },
         id: 51,
-        utterance: "we can add a step value here"
+        utterance: "we can add a step value here",
+        complexity: { forLoops: 4 }
     },
     {
         start: { forLoops: 1 },
         end: { forLoops: 3 },
         id: 52,
-        utterance: "we can add a step value here"
+        utterance: "we can add a step value here",
+        complexity: { forLoops: 4 }
     }
 
 ];
 
-// var CAI_REC_DECISION_TREE = [
-//     {
-//         node: 0,
-//         condition: function () {
-//             // "is code empty?"
-//             var resKeys = Object.keys(currentResults);
-//             var total = 0;
-//             for (var i in resKeys) {
-//                 total += currentResults[resKeys[i]];
-//             }
-
-//             if (total != 1 && total != 0) {
-//                 return false;
-//             }
-//             else {
-//                 if (currentResults["ints"] == 1) {
-//                     return true;
-//                 }
-//                 else return false;
-//             }
-
-//         },
-//         yes: 1,
-//         no: 2,
-//     },
-//     {
-//         node: 1,
-//         suggestion: 29
-//     },
-//     {
-//         node: 2,
-//         condition: function () {
-//             //"is music empty?"
-//             //empty implies there is no music.
-//             if (musicResults != null && musicResults.OVERVIEW != null && musicResults.OVERVIEW.measures == 0) {
-//                 return true;
-//             }
-//             else return false;
-
-//         },
-//         yes: 4,
-//         no: 3
-//     },
-//     {
-//         node: 3,
-//         condition: function () {
-//             //is there a delta?
-//             return Math.abs(currentDeltaSum) > 0;
-
-//         },
-//         yes: 5,
-//         no: 6
-//     },
-//     {
-//         node: 4,
-//         suggestion: 29
-//     },
-//    {
-//        node: 5,
-//        condition: function () {
-
-//            var deltaInLib = false;
-//            possibleDeltaSuggs = [];
-//            for (var i in deltaLibrary) {
-//                //get current value and compare to end value
-//                var endValuesMatch = true;
-//                for (var j in deltaLibrary[i].end) {
-//                    if (deltaLibrary[i].end[j] != results[j]) {
-//                        endValuesMatch = false;
-//                    }
-//                }
-
-//                var startValuesMatch = true;
-//                if (endValuesMatch) {
-//                    for (var j in deltaLibrary[i].start) {
-//                        if (deltaLibrary[i].start[j] != (results[j] - currentDelta[j])) {
-//                            startValuesMatch = false;
-//                        }
-//                    }
-//                }
-
-//                if (endValuesMatch && startValuesMatch) {
-//                    deltaInLib = true;
-//                    possibleDeltaSuggs.push(deltaLibrary[i]);
-//                }
-
-//            }
-
-//            return deltaInLib;
-
-//        },
-//        yes: 9,
-//        no: 10
-
-//    },
-//    {
-//        node: 6,
-//        condition: function () {
-//            return noDeltaCount > 2;
-//        },
-//        yes: 7,
-//        no: 8
-//    },
-//    {
-//        node: 7,
-//        suggestion: 1
-//    },
-//    {
-//        node: 8,
-//        suggestion: 2
-//    },
-//    {
-//        node: 9,
-//        suggestion: 6
-//    },
-//    {
-//        node: 10,
-//        condition: function () {
-//            return currentDelta.sections > 0;
-//        },
-//        yes: 12,
-//        no: 11
-
-//    },
-//    {
-//        node: 11,
-//        condition: function () {
-//            if (musicResults != null && musicResults.SOUNDPROFILE != null) {
-//                return Object.keys(musicResults.SOUNDPROFILE).length >= 2;
-//            }
-//            else return false;
-//        },
-//        yes: 27,
-//        no: 28
-
-//    },
-//    {
-//        node: 12,
-//        condition: function () {
-//            if (musicResults != null && musicResults.SOUNDPROFILE != null) {
-//                var keys = Object.keys(musicResults.SOUNDPROFILE);
-//                for (var i in keys) {
-//                    if (keys[i].includes("'")) {
-//                        return true;
-//                    }
-//                }
-//                return false;
-//            }
-//            else return false;
-//        },
-//        yes: 13,
-//        no: 14
-//    },
-//    {
-//        node: 13,
-//        condition: function () {
-//            if (currentResults != null && currentResults.userFunc != null && currentResults.userFunc < 2) {
-//                return true;
-//            }
-//            return false;
-//        },
-//        yes: 16,
-//        no: 15
-//    },
-//    {
-//        node: 14,
-//        condition: function () {
-//            if (currentResults != null && currentResults.userFunc != null && currentResults.userFunc < 2) {
-//                return true;
-//            }
-//            return false;
-//        },
-//        yes: 22,
-//        no: 21
-//    },
-//    {
-//        node: 15,
-//        condition: function () {
-//            if (currentResults != null && currentResults.userFunc != null && currentResults.userFunc > 3) {
-//                return true;
-//            }
-//            return false;
-//        },
-//        yes: 18,
-//        no: 17
-//    },
-//    {
-//        node: 16,
-//        suggestion: 31
-//    },
-//    {
-//        node: 17,
-//        suggestion: 7
-//    },
-//    {
-//        node: 18,
-//        condition: function () {
-//            for (var i in sectionLines) {
-//                var dictLine = CAI_DICT[Number.parseInt(sectionLines[i]) - 1];
-
-//                if ('userFunction' in dictLine) {
-//                    return true;
-//                }
-//            }
-//            return false;
-//        },
-//        yes: 19,
-//        no: 20
-//    },
-//    {
-//        node: 19,
-//        suggestion: 32
-
-//    },
-//    {
-//        node: 20,
-//        suggestion: 65
-
-//    },
-//    {
-//        node: 21,
-//        condition: function () {
-//            if (currentResults != null && currentResults.forLoops != null && currentResults.forLoops > 2) {
-//                return true;
-//            }
-//            return false;
-//        },
-//        yes: 24,
-//        no: 23
-//    },
-//    {
-//        node: 22,
-//        condition: function () {
-//            for (var i in sectionLines) {
-//                var dictLine = CAI_DICT[Number.parseInt(sectionLines[i]) - 1];
-
-//                if ('userFunction' in dictLine) {
-//                    return true;
-//                }
-//            }
-//            return false;
-//        },
-//        yes: 25,
-//        no: 26
-//    },
-//    {
-//        node: 23,
-//        suggestion: 66
-//    },
-//    {
-//        node: 24,
-//        suggestion: 5
-//    },
-//    {
-//        node: 25,
-//        suggestion: 8
-//    },
-//    {
-//        node: 26,
-//        suggestion: 18
-//    },
-//    {
-//        node: 27,
-//        suggestion: 67
-//    },
-//    {
-//        node: 28,
-//        condition: function () {
-//            //any sound delta?
-
-
-//            if (currentDelta != null && currentDelta.soundsAdded != null && (currentDelta.soundsAdded.length > 0 || currentDelta.soundsRemoved.length > 0)) {
-//                return true;
-//            }
-
-
-
-//            return false;
-//        },
-//        yes: 30,
-//        no:29
-
-//    },
-//    {
-//        node: 29,
-//        condition: function () {
-
-//            //note if any effects are added or changed
-//            var newEffects = [];
-//            for (var i in musicResults.APICALLS) {
-//                if (musicResults.APICALLS[i].function === "setEffect") {
-//                    newEffects.push(musicResults.APICALLS[i].args);
-//                }
-//            }
-
-//            if (newEffects.length > currentEffects.length) { //effect added
-//                return true;
-//            }
-
-//            for (var i in newEffects) {
-//                //does something with the exact same args exist in the current effects?
-//                var exactMatch = false;
-//                for (var j in currentEffects) {
-//                    var argsMatch = true;
-//                    for (var p in newEffects[i]) {
-//                        if (!(p in currentEffects[j])) {
-//                            argsMatch = false;
-//                            break;
-//                        }
-//                        else if (newEffects[i][p] != currentEffects[j][p]) {
-//                            argsMatch = false;
-//                        }
-//                    }
-//                    if (argsMatch) {
-//                        exactMatch = true;
-//                    }
-//                }
-//                if (!exactMatch) {
-//                    return true;
-//                }
-//            }
-
-//            return false;
-//        },
-//        yes: 33,
-//        no: 34
-//    },
-//     {
-//         node: 30,
-//         condition: function () {
-//             //compute average genre distance for all added sounds
-//             var averageGenreDistance = 0;
-
-//             //aggregate and average all measure data
-//             var genreTotalsCurrent = {};
-//             //populate
-
-//             if (genreListCurrent != null) {
-//                 for (var i in genreListCurrent) {
-//                     for (var j in genreListCurrent[i]) {
-//                         if (genreListCurrent[i][j].name in genreTotalsCurrent) {
-//                             //add to total
-//                             genreTotalsCurrent[genreListCurrent[i][j].name] += genreListCurrent[i][j].value;
-//                         }
-//                         else {
-//                             //add property
-//                             genreTotalsCurrent[genreListCurrent[i][j].name] = genreListCurrent[i][j].value
-//                         }
-//                     }
-//                 }
-
-//                 //divide all by # of measures
-//                 for (var i in genreTotalsCurrent) {
-//                     genreTotalsCurrent[i] = genreTotalsCurrent[i] / genreListCurrent.length;
-//                 }
-
-
-//                 var genreTotalsNew = {};
-//                 //populate
-//                 for (var i in musicResults.GENRE) {
-//                     for (var j in musicResults.GENRE[i]) {
-//                         if (musicResults.GENRE[i][j].name in genreTotalsNew) {
-//                             //add to total
-//                             genreTotalsNew[musicResults.GENRE[i][j].name] += musicResults.GENRE[i][j].value;
-//                         }
-//                         else {
-//                             //add property
-//                             genreTotalsNew[musicResults.GENRE[i][j].name] = musicResults.GENRE[i][j].value
-//                         }
-//                     }
-//                 }
-
-//                 //divide all by # of measures
-//                 for (var i in genreTotalsNew) {
-//                     genreTotalsNew[i] = genreTotalsNew[i] / musicResults.GENRE.length;
-//                 }
-
-//                 var genresDifferences = {};
-//                 //populate
-//                 for (var i in genreTotalsCurrent) {
-//                     if (i in genreTotalsNew) {
-//                         genresDifferences[i] = Math.abs(genreTotalsNew[i] - genreTotalsCurrent[i]);
-//                     }
-//                     else {
-//                         genresDifferences[i] = genreTotalsCurrent[i];
-//                     }
-//                 }
-
-//                 for (var i in genreTotalsNew) {
-//                     if (!(i in genreTotalsCurrent)) {
-//                         genresDifferences[i] = genreTotalsNew[i];
-//                     }
-//                 }
-
-//                 var totalDistance = 0;
-
-//                 for (var i in genresDifferences) {
-//                     totalDistance += genresDifferences[i];
-//                 }
-
-//                 var numGenres = Object.keys(genresDifferences).length;
-
-//                 averageGenreDistance = totalDistance / numGenres;
-
-//                 console.log(averageGenreDistance);
-
-//             }
-
-//             genreListCurrent = musicResults.GENRE;
-
-//             return averageGenreDistance > averageGenreThreshold;
-//         },
-//         yes: 32,
-//         no: 31
-//     },
-//     {
-//         node: 31,
-//         suggestion: 13
-//     },
-//     {
-//         node: 32,
-//         suggestion: 11
-//     },
-//     {
-//         node: 33,
-//         condition: function () {
-//             //envelope usage
-//             var newEffects = [];
-//             for (var i in musicResults.APICALLS) {
-//                 if (musicResults.APICALLS[i].function === "setEffect") {
-//                     newEffects.push(musicResults.APICALLS[i].args);
-//                 }
-//             }
-
-//             for (var i in newEffects) {
-//                 if (newEffects[i].length > 3) {
-//                     return true;
-//                 }
-//             }
-
-//             return false;
-//         },
-//         yes: 35,
-//         no: 36
-         
-//     },
-//     {
-//         node: 34,
-//         suggestion: 68
-//     },
-//     {
-//         node: 35,
-//         condition: function () {
-//             //high section similarity?
-//             if(musicResults == null){
-//                 return false;
-//             }
-
-//             var sectionKeys = Object.keys(musicResults.SOUNDPROFILE);
-
-//             for (var i in sectionKeys) {
-
-//                 if (sectionKeys[i].includes("'")) {
-//                     return true;
-//                 }
-//             }
-//             return false;
-//         },
-//         yes: 37,
-//         no: 38
-//     },
-//     {
-//         node: 36,
-//         suggestion: 69
-//     },
-//     {
-//         node: 37,
-//         suggestion: 68
-//     },
-//     {
-//         node: 38,
-//         suggestion: 66
-//     }
-
-// ];
 
 var CAI_RECOMMENDATIONS =
     [
@@ -668,7 +206,8 @@ var CAI_RECOMMENDATIONS =
             id: 5,
             example: "we could use something like this for loop:\nfor measure in range (min, max):\n    fitMedia(FILENAME, track, measure, measure + 0.5)",
             explain: "it's a little bit shorter and easier to read like that",
-            utterance: "i like the new section. maybe we can use a for loop to consolidate the code"
+            utterance: "i like the new section. maybe we can use a for loop to consolidate the code",
+            complexity: {forLoops:1}
         },
         {
             id: 6,
@@ -680,7 +219,8 @@ var CAI_RECOMMENDATIONS =
             id: 7,
             example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, 1, startMeasure, endMeasure)\n\n    fitMedia(FILENAME, 2, startMeasure, endMeasure)",
             explain: "that'll let us vary our repeating sections a little",
-            utterance: "What if we added some parameters to the code that makes the new section?"
+            utterance: "What if we added some parameters to the code that makes the new section?",
+            complexity: {userFunc: 4}
         },
         {
             id: 8,
@@ -746,7 +286,8 @@ var CAI_RECOMMENDATIONS =
             id: 18,
             example: "something like this:\n\ndef mySection(startMeasure, endMeasure):\n    fitMedia(FILENAME, track, startMeasure, endMeasure)\n    fitMedia(FILENAME, track, startMeasure, endMeasure)",
             explain: "it'll let us use that code again.",
-            utterance: "what if we used a custom function to make this section?"
+            utterance: "what if we used a custom function to make this section?",
+            complexity: {userFunc:1}
         },
         {
             id: 19,
@@ -825,7 +366,8 @@ var CAI_RECOMMENDATIONS =
             id: 31,
             example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, 1, startMeasure, endMeasure)\n\n    fitMedia(FILENAME, 2, startMeasure, endMeasure)",
             explain: "that way, we don't have to write the same code twice",
-            utterance: "we have some repeated sections. What if we used a custom function to make them?"
+            utterance: "we have some repeated sections. What if we used a custom function to make them?",
+            complexity: {userFunc: 1}
         },
         {
             id: 32,

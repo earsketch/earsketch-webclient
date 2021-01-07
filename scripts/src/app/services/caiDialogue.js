@@ -667,44 +667,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     }
 
-    /**
-     * Parse debug message into discretized format. Populates currentParameters.
-     * @param txt - text with format "messageType INST MEASURE"
-     */
-    function parseMessage(txt) {
-        currentInput[activeProject] = {};
-        currentInput.text = txt;
-        //Array of key words in txt
-        var txtArr = txt.split(" ");
-
-        //The following switch statements can be replaced by if statements for testing
-
-        //Set messageType in Message
-        if (Object.values(messageType).includes(txtArr[0])) {
-            currentInput[activeProject].messageType = txtArr[0];
-        }
-        else {
-            currentInput[activeProject].messageType = "NULL";
-        }
-
-        //Set inst in dict
-        if (Object.values(instrumentType).includes(txtArr[1])) {
-            dict.inst = txtArr[1];
-        }
-        else {
-            dict.inst = "NULL";
-        }
-        //Set line in dict
-        dict.line = parseInt(txtArr[2], 10);
-
-        //Set d in Message
-        currentInput[activeProject].d = dict;
-
-        var dictKeys = Object.keys(dict);
-        for (var i in dictKeys) {
-            currentParameters[dictKeys[i]] = dict[dictKeys[i]];
-        }
-    }
+    
 
     /**
    * Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
@@ -732,7 +695,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 return currentTreeNode[activeProject];
 
             }
+            if ('complexity' in outputObj) {
 
+                caiStudentPreferenceModule.addCodeSuggestion(outputObj.complexity);
+            }
             return outputObj;
         }
         else return "";

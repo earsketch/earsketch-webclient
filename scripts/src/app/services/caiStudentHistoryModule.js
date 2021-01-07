@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', 'caiStudent', function (userProject, complexityCalculator, caiStudent) {
+app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', 'caiStudent', 'caiStudentPreferenceModule', function (userProject, complexityCalculator, caiStudent, caiStudentPreferenceModule) {
 
     var aggregateScore;
     var curriculumPagesViewed;
@@ -91,6 +91,7 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
     }
 
     function addScoreToAggregate(script, scriptType) {
+
         if (aggregateScore == null) {
             calculateAggregateCodeScore();
         }
@@ -103,7 +104,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
         else {
             newOutput = Object.assign({}, complexityCalculator.analyzeJavascript(script));
         }
-
         //numeric replacement
         if (newOutput["userFunc"] === "Args" || newOutput["userFunc"] === "Returns") {
             newOutput["userFunc"] = 3;
@@ -119,6 +119,7 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
             newOutput["userFunc"] = 4;
         }
 
+        caiStudentPreferenceModule.runCode(newOutput);
         //update aggregateScore
         for (var i in aggregateScore) {
             if (newOutput[i] > aggregateScore[i]) {

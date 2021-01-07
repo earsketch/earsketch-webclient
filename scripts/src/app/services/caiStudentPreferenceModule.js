@@ -6,6 +6,7 @@
  */
 app.factory('caiStudentPreferenceModule', [ 'caiStudent', function (caiStudent) {
 
+    //var init
     var suggestionsAccepted = 0;
     var suggestionsRejected = 0;
 
@@ -18,7 +19,6 @@ app.factory('caiStudentPreferenceModule', [ 'caiStudent', function (caiStudent) 
 
     function addSoundSuggestion(suggestionArray) {
         sampleSuggestionsMade.push([numberOfRuns, suggestionArray]);
-        console.log(sampleSuggestionsMade);
     }
 
     function runSound(soundsUsedArray) {
@@ -56,16 +56,51 @@ app.factory('caiStudentPreferenceModule', [ 'caiStudent', function (caiStudent) 
 
         sampleSuggestionsMade = newArray.slice(0);
 
-        console.log("PREFERENCE MODULE: ")
-        console.log(sampleSuggestionsMade);
     }
 
     function addCodeSuggestion(complexityObj) {
-
+        codeSuggestionsMade.push([numberOfRuns, complexityObj]);
+        console.log("PREFERENCE CODE SUGGS: ");
+        console.log(codeSuggestionsMade);
     }
 
-    function runCode() {
+    function runCode(complexityOutput) {
+        var newArray = [];
+        for (var i = 0; i < codeSuggestionsMade.length; i++) {
 
+            var wasUsed = true;
+
+            //were any reqs readched?
+            var keys = Object.keys(codeSuggestionsMade[i][1]);
+
+            for (var j = 0; j < keys.length; j++) {
+                if (complexityOutput[keys[j]] < codeSuggestionsMade[i][1][keys[j]]) {
+                    wasUsed = false;
+                }
+            }
+
+            //decrement
+            codeSuggestionsMade[i][0] -= 1;
+
+            //if 0, add to the rejection category and delete the item
+            if (wasUsed) {
+                suggestionsAccepted += 1;
+                updateAcceptanceRatio();
+            }
+            else {
+                if (codeSuggestionsMade[i][0] == 0) {
+                    suggestionsRejected += 1;
+                    updateAcceptanceRatio();
+                }
+                else {
+                    newArray.push(codeSuggestionsMade[i].slice(0));
+                }
+            }
+        }
+
+        codeSuggestionsMade = newArray.slice(0);
+        console.log("PREFERENCE CODE SUGGS: ");
+        console.log(codeSuggestionsMade);
     }
 
     function updateAcceptanceRatio() {
