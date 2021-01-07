@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 
 export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch }) => {
-    const {href: _url, loc: _location} = fixLocation(_url, location)
+    const {href: _url, loc: _location} = fixLocation(url, location)
     dispatch(loadChapter({href: _url, loc: _location}))
-    console.log(url, _location);
-    const response = await fetch(_url);
-    const html = await response.text();
-    return { location: _location, html };
+    const response = await fetch(_url)
+    const html = await response.text()
+    return { location: _location, html }
 })
 
 const curriculumSlice = createSlice({
@@ -34,6 +33,23 @@ const curriculumSlice = createSlice({
         togglePopover2(state) {
             state.popover2IsOpen = !state.popover2IsOpen
         },
+        toggleFocus(state, { payload }) {
+            let [unitIdx, chIdx] = payload
+            if (chIdx) {
+                if (state.focus[1] === chIdx) {
+                    state.focus[1] = null
+                } else {
+                    state.focus[1] = chIdx
+                }
+            } else if (unitIdx) {
+                if (state.focus[0] === unitIdx) {
+                    state.focus[0] = null
+                } else {
+                    state.focus[1] = null
+                    state.focus[0] = unitIdx
+                }
+            }
+        },
         loadChapter(state, { payload: { href, loc } }) {
             state.currentLocation = loc;
 
@@ -49,8 +65,7 @@ const curriculumSlice = createSlice({
     },
     extraReducers: {
         [fetchContent.fulfilled]: (state, action) => {
-            console.log(action.payload)
-            state.contentCache[action.payload.location] = action.payload.html;
+            state.contentCache[action.payload.location] = action.payload.html
         }
     }
 })
@@ -62,6 +77,7 @@ export const {
     togglePopover,
     togglePopover2,
     loadChapter,
+    toggleFocus,
 } = curriculumSlice.actions;
 
 export const selectSearchText = state => state.curriculum.searchText
@@ -75,6 +91,8 @@ export const selectContent = state => state.curriculum.contentCache[state.curric
 export const selectPopoverIsOpen = state => state.curriculum.popoverIsOpen
 
 export const selectPopover2IsOpen = state => state.curriculum.popover2IsOpen
+
+export const selectFocus = state => state.curriculum.focus
 
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
@@ -119,9 +137,9 @@ const fixLocation = (href, loc) => {
     if (loc.length === 1) {
         if (toc[loc[0]].chapters.length > 0) {
             if (toc[loc[0]].chapters[0].length > 0) {
-                loc = [loc[0], 0, 0];
+                loc = [loc[0], 0, 0]
             } else {
-                loc.push(0);
+                loc.push(0)
             }
         }
     }

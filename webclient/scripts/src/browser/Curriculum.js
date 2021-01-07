@@ -31,13 +31,14 @@ const copyURL = (language, currentLocation) => {
 
 const TableOfContents = () => {
     const dispatch = useDispatch()
+    const focus = useSelector(curriculum.selectFocus)
     return (
         <ul id="toc">
         {Object.entries(toc).map(([unitIdx, unit]) => (
-            <li key={unitIdx} className="toc-items"  ng-click="toggleFocus($event);">
+            <li key={unitIdx} className="toc-items" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                 <div className="toc-item">
-                    <span ng-if="focus[0]!==unitIdx" ng-show="unit.chapters.length > 0" className="caret-container"><i className="icon icon-arrow-right"></i></span>
-                    <span ng-if="focus[0]===unitIdx" ng-show="unit.chapters.length > 0" className="caret-container"><i className="icon icon-arrow-down"></i></span>
+                    {unit.chapters.length > 0 &&
+                     <span className="caret-container"><i className={`icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i></span>}
                     <a href="#" onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
                 </div>
                 <ul>
@@ -45,25 +46,28 @@ const TableOfContents = () => {
                     Object.entries(unit.chapters).map(([chIdx, ch]) => {
                         const chNumForDisplay = getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
                         return (
-                            <li className="toc-chapters" ng-show="focus[0]===unitIdx" ng-repeat="(chIdx, ch) in unit.chapters" ng-init="chNumForDisplay = getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)">
+                            <li key={chIdx} className="toc-chapters" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
                                 <div className="toc-item">
                                     &emsp;
-                                    <span ng-if="focus[1]!==chIdx" ng-show="ch.sections.length > 0" className="caret-container"><i className="icon icon-arrow-right"></i></span>
-                                    <span ng-if="focus[1]===chIdx" ng-show="ch.sections.length > 0" className="caret-container"><i className="icon icon-arrow-down"></i></span>
-                                    <span ng-show="ch.sections.length == 0" className="empty-caret-container"><i className="icon icon-arrow-right"></i></span>
-                                    <a href="#" ng-click="loadChapter(ch.URL, [unitIdx, chIdx]);">
-                                        {chNumForDisplay}<span ng-show="chNumForDisplay">. </span>{ch.title}
+                                    {ch.sections.length > 0 ?
+                                      <span className="caret-container"><i className={`icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i></span>
+                                    : <span className="empty-caret-container"><i className="icon icon-arrow-right"></i></span>}
+                                    <a href="#" onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
+                                        {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                                     </a>
                                 </div>
                                 <ul>
-                                    <li className="toc-sections" ng-show="focus[1]===chIdx" ng-repeat="(secIdx, sec) in ch.sections">
-                                        <div className="toc-item">
-                                            &emsp;&emsp;
-                                            <a href="#" ng-click="loadChapter(sec.URL, [unitIdx, chIdx, secIdx]);">
-                                                {chNumForDisplay}<span ng-show="chNumForDisplay">.</span>{secIdx+1} {sec.title}
-                                            </a>
-                                        </div>
-                                    </li>
+                                    {focus[1] == chIdx &&
+                                    Object.entries(ch.sections).map(([secIdx, sec]) =>
+                                        <li key={secIdx} className="toc-sections">
+                                            <div className="toc-item">
+                                                &emsp;&emsp;
+                                                <a href="#" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
+                                                    {chNumForDisplay}{chNumForDisplay && <span>.</span>}{secIdx+1} {sec.title}
+                                                </a>
+                                            </div>
+                                        </li>
+                                    )}
                                 </ul>
                             </li>
                         )
@@ -144,17 +148,18 @@ const CurriculumSearch = () => {
                     <i className="icon icon-search browser-icon-search"></i>
                     <input type="search" name="Search" placeholder="Search" className="search-bar ng-pristine ng-untouched ng-valid" style={{height: "2em"}} ng-model="query" ng-click="recallResults()" />
                 </form>
-                <button id="search-clear" className="btn btn-xs btn-primary" style={{position: "absolute", right: "-10px", top: "2px", width: "27px"}} ng-click="query=''">X</button>
+                {/*<button id="search-clear" className="btn btn-xs btn-primary" style={{position: "absolute", right: "-10px", top: "2px", width: "27px"}} ng-click="query=''">X</button>*/}
             </div>
-            <div className="curriculum-search-results">
-                <div ng-repeat="result in results">
+            <hr style={{borderColor: '#777', height: '1px'}}></hr>
+            {/*<div className="curriculum-search-results">
+                {<div ng-repeat="result in results">
                     <a href="#" ng-click="loadChapter(result.id); closeSearchResults();">
                         <div className="search-item">
                             <span>TODO</span>
                         </div>
                     </a>
                 </div>
-            </div>
+            </div>*/}
         </div>
     );
 }
@@ -168,7 +173,7 @@ const CurriculumPane = () => {
 
             <div id="curriculum-body">
                 <div id="curriculum-atlas">
-                    <div ng-include="templateURL" /*onload="chapterLoaded()"*/ dangerouslySetInnerHTML={{__html: (content || `Loading... ${currentLocation}`)}}></div>
+                    {currentLocation[0] === -1 ? <TableOfContents></TableOfContents> : <div dangerouslySetInnerHTML={{__html: (content || `Loading... ${currentLocation}`)}}></div>}
                 </div>
             </div>
 
