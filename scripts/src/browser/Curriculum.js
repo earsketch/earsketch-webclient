@@ -5,8 +5,10 @@ import { Provider, useSelector, useDispatch } from 'react-redux'
 
 import { usePopper } from 'react-popper';
 
+import { SearchBar } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
+
 
 // TODO TEMP
 const theme = 'light'
@@ -134,34 +136,17 @@ const CurriculumHeader = () => {
             </div>
 
             <div style={{clear: "both"}}></div>
-            <CurriculumSearch></CurriculumSearch>
+            <CurriculumSearchBar></CurriculumSearchBar>
         </div>
     )
 }
 
-// TODO: use the common component instead
-const CurriculumSearch = () => {
-    return (
-        <div>
-            <div className="input-group" style={{width: "100%", paddingLeft: "18px"}}>
-                <form>
-                    <i className="icon icon-search browser-icon-search"></i>
-                    <input type="search" name="Search" placeholder="Search" className="search-bar ng-pristine ng-untouched ng-valid" style={{height: "2em"}} ng-model="query" ng-click="recallResults()" />
-                </form>
-                {/*<button id="search-clear" className="btn btn-xs btn-primary" style={{position: "absolute", right: "-10px", top: "2px", width: "27px"}} ng-click="query=''">X</button>*/}
-            </div>
-            <hr style={{borderColor: '#777', height: '1px'}}></hr>
-            {/*<div className="curriculum-search-results">
-                {<div ng-repeat="result in results">
-                    <a href="#" ng-click="loadChapter(result.id); closeSearchResults();">
-                        <div className="search-item">
-                            <span>TODO</span>
-                        </div>
-                    </a>
-                </div>
-            </div>*/}
-        </div>
-    );
+const CurriculumSearchBar = () => {
+    const dispatch = useDispatch()
+    const searchText = useSelector(curriculum.selectSearchText)
+    const dispatchSearch = (event) => dispatch(curriculum.setSearchText(event.target.value))
+    const dispatchReset = () => dispatch(curriculum.setSearchText(''))
+    return <SearchBar {... {searchText, dispatchSearch, dispatchReset}}></SearchBar>
 }
 
 const CurriculumPane = () => {
