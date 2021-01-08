@@ -1691,11 +1691,9 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             return new Promise(function(resolve, reject) {
                 var shareid = "";
                 if (overwrite) {
-                    for (id in scripts) {
-                        if(scripts[id].name === n) {
-                            shareid = id;
-                            break;
-                        }
+                    const match = Object.values(scripts).find(v => v.name===n);
+                    if (match) {
+                        shareid = match.shareid;
                     }
                 }
                 if (shareid === "") {
