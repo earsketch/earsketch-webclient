@@ -39,7 +39,7 @@ export class CodeHighlight extends Component {
 
     render() {
         const { language, children } = this.props
-        return <code ref={this.codeNode} className={language}>{children}</code>
+        return <code ref={this.codeNode} className={`${language} whitespace-pre`}>{children}</code>
     }
 }
 
