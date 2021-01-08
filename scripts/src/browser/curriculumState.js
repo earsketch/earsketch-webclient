@@ -1,18 +1,27 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 
-export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch }) => {
+export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
+    const state = getState()
     const {href: _url, loc: _location} = fixLocation(url, location)
     dispatch(loadChapter({href: _url, loc: _location}))
+    // Check cache before fetching.
+    if (state.curriculum.contentCache[_url] !== undefined) {
+        console.log(`${_url} is in the cache.`)
+        return { url: _url, html: state.curriculum.contentCache[_url] }
+    }
+    console.log(`${_url} not in cache, fetching.`)
     const response = await fetch(_url)
     const html = await response.text()
-    return { location: _location, html }
+    return { url: _url, html }
 })
 
 const curriculumSlice = createSlice({
     name: 'curriculum',
     initialState: {
         searchText: '',
+        showResults: false,
         currentLocation: [-1],
+        currentUrl: '',
         showURLButton: false,
         focus: [null, null], // unit, chapter
         popoverIsOpen: false,
@@ -51,21 +60,28 @@ const curriculumSlice = createSlice({
             }
         },
         loadChapter(state, { payload: { href, loc } }) {
-            state.currentLocation = loc;
+            state.currentUrl = href
+            state.currentLocation = loc
 
             // update the pageIdx for the pagination if necessary
             state.pageIdx = tocPages.map(function(v) {
-                return v.toString();
-            }).indexOf(loc.toString());
+                return v.toString()
+            }).indexOf(loc.toString())
 
-            state.popoverIsOpen = false;
-            state.popover2IsOpen = false;
-            state.showURLButton = true;
+            state.popoverIsOpen = false
+            state.popover2IsOpen = false
+            state.showURLButton = true
+        },
+        showResults(state, { payload }) {
+            state.showResults = payload
         }
     },
     extraReducers: {
         [fetchContent.fulfilled]: (state, action) => {
-            state.contentCache[action.payload.location] = action.payload.html
+            state.contentCache[action.payload.url] = action.payload.html
+        },
+        [fetchContent.rejected]: (...args) => {
+            console.log("Fetch failed!", args)
         }
     }
 })
@@ -78,21 +94,54 @@ export const {
     togglePopover2,
     loadChapter,
     toggleFocus,
+    showResults,
 } = curriculumSlice.actions;
 
 export const selectSearchText = state => state.curriculum.searchText
+
+export const selectShowResults = state => state.curriculum.showResults
 
 export const selectCurrentLocation = state => state.curriculum.currentLocation
 
 export const selectShowURLButton = state => state.curriculum.showURLButton
 
-export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
+export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentUrl]
 
 export const selectPopoverIsOpen = state => state.curriculum.popoverIsOpen
 
 export const selectPopover2IsOpen = state => state.curriculum.popover2IsOpen
 
 export const selectFocus = state => state.curriculum.focus
+
+// Search through chapter descriptions.
+const documents = ESCurr_SearchDoc;
+
+const idx = lunr(function () {
+    this.ref('id')
+    this.field('title')
+    this.field('text')
+
+    documents.forEach(function (doc) {
+        this.add(doc)
+    }, this)
+})
+
+export const selectSearchResults = createSelector(
+    [selectSearchText],
+    (searchText) => {
+        if (!searchText)
+            return []
+        return idx.search(searchText).map((res) => {
+            const title = documents.find((doc) => {
+                return doc.id === res.ref
+            }).title
+            return {
+                id: res.ref,
+                title: title
+            }
+        })
+    }
+)
 
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages

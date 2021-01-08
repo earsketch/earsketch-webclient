@@ -136,7 +136,12 @@ const CurriculumHeader = () => {
             </div>
 
             <div style={{clear: "both"}}></div>
-            <CurriculumSearchBar></CurriculumSearchBar>
+            {/* The setTimeouts here are a hack to get the correct behavior wrt. focus, blur, and the children of this div.
+              * The intent is to have search results disappear when neither the search bar nor the results themselves are focused. */}
+            <div onFocus={() => setTimeout(() => dispatch(curriculum.showResults(true)), 0)} onBlur={() => setTimeout(() => dispatch(curriculum.showResults(false)), 0)}>
+                <CurriculumSearchBar></CurriculumSearchBar>
+                <CurriculumSearchResults></CurriculumSearchResults>
+            </div>
         </div>
     )
 }
@@ -147,6 +152,25 @@ const CurriculumSearchBar = () => {
     const dispatchSearch = (event) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(''))
     return <SearchBar {... {searchText, dispatchSearch, dispatchReset}}></SearchBar>
+}
+
+const CurriculumSearchResults = () => {
+    const dispatch = useDispatch()
+    const results = useSelector(curriculum.selectSearchResults)
+    const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
+    return (showResults &&
+        <div className="curriculum-search-results">
+            {results.map(result =>
+            <div key={result.id}>
+                <a href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); setTimeout(() => dispatch(curriculum.showResults(false)), 0) }}>
+                    <div className="search-item">
+                        <span>{result.title}</span>
+                    </div>
+                </a>
+            </div>)}
+            <hr className="border-gray-600"></hr>
+        </div>
+    )
 }
 
 const CurriculumPane = () => {
