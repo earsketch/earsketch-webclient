@@ -174,6 +174,10 @@ app.directive('caiwindow', [function () {
                 }, 0);
             });
 
+            $scope.$on("PageChanged", function (evt, data) {
+                caiDialogue.addCurriculumPageToHistory(data);
+                caiStudentHistoryModule.addCurriculumPage(data);
+            });
 
             $scope.$on('compileError', function (evt, data) {
 
@@ -276,9 +280,6 @@ app.directive('caiwindow', [function () {
                 }
             };
 
-            $scope.$on("PageChanged", function(evt, data) {
-                caiStudentHistoryModule.addCurriculumPage(data);
-            });
 
             function onPeriodicCheck() {
                 var message = sendCAIOutputMessage("Looking at your code updates...");

@@ -73,6 +73,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         studentInteracted = didInt;
     }
 
+
+    function addCurriculumPageToHistory(page) {
+        nodeHistory[activeProject].push(["curriculum", page]);
+        console.log(nodeHistory[activeProject]);
+    }
+
     function setActiveProject(p) {
         if (!nodeHistory[p]) {
             nodeHistory[p] = [];
@@ -536,10 +542,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (nodeHistory[activeProject]) {
             // Add current node (by node number) and paramters to node history
             if (Number.isInteger(currentTreeNode[activeProject].id)) {
-                nodeHistory[activeProject].push([currentTreeNode[activeProject].id, parameters])
+                nodeHistory[activeProject].push([currentTreeNode[activeProject].id, parameters]);
             }
             else {
-                nodeHistory[activeProject].push([0, utterance, parameters])
+                nodeHistory[activeProject].push([0, utterance, parameters]);
             }
 
             if (FLAGS.UPLOAD_CAI_HISTORY)
@@ -550,6 +556,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         return utterance;
     }
+
 
     function reconstituteNodeHistory() {
         var newVersion = [];
@@ -763,7 +770,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         getNodeHistory: getNodeHistory,
         activeWaits: activeWaits,
         studentInteractedValue: studentInteractedValue,
-        checkForCodeUpdates: checkForCodeUpdates
+        checkForCodeUpdates: checkForCodeUpdates,
+        addCurriculumPageToHistory: addCurriculumPageToHistory
     };
 
 }]);
