@@ -5,14 +5,15 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     const {href: _url, loc: _location} = fixLocation(url, location)
     dispatch(loadChapter({href: _url, loc: _location}))
     // Check cache before fetching.
-    if (state.curriculum.contentCache[_url] !== undefined) {
-        console.log(`${_url} is in the cache.`)
-        return { url: _url, location: _location, html: state.curriculum.contentCache[_url] }
+    if (state.curriculum.contentCache[_location] !== undefined) {
+        console.log(`${_location} is in the cache, nothing else to do.`)
+        return { cached: true }
     }
-    console.log(`${_url} not in cache, fetching.`)
-    const response = await fetch(_url)
+    const urlWithoutAnchor = _url.split('#', 1)[0]
+    console.log(`${_location} not in cache, fetching ${urlWithoutAnchor}.`)
+    const response = await fetch(urlWithoutAnchor)
     const html = await response.text()
-    return { url: _url, location: _location, html }
+    return { location: _location, html, cached: false }
 })
 
 const curriculumSlice = createSlice({
@@ -21,7 +22,6 @@ const curriculumSlice = createSlice({
         searchText: '',
         showResults: false,
         currentLocation: [-1],
-        currentUrl: '',
         showURLButton: false,
         focus: [null, null], // unit, chapter
         popoverIsOpen: false,
@@ -60,7 +60,6 @@ const curriculumSlice = createSlice({
             }
         },
         loadChapter(state, { payload: { href, loc } }) {
-            state.currentUrl = href
             state.currentLocation = loc
 
             // update the pageIdx for the pagination if necessary
@@ -78,21 +77,23 @@ const curriculumSlice = createSlice({
     },
     extraReducers: {
         [fetchContent.fulfilled]: (state, action) => {
-            if (action.payload.location.length < 3) {
+            if (action.payload.cached) {
+                // HTML has already been previously fetched, processed, and cached - nothing to do.
+            } else if (action.payload.location.length < 3) {
                 // No sections, just cache the content directly.
-                state.contentCache[action.payload.url] = action.payload.html
+                state.contentCache[action.payload.location] = action.payload.html
             } else {
                 // Chop the chapter up into sections.
                 const document = new DOMParser().parseFromString(action.payload.html, "text/html")
                 const body = document.querySelector('div.sect1').parentNode
                 // Special case: first section (sect2) should come with the opening blurb (sect1).
                 // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
-                const sections = [body]
-                for (let el of [...document.querySelectorAll('div.sect2')].slice(1)) {
-                    sections.push(el.cloneNode(true))
+                const chapterLocation = action.payload.location.slice(0, 2)
+                for (let [idx, el] of [...document.querySelectorAll('div.sect2')].slice(1).entries()) {
+                    state.contentCache[chapterLocation.concat([idx + 1])] = el.innerHTML
                     el.remove()
                 }
-                state.contentCache[action.payload.url] = sections
+                state.contentCache[chapterLocation.concat([0])] = body.innerHTML
             }
         },
         [fetchContent.rejected]: (...args) => {
@@ -120,18 +121,7 @@ export const selectCurrentLocation = state => state.curriculum.currentLocation
 
 export const selectShowURLButton = state => state.curriculum.showURLButton
 
-export const selectContent = state => {
-    const content = state.curriculum.contentCache[state.curriculum.currentUrl]
-    if (content === undefined)
-        return undefined
-    const location = state.curriculum.currentLocation
-    if (location.length > 2) {
-        // Return appropriate section.
-        return content[state.curriculum.currentLocation[2]].innerHTML
-    }
-    // No sections (probably an intro or summary page); just return the cache content.
-    return content
-}
+export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
 
 export const selectPopoverIsOpen = state => state.curriculum.popoverIsOpen
 
