@@ -10,20 +10,10 @@ import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
 
 
-// TODO TEMP
-const theme = 'light'
-const currentSection = 'Table of Contents'
 const toc = ESCurr_TOC
 
 let clipboard = null
 
-const getChNumberForDisplay = function(unitIdx, chIdx) {
-    if (toc[unitIdx].chapters[chIdx] === undefined || toc[unitIdx].chapters[chIdx].displayChNum === -1) {
-        return '';
-    } else {
-        return toc[unitIdx].chapters[chIdx].displayChNum;
-    }
-}
 
 const copyURL = (language, currentLocation) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
@@ -46,7 +36,7 @@ const TableOfContents = () => {
                 <ul>
                     {focus[0] === unitIdx &&
                     Object.entries(unit.chapters).map(([chIdx, ch]) => {
-                        const chNumForDisplay = getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
+                        const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
                         return (
                             <li key={chIdx} className="toc-chapters" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
                                 <div className="toc-item">
@@ -65,7 +55,7 @@ const TableOfContents = () => {
                                             <div className="toc-item">
                                                 &emsp;&emsp;
                                                 <a href="#" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
-                                                    {chNumForDisplay}{chNumForDisplay && <span>.</span>}{secIdx+1} {sec.title}
+                                                    {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx+1} {sec.title}
                                                 </a>
                                             </div>
                                         </li>
@@ -182,7 +172,7 @@ const CurriculumPane = () => {
 
             <div id="curriculum-body">
                 <div id="curriculum-atlas">
-                    {currentLocation[0] === -1 ? <TableOfContents></TableOfContents> : <div dangerouslySetInnerHTML={{__html: (content || `Loading... ${currentLocation}`)}}></div>}
+                    {currentLocation[0] === -1 ? <TableOfContents></TableOfContents> : <div dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>}
                 </div>
             </div>
 
@@ -193,7 +183,9 @@ const CurriculumPane = () => {
 
 const CurriculumFooter = () => {
     const dispatch = useDispatch()
+    const location = useSelector(curriculum.selectCurrentLocation)
     const showPopover = useSelector(curriculum.selectPopover2IsOpen)
+    const pageTitle = useSelector(curriculum.selectPageTitle)
 
     const [referenceElement, setReferenceElement] = useState(null)
     const [popperElement, setPopperElement] = useState(null)
@@ -203,9 +195,9 @@ const CurriculumFooter = () => {
         <>
             <div id="curriculum-footer">
                 <div id="navigator" className="unselectable">
-                    <span id="left-button" ng-click="prevPage()" title="Previous Page">&lt;</span>
-                    <span ref={setReferenceElement} id="current-section" title={currentSection} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{currentSection}</span>
-                    <span id="right-button" ng-click="nextPage()" title="Next Page">&gt;</span>
+                    <span id="left-button" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">&lt;</span>
+                    <span ref={setReferenceElement} id="current-section" title={pageTitle} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{pageTitle}</span>
+                    <span id="right-button" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">&gt;</span>
                 </div>
             </div>
             <div ref={setPopperElement}

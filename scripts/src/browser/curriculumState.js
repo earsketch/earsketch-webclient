@@ -3,9 +3,9 @@ import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
     const {href: _url, loc: _location} = fixLocation(url, location)
-    dispatch(loadChapter({href: _url, loc: _location}))
-    // Check cache before fetching.
-    if (state.curriculum.contentCache[_location] !== undefined) {
+    dispatch(loadChapter({location: _location}))
+    // Check cache before fetching. Note that the location [-1] indicates the Table of Contents.
+    if (_location[0] === -1 || state.curriculum.contentCache[_location] !== undefined) {
         console.log(`${_location} is in the cache, nothing else to do.`)
         return { cached: true }
     }
@@ -15,6 +15,19 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     const html = await response.text()
     return { location: _location, html, cached: false }
 })
+
+export const adjustLocation = (location, delta) => {
+    // TODO: just construct reverse map once
+    let pageIdx = tocPages.map(v => v.toString()).indexOf(location.toString()) + delta
+    if (pageIdx < -1) {
+        pageIdx = -1
+    } else if (pageIdx >= tocPages.length) {
+        pageIdx = tocPages.length - 1
+    }
+
+    const newLocation = pageIdx > -1 ? tocPages[pageIdx] : [-1]
+    return newLocation
+}
 
 const curriculumSlice = createSlice({
     name: 'curriculum',
@@ -59,17 +72,11 @@ const curriculumSlice = createSlice({
                 }
             }
         },
-        loadChapter(state, { payload: { href, loc } }) {
-            state.currentLocation = loc
-
-            // update the pageIdx for the pagination if necessary
-            state.pageIdx = tocPages.map(function(v) {
-                return v.toString()
-            }).indexOf(loc.toString())
-
+        loadChapter(state, { payload: { location } }) {
+            state.currentLocation = location
             state.popoverIsOpen = false
             state.popover2IsOpen = false
-            state.showURLButton = true
+            state.showURLButton = location[0] !== -1
         },
         showResults(state, { payload }) {
             state.showResults = payload
@@ -79,21 +86,23 @@ const curriculumSlice = createSlice({
         [fetchContent.fulfilled]: (state, action) => {
             if (action.payload.cached) {
                 // HTML has already been previously fetched, processed, and cached - nothing to do.
-            } else if (action.payload.location.length < 3) {
+                return
+            }
+            const document = new DOMParser().parseFromString(action.payload.html, "text/html")
+            if (action.payload.location.length < 3) {
                 // No sections, just cache the content directly.
-                state.contentCache[action.payload.location] = action.payload.html
+                state.contentCache[action.payload.location] = document.body
             } else {
                 // Chop the chapter up into sections.
-                const document = new DOMParser().parseFromString(action.payload.html, "text/html")
                 const body = document.querySelector('div.sect1').parentNode
                 // Special case: first section (sect2) should come with the opening blurb (sect1).
                 // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
                 const chapterLocation = action.payload.location.slice(0, 2)
                 for (let [idx, el] of [...document.querySelectorAll('div.sect2')].slice(1).entries()) {
-                    state.contentCache[chapterLocation.concat([idx + 1])] = el.innerHTML
+                    state.contentCache[chapterLocation.concat([idx + 1])] = el
                     el.remove()
                 }
-                state.contentCache[chapterLocation.concat([0])] = body.innerHTML
+                state.contentCache[chapterLocation.concat([0])] = body
             }
         },
         [fetchContent.rejected]: (...args) => {
@@ -159,6 +168,51 @@ export const selectSearchResults = createSelector(
     }
 )
 
+export const getChNumberForDisplay = (unitIdx, chIdx) => {
+    if (toc[unitIdx].chapters[chIdx] === undefined || toc[unitIdx].chapters[chIdx].displayChNum === -1) {
+        return '';
+    } else {
+        return toc[unitIdx].chapters[chIdx].displayChNum;
+    }
+}
+
+export const selectPageTitle = createSelector(
+    [selectCurrentLocation, selectContent],
+    (location, content) => {
+        if (location[0] === -1) {
+            return 'Table of Contents'
+        } else if (content === undefined) {
+            return 'Loading...'
+        }
+
+        let title = ''
+
+        if (location.length === 1) {
+            return toc[location[0]].title;
+        } else if (location.length === 2) {
+            const h2 = content.querySelector("h2")
+            if (h2) {
+                title = h2.textContent;
+            }
+            const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
+            if (chNumForDisplay) {
+                title = chNumForDisplay + ': ' + title
+            }
+            return title
+        } else if (location.length === 3) {
+            const h3 = content.querySelector("h3")
+            if (h3) {
+                title = (+location[2]+1) + ': ' + h3.textContent
+            }
+            const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
+            if (chNumForDisplay) {
+                title = chNumForDisplay + '.' + title
+            }
+            return title
+        }
+    }
+)
+
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
 
@@ -188,15 +242,28 @@ const findLocFromTocUrl = (url) => {
             });
         });
     });
-    // pageIdx = i;
+
     return loc;
 }
 
 const fixLocation = (href, loc) => {
-    if (typeof(loc) === 'undefined') {
+    if (loc[0] === -1) {
+        // Special case: Table of Contents
+        return { href: null, loc: [-1] }
+    }
+
+    if (loc === undefined) {
         var url = href.split('/').slice(-1)[0].split('#').slice(0, 1)[0];
         var sectionDiv = href.split('/').slice(-1)[0].split('#')[1];
         loc = findLocFromTocUrl(href);
+    } else if (href === undefined) {
+        if (loc.length === 1) {
+            href = toc[loc[0]].URL
+        } else if (loc.length === 2) {
+            href = toc[loc[0]].chapters[loc[1]].URL
+        } else if (loc.length === 3) {
+            href = toc[loc[0]].chapters[loc[1]].sections[loc[2]].URL
+        }
     }
 
     if (loc.length === 1) {
@@ -213,7 +280,7 @@ const fixLocation = (href, loc) => {
         var currChapter = toc[loc[0]].chapters[loc[1]];
 
         if (currChapter.sections.length > 0) {
-            if (typeof(sectionDiv) === 'undefined') {
+            if (sectionDiv === undefined) {
                 // when opening a chapter-level page, also present the first section
                 loc.push(0); // add the first section (index 0)
                 href = currChapter.sections[0].URL;
