@@ -24,6 +24,10 @@ app.factory('caiStudent', [function () {
             if (value.currentComplexity != null) {
                 studentModel.codeKnowledge["currentComplexity"] = value.currentComplexity;
             }
+            if (value.requests != null) {
+                studentModel.codeKnowledge["requests"] = value.requests;
+                console.log("Requests: " + value.requests);
+            }
         }
 
         if (property == "musicAttributes") {
@@ -46,6 +50,8 @@ app.factory('caiStudent', [function () {
         console.log(studentModel);
 
     }
+
+
 
     return {
         studentModel: studentModel,

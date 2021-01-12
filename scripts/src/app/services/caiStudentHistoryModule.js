@@ -8,6 +8,22 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
 
     var aggregateScore;
     var curriculumPagesViewed;
+    var requests = 0;
+
+    var events = { request: incrementRequest };
+
+    function trackEvent(eventName) {
+        if (eventName in events) {
+            events[eventName]();
+        }
+    }
+
+    function incrementRequest() {
+        requests += 1;
+        
+        caiStudent.updateModel("codeKnowledge", { requests: requests });
+    }
+
 
     function calculateAggregateCodeScore() {
         if (aggregateScore == null) {
@@ -151,7 +167,8 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
     return {
         addScoreToAggregate: addScoreToAggregate,
         calculateAggregateCodeScore: calculateAggregateCodeScore,
-        addCurriculumPage: addCurriculumPage
+        addCurriculumPage: addCurriculumPage,
+        trackEvent: trackEvent
     };
 
 }]);

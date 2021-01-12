@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule) {
+app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule, caiStudentHistoryModule) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};
@@ -318,6 +318,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     function showNextDialogue() {
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]); //make a copy
+        if ("event" in currentTreeNode[activeProject]) {
+            for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
+                caiStudentHistoryModule.trackEvent(currentTreeNode[activeProject].event[k]);
+            }
+        }
         var utterance = currentTreeNode[activeProject].utterance;
         if (currentTreeNode[activeProject].title === "Maybe later") {
             studentInteracted = false;
@@ -683,6 +688,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function generateSuggestion() {
         if (isPrompted) {
             studentInteracted = true;
+            caiStudentHistoryModule.trackEvent("request");
         }
         var outputObj = codeSuggestion.generateCodeSuggestion(null, nodeHistory[activeProject]);
         //var outputText = printObject(outputObj);

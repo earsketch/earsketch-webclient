@@ -192,8 +192,9 @@ app.directive('caiwindow', [function () {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
-
-                        $scope.inputOptions.push({ label: "do you know anything about this error i'm getting", value: "error" });
+                        if ($scope.inputOptions != null) {
+                            $scope.inputOptions.push({ label: "do you know anything about this error i'm getting", value: "error" });
+                        }
                         autoScrollCAI();
                     }, 0);
                 }

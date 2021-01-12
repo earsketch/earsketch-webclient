@@ -27,6 +27,7 @@
         title: "you should suggest sounds",
         utterance: "i think we should start with [sound_rec]",
         parameters: {},
+        event: ["request"],
         options: [5, 6]
     },
     {   id: 5,
@@ -39,6 +40,7 @@
         title: "how about something else?",
         utterance: "we could use one of these\n\n[sound_rec]\n[sound_rec]\n[sound_rec]",
         parameters: {},
+        event: ["request"],
         options: [15, 16]
     },
     {   id: 7,
@@ -51,6 +53,7 @@
         title: "yeah, go ahead",
         utterance: "our next move could be [sound_rec].[SOUNDWAIT|10]",
         parameters: {},
+        event: ["request"],
         options: []
     },
     {   id: 9,
@@ -100,6 +103,7 @@
         title: "can i see some more ideas?",
         utterance: "what about\n\n[sound_rec]\n[sound_rec]",
         parameters: {},
+        event: ["request"],
         options: [15,16]
     },
     {   id: 17,
@@ -112,6 +116,7 @@
         title: "sure",
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
+        event: ["request"],
         options: []
     },
     {   id: 19,
