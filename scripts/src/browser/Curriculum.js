@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
@@ -166,8 +166,14 @@ const CurriculumSearchResults = () => {
 const CurriculumPane = () => {
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
-    // The value isn't used, but we need to component to re-render after layoutController updates.
+    // The value isn't used, but we need the component to re-render after layoutController updates.
     const maximized = useSelector(curriculum.selectMaximized)
+
+    // Highlight search text matches found in the curriculum.
+    const myHilitor = new Hilitor("curriculum-atlas")
+    const searchText = useSelector(curriculum.selectSearchText)
+    myHilitor.setMatchType("left")
+    useEffect(() => myHilitor.apply(searchText))
 
     return (
         <div style={{height: "inherit", padding: "61px 0 60px 0"}}>

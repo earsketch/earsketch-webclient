@@ -256,15 +256,13 @@ const findLocFromTocUrl = (url) => {
 }
 
 const fixLocation = (href, loc) => {
-    if (loc[0] === -1) {
-        // Special case: Table of Contents
-        return { href: null, loc: [-1] }
-    }
-
     if (loc === undefined) {
         var url = href.split('/').slice(-1)[0].split('#').slice(0, 1)[0];
         var sectionDiv = href.split('/').slice(-1)[0].split('#')[1];
         loc = findLocFromTocUrl(href);
+    } else if (loc[0] === -1) {
+        // Special case: Table of Contents
+        return { href: null, loc: [-1] }
     } else if (href === undefined) {
         if (loc.length === 1) {
             href = toc[loc[0]].URL
