@@ -102,12 +102,6 @@ To run a specific task, such as jsdoc building:
     $ cd (webclient directory)
     $ grunt jsdoc
 
-<hr>
-## Bower
-Bower is a client-side dependency-management tool. Bower components are installed for angular, bootstrap, jquery, and less. These are installed under webclient/scripts/vendor/bower_components. Currently, additional plugins for those libraries are installed in their respective folders in the parent director (ie angular-mocks, angular-ui-router, etc).
-
-To be written more.
-
 
 <hr>
 <!--- Documentation --->

@@ -7,7 +7,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-string-replace');
     grunt.loadNpmTasks('grunt-git');
-    grunt.loadNpmTasks('grunt-contrib-requirejs');
 
     grunt.initConfig({
         appVersion: -1,
@@ -68,37 +67,6 @@ module.exports = function (grunt) {
                     hostname: '*',
                     keepalive: true,
                     open: true
-                }
-            }
-        },
-
-        requirejs: {
-            compile: {
-                options: {
-                    baseUrl: 'scripts',
-                    mainConfigFile: "scripts/main.js",
-                    name: "main",
-                    generateSourceMaps: true,
-                    paths: {
-                        // 'empty:' excludes the required file from minimization.
-                        kali: 'empty:'
-                    },
-                    optimize: 'none', // Default uglifier only supports the ES5 syntax.
-                    out: (code) => {
-                        const Terser = require('terser'); // An ES6 uglifier.
-                        const result = Terser.minify(code, {
-                            sourceMap: {
-                                filename: 'out.js',
-                                url: 'out.js.map'
-                            }
-                        });
-                        if (result.error) {
-                            console.log(result.error);
-                        } else {
-                            grunt.file.write('scripts/earsketch.min.js', result.code);
-                            grunt.file.write('scripts/earsketch.min.js.map', result.map);
-                        }
-                    }
                 }
             }
         },
@@ -243,13 +211,5 @@ module.exports = function (grunt) {
         grunt.file.write('package.json', JSON.stringify(pkg,null,2));
 
         // grunt.task.run('string-replace');
-    });
-
-    grunt.registerTask('minify', function(version) {
-        grunt.config.set('scriptsMode', 'prod');
-        var pkg = grunt.file.readJSON('package.json');
-        grunt.config.set('appVersion',pkg.ESVersion);
-        grunt.task.run('string-replace');
-        grunt.task.run('requirejs');
     });
 };
