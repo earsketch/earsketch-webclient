@@ -41,6 +41,7 @@ const curriculumSlice = createSlice({
         popover2IsOpen: false,
         pageIdx: -1,
         contentCache: {},
+        maximized: false,
     },
     reducers: {
         setSearchText(state, { payload }) {
@@ -80,6 +81,11 @@ const curriculumSlice = createSlice({
         },
         showResults(state, { payload }) {
             state.showResults = payload
+        },
+        toggleMaximized(state) {
+            state.maximized = !state.maximized
+            // TODO: Update this when we replace the layoutController.
+            angular.element('[ng-controller=layoutController]').scope().toggleCurriculumMaximization()
         }
     },
     extraReducers: {
@@ -120,6 +126,7 @@ export const {
     loadChapter,
     toggleFocus,
     showResults,
+    toggleMaximized,
 } = curriculumSlice.actions;
 
 export const selectSearchText = state => state.curriculum.searchText
@@ -137,6 +144,8 @@ export const selectPopoverIsOpen = state => state.curriculum.popoverIsOpen
 export const selectPopover2IsOpen = state => state.curriculum.popover2IsOpen
 
 export const selectFocus = state => state.curriculum.focus
+
+export const selectMaximized = state => state.curriculum.maximized
 
 // Search through chapter descriptions.
 const documents = ESCurr_SearchDoc;

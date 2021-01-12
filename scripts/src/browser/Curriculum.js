@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
@@ -77,6 +77,7 @@ const CurriculumHeader = () => {
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const showURLButton = useSelector(curriculum.selectShowURLButton)
     const showPopover = useSelector(curriculum.selectPopoverIsOpen)
+    const maximized = useSelector(curriculum.selectMaximized)
 
     const [referenceElement, setReferenceElement] = useState(null)
     const [popperElement, setPopperElement] = useState(null)
@@ -97,9 +98,8 @@ const CurriculumHeader = () => {
                     </span>
 
                     <span className="btn-fullscreen">
-                        <button ng-click="toggleMaximization()">
-                            <i className="icon-zoom-in" ng-show="!curriculumMaximized" title="Maximize curriculum"></i>
-                            <i className="icon-zoom-out" ng-show="curriculumMaximized" title="Un-maximize curriculum"></i>
+                        <button onClick={() => dispatch(curriculum.toggleMaximized())}>
+                            <i className={"icon-zoom-" + (maximized ? "out" : "in")} title={(maximized ? "Un-maximize" : "Maximize") + " curriculum"}></i>
                         </button>
                     </span>
 
@@ -166,6 +166,9 @@ const CurriculumSearchResults = () => {
 const CurriculumPane = () => {
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
+    // The value isn't used, but we need to component to re-render after layoutController updates.
+    const maximized = useSelector(curriculum.selectMaximized)
+
     return (
         <div style={{height: "inherit", padding: "61px 0 60px 0"}}>
             <CurriculumHeader></CurriculumHeader>
