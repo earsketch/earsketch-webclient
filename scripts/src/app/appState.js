@@ -5,7 +5,8 @@ const appSlice = createSlice({
     initialState: {
         locale: 'us-en',
         scriptLanguage: 'python',
-        colorTheme: 'dark'
+        colorTheme: 'dark',
+        fontSize: 14
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -19,6 +20,9 @@ const appSlice = createSlice({
         },
         toggleColorTheme(state) {
             state.colorTheme = state.colorTheme==='light' ? 'dark' : 'light';
+        },
+        setFontSize(state, { payload }) {
+            state.fontSize = payload
         }
     }
 });
@@ -28,8 +32,10 @@ export const {
     setScriptLanguage,
     toggleScriptLanguage,
     setColorTheme,
-    toggleColorTheme
+    toggleColorTheme,
+    setFontSize
 } = appSlice.actions;
 
 export const selectScriptLanguage = state => state.app.scriptLanguage;
 export const selectColorTheme = state => state.app.colorTheme;
+export const selectFontSize = state => state.app.fontSize;

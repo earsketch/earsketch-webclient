@@ -3,7 +3,7 @@ import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 
-import { usePopper } from 'react-popper';
+import { usePopper } from 'react-popper'
 
 import { SearchBar } from './Browser'
 import * as curriculum from './curriculumState'
@@ -164,8 +164,10 @@ const CurriculumSearchResults = () => {
 }
 
 const CurriculumPane = () => {
-    const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const language = useSelector(appState.selectScriptLanguage)
+    const fontSize = useSelector(appState.selectFontSize)
+
+    const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
     // The value isn't used, but we need the component to re-render after layoutController updates.
     const maximized = useSelector(curriculum.selectMaximized)
@@ -186,7 +188,7 @@ const CurriculumPane = () => {
     }
 
     return (
-        <div style={{height: "inherit", padding: "61px 0 60px 0"}}>
+        <div style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
 
             <div id="curriculum-body">
