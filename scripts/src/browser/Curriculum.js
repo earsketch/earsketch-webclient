@@ -111,7 +111,7 @@ const CurriculumHeader = () => {
                         </button>}
                     </span>
 
-                    <span id="disp-lang" ng-click="toggleDisplayLanguage()">
+                    <span id="disp-lang" onClick={() => dispatch(appState.toggleScriptLanguage())}>
                         {language === 'python' ? 'PY' : 'JS'}
                     </span>
                 </div>
@@ -216,6 +216,24 @@ const CurriculumFooter = () => {
 
 const HotCurriculum = hot(props => {
     clipboard = props.clipboard
+
+    // Handle URL parameters.
+    const ESUtils = props.ESUtils
+    const locstr = ESUtils.getURLParameters('curriculum')
+    if (locstr !== null) {
+        // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
+        const loc = locstr.split('-').map((x) => parseInt(x))
+        if (loc.every((idx) => !isNaN(idx))) {
+            props.$ngRedux.dispatch(curriculum.fetchContent({ location: loc }))
+        }
+    }
+
+    if (['python', 'javascript'].indexOf(ESUtils.getURLParameters('language')) > -1) {
+        // If the user has a script open, that language overwrites this one due to ideController;
+        // this is probably a bug, but the old curriculumPaneController has the same behavior.
+        props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
+    }
+
     return (
         <Provider store={props.$ngRedux}>
             <CurriculumPane></CurriculumPane>
@@ -223,4 +241,4 @@ const HotCurriculum = hot(props => {
     )
 })
 
-app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard']))
+app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils']))
