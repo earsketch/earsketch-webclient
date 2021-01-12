@@ -95,6 +95,8 @@ const curriculumSlice = createSlice({
                 return
             }
             const document = new DOMParser().parseFromString(action.payload.html, "text/html")
+            // Highlight code blocks.
+            document.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
             if (action.payload.location.length < 3) {
                 // No sections, just cache the content directly.
                 state.contentCache[action.payload.location] = document.body

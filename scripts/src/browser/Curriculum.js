@@ -165,6 +165,7 @@ const CurriculumSearchResults = () => {
 
 const CurriculumPane = () => {
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
+    const language = useSelector(appState.selectScriptLanguage)
     const content = useSelector(curriculum.selectContent)
     // The value isn't used, but we need the component to re-render after layoutController updates.
     const maximized = useSelector(curriculum.selectMaximized)
@@ -174,6 +175,15 @@ const CurriculumPane = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     myHilitor.setMatchType("left")
     useEffect(() => myHilitor.apply(searchText))
+
+    // Filter content by language.
+    if (content) {
+        const p = (language === 'python')
+        content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
+        content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
+        content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
+        content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
+    }
 
     return (
         <div style={{height: "inherit", padding: "61px 0 60px 0"}}>
