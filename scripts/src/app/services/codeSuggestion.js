@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', function (caiAnalysisModule, complexityCalculator) {
+app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'caiStudent', function (caiAnalysisModule, complexityCalculator, caiStudent) {
 
     var currentDelta = { soundsAdded: [], sections: 0 };
     var currentDeltaSum = 0;

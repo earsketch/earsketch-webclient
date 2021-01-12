@@ -8,7 +8,7 @@ app.directive('caiwindow', [function () {
 
             $scope.messageListCAI = {};
             $scope.inputTextCAI = { label: '', value: '' };
-            $scope.defaultInputOptions = [{ label: "What should we do next?", value: "suggest" }, { label: "Let's add some more sounds", value: "sound_select" }, { label: "I think we're close to done", value: 'wrapup' }]; // { label: "open_suggestion", value: "open_suggestion" }
+            $scope.defaultInputOptions = [{ label: "what should we do next?", value: "suggest" }, { label: "do you want to come up with some sound ideas?", value: "sound_select" }, { label: "i think we're close to done", value: 'wrapup' }]; // { label: "open_suggestion", value: "open_suggestion" }
             $scope.beginningInputOptions = [{ label: "Chat with CAI", value: "begin" }];
             $scope.inputOptions = $scope.beginningInputOptions.slice();
             $scope.dropupLabel = "Dropup";
@@ -184,14 +184,16 @@ app.directive('caiwindow', [function () {
                 var errorReturn = caiDialogue.handleError(data);
                 if (errorReturn != "") {
                     setTimeout(() => {
-                        var message = sendCAIOutputMessage(errorReturn);
-                        $scope.messageListCAI[$scope.activeProject].push(message);
-                        $scope.$applyAsync();
+                        //var message = sendCAIOutputMessage(errorReturn);
+                        //$scope.messageListCAI[$scope.activeProject].push(message);
+                       // $scope.$applyAsync();
                         $scope.inputOptions = caiDialogue.createButtons();
                         if ($scope.inputOptions.length === 0) {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
+
+                        $scope.inputOptions.push({ label: "do you know anything about this error i'm getting", value: "error" });
                         autoScrollCAI();
                     }, 0);
                 }

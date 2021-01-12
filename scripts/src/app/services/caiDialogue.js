@@ -110,8 +110,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else {
             currentError = error;
-            var msg = startTree('error');
-            return msg;
+           // var msg = startTree('error');
+            return "newError";
         }
     }
 

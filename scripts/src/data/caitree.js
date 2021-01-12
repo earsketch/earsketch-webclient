@@ -7,7 +7,7 @@
     },
     {  id: 1,
         title: "Sure",
-        utterance: "How do you want to begin?",
+        utterance: "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us.|let's get started",
         parameters: {},
         options: [3, 4]
     },
@@ -18,28 +18,28 @@
         options: []
     },
     {   id: 3,
-        title: "I want to pick some sounds",
-        utterance: "Okay! Whenever you are ready, you can run it and we can see how it sounds[WAIT|11]",
+        title: "let me add some sounds",
+        utterance: "sounds good. go ahead and run it when you're done so i can listen.[WAIT|11]",
         parameters: {},
         options: []
     },
     {   id: 4,
-        title: "You can pick some sounds",
-        utterance: "How about [sound_rec]?",
+        title: "you should suggest sounds",
+        utterance: "i think we should start with [sound_rec]",
         parameters: {},
-        options: [5, 6, 7]
+        options: [5, 6]
     },
     {   id: 5,
-        title: "Yes, I like it",
-        utterance: "I think it sounds good too. Do you want me to suggest another sound?",
+        title: "ok, i'll add it",
+        utterance: "should we add more samples?",
         parameters: {},
-        options: [8, 9]
+        options: [8]
     },
     {   id: 6,
-        title: "Can you suggest a different sound?",
-        utterance: "Sure! Will these suggestions work?\n[sound_rec]\n[sound_rec]\n[sound_rec]",
+        title: "how about something else?",
+        utterance: "we could use one of these\n\n[sound_rec]\n[sound_rec]\n[sound_rec]",
         parameters: {},
-        options: [15, 16, 17]
+        options: [15, 16]
     },
     {   id: 7,
         title: "I want to add a different sound.",
@@ -48,41 +48,40 @@
         options: []
     },
     {   id: 8,
-        title: "Sure. What do you got?",
-        utterance: "We can try [sound_rec] next.[SOUNDWAIT|10]",
+        title: "yeah, go ahead",
+        utterance: "our next move could be [sound_rec].[SOUNDWAIT|10]",
         parameters: {},
         options: []
     },
     {   id: 9,
-        title: "Wait, I think I got the next one.",
-        utterance: "Okay! Whenever you are ready, you can run it and we can see how it sounds.",
+        title: "no thanks, i've got the next one.",
+        utterance: "ok, i'll have a listen next time you run the code.",
         parameters: {},
         options: []
     },
     {   id: 10,
         title: "",
-        utterance: "Do you like it?",
+        utterance: "that sounds good.",
         parameters: {},
-        options: [5, 6, 7]
+        options: []
     },
     {   id: 11,
         title: "",
-        utterance: "It sounds pretty good. Do you want to try [sound_rec] next?",
+        utterance: "sounds good. wanna try [sound_rec] next?",
         parameters: {},
-        options: [12, 13, 14]
+        options: [12, 13]
     },
     {   id: 12,
-        title: "Sure, let me try it.",
-        utterance: "Okay! Whenever you are ready, you can run it and we can see how it sounds [WAIT|10]",
+        title: "sounds good to me",
+        utterance: "cool. let me see what that sounds like when you run it. [WAIT|10]",
         parameters: {},
         options: []
     },
     {   id: 13,
-        title: "Let's try a different genre",
-        utterance: "Sure! What are you thinking?",
+        title: "no thanks",
+        utterance: "ok, i'll let you add some stuff and see where we go from there",
         parameters: {},
-        dropup: "Genres",
-        options: [46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67]
+        options: []
     },
     {   id: 14,
         title: "I have a specific instrument in mind.",
@@ -92,16 +91,16 @@
         options: [37,38,39,40,41,42,43,44, 45]
     },
     {   id: 15,
-        title: "Yeah! The first one works.",
-        utterance: "Awesome choice! Would you like me to suggest another sound?",
+        title: "ok, i like one of those",
+        utterance: "i have another one we could add if you want",
         parameters: {},
-        options: [18, 19, 20]
+        options: [18, 19]
     },
     {   id: 16,
-        title: "I like the second one best",
-        utterance: "Awesome choice! Would you like me to suggest another sound?",
+        title: "can i see some more ideas?",
+        utterance: "what about\n\n[sound_rec]\n[sound_rec]",
         parameters: {},
-        options: [18, 19, 20]
+        options: [15,16]
     },
     {   id: 17,
         title: "The third one is best",
@@ -110,14 +109,14 @@
         options: [18, 19, 20]
     },
     {   id: 18,
-        title: "Absolutely! You are on a roll",
-        utterance: "We can try [sound_rec] next[SOUNDWAIT|10]",
+        title: "sure",
+        utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
         options: []
     },
     {   id: 19,
-        title: "Wait a minute. I have an idea for the next sound",
-        utterance: "Okay! Whenever you are ready, you can run it and we can see how it sounds.",
+        title: "no thanks",
+        utterance: "no worries",
         parameters: {},
         options: []
     },
@@ -158,7 +157,7 @@
         options: [31]
     },
     {   id: 26,
-        title: "Yes, how do I fix it?",
+        title: "do you know anything about the error i'm getting?",
         utterance: "[ERROREXPLAIN][ERRORWAIT|28]",
         parameters: {},
         options: []
@@ -171,7 +170,7 @@
     },
     {   id: 28,
         title: "",
-        utterance: "Great, it works",
+        utterance: "good, it works now.",
         parameters: {},
         options: []
     },
@@ -212,13 +211,13 @@
         options: [35]
     },
     {   id: 35,
-        title: "Can you explain more?",
+        title: "can you explain more?",
         utterance: "[SUGGESTIONEXPLAIN]",
         parameters: {},
         options: [36]
     },
     {   id: 36,
-        title: "Do you have an example?",
+        title: "i'm still not 100% on that. do you have an example?",
         utterance: "[SUGGESTIONEXAMPLE]",
         parameters: {},
         options: []
@@ -412,7 +411,7 @@
     {
         id: 68,
         title: "",
-        utterance: "Yeah, this looks just about done.",
+        utterance: "Sounds good. thanks for working with me!",
         parameters: {},
         options: [69, 70]
     },
@@ -438,7 +437,7 @@
     } ];
 
 
-const CAI_TREES = { "Chat with CAI": 0, 'error': 24, 'begin': 0, 'sound_select': 4, 'suggest' : 34, 'wrapup': 68, 'selectinstr': 71 };
+const CAI_TREES = { "Chat with CAI": 1, 'error': 26, 'begin': 1, 'sound_select': 18, 'suggest' : 34, 'wrapup': 68, 'selectinstr': 71 };
 
 const CAI_MUSIC_ANALYSIS = null;
 
