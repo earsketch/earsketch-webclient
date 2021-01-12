@@ -15,19 +15,12 @@ app.factory('caiStudent', [function () {
                 studentModel.codeKnowledge = {};
             }
 
-            if (value.curriculum != null) {
-                studentModel.codeKnowledge["curriculum"] = value.curriculum;
+            var keys = Object.keys(value);
+
+            for (var i = 0; i < keys.length; i++) {
+                studentModel.codeKnowledge[keys[i]] = value[keys[i]];
             }
-            if (value.aggregateComplexity != null) {
-                studentModel.codeKnowledge["aggregateComplexity"] = value.aggregateComplexity;
-            }
-            if (value.currentComplexity != null) {
-                studentModel.codeKnowledge["currentComplexity"] = value.currentComplexity;
-            }
-            if (value.requests != null) {
-                studentModel.codeKnowledge["requests"] = value.requests;
-                console.log("Requests: " + value.requests);
-            }
+
         }
 
         if (property == "musicAttributes") {
@@ -42,12 +35,14 @@ app.factory('caiStudent', [function () {
             if (studentModel.preferences == null) {
                 studentModel["preferences"] = {};
             }
-            if (value.acceptanceRatio != null) {
-                studentModel.preferences['acceptanceRatio'] = value.acceptanceRatio;
+
+            var keys = Object.keys(value);
+            for (var i = 0; i < keys.length; i++) {
+                studentModel.preferences[keys[i]] = value[keys[i]];
             }
         }
 
-        console.log(studentModel);
+        console.log("STUDENT MODEL", studentModel);
 
     }
 

@@ -385,7 +385,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             }
 
             var recs = [];
-
+            var usedRecs = [];
             recs = recommender.recommend([], allSamples, 1, 1, [currentGenre], [currentInstr], recommendationHistory[activeProject], count);
             for (var idx in recs)
                 recommendationHistory[activeProject].push(recs[idx]);
@@ -411,7 +411,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
                     if (file != null && file != "undefined" && !utterance.includes(file)) {
                         newRecString = file + " in the section between measures " + bounds[0] + " and " + bounds[1];
+                        usedRecs.push(file);
                     }
+                }
+                else {
+                    usedRecs.push(recs[recIndex]);
                 }
 
                 if (newRecString !== undefined) {
@@ -432,7 +436,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 utterance = utterance.substring(0, addSoundsIndex) + newString;
             }
             parameters.push(["sound_rec", recs])
-            caiStudentPreferenceModule.addSoundSuggestion(recs);
+            caiStudentPreferenceModule.addSoundSuggestion(usedRecs);
 
         }
         while (utterance.includes("[SECTION]")) {
