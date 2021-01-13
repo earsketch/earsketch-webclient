@@ -8,6 +8,7 @@ import { usePopper } from 'react-popper'
 import { SearchBar } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
+import * as helpers from '../helpers'
 
 
 const toc = ESCurr_TOC
@@ -27,10 +28,10 @@ const TableOfContents = () => {
     return (
         <ul id="toc">
         {Object.entries(toc).map(([unitIdx, unit]) => (
-            <li key={unitIdx} className="toc-items" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
+            <li key={unitIdx} className="toc-items py-1" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                 <div className="toc-item">
                     {unit.chapters.length > 0 &&
-                     <span className="caret-container"><i className={`icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i></span>}
+                     <i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i>}
                     <a href="#" onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
                 </div>
                 <ul>
@@ -38,12 +39,12 @@ const TableOfContents = () => {
                     Object.entries(unit.chapters).map(([chIdx, ch]) => {
                         const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
                         return (
-                            <li key={chIdx} className="toc-chapters" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+                            <li key={chIdx} className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
                                 <div className="toc-item">
                                     &emsp;
                                     {ch.sections.length > 0 ?
-                                      <span className="caret-container"><i className={`icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i></span>
-                                    : <span className="empty-caret-container"><i className="icon icon-arrow-right"></i></span>}
+                                      <i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i>
+                                    : <i className="pr-1 icon icon-arrow-right"></i>}
                                     <a href="#" onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
                                         {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                                     </a>
@@ -51,7 +52,7 @@ const TableOfContents = () => {
                                 <ul>
                                     {focus[1] == chIdx &&
                                     Object.entries(ch.sections).map(([secIdx, sec]) =>
-                                        <li key={secIdx} className="toc-sections">
+                                        <li key={secIdx} className="toc-sections py-1">
                                             <div className="toc-item">
                                                 &emsp;&emsp;
                                                 <a href="#" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
@@ -73,65 +74,20 @@ const TableOfContents = () => {
 
 const CurriculumHeader = () => {
     const dispatch = useDispatch()
-    const language = useSelector(appState.selectScriptLanguage)
-    const currentLocation = useSelector(curriculum.selectCurrentLocation)
-    const showURLButton = useSelector(curriculum.selectShowURLButton)
-    const showPopover = useSelector(curriculum.selectPopoverIsOpen)
-    const maximized = useSelector(curriculum.selectMaximized)
-
-    const [referenceElement, setReferenceElement] = useState(null)
-    const [popperElement, setPopperElement] = useState(null)
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom-end' })
 
     return (
         <div id="curriculum-header">
-            <div className="labels">
-                <div id="layout-title">
-                    <i className="icon icon-book3"></i><span> Curriculum</span>
-                </div>
+            <TitleBar></TitleBar>
+            <NavigationBar></NavigationBar>
 
-                <div id="header-buttons">
-                    <span className="btn-toc">
-                        <button ref={setReferenceElement} onClick={() => { update(); dispatch(curriculum.togglePopover()) }} className="btn btn-xs btn-action">
-                            <i className="icon icon-menu3" title="Show Table of Contents"></i>
-                        </button>
-                    </span>
-
-                    <span className="btn-fullscreen">
-                        <button onClick={() => dispatch(curriculum.toggleMaximized())}>
-                            <i className={"icon-zoom-" + (maximized ? "out" : "in")} title={(maximized ? "Un-maximize" : "Maximize") + " curriculum"}></i>
-                        </button>
-                    </span>
-
-                    {/* copy-URL button */}
-                    <span className="btn-copy-url">
-                        {showURLButton &&
-                        <button onClick={() => copyURL(language, currentLocation)} uib-popover="Curriculum URL Copied!" popover-placement="bottom" popover-animation="true" popover-trigger="outsideClick">
-                            <i className="icon-share22" title="Copy the chapter URL to clipboard"></i>
-                        </button>}
-                    </span>
-
-                    <span id="disp-lang" onClick={() => dispatch(appState.toggleScriptLanguage())}>
-                        {language === 'python' ? 'PY' : 'JS'}
-                    </span>
-                </div>
-
-            </div>
-
-            <div ref={setPopperElement}
-                 style={{backgroundColor: "#333333", ...(showPopover ? styles.popper : { display: 'none' })}}
-                 { ...attributes.popper }
-                 className="border border-black p-5 z-50 rounded-lg">
-                <TableOfContents></TableOfContents>
-            </div>
-
-            <div style={{clear: "both"}}></div>
             {/* The setTimeouts here are a hack to get the correct behavior wrt. focus, blur, and the children of this div.
               * The intent is to have search results disappear when neither the search bar nor the results themselves are focused. */}
             <div onFocus={() => setTimeout(() => dispatch(curriculum.showResults(true)), 0)} onBlur={() => setTimeout(() => dispatch(curriculum.showResults(false)), 0)}>
                 <CurriculumSearchBar></CurriculumSearchBar>
                 <CurriculumSearchResults></CurriculumSearchResults>
             </div>
+
+            <hr style={{height: '7px', backgroundColor: '#5872AD', borderColor: 'transparent'}}></hr>
         </div>
     )
 }
@@ -148,8 +104,9 @@ const CurriculumSearchResults = () => {
     const dispatch = useDispatch()
     const results = useSelector(curriculum.selectSearchResults)
     const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
+    const theme = useSelector(appState.selectColorTheme)
     return (showResults &&
-        <div className="curriculum-search-results">
+        <div className={`curriculum-search-results absolute z-50 bg-white w-full border-b border-black ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
             {results.map(result =>
             <div key={result.id}>
                 <a href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); setTimeout(() => dispatch(curriculum.showResults(false)), 0) }}>
@@ -158,7 +115,106 @@ const CurriculumSearchResults = () => {
                     </div>
                 </a>
             </div>)}
-            <hr className="border-gray-600"></hr>
+        </div>
+    )
+}
+
+const Settings = () => {
+    const dispatch = useDispatch()
+    const [showSettings, setShowSettings] = useState(null)
+    const [referenceElement, setReferenceElement] = useState(null)
+    const [popperElement, setPopperElement] = useState(null)
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom' })
+    const theme = useSelector(appState.selectColorTheme)
+
+    const language = useSelector(appState.selectScriptLanguage)
+    const maximized = useSelector(curriculum.selectMaximized)
+    const currentLocation = useSelector(curriculum.selectCurrentLocation)
+    const showURLButton = useSelector(curriculum.selectShowURLButton)
+
+    const Setting = ({ onClick, value }) => {
+        const theme = useSelector(appState.selectColorTheme)
+        const [highlight, setHighlight] = useState(false)
+        return (
+            <div className={`flex justify-left items-center cursor-pointer px-8 ${theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
+                onClick={(event) => { onClick(event); setShowSettings(false); update() }}
+                onMouseEnter={() => setHighlight(true)}
+                onMouseLeave={() => setHighlight(false)}>
+                <div className='select-none'>{value}</div>
+            </div>
+        )
+    }
+
+    return (
+        <span tabIndex="0" style={{outline: 'none'}}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                    setShowSettings(false)
+                    update()
+                }
+              }}>
+            <button ref={setReferenceElement} onClick={() => { setShowSettings(!showSettings); update() }} className="text-3xl">
+                <i className="icon icon-cog2"></i>
+                <span className="caret"></span>
+                <span className="sr-only">Toggle Dropdown</span>
+            </button>
+
+            <div ref={setPopperElement}
+                 style={showSettings ? styles.popper : { display:'none' }}
+                 {...attributes.popper}
+                 className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
+
+                <Setting onClick={() => dispatch(appState.toggleScriptLanguage())} value={`Switch to ${language === 'python' ? 'JavaScript' : 'Python'}`}></Setting>
+                <Setting onClick={() => dispatch(curriculum.toggleMaximized())} value={(maximized ? "Un-maximize" : "Maximize") + " Curriculum"}></Setting>
+
+                {showURLButton &&
+                <Setting onClick={() => copyURL(language, currentLocation)} value={"Copy URL to Clipboard"}></Setting>}
+            </div>
+        </span>
+    )
+}
+
+export const TitleBar = () => {
+    const dispatch = useDispatch()
+    const layoutScope = helpers.getNgController('layoutController').scope()
+    const theme = useSelector(appState.selectColorTheme)
+
+    const language = useSelector(appState.selectScriptLanguage)
+    const showPopover = useSelector(curriculum.selectPopoverIsOpen)
+
+    const [referenceElement, setReferenceElement] = useState(null)
+    const [popperElement, setPopperElement] = useState(null)
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom-end' })
+
+    return (
+        <div className='flex items-center p-3 text-2xl'>
+            <div className='pl-3 pr-4 font-normal'>
+                CURRICULUM
+            </div>
+            <div>
+                <div
+                    className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
+                    onClick={() => {
+                        layoutScope.toggleLayout('curriculum')
+                        layoutScope.$applyAsync()
+                    }}
+                >
+                    <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
+                </div>
+            </div>
+            <div className="ml-auto">
+                <Settings></Settings>
+
+                <button ref={setReferenceElement} onClick={() => { update(); dispatch(curriculum.togglePopover()) }} className="pl-2 text-3xl">
+                    <i className="icon icon-menu3" title="Show Table of Contents"></i>
+                </button>
+            </div>
+            <div ref={setPopperElement}
+                 style={showPopover ? styles.popper : { display: 'none' }}
+                 { ...attributes.popper }
+                 className={`border border-black p-5 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
+                <TableOfContents></TableOfContents>
+            </div>
         </div>
     )
 }
@@ -187,8 +243,30 @@ const CurriculumPane = () => {
         content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
     }
 
+    // Color theme
+    const theme = useSelector(appState.selectColorTheme)
+    useEffect(() => {
+        if (theme === 'dark') {
+            // TODO remove angular stuff, handle this more cleanly.
+            angular.element('#dropdown-toc').css('background-color', '#373737');
+
+            // remove default pygment class
+            angular.element('#curriculum').removeClass('curriculum-light');
+            angular.element("#curriculum .curriculum-javascript").removeClass('default-pygment');
+            angular.element("#curriculum .curriculum-python").removeClass('default-pygment');
+
+        } else {
+            angular.element('#dropdown-toc').css('background-color', '#FFFFFF');
+
+            // add default pygment class
+            angular.element('#curriculum').addClass('curriculum-light');
+            angular.element("#curriculum .curriculum-javascript").addClass('default-pygment');
+            angular.element("#curriculum .curriculum-python").addClass('default-pygment');
+        }
+    })
+
     return (
-        <div style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
+        <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
 
             <div id="curriculum-body">
@@ -197,12 +275,11 @@ const CurriculumPane = () => {
                 </div>
             </div>
 
-            <CurriculumFooter></CurriculumFooter>
         </div>
     )
 }
 
-const CurriculumFooter = () => {
+const NavigationBar = () => {
     const dispatch = useDispatch()
     const location = useSelector(curriculum.selectCurrentLocation)
     const showPopover = useSelector(curriculum.selectPopover2IsOpen)
@@ -214,17 +291,21 @@ const CurriculumFooter = () => {
 
     return (
         <>
-            <div id="curriculum-footer">
-                <div id="navigator" className="unselectable">
-                    <span id="left-button" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">&lt;</span>
-                    <span ref={setReferenceElement} id="current-section" title={pageTitle} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{pageTitle}</span>
-                    <span id="right-button" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">&gt;</span>
+            <div className="w-full" style={{backgroundColor: '#223546', color: 'white'}}>
+                <div id="navigator" className="flex justify-between items-center">
+                    <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
+                        <i className="icon icon-arrow-left2"></i>
+                    </button>
+                    <span ref={setReferenceElement} id="current-section" className="unselectable" title={pageTitle} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{pageTitle}</span>
+                    <button className="text-2xl" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
+                        <i className="icon icon-arrow-right2 p-3"></i>
+                    </button>
                 </div>
             </div>
             <div ref={setPopperElement}
                  style={{backgroundColor: "#fff", ...(showPopover ? styles.popper : { display: 'none' })}}
                  { ...attributes.popper }
-                 className="border border-black p-5 z-50 rounded-lg">
+                 className="border border-black p-5 z-50">
                 <TableOfContents></TableOfContents>
             </div>
         </>
