@@ -146,7 +146,8 @@ const Settings = () => {
     }
 
     return (
-        <span tabIndex="0" style={{outline: 'none'}}
+        <div className="inline-block align-middle outline-none" tabIndex="0"
+             title="Show more options"
               onBlur={(event) => {
                 if (!event.currentTarget.contains(event.relatedTarget)) {
                     setShowSettings(false)
@@ -156,6 +157,7 @@ const Settings = () => {
             <button ref={setReferenceElement} onClick={() => { setShowSettings(!showSettings); update() }} className="text-3xl">
                 <i className="icon icon-cog2"></i>
                 <span className="caret"></span>
+                {/* Is this redundant with `title` above? */}
                 <span className="sr-only">Toggle Dropdown</span>
             </button>
 
@@ -164,13 +166,12 @@ const Settings = () => {
                  {...attributes.popper}
                  className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
 
-                <Setting onClick={() => dispatch(appState.toggleScriptLanguage())} value={`Switch to ${language === 'python' ? 'JavaScript' : 'Python'}`}></Setting>
                 <Setting onClick={() => dispatch(curriculum.toggleMaximized())} value={(maximized ? "Un-maximize" : "Maximize") + " Curriculum"}></Setting>
 
                 {showURLButton &&
                 <Setting onClick={() => copyURL(language, currentLocation)} value={"Copy URL to Clipboard"}></Setting>}
             </div>
-        </span>
+        </div>
     )
 }
 
@@ -203,6 +204,12 @@ export const TitleBar = () => {
                 </div>
             </div>
             <div className="ml-auto">
+                <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3`}
+                        title="Switch script language"
+                        onClick={() => dispatch(appState.toggleScriptLanguage())}>
+                    {language === 'python' ? 'PY' : 'JS'}
+                </button>
+
                 <Settings></Settings>
 
                 <button ref={setReferenceElement} onClick={() => { update(); dispatch(curriculum.togglePopover()) }} className="pl-2 text-3xl">
