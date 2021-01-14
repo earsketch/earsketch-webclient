@@ -35,8 +35,7 @@ const curriculumSlice = createSlice({
         showResults: false,
         currentLocation: [0],
         focus: [null, null], // unit, chapter
-        popoverIsOpen: false,
-        popover2IsOpen: false,
+        showTableOfContents: false,
         contentCache: {},
         maximized: false,
     },
@@ -47,11 +46,8 @@ const curriculumSlice = createSlice({
         setCurrentLocation(state, { payload }) {
             state.currentLocation = payload
         },
-        togglePopover(state) {
-            state.popoverIsOpen = !state.popoverIsOpen
-        },
-        togglePopover2(state) {
-            state.popover2IsOpen = !state.popover2IsOpen
+        showTableOfContents(state, { payload }) {
+            state.showTableOfContents = payload
         },
         toggleFocus(state, { payload }) {
             let [unitIdx, chIdx] = payload
@@ -72,8 +68,7 @@ const curriculumSlice = createSlice({
         },
         loadChapter(state, { payload: { location } }) {
             state.currentLocation = location
-            state.popoverIsOpen = false
-            state.popover2IsOpen = false
+            state.showTableOfContents = false
         },
         showResults(state, { payload }) {
             state.showResults = payload
@@ -119,8 +114,7 @@ export default curriculumSlice.reducer;
 export const {
     setSearchText,
     setCurrentLocation,
-    togglePopover,
-    togglePopover2,
+    showTableOfContents,
     loadChapter,
     toggleFocus,
     showResults,
@@ -135,9 +129,7 @@ export const selectCurrentLocation = state => state.curriculum.currentLocation
 
 export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
 
-export const selectPopoverIsOpen = state => state.curriculum.popoverIsOpen
-
-export const selectPopover2IsOpen = state => state.curriculum.popover2IsOpen
+export const selectShowTableOfContents = state => state.curriculum.showTableOfContents
 
 export const selectFocus = state => state.curriculum.focus
 

@@ -118,6 +118,7 @@
 #curriculum p, #curriculum dd { /* general text styles */
   font-size: 1em;
   line-height: 125%;
+  margin: 0.75em 0;
 }
 
 #curriculum section[data-type="preface"] > h1 + p,

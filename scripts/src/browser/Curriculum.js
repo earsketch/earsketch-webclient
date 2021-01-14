@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
@@ -29,7 +29,7 @@ const TableOfContents = () => {
     const theme = useSelector(appState.selectColorTheme)
     const textClass = 'text-' + (theme === 'light' ? 'black' : 'white')
     return (
-        <ul id="toc">
+        <ul id="toc" className="select-none">
         {Object.entries(toc).map(([unitIdx, unit]) => (
             <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                 <div className="toc-item">
@@ -174,13 +174,7 @@ export const TitleBar = () => {
     const dispatch = useDispatch()
     const layoutScope = helpers.getNgController('layoutController').scope()
     const theme = useSelector(appState.selectColorTheme)
-
     const language = useSelector(appState.selectScriptLanguage)
-    const showPopover = useSelector(curriculum.selectPopoverIsOpen)
-
-    const [referenceElement, setReferenceElement] = useState(null)
-    const [popperElement, setPopperElement] = useState(null)
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom-end' })
 
     return (
         <div className='flex items-center p-3 text-2xl'>
@@ -206,16 +200,6 @@ export const TitleBar = () => {
                 </button>
 
                 <Settings></Settings>
-
-                <button ref={setReferenceElement} onClick={() => { update(); dispatch(curriculum.togglePopover()) }} className="pl-2 text-3xl">
-                    <i className="icon icon-menu3" title="Show Table of Contents"></i>
-                </button>
-            </div>
-            <div ref={setPopperElement}
-                 style={showPopover ? styles.popper : { display: 'none' }}
-                 { ...attributes.popper }
-                 className={`border border-black p-5 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
-                <TableOfContents></TableOfContents>
             </div>
         </div>
     )
@@ -280,13 +264,23 @@ const CurriculumPane = () => {
 const NavigationBar = () => {
     const dispatch = useDispatch()
     const location = useSelector(curriculum.selectCurrentLocation)
-    const showPopover = useSelector(curriculum.selectPopover2IsOpen)
+    const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)
+    const dropdownRef = useRef(null)
+    const triggerRef = useRef(null)
 
-    const [referenceElement, setReferenceElement] = useState(null)
-    const [popperElement, setPopperElement] = useState(null)
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom' })
+    const handleClick = event => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+            triggerRef.current && !triggerRef.current.contains(event.target)) {
+            dispatch(curriculum.showTableOfContents(false))
+        }
+    }
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClick)
+        return () => document.removeEventListener('mousedown', handleClick)
+    }, [])
 
     return (
         <>
@@ -295,16 +289,17 @@ const NavigationBar = () => {
                     <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
                         {((location + "") !== (tocPages[0] + "")) && <i className="icon icon-arrow-left2"></i>}
                     </button>
-                    <span ref={setReferenceElement} id="current-section" className="unselectable" title={pageTitle} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{pageTitle}</span>
+                    <button ref={triggerRef} title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
+                        {pageTitle}
+                        <i className='icon icon-arrow-down2 text-lg p-2' />
+                    </button>
                     <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
                         {((location + "") !== (tocPages[tocPages.length-1] + "")) && <i className="icon icon-arrow-right2"></i>}
                     </button>
                 </div>
             </div>
-            <div ref={setPopperElement}
-                 style={showPopover ? styles.popper : { display: 'none' }}
-                 { ...attributes.popper }
-                 className={`border border-black p-5 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
+            <div ref={dropdownRef} tabIndex="0"
+                 className={`absolute z-50 w-full border-b border-black p-5 ${theme==='light' ? 'bg-white' : 'bg-black'} ${showTableOfContents ? '' : 'hidden'}`}>
                 <TableOfContents></TableOfContents>
             </div>
         </>
