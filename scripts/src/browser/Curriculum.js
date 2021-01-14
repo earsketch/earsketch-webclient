@@ -21,7 +21,40 @@ const copyURL = (language, currentLocation) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
     clipboard.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
-};
+}
+
+const TableOfContentsChapter = ({ unit, unitIdx, ch, chIdx }) => {
+    const dispatch = useDispatch()
+    const focus = useSelector(curriculum.selectFocus)
+    const theme = useSelector(appState.selectColorTheme)
+    const textClass = 'text-' + (theme === 'light' ? 'black' : 'white')
+    const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
+    return (
+        <li className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+            <div className="toc-item">
+                &emsp;
+                {ch.sections.length > 0 &&
+                <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i></button>}
+                <a href="#" className={textClass} onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
+                    {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
+                </a>
+            </div>
+            <ul>
+                {focus[1] == chIdx &&
+                Object.entries(ch.sections).map(([secIdx, sec]) =>
+                    <li key={secIdx} className="toc-sections py-1">
+                        <div className="toc-item">
+                            &emsp;&emsp;
+                            <a href="#" className={textClass} onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
+                                {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx+1} {sec.title}
+                            </a>
+                        </div>
+                    </li>
+                )}
+            </ul>
+        </li>
+    )
+}
 
 const TableOfContents = () => {
     const dispatch = useDispatch()
@@ -29,48 +62,25 @@ const TableOfContents = () => {
     const theme = useSelector(appState.selectColorTheme)
     const textClass = 'text-' + (theme === 'light' ? 'black' : 'white')
     return (
-        <ul id="toc" className="select-none">
-        {Object.entries(toc).map(([unitIdx, unit]) => (
-            <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                <div className="toc-item">
-                    {unit.chapters.length > 0 &&
-                     <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i></button>}
-                    <a href="#" className={textClass} onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
-                </div>
-                <ul>
-                    {focus[0] === unitIdx &&
-                    Object.entries(unit.chapters).map(([chIdx, ch]) => {
-                        const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
-                        return (
-                            <li key={chIdx} className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
-                                <div className="toc-item">
-                                    &emsp;
-                                    {ch.sections.length > 0 &&
-                                    <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i></button>}
-                                    <a href="#" className={textClass} onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
-                                        {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
-                                    </a>
-                                </div>
-                                <ul>
-                                    {focus[1] == chIdx &&
-                                    Object.entries(ch.sections).map(([secIdx, sec]) =>
-                                        <li key={secIdx} className="toc-sections py-1">
-                                            <div className="toc-item">
-                                                &emsp;&emsp;
-                                                <a href="#" className={textClass} onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
-                                                    {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx+1} {sec.title}
-                                                </a>
-                                            </div>
-                                        </li>
-                                    )}
-                                </ul>
-                            </li>
-                        )
-                    })}
-                </ul>
-            </li>
+        <>
+            <div className="inline-block font-bold text-center w-full">Table of Contents</div>
+            <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />
+            <ul id="toc" className="select-none">
+            {Object.entries(toc).map(([unitIdx, unit]) => (
+                <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
+                    <div className="toc-item">
+                        {unit.chapters.length > 0 &&
+                        <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i></button>}
+                        <a href="#" className={textClass} onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
+                    </div>
+                    <ul>
+                        {focus[0] === unitIdx &&
+                        Object.entries(unit.chapters).map(([chIdx, ch]) => <TableOfContentsChapter key={chIdx} {...{unit, unitIdx, ch, chIdx}} />)}
+                    </ul>
+                </li>
             ))}
-        </ul>
+            </ul>
+        </>
     )
 }
 
@@ -134,28 +144,26 @@ const Settings = () => {
         const [highlight, setHighlight] = useState(false)
         return (
             <div className={`flex justify-left items-center cursor-pointer px-8 ${theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
-                onClick={(event) => { onClick(event); setShowSettings(false); update() }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}>
+                 onClick={(event) => { onClick(event); setShowSettings(false); update() }}
+                 onMouseEnter={() => setHighlight(true)}
+                 onMouseLeave={() => setHighlight(false)}>
                 <div className='select-none'>{value}</div>
             </div>
         )
     }
 
     return (
-        <div className="inline-block align-middle outline-none" tabIndex="0"
+        <div className="inline-block outline-none" tabIndex="0"
              title="Show more options"
-              onBlur={(event) => {
+             onBlur={(event) => {
                 if (!event.currentTarget.contains(event.relatedTarget)) {
                     setShowSettings(false)
                     update()
                 }
-              }}>
-            <button ref={setReferenceElement} onClick={() => { setShowSettings(!showSettings); update() }} className="text-3xl">
-                <i className="icon icon-cog2"></i>
+             }}>
+            <button ref={setReferenceElement} onClick={() => { setShowSettings(!showSettings); update() }} className="text-3xl leading-none align-middle">
+                <i className="icon icon-cog2" style={{lineHeight: '0'}}></i>
                 <span className="caret"></span>
-                {/* Is this redundant with `title` above? */}
-                <span className="sr-only">Toggle Dropdown</span>
             </button>
 
             <div ref={setPopperElement}
@@ -193,7 +201,7 @@ export const TitleBar = () => {
                 </div>
             </div>
             <div className="ml-auto">
-                <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3`}
+                <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
                         title="Switch script language"
                         onClick={() => dispatch(appState.toggleScriptLanguage())}>
                     {language === 'python' ? 'PY' : 'JS'}
@@ -233,21 +241,17 @@ const CurriculumPane = () => {
     const theme = useSelector(appState.selectColorTheme)
     useEffect(() => {
         if (theme === 'dark') {
-            // TODO remove angular stuff, handle this more cleanly.
-            angular.element('#dropdown-toc').css('background-color', '#373737');
-
+            // TODO: remove angular stuff, handle this more cleanly.
             // remove default pygment class
-            angular.element('#curriculum').removeClass('curriculum-light');
-            angular.element("#curriculum .curriculum-javascript").removeClass('default-pygment');
-            angular.element("#curriculum .curriculum-python").removeClass('default-pygment');
+            angular.element('#curriculum').removeClass('curriculum-light')
+            angular.element("#curriculum .curriculum-javascript").removeClass('default-pygment')
+            angular.element("#curriculum .curriculum-python").removeClass('default-pygment')
 
         } else {
-            angular.element('#dropdown-toc').css('background-color', '#FFFFFF');
-
             // add default pygment class
-            angular.element('#curriculum').addClass('curriculum-light');
-            angular.element("#curriculum .curriculum-javascript").addClass('default-pygment');
-            angular.element("#curriculum .curriculum-python").addClass('default-pygment');
+            angular.element('#curriculum').addClass('curriculum-light')
+            angular.element("#curriculum .curriculum-javascript").addClass('default-pygment')
+            angular.element("#curriculum .curriculum-python").addClass('default-pygment')
         }
     })
 
@@ -256,7 +260,6 @@ const CurriculumPane = () => {
             <CurriculumHeader></CurriculumHeader>
 
             <div id="curriculum" className="p-8 h-full overflow-y-auto" style={{fontSize}} dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>
-
         </div>
     )
 }
@@ -298,8 +301,7 @@ const NavigationBar = () => {
                     </button>
                 </div>
             </div>
-            <div ref={dropdownRef} tabIndex="0"
-                 className={`absolute z-50 w-full border-b border-black p-5 ${theme==='light' ? 'bg-white' : 'bg-black'} ${showTableOfContents ? '' : 'hidden'}`}>
+            <div ref={dropdownRef} className={`absolute z-50 w-full border-b border-black p-5 ${theme==='light' ? 'bg-white' : 'bg-black'} ${showTableOfContents ? '' : 'hidden'}`}>
                 <TableOfContents></TableOfContents>
             </div>
         </>
@@ -313,7 +315,10 @@ const HotCurriculum = hot(props => {
     // Handle URL parameters.
     const ESUtils = props.ESUtils
     const locstr = ESUtils.getURLParameters('curriculum')
-    if (locstr !== null) {
+    if (locstr === null) {
+        // Load welcome page initially.
+        props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
+    } else {
         // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
         const loc = locstr.split('-').map((x) => parseInt(x))
         if (loc.every((idx) => !isNaN(idx))) {
@@ -326,9 +331,6 @@ const HotCurriculum = hot(props => {
         // this is probably a bug, but the old curriculumPaneController has the same behavior.
         props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
     }
-
-    // Load welcome page initially.
-    props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
 
     return (
         <Provider store={props.$ngRedux}>

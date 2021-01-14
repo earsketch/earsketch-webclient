@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 
 export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
@@ -15,18 +15,6 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     const html = await response.text()
     return { location: _location, html, cached: false }
 })
-
-export const adjustLocation = (location, delta) => {
-    // TODO: just construct reverse map once
-    let pageIdx = tocPages.map(v => v.toString()).indexOf(location.toString()) + delta
-    if (pageIdx < 0) {
-        pageIdx = 0
-    } else if (pageIdx >= tocPages.length) {
-        pageIdx = tocPages.length - 1
-    }
-
-    return tocPages[pageIdx]
-}
 
 const curriculumSlice = createSlice({
     name: 'curriculum',
@@ -110,7 +98,7 @@ const curriculumSlice = createSlice({
     }
 })
 
-export default curriculumSlice.reducer;
+export default curriculumSlice.reducer
 export const {
     setSearchText,
     setCurrentLocation,
@@ -119,7 +107,7 @@ export const {
     toggleFocus,
     showResults,
     toggleMaximized,
-} = curriculumSlice.actions;
+} = curriculumSlice.actions
 
 export const selectSearchText = state => state.curriculum.searchText
 
@@ -136,7 +124,7 @@ export const selectFocus = state => state.curriculum.focus
 export const selectMaximized = state => state.curriculum.maximized
 
 // Search through chapter descriptions.
-const documents = ESCurr_SearchDoc;
+const documents = ESCurr_SearchDoc
 
 const idx = lunr(function () {
     this.ref('id')
@@ -167,9 +155,9 @@ export const selectSearchResults = createSelector(
 
 export const getChNumberForDisplay = (unitIdx, chIdx) => {
     if (toc[unitIdx].chapters[chIdx] === undefined || toc[unitIdx].chapters[chIdx].displayChNum === -1) {
-        return '';
+        return ''
     } else {
-        return toc[unitIdx].chapters[chIdx].displayChNum;
+        return toc[unitIdx].chapters[chIdx].displayChNum
     }
 }
 
@@ -185,11 +173,11 @@ export const selectPageTitle = createSelector(
         let title = ''
 
         if (location.length === 1) {
-            return toc[location[0]].title;
+            return toc[location[0]].title
         } else if (location.length === 2) {
             const h2 = content.querySelector("h2")
             if (h2) {
-                title = h2.textContent;
+                title = h2.textContent
             }
             const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
             if (chNumForDisplay) {
@@ -210,44 +198,38 @@ export const selectPageTitle = createSelector(
     }
 )
 
+
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
 
-// TODO: clean up the ugly incr stuff
-const findLocFromTocUrl = (url) => {
-    var incr = true;
-    var i = 0;
-    var loc = [0];
-    toc.forEach(function (unit, unitIdx) {
-        unit.chapters.forEach(function (ch, chIdx) {
-            if (ch.URL === url) {
-                loc = [unitIdx, chIdx];
-                incr = false;
-            }
-            if (incr) {
-                i++;
-            }
+const locationToPage = {}
+tocPages.forEach((location, pageIdx) => locationToPage[location] = pageIdx)
 
-            ch.sections.forEach(function (sec, secIdx) {
-                if (sec.URL === url) {
-                    loc = [unitIdx, chIdx, secIdx];
-                    incr = false;
-                }
-                if (incr) {
-                    i++;
-                }
-            });
-        });
-    });
+export const adjustLocation = (location, delta) => {
+    let pageIdx = locationToPage[location] + delta
+    if (pageIdx < 0) {
+        pageIdx = 0
+    } else if (pageIdx >= tocPages.length) {
+        pageIdx = tocPages.length - 1
+    }
 
-    return loc;
+    return tocPages[pageIdx]
 }
+
+
+const urlToLocation = {}
+toc.forEach((unit, unitIdx) => {
+    unit.chapters.forEach((ch, chIdx) => {
+        urlToLocation[ch.URL] = [unitIdx, chIdx]
+        ch.sections.forEach((sec, secIdx) => {
+            urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
+        })
+    })
+})
 
 const fixLocation = (href, loc) => {
     if (loc === undefined) {
-        var url = href.split('/').slice(-1)[0].split('#').slice(0, 1)[0];
-        var sectionDiv = href.split('/').slice(-1)[0].split('#')[1];
-        loc = findLocFromTocUrl(href);
+        loc = urlToLocation[href]
     } else if (href === undefined) {
         if (loc.length === 1) {
             href = toc[loc[0]].URL
@@ -269,25 +251,26 @@ const fixLocation = (href, loc) => {
     }
 
     if (loc.length === 2) {
-        var currChapter = toc[loc[0]].chapters[loc[1]];
+        var currChapter = toc[loc[0]].chapters[loc[1]]
 
         if (currChapter.sections.length > 0) {
+            const sectionDiv = href.split('#')[1]
             if (sectionDiv === undefined) {
                 // when opening a chapter-level page, also present the first section
-                loc.push(0); // add the first section (index 0)
-                href = currChapter.sections[0].URL;
+                loc.push(0) // add the first section (index 0)
+                href = currChapter.sections[0].URL
             } else {
                 //section id was sent in href, present the corresponding section
-                for (var i = 0; i < currChapter.sections.length; ++i) {
+                for (let i = 0; i < currChapter.sections.length; i++) {
                     if (sectionDiv === currChapter.sections[i].URL.split('#')[1]) {
-                        loc.push(i);
-                        href = currChapter.sections[i].URL;
-                        break;
+                        loc.push(i)
+                        href = currChapter.sections[i].URL
+                        break
                     }
                 }
             }
         } else {
-            href = currChapter.URL;
+            href = currChapter.URL
         }
     }
 
