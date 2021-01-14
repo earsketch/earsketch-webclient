@@ -12,6 +12,7 @@ import * as helpers from '../helpers'
 
 
 const toc = ESCurr_TOC
+const tocPages = ESCurr_Pages
 
 let clipboard = null
 
@@ -25,14 +26,16 @@ const copyURL = (language, currentLocation) => {
 const TableOfContents = () => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
+    const theme = useSelector(appState.selectColorTheme)
+    const textClass = 'text-' + (theme === 'light' ? 'black' : 'white')
     return (
         <ul id="toc">
         {Object.entries(toc).map(([unitIdx, unit]) => (
-            <li key={unitIdx} className="toc-items py-1" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
+            <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                 <div className="toc-item">
                     {unit.chapters.length > 0 &&
-                     <i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i>}
-                    <a href="#" onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
+                     <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i></button>}
+                    <a href="#" className={textClass} onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
                 </div>
                 <ul>
                     {focus[0] === unitIdx &&
@@ -42,10 +45,9 @@ const TableOfContents = () => {
                             <li key={chIdx} className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
                                 <div className="toc-item">
                                     &emsp;
-                                    {ch.sections.length > 0 ?
-                                      <i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i>
-                                    : <i className="pr-1 icon icon-arrow-right"></i>}
-                                    <a href="#" onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
+                                    {ch.sections.length > 0 &&
+                                    <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i></button>}
+                                    <a href="#" className={textClass} onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
                                         {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                                     </a>
                                 </div>
@@ -55,7 +57,7 @@ const TableOfContents = () => {
                                         <li key={secIdx} className="toc-sections py-1">
                                             <div className="toc-item">
                                                 &emsp;&emsp;
-                                                <a href="#" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
+                                                <a href="#" className={textClass} onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
                                                     {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx+1} {sec.title}
                                                 </a>
                                             </div>
@@ -130,7 +132,6 @@ const Settings = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const maximized = useSelector(curriculum.selectMaximized)
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
-    const showURLButton = useSelector(curriculum.selectShowURLButton)
 
     const Setting = ({ onClick, value }) => {
         const theme = useSelector(appState.selectColorTheme)
@@ -166,10 +167,8 @@ const Settings = () => {
                  {...attributes.popper}
                  className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
 
-                <Setting onClick={() => dispatch(curriculum.toggleMaximized())} value={(maximized ? "Un-maximize" : "Maximize") + " Curriculum"}></Setting>
-
-                {showURLButton &&
-                <Setting onClick={() => copyURL(language, currentLocation)} value={"Copy URL to Clipboard"}></Setting>}
+                <Setting onClick={() => dispatch(curriculum.toggleMaximized())} value={(maximized ? "Unmaximize" : "Maximize") + " Curriculum"}></Setting>
+                <Setting onClick={() => copyURL(language, currentLocation)} value={"Copy URL to Clipboard"}></Setting>
             </div>
         </div>
     )
@@ -276,11 +275,7 @@ const CurriculumPane = () => {
         <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
 
-            <div id="curriculum-body">
-                <div id="curriculum-atlas">
-                    {currentLocation[0] === -1 ? <TableOfContents></TableOfContents> : <div dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>}
-                </div>
-            </div>
+            <div id="curriculum" className="p-8 h-full overflow-y-auto" style={{fontSize}} dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>
 
         </div>
     )
@@ -291,28 +286,29 @@ const NavigationBar = () => {
     const location = useSelector(curriculum.selectCurrentLocation)
     const showPopover = useSelector(curriculum.selectPopover2IsOpen)
     const pageTitle = useSelector(curriculum.selectPageTitle)
+    const theme = useSelector(appState.selectColorTheme)
 
     const [referenceElement, setReferenceElement] = useState(null)
     const [popperElement, setPopperElement] = useState(null)
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'top' })
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom' })
 
     return (
         <>
             <div className="w-full" style={{backgroundColor: '#223546', color: 'white'}}>
                 <div id="navigator" className="flex justify-between items-center">
                     <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
-                        <i className="icon icon-arrow-left2"></i>
+                        {((location + "") !== (tocPages[0] + "")) && <i className="icon icon-arrow-left2"></i>}
                     </button>
                     <span ref={setReferenceElement} id="current-section" className="unselectable" title={pageTitle} onClick={() => { update(); dispatch(curriculum.togglePopover2()) }}>{pageTitle}</span>
-                    <button className="text-2xl" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
-                        <i className="icon icon-arrow-right2 p-3"></i>
+                    <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
+                        {((location + "") !== (tocPages[tocPages.length-1] + "")) && <i className="icon icon-arrow-right2"></i>}
                     </button>
                 </div>
             </div>
             <div ref={setPopperElement}
-                 style={{backgroundColor: "#fff", ...(showPopover ? styles.popper : { display: 'none' })}}
+                 style={showPopover ? styles.popper : { display: 'none' }}
                  { ...attributes.popper }
-                 className="border border-black p-5 z-50">
+                 className={`border border-black p-5 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
                 <TableOfContents></TableOfContents>
             </div>
         </>
@@ -339,6 +335,9 @@ const HotCurriculum = hot(props => {
         // this is probably a bug, but the old curriculumPaneController has the same behavior.
         props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
     }
+
+    // Load welcome page initially.
+    props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
 
     return (
         <Provider store={props.$ngRedux}>

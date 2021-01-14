@@ -4,8 +4,8 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     const state = getState()
     const {href: _url, loc: _location} = fixLocation(url, location)
     dispatch(loadChapter({location: _location}))
-    // Check cache before fetching. Note that the location [-1] indicates the Table of Contents.
-    if (_location[0] === -1 || state.curriculum.contentCache[_location] !== undefined) {
+    // Check cache before fetching.
+    if (state.curriculum.contentCache[_location] !== undefined) {
         console.log(`${_location} is in the cache, nothing else to do.`)
         return { cached: true }
     }
@@ -19,14 +19,13 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
 export const adjustLocation = (location, delta) => {
     // TODO: just construct reverse map once
     let pageIdx = tocPages.map(v => v.toString()).indexOf(location.toString()) + delta
-    if (pageIdx < -1) {
-        pageIdx = -1
+    if (pageIdx < 0) {
+        pageIdx = 0
     } else if (pageIdx >= tocPages.length) {
         pageIdx = tocPages.length - 1
     }
 
-    const newLocation = pageIdx > -1 ? tocPages[pageIdx] : [-1]
-    return newLocation
+    return tocPages[pageIdx]
 }
 
 const curriculumSlice = createSlice({
@@ -34,12 +33,10 @@ const curriculumSlice = createSlice({
     initialState: {
         searchText: '',
         showResults: false,
-        currentLocation: [-1],
-        showURLButton: false,
+        currentLocation: [0],
         focus: [null, null], // unit, chapter
         popoverIsOpen: false,
         popover2IsOpen: false,
-        pageIdx: -1,
         contentCache: {},
         maximized: false,
     },
@@ -77,7 +74,6 @@ const curriculumSlice = createSlice({
             state.currentLocation = location
             state.popoverIsOpen = false
             state.popover2IsOpen = false
-            state.showURLButton = location[0] !== -1
         },
         showResults(state, { payload }) {
             state.showResults = payload
@@ -136,8 +132,6 @@ export const selectSearchText = state => state.curriculum.searchText
 export const selectShowResults = state => state.curriculum.showResults
 
 export const selectCurrentLocation = state => state.curriculum.currentLocation
-
-export const selectShowURLButton = state => state.curriculum.showURLButton
 
 export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
 
@@ -262,9 +256,6 @@ const fixLocation = (href, loc) => {
         var url = href.split('/').slice(-1)[0].split('#').slice(0, 1)[0];
         var sectionDiv = href.split('/').slice(-1)[0].split('#')[1];
         loc = findLocFromTocUrl(href);
-    } else if (loc[0] === -1) {
-        // Special case: Table of Contents
-        return { href: null, loc: [-1] }
     } else if (href === undefined) {
         if (loc.length === 1) {
             href = toc[loc[0]].URL

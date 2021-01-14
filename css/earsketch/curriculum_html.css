@@ -69,7 +69,7 @@
   background-color: white !important; color:black;
 }
 /* DEFAULT PYGMENTS */
-.default-pygment > .n { color: black } 
+.default-pygment > .n { color: black }
 .default-pgments > .hll { background-color: #ffffcc }
 .default-pygment > .c { color: #a50; font-style: italic } /* Comment */
 .default-pygment > .err { border: 1px solid #FF0000 } /* Error */
@@ -115,59 +115,59 @@
 .default-pygment > .vi { color: #666666 } /* Name.Variable.Instance */
 
 
-p, dd { /* general text styles */
+#curriculum p, #curriculum dd { /* general text styles */
   font-size: 1em;
   line-height: 125%;
 }
 
-section[data-type="preface"] > h1 + p, 
-div[data-type="part"] > h1 + p, 
-section[data-type="chapter"] > h1 + p, 
-section[data-type="chapter"] > h1 + div.author p, 
-section[data-type="sect1"] > h1 + p, 
-section[data-type="sect2"] > h2 + p,
-section[data-type="sect3"] > h3 + p { 
+#curriculum section[data-type="preface"] > h1 + p,
+#curriculum div[data-type="part"] > h1 + p,
+#curriculum section[data-type="chapter"] > h1 + p,
+#curriculum section[data-type="chapter"] > h1 + div.author p,
+#curriculum section[data-type="sect1"] > h1 + p,
+#curriculum section[data-type="sect2"] > h2 + p,
+#curriculum section[data-type="sect3"] > h3 + p {
   text-indent: 0px; /* first paragraph following a heading has no indent */
 }
 
 /* general inlines */
 
-p a {
+#curriculum p a {
   display: inline;
 }
 
 /* frontmatter */
 
-section[data-type="titlepage"] h1 {
+#curriculum section[data-type="titlepage"] h1 {
   /*font-family: serif;*/
 }
 
-section[data-type="titlepage"] h2, 
-section[data-type="copyright-page"] h1 {
+#curriculum section[data-type="titlepage"] h2,
+#curriculum section[data-type="copyright-page"] h1 {
   font-family: sans-serif;
 }
 
-section[data-type="halftitlepage"] {
+#curriculum section[data-type="halftitlepage"] {
   display: none;
 }
 
-section[data-type="titlepage"] {
+#curriculum section[data-type="titlepage"] {
   text-align: left;
   page-break-after: always;
 }
 
-section[data-type="titlepage"] h1 {
+#curriculum section[data-type="titlepage"] h1 {
   border-bottom: 1px solid #333;
   margin-top: 100px;
   padding-bottom: 10px;
 }
 
-section[data-type="titlepage"] h1 {
+#curriculum section[data-type="titlepage"] h1 {
   font-size: 2em;
   line-height: 120%;
 }
 
-section[data-type="titlepage"] h2 {
+#curriculum section[data-type="titlepage"] h2 {
   font-size: 1.2em;
   line-height: 120%;
   margin-top: 20px;
@@ -175,11 +175,11 @@ section[data-type="titlepage"] h2 {
 
 /* styling and positioning for author names and other text */
 
-section[data-type="titlepage"] p:first-of-type {
+#curriculum section[data-type="titlepage"] p:first-of-type {
   margin-top: 82pt;
 }
 
-section[data-type="titlepage"] p {
+#curriculum section[data-type="titlepage"] p {
   font-family: sans-serif;
   font-size: 13pt;
   line-height: 16pt;
@@ -191,16 +191,16 @@ section[data-type="titlepage"] p {
 
 /* copyright page */
 
-section[data-type="copyright-page"] {
+#curriculum section[data-type="copyright-page"] {
   margin-top: 100px;
   page-break-after: always;
 }
 
-section[data-type="copyright-page"] h1 {
+#curriculum section[data-type="copyright-page"] h1 {
   font-size: 0.8em;
 }
 
-section[data-type="copyright-page"] p {
+#curriculum section[data-type="copyright-page"] p {
   font-family: sans-serif;
   font-size: 0.8em;
   margin: 0;
@@ -209,7 +209,7 @@ section[data-type="copyright-page"] p {
 
 /* dedication */
 
-section[data-type="dedication"] {
+#curriculum section[data-type="dedication"] {
   /*font-family: serif;*/
   font-style: italic;
   page-break-after: always;
@@ -221,50 +221,52 @@ section[data-type="dedication"] {
 
 /* global styles for the table of contents */
 /* table of contents is a series of nested lists in a nav element */
-nav[data-type="toc"] {
+#curriculum nav[data-type="toc"] {
   /*padding-top:50px;*/
 }
 
-nav[data-type="toc"] a { /* all table of contents entries are also links */
+#curriculum nav[data-type="toc"] a { /* all table of contents entries are also links */
   font-style: normal;
 }
 
-nav[data-type="toc"] ol {
+#curriculum nav[data-type="toc"] ol {
   list-style-type: none;
   counter-reset: level1;
 
 }
 
-nav[data-type="toc"] ol li:first-of-type:before{
+#curriculum nav[data-type="toc"] ol li:first-of-type:before{
   counter-increment: initial;
   content: counter(level1) ". ";
 }
 
-nav[data-type="toc"] ol li:not(:first-of-type):before{
+#curriculum nav[data-type="toc"] ol li:not(:first-of-type):before{
   counter-increment: level1;
   content: counter(level1) ". ";
 }
 
-nav[data-type="toc"] ol li ol {
+#curriculum nav[data-type="toc"] ol li ol {
     list-style-type: none;
     counter-reset: level2;
 }
-nav[data-type="toc"] ol li ol li:first-of-type:before, nav[data-type="toc"] ol li ol li:not(:first-of-type):before {
+#curriculum nav[data-type="toc"] ol li ol li:first-of-type:before,
+#curriculum nav[data-type="toc"] ol li ol li:not(:first-of-type):before {
     content: counter(level1) "." counter(level2) " ";
     counter-increment: level2;
 }
 
-nav[data-type="toc"] ol li ol li ol{
+#curriculum nav[data-type="toc"] ol li ol li ol{
     list-style-type: none;
     counter-reset: level3;
 }
-nav[data-type="toc"] ol li ol li ol li:first-of-type:before, nav[data-type="toc"] ol li ol li ol li:not(:first-of-type):before  {
+#curriculum nav[data-type="toc"] ol li ol li ol li:first-of-type:before,
+#curriculum nav[data-type="toc"] ol li ol li ol li:not(:first-of-type):before  {
     content: counter(level1) "." counter(level2) "." counter(level3) " ";
     counter-increment: level3;
 }
 
 
-nav[data-type="toc"] > h1 { /* table of contents heading */
+#curriculum nav[data-type="toc"] > h1 { /* table of contents heading */
   font-size: 1.5em;
   line-height: 120%;
   margin-top: 80px;
@@ -274,17 +276,17 @@ nav[data-type="toc"] > h1 { /* table of contents heading */
 
 /* defining fonts for the table of contents */
 
-nav[data-type="toc"] a { 
+#curriculum nav[data-type="toc"] a {
   text-decoration: none;
 }
 
-nav[data-type="toc"] li {
+#curriculum nav[data-type="toc"] li {
   font-family: sans-serif;
 }
 
-nav[data-type="toc"] li[data-type="chapter"], 
-nav[data-type="toc"] li[data-type="part"], 
-nav[data-type="toc"] li[data-type="appendix"] { 
+#curriculum nav[data-type="toc"] li[data-type="chapter"],
+#curriculum nav[data-type="toc"] li[data-type="part"],
+#curriculum nav[data-type="toc"] li[data-type="appendix"] {
   font-size: 1em;
   line-height: 120%;
   margin-left: 0;
@@ -293,35 +295,35 @@ nav[data-type="toc"] li[data-type="appendix"] {
 
 /* entries for parts in the table of contents */
 
-nav[data-type="toc"] li[data-type="part"] { 
+#curriculum nav[data-type="toc"] li[data-type="part"] {
   margin-top: 25px;
 }
 
-nav[data-type="toc"] li[data-type="part"] > a { 
+#curriculum nav[data-type="toc"] li[data-type="part"] > a {
   border-bottom: 0px solid #333;
   width: 91%;
   display: inline-block;
 }
 
-nav[data-type="toc"] li[data-type="part"] ol {
+#curriculum nav[data-type="toc"] li[data-type="part"] ol {
   margin-left: 0;
   text-indent: 0;
 }
 
 /* entries for chapters and appendixes in the table of contents */
 
-nav[data-type="toc"] li[data-type="chapter"] { 
+#curriculum nav[data-type="toc"] li[data-type="chapter"] {
   margin-top: 20px;
 }
 
-nav[data-type="toc"] li[data-type="chapter"]:last-of-type, 
-nav[data-type="toc"] li[data-type="appendix"] { 
+#curriculum nav[data-type="toc"] li[data-type="chapter"]:last-of-type,
+#curriculum nav[data-type="toc"] li[data-type="appendix"] {
   margin-bottom: 20px;
 }
 
 /* entries for sub-sections */
 
-nav[data-type="toc"] li[data-type="chapter"] ol { 
+#curriculum nav[data-type="toc"] li[data-type="chapter"] ol {
   font-family: sans-serif;
   font-size: 1em;
   line-height: 120%;
@@ -329,59 +331,59 @@ nav[data-type="toc"] li[data-type="chapter"] ol {
   text-indent: -10px;
 }
 
-nav[data-type="toc"] li[data-type="chapter"] ol ol { 
+#curriculum nav[data-type="toc"] li[data-type="chapter"] ol ol {
   margin-left: 10px;
   text-indent: -10px;
 }
 
 /* front and backmatter in the table of contents */
 
-nav[data-type="toc"] li[data-type="preface"], 
-nav[data-type="toc"] li[data-type="foreword"], 
-nav[data-type="toc"] li[data-type="glossary"], 
-nav[data-type="toc"] li[data-type="index"] {
+#curriculum nav[data-type="toc"] li[data-type="preface"],
+#curriculum nav[data-type="toc"] li[data-type="foreword"],
+#curriculum nav[data-type="toc"] li[data-type="glossary"],
+#curriculum nav[data-type="toc"] li[data-type="index"] {
   font-size: 1em;
   line-height: 120%;
 }
 
-nav[data-type="toc"] li[data-type="preface"] ol, 
-nav[data-type="toc"] li[data-type="foreword"] ol {
+#curriculum nav[data-type="toc"] li[data-type="preface"] ol,
+#curriculum nav[data-type="toc"] li[data-type="foreword"] ol {
   display: none;
 }
 
 /* page breaks after all chapter-level sections */
 
-section[data-type="preface"], 
-div[data-type="part"], 
-section[data-type="chapter"], 
-section[data-type="appendix"] {
-  page-break-after: always; 
+#curriculum section[data-type="preface"],
+#curriculum div[data-type="part"],
+#curriculum section[data-type="chapter"],
+#curriculum section[data-type="appendix"] {
+  page-break-after: always;
 }
 
 /* preface, chapter, and appendix headings */
 
 /* heading font is sans serif */
 
-nav[data-type="toc"] > h1, 
-div[data-type="part"] > h1, 
-section[data-type="preface"] > h1, 
-section[data-type="chapter"] > h1, 
-section[data-type="appendix"] > h1, 
-section[data-type="sect1"] h1 {
+#curriculum nav[data-type="toc"] > h1,
+#curriculum div[data-type="part"] > h1,
+#curriculum section[data-type="preface"] > h1,
+#curriculum section[data-type="chapter"] > h1,
+#curriculum section[data-type="appendix"] > h1,
+#curriculum section[data-type="sect1"] h1 {
 /*  font-family: serif;
 */  line-height: 120%;
 }
 
-section[data-type="sect2"] h2, 
-section[data-type="sect3"] h3 {
+#curriculum section[data-type="sect2"] h2,
+#curriculum section[data-type="sect3"] h3 {
 /*  font-family: sans-serif;
 */  line-height: 120%;
 }
 
 /* shared styles for all chapter-level headings */
-section[data-type="preface"] > h1, 
-section[data-type="chapter"] > h1, 
-section[data-type="appendix"] > h1 {
+#curriculum section[data-type="preface"] > h1,
+#curriculum section[data-type="chapter"] > h1,
+#curriculum section[data-type="appendix"] > h1 {
   font-size: 1.8em;
   margin-top: 70px;
   margin-bottom: 40px;
@@ -390,19 +392,19 @@ section[data-type="appendix"] > h1 {
 
 /* section headings */
 
-section[data-type="sect1"] h1 { /* A-level headings */
+#curriculum section[data-type="sect1"] h1 { /* A-level headings */
   font-size: 1.5em;
   margin-top: 40px;
   margin-bottom: 20px;
 }
 
-section[data-type="sect2"] h2 { /* B-level headings */
+#curriculum section[data-type="sect2"] h2 { /* B-level headings */
   font-size: 1.1em;
   margin-top: 30px;
   margin-bottom: 10px;
 }
 
-section[data-type="sect3"] h3 { /* C-level headings */
+#curriculum section[data-type="sect3"] h3 { /* C-level headings */
   font-size: 1.1em;
   margin-top: 20px;
   margin-bottom: 10px;
@@ -410,7 +412,7 @@ section[data-type="sect3"] h3 { /* C-level headings */
 
 /* parts */
 
-div[data-type="part"] > h1 {
+#curriculum div[data-type="part"] > h1 {
   font-size: 1.8em;
   text-align: center;
   margin-top: 0px;
@@ -419,12 +421,15 @@ div[data-type="part"] > h1 {
 
 /* lists */
 
-ul, ol { /* bulleted and numbered lists */
+#curriculum ul,
+#curriculum ol { /* bulleted and numbered lists */
   margin: 10px 0 10px 0;
 }
 
-ul li, ol li, 
-ul li p, ol li p {
+#curriculum ul li,
+#curriculum ol li,
+#curriculum ul li p,
+#curriculum ol li p {
   font-family: sans-serif;
   font-size: 1em;
   line-height: 120%;
@@ -432,11 +437,11 @@ ul li p, ol li p {
   text-indent: 0;
 }
 
-dl { /* definition lists */
+#curriculum dl { /* definition lists */
   margin-bottom: 15px;
 }
 
-dt { /* definition list terms */
+#curriculum dt { /* definition list terms */
   font-family: sans-serif;
   font-size: 0.9em;
   line-height: 120%;
@@ -444,25 +449,25 @@ dt { /* definition list terms */
   margin-bottom: 4px;
 }
 
-dd { /* definition list descriptions */
+#curriculum dd { /* definition list descriptions */
   text-indent: 0;
   margin-left: 20px;
 }
 
-dd p {
+#curriculum dd p {
   text-indent: 0;
 }
 
 /* tables */
 
-table {
+#curriculum table {
   margin-top: 30px;
   margin-bottom: 30px;
   border-bottom: 1px solid #888;
   border-collapse: collapse;
 }
 
-table caption {
+#curriculum table caption {
   font-family: sans-serif;
   font-size: 0.8em;
   line-height: 120%;
@@ -471,11 +476,11 @@ table caption {
   padding: 0;
 }
 
-tr {
+#curriculum tr {
   border-width: 0px;
 }
 
-th { /* table heading rows */
+#curriculum th { /* table heading rows */
   font-family: sans-serif;
   font-size: 0.8em;
   line-height: 120%;
@@ -485,29 +490,32 @@ th { /* table heading rows */
   border-bottom: 1px solid #888;
 }
 
-th, td {
+#curriculum th, #curriculum td {
   padding: 6px;
 }
 
-td, table p { /* table body text */
+#curriculum td, #curriculum table p { /* table body text */
   font-family: sans-serif;
   font-size: 12px;
   line-height: 120%;
 }
 
-table p { /* table body text */
+#curriculum table p { /* table body text */
   text-indent: 0;
   margin-top: 6px;
 }
 
-td pre.programlisting, td pre.screen, td pre.literallayout, td code { /* allow code in tables to wrap */
+#curriculum td pre.programlisting,
+#curriculum td pre.screen,
+#curriculum td pre.literallayout,
+#curriculum td code { /* allow code in tables to wrap */
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
 /* figures */
 
-figure { /* figure containers */
+#curriculum figure { /* figure containers */
   margin-top: 30px;
   margin-bottom: 30px;
   padding: 0;
@@ -515,7 +523,7 @@ figure { /* figure containers */
   page-break-inside: avoid;
 }
 
-figure img { /* figure images */
+#curriculum figure img { /* figure images */
   border-top: 1px solid #888;
   border-bottom: 1px solid #888;
   padding: 5px 0 5px 0;
@@ -523,7 +531,7 @@ figure img { /* figure images */
   margin: 0;
 }
 
-figcaption {
+#curriculum figcaption {
   font-family: serif;
   font-size: 1em;
   font-style: italic;
@@ -533,7 +541,7 @@ figcaption {
 
 /* sidebars */
 
-aside { /* sidebar containers */
+#curriculum aside { /* sidebar containers */
   color:#333;
   background-color: #d8d8d8;
   border: 1px solid #d8d8d8;
@@ -541,7 +549,7 @@ aside { /* sidebar containers */
   margin: 30px 0 30px 0;
 }
 
-aside h5 { /* sidebar titles */
+#curriculum aside h5 { /* sidebar titles */
   font-family: sans-serif;
   font-size: 1em;
   line-height: 120%;
@@ -550,14 +558,14 @@ aside h5 { /* sidebar titles */
   padding: 0;
 }
 
-aside h6 { /* sidebar subtitles */
+#curriculum aside h6 { /* sidebar subtitles */
   font-family: sans-serif;
   font-weight: bold;
   font-size: 0.9em;
   line-height: 120%;
 }
 
-aside p { /* sidebar text */
+#curriculum aside p { /* sidebar text */
 /*  font-family: serif;
 */  font-size: 1em;
   line-height: 130%;
@@ -567,8 +575,8 @@ aside p { /* sidebar text */
 
 /* admonitions */
 
-div[data-type="note"], 
-div[data-type="warning"] { /* admonition containers */
+#curriculum div[data-type="note"],
+#curriculum div[data-type="warning"] { /* admonition containers */
   background-color:#DDD;
   border-top: 2px solid #888;
   border-bottom: 1px solid #d8d8d8;
@@ -577,8 +585,8 @@ div[data-type="warning"] { /* admonition containers */
   page-break-inside: avoid; /* avoid breaking admonitions across pages */
 }
 
-div[data-type="note"] h1, 
-div[data-type="warning"] h1 { /* admonition titles */
+#curriculum div[data-type="note"] h1,
+#curriculum div[data-type="warning"] h1 { /* admonition titles */
   color: #000;
   font-family: sans-serif;
   font-weight: bold;
@@ -589,8 +597,8 @@ div[data-type="warning"] h1 { /* admonition titles */
   padding: 0;
 }
 
-div[data-type="note"] p, 
-div[data-type="warning"] p { /* admonition text */
+#curriculum div[data-type="note"] p,
+#curriculum div[data-type="warning"] p { /* admonition text */
   /*font-family: serif;*/
   font-size: 1em;
   line-height: 120%;
@@ -599,39 +607,39 @@ div[data-type="warning"] p { /* admonition text */
 
 /* code */
 
-pre, code { /* monospace font for both code blocks and inline code */
+#curriculum pre, #curriculum code { /* monospace font for both code blocks and inline code */
   font-family: Hack, Monaco, Consolas, 'Lucida Console', monospace;
   background: #323232;
   border: none;
   color:white;
 }
 
-pre { /* code blocks */
+#curriculum pre { /* code blocks */
   font-size: 0.9em;
   line-height: 120%;
   margin: 10px;
   overflow-x: auto;
 }
 
-code { /* inline code */
+#curriculum code { /* inline code */
   background-color:transparent;
   font-size: 0.9em;
   line-height: 120%;
 }
 
-table pre { /* code blocks within tables */
+#curriculum table pre { /* code blocks within tables */
   text-indent: 0;
 }
 
-div[data-type="note"] code, 
-div[data-type="warning"] code, 
-aside code, 
-table code { /* inline code within notes, sidebars and tables */
+#curriculum div[data-type="note"] code,
+#curriculum div[data-type="warning"] code,
+#curriculum aside code,
+#curriculum table code { /* inline code within notes, sidebars and tables */
   font-size: inherit;
   line-height: inherit;
 }
 
-div[data-type="example"] h5 { /* titles for formal code examples */
+#curriculum div[data-type="example"] h5 { /* titles for formal code examples */
   font-family: sans-serif;
   font-size: 0.8em;
   line-height: 120%;
@@ -642,7 +650,7 @@ div[data-type="example"] h5 { /* titles for formal code examples */
 
 /* blockquote */
 
-blockquote {
+#curriculum blockquote {
   font-family: sans-serif;
   font-size: 0.9em;
   line-height: 130%;
@@ -650,7 +658,7 @@ blockquote {
   margin-right: 30px;
 }
 
-blockquote p {
+#curriculum blockquote p {
   text-indent: 0;
 }
 
@@ -690,10 +698,10 @@ blockquote p {
 
 /* API styling */
 
-div.apicontent {
+#curriculum div.apicontent {
   margin-left: 30px;
 }
-.apifunction {
+#curriculum .apifunction {
   font-size: 2em;
 }
 
@@ -707,7 +715,7 @@ div.apicontent {
   }
 }
 
-/* iPhone [portrait + landscape] 
+/* iPhone [portrait + landscape]
 --------------------------------------------------------------------------- */
 
 @media screen and (max-width: 480px) {
@@ -735,5 +743,5 @@ div.apicontent {
     float: none;
     text-indent: 0;
   }
-  
+
 }
