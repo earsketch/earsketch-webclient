@@ -108,15 +108,11 @@ const CurriculumSearchResults = () => {
     const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
     const theme = useSelector(appState.selectColorTheme)
     return (showResults &&
-        <div className={`curriculum-search-results absolute z-50 bg-white w-full border-b border-black ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
+        <div className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`}>
             {results.map(result =>
-            <div key={result.id}>
-                <a href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); setTimeout(() => dispatch(curriculum.showResults(false)), 0) }}>
-                    <div className="search-item">
-                        <span>{result.title}</span>
-                    </div>
-                </a>
-            </div>)}
+            <a key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); setTimeout(() => dispatch(curriculum.showResults(false)), 0) }}>
+                <div className={`search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
+            </a>)}
         </div>
     )
 }
