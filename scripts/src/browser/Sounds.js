@@ -346,8 +346,8 @@ const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, filteredLi
     }, [filteredListChanged]);
 
     const getItemSize = index => {
-        const folderHeight = 42;
-        const clipHeight = 32;
+        const folderHeight = 40;
+        const clipHeight = 33;
         return folderHeight + (expanded.has(index) && clipHeight * fileKeysByFolders[folders[index]].length);
     };
 
