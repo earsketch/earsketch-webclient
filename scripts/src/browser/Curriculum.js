@@ -86,6 +86,8 @@ const TableOfContents = () => {
 
 const CurriculumHeader = () => {
     const dispatch = useDispatch()
+    const location = useSelector(curriculum.selectCurrentLocation)
+    const progress = (location[2] === undefined ? 0 : (location[2] + 1) / toc[location[0]].chapters[location[1]].sections.length)
 
     return (
         <div id="curriculum-header">
@@ -99,7 +101,9 @@ const CurriculumHeader = () => {
                 <CurriculumSearchResults></CurriculumSearchResults>
             </div>
 
-            <hr style={{height: '7px', backgroundColor: '#5872AD', borderColor: 'transparent'}}></hr>
+            <div className="w-full" style={{height: '7px', backgroundColor: '#D8D8D8'}}>
+                <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
+            </div>
         </div>
     )
 }
@@ -259,7 +263,9 @@ const CurriculumPane = () => {
         <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
 
-            <div id="curriculum" className="p-8 h-full overflow-y-auto" style={{fontSize}} dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>
+            <div id="curriculum" style={{fontSize}}>
+                <div className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>
+            </div>
         </div>
     )
 }
@@ -272,6 +278,7 @@ const NavigationBar = () => {
     const theme = useSelector(appState.selectColorTheme)
     const dropdownRef = useRef(null)
     const triggerRef = useRef(null)
+    const [highlight, setHighlight] = useState(false)
 
     const handleClick = event => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
@@ -287,19 +294,24 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div className="w-full" style={{backgroundColor: '#223546', color: 'white'}}>
-                <div id="navigator" className="flex justify-between items-center">
-                    <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
-                        {((location + "") !== (tocPages[0] + "")) && <i className="icon icon-arrow-left2"></i>}
-                    </button>
-                    <button ref={triggerRef} title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
-                        {pageTitle}
-                        <i className='icon icon-arrow-down2 text-lg p-2' />
-                    </button>
-                    <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
-                        {((location + "") !== (tocPages[tocPages.length-1] + "")) && <i className="icon icon-arrow-right2"></i>}
-                    </button>
-                </div>
+            <div className="w-full flex justify-between items-center cursor-pointer select-none"
+                 style={{backgroundColor: highlight ? '#334657' : '#223546', color: 'white'}}
+                 onMouseEnter={() => setHighlight(true)}
+                 onMouseLeave={() => setHighlight(false)}>
+                {((location + "") === (tocPages[0] + "")) ?
+                    <span></span>
+                : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
+                    <i className="icon icon-arrow-left2"></i>
+                    </button>}
+                <button ref={triggerRef} title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
+                    {pageTitle}
+                    <i className='icon icon-arrow-down2 text-lg p-2' />
+                </button>
+                {((location + "") === (tocPages[tocPages.length-1] + "")) ?
+                    <span></span>
+                : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
+                    <i className="icon icon-arrow-right2"></i>
+                    </button>}
             </div>
             <div ref={dropdownRef} className={`absolute z-50 w-full border-b border-black p-5 ${theme==='light' ? 'bg-white' : 'bg-black'} ${showTableOfContents ? '' : 'hidden'}`}>
                 <TableOfContents></TableOfContents>
