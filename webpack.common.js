@@ -140,6 +140,7 @@ module.exports = {
             // currToC: path.resolve(__dirname,`${dataDir}/curr_toc.js`),
             // currPages: path.resolve(__dirname,`${dataDir}/curr_pages.js`),
             // currSearchDoc: path.resolve(__dirname,`${dataDir}/curr_searchdoc.js`),
+            currQuestions: path.resolve(__dirname,`scripts/src/browser/questions.js`),
 
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
@@ -242,7 +243,8 @@ module.exports = {
             // ESCurr_Pages: 'exports-loader?type=commonjs&exports=single ESCurr_Pages!currPages',
             ESNum_Slides: 'exports-loader?type=commonjs&exports=single ESNum_Slides!numSlides',
             // ESCurr_SearchDoc: 'exports-loader?type=commonjs&exports=single ESCurr_SearchDoc!currSearchDoc',
-            
+            Question: 'exports-loader?type=commonjs&exports=single Question!currQuestions',
+
             AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
             NUMBERS_AUDIOKEYS: 'exports-loader?type=commonjs&exports=single NUMBERS_AUDIOKEYS!numbersAudiokeys',
             AUDIOKEYS_RECOMMENDATIONS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_RECOMMENDATIONS!audiokeysRecommendations',

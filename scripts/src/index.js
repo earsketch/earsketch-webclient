@@ -31,6 +31,7 @@ persistStore(store);
 require('jquery');
 require('jqueryUI');
 window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
+window.Question = Question; // Used inside curriculum HTMLs.
 
 import 'angularjs-slider/dist/rzslider.css';
 
