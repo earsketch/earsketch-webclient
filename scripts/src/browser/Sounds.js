@@ -406,7 +406,7 @@ const FeaturedArtistCollection = () => {
     const folders = useSelector(sounds.selectFeaturedFolders);
     const fileKeysByFolders = useSelector(sounds.selectFeaturedFileKeysByFolders);
     const visible = useSelector(sounds.selectFeaturedSoundVisibility);
-    const initExpanded = false;
+    const initExpanded = true;
     const numFileKeys = useSelector(sounds.selectFeaturedFileKeys).length;
     const title = `FEATURED ARTIST${artists.length>1 ? 'S' : ''} (${numFileKeys})`;
     const props = { title, folders, fileKeysByFolders, visible, initExpanded };
