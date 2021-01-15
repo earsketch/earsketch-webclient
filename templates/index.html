@@ -25,9 +25,6 @@
     <!-- Custom styles for Curriculum template -->
     <link rel="stylesheet" type="text/css" href="../curriculum/theme/html/html.css">
 
-    <!-- LESS -->
-    <link rel="stylesheet" type="text/css" href="css/earsketch/allstyles.css">
-
     <!-- highlight js style -->
     <link rel="stylesheet" type="text/css" href="scripts/lib/jsdifflib/diffview.css">
 
@@ -455,9 +452,9 @@
             </div> <!-- end of #content -->
 
             <div ui-layout-container size="440px" collapsed="!layout.curriculum" min-size="360px" id="curriculum-container" ng-style="{'z-index':bubble.active&&bubble.currentPage>=8?35:0}"> <!-- curriculum -->
-                <div id="curriculum" ng-show="!showChatWindow">
+                <article class="prose max-w-none" id="curriculum" ng-show="!showChatWindow">
                     <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div>
-                </div>
+                </article>
                 <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
             </div> <!-- end of #curriculum -->
         </div> <!-- ui-layout -->
