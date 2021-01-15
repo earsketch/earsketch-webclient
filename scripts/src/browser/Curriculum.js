@@ -220,6 +220,7 @@ export const TitleBar = () => {
 const CurriculumPane = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const fontSize = useSelector(appState.selectFontSize)
+    const theme = useSelector(appState.selectColorTheme)
 
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
@@ -232,38 +233,29 @@ const CurriculumPane = () => {
     myHilitor.setMatchType("left")
     useEffect(() => myHilitor.apply(searchText))
 
-    // Filter content by language.
     if (content) {
+        // Filter content by language.
         const p = (language === 'python')
         content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
         content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
         content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
         content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
-    }
 
-    // Color theme
-    const theme = useSelector(appState.selectColorTheme)
-    useEffect(() => {
-        if (theme === 'dark') {
-            // TODO: remove angular stuff, handle this more cleanly.
-            // remove default pygment class
-            angular.element('#curriculum').removeClass('curriculum-light')
-            angular.element("#curriculum .curriculum-javascript").removeClass('default-pygment')
-            angular.element("#curriculum .curriculum-python").removeClass('default-pygment')
-
+        // Apply color theme to code blocks.
+        if (theme === 'light') {
+            content.querySelectorAll(".curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
+            content.querySelectorAll(".curriculum-python").forEach(el => el.classList.add('default-pygment'))
         } else {
-            // add default pygment class
-            angular.element('#curriculum').addClass('curriculum-light')
-            angular.element("#curriculum .curriculum-javascript").addClass('default-pygment')
-            angular.element("#curriculum .curriculum-python").addClass('default-pygment')
+            content.querySelectorAll(".curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
+            content.querySelectorAll(".curriculum-python").forEach(el => el.classList.remove('default-pygment'))
         }
-    })
+    }
 
     return (
         <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
 
-            <div id="curriculum" style={{fontSize}}>
+            <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : ''} style={{fontSize}}>
                 <div className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading... ${currentLocation}`)}}></div>
             </div>
         </div>
@@ -322,27 +314,29 @@ const NavigationBar = () => {
 
 
 const HotCurriculum = hot(props => {
-    clipboard = props.clipboard
+    useEffect(() => {
+        clipboard = props.clipboard
 
-    // Handle URL parameters.
-    const ESUtils = props.ESUtils
-    const locstr = ESUtils.getURLParameters('curriculum')
-    if (locstr === null) {
-        // Load welcome page initially.
-        props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
-    } else {
-        // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
-        const loc = locstr.split('-').map((x) => parseInt(x))
-        if (loc.every((idx) => !isNaN(idx))) {
-            props.$ngRedux.dispatch(curriculum.fetchContent({ location: loc }))
+        // Handle URL parameters.
+        const ESUtils = props.ESUtils
+        const locstr = ESUtils.getURLParameters('curriculum')
+        if (locstr === null) {
+            // Load welcome page initially.
+            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
+        } else {
+            // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
+            const loc = locstr.split('-').map((x) => parseInt(x))
+            if (loc.every((idx) => !isNaN(idx))) {
+                props.$ngRedux.dispatch(curriculum.fetchContent({ location: loc }))
+            }
         }
-    }
 
-    if (['python', 'javascript'].indexOf(ESUtils.getURLParameters('language')) > -1) {
-        // If the user has a script open, that language overwrites this one due to ideController;
-        // this is probably a bug, but the old curriculumPaneController has the same behavior.
-        props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
-    }
+        if (['python', 'javascript'].indexOf(ESUtils.getURLParameters('language')) > -1) {
+            // If the user has a script open, that language overwrites this one due to ideController;
+            // this is probably a bug, but the old curriculumPaneController has the same behavior.
+            props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
+        }
+    }, [])
 
     return (
         <Provider store={props.$ngRedux}>
