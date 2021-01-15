@@ -286,7 +286,7 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div className="w-full flex justify-between items-center cursor-pointer select-none"
+            <div className="w-full flex justify-between items-stretch cursor-pointer select-none"
                  style={{backgroundColor: highlight ? '#334657' : '#223546', color: 'white'}}
                  onMouseEnter={() => setHighlight(true)}
                  onMouseLeave={() => setHighlight(false)}>
@@ -295,7 +295,7 @@ const NavigationBar = () => {
                 : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
                     <i className="icon icon-arrow-left2"></i>
                     </button>}
-                <button ref={triggerRef} title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
+                <button ref={triggerRef} className="w-full" title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
                     {pageTitle}
                     <i className='icon icon-arrow-down2 text-lg p-2' />
                 </button>
