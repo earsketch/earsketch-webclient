@@ -389,7 +389,7 @@ export const selectFavorites = state => state.sounds.filters.favorites;
 export const selectSearchText = state => state.sounds.filters.searchText;
 export const selectFilters = state => state.sounds.filters;
 
-export const selectFilteredEntities = createSelector(
+export const selectFilteredRegularEntities = createSelector(
     [selectAllRegularEntities, selectFilters],
     (entities, filters) => {
         const term = filters.searchText.toUpperCase();
@@ -404,21 +404,64 @@ export const selectFilteredEntities = createSelector(
     }
 );
 
-export const selectFilteredFileKeys = createSelector(
-    [selectFilteredEntities],
+export const selectFilteredRegularFileKeys = createSelector(
+    [selectFilteredRegularEntities],
     (entities) => Object.keys(entities)
 );
 
-export const selectFilteredFolders = createSelector(
-    [selectFilteredEntities],
+export const selectFilteredRegularFolders = createSelector(
+    [selectFilteredRegularEntities],
     (entities) => {
         const entityList = Object.values(entities);
         return Array.from(new Set(entityList.map(v => v.folder)));
     }
 );
 
-export const selectFilteredFileKeysByFolders = createSelector(
-    [selectFilteredEntities, selectFilteredFolders],
+export const selectFilteredRegularFileKeysByFolders = createSelector(
+    [selectFilteredRegularEntities, selectFilteredRegularFolders],
+    (entities, folders) => {
+        const result = {};
+        const entitiesList = Object.values(entities);
+        folders.forEach(folder => {
+            result[folder] = entitiesList.filter(v => v.folder===folder).map(v => v.file_key).sort((a,b) => a.localeCompare(b,undefined,{
+                numeric: true,
+                sensitivity: 'base'
+            }));
+        });
+        return result;
+    }
+);
+
+export const selectFilteredFeaturedEntities = createSelector(
+    [selectFeaturedEntities, selectFilters],
+    (entities, filters) => {
+        const term = filters.searchText.toUpperCase();
+        return pickBy(entities, v => {
+            const field = `${v.folder}${v.file_key}${v.artist}${v.genre}${v.instrument}${v.tempo}`
+            return (term.length ? field.includes(term) : true)
+                && (filters.byFavorites ? filters.favorites.includes(v.file_key) : true)
+                && (filters.artists.length ? filters.artists.includes(v.artist) : true)
+                && (filters.genres.length ? filters.genres.includes(v.genre) : true)
+                && (filters.instruments.length ? filters.instruments.includes(v.instrument) : true)
+        });
+    }
+);
+
+export const selectFilteredFeaturedFileKeys = createSelector(
+    [selectFilteredFeaturedEntities],
+    (entities) => Object.keys(entities)
+);
+
+export const selectFilteredFeaturedFolders = createSelector(
+    [selectFilteredFeaturedEntities],
+    (entities) => {
+        const entityList = Object.values(entities);
+        return Array.from(new Set(entityList.map(v => v.folder)));
+    }
+);
+
+export const selectFilteredFeaturedFileKeysByFolders = createSelector(
+    [selectFilteredFeaturedEntities, selectFilteredFeaturedFolders],
     (entities, folders) => {
         const result = {};
         const entitiesList = Object.values(entities);
@@ -434,9 +477,24 @@ export const selectFilteredFileKeysByFolders = createSelector(
 
 // TODO: Possibly redundant -- filteredFileKeys could be checked for equality.
 export const selectFilteredListChanged = createDeepEqualSelector(
-    [selectFilteredFileKeys], () => {
+    [selectFilteredRegularFileKeys, selectFilteredFeaturedFileKeys], () => {
         return Math.random(); // Return a new value on change.
     }
+);
+
+export const selectAllArtists = createSelector(
+    [selectAllEntities, selectAllFileKeys],
+    (entities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].artist)))
+);
+
+export const selectAllGenres = createSelector(
+    [selectAllEntities, selectAllFileKeys],
+    (entities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].genre)))
+);
+
+export const selectAllInstruments = createSelector(
+    [selectAllEntities, selectAllFileKeys],
+    (entities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].instrument)))
 );
 
 export const selectAllRegularArtists = createSelector(

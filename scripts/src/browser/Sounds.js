@@ -56,9 +56,14 @@ const FilterItem = ({ category, value }) => {
 };
 
 const Filters = () => {
-    const artists = useSelector(sounds.selectAllRegularArtists);
-    const genres = useSelector(sounds.selectAllRegularGenres);
-    const instruments = useSelector(sounds.selectAllRegularInstruments);
+    const includeFeaturedArtists = useSelector(sounds.selectFeaturedSoundVisibility);
+    const artistsSelector = includeFeaturedArtists ? sounds.selectAllArtists : sounds.selectAllRegularArtists;
+    const genresSelector = includeFeaturedArtists ? sounds.selectAllGenres : sounds.selectAllRegularGenres;
+    const instrumentsSelector = includeFeaturedArtists ? sounds.selectAllInstruments : sounds.selectAllRegularInstruments;
+
+    const artists = useSelector(artistsSelector);
+    const genres = useSelector(genresSelector);
+    const instruments = useSelector(instrumentsSelector);
     const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected);
     const numGenresSelected = useSelector(sounds.selectNumGenresSelected);
     const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected);
@@ -390,11 +395,11 @@ const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, filteredLi
 };
 
 const DefaultSoundCollection = () => {
-    const folders = useSelector(sounds.selectFilteredFolders);
-    const fileKeysByFolders = useSelector(sounds.selectFilteredFileKeysByFolders);
+    const folders = useSelector(sounds.selectFilteredRegularFolders);
+    const fileKeysByFolders = useSelector(sounds.selectFilteredRegularFileKeysByFolders);
     const filteredListChanged = useSelector(sounds.selectFilteredListChanged);
     const numFileKeys = useSelector(sounds.selectAllRegularFileKeys).length;
-    const numFilteredFileKeys = useSelector(sounds.selectFilteredFileKeys).length;
+    const numFilteredFileKeys = useSelector(sounds.selectFilteredRegularFileKeys).length;
     const filtered = numFilteredFileKeys !== numFileKeys;
     const title = `SOUND COLLECTION (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
     const props = { title, folders, fileKeysByFolders, filteredListChanged };
@@ -402,14 +407,17 @@ const DefaultSoundCollection = () => {
 };
 
 const FeaturedArtistCollection = () => {
-    const artists = useSelector(sounds.selectFeaturedArtists);
-    const folders = useSelector(sounds.selectFeaturedFolders);
-    const fileKeysByFolders = useSelector(sounds.selectFeaturedFileKeysByFolders);
+    const folders = useSelector(sounds.selectFilteredFeaturedFolders);
+    const fileKeysByFolders = useSelector(sounds.selectFilteredFeaturedFileKeysByFolders);
+    const filteredListChanged = useSelector(sounds.selectFilteredListChanged);
     const visible = useSelector(sounds.selectFeaturedSoundVisibility);
     const initExpanded = true;
     const numFileKeys = useSelector(sounds.selectFeaturedFileKeys).length;
-    const title = `FEATURED ARTIST${artists.length>1 ? 'S' : ''} (${numFileKeys})`;
-    const props = { title, folders, fileKeysByFolders, visible, initExpanded };
+    const numFilteredFileKeys = useSelector(sounds.selectFilteredFeaturedFileKeys).length;
+    const filtered = numFilteredFileKeys !== numFileKeys;
+    const artists = useSelector(sounds.selectFeaturedArtists);
+    const title = `FEATURED ARTIST${artists.length>1 ? 'S' : ''} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
+    const props = { title, folders, fileKeysByFolders, filteredListChanged, visible, initExpanded };
     return <WindowedSoundCollection { ...props } />;
 };
 
