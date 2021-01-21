@@ -33,10 +33,10 @@ phases:
       - npm run $NPM_BUILD_COMMAND -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.host=$ES_HOST
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
-      - mkdir $LOCAL_STAGING_NOCACHE_DIR
+      - mkdir $LOCAL_STAGING_CACHED_DIR
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
-      - cp -r sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
+      - cp -r sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
   post_build:
     commands:
       - |
