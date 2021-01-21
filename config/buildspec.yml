@@ -42,7 +42,6 @@ phases:
       - mkdir $LOCAL_STAGING_DIR
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
-      # - python "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN $CODEBUILD_RESOLVED_SOURCE_VERSION $LOCAL_STAGING_DIR_NAME
   post_build:
     commands:
       - |
@@ -54,6 +53,15 @@ phases:
           echo "Not applying git tag. Non-production environment: $ES_BUILD_ENVIRONMENT"
         fi
 artifacts:
+  base-directory: $LOCAL_STAGING_DIR_NAME
   files:
     - '**/*'
-  base-directory: $LOCAL_STAGING_DIR_NAME
+  secondary-artifacts:
+    artifact_index_html:
+      base-directory: $LOCAL_STAGING_DIR_NAME
+      files:
+        - index.html
+    artifact_web_minus_index_html:
+      base-directory: $LOCAL_STAGING_DIR_NAME
+        files:
+          - '**/*'
