@@ -22,15 +22,6 @@ phases:
     commands:
       - start_time="$(date -u +%s)"
       - du -sh $CODEBUILD_SRC_DIR
-      - echo $ES_SCRIPT_HOME
-      - echo $CODEBUILD_SOURCE_VERSION
-      - echo $LOCAL_STAGING_DIR
-      - echo $ES_VERSION
-      - echo $NPM_BUILD_COMMAND
-      - echo $ENV_FLAGS_FILE
-      - echo $ES_VERSION_MAJOR
-      - echo $ES_VERSION_MINOR
-      - echo Finished printing variables
       - echo "Entered the build phase..."
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm install
@@ -63,5 +54,5 @@ artifacts:
         - index.html
     artifact_web_minus_index_html:
       base-directory: $LOCAL_STAGING_DIR_NAME
-        files:
-          - '**/*'
+      files:
+        - '**/*'
