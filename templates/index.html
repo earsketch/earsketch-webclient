@@ -461,7 +461,7 @@
                     <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div>
                 </div>
                 <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
-                <div caiwindow id="chat-window" ng-show="showCAIWindow"></div>
+                <div caiwindow ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
             </div> <!-- end of #curriculum -->
         </div> <!-- ui-layout -->
     </div> <!-- layoutController -->

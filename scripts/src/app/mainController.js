@@ -19,7 +19,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.showChatWindow = false;
 
     // CAI visibility
-    $scope.enableCAI = true;
+    $scope.enableCAI = FLAGS.SHOW_CAI;
     $scope.showCAIWindow = false;
 
     // TEMPORARY FOR AWS CONTEST TESTING

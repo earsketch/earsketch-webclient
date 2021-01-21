@@ -133,8 +133,7 @@ app.directive('caiwindow', [function () {
                 $scope.inputTextCAI = Object.assign({}, input);
                 return $scope.sendCAIMessage();
             }
-
-
+            
 
             $scope.$on('compileCAI', function (evt, data) {
 
