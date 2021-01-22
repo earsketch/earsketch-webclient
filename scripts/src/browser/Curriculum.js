@@ -87,7 +87,6 @@ const TableOfContents = () => {
 const CurriculumHeader = () => {
     const dispatch = useDispatch()
     const location = useSelector(curriculum.selectCurrentLocation)
-    const progress = (location[2] === undefined ? 0 : (location[2] + 1) / toc[location[0]].chapters[location[1]].sections.length)
 
     return (
         <div id="curriculum-header">
@@ -99,10 +98,6 @@ const CurriculumHeader = () => {
             <div onFocus={() => setTimeout(() => dispatch(curriculum.showResults(true)), 0)} onBlur={() => setTimeout(() => dispatch(curriculum.showResults(false)), 0)}>
                 <CurriculumSearchBar></CurriculumSearchBar>
                 <CurriculumSearchResults></CurriculumSearchResults>
-            </div>
-
-            <div className="w-full" style={{height: '7px', backgroundColor: '#D8D8D8'}}>
-                <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
             </div>
         </div>
     )
@@ -243,11 +238,11 @@ const CurriculumPane = () => {
 
         // Apply color theme to code blocks.
         if (theme === 'light') {
-            content.querySelectorAll(".curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
-            content.querySelectorAll(".curriculum-python").forEach(el => el.classList.add('default-pygment'))
+            content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
+            content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.add('default-pygment'))
         } else {
-            content.querySelectorAll(".curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
-            content.querySelectorAll(".curriculum-python").forEach(el => el.classList.remove('default-pygment'))
+            content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
+            content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
         }
     }
 
@@ -277,7 +272,7 @@ const CurriculumPane = () => {
             <CurriculumHeader></CurriculumHeader>
 
             <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : ''} style={{fontSize}}>
-                <div id="hmmm" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading...`)}}></div>
+                <div id="curriculum-body" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading...`)}}></div>
             </div>
         </div>
     )
@@ -286,6 +281,7 @@ const CurriculumPane = () => {
 const NavigationBar = () => {
     const dispatch = useDispatch()
     const location = useSelector(curriculum.selectCurrentLocation)
+    const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / toc[location[0]].chapters[location[1]].sections.length)
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)
@@ -325,6 +321,9 @@ const NavigationBar = () => {
                 : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
                     <i className="icon icon-arrow-right2"></i>
                     </button>}
+            </div>
+            <div className="w-full" style={{height: '7px'}}>
+                <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
             </div>
             <div ref={dropdownRef} className={`absolute z-50 w-full border-b border-black p-5 ${theme==='light' ? 'bg-white' : 'bg-black'} ${showTableOfContents ? '' : 'hidden'}`}>
                 <TableOfContents></TableOfContents>
