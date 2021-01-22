@@ -950,7 +950,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
                 lang = '';
             }
 
-            var notify_team_members = ["@xfreeman", "@heerman", "@Jas1238Smith", "@sandcobainer"];
+            var notify_team_members = ["@xfreeman", "@heerman", "@manodrum"];
             var body = notify_team_members.join(" ")+"\r\n";
 
             if (userName || userEmail) {

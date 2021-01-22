@@ -38,13 +38,13 @@ export const pages = [
     },
     {
         header: '6/8 Add sounds to your code',
-        body: 'The first folder is the Sound Browser <span class="text-yellow-500 text-3xl align-middle icon icon-sound-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></span>. Click to search the 4,000 plus audio clips to use in your music, composed by popular recording artists.',
+        body: 'The first folder is the Sound Browser <span class="text-yellow-500 text-3xl align-middle icon icon-headphones"></span>. Click to search the 4,000 plus audio clips to use in your music, composed by popular recording artists.',
         ref: '#sidebar-container',
         placement: 'right-start'
     },
     {
         header: '7/8 Save your Code',
-        body: 'Your code is automatically saved to the Scripts Browser <span class="text-yellow-500 text-3xl align-middle icon icon-code-browser"><span class="path1"></span><span class="path2"></span></span>. You can search for scripts by date, programming language, and owner.',
+        body: 'Your code is automatically saved to the Scripts Browser <span class="text-yellow-500 text-3xl align-middle icon icon-embed2"></span>. You can search for scripts by date, programming language, and owner.',
         ref: '#sidebar-container',
         placement: 'right-start'
     },

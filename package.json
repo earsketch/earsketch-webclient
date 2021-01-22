@@ -19,6 +19,7 @@
   "dependencies": {
     "@popperjs/core": "^2.4.4",
     "@reduxjs/toolkit": "^1.4.0",
+    "@tailwindcss/typography": "^0.3.1",
     "ace-builds": "^1.4.11",
     "acorn": "^7.3.1",
     "angular": "^1.8.0",
@@ -66,7 +67,7 @@
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "soundcloud": "^3.3.2",
-    "tailwindcss": "^1.5.2",
+    "tailwindcss": "^2.0.2",
     "uuid": "^8.3.0",
     "xml2js": "^0.4.23"
   },

@@ -3,6 +3,9 @@
 /* CURRICULUM */
 
 #curriculum {
+  // Re-apply default tag styles under #curriculum (post normalize.css).
+  @import (less) "/../vendor/html.css";
+
   background: @dark-bg;
   color: @light-font;
   font-size: 13px;
@@ -10,6 +13,22 @@
   font-family: @font;
   font-weight: 300;
   height: 100%;
+
+  // These reset the defaults under .prose (a tailwind plugin).
+  #toc {
+    > li::before, ul > li::before {
+      display: none;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+  .stretch {
+    all: unset;
+  }
+  code {
+    font-size: 1em;
+  }
 }
 
 #curriculum-header .popover.bottom > .arrow:after, 
@@ -397,4 +416,19 @@ section[data-type="chapter"], nav[data-type="toc"], div[data-type="part"] {
 /* Video */
 #curriculum video {
   width:100%;
+}
+
+.youtube-container .content { 
+  position: relative;
+  overflow: hidden; 
+  padding-bottom: 56.25%; 
+  height: 0; 
+}
+
+.youtube-container .content iframe, .video-container object, .video-container embed { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
 }

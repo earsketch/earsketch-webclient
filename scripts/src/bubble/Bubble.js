@@ -19,7 +19,7 @@ const NavButton = props => {
     const action = props.tag==='proceed' ? proceed : dismissBubble;
     const primary = props.primary;
     const { readyToProceed } = useSelector(state => state.bubble);
-    const backgroundColor = primary ? (readyToProceed ? 'bg-black' : 'bg-gray-400') + ' text-white' : 'bg-white';
+    const backgroundColor = primary ? (readyToProceed ? 'bg-black' : 'bg-gray-300') + ' text-white' : 'bg-white';
     const borderColor = primary && !readyToProceed ? 'border-transparent' : 'border-black';
     const pointer = primary && !readyToProceed ? 'cursor-not-allowed' : 'cursor-pointer';
 
@@ -187,7 +187,7 @@ const MessageBox = () => {
 
     return (
         <div
-            className={`absolute z-40 w-1/3 h-1/6 bg-white p-8`}
+            className={`absolute z-40 w-1/3 bg-white p-8`}
             ref={setPopperElement}
             style={pages[currentPage].ref===null?{}:styles.popper}
             { ...attributes.popper }

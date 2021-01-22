@@ -39,7 +39,7 @@ app.controller("submitAWSController", ['$rootScope', '$scope', '$uibModalInstanc
     };
 
     $scope.updatePopulyLink = function () {
-        window.open("https://www.populy.io/register/FOHAND?scriptid=".concat($scope.lockedShareId)); 
+        window.open("https://rocketjudge.com/register/poRnymQW#scriptid=".concat($scope.lockedShareId));
     }
 
     userProject.getLockedSharedScriptId(script.shareid).then(function(result) {
