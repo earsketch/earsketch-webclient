@@ -273,7 +273,7 @@
                 </button>
 
                 <!-- CAI User Interface -->
-                <button ng-if="enableCAI" class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': !showCAIWindow}" ng-click="toggleLayout('cai')" id="sidenav-cai" data-toggle="tooltip" title="CAI">
+                <button ng-if-cai="enableCAI" class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': !showCAIWindow}" ng-click="toggleLayout('cai')" id="sidenav-cai" data-toggle="tooltip" title="CAI">
                     <i class="icon icon-bubbles"></i>
                 </button>
 
@@ -461,7 +461,7 @@
                     <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div>
                 </div>
                 <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
-                <div caiwindow ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
+                <div caiwindow ng-if-cai="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
             </div> <!-- end of #curriculum -->
         </div> <!-- ui-layout -->
     </div> <!-- layoutController -->

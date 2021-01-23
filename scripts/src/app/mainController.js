@@ -19,6 +19,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.showChatWindow = false;
 
     // CAI visibility
+    console.log("CAI",FLAGS.SHOW_CAI);
     $scope.enableCAI = FLAGS.SHOW_CAI;
     $scope.showCAIWindow = false;
 
