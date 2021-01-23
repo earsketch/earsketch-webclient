@@ -135,7 +135,6 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
     var codeComplexity = analyzeCode(language, script);
        var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.apiCalls());
        savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis });
-       console.log("SHOW CAI 2", FLAGS.SHOW_CAI);
        if (caiStudent != null && FLAGS.SHOW_CAI) {
            //caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity });
            caiStudent.updateModel("musicAttributes", musicAnalysis);

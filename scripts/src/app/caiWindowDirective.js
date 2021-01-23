@@ -48,7 +48,6 @@ app.directive('caiwindow', [function () {
             $scope.$on('caiSwapTab', function (event, name) {
                 $scope.activeProject = name;
                 caiDialogue.setActiveProject($scope.activeProject);
-                console.log("caiswaptab");
                 if (!$scope.messageListCAI[$scope.activeProject]) {
                     $scope.messageListCAI[$scope.activeProject] = [];
                     $scope.introduceCAI();
@@ -157,7 +156,6 @@ app.directive('caiwindow', [function () {
                     if (output != null && output != "") {
 
                         var message = sendCAIOutputMessage(output);
-                        console.log("message", message, $scope.messageListCAI);
                         $scope.messageListCAI[$scope.activeProject].push(message);
                         $scope.$applyAsync();
                         $scope.inputOptions = caiDialogue.createButtons();
