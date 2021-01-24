@@ -399,13 +399,11 @@ app.directive('caiwindow', [function () {
             };
 
             $scope.$on("reloadRecommendations", function (evt, data) {
-                // console.log("running check update");
                 var editorCode = $scope.editor.ace.session.doc.$lines.join("\n");
                 caiDialogue.checkForCodeUpdates(editorCode);
             });
 
             $scope.$on('userOnPage', function(event,time)  {
-                // console.log("time ", time)
                 caiStudentPreferenceModule.addOnPageStatus(1,time);
             });
             $scope.$on('userOffPage', function(event,time)  {
@@ -414,13 +412,11 @@ app.directive('caiwindow', [function () {
 
 
             $scope.$on('keyStroke', function(event,action, content,time) {
-                // console.log("listener", action, content);
                 caiStudentPreferenceModule.addKeystroke(action, content, time);
             });
 
             $scope.$on('mousePosition', function(event,x,y) {
                 caiStudentPreferenceModule.addMousePos({x,y});
-                // console.log("POS", x, y); 
             });
 
         }]

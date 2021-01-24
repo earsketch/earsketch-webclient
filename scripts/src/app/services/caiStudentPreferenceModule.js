@@ -1,5 +1,6 @@
 ﻿//import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS} from 'caiTree';
 
+import { computeStyles } from "@popperjs/core";
 import { parseString } from "xml2js";
 
 /**
@@ -196,7 +197,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
 
     function addCompileTS(time) {
         compileTS.push(time);
-        lastEditTs = time;
+        lastEditTS = time;
         caiStudent.updateModel("preferences", { compileTS: compileTS});
     }
 
@@ -208,16 +209,21 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
 
     function addCompileError(error, time) {
         compileErrors.push({error, time});
-        // console.log("compile errors", compileErrors);
         caiStudent.updateModel("preferences", { compileErrors: compileErrors});
     }
 
     function stuckOnError() {
-        if (compileErrors.length >= recentCompiles && compileErrors[-1] == compileErrors[-2] && compileErrors[-2] == compileErrors[-3]) {
+        var recentHistory = compileErrors.slice(compileErrors.length-recentCompiles, compileErrors.length);
+        var errors = recentHistory.map(function(a) {return a.error[0].args.v[0].v;});
+        if (compileErrors.length >= recentCompiles && allEqual(errors)) {
             return true;
         }
         return false;
     }
+
+    function allEqual(arr) {
+        return new Set(arr).size == 1;
+      }
 
     function addMousePos(pos) {
         mousePos.push(pos);
@@ -242,7 +248,8 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
         addCompileTS: addCompileTS,
         addKeystroke: addKeystroke,
         addMousePos: addMousePos,
-        returnPageStatus: returnPageStatus
+        returnPageStatus: returnPageStatus,
+        stuckOnError: stuckOnError
     };
 
 }]);

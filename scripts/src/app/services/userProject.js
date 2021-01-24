@@ -148,7 +148,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             $rootScope.$broadcast("mousePosition",mouse_x, mouse_y);
             // console.log('x', e.x,'y', e.y); 
             clearInterval();
-        }, 3000);
+        }, 5000);
     
 
     /**
