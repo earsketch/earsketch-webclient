@@ -103,7 +103,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function handleError(error) {
-
+        // console.log("error",currentError);
+        var t = Date.now();
+        caiStudentPreferenceModule.addCompileError(error, t);
         if (String(error[0]) === String(currentError[0]) && errorWait != -1) {
             //then it's the same error. do nothing. we still wait
             return "";

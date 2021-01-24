@@ -1,10 +1,13 @@
 ﻿//import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS} from 'caiTree';
+
+import { parseString } from "xml2js";
+
 /**
  * Student preference module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
+app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function (caiStudent, userProject) {
 
     //var init
     var suggestionsAccepted = 0;
@@ -167,13 +170,79 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
         acceptanceRatio = suggestionsAccepted / (suggestionsAccepted + suggestionsRejected);
         caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
     }
+   
+    var bucketSize = 30; // options range from 10s - 120s
+    // for experimenting
+    // var bucketOptions = [10,20,30,40,50,60,90,120];
+
+    var onPageHistory = [];
+    var lastEditTS = 0;
+    var deleteKeyTS = [];
+    var recentCompiles = 3;
+    var compileTS = [];
+    var compileErrors = [];
+    var mousePos = [];
+
+
+    function addOnPageStatus(status, time) {
+        onPageHistory.push({status,time});
+        caiStudent.updateModel("preferences", { onPageHistory: onPageHistory});
+        // console.log("history", onPageHistory);
+    }
+
+    function returnPageStatus() {
+        return onPageHistory[-1];
+    }
+
+    function addCompileTS(time) {
+        compileTS.push(time);
+        lastEditTs = time;
+        caiStudent.updateModel("preferences", { compileTS: compileTS});
+    }
+
+    function addKeystroke(action, content, time) {
+        if (action=='remove') {
+            deleteKeyTS.push(time);
+        }
+    }
+
+    function addCompileError(error, time) {
+        compileErrors.push({error, time});
+        // console.log("compile errors", compileErrors);
+        caiStudent.updateModel("preferences", { compileErrors: compileErrors});
+    }
+
+    function stuckOnError() {
+        if (compileErrors.length >= recentCompiles && compileErrors[-1] == compileErrors[-2] && compileErrors[-2] == compileErrors[-3]) {
+            return true;
+        }
+        return false;
+    }
+
+    function addMousePos(pos) {
+        mousePos.push(pos);
+        caiStudent.updateModel("preferences", { mousePos: mousePos});
+    }
+
+    // what are the measures to understand how off or on task one is?
+
+    // other options: caiClose, pageChanged, caiSwapTab 
+    // time spent on each project
+    // start/end of key presses [bursts]
+    // mouse clicks
+
 
     return {
         addSoundSuggestion: addSoundSuggestion,
         runSound: runSound,
         addCodeSuggestion: addCodeSuggestion,
-        runCode: runCode
-
+        runCode: runCode,
+        addOnPageStatus: addOnPageStatus,
+        addCompileError, addCompileError,
+        addCompileTS: addCompileTS,
+        addKeystroke: addKeystroke,
+        addMousePos: addMousePos,
+        returnPageStatus: returnPageStatus
     };
 
 }]);
