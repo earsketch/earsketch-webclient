@@ -141,15 +141,20 @@ export const selectSearchResults = createSelector(
     (searchText) => {
         if (!searchText)
             return []
-        return idx.search(searchText).map((res) => {
-            const title = documents.find((doc) => {
-                return doc.id === res.ref
-            }).title
-            return {
-                id: res.ref,
-                title: title
-            }
-        })
+        try {
+            return idx.search(searchText).map((res) => {
+                const title = documents.find((doc) => {
+                    return doc.id === res.ref
+                }).title
+                return {
+                    id: res.ref,
+                    title: title
+                }
+            })
+        } catch (error) {
+            console.log(`lunr parse error on "${searchText}"`)
+            return []
+        }
     }
 )
 
