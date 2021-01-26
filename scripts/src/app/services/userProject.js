@@ -125,6 +125,32 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         }
     };
 
+    $window.onfocus = function() {
+        var t = Date.now();
+        $rootScope.$broadcast('userOnPage',t);
+        // console.log("on page");
+    };
+
+    $window.onblur = function() {
+        var t = Date.now();
+        $rootScope.$broadcast('userOffPage',t);
+        // console.log("off page");        
+    };
+
+    var mouse_x;
+    var mouse_y;
+    $window.addEventListener('mousemove', function (e) {
+        mouse_x = e.x;
+        mouse_y = e.y;
+    });   
+
+    $window.setInterval(function() {
+            $rootScope.$broadcast("mousePosition",mouse_x, mouse_y);
+            // console.log('x', e.x,'y', e.y); 
+            clearInterval();
+        }, 5000);
+    
+
     /**
      * Because scripts and openScripts are objects and we can't reset them
      * simply by re-instantiating empty objects, we use resetScripts() to

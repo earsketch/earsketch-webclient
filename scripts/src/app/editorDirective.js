@@ -382,6 +382,11 @@ app.directive('editor', ['$rootScope', 'collaboration', 'esconsole', '$timeout',
             // TODO: add listener if collaboration userStatus is owner, remove otherwise
             // TODO: also make sure switching / closing tab is handled
             scope.editor.ace.on('change', function (event) {
+                
+                // console.log("event in editor", event,event['action'],event['lines']);
+                var t = Date.now();
+                $rootScope.$broadcast('keyStroke',event['action'],event['lines'],t);
+                
                 if (collaboration.active && !collaboration.lockEditor) {
                     // convert from positionObjects & lines to index & text
                     var session = scope.editor.ace.getSession();

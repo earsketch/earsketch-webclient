@@ -171,6 +171,9 @@ app.directive('caiwindow', [function () {
                     autoScrollCAI();
                     $scope.dropupLabel = caiDialogue.getDropup();
                 }, 0);
+                
+                var t = Date.now();
+                caiStudentPreferenceModule.addCompileTS(t);
             });
 
             $scope.$on("PageChanged", function (evt, data) {
@@ -283,7 +286,14 @@ app.directive('caiwindow', [function () {
             };
 
 
+            // TODO: update following so message stops if user is completely off the page
             function onPeriodicCheck() {
+                var pageStatus = caiStudentPreferenceModule.returnPageStatus();
+                secondsOffPage = 0;
+                if (pageStatus==0) {
+                    secondsOffPage = Date.now()/1000 - pageStatus[1]/1000;
+                }
+                // console.log(pageStatus, secondsOffPage, Date.now()/1000);
                 var message = sendCAIOutputMessage("Looking at your code updates...");
                 if ($scope.messageListCAI[$scope.activeProject]) {
                     $scope.messageListCAI[$scope.activeProject].push(message);
@@ -389,9 +399,24 @@ app.directive('caiwindow', [function () {
             };
 
             $scope.$on("reloadRecommendations", function (evt, data) {
-                console.log("running check update");
                 var editorCode = $scope.editor.ace.session.doc.$lines.join("\n");
                 caiDialogue.checkForCodeUpdates(editorCode);
+            });
+
+            $scope.$on('userOnPage', function(event,time)  {
+                caiStudentPreferenceModule.addOnPageStatus(1,time);
+            });
+            $scope.$on('userOffPage', function(event,time)  {
+                caiStudentPreferenceModule.addOnPageStatus(0,time);
+            });
+
+
+            $scope.$on('keyStroke', function(event,action, content,time) {
+                caiStudentPreferenceModule.addKeystroke(action, content, time);
+            });
+
+            $scope.$on('mousePosition', function(event,x,y) {
+                caiStudentPreferenceModule.addMousePos({x,y});
             });
 
         }]
