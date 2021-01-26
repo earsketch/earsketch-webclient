@@ -279,6 +279,6 @@ const fixLocation = (href, loc) => {
         }
     }
 
-    const curriculumDir = 'curriculum/'
+    const curriculumDir = '../curriculum/'
     return {href: curriculumDir + href, loc}
 }

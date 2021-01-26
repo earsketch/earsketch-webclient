@@ -272,8 +272,8 @@ const NavigationBar = () => {
                     <i className="icon icon-arrow-right2"></i>
                     </button>}
             </div>
-            <div ref={dropdownRef} className={`absolute z-50 w-full p-2 ${showTableOfContents ? '' : 'hidden'}`}>
-                <div className={`w-full p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}><TableOfContents></TableOfContents></div>
+            <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? '' : 'hidden'}`}>
+                <div ref={dropdownRef} className={`w-full pointer-events-auto p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}><TableOfContents></TableOfContents></div>
             </div>
             <div className="w-full" style={{height: '7px'}}>
                 <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
