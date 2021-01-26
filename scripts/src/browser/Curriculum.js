@@ -125,62 +125,12 @@ const CurriculumSearchResults = () => {
     )
 }
 
-const Settings = () => {
-    const dispatch = useDispatch()
-    const [showSettings, setShowSettings] = useState(null)
-    const [referenceElement, setReferenceElement] = useState(null)
-    const [popperElement, setPopperElement] = useState(null)
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, { placement: 'bottom' })
-    const theme = useSelector(appState.selectColorTheme)
-
-    const language = useSelector(appState.selectScriptLanguage)
-    const maximized = useSelector(curriculum.selectMaximized)
-    const currentLocation = useSelector(curriculum.selectCurrentLocation)
-
-    const Setting = ({ onClick, value }) => {
-        const theme = useSelector(appState.selectColorTheme)
-        const [highlight, setHighlight] = useState(false)
-        return (
-            <div className={`flex justify-left items-center cursor-pointer px-8 ${theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
-                 onClick={(event) => { onClick(event); setShowSettings(false); update() }}
-                 onMouseEnter={() => setHighlight(true)}
-                 onMouseLeave={() => setHighlight(false)}>
-                <div className='select-none'>{value}</div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="inline-block outline-none" tabIndex="0"
-             title="Show more options"
-             onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget)) {
-                    setShowSettings(false)
-                    update()
-                }
-             }}>
-            <button ref={setReferenceElement} onClick={() => { setShowSettings(!showSettings); update() }} className="text-3xl leading-none align-middle">
-                <i className="icon icon-cog2" style={{lineHeight: '0'}}></i>
-                <span className="caret"></span>
-            </button>
-
-            <div ref={setPopperElement}
-                 style={showSettings ? styles.popper : { display:'none' }}
-                 {...attributes.popper}
-                 className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}>
-
-                <Setting onClick={() => dispatch(curriculum.toggleMaximized())} value={(maximized ? "Unmaximize" : "Maximize") + " Curriculum"}></Setting>
-                <Setting onClick={() => copyURL(language, currentLocation)} value={"Copy URL to Clipboard"}></Setting>
-            </div>
-        </div>
-    )
-}
-
 export const TitleBar = () => {
     const dispatch = useDispatch()
     const layoutScope = helpers.getNgController('layoutController').scope()
     const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
+    const location = useSelector(curriculum.selectCurrentLocation)
 
     return (
         <div className='flex items-center p-3 text-2xl'>
@@ -199,13 +149,14 @@ export const TitleBar = () => {
                 </div>
             </div>
             <div className="ml-auto">
+                <button className="px-2 leading-none align-middle text-3xl" onClick={() => copyURL(language, location)} title="Copy curriculum URL">
+                    <i className="icon icon-link" style={{lineHeight: '0'}}></i>
+                </button>
                 <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
                         title="Switch script language"
                         onClick={() => dispatch(appState.toggleScriptLanguage())}>
                     {language === 'python' ? 'PY' : 'JS'}
                 </button>
-
-                <Settings></Settings>
             </div>
         </div>
     )
@@ -321,19 +272,20 @@ const NavigationBar = () => {
                     <i className="icon icon-arrow-right2"></i>
                     </button>}
             </div>
+            <div ref={dropdownRef} className={`absolute z-50 w-full p-2 ${showTableOfContents ? '' : 'hidden'}`}>
+                <div className={`w-full p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}><TableOfContents></TableOfContents></div>
+            </div>
             <div className="w-full" style={{height: '7px'}}>
                 <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
-            </div>
-            <div ref={dropdownRef} className={`absolute z-50 w-full border-b border-black p-5 ${theme==='light' ? 'bg-white' : 'bg-black'} ${showTableOfContents ? '' : 'hidden'}`}>
-                <TableOfContents></TableOfContents>
             </div>
         </>
     )
 }
 
+let initialized = false
 
 const HotCurriculum = hot(props => {
-    useEffect(() => {
+    if (!initialized) {
         clipboard = props.clipboard
 
         // Handle URL parameters.
@@ -355,7 +307,9 @@ const HotCurriculum = hot(props => {
             // this is probably a bug, but the old curriculumPaneController has the same behavior.
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
-    }, [])
+
+        initialized = true
+    }
 
     return (
         <Provider store={props.$ngRedux}>
