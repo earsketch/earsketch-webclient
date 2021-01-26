@@ -8,9 +8,11 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
 
     var aggregateScore;
     var curriculumPagesViewed;
-    var requests = 0;
+    var codeRequests = 0;
+    var soundRequests = 0;
+    var errorRequests = 0
 
-    var events = { request: incrementRequest };
+    var events = { codeRequest: incrementCodeRequest, soundRequest: incrementSoundRequest, errorRequest: incrementErrorRequest };
 
     function trackEvent(eventName) {
         if (eventName in events) {
@@ -18,10 +20,21 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
         }
     }
 
-    function incrementRequest() {
-        requests += 1;
+    function incrementCodeRequest() {
+        codeRequests += 1;
         
-        caiStudent.updateModel("codeKnowledge", { requests: requests });
+        caiStudent.updateModel("preferences", { codeRequests: codeRequests });
+    }
+    function incrementSoundRequest() {
+        soundRequests += 1;
+
+        caiStudent.updateModel("preferences", { soundRequests: soundRequests });
+    }
+
+    function incrementErrorRequest() {
+        errorRequests += 1;
+
+        caiStudent.updateModel("preferences", { errorRequests: errorRequests });
     }
 
 
@@ -59,6 +72,10 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
                     savedNames.push(userProject.scripts[keys[i]].name);
                     savedScripts.push(userProject.scripts[keys[i]].source_code);
                     scriptTypes.push(userProject.scripts[keys[i]].name.substring(userProject.scripts[keys[i]].name.length - 2));
+
+                    if (savedNames.length >= 30) {
+                        break;
+                    }
                 }
             }
 

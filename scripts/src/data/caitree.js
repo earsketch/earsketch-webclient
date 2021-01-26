@@ -1,13 +1,13 @@
 ﻿const CAI_TREE_NODES =
     [{  id: 0,
         title: "",
-        utterance: "Hi, I'm CAI (short for Co-creative AI) I'll be your partner here in EarSketch. I'm still learning programming in EarSketch but together we can create some cool music. This is going to be fun!|Do you want to start chatting now?",
+        utterance: "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us.",
         parameters: {},
-        options: [1, 2]
+        options: [1]
     },
     {  id: 1,
-        title: "Sure",
-        utterance: "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us.|let's get started",
+        title: "Okay",
+        utterance: "let's get started",
         parameters: {},
         options: [3, 4]
     },
@@ -27,7 +27,7 @@
         title: "you should suggest sounds",
         utterance: "i think we should start with [sound_rec]",
         parameters: {},
-        event: ["request"],
+        event: ["soundRequest"],
         options: [5, 6]
     },
     {   id: 5,
@@ -40,7 +40,7 @@
         title: "how about something else?",
         utterance: "we could use one of these\n\n[sound_rec]\n[sound_rec]\n[sound_rec]",
         parameters: {},
-        event: ["request"],
+        event: ["soundRequest"],
         options: [15, 16]
     },
     {   id: 7,
@@ -53,7 +53,7 @@
         title: "yeah, go ahead",
         utterance: "our next move could be [sound_rec].[SOUNDWAIT|10]",
         parameters: {},
-        event: ["request"],
+        event: ["soundRequest"],
         options: []
     },
     {   id: 9,
@@ -103,7 +103,7 @@
         title: "can i see some more ideas?",
         utterance: "what about\n\n[sound_rec]\n[sound_rec]",
         parameters: {},
-        event: ["request"],
+        event: ["soundRequest"],
         options: [15,16]
     },
     {   id: 17,
@@ -116,7 +116,7 @@
         title: "sure",
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
-        event: ["request"],
+        event: ["soundRequest"],
         options: []
     },
     {   id: 19,
@@ -165,6 +165,7 @@
         title: "do you know anything about the error i'm getting?",
         utterance: "[ERROREXPLAIN][ERRORWAIT|28]",
         parameters: {},
+        event: ["errorRequest"],
         options: []
     },
     {   id: 27,
@@ -212,6 +213,7 @@
     {   id: 34, //- BEGIN CODE SUGGESTION TREE
         title: "",
         utterance: "[SUGGESTION][RESET_PARAMS]",
+        event: ["codeRequest"],
         parameters: {},
         options: [35]
     },
@@ -442,7 +444,7 @@
     } ];
 
 
-const CAI_TREES = { "Chat with CAI": 1, 'error': 26, 'begin': 1, 'sound_select': 18, 'suggest' : 34, 'wrapup': 68, 'selectinstr': 71 };
+const CAI_TREES = { "Chat with CAI": 0, 'error': 26, 'begin': 1, 'sound_select': 18, 'suggest' : 34, 'wrapup': 68, 'selectinstr': 71 };
 
 const CAI_MUSIC_ANALYSIS = null;
 

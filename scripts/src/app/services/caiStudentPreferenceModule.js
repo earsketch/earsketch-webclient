@@ -14,6 +14,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
     var allSoundsUsed = [];
     var soundsSuggestedAndUsed = []
     var currentSoundSuggestionsPresent = [];
+    var soundsContributedByStudent = [];
 
     var codeSuggestionsMade = [];
     var sampleSuggestionsMade = [];
@@ -45,7 +46,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
 
         //update historical list of sound suggestions used
         for (var i = 0; i < allSoundsUsed.length; i++) {
-            if (allSoundsSuggested.includes(allSoundsUsed[i]) && !soundsSuggestedAndUsed.includes(allSoundsUsed[i])) {
+            if (allSoundsSuggested.includes(allSoundsUsed[i]) && !soundsSuggestedAndUsed.includes(allSoundsUsed[i]) && !soundsContributedByStudent.includes(allSoundsUsed[i])) {
                 soundsSuggestedAndUsed.push(allSoundsUsed[i]);
             }
         }
@@ -69,9 +70,17 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
             currentSoundSuggestionsPresent = newCurrentSuggs.slice(0);
         }
 
+        if (currentSounds != null) {
+            for (var i = 0; i < currentSounds.length; i++) {
+                if (!allSoundsSuggested.includes(currentSounds[i]) && !soundsContributedByStudent.includes(currentSounds[i])) {
+                    soundsContributedByStudent.push(currentSounds[i]);
+                }
+            }
+        }
+
         //push this set of lists to the student model
 
-        var suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent };
+        var suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent, soundsContributedByStudent: soundsContributedByStudent };
 
         caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker });
 

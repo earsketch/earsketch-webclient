@@ -24,7 +24,7 @@ app.factory('complexityCalculator', ['esconsole', 'userNotification', 'complexit
             studentCode = source.split("\n");
             return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags);
         } catch (error) {
-            userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
+            //userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
             throw error;
         }
     }

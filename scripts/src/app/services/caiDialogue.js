@@ -320,7 +320,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]); //make a copy
         if ("event" in currentTreeNode[activeProject]) {
             for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
-                caiStudentHistoryModule.trackEvent(currentTreeNode[activeProject].event[k]);
+                if (currentTreeNode[activeProject].event[k] != 'codeRequest') {
+                    caiStudentHistoryModule.trackEvent(currentTreeNode[activeProject].event[k]);
+                }
             }
         }
         var utterance = currentTreeNode[activeProject].utterance;
@@ -692,7 +694,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function generateSuggestion() {
         if (isPrompted) {
             studentInteracted = true;
-            caiStudentHistoryModule.trackEvent("request");
+
+            caiStudentHistoryModule.trackEvent("codeRequest");
         }
         var outputObj = codeSuggestion.generateCodeSuggestion(null, nodeHistory[activeProject]);
         //var outputText = printObject(outputObj);
