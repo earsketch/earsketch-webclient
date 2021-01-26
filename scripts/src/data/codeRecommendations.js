@@ -58,20 +58,20 @@ var CAI_DELTA_LIBRARY = [
         start: { variables: 0 },
         end: { variables: 1 },
         id: 37,
-        utterance: "let's use the variable we've just defined in a fitMedia statement",
+        utterance: "let's use the variable we just defined in a fitMedia statement",
         complexity: {variables:3}
     },
     {
         start: { variables: 0 },
         end: { variables: 2 },
-        utterance: "let's use the variable we've just defined in a fitMedia statement",
+        utterance: "let's use the variable we just defined in a fitMedia statement",
         complexity: { variables: 3 }
     },
     {
         start: { variables: 1 },
         end: { variables: 2 },
         id: 38,
-        utterance: "let's use the variable we've just defined in a fitMedia statement",
+        utterance: "let's use the variable we just defined in a fitMedia statement",
         complexity: { variables: 3 }
     },
     {
@@ -193,8 +193,8 @@ var CAI_RECOMMENDATIONS =
         {
             id: 3,
             example: "We can make a new section using a for loop like\n for measure in range(min, max):\n    makeBeat(FILENAME, track, measure, beatstring)",
-            explain: "All of the stuff you put in sounds great. We should put in some contrast by adding other sounds later on.",
-            utterance: "Let's start a new section."
+            explain: "all of the stuff you put in sounds great. we should put in some contrast by adding other sounds later on.",
+            utterance: "let's start a new section."
         },
         {
             id: 4,
@@ -219,7 +219,7 @@ var CAI_RECOMMENDATIONS =
             id: 7,
             example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, 1, startMeasure, endMeasure)\n\n    fitMedia(FILENAME, 2, startMeasure, endMeasure)",
             explain: "that'll let us vary our repeating sections a little",
-            utterance: "What if we added some parameters to the code that makes the new section?",
+            utterance: "what if we added some parameters to the code that makes the new section?",
             complexity: {userFunc: 4}
         },
         {
