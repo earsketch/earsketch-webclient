@@ -253,7 +253,7 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div className="w-full flex justify-between items-stretch cursor-pointer select-none"
+            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none"
                  style={{backgroundColor: highlight ? '#334657' : '#223546', color: 'white'}}
                  onMouseEnter={() => setHighlight(true)}
                  onMouseLeave={() => setHighlight(false)}>
