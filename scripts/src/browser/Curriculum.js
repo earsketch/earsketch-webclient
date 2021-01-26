@@ -149,8 +149,8 @@ export const TitleBar = () => {
                 </div>
             </div>
             <div className="ml-auto">
-                <button className="px-2 leading-none align-middle text-3xl" onClick={() => copyURL(language, location)} title="Copy curriculum URL">
-                    <i className="icon icon-link" style={{lineHeight: '0'}}></i>
+                <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title="Copy curriculum URL">
+                    <i className="icon icon-link" />
                 </button>
                 <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
                         title="Switch script language"
