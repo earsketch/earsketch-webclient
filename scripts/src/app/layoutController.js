@@ -1,4 +1,4 @@
-app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout', '$window', '$location', 'ESUtils', 'userConsole', 'esconsole', 'reporter', 'collaboration', function (layout, $rootScope, $scope, $timeout, $window, $location, ESUtils, userConsole, esconsole, reporter, collaboration) {
+app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout', '$window', '$location', 'ESUtils', 'userConsole', 'esconsole', 'reporter', 'collaboration', 'userNotification', function (layout, $rootScope, $scope, $timeout, $window, $location, ESUtils, userConsole, esconsole, reporter, collaboration, userNotification) {
     // TODO: use the localStorage service
     var localStorage = $window.localStorage;
 
@@ -42,24 +42,6 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
     $scope.layoutLoaded = false;
     $scope.curriculumMaximized = false;
     var lastLayout = {};
-
-    /* Timeout 100ms to allow the view to update before setting activeTab
-     * TODO: find a way to remove activeTab from layoutController and handle it in ideController
-     * currently "view" only sees the activeTab defined in layoutController because we have
-     * nested the controllers so are forced to keep it in sync using syncActiveTab defined below
-    */
-    $scope.activeTab = 0;
-    $rootScope.$on('syncActiveTab', function (event, args) {
-        if (!$scope.timeoutActive) {
-            $scope.timeoutActive = $timeout(function(){
-                $scope.activeTab = args;
-				//AVN LOG
-                //console.log("ACTIVE TAB LAYOUT", args);
-                delete $scope.timeoutActive;
-                $rootScope.$broadcast('checkForDroppedTabs', args);
-            }, 100, true);
-        }
-    });
 
     // TODO: move direct manipulation of elements to a directive
     function updateSplitBars() {
@@ -140,8 +122,9 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
 
             layout.set('cai', $scope.showCAIWindow, true);
         } else if (pane === 'curriculum') {
-            $scope.layout[pane] = $scope.showChatWindow ? true : !$scope.layout[pane];
+            $scope.layout[pane] = ($scope.showChatWindow || $scope.showCAIWindow) ? true : !$scope.layout[pane];
             $scope.showChatWindow = false; 
+            $scope.showCAIWindow = false;
             $scope.$broadcast('toggleCurr', $scope.layout[pane]);
         } else {
             // Toggle the layout
@@ -235,6 +218,9 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
             $scope.layoutLoaded = true;
             updateSplitBars();
         });
+
+        angular.element('#screen').fadeOut(100);
+        userNotification.isInLoadingScreen = false;
     });
 
     $scope.$on('openConsoleOnCodeCompileError', function() {
@@ -256,14 +242,15 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
         }
     });
 
-    $scope.$on('switchToShareMode', function() {
-        if ($scope.layout.curriculum) {
-            $scope.toggleLayout('curriculum');
-        }
-        if (!$scope.isEmbedded) {
-            $scope.openSidebarTab('share');
-        }
-    });
+    // Note: Shared-script browser was retired.
+    // $scope.$on('switchToShareMode', function() {
+    //     if ($scope.layout.curriculum) {
+    //         $scope.toggleLayout('curriculum');
+    //     }
+    //     if (!$scope.isEmbedded) {
+    //         $scope.openSidebarTab('share');
+    //     }
+    // });
 
     /**
      * Function to run when digest cycle completes.

@@ -2,7 +2,7 @@
  * Angular controller for the AWS submission script modal dialog.
  * @module submitAWSController
  */
-app.controller("submitAWSController", ['$rootScope', '$scope', '$uibModalInstance', '$uibModal', '$location', '$timeout', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'esconsole', 'colorTheme', 'collaboration', 'tabs', function($rootScope, $scope, $uibModalInstance, $uibModal, $location, $timeout, $window, userProject, script, quality, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, esconsole, colorTheme, collaboration, tabs) {
+app.controller("submitAWSController", ['$rootScope', '$scope', '$uibModalInstance', '$uibModal', '$location', '$timeout', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'esconsole', 'colorTheme', function($rootScope, $scope, $uibModalInstance, $uibModal, $location, $timeout, $window, userProject, script, quality, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, esconsole, colorTheme) {
 
     $scope.sharelink = location.origin + location.pathname +'#?sharing=' + script.shareid;
     $scope.lockedShareLink = "";
@@ -39,7 +39,7 @@ app.controller("submitAWSController", ['$rootScope', '$scope', '$uibModalInstanc
     };
 
     $scope.updatePopulyLink = function () {
-        window.open("https://www.populy.io/register/FOHAND?scriptid=".concat($scope.lockedShareId)); 
+        window.open("https://rocketjudge.com/register/poRnymQW#scriptid=".concat($scope.lockedShareId));
     }
 
     userProject.getLockedSharedScriptId(script.shareid).then(function(result) {

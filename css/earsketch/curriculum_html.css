@@ -1,0 +1,748 @@
+
+/* Pygments */
+.hll { background-color: #323232 }
+.c { color: #75715e;} /* Comment */
+.err {  background: #ac4142; color: #b0b0b0;} /* Error */
+.k { color: #f92672; font-weight: bold } /* Keyword */
+.o { color: #666666 } /* Operator */
+.n {color:white}
+.p {color:#AAA;}
+.cm { color: #aaa; font-style: italic } /* Comment.Multiline */
+.cp { color: #959595 } /* Comment.Preproc */
+.c1 { color: #959595; font-style: italic } /* Comment.Single */
+.cs { color: #959595; font-style: italic } /* Comment.Special */
+.gd { color: #A00000 } /* Generic.Deleted */
+.ge { font-style: italic } /* Generic.Emph */
+.gr { background: #ac4142; color: #b0b0b0; } /* Generic.Error */
+.gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.gi { color: #00A000 } /* Generic.Inserted */
+.go { color: #808080 } /* Generic.Output */
+.gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.gs { font-weight: bold } /* Generic.Strong */
+.gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.gt { color: #0040D0 } /* Generic.Traceback */
+.kc { color: #f92672; font-weight: bold } /* Keyword.Constant */
+.kd { color: #f92672; font-weight: bold } /* Keyword.Declaration */
+.kn { color: #f92672; font-weight: bold } /* Keyword.Namespace */
+.kp { color: #f92672 } /* Keyword.Pseudo */
+.kr { color: #f92672; font-weight: bold } /* Keyword.Reserved */
+.kt { color: #f92672 } /* Keyword.Type */
+.m { color: #ae81ff } /* Literal.Number */
+.s { color: #e6db74 } /* Literal.String */
+.na { color: #7D9029 } /* Name.Attribute */
+.nb { color: #008000 } /* Name.Builtin */
+.nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.no { color: #880000 } /* Name.Constant */
+.nd { color: #AA22FF } /* Name.Decorator */
+.ni { color: #999999; font-weight: bold } /* Name.Entity */
+.ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.nf { color: #fd971f } /* Name.Function */
+.nl { color: #A0A000 } /* Name.Label */
+.nn { color: #FFF; font-weight: bold } /* Name.Namespace */
+.nt { color: #f92672; font-weight: bold } /* Name.Tag */
+.nv { color: #19177C } /* Name.Variable */
+.ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.w { color: #bbbbbb } /* Text.Whitespace */
+.mf { color: #ae81ff } /* Literal.Number.Float */
+.mh { color: #ae81ff } /* Literal.Number.Hex */
+.mi { color: #ae81ff } /* Literal.Number.Integer */
+.mo { color: #ae81ff } /* Literal.Number.Oct */
+.sb { color: #e6db74 } /* Literal.String.Backtick */
+.sc { color: #e6db74 } /* Literal.String.Char */
+.sd { color: #e6db74; font-style: italic } /* Literal.String.Doc */
+.s2 { color: #e6db74 } /* Literal.String.Double */
+.se { color: #e6db74; font-weight: bold } /* Literal.String.Escape */
+.sh { color: #e6db74 } /* Literal.String.Heredoc */
+.si { color: #e6db74; font-weight: bold } /* Literal.String.Interpol */
+.sx { color: #e6db74 } /* Literal.String.Other */
+.sr { color: #e6db74 } /* Literal.String.Regex */
+.s1 { color: #e6db74 } /* Literal.String.Single */
+.ss { color: #e6db74 } /* Literal.String.Symbol */
+.bp { color: #FFF } /* Name.Builtin.Pseudo */
+.vc { color: #f8f8f2 } /* Name.Variable.Class */
+.vg { color: #f8f8f2 } /* Name.Variable.Global */
+.vi { color: #f8f8f2 } /* Name.Variable.Instance */
+.il { color: #FFF } /* Literal.Number.Integer.Long */
+
+
+.default-pygment {
+  background-color: white !important; color:black;
+}
+/* DEFAULT PYGMENTS */
+.default-pygment > .n { color: black }
+.default-pgments > .hll { background-color: #ffffcc }
+.default-pygment > .c { color: #a50; font-style: italic } /* Comment */
+.default-pygment > .err { border: 1px solid #FF0000 } /* Error */
+.default-pygment > .k { color: #008000; font-weight: bold } /* Keyword */
+.default-pygment > .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.default-pygment > .cp { color: #BC7A00 } /* Comment.Preproc */
+
+.default-pygment > .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.default-pygment > .cs { color: #408080; font-style: italic } /* Comment.Special */
+.default-pygment > .gr { color: #FF0000 } /* Generic.Error */
+
+.default-pygment > .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.default-pygment > .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.default-pygment > .kn { color: #708; font-weight: bold } /* Keyword.Namespace */
+.default-pygment > .kp { color: #008000 } /* Keyword.Pseudo */
+.default-pygment > .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.default-pygment > .kt { color: #B00040 } /* Keyword.Type */
+.default-pygment > .m { color: #164 } /* Literal.Number */
+.default-pygment > .s { color: #BA2121 } /* Literal.String */
+
+
+.default-pygment > .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.default-pygment > .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.default-pygment > .mf { color: #164 } /* Literal.Number.Float */
+.default-pygment > .mh { color: #164 } /* Literal.Number.Hex */
+.default-pygment > .mi { color: #164 } /* Literal.Number.Integer */
+.default-pygment > .mo { color: #164 } /* Literal.Number.Oct */
+.default-pygment > .sb { color: #BA2121 } /* Literal.String.Backtick */
+.default-pygment > .sc { color: #BA2121 } /* Literal.String.Char */
+.default-pygment > .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.default-pygment > .s2 { color: #BA2121 } /* Literal.String.Double */
+.default-pygment > .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.default-pygment > .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.default-pygment > .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.default-pygment > .sx { color: #008000 } /* Literal.String.Other */
+.default-pygment > .sr { color: #BB6688 } /* Literal.String.Regex */
+.default-pygment > .s1 { color: #BA2121 } /* Literal.String.Single */
+.default-pygment > .ss { color: #19177C } /* Literal.String.Symbol */
+.default-pygment > .bp { color: #008000 } /* Name.Builtin.Pseudo */
+
+.default-pygment > .vc { color: #19177C } /* Name.Variable.Class */
+.default-pygment > .vg { color: #19177C } /* Name.Variable.Global */
+.default-pygment > .vi { color: #666666 } /* Name.Variable.Instance */
+
+
+#curriculum p, #curriculum dd { /* general text styles */
+  font-size: 1em;
+  line-height: 125%;
+  margin: 0.75em 0;
+}
+
+#curriculum section[data-type="preface"] > h1 + p,
+#curriculum div[data-type="part"] > h1 + p,
+#curriculum section[data-type="chapter"] > h1 + p,
+#curriculum section[data-type="chapter"] > h1 + div.author p,
+#curriculum section[data-type="sect1"] > h1 + p,
+#curriculum section[data-type="sect2"] > h2 + p,
+#curriculum section[data-type="sect3"] > h3 + p {
+  text-indent: 0px; /* first paragraph following a heading has no indent */
+}
+
+/* general inlines */
+
+#curriculum p a {
+  display: inline;
+}
+
+/* frontmatter */
+
+#curriculum section[data-type="titlepage"] h1 {
+  /*font-family: serif;*/
+}
+
+#curriculum section[data-type="titlepage"] h2,
+#curriculum section[data-type="copyright-page"] h1 {
+  font-family: sans-serif;
+}
+
+#curriculum section[data-type="halftitlepage"] {
+  display: none;
+}
+
+#curriculum section[data-type="titlepage"] {
+  text-align: left;
+  page-break-after: always;
+}
+
+#curriculum section[data-type="titlepage"] h1 {
+  border-bottom: 1px solid #333;
+  margin-top: 100px;
+  padding-bottom: 10px;
+}
+
+#curriculum section[data-type="titlepage"] h1 {
+  font-size: 2em;
+  line-height: 120%;
+}
+
+#curriculum section[data-type="titlepage"] h2 {
+  font-size: 1.2em;
+  line-height: 120%;
+  margin-top: 20px;
+}
+
+/* styling and positioning for author names and other text */
+
+#curriculum section[data-type="titlepage"] p:first-of-type {
+  margin-top: 82pt;
+}
+
+#curriculum section[data-type="titlepage"] p {
+  font-family: sans-serif;
+  font-size: 13pt;
+  line-height: 16pt;
+  margin-top: 0pt;
+  margin-bottom: 0pt;
+  float: none;
+  text-indent: 0;
+}
+
+/* copyright page */
+
+#curriculum section[data-type="copyright-page"] {
+  margin-top: 100px;
+  page-break-after: always;
+}
+
+#curriculum section[data-type="copyright-page"] h1 {
+  font-size: 0.8em;
+}
+
+#curriculum section[data-type="copyright-page"] p {
+  font-family: sans-serif;
+  font-size: 0.8em;
+  margin: 0;
+  text-indent: 0;
+}
+
+/* dedication */
+
+#curriculum section[data-type="dedication"] {
+  /*font-family: serif;*/
+  font-style: italic;
+  page-break-after: always;
+  text-align: center;
+  padding-top: 100px;
+}
+
+/* table of contents */
+
+/* global styles for the table of contents */
+/* table of contents is a series of nested lists in a nav element */
+#curriculum nav[data-type="toc"] {
+  /*padding-top:50px;*/
+}
+
+#curriculum nav[data-type="toc"] a { /* all table of contents entries are also links */
+  font-style: normal;
+}
+
+#curriculum nav[data-type="toc"] ol {
+  list-style-type: none;
+  counter-reset: level1;
+
+}
+
+#curriculum nav[data-type="toc"] ol li:first-of-type:before{
+  counter-increment: initial;
+  content: counter(level1) ". ";
+}
+
+#curriculum nav[data-type="toc"] ol li:not(:first-of-type):before{
+  counter-increment: level1;
+  content: counter(level1) ". ";
+}
+
+#curriculum nav[data-type="toc"] ol li ol {
+    list-style-type: none;
+    counter-reset: level2;
+}
+#curriculum nav[data-type="toc"] ol li ol li:first-of-type:before,
+#curriculum nav[data-type="toc"] ol li ol li:not(:first-of-type):before {
+    content: counter(level1) "." counter(level2) " ";
+    counter-increment: level2;
+}
+
+#curriculum nav[data-type="toc"] ol li ol li ol{
+    list-style-type: none;
+    counter-reset: level3;
+}
+#curriculum nav[data-type="toc"] ol li ol li ol li:first-of-type:before,
+#curriculum nav[data-type="toc"] ol li ol li ol li:not(:first-of-type):before  {
+    content: counter(level1) "." counter(level2) "." counter(level3) " ";
+    counter-increment: level3;
+}
+
+
+#curriculum nav[data-type="toc"] > h1 { /* table of contents heading */
+  font-size: 1.5em;
+  line-height: 120%;
+  margin-top: 80px;
+  margin-bottom: 50px;
+  text-align: center;
+}
+
+/* defining fonts for the table of contents */
+
+#curriculum nav[data-type="toc"] a {
+  text-decoration: none;
+}
+
+#curriculum nav[data-type="toc"] li {
+  font-family: sans-serif;
+}
+
+#curriculum nav[data-type="toc"] li[data-type="chapter"],
+#curriculum nav[data-type="toc"] li[data-type="part"],
+#curriculum nav[data-type="toc"] li[data-type="appendix"] {
+  font-size: 1em;
+  line-height: 120%;
+  margin-left: 0;
+  text-indent: 0;
+}
+
+/* entries for parts in the table of contents */
+
+#curriculum nav[data-type="toc"] li[data-type="part"] {
+  margin-top: 25px;
+}
+
+#curriculum nav[data-type="toc"] li[data-type="part"] > a {
+  border-bottom: 0px solid #333;
+  width: 91%;
+  display: inline-block;
+}
+
+#curriculum nav[data-type="toc"] li[data-type="part"] ol {
+  margin-left: 0;
+  text-indent: 0;
+}
+
+/* entries for chapters and appendixes in the table of contents */
+
+#curriculum nav[data-type="toc"] li[data-type="chapter"] {
+  margin-top: 20px;
+}
+
+#curriculum nav[data-type="toc"] li[data-type="chapter"]:last-of-type,
+#curriculum nav[data-type="toc"] li[data-type="appendix"] {
+  margin-bottom: 20px;
+}
+
+/* entries for sub-sections */
+
+#curriculum nav[data-type="toc"] li[data-type="chapter"] ol {
+  font-family: sans-serif;
+  font-size: 1em;
+  line-height: 120%;
+  margin-left: 20px;
+  text-indent: -10px;
+}
+
+#curriculum nav[data-type="toc"] li[data-type="chapter"] ol ol {
+  margin-left: 10px;
+  text-indent: -10px;
+}
+
+/* front and backmatter in the table of contents */
+
+#curriculum nav[data-type="toc"] li[data-type="preface"],
+#curriculum nav[data-type="toc"] li[data-type="foreword"],
+#curriculum nav[data-type="toc"] li[data-type="glossary"],
+#curriculum nav[data-type="toc"] li[data-type="index"] {
+  font-size: 1em;
+  line-height: 120%;
+}
+
+#curriculum nav[data-type="toc"] li[data-type="preface"] ol,
+#curriculum nav[data-type="toc"] li[data-type="foreword"] ol {
+  display: none;
+}
+
+/* page breaks after all chapter-level sections */
+
+#curriculum section[data-type="preface"],
+#curriculum div[data-type="part"],
+#curriculum section[data-type="chapter"],
+#curriculum section[data-type="appendix"] {
+  page-break-after: always;
+}
+
+/* preface, chapter, and appendix headings */
+
+/* heading font is sans serif */
+
+#curriculum nav[data-type="toc"] > h1,
+#curriculum div[data-type="part"] > h1,
+#curriculum section[data-type="preface"] > h1,
+#curriculum section[data-type="chapter"] > h1,
+#curriculum section[data-type="appendix"] > h1,
+#curriculum section[data-type="sect1"] h1 {
+/*  font-family: serif;
+*/  line-height: 120%;
+}
+
+#curriculum section[data-type="sect2"] h2,
+#curriculum section[data-type="sect3"] h3 {
+/*  font-family: sans-serif;
+*/  line-height: 120%;
+}
+
+/* shared styles for all chapter-level headings */
+#curriculum section[data-type="preface"] > h1,
+#curriculum section[data-type="chapter"] > h1,
+#curriculum section[data-type="appendix"] > h1 {
+  font-size: 1.8em;
+  margin-top: 70px;
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+/* section headings */
+
+#curriculum section[data-type="sect1"] h1 { /* A-level headings */
+  font-size: 1.5em;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+#curriculum section[data-type="sect2"] h2 { /* B-level headings */
+  font-size: 1.1em;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+#curriculum section[data-type="sect3"] h3 { /* C-level headings */
+  font-size: 1.1em;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* parts */
+
+#curriculum div[data-type="part"] > h1 {
+  font-size: 1.8em;
+  text-align: center;
+  margin-top: 0px;
+  margin-bottom: 15px;
+}
+
+/* lists */
+
+#curriculum ul,
+#curriculum ol { /* bulleted and numbered lists */
+  margin: 10px 0 10px 0;
+}
+
+#curriculum ul li,
+#curriculum ol li,
+#curriculum ul li p,
+#curriculum ol li p {
+  font-family: sans-serif;
+  font-size: 1em;
+  line-height: 120%;
+  margin-top: 5px;
+  text-indent: 0;
+}
+
+#curriculum dl { /* definition lists */
+  margin-bottom: 15px;
+}
+
+#curriculum dt { /* definition list terms */
+  font-family: sans-serif;
+  font-size: 0.9em;
+  line-height: 120%;
+  margin-top: 15px;
+  margin-bottom: 4px;
+}
+
+#curriculum dd { /* definition list descriptions */
+  text-indent: 0;
+  margin-left: 20px;
+}
+
+#curriculum dd p {
+  text-indent: 0;
+}
+
+/* tables */
+
+#curriculum table {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #888;
+  border-collapse: collapse;
+}
+
+#curriculum table caption {
+  font-family: sans-serif;
+  font-size: 0.8em;
+  line-height: 120%;
+  text-align: left;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+#curriculum tr {
+  border-width: 0px;
+}
+
+#curriculum th { /* table heading rows */
+  font-family: sans-serif;
+  font-size: 0.8em;
+  line-height: 120%;
+  text-align: left;
+  margin-top: 0;
+  border-top: 1px solid #888;
+  border-bottom: 1px solid #888;
+}
+
+#curriculum th, #curriculum td {
+  padding: 6px;
+}
+
+#curriculum td, #curriculum table p { /* table body text */
+  font-family: sans-serif;
+  font-size: 12px;
+  line-height: 120%;
+}
+
+#curriculum table p { /* table body text */
+  text-indent: 0;
+  margin-top: 6px;
+}
+
+#curriculum td pre.programlisting,
+#curriculum td pre.screen,
+#curriculum td pre.literallayout,
+#curriculum td code { /* allow code in tables to wrap */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* figures */
+
+#curriculum figure { /* figure containers */
+  margin-top: 30px;
+  margin-bottom: 30px;
+  padding: 0;
+  display: block;
+  page-break-inside: avoid;
+}
+
+#curriculum figure img { /* figure images */
+  border-top: 1px solid #888;
+  border-bottom: 1px solid #888;
+  padding: 5px 0 5px 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+#curriculum figcaption {
+  font-family: serif;
+  font-size: 1em;
+  font-style: italic;
+  line-height: 120%;
+  display: block;
+}
+
+/* sidebars */
+
+#curriculum aside { /* sidebar containers */
+  color:#333;
+  background-color: #d8d8d8;
+  border: 1px solid #d8d8d8;
+  padding: 20px 20px 10px 20px;
+  margin: 30px 0 30px 0;
+}
+
+#curriculum aside h5 { /* sidebar titles */
+  font-family: sans-serif;
+  font-size: 1em;
+  line-height: 120%;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+#curriculum aside h6 { /* sidebar subtitles */
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 0.9em;
+  line-height: 120%;
+}
+
+#curriculum aside p { /* sidebar text */
+/*  font-family: serif;
+*/  font-size: 1em;
+  line-height: 130%;
+  text-indent: 0;
+  margin-top: 6px;
+}
+
+/* admonitions */
+
+#curriculum div[data-type="note"],
+#curriculum div[data-type="warning"] { /* admonition containers */
+  background-color:#DDD;
+  border-top: 2px solid #888;
+  border-bottom: 1px solid #d8d8d8;
+  padding: 10px 0;
+  margin: 30px 30px 30px 30px;
+  page-break-inside: avoid; /* avoid breaking admonitions across pages */
+}
+
+#curriculum div[data-type="note"] h1,
+#curriculum div[data-type="warning"] h1 { /* admonition titles */
+  color: #000;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 4px 0;
+  padding: 0;
+}
+
+#curriculum div[data-type="note"] p,
+#curriculum div[data-type="warning"] p { /* admonition text */
+  /*font-family: serif;*/
+  font-size: 1em;
+  line-height: 120%;
+  text-indent: 0in;
+}
+
+/* code */
+
+#curriculum pre, #curriculum code { /* monospace font for both code blocks and inline code */
+  font-family: Hack, Monaco, Consolas, 'Lucida Console', monospace;
+  background: #323232;
+  border: none;
+  color:white;
+}
+
+#curriculum pre { /* code blocks */
+  font-size: 0.9em;
+  line-height: 120%;
+  margin: 10px;
+  overflow-x: auto;
+}
+
+#curriculum code { /* inline code */
+  background-color:transparent;
+  font-size: 0.9em;
+  line-height: 120%;
+}
+
+#curriculum table pre { /* code blocks within tables */
+  text-indent: 0;
+}
+
+#curriculum div[data-type="note"] code,
+#curriculum div[data-type="warning"] code,
+#curriculum aside code,
+#curriculum table code { /* inline code within notes, sidebars and tables */
+  font-size: inherit;
+  line-height: inherit;
+}
+
+#curriculum div[data-type="example"] h5 { /* titles for formal code examples */
+  font-family: sans-serif;
+  font-size: 0.8em;
+  line-height: 120%;
+  border-bottom: 1px solid #d8d8d8;
+  padding-bottom: 6px;
+  margin-top: 30px;
+}
+
+/* blockquote */
+
+#curriculum blockquote {
+  font-family: sans-serif;
+  font-size: 0.9em;
+  line-height: 130%;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+#curriculum blockquote p {
+  text-indent: 0;
+}
+
+/* website nav element */
+
+#curriculum div.navbar {
+  font-family: sans-serif;
+  background-color: #E8E8E8;
+  /*position: fixed;*/
+  right:0;
+  padding: 10px 20px 10px 20px;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+#curriculum div.navbar h1 {
+  float: left;
+  font-size: 1em;
+  font-weight: normal;
+  padding: 0;
+  margin: 0;
+  color: #999;
+}
+
+#curriculum div.navbar p {
+  float: right;
+  font-size: 1em;
+  font-weight: normal;
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+#curriculum div.navbar p a {
+  text-decoration: none;
+  color: #999;
+}
+
+/* API styling */
+
+#curriculum div.apicontent {
+  margin-left: 30px;
+}
+#curriculum .apifunction {
+  font-size: 2em;
+}
+
+/* iPad
+------------------------------------------------ */
+
+@media screen and (min-width: 480px) and (max-width: 1024px) {
+  body {
+    width: 100%;
+    padding: 20px;
+  }
+}
+
+/* iPhone [portrait + landscape]
+--------------------------------------------------------------------------- */
+
+@media screen and (max-width: 480px) {
+  body {
+    width: 100%;
+    padding: 10px;
+  }
+
+  /* website nav element */
+
+  #curriculum div.navbar {
+    position: relative;
+    padding: 10px 20px 10px 20px;
+    border-bottom: 2px solid #e8e8e8;
+    box-shadow: 0px 0px 0px #f0f0f0;
+    text-align: center;
+  }
+
+  #curriculum div.navbar h1 {
+    float: none;
+    margin-bottom: 10px;
+  }
+
+  #curriculum div.navbar p {
+    float: none;
+    text-indent: 0;
+  }
+
+}

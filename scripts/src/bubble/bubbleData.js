@@ -38,21 +38,21 @@ export const pages = [
     },
     {
         header: '6/8 Add sounds to your code',
-        body: 'The first folder is the Sound Browser <span class="text-yellow-500 text-3xl align-middle icon icon-sound-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></span>. Click to search the 4,000 plus audio clips to use in your music, composed by popular recording artists.',
+        body: 'The first folder is the Sound Browser <span class="text-yellow-500 text-3xl align-middle icon icon-headphones"></span>. Click to search the 4,000 plus audio clips to use in your music, composed by popular recording artists.',
         ref: '#sidebar-container',
         placement: 'right-start'
     },
     {
         header: '7/8 Save your Code',
-        body: 'Your code is automatically saved to the Scripts Browser <span class="text-yellow-500 text-3xl align-middle icon icon-code-browser"><span class="path1"></span><span class="path2"></span></span>. You can search for scripts by date, programming language, and owner.',
+        body: 'Your code is automatically saved to the Scripts Browser <span class="text-yellow-500 text-3xl align-middle icon icon-embed2"></span>. You can search for scripts by date, programming language, and owner.',
         ref: '#sidebar-container',
         placement: 'right-start'
     },
     {
         header: '8/8 Read the curriculum',
-        body: 'The book icon <span class="text-yellow-500 text-3xl align-middle icon icon-book3"></span> will open a curriculum panel on the right side of the screen. You can search this panel for any topic to find support for your coding.',
-        ref: '#curriculum',
-        placement: 'left-start'
+        body: 'The book icon <span class="text-yellow-500 text-3xl align-middle icon icon-book3"></span> will open a curriculum panel on the right side of the screen. You can open the Table of Contents by clicking this bar to read about topics to continue learning about EarSketch.',
+        ref: '#curriculum-navigation',
+        placement: 'left'
     },
     {
         header: `End`,

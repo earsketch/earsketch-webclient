@@ -87,7 +87,7 @@ app.directive('curriculumpane', function () {
                 }
                 //==========================================
 
-                var curriculumDir = 'curriculum/';
+                var curriculumDir = '../curriculum/';
 
                 function preloadModifiedHTML(url) {
                     url = curriculumDir + url;
@@ -291,7 +291,7 @@ app.directive('curriculumpane', function () {
                                 if (slideNum.length === 1) {
                                     slideNum = '0' + slideNum;
                                 }
-                                $scope.slides.push('teachermaterials/Unit ' + $scope.currentLocation[0] + '/Lesson ' + chNum + '/Slide' + slideNum + '.jpeg');
+                                $scope.slides.push('/teachermaterials/Unit ' + $scope.currentLocation[0] + '/Lesson ' + chNum + '/Slide' + slideNum + '.jpeg');
                             }
 
                             $scope.showSlideButton = true;

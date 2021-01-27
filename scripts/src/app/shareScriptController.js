@@ -1,8 +1,11 @@
+import * as scripts from '../browser/scriptsState';
+import * as tabs from '../editor/tabState';
+
 /**
  * Angular controller for the share script modal dialog.
  * @module shareScriptCtroller
  */
-app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInstance', '$uibModal', '$location', '$timeout', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'esconsole', 'colorTheme', 'collaboration', 'tabs', function($rootScope, $scope, $uibModalInstance, $uibModal, $location, $timeout, $window, userProject, script, quality, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, esconsole, colorTheme, collaboration, tabs) {
+app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInstance', '$uibModal', '$location', '$timeout', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'esconsole', 'colorTheme', 'collaboration', '$ngRedux', function($rootScope, $scope, $uibModalInstance, $uibModal, $location, $timeout, $window, userProject, script, quality, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, esconsole, colorTheme, collaboration, $ngRedux) {
 
     $scope.sharelink = location.origin + location.pathname +'#?sharing=' + script.shareid;
     $scope.lockedShareLink = "";
@@ -351,6 +354,7 @@ app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInsta
 
             // update the local script state
             script.collaborators = newUsersList;
+            userProject.scripts[script.shareid] = script;
 
             // save license info for the collaboration mode as well
             userProject.setLicense(script.name, script.shareid, $scope.data.selectedLicenseId);
@@ -359,7 +363,7 @@ app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInsta
             script.collaborative = newUsersList.length !== 0;
 
             // manage the state of tab if already open
-            if (tabs.activeTabScript && tabs.activeTabIndex !== -1 && tabs.activeTabScript.shareid === script.shareid) {
+            if (tabs.selectActiveTabID($ngRedux.getState()) === script.shareid) {
                 if (existingUsersList.length === 0 && newUsersList.length > 0) {
                     if (!script.saved) {
                         userProject.saveScript(script.name, script.source_code)
@@ -375,11 +379,13 @@ app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInsta
             }
 
             if ($scope.collaborators.ready) {
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
                 $scope.close();
             } else {
                 if ($scope.collaborators.query.length) {
                     alert(ESMessages.shareScript.preemptiveSave);
                 } else {
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
                     $scope.close();
                 }
             }

@@ -1,3 +1,5 @@
+import * as sounds from '../browser/soundsState';
+
 /**
  * @module renameController
  */
@@ -44,7 +46,7 @@ app.controller("renameController", ['$scope', '$uibModalInstance', 'userProject'
     };
 }]);
 
-app.controller("renameSoundController", ['$scope', '$uibModalInstance', 'sound', 'userProject','esconsole','userNotification', function ($scope, $uibModalInstance, sound, userProject, esconsole, userNotification) {
+app.controller("renameSoundController", ['$scope','$uibModalInstance','sound','userProject','esconsole','userNotification','$ngRedux', function ($scope,$uibModalInstance,sound,userProject,esconsole,userNotification,$ngRedux) {
     $scope.artist = sound.artist;
     $scope.username = userProject.getUsername().toUpperCase();
     // memo
@@ -89,6 +91,9 @@ app.controller("renameSoundController", ['$scope', '$uibModalInstance', 'sound',
             userProject.renameAudio(
                 sound.file_key, $scope.username + '_' + $scope.soundKey
             ).then(function () {
+                const oldName = sound.file_key;
+                const newName = $scope.username + '_' + $scope.soundKey;
+                $ngRedux.dispatch(sounds.renameLocalUserSound({ oldName, newName }));
                 $uibModalInstance.close();
             });
         } else {

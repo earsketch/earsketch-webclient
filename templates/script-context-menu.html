@@ -1,19 +1,19 @@
 <div ng-if="tab.username === username">
-    <div><a href="#" ng-click="callScriptBrowserFunction('copyScript', tab)"><i class="icon icon-copy"></i> Create Copy</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('renameScript', tab)" ><i class="icon icon-pencil2" ></i> Rename</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('downloadModal', tab)" ><i class="icon icon-cloud-download"></i> Download</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('printScript', tab)" ><i class="icon icon-printer" ></i> Print</a></div>
-    <div ng-class="{ disabled: !loggedIn}" uib-tooltip="{{!loggedIn ? 'Login to enable sharing tabs' : ''}}"><a href="#" ng-click="callScriptBrowserFunction('shareScript', tab)" ><i class="icon icon-share2" ></i> Share</a></div>
-    <div ng-show="showAmazon" ng-class="{disabled: !loggedIn}"><a href="#" ng-click="callScriptBrowserFunction('submitToAWS', tab)" ><i class="icon icon-share2" ></i> Submit to Competition</a></div>
-    <div ng-class="{ disabled: !loggedIn}" uib-tooltip="{{!loggedIn ? 'Login to track history of tabs' : ''}}"><a href="#" ng-click="callScriptBrowserFunction('openHistory', tab)"><i class="icon icon-history"></i> History</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('analyzeScript', tab)"><i class="glyphicon glyphicon-info-sign"></i> Code Indicator</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('deleteScript', tab)"><i class="icon icon-bin" ></i> Delete</a></div>
+    <div><a href="#" ng-click="copyScript(tab)"><i class="icon icon-copy"></i> Create Copy</a></div>
+    <div><a href="#" ng-click="renameScript(tab)" ><i class="icon icon-pencil2" ></i> Rename</a></div>
+    <div><a href="#" ng-click="downloadScript(tab)" ><i class="icon icon-cloud-download"></i> Download</a></div>
+    <div><a href="#" ng-click="printScript(tab)" ><i class="icon icon-printer" ></i> Print</a></div>
+    <div ng-class="{ disabled: !loggedIn }" uib-tooltip="{{!loggedIn ? 'Login to enable sharing tabs' : ''}}"><a href="#" ng-click="shareScript(tab)" ><i class="icon icon-share2" ></i> Share</a></div>
+    <div ng-show="showAmazon" ng-class="{disabled: !loggedIn}"><a href="#" ng-click="submitToCompetition(tab)" ><i class="icon icon-share2" ></i> Submit to Competition</a></div>
+    <div ng-class="{ disabled: !loggedIn }" uib-tooltip="{{!loggedIn ? 'Login to track history of tabs' : ''}}"><a href="#" ng-click="openScriptHistory(tab, true)"><i class="icon icon-history"></i> History</a></div>
+    <div><a href="#" ng-click="openCodeIndicator(tab)"><i class="glyphicon glyphicon-info-sign"></i> Code Indicator</a></div>
+    <div><a href="#" ng-click="deleteScript(tab)"><i class="icon icon-bin" ></i> Delete</a></div>
 </div>
 <div ng-if="tab.username !== username">
-    <div><a href="#" ng-click="callScriptBrowserFunction('downloadModal', tab)" ><i class="icon icon-cloud-download"></i> Download</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('printScript', tab)" ><i class="icon icon-printer" ></i> Print</a></div>
-    <div ng-class="{ disabled: !loggedIn}" uib-tooltip="{{!loggedIn ? 'Login to track history of tabs' : ''}}"><a href="#" ng-click="callScriptBrowserFunction('openHistory', tab)"><i class="icon icon-history"></i> History</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('analyzeScript', tab)"><i class="glyphicon glyphicon-info-sign"></i> Code Indicator</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('importScript', tab)"><i class="icon icon-import"></i> Import</a></div>
-    <div><a href="#" ng-click="callScriptBrowserFunction('deleteSharedScript', tab)"><i class="icon icon-bin" ></i> {{tab.collaborative ? 'Leave Collaboration' : 'Delete'}}</a></div>
+    <div><a href="#" ng-click="downloadScript(tab)" ><i class="icon icon-cloud-download"></i> Download</a></div>
+    <div><a href="#" ng-click="printScript(tab)" ><i class="icon icon-printer" ></i> Print</a></div>
+    <div ng-class="{ disabled: !loggedIn }" uib-tooltip="{{!loggedIn ? 'Login to track history of tabs' : ''}}"><a href="#" ng-click="openScriptHistory(tab)"><i class="icon icon-history"></i> History</a></div>
+    <div><a href="#" ng-click="openCodeIndicator(tab)"><i class="glyphicon glyphicon-info-sign"></i> Code Indicator</a></div>
+    <div><a href="#" ng-click="importScript(tab)"><i class="icon icon-import"></i> Import</a></div>
+    <div><a href="#" ng-click="deleteSharedScript(tab)"><i class="icon icon-bin" ></i> {{tab.collaborative ? 'Leave Collaboration' : 'Delete'}}</a></div>
 </div>

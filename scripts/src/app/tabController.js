@@ -1,11 +1,12 @@
+import * as scripts from '../browser/scriptsState';
+import * as tabs from '../editor/tabState';
+
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'colorTheme', 'collaboration', 'tabs', 'layout', 'websocket', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, colorTheme, collaboration, tabs, layout, websocket) {
+app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, colorTheme, collaboration, $ngRedux) {
     $scope.tabContextMenu = [];
-
-    window.tabScope = $scope;
 
     $scope.openContextMenu = function (index) {
         $scope.swapTab(index);
@@ -21,7 +22,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     };
 
     $scope.activeTab = 0; // the index of the current active tab
-    $scope.activeTab2 = 0; //Part of a hack fix for active tab not updating properly, see postDigest() for more
 
     $scope.embeddedScriptUsername = "";
     $scope.embeddedScriptName = "";
@@ -68,11 +68,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             }
         }
     }, true);
-
-    // $scope.$watch('activeTab', function(newVal, oldVal){
-    //     //AVN LOG
-    //     console.log("ACTIVE TAB LOG", newVal, oldVal);
-    // });
 
     $scope.$watch('sharedScripts', function () {
         if (userProject.sharedScriptsReady) {
@@ -231,6 +226,10 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $scope.selectSharedScript(script);
     });
 
+    $scope.$on('refreshTabState', () => {
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
+        refreshTabState();
+    });
 
     // TODO: move this to tabs service?
     /**
@@ -274,7 +273,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 $scope.tabs.splice(key, 0, value);
             }
         });
-        $rootScope.$applyAsync();
     }
 
     // TODO: move this to tabs service?
@@ -332,8 +330,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     }
 
     postDigest(function () {
-        $scope.setupDropdownTabs();
-        $scope.activeTab = $scope.activeTab2; //TODO: for some reason activeTab gets set to null in the digest cycle. This is a hack fix
+        $scope.setupDropdownTabs(); // TODO: Only call it when state is invalidated.
     });
 
     
@@ -346,7 +343,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         // TODO: not working well with collaborative scripts
         var script = $scope.tabs[$scope.activeTab];
 
-        if (script && script.saved && !script.collaborative) {
+        if (script && !script.collaborative) {
             // the script has been modified -- flag the script
             script.saved = false;
             script.tooltipText = ESMessages.idecontroller.unsavedScript;
@@ -389,8 +386,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         //refresh tab state to keep $scope.tabs up-to-date before we call getTabId
         refreshTabStateForSharedScripts();
         $scope.swapTab($scope.getTabId(script.shareid));
-
-        tabs.loadSharedScript(script);
     };
 
     /**
@@ -408,11 +403,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
         //note - the editor value is passed to the tabController from ideController via scope inheritance
         if ($scope.editor.ace) {
-            tabs.activeTabIndex = newTabIndex;
-            tabs.activeTabScript = $scope.tabs[newTabIndex];
-            tabs.unloadSharedScript();
-
-            tabs.ignoreOnChange = true;
             var nextScript = $scope.tabs[newTabIndex];
             var prevScript = $scope.tabs[$scope.activeTab];
 
@@ -427,11 +417,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 $scope.activeTab = newTabIndex;
 				//AVN LOG
                 //console.log("ACTIVE TAB SET", $scope.activeTab, newTabIndex);
-
-                /*
-                 * TODO: syncActiveTab updates activeTab in layoutController based on which view handles uib-tabset. Find a way to get rid of it and handle it in ideController
-                 */
-                $rootScope.$broadcast('syncActiveTab', newTabIndex);
 
                 if (nextScript.collaborative) {
                     if ($scope.editor.droplet.currentlyUsingBlocks) {
@@ -452,8 +437,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 $scope.setLanguage(ESUtils.parseLanguage(nextScript.name));
 
                 if (nextScript.isShared) {
-                    tabs.loadSharedScript(nextScript);
-
                     if (nextScript.collaborative) {
                         userConsole.status('Opening a collaborative script.');
                     } else {
@@ -473,23 +456,28 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 $rootScope.$broadcast('caiClose');
             }
 
-            $rootScope.$broadcast('reloadRecommendations');
-
-            tabs.ignoreOnChange = false;
-
             $scope.editor.clearHistory();
             // force-set the custom horizontal scroller width and re-render
             $scope.editor.ace.renderer.scrollBarH.setInnerWidth($scope.editor.ace.renderer.content.clientWidth);
             $scope.editor.ace.resize();
-            $scope.activeTab2 = $scope.activeTab;
-            $rootScope.$broadcast('setNumTabsOpen', $scope.tabs.length);
 
+            if (newTabIndex >= 0 ) {
+                if ($scope.tabs.length) {
+                    $scope.activeTabID = $scope.tabs[newTabIndex].shareid;
+                    $ngRedux.dispatch(tabs.setOpenTabs($scope.tabs.map(v => v.shareid)));
+                    $ngRedux.dispatch(tabs.setActiveTabID($scope.activeTabID));
+                }
+            } else if ($scope.tabs.length) {
+                $ngRedux.dispatch(tabs.setOpenTabs($scope.tabs.map(v => v.shareid)));
+                $ngRedux.dispatch(tabs.setActiveTabID($scope.activeTabID));
+            } else {
+                $ngRedux.dispatch(tabs.resetTabs());
+            }
         }
     };
 
     $scope.$on('reloadRecommendations', function(event){
         $rootScope.$broadcast('recommenderScript',$scope.tabs[$scope.activeTab]);
-        $rootScope.$broadcast('setNumTabsOpen', $scope.tabs.length);
     });
 
     /**
@@ -534,9 +522,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         if (script.isShared) {
             $scope.openSharedScripts = userProject.closeSharedScript(script.shareid);
             $scope.tabs.splice(id, 1);
-            if (!userProject.isLogged()) {
-                tabs.unloadSharedScript();
-            }
         }
         // readonly tabs are not backed by the user service, so just close the tab
         else if (script.readonly) {
@@ -596,10 +581,11 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
      * @function
      */
     $scope.setupDropdownTabs = function () {
-        angular.element('.nav-tabs').tabdrop('layout');
+        angular.element('.nav-tabs').tabdrop({align:'left'}).tabdrop('layout');
         angular.element('.close-all').remove();
         angular.element('.nav-tabs').find('.dropdown-menu').append('<li class="close-all"><a>Close All</a></li>');
-        angular.element('.close-all').on('click', function () {
+        angular.element('.nav-tabs').find('.dropdown-menu').css('left','inherit').css('transform','inherit').css('top','40px');
+        angular.element('.close-all').on('mousedown', function () {
             $confirm({text: ESMessages.idecontroller.closealltabs,
                 ok: "Close All"}).then(function () {
                 var promises = userProject.saveAll();
@@ -615,6 +601,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                         }
                     });
                     $scope.tabs.splice(0,$scope.tabs.length);
+                    $ngRedux.dispatch(tabs.resetTabs());
                 }).catch(function (err) {
                     userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1');
                 });
@@ -656,14 +643,14 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         if (!script.saved && !script.collaborative) {
             console.log('saved', script);
             $rootScope.$broadcast('recommenderScript', script);
-            userProject.saveScript(script.name, script.source_code)
-                .then(function () {
-                    if (userProject.isLogged()) {
-                        userNotification.show(ESMessages.user.scriptcloud, 'success');
-                    } else {
-                        userNotification.show(ESMessages.user.scriptlocal);
-                    }
-                }).catch(function (err) {
+            userProject.saveScript(script.name, script.source_code).then(function () {
+                if (userProject.isLogged()) {
+                    userNotification.show(ESMessages.user.scriptcloud, 'success');
+                } else {
+                    userNotification.show(ESMessages.user.scriptlocal);
+                }
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+            }).catch(function (err) {
                 userNotification.show(ESMessages.idecontroller.savefailed, 'failure1');
             });
         }
@@ -732,6 +719,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 collaboration.getScriptText(script.shareid).then(function (text) {
                     userProject.saveScript(script.name, text).then(function () {
                         userProject.refreshCodeBrowser();
+                        $ngRedux.dispatch(scripts.syncToNgUserProject());
                     });
                 });
             });
@@ -744,7 +732,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 }
 
                 $scope.refreshCodeBrowser().then(function() {
-                    tabs.unloadSharedScript();
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
                     return $scope.selectScript(importedScript);
                 });
             }).catch(function(err) {

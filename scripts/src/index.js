@@ -1,16 +1,36 @@
 // Global imports of CSS
-import '../../css/earsketch/allstyles.css';
 import './tailwind.css';
 
 import { configureStore } from '@reduxjs/toolkit';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+
 import rootReducer from './reducers';
 
+const persistConfig = {
+    key: 'root',
+    whitelist: ['app'],
+    storage
+};
+
 const store = configureStore({
-    reducer: rootReducer
+    reducer: persistReducer(persistConfig, rootReducer),
+    middleware: (getDefaultMiddleware) => {
+        return getDefaultMiddleware({
+            // Toggle these on for sanity checks.
+            // See: https://redux-toolkit.js.org/api/getDefaultMiddleware#included-default-middleware
+            immutableCheck: false,
+            serializableCheck: false
+        });
+    }
 });
+
+persistStore(store);
 
 require('jquery');
 require('jqueryUI');
+window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
+window.Question = Question; // Used inside curriculum HTMLs.
 
 import 'angularjs-slider/dist/rzslider.css';
 
@@ -151,6 +171,7 @@ require(['angular'], () => {
     require('adminWindowController');
     require('forgotPasswordController');
     require('shareController');
+    require('submitAWSController');
 
     require('soundBrowserController');
     require('scriptBrowserController');
@@ -161,6 +182,10 @@ require(['angular'], () => {
 
     // React components
     require('./bubble/Bubble');
+    require('./browser/API');
+    require('./browser/Sounds');
+    require('./browser/Scripts');
+    require('./browser/Curriculum');
 
     // Autograders
     require('autograderController');

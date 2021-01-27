@@ -23,15 +23,15 @@
     <link rel="stylesheet" type="text/css" href="fonts/icomoon_ultimate/style.css">
 
     <!-- Custom styles for Curriculum template -->
-    <link rel="stylesheet" type="text/css" href="theme/html/html.css">
-
-    <!-- LESS -->
-    <link rel="stylesheet" type="text/css" href="css/earsketch/allstyles.css">
+    <link rel="stylesheet" type="text/css" href="css/earsketch/curriculum_html.css">
 
     <!-- highlight js style -->
     <link rel="stylesheet" type="text/css" href="scripts/lib/jsdifflib/diffview.css">
 
     <link rel="stylesheet" type="text/css" href="css/vendor/colpick.css" />
+
+    <!-- LESS -->
+    <link rel="stylesheet" type="text/css" href="css/earsketch/allstyles.css">
 
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="google-site-verification" content="ojwZ1r7MVOTRWsiqPITqwmhCOUou2CcqxRMG6itoci4"/>
@@ -48,8 +48,7 @@
 
 <div id="screen" class="loader">
     <br/><br/><br/><br/><br/><br/>
-    <h1>Loading EarSketch...</h1>
-    <br/><br/>
+    <div class="text-5xl text-center pb-16" style="font-size: 3rem; padding-bottom: 4rem;">Loading EarSketch...</div>
     <div class="loading-spinner"></div>
 </div>
 <script>
@@ -62,6 +61,10 @@
         document.body.style['background-color'] = '#000000'
     }
 </script>
+
+<script type="text/javascript" src="/curriculum/curr_toc.js"></script>
+<script type="text/javascript" src="/curriculum/curr_pages.js"></script>
+<script type="text/javascript" src="/curriculum/curr_searchdoc.js"></script>
 
 <div id="notification-history" ng-show="showNotificationHistory">
     <div style="padding:1em; display:flex; justify-content:space-between;">
@@ -239,22 +242,25 @@
             <ul>
                 <!-- Sound Browser -->
                 <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 0}" id="sidenav-filebrowser" data-toggle="tooltip" title="Sounds" ng-click="toggleSidebarTab('sound');" >
-                    <i class="icon icon-sound-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+<!--                    <i class="icon icon-sound-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>-->
+                    <i class="icon icon-headphones"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                 </button>
 
                 <!-- Scripts Browser -->
                 <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 1}" id="sidenav-scriptbrowser" data-toggle="tooltip" title="Scripts" ng-click="toggleSidebarTab('script')">
-                    <i class="icon icon-code-browser"><span class="path1"></span><span class="path2"></span></i>
+<!--                    <i class="icon icon-code-browser"><span class="path1"></span><span class="path2"></span></i>-->
+                    <i class="icon icon-embed2"><span class="path1"></span><span class="path2"></span></i>
                 </button>
 
                 <!-- Share Browser -->
-                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 2}" id="sidenav-sharebrowser" data-toggle="tooltip" title="Share" ng-click="toggleSidebarTab('share')">
-                    <i class="icon icon-share-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                </button>
+<!--                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 2}" id="sidenav-sharebrowser" data-toggle="tooltip" title="Share" ng-click="toggleSidebarTab('share')">-->
+<!--                    <i class="icon icon-share-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>-->
+<!--                </button>-->
 
                 <!-- API Browser -->
                 <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 3}" id="sidenav-apibrowser" data-toggle="tooltip" title="API" ng-click="toggleSidebarTab('api');">
-                    <i class="icon icon-api-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+<!--                    <i class="icon icon-api-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>-->
+                    <i class="icon icon-book"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
                 </button>
 
                 <!-- Console -->
@@ -264,7 +270,7 @@
 
                 <!-- Curriculum -->
                 <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': (!layout.curriculum || showChatWindow || showCAIWindow)}" ng-click="toggleLayout('curriculum')" id="sidenav-curriculum" data-toggle="tooltip" title="Curriculum">
-                    <i class="icon icon-book3"></i>
+                    <i class="icon icon-book3" style="font-size:18px"></i>
                 </button>
 
                 <!-- Chat (hidden option) -->
@@ -299,20 +305,17 @@
                 <div id="sidebar">
                     <uib-tabset class="sidebar-inner" active="layout.browser">
                         <uib-tab id="tab-soundbrowser" index="0" select="openSidebarTab('sound');">
-                            <!--<uib-tab-heading>Sounds</uib-tab-heading>-->
-                            <div soundbrowser></div>
+                            <sound-browser></sound-browser>
                         </uib-tab>
                         <uib-tab id="tab-scriptbrowser" index="1" select="openSidebarTab('script')">
-                            <!--<uib-tab-heading>Scripts</uib-tab-heading>-->
-                            <div scriptbrowser></div>
+                            <script-browser></script-browser>
                         </uib-tab>
                         <uib-tab id="tab-sharebrowser" index="2" select="openSidebarTab('share')">
                             <!--<uib-tab-heading>Share</uib-tab-heading>-->
                             <div sharebrowser></div>
                         </uib-tab>
                         <uib-tab id="tab-apibrowser" index="3" select="openSidebarTab('api')">
-                            <!--<uib-tab-heading>API</uib-tab-heading>-->
-                            <div apibrowser></div>
+                            <api-browser></api-browser>
                         </uib-tab>
                     </uib-tabset>
                 </div>
@@ -377,9 +380,10 @@
                                 <!-- Tabs -->
                                 <div class="tab-container" ng-show="tabs.length > 0">
                                     <span ng-show="isEmbedded" class="embedded-script-info"> By: {{embeddedScriptUsername}}</span>
-                                    <uib-tabset active="activeTab">
-                                        <uib-tab ng-hide="isEmbedded" ng-repeat="tab in tabs track by $index" index="$index" select="swapTab($index)" ng-init="tabContextMenu[$index]={state:false}" ng-click="preventPopover($index)" class="tab-context-menu">
-                                            <uib-tab-heading uib-popover-template="'templates/script-context-menu.html'" popover-trigger="outsideClick" popover-placement="bottom" popover-is-open="tabContextMenu[$index].state" right-click-menu="openContextMenu($index)">
+                                    <uib-tabset active="activeTabID">
+                                        <!-- Note: Do not track by $index because uib-tab freaks out -->
+                                        <uib-tab ng-hide="isEmbedded" ng-repeat="tab in tabs track by $index" index="tab.shareid" select="swapTab(getTabId(tab.shareid),activeTabID,tab.shareid)" ng-init="tabContextMenu[getTabId(tab.shareid)]={state:false}" ng-click="preventPopover(getTabId(tab.shareid))" class="tab-context-menu">
+                                            <uib-tab-heading uib-popover-template="'templates/script-context-menu.html'" popover-trigger="outsideClick" popover-placement="bottom" popover-is-open="tabContextMenu[getTabId(tab.shareid)].state" right-click-menu="openContextMenu(getTabId(tab.shareid))">
                                                 <div class="title-block prevent-selection">
                                                         <span class="tab-text" ng-class="{ 'dirty-tab-header' : !tab.saved && !tab.readonly && !tab.collaborative}" title="{{tab.tooltipText}}">
                                                             <i class="icon icon-eye" ng-show="tab.readonly && !tab.isShared"></i>
@@ -391,7 +395,7 @@
                                                                 <div></div> <!-- a hack to disable safari tooltip: don't remove! -->
                                                             </span>
                                                         </span>
-                                                    <span class="tab-close" ng-click="closeTab($index, $event);">X</span>
+                                                    <span class="tab-close" ng-click="closeTab(getTabId(tab.shareid), $event);">X</span>
                                                 </div>
                                             </uib-tab-heading>
                                         </uib-tab>
@@ -457,8 +461,9 @@
             </div> <!-- end of #content -->
 
             <div ui-layout-container size="440px" collapsed="!layout.curriculum" min-size="360px" id="curriculum-container" ng-style="{'z-index':bubble.active&&bubble.currentPage>=8?35:0}"> <!-- curriculum -->
-                <div id="curriculum" ng-show="!showChatWindow && !showCAIWindow">
-                    <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div>
+                <div class="h-full" ng-show="!showChatWindow && !showCAIWindow">
+                    <!-- <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div> -->
+                    <curriculum style="height:inherit"></curriculum>
                 </div>
                 <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
                 <div caiwindow ng-if-cai="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
@@ -466,6 +471,6 @@
         </div> <!-- ui-layout -->
     </div> <!-- layoutController -->
 </div> <!-- end of container -->
-<hot-bubble />
+<hot-bubble></hot-bubble>
 </body>
 </html>
