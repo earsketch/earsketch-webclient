@@ -423,13 +423,13 @@
         options: [69, 70]
     },
     {  id: 69,
-        title: "I agree.",
-        utterance: "nice, let's call it good",
+        title: "bye!",
+        utterance: "see ya",
         parameters: {},
         options: []
     },
     {  id: 70,
-        title: "Wait, I want to work on it some more",
+        title: "wait, I want to work on it some more",
         utterance: "ok, go ahead",
         parameters: {},
         options: []
