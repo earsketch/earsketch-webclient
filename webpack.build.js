@@ -12,8 +12,7 @@ module.exports = env => {
     const target = (env && env.target) ? env.target : 'prod';
     const apiHost = target==='prod' ? 'https://api.ersktch.gatech.edu' : 'https://earsketch-dev.lmc.gatech.edu';
     const webSocketURL = apiHost.replace('http', 'ws') + (target==='prod' ? '/EarSketchWS' : '/websocket');
-    const clientHost = (env && env.host) ? env.host : 'https://earsketch.gatech.edu';
-    const clientPath = (env && env.path) ? env.path : 'earsketch2';
+    const clientBaseURI = (env && env.baseuri) ? env.baseuri : 'https://earsketch.gatech.edu/earsketch2';
     const release = (env && env.release) ? env.release : Date.now();
 
     return merge(common, {
@@ -34,7 +33,7 @@ module.exports = env => {
                 URL_SEARCHFREESOUND: JSON.stringify(`${apiHost}/EarSketchWS/services/audio/searchfreesound`),
                 URL_SAVEFREESOUND: JSON.stringify(`${apiHost}/EarSketchWS/services/files/uploadfromfreesound`),
                 URL_LOADAUDIO: JSON.stringify(`${apiHost}/EarSketchWS/services/audio/getaudiosample`),
-                SITE_BASE_URI: JSON.stringify(`${clientHost}/${clientPath}`)
+                SITE_BASE_URI: JSON.stringify(`${clientBaseURI}`)
             }),
             new CleanWebpackPlugin()
         ],

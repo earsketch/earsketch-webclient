@@ -6,7 +6,7 @@ env:
     ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/npm-env-flags-file
     ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
     ES_VERSION_MINOR: /earsketch-webclient/version_number/minor
-    ES_HOST: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/client_host
+    ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/client_base_uri
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
@@ -30,7 +30,7 @@ phases:
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - grunt less
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
-      - npm run $NPM_BUILD_COMMAND -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.host=$ES_HOST
+      - npm run $NPM_BUILD_COMMAND -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.baseuri=$ES_BASE_URI
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR
