@@ -3,8 +3,6 @@ import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 
-import { usePopper } from 'react-popper'
-
 import { SearchBar } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
@@ -21,6 +19,24 @@ const copyURL = (language, currentLocation) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
     clipboard.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
+}
+
+// Useful for preventing absolute-positioned elements from exceeding window height.
+const useHeightLimiter = (show, marginBottom) => {
+    const [height, setHeight] = useState('100vh')
+    const el = useRef()
+
+    const handleResize = () => setHeight(`calc(100vh - ${el.current.getBoundingClientRect().top}px${marginBottom ? ' - ' + marginBottom : ''})`)
+
+    useEffect(() => {
+        if (show) {
+            window.addEventListener('resize', handleResize)
+            handleResize()
+            return () => window.removeEventListener('resize', handleResize)
+        }
+    }, [show])
+
+    return [el, { maxHeight: height, overflowY: 'scroll' }]
 }
 
 const TableOfContentsChapter = ({ unit, unitIdx, ch, chIdx }) => {
@@ -115,8 +131,10 @@ const CurriculumSearchResults = () => {
     const results = useSelector(curriculum.selectSearchResults)
     const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
     const theme = useSelector(appState.selectColorTheme)
+    const [resultsRef, resultsStyle] = useHeightLimiter(showResults)
+
     return (showResults &&
-        <div className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`}>
+        <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
             <a key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                 <div className={`search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
@@ -235,9 +253,9 @@ const NavigationBar = () => {
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)
-    const dropdownRef = useRef(null)
     const triggerRef = useRef(null)
     const [highlight, setHighlight] = useState(false)
+    const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, '8px')
 
     const handleClick = event => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
@@ -273,7 +291,10 @@ const NavigationBar = () => {
                     </button>}
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? '' : 'hidden'}`}>
-                <div ref={dropdownRef} className={`w-full pointer-events-auto p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}><TableOfContents></TableOfContents></div>
+                <div ref={dropdownRef} style={tocStyle}
+                     className={`w-full pointer-events-auto p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}>
+                    <TableOfContents></TableOfContents>
+                </div>
             </div>
             <div className="w-full" style={{height: '7px'}}>
                 <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
