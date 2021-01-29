@@ -103,6 +103,8 @@
     "karma-html-reporter": "^0.2.7",
     "karma-jasmine": "^0.3.6",
     "karma-safari-launcher": "^1.0.0",
+    "karma-sourcemap-loader": "^0.3.8",
+    "karma-webpack": "^4.0.2",
     "ng-midway-tester": "^2.0.5",
     "postcss": "^8.1.1",
     "postcss-loader": "^4.0.3",
