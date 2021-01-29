@@ -11,30 +11,84 @@ import { parseString } from "xml2js";
 app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function (caiStudent, userProject) {
 
     //var init
-    var suggestionsAccepted = 0;
-    var suggestionsRejected = 0;
+    var suggestionsAccepted = {};
+    var suggestionsRejected = {};
 
-    var allSoundsSuggested = [];
-    var allSoundsUsed = [];
-    var soundsSuggestedAndUsed = []
-    var currentSoundSuggestionsPresent = [];
-    var soundsContributedByStudent = [];
+    var allSoundsSuggested = {};
+    var allSoundsUsed = {};
+    var soundsSuggestedAndUsed = {};
+    var currentSoundSuggestionsPresent = {};
+    var soundsContributedByStudent = {};
 
-    var codeSuggestionsMade = [];
-    var sampleSuggestionsMade = [];
+    var codeSuggestionsUsed = {};
+
+    var codeSuggestionsMade = {};
+    var sampleSuggestionsMade = {};
 
     var numberOfRuns = 3;
 
-    var acceptanceRatio = 0;
+    var acceptanceRatio = {};
+    var activeProject = "";
+
+    function setActiveProject(projectName) {
+        activeProject = projectName;
+
+        if (!allSoundsSuggested[projectName]) {
+            allSoundsSuggested[projectName] = [];
+        }
+        if (!allSoundsUsed[projectName]) {
+            allSoundsUsed[projectName] = [];
+        }
+        if (!soundsSuggestedAndUsed[projectName]) {
+            soundsSuggestedAndUsed[projectName] = [];
+        }
+        if (!currentSoundSuggestionsPresent[projectName]) {
+            currentSoundSuggestionsPresent[projectName] = [];
+        }
+        if (!soundsContributedByStudent[projectName]) {
+            soundsContributedByStudent[projectName] = [];
+        }
+
+        if (!codeSuggestionsUsed[projectName]) {
+            codeSuggestionsUsed[projectName] = [];
+        }
+
+        if (!codeSuggestionsMade[projectName]) {
+            codeSuggestionsMade[projectName] = [];
+        }
+        if (!sampleSuggestionsMade[projectName]) {
+            sampleSuggestionsMade[projectName] = [];
+        }
+
+        if (!acceptanceRatio[projectName]) {
+            acceptanceRatio[projectName] = 0;
+        }
+
+        if (!suggestionsAccepted[projectName]) {
+            suggestionsAccepted[projectName] = 0;
+        }
+        if (!suggestionsRejected[projectName]) {
+            suggestionsRejected[projectName] = 0;
+        }
+        activeProject = projectName;
+    }
+
+    function getSoundSuggestionsUsed() {
+        return soundsSuggestedAndUsed[activeProject].slice(0);
+    }
+
+    function getCodeSuggestionsUsed() {
+        return codeSuggestionsUsed[activeProject].slice(0);
+    }
 
     function updateHistoricalArrays(currentSounds) {
 
 
         //update historical list of all sound suggestions
-        for (var i = 0; i < sampleSuggestionsMade.length; i++) {
-            for (var j = 0; j < sampleSuggestionsMade[i][1].length; j++) {
-                if (!allSoundsSuggested.includes(sampleSuggestionsMade[i][1][j])) {
-                    allSoundsSuggested.push(sampleSuggestionsMade[i][1][j]);
+        for (var i = 0; i < sampleSuggestionsMade[activeProject].length; i++) {
+            for (var j = 0; j < sampleSuggestionsMade[activeProject][i][1].length; j++) {
+                if (!allSoundsSuggested[activeProject].includes(sampleSuggestionsMade[activeProject][i][1][j])) {
+                    allSoundsSuggested[activeProject].push(sampleSuggestionsMade[activeProject][i][1][j]);
                 }
             }
         }
@@ -42,16 +96,16 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
         //update historical list of all sounds used
         if (currentSounds != null) {
             for (var i = 0; i < currentSounds.length; i++) {
-                if (!allSoundsUsed.includes(currentSounds[i])) {
-                    allSoundsUsed.push(currentSounds[i]);
+                if (!allSoundsUsed[activeProject].includes(currentSounds[i])) {
+                    allSoundsUsed[activeProject].push(currentSounds[i]);
                 }
             }
         }
 
         //update historical list of sound suggestions used
-        for (var i = 0; i < allSoundsUsed.length; i++) {
-            if (allSoundsSuggested.includes(allSoundsUsed[i]) && !soundsSuggestedAndUsed.includes(allSoundsUsed[i]) && !soundsContributedByStudent.includes(allSoundsUsed[i])) {
-                soundsSuggestedAndUsed.push(allSoundsUsed[i]);
+        for (var i = 0; i < allSoundsUsed[activeProject].length; i++) {
+            if (allSoundsSuggested[activeProject].includes(allSoundsUsed[activeProject][i]) && !soundsSuggestedAndUsed[activeProject].includes(allSoundsUsed[i]) && !soundsContributedByStudent[activeProject].includes(allSoundsUsed[activeProject][i])) {
+                soundsSuggestedAndUsed[activeProject].push(allSoundsUsed[activeProject][i]);
             }
         }
 
@@ -59,25 +113,25 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
         //if current sounds passed, update "currently used suggestions" list
         if (currentSounds != null) {
             var newCurrentSuggs = [];
-            for (var i = 0; i < currentSoundSuggestionsPresent.length; i++) {
-                if (currentSounds.includes(currentSoundSuggestionsPresent[i])) {
-                    newCurrentSuggs.push(currentSoundSuggestionsPresent[i])
+            for (var i = 0; i < currentSoundSuggestionsPresent[activeProject].length; i++) {
+                if (currentSounds.includes(currentSoundSuggestionsPresent[activeProject][i])) {
+                    newCurrentSuggs.push(currentSoundSuggestionsPresent[activeProject][i])
                 }
             }
 
             for (var i = 0; i < currentSounds.length; i++) {
-                if (allSoundsSuggested.includes(currentSounds[i]) && !newCurrentSuggs.includes(currentSounds[i])) {
+                if (allSoundsSuggested[activeProject].includes(currentSounds[i]) && !newCurrentSuggs.includes(currentSounds[i])) {
                     newCurrentSuggs.push(currentSounds[i]);
                 }
             }
 
-            currentSoundSuggestionsPresent = newCurrentSuggs.slice(0);
+            currentSoundSuggestionsPresent[activeProject] = newCurrentSuggs.slice(0);
         }
 
         if (currentSounds != null) {
             for (var i = 0; i < currentSounds.length; i++) {
-                if (!allSoundsSuggested.includes(currentSounds[i]) && !soundsContributedByStudent.includes(currentSounds[i])) {
-                    soundsContributedByStudent.push(currentSounds[i]);
+                if (!allSoundsSuggested[activeProject].includes(currentSounds[i]) && !soundsContributedByStudent[activeProject].includes(currentSounds[i])) {
+                    soundsContributedByStudent[activeProject].push(currentSounds[i]);
                 }
             }
         }
@@ -91,7 +145,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
     }
 
     function addSoundSuggestion(suggestionArray) {
-        sampleSuggestionsMade.push([numberOfRuns, suggestionArray]);
+        sampleSuggestionsMade[activeProject].push([numberOfRuns, suggestionArray]);
         updateHistoricalArrays();
     }
 
@@ -100,84 +154,85 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
         updateHistoricalArrays(soundsUsedArray);
 
         var newArray = [];
-        for (var i = 0; i < sampleSuggestionsMade.length; i++) {
+        for (var i = 0; i < sampleSuggestionsMade[activeProject].length; i++) {
 
             var wasUsed = false;
 
             //were any of the sounds used?
             for (var j = 0; j < soundsUsedArray.length; j++) {
-                if (sampleSuggestionsMade[i][1].includes(soundsUsedArray[j])) {
+                if (sampleSuggestionsMade[activeProject][i][1].includes(soundsUsedArray[j])) {
                     wasUsed = true;
                     break;
                 }
             }
 
             //decrement
-            sampleSuggestionsMade[i][0] -= 1;
+            sampleSuggestionsMade[activeProject][i][0] -= 1;
 
             //if 0, add to the rejection category and delete the item
             if (wasUsed) {
-                suggestionsAccepted += 1;
+                suggestionsAccepted[activeProject] += 1;
                 updateAcceptanceRatio();
             }
             else {
-                if (sampleSuggestionsMade[i][0] == 0) {
-                    suggestionsRejected += 1;
+                if (sampleSuggestionsMade[activeProject][i][0] == 0) {
+                    suggestionsRejected[activeProject] += 1;
                     updateAcceptanceRatio();
                 }
                 else {
-                    newArray.push(sampleSuggestionsMade[i].slice(0));
+                    newArray.push(sampleSuggestionsMade[activeProject][i].slice(0));
                 }
             }
         }
 
-        sampleSuggestionsMade = newArray.slice(0);
+        sampleSuggestionsMade[activeProject] = newArray.slice(0);
 
     }
 
     function addCodeSuggestion(complexityObj) {
-        codeSuggestionsMade.push([numberOfRuns, complexityObj]);
+        codeSuggestionsMade[activeProject].push([numberOfRuns, complexityObj]);
     }
 
     function runCode(complexityOutput) {
         var newArray = [];
-        for (var i = 0; i < codeSuggestionsMade.length; i++) {
+        for (var i = 0; i < codeSuggestionsMade[activeProject].length; i++) {
 
             var wasUsed = true;
 
             //were any reqs readched?
-            var keys = Object.keys(codeSuggestionsMade[i][1]);
+            var keys = Object.keys(codeSuggestionsMade[activeProject][i][1]);
 
             for (var j = 0; j < keys.length; j++) {
-                if (complexityOutput[keys[j]] < codeSuggestionsMade[i][1][keys[j]]) {
+                if (complexityOutput[keys[j]] < codeSuggestionsMade[activeProject][i][1][keys[j]]) {
                     wasUsed = false;
                 }
             }
 
             //decrement
-            codeSuggestionsMade[i][0] -= 1;
+            codeSuggestionsMade[activeProject][i][0] -= 1;
 
             //if 0, add to the rejection category and delete the item
             if (wasUsed) {
-                suggestionsAccepted += 1;
+                suggestionsAccepted[activeProject] += 1;
                 updateAcceptanceRatio();
+                codeSuggestionsUsed[activeProject].push(codeSuggestionsMade[i][1]);
             }
             else {
-                if (codeSuggestionsMade[i][0] == 0) {
-                    suggestionsRejected += 1;
+                if (codeSuggestionsMade[activeProject][i][0] == 0) {
+                    suggestionsRejected[activeProject] += 1;
                     updateAcceptanceRatio();
                 }
                 else {
-                    newArray.push(codeSuggestionsMade[i].slice(0));
+                    newArray.push(codeSuggestionsMade[activeProject][i].slice(0));
                 }
             }
         }
 
-        codeSuggestionsMade = newArray.slice(0);
+        codeSuggestionsMade[activeProject] = newArray.slice(0);
     }
 
     function updateAcceptanceRatio() {
-        acceptanceRatio = suggestionsAccepted / (suggestionsAccepted + suggestionsRejected);
+        acceptanceRatio[activeProject] = suggestionsAccepted[activeProject] / (suggestionsAccepted[activeProject] + suggestionsRejected[activeProject]);
         caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
     }
    
@@ -258,7 +313,10 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
         addKeystroke: addKeystroke,
         addMousePos: addMousePos,
         returnPageStatus: returnPageStatus,
-        stuckOnError: stuckOnError
+        stuckOnError: stuckOnError,
+        getSoundSuggestionsUsed: getSoundSuggestionsUsed,
+        getCodeSuggestionsUsed: getCodeSuggestionsUsed,
+        setActiveProject: setActiveProject
     };
 
 }]);

@@ -44,6 +44,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     var currentDropup = "";
     var isPrompted = true;
 
+    var soundSuggestionsUsed = {};
+    var codeSuggestionsUsed = {};
+
     var allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"];
 
     //defines creation rules for generated utterances/button options (ex. creates option items for every line of student code for line selection)
@@ -95,6 +98,18 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (!currentInput[p]) {
             currentInput[p] = {};
         }
+
+        //interface w/student preference module
+        if (!codeSuggestionsUsed[p]) {
+            codeSuggestionsUsed[p] = 0;
+        }
+        if (!soundSuggestionsUsed[p]) {
+            soundSuggestionsUsed[p] = 0;
+        }
+        caiStudentPreferenceModule.setActiveProject(p);
+        codeSuggestionsUsed[p] = caiStudentPreferenceModule.getCodeSuggestionsUsed().length;
+        soundSuggestionsUsed[p] = caiStudentPreferenceModule.getSoundSuggestionsUsed().length;
+
         activeProject = p;
     }
 
@@ -106,6 +121,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         // console.log("error",currentError);
         var t = Date.now();
         caiStudentPreferenceModule.addCompileError(error, t);
+        nodeHistory[activeProject].push(["Compilation With Error", error]);
         if (String(error[0]) === String(currentError[0]) && errorWait != -1) {
             //then it's the same error. do nothing. we still wait
             return "";
@@ -128,7 +144,17 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     function explainError() {
 
-        return CAI_ERRORS[String(currentError[0]).split(':')[0]];
+        var errorType = String(currentError[0]).split(':')[0].trim();
+        if (errorType == "ExternalError") {
+            errorType = String(currentError[0]).split(':')[1].trim();
+        }
+        
+        if (CAI_ERRORS[errorType]) {
+            return CAI_ERRORS[errorType];
+        }
+        else {
+            return "i'm not sure how to fix this. you might have to peek at the curriculum";
+        }
     }
 
 
@@ -142,6 +168,24 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         var allSamples = recommender.addRecInput([], { source_code: studentCodeObj });
         caiStudentPreferenceModule.runSound(allSamples);
 
+        //once htat's done, record historicalinfo from the preference module
+        var suggestionRecord = caiStudentPreferenceModule.getSoundSuggestionsUsed();
+        if (suggestionRecord.length > soundSuggestionsUsed[activeProject]) {
+            for (i = soundSuggestionsUsed[activeProject]; i < suggestionRecord.length; i++) {
+                nodeHistory[activeProject].push(["Sound Suggestion Used", suggestionRecord[i]])
+            }
+            soundSuggestionsUsed[activeProject] += suggestionRecord.length - soundSuggestionsUsed[activeProject];
+
+        }
+
+        var codeSuggestionRecord = caiStudentPreferenceModule.getCodeSuggestionsUsed();
+        if (codeSuggestionRecord.length > codeSuggestionsUsed[activeProject]) {
+            for (i = codeSuggestionsUsed[activeProject]; i < codeSuggestionRecord.length; i++) {
+                nodeHistory[activeProject].push(["Code Suggestion Used", codeSuggestionRecord[i]])
+            }
+            codeSuggestionsUsed[activeProject] += codeSuggestionRecord.length - codeSuggestionsUsed[activeProject];
+        }
+
         if (complexityResults != null) {
             currentComplexity = Object.assign({}, complexityResults);
 
@@ -151,6 +195,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             else if (currentComplexity.userFunc == "ReturnAndArgs") {
                 currentComplexity.userFunc = 4;
             }
+            nodeHistory[activeProject].push(["Successful Compilation", Object.assign({}, currentComplexity)]);
         }
         if (!studentInteracted) {
             return "";
@@ -324,6 +369,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
                 if (currentTreeNode[activeProject].event[k] != 'codeRequest') {
                     caiStudentHistoryModule.trackEvent(currentTreeNode[activeProject].event[k]);
+                    nodeHistory[activeProject].push(["request", currentTreeNode[activeProject].event[k]]);
                 }
             }
         }
@@ -698,6 +744,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             studentInteracted = true;
 
             caiStudentHistoryModule.trackEvent("codeRequest");
+            nodeHistory[activeProject].push(["request", "codeRequest"]);
         }
         var outputObj = codeSuggestion.generateCodeSuggestion(null, nodeHistory[activeProject]);
         //var outputText = printObject(outputObj);
