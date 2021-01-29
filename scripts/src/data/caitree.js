@@ -117,7 +117,7 @@
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
         event: ["soundRequest"],
-        options: []
+        options: [19,6]
     },
     {   id: 19,
         title: "no thanks",
@@ -126,7 +126,7 @@
         options: []
     },
     {   id: 20,
-        title: "Can you suggest different sounds?",
+        title: "what about something else?",
         utterance: "Sure! Will these suggestions work?\n[sound_rec]\n[sound_rec]\n[sound_rec]",
         parameters: {},
         options: [15, 16, 17]
