@@ -455,15 +455,15 @@ const CAI_MUSIC_ANALYSIS = null;
 
 
 const CAI_ERRORS = {
-    "ParseError": "looks like you've got a parse error. I think we might be missing something in the line with the error.",
-    "ImportError": "something's not importing right. Do we have the right package name up top?",
+    "ParseError": "looks like you've got a parse error. I think we might be missing something.",
+    "ImportError": "something's not importing right. do we have the right package name up top?",
     "IndentationError": "looks like one of our lines isn't indented right.",
-    "IndexError": "i think this means we're trying to access an index that doesn't exist.",
-    "NameError": "oh, I think we're trying to use a variable or function that we haven't defined, or maybe we misspelled a name.",
+    "IndexError": "i think this means we're trying to use an index that doesn't exist.",
+    "NameError": "i think we're trying to use a variable or function that we haven't defined, or maybe we misspelled a name.",
     "SyntaxError": "we have a syntax error, which might mean that we're using the wrong operator.",
-    "TypeError": "it's saying type error, which means that line is expecting a different type of data than we're giving it.",
+    "TypeError": "it's saying type error, which means that we put in the wrong kind of data, or we're missing something.",
     "ValueError": "i think something is wrong with one of our function arguments.",
-    "ServerError": "this is an issue with the ES server, and not with your code. We might have to make some changes."
+    "ServerError": "this is an issue with the ES server, and not with your code. we might have to make some changes."
 };
 
 export {CAI_TREE_NODES, CAI_TREES, CAI_MUSIC_ANALYSIS, CAI_ERRORS};
