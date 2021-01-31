@@ -12,33 +12,19 @@
 }
 
 #daw-container {
-  position: absolute;
-  right: 0;
-  left: @vert-zoom-offset;
-  bottom: 0;
-  top: @horz-zoom-offset;
+  position: relative;
+  width: 100%;
   overflow: auto;
   border-left: @border-width solid @med-bg;
   border-top: @border-width solid @med-bg;
 }
 
 #zoom-container {
-  position: absolute;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  top: @panel-label-height;
   border-top: @border-width solid @med-bg;
-}
-
-#daw-main {
-  /*width: 1100px; */ /*width of daw window*/
 }
 
 #daw-timeline{
   height: @timeline-height;
-  position: absolute;
-  top: 0;
   z-index: 9;
   overflow: hidden;
   background: @bg;
@@ -55,17 +41,12 @@
 
 #daw-measureline{
   height: @measureline-height;
-  position: absolute;
   top: @timeline-height;
   z-index: 9;
   overflow: hidden;
   background: @bg;
   opacity: 0.8;
   box-shadow: 0px 2px 10px @dark-bg;
-}
-
-.daw-track-group-container{
-  margin-top: @control-height;  /*place just under timeline*/
 }
 
 .daw-track {
@@ -199,12 +180,6 @@
 
 .dawTrackContainer {
   position: relative;
-  //-moz-transition: all 0.5s linear;
-  //-ms-transition: all 0.5s linear;
-  //-o-transition: all 0.5s linear;
-  //-webkit-transition: all 0.5s linear;
-  //transition: all 0.5s linear;
-  //transition: all 0.5s linear;
 }
 
 .dawTrackEffectName {
@@ -327,12 +302,14 @@
 
 svg.effectAxis{
   position: absolute;
-  left: 0px;
+  left: 0;
+  height: 100%;
 }
 
 svg.effectSvg{
   position: absolute;
-  left: 0px;
+  left: 0;
+  height: 100%;
   stroke-width: 1;
 }
 
@@ -351,11 +328,6 @@ svg.effectSvg path {
 }
 
 .daw-transport-button {
-  //-moz-transition: all 0.5s linear;
-  //-ms-transition: all 0.5s linear;
-  //-o-transition: all 0.5s linear;
-  //-webkit-transition: all 0.5s linear;
-  //transition: all 0.5s linear;
   display: flex;
   align-items: center;
 }
@@ -399,7 +371,6 @@ svg.effectSvg path {
 .dawMuteButton{
   position: absolute;
   right: 16px;
-  top: 2px;
   width: 22px;
   height: 18px;
   border-radius: 8px;
@@ -437,18 +408,15 @@ svg.effectSvg path {
 
 .btn-effect{
   position:absolute;
-  top:@horz-zoom-offset + @border-width;
-  left:@vert-zoom-offset + @border-width;
   height:@control-height;
   z-index: 34;
   width: 100px;
-  border-radius: 0px;
+  border-radius: 0;
   background: @selected-bg;
   color: @tab-text;
 }
 
 .btn-effect > span {
-  position: absolute;
   letter-spacing : 2px;
 }
 
@@ -510,7 +478,7 @@ svg.effectSvg path {
 .daw-highlight {
   position: absolute;
   top: 0;
-  height: 1000px;
+  height: 100%;
   background-color: rgba(255, 153, 0, 0.3);
   border-left: 1px solid rgb(255, 153, 0);
   border-right: 1px solid rgb(255, 153, 0);
@@ -524,7 +492,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%;
   float: left;
-  margin-left: 98px;
+  margin-left: 100px;
   z-index: 10;
   position: absolute;
   top: 0;
@@ -534,7 +502,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%; /*smaller than daw height to avoid infinite scroll*/
   float: left;
-  margin-left: 98px;
+  margin-left: 100px;
   z-index: 20;
   position: absolute;
   background-color: #ff0000;
@@ -548,7 +516,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%; /*smaller than daw height to avoid infinite scroll*/
   float: left;
-  margin-left: 98px;
+  margin-left: 100px;
   z-index: 20;
   position: absolute;
   background-color: #6DFED4;
@@ -558,16 +526,14 @@ svg.effectSvg path {
 /* Zoom Sliders */
 
 #horz-zoom-slider-container {
-  position: absolute;
-  margin-left: 100px + @vert-zoom-offset;
-  width: calc(~"100% - 115px"); /* less.jss needs ~".." to compile calc */
+  position: relative;
+  padding-left: 16px;
   display: flex;
-  floar: right;
   outline: none;
   overflow: hidden;
   height: @horz-zoom-offset;
-  top: 0px;
-  opacity: 0.2;
+  min-height: @horz-zoom-offset;
+  top: 0;
 
   -moz-animation: fadeout 25s linear forwards;
   -ms-animation: fadeout 25s linear forwards;
@@ -588,12 +554,15 @@ svg.effectSvg path {
 
 #horz-zoom-slider-container > span {
   color: grey;
+}
+
+.zoom-out, .zoom-in {
   position: absolute;
 }
 
 #horz-zoom-slider-container .zoom-out {
   font-size: 38px;
-  left: 4px;
+  left: 20px;
   bottom: -18px;
 }
 
@@ -641,11 +610,8 @@ svg.effectSvg path {
 }
 
 #vert-zoom-slider-container {
-  height: calc(~"100% - 45px"); /* less.jss needs ~".." to compile calc */
   width: @vert-zoom-offset;
   top: @vert-zoom-offset + @control-height;
-  position: absolute;
-  opacity: 0.2;
 
   -moz-animation: fadeout 8s linear forwards;
   -ms-animation: fadeout 8s linear forwards;
@@ -688,7 +654,7 @@ svg.effectSvg path {
 #vert-zoom-slider-container .zoom-out {
   font-size: 38px;
   left: 2px;
-  top: -18px;
+  top: -8px;
 }
 
 #vert-zoom-slider-container .zoom-in {
