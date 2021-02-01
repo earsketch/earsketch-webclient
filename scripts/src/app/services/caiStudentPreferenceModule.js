@@ -145,7 +145,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
     }
 
     function addSoundSuggestion(suggestionArray) {
-        sampleSuggestionsMade[activeProject].push([numberOfRuns, suggestionArray]);
+        sampleSuggestionsMade[activeProject].push([0, suggestionArray]);
         updateHistoricalArrays();
     }
 
@@ -167,7 +167,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
             }
 
             //decrement
-            sampleSuggestionsMade[activeProject][i][0] -= 1;
+            sampleSuggestionsMade[activeProject][i][0] += 1;
 
             //if 0, add to the rejection category and delete the item
             if (wasUsed) {
@@ -190,7 +190,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
     }
 
     function addCodeSuggestion(complexityObj) {
-        codeSuggestionsMade[activeProject].push([numberOfRuns, complexityObj]);
+        codeSuggestionsMade[activeProject].push([0, complexityObj]);
     }
 
     function runCode(complexityOutput) {
@@ -209,7 +209,7 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
             }
 
             //decrement
-            codeSuggestionsMade[activeProject][i][0] -= 1;
+            codeSuggestionsMade[activeProject][i][0] += 1;
 
             //if 0, add to the rejection category and delete the item
             if (wasUsed) {
