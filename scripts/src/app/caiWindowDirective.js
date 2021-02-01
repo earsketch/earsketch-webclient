@@ -405,18 +405,21 @@ app.directive('caiwindow', [function () {
 
             $scope.$on('userOnPage', function(event,time)  {
                 caiStudentPreferenceModule.addOnPageStatus(1,time);
+                addToNodeHistory(["pageStatus", 1]);
             });
             $scope.$on('userOffPage', function(event,time)  {
                 caiStudentPreferenceModule.addOnPageStatus(0,time);
+                addToNodeHistory(["pageStatus", 0]);
             });
-
 
             $scope.$on('keyStroke', function(event,action, content,time) {
                 caiStudentPreferenceModule.addKeystroke(action, content, time);
+                // addToNodeHistory(["keyStroke", {action, content}]);
             });
 
             $scope.$on('mousePosition', function(event,x,y) {
                 caiStudentPreferenceModule.addMousePos({x,y});
+                // addToNodeHistory(["mousePosition", {x,y}]);
             });
 
         }]
