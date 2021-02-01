@@ -30,6 +30,7 @@ persistStore(store);
 require('jquery');
 require('jqueryUI');
 window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
+window.Question = Question; // Used inside curriculum HTMLs.
 
 import 'angularjs-slider/dist/rzslider.css';
 
@@ -184,6 +185,7 @@ require(['angular'], () => {
     require('./browser/API');
     require('./browser/Sounds');
     require('./browser/Scripts');
+    require('./browser/Curriculum');
 
     // Autograders
     require('autograderController');
@@ -193,9 +195,17 @@ require(['angular'], () => {
     require('inputsController');
 
     // CAI
+    require('caiWindowDirective');
+    require('caiStudent');
     require('autograder');
     require('caiAnalysisModule');
+    require('caiStudentPreferenceModule');
+    require('caiStudentHistoryModule');
     require('complexityCalculator');
+    require('complexityCalculatorHelperFunctions');
+    require('caiDialogue');
+    require('caiErrorHandling');
+    require('codeSuggestion');
     require('recommender');
 
     // TODO: Use a module.

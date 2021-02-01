@@ -50,9 +50,9 @@ export const pages = [
     },
     {
         header: '8/8 Read the curriculum',
-        body: 'The book icon <span class="text-yellow-500 text-3xl align-middle icon icon-book3"></span> will open a curriculum panel on the right side of the screen. You can search this panel for any topic to find support for your coding.',
-        ref: '#curriculum',
-        placement: 'left-start'
+        body: 'The book icon <span class="text-yellow-500 text-3xl align-middle icon icon-book3"></span> will open a curriculum panel on the right side of the screen. You can open the Table of Contents by clicking this bar to read about topics to continue learning about EarSketch.',
+        ref: '#curriculum-navigation',
+        placement: 'left'
     },
     {
         header: `End`,

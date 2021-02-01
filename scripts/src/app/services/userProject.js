@@ -134,6 +134,32 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         }
     };
 
+    $window.onfocus = function() {
+        var t = Date.now();
+        $rootScope.$broadcast('userOnPage',t);
+        // console.log("on page");
+    };
+
+    $window.onblur = function() {
+        var t = Date.now();
+        $rootScope.$broadcast('userOffPage',t);
+        // console.log("off page");        
+    };
+
+    var mouse_x;
+    var mouse_y;
+    $window.addEventListener('mousemove', function (e) {
+        mouse_x = e.x;
+        mouse_y = e.y;
+    });   
+
+    $window.setInterval(function() {
+            $rootScope.$broadcast("mousePosition",mouse_x, mouse_y);
+            // console.log('x', e.x,'y', e.y); 
+            clearInterval();
+        }, 5000);
+    
+
     /**
      * Because scripts and openScripts are objects and we can't reset them
      * simply by re-instantiating empty objects, we use resetScripts() to
@@ -314,6 +340,9 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             // Clear Recommendations in Sound Browser
             $rootScope.$broadcast('clearRecommender');
+
+            // Close CAI
+            $rootScope.$broadcast('caiClose');
 
             // Copy scripts local storage to the web service.
             if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
@@ -726,6 +755,9 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
         // Clear Recommendations in Sound Browser
         $rootScope.$broadcast('clearRecommender');
+
+        // Close CAI
+        $rootScope.$broadcast('caiClose');
 
         websocket.close();
     }
@@ -1640,11 +1672,13 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             status = 0;
         }
 
+        var n = null;
+
         if (overwrite) {
-            var n = scriptname;
+            n = scriptname;
         } else {
             // avoid overwriting scripts by suffixing the name with a number
-            var n = nextName(scriptname);
+            n = nextName(scriptname);
         }
 
         if (isLogged()) {
@@ -1864,6 +1898,27 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         });
     }
 
+function uploadCAIHistory(projectName, node) {
+    var url = URL_DOMAIN + '/services/scripts/uploadcaihistory';
+
+    var opts = {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+    };
+
+    var body = new FormData();
+    body.append('username', getUsername());
+    body.append('project', projectName)
+    body.append('node', JSON.stringify(node));
+
+    $http.post(url, body, opts).then(function(result) {
+        console.log('saved to CAI history:', projectName);
+    }).catch(function(err) {
+        console.log('could not save to cai', projectName);
+        throw err;
+    });
+}
+
     self = {
         login: login,
         storeUser: storeUser,
@@ -1920,6 +1975,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         setPasswordForUser: setPasswordForUser,
         shareWithPeople: shareWithPeople,
         getTutoringRecord: getTutoringRecord,
+        uploadCAIHistory: uploadCAIHistory,
         // export constants
         STATUS_UNKNOWN: STATUS_UNKNOWN,
         STATUS_SUCCESSFUL: STATUS_SUCCESSFUL,

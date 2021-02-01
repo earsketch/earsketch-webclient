@@ -105,6 +105,60 @@ button:focus {
 }
 
 
+.btn-cai {
+  background-color: #d3d25a;
+  color: black;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: #9b9a46;
+  }
+}
+
+.dropbtn-cai {
+  background: #d3d25a;
+  color: black;
+  padding: 12px 16px;
+
+  &:hover {
+    background-color: #9b9a46;
+  }
+}
+
+.dropup-cai {
+  position: relative;
+  display: inline-block;
+}
+
+.dropup-cai-content {
+  display: none;
+  position: absolute;
+  background-color: #d3d25a;
+  min-width: 160px;
+  bottom: 40px;
+  z-index: 1;
+  height: 120px;
+  overflow: auto;
+}
+
+.dropup-cai-content option {
+  color: black;
+  padding: 12px 16px;
+  display: block;
+}
+
+.dropup-cai-content option:hover {
+  background-color: #9b9a46
+}
+
+.dropup-cai:hover .dropup-cai-content {
+  display: block;
+}
+
+.dropup-cai:hover .dropbtn-cai {
+  background-color: #9b9a46;
+}
+
 .btn-xs {
   padding: 2px 5px;
 }

@@ -77,6 +77,45 @@
   }
 }
 
+#cai-body {
+  flex: auto;
+  overflow-y: scroll;
+
+  .chat-message-container {
+    width: 100%;
+    overflow: auto;
+
+    .chat-message {
+      width: 100%;
+
+      .chat-message-bubble {
+        margin: 10px 10px 0 10px;
+        padding: 10px;
+        border-radius: 15px;
+        width: fit-content;
+        max-width: 97%;
+
+        .chat-message-sender {
+          font-family: sans-serif;
+          font-weight: 900;
+        }
+
+        .chat-message-text {
+          white-space: pre-wrap;
+          overflow-wrap: break-word;
+        }
+      }
+
+      .chat-message-date {
+        color: dimgray;
+        font-style: italic;
+        margin: 0 10px 0 10px;
+        clear: both;
+      }
+    }
+  }
+}
+
 #chat-footer {
   background-color: @bg;
   align-self: flex-end;

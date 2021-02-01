@@ -23,7 +23,7 @@
     <link rel="stylesheet" type="text/css" href="fonts/icomoon_ultimate/style.css">
 
     <!-- Custom styles for Curriculum template -->
-    <link rel="stylesheet" type="text/css" href="../curriculum/theme/html/html.css">
+    <link rel="stylesheet" type="text/css" href="css/earsketch/curriculum_html.css">
 
     <!-- highlight js style -->
     <link rel="stylesheet" type="text/css" href="scripts/lib/jsdifflib/diffview.css">
@@ -269,7 +269,7 @@
                 <!--</button>-->
 
                 <!-- Curriculum -->
-                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': (!layout.curriculum || showChatWindow)}" ng-click="toggleLayout('curriculum')" id="sidenav-curriculum" data-toggle="tooltip" title="Curriculum">
+                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': (!layout.curriculum || showChatWindow || showCAIWindow)}" ng-click="toggleLayout('curriculum')" id="sidenav-curriculum" data-toggle="tooltip" title="Curriculum">
                     <i class="icon icon-book3" style="font-size:18px"></i>
                 </button>
 
@@ -277,6 +277,12 @@
                 <button ng-if="enableChat" class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': !showChatWindow}" ng-click="toggleLayout('chat')" id="sidenav-chat" data-toggle="tooltip" title="Chat">
                     <i class="icon icon-bubbles"></i>
                 </button>
+
+                <!-- CAI User Interface -->
+                <button ng-if="enableCAI" class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': !showCAIWindow}" ng-click="toggleLayout('cai')" id="sidenav-cai" data-toggle="tooltip" title="CAI">
+                    <i class="icon icon-bubbles"></i>
+                </button>
+
             </ul>
 
             <div>
@@ -455,10 +461,12 @@
             </div> <!-- end of #content -->
 
             <div ui-layout-container size="440px" collapsed="!layout.curriculum" min-size="360px" id="curriculum-container" ng-style="{'z-index':bubble.active&&bubble.currentPage>=8?35:0}"> <!-- curriculum -->
-                <article class="prose max-w-none" id="curriculum" ng-show="!showChatWindow">
-                    <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div>
-                </article>
+                <div class="h-full" ng-show="!showChatWindow && !showCAIWindow">
+                    <!-- <div curriculumpane style="height:inherit; padding:61px 0 60px 0;"></div> -->
+                    <curriculum style="height:inherit"></curriculum>
+                </div>
                 <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
+                <div caiwindow ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
             </div> <!-- end of #curriculum -->
         </div> <!-- ui-layout -->
     </div> <!-- layoutController -->

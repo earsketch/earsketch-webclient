@@ -31,6 +31,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.enableChat = false; // Chat window toggle button. Hidden by default.
     $scope.showChatWindow = false;
 
+    // CAI visibility
+    $scope.enableCAI = FLAGS.SHOW_CAI;
+    $scope.showCAIWindow = false;
+
     // TEMPORARY FOR AWS CONTEST TESTING
     $scope.showAmazon = FLAGS.SHOW_AMAZON;
     $scope.showAmazonSounds = FLAGS.SHOW_AMAZON_SOUNDS;
@@ -563,7 +567,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $scope.showNotificationHistory = bool;
 
         $rootScope.$broadcast('visible', bool);
-        
+
         if (bool) {
             $scope.showNotification = false;
         }
@@ -961,6 +965,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.$on('language', (event, language) => {
         $ngRedux.dispatch(appState.setScriptLanguage(language));
     })
+
+    $scope.$on('fontSizeChanged', (event, val) => $ngRedux.dispatch(appState.setFontSize(val)))
 
     // for Chrome 66+ web-audio restriction
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=807017
