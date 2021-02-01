@@ -2,11 +2,14 @@ version: 0.2
 
 env:
   parameter-store:
-    NPM_BUILD_COMMAND: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/npm-build-command
-    ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/npm-env-flags-file
+    NPM_BUILD_COMMAND_TEST: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_TEST/npm-build-command
+    NPM_BUILD_COMMAND_PROD: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_PROD/npm-build-command
+    ENV_FLAGS_FILE_TEST: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_TEST/npm-env-flags-file
+    ENV_FLAGS_FILE_PROD: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_PROD/npm-env-flags-file
     ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
     ES_VERSION_MINOR: /earsketch-webclient/version_number/minor
-    ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/client_base_uri
+    ES_BASE_URI_TEST: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_TEST/client_base_uri
+    ES_BASE_URI_PROD: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_PROD/client_base_uri
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
@@ -18,10 +21,16 @@ batch:
       env:
         variables:
           ES_BUILD_ENVIRONMENT: "$ES_BUILD_ENVIRONMENT_TEST"
+          NPM_BUILD_COMMAND: "$NPM_BUILD_COMMAND_TEST"
+          ENV_FLAGS_FILE: "$ENV_FLAGS_FILE_TEST"
+          ES_BASE_URI: "$ES_BASE_URI_TEST"
     - identifier: prod_build
       env:
         variables:
           ES_BUILD_ENVIRONMENT: "$ES_BUILD_ENVIRONMENT_PROD"
+          NPM_BUILD_COMMAND: "$NPM_BUILD_COMMAND_PROD"
+          ENV_FLAGS_FILE: "$ENV_FLAGS_FILE_PROD"
+          ES_BASE_URI: "$ES_BASE_URI_PROD"
 phases:
   pre_build:
     commands:
