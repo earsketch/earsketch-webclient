@@ -1,31 +1,7 @@
 // Global imports of CSS
 import './tailwind.css';
 
-import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-
-import rootReducer from './reducers';
-
-const persistConfig = {
-    key: 'root',
-    whitelist: ['app'],
-    storage
-};
-
-const store = configureStore({
-    reducer: persistReducer(persistConfig, rootReducer),
-    middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware({
-            // Toggle these on for sanity checks.
-            // See: https://redux-toolkit.js.org/api/getDefaultMiddleware#included-default-middleware
-            immutableCheck: false,
-            serializableCheck: false
-        });
-    }
-});
-
-persistStore(store);
+import store from './reducers';
 
 require('jquery');
 require('jqueryUI');
@@ -181,11 +157,16 @@ require(['angular'], () => {
     require('curriculumSearchController');
 
     // React components
+    require('./browser/Browser');
     require('./bubble/Bubble');
     require('./browser/API');
     require('./browser/Sounds');
     require('./browser/Scripts');
     require('./browser/Curriculum');
+    require('./app/Footer');
+
+    // To be ported to React
+    require('./layout/Layout');
 
     // Autograders
     require('autograderController');

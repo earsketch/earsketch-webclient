@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
-import { Provider, useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -299,7 +297,7 @@ const SingletonDropdownMenu = () => {
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickAsync);
-        return () => document.removeEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClickAsync);
     }, []);
 
     return (
@@ -478,7 +476,7 @@ const SingletonSharedScriptInfo = () => {
 
     useEffect(() => {
         document.addEventListener('mousedown', handleClickAsync);
-        return () => document.removeEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClickAsync);
     }, []);
 
     return (
@@ -685,17 +683,9 @@ const DeletedScriptCollection = () => {
     return <WindowedScriptCollection { ...props } />;
 };
 
-const ScriptBrowser = () => {
-    const theme = useSelector(appState.selectColorTheme);
-
+export const ScriptBrowser = () => {
     return (
-        <div
-            className={`flex flex-col absolute h-full w-full font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
-            style={{marginTop:-12}}
-        >
-            <TitleBar />
-            <BrowserTabs selection='SCRIPTS' />
-
+        <>
             <ScriptSearchBar />
             <Filters />
 
@@ -712,16 +702,6 @@ const ScriptBrowser = () => {
 
             <SingletonDropdownMenu />
             <SingletonSharedScriptInfo />
-        </div>
+        </>
     );
 };
-
-const HotScriptBrowser = hot(props => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <ScriptBrowser />
-        </Provider>
-    );
-});
-
-app.component('scriptBrowser', react2angular(HotScriptBrowser, null, ['$ngRedux']));

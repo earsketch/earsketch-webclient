@@ -1,8 +1,6 @@
 import React, { Component, useState } from 'react'
 import PropTypes from 'prop-types'
-import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { isArray } from 'lodash'
 
@@ -207,34 +205,16 @@ const APISearchBar = () => {
     return <SearchBar { ...props } />
 }
 
-const APIBrowser = () => {
-    const theme = useSelector(appState.selectColorTheme);
-
+export const APIBrowser = () => {
     return (
-        <div
-            className={`flex flex-col absolute h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
-            style={{marginTop:-12}}
-        >
+        <>
             <div className='flex-grow-0 pb-4'>
-                <TitleBar />
-                <BrowserTabs selection='API' />
                 <APISearchBar />
             </div>
 
             <div className="flex-auto overflow-y-scroll overflow-x-none">
                 <EntryList />
             </div>
-        </div>
+        </>
     )
 }
-
-const HotAPIBrowser = hot(props => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <APIBrowser />
-        </Provider>
-    );
-})
-
-
-app.component('apiBrowser', react2angular(HotAPIBrowser, null, ['$ngRedux']))

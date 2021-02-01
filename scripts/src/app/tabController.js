@@ -330,7 +330,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     }
 
     postDigest(function () {
-        $scope.setupDropdownTabs(); // TODO: Only call it when state is invalidated.
+        // $scope.setupDropdownTabs(); // TODO: Only call it when state is invalidated.
     });
 
     
