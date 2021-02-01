@@ -12,9 +12,6 @@ const appSlice = createSlice({
         setScriptLanguage(state, { payload }) {
             state.scriptLanguage = payload;
         },
-        toggleScriptLanguage(state) {
-            state.scriptLanguage = (state.scriptLanguage === 'python' ? 'javascript' : 'python')
-        },
         setColorTheme(state, { payload }) {
             state.colorTheme = payload;
         },
@@ -30,7 +27,6 @@ const appSlice = createSlice({
 export default appSlice.reducer;
 export const {
     setScriptLanguage,
-    toggleScriptLanguage,
     setColorTheme,
     toggleColorTheme,
     setFontSize

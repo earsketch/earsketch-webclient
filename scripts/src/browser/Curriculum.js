@@ -172,7 +172,12 @@ export const TitleBar = () => {
                 </button>
                 <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
                         title="Switch script language"
-                        onClick={() => dispatch(appState.toggleScriptLanguage())}>
+                        onClick={() => {
+                            const newLanguage = (language === 'python' ? 'javascript' : 'python')
+                            // TODO: This line is here to mesh with angular; remove it after rewriting other components.
+                            $rootScope.$broadcast('language', newLanguage)
+                            dispatch(appState.setScriptLanguage(newLanguage))
+                        }}>
                     {language === 'python' ? 'PY' : 'JS'}
                 </button>
             </div>
@@ -304,6 +309,7 @@ const NavigationBar = () => {
 }
 
 let initialized = false
+let $rootScope = null
 
 const HotCurriculum = hot(props => {
     if (!initialized) {
@@ -329,6 +335,7 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
 
+        $rootScope = props.$rootScope
         initialized = true
     }
 
@@ -339,4 +346,4 @@ const HotCurriculum = hot(props => {
     )
 })
 
-app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils']))
+app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils', '$rootScope']))
