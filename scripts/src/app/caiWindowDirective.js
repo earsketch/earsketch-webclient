@@ -242,7 +242,12 @@ app.directive('caiwindow', [function () {
                         }
                     }
 
-                    $scope.inputOptions = caiDialogue.createButtons();
+                    if (!caiDialogue.isDone()) {
+                        $scope.inputOptions = caiDialogue.createButtons();
+                    }
+                    else {
+                        $scope.inputOptions = [];
+                    }
 
                     $scope.inputTextCAI.label = '';
                     $scope.inputTextCAI.value = '';
@@ -270,7 +275,7 @@ app.directive('caiwindow', [function () {
                             }
                         }
 
-                        if ($scope.inputOptions.length === 0) {
+                        if ($scope.inputOptions.length === 0 && !caiDialogue.isDone()) {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
@@ -405,11 +410,11 @@ app.directive('caiwindow', [function () {
 
             $scope.$on('userOnPage', function(event,time)  {
                 caiStudentPreferenceModule.addOnPageStatus(1,time);
-                addToNodeHistory(["pageStatus", 1]);
+                caiDialogue.addToNodeHistory(["pageStatus", 1]);
             });
             $scope.$on('userOffPage', function(event,time)  {
                 caiStudentPreferenceModule.addOnPageStatus(0,time);
-                addToNodeHistory(["pageStatus", 0]);
+                caiDialogue.addToNodeHistory(["pageStatus", 0]);
             });
 
             $scope.$on('keyStroke', function(event,action, content,time) {
