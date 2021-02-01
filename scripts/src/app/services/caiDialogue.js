@@ -771,7 +771,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             }
             if ('complexity' in outputObj) {
 
-                caiStudentPreferenceModule.addCodeSuggestion(outputObj.complexity);
+                caiStudentPreferenceModule.addCodeSuggestion(outputObj.complexity, outputObj.utterance);
             }
             return outputObj;
         }

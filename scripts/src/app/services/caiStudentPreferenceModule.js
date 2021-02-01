@@ -198,8 +198,8 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function
 
     }
 
-    function addCodeSuggestion(complexityObj) {
-        codeSuggestionsMade[activeProject].push([0, complexityObj]);
+    function addCodeSuggestion(complexityObj, utterance) {
+        codeSuggestionsMade[activeProject].push([0, complexityObj, utterance]);
     }
 
     function runCode(complexityOutput) {
