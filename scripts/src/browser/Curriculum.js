@@ -189,11 +189,8 @@ const CurriculumPane = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
-
-    const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
-    // The value isn't used, but we need the component to re-render after layoutController updates.
-    const maximized = useSelector(curriculum.selectMaximized)
+    const curriculumBody = useRef()
 
     // Highlight search text matches found in the curriculum.
     const myHilitor = new Hilitor("curriculum-atlas")
@@ -219,6 +216,13 @@ const CurriculumPane = () => {
         }
     }
 
+    useEffect(() => {
+        if (content) {
+            curriculumBody.current.appendChild(content)
+            return () => content.remove()
+        }
+    }, [content])
+
     // <script> tags inserted via innerHTML (including dangerouslySetInnerHTML) do not execute, so we have to handle them ourselves.
     // (See https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML#security_considerations.)
     useEffect(() => {
@@ -238,7 +242,7 @@ const CurriculumPane = () => {
 
             return () => scripts.forEach(script => document.body.removeChild(script))
         }
-      }, [content]);
+    }, [content]);
 
     return (
         <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
@@ -246,10 +250,10 @@ const CurriculumPane = () => {
 
             <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : ''} style={{fontSize}}>
                 {content ? 
-                  <div id="curriculum-body" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: content.innerHTML}}></div>
+                  <div ref={curriculumBody} id="curriculum-body" className="p-8 h-full overflow-y-auto"></div>
                 : <div>
-                      <div class="text-4xl text-center py-16">Loading curriculum...</div>
-                      <div class="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}}></div>
+                      <div className="text-4xl text-center py-16">Loading curriculum...</div>
+                      <div className="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}}></div>
                   </div>}
             </div>
         </div>

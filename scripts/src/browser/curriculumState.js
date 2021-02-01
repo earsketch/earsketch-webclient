@@ -7,16 +7,70 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     // Check cache before fetching.
     if (state.curriculum.contentCache[_location] !== undefined) {
         esconsole(`${_location} is in the cache, nothing else to do.`, 'debug')
-        return { cached: true }
+        return {}
     }
     const urlWithoutAnchor = _url.split('#', 1)[0]
     esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, 'debug')
     const response = await fetch(urlWithoutAnchor)
     // Add artificial latency; useful for testing:
     // await new Promise(r => setTimeout(r, 1000))
-    const html = await response.text()
-    return { location: _location, html, cached: false }
+    return processContent(_location, await response.text(), dispatch)
 })
+
+const processContent = (location, html, dispatch) => {
+    const doc = new DOMParser().parseFromString(html, "text/html")
+
+    // Bring these nodes into our document context, but replace the <body> with a <div>.
+    const root = document.createElement('div')
+    while (doc.body.firstChild) {
+        root.appendChild(document.adoptNode(doc.body.firstChild))
+    }
+
+    // Highlight code blocks.
+    root.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
+
+    // Fix internal cross-references.
+    root.querySelectorAll('a[href^="#"]').forEach(el => {
+        el.onclick = (e) => {
+            e.preventDefault()
+            dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2)] + el.getAttribute("href") }))
+        }
+    })
+    root.querySelectorAll('a[href^="ch_"]').forEach(el => {
+        el.onclick = (e) => {
+            e.preventDefault()
+            dispatch(fetchContent({ url: el.getAttribute("href") }))
+        }
+    })
+
+    // This has a weird URL (why does "<toc.html>" open the API browser?) and is only used in one place (Ch. 27).
+    // Can we get rid of it?
+    root.querySelectorAll('a[href="<toc.html>"]').forEach(el => {
+        el.onclick = (e) => {
+            e.preventDefault()
+            // TODO: Update this when we replace the layoutController.
+            angular.element('[ng-controller=layoutController]').scope().openSidebarTab('api')
+        }
+    })
+
+    if (location.length < 3) {
+        // No sections, leave as-is.
+        return {[location]: root}
+    }
+
+    // Chop the chapter up into sections.
+    const body = root.querySelector('div.sect1').parentNode
+    // Special case: first section (sect2) should come with the opening blurb (sect1).
+    // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
+    const chapterLocation = location.slice(0, 2)
+    const map = {}
+    for (let [idx, el] of [...root.querySelectorAll('div.sect2')].slice(1).entries()) {
+        map[chapterLocation.concat([idx + 1])] = el
+        el.remove()
+    }
+    map[chapterLocation.concat([0])] = body
+    return map
+}
 
 const curriculumSlice = createSlice({
     name: 'curriculum',
@@ -71,28 +125,8 @@ const curriculumSlice = createSlice({
     },
     extraReducers: {
         [fetchContent.fulfilled]: (state, action) => {
-            if (action.payload.cached) {
-                // HTML has already been previously fetched, processed, and cached - nothing to do.
-                return
-            }
-            const document = new DOMParser().parseFromString(action.payload.html, "text/html")
-            // Highlight code blocks.
-            document.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
-            if (action.payload.location.length < 3) {
-                // No sections, just cache the content directly.
-                state.contentCache[action.payload.location] = document.body
-            } else {
-                // Chop the chapter up into sections.
-                const body = document.querySelector('div.sect1').parentNode
-                // Special case: first section (sect2) should come with the opening blurb (sect1).
-                // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
-                const chapterLocation = action.payload.location.slice(0, 2)
-                for (let [idx, el] of [...document.querySelectorAll('div.sect2')].slice(1).entries()) {
-                    state.contentCache[chapterLocation.concat([idx + 1])] = el
-                    el.remove()
-                }
-                state.contentCache[chapterLocation.concat([0])] = body
-            }
+            // Update the cache.
+            state.contentCache = {...state.contentCache, ...action.payload}   
         },
         [fetchContent.rejected]: (...args) => {
             esconsole("Fetch failed! " + JSON.stringify(args), 'error')
@@ -226,11 +260,16 @@ export const adjustLocation = (location, delta) => {
 
 
 const urlToLocation = {}
+const locationToUrl = {}
 toc.forEach((unit, unitIdx) => {
+    urlToLocation[unit.URL] = [unitIdx]
+    locationToUrl[[unitIdx]] = unit.URL
     unit.chapters.forEach((ch, chIdx) => {
         urlToLocation[ch.URL] = [unitIdx, chIdx]
+        locationToUrl[[unitIdx, chIdx]] = ch.URL
         ch.sections.forEach((sec, secIdx) => {
             urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
+            locationToUrl[[unitIdx, chIdx, secIdx]] = sec.URL
         })
     })
 })
@@ -239,13 +278,7 @@ const fixLocation = (href, loc) => {
     if (loc === undefined) {
         loc = urlToLocation[href]
     } else if (href === undefined) {
-        if (loc.length === 1) {
-            href = toc[loc[0]].URL
-        } else if (loc.length === 2) {
-            href = toc[loc[0]].chapters[loc[1]].URL
-        } else if (loc.length === 3) {
-            href = toc[loc[0]].chapters[loc[1]].sections[loc[2]].URL
-        }
+        href = locationToUrl[loc]
     }
 
     if (loc.length === 1) {
