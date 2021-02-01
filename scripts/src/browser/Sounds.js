@@ -10,7 +10,7 @@ import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as tabs from '../editor/tabState';
 
-import { TitleBar, BrowserTabs, SearchBar, Collection, DropdownMultiSelector } from './Browser';
+import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch();

@@ -29,6 +29,7 @@ export const TitleBar = () => {
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }));
                         Layout.horizontalSplits.collapse(0);
+                        Layout.toggleHorizontalDrag(0, false);
                     }}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -229,6 +230,24 @@ export const Collection = ({ title, visible=true, initExpanded=true, children, c
     );
 };
 
+export const Collapsed = ({ position='west' }) => {
+    const theme = useSelector(appState.selectColorTheme);
+    const dispatch = useDispatch();
+
+    return (
+        <div
+            className={`flex justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
+            onClick={() => {
+                dispatch(layout[position==='west' ? 'setWest' : 'setEast']({ open: true }));
+                Layout.resetHorizontalSplits();
+                Layout.toggleHorizontalDrag(['west','east'].indexOf(position), true);
+            }}
+        >
+            <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
+        </div>
+    );
+};
+
 // Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
 const BrowserComponents = {
     SOUNDS: SoundBrowser,
@@ -237,10 +256,8 @@ const BrowserComponents = {
 };
 
 const Browser = () => {
-    const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector(state => state.layout.west.open);
-    const horzRatio = useSelector(layout.selectHorzRatio);
     let kind = useSelector(layout.selectWestKind);
     if (!Object.keys(BrowserComponents).includes(kind)) {
         kind = 'SOUNDS';
@@ -255,17 +272,7 @@ const Browser = () => {
             <BrowserTabs />
             <BrowserBody />
         </div>
-    ) : (
-        <div
-            className={`flex justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
-            onClick={() => {
-                dispatch(layout.setWest({ open: true }));
-                Layout.horizontalSplits.setSizes(horzRatio);
-            }}
-        >
-            <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
-        </div>
-    );
+    ) : <Collapsed position='west' />;
 };
 
 const HotBrowser = hot(props => {

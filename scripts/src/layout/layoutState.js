@@ -52,25 +52,25 @@ export const {
     setSouthSize
 } = layoutSlice.actions;
 
-const windowWidth = () => {
-    return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-};
+export const horizontalMinSize = 45;
+const windowWidth = () => window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+const windowHeight = () => window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
 
-const windowHeight = () => {
-    return window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
-};
+export const isWestOpen = state => state.layout.west.open;
+export const isEastOpen = state => state.layout.east.open;
 
-export const setHorzSizesFromRatio = createAsyncThunk(
-    'layout/setHorzSizes',
-    (ratio, { dispatch }) => {
+export const setHorizontalSizesFromRatio = createAsyncThunk(
+    'layout/setHorizontalSizesFromRatio',
+    (ratio, { getState, dispatch }) => {
         const width  = windowWidth();
-        dispatch(setWestSize(width*ratio[0]/100));
-        dispatch(setEastSize(width*ratio[2]/100));
+        // Do not remember the sizes for closed panes.
+        isWestOpen(getState()) && dispatch(setWestSize(width*ratio[0]/100));
+        isEastOpen(getState()) && dispatch(setEastSize(width*ratio[2]/100));
     }
 );
 
-export const setVertSizesFromRatio = createAsyncThunk(
-    'layout/setVertSizes',
+export const setVerticalSizesFromRatio = createAsyncThunk(
+    'layout/setVerticalSizesFromRatio',
     (ratio, { dispatch }) => {
         const height = windowHeight();
         dispatch(setNorthSize(height*ratio[0]/100));
@@ -83,17 +83,17 @@ const selectEastSize = state => state.layout.east.size;
 const selectNorthSize = state => state.layout.north.size;
 const selectSouthSize = state => state.layout.south.size;
 
-export const selectHorzRatio = createSelector(
-    [selectWestSize, selectEastSize],
-    (west, east) => {
+export const selectHorizontalRatio = createSelector(
+    [selectWestSize, selectEastSize, isWestOpen, isEastOpen],
+    (west, east, westIsOpen, eastIsOpen) => {
         const width = windowWidth();
-        west = west/width*100;
-        east = east/width*100;
+        west = (westIsOpen ? west : horizontalMinSize)/width*100;
+        east = (eastIsOpen ? east : horizontalMinSize)/width*100;
         return [west,100-(west+east),east];
     }
 );
 
-export const selectVertRatio = createSelector(
+export const selectVerticalRatio = createSelector(
     [selectNorthSize, selectSouthSize],
     (north, south) => {
         const height = windowHeight();

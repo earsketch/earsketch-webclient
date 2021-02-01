@@ -7,7 +7,7 @@ import { isArray } from 'lodash'
 import * as api from './apiState'
 import { selectScriptLanguage } from '../app/appState'
 
-import { TitleBar, BrowserTabs, SearchBar } from './Browser'
+import { SearchBar } from './Browser'
 import * as helpers from "../helpers";
 import * as appState from "../app/appState";
 import * as tabs from '../editor/tabState';

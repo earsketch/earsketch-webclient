@@ -5,11 +5,11 @@ import { Provider, useSelector, useDispatch } from 'react-redux'
 
 import { usePopper } from 'react-popper'
 
-import { SearchBar } from './Browser'
+import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
-import * as helpers from '../helpers'
-
+import * as layout from '../layout/layoutState'
+import * as Layout from '../layout/Layout'
 
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
@@ -127,7 +127,6 @@ const CurriculumSearchResults = () => {
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
-    const layoutScope = helpers.getNgController('layoutController').scope()
     const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
@@ -141,8 +140,9 @@ export const TitleBar = () => {
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
                     onClick={() => {
-                        layoutScope.toggleLayout('curriculum')
-                        layoutScope.$applyAsync()
+                        dispatch(layout.setEast({ open: false }))
+                        Layout.horizontalSplits.collapse(2);
+                        Layout.toggleHorizontalDrag(1, false);
                     }}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -166,6 +166,7 @@ const CurriculumPane = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
+    const paneIsOpen = useSelector(layout.isEastOpen)
 
     const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
@@ -217,7 +218,7 @@ const CurriculumPane = () => {
         }
       }, [content]);
 
-    return (
+    return paneIsOpen ? (
         <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
 
@@ -225,7 +226,7 @@ const CurriculumPane = () => {
                 <div id="curriculum-body" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading...`)}}></div>
             </div>
         </div>
-    )
+    ) : <Collapsed position='east' />
 }
 
 const NavigationBar = () => {

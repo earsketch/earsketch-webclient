@@ -10,7 +10,7 @@ import * as scripts from './scriptsState';
 import * as tabs from '../editor/tabState';
 import * as appState from '../app/appState';
 
-import { TitleBar, BrowserTabs, SearchBar, Collection, DropdownMultiSelector } from './Browser';
+import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 
 function generateGetBoundingClientRect(x=0, y=0) {
     return () => ({
