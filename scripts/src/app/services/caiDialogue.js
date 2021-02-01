@@ -603,7 +603,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             soundWait.sounds = [];
         }
 
-        if (nodeHistory[activeProject]) {
+        if (nodeHistory[activeProject] && utterance != "") {
             // Add current node (by node number) and paramters to node history
             if (Number.isInteger(currentTreeNode[activeProject].id)) {
                 addToNodeHistory([currentTreeNode[activeProject].id, parameters]);
@@ -769,7 +769,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 return currentTreeNode[activeProject];
 
             }
-            if ('complexity' in outputObj) {
+            if ('complexity' in outputObj && outputObj.utterance != "") {
 
                 caiStudentPreferenceModule.addCodeSuggestion(outputObj.complexity, outputObj.utterance);
             }
