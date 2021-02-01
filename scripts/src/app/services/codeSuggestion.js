@@ -614,9 +614,9 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             sugg = deltaSugg();
             //if cai already suggested this, return empty
             for (var i in history) {
-                if (history[i].length > 1) {
-                    var oldUtterance = history[i][1];
-                    if (sugg.utterance == oldUtterance) {
+                if (history[i][0] ==34) {
+                    var oldUtterance = history[i][1][0][1];
+                    if (sugg.id == oldUtterance) {
                         sugg.utterance = "";
                         return sugg;
                     }
