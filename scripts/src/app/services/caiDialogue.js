@@ -47,6 +47,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     var soundSuggestionsUsed = {};
     var codeSuggestionsUsed = {};
 
+    var done = false;
+
     var allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"];
 
     //defines creation rules for generated utterances/button options (ex. creates option items for every line of student code for line selection)
@@ -83,6 +85,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function setActiveProject(p) {
+        done = false;
         if (!nodeHistory[p]) {
             nodeHistory[p] = [];
         }
@@ -368,8 +371,15 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
     }
 
+    function isDone() {
+        return done;
+    }
+
     function showNextDialogue() {
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]); //make a copy
+        if (currentTreeNode[activeProject].id == 69) {
+            done = true;
+        }
         if ("event" in currentTreeNode[activeProject]) {
             for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
                 if (currentTreeNode[activeProject].event[k] != 'codeRequest') {
@@ -839,7 +849,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         activeWaits: activeWaits,
         studentInteractedValue: studentInteractedValue,
         checkForCodeUpdates: checkForCodeUpdates,
-        addCurriculumPageToHistory: addCurriculumPageToHistory
+        addCurriculumPageToHistory: addCurriculumPageToHistory,
+        isDone: isDone,
+        addToNodeHistory: addToNodeHistory
     };
 
 }]);
