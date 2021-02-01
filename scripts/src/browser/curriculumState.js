@@ -12,6 +12,8 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     const urlWithoutAnchor = _url.split('#', 1)[0]
     esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, 'debug')
     const response = await fetch(urlWithoutAnchor)
+    // Add artificial latency; useful for testing:
+    // await new Promise(r => setTimeout(r, 1000))
     const html = await response.text()
     return { location: _location, html, cached: false }
 })

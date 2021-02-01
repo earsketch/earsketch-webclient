@@ -245,7 +245,12 @@ const CurriculumPane = () => {
             <CurriculumHeader></CurriculumHeader>
 
             <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : ''} style={{fontSize}}>
-                <div id="curriculum-body" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading...`)}}></div>
+                {content ? 
+                  <div id="curriculum-body" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: content.innerHTML}}></div>
+                : <div>
+                      <div class="text-4xl text-center py-16">Loading curriculum...</div>
+                      <div class="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}}></div>
+                  </div>}
             </div>
         </div>
     )
