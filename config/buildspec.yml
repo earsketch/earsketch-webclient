@@ -17,12 +17,12 @@ batch:
     - identifier: test_build
       env:
         variables:
-          ES_BUILD_ENVIRONMENT: "$ES_BUILD_ENVIRONMENT_TEST"
+          ES_BUILD_ENVIRONMENT: $ES_BUILD_ENVIRONMENT_TEST
           ES_API_TARGET_ENVIRONMENT: "test"
     - identifier: prod_build
       env:
         variables:
-          ES_BUILD_ENVIRONMENT: "$ES_BUILD_ENVIRONMENT_PROD"
+          ES_BUILD_ENVIRONMENT: $ES_BUILD_ENVIRONMENT_PROD
           ES_API_TARGET_ENVIRONMENT: "production"
 
 phases:
