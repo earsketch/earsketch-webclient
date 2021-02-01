@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   parameter-store:
-    NPM_BUILD_COMMAND_TEST: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_TEST/npm-build-command
-    NPM_BUILD_COMMAND_PROD: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_PROD/npm-build-command
+    NPM_BUILD_COMMAND_TEST: /earsketch-webclient/BuildConfig/test/npm-build-command
+    NPM_BUILD_COMMAND_PROD: /earsketch-webclient/BuildConfig/production/npm-build-command
     ENV_FLAGS_FILE_TEST: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_TEST/npm-env-flags-file
     ENV_FLAGS_FILE_PROD: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT_PROD/npm-env-flags-file
     ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
