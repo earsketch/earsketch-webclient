@@ -6,11 +6,11 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     dispatch(loadChapter({location: _location}))
     // Check cache before fetching.
     if (state.curriculum.contentCache[_location] !== undefined) {
-        console.log(`${_location} is in the cache, nothing else to do.`)
+        esconsole(`${_location} is in the cache, nothing else to do.`, 'debug')
         return { cached: true }
     }
     const urlWithoutAnchor = _url.split('#', 1)[0]
-    console.log(`${_location} not in cache, fetching ${urlWithoutAnchor}.`)
+    esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, 'debug')
     const response = await fetch(urlWithoutAnchor)
     const html = await response.text()
     return { location: _location, html, cached: false }
@@ -93,7 +93,7 @@ const curriculumSlice = createSlice({
             }
         },
         [fetchContent.rejected]: (...args) => {
-            console.log("Fetch failed!", args)
+            esconsole("Fetch failed! " + JSON.stringify(args), 'error')
         }
     }
 })
@@ -152,7 +152,8 @@ export const selectSearchResults = createSelector(
                 }
             })
         } catch (error) {
-            console.log(`lunr parse error on "${searchText}"`)
+            // Not very concerning; searching for 'foo:', for example, causes a parse error.
+            esconsole(`lunr parse error on "${searchText}"`, 'debug')
             return []
         }
     }
