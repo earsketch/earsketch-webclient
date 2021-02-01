@@ -11,6 +11,17 @@ env:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
 
+batch:
+  fast-fail: true
+  build-list:
+    - identifier: test_build
+      env:
+        variables:
+          ES_BUILD_ENVIRONMENT: "$ES_BUILD_ENVIRONMENT_TEST"
+    - identifier: prod_build
+      env:
+        variables:
+          ES_BUILD_ENVIRONMENT: "$ES_BUILD_ENVIRONMENT_PROD"
 phases:
   pre_build:
     commands:
