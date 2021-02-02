@@ -469,3 +469,77 @@ section[data-type="chapter"], nav[data-type="toc"], div[data-type="part"] {
   font-weight: bold;
   text-decoration: underline;
 }
+
+// Question styling:
+#curriculum ul#questionsContainer {
+  list-style: none;
+  list-style-position: outside;
+  font-weight: bold;
+}
+
+#curriculum #questionsContainer label {
+  font-weight: bold;
+  display: flex;
+  align-items: flex-start;
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+
+@bullet-spacing: 26px;
+
+#curriculum li.question {
+  padding-top: .5em;
+  position: relative;
+  margin-left: @bullet-spacing;
+}
+
+#curriculum li.question::before {
+  position: absolute;
+  left: -@bullet-spacing;
+  top: 11px;
+  content: "";
+  background-color: #CCCCCC;
+  border-radius: 50%;
+  display: inline-block;
+  width: 10.37px;
+  height: 10.37px;
+  margin-right: 1em;
+}
+
+#curriculum ul.answers {
+  font-size: 1.3rem;
+}
+
+#curriculum ul.answers input[type="radio"] {
+  transform: scale(0.8);
+  margin-right: 1em;
+  margin-top: 2px;
+}
+
+#curriculum .correct {
+  color: green;
+}
+
+#curriculum .incorrect {
+  color: red;
+}
+
+#curriculum .correct span::after {
+  font-weight: normal;
+  margin-left: 1em;
+  margin-right: 1em;
+  font-size: smaller;
+  white-space: nowrap;
+  text-align: right;
+  content: " Correct!"
+}
+
+#curriculum .incorrect input[type="radio"]:checked + ::after {
+  font-weight: normal;
+  margin-left: 1em;
+  margin-right: 1em;
+  font-size: smaller;
+  white-space: nowrap;
+  text-align: right;
+  content: " Try Again!"
+}
