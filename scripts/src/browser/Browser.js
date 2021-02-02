@@ -19,7 +19,10 @@ export const TitleBar = () => {
     const dispatch = useDispatch();
 
     return (
-        <div className={`flex items-center p-3 text-2xl`}>
+        <div
+            className={`flex items-center p-3 text-2xl`}
+            style={{minHeight: 'fit-content'}}  // Safari-specific issue
+        >
             <div className='pl-3 pr-4'>
                 CONTENT MANAGER
             </div>
@@ -67,7 +70,8 @@ export const BrowserTabs = () => {
             className='flex justify-between text-center'
             style={{
                 backgroundColor: darkBgColor,
-                color: 'white'
+                color: 'white',
+                minHeight: 'fit-content' // Safari-specific issue
             }}
         >
             <BrowserTab name='SOUNDS'>
