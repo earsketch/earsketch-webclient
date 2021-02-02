@@ -515,7 +515,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     var measureIndex = randomIntFromInterval(bounds[0] - 1, bounds[1] - 1);
                     var recIndex = randomIntFromInterval(0, 2);
 
-                    var file = musicResults.RECOMMENDATIONS[measureIndex][recIndex];
+                    if (musicResults.RECOMMENDATIONS[measureIndex] && musicResults.RECOMMENDATIONS[measureIndex].length > 0) {
+                        var file = musicResults.RECOMMENDATIONS[measureIndex][recIndex];
+                    }
 
 
                     if (file != null && file != "undefined" && !utterance.includes(file)) {
