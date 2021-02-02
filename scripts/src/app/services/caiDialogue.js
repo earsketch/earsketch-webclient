@@ -334,11 +334,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function createButtons() {
         var buttons = [];
 
-        if (currentSuggestion[activeProject] != null && (currentSuggestion[activeProject].explain == null || currentSuggestion[activeProject].explain == "")) {
-            if (currentTreeNode[activeProject].id == 34) {
+        if (currentTreeNode[activeProject].id == 34 && (currentSuggestion[activeProject] == null || (currentSuggestion[activeProject].explain == null || currentSuggestion[activeProject].explain == ""))) {
                 currentSuggestion[activeProject] = null;
                 return [];
-            }
+            
         }
 
         if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
