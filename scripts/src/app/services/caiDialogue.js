@@ -47,6 +47,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     var soundSuggestionsUsed = {};
     var codeSuggestionsUsed = {};
 
+    var done = false;
+
     var allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"];
 
     //defines creation rules for generated utterances/button options (ex. creates option items for every line of student code for line selection)
@@ -78,11 +80,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
     function addCurriculumPageToHistory(page) {
-        nodeHistory[activeProject].push(["curriculum", page]);
+        addToNodeHistory(["curriculum", page]);
         console.log(nodeHistory[activeProject]);
     }
 
     function setActiveProject(p) {
+        done = false;
         if (!nodeHistory[p]) {
             nodeHistory[p] = [];
         }
@@ -121,7 +124,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         // console.log("error",currentError);
         var t = Date.now();
         caiStudentPreferenceModule.addCompileError(error, t);
-        nodeHistory[activeProject].push(["Compilation With Error", error]);
+        addToNodeHistory(["Compilation With Error", error]);
         if (String(error[0]) === String(currentError[0]) && errorWait != -1) {
             //then it's the same error. do nothing. we still wait
             return "";
@@ -172,7 +175,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         var suggestionRecord = caiStudentPreferenceModule.getSoundSuggestionsUsed();
         if (suggestionRecord.length > soundSuggestionsUsed[activeProject]) {
             for (i = soundSuggestionsUsed[activeProject]; i < suggestionRecord.length; i++) {
-                nodeHistory[activeProject].push(["Sound Suggestion Used", suggestionRecord[i]])
+                addToNodeHistory(["Sound Suggestion Used", suggestionRecord[i]])
             }
             soundSuggestionsUsed[activeProject] += suggestionRecord.length - soundSuggestionsUsed[activeProject];
 
@@ -181,7 +184,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         var codeSuggestionRecord = caiStudentPreferenceModule.getCodeSuggestionsUsed();
         if (codeSuggestionRecord.length > codeSuggestionsUsed[activeProject]) {
             for (i = codeSuggestionsUsed[activeProject]; i < codeSuggestionRecord.length; i++) {
-                nodeHistory[activeProject].push(["Code Suggestion Used", codeSuggestionRecord[i]])
+                addToNodeHistory(["Code Suggestion Used", codeSuggestionRecord[i]])
             }
             codeSuggestionsUsed[activeProject] += codeSuggestionRecord.length - codeSuggestionsUsed[activeProject];
         }
@@ -195,7 +198,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             else if (currentComplexity.userFunc == "ReturnAndArgs") {
                 currentComplexity.userFunc = 4;
             }
-            nodeHistory[activeProject].push(["Successful Compilation", Object.assign({}, currentComplexity)]);
+            addToNodeHistory(["Successful Compilation", Object.assign({}, currentComplexity)]);
         }
         if (!studentInteracted) {
             return "";
@@ -362,14 +365,26 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         return buttons;
     }
 
+    function addToNodeHistory(nodeObj) {
+        nodeHistory[activeProject].push(nodeObj);
+        if (FLAGS.UPLOAD_CAI_HISTORY)
+            userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
+    }
+
+    function isDone() {
+        return done;
+    }
 
     function showNextDialogue() {
         currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]); //make a copy
+        if (currentTreeNode[activeProject].id == 69) {
+            done = true;
+        }
         if ("event" in currentTreeNode[activeProject]) {
             for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
                 if (currentTreeNode[activeProject].event[k] != 'codeRequest') {
                     caiStudentHistoryModule.trackEvent(currentTreeNode[activeProject].event[k]);
-                    nodeHistory[activeProject].push(["request", currentTreeNode[activeProject].event[k]]);
+                    addToNodeHistory(["request", currentTreeNode[activeProject].event[k]]);
                 }
             }
         }
@@ -598,13 +613,13 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             soundWait.sounds = [];
         }
 
-        if (nodeHistory[activeProject]) {
+        if (nodeHistory[activeProject] && utterance != "") {
             // Add current node (by node number) and paramters to node history
             if (Number.isInteger(currentTreeNode[activeProject].id)) {
-                nodeHistory[activeProject].push([currentTreeNode[activeProject].id, parameters]);
+                addToNodeHistory([currentTreeNode[activeProject].id, parameters]);
             }
             else {
-                nodeHistory[activeProject].push([0, utterance, parameters]);
+                addToNodeHistory([0, utterance, parameters]);
             }
 
             if (FLAGS.UPLOAD_CAI_HISTORY)
@@ -744,7 +759,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             studentInteracted = true;
 
             caiStudentHistoryModule.trackEvent("codeRequest");
-            nodeHistory[activeProject].push(["request", "codeRequest"]);
+            addToNodeHistory(["request", "codeRequest"]);
         }
         var outputObj = codeSuggestion.generateCodeSuggestion(null, nodeHistory[activeProject]);
         //var outputText = printObject(outputObj);
@@ -764,9 +779,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 return currentTreeNode[activeProject];
 
             }
-            if ('complexity' in outputObj) {
+            if ('complexity' in outputObj && outputObj.utterance != "") {
 
-                caiStudentPreferenceModule.addCodeSuggestion(outputObj.complexity);
+                caiStudentPreferenceModule.addCodeSuggestion(outputObj.complexity, outputObj.utterance);
             }
             return outputObj;
         }
@@ -804,8 +819,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     console.log(recentScripts[activeProject]);
                     userProject.saveScript(activeProject, code);
                     recentScripts[activeProject] = code;
-                    if (FLAGS.UPLOAD_CAI_HISTORY)
-                        userProject.uploadCAIHistory(activeProject,[]);
+                    addToNodeHistory(["Code Updates"]);
+                    //if (FLAGS.UPLOAD_CAI_HISTORY)
+                        //userProject.uploadCAIHistory(activeProject,[]);
                 }
 
             }
@@ -833,7 +849,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         activeWaits: activeWaits,
         studentInteractedValue: studentInteractedValue,
         checkForCodeUpdates: checkForCodeUpdates,
-        addCurriculumPageToHistory: addCurriculumPageToHistory
+        addCurriculumPageToHistory: addCurriculumPageToHistory,
+        isDone: isDone,
+        addToNodeHistory: addToNodeHistory
     };
 
 }]);

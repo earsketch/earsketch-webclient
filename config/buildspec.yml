@@ -2,14 +2,28 @@ version: 0.2
 
 env:
   parameter-store:
-    NPM_BUILD_COMMAND: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/npm-build-command
-    ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/npm-env-flags-file
+    NPM_BUILD_COMMAND: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/npm-build-command
+    ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/npm-env-flags-file
     ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
     ES_VERSION_MINOR: /earsketch-webclient/version_number/minor
-    ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT/client_base_uri
+    ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
+
+batch:
+  fast-fail: true
+  build-list:
+    - identifier: test_build
+      env:
+        variables:
+          ES_BUILD_ENVIRONMENT: "test"
+          ES_API_TARGET_ENVIRONMENT: "test"
+    - identifier: prod_build
+      env:
+        variables:
+          ES_BUILD_ENVIRONMENT: "production"
+          ES_API_TARGET_ENVIRONMENT: "production"
 
 phases:
   pre_build:

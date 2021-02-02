@@ -8,7 +8,7 @@ app.directive('caiwindow', [function () {
 
             $scope.messageListCAI = {};
             $scope.inputTextCAI = { label: '', value: '' };
-            $scope.defaultInputOptions = [{ label: "what should we do next?", value: "suggest" }, { label: "do you want to come up with some sound ideas?", value: "sound_select" }, { label: "i think we're close to done", value: 'wrapup' }]; // { label: "open_suggestion", value: "open_suggestion" }
+            $scope.defaultInputOptions = [{ label: "what do you think we should do next?", value: "suggest" }, { label: "do you want to come up with some sound ideas?", value: "sound_select" }, { label: "i think we're close to done", value: 'wrapup' }]; // { label: "open_suggestion", value: "open_suggestion" }
             $scope.beginningInputOptions = [{ label: "Chat with CAI", value: "begin" }];
             $scope.inputOptions = $scope.beginningInputOptions.slice();
             $scope.dropupLabel = "Dropup";
@@ -242,7 +242,12 @@ app.directive('caiwindow', [function () {
                         }
                     }
 
-                    $scope.inputOptions = caiDialogue.createButtons();
+                    if (!caiDialogue.isDone()) {
+                        $scope.inputOptions = caiDialogue.createButtons();
+                    }
+                    else {
+                        $scope.inputOptions = [];
+                    }
 
                     $scope.inputTextCAI.label = '';
                     $scope.inputTextCAI.value = '';
@@ -270,7 +275,7 @@ app.directive('caiwindow', [function () {
                             }
                         }
 
-                        if ($scope.inputOptions.length === 0) {
+                        if ($scope.inputOptions.length === 0 && !caiDialogue.isDone()) {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
@@ -405,18 +410,21 @@ app.directive('caiwindow', [function () {
 
             $scope.$on('userOnPage', function(event,time)  {
                 caiStudentPreferenceModule.addOnPageStatus(1,time);
+                caiDialogue.addToNodeHistory(["pageStatus", 1]);
             });
             $scope.$on('userOffPage', function(event,time)  {
                 caiStudentPreferenceModule.addOnPageStatus(0,time);
+                caiDialogue.addToNodeHistory(["pageStatus", 0]);
             });
-
 
             $scope.$on('keyStroke', function(event,action, content,time) {
                 caiStudentPreferenceModule.addKeystroke(action, content, time);
+                // addToNodeHistory(["keyStroke", {action, content}]);
             });
 
             $scope.$on('mousePosition', function(event,x,y) {
                 caiStudentPreferenceModule.addMousePos({x,y});
+                // addToNodeHistory(["mousePosition", {x,y}]);
             });
 
         }]
