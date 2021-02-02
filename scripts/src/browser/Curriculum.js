@@ -193,10 +193,13 @@ const CurriculumPane = () => {
     const curriculumBody = useRef()
 
     // Highlight search text matches found in the curriculum.
-    const myHilitor = new Hilitor("curriculum-atlas")
+    const hilitor = new Hilitor("curriculum-body")
     const searchText = useSelector(curriculum.selectSearchText)
-    myHilitor.setMatchType("left")
-    useEffect(() => myHilitor.apply(searchText))
+    hilitor.setMatchType("left")
+    useEffect(() => {
+        hilitor.apply(searchText)
+        return () => hilitor.remove()
+    })
 
     if (content) {
         // Filter content by language.
