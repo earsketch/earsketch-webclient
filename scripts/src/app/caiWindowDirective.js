@@ -61,6 +61,7 @@ app.directive('caiwindow', [function () {
 
             $scope.$on('caiClose', function (event) {
                 $scope.activeProject = 'No Project'
+                caiDialogue.clearNodeHistory();
                 $scope.messageListCAI = {};
                 $scope.inputTextCAI = { label: '', value: '' };
                 $scope.inputOptions = [];
