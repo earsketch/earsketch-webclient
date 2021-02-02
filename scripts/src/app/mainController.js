@@ -937,6 +937,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     };
 
+    $scope.toggleCAIWindow = () => {
+        $scope.showCAIWindow = !$scope.showCAIWindow;
+    };
+
     $scope.$on('createScript', () => {
         $ngRedux.dispatch(scripts.syncToNgUserProject());
     });

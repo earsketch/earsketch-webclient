@@ -159,6 +159,11 @@
 
         <!-- top-right icons -->
         <div id="top-header-nav-form">
+            <!-- CAI-window toggle -->
+            <button ng-if="enableCAI" class="top-header-nav-button btn" ng-style="{color:showCAIWindow?'white':'#939393'}" ng-click="toggleCAIWindow()" data-toggle="tooltip" title="CAI">
+                <i class="icon icon-bubbles"></i>
+            </button>
+
             <!-- keyboard shortcuts -->
             <div>
                 <button id="keyboard-shortcuts" type="button" class="top-header-nav-button btn btn-xs btn-clear" ng-click="toggleShortcutHelper()" ng-class="showKeyShortcuts ? 'grow-in-size':''" title="Show/Hide Keyboard Shortcuts">
