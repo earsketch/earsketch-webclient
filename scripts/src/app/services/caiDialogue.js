@@ -120,6 +120,54 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         return nodeHistory;
     }
 
+    function clearNodeHistory() {
+        currentInput = {};
+        currentParameters = {};
+        currentTreeNode = {};
+        studentCodeObj = [];
+        musicAnalysisObj = {};
+        measures = [];
+        lineNodes = [];
+        parameterNodes = [];
+
+        currentSuggestion = {};
+        utteranceObj;
+
+        currentWait = -1;
+        errorWait = -1;
+        soundWait = { node: -1, sounds: [] };
+        complexityWait = { node: -1, complexity: {} };
+
+        currentError = ["", ""];
+
+        currentComplexity = {};
+        currentInstr = null;
+        currentGenre = null;
+
+        complexityUpdated = true;
+        errorSuccess = 0;
+        errorFail = 0;
+        promise;
+
+        activeProject = '';
+        nodeHistory = {};
+        recommendationHistory = {};
+        chattiness = 0;
+        currentNoSuggRuns = 0;
+        recentScripts = {};
+
+        studentInteracted = false;
+        currentDropup = "";
+        isPrompted = true;
+
+        soundSuggestionsUsed = {};
+        codeSuggestionsUsed = {};
+
+        done = false;
+
+        allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"];
+    }
+
     function handleError(error) {
         // console.log("error",currentError);
         var t = Date.now();
@@ -286,11 +334,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function createButtons() {
         var buttons = [];
 
-
-
-        if (currentSuggestion[activeProject] != null && currentTreeNode[activeProject].options[0] == 35 && (currentSuggestion[activeProject].explain == null || currentSuggestion[activeProject].explain == "")) {
-            currentSuggestion[activeProject] = null;
-            return [];
+        if (currentTreeNode[activeProject].id == 34 && (currentSuggestion[activeProject] == null || (currentSuggestion[activeProject].explain == null || currentSuggestion[activeProject].explain == ""))) {
+                currentSuggestion[activeProject] = null;
+                return [];
+            
         }
 
         if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
@@ -366,9 +413,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function addToNodeHistory(nodeObj) {
-        nodeHistory[activeProject].push(nodeObj);
-        if (FLAGS.UPLOAD_CAI_HISTORY)
-            userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
+        if (nodeHistory[activeProject]) {
+            nodeHistory[activeProject].push(nodeObj);
+            if (FLAGS.UPLOAD_CAI_HISTORY)
+                userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
+        }
     }
 
     function isDone() {
@@ -407,12 +456,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else if (utterance.includes("[SUGGESTION]")) {
             utteranceObj = actions["[SUGGESTION]"]();
-            // if (utteranceObj.id != 1 && utteranceObj.id != 6) {
             parameters.push(["SUGGESTION", utteranceObj.id]);
-            // }
-            // else{
-            //    parameters.push(["SUGGESTION", utteranceObj.utterance]);
-            // }
             utterance = utteranceObj.utterance;
         }
         else if (currentTreeNode[activeProject].utterance in actions) {
@@ -471,7 +515,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     var measureIndex = randomIntFromInterval(bounds[0] - 1, bounds[1] - 1);
                     var recIndex = randomIntFromInterval(0, 2);
 
-                    var file = musicResults.RECOMMENDATIONS[measureIndex][recIndex];
+                    if (musicResults.RECOMMENDATIONS[measureIndex] && musicResults.RECOMMENDATIONS[measureIndex].length > 0) {
+                        var file = musicResults.RECOMMENDATIONS[measureIndex][recIndex];
+                    }
 
 
                     if (file != null && file != "undefined" && !utterance.includes(file)) {
@@ -762,9 +808,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             addToNodeHistory(["request", "codeRequest"]);
         }
         var outputObj = codeSuggestion.generateCodeSuggestion(null, nodeHistory[activeProject]);
-        //var outputText = printObject(outputObj);
         currentSuggestion[activeProject] = Object.assign({}, outputObj);
-        // outputObject = { messageType: "P", text: outputText, d: outputObj };
+
         if (outputObj != null) {
 
             if (outputObj.utterance == "" && isPrompted) {
@@ -846,6 +891,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         getDropup: getDropup,
         setActiveProject: setActiveProject,
         getNodeHistory: getNodeHistory,
+        clearNodeHistory: clearNodeHistory,
         activeWaits: activeWaits,
         studentInteractedValue: studentInteractedValue,
         checkForCodeUpdates: checkForCodeUpdates,
