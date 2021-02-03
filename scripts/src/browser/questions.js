@@ -22,6 +22,9 @@ Question = function(questionNumber, questionText, answer1, answer2, answer3, ans
   question.classList.add('question')
   if (langClass) question.classList.add(langClass)
   question.innerHTML = questionText
+  const icon = document.createElement('i')
+  icon.classList.add('icon', 'icon-checkmark')
+  question.prepend(icon)
 
   const answerList = document.createElement('ul')
   answerList.classList.add('answers')
@@ -34,9 +37,11 @@ Question = function(questionNumber, questionText, answer1, answer2, answer3, ans
     const item = document.createElement('li')
     const label = document.createElement('label')
     const input = document.createElement('input')
+    const control = document.createElement('span')
     const span = document.createElement('span')
     item.appendChild(label)
     label.appendChild(input)
+    label.appendChild(control)
     label.appendChild(span)
 
     input.type = "radio"
@@ -44,10 +49,14 @@ Question = function(questionNumber, questionText, answer1, answer2, answer3, ans
     input.onclick = () => {
       if (i === 0) {
         item.classList.add('correct')
+        question.classList.add('complete')
+        question.querySelectorAll('input').forEach(el => el.disabled = true)
+        question.querySelectorAll('.incorrect').forEach(el => el.classList.remove('incorrect'))
       } else {
         item.classList.add('incorrect')
       }
     }
+    control.classList.add('control')
     span.innerText = answerText + ' '  // space included for wrapping ::after
     return item
   })

@@ -226,27 +226,6 @@ const CurriculumPane = () => {
         }
     }, [content])
 
-    // <script> tags inserted via innerHTML (including dangerouslySetInnerHTML) do not execute, so we have to handle them ourselves.
-    // (See https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML#security_considerations.)
-    useEffect(() => {
-        if (content) {
-            const scripts = []
-            content.querySelectorAll("script").forEach(script => {
-                // Cloning the script (with cloneNode or importNode) does not work, because clones are marked as "already started" and do not execute.
-                // (See https://html.spec.whatwg.org/multipage/scripting.html#script-processing-model.)
-                // Instead, we create a new <script> element and copy over the details.
-                const copy = document.createElement("script")
-                if (script.src) copy.src = script.src
-                copy.async = script.async
-                copy.innerText = script.innerText
-                scripts.push(copy)
-                document.body.appendChild(copy)
-            })
-
-            return () => scripts.forEach(script => document.body.removeChild(script))
-        }
-    }, [content]);
-
     return (
         <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
             <CurriculumHeader></CurriculumHeader>
