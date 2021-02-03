@@ -415,7 +415,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function addToNodeHistory(nodeObj) {
         if (nodeHistory[activeProject]) {
             nodeHistory[activeProject].push(nodeObj);
-            if (FLAGS.UPLOAD_CAI_HISTORY)
+            if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0)
                 userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
         }
     }
