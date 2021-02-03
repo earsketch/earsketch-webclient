@@ -668,9 +668,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 addToNodeHistory([0, utterance, parameters]);
             }
 
-            if (FLAGS.UPLOAD_CAI_HISTORY)
-                userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
-
             console.log("node history", nodeHistory);
             // reconstituteNodeHistory();
         }
