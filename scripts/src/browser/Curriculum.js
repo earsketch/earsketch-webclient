@@ -227,12 +227,12 @@ const CurriculumPane = () => {
     }, [content])
 
     return (
-        <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
+        <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
             <CurriculumHeader></CurriculumHeader>
 
-            <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : ''} style={{fontSize}}>
+            <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : 'dark'} style={{fontSize}}>
                 {content ? 
-                  <div ref={curriculumBody} id="curriculum-body" className="p-8 h-full overflow-y-auto"></div>
+                  <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-8 h-full overflow-y-auto" style={{fontSize}}></article>
                 : <div>
                       <div className="text-4xl text-center py-16">Loading curriculum...</div>
                       <div className="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}}></div>

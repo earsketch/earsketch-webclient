@@ -1,5 +1,6 @@
 module.exports = {
     purge: [],
+    darkMode: 'class',
     theme: {
         extend: {
             // Modify some of .prose styles
@@ -16,11 +17,19 @@ module.exports = {
                         "blockquote p:first-of-type::before": null,
                         "blockquote p:last-of-type::after": null
                     }
+                },
+                dark: {
+                    css: {
+                        color: '#bbb',
+			h1: { color: '#fff' },
+			h2: { color: '#fff' },
+			h3: { color: '#fff' },
+                    }
                 }
             }
         },
     },
-    variants: ['hover', 'active'],
+    variants: ['hover', 'active', 'dark'],
     plugins: [
         require('@tailwindcss/typography')
     ],
