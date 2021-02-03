@@ -177,7 +177,7 @@ app.directive('caiwindow', [function () {
                 caiStudentPreferenceModule.addCompileTS(t);
             });
 
-            $scope.$on("PageChanged", function (evt, data) {
+            $scope.$on("curriculumPageView", function (evt, data) {
                 caiDialogue.addCurriculumPageToHistory(data);
                 caiStudentHistoryModule.addCurriculumPage(data);
             });
@@ -300,11 +300,11 @@ app.directive('caiwindow', [function () {
                     secondsOffPage = Date.now()/1000 - pageStatus[1]/1000;
                 }
                 // console.log(pageStatus, secondsOffPage, Date.now()/1000);
-                var message = sendCAIOutputMessage("Looking at your code updates...");
+                // var message = sendCAIOutputMessage("Looking at your code updates...");
                 if ($scope.messageListCAI[$scope.activeProject]) {
-                    $scope.messageListCAI[$scope.activeProject].push(message);
-                    autoScrollCAI();
-                    $scope.$applyAsync();
+                    // $scope.messageListCAI[$scope.activeProject].push(message);
+                    // autoScrollCAI();
+                    // $scope.$applyAsync();
 
                     $scope.periodicCheckOn = false;
                     startPeriodicCheck();

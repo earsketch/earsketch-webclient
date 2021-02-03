@@ -1912,9 +1912,9 @@ function uploadCAIHistory(projectName, node) {
     body.append('node', JSON.stringify(node));
 
     $http.post(url, body, opts).then(function(result) {
-        console.log('saved to CAI history:', projectName);
+        console.log('saved to CAI history:', projectName, node);
     }).catch(function(err) {
-        console.log('could not save to cai', projectName);
+        console.log('could not save to cai', projectName, node);
         throw err;
     });
 }

@@ -81,7 +81,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     function addCurriculumPageToHistory(page) {
         addToNodeHistory(["curriculum", page]);
-        console.log(nodeHistory[activeProject]);
     }
 
     function setActiveProject(p) {
@@ -858,17 +857,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             if (activeProject in recentScripts) {
                 if (recentScripts[activeProject] != code) {
                     console.log("previous code state, which is different from the current one");
-                    console.log(recentScripts[activeProject]);
                     userProject.saveScript(activeProject, code);
                     recentScripts[activeProject] = code;
                     addToNodeHistory(["Code Updates"]);
-                    //if (FLAGS.UPLOAD_CAI_HISTORY)
-                        //userProject.uploadCAIHistory(activeProject,[]);
                 }
 
             }
             else {
-                console.log("new project addded to history")
+                console.log("new project added to history")
                 recentScripts[activeProject] = code;
             }
         }
