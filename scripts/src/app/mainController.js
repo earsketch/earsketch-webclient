@@ -33,7 +33,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     // CAI visibility
     $scope.enableCAI = FLAGS.SHOW_CAI;
-    $scope.showCAIWindow = false;
+    $scope.showCAIWindow = FLAGS.SHOW_CAI;
 
     // TEMPORARY FOR AWS CONTEST TESTING
     $scope.showAmazon = FLAGS.SHOW_AMAZON;
