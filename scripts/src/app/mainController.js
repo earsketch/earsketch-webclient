@@ -807,7 +807,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             });
     };
 
-    $scope.shareScript = script => {
+    $scope.shareScript = async script => {
+        await userProject.saveScript(script.name, script.source_code);
         $uibModal.open({
             templateUrl: 'templates/share-script.html',
             controller: 'shareScriptController',
@@ -855,7 +856,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         exporter.print(script);
     }
 
-    $scope.openScriptHistory = (script, allowRevert) => {
+    $scope.openScriptHistory = async (script, allowRevert) => {
+        await userProject.saveScript(script.name, script.source_code);
         $uibModal.open({
             templateUrl: 'templates/script-versions.html',
             controller: 'scriptVersionController',
@@ -887,6 +889,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid);
             }
+            await userProject.saveScript(script.name, script.source_code);
             await userProject.deleteScript(script.shareid);
             reporter.deleteScript();
 
@@ -912,7 +915,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     };
 
-    $scope.submitToCompetition = script => {
+    $scope.submitToCompetition = async script => {
+        await userProject.saveScript(script.name, script.source_code);
         $uibModal.open({
             templateUrl: 'templates/submit-script-aws.html',
             controller: 'submitAWSController',
