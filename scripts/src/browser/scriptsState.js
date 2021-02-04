@@ -424,6 +424,21 @@ export const selectShowDropdownMenu = state => state.scripts.dropdownMenu.show;
 export const selectDropdownMenuScript = state => state.scripts.dropdownMenu.script;
 export const selectDropdownMenuType = state => state.scripts.dropdownMenu.type;
 
+// TODO: Unsaved scripts should probably be tracked in the editor or tab state.
+export const selectUnsavedDropdownMenuScript = createSelector(
+    [selectDropdownMenuScript, selectDropdownMenuType],
+    (script, type) => {
+        if (!script) {
+            return null;
+        }
+
+        const userProject = helpers.getNgService('userProject');
+        return type==='regular'
+            ? userProject.scripts[script.shareid]
+            : userProject.sharedScripts[script.shareid];
+    }
+);
+
 export const selectShowSharedScriptInfo = state => state.scripts.sharedScriptInfo.show;
 export const selectSharedInfoScript = state => state.scripts.sharedScriptInfo.script;
 

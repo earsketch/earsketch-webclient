@@ -52,7 +52,6 @@ const shareScript = script => {
 };
 
 const CreateScriptButton = () => {
-    const dispatch = useDispatch();
     const ideScope = helpers.getNgController('ideController').scope();
     return (
         <div
@@ -280,6 +279,9 @@ const SingletonDropdownMenu = () => {
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
     const script = useSelector(scripts.selectDropdownMenuScript);
     const type = useSelector(scripts.selectDropdownMenuType);
+
+    // For some operations, get the most up-to-date script being kept in userProject.
+    const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript);
     const loggedIn = useSelector(state => state.user.loggedIn);
     const openTabs = useSelector(tabs.selectOpenTabs);
 
@@ -335,7 +337,7 @@ const SingletonDropdownMenu = () => {
                 visible={type==='regular'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.copyScript(script);
+                    scope.copyScript(unsavedScript);
                 }}
             />
             <MenuItem
@@ -350,21 +352,21 @@ const SingletonDropdownMenu = () => {
                 name='Download' icon='icon-cloud-download'
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.downloadScript(script);
+                    scope.downloadScript(unsavedScript);
                 }}
             />
             <MenuItem
                 name='Print' icon='icon-printer'
                 onClick={() => {
                     const exporter = helpers.getNgService('exporter');
-                    exporter.print(script);
+                    exporter.print(unsavedScript);
                 }}
             />
             <MenuItem
                 name='Share' icon='icon-share32'
                 visible={type==='regular'}
                 onClick={() => {
-                    shareScript(script);
+                    shareScript(unsavedScript);
                 }}
             />
             <MenuItem
@@ -373,7 +375,7 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.submitToCompetition(script);
+                    scope.submitToCompetition(unsavedScript);
                 }}
             />
             <MenuItem
@@ -381,7 +383,7 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.openScriptHistory(script, true);
+                    scope.openScriptHistory(unsavedScript, true);
                 }}
             />
             <MenuItem
@@ -389,7 +391,7 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.openCodeIndicator(script);
+                    scope.openCodeIndicator(unsavedScript);
                 }}
             />
             <MenuItem
@@ -411,7 +413,7 @@ const SingletonDropdownMenu = () => {
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     if (type==='regular') {
-                        scope.deleteScript(script);
+                        scope.deleteScript(unsavedScript);
                     } else if (type==='shared') {
                         scope.deleteSharedScript(script);
                     }
