@@ -335,7 +335,6 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
     };
 
     $scope.curriculumPageView = function (title) {
-        console.log('page', title);
         $rootScope.$broadcast('curriculumPageView', title);
     };
 

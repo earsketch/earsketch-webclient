@@ -4,7 +4,7 @@ app.directive('caiwindow', [function () {
         templateUrl: 'templates/cai-window.html',
         controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', 'caiStudentHistoryModule', 'caiStudentPreferenceModule', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion, caiStudentHistoryModule, caiStudentPreferenceModule) {
 
-            $scope.activeProject = 'No Project'
+            $scope.activeProject = ''
 
             $scope.messageListCAI = {};
             $scope.inputTextCAI = { label: '', value: '' };
@@ -60,7 +60,7 @@ app.directive('caiwindow', [function () {
             });
 
             $scope.$on('caiClose', function (event) {
-                $scope.activeProject = 'No Project'
+                $scope.activeProject = ''
                 caiDialogue.clearNodeHistory();
                 $scope.messageListCAI = {};
                 $scope.inputTextCAI = { label: '', value: '' };
