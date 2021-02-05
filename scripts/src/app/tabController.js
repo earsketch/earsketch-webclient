@@ -449,6 +449,11 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 // alerts the dawController to reset preservation flags
                 $rootScope.$broadcast('swapTab');
 
+                $rootScope.$broadcast('caiSwapTab',$scope.tabs[$scope.activeTab].name);
+
+            }
+            else {
+                $rootScope.$broadcast('caiClose');
             }
 
             $scope.editor.clearHistory();

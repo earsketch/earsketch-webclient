@@ -1,0 +1,38 @@
+<div id="chat-header">
+    <div id="chatroom-title">
+        <div>
+            Talk to CAI about <span id="chat-script-name">{{activeProject}}</span>
+        </div>
+    </div>
+</div>
+<div id="cai-body">
+    <div class="chat-message-container" ng-repeat="message in messageListCAI[activeProject] track by $index">
+        <div class="chat-message" ng-style="senderIsUser(message) ? messageStyles.sender : messageStyles.collaborator">
+            <div class="chat-message-bubble" ng-style="senderIsUser(message) ? messageBubbleStyles.sender : messageBubbleStyles.collaborator">
+                <div class="chat-message-sender">{{message.sender}}</div>
+                <div class="chat-message-text" ng-style="selectBubbleStyles(message)">{{message.text}}</div>
+            </div>
+            <div class="chat-message-date" ng-style="senderIsUser(message) ? messageDateStyles.sender : messageDateStyles.collaborator">
+                {{calcDate(message) | formatTimer}}
+            </div>
+        </div>
+    </div>
+</div>
+<div id="chat-footer" style="height:auto;">
+    <div ng-show="inputOptions.length < 6">
+        <div ng-repeat="input in inputOptions">
+            <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px;">{{input.label}}</button>
+        </div>
+    </div>
+
+    <div class="dropup-cai" ng-hide="inputOptions.length < 6">
+        <button class="dropbtn-cai">{{dropupLabel}}</button>
+        <div class="dropup-cai-content">
+        	<li ng-repeat="input in inputOptions">
+	            <option href="#" ng-click="sendCAIMessageButton(input)">{{::input.label}}</a>
+	            </a>
+            </li>
+        </div>
+    </div>
+
+</div>

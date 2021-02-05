@@ -79,6 +79,7 @@ module.exports = {
             curriculumPaneController: path.resolve(__dirname,`${appDir}/curriculumPaneController.js`),
             curriculumSearchController: path.resolve(__dirname,`${appDir}/curriculumSearchController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
+            caiWindowDirective: path.resolve(__dirname,`${appDir}/caiWindowDirective.js`),
             createScriptController: path.resolve(__dirname,`${appDir}/createScriptController.js`),
             layoutController: path.resolve(__dirname,`${appDir}/layoutController.js`),
             promptController: path.resolve(__dirname,`${appDir}/promptController.js`),
@@ -146,11 +147,22 @@ module.exports = {
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
             audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
             ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
+            caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
+            codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
+            complexityCalculatorStorage: path.resolve(__dirname,`${dataDir}/complexityCalculatorStorage.js`),
 
             // CAI
             complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
+            complexityCalculatorHelperFunctions: path.resolve(__dirname, `${servicesDir}/complexityCalculatorHelperFunctions.js`),
+            caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
+            caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
+            caiStudent: path.resolve(__dirname, `${servicesDir}/caiStudent.js`),
             caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
+            caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
+            caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
+            codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
             recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`)
+
         }
     },
     module: {
@@ -248,6 +260,18 @@ module.exports = {
             AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
             NUMBERS_AUDIOKEYS: 'exports-loader?type=commonjs&exports=single NUMBERS_AUDIOKEYS!numbersAudiokeys',
             AUDIOKEYS_RECOMMENDATIONS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_RECOMMENDATIONS!audiokeysRecommendations',
+
+            CC_SAMPLES: 'exports-loader?type=commonjs&exports=single CC_SAMPLES!ccSamples',
+            CAI_TREE_NODES: 'exports-loader?type=commonjs&exports=single CAI_TREE_NODES!caiTree',
+            CAI_TREES: 'exports-loader?type=commonjs&exports=single CAI_TREES!caiTree',
+            CAI_MUSIC_ANALYSIS: 'exports-loader?type=commonjs&exports=single CAI_MUSIC_ANALYSIS!caiTree',
+            CAI_ERRORS: 'exports-loader?type=commonjs&exports=single CAI_ERRORS!caiTree',
+
+            CAI_DELTA_LIBRARY: 'exports-loader?type=commonjs&exports=single CAI_DELTA_LIBRARY!codeRecommendations',
+            CAI_RECOMMENDATIONS: 'exports-loader?type=commonjs&exports=single CAI_RECOMMENDATIONS!codeRecommendations',
+            CAI_NUCLEI: 'exports-loader?type=commonjs&exports=single CAI_NUCLEI!codeRecommendations',
+
+            COMPLEXITY_CALCULATOR_STORAGE: 'exports-loader?type=commonjs&exports=single COMPLEXITY_CALCULATOR_STORAGE!complexityCalculatorStorage',
 
             ServiceWrapper: 'exports-loader?type=commonjs&exports=single ServiceWrapper!ngWrappers',
             ES_PASSTHROUGH: 'exports-loader?type=commonjs&exports=single ES_PASSTHROUGH!passthrough',

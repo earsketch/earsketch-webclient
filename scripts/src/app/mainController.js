@@ -31,6 +31,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.enableChat = false; // Chat window toggle button. Hidden by default.
     $scope.showChatWindow = false;
 
+    // CAI visibility
+    $scope.enableCAI = FLAGS.SHOW_CAI;
+    $scope.showCAIWindow = false;
+
     // TEMPORARY FOR AWS CONTEST TESTING
     $scope.showAmazon = FLAGS.SHOW_AMAZON;
     $scope.showAmazonSounds = FLAGS.SHOW_AMAZON_SOUNDS;

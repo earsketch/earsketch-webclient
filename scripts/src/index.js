@@ -195,9 +195,17 @@ require(['angular'], () => {
     require('inputsController');
 
     // CAI
+    require('caiWindowDirective');
+    require('caiStudent');
     require('autograder');
     require('caiAnalysisModule');
+    require('caiStudentPreferenceModule');
+    require('caiStudentHistoryModule');
     require('complexityCalculator');
+    require('complexityCalculatorHelperFunctions');
+    require('caiDialogue');
+    require('caiErrorHandling');
+    require('codeSuggestion');
     require('recommender');
 
     // TODO: Use a module.

@@ -156,10 +156,14 @@ require.config({
         analytics: 'src/app/services/reporter',
 
         // CAI (Co-creative AI) utilities
+
+        caiStudent: 'src/app/services/caiStudent',
+        caiStudentPreferenceModule: 'src/app/services/caiStudentPreferenceModule',
+        caiStudentHistoryModule: 'src/app/services/caiStudentHistoryModule',
         complexityCalculator: 'src/app/services/complexityCalculator',
         caiAnalysisModule: 'src/app/services/caiAnalysisModule',
 
-        // Recommender system 
+        // Recommender system
         recommender: 'src/app/services/recommender',
 
         // Recommendation JSON/js file
@@ -225,8 +229,8 @@ require.config({
         esrecorder: {deps: ['app', 'recorder', 'volume_meter']},
         uploader: {deps: ['app']},
         exporter: {deps: ['app']},
-        analytics: {deps: ['app']},
-        caiAnalysisModule: {deps: ['app', 'esutils', 'complexityCalculator', 'recommender']},
+        analytics: { deps: ['app'] },
+        caiAnalysisModule: { deps: ['app', 'esutils', 'complexityCalculator', 'recommender', 'caiStudent']},
         recommender: {deps: ['app', 'audiokeys_numbers', 'numbers_audiokeys', 'audiokeys_recommendations']},
         esutils: {deps: ['app']},
         applyeffects: {deps: ['app']},
