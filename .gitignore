@@ -8,6 +8,7 @@ karma_html/
 earsketch.min.js*
 dist/
 index.html
+css/earsketch/allstyles.css
 
 # EarSketchWS
 EarSketchWS/build
