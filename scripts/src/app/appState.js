@@ -34,4 +34,5 @@ export const {
 
 export const selectScriptLanguage = state => state.app.scriptLanguage;
 export const selectColorTheme = state => state.app.colorTheme;
-export const selectFontSize = state => state.app.fontSize;
+// TODO: Figure out the right way to do this with redux-persist.
+export const selectFontSize = state => state.app.fontSize || 14;
