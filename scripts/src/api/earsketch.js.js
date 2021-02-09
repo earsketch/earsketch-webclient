@@ -11,7 +11,12 @@
 ES_JAVASCRIPT_API = function(interpreter, scope) {
     var wrapper;
 
-    // MASTER_TRACK constant
+    // MIX_TRACK constant
+    interpreter.setProperty(
+        scope, 'MIX_TRACK', (0)
+    );
+
+    // Deprecated MASTER_TRACK alias for MIX_TRACK
     interpreter.setProperty(
         scope, 'MASTER_TRACK', (0)
     );

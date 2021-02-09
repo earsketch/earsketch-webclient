@@ -1,7 +1,7 @@
-<div class="dawTrackContainer" ng-style="{'height': masterTrackHeight + 'px'}">
+<div class="dawTrackContainer" ng-style="{'height': mixTrackHeight + 'px'}">
     <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> -->
     <div track-panel-position>
-        <div class="masterTrackFiller">{{track.label}}</div>
+        <div class="mixTrackFiller">{{track.label}}</div>
         <div class="dropdown dawTrackEffectDropdown" ng-show="track.effects.length > 0">
             <div class="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
                 &#x25BC
@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="daw-track">
-        <div class="masterTrackFiller" ng-style="{'background':trackColors[trackNum]}"><span ng-hide="hideMasterTrackLabel">MASTER TRACK</span></div>
+        <div class="mixTrackFiller" ng-style="{'background':trackColors[trackNum]}"><span ng-hide="hideMasterTrackLabel">MIX TRACK</span></div>
     </div>
 </div>
 <div id="dawTrackEffectContainer" ng-repeat="(key, effect) in track.effects track by $index" ng-show="effect.visible" ng-style="{'height': trackHeight + 'px'}">

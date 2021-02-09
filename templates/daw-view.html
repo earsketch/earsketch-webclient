@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="daw-track-group-container">
-                    <div ng-repeat="(trackNum, track) in tracks" ng-if="$index == 0" ng-show="track.visible" daw-master-track>
+                    <div ng-repeat="(trackNum, track) in tracks" ng-if="$index == 0" ng-show="track.visible" daw-mix-track>
                     </div>
                     <div ng-repeat="(trackNum, track) in tracks" ng-if="$index > 0 && $index < tracks.length-1" ng-show="track.visible" daw-track>
                     </div>
