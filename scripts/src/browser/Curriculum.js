@@ -137,7 +137,7 @@ const CurriculumSearchResults = () => {
         <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
             <a key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
-                <div className={`search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
+                <div className={`px-5 py-2 search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
             </a>)}
         </div>
     )
@@ -192,15 +192,6 @@ const CurriculumPane = () => {
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef()
 
-    // Highlight search text matches found in the curriculum.
-    const hilitor = new Hilitor("curriculum-body")
-    const searchText = useSelector(curriculum.selectSearchText)
-    hilitor.setMatchType("left")
-    useEffect(() => {
-        hilitor.apply(searchText)
-        return () => hilitor.remove()
-    })
-
     if (content) {
         // Filter content by language.
         const p = (language === 'python')
@@ -226,6 +217,15 @@ const CurriculumPane = () => {
             return () => content.remove()
         }
     }, [content])
+
+    // Highlight search text matches found in the curriculum.
+    const hilitor = new Hilitor("curriculum-body")
+    const searchText = useSelector(curriculum.selectSearchText)
+    hilitor.setMatchType("left")
+    useEffect(() => {
+        hilitor.apply(searchText)
+        return () => hilitor.remove()
+    }, [content, searchText])
 
     return (
         <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
