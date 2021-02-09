@@ -222,6 +222,7 @@ const CurriculumPane = () => {
     useEffect(() => {
         if (content) {
             curriculumBody.current.appendChild(content)
+            curriculumBody.current.scrollTop = 0
             return () => content.remove()
         }
     }, [content])
