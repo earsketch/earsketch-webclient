@@ -43,9 +43,8 @@ const processContent = (location, html, dispatch) => {
         }
     })
 
-    // This has a weird URL (why does "<toc.html>" open the API browser?) and is only used in one place (Ch. 27).
-    // Can we get rid of it?
-    root.querySelectorAll('a[href="<toc.html>"]').forEach(el => {
+    // Used in 4.1, 27.
+    root.querySelectorAll('a[href="<api>"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             // TODO: Update this when we replace the layoutController.
