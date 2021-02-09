@@ -923,9 +923,12 @@ ES_PASSTHROUGH = {
         var args = copyArgs(arguments).slice(1);
         ptCheckArgs('println', args, 1, 1);
 
-        // load an angular service outside angular
-        var userConsole = ServiceWrapper().userConsole;
-        userConsole.log(msg);
+        let compiler = ServiceWrapper().compiler;
+        if (!compiler.isTestRun()) {
+            // load an angular service outside angular
+            var userConsole = ServiceWrapper().userConsole;
+            userConsole.log(msg);
+        }
     },
 
     /**
