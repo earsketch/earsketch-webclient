@@ -327,7 +327,19 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
 
+
         $rootScope = props.$rootScope
+        // Hack to facilitate Angular loading curriculum page for errors in console.
+        // TODO: Remove this after we've ported templates/index.html to React.
+        $rootScope.loadChapterForError = (errorMessage) => {
+            const aliases = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
+            const types = ["importerror", "indentationerror", "indexerror", "nameerror",
+                           "parseerror", "syntaxerror", "typeerror", "valueerror"]
+            let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+            type = aliases[type] || type
+            const anchor = types.includes(type) ? '#' + type : ''
+            props.$ngRedux.dispatch(curriculum.fetchContent({ url: `ch_29.html${anchor}` }))
+        }
         initialized = true
     }
 
