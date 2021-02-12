@@ -365,6 +365,7 @@ const SingletonDropdownMenu = () => {
             <MenuItem
                 name='Share' icon='icon-share32'
                 visible={type==='regular'}
+                disabled={!loggedIn}
                 onClick={() => {
                     shareScript(unsavedScript);
                 }}
@@ -388,7 +389,6 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name='Code Indicator' icon='glyphicon glyphicon-info-sign'
-                disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     scope.openCodeIndicator(unsavedScript);
@@ -556,6 +556,7 @@ const Script = ({ script, bgTint, type }) => {
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
     const active = useSelector(tabs.selectActiveTabID) === script.shareid;
     const tabIndicator = (open||active) ? (active ? 'border-green-400' : 'opacity-50 border-green-300') : 'opacity-0';
+    const loggedIn = useSelector(state => state.user.loggedIn);
 
     let bgColor;
     if (highlight) {
@@ -603,7 +604,7 @@ const Script = ({ script, bgTint, type }) => {
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
-                        <ShareButton script={script} />
+                        { loggedIn && (<ShareButton script={script} />) }
                         <DropdownMenuCaller script={script} type='regular' />
                     </div>
                     <div className={`${type==='shared' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
