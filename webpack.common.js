@@ -284,8 +284,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'index.html'),
-            template: 'templates/index.html',
-            hash: true
+            template: 'templates/index.html'
         })
     ],
     optimization: {
