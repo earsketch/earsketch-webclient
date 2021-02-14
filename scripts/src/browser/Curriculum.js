@@ -3,8 +3,6 @@ import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 
-import { usePopper } from 'react-popper'
-
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
@@ -21,6 +19,24 @@ const copyURL = (language, currentLocation) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
     clipboard.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
+}
+
+// Useful for preventing absolute-positioned elements from exceeding window height.
+const useHeightLimiter = (show, marginBottom) => {
+    const [height, setHeight] = useState('100vh')
+    const el = useRef()
+
+    const handleResize = () => setHeight(`calc(100vh - ${el.current.getBoundingClientRect().top}px${marginBottom ? ' - ' + marginBottom : ''})`)
+
+    useEffect(() => {
+        if (show) {
+            window.addEventListener('resize', handleResize)
+            handleResize()
+            return () => window.removeEventListener('resize', handleResize)
+        }
+    }, [show])
+
+    return [el, { maxHeight: height, overflowY: 'scroll' }]
 }
 
 const TableOfContentsChapter = ({ unit, unitIdx, ch, chIdx }) => {
@@ -115,11 +131,13 @@ const CurriculumSearchResults = () => {
     const results = useSelector(curriculum.selectSearchResults)
     const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
     const theme = useSelector(appState.selectColorTheme)
+    const [resultsRef, resultsStyle] = useHeightLimiter(showResults)
+
     return (showResults &&
-        <div className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`}>
+        <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
             <a key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
-                <div className={`search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
+                <div className={`px-5 py-2 search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
             </a>)}
         </div>
     )
@@ -154,7 +172,12 @@ export const TitleBar = () => {
                 </button>
                 <button className={`border-2 -my-1 ${theme === 'light' ? 'border-black' : 'border-white'} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
                         title="Switch script language"
-                        onClick={() => dispatch(appState.toggleScriptLanguage())}>
+                        onClick={() => {
+                            const newLanguage = (language === 'python' ? 'javascript' : 'python')
+                            // TODO: This line is here to mesh with angular; remove it after rewriting other components.
+                            $rootScope.$broadcast('language', newLanguage)
+                            dispatch(appState.setScriptLanguage(newLanguage))
+                        }}>
                     {language === 'python' ? 'PY' : 'JS'}
                 </button>
             </div>
@@ -167,17 +190,8 @@ const CurriculumPane = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
-
-    const currentLocation = useSelector(curriculum.selectCurrentLocation)
     const content = useSelector(curriculum.selectContent)
-    // The value isn't used, but we need the component to re-render after layoutController updates.
-    const maximized = useSelector(curriculum.selectMaximized)
-
-    // Highlight search text matches found in the curriculum.
-    const myHilitor = new Hilitor("curriculum-atlas")
-    const searchText = useSelector(curriculum.selectSearchText)
-    myHilitor.setMatchType("left")
-    useEffect(() => myHilitor.apply(searchText))
+    const curriculumBody = useRef()
 
     if (content) {
         // Filter content by language.
@@ -197,33 +211,34 @@ const CurriculumPane = () => {
         }
     }
 
-    // <script> tags inserted via innerHTML (including dangerouslySetInnerHTML) do not execute, so we have to handle them ourselves.
-    // (See https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML#security_considerations.)
     useEffect(() => {
         if (content) {
-            const scripts = []
-            content.querySelectorAll("script").forEach(script => {
-                // Cloning the script (with cloneNode or importNode) does not work, because clones are marked as "already started" and do not execute.
-                // (See https://html.spec.whatwg.org/multipage/scripting.html#script-processing-model.)
-                // Instead, we create a new <script> element and copy over the details.
-                const copy = document.createElement("script")
-                if (script.src) copy.src = script.src
-                copy.async = script.async
-                copy.innerText = script.innerText
-                scripts.push(copy)
-                document.body.appendChild(copy)
-            })
-
-            return () => scripts.forEach(script => document.body.removeChild(script))
+            curriculumBody.current.appendChild(content)
+            curriculumBody.current.scrollTop = 0
+            return () => content.remove()
         }
-      }, [content]);
+    }, [content])
+
+    // Highlight search text matches found in the curriculum.
+    const hilitor = new Hilitor("curriculum-body")
+    const searchText = useSelector(curriculum.selectSearchText)
+    hilitor.setMatchType("left")
+    useEffect(() => {
+        hilitor.apply(searchText)
+        return () => hilitor.remove()
+    }, [content, searchText])
 
     return paneIsOpen ? (
-        <div className={`font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`} style={{height: "inherit", padding: "61px 0 60px 0", fontSize}}>
+        <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
             <CurriculumHeader></CurriculumHeader>
 
-            <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : ''} style={{fontSize}}>
-                <div id="curriculum-body" className="p-8 h-full overflow-y-auto" dangerouslySetInnerHTML={{__html: (content ? content.innerHTML : `Loading...`)}}></div>
+            <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : 'dark'} style={{fontSize}}>
+                {content ? 
+                  <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-8 h-full max-w-none overflow-y-auto" style={{fontSize}}></article>
+                : <div>
+                      <div className="text-4xl text-center py-16">Loading curriculum...</div>
+                      <div className="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}}></div>
+                  </div>}
             </div>
         </div>
     ) : <Collapsed position='east' />
@@ -236,9 +251,9 @@ const NavigationBar = () => {
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)
-    const dropdownRef = useRef(null)
     const triggerRef = useRef(null)
     const [highlight, setHighlight] = useState(false)
+    const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, '8px')
 
     const handleClick = event => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
@@ -274,7 +289,10 @@ const NavigationBar = () => {
                     </button>}
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? '' : 'hidden'}`}>
-                <div ref={dropdownRef} className={`w-full pointer-events-auto p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}><TableOfContents></TableOfContents></div>
+                <div ref={dropdownRef} style={tocStyle}
+                     className={`w-full pointer-events-auto p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}>
+                    <TableOfContents></TableOfContents>
+                </div>
             </div>
             <div className="w-full" style={{height: '7px'}}>
                 <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
@@ -284,6 +302,7 @@ const NavigationBar = () => {
 }
 
 let initialized = false
+let $rootScope = null
 
 const HotCurriculum = hot(props => {
     if (!initialized) {
@@ -309,6 +328,19 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
 
+
+        $rootScope = props.$rootScope
+        // Hack to facilitate Angular loading curriculum page for errors in console.
+        // TODO: Remove this after we've ported templates/index.html to React.
+        $rootScope.loadChapterForError = (errorMessage) => {
+            const aliases = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
+            const types = ["importerror", "indentationerror", "indexerror", "nameerror",
+                           "parseerror", "syntaxerror", "typeerror", "valueerror"]
+            let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+            type = aliases[type] || type
+            const anchor = types.includes(type) ? '#' + type : ''
+            props.$ngRedux.dispatch(curriculum.fetchContent({ url: `ch_29.html${anchor}` }))
+        }
         initialized = true
     }
 
@@ -319,4 +351,4 @@ const HotCurriculum = hot(props => {
     )
 })
 
-app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils']))
+app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils', '$rootScope']))

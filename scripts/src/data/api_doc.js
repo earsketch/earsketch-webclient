@@ -526,7 +526,7 @@ var ESApiDoc = {
         "parameters": {
             "track": {
                 "type": "Integer",
-                "description": "Track to place pattern onto (or MASTER_TRACK to apply it to all tracks)."
+                "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
             },
             "effectType": {
                 "type": "Effect Constant",
@@ -579,7 +579,7 @@ var ESApiDoc = {
             "parameters": {
                 "track": {
                     "type": "Integer",
-                    "description": "Track to place effect onto (or MASTER_TRACK to apply it to all tracks)"
+                    "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
                 },
                 "effectType": {
                     "type": "Effect Constant",
@@ -606,7 +606,7 @@ var ESApiDoc = {
             "parameters": {
                 "track": {
                     "type": "Integer",
-                    "description": "Track to place effect onto (or MASTER_TRACK to apply it to all tracks)"
+                    "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
                 },
                 "effectType": {
                     "type": "Effect Constant",

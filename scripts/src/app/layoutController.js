@@ -18,6 +18,7 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
         browser: 0 // -1: all closed, 0: sound, 1: script, 2: share, 3: api
     };
 
+
     // #1991: Some layout panes don't like to be closed at initialization,
     // so we cannot assign / ng-init $scope.layout state with the isEmbedded value.
     // Here, deferring the pane control until the embedded script is loaded.
@@ -114,13 +115,13 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
             }
             layout.set('chat', $scope.showChatWindow, true);
         } else if (pane == 'cai') {
-            $scope.showCAIWindow = !$scope.showCAIWindow;
-            if ($scope.showCAIWindow)
-                $scope.showChatWindow = false;
-            if (!$scope.showChatWindow)
-                $scope.layout['curriculum'] = $scope.showCAIWindow;
 
-            layout.set('cai', $scope.showCAIWindow, true);
+            $scope.showCAIWindow = !$scope.showCAIWindow;
+            if ($scope.showCAIWindow) {
+                $scope.showChatWindow = false;
+            }
+            $scope.layout['curriculum'] = $scope.showCAIWindow;
+
         } else if (pane === 'curriculum') {
             $scope.layout[pane] = ($scope.showChatWindow || $scope.showCAIWindow) ? true : !$scope.layout[pane];
             $scope.showChatWindow = false; 
@@ -331,6 +332,10 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
         } else {
             $scope.toggleSidebarTab(tab);
         }
+    };
+
+    $scope.curriculumPageView = function (title) {
+        $rootScope.$broadcast('curriculumPageView', title);
     };
 
     $scope.toggleCurriculumMaximization = function () {

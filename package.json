@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "webpack-dev-server --open --config webpack.serve.js",
+    "serve": "grunt less && webpack-dev-server --open --config webpack.serve.js",
     "build-dev": "webpack --config webpack.build.js --env.target=dev",
     "build-prod": "webpack --config webpack.build.js --env.target=prod"
   },

@@ -12,8 +12,8 @@
 <div ng-if="tab.username !== username">
     <div><a href="#" ng-click="downloadScript(tab)" ><i class="icon icon-cloud-download"></i> Download</a></div>
     <div><a href="#" ng-click="printScript(tab)" ><i class="icon icon-printer" ></i> Print</a></div>
-    <div ng-class="{ disabled: !loggedIn }" uib-tooltip="{{!loggedIn ? 'Login to track history of tabs' : ''}}"><a href="#" ng-click="openScriptHistory(tab)"><i class="icon icon-history"></i> History</a></div>
+    <div ng-show="loggedIn" ng-class="{ disabled: !loggedIn }" uib-tooltip="{{!loggedIn ? 'Login to track history of tabs' : ''}}"><a href="#" ng-click="openScriptHistory(tab)"><i class="icon icon-history"></i> History</a></div>
     <div><a href="#" ng-click="openCodeIndicator(tab)"><i class="glyphicon glyphicon-info-sign"></i> Code Indicator</a></div>
-    <div><a href="#" ng-click="importScript(tab)"><i class="icon icon-import"></i> Import</a></div>
+    <div ng-show="loggedIn"><a href="#" ng-click="importScript(tab)"><i class="icon icon-import"></i> Import</a></div>
     <div><a href="#" ng-click="deleteSharedScript(tab)"><i class="icon icon-bin" ></i> {{tab.collaborative ? 'Leave Collaboration' : 'Delete'}}</a></div>
 </div>

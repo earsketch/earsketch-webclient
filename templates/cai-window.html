@@ -1,11 +1,20 @@
 <div id="chat-header">
     <div id="chatroom-title">
         <div>
-            Talk to CAI about <span id="chat-script-name">{{activeProject}}</span>
+            Talk to CAI about 
+            <span ng-show="activeProject.length > 0" id="chat-script-name">
+                {{activeProject}}
+            </span>
+            <span ng-show="activeProject.length < 1">
+                a project, when one is open
+            </span>
+            .
         </div>
     </div>
 </div>
 <div id="cai-body">
+    <iframe src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" allow="fullscreen" style="margin:auto;">    
+    </iframe>
     <div class="chat-message-container" ng-repeat="message in messageListCAI[activeProject] track by $index">
         <div class="chat-message" ng-style="senderIsUser(message) ? messageStyles.sender : messageStyles.collaborator">
             <div class="chat-message-bubble" ng-style="senderIsUser(message) ? messageBubbleStyles.sender : messageBubbleStyles.collaborator">
@@ -18,7 +27,7 @@
         </div>
     </div>
 </div>
-<div id="chat-footer" style="height:auto;">
+<div id="chat-footer" style="height:auto;" ng-show="activeProject.length > 0">
     <div ng-show="inputOptions.length < 6">
         <div ng-repeat="input in inputOptions">
             <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px;">{{input.label}}</button>
