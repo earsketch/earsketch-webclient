@@ -9,9 +9,8 @@ const common = require('./webpack.common.js');
 
 module.exports = env => {
     const envFile = (env && env.flags) ? env.flags : path.resolve(__dirname, 'flags.env');
-    const target = (env && env.target) ? env.target : 'prod';
-    const apiHost = target==='prod' ? 'https://api.ersktch.gatech.edu' : 'https://earsketch-dev.lmc.gatech.edu';
-    const webSocketURL = apiHost.replace('http', 'ws') + (target==='prod' ? '/EarSketchWS' : '/websocket');
+    const apiHost = (env && env.apihost) ? env.apihost : 'builderror';
+    const webSocketURL = apiHost.replace('http', 'ws') + '/EarSketchWS';
     const clientBaseURI = (env && env.baseuri) ? env.baseuri : 'https://earsketch.gatech.edu/earsketch2';
     const release = (env && env.release) ? env.release : Date.now();
 
