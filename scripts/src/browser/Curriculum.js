@@ -192,24 +192,6 @@ const CurriculumPane = () => {
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef()
 
-    if (content) {
-        // Filter content by language.
-        const p = (language === 'python')
-        content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
-        content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
-        content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
-        content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
-
-        // Apply color theme to code blocks.
-        if (theme === 'light') {
-            content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
-            content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.add('default-pygment'))
-        } else {
-            content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
-            content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
-        }
-    }
-
     useEffect(() => {
         if (content) {
             curriculumBody.current.appendChild(content)
@@ -217,6 +199,28 @@ const CurriculumPane = () => {
             return () => content.remove()
         }
     }, [content])
+
+    useEffect(() => {
+        // <script> tags in the content may add elements to the DOM,
+        // so we wrap this in a useEffect() and run it after inserting the content.
+        if (content) {
+            // Filter content by language.
+            const p = (language === 'python')
+            content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
+            content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
+            content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
+            content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
+
+            // Apply color theme to code blocks.
+            if (theme === 'light') {
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.add('default-pygment'))
+            } else {
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
+            }
+        }
+    }, [content, language])
 
     // Highlight search text matches found in the curriculum.
     const hilitor = new Hilitor("curriculum-body")
