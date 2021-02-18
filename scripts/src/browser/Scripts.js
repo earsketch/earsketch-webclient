@@ -558,6 +558,9 @@ const Script = ({ script, bgTint, type }) => {
     const tabIndicator = (open||active) ? (active ? 'border-green-400' : 'opacity-50 border-green-300') : 'opacity-0';
     const loggedIn = useSelector(state => state.user.loggedIn);
 
+    // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
+    const userProject = helpers.getNgService('userProject');
+
     let bgColor;
     if (highlight) {
         bgColor = theme==='light' ? 'bg-blue-200' : 'bg-blue-500';
@@ -604,7 +607,7 @@ const Script = ({ script, bgTint, type }) => {
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
-                        { loggedIn && (<ShareButton script={script} />) }
+                        { loggedIn && (<ShareButton script={userProject.scripts[script.shareid]} />) }
                         <DropdownMenuCaller script={script} type='regular' />
                     </div>
                     <div className={`${type==='shared' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
