@@ -11,7 +11,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "grunt less && webpack-dev-server --open --config webpack.serve.js",
-    "build": "webpack --config webpack.build.js --env.target=dev"
+    "build": "webpack --config webpack.build.js"
   },
   "author": "GTCMT",
   "license": "NA",

@@ -13,6 +13,7 @@ module.exports = env => {
     const webSocketURL = apiHost.replace('http', 'ws') + '/EarSketchWS';
     const clientBaseURI = (env && env.baseuri) ? env.baseuri : 'https://earsketch.gatech.edu/earsketch2';
     const release = (env && env.release) ? env.release : Date.now();
+    const buildConfig = (env && env.buildconfig) ? env.buildconfig : '';
 
     return merge(common, {
         mode: 'production', // For both ES DEV and PROD servers.
@@ -26,6 +27,7 @@ module.exports = env => {
             // Environment variables
             new webpack.DefinePlugin({
                 BUILD_NUM: JSON.stringify(release),
+                BUILD_CONFIG: JSON.stringify(buildConfig),
                 FLAGS: require('dotenv').config({ path: envFile }).parsed,
                 URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
                 URL_WEBSOCKET: JSON.stringify(`${webSocketURL}`),
