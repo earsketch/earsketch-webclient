@@ -180,6 +180,7 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
                 'pass': false
             };
             $scope.uploads.push(results);
+            $scope.$apply();
             //AVN LOG
             //console.log("RESULT_P3e", $scope.compareCount, i, results, err);
             return results;
@@ -189,6 +190,7 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
             //console.log("RESULT_P4", $scope.compareCount, i, testResults);
             $scope.uploads.push(testResults);
             $scope.compareCount++;
+            $scope.$apply();
           });
         });
     });
