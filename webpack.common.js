@@ -285,6 +285,22 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'index.html'),
             template: 'templates/index.html'
+        }),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname,'autograder/index.html'),
+            template: 'autograder/index.template.html'
+        }),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname,'autograder2/index.html'),
+            template: 'autograder2/index.template.html'
+        }),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname,'autograder3/index.html'),
+            template: 'autograder3/index.template.html'
+        }),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname,'autograderAWS/index.html'),
+            template: 'autograderAWS/index.template.html'
         })
     ],
     optimization: {

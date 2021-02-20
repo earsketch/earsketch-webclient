@@ -49,7 +49,9 @@
 
 </head>
 <body ng-controller="autograder3Controller" ng-cloak>
-
+<script type="text/javascript" src="/curriculum/curr_toc.js"></script>
+<script type="text/javascript" src="/curriculum/curr_pages.js"></script>
+<script type="text/javascript" src="/curriculum/curr_searchdoc.js"></script>
   <div class="container">
     <h1>EarSketch Autograder 3</h1>
 
@@ -191,5 +193,4 @@
     <div class="container" style="text-align:center" ng-if="results.length > 0">
       <button class="btn btn-lg btn-primary" ng-click="downloadCSV()"><i class="glyphicon glyphicon-download-alt"></i> Download Report</button>
     </div>
-  <script src="dist/bundle.js"></script>
 </body>
