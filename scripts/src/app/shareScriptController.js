@@ -7,7 +7,7 @@ import * as tabs from '../editor/tabState';
  */
 app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInstance', '$uibModal', '$location', '$timeout', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'esconsole', 'colorTheme', 'collaboration', '$ngRedux', function($rootScope, $scope, $uibModalInstance, $uibModal, $location, $timeout, $window, userProject, script, quality, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, esconsole, colorTheme, collaboration, $ngRedux) {
 
-    $scope.sharelink = location.origin + location.pathname +'#?sharing=' + script.shareid;
+    $scope.sharelink = location.origin + location.pathname +'?sharing=' + script.shareid;
     $scope.lockedShareLink = "";
     $scope.lockedShareId = "";
     $scope.showLockedShareLink = false;
@@ -57,7 +57,7 @@ app.controller("shareScriptController", ['$rootScope', '$scope', '$uibModalInsta
     };
 
     userProject.getLockedSharedScriptId(script.shareid).then(function(result) {
-        $scope.lockedShareLink = location.origin + location.pathname +'#?sharing=' + result;
+        $scope.lockedShareLink = location.origin + location.pathname +'?sharing=' + result;
         $scope.lockedShareId = result;
     });
 
