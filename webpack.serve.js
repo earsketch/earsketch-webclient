@@ -16,6 +16,7 @@ module.exports = env => {
     const envFile = (env && env.flags) ? env.flags : path.resolve(__dirname, 'flags.env');
     const release = (env && env.release) ? env.release : Date.now();
     const buildConfig = (env && env.buildconfig) ? env.buildconfig : 'dev';
+    const baseURL = (env && env.baseurl) ? env.baseurl : '/';
 
     return merge(common, {
         mode: 'development', // For localhost with websocket-dev-server
@@ -34,6 +35,7 @@ module.exports = env => {
             new webpack.DefinePlugin({
                 BUILD_NUM: JSON.stringify(release),
                 BUILD_CONFIG: JSON.stringify(buildConfig),
+                BASE_URL: JSON.stringify(baseURL),
                 FLAGS: webpack.DefinePlugin.runtimeValue(
                     () => require('dotenv').config({ path: envFile }).parsed,
                     [envFile] // Watch the ~.env file and rebuild.

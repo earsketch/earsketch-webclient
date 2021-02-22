@@ -105,7 +105,7 @@ require(['angular'], () => {
         'ngRedux'
     ]).config($locationProvider => {
         // Prevent legacy hash-bang URL being overwritten by $location.
-        $locationProvider.html5Mode(false).hashPrefix('');
+        $locationProvider.html5Mode(true).hashPrefix('');
     }).config($ngReduxProvider => {
         $ngReduxProvider.provideStore(store);
     });
