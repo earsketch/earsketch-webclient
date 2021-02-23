@@ -6,6 +6,7 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const common = require('./webpack.common.js');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = env => {
     const envFile = (env && env.flags) ? env.flags : path.resolve(__dirname, 'flags.env');
@@ -23,6 +24,12 @@ module.exports = env => {
             filename: 'bundle.[hash].js',
             publicPath: 'dist/'
         },
+        module: {
+            rules: [{
+                test: /\.less$/,
+                use: [MiniCssExtractPlugin.loader,'css-loader','less-loader']
+            }]
+        },
         plugins: [
             // Environment variables
             new webpack.DefinePlugin({
@@ -36,7 +43,8 @@ module.exports = env => {
                 URL_LOADAUDIO: JSON.stringify(`${apiHost}/EarSketchWS/services/audio/getaudiosample`),
                 SITE_BASE_URI: JSON.stringify(`${clientBaseURI}`)
             }),
-            new CleanWebpackPlugin()
+            new CleanWebpackPlugin(),
+            new MiniCssExtractPlugin({filename: '[name].[hash].css'})
         ],
         devtool: 'source-map'
     });

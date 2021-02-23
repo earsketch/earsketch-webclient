@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "grunt less && webpack-dev-server --open --config webpack.serve.js",
+    "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js"
   },
   "author": "GTCMT",
@@ -44,7 +44,6 @@
     "jsdoc": "^3.3.2",
     "jszip": "^3.5.0",
     "lamejs": "^1.2.0",
-    "less": "^2.5.3",
     "lodash": "^4.17.15",
     "lunr": "^2.3.8",
     "ng-file-upload": "^12.2.13",
@@ -104,6 +103,9 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.8",
     "karma-webpack": "^4.0.2",
+    "less": "^2.7.3",
+    "less-loader": "^7.3.0",
+    "mini-css-extract-plugin": "^1.3.8",
     "ng-midway-tester": "^2.0.5",
     "postcss": "^8.1.1",
     "postcss-loader": "^4.0.3",
