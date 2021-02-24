@@ -136,7 +136,7 @@ const CurriculumSearchResults = () => {
     return (showResults &&
         <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
-            <a key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
+            <a tabIndex="0" key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                 <div className={`px-5 py-2 search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
             </a>)}
         </div>
