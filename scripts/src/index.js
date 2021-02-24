@@ -1,6 +1,6 @@
 // Global imports of CSS
-import './tailwind.css';
 import '../../css/earsketch/allstyles.less'
+import './tailwind.css';
 
 import { configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
