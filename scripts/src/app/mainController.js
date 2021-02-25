@@ -5,6 +5,7 @@ import * as sounds from '../browser/soundsState';
 import * as recommenderState from '../browser/recommenderState';
 import * as bubble from '../bubble/bubbleState';
 import * as tabs from '../editor/tabState';
+import * as curriculum from '../browser/curriculumState';
 
 /**
  * @module mainController
@@ -940,9 +941,14 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $rootScope.$broadcast('selectScript', script.shareid);
         }
     };
-
+    
     $scope.toggleCAIWindow = () => {
         $scope.showCAIWindow = !$scope.showCAIWindow;
+    };
+
+    // Note: Used in api_doc.js links to the curriculum Effects chapter.
+    $scope.loadCurriculumChapter = location => {
+        $ngRedux.dispatch(curriculum.fetchContent({ location: location.split('-') }));
     };
 
     $scope.$on('createScript', () => {

@@ -29,6 +29,12 @@ module.exports = env => {
             port: port,
             hotOnly: true
         },
+        module: {
+            rules: [{
+                test: /\.less$/,
+                use: ['style-loader','css-loader','less-loader']
+            }]
+        },
         plugins: [
             // Environment variables
             new webpack.DefinePlugin({
