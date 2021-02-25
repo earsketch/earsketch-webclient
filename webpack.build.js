@@ -27,7 +27,14 @@ module.exports = env => {
         module: {
             rules: [{
                 test: /\.less$/,
-                use: [MiniCssExtractPlugin.loader,'css-loader','less-loader']
+                use: [
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: clientBaseURI + '/dist'
+                        }
+                    },
+                    'css-loader','less-loader']
             }]
         },
         plugins: [
