@@ -19,7 +19,7 @@
         <div class="chat-message" ng-style="senderIsUser(message) ? messageStyles.sender : messageStyles.collaborator">
             <div class="chat-message-bubble" ng-style="senderIsUser(message) ? messageBubbleStyles.sender : messageBubbleStyles.collaborator">
                 <div class="chat-message-sender">{{message.sender}}</div>
-                <div class="chat-message-text" ng-style="selectBubbleStyles(message)">{{message.text}}</div>
+                <div id="text" class="chat-message-text" ng-style="selectBubbleStyles(message)">{{message.text}}<a href={{message.link}}>{{message.keyword}}</a>{{message.textPartTwo}}</div>
             </div>
             <div class="chat-message-date" ng-style="senderIsUser(message) ? messageDateStyles.sender : messageDateStyles.collaborator">
                 {{calcDate(message) | formatTimer}}

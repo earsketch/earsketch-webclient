@@ -220,7 +220,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         var allSamples = recommender.addRecInput([], { source_code: studentCodeObj });
         caiStudentPreferenceModule.runSound(allSamples);
 
-        //once htat's done, record historicalinfo from the preference module
+        //once that's done, record historicalinfo from the preference module
         var suggestionRecord = caiStudentPreferenceModule.getSoundSuggestionsUsed();
         if (suggestionRecord.length > soundSuggestionsUsed[activeProject]) {
             for (i = soundSuggestionsUsed[activeProject]; i < suggestionRecord.length; i++) {
@@ -719,6 +719,21 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             soundWait.sounds = [];
         }
 
+        var utteranceFirstHalf = utterance;
+        var utteranceSecondHalf = "";
+        var keyword = ""
+        var link = ""
+        //does one iterations/ assumes one appearance
+        if (utterance.includes("[LINK")) {
+
+            keyword = utterance.substring(utterance.indexOf("[LINK") + 6, utterance.indexOf("]"));
+            // keyword = keyword.link("google.com")
+            link = LINKS[keyword];
+            utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
+            utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length - 1);
+            console.log(utterance);
+        }
+
         if (nodeHistory[activeProject] && utterance != "") {
             // Add current node (by node number) and paramters to node history
             if (Number.isInteger(currentTreeNode[activeProject].id)) {
@@ -731,7 +746,26 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             console.log("node history", nodeHistory);
             // reconstituteNodeHistory();
         }
-        return utterance;
+
+        console.log("hi", keyword)
+        var structure = [[utteranceFirstHalf,utteranceSecondHalf], [keyword,link]];
+        console.log(structure);
+        return structure;
+    }
+
+    var dummyLink = "https://earsketch.gatech.edu/landing/#/"
+    const LINKS = {
+        "parse error": dummyLink,
+        "importing":dummyLink,
+        "indented":dummyLink,
+        "index":dummyLink,
+        "name":dummyLink,
+        "syntax error":dummyLink,
+        "type error":dummyLink,
+        "function arguments":dummyLink,
+        "makeBeat":dummyLink,
+        "fitMedia":dummyLink,
+        "setEffect":dummyLink
     }
 
 

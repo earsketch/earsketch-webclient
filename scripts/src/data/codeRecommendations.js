@@ -37,41 +37,41 @@ var CAI_DELTA_LIBRARY = [
         start: { lists: 0 },
         end: { lists: 1 },
         id: 34,
-        utterance: "what if we used makeBeat with a list to make our own beat?",
+        utterance: "what if we used [LINK|makeBeat] with a list to make our own beat?",
         complexity: {lists:4, strings:3}
     },
     {
         start: { lists: 0 },
         end: { lists: 2 },
         id: 35,
-        utterance: "what if we used makeBeat with a list to make our own beat?",
+        utterance: "what if we used [LINK|makeBeat] with a list to make our own beat?",
         complexity: { lists: 4, strings: 3 }
     },
     {
         start: { lists: 1 },
         end: { lists: 2 },
         id: 36,
-        utterance: "what if we used makeBeat with a list to make our own beat?",
+        utterance: "what if we used [LINK|makeBeat] with a list to make our own beat?",
         complexity: { lists: 4, strings: 3 }
     },
     {
         start: { variables: 0 },
         end: { variables: 1 },
         id: 37,
-        utterance: "let's use the variable we just defined in a fitMedia statement",
+        utterance: "let's use the variable we just defined in a [LINK|fitMedia] statement",
         complexity: {variables:3}
     },
     {
         start: { variables: 0 },
         end: { variables: 2 },
-        utterance: "let's use the variable we just defined in a fitMedia statement",
+        utterance: "let's use the variable we just defined in a [LINK|fitMedia] statement",
         complexity: { variables: 3 }
     },
     {
         start: { variables: 1 },
         end: { variables: 2 },
         id: 38,
-        utterance: "let's use the variable we just defined in a fitMedia statement",
+        utterance: "let's use the variable we just defined in a [LINK|fitMedia] statement",
         complexity: { variables: 3 }
     },
     {
@@ -192,7 +192,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 3,
-            example: "We can make a new section using a for loop like\n for measure in range(min, max):\n    makeBeat(FILENAME, track, measure, beatstring)",
+            example: "We can make a new section using a for loop like\n for measure in range(min, max):\n    [LINK|makeBeat](FILENAME, track, measure, beatstring)",
             explain: "all of the stuff you put in sounds great. we should put in some contrast by adding other sounds later on.",
             utterance: "let's start a new section."
         },
@@ -204,7 +204,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 5,
-            example: "we could use something like this for loop:\nfor measure in range (min, max):\n    fitMedia(FILENAME, track, measure, measure + 0.5)",
+            example: "we could use something like this for loop:\nfor measure in range (min, max):\n    [LINK|fitMedia](FILENAME, track, measure, measure + 0.5)",
             explain: "it's a little bit shorter and easier to read like that",
             utterance: "i like the new section. maybe we can use a for loop to consolidate the code",
             complexity: {forLoops:1}
@@ -217,7 +217,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 7,
-            example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, 1, startMeasure, endMeasure)\n\n    fitMedia(FILENAME, 2, startMeasure, endMeasure)",
+            example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, 1, startMeasure, endMeasure)\n\n    [LINK|fitMedia](FILENAME, 2, startMeasure, endMeasure)",
             explain: "that'll let us vary our repeating sections a little",
             utterance: "what if we added some parameters to the code that makes the new section?",
             complexity: {userFunc: 4}
@@ -236,7 +236,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 10,
-            example: "this loop only puts the second sound in even-numbered measures:\n\nfor measure in range(min, max):\n    fitMedia(FILENAME, track, measure, measure + 2)\n    if (measure % 2 == 0): #if the measure number is even\n        fitMedia(FILENAME, track, measure, measure + 1)",
+            example: "this loop only puts the second sound in even-numbered measures:\n\nfor measure in range(min, max):\n    [LINK|fitMedia](FILENAME, track, measure, measure + 2)\n    if (measure % 2 == 0): #if the measure number is even\n        [LINK|fitMedia](FILENAME, track, measure, measure + 1)",
             explain: "that way we're not being repetitive every measure",
             utterance: "if we use an if statement in our loop, we can alternate some sounds in the section"
         },
@@ -266,13 +266,13 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 15,
-            example: "# Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB\nsetEffect(1, VOLUME, GAIN, startValue, startLocation, endValue, endLocation)",
-            explain: "we can use more arguments for setEffect to give us more control over how our effects behave",
+            example: "# Makes an effect ramp between measures 1 and 3, moving from -60dB to 0dB\n[LINK|setEffect](1, VOLUME, GAIN, startValue, startLocation, endValue, endLocation)",
+            explain: "we can use more arguments for [LINK|setEffect] to give us more control over how our effects behave",
             utterance: "what if we used an effects envelope?"
         },
         {
             id: 16,
-            example: "for example, this code makes a section:\n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, track, startMeasure, endMeasure)\n    fitMedia(FILENAME, track, startMeasure, endMeasure)",
+            example: "for example, this code makes a section:\n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, track, startMeasure, endMeasure)\n    [LINK|fitMedia](FILENAME, track, startMeasure, endMeasure)",
             explain: "we can use structures like helper functions and nested loops to keep our code short and flexible",
             utterance: "is there a way we can make the inside of our functions more concise?"
         },
@@ -284,7 +284,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 18,
-            example: "something like this:\n\ndef mySection(startMeasure, endMeasure):\n    fitMedia(FILENAME, track, startMeasure, endMeasure)\n    fitMedia(FILENAME, track, startMeasure, endMeasure)",
+            example: "something like this:\n\ndef mySection(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, track, startMeasure, endMeasure)\n    [LINK|fitMedia](FILENAME, track, startMeasure, endMeasure)",
             explain: "it'll let us use that code again.",
             utterance: "what if we used a custom function to make this section?",
             complexity: {userFunc:1}
@@ -297,7 +297,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 20,
-            example: "something like using a slightly different sound in each measure like this:\n\nmyDrums = [FILENAME, FILENAME, FILENAME, FILENAME]\nfor i in range(1, 4):\n    fitMedia(myDrums[i- 1], 1, i, i + 1)",
+            example: "something like using a slightly different sound in each measure like this:\n\nmyDrums = [FILENAME, FILENAME, FILENAME, FILENAME]\nfor i in range(1, 4):\n    [LINK|fitMedia](myDrums[i- 1], 1, i, i + 1)",
             explain: "it can help us be less repetitive with the section",
             utterance: "we can use some advanced topics from the curriculum to make our new section more complex and interesting"
         },
@@ -345,7 +345,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 28, //9a org
-            example: "something like:\n\nfor measure in range (min, max, step):\n    fitMedia(FILENAME, track, measure, measure + 1)\n\nor\n\nfor measure in range (min, max):\n    if(measure % 3 == 0):\n        fitMedia(FILENAME, track, measure, measure + 1)",
+            example: "something like:\n\nfor measure in range (min, max, step):\n    [LINK|fitMedia](FILENAME, track, measure, measure + 1)\n\nor\n\nfor measure in range (min, max):\n    if(measure % 3 == 0):\n        [LINK|fitMedia](FILENAME, track, measure, measure + 1)",
             explain: "this will give us more variety. we can use an if statement inside a for loop (like, if the measure number is divisible by 3, do something), or use a for loop with a step value",
             utterance: "we can use a conditional or a for loop with a step to alternate a new sound in one of our sections"
         }
@@ -364,7 +364,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 31,
-            example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, 1, startMeasure, endMeasure)\n\n    fitMedia(FILENAME, 2, startMeasure, endMeasure)",
+            example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, 1, startMeasure, endMeasure)\n\n    [LINK|fitMedia](FILENAME, 2, startMeasure, endMeasure)",
             explain: "that way, we don't have to write the same code twice",
             utterance: "we have some repeated sections. What if we used a custom function to make them?",
             complexity: {userFunc: 1}
@@ -377,7 +377,7 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 65,
-            example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    fitMedia(FILENAME, 1, startMeasure, endMeasure)\n\n    fitMedia(FILENAME, 2, startMeasure, endMeasure)",
+            example: "like: \n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, 1, startMeasure, endMeasure)\n\n    [LINK|fitMedia](FILENAME, 2, startMeasure, endMeasure)",
             explain: "that'll make our code more modular, and we can re=use that code in the future without having to type it all out",
             utterance: "so we already have a custom function, but what if we used one to make one or two of our sections?"
         },
@@ -395,13 +395,13 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 68,
-            example: "something like:\n\nsetEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)",
+            example: "something like:\n\n[LINK|setEffect](1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)",
             explain: "we can customize our sounds a little more, and it gives us more control",
             utterance: "let's put in some effects, like a filter or volume mixing"
         },
         {
             id: 69,
-            example: "something like:\n\nsetEffect(1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)",
+            example: "something like:\n\n[LINK|setEffect](1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)",
             explain: "we can specify start and end values, and chain them together if we want",
             utterance: "we could use an envelope with our effects to give us more control over how they behave."
         }

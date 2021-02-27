@@ -85,7 +85,6 @@ app.directive('caiwindow', [function () {
                     }
                     for (var msg in messages) {
                         var message = sendCAIOutputMessage(messages[msg]);
-
                         // check for code updates.
                         if (messages[msg] === "OK, I'll wait.")
                             startPeriodicCheck();
@@ -265,7 +264,8 @@ app.directive('caiwindow', [function () {
                             for (var msg in messages) {
                                 if (messages[msg] != "") {
                                     var message = sendCAIOutputMessage(messages[msg]);
-
+                                    // var a = document.getElementById("text")
+                                    // a.setAttribute("href", message.link);
                                     // check for code updates.
                                     if (messages[msg] === "OK, I'll wait.")
                                         startPeriodicCheck();
@@ -388,9 +388,12 @@ app.directive('caiwindow', [function () {
             function sendCAIOutputMessage(text) {
 
                 var message = {};
-                message.text = text;
+                message.text = text[0][0];
+                message.keyword = text[1][0];
+                message.textPartTwo = text[0][1];
                 message.date = Date.now();
                 message.sender = "CAI";
+                message.link = text[1][1];
                 return message;
             };
 
@@ -398,9 +401,11 @@ app.directive('caiwindow', [function () {
 
                 var message = {};
                 message.text = text;
+                message.keyword = "";
+                message.textPartTwo = "";
                 message.date = Date.now();
+                message.link = "";
                 message.sender = userProject.getUsername();
-
                 return message;
             };
 
