@@ -272,6 +272,8 @@ app.directive('caiwindow', [function () {
 
                                     $scope.messageListCAI[$scope.activeProject].push(message);
                                     $scope.$applyAsync();
+                                    // ReactDOM.render(<a href="https://www.youtube.com"> it worked</a>,document.getElementById("text"));
+                                    // console.log("should render...");
                                 }
                             }
                         }
