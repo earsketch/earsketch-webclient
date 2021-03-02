@@ -69,8 +69,6 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
       Contains a variety of controllers, including:
       - `dawController.js`
       - `ideController.js`
-      - `soundbrowserController.js`
-      - `scriptbrowserController.js`
 
       And many others. If you're looking at some big, visible piece of client functionality and you're wondering where it lives, the answer is probably `webclient/scripts/src/app`.
 
