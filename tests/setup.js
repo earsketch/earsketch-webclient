@@ -276,9 +276,6 @@ require('forgotPasswordController');
 require('shareController');
 require('submitAWSController');
 
-require('curriculumPaneController');
-require('curriculumSearchController');
-
 require('autograderController');
 require('autograder2Controller');
 require('autograderAWSController');

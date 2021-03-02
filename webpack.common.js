@@ -72,8 +72,6 @@ module.exports = {
             submitAWSController: path.resolve(__dirname,`${appDir}/submitAWSController.js`),
             downloadController: path.resolve(__dirname,`${appDir}/downloadController.js`),
             renameController: path.resolve(__dirname,`${appDir}/renameController.js`),
-            curriculumPaneController: path.resolve(__dirname,`${appDir}/curriculumPaneController.js`),
-            curriculumSearchController: path.resolve(__dirname,`${appDir}/curriculumSearchController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             caiWindowDirective: path.resolve(__dirname,`${appDir}/caiWindowDirective.js`),
             createScriptController: path.resolve(__dirname,`${appDir}/createScriptController.js`),

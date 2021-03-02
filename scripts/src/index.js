@@ -174,9 +174,6 @@ require(['angular'], () => {
     require('shareController');
     require('submitAWSController');
 
-    require('curriculumPaneController');
-    require('curriculumSearchController');
-
     // React components
     require('./bubble/Bubble');
     require('./browser/API');
