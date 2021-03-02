@@ -64,6 +64,13 @@ const processContent = (location, html, dispatch) => {
         script.replaceWith(copy)
     })
 
+    if (/WebKit/.test(navigator.userAgent)) {
+        // Apparent WebKit (including Safari) bug: adopted <video> elements are missing their controls.
+        // (This does not occur in Chrome or Firefox.)
+        // Workaround: clone the element.
+        root.querySelectorAll("video").forEach(video => video.replaceWith(video.cloneNode()))
+    }
+
     if (location.length < 3) {
         // No sections, leave as-is.
         return {[location]: root}
