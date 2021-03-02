@@ -990,3 +990,70 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $document.on('click', resumeAudioContext);
 }]);
+
+/**
+ * Filter for calculating last modified time unit (previously in scriptBrowserController)
+ */
+app.filter('formatTimer', function () {
+    return function (input) {
+        var seconds = Math.floor(input / 1000);
+        var minutes = Math.floor(seconds / 60);
+        var hours = Math.floor(minutes / 60);
+        var days = Math.floor(hours / 24);
+
+        if (days <= 1) {
+            if (seconds <= 0) {
+                return 'just now';
+            } else if (minutes === 0) {
+                // if (seconds === 1) {
+                //     return '1 second ago';
+                // } else {
+                //     return seconds + ' seconds ago';
+                // }
+                return 'recently';
+            } else if (hours === 0) {
+                if (minutes === 1) {
+                    return '1 minute ago';
+                } else {
+                    return minutes + ' minutes ago';
+                }
+            } else if (hours < 24) {
+                if (hours === 1) {
+                    return '1 hour ago';
+                } else {
+                    return hours + ' hours ago';
+                }
+            }
+        } else {
+            // if (days <= 1) return "today";
+            if (days > 1 && days <= 2) {
+                return "yesterday";
+            } else if (days > 2 && days <= 7) {
+                return days + " days ago";
+            } else if (days > 7) {
+                var weeks = Math.floor(days/7);
+
+                if (weeks === 1) {
+                    return "last week";
+                } else if (weeks > 1 && weeks <= 4) {
+                    return weeks + " weeks ago";
+                } else if (weeks > 4) {
+                    var months = Math.floor(weeks/4);
+
+                    if (months === 1) {
+                        return "last month";
+                    } else if (months > 1 && months < 12) {
+                        return months + " months ago";
+                    } else if (months >= 12) {
+                        var years = Math.floor(months/12);
+                        if (years <= 1) {
+                            return "last year";
+                        } else if (years > 1) {
+                            return years + " years ago";
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
