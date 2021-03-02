@@ -87,7 +87,5 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
 - There are some rogue files lying around that are ripe for removal, such as `scripts/lib/levenshtein-search.js`.
 
-- `main.js`, the former outermost entrypoint, has been superseded by `index.js` and is now defunct.
-
 - `scripts/src/model/modules.js` defines namespaces prefixed by `EarSketch.`, but it is essentially defunct. We should remove it since we're trying to clean up the global namespace anyway.
 (The only two namespaces it defines are `EarSketch.Global.ExitFlag` and `EarSketch.analytics`, and neither is actually in use as far as I can tell.)
