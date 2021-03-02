@@ -76,9 +76,6 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
       More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js` uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
 
-      This directory also contains `app.js`, the main entry point. This file decides if the system is in production mode based on the URL, and sets
-      other globals accordingly. (This is what causes to client to use `earsketch-dev.lmc.gatech.edu` when you host the client locally.)
-
 ## Notes and Maintenance TODOs
 
 - `doc/` is the destination folder for inline JSDoc generation, but it is kind of defunct.

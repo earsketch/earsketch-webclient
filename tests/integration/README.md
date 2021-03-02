@@ -24,7 +24,7 @@ To use these integration tests, you must install karma, jasmine, ngMidwayTester,
 
 When we add a new angular module or create a new service, the existing tests are likely to fail before fixing the config config and spec files.
 
-When you add a new angular module that is listed in `angular.module('EarSketchApp', ['__here__'])` in `webclient/scripts/src/app/app.js`, you should also include it in each of the spec files (such as `api.spc.js`) with `angular.module('__name__', [])`.
+When you add a new angular module that is listed in `angular.module('EarSketchApp', ['__here__'])` in `scripts/src/index.js`, you should also include it in each of the spec files (such as `api.spc.js`) with `angular.module('__name__', [])`.
 
 When you create a new angular service or factory used in various places in the EarSketch app, you should also include it in the list of loaded files in `compiler.conf.js`. 
 
