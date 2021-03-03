@@ -7,7 +7,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 
 // TODO: variable esHost with env.target for localhost Tomcat server.
-const esHost = 'https://earsketch-dev.lmc.gatech.edu';
+const esHost = 'https://api-dev.ersktch.gatech.edu';
 const wsHost = esHost.replace('http', 'ws');
 
 module.exports = env => {
@@ -15,6 +15,8 @@ module.exports = env => {
     const clientPath = (env && env.path) ? env.path : '';
     const envFile = (env && env.flags) ? env.flags : path.resolve(__dirname, 'flags.env');
     const release = (env && env.release) ? env.release : Date.now();
+    const buildConfig = (env && env.buildconfig) ? env.buildconfig : 'dev';
+    const baseURL = (env && env.baseurl) ? env.baseurl : '/';
 
     return merge(common, {
         mode: 'development', // For localhost with websocket-dev-server
@@ -28,16 +30,24 @@ module.exports = env => {
             port: port,
             hotOnly: true
         },
+        module: {
+            rules: [{
+                test: /\.less$/,
+                use: ['style-loader','css-loader','less-loader']
+            }]
+        },
         plugins: [
             // Environment variables
             new webpack.DefinePlugin({
                 BUILD_NUM: JSON.stringify(release),
+                BUILD_CONFIG: JSON.stringify(buildConfig),
+                BASE_URL: JSON.stringify(baseURL),
                 FLAGS: webpack.DefinePlugin.runtimeValue(
                     () => require('dotenv').config({ path: envFile }).parsed,
                     [envFile] // Watch the ~.env file and rebuild.
                 ),
                 URL_DOMAIN: JSON.stringify(`${esHost}/EarSketchWS`),
-                URL_WEBSOCKET: JSON.stringify(`${wsHost}/websocket`),
+                URL_WEBSOCKET: JSON.stringify(`${wsHost}/EarSketchWS`),
                 URL_SEARCHFREESOUND: JSON.stringify(`${esHost}/EarSketchWS/services/audio/searchfreesound`),
                 URL_SAVEFREESOUND: JSON.stringify(`${esHost}/EarSketchWS/services/files/uploadfromfreesound`),
                 URL_LOADAUDIO: JSON.stringify(`${esHost}/EarSketchWS/services/audio/getaudiosample`),

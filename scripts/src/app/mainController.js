@@ -5,6 +5,7 @@ import * as sounds from '../browser/soundsState';
 import * as recommenderState from '../browser/recommenderState';
 import * as bubble from '../bubble/bubbleState';
 import * as tabs from '../editor/tabState';
+import * as curriculum from '../browser/curriculumState';
 
 /**
  * @module mainController
@@ -807,7 +808,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             });
     };
 
-    $scope.shareScript = script => {
+    $scope.shareScript = async script => {
+        await userProject.saveScript(script.name, script.source_code);
         $uibModal.open({
             templateUrl: 'templates/share-script.html',
             controller: 'shareScriptController',
@@ -855,7 +857,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         exporter.print(script);
     }
 
-    $scope.openScriptHistory = (script, allowRevert) => {
+    $scope.openScriptHistory = async (script, allowRevert) => {
+        await userProject.saveScript(script.name, script.source_code);
         $uibModal.open({
             templateUrl: 'templates/script-versions.html',
             controller: 'scriptVersionController',
@@ -887,6 +890,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid);
             }
+            await userProject.saveScript(script.name, script.source_code);
             await userProject.deleteScript(script.shareid);
             reporter.deleteScript();
 
@@ -912,7 +916,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     };
 
-    $scope.submitToCompetition = script => {
+    $scope.submitToCompetition = async script => {
+        await userProject.saveScript(script.name, script.source_code);
         $uibModal.open({
             templateUrl: 'templates/submit-script-aws.html',
             controller: 'submitAWSController',
@@ -935,6 +940,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             userProject.openScript(imported.shareid);
             $rootScope.$broadcast('selectScript', script.shareid);
         }
+    };
+
+    // Note: Used in api_doc.js links to the curriculum Effects chapter.
+    $scope.loadCurriculumChapter = location => {
+        $ngRedux.dispatch(curriculum.fetchContent({ location: location.split('-') }));
     };
 
     $scope.$on('createScript', () => {
@@ -980,3 +990,70 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $document.on('click', resumeAudioContext);
 }]);
+
+/**
+ * Filter for calculating last modified time unit (previously in scriptBrowserController)
+ */
+app.filter('formatTimer', function () {
+    return function (input) {
+        var seconds = Math.floor(input / 1000);
+        var minutes = Math.floor(seconds / 60);
+        var hours = Math.floor(minutes / 60);
+        var days = Math.floor(hours / 24);
+
+        if (days <= 1) {
+            if (seconds <= 0) {
+                return 'just now';
+            } else if (minutes === 0) {
+                // if (seconds === 1) {
+                //     return '1 second ago';
+                // } else {
+                //     return seconds + ' seconds ago';
+                // }
+                return 'recently';
+            } else if (hours === 0) {
+                if (minutes === 1) {
+                    return '1 minute ago';
+                } else {
+                    return minutes + ' minutes ago';
+                }
+            } else if (hours < 24) {
+                if (hours === 1) {
+                    return '1 hour ago';
+                } else {
+                    return hours + ' hours ago';
+                }
+            }
+        } else {
+            // if (days <= 1) return "today";
+            if (days > 1 && days <= 2) {
+                return "yesterday";
+            } else if (days > 2 && days <= 7) {
+                return days + " days ago";
+            } else if (days > 7) {
+                var weeks = Math.floor(days/7);
+
+                if (weeks === 1) {
+                    return "last week";
+                } else if (weeks > 1 && weeks <= 4) {
+                    return weeks + " weeks ago";
+                } else if (weeks > 4) {
+                    var months = Math.floor(weeks/4);
+
+                    if (months === 1) {
+                        return "last month";
+                    } else if (months > 1 && months < 12) {
+                        return months + " months ago";
+                    } else if (months >= 12) {
+                        var years = Math.floor(months/12);
+                        if (years <= 1) {
+                            return "last year";
+                        } else if (years > 1) {
+                            return years + " years ago";
+                        }
+                    }
+                }
+            }
+        }
+    }
+});

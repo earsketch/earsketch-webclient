@@ -52,7 +52,6 @@ const shareScript = script => {
 };
 
 const CreateScriptButton = () => {
-    const dispatch = useDispatch();
     const ideScope = helpers.getNgController('ideController').scope();
     return (
         <div
@@ -280,6 +279,9 @@ const SingletonDropdownMenu = () => {
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
     const script = useSelector(scripts.selectDropdownMenuScript);
     const type = useSelector(scripts.selectDropdownMenuType);
+
+    // For some operations, get the most up-to-date script being kept in userProject.
+    const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript);
     const loggedIn = useSelector(state => state.user.loggedIn);
     const openTabs = useSelector(tabs.selectOpenTabs);
 
@@ -335,7 +337,7 @@ const SingletonDropdownMenu = () => {
                 visible={type==='regular'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.copyScript(script);
+                    scope.copyScript(unsavedScript);
                 }}
             />
             <MenuItem
@@ -350,21 +352,22 @@ const SingletonDropdownMenu = () => {
                 name='Download' icon='icon-cloud-download'
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.downloadScript(script);
+                    scope.downloadScript(unsavedScript);
                 }}
             />
             <MenuItem
                 name='Print' icon='icon-printer'
                 onClick={() => {
                     const exporter = helpers.getNgService('exporter');
-                    exporter.print(script);
+                    exporter.print(unsavedScript);
                 }}
             />
             <MenuItem
                 name='Share' icon='icon-share32'
                 visible={type==='regular'}
+                disabled={!loggedIn}
                 onClick={() => {
-                    shareScript(script);
+                    shareScript(unsavedScript);
                 }}
             />
             <MenuItem
@@ -373,7 +376,7 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.submitToCompetition(script);
+                    scope.submitToCompetition(unsavedScript);
                 }}
             />
             <MenuItem
@@ -381,15 +384,14 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.openScriptHistory(script, true);
+                    scope.openScriptHistory(unsavedScript, true);
                 }}
             />
             <MenuItem
                 name='Code Indicator' icon='glyphicon glyphicon-info-sign'
-                disabled={!loggedIn}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.openCodeIndicator(script);
+                    scope.openCodeIndicator(unsavedScript);
                 }}
             />
             <MenuItem
@@ -411,7 +413,7 @@ const SingletonDropdownMenu = () => {
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     if (type==='regular') {
-                        scope.deleteScript(script);
+                        scope.deleteScript(unsavedScript);
                     } else if (type==='shared') {
                         scope.deleteSharedScript(script);
                     }
@@ -522,7 +524,7 @@ const SingletonSharedScriptInfo = () => {
                     />
                     <SharedScriptInfoItem
                         title='View-Only Script Link'
-                        body={`${SITE_BASE_URI}#?sharing=${script.shareid}`}
+                        body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
                     />
                 </>)
             }
@@ -554,6 +556,10 @@ const Script = ({ script, bgTint, type }) => {
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
     const active = useSelector(tabs.selectActiveTabID) === script.shareid;
     const tabIndicator = (open||active) ? (active ? 'border-green-400' : 'opacity-50 border-green-300') : 'opacity-0';
+    const loggedIn = useSelector(state => state.user.loggedIn);
+
+    // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
+    const userProject = helpers.getNgService('userProject');
 
     let bgColor;
     if (highlight) {
@@ -601,7 +607,7 @@ const Script = ({ script, bgTint, type }) => {
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
-                        <ShareButton script={script} />
+                        { loggedIn && (<ShareButton script={userProject.scripts[script.shareid]} />) }
                         <DropdownMenuCaller script={script} type='regular' />
                     </div>
                     <div className={`${type==='shared' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>

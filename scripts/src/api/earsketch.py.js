@@ -16,7 +16,9 @@ var $builtinmodule = function (name) {
     // is called.
     mod.__ES_RESULT = new Sk.builtin.dict();
 
-    // Add MASTER_TRACK as a global constant
+    // Add MIX_TRACK as a global constant
+    mod.MIX_TRACK = new Sk.builtin.int_(0);
+    // MASTER_TRACK is a deprecated alias of MIX_TRACK
     mod.MASTER_TRACK = new Sk.builtin.int_(0);
 
     /**

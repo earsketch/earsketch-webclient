@@ -134,7 +134,7 @@ app.directive('daw', function () {
 
             $scope.$watch("vertSlider.value", function(){
                 $scope.updateTrackHeight($scope.vertSlider.value);
-                $scope.masterTrackHeight = Math.max(25,Math.round($scope.vertSlider.value/2));
+                $scope.mixTrackHeight = Math.max(25,Math.round($scope.vertSlider.value/2));
             });
 
             /**
@@ -310,7 +310,7 @@ app.directive('daw', function () {
             function prepareWaveforms(tracks, tempo) {
                 esconsole('preparing a waveform to draw', 'daw');
 
-                // ignore the master track (0) and metronome track (len-1)
+                // ignore the mix track (0) and metronome track (len-1)
                 for (var i = 1; i < tracks.length - 1; i++) {
                     tracks[i].clips.forEach(function (clip) {
                         if (!WaveformCache.checkIfExists(clip)) {
@@ -428,7 +428,7 @@ app.directive('daw', function () {
                         }}
 
                 }
-                $scope.master = $scope.tracks[0];
+                $scope.mix = $scope.tracks[0];
                 $scope.metronome = $scope.tracks[$scope.tracks.length-1];
 
                 $scope.xScale = d3.scale.linear()
@@ -447,14 +447,14 @@ app.directive('daw', function () {
                     $scope.loop.end = $scope.playLength;
                 }
 
-                if (typeof $scope.master !== "undefined") {
-                    var effects = $scope.master.effects;
+                if (typeof $scope.mix !== "undefined") {
+                    var effects = $scope.mix.effects;
                     var num = Object.keys(effects).length;
-                    $scope.master.visible = num > 0;
-                    $scope.master.mute = false;
-                    // the master track is special
-                    $scope.master.label = 'MASTER';
-                    $scope.master.buttons = false;
+                    $scope.mix.visible = num > 0;
+                    $scope.mix.mute = false;
+                    // the mix track is special
+                    $scope.mix.label = 'MIX';
+                    $scope.mix.buttons = false;
                 }
                 if (typeof $scope.metronome !== "undefined") {
                     $scope.metronome.visible = false;
@@ -1252,13 +1252,13 @@ app.directive('dawTimeline', function () {
 });
 
 /**
- * Angular directive / controller for DAW master track
- * @module dawMasterTrack
+ * Angular directive / controller for DAW mix track
+ * @module dawMixTrack
  */
-app.directive('dawMasterTrack', function () {
+app.directive('dawMixTrack', function () {
     return {
         require: '^daw',
-        templateUrl: 'templates/daw-master-track.html',
+        templateUrl: 'templates/daw-mix-track.html',
         transclude: true,
         link: function (scope, element) {
             // scale width to zoom amount
@@ -1323,8 +1323,8 @@ app.directive('dawTrack', function () {
 
                 }
 
-                // master and metronome are unaffected
-                $scope.master.mute = false;
+                // mix and metronome are unaffected
+                $scope.mix.mute = false;
                 $scope.metronome.mute = temp;
                 player.setMutedTracks($scope.tracks);
             };
@@ -1346,8 +1346,8 @@ app.directive('dawTrack', function () {
                     }
                 }
 
-                // master and metronome are unaffected
-                $scope.master.mute = false;
+                // mix and metronome are unaffected
+                $scope.mix.mute = false;
                 $scope.metronome.mute = temp;
                 player.setMutedTracks($scope.tracks);
             }

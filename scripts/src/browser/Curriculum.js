@@ -136,8 +136,8 @@ const CurriculumSearchResults = () => {
     return (showResults &&
         <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
-            <a key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
-                <div className={`search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
+            <a tabIndex="0" key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
+                <div className={`px-5 py-2 search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
             </a>)}
         </div>
     )
@@ -192,6 +192,36 @@ const CurriculumPane = () => {
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef()
 
+    useEffect(() => {
+        if (content) {
+            curriculumBody.current.appendChild(content)
+            curriculumBody.current.scrollTop = 0
+            return () => content.remove()
+        }
+    }, [content])
+
+    useEffect(() => {
+        // <script> tags in the content may add elements to the DOM,
+        // so we wrap this in a useEffect() and run it after inserting the content.
+        if (content) {
+            // Filter content by language.
+            const p = (language === 'python')
+            content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
+            content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
+            content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
+            content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
+
+            // Apply color theme to code blocks.
+            if (theme === 'light') {
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.add('default-pygment'))
+            } else {
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
+            }
+        }
+    }, [content, language])
+
     // Highlight search text matches found in the curriculum.
     const hilitor = new Hilitor("curriculum-body")
     const searchText = useSelector(curriculum.selectSearchText)
@@ -199,32 +229,7 @@ const CurriculumPane = () => {
     useEffect(() => {
         hilitor.apply(searchText)
         return () => hilitor.remove()
-    })
-
-    if (content) {
-        // Filter content by language.
-        const p = (language === 'python')
-        content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
-        content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
-        content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
-        content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
-
-        // Apply color theme to code blocks.
-        if (theme === 'light') {
-            content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
-            content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.add('default-pygment'))
-        } else {
-            content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
-            content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
-        }
-    }
-
-    useEffect(() => {
-        if (content) {
-            curriculumBody.current.appendChild(content)
-            return () => content.remove()
-        }
-    }, [content])
+    }, [content, searchText])
 
     return (
         <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
@@ -326,7 +331,19 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
 
+
         $rootScope = props.$rootScope
+        // Hack to facilitate Angular loading curriculum page for errors in console.
+        // TODO: Remove this after we've ported templates/index.html to React.
+        $rootScope.loadChapterForError = (errorMessage) => {
+            const aliases = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
+            const types = ["importerror", "indentationerror", "indexerror", "nameerror",
+                           "parseerror", "syntaxerror", "typeerror", "valueerror"]
+            let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+            type = aliases[type] || type
+            const anchor = types.includes(type) ? '#' + type : ''
+            props.$ngRedux.dispatch(curriculum.fetchContent({ url: `ch_29.html${anchor}` }))
+        }
         initialized = true
     }
 

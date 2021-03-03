@@ -1,11 +1,14 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="<%= BASE_URL %>">
     <meta charset="UTF-8">
     <title>EarSketch</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="scripts/vendor/newrelic/newrelicbrowser.<%= BUILD_CONFIG %>.js"></script>
 
     <!-- Suppress favicon error -->
-    <link rel="shortcut icon" href="#">
+    <link rel="shortcut icon" href="favicon.ico">
 
     <!-- Angular UI Layout -->
     <link rel="stylesheet" type="text/css" href="scripts/lib/ui-layout.css">
@@ -27,10 +30,6 @@
 
     <link rel="stylesheet" type="text/css" href="css/vendor/colpick.css" />
 
-    <!-- LESS -->
-    <link rel="stylesheet" type="text/css" href="css/earsketch/allstyles.css">
-
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="google-site-verification" content="ojwZ1r7MVOTRWsiqPITqwmhCOUou2CcqxRMG6itoci4"/>
 </head>
 <body ng-controller="mainController as mainCtrl" ng-init="init()" ng-keydown="keydownES($event)">
@@ -249,11 +248,6 @@
                     <i class="icon icon-embed2"><span class="path1"></span><span class="path2"></span></i>
                 </button>
 
-                <!-- Share Browser -->
-<!--                <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 2}" id="sidenav-sharebrowser" data-toggle="tooltip" title="Share" ng-click="toggleSidebarTab('share')">-->
-<!--                    <i class="icon icon-share-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>-->
-<!--                </button>-->
-
                 <!-- API Browser -->
                 <button class="sidenav-button btn btn-primary" ng-class="{'sidenav-button-transparent': layout.browser !== 3}" id="sidenav-apibrowser" data-toggle="tooltip" title="API" ng-click="toggleSidebarTab('api');">
 <!--                    <i class="icon icon-api-browser"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>-->
@@ -306,10 +300,6 @@
                         </uib-tab>
                         <uib-tab id="tab-scriptbrowser" index="1" select="openSidebarTab('script')">
                             <script-browser></script-browser>
-                        </uib-tab>
-                        <uib-tab id="tab-sharebrowser" index="2" select="openSidebarTab('share')">
-                            <!--<uib-tab-heading>Share</uib-tab-heading>-->
-                            <div sharebrowser></div>
                         </uib-tab>
                         <uib-tab id="tab-apibrowser" index="3" select="openSidebarTab('api')">
                             <api-browser></api-browser>

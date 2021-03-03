@@ -43,9 +43,8 @@ const processContent = (location, html, dispatch) => {
         }
     })
 
-    // This has a weird URL (why does "<toc.html>" open the API browser?) and is only used in one place (Ch. 27).
-    // Can we get rid of it?
-    root.querySelectorAll('a[href="<toc.html>"]').forEach(el => {
+    // Used in 4.1, 27.
+    root.querySelectorAll('a[href="<api>"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             // TODO: Update this when we replace the layoutController.
@@ -64,6 +63,13 @@ const processContent = (location, html, dispatch) => {
         copy.innerText = script.innerText
         script.replaceWith(copy)
     })
+
+    if (/WebKit/.test(navigator.userAgent)) {
+        // Apparent WebKit (including Safari) bug: adopted <video> elements are missing their controls.
+        // (This does not occur in Chrome or Firefox.)
+        // Workaround: clone the element.
+        root.querySelectorAll("video").forEach(video => video.replaceWith(video.cloneNode()))
+    }
 
     if (location.length < 3) {
         // No sections, leave as-is.

@@ -7,6 +7,8 @@
 app.factory('compiler',
 ['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','ESUtils','esconsole','$q',
 function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,ESUtils,esconsole,$q) {
+    let testRun = false;
+
     /**
      * After compiling code, go through each clip, load the audio file and
      * replace looped ones with multiple clips. Why? Because we don't know
@@ -172,6 +174,7 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
      */
     function recursiveNameCheckPY(code, undefinedNames) {
         try {
+            testRun = true;
             Sk.importMainWithBody('<stdin>',false,code,true);
         } catch (e) {
             if (e.tp$name && e.tp$name === 'NameError') {
@@ -188,6 +191,8 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
                 }
 
             }
+        } finally {
+            testRun = false;
         }
         return undefinedNames;
     }
@@ -355,6 +360,7 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
             interpreter.setProperty(interpreter.getScope().object,v,v);
         });
         try {
+            testRun = true;
             runJsInterpreter(interpreter);
         } catch(e) {
             if (e instanceof ReferenceError) {
@@ -363,6 +369,8 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
                 undefinedNames.push(name);
                 return recursiveNameCheckJS(code, undefinedNames, tags, quality);
             }
+        } finally {
+            testRun = false;
         }
         return undefinedNames;
     }
@@ -939,6 +947,15 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
     }
 
     /**
+     * Indicates whether this is a test run or a "real" (user-visible) run.
+     * 
+     * @returns {boolean}
+     */
+    function isTestRun() {
+        return testRun;
+    }
+
+    /**
      * Return the public functions in this service.
      *
      * @returns {object} The public functions in this service.
@@ -948,7 +965,8 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
         importPython: importPython,
         compilePython: compilePython,
         compileJavascript: compileJavascript,
-        loadBuffersForSampleSlicing: loadBuffersForSampleSlicing
+        loadBuffersForSampleSlicing: loadBuffersForSampleSlicing,
+        isTestRun: isTestRun,
     };
 
 }]);
