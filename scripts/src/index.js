@@ -187,6 +187,7 @@ require(['angular'], () => {
     require('./browser/Sounds');
     require('./browser/Scripts');
     require('./browser/Curriculum');
+    require('./app/GlobalOptions')
 
     // Autograders
     require('autograderController');
