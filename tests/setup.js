@@ -276,13 +276,6 @@ require('forgotPasswordController');
 require('shareController');
 require('submitAWSController');
 
-require('soundBrowserController');
-require('scriptBrowserController');
-require('shareBrowserController');
-require('apiBrowserController');
-require('curriculumPaneController');
-require('curriculumSearchController');
-
 require('autograderController');
 require('autograder2Controller');
 require('autograderAWSController');

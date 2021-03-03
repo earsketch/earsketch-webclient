@@ -69,15 +69,10 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
       Contains a variety of controllers, including:
       - `dawController.js`
       - `ideController.js`
-      - `soundbrowserController.js`
-      - `scriptbrowserController.js`
 
       And many others. If you're looking at some big, visible piece of client functionality and you're wondering where it lives, the answer is probably `webclient/scripts/src/app`.
 
       More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js` uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
-
-      This directory also contains `app.js`, the main entry point. This file decides if the system is in production mode based on the URL, and sets
-      other globals accordingly. (This is what causes to client to use `earsketch-dev.lmc.gatech.edu` when you host the client locally.)
 
 ## Notes and Maintenance TODOs
 
@@ -86,8 +81,6 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 - Bower is around but unused, previously due to people including hard copies of libraries, and (going forward) due to our using Webpack + NPM instead.
 
 - There are some rogue files lying around that are ripe for removal, such as `scripts/lib/levenshtein-search.js`.
-
-- `main.js`, the former outermost entrypoint, has been superseded by `index.js` and is now defunct.
 
 - `scripts/src/model/modules.js` defines namespaces prefixed by `EarSketch.`, but it is essentially defunct. We should remove it since we're trying to clean up the global namespace anyway.
 (The only two namespaces it defines are `EarSketch.Global.ExitFlag` and `EarSketch.analytics`, and neither is actually in use as far as I can tell.)
