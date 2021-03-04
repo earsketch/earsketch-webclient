@@ -524,7 +524,7 @@ const SingletonSharedScriptInfo = () => {
                     />
                     <SharedScriptInfoItem
                         title='View-Only Script Link'
-                        body={`${SITE_BASE_URI}#?sharing=${script.shareid}`}
+                        body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
                     />
                 </>)
             }

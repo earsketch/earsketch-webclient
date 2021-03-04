@@ -1,4 +1,5 @@
 // Global imports of CSS
+import '../../css/earsketch/allstyles.less'
 import './tailwind.css';
 
 import { configureStore } from '@reduxjs/toolkit';
@@ -105,7 +106,7 @@ require(['angular'], () => {
         'ngRedux'
     ]).config($locationProvider => {
         // Prevent legacy hash-bang URL being overwritten by $location.
-        $locationProvider.html5Mode(false).hashPrefix('');
+        $locationProvider.html5Mode(true).hashPrefix('');
     }).config($ngReduxProvider => {
         $ngReduxProvider.provideStore(store);
     });
@@ -172,13 +173,6 @@ require(['angular'], () => {
     require('forgotPasswordController');
     require('shareController');
     require('submitAWSController');
-
-    require('soundBrowserController');
-    require('scriptBrowserController');
-    require('shareBrowserController');
-    require('apiBrowserController');
-    require('curriculumPaneController');
-    require('curriculumSearchController');
 
     // React components
     require('./bubble/Bubble');
