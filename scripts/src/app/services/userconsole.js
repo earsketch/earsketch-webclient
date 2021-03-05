@@ -181,8 +181,9 @@ function ($rootScope, $window, $timeout, $uibModal) {
         // need defer
         $timeout(function () {
             var c = document.getElementById('console-frame');
-            if (c)
+            if (c) {
                 c.scrollTop = c.scrollHeight;
+            }
         });
     }
 
