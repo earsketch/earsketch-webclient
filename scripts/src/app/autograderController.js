@@ -287,9 +287,6 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
         reference = angular.copy(reference);
         test = angular.copy(test);
 
-        // delete reference.master;
-        // delete test.master;
-
         // sort clips so clips inserted in different orders will not effect
         // equality.
         sortClips(reference);
