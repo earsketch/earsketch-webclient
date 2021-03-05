@@ -304,10 +304,10 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
           });
         }
 
-        var retVal = JSON.stringify(reference.tracks) == JSON.stringify(test.tracks);
+        var retVal = JSON.stringify(reference) == JSON.stringify(test);
         var diffString = "";
         if(!retVal){
-          diffString = "\n\n" + JSON.stringify(reference, Object.keys(reference).sort()); + "\n\n" + JSON.stringify(test, Object.keys(test).sort());
+          diffString = "\n\n" + JSON.stringify(reference) + "\n\n" + JSON.stringify(test);
         }
         //AVN LOG
         //console.log("RESULT_DIFF", $scope.compareCount, $scope.activeFile, diffString);
