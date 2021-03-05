@@ -767,11 +767,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         window.open('https://twitter.com/earsketch', '_blank');
     };
 
-    $scope.resumeQuickTour = () => {
-        $ngRedux.dispatch(bubble.reset());
-        $ngRedux.dispatch(bubble.resume());
-    };
-
     $scope.renameSound = sound => {
         $uibModal.open({
             templateUrl: 'templates/rename-sound.html',
