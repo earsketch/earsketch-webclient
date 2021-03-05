@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "allowJs": false,
+        "moduleResolution": "Node",
+        "baseUrl": "./scripts",
+        "paths": {
+            "helpers": ["./src/helpers.js"]
+        }
+    }
+}

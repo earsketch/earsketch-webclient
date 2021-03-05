@@ -19,7 +19,7 @@ module.exports = {
         main: './scripts/src/index.js'
     },
     resolve: {
-        extensions: ['*','.js','.jsx','.mjs','.wasm','.json','.css'],
+        extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
             tabdrop: 'bootstrap-tabdrop-ro/js/bootstrap-tabdrop.js',
@@ -178,6 +178,10 @@ module.exports = {
             test: /\.(js|jsx|mjs)$/,
             use: 'react-hot-loader/webpack',
             include: /node_modules/
+        }, {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/
         }, {
             test: /\.css$/,
             use: ['style-loader','css-loader','postcss-loader']
