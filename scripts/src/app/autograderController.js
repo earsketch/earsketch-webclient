@@ -307,9 +307,6 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
           });
         }
 
-        console.log(JSON.stringify(reference));
-        console.log(JSON.stringify(test));
-
         var retVal = JSON.stringify(reference.tracks) == JSON.stringify(test.tracks);
         var diffString = "";
         if(!retVal){
