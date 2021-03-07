@@ -294,14 +294,13 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             var storedScripts;
 
-            if (result.data === null) {
-                // no scripts
-                return [];
-            } else if (result.data.scripts instanceof Array) {
-                storedScripts = result.data.scripts;
-            } else {
-                // one script -- somehow this gets parsed to one object
-                storedScripts = [result.data.scripts];
+            if (result.data) {
+                if (result.data.scripts instanceof Array) {
+                    storedScripts = result.data.scripts;
+                } else {
+                    // one script -- somehow this gets parsed to one object
+                    storedScripts = [result.data.scripts];
+                }
             }
 
             resetScripts();
