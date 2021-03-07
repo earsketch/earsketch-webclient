@@ -360,22 +360,21 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
                 resetOpenScripts();
 
-                $q.all(promises).then(function (savedScripts) {
-                    refreshCodeBrowser().then(function () {
+                return $q.all(promises).then(function (savedScripts) {
+                    localStorage.remove(LS_SCRIPTS_KEY);
+                    localStorage.remove(LS_TABS_KEY);
+
+                    return refreshCodeBrowser().then(function () {
                         // once all scripts have been saved open them
                         angular.forEach(savedScripts, function(savedScript) {
                             openScript(savedScript.shareid);
                         });
                     });
-                });
-
-                localStorage.remove(LS_SCRIPTS_KEY);
-                localStorage.remove(LS_TABS_KEY);
+                }).then(() => getSharedScripts(username, password));
+            } else {
+                // load scripts in shared browser
+                return getSharedScripts(username, password);
             }
-
-            // load scripts in shared browser
-            return getSharedScripts(username, password);
-
         }, function(err) {
             esconsole('Login failure', ['DEBUG','ERROR']);
             esconsole(err.toString(), ['DEBUG','ERROR']); // TODO: this shows as [object object]?
