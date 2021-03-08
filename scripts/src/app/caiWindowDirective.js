@@ -1,3 +1,4 @@
+import * as helpers from '../helpers'
 app.directive('caiwindow', [function () {
 
     return {
@@ -264,6 +265,7 @@ app.directive('caiwindow', [function () {
                             for (var msg in messages) {
                                 if (messages[msg] != "") {
                                     var message = sendCAIOutputMessage(messages[msg]);
+                                    // console.log("helpers", helpers);
                                     // var a = document.getElementById("text")
                                     // a.setAttribute("href", message.link);
                                     // check for code updates.
@@ -373,6 +375,11 @@ app.directive('caiwindow', [function () {
                 return Date.now() - message.date;
             };
 
+            $scope.openCurr = function(message) {
+                layoutScope.loadCurriculumChapter(message.curr); 
+                layoutScope.toggleLayout('curriculum')
+            }
+
             function processCompilationMessage(data) {
                 if (data.text === 'success') {
                     data.result = 'success';
@@ -396,6 +403,7 @@ app.directive('caiwindow', [function () {
                 message.date = Date.now();
                 message.sender = "CAI";
                 message.link = text[1][1];
+                message.curr = text[1][1];
                 return message;
             };
 
@@ -407,6 +415,7 @@ app.directive('caiwindow', [function () {
                 message.textPartTwo = "";
                 message.date = Date.now();
                 message.link = "";
+                message.curr = ""
                 message.sender = userProject.getUsername();
                 return message;
             };

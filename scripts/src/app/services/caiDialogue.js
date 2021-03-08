@@ -755,17 +755,17 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     var dummyLink = "https://earsketch.gatech.edu/landing/#/"
     const LINKS = {
-        "parse error": dummyLink,
-        "importing":dummyLink,
-        "indented":dummyLink,
-        "index":dummyLink,
-        "name":dummyLink,
-        "syntax error":dummyLink,
-        "type error":dummyLink,
-        "function arguments":dummyLink,
-        "makeBeat":dummyLink,
+        "parse error": "5-2-4",
+        "importing":"5-2-0",
+        "indented":"5-2-1",
+        "index":"5-2-2",
+        "name":"5-2-3",
+        "syntax error":"5-2-5",
+        "type error":"5-2-6",
+        "function arguments":"5-2-7",
+        "makeBeat":"2-3-2",
         "fitMedia":dummyLink,
-        "setEffect":dummyLink
+        "setEffect":"1-1-4"
     }
 
 
