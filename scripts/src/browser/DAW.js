@@ -403,6 +403,190 @@ const Slider = ({ value, onChange, options, title }) => {
 
 // More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition, dawTimeline, dawMeasureline
 
+// Pulled in via angular dependencies
+let WaveformCache, ESUtils
+
+const rms = (array) => {
+    return Math.sqrt(array.map(function (v) {
+        return Math.pow(v, 2);
+    }).reduce(function (a, b) { return a + b; }) / array.length);
+}
+
+const prepareWaveforms = (tracks, tempo) => {
+    esconsole('preparing a waveform to draw', 'daw');
+
+    // ignore the mix track (0) and metronome track (len-1)
+    for (var i = 1; i < tracks.length - 1; i++) {
+        tracks[i].clips.forEach(function (clip) {
+            if (!WaveformCache.checkIfExists(clip)) {
+                var waveform = clip.audio.getChannelData(0);
+
+                // uncut clip duration
+                var wfDurInMeasure = ESUtils.timeToMeasure(clip.audio.duration, tempo);
+
+                // clip start in samples
+                var sfStart = (clip.start-1) / wfDurInMeasure  * waveform.length;
+                var sfEnd = (clip.end-1) / wfDurInMeasure  * waveform.length;
+
+                // suppress error when clips are overlapped
+                if (sfEnd <= sfStart) {
+                    return null;
+                }
+
+                // extract waveform portion actually used
+                var subFrames = waveform.subarray(sfStart, sfEnd);
+
+                var out = [];
+                var N = 30; // resolution; total samples to draw per measure
+
+                // downsample to N values using block-wise RMS
+                var outNumSamps = (clip.end-clip.start) * N;
+                for (var i = 0; i < outNumSamps; i++) {
+                    var blStart = i/outNumSamps * subFrames.length;
+                    var blEnd = (i+1)/outNumSamps * subFrames.length;
+                    out[i] = rms(subFrames.subarray(blStart, blEnd));
+                }
+
+                // check: makebeat need special loop treatment or not???
+
+                WaveformCache.add(clip, out);
+            }
+        });
+    }
+}
+
+
+let setupDone = false
+const setup = () => {
+    if (setupDone) return
+    setupDone = true
+
+    const $scope = helpers.getNgController('ideController').scope()
+    // everything in here gets reset when a new project is loaded
+    // Listen for the IDE to compile code and return a JSON result
+    $scope.$watch('compiled', function (result) {
+        console.log("compiled result:", result)
+        if (result === null || result === undefined) return
+
+        esconsole('code compiled', 'daw')
+        prepareWaveforms(result.tracks, result.tempo)
+
+        // TODO: bring over the rest of this
+        return
+
+        if (!$scope.preserve.playPosition) {
+            $scope.playPosition = 1;
+        }
+
+        // overwrite the current script result, create a copy so we
+        // can non-destructively modify it.
+        // TODO: use a different data structure for destructive modifications
+        // so we don't waste memory
+        $scope.result = result;
+
+        $scope.$on('resetScrollBars', function () {
+            $scope.resetScrollPos();
+        });
+
+        $scope.tempo = $scope.result.tempo;
+        $scope.beatsPerBar = 4;
+        // this is the measure number where the script ends
+        $scope.playLength = result.length + 1;
+        $scope.songDuration = ($scope.playLength*$scope.beatsPerBar)/($scope.tempo/60);
+
+        if ($scope.freshPallete) {
+            var result_ = $scope.getZoomIntervals($scope.playLength,$scope.zoomLevels);
+            if (result_) {
+                $scope.horzSlider.value = result_.zoomLevel;
+                $scope.updateTrackWidth($scope.horzSlider.value);
+            }
+            $scope.freshPallete = false;
+        }
+
+        $scope.tracks = []; //$scope.result.tracks;
+
+        if (!$scope.preserve.trackColors) {
+            $scope.fillTrackColors($scope.result.tracks.length-1);
+        }
+
+        //We want to keep the length of a bar proportional to number of pixels on the screen
+        //We also don't want this proportion to change based on songs of different length
+        //So, we set a default number of measures that we want the screen to fit in
+        $scope.measuresFitToScreen = 61; //default length for scaling trackWidth
+        $scope.secondsFitToScreen = ($scope.measuresFitToScreen * $scope.beatsPerBar)/($scope.tempo/60);
+
+        for (var i in $scope.result.tracks) {
+            if ($scope.result.tracks.hasOwnProperty(i)) {
+                i = parseInt(i); // for some reason this isn't always a str
+                // create a (shallow) copy of the track so that we can
+                // add stuff to it without affecting the reference which
+                // we want to preserve (e.g., for the autograder)
+                var track = angular.extend({}, $scope.result.tracks[i]);
+                $scope.tracks.push(track);
+
+                track.visible = true;
+                track.solo = $scope.preserve.solo.indexOf(i) > -1;
+                track.mute = $scope.preserve.muted.indexOf(i) > -1;
+                track.label = i;
+                track.buttons = true; // show solo/mute buttons
+
+                for (var j in track.effects) {
+                    // not sure what this is trying to do (ref. line 131)?
+                    // var effect = track.effects[j];
+                    // track.effects[j] = angular.extend({}, track.effects[j]);
+                    // effect.visible = $scope.preserve.effects;
+                    // effect.bypass = $scope.preserve.bypass.indexOf
+
+                    if (track.effects.hasOwnProperty(j)) {
+                        track.effects[j].visible = $scope.preserve.effects;
+                        track.effects[j].bypass = $scope.preserve.bypass.indexOf(j) > -1;
+                    }
+                }
+            }
+        }
+        $scope.mix = $scope.tracks[0];
+        $scope.metronome = $scope.tracks[$scope.tracks.length-1];
+
+        $scope.xScale = d3.scale.linear()
+            .domain([1, $scope.measuresFitToScreen]) // measures start at 1
+            .range([0, $scope.trackWidth]);
+
+        $scope.timeScale = d3.scale.linear()
+            .domain([0, $scope.secondsFitToScreen]) // time starts at 0
+            .range([0, $scope.trackWidth]);
+
+        // sanity checks
+        if ($scope.loop.start > $scope.playLength) {
+            $scope.loop.start = 1;
+        }
+        if ($scope.loop.end > $scope.playLength) {
+            $scope.loop.end = $scope.playLength;
+        }
+
+        if (typeof $scope.mix !== "undefined") {
+            var effects = $scope.mix.effects;
+            var num = Object.keys(effects).length;
+            $scope.mix.visible = num > 0;
+            $scope.mix.mute = false;
+            // the mix track is special
+            $scope.mix.label = 'MIX';
+            $scope.mix.buttons = false;
+        }
+        if (typeof $scope.metronome !== "undefined") {
+            $scope.metronome.visible = false;
+            $scope.metronome.mute = !$scope.preserve.metronome;
+            $scope.metronome.effects = {};
+        }
+
+        player.setRenderingData($scope.result);
+        player.setMutedTracks($scope.tracks);
+        player.setBypassedEffects($scope.tracks);
+
+        $scope.freshPallete = false;
+        $scope.$broadcast('setPanelPosition');
+    });
+}
+
 const DAW = () => {
     // TODO
     const embeddedScriptName = "TODO"
@@ -490,6 +674,9 @@ const DAW = () => {
 }
 
 const HotDAW = hot(props => {
+    WaveformCache = props.WaveformCache
+    ESUtils = props.ESUtils
+    setup()
     return (
         <Provider store={props.$ngRedux}>
             <DAW />
@@ -497,4 +684,4 @@ const HotDAW = hot(props => {
     );
 });
 
-app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux']))
+app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache']))
