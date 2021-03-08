@@ -6,8 +6,6 @@ import { react2angular } from 'react2angular'
 import * as daw from './dawState'
 
 import * as helpers from "../helpers";
-import { reset } from '../bubble/bubbleState'
-import { PAUSE } from 'redux-persist'
 
 // TODO
 const isEmbedded = false
@@ -116,6 +114,115 @@ const Header = () => {
     </div>
 }
 
+const Track = () => {
+    // TODO
+    return <div></div>
+}
+
+const MixTrack = () => {
+    // TODO
+    return <div></div>
+}
+
+const Highlight = ({ style }) => {
+    // TODO
+    // return {
+    //     restrict: 'E',
+    //     scope: {},
+    //     link: function (scope, element) {
+    //         element.addClass('daw-highlight');
+    //         element.css('top', '0px');
+    //     }
+    // }
+    return <div style={style}></div>
+}
+
+const Cursor = () => {
+    // TODO
+    // app.directive('dawCursor', function () {
+    //     return {
+    //         restrict: 'E',
+    //         scope: {},
+    //         link: function (scope, element) {
+    //             element.addClass('daw-cursor');
+    //             element.css('top', '0px');
+    
+    //             scope.$on('setSchedPlayheadVisibility', function (event, visible) {
+    //                 if (visible) {
+    //                     element.removeClass('daw-cursor');
+    //                 } else {
+    //                     element.addClass('daw-cursor');
+    //                 }
+    //             });
+    
+    //             scope.$on('setCurrentPosition', function (event, position) {
+    //                 element.addClass('daw-cursor'); // this is safe
+    //                 element.css('left', position + 'px');
+    //             });
+    
+    //             scope.$on('adjustTopPostition', function (event, position) {
+    //                 element.css('top', position + 'px');
+    //             });
+    //         }
+    //     }
+    // });
+    return <div></div>
+}
+
+const Playhead = () => {
+    // return {
+    //     restrict: 'E',
+    //     scope: {},
+    //     link: function (scope, element) {
+    //         element.addClass('daw-marker');
+    //         element.css('top', '0px');
+
+    //         scope.$on('adjustPlayHead', function (event, topPos) {
+    //             element.css('top', topPos + 'px');
+    //         });
+
+    //         scope.$on('setPlayHeadPosition', function (event, currentPosition) {
+    //             element.css('left', currentPosition + 'px');
+    //         });
+    //     }
+    // }
+    return <div></div>
+}
+
+const SchedPlayhead = () => {
+    // return {
+    //     restrict: 'E',
+    //     scope: {},
+    //     link: function (scope, element) {
+    //         element.css('top', '0px');
+
+    //         scope.$on('adjustPlayHead', function (event, topPos) {
+    //             element.css('top', topPos + 'px');
+    //         });
+
+    //         scope.$on('setSchedPlayheadPosition', function (event, currentPosition) {
+    //             element.css('left', currentPosition + 'px');
+    //         });
+
+    //         scope.$on('setSchedPlayheadVisibility', function (event, visible) {
+    //             if (visible) {
+    //                 element.addClass('daw-sched-marker');
+    //             } else {
+    //                 element.removeClass('daw-sched-marker');
+    //             }
+    //         });
+    //     }
+    // }
+    return <div></div>
+}
+
+const Slider = ({ value, onChange, options, title }) => {
+    console.log("TODO", options)
+    return <input type="range" value={value} onChange={onChange} title={title} />
+}
+
+// More directives: widthExceeded, sizeChanged, dawContainer, trackEffectPanelPosition, dawTimeline, dawMeasureline
+
 const DAW = () => {
     // TODO
     const embeddedScriptName = "TODO"
@@ -126,6 +233,8 @@ const DAW = () => {
     const dragging = false
     const vertScrollPos = 0
     const tracks = {}
+    const horzSlider = {value: 0, options: {}}
+    const vertSlider = {value: 0, options: {}}
 
     const toggleEffects = todo
     const hasEffects = todo
@@ -146,7 +255,7 @@ const DAW = () => {
             {/* Horizontal Zoom Slider */}
             <div id="horz-zoom-slider-container" className="flex-grow-0">
                 <span className="zoom-out">-</span>
-                {/*<rzslider rz-slider-model="horzSlider.value" rz-slider-options="horzSlider.options" title="Slide to zoom-in/out"></rzslider>*/}
+                <Slider value={horzSlider.value} onChange={(x) => horzSlider.value = x} options={horzSlider.options} title="Slide to zoom-in/out"/>
                 <span className="zoom-in">+</span>
             </div>
 
@@ -154,7 +263,7 @@ const DAW = () => {
                 {/* Vertical Zoom Slider */}
                 <div id="vert-zoom-slider-container" className="flex-grow-0 h-full">
                     <span className="zoom-out">-</span>
-                    {/*<rzslider rz-slider-model="vertSlider.value" rz-slider-options="vertSlider.options" title="Slide to change track height"></rzslider>*/}
+                    <Slider value={vertSlider.value} onChange={(x) => vertSlider.value = x} options={vertSlider.options} title="Slide to change track height"/>
                     <span className="zoom-in">+</span>
                 </div>
 
@@ -179,20 +288,20 @@ const DAW = () => {
                             Object.entries(tracks).map(([[trackNum, track], index]) => {
                                 if (track.visible) {
                                     if (index === 0) {
-                                        return <div/> /* Directive dawMixTrack */
+                                        return <MixTrack />
                                     } else if (index < tracks.length - 1) {
-                                        return <div/> /* Directive dawTrack */
+                                        return <Track />
                                     }
                                 }
                             })}
                         </div>
 
                         <div className="absolute top-0 left-0 h-full">
-                            <daw-play-head></daw-play-head>
-                            <daw-sched-playhead></daw-sched-playhead>
-                            <daw-cursor></daw-cursor>
+                            <Playhead />
+                            <SchedPlayhead />
+                            <Cursor />
                             {(dragging || loop.selection && loop.on) && loop.end != loop.start &&
-                            <daw-highlight style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos, 'left': xScale(Math.min(loop.start, loop.end))}}></daw-highlight>}
+                            <Highlight style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos, 'left': xScale(Math.min(loop.start, loop.end))}} />}
                         </div>
                     </div>
                 </div>
