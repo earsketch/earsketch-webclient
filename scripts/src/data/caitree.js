@@ -560,7 +560,7 @@ const CAI_ERRORS = {
     "ParseError": "looks like you've got a [LINK|parse error]. I think we might be missing something.",
     "ImportError": "something's not [LINK|importing] right. do we have the right package name up top?",
     "IndentationError": "looks like one of our lines isn't [LINK|indented] right.",
-    "IndexError": "i think this means we're trying to use an [INDEX|index] that doesn't exist.",
+    "IndexError": "i think this means we're trying to use an [LINK|index] that doesn't exist.",
     "NameError": "i think we're trying to use a variable or function that we haven't defined, or maybe we misspelled a [LINK|name].",
     "SyntaxError": "we have a [LINK|syntax error], which might mean that we're using the wrong operator.",
     "TypeError": "it's saying [LINK|type error], which means that we put in the wrong kind of data, or we're missing something.",

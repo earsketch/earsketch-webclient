@@ -719,20 +719,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             soundWait.sounds = [];
         }
 
-        var utteranceFirstHalf = utterance;
-        var utteranceSecondHalf = "";
-        var keyword = ""
-        var link = ""
-        //does one iterations/ assumes one appearance
-        if (utterance.includes("[LINK")) {
-
-            keyword = utterance.substring(utterance.indexOf("[LINK") + 6, utterance.indexOf("]"));
-            // keyword = keyword.link("google.com")
-            link = LINKS[keyword];
-            utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
-            utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length - 1);
-            console.log(utterance);
-        }
+        var structure = getLinks(utterance);
 
         if (nodeHistory[activeProject] && utterance != "") {
             // Add current node (by node number) and paramters to node history
@@ -747,25 +734,82 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             // reconstituteNodeHistory();
         }
 
-        console.log("hi", keyword)
-        var structure = [[utteranceFirstHalf,utteranceSecondHalf], [keyword,link]];
+        return structure;
+    }
+
+    function getLinks(utterance) {
+        var utteranceFirstHalf = utterance;
+        var utteranceSecondHalf = "";
+        var keyword = ""
+        var link = ""
+        var textPieces = [];
+        var keywordLinks = [];
+        //does one iterations/ assumes one appearance
+        if (utterance.includes("[LINK")) {
+            while (utterance.includes("[LINK")) {
+
+                keyword = utterance.substring(utterance.indexOf("[LINK") + 6, utterance.indexOf("]"));
+                // keyword = keyword.link("google.com")
+                link = LINKS[keyword];
+                utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
+                utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length - 1);
+    
+                utterance = utteranceSecondHalf;
+                textPieces.push(utteranceFirstHalf);
+                keywordLinks.push([keyword,link]);
+    
+                console.log(utterance);
+            }
+
+            if (textPieces.length==2) {
+                textPieces.push("");
+                keywordLinks.push(["",""]);
+            }
+        }
+        else {
+            keywordLinks = ["",""];
+        }
+        textPieces.push(utterance);
+        
+        var structure = [textPieces, keywordLinks]
         console.log(structure);
         return structure;
     }
 
     var dummyLink = "https://earsketch.gatech.edu/landing/#/"
     const LINKS = {
-        "parse error": "5-2-4",
+        "fitMedia":"1-1-9",
+        "setEffect":"1-4-0",
+        "effect ramp": "1-4-0",
+        "function": "1-2-2",
+        "functions": "1-2-2",
+        "parameters": "1-2-2",
+        "variable":"1-2-4",
+        "varables":"1-2-4",
+        "section":"2-1-0",
+        "sections":"2-1-0",
+        "ABA":"2-1-1",
+        "custom function": "2-1-1",
+        "makeBeat":"2-3-2",
+        "loop":"2-4-0",
+        "for loop":"2-4-0",
+        "loops":"2-4-0",
+        "range":"2-4-1",
+        "console input":"3-1-0",
+        "if statement": "3-1-2",
+        "if": "3-1-2",
+        "conditional":"3-1-2",
+        "list":"3-2-0",
+        "randomness": "3-4-0",
+        "nested loops": "4-1-3",
         "importing":"5-2-0",
         "indented":"5-2-1",
         "index":"5-2-2",
         "name":"5-2-3",
+        "parse error": "5-2-4",
         "syntax error":"5-2-5",
         "type error":"5-2-6",
         "function arguments":"5-2-7",
-        "makeBeat":"2-3-2",
-        "fitMedia":dummyLink,
-        "setEffect":"1-1-4"
     }
 
 

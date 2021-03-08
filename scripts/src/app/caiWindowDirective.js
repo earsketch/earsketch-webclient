@@ -375,8 +375,8 @@ app.directive('caiwindow', [function () {
                 return Date.now() - message.date;
             };
 
-            $scope.openCurr = function(message) {
-                layoutScope.loadCurriculumChapter(message.curr); 
+            $scope.openCurr = function(message,loc) {
+                layoutScope.loadCurriculumChapter(message.keyword[loc][1]); 
                 layoutScope.toggleLayout('curriculum')
             }
 
@@ -397,25 +397,21 @@ app.directive('caiwindow', [function () {
             function sendCAIOutputMessage(text) {
 
                 var message = {};
-                message.text = text[0][0];
-                message.keyword = text[1][0];
-                message.textPartTwo = text[0][1];
+                message.text = text[0];
+                message.keyword = text[1];
+
                 message.date = Date.now();
                 message.sender = "CAI";
-                message.link = text[1][1];
-                message.curr = text[1][1];
                 return message;
             };
 
             function sendCAIMessage(text) {
 
                 var message = {};
-                message.text = text;
+                message.returnText = text;
                 message.keyword = "";
-                message.textPartTwo = "";
+
                 message.date = Date.now();
-                message.link = "";
-                message.curr = ""
                 message.sender = userProject.getUsername();
                 return message;
             };
