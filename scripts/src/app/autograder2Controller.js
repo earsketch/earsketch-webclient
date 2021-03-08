@@ -3,15 +3,8 @@
  */
 
 app.controller("autograder2Controller",
-['$scope','compiler', 'Upload','userConsole','esconsole','ESUtils', 'userProject', '$http',
-function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject, $http) {
-
-    $scope.load = function(scriptname) {
-      $scope.testScript = 'Fetching sample script. One second...';
-      $http.get(SITE_BASE_URI + '/autograder2/' + scriptname).then(function(result) {
-        $scope.testScript = result.data;
-      });
-    }
+['$scope','compiler', 'reader', 'Upload','userConsole','esconsole','ESUtils', 'userProject', '$http',
+function($scope, compiler, reader, Upload, userConsole, esconsole, ESUtils, userProject, $http) {
 
     // Loading ogg by default for browsers other than Safari
     // setting default to wav for chrome 58 (May 22, 2017)
@@ -25,11 +18,37 @@ function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject,
     $scope.processing = null;
 
     /**
+     * Calculate the complexity of a script as python or javascript based on the extension and
+     * return the complexity scores.
+     */
+    $scope.read = function(script, filename) {
+        var ext = ESUtils.parseExt(filename);
+        if (ext == '.py') {
+            return reader.analyzePython(script);
+        } else if (ext == '.js') {
+            return reader.analyzeJavascript(script);
+        } else {
+          return new Promise(function(accept, reject) {
+            reject("Invalid file extension " + ext);
+          });
+        }
+    };
+
+    /**
      * Compile a script as python or javascript based on the extension and
      * return the compilation promise.
      */
-    $scope.compile = function(script) {
-      return $scope.compileTest($scope.testScript, script, $scope.quality);
+    $scope.compile = function(script, filename) {
+        var ext = ESUtils.parseExt(filename);
+        if (ext == '.py') {
+            return compiler.compilePython(script, $scope.quality);
+        } else if (ext == '.js') {
+            return compiler.compileJavascript(script, $scope.quality);
+        } else {
+          return new Promise(function(accept, reject) {
+            reject("Invalid file extension " + ext);
+          });
+        }
     };
 
     /**
@@ -48,10 +67,8 @@ function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject,
       // start with a promise that resolves immediately
       var p = new Promise(function(resolve) { resolve(); });
 
-      //for (var i = 0; i < shareUrls.length; i++) {
       angular.forEach(matches, function(match) {
         esconsole("Grading: " + match, ['DEBUG']);
-        //var shareId = ESUtils.parseShareId(url);
         var shareId = match.substring(9);
         esconsole("ShareId: " + shareId, ['DEBUG']);
         p = p.then(function() {
@@ -66,14 +83,13 @@ function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject,
      */
     $scope.runScript = function(script) {
       console.log("run script", script.name);
-      return $scope.compile(script).then(function(reports) {
-          console.log(reports)
-          esconsole(reports, ['DEBUG']);
+      return $scope.compile(script.source_code,script.name).then(function(tracks) {
+          console.log(tracks)
+          esconsole(tracks, ['DEBUG']);
           $scope.results.push({
             script: script,
-            reports: reports,
+            reports: {'Code Complexity': $scope.read(script.source_code, script.name)},
           });
-          $scope.$apply();
           $scope.processing = null;
         }).catch(function(err) {
           esconsole(err, ['ERROR']);
@@ -81,7 +97,6 @@ function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject,
             script: script,
             error: err,
           });
-          $scope.$apply();
           $scope.processing = null;
       });
     };
@@ -125,76 +140,6 @@ function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject,
       }
     };
 
-    /**
-     * Compile the test script.
-     *
-     * @param {string} reference The test script to run on each input script.
-     * @param {object} target The student code to evaluate.
-     * @param {int} quality Numeric value for the audio quality to load.
-     * @returns {Promise} A promise that resolves to the compiled result object.
-     */
-    $scope.compileTest = function(reference, target, quality) {
-
-        esconsole('Loading EarSketch library from: '+ SITE_BASE_URI+
-                  '/scripts/src/api/autograder.py.js');
-        Sk.externalLibraries = {
-            // import EarSketch library into skulpt
-            autograder : {
-                path: SITE_BASE_URI + '/scripts/src/api/autograder.py.js'
-                //path: SITE_BASE_URI + '/scripts/src/api/earsketch.py.js'
-            }
-        };
-
-        var lines = reference.match(/\n/g).length + 1;
-        esconsole(
-            'Compiling ' + lines + ' lines of Python', ['DEBUG','COMPILER']
-        );
-
-        // STEP 1: get a list of constants from the server and inject them into
-        // the skulpt list of builtins
-        return new Promise(function(resolve) {
-            Sk.builtins['__AUDIO_QUALITY'] = quality;
-            Sk.builtins['__SCRIPT'] = target;
-            resolve();
-        }).catch(function(err) {
-            esconsole(err, ['ERROR','COMPILER']);
-        // STEP 2: compile python code using Skulpt
-        }).then(function() {
-            esconsole('Compiling script using Skulpt.', ['DEBUG','COMPILER']);
-            return Sk.misceval.asyncToPromise(function() {
-                try {
-                    return Sk.importMainWithBody("<autograder>", false, reference, true);
-                } catch(err) {
-                    esconsole(err, ['ERROR','COMPILER']);
-                    throw err;
-                }
-            });
-        }).catch(function(err) {
-            throw err; // catch Skulpt errors
-
-        // STEP 3: Extract the result object from within the EarSketch module.
-        }).then(function(mod) {
-            esconsole('Compiling finished. Extracting result.',
-                      ['DEBUG','COMPILER']);
-            if (mod.$d.autograder && mod.$d.autograder.$d._getReports) {
-                // case: import autograder
-                return Sk.ffi.remapToJs(
-                    Sk.misceval.call(mod.$d.autograder.$d._getReports)
-                ); // result
-            } else if (mod.$d._getReports) {
-                // case: from autograder import *
-                return Sk.ffi.remapToJs(
-                    Sk.misceval.call(mod.$d._getReports)
-                ); // result
-            } else {
-                throw new ReferenceError(
-                    "Something went wrong. Skulpt did not provide the " +
-                    "expected output.");
-            }
-        }).catch(function(err) {
-            throw err;
-        });
-    };
 
     $scope.generateCSV = function() {
       var headers = ['username', 'script_name', 'shareid', 'error'];
@@ -271,30 +216,3 @@ function($scope, compiler, Upload, userConsole, esconsole, ESUtils, userProject,
     };
 
 }]);
-
-app.directive("codeWrite", [function() {
-  return {
-    scope: {
-      language: "=",
-      ngModel: "=",
-    },
-    require: '?ngModel',
-    transclude: true,
-    link: function (scope, element, attributes, ngModel) {
-      var editor = ace.edit(element[0]);
-      editor.setOptions({
-          mode: 'ace/mode/python',// + scope.language,
-          theme: 'ace/theme/github',
-          showPrintMargin: false,
-          wrap: true
-      });
-      editor.on('change', function () {
-        scope.ngModel = editor.getValue();
-      });
-      ngModel.$render = function() {
-        editor.setValue(ngModel.$viewValue, -1);
-      };
-    }
-  };
-}]);
-
