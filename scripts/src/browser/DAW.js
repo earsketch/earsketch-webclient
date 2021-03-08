@@ -116,7 +116,134 @@ const Header = () => {
 
 const Track = () => {
     // TODO
-    return <div></div>
+    const scope = {xOffset: 0, xScale: (x) => x, playLength: 1}
+    const track = {label: "TODO", effects: [], mute: false, solo: false, buttons: true, clips: []}
+    const trackColors = ['red']
+    const trackNum = 0
+    const trackHeight = 20
+    const toggleBypass = todo
+    const toggleSolo = todo
+    const toggleMute = todo
+
+    // $scope.toggleSolo = function () {
+    //     var temp = $scope.metronome.mute;
+
+    //     if (!$scope.track.solo) {
+    //         // solo
+    //         for (var i in $scope.tracks) {
+    //             if ($scope.tracks.hasOwnProperty(i)) {
+    //                 // TODO: why is this a string...?
+    //                 i = parseInt(i);
+    //                 // mute tracks that are not soloed
+    //                 if (!$scope.tracks[i].solo) {
+    //                     $scope.muteTrack(i);
+    //                 }
+    //             }
+    //         }
+    //         // unmute and solo this track
+    //         $scope.unmuteTrack($scope.trackNum);
+    //         $scope.soloTrack($scope.trackNum)
+    //     } else {
+    //         // unsolo
+
+    //         $scope.unsoloTrack($scope.trackNum);
+
+    //         if ($scope.hasSoloTracks()) {
+    //             $scope.muteTrack($scope.trackNum);
+    //         } else {
+    //             for (var i in $scope.tracks) {
+    //                 if ($scope.tracks.hasOwnProperty(i)) {
+    //                     // TODO: why is this a string...?
+    //                     i = parseInt(i);
+    //                     $scope.unmuteTrack(i);
+    //                 }
+    //             }
+    //         }
+
+    //     }
+
+    //     // mix and metronome are unaffected
+    //     $scope.mix.mute = false;
+    //     $scope.metronome.mute = temp;
+    //     player.setMutedTracks($scope.tracks);
+    // };
+
+    // $scope.toggleMute = function () {
+    //     var temp = $scope.metronome.mute;
+        
+    //     if ($scope.track.mute) {
+    //         $scope.unmuteTrack($scope.trackNum);
+    //     } else {
+    //         $scope.muteTrack($scope.trackNum);
+
+    //         if ($scope.track.solo) {
+    //             $scope.unsoloTrack($scope.trackNum);
+    //         }
+    //     }
+
+    //     // mix and metronome are unaffected
+    //     $scope.mix.mute = false;
+    //     $scope.metronome.mute = temp;
+    //     player.setMutedTracks($scope.tracks);
+    // }
+
+    return <div style={{width: scope.xOffset + scope.xScale(scope.playLength) + 'px'}}>
+        <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
+            {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
+            <div> {/* Directive: track-panel-position */}
+                <div className="dawTrackName prevent-selection">{track.label}</div>
+                {track.buttons &&
+                <>
+                    <button className={"btn btn-default btn-xs dawSoloButton" + (track.solo ? " active" : "")} onClick={toggleSolo} title="Solo">S</button>
+                    <button className={"btn btn-default btn-xs dawMuteButton" + (track.mute ? " active" : "")} onClick={toggleMute} title="Mute">M</button>
+                </>}
+                {track.effects.length > 0 &&
+                <div className="dropdown dawTrackEffectDropdown">
+                    <div className="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
+                        &#x25BC
+                    </div>
+                    <ul className="dropdown-menu" role="menu">
+                        {track.effects.map(([key, effect]) => {
+                        <li role="presentation">
+                            <a href="#" onClick={() => effect.visible = !effect.visible}>{key} {effect.visible && <span>&#x2714</span>}</a>
+                        </li>})}
+                    </ul>
+                </div>}
+            </div>
+            <div className={`daw-track ${track.mute ? 'muted' : ''} ${track.solo ? 'solo' : ''}`} onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
+                {track.clips.map(clip =>
+                <div className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: trackColors[trackNum]}}>
+                    {/* Directive: daw-clip */}
+                    <div className="clipWrapper">
+                        <div className="clipName prevent-selection">{/* Directive: daw-clip-name */}{clip.filekey}</div>
+                        <canvas></canvas>
+                    </div>
+                </div>)}
+            </div>
+        </div>
+        {track.effects.map(([key, effect], index) => 
+        effect.visible &&
+        <div id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
+            {/* <!-- <div class="dawEffectCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
+            <div> {/* Directive: track-effect-panel-position */}
+                <div className="dawTrackName"></div>
+                <div className="dawTrackEffectName">Effect {index+1}</div>
+                <button className={"btn btn-default btn-xs dawEffectBypassButton" + (effect.bypass ? ' active' : '')} onClick={toggleBypass} disabled={track.mute}>
+                    Bypass
+                </button>
+            </div>
+            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? ' bypassed' : '')} style={{background: trackColors[trackNum]}}>
+                {/* Directive: daw-effect */}
+                <div className="clipName">{key}</div>
+                <svg className="effectAxis">
+                    <g></g>
+                </svg>
+                <svg className="effectSvg">
+                    <path></path>
+                </svg>
+            </div>
+        </div>)}
+    </div>
 }
 
 const MixTrack = () => {
