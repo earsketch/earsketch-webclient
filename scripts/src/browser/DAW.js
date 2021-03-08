@@ -6,6 +6,7 @@ import { react2angular } from 'react2angular'
 import * as daw from './dawState'
 
 import * as helpers from "../helpers";
+import { dispatch } from 'd3'
 
 // TODO
 const isEmbedded = false
@@ -114,16 +115,16 @@ const Header = () => {
     </div>
 }
 
-const Track = () => {
+const Track = ({ track }) => {
     // TODO
     const scope = {xOffset: 0, xScale: (x) => x, playLength: 1}
-    const track = {label: "TODO", effects: [], mute: false, solo: false, buttons: true, clips: []}
     const trackColors = ['red']
     const trackNum = 0
     const trackHeight = 20
     const toggleBypass = todo
     const toggleSolo = todo
     const toggleMute = todo
+    const startDrag = todo, endDrag = todo, drag = todo
 
     // $scope.toggleSolo = function () {
     //     var temp = $scope.metronome.mute;
@@ -197,22 +198,22 @@ const Track = () => {
                     <button className={"btn btn-default btn-xs dawSoloButton" + (track.solo ? " active" : "")} onClick={toggleSolo} title="Solo">S</button>
                     <button className={"btn btn-default btn-xs dawMuteButton" + (track.mute ? " active" : "")} onClick={toggleMute} title="Mute">M</button>
                 </>}
-                {track.effects.length > 0 &&
+                {Object.keys(track.effects).length > 0 &&
                 <div className="dropdown dawTrackEffectDropdown">
                     <div className="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
                         &#x25BC
                     </div>
                     <ul className="dropdown-menu" role="menu">
-                        {track.effects.map(([key, effect]) => {
-                        <li role="presentation">
+                        {Object.entries(track.effects).map(([key, effect]) => {
+                        <li key={key} role="presentation">
                             <a href="#" onClick={() => effect.visible = !effect.visible}>{key} {effect.visible && <span>&#x2714</span>}</a>
                         </li>})}
                     </ul>
                 </div>}
             </div>
             <div className={`daw-track ${track.mute ? 'muted' : ''} ${track.solo ? 'solo' : ''}`} onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
-                {track.clips.map(clip =>
-                <div className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: trackColors[trackNum]}}>
+                {track.clips.map((clip, index) =>
+                <div key={index} className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: trackColors[trackNum]}}>
                     {/* Directive: daw-clip */}
                     <div className="clipWrapper">
                         <div className="clipName prevent-selection">{/* Directive: daw-clip-name */}{clip.filekey}</div>
@@ -221,9 +222,9 @@ const Track = () => {
                 </div>)}
             </div>
         </div>
-        {track.effects.map(([key, effect], index) => 
+        {Object.entries(track.effects).map(([key, effect], index) => 
         effect.visible &&
-        <div id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
+        <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
             {/* <!-- <div class="dawEffectCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div> {/* Directive: track-effect-panel-position */}
                 <div className="dawTrackName"></div>
@@ -246,11 +247,10 @@ const Track = () => {
     </div>
 }
 
-const MixTrack = () => {
+const MixTrack = ({ track }) => {
     // TODO
     const scope = {xOffset: 0, xScale: (x) => x, playLength: 1}
     const mixTrackHeight = 20
-    const track = {label: "TODO", effects: [], mute: false}
     const trackColors = ['red']
     const trackNum = 0
     const hideMasterTrackLabel = false
@@ -262,14 +262,14 @@ const MixTrack = () => {
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div> {/* Directive: track-panel-position */}
                 <div className="mixTrackFiller">{track.label}</div>
-                {track.effects.length > 0 &&
+                {Object.keys(track.effects).length > 0 &&
                 <div className="dropdown dawTrackEffectDropdown">
                     <div className="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
                         &#x25BC
                     </div>
                     <ul className="dropdown-menu" role="menu">
-                        {track.effects.map(([key, effect]) => {
-                        <li role="presentation">
+                        {Object.entries(track.effects).map(([key, effect]) => {
+                        <li key={key} role="presentation">
                             <a href="#" onClick={() => effect.visible = !effect.visible}>{key} {effect.visible && <span>&#x2714</span>}</a>
                         </li>})}
                     </ul>
@@ -279,9 +279,9 @@ const MixTrack = () => {
                 <div className="mixTrackFiller" style={{background: trackColors[trackNum]}}>{!hideMasterTrackLabel && <span>MIX TRACK</span>}</div>
             </div>
         </div>
-        {track.effects.map(([key, effect], index) => 
+        {Object.entries(track.effects).map(([key, effect], index) => 
         effect.visible && 
-        <div id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
+        <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
             {/* <!-- <div class="dawEffectCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div> {/* Directive: track-effect-panel-position */}
                 <div className="dawTrackName"></div>
@@ -457,7 +457,7 @@ const prepareWaveforms = (tracks, tempo) => {
 
 
 let setupDone = false
-const setup = () => {
+const setup = (dispatch) => {
     if (setupDone) return
     setupDone = true
 
@@ -470,6 +470,33 @@ const setup = () => {
 
         esconsole('code compiled', 'daw')
         prepareWaveforms(result.tracks, result.tempo)
+
+        const tracks = []
+        result.tracks.forEach((track, index) => {
+            // create a (shallow) copy of the track so that we can
+            // add stuff to it without affecting the reference which
+            // we want to preserve (e.g., for the autograder)
+            track = Object.assign({}, track)
+            tracks.push(track)
+
+            track.visible = true
+            // TODO:
+            // track.solo = $scope.preserve.solo.indexOf(i) > -1
+            // track.mute = $scope.preserve.muted.indexOf(i) > -1
+            track.solo = track.mute = false
+            track.label = index
+            track.buttons = true // show solo/mute buttons
+
+            for (const [key, effect] of Object.entries(track.effects)) {
+                // TODO
+                // track.effects[key].visible = $scope.preserve.effects
+                // track.effects[key].bypass = $scope.preserve.bypass.indexOf(key) > -1
+                effect.visible = true
+                effect.bypass = false
+            }
+        })
+
+        dispatch(daw.setTracks(tracks))
 
         // TODO: bring over the rest of this
         return
@@ -596,7 +623,8 @@ const DAW = () => {
     const hideDaw = false
     const dragging = false
     const vertScrollPos = 0
-    const tracks = []
+    const tracks = useSelector(daw.selectTracks)
+    console.log("Tracks:", tracks)
     const horzSlider = {value: 0, options: {}}
     const vertSlider = {value: 0, options: {}}
 
@@ -651,9 +679,9 @@ const DAW = () => {
                             {tracks.map((track, index) => {
                                 if (track.visible) {
                                     if (index === 0) {
-                                        return <MixTrack />
+                                        return <MixTrack key={index} track={track} />
                                     } else if (index < tracks.length - 1) {
-                                        return <Track />
+                                        return <Track key={index} track={track} />
                                     }
                                 }
                             })}
@@ -676,7 +704,7 @@ const DAW = () => {
 const HotDAW = hot(props => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
-    setup()
+    setup(props.$ngRedux.dispatch)
     return (
         <Provider store={props.$ngRedux}>
             <DAW />
