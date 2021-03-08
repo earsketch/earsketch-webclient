@@ -121,7 +121,60 @@ const Track = () => {
 
 const MixTrack = () => {
     // TODO
-    return <div></div>
+    const scope = {xOffset: 0, xScale: (x) => x, playLength: 1}
+    const mixTrackHeight = 20
+    const track = {label: "TODO", effects: [], mute: false}
+    const trackColors = ['red']
+    const trackNum = 0
+    const hideMasterTrackLabel = false
+    const trackHeight = 20
+    const toggleBypass = todo
+
+    return <div style={{width: scope.xOffset + scope.xScale(scope.playLength) + 'px'}}>
+        <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
+            {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
+            <div> {/* Directive: track-panel-position */}
+                <div className="mixTrackFiller">{track.label}</div>
+                {track.effects.length > 0 &&
+                <div className="dropdown dawTrackEffectDropdown">
+                    <div className="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
+                        &#x25BC
+                    </div>
+                    <ul className="dropdown-menu" role="menu">
+                        {track.effects.map(([key, effect]) => {
+                        <li role="presentation">
+                            <a href="#" onClick={() => effect.visible = !effect.visible}>{key} {effect.visible && <span>&#x2714</span>}</a>
+                        </li>})}
+                    </ul>
+                </div>}
+            </div>
+            <div className="daw-track">
+                <div className="mixTrackFiller" style={{background: trackColors[trackNum]}}>{!hideMasterTrackLabel && <span>MIX TRACK</span>}</div>
+            </div>
+        </div>
+        {track.effects.map(([key, effect], index) => 
+        effect.visible && 
+        <div id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
+            {/* <!-- <div class="dawEffectCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
+            <div> {/* Directive: track-effect-panel-position */}
+                <div className="dawTrackName"></div>
+                <div className="dawTrackEffectName">Effect {index+1}</div>
+                <button className={"btn btn-default btn-xs dawEffectBypassButton" + (effect.bypass ? " active" : "")} onClick={toggleBypass} disabled={track.mute}>
+                    Bypass
+                </button>
+            </div>
+            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? " bypassed" : "")} style={{background: trackColors[trackNum]}}>
+                {/* Directive: daw-effect */}
+                <div className="clipName">{key}</div>
+                <svg className="effectAxis">
+                    <g></g>
+                </svg>
+                <svg className="effectSvg">
+                    <path></path>
+                </svg>
+            </div>
+        </div>)}
+    </div>
 }
 
 const Highlight = ({ style }) => {
@@ -221,7 +274,7 @@ const Slider = ({ value, onChange, options, title }) => {
     return <input type="range" value={value} onChange={onChange} title={title} />
 }
 
-// More directives: widthExceeded, sizeChanged, dawContainer, trackEffectPanelPosition, dawTimeline, dawMeasureline
+// More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition, dawTimeline, dawMeasureline
 
 const DAW = () => {
     // TODO
@@ -232,7 +285,7 @@ const DAW = () => {
     const hideDaw = false
     const dragging = false
     const vertScrollPos = 0
-    const tracks = {}
+    const tracks = []
     const horzSlider = {value: 0, options: {}}
     const vertSlider = {value: 0, options: {}}
 
@@ -284,8 +337,7 @@ const DAW = () => {
                         </div>
 
                         <div className="daw-track-group-container">
-                            {// TODO: Check if `tracks` is an object or an array of pairs.
-                            Object.entries(tracks).map(([[trackNum, track], index]) => {
+                            {tracks.map((track, index) => {
                                 if (track.visible) {
                                     if (index === 0) {
                                         return <MixTrack />
