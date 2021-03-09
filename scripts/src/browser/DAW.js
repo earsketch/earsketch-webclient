@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useEffect, useState, useRef } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
@@ -6,7 +6,6 @@ import { react2angular } from 'react2angular'
 import * as daw from './dawState'
 
 import * as helpers from "../helpers";
-import { dispatch } from 'd3'
 
 // TODO
 const isEmbedded = false
@@ -116,12 +115,12 @@ const Header = () => {
     </div>
 }
 
-const Track = ({ track }) => {
+const Track = ({ color, track }) => {
+    const playLength = useSelector(daw.selectPlayLength)
+    const xScale = useSelector(daw.selectXScale)
+    const trackHeight = useSelector(daw.selectTrackHeight)
     // TODO
-    const scope = {xOffset: 0, xScale: (x) => x, playLength: 300}
-    const trackColors = ['blue']
-    const trackNum = 0
-    const trackHeight = 20
+    const scope = {xOffset: 0}
     const toggleBypass = todo
     const toggleSolo = todo
     const toggleMute = todo
@@ -189,7 +188,7 @@ const Track = ({ track }) => {
     //     player.setMutedTracks($scope.tracks);
     // }
 
-    return <div style={{width: scope.xOffset + scope.xScale(scope.playLength) + 'px'}}>
+    return <div style={{width: scope.xOffset + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
@@ -213,14 +212,7 @@ const Track = ({ track }) => {
                 </div>}
             </div>
             <div className={`daw-track ${track.mute ? 'muted' : ''} ${track.solo ? 'solo' : ''}`} onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
-                {track.clips.map((clip, index) =>
-                <div key={index} className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: trackColors[trackNum]}}>
-                    {/* Directive: daw-clip */}
-                    <div className="clipWrapper">
-                        <div className="clipName prevent-selection">{/* Directive: daw-clip-name */}{clip.filekey}</div>
-                        <canvas></canvas>
-                    </div>
-                </div>)}
+                {track.clips.map((clip, index) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {Object.entries(track.effects).map(([key, effect], index) => 
@@ -234,7 +226,7 @@ const Track = ({ track }) => {
                     Bypass
                 </button>
             </div>
-            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? ' bypassed' : '')} style={{background: trackColors[trackNum]}}>
+            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? ' bypassed' : '')} style={{background: color}}>
                 {/* Directive: daw-effect */}
                 <div className="clipName">{key}</div>
                 <svg className="effectAxis">
@@ -248,17 +240,66 @@ const Track = ({ track }) => {
     </div>
 }
 
-const MixTrack = ({ track }) => {
+
+const drawWaveform = (element, waveform, width, height) => {
+    var cvs = d3.select(element).select('canvas')
+        .attr('width', width)
+        .attr('height', height)
+
+    var interval = width / waveform.length
+    var pos = 0
+    var zero = height / 2
+    var magScaled = 0
+
+    var ctx = cvs.node().getContext('2d')
+    ctx.strokeStyle = '#427EB0'
+    ctx.fillStyle = "#181818"
+    ctx.lineWidth = interval > 1 ? interval * 0.9 : interval // give some space between bins
+    ctx.beginPath()
+    for (var i = 0; i < waveform.length; i++) {
+        pos = i * interval + 0.5 // pixel offset needed to avoid canvas blurriness
+        // TODO: include this scaling in the preprocessing if possible
+        magScaled = waveform[i] * height / 2
+        ctx.moveTo(pos, zero + magScaled)
+        ctx.lineTo(pos, zero - magScaled)
+    }
+    ctx.stroke()
+    ctx.closePath()
+}
+
+const Clip = ({ color, clip }) => {
+    const xScale = useSelector(daw.selectXScale)
+    const trackHeight = useSelector(daw.selectTrackHeight)
+    const width = xScale(clip.end - clip.start + 1)
+    const offset = xScale(clip.measure)
+    const element = useRef()
+
+    useEffect(() => {
+        if (WaveformCache.checkIfExists(clip)) {
+            const waveform = WaveformCache.get(clip)
+            drawWaveform(element.current, waveform, width, trackHeight)
+        }
+    }, [clip, trackHeight])
+
+    return <div ref={element} className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: color, width: width + 'px', left: offset + 'px'}}>
+        <div className="clipWrapper">
+            <div style={{width: width + 'px'}} className="clipName prevent-selection">{clip.filekey}</div>
+            <canvas></canvas>
+        </div>
+    </div>
+}
+
+const MixTrack = ({ color, track }) => {
+    const playLength = useSelector(daw.selectPlayLength)
+    const xScale = useSelector(daw.selectXScale)
+    const trackHeight = useSelector(daw.selectTrackHeight)
+    const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
     // TODO
-    const scope = {xOffset: 0, xScale: (x) => x, playLength: 200}
-    const mixTrackHeight = 20
-    const trackColors = ['red']
-    const trackNum = 0
+    const scope = {xOffset: 0}
     const hideMasterTrackLabel = false
-    const trackHeight = 20
     const toggleBypass = todo
 
-    return <div style={{width: scope.xOffset + scope.xScale(scope.playLength) + 'px'}}>
+    return <div style={{width: scope.xOffset + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
@@ -277,7 +318,7 @@ const MixTrack = ({ track }) => {
                 </div>}
             </div>
             <div className="daw-track">
-                <div className="mixTrackFiller" style={{background: trackColors[trackNum]}}>{!hideMasterTrackLabel && <span>MIX TRACK</span>}</div>
+                <div className="mixTrackFiller" style={{background: color}}>{!hideMasterTrackLabel && <span>MIX TRACK</span>}</div>
             </div>
         </div>
         {Object.entries(track.effects).map(([key, effect], index) => 
@@ -291,7 +332,7 @@ const MixTrack = ({ track }) => {
                     Bypass
                 </button>
             </div>
-            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? " bypassed" : "")} style={{background: trackColors[trackNum]}}>
+            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? " bypassed" : "")} style={{background: color}}>
                 {/* Directive: daw-effect */}
                 <div className="clipName">{key}</div>
                 <svg className="effectAxis">
@@ -399,7 +440,7 @@ const SchedPlayhead = () => {
 
 const Slider = ({ value, onChange, options, title }) => {
     console.log("TODO", options)
-    return <input type="range" value={value} onChange={onChange} title={title} />
+    return <input type="range" min={options.floor} max={options.ceil} step={options.step} value={value} onChange={onChange} title={title} />
 }
 
 // More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition, dawTimeline, dawMeasureline
@@ -472,6 +513,9 @@ const setup = (dispatch) => {
         esconsole('code compiled', 'daw')
         prepareWaveforms(result.tracks, result.tempo)
 
+        console.log("set playLength", result.length + 1)
+        dispatch(daw.setPlayLength(result.length + 1))
+
         const tracks = []
         result.tracks.forEach((track, index) => {
             // create a (shallow) copy of the track so that we can
@@ -488,7 +532,7 @@ const setup = (dispatch) => {
             track.label = index
             track.buttons = true // show solo/mute buttons
 
-            for (const [key, effect] of Object.entries(track.effects)) {
+            for (let [key, effect] of Object.entries(track.effects)) {
                 // TODO
                 // track.effects[key].visible = $scope.preserve.effects
                 // track.effects[key].bypass = $scope.preserve.bypass.indexOf(key) > -1
@@ -536,7 +580,7 @@ const setup = (dispatch) => {
         $scope.tempo = $scope.result.tempo;
         $scope.beatsPerBar = 4;
         // this is the measure number where the script ends
-        $scope.playLength = result.length + 1;
+        // $scope.playLength = result.length + 1;
         $scope.songDuration = ($scope.playLength*$scope.beatsPerBar)/($scope.tempo/60);
 
         if ($scope.freshPallete) {
@@ -633,6 +677,8 @@ const setup = (dispatch) => {
 }
 
 const DAW = () => {
+    const xScale = useSelector(daw.selectXScale)
+    const trackColors = useSelector(daw.selectTrackColors)
     // TODO
     const embeddedScriptName = "TODO"
     const embeddedScriptUsername = "TODO"
@@ -652,7 +698,6 @@ const DAW = () => {
     const startDrag = todo
     const endDrag = todo
     const drag = todo
-    const xScale = todo
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
         {isEmbedded && codeHidden &&
@@ -697,9 +742,9 @@ const DAW = () => {
                             {tracks.map((track, index) => {
                                 if (track.visible) {
                                     if (index === 0) {
-                                        return <MixTrack key={index} track={track} />
+                                        return <MixTrack key={index} color={trackColors[index]} track={track} />
                                     } else if (index < tracks.length - 1) {
-                                        return <Track key={index} track={track} />
+                                        return <Track key={index} color={trackColors[index]} track={track} />
                                     }
                                 }
                             })}
