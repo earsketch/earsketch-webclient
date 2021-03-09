@@ -10,6 +10,7 @@ import { dispatch } from 'd3'
 
 // TODO
 const isEmbedded = false
+const adjustLeftPosition = 0
 const todo = (...args) => console.log("TODO", args)
 const loop = {on: false, selection: null, start: null, end: null}
 
@@ -117,8 +118,8 @@ const Header = () => {
 
 const Track = ({ track }) => {
     // TODO
-    const scope = {xOffset: 0, xScale: (x) => x, playLength: 1}
-    const trackColors = ['red']
+    const scope = {xOffset: 0, xScale: (x) => x, playLength: 300}
+    const trackColors = ['blue']
     const trackNum = 0
     const trackHeight = 20
     const toggleBypass = todo
@@ -191,7 +192,7 @@ const Track = ({ track }) => {
     return <div style={{width: scope.xOffset + scope.xScale(scope.playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
-            <div> {/* Directive: track-panel-position */}
+            <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
@@ -249,7 +250,7 @@ const Track = ({ track }) => {
 
 const MixTrack = ({ track }) => {
     // TODO
-    const scope = {xOffset: 0, xScale: (x) => x, playLength: 1}
+    const scope = {xOffset: 0, xScale: (x) => x, playLength: 200}
     const mixTrackHeight = 20
     const trackColors = ['red']
     const trackNum = 0
@@ -260,7 +261,7 @@ const MixTrack = ({ track }) => {
     return <div style={{width: scope.xOffset + scope.xScale(scope.playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
-            <div> {/* Directive: track-panel-position */}
+            <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
                 <div className="mixTrackFiller">{track.label}</div>
                 {Object.keys(track.effects).length > 0 &&
                 <div className="dropdown dawTrackEffectDropdown">
@@ -496,6 +497,23 @@ const setup = (dispatch) => {
             }
         })
 
+        const mix = tracks[0]
+        const metronome = tracks[tracks.length-1]
+
+        if (mix !== undefined) {
+            mix.visible = Object.keys(mix.effects).length > 0
+            mix.mute = false
+            // the mix track is special
+            mix.label = 'MIX'
+            mix.buttons = false
+        }
+        if (metronome !== undefined) {
+            metronome.visible = false
+            // TODO
+            // metronome.mute = !$scope.preserve.metronome
+            metronome.effects = {}
+        }
+
         dispatch(daw.setTracks(tracks))
 
         // TODO: bring over the rest of this
@@ -530,7 +548,7 @@ const setup = (dispatch) => {
             $scope.freshPallete = false;
         }
 
-        $scope.tracks = []; //$scope.result.tracks;
+        // $scope.tracks = []; //$scope.result.tracks;
 
         if (!$scope.preserve.trackColors) {
             $scope.fillTrackColors($scope.result.tracks.length-1);
@@ -542,37 +560,37 @@ const setup = (dispatch) => {
         $scope.measuresFitToScreen = 61; //default length for scaling trackWidth
         $scope.secondsFitToScreen = ($scope.measuresFitToScreen * $scope.beatsPerBar)/($scope.tempo/60);
 
-        for (var i in $scope.result.tracks) {
-            if ($scope.result.tracks.hasOwnProperty(i)) {
-                i = parseInt(i); // for some reason this isn't always a str
-                // create a (shallow) copy of the track so that we can
-                // add stuff to it without affecting the reference which
-                // we want to preserve (e.g., for the autograder)
-                var track = angular.extend({}, $scope.result.tracks[i]);
-                $scope.tracks.push(track);
+        // for (var i in $scope.result.tracks) {
+        //     if ($scope.result.tracks.hasOwnProperty(i)) {
+        //         i = parseInt(i); // for some reason this isn't always a str
+        //         // create a (shallow) copy of the track so that we can
+        //         // add stuff to it without affecting the reference which
+        //         // we want to preserve (e.g., for the autograder)
+        //         var track = angular.extend({}, $scope.result.tracks[i]);
+        //         $scope.tracks.push(track);
 
-                track.visible = true;
-                track.solo = $scope.preserve.solo.indexOf(i) > -1;
-                track.mute = $scope.preserve.muted.indexOf(i) > -1;
-                track.label = i;
-                track.buttons = true; // show solo/mute buttons
+        //         track.visible = true;
+        //         track.solo = $scope.preserve.solo.indexOf(i) > -1;
+        //         track.mute = $scope.preserve.muted.indexOf(i) > -1;
+        //         track.label = i;
+        //         track.buttons = true; // show solo/mute buttons
 
-                for (var j in track.effects) {
-                    // not sure what this is trying to do (ref. line 131)?
-                    // var effect = track.effects[j];
-                    // track.effects[j] = angular.extend({}, track.effects[j]);
-                    // effect.visible = $scope.preserve.effects;
-                    // effect.bypass = $scope.preserve.bypass.indexOf
+        //         for (var j in track.effects) {
+        //             // not sure what this is trying to do (ref. line 131)?
+        //             // var effect = track.effects[j];
+        //             // track.effects[j] = angular.extend({}, track.effects[j]);
+        //             // effect.visible = $scope.preserve.effects;
+        //             // effect.bypass = $scope.preserve.bypass.indexOf
 
-                    if (track.effects.hasOwnProperty(j)) {
-                        track.effects[j].visible = $scope.preserve.effects;
-                        track.effects[j].bypass = $scope.preserve.bypass.indexOf(j) > -1;
-                    }
-                }
-            }
-        }
-        $scope.mix = $scope.tracks[0];
-        $scope.metronome = $scope.tracks[$scope.tracks.length-1];
+        //             if (track.effects.hasOwnProperty(j)) {
+        //                 track.effects[j].visible = $scope.preserve.effects;
+        //                 track.effects[j].bypass = $scope.preserve.bypass.indexOf(j) > -1;
+        //             }
+        //         }
+        //     }
+        // }
+        // $scope.mix = $scope.tracks[0];
+        // $scope.metronome = $scope.tracks[$scope.tracks.length-1];
 
         $scope.xScale = d3.scale.linear()
             .domain([1, $scope.measuresFitToScreen]) // measures start at 1
@@ -590,20 +608,20 @@ const setup = (dispatch) => {
             $scope.loop.end = $scope.playLength;
         }
 
-        if (typeof $scope.mix !== "undefined") {
-            var effects = $scope.mix.effects;
-            var num = Object.keys(effects).length;
-            $scope.mix.visible = num > 0;
-            $scope.mix.mute = false;
-            // the mix track is special
-            $scope.mix.label = 'MIX';
-            $scope.mix.buttons = false;
-        }
-        if (typeof $scope.metronome !== "undefined") {
-            $scope.metronome.visible = false;
-            $scope.metronome.mute = !$scope.preserve.metronome;
-            $scope.metronome.effects = {};
-        }
+        // if (typeof $scope.mix !== "undefined") {
+        //     var effects = $scope.mix.effects;
+        //     var num = Object.keys(effects).length;
+        //     $scope.mix.visible = num > 0;
+        //     $scope.mix.mute = false;
+        //     // the mix track is special
+        //     $scope.mix.label = 'MIX';
+        //     $scope.mix.buttons = false;
+        // }
+        // if (typeof $scope.metronome !== "undefined") {
+        //     $scope.metronome.visible = false;
+        //     $scope.metronome.mute = !$scope.preserve.metronome;
+        //     $scope.metronome.effects = {};
+        // }
 
         player.setRenderingData($scope.result);
         player.setMutedTracks($scope.tracks);
