@@ -226,16 +226,7 @@ const Track = ({ color, track }) => {
                     Bypass
                 </button>
             </div>
-            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? ' bypassed' : '')} style={{background: color}}>
-                {/* Directive: daw-effect */}
-                <div className="clipName">{key}</div>
-                <svg className="effectAxis">
-                    <g></g>
-                </svg>
-                <svg className="effectSvg">
-                    <path></path>
-                </svg>
-            </div>
+            <Effect color={color} name={key} effect={effect} mute={track.mute} />
         </div>)}
     </div>
 }
@@ -289,6 +280,115 @@ const Clip = ({ color, clip }) => {
     </div>
 }
 
+const Effect = ({ name, color, effect, mute }) => {
+    const playLength = useSelector(daw.selectPlayLength)
+    const xScale = useSelector(daw.selectXScale)
+    const trackHeight = useSelector(daw.selectTrackHeight)
+    const element = useRef()
+    // TODO
+    // $scope.toggleBypass = function () {
+    //     var i = $scope.effect[0].track +
+    //         $scope.effect[0].name +
+    //         $scope.effect[0].parameter;
+
+    //     if ($scope.effect.bypass) {
+    //         $scope.effect.bypass = false;
+    //         // update preservation values
+    //         if ($scope.preserve.bypass.indexOf(i) >= 0) {
+    //             $scope.preserve.bypass.splice(
+    //                 $scope.preserve.bypass.indexOf(i)
+    //                 , 1);
+    //         }
+    //     } else {
+    //         $scope.effect.bypass = true;
+    //         // update preservation values
+    //         if ($scope.preserve.bypass.indexOf(i) < 0) {
+    //             $scope.preserve.bypass.push(i);
+    //         }
+    //     }
+
+    //     player.setBypassedEffects($scope.tracks);
+    // }
+
+    // helper function to build a d3 plot of the effect
+    const drawEffectWaveform = () => {
+        const points = []
+
+        // scope.effect = { 0: segment1, 1: segment2, etc., visible, bypass }
+        // TODO: hacky and will probably introduce bugs
+        const fxSegmentIdx = Object.keys(effect).filter(v => !isNaN(parseInt(v)))
+
+        fxSegmentIdx.forEach(v => {
+            const range = effect[v]
+            points.push({x: range.startMeasure, y: range.inputStartValue})
+            points.push({x: range.endMeasure, y: range.inputEndValue})
+        })
+
+        // draw a line to the end
+        points.push({x: playLength + 1, y: points[points.length - 1].y})
+
+        const defaults = applyEffects.effectDefaults[effect[0].name][effect[0].parameter]
+
+        const x = d3.scale.linear()
+            .domain([1, playLength + 1])
+            .range([0, xScale(playLength + 1)])
+        const y = d3.scale.linear()
+            .domain([defaults.min, defaults.max])
+            .range([trackHeight - 5, 5])
+
+        // map (x,y) pairs into a line
+        const line = d3.svg.line().interpolate("linear").x(d => x(d.x)).y(d => y(d.y))
+
+        return line(points)
+    }
+
+    useEffect(() => {
+        // update SVG waveform
+        d3.select(element.current)
+          .select("svg.effectSvg")
+          .select("path")
+          .attr("d", drawEffectWaveform())
+    })
+
+    useEffect(() => {
+        // update SVG waveform
+        d3.select(element.current)
+          .select("svg.effectSvg")
+          .select("path")
+          .attr("d", drawEffectWaveform())
+
+        const parameter = applyEffects.effectDefaults[effect[0].name][effect[0].parameter]
+
+        const yScale = d3.scale.linear()
+            .domain([parameter.max, parameter.min])
+            .range([0, trackHeight])
+
+        const axis = d3.svg.axis()
+            .scale(yScale)
+            .orient('right')
+            .tickValues([parameter.max, parameter.min])
+            .tickFormat(d3.format("1.1f"))
+
+        d3.select(element.current).select('svg.effectAxis g')
+          .call(axis)
+          .select('text').attr('transform', 'translate(0,10)')
+
+        // move the bottom label with this atrocious mess
+        d3.select(d3.select(element.current).select('svg.effectAxis g')
+          .selectAll('text')[0][1]).attr('transform', 'translate(0,-10)')
+    })
+
+    return <div ref={element} className={"dawTrackEffect" + (effect.bypass || mute ? ' bypassed' : '')} style={{background: color, width: xScale(playLength) + 'px'}}>
+        <div className="clipName">{name}</div>
+        <svg className="effectAxis">
+            <g></g>
+        </svg>
+        <svg className="effectSvg">
+            <path></path>
+        </svg>
+    </div>
+}
+
 const MixTrack = ({ color, track }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
@@ -332,16 +432,7 @@ const MixTrack = ({ color, track }) => {
                     Bypass
                 </button>
             </div>
-            <div className={"dawTrackEffect" + (effect.bypass || track.mute ? " bypassed" : "")} style={{background: color}}>
-                {/* Directive: daw-effect */}
-                <div className="clipName">{key}</div>
-                <svg className="effectAxis">
-                    <g></g>
-                </svg>
-                <svg className="effectSvg">
-                    <path></path>
-                </svg>
-            </div>
+            <Effect color={color} name={key} effect={effect} mute={track.mute} />
         </div>)}
     </div>
 }
@@ -446,7 +537,7 @@ const Slider = ({ value, onChange, options, title }) => {
 // More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition, dawTimeline, dawMeasureline
 
 // Pulled in via angular dependencies
-let WaveformCache, ESUtils
+let WaveformCache, ESUtils, applyEffects
 
 const rms = (array) => {
     return Math.sqrt(array.map(function (v) {
@@ -767,6 +858,7 @@ const DAW = () => {
 const HotDAW = hot(props => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
+    applyEffects = props.applyEffects
     setup(props.$ngRedux.dispatch)
     return (
         <Provider store={props.$ngRedux}>
@@ -775,4 +867,4 @@ const HotDAW = hot(props => {
     );
 });
 
-app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache']))
+app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects']))
