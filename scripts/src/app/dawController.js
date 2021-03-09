@@ -36,10 +36,16 @@ app.directive('daw', function () {
                 $scope.pause(true);
             });
 
-
-            $scope.isEmbedded = $location.search()["embedded"] === "true";
-            $scope.hideDaw = $location.search()["hideDaw"] && $scope.isEmbedded;
-            $scope.codeHidden = $location.search()["hideCode"] && $scope.isEmbedded;
+            if ($location.search()) {
+                $scope.isEmbedded = $location.search()["embedded"] === "true";
+                $scope.hideDaw = $location.search()["hideDaw"] && $scope.isEmbedded;
+                $scope.codeHidden = $location.search()["hideCode"] && $scope.isEmbedded;
+            }
+            else {
+                $scope.isEmbedded = false;
+                $scope.hideDaw = false;
+                $scope.codeHidden = false;
+            }
 
             $scope.dynamicStyle = function(){
                 var top = $scope.codeHidden ? "54px" : "40px";
