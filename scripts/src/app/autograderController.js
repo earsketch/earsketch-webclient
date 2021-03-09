@@ -106,6 +106,7 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
         $scope.compileError = '';
         $scope.referenceScript = '';
         $scope.referenceResult = null;
+        $scope.referenceResultCopy = null;
         // restore prompt function to record inputs
         userConsole.prompt = $scope.listenerPrompt;
         if (file !== null) {
@@ -123,6 +124,7 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
             }).then(function(result) {
                 $scope.compilingReference = false;
                 $scope.referenceResult = result;
+                $scope.referenceResultCopy = angular.copy(result);
                 $scope.$apply();
             }).catch(function(err) {
                 console.error(err);
@@ -164,8 +166,8 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
             return $scope.readFile(file);
           }).then(function(script) {
             // if the script was read successfully, test it against the
-            // reference script
-            var retVal = $scope.compileAndCompare($scope.referenceResult, file, script);
+            // reference script copy
+            var retVal = $scope.compileAndCompare($scope.referenceResultCopy, file, script);
             //AVN LOG
             //console.log("RESULT_P3d", $scope.compareCount, retVal);
             return retVal;
@@ -305,7 +307,7 @@ function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
         var retVal = JSON.stringify(reference) == JSON.stringify(test);
         var diffString = "";
         if(!retVal){
-          diffString = "\n\n" + JSON.stringify(reference) + "\n\n" + JSON.stringify(test)
+          diffString = "\n\n" + JSON.stringify(reference) + "\n\n" + JSON.stringify(test);
         }
         //AVN LOG
         //console.log("RESULT_DIFF", $scope.compareCount, $scope.activeFile, diffString);
