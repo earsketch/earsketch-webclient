@@ -6,11 +6,13 @@ import * as recommenderState from '../browser/recommenderState';
 import * as bubble from '../bubble/bubbleState';
 import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
+import * as layout from '../layout/layoutState';
+import * as Layout from '../layout/Layout';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'layout', 'collaboration', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, layout, collaboration, $document, audioContext, audioLibrary, timesync, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, timesync, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -71,6 +73,23 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $scope.isEmbedded = $location.search()["embedded"] === "true";
     $scope.embeddedScriptName = '';
+
+    if ($scope.isEmbedded) {
+        colorTheme.set('light');
+        $ngRedux.dispatch(appState.setEmbedMode(true));
+        Layout.destroy();
+        layout.setMinSize(0);
+        Layout.initialize();
+        $ngRedux.dispatch(layout.collapseWest());
+        $ngRedux.dispatch(layout.collapseEast());
+        $ngRedux.dispatch(layout.collapseSouth());
+        $ngRedux.dispatch(layout.setNorthFromRatio([25,75,0]));
+    }
+
+    $scope.$on('embeddedScriptLoaded', function(event, data){
+        $scope.embeddedScriptUsername = data.username;
+        $scope.embeddedScriptName = data.scriptName;
+    });
 
     $scope.activeTabID = null;
 
@@ -717,8 +736,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             layoutParamString.split(',').forEach(function (item) {
                 var keyval = item.split(':');
                 if (keyval.length === 2) {
-                    esconsole('setting layout from URL parameters', ['main', 'url']);
-                    layout.set(keyval[0], parseInt(keyval[1]));
+                    esconsole('*Not* setting layout from URL parameters', ['main', 'url']);
+                    // layout.set(keyval[0], parseInt(keyval[1]));
                 }
             });
         }
@@ -749,15 +768,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     } catch (error) {
         esconsole(error, ['main', 'url']);
     }
-
-    /**
-     * Usually hidden function to check and display the chat bubble icon next to the active script / tab.
-     * @param script
-     * @returns {*|boolean}
-     */
-    $scope.showChatBubble = function (script) {
-        return layout.get('chat') && collaboration.scriptID === script.shareid;
-    };
 
     $scope.openFacebook = function () {
         window.open('https://www.facebook.com/EarSketch/', '_blank');

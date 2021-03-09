@@ -107,7 +107,7 @@ const MessageBox = () => {
     const [arrowElement, setArrowElement] = useState(null);
 
     const placement = pages[currentPage].placement;
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
         placement,
         modifiers: [
             { name: 'arrow', options: { element: arrowElement, padding: -25 } },
@@ -123,7 +123,7 @@ const MessageBox = () => {
                 bottom:'-19px',
                 borderLeft: '20px solid transparent',
                 borderRight: '20px solid transparent',
-                borderTop: '20px solid white'
+                borderTop: '20px solid #F9FAFB'
             });
             break;
         case 'bottom':
@@ -131,7 +131,7 @@ const MessageBox = () => {
                 top:'-19px',
                 borderLeft: '20px solid transparent',
                 borderRight: '20px solid transparent',
-                borderBottom: '20px solid white'
+                borderBottom: '20px solid #F9FAFB'
             });
             break;
         case 'bottom-start':
@@ -140,7 +140,7 @@ const MessageBox = () => {
                 left: '-270px',
                 borderLeft: '20px solid transparent',
                 borderRight: '20px solid transparent',
-                borderBottom: '20px solid white'
+                borderBottom: '20px solid #F9FAFB'
             });
             break;
         case 'left':
@@ -148,7 +148,7 @@ const MessageBox = () => {
                 right:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderLeft: '20px solid white'
+                borderLeft: '20px solid #F9FAFB'
             });
             break;
         case 'left-start':
@@ -157,7 +157,7 @@ const MessageBox = () => {
                 right:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderLeft: '20px solid white'
+                borderLeft: '20px solid #F9FAFB'
             });
             break;
         case 'right':
@@ -165,7 +165,7 @@ const MessageBox = () => {
                 left:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderRight: '20px solid white'
+                borderRight: '20px solid #F9FAFB'
             });
             break;
         case 'right-start':
@@ -174,7 +174,7 @@ const MessageBox = () => {
                 left:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderRight: '20px solid white'
+                borderRight: '20px solid #F9FAFB'
             });
             break;
         default:
@@ -183,11 +183,12 @@ const MessageBox = () => {
 
     useEffect(() => {
         setReferenceElement(document.querySelector(pages[currentPage].ref));
+        update && update();
     }, [currentPage]);
 
     return (
         <div
-            className={`absolute z-40 w-1/3 bg-white p-8`}
+            className={`absolute z-40 w-1/3 bg-gray-50 p-8`}
             ref={setPopperElement}
             style={pages[currentPage].ref===null?{}:styles.popper}
             { ...attributes.popper }
@@ -217,8 +218,7 @@ const Bubble = () => {
     const active = useSelector(state => state.bubble.active);
     return (
         <div
-            className={`absolute w-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
-            style={{ height: 'calc(100% - 60px)',  top: 60 }}
+            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
         >
             <Backdrop />
             <MessageBox />

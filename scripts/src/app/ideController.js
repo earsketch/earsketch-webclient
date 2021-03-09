@@ -1,5 +1,7 @@
 import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
+import * as editor from '../editor/editorState';
+import * as tabs from '../editor/tabState';
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
@@ -132,6 +134,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      */
     $scope.initEditor = function () {
         esconsole('initEditor called', 'IDE');
+        if (!$scope.editor) return;
 
         $scope.editor.ace.setOptions({
             mode: 'ace/mode/' + $scope.currentLanguage,
@@ -219,6 +222,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             userProject.shareid = shareID;
             $scope.openShare(shareID).then(() => {
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
             });
         }
 
@@ -228,6 +232,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $rootScope.$broadcast('editorLoaded');
 
         colorTheme.load();
+
+        $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
     };
 
     
@@ -550,9 +556,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         EarSketch.Global.ExitFlag = true;//assure the exit check variable is ON
 
         $scope.loaded = false; // show spinning icon
-
-        // TODO: use the layout service instead
-        var layoutCtrlScope = angular.element('[ng-controller=layoutController]').scope();
 
         var code = $scope.editor.getValue();
 

@@ -129,6 +129,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         } else if ($scope.tabs[$scope.activeTab].collaborative) {
             collaboration.saveScript();
         }
+        $scope.activeTabID && $ngRedux.dispatch(tabs.removeModifiedScript($scope.activeTabID));
     });
 
     $scope.$on('updateTabValueOnEditorChange', function() {
@@ -355,6 +356,8 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             // To reflect changes in tab saved state
             $scope.$$phase || $scope.$digest();
+
+            $scope.activeTabID && $ngRedux.dispatch(tabs.addModifiedScript($scope.activeTabID));
         }
     }
 
@@ -440,7 +443,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                     if (nextScript.collaborative) {
                         userConsole.status('Opening a collaborative script.');
                     } else {
-                        userConsole.status(ESMessages.idecontroller.shared);
+                        $scope.isEmbedded || userConsole.status(ESMessages.idecontroller.shared);
                     }
                 } else if (nextScript.readonly) {
                     userConsole.status(ESMessages.idecontroller.readonly);
@@ -507,6 +510,8 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.closeTab = function (id, $event) {
         esconsole('closing a tab at: ' + id, 'IDE');
 
+        let savePromise = null;
+
         if ($event) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -535,7 +540,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             // var c = confirm(ESMessages.idecontroller.closetab);
 
             // actually, let's go ahead and automatically save scripts
-            userProject.saveScript(script.name, script.source_code)
+            savePromise = userProject.saveScript(script.name, script.source_code)
                 .then(function () {
                     $scope.openScripts = userProject.closeScript(script.shareid);
                     $scope.tabs.splice(id, 1);
@@ -551,8 +556,8 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             $scope.openScripts = userProject.closeScript(script.shareid);
             $scope.tabs.splice(id, 1);
         }
-
-        $scope.swapTabAfterClose(id);
+        $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
+        savePromise ? savePromise.then(() => $scope.swapTabAfterClose(id)) : $scope.swapTabAfterClose(id);
     };
 
     /**
@@ -623,6 +628,32 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         else{
             dropdownmenu.css({"overflow":"","max-height": ""});
         }
+    };
+
+    $scope.closeAllTabs = function () {
+        $confirm({text: ESMessages.idecontroller.closealltabs,
+            ok: "Close All"}).then(function () {
+            var promises = userProject.saveAll();
+            $q.all(promises).then(function () {
+                userNotification.show(ESMessages.user.allscriptscloud);
+
+                //once all scripts have been saved close all tabs
+                angular.forEach($scope.tabs, function(script) {
+                    if(!script.isShared) {
+                        userProject.closeScript(script.shareid);
+                    } else {
+                        userProject.closeSharedScript(script.shareid);
+                    }
+                });
+                $scope.tabs.splice(0,$scope.tabs.length);
+                $ngRedux.dispatch(tabs.resetTabs());
+                $ngRedux.dispatch(tabs.resetModifiedScripts());
+            }).catch(function (err) {
+                userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1');
+            });
+        });
+
+        $scope.$applyAsync();
     };
 
     /**

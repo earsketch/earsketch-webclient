@@ -1,6 +1,7 @@
 import xml2js from 'xml2js';
+import * as appState from '../appState';
 
-app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', 'tabs', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, tabs) {
+app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;
@@ -328,7 +329,8 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             // when the user logs in and his/her scripts are loaded, we can restore
             // their previous tab session stored in the browser's local storage
-            if (localStorage.checkKey(LS_TABS_KEY)) {
+            const embedMode = appState.selectEmbedMode($ngRedux.getState());
+            if (!embedMode && localStorage.checkKey(LS_TABS_KEY)) {
                 var opened = JSON.parse(localStorage.get(LS_TABS_KEY));
 
                 for (var i in opened) {

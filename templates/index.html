@@ -243,7 +243,7 @@
                     </div>
 
                     <div class="split flex flex-col" id="content">
-                        <div class="split" id="devctrl" ng-show="showIDE || showAll" ng-style="{'z-index':bubble.active&&bubble.currentPage>=2?35:0}">
+                        <div class="split" id="devctrl" ng-show="showIDE || showAll" ng-style="{'z-index':bubble.active&&bubble.currentPage>=3?35:0}">
                             <div class="h-full max-h-full" id="workspace" ng-hide="showIDE && showAll">
                                 <div class="loading text-center h-full w-full flex items-center justify-center" ng-show="!loaded && !(showIDE && showAll)">
                                     <i class="spinner icon icon-spinner"></i> &nbsp; Loading...
@@ -256,72 +256,16 @@
                         </div>
 
                         <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&bubble.currentPage!==0?35:0}" ng-controller="tabController">
-                            <div class="row ide-toolbar flex-none" id="code-toolbar">
-                                <span ng-hide="isEmbedded" class="panel-label" id="code-eidtor-label">
-                                    <i class="icon icon-code"></i> Code Editor
-                                    <div class="btn-group" uib-popover-html="getPopoverContent('editor')" popover-placement="right-top" popover-animation="true" popover-title="Editor Shortcuts" popover-is-open="isShortcutHelperOpen()" popover-trigger="none"></div>
-                                </span>
-
-                                <div ng-hide="isEmbedded" class="text-right menuright">
-                                    <!-- Options Split button -->
-                                    <div uib-dropdown dropdown-append-to-body class="btn-group">
-                                        <button uib-dropdown-toggle type="button" class="btn btn-xs btn-clear dropdown-toggle" id="editor-options"><i class="icon icon-cog2"></i>
-                                            <span class="caret"></span>
-                                            <span class="sr-only">Toggle Dropdown</span>
-                                        </button>
-                                        <ul uib-dropdown-menu class="dropdown-menu dropdown-menu-right" role="menu" style="max-height:300px; height:auto; overflow-y:auto">
-                                            <li ng-class="{hidden: tabs.length < 1, disabled: tabs[activeTab].saved}" ng-switch="tabs[activeTab].saved">
-                                                <a href="#" ng-click="saveScript()" ng-switch-when="false"> Save Changes in Script</a>
-                                                <a href="#" ng-switch-when="true"> All Changes in Script Already Saved</a>
-                                            </li>
-                                            <!-- <li ng-class="{hidden: tabs.length < 1}" ng-switch="!tabs[activeTab].readonly">
-                                                <a href="#" ng-click="copyScript()" ng-switch-when="true"> Create Copy of Script</a>
-                                            </li> -->
-                                            <li ng-class="{disabled: !editor.checkUndo()}" ><a href="#" ng-click="editor.undo()">Undo</a></li>
-                                            <li ng-class="{disabled: !editor.checkRedo()}" ><a href="#" ng-click="editor.redo()">Redo</a></li>
-                                            <li><a href="#" ng-click="toggleBlocks()"> Toggle Blocks Mode</a></li>
-                                        </ul>
-                                    </div>
-
-                                    <!-- Run Code -->
-                                    <button id="run-button" type="submit" ng-disabled="(tabs.length == 0) || !loaded" ng-click='compileCode()' class="btn btn-xs btn-run btn-clear" title="{{detectOS ==='MacOS'?'Cmd':'Ctrl'}} + Enter" uib-popover-html="getPopoverContent('run')" popover-placement="bottom-right" popover-animation="true" popover-is-open="isShortcutHelperOpen()" popover-trigger="none">Run <i class="icon icon-arrow-right15"></i></button>
-                                </div>
+                            <editor-header></editor-header>
+                            <div ng-show="isEmbedded" class="embedded-script-info" >
+                                <p>Script: {{embeddedScriptName}}</p>
+                                <p>By: {{embeddedScriptUsername}}</p>
                             </div>
 
                             <div class="flex-grow h-full">
                                 <div class="h-full flex flex-col" ng-hide="tabs.length === 0">
-                                    <div class="tab-container">
-
-                                        <!-- TODO: this may break -->
-                                        <span ng-show="isEmbedded" class="embedded-script-info"> By: {{embeddedScriptUsername}}</span>
-
-                                        <uib-tabset active="activeTabID">
-                                            <!-- Note: Do not track by $index because uib-tab freaks out -->
-                                            <uib-tab ng-hide="isEmbedded" ng-repeat="tab in tabs track by $index" index="tab.shareid" select="swapTab(getTabId(tab.shareid),activeTabID,tab.shareid)" ng-init="tabContextMenu[getTabId(tab.shareid)]={state:false}" ng-click="preventPopover(getTabId(tab.shareid))" class="tab-context-menu">
-                                                <uib-tab-heading uib-popover-template="'templates/script-context-menu.html'" popover-trigger="outsideClick" popover-placement="bottom" popover-is-open="tabContextMenu[getTabId(tab.shareid)].state" right-click-menu="openContextMenu(getTabId(tab.shareid))">
-                                                    <div class="title-block prevent-selection">
-                                                    <span class="tab-text" ng-class="{ 'dirty-tab-header' : !tab.saved && !tab.readonly && !tab.collaborative}" title="{{tab.tooltipText}}">
-                                                        <i class="icon icon-eye" ng-show="tab.readonly && !tab.isShared"></i>
-                                                        <i class="icon icon-bubble" style="color:#6DFED4;" ng-show="enableChat && showChatBubble(tab)"></i>
-                                                        <i class="icon icon-users" style="color:#6DFED4;" ng-show="tab.collaborative"></i>
-                                                        <i class="icon icon-copy" style="color:#6DFED4;" ng-show="tab.isShared && !tab.collaborative"></i>
-                                                        <span uib-tooltip="{{tab.name}}" tooltip-placement="bottom">
-                                                            {{tab.name}}
-                                                            <div></div> <!-- a hack to disable safari tooltip: don't remove! -->
-                                                        </span>
-                                                    </span>
-                                                        <span class="tab-close" ng-click="closeTab(getTabId(tab.shareid), $event);">X</span>
-                                                    </div>
-                                                </uib-tab-heading>
-                                            </uib-tab>
-
-                                            <button ng-hide="isEmbedded" class="btn btn-clear" id="btn-add-tab" ng-click="createScript()">
-                                                <i class="icon icon-plus2"></i>
-                                            </button>
-                                        </uib-tabset>
-                                    </div>
-
-                                    <div editor class="flex-grow h-full max-h-full"></div>
+                                    <script-tabs></script-tabs>
+                                    <div editor class="flex flex-grow h-full max-h-full"></div>
                                 </div>
 
                                 <span ng-show="isEmbedded" class="embedded-script-info" style="padding-top: 5px;"> Script: {{embeddedScriptName}}</span>
@@ -341,7 +285,7 @@
                             </div>
                         </div>
 
-                        <div class="split" id="console-frame">
+                        <div class="split" id="console-frame" ng-style="{'z-index':bubble.active&&bubble.currentPage>=3?35:0}">
                             <div class="results">
                                 <div class="row">
                                     <div id="console">

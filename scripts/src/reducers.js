@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage';
 
 import app from './app/appState';
 import user from './user/userState';
+import editor from './editor/editorState';
 import tabs from './editor/tabState';
 import layout from './layout/layoutState';
 import bubble from './bubble/bubbleState';
@@ -17,6 +18,7 @@ import recommender from './browser/recommenderState';
 const rootReducer = combineReducers({
     app,
     user,
+    editor,
     tabs,
     layout,
     bubble,
@@ -28,9 +30,10 @@ const rootReducer = combineReducers({
 });
 
 // Note: Configuring store in rootReducer so it can be imported and accessed in non-React files.
+// Some persistence settings are done in individual reducers for more granularity.
 const persistConfig = {
     key: 'root',
-    whitelist: ['app','layout'],
+    whitelist: ['layout'],
     storage
 };
 

@@ -158,6 +158,8 @@ require(['angular'], () => {
     require('./browser/Scripts');
     require('./browser/Curriculum');
     require('./app/Footer');
+    require('./editor/Tabs');
+    require('./editor/EditorHeader');
 
     // To be ported to React
     require('./layout/Layout');

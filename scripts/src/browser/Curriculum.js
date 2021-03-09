@@ -7,7 +7,6 @@ import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
 import * as layout from '../layout/layoutState'
-import * as Layout from '../layout/Layout'
 
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
@@ -151,17 +150,13 @@ export const TitleBar = () => {
 
     return (
         <div className='flex items-center p-3 text-2xl'>
-            <div className='pl-3 pr-4 font-normal'>
+            <div className='pl-3 pr-4 font-semibold truncate'>
                 CURRICULUM
             </div>
             <div>
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
-                    onClick={() => {
-                        dispatch(layout.setEast({ open: false }))
-                        Layout.horizontalSplits.collapse(2);
-                        Layout.toggleHorizontalDrag(1, false);
-                    }}
+                    onClick={() => dispatch(layout.collapseEast())}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
                 </div>
@@ -194,12 +189,12 @@ const CurriculumPane = () => {
     const curriculumBody = useRef()
 
     useEffect(() => {
-        if (content) {
+        if (content && curriculumBody.current) {
             curriculumBody.current.appendChild(content)
             curriculumBody.current.scrollTop = 0
             return () => content.remove()
         }
-    }, [content])
+    }, [content, paneIsOpen])
 
     useEffect(() => {
         // <script> tags in the content may add elements to the DOM,
@@ -221,7 +216,7 @@ const CurriculumPane = () => {
                 content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
             }
         }
-    }, [content, language])
+    }, [content, language, paneIsOpen])
 
     // Highlight search text matches found in the curriculum.
     const hilitor = new Hilitor("curriculum-body")

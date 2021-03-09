@@ -11,43 +11,10 @@ import * as tabs from '../editor/tabState';
 import * as appState from '../app/appState';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
-
-function generateGetBoundingClientRect(x=0, y=0) {
-    return () => ({
-        width: 0,
-        height: 0,
-        top: y,
-        right: x,
-        bottom: y,
-        left: x,
-    });
-}
-
-class VirtualRef {
-    constructor() {
-        this.getBoundingClientRect = generateGetBoundingClientRect();
-        this.updatePopper = null;
-    }
-}
-
-const openScript = script => {
-    const userProject = helpers.getNgService('userProject');
-    const rootScope = helpers.getNgRootScope();
-    userProject.openScript(script.shareid);
-    rootScope.$broadcast('selectScript', script.shareid);
-};
-
-const openSharedScript = script => {
-    const userProject = helpers.getNgService('userProject');
-    const rootScope = helpers.getNgRootScope();
-    userProject.openSharedScript(script.shareid);
-    rootScope.$broadcast('selectSharedScript', script);
-};
-
-const shareScript = script => {
-    const scope = helpers.getNgMainController().scope();
-    scope.shareScript(Object.assign({}, script));
-};
+import {
+    openScript, openSharedScript, shareScript,
+    generateGetBoundingClientRect, VirtualRef, DropdownMenuCaller
+} from './ScriptsMenus';
 
 const CreateScriptButton = () => {
     const ideScope = helpers.getNgController('ideController').scope();
@@ -244,205 +211,6 @@ const RestoreButton = ({ script }) => {
     );
 };
 
-const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }) => {
-    const [highlight, setHighlight] = useState(false);
-    const dispatch = useDispatch();
-    const theme = useSelector(appState.selectColorTheme);
-    const cursor = disabled ? 'cursor-not-allowed' : 'cursor-pointer';
-
-    return (
-        <div
-            className={`${visible ? 'flex' : 'hidden'} items-center justify-start p-2 space-x-4 ${cursor} ${theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
-            onClick={() => {
-                if (disabled) return null;
-                onClick();
-                dispatch(scripts.resetDropdownMenu());
-            }}
-        >
-            <div className='flex justify-center items-center w-6'>
-                <i className={`${icon} align-middle`} />
-            </div>
-            <div className={`${disabled ? 'text-gray-500' : ''}`}>{name}</div>
-        </div>
-    );
-};
-
-const dropdownMenuVirtualRef = new VirtualRef();
-
-const SingletonDropdownMenu = () => {
-    const theme = useSelector(appState.selectColorTheme);
-    const dispatch = useDispatch();
-    const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
-    const script = useSelector(scripts.selectDropdownMenuScript);
-    const type = useSelector(scripts.selectDropdownMenuType);
-
-    // For some operations, get the most up-to-date script being kept in userProject.
-    const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript);
-    const loggedIn = useSelector(state => state.user.loggedIn);
-    const openTabs = useSelector(tabs.selectOpenTabs);
-
-    const [popperElement, setPopperElement] = useState(null);
-    const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement);
-    dropdownMenuVirtualRef.updatePopper = update;
-
-    // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = event => {
-        setPopperElement(ref => {
-            if (!ref.contains(event.target)) {
-                dispatch(scripts.resetDropdownMenuAsync());
-            }
-            return ref;
-        });
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousedown', handleClickAsync);
-        return () => document.removeEventListener('mousedown', handleClickAsync);
-    }, []);
-
-    return (
-        <div
-            ref={setPopperElement}
-            style={showDropdownMenu ? styles.popper : { display:'none' }}
-            { ...attributes.popper }
-            className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
-        >
-            <div className='flex justify-between items-center p-2 space-x-2 pb-4 border-b border-black mb-2'>
-                <div className='truncate'>
-                    {script && script.name}
-                </div>
-                <i
-                    className={`icon-cross2 pr-1 align-middle cursor-pointer ${theme==='light' ? 'text-gray-700' : 'text-gray-500'}`}
-                    onClick={() => {
-                        dispatch(scripts.resetDropdownMenu());
-                    }}
-                />
-            </div>
-            <MenuItem
-                name='Open' icon='icon-file-empty'
-                onClick={() => {
-                    if (type==='regular') {
-                        openScript(script);
-                    } else if (type==='shared') {
-                        openSharedScript(script);
-                    }
-                }}
-            />
-            <MenuItem
-                name='Create Copy' icon='icon-copy'
-                visible={type==='regular'}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.copyScript(unsavedScript);
-                }}
-            />
-            <MenuItem
-                name='Rename' icon='icon-pencil2'
-                visible={type==='regular'}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.renameScript(script);
-                }}
-            />
-            <MenuItem
-                name='Download' icon='icon-cloud-download'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.downloadScript(unsavedScript);
-                }}
-            />
-            <MenuItem
-                name='Print' icon='icon-printer'
-                onClick={() => {
-                    const exporter = helpers.getNgService('exporter');
-                    exporter.print(unsavedScript);
-                }}
-            />
-            <MenuItem
-                name='Share' icon='icon-share32'
-                visible={type==='regular'}
-                disabled={!loggedIn}
-                onClick={() => {
-                    shareScript(unsavedScript);
-                }}
-            />
-            <MenuItem
-                name='Submit to Competition' icon='icon-share2'
-                visible={type==='regular' && loggedIn && FLAGS.SHOW_AMAZON}
-                disabled={!loggedIn}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.submitToCompetition(unsavedScript);
-                }}
-            />
-            <MenuItem
-                name='History' icon='icon-history'
-                disabled={!loggedIn}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.openScriptHistory(unsavedScript, true);
-                }}
-            />
-            <MenuItem
-                name='Code Indicator' icon='glyphicon glyphicon-info-sign'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.openCodeIndicator(unsavedScript);
-                }}
-            />
-            <MenuItem
-                name='Import' icon='icon-import'
-                visible={type==='shared'}
-                onClick={async () => {
-                    const userProject = helpers.getNgService('userProject');
-                    const imported = await userProject.importScript(Object.assign({},script));
-                    await userProject.refreshCodeBrowser();
-                    dispatch(scripts.syncToNgUserProject());
-                    
-                    if (openTabs.includes(script.shareid)) {
-                        openScript(imported);
-                    }
-                }}
-            />
-            <MenuItem
-                name='Delete' icon='icon-bin'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    if (type==='regular') {
-                        scope.deleteScript(unsavedScript);
-                    } else if (type==='shared') {
-                        scope.deleteSharedScript(script);
-                    }
-                }}
-            />
-        </div>
-    );
-};
-
-const DropdownMenuCaller = ({ script, type }) => {
-    const dispatch = useDispatch();
-
-    return (
-        <div
-            onClick={event => {
-                event.preventDefault();
-                event.stopPropagation();
-                dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY);
-                dropdownMenuVirtualRef.updatePopper && dropdownMenuVirtualRef.updatePopper();
-                dispatch(scripts.setDropdownMenu({ script, type }));
-            }}
-        >
-            <div className='flex justify-left truncate'>
-                <div className='truncate min-w-0'>
-                    <i className='icon-menu3 text-4xl px-2 align-middle' />
-                </div>
-            </div>
-        </div>
-    );
-};
-
 const sharedInfoPanelVirtualRef = new VirtualRef();
 
 const SharedScriptInfoItem = ({ title, body }) => {
@@ -553,7 +321,8 @@ const Script = ({ script, bgTint, type }) => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
     const active = useSelector(tabs.selectActiveTabID) === script.shareid;
-    const tabIndicator = (open||active) ? (active ? 'border-green-400' : 'opacity-50 border-green-300') : 'opacity-0';
+    const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid);
+    const tabIndicator = (open||active) ? (active ? (modified ? 'border-red-600' : 'border-green-400') : (modified ? 'border-red-400' : 'border-green-300') + ' opacity-80') : 'opacity-0';
     const loggedIn = useSelector(state => state.user.loggedIn);
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
@@ -706,7 +475,6 @@ export const ScriptBrowser = () => {
                 <DeletedScriptCollection />
             </div>
 
-            <SingletonDropdownMenu />
             <SingletonSharedScriptInfo />
         </>
     );

@@ -9,12 +9,12 @@ export const pages = [
     {
         header: '1/8 Explore the Code Editor',
         body: 'The code editor is your workspace to compose music. It is a text editor with numbered lines.',
-        ref: '.ace_editor',
+        ref: '#coder',
         placement: 'top'
     },
     {
         header: '2/8 Run Your Code',
-        body: 'Run your code and see it turn into music. Click the <span class="font-black text-green-600 text-2xl">Run<i class="align-middle icon icon-arrow-right15"></i></span> button and view the code in the Digital Audio Workstation located above your code editor.',
+        body: 'Run your code and see it turn into music. Click the <span class="font-black text-green-600 text-2xl"><i class="align-middle icon icon-arrow-right22"></i>Run</span> button and view the code in the Digital Audio Workstation located above your code editor.',
         ref: '#run-button',
         placement: 'bottom'
     },
@@ -32,33 +32,32 @@ export const pages = [
     },
     {
         header: '5/8 Explore your code',
-        body: 'Each folder in this menu provides a set of EarSketch resources. Click the folder to access the resources and click again to remove from view. We will explore the function of each folder in the next steps.',
-        ref: '#sidenav',
+        body: 'On the left side of screen is the browser area. There are several types of browser. We will explore their function in the next steps.',
+        ref: '#content-manager',
         placement: 'right-start'
     },
     {
         header: '6/8 Add sounds to your code',
-        body: 'The first folder is the Sound Browser <span class="text-yellow-500 text-3xl align-middle icon icon-headphones"></span>. Click to search the 4,000 plus audio clips to use in your music, composed by popular recording artists.',
-        ref: '#sidebar-container',
+        body: 'The first browser is the <span class="text-yellow-500 text-3xl align-middle icon icon-headphones"></span> Sound Browser. Scroll and click the folders to discover 4,000+ audio clips to use in your music, composed by popular recording artists.',
+        ref: '#content-manager',
         placement: 'right-start'
     },
     {
         header: '7/8 Save your Code',
-        body: 'Your code is automatically saved to the Scripts Browser <span class="text-yellow-500 text-3xl align-middle icon icon-embed2"></span>. You can search for scripts by date, programming language, and owner.',
-        ref: '#sidebar-container',
+        body: 'Your code is automatically saved to the <span class="text-yellow-500 text-3xl align-middle icon icon-embed2"></span> Scripts Browser. You can search for scripts by date, programming language, and owner.',
+        ref: '#content-manager',
         placement: 'right-start'
     },
     {
         header: '8/8 Read the curriculum',
-        body: 'The book icon <span class="text-yellow-500 text-3xl align-middle icon icon-book3"></span> will open a curriculum panel on the right side of the screen. You can open the Table of Contents by clicking this bar to read about topics to continue learning about EarSketch.',
+        body: 'On the right side is the curriculum panel. You can open the Table of Contents by clicking this bar to read about topics to continue learning about EarSketch.',
         ref: '#curriculum-navigation',
         placement: 'left'
     },
     {
         header: `End`,
         body: 'Congratulations! You have completed the tour. You are ready to start making music. Click <span class="text-blue-500 align-middle icon icon-plus2"></span> to open up a new script and start coding.',
-        ref: '#btn-add-tab',
-        placement: 'bottom'
+        ref: null
     }
 ];
 

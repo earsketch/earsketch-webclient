@@ -40,7 +40,8 @@ const scriptsSlice = createSlice({
         dropdownMenu: {
             show: false,
             script: null,
-            type: null
+            type: null,
+            context: false
         },
         sharedScriptInfo: {
             show: false,
@@ -108,6 +109,7 @@ const scriptsSlice = createSlice({
             state.dropdownMenu.show = payload.show ? payload.show : true;
             state.dropdownMenu.script = payload.script;
             state.dropdownMenu.type = payload.type;
+            state.dropdownMenu.context = payload.context ? payload.context : false;
         },
         resetDropdownMenu(state) {
             state.dropdownMenu = {
@@ -423,6 +425,7 @@ export const selectFeatureSharedScript = state => state.scripts.featureSharedScr
 export const selectShowDropdownMenu = state => state.scripts.dropdownMenu.show;
 export const selectDropdownMenuScript = state => state.scripts.dropdownMenu.script;
 export const selectDropdownMenuType = state => state.scripts.dropdownMenu.type;
+export const selectDropdownMenuContext = state => state.scripts.dropdownMenu.context;
 
 // TODO: Unsaved scripts should probably be tracked in the editor or tab state.
 export const selectUnsavedDropdownMenuScript = createSelector(

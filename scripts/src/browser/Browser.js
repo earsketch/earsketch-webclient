@@ -7,7 +7,6 @@ import { react2angular } from 'react2angular';
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
 
-import * as Layout from '../layout/Layout';
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
@@ -23,16 +22,14 @@ export const TitleBar = () => {
             className={`flex items-center p-3 text-2xl`}
             style={{minHeight: 'fit-content'}}  // Safari-specific issue
         >
-            <div className='pl-3 pr-4'>
+            <div className='pl-3 pr-4 font-semibold truncate'>
                 CONTENT MANAGER
             </div>
             <div>
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
                     onClick={() => {
-                        dispatch(layout.setWest({ open: false }));
-                        Layout.horizontalSplits.collapse(0);
-                        Layout.toggleHorizontalDrag(0, false);
+                        dispatch(layout.collapseWest());
                     }}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -236,15 +233,18 @@ export const Collection = ({ title, visible=true, initExpanded=true, children, c
 
 export const Collapsed = ({ position='west' }) => {
     const theme = useSelector(appState.selectColorTheme);
+    const embedMode = useSelector(appState.selectEmbedMode);
     const dispatch = useDispatch();
 
     return (
         <div
-            className={`flex justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
+            className={`
+                ${embedMode ? 'hidden' : 'flex'}
+                justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer 
+                ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
+            `}
             onClick={() => {
-                dispatch(layout[position==='west' ? 'setWest' : 'setEast']({ open: true }));
-                Layout.resetHorizontalSplits();
-                Layout.toggleHorizontalDrag(['west','east'].indexOf(position), true);
+                position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
             }}
         >
             <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -268,15 +268,22 @@ const Browser = () => {
     }
     const BrowserBody = BrowserComponents[kind];
 
-    return open ? (
+    return (
         <div
             className={`flex flex-col h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
+            id='content-manager'
         >
-            <TitleBar />
-            <BrowserTabs />
-            <BrowserBody />
+            {
+                open ? (
+                    <>
+                        <TitleBar />
+                        <BrowserTabs />
+                        <BrowserBody />
+                    </>
+                ) : <Collapsed position='west' />
+            }
         </div>
-    ) : <Collapsed position='west' />;
+    );
 };
 
 const HotBrowser = hot(props => {
