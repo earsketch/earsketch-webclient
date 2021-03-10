@@ -36,7 +36,7 @@ const processContent = (location, html, dispatch) => {
             dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2)] + el.getAttribute("href") }))
         }
     })
-    root.querySelectorAll('a[href^="ch_"]').forEach(el => {
+    root.querySelectorAll('a[data-es-internallink="true"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: el.getAttribute("href") }))
