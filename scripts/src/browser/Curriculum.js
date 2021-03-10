@@ -104,7 +104,7 @@ const CurriculumHeader = () => {
     const location = useSelector(curriculum.selectCurrentLocation)
 
     return (
-        <div id="curriculum-header">
+        <div id="curriculum-header" style={{position: 'relative'}}>
             <TitleBar></TitleBar>
             <NavigationBar></NavigationBar>
 
