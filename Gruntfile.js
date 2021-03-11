@@ -41,12 +41,6 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: 'css/earsketch',
-                    src: 'allstyles.less',
-                    dest: 'css/earsketch',
-                    ext: '.css'
-                }, {
-                    expand: true,
-                    cwd: 'css/earsketch',
                     src: 'theme_dark.less',
                     dest: 'css/earsketch',
                     ext: '.css'
