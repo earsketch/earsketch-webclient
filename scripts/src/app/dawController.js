@@ -13,6 +13,10 @@ app.directive('daw', function () {
             ngModel: '='
         },
         controller: ['$scope', '$rootScope', '$location', '$timeout', 'player', 'audioContext', 'ESUtils', 'esconsole', '$sce', 'timesync', 'userProject', 'WaveformCache', 'userNotification', '$ngRedux', function ($scope, $rootScope, $location, $timeout, player, context, ESUtils, esconsole, $sce, timesync, userProject, WaveformCache, userNotification, $ngRedux) {
+            $ngRedux.connect(state => ({ ...state.bubble }))(state => {
+                $scope.bubble = state;
+            });
+
             $scope.freshPallete = true;
             $scope.zoomLowerLimit = 650;
             $scope.zoomStep = 100;

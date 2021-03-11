@@ -15,7 +15,7 @@ const layoutSlice = createSlice({
         },
         north: {
             open: true,
-            size: 150
+            size: 220
         },
         south: {
             open: true,

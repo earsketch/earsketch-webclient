@@ -20,6 +20,7 @@ const CreateScriptButton = () => {
                 flex items-center justify-center flex-shrink-0
                 text-lg cursor-pointer
             `}
+            id='create-script-button'
             onClick={() => ideControllerScope.createScript()}
         >
             <i className='icon icon-plus2' />

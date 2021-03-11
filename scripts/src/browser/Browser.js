@@ -65,6 +65,7 @@ export const BrowserTabs = () => {
     return (
         <div
             className='flex justify-between text-center'
+            id='browser-tabs'
             style={{
                 backgroundColor: darkBgColor,
                 color: 'white',

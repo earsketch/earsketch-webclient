@@ -236,14 +236,14 @@
                 <div class="hidden" ui-layout="" ui-layout-loaded></div>
 
                 <div id="layout-container" class="flex flex-row h-full">
-                    <div class="split" id="sidebar-container" ng-style="{'z-index':bubble.active&&bubble.currentPage>=5?35:0}">
+                    <div class="split" id="sidebar-container" ng-style="{'z-index':bubble.active&&[5,6,7,9].includes(bubble.currentPage)?35:0}">
                         <div class="overflow-hidden" id="sidebar"> <!-- re:overflow, split.js width calculation can cause the width to spill over the parent width -->
                             <content-manager></content-manager>
                         </div>
                     </div>
 
                     <div class="split flex flex-col" id="content">
-                        <div class="split" id="devctrl" ng-show="showIDE || showAll" ng-style="{'z-index':bubble.active&&bubble.currentPage>=3?35:0}">
+                        <div class="split" id="devctrl" ng-show="showIDE || showAll">
                             <div class="h-full max-h-full" id="workspace" ng-hide="showIDE && showAll">
                                 <div class="loading text-center h-full w-full flex items-center justify-center" ng-show="!loaded && !(showIDE && showAll)">
                                     <i class="spinner icon icon-spinner"></i> &nbsp; Loading...
@@ -255,7 +255,7 @@
                             </div>
                         </div>
 
-                        <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&bubble.currentPage!==0?35:0}" ng-controller="tabController">
+                        <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&[1,2,9].includes(bubble.currentPage)?35:0}" ng-controller="tabController">
                             <editor-header></editor-header>
                             <div ng-show="isEmbedded" class="embedded-script-info" >
                                 <p>Script: {{embeddedScriptName}}</p>
@@ -288,7 +288,7 @@
                             </div>
                         </div>
 
-                        <div class="split" id="console-frame" ng-style="{'z-index':bubble.active&&bubble.currentPage>=3?35:0}">
+                        <div class="split" id="console-frame" ng-style="{'z-index':bubble.active&&[9].includes(bubble.currentPage)?35:0}">
                             <div class="results">
                                 <div class="row">
                                     <div id="console">
@@ -321,7 +321,7 @@
                         </div>
                     </div>
 
-                    <div class="split" id="curriculum-container" ng-style="{'z-index':bubble.active&&bubble.currentPage>=8?35:0}"> <!-- curriculum -->
+                    <div class="split" id="curriculum-container" ng-style="{'z-index':bubble.active&&[8,9].includes(bubble.currentPage)?35:0}"> <!-- curriculum -->
                         <div class="h-full" ng-show="!showChatWindow && !showCAIWindow">
                             <curriculum style="height:inherit"></curriculum>
                         </div>
