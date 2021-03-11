@@ -50,7 +50,7 @@ export const pages = [
     },
     {
         header: '8/8 Read the curriculum',
-        body: 'On the right side is the curriculum panel. You can open the Table of Contents by clicking this bar to read about topics to continue learning about EarSketch.',
+        body: 'On the right side is the curriculum panel. Use the toggle switch to view the curriculum and the Welcome bar to navigate through the content.',
         ref: '#curriculum-navigation',
         placement: 'left'
     },
