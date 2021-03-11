@@ -242,13 +242,12 @@ export const Collapsed = ({ position='west', title=null }) => {
     };
 
     return (
-        <div className='flex flex-col h-full'>
+        <div className={`${embedMode ? 'hidden' : 'flex'} flex-col h-full`}>
             <div
                 className={`
-                ${embedMode ? 'hidden' : 'flex'}
-                justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer 
-                ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
-            `}
+                    flex justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer 
+                    ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
+                `}
                 onClick={onclickFn}
             >
                 <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>

@@ -44,17 +44,6 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
     var openScripts = [];
     var openSharedScripts = [];
 
-    // Load scripts from local storage if they are available. When a user logs
-    // in these scripts will be saved to the web service and deleted from local
-    // storage.
-    if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-        scripts = JSON.parse(localStorage.get(LS_SCRIPTS_KEY));
-
-        if (localStorage.checkKey(LS_TABS_KEY)) {
-            openScripts = JSON.parse(localStorage.get(LS_TABS_KEY));
-        }
-    }
-
     // websocket gets closed before onunload in FF
     $window.onbeforeunload = function (e) {
         if (isLogged()) {
@@ -159,8 +148,22 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             // console.log('x', e.x,'y', e.y); 
             clearInterval();
         }, 5000);
-    
 
+    function loadLocalScripts() {
+        // Load scripts from local storage if they are available. When a user logs
+        // in these scripts will be saved to the web service and deleted from local
+        // storage.
+        if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
+            scripts = Object.assign(scripts, JSON.parse(localStorage.get(LS_SCRIPTS_KEY)));
+
+            if (localStorage.checkKey(LS_TABS_KEY)) {
+                const storedTabs = JSON.parse(localStorage.get(LS_TABS_KEY));
+                if (storedTabs) {
+                    storedTabs.forEach(tab => openScripts.push(tab));
+                }
+            }
+        }
+    }
     /**
      * Because scripts and openScripts are objects and we can't reset them
      * simply by re-instantiating empty objects, we use resetScripts() to
@@ -1923,6 +1926,7 @@ function uploadCAIHistory(projectName, node) {
 
     self = {
         login: login,
+        loadLocalScripts: loadLocalScripts,
         storeUser: storeUser,
         loadUser: loadUser,
         clearUser: clearUser,

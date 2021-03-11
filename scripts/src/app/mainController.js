@@ -84,6 +84,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(layout.collapseEast());
         $ngRedux.dispatch(layout.collapseSouth());
         $ngRedux.dispatch(layout.setNorthFromRatio([25,75,0]));
+    } else {
+        userProject.loadLocalScripts();
+        $ngRedux.dispatch(scripts.syncToNgUserProject());
     }
 
     $scope.$on('embeddedScriptLoaded', function(event, data){

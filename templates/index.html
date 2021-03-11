@@ -257,18 +257,19 @@
 
                         <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&[1,2,9].includes(bubble.currentPage)?35:0}" ng-controller="tabController">
                             <editor-header></editor-header>
-                            <div ng-show="isEmbedded" class="embedded-script-info" >
-                                <p>Script: {{embeddedScriptName}}</p>
-                                <p>By: {{embeddedScriptUsername}}</p>
-                            </div>
 
                             <div class="flex-grow h-full">
                                 <div class="h-full flex flex-col" ng-hide="tabs.length === 0">
                                     <script-tabs></script-tabs>
+                                    <div ng-show="isEmbedded" class="embedded-script-info h-auto" >
+                                        <p>Script: {{embeddedScriptName}}</p>
+                                        <p>By: {{embeddedScriptUsername}}</p>
+                                    </div>
+
                                     <div editor class="flex flex-grow h-full max-h-full"></div>
                                 </div>
 
-                                <span ng-show="isEmbedded" class="embedded-script-info" style="padding-top: 5px;"> Script: {{embeddedScriptName}}</span>
+<!--                                <span ng-show="isEmbedded" class="embedded-script-info" style="padding-top: 5px;"> Script: {{embeddedScriptName}}</span>-->
 
                                 <div class="h-full flex flex-col justify-evenly text-4xl" ng-hide="tabs.length !== 0" style="text-align: center">
                                     <div class="leading-relaxed">
