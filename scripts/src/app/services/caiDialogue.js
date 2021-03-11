@@ -761,9 +761,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 console.log(utterance);
             }
 
-            if (textPieces.length==2) {
+            if (textPieces.length>=2) {
                 textPieces.push("");
                 keywordLinks.push(["",""]);
+
+                if(textPieces.length==3) {
+                    textPieces.push("");
+                    keywordLinks.push(["",""]);
+                }
             }
         }
         else {
