@@ -50,6 +50,7 @@ const EditorHeader = () => {
     const dispatch = useDispatch();
     const mainScope = helpers.getNgMainController().scope();
     const ideScope = helpers.getNgController('ideController').scope();
+    const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID);
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const blocksMode = useSelector(editor.selectBlocksMode);
@@ -68,7 +69,7 @@ const EditorHeader = () => {
             <div className={`font-semibold truncate`}>
                 CODE EDITOR
             </div>
-            <div className={`flex items-center space-x-8`}>
+            <div className={`${openTabs.length ? 'flex' : 'hidden'} items-center space-x-8`}>
                 <UndoRedoButtons />
 
                 <div
