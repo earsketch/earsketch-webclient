@@ -14,7 +14,7 @@ export const pages = [
     },
     {
         header: '2/8 Run Your Code',
-        body: 'Run your code and see it turn into music. Click the <span class="font-black text-green-600 text-2xl"><i class="align-middle icon icon-arrow-right22"></i>Run</span> button and view the code in the Digital Audio Workstation located above your code editor.',
+        body: 'Run your code and see it turn into music. Click the <span class="font-black text-green-600 text-2xl"><i class="align-middle icon icon-arrow-right22"></i>RUN</span> button and view the code in the Digital Audio Workstation located above your code editor.',
         ref: '#run-button',
         placement: 'bottom'
     },
