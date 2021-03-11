@@ -48,13 +48,13 @@
     <div class="loading-spinner"></div>
 </div>
 <script>
-    // white loading screen -- since angular is loaded much later, CSS file swapping will be too late to change the color of the loading screen
-    if (localStorage['colorTheme'] === 'light') {
-        document.getElementsByClassName('loader')[0].style['background-color'] = '#EFEFEF';
-        document.getElementsByClassName('loader')[0].style['color'] = '#4e4e4e';
-        document.body.style['background-color'] = '#EFEFEF'
+    // dark loading screen -- since angular is loaded much later, CSS file swapping will be too late to change the color of the loading screen
+    if (localStorage['colorTheme'] === 'dark') {
+        document.body.style['background-color'] = '#000'
     } else {
-        document.body.style['background-color'] = '#000000'
+        document.getElementsByClassName('loader')[0].style['background-color'] = '#EEE';
+        document.getElementsByClassName('loader')[0].style['color'] = '#4e4e4e';
+        document.body.style['background-color'] = '#EEE'
     }
 </script>
 

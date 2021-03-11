@@ -5,7 +5,7 @@
  * @author Takahiko Tsuchiya
  */
 app.factory('colorTheme', ['localStorage', '$rootScope', 'esconsole', function (localStorage, $rootScope, esconsole) {
-    var currentTheme = 'dark';
+    var currentTheme = 'light';
 
     function setTheme(theme) {
         esconsole('setting the color theme to ' + theme);
@@ -39,7 +39,7 @@ app.factory('colorTheme', ['localStorage', '$rootScope', 'esconsole', function (
         },
         
         load: function () {
-            const theme = localStorage.get('colorTheme');
+            const theme = localStorage.get('colorTheme', 'light');
             return setTheme(theme);
         }
     }

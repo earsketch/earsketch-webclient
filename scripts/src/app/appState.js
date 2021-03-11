@@ -7,7 +7,7 @@ const appSlice = createSlice({
     initialState: {
         locale: 'us-en',
         scriptLanguage: 'python',
-        colorTheme: 'dark',
+        colorTheme: 'light',
         fontSize: 14,
         embedMode: false
     },
