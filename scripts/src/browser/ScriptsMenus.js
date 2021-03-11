@@ -51,7 +51,11 @@ const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }) => {
 
     return (
         <div
-            className={`${visible ? 'flex' : 'hidden'} items-center justify-start p-2 space-x-4 ${cursor} ${theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
+            className={`
+                ${visible ? 'flex' : 'hidden'} items-center justify-start p-2 space-x-4 ${cursor} 
+                ${theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}
+                ${theme==='light' ? 'text-black' : 'text-white'}
+            `}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
             onClick={() => {
@@ -109,7 +113,7 @@ export const SingletonDropdownMenu = () => {
             { ...attributes.popper }
             className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
         >
-            <div className='flex justify-between items-center p-2 space-x-2 pb-4 border-b border-black mb-2'>
+            <div className={`flex justify-between items-center p-2 space-x-2 pb-4 border-b mb-2 ${theme==='light' ? 'text-black border-black' : 'text-white border-white'}`}>
                 <div className='truncate'>
                     {script && script.name}
                 </div>
