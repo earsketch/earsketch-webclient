@@ -88,9 +88,7 @@ export const proceed = createAsyncThunk(
                 break;
             case 2:
             case 3:
-                break;
             case 4:
-                await dispatch(layout.openWest('API'));
                 break;
             case 5:
                 await dispatch(layout.openWest('SOUNDS'));

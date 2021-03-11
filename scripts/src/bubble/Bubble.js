@@ -10,7 +10,7 @@ import { proceed, dismissBubble, setLanguage } from './bubbleState';
 
 const Backdrop = () => {
     return (
-        <div className={`w-full h-full z-30 bg-black opacity-75`}/>
+        <div className={`w-full h-full z-30 bg-black opacity-60`}/>
     );
 };
 
@@ -123,7 +123,7 @@ const MessageBox = () => {
                 bottom:'-19px',
                 borderLeft: '20px solid transparent',
                 borderRight: '20px solid transparent',
-                borderTop: '20px solid #F9FAFB'
+                borderTop: '20px solid white'
             });
             break;
         case 'bottom':
@@ -131,7 +131,7 @@ const MessageBox = () => {
                 top:'-19px',
                 borderLeft: '20px solid transparent',
                 borderRight: '20px solid transparent',
-                borderBottom: '20px solid #F9FAFB'
+                borderBottom: '20px solid white'
             });
             break;
         case 'bottom-start':
@@ -140,7 +140,7 @@ const MessageBox = () => {
                 left: '-270px',
                 borderLeft: '20px solid transparent',
                 borderRight: '20px solid transparent',
-                borderBottom: '20px solid #F9FAFB'
+                borderBottom: '20px solid white'
             });
             break;
         case 'left':
@@ -148,7 +148,7 @@ const MessageBox = () => {
                 right:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderLeft: '20px solid #F9FAFB'
+                borderLeft: '20px solid white'
             });
             break;
         case 'left-start':
@@ -157,7 +157,7 @@ const MessageBox = () => {
                 right:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderLeft: '20px solid #F9FAFB'
+                borderLeft: '20px solid white'
             });
             break;
         case 'right':
@@ -165,7 +165,7 @@ const MessageBox = () => {
                 left:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderRight: '20px solid #F9FAFB'
+                borderRight: '20px solid white'
             });
             break;
         case 'right-start':
@@ -174,7 +174,7 @@ const MessageBox = () => {
                 left:'-19px',
                 borderTop: '20px solid transparent',
                 borderBottom: '20px solid transparent',
-                borderRight: '20px solid #F9FAFB'
+                borderRight: '20px solid white'
             });
             break;
         default:
@@ -188,7 +188,7 @@ const MessageBox = () => {
 
     return (
         <div
-            className={`absolute z-40 w-1/3 bg-gray-50 p-8`}
+            className={`absolute z-40 w-1/3 bg-white p-8 shadow-xl`}
             ref={setPopperElement}
             style={pages[currentPage].ref===null?{}:styles.popper}
             { ...attributes.popper }
