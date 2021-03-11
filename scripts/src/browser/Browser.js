@@ -231,23 +231,41 @@ export const Collection = ({ title, visible=true, initExpanded=true, children, c
     );
 };
 
-export const Collapsed = ({ position='west' }) => {
+export const Collapsed = ({ position='west', title=null }) => {
     const theme = useSelector(appState.selectColorTheme);
     const embedMode = useSelector(appState.selectEmbedMode);
     const dispatch = useDispatch();
 
+    const onclickFn = () => {
+        position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
+    };
+
     return (
-        <div
-            className={`
+        <div className='flex flex-col h-full'>
+            <div
+                className={`
                 ${embedMode ? 'hidden' : 'flex'}
                 justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer 
                 ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
             `}
-            onClick={() => {
-                position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
-            }}
-        >
-            <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
+                onClick={onclickFn}
+            >
+                <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
+            </div>
+            <div
+                className={`flex-grow flex items-center justify-center`}
+            >
+                <div
+                    className={`
+                        whitespace-nowrap text-2xl font-semibold cursor-pointer tracking-widest
+                        ${theme==='light' ? 'text-gray-400' : 'text-gray-600'}
+                        transform ${position==='west' ? '-rotate-90' : 'rotate-90'}
+                    `}
+                    onClick={onclickFn}
+                >
+                    { title }
+                </div>
+            </div>
         </div>
     );
 };
@@ -280,7 +298,7 @@ const Browser = () => {
                         <BrowserTabs />
                         <BrowserBody />
                     </>
-                ) : <Collapsed position='west' />
+                ) : <Collapsed title='CONTENT MANAGER' position='west' />
             }
         </div>
     );

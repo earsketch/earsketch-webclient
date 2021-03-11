@@ -240,7 +240,7 @@ const CurriculumPane = () => {
                   </div>}
             </div>
         </div>
-    ) : <Collapsed position='east' />
+    ) : <Collapsed title='CURRICULUM' position='east' />
 }
 
 const NavigationBar = () => {
