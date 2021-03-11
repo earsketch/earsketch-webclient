@@ -32,7 +32,7 @@ export const pages = [
     },
     {
         header: '5/8 Explore your code',
-        body: 'On the left side of screen is the browser area. There are several types of browser. We will explore their function in the next steps.',
+        body: 'On the left side of screen is the browser area. There are several types of browsers. We will explore their functions in the next steps.',
         ref: '#content-manager',
         placement: 'right-start'
     },
