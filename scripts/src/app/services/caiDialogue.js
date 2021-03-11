@@ -738,7 +738,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function getLinks(utterance) {
+        utterance = "like: \n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, 1, startMeasure, endMeasure)\n\n    [LINK|fitMedia](FILENAME, 2, startMeasure, endMeasure)";
         var utteranceFirstHalf = utterance;
+        // var utteranceFirstHalf = utterance;
         var utteranceSecondHalf = "";
         var keyword = ""
         var link = ""
@@ -752,24 +754,25 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 // keyword = keyword.link("google.com")
                 link = LINKS[keyword];
                 utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
-                utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length - 1);
-    
+                utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length);
+                console.log("parts",utteranceFirstHalf,"next",utteranceSecondHalf);
                 utterance = utteranceSecondHalf;
                 textPieces.push(utteranceFirstHalf);
                 keywordLinks.push([keyword,link]);
     
                 console.log(utterance);
             }
-
-            while (textPieces.length<6) {
-                textPieces.push("");
-                keywordLinks.push(["",""]);
-            }
         }
         else {
-            keywordLinks = ["",""];
+            keywordLinks.push(["",""]);
         }
         textPieces.push(utterance);
+
+        while (textPieces.length<6) {
+            textPieces.push("");
+            keywordLinks.push(["",""]);
+        }
+
         
         var structure = [textPieces, keywordLinks]
         console.log(structure);
