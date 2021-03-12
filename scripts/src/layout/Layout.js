@@ -82,5 +82,6 @@ export const destroy = () => {
     layout.setVerticalSplits(null);
 };
 
-initialize();
+// Only create splitters when loaded through index.html with a particular structure.
+!!document.getElementById('sidebar-container') && initialize();
 
