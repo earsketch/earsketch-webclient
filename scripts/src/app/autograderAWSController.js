@@ -6,8 +6,6 @@ app.controller("autograderAWSController",
 ['$scope','compiler', 'Upload','userConsole','esconsole','reader', 'caiAnalysisModule','ESUtils', 'userProject', '$http',
 function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisModule, ESUtils, userProject, $http) {
 
-    // URL_DOMAIN = 'https://earsketch.gatech.edu/EarSketchWS';
-
     // Loading ogg by default for browsers other than Safari
     // setting default to wav for chrome 58 (May 22, 2017)
     if (ESUtils.whichBrowser().match('Opera|Firefox|Msie|Trident') !== null) {
@@ -15,6 +13,11 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
     } else {
         $scope.quality = false;//false wav, true ogg
     }
+
+    $scope.artistName = '';
+    $scope.complexityThreshold = 0;
+    $scope.uniqueStems = 0;
+    $scope.lengthRequirement = 0;
 
     $scope.contestDict = {};
 
@@ -27,7 +30,7 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
     $scope.processing = null;
 
     /**
-     * Calcualtethe complexity of a script as python or javascript based on the extension and
+     * Calculate the complexity of a script as python or javascript based on the extension and
      * return the complexity scores.
      */
     $scope.read = function(script, filename) {
@@ -65,39 +68,45 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
      * every script adding the results to the results list.
      */
     $scope.run = function() {
-      $scope.results = [];
+
       $scope.processing = null;
 
+      $scope.results = [];
+      $scope.contestDict = {};
+
+      $scope.music_passed = [];
+      $scope.code_passed = [];
+      $scope.music_code_passed = [];
+
       esconsole("Running autograder.", ['DEBUG']);
-      $scope.urls = document.querySelector('.output').innerText;
-      $scope.entries = document.querySelector('.hiddenOutput').innerText;
-      var shareUrls = $scope.urls.split('\n');
-      shareUrls.pop();
-      var contestID = $scope.entries.split(',');
+      $scope.entries = document.querySelector('.output').innerText;
+      $scope.entrants = document.querySelector('.hiddenOutput').innerText;
+      // var shareUrls = $scope.urls.split('\n');
+      // shareUrls.pop();
+      var shareID = $scope.entries.split('\n');
+      var contestID = $scope.entrants.split(',');
       // console.log(shareUrls);
 
-      for (i = 0; i < shareUrls.length; i++) {
-        if (shareUrls[i][0] == ','){
-          shareUrls[i] = shareUrls[i].substring(1);
+      for (i = 0; i < shareID.length; i++) {
+        if (shareID[i][0] == ','){
+          shareID[i] = shareID[i].substring(1);
         }
-        $scope.contestDict[shareUrls[i]] = contestID[i];
+        $scope.contestDict[shareID[i]] = contestID[i];
       }
 
-      var re = /\?sharing=([^\s.,;])+/g
-      var matches = $scope.urls.match(re);
+      // var re = /\?sharing=([^\s.,;])+/g
+      // var matches = $scope.urls.match(re);
 
       // start with a promise that resolves immediately
       var p = new Promise(function(resolve) { resolve(); });
 
       //for (var i = 0; i < shareUrls.length; i++) {
-      angular.forEach(matches, function(match) {
-        esconsole("Grading: " + match, ['DEBUG']);
-        //var shareId = ESUtils.parseShareId(url);
-        var shareId = match.substring(9);
-        esconsole("ShareId: " + shareId, ['DEBUG']);
+      // angular.forEach(matches, function(match) {
+      angular.forEach(shareID, function(id) {
+        esconsole("ShareId: " + id, ['DEBUG']);
         p = p.then(function() {
-          $scope.processing = shareId;
-          var ret = userProject.loadScript(shareId).then($scope.compileScript);
+          $scope.processing = id;
+          var ret = userProject.loadScript(id).then($scope.compileScript);
           if (ret != 0)
             return ret;
         });
@@ -118,16 +127,18 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
 
       var complexity = $scope.read(script.source_code, script.name);
       var complexityScore = reader.total(complexity);
-      var complexityPass = complexityScore > 50;
+      var complexityPass = complexityScore >= $scope.complexityThreshold;
 
       return $scope.compile(script.source_code, script.name).then(function(compiler_output) {
         esconsole(compiler_output, ['DEBUG']);
 
-        reports = caiAnalysisModule.analyzeMusic(compiler_output);
+        var analysis = caiAnalysisModule.analyzeMusic(compiler_output);
+        var reports = {};
+        reports["OVERVIEW"] = analysis["OVERVIEW"];
         reports["COMPLEXITY"] = complexity;
         reports["COMPLEXITY"]["complexityScore"] = complexityScore;
 
-        reports = Object.assign({}, reports, $scope.contestGrading(reports["OVERVIEW"]["length (seconds)"], reports["MEASUREVIEW"]));
+        reports = Object.assign({}, reports, $scope.contestGrading(reports["OVERVIEW"]["length (seconds)"], analysis["MEASUREVIEW"]));
 
         $scope.results.push({
           script: script,
@@ -141,6 +152,9 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
         });
         }
         reports["GRADE"]["code"] = (complexityPass > 0) ? 1 : 0;
+        if (reports["COMPLEXITY"]["userFunc"] == 0) {
+          reports["GRADE"]["code"] = 0;
+        } 
         if (reports["GRADE"]["code"] > 0) {
           $scope.code_passed.push({
           script: script,
@@ -154,11 +168,9 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
           reports: reports,
         });
         }
-        $scope.$apply();
         $scope.processing = null;
       }).catch(function(err) {
         esconsole(err, ['ERROR']);
-        $scope.$apply();
         $scope.processing = null;
     });
 
@@ -170,25 +182,34 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
     $scope.contestGrading = function(lengthInSeconds, measureView) {
 
         var report = {};
-        report["CIARA"] = {"numStems": 0, "stems": []};
+        report[$scope.artistName] = {"numStems": 0, "stems": []};
+
+        var stems = [];
 
         for (var measure in measureView) {
           for (var item in measureView[measure]) {
-            var sound = measureView[measure][item];
-            if (sound.includes("CIARA")) {
-              if (report["CIARA"]["stems"].indexOf(sound) === -1) {
-                report["CIARA"]["stems"].push(sound);
-                report["CIARA"]["numStems"] += 1;
+            if (measureView[measure][item].type == "sound") {
+              var sound = measureView[measure][item].name;
+              if (!stems.includes(sound)) {
+                stems.push(sound);
+              }
+              if (sound.includes($scope.artistName)) {
+                if (report[$scope.artistName]["stems"].indexOf(sound) === -1) {
+                  report[$scope.artistName]["stems"].push(sound);
+                  report[$scope.artistName]["numStems"] += 1;
+                }
               }
             }
           }
         }
 
-        report["GRADE"] = {"music": 0, "code": 0, "music_code": 0};
+        report["GRADE"] = {"music": 0, "code": 0, "music_code": 0, "uniqueStems": stems};
 
-        if(report["CIARA"]["numStems"] > 0){
-          if(30 <= lengthInSeconds <= 180){
-            report["GRADE"]["music"] = 1;
+        if(report[$scope.artistName]["numStems"] > 0){
+          if (stems.length > Number($scope.uniqueStems)) {
+            if(Number($scope.lengthRequirement) <= lengthInSeconds){
+              report["GRADE"]["music"] = 1;
+            }
           }
         }
 
@@ -230,7 +251,8 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
           row[1] = result.script.username;
           row[2] = result.script.name;
           row[3] = result.script.shareid;
-          var frontString = "https://earsketch.gatech.edu/earsketch2/#?sharing=";
+          // var frontString = "https://earsketch.gatech.edu/earsketch2/#?sharing=";
+          var frontString = SITE_BASE_URI + "/earsketch2/?sharing=";
           row[0] = $scope.contestDict[frontString+row[3]];
         }
         if (result.error) {
