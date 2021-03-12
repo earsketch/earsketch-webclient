@@ -83,7 +83,7 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
       $scope.entrants = document.querySelector('.hiddenOutput').innerText;
       // var shareUrls = $scope.urls.split('\n');
       // shareUrls.pop();
-      var shareID = $scope.entries.split('\n');
+      var shareID = $scope.entries.split(',');
       var contestID = $scope.entrants.split(',');
       // console.log(shareUrls);
 
@@ -203,7 +203,8 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
           }
         }
 
-        report["GRADE"] = {"music": 0, "code": 0, "music_code": 0, "uniqueStems": stems};
+        report["GRADE"] = {"music": 0, "code": 0, "music_code": 0};
+        report["UNIQUE_STEMS"] = {"stems": stems};
 
         if(report[$scope.artistName]["numStems"] > 0){
           if (stems.length > Number($scope.uniqueStems)) {
@@ -218,6 +219,7 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
 
     $scope.generateCSVAWS = function() {
       var headers = ['#', 'username', 'script_name', 'shareid', 'error'];
+      var includeReports = ["GRADE", "OVERVIEW"];
       var rows = [];
       var col_map = {};
 
@@ -226,17 +228,20 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
         if (result.reports) {
           for (var j = 0; j < Object.keys(result.reports).length; j++) {
             var name = Object.keys(result.reports)[j];
-            var report = result.reports[name];
-            if (col_map[name] === undefined) {
-              col_map[name] = {};
-            }
+            if (includeReports.includes(name)) {
 
-            for (var k = 0; k < Object.keys(report).length; k++) {
-              var key = Object.keys(report)[k];
-              var colname = name + '_' + key;
-              if (headers.indexOf(colname) === -1) {
-                headers.push(colname);
-                col_map[name][key] = headers.length - 1;
+              var report = result.reports[name];
+              if (col_map[name] === undefined) {
+                col_map[name] = {};
+              }
+
+              for (var k = 0; k < Object.keys(report).length; k++) {
+                var key = Object.keys(report)[k];
+                var colname = name + '_' + key;
+                if (headers.indexOf(colname) === -1) {
+                  headers.push(colname);
+                  col_map[name][key] = headers.length - 1;
+                }
               }
             }
           }
@@ -264,9 +269,11 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
           }
         } else if (result.reports) {
           angular.forEach(result.reports, function(report, name) {
-            angular.forEach(Object.keys(report), function(key) {
-              row[col_map[name][key]] = report[key];
-            });
+            if (includeReports.includes(name)) {
+              angular.forEach(Object.keys(report), function(key) {
+                row[col_map[name][key]] = report[key];
+              });
+            }
           });
         }
 
