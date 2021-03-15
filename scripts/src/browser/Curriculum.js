@@ -342,7 +342,7 @@ const HotCurriculum = hot(props => {
             let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
             type = aliases[type] || type
             const anchor = types.includes(type) ? '#' + type : ''
-            props.$ngRedux.dispatch(curriculum.fetchContent({ url: `ch_29.html${anchor}` }))
+            props.$ngRedux.dispatch(curriculum.fetchContent({ url: `every-error-explained-in-detail.html${anchor}` }))
         }
         initialized = true
     }
