@@ -20,7 +20,6 @@
             <div class="chat-message-bubble" ng-style="senderIsUser(message) ? messageBubbleStyles.sender : messageBubbleStyles.collaborator">
                 <div class="chat-message-sender">{{message.sender}}</div>
                 <div id="text" class="chat-message-text" ng-style="selectBubbleStyles(message)">{{message.returnText}} {{message.text[0]}}<a href="#" ng-click="openCurr(message,0)">{{message.keyword[0][0]}}</a>{{message.text[1]}}<a href="#" ng-click="openCurr(message,1)">{{message.keyword[1][0]}}</a>{{message.text[2]}}<a href="#" ng-click="openCurr(message,2)">{{message.keyword[2][0]}}</a>{{message.text[3]}}<a href="#" ng-click="openCurr(message,3)">{{message.keyword[3][0]}}</a>{{message.text[4]}}<a href="#" ng-click="openCurr(message,4)">{{message.keyword[4][0]}}</a>{{message.text[5]}}</div>
-                        <!-- <a href="#" ng-click="openCurr(message)"> {{message.curr}} test ch_1 new script link </a>  --> 
             </div>
             <div class="chat-message-date" ng-style="senderIsUser(message) ? messageDateStyles.sender : messageDateStyles.collaborator">
                 {{calcDate(message) | formatTimer}}
