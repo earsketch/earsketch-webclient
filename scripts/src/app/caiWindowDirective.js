@@ -1,4 +1,3 @@
-import * as helpers from '../helpers'
 app.directive('caiwindow', [function () {
 
     return {
@@ -265,17 +264,12 @@ app.directive('caiwindow', [function () {
                             for (var msg in messages) {
                                 if (messages[msg] != "") {
                                     var message = sendCAIOutputMessage(messages[msg]);
-                                    // console.log("helpers", helpers);
-                                    // var a = document.getElementById("text")
-                                    // a.setAttribute("href", message.link);
                                     // check for code updates.
                                     if (messages[msg] === "OK, I'll wait.")
                                         startPeriodicCheck();
 
                                     $scope.messageListCAI[$scope.activeProject].push(message);
                                     $scope.$applyAsync();
-                                    // ReactDOM.render(<a href="https://www.youtube.com"> it worked</a>,document.getElementById("text"));
-                                    // console.log("should render...");
                                 }
                             }
                         }

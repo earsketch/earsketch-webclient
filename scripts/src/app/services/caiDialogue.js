@@ -755,7 +755,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 link = LINKS[keyword];
                 utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
                 utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length);
-                console.log("parts",utteranceFirstHalf,"next",utteranceSecondHalf);
                 utterance = utteranceSecondHalf;
                 textPieces.push(utteranceFirstHalf);
                 keywordLinks.push([keyword,link]);
@@ -775,7 +774,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         
         var structure = [textPieces, keywordLinks]
-        console.log(structure);
         return structure;
     }
 
