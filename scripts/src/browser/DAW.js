@@ -10,7 +10,9 @@ import * as helpers from "../helpers";
 // TODO
 const isEmbedded = false
 const adjustLeftPosition = 0
-const todo = (...args) => console.log("TODO", args)
+const adjustTopPosition = 0
+const scope = {xOffset: 0}
+const todo = (...args) => undefined // console.log("TODO", args)
 const loop = {on: false, selection: null, start: null, end: null}
 
 const Header = () => {
@@ -120,7 +122,6 @@ const Track = ({ color, track }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // TODO
-    const scope = {xOffset: 0}
     const toggleBypass = todo
     const toggleSolo = todo
     const toggleMute = todo
@@ -395,7 +396,6 @@ const MixTrack = ({ color, track }) => {
     const trackHeight = useSelector(daw.selectTrackHeight)
     const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
     // TODO
-    const scope = {xOffset: 0}
     const hideMasterTrackLabel = false
     const toggleBypass = todo
 
@@ -534,10 +534,46 @@ const Slider = ({ value, onChange, options, title }) => {
     return <input type="range" min={options.floor} max={options.ceil} step={options.step} value={value} onChange={onChange} title={title} />
 }
 
+const Timeline = () => {
+    const xScale = useSelector(daw.selectXScale)
+    const playLength = useSelector(daw.selectPlayLength)
+    const timeScale = useSelector(daw.selectTimeScale)
+    const songDuration = useSelector(daw.selectSongDuration)
+    const intervals = useSelector(daw.selectZoomIntervals)
+    const element = useRef()
+    console.log("songDuration", songDuration)
+    console.log("intervals", intervals)
+
+    // redraw the timeline when the track width changes
+    useEffect(() => {
+        // create d3 axis
+        const timeline = d3.svg.axis()
+            .scale(timeScale) // scale ticks according to zoom
+            .orient("bottom")
+            .tickValues(d3.range(0, songDuration + 1, intervals.tickInterval))
+            .tickFormat(d => (d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, d))))
+
+        // append axis to timeline dom element
+        d3.select(element.current).select('svg.axis g')
+          .call(timeline)
+          .selectAll("text")
+          // move the first text element to fit inside the view
+          .style("text-anchor", "start")
+          .attr('y', 6)
+          .attr('x', 2)
+    })
+
+    return <div ref={element} id="daw-timeline" style={{width: scope.xOffset + xScale(playLength + 1) + 'px', top: adjustTopPosition + 'px'}}>
+        <svg className="axis">
+            <g></g>
+        </svg>
+    </div>
+}
+
 // More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition, dawTimeline, dawMeasureline
 
 // Pulled in via angular dependencies
-let WaveformCache, ESUtils, applyEffects
+let WaveformCache, ESUtils, applyEffects, player
 
 const rms = (array) => {
     return Math.sqrt(array.map(function (v) {
@@ -588,23 +624,34 @@ const prepareWaveforms = (tracks, tempo) => {
     }
 }
 
+let reset = true
 
 let setupDone = false
-const setup = (dispatch) => {
+const setup = (dispatch, getState) => {
     if (setupDone) return
     setupDone = true
 
     const $scope = helpers.getNgController('ideController').scope()
+    // TODO: remember which tab we came from, so if the user switches back and forth without re-running, we don't forget everything.
+    // Holding off for the moment because tabs are getting moved to React/Redux.
+    $scope.$on('swapTab', function () {
+        console.log("TODO: swapTab")
+        reset = true
+        // Set a dirty flag for next run.
+        // Don't need this to change anything yet, so it's outside of the store.
+    })
+
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
     $scope.$watch('compiled', function (result) {
+        const state = getState().daw
         console.log("compiled result:", result)
         if (result === null || result === undefined) return
 
         esconsole('code compiled', 'daw')
         prepareWaveforms(result.tracks, result.tempo)
 
-        console.log("set playLength", result.length + 1)
+        dispatch(daw.setTempo(result.tempo))
         dispatch(daw.setPlayLength(result.length + 1))
 
         const tracks = []
@@ -616,19 +663,13 @@ const setup = (dispatch) => {
             tracks.push(track)
 
             track.visible = true
-            // TODO:
-            // track.solo = $scope.preserve.solo.indexOf(i) > -1
-            // track.mute = $scope.preserve.muted.indexOf(i) > -1
-            track.solo = track.mute = false
+            track.solo = reset ? false : Boolean(state.tracks[index]?.solo)
+            track.mute = reset ? false : Boolean(state.tracks[index]?.mute)
             track.label = index
             track.buttons = true // show solo/mute buttons
 
             for (let [key, effect] of Object.entries(track.effects)) {
-                // TODO
-                // track.effects[key].visible = $scope.preserve.effects
-                // track.effects[key].bypass = $scope.preserve.bypass.indexOf(key) > -1
-                effect.visible = true
-                effect.bypass = false
+                effect.bypass = reset ? false : Boolean(state.tracks[index]?.effects?.[key]?.bypass)
             }
         })
 
@@ -644,126 +685,52 @@ const setup = (dispatch) => {
         }
         if (metronome !== undefined) {
             metronome.visible = false
-            // TODO
-            // metronome.mute = !$scope.preserve.metronome
+            metronome.mute = !state.metronome
             metronome.effects = {}
         }
 
         dispatch(daw.setTracks(tracks))
 
-        // TODO: bring over the rest of this
-        return
-
-        if (!$scope.preserve.playPosition) {
-            $scope.playPosition = 1;
+        if (reset) {
+            dispatch(daw.setMetronome(false))
+            dispatch(daw.setShowEffects(true))
+            // TODO:
+            // $scope.preserve.playing = false;
+            // $scope.preserve.playPosition = 1;
+            dispatch(daw.shuffleTrackColors())
         }
 
-        // overwrite the current script result, create a copy so we
-        // can non-destructively modify it.
-        // TODO: use a different data structure for destructive modifications
-        // so we don't waste memory
-        $scope.result = result;
+        // Reset the dirty flag.
+        reset = false
 
-        $scope.$on('resetScrollBars', function () {
-            $scope.resetScrollPos();
-        });
+        player.setRenderingData(result)
+        player.setMutedTracks(tracks)
+        player.setBypassedEffects(tracks)
 
-        $scope.tempo = $scope.result.tempo;
-        $scope.beatsPerBar = 4;
-        // this is the measure number where the script ends
-        // $scope.playLength = result.length + 1;
-        $scope.songDuration = ($scope.playLength*$scope.beatsPerBar)/($scope.tempo/60);
+        // TODO:
+        // $scope.$on('resetScrollBars', function () {
+        //     $scope.resetScrollPos();
+        // });
 
-        if ($scope.freshPallete) {
-            var result_ = $scope.getZoomIntervals($scope.playLength,$scope.zoomLevels);
-            if (result_) {
-                $scope.horzSlider.value = result_.zoomLevel;
-                $scope.updateTrackWidth($scope.horzSlider.value);
-            }
-            $scope.freshPallete = false;
-        }
-
-        // $scope.tracks = []; //$scope.result.tracks;
-
-        if (!$scope.preserve.trackColors) {
-            $scope.fillTrackColors($scope.result.tracks.length-1);
-        }
-
-        //We want to keep the length of a bar proportional to number of pixels on the screen
-        //We also don't want this proportion to change based on songs of different length
-        //So, we set a default number of measures that we want the screen to fit in
-        $scope.measuresFitToScreen = 61; //default length for scaling trackWidth
-        $scope.secondsFitToScreen = ($scope.measuresFitToScreen * $scope.beatsPerBar)/($scope.tempo/60);
-
-        // for (var i in $scope.result.tracks) {
-        //     if ($scope.result.tracks.hasOwnProperty(i)) {
-        //         i = parseInt(i); // for some reason this isn't always a str
-        //         // create a (shallow) copy of the track so that we can
-        //         // add stuff to it without affecting the reference which
-        //         // we want to preserve (e.g., for the autograder)
-        //         var track = angular.extend({}, $scope.result.tracks[i]);
-        //         $scope.tracks.push(track);
-
-        //         track.visible = true;
-        //         track.solo = $scope.preserve.solo.indexOf(i) > -1;
-        //         track.mute = $scope.preserve.muted.indexOf(i) > -1;
-        //         track.label = i;
-        //         track.buttons = true; // show solo/mute buttons
-
-        //         for (var j in track.effects) {
-        //             // not sure what this is trying to do (ref. line 131)?
-        //             // var effect = track.effects[j];
-        //             // track.effects[j] = angular.extend({}, track.effects[j]);
-        //             // effect.visible = $scope.preserve.effects;
-        //             // effect.bypass = $scope.preserve.bypass.indexOf
-
-        //             if (track.effects.hasOwnProperty(j)) {
-        //                 track.effects[j].visible = $scope.preserve.effects;
-        //                 track.effects[j].bypass = $scope.preserve.bypass.indexOf(j) > -1;
-        //             }
-        //         }
+        // if ($scope.freshPallete) {
+        //     var result_ = $scope.getZoomIntervals($scope.playLength,$scope.zoomLevels);
+        //     if (result_) {
+        //         $scope.horzSlider.value = result_.zoomLevel;
+        //         $scope.updateTrackWidth($scope.horzSlider.value);
         //     }
-        // }
-        // $scope.mix = $scope.tracks[0];
-        // $scope.metronome = $scope.tracks[$scope.tracks.length-1];
-
-        $scope.xScale = d3.scale.linear()
-            .domain([1, $scope.measuresFitToScreen]) // measures start at 1
-            .range([0, $scope.trackWidth]);
-
-        $scope.timeScale = d3.scale.linear()
-            .domain([0, $scope.secondsFitToScreen]) // time starts at 0
-            .range([0, $scope.trackWidth]);
-
-        // sanity checks
-        if ($scope.loop.start > $scope.playLength) {
-            $scope.loop.start = 1;
-        }
-        if ($scope.loop.end > $scope.playLength) {
-            $scope.loop.end = $scope.playLength;
-        }
-
-        // if (typeof $scope.mix !== "undefined") {
-        //     var effects = $scope.mix.effects;
-        //     var num = Object.keys(effects).length;
-        //     $scope.mix.visible = num > 0;
-        //     $scope.mix.mute = false;
-        //     // the mix track is special
-        //     $scope.mix.label = 'MIX';
-        //     $scope.mix.buttons = false;
-        // }
-        // if (typeof $scope.metronome !== "undefined") {
-        //     $scope.metronome.visible = false;
-        //     $scope.metronome.mute = !$scope.preserve.metronome;
-        //     $scope.metronome.effects = {};
+        //     $scope.freshPallete = false;
         // }
 
-        player.setRenderingData($scope.result);
-        player.setMutedTracks($scope.tracks);
-        player.setBypassedEffects($scope.tracks);
+        // // sanity checks
+        // if ($scope.loop.start > $scope.playLength) {
+        //     $scope.loop.start = 1;
+        // }
+        // if ($scope.loop.end > $scope.playLength) {
+        //     $scope.loop.end = $scope.playLength;
+        // }
 
-        $scope.freshPallete = false;
-        $scope.$broadcast('setPanelPosition');
+        // $scope.freshPallete = false;
+        // $scope.$broadcast('setPanelPosition');
     });
 }
 
@@ -825,7 +792,7 @@ const DAW = () => {
 
                         <div id="daw-clickable" onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
                             {/* Timescales */}
-                            <div id="daw-timeline"></div> {/* dawTimeline directive */}
+                            <Timeline />
                             <div id="daw-measureline"></div> {/* dawMeasureline directive */}
                         </div>
 
@@ -833,9 +800,9 @@ const DAW = () => {
                             {tracks.map((track, index) => {
                                 if (track.visible) {
                                     if (index === 0) {
-                                        return <MixTrack key={index} color={trackColors[index]} track={track} />
+                                        return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track} />
                                     } else if (index < tracks.length - 1) {
-                                        return <Track key={index} color={trackColors[index]} track={track} />
+                                        return <Track key={index} color={trackColors[index % trackColors.length]} track={track} />
                                     }
                                 }
                             })}
@@ -859,7 +826,8 @@ const HotDAW = hot(props => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
     applyEffects = props.applyEffects
-    setup(props.$ngRedux.dispatch)
+    player = props.player
+    setup(props.$ngRedux.dispatch, props.$ngRedux.getState)
     return (
         <Provider store={props.$ngRedux}>
             <DAW />
@@ -867,4 +835,4 @@ const HotDAW = hot(props => {
     );
 });
 
-app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects']))
+app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player']))
