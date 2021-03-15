@@ -7,11 +7,13 @@ import * as daw from './dawState'
 
 import * as helpers from "../helpers";
 
+// Width of track control box
+const X_OFFSET = 100
+
 // TODO
 const isEmbedded = false
 const adjustLeftPosition = 0
 const adjustTopPosition = 0
-const scope = {xOffset: 0}
 const todo = (...args) => undefined // console.log("TODO", args)
 const loop = {on: false, selection: null, start: null, end: null}
 
@@ -189,7 +191,7 @@ const Track = ({ color, track }) => {
     //     player.setMutedTracks($scope.tracks);
     // }
 
-    return <div style={{width: scope.xOffset + xScale(playLength) + 'px'}}>
+    return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
@@ -399,7 +401,7 @@ const MixTrack = ({ color, track }) => {
     const hideMasterTrackLabel = false
     const toggleBypass = todo
 
-    return <div style={{width: scope.xOffset + xScale(playLength) + 'px'}}>
+    return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
             <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
@@ -563,7 +565,7 @@ const Timeline = () => {
           .attr('x', 2)
     })
 
-    return <div ref={element} id="daw-timeline" style={{width: scope.xOffset + xScale(playLength + 1) + 'px', top: adjustTopPosition + 'px'}}>
+    return <div ref={element} id="daw-timeline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: adjustTopPosition + 'px'}}>
         <svg className="axis">
             <g></g>
         </svg>
