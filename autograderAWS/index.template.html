@@ -80,6 +80,8 @@
             <input type="text" id="complexityThreshold" ng-model="complexityThreshold" name="complexityThreshold" style="background: lightgray;">
             {{complexityThreshold}}
           </label>
+          <input type="checkbox" id="showIndividualGrades" name="showIndividualGrades">
+          <label for="showIndividualGrades"> Show individual entry reports.</label><br>
           <input type="file" id="fileUpload" onchange="read(this)" multiple>
           <script type="text/javascript">
             const reader = new FileReader()
@@ -103,8 +105,8 @@
               for(var i = 1; i < outputList.length; i++){
                  var outputID = outputList[i].split(',')[scriptIdx];
                  if (outputID && outputID.length > 1) {
-                  if (outputID[0] == "=") {
-                    outputID = outputID.substr(1);
+                  if (outputID.includes("=")) {
+                    outputID = outputID.split("=")[1];
                   }
                   outputArr.push(outputID);
                   contestID.push(outputList[i].split(',')[0]);
@@ -127,7 +129,7 @@
 
     <div class="container" ng-if="results.length > 0">
       {{results.length}} valid results. {{music_passed.length}} passed music. {{code_passed.length}} passed code. {{music_code_passed.length}} passed both.
-      <div class="panel panel-primary" ng-repeat="result in results">
+      <div class="panel panel-primary" ng-show="showIndividualGrades" ng-repeat="result in results">
         <div class="panel-heading">
           <b>{{result.script.username}}</b> ({{result.script.name}})
           <div class="pull-right">{{result.script.shareid}}</div>
@@ -136,18 +138,17 @@
           <b>{{result.error.args.v[0].v}}</b> on line {{result.error.traceback[0].lineno}}
         </div>
         <div class="row" ng-if="result.reports" >
-        <div class="col-md-6" ng-repeat="(name, report) in result.reports">
-          <h3>{{name}}</h3>
-          <table class="table">
-            <tr ng-repeat="(key, value) in report">
-              <th>{{key}}</th><td>{{value}}</td>
-            </tr>
-          </table>
-        </div>
+          <div class="col-md-6" ng-repeat="(name, report) in result.reports">
+            <h3>{{name}}</h3>
+            <table class="table">
+              <tr ng-repeat="(key, value) in report">
+                <th>{{key}}</th><td>{{value}}</td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
-      </div>
-    </div>
+    </div> 
     <div class="container" ng-show="processing">
       <div class="alert alert-info">
         Processing script id: {{processing}}
