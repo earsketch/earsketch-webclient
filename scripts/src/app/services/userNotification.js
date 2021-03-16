@@ -93,7 +93,9 @@ app.service('userNotification', ['$window', '$rootScope', function ($window, $ro
         } else {
             // showCallback.apply(this, arguments);
         }
-        popupCallback.apply(this, arguments);
+        if (popupCallback){
+            popupCallback.apply(this, arguments);
+        }
     };
 
     this.showBanner = function () {
