@@ -83,7 +83,7 @@ const CloseAllTab = () => {
     return (
         <div
             className={`
-                w-36 flex-shrink-0 h-12 p-3 cursor-pointer
+                w-48 flex-shrink-0 h-12 p-3 cursor-pointer
                 flex justify-around items-center
                 text-white bg-gray-800 border border-gray-800    
             `}
@@ -185,7 +185,7 @@ const Tabs = () => {
     const theme = useSelector(appState.selectColorTheme);
     const embedMode = useSelector(appState.selectEmbedMode);
 
-    const tabWidth = 90;
+    const tabWidth = 120;
     const createButtonWidth = 35;
     const dropdownWidth = 95;
     const containerRef = useRef(null);
