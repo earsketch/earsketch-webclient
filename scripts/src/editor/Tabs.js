@@ -16,7 +16,8 @@ const CreateScriptButton = () => {
     return (
         <div
             className={`
-                bg-black text-white h-7 w-7 mx-3 my-2
+                bg-black text-white dark:bg-white dark:text-black
+                h-7 w-7 mx-3 my-2
                 flex items-center justify-center flex-shrink-0
                 text-lg cursor-pointer
             `}
@@ -209,7 +210,7 @@ const Tabs = () => {
             className={`
                 ${embedMode ? 'hidden' : 'flex'}
                 justify-between items-center
-                ${theme==='light' ? 'bg-gray-200' : 'bg-gray-900'}
+                ${theme==='light' ? 'bg-gray-200' : 'dark bg-gray-900'}
             `}
             ref={containerRef}
         >
