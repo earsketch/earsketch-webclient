@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from "react-redux";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { react2angular } from 'react2angular';
 import { usePopper } from 'react-popper';
 import * as appState from "../app/appState";
 import * as scripts from "./scriptsState";
@@ -74,7 +75,7 @@ const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }) => {
 
 const dropdownMenuVirtualRef = new VirtualRef();
 
-export const SingletonDropdownMenu = () => {
+const SingletonDropdownMenu = () => {
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
@@ -264,3 +265,11 @@ export const DropdownContextMenuCaller = ({ script, type, children, className })
         </div>
     );
 };
+
+const DropdownMenuContainer = props => (
+    <Provider store={props.$ngRedux}>
+        <SingletonDropdownMenu />
+    </Provider>
+);
+
+app.component('scriptDropdownMenu', react2angular(DropdownMenuContainer, null, ['$ngRedux']));

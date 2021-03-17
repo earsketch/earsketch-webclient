@@ -9,7 +9,7 @@ import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
 import * as helpers from 'helpers';
 
-import { DropdownContextMenuCaller, SingletonDropdownMenu } from '../browser/ScriptsMenus';
+import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 
 const CreateScriptButton = () => {
     const ideControllerScope = helpers.getNgController('ideController').scope();
@@ -224,9 +224,6 @@ const HotTabs = hot(props => {
     return (
         <Provider store={props.$ngRedux}>
             <Tabs />
-
-            {/* TODO: Render this at the top (app) level. */}
-            <SingletonDropdownMenu />
         </Provider>
     );
 });

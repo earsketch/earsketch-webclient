@@ -157,6 +157,7 @@ require(['angular'], () => {
     require('./browser/Sounds');
     require('./browser/Scripts');
     require('./browser/Curriculum');
+    require('./browser/ScriptsMenus');
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');
