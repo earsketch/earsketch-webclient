@@ -292,7 +292,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
                     // user has not opened this shared link before
                     promise = userProject.loadScript(shareid, true).then(function (result) {
-                        if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        if ($scope.isEmbedded) {
+                            $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        }
+
                         if (result.username !== $scope.username) {
                             // the shared script doesn't belong to the logged-in user
                             $scope.switchToShareMode();
@@ -308,10 +311,15 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                             // TODO: use broadcast or service
                             $scope.editor.ace.focus();
 
-                            $rootScope.$broadcast('togglePanesOnOpeningOwnSharedScript')
-                            
-                            $scope.selectScript(result);
-                            userNotification.show('This shared script link points to your own script.');
+                            if ($scope.isEmbedded) {
+                                $scope.selectScript(result);
+
+                                // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
+                                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareid));
+                            } else {
+                                userNotification.show('This shared script link points to your own script.');
+                            }
 
                             // Manually removing the user-owned shared script from the browser.
                             // TODO: Better to have refreshShareBrowser or something.
