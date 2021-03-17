@@ -35,7 +35,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     const ngTabControllerScope = helpers.getNgController('tabController').scope();
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
-    const activeTabStyle = theme==='light' ? 'text-white bg-black' : 'text-black bg-gray-300';
+    const activeTabStyle = 'text-white bg-black dark:text-black dark:bg-gray-300';
     const inactiveTabStyle = theme==='light' && (highlight ? 'bg-gray-100 border-gray-200' : 'text-gray-600 bg-gray-200 border-gray-300') || (highlight ? 'bg-gray-400 border-gray-400' : 'text-gray-300 bg-gray-800 border-gray-700');
 
     const allScripts = useSelector(scripts.selectAllScriptEntities);
