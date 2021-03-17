@@ -62,7 +62,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
                 script={allScripts[scriptID]}
                 type={'regular'}
             >
-                <div className='truncate'>{scriptName}</div>
+                <div className='truncate select-none'>{scriptName}</div>
                 { highlight && (
                     <button
                         className='p-2 flex items-center'
