@@ -45,7 +45,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
             className={`
                 w-48 flex-shrink-0 h-12 cursor-pointer
                 ${active ? activeTabStyle : (inactiveTabStyle)+' border'}
-                flex justify-around items-center relative
+                flex relative
             `}
             key={scriptID}
             onClick={() => {
@@ -58,7 +58,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
             onMouseLeave={() => setHighlight(false)}
         >
             <DropdownContextMenuCaller
-                className={`flex justify-around items-center truncate p-3`}
+                className={`flex justify-between items-center truncate p-3 w-full`}
                 script={allScripts[scriptID]}
                 type={'regular'}
             >
