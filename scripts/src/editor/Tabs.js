@@ -43,7 +43,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     return (
         <div
             className={`
-                w-36 flex-shrink-0 h-12 cursor-pointer
+                w-48 flex-shrink-0 h-12 cursor-pointer
                 ${active ? activeTabStyle : (inactiveTabStyle)+' border'}
                 flex justify-around items-center relative
             `}
