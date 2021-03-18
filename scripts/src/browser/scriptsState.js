@@ -450,16 +450,16 @@ export const selectDropdownMenuContext = state => state.scripts.dropdownMenu.con
 
 // TODO: Unsaved scripts should probably be tracked in the editor or tab state.
 export const selectUnsavedDropdownMenuScript = createSelector(
-    [selectDropdownMenuScript, selectDropdownMenuType],
-    (script, type) => {
+    [selectDropdownMenuScript, selectDropdownMenuType, selectReadOnlyScriptEntities],
+    (script, type, readOnlyScripts) => {
         if (!script) {
             return null;
         }
 
         const userProject = helpers.getNgService('userProject');
-        return type==='regular'
-            ? userProject.scripts[script.shareid]
-            : userProject.sharedScripts[script.shareid];
+        return type==='regular' && userProject.scripts[script.shareid]
+            || type==='shared' && userProject.sharedScripts[script.shareid]
+            || type==='readonly' && readOnlyScripts[script.shareid] || null;
     }
 );
 

@@ -185,7 +185,7 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name='History' icon='icon-history'
-                disabled={!loggedIn}
+                disabled={!loggedIn || type==='readonly'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     scope.openScriptHistory(unsavedScript, true);
@@ -200,7 +200,7 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name='Import' icon='icon-import'
-                visible={type==='shared'}
+                visible={['shared','readonly'].includes(type)}
                 onClick={async () => {
                     const userProject = helpers.getNgService('userProject');
                     const imported = await userProject.importScript(Object.assign({},script));
@@ -214,6 +214,7 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name='Delete' icon='icon-bin'
+                visible={type!=='readonly'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     if (type==='regular') {

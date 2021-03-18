@@ -39,6 +39,8 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     const inactiveTabStyle = theme==='light' && (highlight ? 'bg-gray-100 border-gray-200' : 'text-gray-600 bg-gray-200 border-gray-300') || (highlight ? 'bg-gray-400 border-gray-400' : 'text-gray-300 bg-gray-800 border-gray-700');
 
     const allScripts = useSelector(scripts.selectAllScriptEntities);
+    const script = allScripts[scriptID];
+    const scriptType = script.isShared && 'shared' || script.readonly && 'readonly' || 'regular';
 
     return (
         <div
@@ -59,8 +61,8 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
         >
             <DropdownContextMenuCaller
                 className={`flex justify-between items-center truncate p-3 w-full`}
-                script={allScripts[scriptID]}
-                type={'regular'}
+                script={script}
+                type={scriptType}
             >
                 <div className='truncate select-none'>{scriptName}</div>
                 { highlight && (
