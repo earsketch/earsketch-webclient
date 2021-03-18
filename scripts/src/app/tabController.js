@@ -373,6 +373,8 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
         script.readonly = true;
         $scope.tabs.push(script);
+
+        $ngRedux.dispatch(scripts.addReadOnlyScript(Object.assign({}, script)));
         return $scope.tabs.length - 1;
     };
 
@@ -531,6 +533,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         // readonly tabs are not backed by the user service, so just close the tab
         else if (script.readonly) {
             $scope.tabs.splice(id, 1);
+            $ngRedux.dispatch(scripts.removeReadOnlyScript(script.shareid));
         }
         // otherwise tabs are backed by the user service
         else if (!script.saved && !script.collaborative) {
@@ -648,6 +651,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 $scope.tabs.splice(0,$scope.tabs.length);
                 $ngRedux.dispatch(tabs.resetTabs());
                 $ngRedux.dispatch(tabs.resetModifiedScripts());
+                $ngRedux.dispatch(scripts.resetReadOnlyScripts());
             }).catch(function (err) {
                 userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1');
             });

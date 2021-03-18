@@ -25,6 +25,10 @@ const scriptsSlice = createSlice({
             entities: {},
             scriptIDs: []
         },
+        readOnlyScripts: {
+            entities: {},
+            scriptIDs: []
+        },
         filters: {
             searchText: '',
             showDeleted: false,
@@ -65,13 +69,25 @@ const scriptsSlice = createSlice({
             state.sharedScripts.entities = {};
             state.sharedScripts.scriptIDs = [];
         },
-        addLocalScript(state, { payload }) {
-            state.localScripts.entities[payload.scriptID] = payload.entity;
-            state.localScripts.scriptIDs.push(payload.scriptID);
+        // addLocalScript(state, { payload }) {
+        //     state.localScripts.entities[payload.scriptID] = payload;
+        //     state.localScripts.scriptIDs.push(payload.scriptID);
+        // },
+        // resetLocalScripts(state) {
+        //     state.localScripts.entities = {};
+        //     state.localScripts.scriptIDs = [];
+        // },
+        addReadOnlyScript(state, { payload }) {
+            state.readOnlyScripts.entities[payload.shareid] = payload;
+            state.readOnlyScripts.scriptIDs.push(payload.shareid);
         },
-        resetLocalScripts(state) {
-            state.localScripts.entities = {};
-            state.localScripts.scriptIDs = [];
+        removeReadOnlyScript(state, { payload }) {
+            delete state.readOnlyScripts.entities[payload];
+            state.readOnlyScripts.scriptIDs = state.readOnlyScripts.scriptIDs.filter(v => v !== payload);
+        },
+        resetReadOnlyScripts(state) {
+            state.readOnlyScripts.entities = {};
+            state.readOnlyScripts.scriptIDs = [];
         },
         setSearchText(state, { payload }) {
             state.filters.searchText = payload;
@@ -143,8 +159,11 @@ export const {
     resetRegularScripts,
     setSharedScripts,
     resetSharedScripts,
-    addLocalScript,
-    resetLocalScripts,
+    // addLocalScript,
+    // resetLocalScripts,
+    addReadOnlyScript,
+    removeReadOnlyScript,
+    resetReadOnlyScripts,
     setSearchText,
     setShowDeleted,
     addFilterItem,
@@ -321,10 +340,12 @@ export const resetSharedScriptInfoAsync = createAsyncThunk(
 );
 
 /*=== Selectors ===*/
-export const selectRegularScriptEntities = state => state.scripts.regularScripts.entities;
-export const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
-export const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
+const selectRegularScriptEntities = state => state.scripts.regularScripts.entities;
+const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
+const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
 export const selectSharedScriptIDs = state => state.scripts.sharedScripts.scriptIDs;
+const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
+const selectReadOnlyScriptIDs = state => state.scripts.readOnlyScripts.scriptIDs;
 
 export const selectActiveScriptEntities = createSelector(
     [selectRegularScriptEntities],
@@ -344,13 +365,13 @@ export const selectDeletedScriptIDs = createSelector(
     (entities) => Object.keys(entities)
 );
 export const selectAllScriptEntities = createSelector(
-    [selectRegularScriptEntities, selectSharedScriptEntities],
-    (regularScripts, sharedScripts) => Object.assign({}, regularScripts, sharedScripts)
+    [selectRegularScriptEntities, selectSharedScriptEntities, selectReadOnlyScriptEntities],
+    (regularScripts, sharedScripts, readOnlyScripts) => Object.assign({}, regularScripts, sharedScripts, readOnlyScripts)
 );
 export const selectAllScriptIDs = createSelector(
-    [selectRegularScriptIDs, selectSharedScriptIDs],
-    (regularIDs, sharedIDs) => [...regularIDs, ...sharedIDs]
-)
+    [selectRegularScriptIDs, selectSharedScriptIDs, selectReadOnlyScriptIDs],
+    (regularIDs, sharedIDs, readOnlyIDs) => [...regularIDs, ...sharedIDs, ...readOnlyIDs]
+);
 
 export const selectFilters = state => state.scripts.filters;
 export const selectSearchText = state => state.scripts.filters.searchText;
