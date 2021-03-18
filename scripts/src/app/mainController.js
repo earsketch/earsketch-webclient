@@ -8,6 +8,7 @@ import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
+import * as helpers from '../helpers';
 
 /**
  * @module mainController
@@ -413,7 +414,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $scope.notificationList = [];
             reporter.logout();
 
+            // Note: Temporary scripts like read-only curriculum code may linger in tabController variables.
+            helpers.getNgController('tabController').scope().tabs = [];
             $ngRedux.dispatch(scripts.syncToNgUserProject());
+            $ngRedux.dispatch(scripts.resetReadOnlyScripts());
+            $ngRedux.dispatch(tabs.resetTabs());
         }).catch(function (err) {
             $confirm({text: ESMessages.idecontroller.saveallfailed,
                 cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
