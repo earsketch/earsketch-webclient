@@ -86,19 +86,19 @@ const Entry = ({ name, obj }) => {
         >
             <div className="flex justify-between mb-4">
                 <span
-                    className="text-2xl font-bold cursor-pointer" title={returnText}
+                    className="text-2xl font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate() }}
                 >
                     {name}
                 </span>
-                <div className="h-8">
+                <div className="h-8 flex">
                     <button
-                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? ' inline-block' : 'hidden'}`}
+                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? '' : 'hidden'}`}
                         onClick={() => paste(name, obj)}
                     >
-                        <i className="inline-block icon icon-paste2" />
+                        <i className="icon icon-paste2" />
                     </button>
-                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full inline-block text-xl rounded-full pl-4 border border-gray-600" onClick={() => { obj.details = !obj.details; forceUpdate() }}>
+                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap" onClick={() => { obj.details = !obj.details; forceUpdate() }}>
                         <div className="inline-block w-12">{obj.details ? "Close" : "Open"}</div>
                         <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? 'arrow-down' : 'arrow-right'}`} />
                     </button>
