@@ -94,7 +94,7 @@ const tabsMutableState = {
 };
 
 export const setActiveTabAndEditor = createAsyncThunk(
-    'editor/setActiveTabAndEditor',
+    'tabs/setActiveTabAndEditor',
     (scriptID, { getState, dispatch }) => {
         const ideScope = helpers.getNgController('ideController').scope();
 
@@ -114,6 +114,22 @@ export const setActiveTabAndEditor = createAsyncThunk(
         }
 
         dispatch(setActiveTabID(scriptID));
+    }
+);
+
+export const closeDeletedScript = createAsyncThunk(
+    'tabs/closeDeletedScript',
+    (scriptID, { getState, dispatch }) => {
+        const openTabs = selectOpenTabs(getState());
+        if (openTabs.includes(scriptID)) {
+            const filteredOpenTabs = openTabs.filter(v => v !== scriptID);
+            dispatch(setOpenTabs(filteredOpenTabs));
+            if (filteredOpenTabs.length) {
+                dispatch(setActiveTabAndEditor(filteredOpenTabs[Math.min(openTabs.indexOf(scriptID),filteredOpenTabs.length-1)]));
+            } else {
+                dispatch(setActiveTabID(null));
+            }
+        }
     }
 );
 

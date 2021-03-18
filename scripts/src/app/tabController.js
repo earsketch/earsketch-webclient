@@ -554,12 +554,13 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 }).catch(function (err) {
                 userNotification.show(ESMessages.idecontroller.savefailed, 'failure1');
             });
+
+            $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         } else {
 
             $scope.openScripts = userProject.closeScript(script.shareid);
             $scope.tabs.splice(id, 1);
         }
-        $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         savePromise ? savePromise.then(() => $scope.swapTabAfterClose(id)) : $scope.swapTabAfterClose(id);
     };
 

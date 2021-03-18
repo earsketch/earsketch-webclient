@@ -908,6 +908,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             reporter.deleteScript();
 
             $ngRedux.dispatch(scripts.syncToNgUserProject());
+            $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
+            $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         });
     };
 
