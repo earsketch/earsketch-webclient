@@ -56,6 +56,7 @@ const EditorHeader = () => {
     const blocksMode = useSelector(editor.selectBlocksMode);
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
+    const loggedIn = useSelector(state => state.user.loggedIn);
 
     return (
         <div
@@ -90,7 +91,7 @@ const EditorHeader = () => {
                     </div>
                     BLOCKS MODE
                 </div>
-                <div
+                {loggedIn && <div
                     className={`
                         rounded-full
                         text-white
@@ -102,7 +103,7 @@ const EditorHeader = () => {
                 >
                     <i className='icon-share32 pr-2' />
                     SHARE
-                </div>
+                </div>}
                 <div
                     className={`
                         flex
