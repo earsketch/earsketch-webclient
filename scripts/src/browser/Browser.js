@@ -237,18 +237,18 @@ export const Collapsed = ({ position='west', title=null }) => {
     const embedMode = useSelector(appState.selectEmbedMode);
     const dispatch = useDispatch();
 
-    const onclickFn = () => {
-        position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
-    };
-
     return (
-        <div className={`${embedMode ? 'hidden' : 'flex'} flex-col h-full`}>
+        <div
+            className={`${embedMode ? 'hidden' : 'flex'} flex-col h-full cursor-pointer`}
+            onClick={() => {
+                position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
+            }}
+        >
             <div
                 className={`
-                    flex justify-start w-12 h-7 p-1 m-3 rounded-full cursor-pointer 
+                    flex justify-start w-12 h-7 p-1 m-3 rounded-full 
                     ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
                 `}
-                onClick={onclickFn}
             >
                 <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
             </div>
@@ -261,7 +261,6 @@ export const Collapsed = ({ position='west', title=null }) => {
                         ${theme==='light' ? 'text-gray-400' : 'text-gray-600'}
                         transform ${position==='west' ? '-rotate-90' : 'rotate-90'}
                     `}
-                    onClick={onclickFn}
                 >
                     { title }
                 </div>
