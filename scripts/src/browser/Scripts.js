@@ -366,7 +366,7 @@ const Script = ({ script, bgTint, type }) => {
                         </div>
                         <div className='pr-4 space-x-2'>
                             {
-                                shared && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} />)
+                                (shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} />)
                             }
                             {
                                 script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${script.collaborators.join(', ')}`} />)

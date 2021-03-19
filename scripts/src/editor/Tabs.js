@@ -65,15 +65,17 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
                 script={script}
                 type={scriptType}
             >
-                <div className='truncate select-none'>{scriptName}</div>
-                { highlight && (
-                    <button
-                        className='p-2 flex items-center'
-                        onClick={(event) => ngTabControllerScope.closeTab(index, event)}
-                    >
-                        <i className={`icon-cross2 pr-1 cursor-pointer`} />
-                    </button>
-                )}
+                <div className='flex items-center space-x-3 truncate'>
+                    { (script.isShared && !script.collaborative) && <i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} /> }
+                    { script.collaborative && <i className='icon-users4 align-middle' title={`Shared with ${script.collaborators.join(', ')}`} /> }
+                    <div className='truncate select-none align-middle'>{scriptName}</div>
+                </div>
+                <button
+                    className='flex items-center'
+                    onClick={(event) => ngTabControllerScope.closeTab(index, event)}
+                >
+                    <i className={`icon-cross2 cursor-pointer`} />
+                </button>
             </DropdownContextMenuCaller>
             { modified && (<div className={`w-full border-b-4 border-red-500 absolute bottom-0 opacity-50`}/>) }
         </div>
