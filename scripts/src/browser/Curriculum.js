@@ -169,7 +169,7 @@ export const TitleBar = () => {
                         title="Switch script language"
                         onClick={() => {
                             const newLanguage = (language === 'python' ? 'javascript' : 'python')
-                            // TODO: This line is here to mesh with angular; remove it after rewriting other components.
+                            // TODO: Remove angular $broadcast after moving other components to React.
                             $rootScope.$broadcast('language', newLanguage)
                             dispatch(appState.setScriptLanguage(newLanguage))
                         }}>
@@ -327,8 +327,11 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
 
-
         $rootScope = props.$rootScope
+        // TODO: Remove angular $broadcast after moving other components to React.
+        const language = props.$ngRedux.getState().app.scriptLanguage
+        $rootScope.$broadcast('language', language)
+
         // Hack to facilitate Angular loading curriculum page for errors in console.
         // TODO: Remove this after we've ported templates/index.html to React.
         $rootScope.loadChapterForError = (errorMessage) => {

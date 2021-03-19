@@ -70,18 +70,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.currentLanguage = localStorage.get('language', 'python');
     $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
-    /**
-     * Variable that remembers what language is being displayed in the curriculum,
-     * so that the ide language type can be properly changed when copying curriculum code. 
-     */
-    $scope.curriculumLanguage = localStorage.get('language', 'python'); 
-
-
-    $scope.$on('curriculumLanguage', function(event, val){
-        $scope.curriculumLanguage = val;
-    });
-
-
     // TODO: create and handle this in userConsole directive
     $scope.$on('updateConsole', function () {
         $scope.logs = userConsole.getLogs();
@@ -495,16 +483,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         esconsole("paste key" + key, 'debug');
-        var ext;
-        var ideTargetLanguage;
-
-        if ($scope.curriculumLanguage === 'python') {
-            ext = '.py';
-            ideTargetLanguage = 'python';
-        } else {
-            ext = '.js';
-            ideTargetLanguage = 'javascript';
-        }
+        const ideTargetLanguage = $ngRedux.getState().app.scriptLanguage;
+        const ext = ideTargetLanguage === 'python' ? '.py' : '.js';
 
         $rootScope.$broadcast('language', ideTargetLanguage);
 
@@ -745,40 +725,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      * @param lang {string} 'python' or 'javascript'
      */
     $scope.languageModeSelect = function (lang) {
-        //var scriptName = $('#scriptName').html();
-        //var scriptName = $scope.scriptName;
-
         if (lang === 'python') {
-            //$scope.tabs[$scope.active()].name = scriptName.replace(/.(^.*)$/, '.py');
-            //$('#scriptName').html(scriptName.replace(/.([^.]*)$/, '.py'));
             $scope.currentLanguage = 'python';
             $scope.scriptExtension = '.py';
-            angular.element("#py i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            angular.element("#js i").removeClass("glyphicon glyphicon-ok-sign").addClass("glyphicon glyphicon-unchecked");
-
-            //Hide javascript and show python code blocks in curriculum
-            angular.element("#curriculum .curriculum-javascript").hide();
-            angular.element("#curriculum .curriculum-python").show();
-
-            //Hide /show copy buttons
-            angular.element(".copy-btn-js").hide();
-            angular.element(".copy-btn-py").show();
-
         } else {
-            //$scope.tabs[$scope.active()].name = scriptName.replace(/.(^.*)$/, '.js');
-            //$('#scriptName').html(scriptName.replace(/.([^.]*)$/, '.js'));
             $scope.currentLanguage = 'javascript';
             $scope.scriptExtension = '.js';
-            angular.element("#js i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            angular.element("#py i").removeClass("glyphicon glyphicon-ok").addClass("glyphicon glyphicon-unchecked");
-
-            //Hide javascript and show python code blocks in curriculum
-            angular.element("#curriculum .curriculum-python").hide();
-            angular.element("#curriculum .curriculum-javascript").show();
-
-            //Hide /show copy buttons
-            angular.element(".copy-btn-py").hide();
-            angular.element(".copy-btn-js").show();
         }
 
         localStorage.set('language', $scope.currentLanguage);
