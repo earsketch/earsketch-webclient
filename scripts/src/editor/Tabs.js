@@ -58,6 +58,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
+            title={script.name}
         >
             <DropdownContextMenuCaller
                 className={`flex justify-between items-center truncate p-3 w-full`}
