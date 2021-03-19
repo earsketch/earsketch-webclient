@@ -919,19 +919,32 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.deleteSharedScript = script => {
+        const tabScope = helpers.getNgController('tabController').scope();
+
         if (script.collaborative) {
-            $confirm({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(async () => {
+            $confirm({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(() => {
                 if (script.shareid === collaboration.scriptID && collaboration.active) {
                     collaboration.closeScript(script.shareid, userProject.getUsername());
                     userProject.closeSharedScript(script.shareid);
                 }
-                await collaboration.leaveCollaboration(script.shareid, userProject.getUsername());
+                // Apply state change first
+                delete userProject.sharedScripts[script.shareid];
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
+                $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
+                // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
+                collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
+
+                tabScope.tabs = tabScope.tabs.filter(v => v.shareid===script.shareid);
             })
         } else {
-            $confirm({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(async () => {
-                await userProject.deleteSharedScript(script.shareid);
-                $ngRedux.dispatch(scripts.syncToNgUserProject());
+            $confirm({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
+                userProject.deleteSharedScript(script.shareid).then(() => {
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
+                    $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
+                    $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
+                    tabScope.tabs = tabScope.tabs.filter(v => v.shareid===script.shareid);
+                });
             });
         }
     };

@@ -60,9 +60,9 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                     count++;
                 });
 
-                if ($scope.tabs[index] !== undefined && !$scope.tabs[index].readonly) {
+                if ($scope.tabs[index] && !$scope.tabs[index].readonly && $scope.scripts[key]) {
                     $scope.tabs[index] = $scope.scripts[key];
-                } else if ($scope.tabs[index] !== undefined && !$scope.tabs[index].isShared && $scope.scripts[key] !== undefined) {
+                } else if ($scope.tabs[index] && !$scope.tabs[index].isShared && $scope.scripts[key]) {
                     $scope.tabs.splice(index, 0, $scope.scripts[key]);
                 }
             }
@@ -84,7 +84,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                         count++;
                     });
 
-                    if ($scope.tabs[index] !== undefined) {
+                    if ($scope.tabs[index] && $scope.sharedScripts[shareid]) {
                         $scope.tabs[index] = $scope.sharedScripts[shareid];
                     }
                 }
@@ -247,6 +247,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         for (i in $scope.tabs) {
             if ($scope.tabs.hasOwnProperty(i)) {
                 var script = $scope.tabs[i];
+                if (!script) continue;
                 // #1858
                 if (script.readonly || (userProject.isLogged() && script.collaborative && script.username.toLowerCase() !== userProject.getUsername().toLowerCase())) {
                     notOwnedScriptsCache[i] = script;
@@ -260,7 +261,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             // if the user has tabs, open them
             for (i in $scope.openScripts) {
                 var key = $scope.openScripts[i];
-                if ($scope.openScripts.hasOwnProperty(i) && $scope.scripts[key] !== undefined) {
+                if ($scope.openScripts.hasOwnProperty(i) && $scope.scripts[key]) {
                     $scope.tabs.push($scope.scripts[key]);
                 }
             }
@@ -270,7 +271,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         angular.forEach(notOwnedScriptsCache, function(value, key) {
             // checking this because collaborative scripts in notOwnedScriptsCache is handled differently from the share scripts cache upon logout.
             // TODO: could be improved by introducing the tabs service properly.
-            if (userProject.scripts.hasOwnProperty(value.shareid) || userProject.sharedScripts.hasOwnProperty(value.shareid) || value.readonly) {
+            if (value && (userProject.scripts.hasOwnProperty(value.shareid) || userProject.sharedScripts.hasOwnProperty(value.shareid) || value.readonly)) {
                 $scope.tabs.splice(key, 0, value);
             }
         });
@@ -290,7 +291,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
         for (i in $scope.tabs) {
             if ($scope.tabs.hasOwnProperty(i)) {
-                if (!$scope.tabs[i].isShared) {
+                if ($scope.tabs[i] && !$scope.tabs[i].isShared) {
                     openScriptsCache[i] = $scope.tabs[i];
                 }
             }
@@ -302,14 +303,14 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             for (i in $scope.openSharedScripts) {
                 if ($scope.openSharedScripts.hasOwnProperty(i)) {
                     var key = $scope.openSharedScripts[i];
-                    $scope.tabs.push($scope.sharedScripts[key]);
+                    $scope.sharedScripts[key] && $scope.tabs.push($scope.sharedScripts[key]);
                 }
             }
         }
 
         // re-insert open tabs at previous positions
         angular.forEach(openScriptsCache, function(value, key) {
-            $scope.tabs.splice(key, 0, value);
+            value && $scope.tabs.splice(key, 0, value);
         });
     }
 

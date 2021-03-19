@@ -203,7 +203,14 @@ const SingletonDropdownMenu = () => {
                 visible={['shared','readonly'].includes(type)}
                 onClick={async () => {
                     const userProject = helpers.getNgService('userProject');
-                    const imported = await userProject.importScript(Object.assign({},script));
+                    let imported;
+
+                    if (script.collaborative) {
+                        imported = await userProject.importCollaborativeScript(Object.assign({},script));
+                    } else {
+                        imported = await userProject.importScript(Object.assign({},script));
+                    }
+
                     await userProject.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
 
@@ -215,13 +222,16 @@ const SingletonDropdownMenu = () => {
             <MenuItem
                 name='Delete' icon='icon-bin'
                 visible={type!=='readonly'}
-                onClick={() => {
+                onClick={async () => {
                     const scope = helpers.getNgMainController().scope();
+                    const userProject = helpers.getNgService('userProject');
                     if (type==='regular') {
-                        scope.deleteScript(unsavedScript);
+                        await scope.deleteScript(unsavedScript);
                     } else if (type==='shared') {
-                        scope.deleteSharedScript(script);
+                        await scope.deleteSharedScript(script);
                     }
+                    await userProject.refreshCodeBrowser();
+                    dispatch(scripts.syncToNgUserProject());
                 }}
             />
         </div>

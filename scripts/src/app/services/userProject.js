@@ -402,21 +402,22 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             // TODO: base64 encoding is not a secure way to send password
 
-            return $http.post(url, payload, opts).then(function(result) {
-                if (result.data === null) {
-                    // no scripts
-                    return [];
-                } else if (result.data.scripts instanceof Array) {
-                    var r = result.data.scripts;
-                } else {
-                    // one script -- somehow this gets parsed to one object
-                    var r = [result.data.scripts];
+            return $http.post(url, payload, opts).then(result => {
+                let res;
+
+                if (result.data) {
+                    if (result.data.scripts instanceof Array) {
+                        res = result.data.scripts;
+                    } else {
+                        // one script -- somehow this gets parsed to one object
+                        res = [result.data.scripts];
+                    }
                 }
 
                 resetScripts();
 
-                for (var i in r) {
-                    var script = r[i];
+                for (var i in res) {
+                    let script = res[i];
                     // reformat saved date to ISO 8601 format
                     // TODO: moment.js would allow us to format arbitrary date strings
                     // alternatively, dates should be stored in the database
@@ -452,7 +453,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                     scripts[script.shareid] = script;
                 }
             }
-            return new Promise(function(resolve) {resolve()});
+            return Promise.resolve();
         }
     }
 
@@ -586,26 +587,26 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
          };
 
          return $http.post(url, payload, opts).then(function (result) {
-             if (result.data === null) {
-                 // no scripts
-                 sharedScriptsReady = true;
-                 return [];
-             } else if (result.data.scripts instanceof Array) {
-                 var r = result.data.scripts;
-             } else {
-                 // one script -- somehow this gets parsed to one object
-                 var r = [result.data.scripts];
+             let res;
+
+             if (result.data) {
+                 if (result.data.scripts instanceof Array) {
+                     res = result.data.scripts;
+                 } else {
+                     // one script -- somehow this gets parsed to one object
+                     res = [result.data.scripts];
+                 }
              }
 
-             for (var i in r) {
-                 var script = r[i];
+             for (var i in res) {
+                 var script = res[i];
                  script.isShared = true;
                  script = postProcessCollaborators(script, getUsername());
                  sharedScripts[script.shareid] = script;
              }
 
              sharedScriptsReady = true;
-             return r;
+             return res;
          });
      }
 
@@ -1255,6 +1256,38 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 return saveScript(script.name, script.source_code);
             }
         });
+    }
+
+    function importCollaborativeScript(script) {
+        let p, originalScriptName = script.name;
+        if (lookForScriptByName(script.name)) {
+            p = $uibModal.open({
+                templateUrl: 'templates/rename-import-script.html',
+                controller: 'renameController',
+                size: 100,
+                resolve: {
+                    script: function() { return script; }
+                }
+            }).result;
+
+            p.then(newScript => {
+                if (newScript.name === script.name) {
+                    script.name = nextName(script.name);
+                } else {
+                    script.name = newScript.name;
+                }
+                return script;
+            });
+        } else {
+            // Script name is valid, so just return it
+            p = Promise.resolve(script);
+        }
+
+        return p.then(() => collaboration.getScriptText(script.shareid).then(text => {
+            userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`);
+            collaboration.closeScript(script.shareid, getUsername());
+            return saveScript(script.name, text);
+        }));
     }
 
     /**
@@ -1968,6 +2001,7 @@ function uploadCAIHistory(projectName, node) {
         setScriptDesc: setScriptDesc,
         importSharedScript: importSharedScript,
         importScript: importScript,
+        importCollaborativeScript: importCollaborativeScript,
         openSharedScriptForEdit: openSharedScriptForEdit,
         addSharedScript: addSharedScript,
         refreshCodeBrowser: refreshCodeBrowser,
