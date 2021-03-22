@@ -828,6 +828,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $scope.shareScript = async script => {
         await userProject.saveScript(script.name, script.source_code);
+        $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
             templateUrl: 'templates/share-script.html',
             controller: 'shareScriptController',
@@ -877,6 +878,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $scope.openScriptHistory = async (script, allowRevert) => {
         await userProject.saveScript(script.name, script.source_code);
+        $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
             templateUrl: 'templates/script-versions.html',
             controller: 'scriptVersionController',
@@ -951,6 +953,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $scope.submitToCompetition = async script => {
         await userProject.saveScript(script.name, script.source_code);
+        $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
             templateUrl: 'templates/submit-script-aws.html',
             controller: 'submitAWSController',

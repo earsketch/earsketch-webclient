@@ -555,6 +555,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $scope.clearErrors();
         userConsole.status('Running script...');
 
+        const scriptID = tabs.selectActiveTabID($ngRedux.getState());
+        $ngRedux.dispatch(tabs.removeModifiedScript(scriptID));
+
         promise.then(function (result) {
             var duration = Date.now() - startTime;
             $scope.loaded = true;
