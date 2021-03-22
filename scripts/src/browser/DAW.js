@@ -18,6 +18,54 @@ const todo = (...args) => undefined // console.log("TODO", args)
 const loop = {on: false, selection: null, start: null, end: null}
 
 const Header = () => {
+    const playLength = useSelector(daw.selectPlayLength)
+
+    // TODO:
+    const playbackStartedCallback = (...args) => console.log("playback started", args)
+    const playbackEndedCallback = (...args) => console.log("playback ended", args)
+    const playPosition = 1
+
+    const play = () => {
+        // const { bubble } = $ngRedux.getState();
+        // if (bubble.active && bubble.currentPage===4 && !bubble.readyToProceed) {
+        //     $ngRedux.dispatch(setReady(true));
+        // }
+
+        // if ($scope.trackIsembeddedAndUncompiled) {
+        //     $rootScope.$broadcast('compileembeddedTrack', true);
+        //     $(".btn-play").removeClass("flashButton");
+        //     $scope.trackIsembeddedAndUncompiled = false;
+        //     return;
+        // }
+
+        // drawPlayhead(false)
+
+        // if ($scope.playPosition >= $scope.playLength) {
+        //     if ($scope.loop.selection) {
+        //         $scope.playPosition = $scope.loop.start
+        //     } else {
+        //         $scope.playPosition = 1
+        //     }
+        // }
+
+        // $scope.playing = true
+
+        // Seems like these should be unnecessary given that they're set upon compile:
+        // player.setRenderingData($scope.result)
+        // player.setMutedTracks($scope.tracks)
+        // player.setBypassedEffects($scope.tracks)
+        player.setOnStartedCallback(playbackStartedCallback)
+        player.setOnFinishedCallback(playbackEndedCallback)
+        player.play(playPosition, playLength)
+
+        // volume state is not preserved between plays
+        // if ($scope.volumeMuted) {
+        //     $scope.mute()
+        // } else {
+        //     $scope.changeVolume()
+        // }
+    }
+
     // TODO
     const showIcon = true
     const showFullTitle = true
@@ -33,7 +81,6 @@ const Header = () => {
     const volume = 0
 
     const reset = todo
-    const play = todo
     const pause = todo
     const toggleLoop = todo
     const toggleMute = todo
@@ -439,19 +486,6 @@ const MixTrack = ({ color, track }) => {
     </div>
 }
 
-const Highlight = ({ style }) => {
-    // TODO
-    // return {
-    //     restrict: 'E',
-    //     scope: {},
-    //     link: function (scope, element) {
-    //         element.addClass('daw-highlight');
-    //         element.css('top', '0px');
-    //     }
-    // }
-    return <div style={style}></div>
-}
-
 const Cursor = () => {
     // TODO
     // app.directive('dawCursor', function () {
@@ -745,6 +779,9 @@ const setup = (dispatch, getState) => {
             track = Object.assign({}, track)
             tracks.push(track)
 
+            // Copy clips, too... because somehow dispatch(daw.setTracks(tracks)) is doing a deep freeze, preventing clip.source from being set by player.
+            track.clips = track.clips.map(c => Object.assign({}, c))
+
             track.visible = true
             track.solo = reset ? false : Boolean(state.tracks[index]?.solo)
             track.mute = reset ? false : Boolean(state.tracks[index]?.mute)
@@ -772,7 +809,23 @@ const setup = (dispatch, getState) => {
             metronome.effects = {}
         }
 
+        // Without copying clips above, this dispatch somehow freezes all of the clips, which breaks player.
+
+        // result.tracks.forEach((track, index) => {
+        //     console.log("frozen conspiracy before: track", index)
+        //     track.clips.forEach((clip, index) => {
+        //         console.log("clip", index, Object.isExtensible(clip))
+        //     })
+        // })
+
         dispatch(daw.setTracks(tracks))
+
+        // result.tracks.forEach((track, index) => {
+        //     console.log("frozen conspiracy after: track", index)
+        //     track.clips.forEach((clip, index) => {
+        //         console.log("clip", index, Object.isExtensible(clip))
+        //     })
+        // })
 
         if (reset) {
             dispatch(daw.setMetronome(false))
@@ -896,7 +949,7 @@ const DAW = () => {
                             <SchedPlayhead />
                             <Cursor />
                             {(dragging || loop.selection && loop.on) && loop.end != loop.start &&
-                            <Highlight style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos, 'left': xScale(Math.min(loop.start, loop.end))}} />}
+                            <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
                         </div>
                     </div>
                 </div>
