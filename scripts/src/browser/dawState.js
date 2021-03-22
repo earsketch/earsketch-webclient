@@ -18,12 +18,25 @@ const BEATS_PER_MEASURE = 4
 
 // Intervals of measure line based on zoom levels
 // This list is referred during zoom in/out
-const MEASURE_LINE_ZOOM_INTERVALS = [
+const MEASURELINE_ZOOM_INTERVALS = [
     {start: 649, end: 750, tickInterval: 4, labelInterval: 4, tickDivision: 1},
     {start: 750, end: 1350, tickInterval: 1, labelInterval: 4, tickDivision: 4},
     {start: 1350, end: 1950, tickInterval: 0.5, labelInterval: 4, tickDivision: 1},
     {start: 1950, end: 2850, tickInterval: 0.5, labelInterval: 1, tickDivision: 1},
     {start: 2850, end: 50000, tickInterval: 0.25, labelInterval: 1, tickDivision: 1}
+]
+
+// Intervals of timeline based on zoom levels
+// This list is referred during zoom in/out
+const TIMELINE_ZOOM_INTERVALS = [
+    {start: 649, end: 950, tickInterval: 15},
+    {start: 950, end: 1550, tickInterval: 10},
+    {start: 1550, end: 2650, tickInterval: 5},
+    {start: 2650, end: 2950, tickInterval: 5},
+    {start: 2950, end: 3950, tickInterval: 4},
+    {start: 3950, end: 7850, tickInterval: 2},
+    {start: 7850, end: 9150, tickInterval: 1},
+    {start: 9150, end: 50000, tickInterval: 1}
 ]
 
 // We want to keep the length of a bar proportional to number of pixels on the screen.
@@ -102,16 +115,21 @@ export const selectMixTrackHeight = createSelector(
 export const selectXScale = createSelector(
     [selectTrackWidth],
     (trackWidth) => {
-        return (x) => (x - 1)/(MEASURES_FIT_TO_SCREEN - 1) * trackWidth
-})
+        // Would prefer to do this, but d3 won't accept a plain function in d3.svg.axis().scale(...).
+        // return (x) => (x - 1)/(MEASURES_FIT_TO_SCREEN - 1) * trackWidth
+        return d3.scale.linear()
+            .domain([1, MEASURES_FIT_TO_SCREEN])
+            .range([0, trackWidth])
+    }
+)
 
 export const selectTimeScale = createSelector(
     [selectTrackWidth, selectTempo],
     (trackWidth, tempo) => {
         const secondsFitToScreen = MEASURES_FIT_TO_SCREEN*BEATS_PER_MEASURE/(tempo/60)
         return d3.scale.linear()
-                       .domain([0, secondsFitToScreen])
-                       .range([0, trackWidth])
+            .domain([0, secondsFitToScreen])
+            .range([0, trackWidth])
     }
 )
 
@@ -120,14 +138,20 @@ export const selectSongDuration = createSelector(
     (playLength, tempo) => playLength*BEATS_PER_MEASURE/(tempo/60)
 )
 
-export const selectZoomIntervals = createSelector(
-    [selectTrackWidth],
-    (width) => {
-        width = 650 // TODO: This looks wrong if it uses 2750, but other things like wrong if they use 650...
-        for (const zoomInterval of MEASURE_LINE_ZOOM_INTERVALS) {
-            if (width > zoomInterval.start && width <= zoomInterval.end) {
-                return zoomInterval
-            }
+const getZoomIntervals = (intervals, width) => {
+    for (const zoomIntervals of intervals) {
+        if (width > zoomIntervals.start && width <= zoomIntervals.end) {
+            return zoomIntervals
         }
     }
+}
+
+export const selectMeasurelineZoomIntervals = createSelector(
+    [selectTrackWidth],
+    width => getZoomIntervals(MEASURELINE_ZOOM_INTERVALS, width)
+)
+
+export const selectTimelineZoomIntervals = createSelector(
+    [selectTrackWidth],
+    width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
 )

@@ -536,15 +536,96 @@ const Slider = ({ value, onChange, options, title }) => {
     return <input type="range" min={options.floor} max={options.ceil} step={options.step} value={value} onChange={onChange} title={title} />
 }
 
+const Measureline = () => {
+    const xScale = useSelector(daw.selectXScale)
+    const intervals = useSelector(daw.selectMeasurelineZoomIntervals)
+    const playLength = useSelector(daw.selectPlayLength)
+    const element = useRef()
+
+    useEffect(() => {
+        let n = 1
+
+        console.log("Measureline intervals", intervals)
+
+        // create d3 axis
+        const measureline = d3.svg.axis()
+            .scale(xScale) // scale ticks according to zoom
+            .orient("bottom")
+            .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
+            .tickSize(15)
+            .tickFormat(d => {
+                // choose the next tick based on interval
+                if (n === 1) {
+                    n = intervals.labelInterval + d
+                    return d
+                } else {
+                    if (d === n) {
+                        n = intervals.labelInterval + n
+                        return d
+                    }
+                }
+                return ''
+            })
+
+        // append axis to timeline dom element
+        d3.select(element.current).select('svg.axis g')
+            .call(measureline)
+            .selectAll("text")
+            // move the first text element to fit inside the view
+            .style("text-anchor", "start")
+            .attr('y', 2)
+            .attr('x', 3)
+
+        if (intervals.tickDivision > 1) {
+            let n = 1
+            d3.select(element.current).selectAll('svg .tick')
+                .filter(d => {
+                    if (n === 1) {
+                        n = intervals.tickDivision + d
+                        return false
+                    } else {
+                        if (d === n) {
+                            n = intervals.tickDivision + n
+                            return false
+                        }
+                    }
+                    return true
+                })
+                .select('line')
+                .attr('y1', 8)
+                .attr('y2', 15)
+
+        } else {
+            d3.select(element.current).selectAll('svg .tick')
+                .filter(d => d % 1 !== 0)
+                .select('line')
+                .attr('y1', 8)
+                .attr('y2', 15)
+
+            d3.select(element.current).selectAll('svg .tick')
+                .filter(d => d % 1 === 0)
+                .select('line')
+                .attr('y1', 0)
+                .attr('y2', 15)
+        }
+    })
+
+    return <div ref={element} id="daw-measureline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: adjustTopPosition + 15 + 'px'}}>
+        <svg className="axis">
+            <g></g>
+        </svg>
+    </div>
+}
+
 const Timeline = () => {
     const xScale = useSelector(daw.selectXScale)
     const playLength = useSelector(daw.selectPlayLength)
     const timeScale = useSelector(daw.selectTimeScale)
     const songDuration = useSelector(daw.selectSongDuration)
-    const intervals = useSelector(daw.selectZoomIntervals)
+    const intervals = useSelector(daw.selectTimelineZoomIntervals)
     const element = useRef()
     console.log("songDuration", songDuration)
-    console.log("intervals", intervals)
+    console.log("Timeline intervals", intervals)
 
     // redraw the timeline when the track width changes
     useEffect(() => {
@@ -557,12 +638,12 @@ const Timeline = () => {
 
         // append axis to timeline dom element
         d3.select(element.current).select('svg.axis g')
-          .call(timeline)
-          .selectAll("text")
-          // move the first text element to fit inside the view
-          .style("text-anchor", "start")
-          .attr('y', 6)
-          .attr('x', 2)
+            .call(timeline)
+            .selectAll("text")
+            // move the first text element to fit inside the view
+            .style("text-anchor", "start")
+            .attr('y', 6)
+            .attr('x', 2)
     })
 
     return <div ref={element} id="daw-timeline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: adjustTopPosition + 'px'}}>
@@ -795,7 +876,7 @@ const DAW = () => {
                         <div id="daw-clickable" onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
                             {/* Timescales */}
                             <Timeline />
-                            <div id="daw-measureline"></div> {/* dawMeasureline directive */}
+                            <Measureline />
                         </div>
 
                         <div className="daw-track-group-container">
