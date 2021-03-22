@@ -5,12 +5,14 @@ import { react2angular } from 'react2angular'
 
 import * as daw from './dawState'
 
-import * as helpers from "../helpers";
+import { setReady } from '../bubble/bubbleState'
+import * as helpers from "../helpers"
 
 // Width of track control box
 const X_OFFSET = 100
 
 // TODO
+const vertScrollPos = 0
 const isEmbedded = false
 const adjustLeftPosition = 0
 const adjustTopPosition = 0
@@ -18,7 +20,9 @@ const todo = (...args) => undefined // console.log("TODO", args)
 const loop = {on: false, selection: null, start: null, end: null}
 
 const Header = () => {
+    const dispatch = useDispatch()
     const playLength = useSelector(daw.selectPlayLength)
+    const bubble = useSelector(state => state.bubble)
 
     // TODO:
     const playbackStartedCallback = (...args) => console.log("playback started", args)
@@ -26,10 +30,9 @@ const Header = () => {
     const playPosition = 1
 
     const play = () => {
-        // const { bubble } = $ngRedux.getState();
-        // if (bubble.active && bubble.currentPage===4 && !bubble.readyToProceed) {
-        //     $ngRedux.dispatch(setReady(true));
-        // }
+        if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
+            dispatch(setReady(true))
+        }
 
         // if ($scope.trackIsembeddedAndUncompiled) {
         //     $rootScope.$broadcast('compileembeddedTrack', true);
@@ -519,23 +522,14 @@ const Cursor = () => {
 }
 
 const Playhead = () => {
-    // return {
-    //     restrict: 'E',
-    //     scope: {},
-    //     link: function (scope, element) {
-    //         element.addClass('daw-marker');
-    //         element.css('top', '0px');
-
-    //         scope.$on('adjustPlayHead', function (event, topPos) {
-    //             element.css('top', topPos + 'px');
-    //         });
-
-    //         scope.$on('setPlayHeadPosition', function (event, currentPosition) {
-    //             element.css('left', currentPosition + 'px');
-    //         });
-    //     }
-    // }
-    return <div></div>
+    const [position, setPosition] = useState(0)
+    const xScale = useSelector(daw.selectXScale)
+    useEffect(() => {
+        // TODO: Perhaps we could make this smoother and cheaper with CSS animation?
+        const interval = setInterval(() => setPosition(player.getCurrentPosition()), 60)
+        return () => clearInterval(interval)
+    }, [])
+    return <div className="daw-marker" style={{top: vertScrollPos + 'px', left: xScale(position) + 'px'}}></div>
 }
 
 const SchedPlayhead = () => {
@@ -880,7 +874,6 @@ const DAW = () => {
     const result = true
     const hideDaw = false
     const dragging = false
-    const vertScrollPos = 0
     const tracks = useSelector(daw.selectTracks)
     console.log("Tracks:", tracks)
     const horzSlider = {value: 0, options: {}}
