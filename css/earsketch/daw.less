@@ -120,43 +120,28 @@
   cursor: pointer;
 }
 
-/* Firefox slider styles */
-#dawVolumeSlider::-moz-range-track {
-  width: 80px;
-  border-radius: @border-radius-small;
-  height: 14px;
-  vertical-align:middle;
-  margin-top:12px;
-  background-color: #fff;
-}
 #dawVolumeSlider::-moz-range-thumb {
   border: none;
-  background: rgb(66, 139, 202);
-  width: 12px;
-  height: 34px;
-  border-radius: @border-radius-small;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
   cursor: pointer;
 }
 /* IE slider styles */
 #dawVolumeSlider::-ms-fill-upper, #dawVolumeSlider::-ms-fill-lower {
   background:transparent;
 }
-#dawVolumeSlider::-ms-track {
-  width: 80px;
-  border-radius: @border-radius-small;
-  height: 14px;
-  vertical-align:middle;
-  margin-top:12px;
-  background-color: #fff;
-}
+
 #dawVolumeSlider::-ms-thumb {
   border: none;
-  background: rgb(66, 139, 202);
-  width: 12px;
-  height: 34px;
-  border-radius: @border-radius-small;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
   cursor: pointer;
 }
+
 .volumeLabel {
   color: @light-font;
   line-height: 30px;
