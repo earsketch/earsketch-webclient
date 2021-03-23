@@ -35,7 +35,6 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID);
     const ngTabControllerScope = helpers.getNgController('tabController').scope();
     const [highlight, setHighlight] = useState(false);
-    const theme = useSelector(appState.selectColorTheme);
 
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const script = allScripts[scriptID];
@@ -43,15 +42,15 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     var tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer',
         {
             'bg-blue ': active,//dark:bg-gray-300
-            'bg-gray-200 hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-200': !active, // background
-            'border border-gray-300 hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-400': !active // border
+            'bg-gray-200 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800': !active, // background
+            'border border-gray-300 hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-900': !active // border
         },
         {
             // treating tab text color separately for code readability
             'text-white dark:text-gray-300': active && !modified,
             'text-red-500':  active && modified,
             'text-red-600': !active && modified,
-            'text-gray-600 dark:text-gray-400': !active && !highlight && !modified
+            'text-gray-600 dark:text-gray-400': !active && !modified
         },
         'flex relative');
 
