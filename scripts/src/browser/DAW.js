@@ -13,9 +13,8 @@ const X_OFFSET = 100
 
 // TODO
 const vertScrollPos = 0
+const horzScrollPos = 0
 const isEmbedded = false
-const adjustLeftPosition = 0
-const adjustTopPosition = 0
 const todo = (...args) => undefined // console.log("TODO", args)
 const loop = {on: false, selection: null, start: null, end: null}
 
@@ -180,6 +179,7 @@ const Track = ({ color, track }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
+    const showEffects = useSelector(daw.selectShowEffects)
     // TODO
     const toggleBypass = todo
     const toggleSolo = todo
@@ -251,35 +251,22 @@ const Track = ({ color, track }) => {
     return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
-            <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
+            <div className="dawTrackCtrl" style={{left: horzScrollPos + 'px'}}>
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
                     <button className={"btn btn-default btn-xs dawSoloButton" + (track.solo ? " active" : "")} onClick={toggleSolo} title="Solo">S</button>
                     <button className={"btn btn-default btn-xs dawMuteButton" + (track.mute ? " active" : "")} onClick={toggleMute} title="Mute">M</button>
                 </>}
-                {Object.keys(track.effects).length > 0 &&
-                <div className="dropdown dawTrackEffectDropdown">
-                    <div className="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
-                        &#x25BC
-                    </div>
-                    <ul className="dropdown-menu" role="menu">
-                        {Object.entries(track.effects).map(([key, effect]) => {
-                        <li key={key} role="presentation">
-                            <a href="#" onClick={() => effect.visible = !effect.visible}>{key} {effect.visible && <span>&#x2714</span>}</a>
-                        </li>})}
-                    </ul>
-                </div>}
             </div>
-            <div className={`daw-track ${track.mute ? 'muted' : ''} ${track.solo ? 'solo' : ''}`} onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
+            <div className={`daw-track ${track.mute ? 'muted' : ''} ${track.solo ? 'solo' : ''}`} /*onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}*/>
                 {track.clips.map((clip, index) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
-        {Object.entries(track.effects).map(([key, effect], index) => 
-        effect.visible &&
+        {showEffects &&
+        Object.entries(track.effects).map(([key, effect], index) => 
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
-            {/* <!-- <div class="dawEffectCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
-            <div> {/* Directive: track-effect-panel-position */}
+            <div className="dawEffectCtrl" style={{left: horzScrollPos + 'px'}}>
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">Effect {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (effect.bypass ? ' active' : '')} onClick={toggleBypass} disabled={track.mute}>
@@ -454,6 +441,7 @@ const MixTrack = ({ color, track }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
+    const showEffects = useSelector(daw.selectShowEffects)
     // TODO
     const hideMasterTrackLabel = false
     const toggleBypass = todo
@@ -461,30 +449,17 @@ const MixTrack = ({ color, track }) => {
     return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
             {/* <!-- <div class="dawTrackCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
-            <div className="dawTrackCtrl" style={{left: adjustLeftPosition + 'px'}}>
+            <div className="dawTrackCtrl" style={{left: horzScrollPos + 'px'}}>
                 <div className="mixTrackFiller">{track.label}</div>
-                {Object.keys(track.effects).length > 0 &&
-                <div className="dropdown dawTrackEffectDropdown">
-                    <div className="dropdown-toggle dawTrackEffectDropdownButton hidden" role="button" data-toggle="dropdown">
-                        &#x25BC
-                    </div>
-                    <ul className="dropdown-menu" role="menu">
-                        {Object.entries(track.effects).map(([key, effect]) => {
-                        <li key={key} role="presentation">
-                            <a href="#" onClick={() => effect.visible = !effect.visible}>{key} {effect.visible && <span>&#x2714</span>}</a>
-                        </li>})}
-                    </ul>
-                </div>}
             </div>
             <div className="daw-track">
                 <div className="mixTrackFiller" style={{background: color}}>{!hideMasterTrackLabel && <span>MIX TRACK</span>}</div>
             </div>
         </div>
-        {Object.entries(track.effects).map(([key, effect], index) => 
-        effect.visible && 
+        {showEffects &&
+        Object.entries(track.effects).map(([key, effect], index) => 
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
-            {/* <!-- <div class="dawEffectCtrl" ng-style="{'left': horzScrollPos + 'px'}"> --> */}
-            <div> {/* Directive: track-effect-panel-position */}
+            <div className="dawEffectCtrl" style={{left: horzScrollPos + 'px'}}>
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">Effect {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (effect.bypass ? " active" : "")} onClick={toggleBypass} disabled={track.mute}>
@@ -602,7 +577,7 @@ const Measureline = () => {
         }
     })
 
-    return <div ref={element} id="daw-measureline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: adjustTopPosition + 15 + 'px'}}>
+    return <div ref={element} id="daw-measureline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: vertScrollPos + 15 + 'px'}}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -638,7 +613,7 @@ const Timeline = () => {
             .attr('x', 2)
     })
 
-    return <div ref={element} id="daw-timeline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: adjustTopPosition + 'px'}}>
+    return <div ref={element} id="daw-timeline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: vertScrollPos + 'px'}}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -829,10 +804,16 @@ const setup = (dispatch, getState) => {
 }
 
 const DAW = () => {
+    const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const trackColors = useSelector(daw.selectTrackColors)
     const playLength = useSelector(daw.selectPlayLength)
     const [cursorPosition, setCursorPosition] = useState(0)
+    const tracks = useSelector(daw.selectTracks)
+    const showEffects = useSelector(daw.selectShowEffects)
+    const hasEffects = tracks.some(track => Object.keys(track.effects).length > 0)
+    const toggleEffects = () => dispatch(daw.setShowEffects(!showEffects))
+
     // TODO
     const embeddedScriptName = "TODO"
     const embeddedScriptUsername = "TODO"
@@ -840,14 +821,9 @@ const DAW = () => {
     const result = true
     const hideDaw = false
     const dragging = false
-    const tracks = useSelector(daw.selectTracks)
-    console.log("Tracks:", tracks)
     const horzSlider = {value: 0, options: {}}
     const vertSlider = {value: 0, options: {}}
 
-    const toggleEffects = todo
-    const hasEffects = todo
-    const hasInvisibleEffects = todo
     const startDrag = todo
     const endDrag = todo
 
@@ -855,6 +831,7 @@ const DAW = () => {
     const onMouseMove = (event) => {
         event.preventDefault()
         // calculate x position of the bar from mouse position
+        // TODO: remove angular here
         const target = angular.element(event.currentTarget)
         let xpos = event.clientX - target.offset().left
         if (target[0].className !== "daw-track") {
@@ -918,10 +895,10 @@ const DAW = () => {
                 <div className="flex-grow" id="daw-container" onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
                     <div className="relative">
                         {/* Effects Toggle */}
-                        <button type="submit" className="btn-primary btn-effect flex items-center justify-center" data-toggle="tooltip" data-placement="bottom" title="Toggle All Effects" onClick={toggleEffects} disabled={!hasEffects()}>
+                        <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects" onClick={toggleEffects} disabled={!hasEffects}>
                             {/* Directive trackEffectPanelPosition */}
                             <span>EFFECTS</span>
-                            <span className={"icon icon-eye" + (hasInvisibleEffects() ? "-blocked" : "")}></span>
+                            <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
                         </button>
 
                         <div id="daw-clickable">

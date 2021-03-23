@@ -118,6 +118,7 @@ export const selectPlayLength = state => state.daw.playLength
 export const selectTrackWidth = state => state.daw.trackWidth
 export const selectTrackHeight = state => state.daw.trackHeight
 export const selectTrackColors = state => state.daw.trackColors
+export const selectShowEffects = state => state.daw.showEffects
 export const selectTempo = state => state.daw.tempo
 export const selectPlaying = state => state.daw.playing
 export const selectPendingPosition = state => state.daw.pendingPosition
