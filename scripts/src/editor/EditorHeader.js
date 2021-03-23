@@ -73,37 +73,45 @@ const EditorHeader = () => {
             <div className={`${openTabs.length ? 'flex' : 'hidden'} items-center space-x-8`}>
                 <UndoRedoButtons />
 
-                <div
-                    className={'flex items-center cursor-pointer truncate'}
-                    onClick={() => {
-                        ideScope.toggleBlocks();
-                        dispatch(editor.setBlocksMode(ideScope.editor.droplet.currentlyUsingBlocks));
-                    }}
-                >
-                    <div
-                        className={`
-                            flex w-10 h-6 p-1 
-                            rounded-full select-none mr-2 
-                            ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
-                            ${blocksMode ? 'justify-end' : 'justify-start'}
-                    `}>
-                        <div className='w-4 h-4 bg-white rounded-full'>&nbsp;</div>
-                    </div>
-                    BLOCKS MODE
-                </div>
-                {loggedIn && <div
-                    className={`
-                        rounded-full
-                        text-white
-                        cursor-pointer
-                        px-4 py-1
-                        ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
-                    `}
-                    onClick={() => mainScope.shareScript(Object.assign({}, allScripts[activeTab]))}
-                >
-                    <i className='icon-share32 pr-2' />
-                    SHARE
-                </div>}
+                {
+                    !(allScripts[activeTab] && allScripts[activeTab].collaborative) && (
+                        <div
+                            className={'flex items-center cursor-pointer truncate'}
+                            onClick={() => {
+                                ideScope.toggleBlocks();
+                                dispatch(editor.setBlocksMode(ideScope.editor.droplet.currentlyUsingBlocks));
+                            }}
+                        >
+                            <div
+                                className={`
+                                    flex w-10 h-6 p-1 
+                                    rounded-full select-none mr-2 
+                                    ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
+                                    ${blocksMode ? 'justify-end' : 'justify-start'}
+                                `}>
+                                <div className='w-4 h-4 bg-white rounded-full'>&nbsp;</div>
+                            </div>
+                            BLOCKS MODE
+                        </div>
+                    )
+                }
+                {
+                    loggedIn && (
+                        <div
+                            className={`
+                                rounded-full
+                                text-white
+                                cursor-pointer
+                                px-4 py-1
+                                ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
+                            `}
+                            onClick={() => mainScope.shareScript(Object.assign({}, allScripts[activeTab]))}
+                        >
+                            <i className='icon-share32 pr-2' />
+                            SHARE
+                        </div>
+                    )
+                }
                 <div
                     className={`
                         flex
