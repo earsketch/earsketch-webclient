@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
@@ -21,13 +21,13 @@ const loop = {on: false, selection: null, start: null, end: null}
 
 const Header = () => {
     const dispatch = useDispatch()
+    const playPosition = useSelector(daw.selectPlayPosition)
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector(state => state.bubble)
+    const playing = useSelector(daw.selectPlaying)
 
     // TODO:
     const playbackStartedCallback = (...args) => console.log("playback started", args)
-    const playbackEndedCallback = (...args) => console.log("playback ended", args)
-    const playPosition = 1
 
     const play = () => {
         if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
@@ -43,22 +43,25 @@ const Header = () => {
 
         // drawPlayhead(false)
 
-        // if ($scope.playPosition >= $scope.playLength) {
-        //     if ($scope.loop.selection) {
-        //         $scope.playPosition = $scope.loop.start
-        //     } else {
-        //         $scope.playPosition = 1
-        //     }
-        // }
+        if (playPosition >= playLength) {
+        //  if ($scope.loop.selection) {
+        //      $scope.playPosition = $scope.loop.start
+        //  } else {
+            dispatch(daw.setPlayPosition(1))
+        //  }
+        }
 
-        // $scope.playing = true
+        // Should this get set in playbackStartedCallback, instead?
+        dispatch(daw.setPlaying(true))
 
-        // Seems like these should be unnecessary given that they're set upon compile:
+        // TODO: Seems like these should be unnecessary given that they're set upon compile...
+        // ...except player calls player.reset() on finish. :-(
         // player.setRenderingData($scope.result)
         // player.setMutedTracks($scope.tracks)
         // player.setBypassedEffects($scope.tracks)
         player.setOnStartedCallback(playbackStartedCallback)
-        player.setOnFinishedCallback(playbackEndedCallback)
+        player.setOnFinishedCallback(() => dispatch(daw.setPlaying(false)))
+        console.log("play", playPosition)
         player.play(playPosition, playLength)
 
         // volume state is not preserved between plays
@@ -69,12 +72,17 @@ const Header = () => {
         // }
     }
 
+    const pause = () => {
+        console.log("pause", playPosition)
+        player.pause()
+        dispatch(daw.setPlaying(false))
+    }
+
     // TODO
     const showIcon = true
     const showFullTitle = true
     const showShortTitle = false
     const shareScriptLink = "TODO"
-    const playing = false
     const horzOverflow = false
     let autoScroll = true
     const timesync = {available: true}
@@ -84,7 +92,6 @@ const Header = () => {
     const volume = 0
 
     const reset = todo
-    const pause = todo
     const toggleLoop = todo
     const toggleMute = todo
     const changeVolume = todo
@@ -119,7 +126,7 @@ const Header = () => {
 
             {/* Pause */}
             {playing && <span className="daw-transport-button">
-                <button type="submit" className="btn btn-clear" title="Pause" onClick={() => pause(true)}>
+                <button type="submit" className="btn btn-clear" title="Pause" onClick={pause}>
                     <span className="icon icon-pause2"></span>
                 </button>
             </span>}
@@ -489,74 +496,31 @@ const MixTrack = ({ color, track }) => {
     </div>
 }
 
-const Cursor = () => {
-    // TODO
-    // app.directive('dawCursor', function () {
-    //     return {
-    //         restrict: 'E',
-    //         scope: {},
-    //         link: function (scope, element) {
-    //             element.addClass('daw-cursor');
-    //             element.css('top', '0px');
-    
-    //             scope.$on('setSchedPlayheadVisibility', function (event, visible) {
-    //                 if (visible) {
-    //                     element.removeClass('daw-cursor');
-    //                 } else {
-    //                     element.addClass('daw-cursor');
-    //                 }
-    //             });
-    
-    //             scope.$on('setCurrentPosition', function (event, position) {
-    //                 element.addClass('daw-cursor'); // this is safe
-    //                 element.css('left', position + 'px');
-    //             });
-    
-    //             scope.$on('adjustTopPostition', function (event, position) {
-    //                 element.css('top', position + 'px');
-    //             });
-    //         }
-    //     }
-    // });
-    return <div></div>
+const Cursor = ({ position }) => {
+    const pendingPosition = useSelector(daw.selectPendingPosition)
+    return pendingPosition === null && <div className="daw-cursor" style={{top: vertScrollPos + 'px', left: position + 'px'}}></div>
 }
 
 const Playhead = () => {
-    const [position, setPosition] = useState(0)
+    const dispatch = useDispatch()
+    const playing = useSelector(daw.selectPlaying)
+    const playPosition = useSelector(daw.selectPlayPosition)
+    const pendingPosition = useSelector(daw.selectPendingPosition)
     const xScale = useSelector(daw.selectXScale)
     useEffect(() => {
-        // TODO: Perhaps we could make this smoother and cheaper with CSS animation?
-        const interval = setInterval(() => setPosition(player.getCurrentPosition()), 60)
-        return () => clearInterval(interval)
-    }, [])
-    return <div className="daw-marker" style={{top: vertScrollPos + 'px', left: xScale(position) + 'px'}}></div>
+        if (playing) {
+            // TODO: Perhaps we could make this smoother and cheaper with CSS animation?
+            const interval = setInterval(() => dispatch(daw.setPlayPosition(player.getCurrentPosition())), 60)
+            return () => clearInterval(interval)
+        }
+    }, [playing])
+    return pendingPosition === null && <div className="daw-marker" style={{top: vertScrollPos + 'px', left: xScale(playPosition) + 'px'}}></div>
 }
 
 const SchedPlayhead = () => {
-    // return {
-    //     restrict: 'E',
-    //     scope: {},
-    //     link: function (scope, element) {
-    //         element.css('top', '0px');
-
-    //         scope.$on('adjustPlayHead', function (event, topPos) {
-    //             element.css('top', topPos + 'px');
-    //         });
-
-    //         scope.$on('setSchedPlayheadPosition', function (event, currentPosition) {
-    //             element.css('left', currentPosition + 'px');
-    //         });
-
-    //         scope.$on('setSchedPlayheadVisibility', function (event, visible) {
-    //             if (visible) {
-    //                 element.addClass('daw-sched-marker');
-    //             } else {
-    //                 element.removeClass('daw-sched-marker');
-    //             }
-    //         });
-    //     }
-    // }
-    return <div></div>
+    const pendingPosition = useSelector(daw.selectPendingPosition)
+    const xScale = useSelector(daw.selectXScale)
+    return pendingPosition !== null && <div className="daw-sched-marker" style={{top: vertScrollPos + 'px', left: xScale(pendingPosition)}}></div>
 }
 
 const Slider = ({ value, onChange, options, title }) => {
@@ -867,6 +831,8 @@ const setup = (dispatch, getState) => {
 const DAW = () => {
     const xScale = useSelector(daw.selectXScale)
     const trackColors = useSelector(daw.selectTrackColors)
+    const playLength = useSelector(daw.selectPlayLength)
+    const [cursorPosition, setCursorPosition] = useState(0)
     // TODO
     const embeddedScriptName = "TODO"
     const embeddedScriptUsername = "TODO"
@@ -884,7 +850,46 @@ const DAW = () => {
     const hasInvisibleEffects = todo
     const startDrag = todo
     const endDrag = todo
-    const drag = todo
+
+    // TODO before commit: fix sizes of clickable area/track group
+    const onMouseMove = (event) => {
+        event.preventDefault()
+        // calculate x position of the bar from mouse position
+        const target = angular.element(event.currentTarget)
+        let xpos = event.clientX - target.offset().left
+        if (target[0].className !== "daw-track") {
+            xpos -= X_OFFSET
+        }
+        // round to nearest measure
+        const measure = Math.round(xScale.invert(xpos))
+
+        if (measure <= playLength && measure > 0) {
+            setCursorPosition(xScale(measure))
+        }
+
+        // Prevent dragging beyond playLength
+        // if (measure > $scope.playLength) {
+        //     return;
+        // }
+
+        // if ($scope.dragging) {
+        //     if (measure === origin) {
+        //         $scope.loop.selection = false;
+        //         $scope.loop.start = measure;
+        //         $scope.loop.end = measure;
+        //     } else {
+        //         $scope.loop.selection = true;
+
+        //         if (measure > origin) {
+        //             $scope.loop.start = origin;
+        //             $scope.loop.end = measure;
+        //         } else if (measure < origin) {
+        //             $scope.loop.start = measure;
+        //             $scope.loop.end = origin;
+        //         }
+        //     }
+        // }
+    }
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
         {isEmbedded && codeHidden &&
@@ -910,7 +915,7 @@ const DAW = () => {
                 </div>
 
                 {/* DAW Container */}
-                <div className="flex-grow" id="daw-container"> {/* Directive dawContainer */}
+                <div className="flex-grow" id="daw-container" onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
                     <div className="relative">
                         {/* Effects Toggle */}
                         <button type="submit" className="btn-primary btn-effect flex items-center justify-center" data-toggle="tooltip" data-placement="bottom" title="Toggle All Effects" onClick={toggleEffects} disabled={!hasEffects()}>
@@ -919,7 +924,7 @@ const DAW = () => {
                             <span className={"icon icon-eye" + (hasInvisibleEffects() ? "-blocked" : "")}></span>
                         </button>
 
-                        <div id="daw-clickable" onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}>
+                        <div id="daw-clickable">
                             {/* Timescales */}
                             <Timeline />
                             <Measureline />
@@ -940,7 +945,7 @@ const DAW = () => {
                         <div className="absolute top-0 left-0 h-full">
                             <Playhead />
                             <SchedPlayhead />
-                            <Cursor />
+                            <Cursor position={cursorPosition} />
                             {(dragging || loop.selection && loop.on) && loop.end != loop.start &&
                             <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
                         </div>

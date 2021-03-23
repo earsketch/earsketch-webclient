@@ -48,19 +48,24 @@ const dawSlice = createSlice({
     name: 'daw',
     initialState: {
         tracks: [],
+        // TODO: I suspect this should not really be necessary (player also has stores this), but for some reason player.pause() also resets the play position.
         playPosition: 1,  // Current play position in measures.
         playLength: 0,
-        trackWidth: 2750, // TODO: Not sure why this changes from its initial value (650).
+        trackWidth: 2750,  // TODO: Not sure why this changes from its initial value (650).
         trackHeight: 45,
         trackColors: shuffle(TRACK_COLORS.slice()),
         showEffects: true,
         metronome: false,
         tempo: 120,
-        // TODO: playing = false,
+        playing: false,
+        pendingPosition: null,  // null indicates no position pending.
     },
     reducers: {
         setTracks(state, { payload }) {
             state.tracks = payload
+        },
+        setPlayPosition(state, { payload }) {
+            state.playPosition = payload
         },
         setPlayLength(state, { payload }) {
             state.playLength = payload
@@ -82,6 +87,12 @@ const dawSlice = createSlice({
         },
         setTempo(state, { payload }) {
             state.tempo = payload
+        },
+        setPlaying(state, { payload }) {
+            state.playing = payload
+        },
+        setPendingPosition(state, { payload }) {
+            state.pendingPosition = payload
         }
     }
 })
@@ -89,6 +100,7 @@ const dawSlice = createSlice({
 export default dawSlice.reducer
 export const {
     setTracks,
+    setPlayPosition,
     setPlayLength,
     setTrackWidth,
     setTrackHeight,
@@ -96,14 +108,19 @@ export const {
     setShowEffects,
     setMetronome,
     setTempo,
+    setPlaying,
+    setPendingPosition,
 } = dawSlice.actions
 
 export const selectTracks = state => state.daw.tracks
+export const selectPlayPosition = state => state.daw.playPosition
 export const selectPlayLength = state => state.daw.playLength
 export const selectTrackWidth = state => state.daw.trackWidth
 export const selectTrackHeight = state => state.daw.trackHeight
 export const selectTrackColors = state => state.daw.trackColors
 export const selectTempo = state => state.daw.tempo
+export const selectPlaying = state => state.daw.playing
+export const selectPendingPosition = state => state.daw.pendingPosition
 
 export const selectMixTrackHeight = createSelector(
     [selectTrackHeight],
