@@ -11,6 +11,9 @@ import * as helpers from "../helpers"
 // Width of track control box
 const X_OFFSET = 100
 
+// TODO: remove after refactoring player
+let _result = null
+
 // TODO
 const vertScrollPos = 0
 const horzScrollPos = 0
@@ -24,9 +27,12 @@ const Header = () => {
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector(state => state.bubble)
     const playing = useSelector(daw.selectPlaying)
+    const tracks = useSelector(daw.selectTracks)
 
-    // TODO:
-    const playbackStartedCallback = (...args) => console.log("playback started", args)
+    const playbackEndedCallback = () => {
+        dispatch(daw.setPlaying(false))
+        dispatch(daw.setPlayPosition(1))
+    }
 
     const play = () => {
         if (bubble.active && bubble.currentPage === 4 && !bubble.readyToProceed) {
@@ -53,14 +59,14 @@ const Header = () => {
         // Should this get set in playbackStartedCallback, instead?
         dispatch(daw.setPlaying(true))
 
-        // TODO: Seems like these should be unnecessary given that they're set upon compile...
+        // TODO: These should be unnecessary given that they're set upon compile...
         // ...except player calls player.reset() on finish. :-(
-        // player.setRenderingData($scope.result)
-        // player.setMutedTracks($scope.tracks)
-        // player.setBypassedEffects($scope.tracks)
-        player.setOnStartedCallback(playbackStartedCallback)
-        player.setOnFinishedCallback(() => dispatch(daw.setPlaying(false)))
-        console.log("play", playPosition)
+        // Remove this after refactoring player.
+        player.setRenderingData(_result)
+        player.setMutedTracks(tracks)
+        player.setBypassedEffects(tracks)
+    
+        player.setOnFinishedCallback(playbackEndedCallback)
         player.play(playPosition, playLength)
 
         // volume state is not preserved between plays
@@ -72,7 +78,6 @@ const Header = () => {
     }
 
     const pause = () => {
-        console.log("pause", playPosition)
         player.pause()
         dispatch(daw.setPlaying(false))
     }
@@ -694,6 +699,7 @@ const setup = (dispatch, getState) => {
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
     $scope.$watch('compiled', function (result) {
+        _result = result
         const state = getState().daw
         console.log("compiled result:", result)
         if (result === null || result === undefined) return
