@@ -40,7 +40,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const script = allScripts[scriptID];
     const scriptType = script.isShared && 'shared' || script.readonly && 'readonly' || 'regular';
-    var tabClass = classNames('w-48 flex-shrink-0 h-12 cursor-pointer',
+    var tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer',
         {
             'bg-blue ': active,//dark:bg-gray-300
             'bg-gray-200 hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-200': !active, // background
@@ -49,9 +49,9 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
         {
             // treating tab text color separately for code readability
             'text-white dark:text-gray-300': active && !modified,
-            'text-gray-600 dark:text-gray-400': !active && !highlight && !modified,
-            'text-red-600': modified && !active,
-            'text-red-500': modified && active
+            'text-red-500':  active && modified,
+            'text-red-600': !active && modified,
+            'text-gray-600 dark:text-gray-400': !active && !highlight && !modified
         },
         'flex relative');
 
