@@ -39,20 +39,25 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const script = allScripts[scriptID];
     const scriptType = script.isShared && 'shared' || script.readonly && 'readonly' || 'regular';
-    var tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer',
+    var tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer border',
         {
-            'bg-blue ': active,//dark:bg-gray-300
-            'bg-gray-200 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800': !active, // background
-            'border border-gray-300 hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-900': !active // border
+            'bg-blue border-blue': active,
+            'bg-gray-200 hover:bg-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800': !active, // background
+            'border-gray-300 hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-900': !active // border
         },
         {
             // treating tab text color separately for code readability
             'text-white dark:text-gray-300': active && !modified,
             'text-red-500':  active && modified,
             'text-red-600': !active && modified,
-            'text-gray-600 dark:text-gray-400': !active && !modified
+            'text-gray-600 hover:text-white dark:text-gray-400': !active && !modified
         },
         'flex relative');
+    var closeButtonClass = classNames('flex items-center hover:text-gray-800',
+        {
+            'hover:bg-gray-400': !active,
+            'hover:bg-gray-300': active
+        });
 
     return (
         <div
@@ -79,7 +84,7 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
                     <div className='truncate select-none align-middle'>{scriptName}</div>
                 </div>
                 <button
-                    className='flex items-center'
+                    className={closeButtonClass}
                     onClick={(event) => ngTabControllerScope.closeTab(index, event)}
                 >
                     <i className={`icon-cross2 cursor-pointer`} />
