@@ -1,4 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit'
+import { keys } from 'lodash'
 
 const shuffle = (array) => {
     let i = array.length
@@ -59,6 +60,8 @@ const dawSlice = createSlice({
         tempo: 120,
         playing: false,
         pendingPosition: null,  // null indicates no position pending.
+        muted: {},  // Track index -> "mute" or "solo"
+        bypassed: {},  // Track index -> [bypassed effect keys]
     },
     reducers: {
         setTracks(state, { payload }) {
@@ -93,6 +96,12 @@ const dawSlice = createSlice({
         },
         setPendingPosition(state, { payload }) {
             state.pendingPosition = payload
+        },
+        setMuted(state, { payload }) {
+            state.muted = payload
+        },
+        setBypassed(state, { payload }) {
+            state.bypassed = payload
         }
     }
 })
@@ -110,6 +119,8 @@ export const {
     setTempo,
     setPlaying,
     setPendingPosition,
+    setMuted,
+    setBypassed,
 } = dawSlice.actions
 
 export const selectTracks = state => state.daw.tracks
@@ -119,9 +130,12 @@ export const selectTrackWidth = state => state.daw.trackWidth
 export const selectTrackHeight = state => state.daw.trackHeight
 export const selectTrackColors = state => state.daw.trackColors
 export const selectShowEffects = state => state.daw.showEffects
+export const selectMetronome = state => state.daw.metronome
 export const selectTempo = state => state.daw.tempo
 export const selectPlaying = state => state.daw.playing
 export const selectPendingPosition = state => state.daw.pendingPosition
+export const selectMuted = state => state.daw.muted
+export const selectBypassed = state => state.daw.bypassed
 
 export const selectMixTrackHeight = createSelector(
     [selectTrackHeight],
@@ -172,4 +186,21 @@ export const selectMeasurelineZoomIntervals = createSelector(
 export const selectTimelineZoomIntervals = createSelector(
     [selectTrackWidth],
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
+)
+
+export const getMutedTracks = (tracks, muted, metronome) => {
+    const keys = Object.keys(tracks).map(x => +x)
+    const soloed = keys.filter(key => muted[key] === "solo")
+    if (soloed.length > 0) {
+        // Omit mix track and (if metronome is enabled) metronome track.
+        return keys.filter(key => !soloed.includes(key) && key !== 0 && (!metronome || key !== keys.length - 1))
+    } else {
+        return [...keys.filter(key => muted[key] === "mute"), ...(metronome ? [] : [keys.length - 1])]
+    }
+}
+
+// Returns an array of all tracks that should be muted, by index.
+export const selectMutedTracks = createSelector(
+    [selectTracks, selectMuted, selectMetronome],
+    getMutedTracks
 )

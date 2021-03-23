@@ -27,7 +27,8 @@ const Header = () => {
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector(state => state.bubble)
     const playing = useSelector(daw.selectPlaying)
-    const tracks = useSelector(daw.selectTracks)
+    const muted = useSelector(daw.selectMutedTracks)
+    const bypassed = useSelector(daw.selectBypassed)
 
     const playbackEndedCallback = () => {
         dispatch(daw.setPlaying(false))
@@ -63,8 +64,8 @@ const Header = () => {
         // ...except player calls player.reset() on finish. :-(
         // Remove this after refactoring player.
         player.setRenderingData(_result)
-        player.setMutedTracks(tracks)
-        player.setBypassedEffects(tracks)
+        player.setMutedTracks(muted)
+        player.setBypassedEffects(bypassed)
     
         player.setOnFinishedCallback(playbackEndedCallback)
         player.play(playPosition, playLength)
@@ -180,15 +181,24 @@ const Header = () => {
     </div>
 }
 
-const Track = ({ color, track }) => {
+const Track = ({ color, index, track }) => {
+    const dispatch = useDispatch()
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const showEffects = useSelector(daw.selectShowEffects)
+    const tracks = useSelector(daw.selectTracks)
+    const muted = useSelector(daw.selectMuted)
+    const metronome = useSelector(daw.selectMetronome)
+
+    const toggle = (kind) => {
+        const updated = {...muted, [index]: muted[index] === kind ? undefined : kind}
+        dispatch(daw.setMuted(updated))
+        player.setMutedTracks(daw.getMutedTracks(tracks, updated, metronome))
+    }
+
     // TODO
     const toggleBypass = todo
-    const toggleSolo = todo
-    const toggleMute = todo
     const startDrag = todo, endDrag = todo, drag = todo
 
     // $scope.toggleSolo = function () {
@@ -260,11 +270,11 @@ const Track = ({ color, track }) => {
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"btn btn-default btn-xs dawSoloButton" + (track.solo ? " active" : "")} onClick={toggleSolo} title="Solo">S</button>
-                    <button className={"btn btn-default btn-xs dawMuteButton" + (track.mute ? " active" : "")} onClick={toggleMute} title="Mute">M</button>
+                    <button className={"btn btn-default btn-xs dawSoloButton" + (muted[index] === "solo" ? " active" : "")} onClick={() => toggle("solo")} title="Solo">S</button>
+                    <button className={"btn btn-default btn-xs dawMuteButton" + (muted[index] === "mute" ? " active" : "")} onClick={() => toggle("mute")} title="Mute">M</button>
                 </>}
             </div>
-            <div className={`daw-track ${track.mute ? 'muted' : ''} ${track.solo ? 'solo' : ''}`} /*onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={drag}*/>
+            <div className={`daw-track ${muted[track] ?? ''}`}>
                 {track.clips.map((clip, index) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
@@ -700,7 +710,7 @@ const setup = (dispatch, getState) => {
     // Listen for the IDE to compile code and return a JSON result
     $scope.$watch('compiled', function (result) {
         _result = result
-        const state = getState().daw
+        const state = getState()
         console.log("compiled result:", result)
         if (result === null || result === undefined) return
 
@@ -722,13 +732,13 @@ const setup = (dispatch, getState) => {
             track.clips = track.clips.map(c => Object.assign({}, c))
 
             track.visible = true
-            track.solo = reset ? false : Boolean(state.tracks[index]?.solo)
-            track.mute = reset ? false : Boolean(state.tracks[index]?.mute)
+            track.solo = reset ? false : Boolean(state.daw.tracks[index]?.solo)
+            track.mute = reset ? false : Boolean(state.daw.tracks[index]?.mute)
             track.label = index
             track.buttons = true // show solo/mute buttons
 
             for (let [key, effect] of Object.entries(track.effects)) {
-                effect.bypass = reset ? false : Boolean(state.tracks[index]?.effects?.[key]?.bypass)
+                effect.bypass = reset ? false : Boolean(state.daw.tracks[index]?.effects?.[key]?.bypass)
             }
         })
 
@@ -744,7 +754,7 @@ const setup = (dispatch, getState) => {
         }
         if (metronome !== undefined) {
             metronome.visible = false
-            metronome.mute = !state.metronome
+            metronome.mute = !state.daw.metronome
             metronome.effects = {}
         }
 
@@ -779,8 +789,8 @@ const setup = (dispatch, getState) => {
         reset = false
 
         player.setRenderingData(result)
-        player.setMutedTracks(tracks)
-        player.setBypassedEffects(tracks)
+        player.setMutedTracks(daw.selectMutedTracks(state))
+        player.setBypassedEffects(daw.selectBypassed(state))
 
         // TODO:
         // $scope.$on('resetScrollBars', function () {
@@ -919,7 +929,7 @@ const DAW = () => {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track} />
                                     } else if (index < tracks.length - 1) {
-                                        return <Track key={index} color={trackColors[index % trackColors.length]} track={track} />
+                                        return <Track key={index} color={trackColors[index % trackColors.length]} index={index} track={track} />
                                     }
                                 }
                             })}
