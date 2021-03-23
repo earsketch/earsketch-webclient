@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import * as config from './editorConfig';
 import * as app from '../app/appState';
 
@@ -14,7 +16,13 @@ const editorSlice = createSlice({
     }
 });
 
-export default editorSlice.reducer;
+const persistConfig = {
+    key: 'editor',
+    whitelist: ['blocksMode'],
+    storage
+};
+
+export default persistReducer(persistConfig, editorSlice.reducer);
 export const {
     setBlocksMode
 } = editorSlice.actions;

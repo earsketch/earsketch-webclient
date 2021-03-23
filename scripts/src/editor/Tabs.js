@@ -7,6 +7,7 @@ import { usePopper } from "react-popper";
 import * as appState from '../app/appState';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
+import * as editor from './editorState';
 import * as helpers from 'helpers';
 
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
@@ -29,7 +30,7 @@ const CreateScriptButton = () => {
     );
 };
 
-const Tab = ({ scriptID, scriptName, active=false, index }) => {
+const Tab = ({ scriptID, scriptName, index }) => {
     const dispatch = useDispatch();
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID);
     const ngTabControllerScope = helpers.getNgController('tabController').scope();
@@ -41,6 +42,12 @@ const Tab = ({ scriptID, scriptName, active=false, index }) => {
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const script = allScripts[scriptID];
     const scriptType = script.isShared && 'shared' || script.readonly && 'readonly' || 'regular';
+    const activeTabID = useSelector(tabs.selectActiveTabID);
+    const active = activeTabID === scriptID;
+
+    useEffect(() => {
+        script.collaborative && dispatch(editor.setBlocksMode(false));
+    }, [activeTabID]);
 
     return (
         <div
@@ -101,7 +108,6 @@ const CloseAllTab = () => {
 
 const MainTabGroup = () => {
     const openTabs = useSelector(tabs.selectOpenTabs);
-    const activeTab = useSelector(tabs.selectActiveTabID);
     const visibleTabs = useSelector(tabs.selectVisibleTabs);
     const allScripts = useSelector(scripts.selectAllScriptEntities);
 
@@ -114,7 +120,6 @@ const MainTabGroup = () => {
                     <Tab
                         scriptID={ID}
                         scriptName={allScripts[ID].name}
-                        active={ID===activeTab}
                         key={ID}
                         index={openTabs.indexOf(ID)}
                     />
@@ -130,7 +135,6 @@ const TabDropdown = () => {
     const hiddenTabs = useSelector(tabs.selectHiddenTabs);
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const [highlight, setHighlight] = useState(false);
-    const activeTab = useSelector(tabs.selectActiveTabID);
     const theme = useSelector(appState.selectColorTheme);
 
     const [showDropdown, setShowDropdown] = useState(false);
@@ -172,7 +176,6 @@ const TabDropdown = () => {
                     <Tab
                         scriptID={ID}
                         scriptName={allScripts[ID].name}
-                        active={ID===activeTab}
                         key={ID}
                         index={openTabs.indexOf(ID)}
                     />
