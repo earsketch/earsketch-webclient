@@ -27,7 +27,7 @@ module.exports = env => {
         },
         module: {
             rules: [{
-                test: /\.less$/,
+                test: /allstyles.less/,
                 use: [
                     {
                         loader: MiniCssExtractPlugin.loader,

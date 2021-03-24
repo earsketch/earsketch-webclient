@@ -1177,14 +1177,14 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         }
     };
 
-    this.leaveCollaboration = function (scriptID, userName) {
+    this.leaveCollaboration = function (scriptID, userName, refresh=true) {
         var message = new PrepareWsMessage();
         message.action = 'leaveCollaboration';
         message.scriptID = scriptID;
         message.sender = userName.toLowerCase(); // #1858
         websocket.send(message);
 
-        if (this.refreshSharedScriptBrowser) {
+        if (refresh && this.refreshSharedScriptBrowser) {
             return this.refreshSharedScriptBrowser();
         } else {
             return Promise.resolve(null);

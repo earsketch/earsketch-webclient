@@ -32,7 +32,7 @@ module.exports = env => {
         },
         module: {
             rules: [{
-                test: /\.less$/,
+                test: /allstyles.less/,
                 use: ['style-loader','css-loader','less-loader']
             }]
         },

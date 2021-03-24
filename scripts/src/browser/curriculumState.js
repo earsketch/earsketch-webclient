@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
+import * as layout from '../layout/layoutState'
 
 export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
@@ -36,7 +37,7 @@ const processContent = (location, html, dispatch) => {
             dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2)] + el.getAttribute("href") }))
         }
     })
-    root.querySelectorAll('a[href^="ch_"]').forEach(el => {
+    root.querySelectorAll('a[data-es-internallink="true"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: el.getAttribute("href") }))
@@ -47,8 +48,7 @@ const processContent = (location, html, dispatch) => {
     root.querySelectorAll('a[href="<api>"]').forEach(el => {
         el.onclick = (e) => {
             e.preventDefault()
-            // TODO: Update this when we replace the layoutController.
-            angular.element('[ng-controller=layoutController]').scope().openSidebarTab('api')
+            dispatch(layout.openWest("API"))
         }
     })
 

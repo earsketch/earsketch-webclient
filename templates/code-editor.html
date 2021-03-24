@@ -1,32 +1,14 @@
 <!-- TODO: using parent (ideController) scope... cannot isolate them well -->
-<div id="editor" class="code-container" ng-style="{right:collaboration.active ? '60px' : '0'}">
+<div id="editor" class="code-container">
     <!-- import button -->
     <div ng-show="tabs[activeTab].readonly && !isEmbedded" class="floating-bar" ng-click="importScript()">
         <div><!-- DO NOT REMOVE: this is an empty div to block the space before the next div --></div>
         <div class="btn-action btn-floating shake" ng-class="{'notAllowedTo':notAllowedToImport, '':!notAllowedToAddSound}"><i class="icon icon-import"></i><span>IMPORT TO EDIT</span></div>
     </div>
-
-    <!-- invite button -->
-    <!--<div class="floating-bar prevent-selection" ng-click="collaboration.invite()">-->
-        <!--<div>&lt;!&ndash; DO NOT REMOVE &ndash;&gt;</div>-->
-        <!--<div class="btn-action btn-floating shake"><span>INVITE USERS</span></div>-->
-    <!--</div>-->
 </div>
 
 <div id="collab-badges-container" ng-if="collaboration.active && collaboration.editorVisible">
-    <!--<div class="collaborator-badge prevent-selection" uib-popover-template="'templates/collab-chat-input.html'" popover-placement="left" popover-is-open="collaboration.chat[collaboration.userName].popover" ng-click="collaboration.chat[collaboration.userName].popover = !collaboration.chat[collaboration.userName].popover">-->
-        <!--<i class="icon icon-bubble"></i>-->
-    <!--</div>-->
     <div ng-repeat="(name, state) in collaboration.otherMembers track by $index">
         <div class="collaborator-badge prevent-selection" ng-style="{'border-color':state.active?'rgba('+collaboration.colors[$index%6].join()+',0.75)':'#666','background-color':state.active?'rgba('+collaboration.colors[$index%6].join()+',0.5)':'#666'}" uib-tooltip="{{name}}" tooltip-placement="left" uib-popover="{{collaboration.chat[name].text}}" popover-placement="left" popover-is-open="collaboration.chat[name].popover" popover-trigger="'none'">{{name[0].toUpperCase()}}</div>
-        <!--<div class="collaborator-access-badge">-->
-            <!--<i ng-if="collaboration.canEdit" class="icon icon-pencil3"></i>-->
-            <!--<i ng-if="!collaboration.canEdit" class="icon icon-eye"></i>-->
-        <!--</div>-->
     </div>
-
-    <!--<i class="icon icon-users" popover-placement="left-top" popover-trigger="outsideClick" uib-popover-template="'templates/collab-popover.html'" popover-is-open="showChatMessage"></i>-->
-    <!--<i ng-if="collaboration.owner" class="icon icon-users" popover-placement="left-top" popover-trigger="outsideClick" uib-popover-template="'templates/collab-popover.html'"></i>-->
-    <!--<i ng-if="!collaboration.owner && collaboration.canEdit" class="icon icon-pencil3" ng-click="collaboration.giveUpWriteAccess()" uib-popover="I'm done with editing." popover-placement="left-top" popover-trigger="outsideClick"></i>-->
-    <!--<i ng-if="!collaboration.owner && !collaboration.canEdit" class="icon icon-eye" ng-click="collaboration.requestWriteAccess()" uib-popover="Requested write access!" popover-placement="left-top" popover-trigger="outsideClick"></i>-->
 </div>

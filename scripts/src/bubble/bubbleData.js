@@ -9,12 +9,12 @@ export const pages = [
     {
         header: '1/8 Explore the Code Editor',
         body: 'The code editor is your workspace to compose music. It is a text editor with numbered lines.',
-        ref: '.ace_editor',
+        ref: '#coder',
         placement: 'top'
     },
     {
         header: '2/8 Run Your Code',
-        body: 'Run your code and see it turn into music. Click the <span class="font-black text-green-600 text-2xl">Run<i class="align-middle icon icon-arrow-right15"></i></span> button and view the code in the Digital Audio Workstation located above your code editor.',
+        body: 'Run your code and see it turn into music. Click the <span class="font-black text-green-600 text-2xl"><i class="align-middle icon icon-arrow-right22"></i>RUN</span> button and view the code in the Digital Audio Workstation located above your code editor.',
         ref: '#run-button',
         placement: 'bottom'
     },
@@ -22,7 +22,7 @@ export const pages = [
         header: '3/8 Preview your Music',
         body: 'The Digital Audio Workstation (DAW) is a timeline visualization of your code showing time both in seconds and measures. Below the timeline, the audio clips added to your song are placed on tracks.',
         ref: '#devctrl',
-        placement: 'bottom-start'
+        placement: 'bottom'
     },
     {
         header: '4/8 Play your Music',
@@ -32,33 +32,33 @@ export const pages = [
     },
     {
         header: '5/8 Explore your code',
-        body: 'Each folder in this menu provides a set of EarSketch resources. Click the folder to access the resources and click again to remove from view. We will explore the function of each folder in the next steps.',
-        ref: '#sidenav',
-        placement: 'right-start'
+        body: 'On the left side of screen is the browser area. Click the toggle switch at the top to open / close. There are several types of browsers. We will explore their functions in the next steps.',
+        ref: '#content-manager',
+        placement: 'right'
     },
     {
         header: '6/8 Add sounds to your code',
-        body: 'The first folder is the Sound Browser <span class="text-yellow-500 text-3xl align-middle icon icon-headphones"></span>. Click to search the 4,000 plus audio clips to use in your music, composed by popular recording artists.',
-        ref: '#sidebar-container',
-        placement: 'right-start'
+        body: 'The first browser is <span class="text-yellow-500 text-3xl align-middle icon icon-headphones"></span> SOUNDS. Scroll and click the folders to discover 4,000+ audio clips to use in your music, composed by popular recording artists.',
+        ref: '#browser-tabs',
+        placement: 'right'
     },
     {
         header: '7/8 Save your Code',
-        body: 'Your code is automatically saved to the Scripts Browser <span class="text-yellow-500 text-3xl align-middle icon icon-embed2"></span>. You can search for scripts by date, programming language, and owner.',
-        ref: '#sidebar-container',
-        placement: 'right-start'
+        body: 'Your code is automatically saved to <span class="text-yellow-500 text-3xl align-middle icon icon-embed2"></span> SCRIPTS. You can search for scripts by date, programming language, and owner.',
+        ref: '#browser-tabs',
+        placement: 'right'
     },
     {
         header: '8/8 Read the curriculum',
-        body: 'The book icon <span class="text-yellow-500 text-3xl align-middle icon icon-book3"></span> will open a curriculum panel on the right side of the screen. You can open the Table of Contents by clicking this bar to read about topics to continue learning about EarSketch.',
+        body: 'On the right side is the curriculum panel. Use the toggle switch to view the curriculum and the Welcome bar to navigate through the content.',
         ref: '#curriculum-navigation',
         placement: 'left'
     },
     {
         header: `End`,
-        body: 'Congratulations! You have completed the tour. You are ready to start making music. Click <span class="text-blue-500 align-middle icon icon-plus2"></span> to open up a new script and start coding.',
-        ref: '#btn-add-tab',
-        placement: 'bottom'
+        body: 'Congratulations! You have completed the tour. You are ready to start making music. Click <span class="align-middle icon icon-plus2"></span> to open up a new script and start coding.',
+        ref: '#create-script-button',
+        placement: 'right'
     }
 ];
 

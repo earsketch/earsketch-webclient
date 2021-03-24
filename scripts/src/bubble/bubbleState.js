@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import * as layout from '../layout/layoutState';
 import * as helpers from 'helpers';
 import { sampleScript } from "./bubbleData";
 
@@ -25,6 +26,7 @@ const bubbleSlice = createSlice({
     }
 });
 
+export default bubbleSlice.reducer;
 export const { reset, resume, suspend, increment, setReady, setLanguage } = bubbleSlice.actions;
 
 const createSampleScript = createAsyncThunk(
@@ -45,58 +47,6 @@ const createSampleScript = createAsyncThunk(
     }
 );
 
-// TODO: These should belong to the layout reducer.
-const deferLayoutChange = 100;
-
-const hideSideBars = createAsyncThunk(
-    'bubble/hideSideBars',
-    async () => {
-        const layoutScope = helpers.getNgController('layoutController').scope();
-
-        return new Promise(resolve => {
-            layoutScope.closeSidebarTabs();
-            layoutScope.toggleLayoutToState('curriculum','close');
-            setTimeout(resolve, deferLayoutChange);
-        });
-    }
-);
-
-const showBrowser = createAsyncThunk(
-    'bubble/showBrowser',
-    async (payload) => {
-        const layoutScope = helpers.getNgController('layoutController').scope();
-
-        return new Promise(resolve => {
-            switch (payload) {
-                case 'sounds':
-                    layoutScope.openSidebarTab('sound');
-                    break;
-                case 'scripts':
-                    layoutScope.openSidebarTab('script');
-                    break;
-                case 'API':
-                    layoutScope.openSidebarTab('api');
-                    break;
-                default:
-                    break;
-            }
-            setTimeout(resolve,deferLayoutChange);
-        });
-    }
-);
-
-const showCurriculum = createAsyncThunk(
-    'bubble/showCurriculum',
-    async () => {
-        const layoutScope = helpers.getNgController('layoutController').scope();
-
-        return new Promise(resolve => {
-            layoutScope.toggleLayoutToState('curriculum','open');
-            setTimeout(resolve,deferLayoutChange);
-        });
-    }
-);
-
 // TODO: Should be an action in the editor reducer.
 const setEditorReadOnly = createAsyncThunk(
     'bubble/setEditorWritable',
@@ -104,7 +54,7 @@ const setEditorReadOnly = createAsyncThunk(
         return new Promise(resolve => {
             const editorScope = helpers.getNgDirective('editor').scope();
             editorScope.editor.setReadOnly(payload);
-            setTimeout(resolve,deferLayoutChange);
+            setTimeout(resolve, 100);
         });
     }
 );
@@ -117,7 +67,6 @@ export const dismissBubble = createAsyncThunk(
     }
 );
 
-
 export const proceed = createAsyncThunk(
     'bubble/proceed',
     async (payload, { getState, dispatch }) => {
@@ -129,7 +78,8 @@ export const proceed = createAsyncThunk(
 
         switch (currentPage) {
             case 0:
-                await dispatch(hideSideBars());
+                await dispatch(layout.collapseWest());
+                await dispatch(layout.collapseEast());
                 await dispatch(createSampleScript());
                 await dispatch(setEditorReadOnly(true));
                 break;
@@ -141,13 +91,13 @@ export const proceed = createAsyncThunk(
             case 4:
                 break;
             case 5:
-                await dispatch(showBrowser('sounds'));
+                await dispatch(layout.openWest('SOUNDS'));
                 break;
             case 6:
-                await dispatch(showBrowser('scripts'));
+                await dispatch(layout.openWest('SCRIPTS'));
                 break;
             case 7:
-                await dispatch(showCurriculum());
+                await dispatch(layout.openEast());
                 break;
             case 8:
                 await dispatch(setEditorReadOnly(false));
@@ -159,5 +109,3 @@ export const proceed = createAsyncThunk(
         dispatch(increment());
     }
 );
-
-export default bubbleSlice.reducer;

@@ -1,15 +1,13 @@
 import React, { Component, useState } from 'react'
 import PropTypes from 'prop-types'
-import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { isArray } from 'lodash'
 
 import * as api from './apiState'
 import { selectScriptLanguage } from '../app/appState'
 
-import { TitleBar, BrowserTabs, SearchBar } from './Browser'
+import { SearchBar } from './Browser'
 import * as helpers from "../helpers";
 import * as appState from "../app/appState";
 import * as tabs from '../editor/tabState';
@@ -88,19 +86,19 @@ const Entry = ({ name, obj }) => {
         >
             <div className="flex justify-between mb-4">
                 <span
-                    className="text-2xl font-bold cursor-pointer" title={returnText}
+                    className="text-2xl font-bold cursor-pointer truncate" title={returnText}
                     onClick={() => { obj.details = !obj.details; forceUpdate() }}
                 >
                     {name}
                 </span>
-                <div className="h-8">
+                <div className="h-8 flex">
                     <button
-                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? ' inline-block' : 'hidden'}`}
+                        className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? '' : 'hidden'}`}
                         onClick={() => paste(name, obj)}
                     >
-                        <i className="inline-block icon icon-paste2" />
+                        <i className="icon icon-paste2" />
                     </button>
-                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full inline-block text-xl rounded-full pl-4 border border-gray-600" onClick={() => { obj.details = !obj.details; forceUpdate() }}>
+                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap" onClick={() => { obj.details = !obj.details; forceUpdate() }}>
                         <div className="inline-block w-12">{obj.details ? "Close" : "Open"}</div>
                         <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? 'arrow-down' : 'arrow-right'}`} />
                     </button>
@@ -207,34 +205,16 @@ const APISearchBar = () => {
     return <SearchBar { ...props } />
 }
 
-const APIBrowser = () => {
-    const theme = useSelector(appState.selectColorTheme);
-
+export const APIBrowser = () => {
     return (
-        <div
-            className={`flex flex-col absolute h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
-            style={{marginTop:-12}}
-        >
+        <>
             <div className='flex-grow-0 pb-4'>
-                <TitleBar />
-                <BrowserTabs selection='API' />
                 <APISearchBar />
             </div>
 
             <div className="flex-auto overflow-y-scroll overflow-x-none">
                 <EntryList />
             </div>
-        </div>
+        </>
     )
 }
-
-const HotAPIBrowser = hot(props => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <APIBrowser />
-        </Provider>
-    );
-})
-
-
-app.component('apiBrowser', react2angular(HotAPIBrowser, null, ['$ngRedux']))

@@ -1,6 +1,5 @@
 module.exports = function (grunt) {
 
-    grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-connect');
@@ -13,17 +12,6 @@ module.exports = function (grunt) {
         gitSrcFiles: [],
         commitMsg: '',
         scriptsMode: 'dev',
-        jsdoc: {
-            dist: {
-                //src: ['scripts/src/**/*.js'],
-                jsdoc: 'jsdoc',
-                options: {
-                    destination: 'doc',
-                    configure: 'conf.json'
-                    //template: './node_modules/ink-docstrap/template'
-                }
-            }
-        },
 
         open: {
             doc: {
@@ -39,12 +27,6 @@ module.exports = function (grunt) {
                     optimization: 2
                 },
                 files: [{
-                    expand: true,
-                    cwd: 'css/earsketch',
-                    src: 'allstyles.less',
-                    dest: 'css/earsketch',
-                    ext: '.css'
-                }, {
                     expand: true,
                     cwd: 'css/earsketch',
                     src: 'theme_dark.less',
@@ -170,9 +152,8 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('css', ['less']);
-    grunt.registerTask('doc', ['jsdoc', 'open:doc']);
     grunt.registerTask('serve', ['connect']);
-    grunt.registerTask('default', ['jsdoc', 'less', 'connect']);
+    grunt.registerTask('default', ['less', 'connect']);
     grunt.registerTask('test', ['karma:unit', 'karma:continuous']);
     grunt.registerTask('switch-to-branch', ['gitcheckout','gitpull']);
     grunt.registerTask('save-version', ['gitadd', 'gitcommit','gitpush']);

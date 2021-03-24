@@ -7,6 +7,7 @@ env:
     ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
     ES_VERSION_MINOR: /earsketch-webclient/version_number/minor
     ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
+    ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
   secrets-manager:
     GITHUB_USER: Github_EarSketch_CICD_Credentials:github_user
     GITHUB_TOKEN: Github_EarSketch_CICD_Credentials:github_token
@@ -42,7 +43,8 @@ phases:
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - npm install
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
-      - npm run build -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.baseuri=$ES_BASE_URI --env.apihost=$ES_API_HOST --env.buildconfig=$ES_BUILD_ENVIRONMENT
+      - grunt less
+      - npm run build -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.baseuri=$ES_BASE_URI --env.apihost=$ES_API_HOST --env.buildconfig=$ES_BUILD_ENVIRONMENT --env.baseurl=$ES_BASE_URL
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR

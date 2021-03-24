@@ -16,6 +16,8 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
     var savedReport = {};
     var savedAnalysis = {};
 
+  var apiCalls = [];
+
   // Load lists of numbers and keys
   var AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS);
 
@@ -154,10 +156,11 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
       report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length)};
       report["EFFECTS"] = {};
 
-      var apiCalls = complexityCalculator.apiCalls();
+      apiCalls = complexityCalculator.apiCalls();
 
-      if(apiCalls)
+      if(apiCalls.length > 0) {
         report["APICALLS"] = apiCalls;
+      }
 
       var measureView = {};
 
@@ -314,11 +317,13 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
                           section[itemType][item.name] = {measure:[], line: []};
                         section[itemType][item.name].measure.push(i);
 
-                        apiCalls.forEach(function(codeLine) {
-                          if (codeLine.args.includes(item.name))
-                            if (!section[itemType][item.name].line.includes(codeLine.line))
-                              section[itemType][item.name].line.push(codeLine.line);
-                        });
+                        if(apiCalls.length > 0) {
+                          apiCalls.forEach(function(codeLine) {
+                            if (codeLine.args.includes(item.name))
+                              if (!section[itemType][item.name].line.includes(codeLine.line))
+                                section[itemType][item.name].line.push(codeLine.line);
+                          });
+                        }
                       }
                     }
 
@@ -343,11 +348,13 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
                       section[itemType][item.name] = {measure: [], line: []};
                     section[itemType][item.name].measure.push(i);
 
-                    apiCalls.forEach(function(codeLine) {
-                      if (codeLine.args.includes(item.name))
-                        if (!section[itemType][item.name].line.includes(codeLine.line))
-                          section[itemType][item.name].line.push(codeLine.line);
-                    });
+                    if (apiCalls.length > 0) {
+                      apiCalls.forEach(function(codeLine) {
+                        if (codeLine.args.includes(item.name))
+                          if (!section[itemType][item.name].line.includes(codeLine.line))
+                            section[itemType][item.name].line.push(codeLine.line);
+                      });
+                    }
                   }
                 }
 

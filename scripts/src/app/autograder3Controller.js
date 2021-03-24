@@ -6,15 +6,10 @@ app.controller("autograder3Controller",
 ['$scope','compiler', 'Upload','userConsole','esconsole', 'caiAnalysisModule','ESUtils', 'userProject', '$http',
 function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ESUtils, userProject, $http) {
 
-    // URL_DOMAIN = 'https://earsketch.gatech.edu/EarSketchWS';
-
     $scope.prompts = [0];
     $scope.allowPrompts = false;
     $scope.seed = Date.now();
     $scope.useSeed = true;
-
-    // TEMPORAARY - SOUND PROFILE TEST EXAMPLES
-    var soundProfileTests = false;
 
     // overwrite userConsole javascript prompt with a hijackable one
     var nativePrompt = userConsole.prompt;
@@ -109,10 +104,8 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
       // start with a promise that resolves immediately
       var p = new Promise(function(resolve) { resolve(); });
 
-      // for (var i = 0; i < shareUrls.length; i++) {
       angular.forEach(matches, function(match) {
         esconsole("Grading: " + match, ['DEBUG']);
-        //var shareId = ESUtils.parseShareId(url);
         var shareId = match.substring(9);
         esconsole("ShareId: " + shareId, ['DEBUG']);
         p = p.then(function() {
@@ -133,34 +126,21 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
           if (!$scope.options["HISTORY"])
               scriptVersions = [scriptVersions[scriptVersions.length-1]];
 
-          // scriptVersions = [0, 1, 2];
-
           var p = new Promise(function(resolve) { resolve(); });
 
 
           angular.forEach(scriptVersions, function(version) {
 
             p = p.then(function() {
-              // $scope.processing = script.name;
 
               scriptHistory[version].name = script.name;
 
               return $scope.runScript(scriptHistory[version], version).then(function(result) {
-                // $scope.processing = null;
                 return result;
               });
 
           });
 
-          // var promises = scriptVersions.map(function(version) {
-          //   scriptHistory[version].name = script.name;
-
-          //   return $scope.runScript(scriptHistory[version], version);
-          // });
-
-          // Promise.all(promises).then((results) => {
-          //   console.log(results);
-          // });
         });
 
       });
@@ -200,19 +180,6 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
             var reports = caiAnalysisModule.analyzeMusic(compiler_output);
             reports["COMPLEXITY"] = complexity;
 
-            if (soundProfileTests) {
-
-              console.log("sectionToMeasure", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"section","A","measure"));
-              console.log("soundToLine", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"sound","YG_NEW_FUNK_DRUMS_1","line"));
-              console.log("soundToMeasure", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"sound","YG_NEW_FUNK_DRUMS_1","measure"));
-              console.log("lineToSound", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"line",17,"sound"));
-              console.log("sectionToLine", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"section",
-                "A","line"));
-              console.log("effectToSound", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"effect","VOLUME","sound"));
-              console.log("lineToMeasure", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"line", 17, "measure"));
-              console.log("measureToLine", caiAnalysisModule.soundProfileLookup(reports["SOUNDPROFILE"],"measure",1,"line"));
-            }
-
             Object.keys($scope.options).forEach(function(option) {
               if (reports[option] && !$scope.options[option])
                 delete reports[option];
@@ -226,8 +193,6 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
               reports: Object.assign({}, reports),
             });
 
-            $scope.$apply();
-
             }).catch(function(err) {
               esconsole(err, ['ERROR']);
 
@@ -237,7 +202,6 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
                 error: err,
               });
 
-              $scope.$apply();
           });
     };
 
@@ -366,7 +330,6 @@ function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ES
       a.target = '_blank';
       esconsole('File location: ' + a.href, ['debug','exporter']);
       a.click();
-      //window.URL.revokeObjectURL(url);
     };
 
     $scope.changeInputMode = function() {

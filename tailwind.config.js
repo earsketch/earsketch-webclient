@@ -26,6 +26,14 @@ module.exports = {
 			h3: { color: '#fff' },
                     }
                 }
+            },
+            colors: {
+                amber: {
+                    DEFAULT: '#F5AE3C'
+                },
+                blue: {
+                    DEFAULT: '#223546'
+                }
             }
         },
     },
