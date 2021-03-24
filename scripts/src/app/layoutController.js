@@ -275,7 +275,7 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
      */
     postDigest(function () {
         var editorScope = angular.element('.code-container').scope();
-        if (editorScope) {
+        if (editorScope && editorScope.editor.droplet) {
             editorScope.editor.droplet.resize();
         }
     });
