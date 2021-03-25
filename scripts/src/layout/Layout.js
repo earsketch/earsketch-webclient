@@ -13,7 +13,7 @@ export const toggleHorizontalDrag = (index, state) => {
 
 export const initialize = () => {
     const horizontalSplits = Split(['#sidebar-container','#content','#curriculum-container'], {
-        gutterSize: 8,
+        gutterSize: layout.getGutterSize(),
         minSize: layout.getMinSize(),
         snapOffset: 0,
         sizes: layout.selectHorizontalRatio(store.getState()),
@@ -25,7 +25,7 @@ export const initialize = () => {
         },
         gutterStyle() {
             return {
-                width: '8px',
+                width: `${layout.getGutterSize()}px`,
                 cursor: 'col-resize'
             }
         },
@@ -36,7 +36,7 @@ export const initialize = () => {
 
     const verticalSplits = Split(['#devctrl','#coder','#console-frame'], {
         direction: 'vertical',
-        gutterSize: 8,
+        gutterSize: layout.getGutterSize(),
         minSize: layout.getMinSize(),
         sizes: layout.selectVerticalRatio(store.getState()),
         snapOffset: 0,
@@ -54,7 +54,7 @@ export const initialize = () => {
         gutterStyle(dimension, gutterSize) {
             return {
                 'flex-basis': gutterSize + 'px',
-                height: '8px',
+                height: `${layout.getGutterSize()}px`,
                 cursor: 'row-resize'
             }
         },

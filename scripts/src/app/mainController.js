@@ -73,6 +73,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     var trustedHtml = {};
 
     $scope.isEmbedded = $location.search()["embedded"] === "true";
+    $scope.hideDAW = $scope.isEmbedded && $location.search()['hideDaw'];
+    $scope.hideEditor = $scope.isEmbedded && $location.search()['hideCode'];
     $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
@@ -80,11 +82,21 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(appState.setEmbedMode(true));
         Layout.destroy();
         layout.setMinSize(0);
+
+        if ($scope.hideEditor) {
+            layout.setGutterSize(0);
+        }
         Layout.initialize();
         $ngRedux.dispatch(layout.collapseWest());
         $ngRedux.dispatch(layout.collapseEast());
         $ngRedux.dispatch(layout.collapseSouth());
-        $ngRedux.dispatch(layout.setNorthFromRatio([25,75,0]));
+
+        if ($scope.hideEditor) {
+            // Note: hideDAW-only currently does not fit the layout height to the DAW player height as the below API only supports ratios.
+            $ngRedux.dispatch(layout.setNorthFromRatio([100,0,0]));
+        } else {
+            $ngRedux.dispatch(layout.setNorthFromRatio([25,75,0]));
+        }
     } else {
         userProject.loadLocalScripts();
         $ngRedux.dispatch(scripts.syncToNgUserProject());

@@ -255,7 +255,7 @@
                             </div>
                         </div>
 
-                        <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&[1,2,9].includes(bubble.currentPage)?35:0}" ng-controller="tabController">
+                        <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&[1,2,9].includes(bubble.currentPage)?35:0}" ng-controller="tabController" ng-show="!hideEditor">
                             <editor-header></editor-header>
 
                             <div class="flex-grow h-full overflow-y-hidden">

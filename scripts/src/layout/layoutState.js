@@ -70,7 +70,8 @@ const windowHeight = () => window.innerHeight|| document.documentElement.clientH
 const layoutMutableState = {
     horizontalSplits: null,
     verticalSplits: null,
-    minSize: horizontalMinSize
+    minSize: horizontalMinSize,
+    gutterSize: 8
 };
 
 export const setHorizontalSplits = ref => {
@@ -86,8 +87,13 @@ export const getVerticalSplits = () => layoutMutableState.verticalSplits;
 
 export const setMinSize = size => {
     layoutMutableState.minSize = size;
-}
+};
 export const getMinSize = () => layoutMutableState.minSize;
+
+export const setGutterSize = size => {
+    layoutMutableState.gutterSize = size;
+};
+export const getGutterSize = () => layoutMutableState.gutterSize;
 
 export const isWestOpen = state => state.layout.west.open;
 export const isEastOpen = state => state.layout.east.open;

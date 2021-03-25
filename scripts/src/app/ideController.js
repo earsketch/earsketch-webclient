@@ -687,6 +687,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     };
 
     colorTheme.subscribe($scope, function (event, theme) {
+        if (!$scope.editor.ace) return;
+
         if (theme === 'dark') {
             $scope.editor.ace.setTheme('ace/theme/monokai');
         } else {
