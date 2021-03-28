@@ -56,21 +56,21 @@ finish()
 
 Output:
 
-boolOps: "Does Not Use"
-booleans: "Does Not Use"
-comparisons: "Does Not Use"
-conditionals: "Does Not Use"
-consoleInput: "Does Not Use"
-floats: "Uses Originally For Purpose"
-forLoops: "Uses Originally With Range Min/Max And Increment"
-ints: "Uses Originally For Purpose"
-listOps: "Does Not Use"
-lists: "Uses Original"
-mathematicalOperators: "Uses Originally For Purpose"
-strOps: "Does Not Use"
-strings: "Does Not Use"
-userFunc: "Uses Originally, Takes Arguments, And Returns Values"
-variables: "Uses Originally And Transforms Value
+boolOps: 0
+booleans: 0
+comparisons: 0
+conditionals: 0
+consoleInput: 0
+floats: 3
+forLoops: 4
+ints: 3
+listOps: 0
+lists: 2
+mathematicalOperators: 3
+strOps: 0
+strings: 0
+userFunc: 5
+variables: 4
 
 
 2. 
@@ -113,21 +113,21 @@ finish()
 
 Output:
 
-boolOps: "Does Not Use"
-booleans: "Uses Originally For Purpose"
-comparisons: "Uses Originally For Purpose"
-conditionals: "Uses Originally to Follow Multiple Code Paths"
-consoleInput: "Does Not Use"
-floats: "Does Not Use"
-forLoops: "Does Not Use"
-ints: "Uses"
-listOps: "Does Not Use"
-lists: "Does Not Use"
-mathematicalOperators: "Uses Originally For Purpose"
-strOps: "Uses Originally For Purpose"
-strings: "Uses Originally For Purpose"
-userFunc: "Uses"
-variables: "Uses Originally And Transforms Value"
+boolOps: 0
+booleans: 3
+comparisons: 3
+conditionals: 3
+consoleInput: 0
+floats: 0
+forLoops: 0
+ints: 1
+listOps: 0
+lists: 0
+mathematicalOperators: 3
+strOps: 3
+strings: 3
+userFunc: 1
+variables: 4
 
 3. 
 Script:
@@ -150,21 +150,21 @@ finish()
 ```
 
 Output:
-boolOps: "Does Not Use"
-booleans: "Does Not Use"
-comparisons: "Does Not Use"
-conditionals: "Does Not Use"
-consoleInput: "Does Not Use"
-floats: "Does Not Use"
-forLoops: "Uses Original"
-ints: "Uses Originally For Purpose"
-listOps: "Does Not Use"
-lists: "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon"
-mathematicalOperators: "Does Not Use"
-strOps: "Does Not Use"
-strings: "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon"
-userFunc: "Does Not Use"
-variables: "Uses Original"
+boolOps: 0
+booleans: 0
+comparisons: 0
+conditionals: 0
+consoleInput: 0
+floats: 0
+forLoops: 1
+ints: 3
+listOps: 0
+lists: 4
+mathematicalOperators: 0
+strOps: 0
+strings: 4
+userFunc: 0
+variables: 1
 
 
 4.
@@ -209,21 +209,21 @@ finish();
 ```
 
 Output:
-boolOps: "Does Not Use"
-booleans: "Uses Originally For Purpose"
-comparisons: "Uses Originally For Purpose"
-conditionals: "Does Not Use"
-consoleInput: "Does Not Use"
-floats: "Does Not Use"
-forLoops: "Uses Originally With Three Arguments"
-ints: "Uses Originally For Purpose"
-listOps: "Uses Originally For Purpose"
-lists: "Uses Originally For Purpose"
-mathematicalOperators: "Uses Originally For Purpose"
-strOps: "Does Not Use"
-strings: "Uses Originally For Purpose"
-userFunc: "Uses Originally, Takes Arguments, And Returns Values"
-variables: "Uses Originally And Transforms Value"
+boolOps: 0
+booleans: 3
+comparisons: 3
+conditionals: 0
+consoleInput: 0
+floats: 0
+forLoops: 4
+ints: 3
+listOps: 3
+lists: 3
+mathematicalOperators: 3
+strOps: 0
+strings: 3
+userFunc: 5
+variables: 4
 
 5. (future test)
 
