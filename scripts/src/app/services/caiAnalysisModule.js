@@ -153,7 +153,7 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
       var report = {};
 
       // basic music information
-      report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length)};
+      report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length * 4.0)};
       report["EFFECTS"] = {};
 
       apiCalls = complexityCalculator.apiCalls();
