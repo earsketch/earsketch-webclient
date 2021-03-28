@@ -29,17 +29,17 @@ app.directive('caiwindow', [function () {
                 },
                 collaborator: {
                     'float': 'right',
-                    'background-color': 'white'
+                    'background-color': 'lightgray'
                 },
                 collab_compile_success: {
                     'float': 'right',
-                    'background-color': 'white',
+                    'background-color': 'lightgray',
                     'color': 'green',
                     'font-style': 'italic'
                 },
                 collab_compile_fail: {
                     'float': 'right',
-                    'background-color': 'white',
+                    'background-color': 'lightgray',
                     'color': 'red',
                     'font-style': 'italic'
                 }
