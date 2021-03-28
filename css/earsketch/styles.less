@@ -1,6 +1,7 @@
 @import "variables.less";
 
 html, body {
+  height: 100vh;
   padding: 0;
   margin: 0;
   font-family: @font;
@@ -8,6 +9,20 @@ html, body {
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: @font;
+}
+
+.gutter {
+  background-color: black
+}
+
+.gutter.gutter-vertical {
+  height: 6px;
+  cursor: ns-resize;
+}
+
+.gutter.gutter-horizontal {
+  width: 6px;
+  cursor: ew-resize;
 }
 
 .modal-dialog {
@@ -164,7 +179,7 @@ button:focus {
 }
 
 .btn-floating {
-  z-index: 100;
+  z-index: 40;
   border-color: @gen-action;
   border-style: solid;
   border-width: 1px;
@@ -207,11 +222,8 @@ button:focus {
 }
 
 #main-container {
-  position: absolute;
   top: @header-height;
-  bottom: 0;
-  right: 0;
-  left: @sidenav-width;
+  width: 100%;
   overflow-y: hidden;
 }
 
@@ -243,7 +255,6 @@ button:focus {
 
 /* NAVIGATION BAR */
 #top-header-nav {
-  position: absolute;
   top: 0;
   right: 0;
   left: 0;
@@ -440,11 +451,6 @@ button:focus {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
-}    
-
-#empty-script-lang-message {
-  font-size: 20px;
-  margin-top: 50px;
 }
 
 #download-loader {
@@ -494,23 +500,16 @@ button:focus {
 }
 
 .tab-container {
-  position: absolute;
   clear: both;
-  top: @panel-label-height;
-  right: 0;
-  left: 0;
-  bottom: 0;
 }
 
 #coder {
-  padding-right: 4px;
   overflow-y:hidden;
 }
 
 /* Sidebar */
-.sidebar-inner, #console-frame {
-  min-width: 300px;
-  //overflow-x:hidden;
+#sidebar, .sidebar-inner, .tab-content, .tab-pane, #tab-soundbrowser, #tab-scriptbrowser, #tab-apibrowser {
+  height: 100%;
 }
 
 #tempoSlider {
@@ -592,10 +591,6 @@ a:hover {
 }
 
 /* Overall styling */
-.tab-content {
-  margin-top: 10px;
-}
-
 .tab-container .dropdown-menu > li > a, .nav-tabs > li > a {
   margin: 0;
   border:none;
@@ -847,7 +842,6 @@ textarea:focus {
 
 #collab-badges-container {
   color: steelblue;
-  position: absolute;
   z-index: 100;
   top: 39px;
   padding: 4px;
@@ -874,6 +868,10 @@ textarea:focus {
 
 .collaborator-access-badge {
   z-index: 200;
+}
+
+#console-frame {
+  overflow-y: scroll;
 }
 
 //=== these might be obsolete===
@@ -1036,11 +1034,6 @@ textarea:focus {
 }
 
 /*combined view styling */
-.tab-content.combined-view {
-  position: absolute;
-  left: 0;
-}
-
 #devctrl {
   overflow-y:hidden !important;
 }
@@ -1133,14 +1126,12 @@ button.round-button:hover {
 }
 
 .code-container {
-  position: absolute;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  top: 39px;
+  height: 100%;
   overflow:hidden;
   background: @dark-bg !important;
   border-top: 1px solid #393939;
+  position: relative;
+  flex-grow: 1;
 }
 
 .code-container-cloak {
@@ -1747,7 +1738,7 @@ textarea.form-control {
   width: 100%;
   text-align: center;
   display: inline-block;
-  color: white;
+  color: black;
   font-family: Roboto, Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   font-size: 14px;
 }

@@ -25,6 +25,10 @@ const scriptsSlice = createSlice({
             entities: {},
             scriptIDs: []
         },
+        readOnlyScripts: {
+            entities: {},
+            scriptIDs: []
+        },
         filters: {
             searchText: '',
             showDeleted: false,
@@ -40,7 +44,8 @@ const scriptsSlice = createSlice({
         dropdownMenu: {
             show: false,
             script: null,
-            type: null
+            type: null,
+            context: false
         },
         sharedScriptInfo: {
             show: false,
@@ -64,13 +69,25 @@ const scriptsSlice = createSlice({
             state.sharedScripts.entities = {};
             state.sharedScripts.scriptIDs = [];
         },
-        addLocalScript(state, { payload }) {
-            state.localScripts.entities[payload.scriptID] = payload.entity;
-            state.localScripts.scriptIDs.push(payload.scriptID);
+        // addLocalScript(state, { payload }) {
+        //     state.localScripts.entities[payload.scriptID] = payload;
+        //     state.localScripts.scriptIDs.push(payload.scriptID);
+        // },
+        // resetLocalScripts(state) {
+        //     state.localScripts.entities = {};
+        //     state.localScripts.scriptIDs = [];
+        // },
+        addReadOnlyScript(state, { payload }) {
+            state.readOnlyScripts.entities[payload.shareid] = payload;
+            state.readOnlyScripts.scriptIDs.push(payload.shareid);
         },
-        resetLocalScripts(state) {
-            state.localScripts.entities = {};
-            state.localScripts.scriptIDs = [];
+        removeReadOnlyScript(state, { payload }) {
+            delete state.readOnlyScripts.entities[payload];
+            state.readOnlyScripts.scriptIDs = state.readOnlyScripts.scriptIDs.filter(v => v !== payload);
+        },
+        resetReadOnlyScripts(state) {
+            state.readOnlyScripts.entities = {};
+            state.readOnlyScripts.scriptIDs = [];
         },
         setSearchText(state, { payload }) {
             state.filters.searchText = payload;
@@ -108,6 +125,7 @@ const scriptsSlice = createSlice({
             state.dropdownMenu.show = payload.show ? payload.show : true;
             state.dropdownMenu.script = payload.script;
             state.dropdownMenu.type = payload.type;
+            state.dropdownMenu.context = payload.context ? payload.context : false;
         },
         resetDropdownMenu(state) {
             state.dropdownMenu = {
@@ -141,8 +159,11 @@ export const {
     resetRegularScripts,
     setSharedScripts,
     resetSharedScripts,
-    addLocalScript,
-    resetLocalScripts,
+    // addLocalScript,
+    // resetLocalScripts,
+    addReadOnlyScript,
+    removeReadOnlyScript,
+    resetReadOnlyScripts,
     setSearchText,
     setShowDeleted,
     addFilterItem,
@@ -319,10 +340,12 @@ export const resetSharedScriptInfoAsync = createAsyncThunk(
 );
 
 /*=== Selectors ===*/
-export const selectRegularScriptEntities = state => state.scripts.regularScripts.entities;
-export const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
-export const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
+const selectRegularScriptEntities = state => state.scripts.regularScripts.entities;
+const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
+const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
 export const selectSharedScriptIDs = state => state.scripts.sharedScripts.scriptIDs;
+const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
+const selectReadOnlyScriptIDs = state => state.scripts.readOnlyScripts.scriptIDs;
 
 export const selectActiveScriptEntities = createSelector(
     [selectRegularScriptEntities],
@@ -342,13 +365,13 @@ export const selectDeletedScriptIDs = createSelector(
     (entities) => Object.keys(entities)
 );
 export const selectAllScriptEntities = createSelector(
-    [selectRegularScriptEntities, selectSharedScriptEntities],
-    (regularScripts, sharedScripts) => Object.assign({}, regularScripts, sharedScripts)
+    [selectRegularScriptEntities, selectSharedScriptEntities, selectReadOnlyScriptEntities],
+    (regularScripts, sharedScripts, readOnlyScripts) => Object.assign({}, regularScripts, sharedScripts, readOnlyScripts)
 );
 export const selectAllScriptIDs = createSelector(
-    [selectRegularScriptIDs, selectSharedScriptIDs],
-    (regularIDs, sharedIDs) => [...regularIDs, ...sharedIDs]
-)
+    [selectRegularScriptIDs, selectSharedScriptIDs, selectReadOnlyScriptIDs],
+    (regularIDs, sharedIDs, readOnlyIDs) => [...regularIDs, ...sharedIDs, ...readOnlyIDs]
+);
 
 export const selectFilters = state => state.scripts.filters;
 export const selectSearchText = state => state.scripts.filters.searchText;
@@ -423,19 +446,20 @@ export const selectFeatureSharedScript = state => state.scripts.featureSharedScr
 export const selectShowDropdownMenu = state => state.scripts.dropdownMenu.show;
 export const selectDropdownMenuScript = state => state.scripts.dropdownMenu.script;
 export const selectDropdownMenuType = state => state.scripts.dropdownMenu.type;
+export const selectDropdownMenuContext = state => state.scripts.dropdownMenu.context;
 
 // TODO: Unsaved scripts should probably be tracked in the editor or tab state.
 export const selectUnsavedDropdownMenuScript = createSelector(
-    [selectDropdownMenuScript, selectDropdownMenuType],
-    (script, type) => {
+    [selectDropdownMenuScript, selectDropdownMenuType, selectReadOnlyScriptEntities],
+    (script, type, readOnlyScripts) => {
         if (!script) {
             return null;
         }
 
         const userProject = helpers.getNgService('userProject');
-        return type==='regular'
-            ? userProject.scripts[script.shareid]
-            : userProject.sharedScripts[script.shareid];
+        return type==='regular' && userProject.scripts[script.shareid]
+            || type==='shared' && userProject.sharedScripts[script.shareid]
+            || type==='readonly' && readOnlyScripts[script.shareid] || null;
     }
 );
 

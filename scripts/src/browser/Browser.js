@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
+import { hot } from 'react-hot-loader/root';
+import { react2angular } from 'react2angular';
 
-import * as helpers from 'helpers';
-import * as app from '../app/appState';
+import * as appState from '../app/appState';
+import * as layout from '../layout/layoutState';
 
-// const darkBgColor = '#282828'; // Change to #223546 for Amazon design.
+import { SoundBrowser } from './Sounds';
+import { ScriptBrowser } from './Scripts';
+import { APIBrowser } from './API';
+
 const darkBgColor = '#223546';
 
 export const TitleBar = () => {
-    const layoutScope = helpers.getNgController('layoutController').scope();
-    const theme = useSelector(app.selectColorTheme);
+    const theme = useSelector(appState.selectColorTheme);
+    const dispatch = useDispatch();
 
     return (
-        <div className='flex items-center p-3 text-2xl'>
-            <div className='pl-3 pr-4'>
+        <div
+            className={`flex items-center p-3 text-2xl`}
+            style={{minHeight: 'fit-content'}}  // Safari-specific issue
+        >
+            <div className='pl-3 pr-4 font-semibold truncate'>
                 CONTENT MANAGER
             </div>
             <div>
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
                     onClick={() => {
-                        layoutScope.closeSidebarTabs();
-                        layoutScope.$applyAsync();
+                        dispatch(layout.collapseWest());
                     }}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -32,49 +39,47 @@ export const TitleBar = () => {
     );
 };
 
-const BrowserTab = ({ selected, onClick, children }) => (
-    <div
-        className={`p-3 w-1/3 cursor-pointer ${selected ? 'border-b-4' : ''}`}
-        style={selected ? {
-            color: '#F5AE3C',
-            borderColor: '#F5AE3C'
-        } : {}}
-        onClick={onClick}
-    >
-        { children }
-    </div>
-);
+const BrowserTab = ({ name, children }) => {
+    const dispatch = useDispatch();
+    const isSelected = useSelector(layout.selectWestKind)===name;
 
-export const BrowserTabs = ({ selection }) => {
-    const layoutScope = helpers.getNgController('layoutController').scope();
+    return (
+        <div
+            className={`p-3 w-1/3 cursor-pointer ${isSelected ? 'border-b-4' : ''} truncate`}
+            style={isSelected ? {
+                color: '#F5AE3C',
+                borderColor: '#F5AE3C'
+            } : {}}
+            onClick={() => dispatch(layout.setWest({
+                open: true,
+                kind: name
+            }))}
+        >
+            { children }
+            { name }
+        </div>
+    );
+};
+
+export const BrowserTabs = () => {
     return (
         <div
             className='flex justify-between text-center'
+            id='browser-tabs'
             style={{
                 backgroundColor: darkBgColor,
-                color: 'white'
+                color: 'white',
+                minHeight: 'fit-content' // Safari-specific issue
             }}
         >
-            <BrowserTab
-                selected={selection==='SOUNDS'}
-                onClick={() => layoutScope.openSidebarTab('sound')}
-            >
+            <BrowserTab name='SOUNDS'>
                 <i className='icon-headphones pr-2' />
-                SOUNDS
             </BrowserTab>
-            <BrowserTab
-                selected={selection==='SCRIPTS'}
-                onClick={() => layoutScope.openSidebarTab('script')}
-            >
+            <BrowserTab name='SCRIPTS'>
                 <i className='icon-embed2 pr-2' />
-                SCRIPTS
             </BrowserTab>
-            <BrowserTab
-                selected={selection==='API'}
-                onClick={() => layoutScope.openSidebarTab('api')}
-            >
+            <BrowserTab name='API'>
                 <i className='icon-book pr-2' />
-                APIs
             </BrowserTab>
         </div>
     );
@@ -85,7 +90,7 @@ export const Header = ({ title }) => (
 );
 
 export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }) => {
-    const theme = useSelector(app.selectColorTheme);
+    const theme = useSelector(appState.selectColorTheme);
     return (
         <form className='p-3 pb-1' onSubmit={e => e.preventDefault()}>
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === 'light' ? 'border-black' : 'border-white'}`}>
@@ -111,7 +116,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }) => {
 };
 
 export const DropdownMultiSelector = ({ title, category, items, position, numSelected, FilterItem }) => {
-    const theme = useSelector(app.selectColorTheme);
+    const theme = useSelector(appState.selectColorTheme);
     const [showTooltip, setShowTooltip] = useState(false);
     const [referenceElement, setReferenceElement] = useState(null);
     const [popperElement, setPopperElement] = useState(null);
@@ -197,7 +202,7 @@ export const Collection = ({ title, visible=true, initExpanded=true, children, c
                     (<div className='h-auto border-l-4 border-orange-400' />)
                 }
                 <div
-                    className={`flex flex-grow justify-between items-center p-3 text-2xl border-t border-gray-600 cursor-pointer select-none`}
+                    className={`flex flex-grow justify-between items-center p-3 text-2xl border-t border-gray-600 cursor-pointer select-none truncate`}
                     style={{
                         backgroundColor: highlight ? '#334657' : darkBgColor,
                         color: '#F5AE3C'
@@ -226,3 +231,84 @@ export const Collection = ({ title, visible=true, initExpanded=true, children, c
         </div>
     );
 };
+
+export const Collapsed = ({ position='west', title=null }) => {
+    const theme = useSelector(appState.selectColorTheme);
+    const embedMode = useSelector(appState.selectEmbedMode);
+    const dispatch = useDispatch();
+
+    return (
+        <div
+            className={`${embedMode ? 'hidden' : 'flex'} flex-col h-full cursor-pointer`}
+            onClick={() => {
+                position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
+            }}
+        >
+            <div
+                className={`
+                    flex justify-start w-12 h-7 p-1 m-3 rounded-full 
+                    ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
+                `}
+            >
+                <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
+            </div>
+            <div
+                className={`flex-grow flex items-center justify-center`}
+            >
+                <div
+                    className={`
+                        whitespace-nowrap text-2xl font-semibold cursor-pointer tracking-widest
+                        ${theme==='light' ? 'text-gray-400' : 'text-gray-600'}
+                        transform ${position==='west' ? '-rotate-90' : 'rotate-90'}
+                    `}
+                >
+                    { title }
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
+const BrowserComponents = {
+    SOUNDS: SoundBrowser,
+    SCRIPTS: ScriptBrowser,
+    API: APIBrowser
+};
+
+const Browser = () => {
+    const theme = useSelector(appState.selectColorTheme);
+    const open = useSelector(state => state.layout.west.open);
+    let kind = useSelector(layout.selectWestKind);
+    if (!Object.keys(BrowserComponents).includes(kind)) {
+        kind = 'SOUNDS';
+    }
+    const BrowserBody = BrowserComponents[kind];
+
+    return (
+        <div
+            className={`flex flex-col h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
+            id='content-manager'
+        >
+            {
+                open ? (
+                    <>
+                        <TitleBar />
+                        <BrowserTabs />
+                        <BrowserBody />
+                    </>
+                ) : <Collapsed title='CONTENT MANAGER' position='west' />
+            }
+        </div>
+    );
+};
+
+const HotBrowser = hot(props => {
+    return (
+        <Provider store={props.$ngRedux}>
+            <Browser />
+        </Provider>
+    );
+});
+
+app.component('contentManager', react2angular(HotBrowser, null, ['$ngRedux']));

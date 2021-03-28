@@ -13,6 +13,10 @@ app.directive('daw', function () {
             ngModel: '='
         },
         controller: ['$scope', '$rootScope', '$location', '$timeout', 'player', 'audioContext', 'ESUtils', 'esconsole', '$sce', 'timesync', 'userProject', 'WaveformCache', 'userNotification', '$ngRedux', function ($scope, $rootScope, $location, $timeout, player, context, ESUtils, esconsole, $sce, timesync, userProject, WaveformCache, userNotification, $ngRedux) {
+            $ngRedux.connect(state => ({ ...state.bubble }))(state => {
+                $scope.bubble = state;
+            });
+
             $scope.freshPallete = true;
             $scope.zoomLowerLimit = 650;
             $scope.zoomStep = 100;
@@ -1066,13 +1070,13 @@ app.directive('dawContainer', function () {
                 );
 
                 var viewMax = scope.xScale.invert(
-                    scope.horzScrollPos + element.width() - scope.xOffset
+                    scope.horzScrollPos + element.parent().width() - scope.xOffset - 16
                 );
 
                 // autoscroll right
                 if (scope.playPosition > viewMax) {
-                    element[0].scrollLeft += element.width() - scope.xOffset;
-                    scope.horzScrollPos += element.width() - scope.xOffset;
+                    element[0].scrollLeft += element.parent().width() - scope.xOffset;
+                    scope.horzScrollPos += element.parent().width() - scope.xOffset;
                     // autoscroll left
                 } else if (scope.playPosition < viewMin) {
                     var jump = scope.xScale(scope.playPosition);
@@ -1676,7 +1680,6 @@ app.directive('dawPlayHead', ['$animateCss', function ($animateCss) {
             element.css('top', '0px');
 
             scope.$on('adjustPlayHead', function (event, topPos) {
-                element.css('min-height', '100%');
                 element.css('top', topPos + 'px');
             });
 
@@ -1695,7 +1698,6 @@ app.directive('dawSchedPlayhead', [function () {
             element.css('top', '0px');
 
             scope.$on('adjustPlayHead', function (event, topPos) {
-                element.css('min-height', '100%');
                 element.css('top', topPos + 'px');
             });
 

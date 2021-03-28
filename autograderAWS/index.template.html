@@ -60,6 +60,26 @@
         </div>
         <div class="panel-body">
           <!-- <textarea class="form-control" rows="20" placeholder="One per line..." ng-model="urls"></textarea> -->
+          <label>
+            Artist name:
+            <input type="text" id="artistName" ng-model="artistName" name="artistName" style="background: lightgray;">
+            {{artistName}}
+          </label>
+          <label>
+            Number of Unique Stems:
+            <input type="text" id="uniqueStems" ng-model="uniqueStems" name="uniqueStems" style="background: lightgray;">
+            {{uniqueStems}} stems.
+          </label>
+          <label>
+            Length Requirement:
+            <input type="text" id="lengthRequirement" ng-model="lengthRequirement" name="lengthRequirement" style="background: lightgray;">
+            {{lengthRequirement}} seconds.
+          </label>
+          <label>
+            Compleixity Requirement:
+            <input type="text" id="complexityThreshold" ng-model="complexityThreshold" name="complexityThreshold" style="background: lightgray;">
+            {{complexityThreshold}}
+          </label>
           <input type="file" id="fileUpload" onchange="read(this)" multiple>
           <script type="text/javascript">
             const reader = new FileReader()
@@ -71,20 +91,22 @@
 
             reader.onload = function (e) {
               var outputStr = e.target.result;
+
+              outputStr = outputStr + "\n";
               var outputList = outputStr.split("\n");
 
               var outputArr = [];
               var contestID = [];
-              
-              var frontString = "https://earsketch.gatech.edu/earsketch2/#?sharing=";
 
+              var scriptIdx = 16;
+              
               for(var i = 1; i < outputList.length; i++){
-                 var outputID = outputList[i].split(',')[0];
-                 if (!outputID.includes("undefined") && outputID.length > 1) {
+                 var outputID = outputList[i].split(',')[scriptIdx];
+                 if (outputID && outputID.length > 1) {
                   if (outputID[0] == "=") {
                     outputID = outputID.substr(1);
                   }
-                  outputArr.push(frontString+outputID);
+                  outputArr.push(outputID);
                   contestID.push(outputList[i].split(',')[0]);
                  }
                }
@@ -96,10 +118,6 @@
           <div class="output"></div>
           <div class="hiddenOutput" style="height: 0px;"></div>
         </div>
-        <!-- <div class="panel-footer">
-          <button class="btn btn-primary" ng-click="load('complexity.py'); run();" ng-hide="running">Run</button>
-          <button class="btn btn-primary" ng-click="load('complexity.py'); run();" ng-show="running" disabled><i class="spinner icon icon-spinner"></i> Run</button>
-        </div> -->
         <div class="panel-footer">
           <button class="btn btn-primary" ng-click="run();" ng-hide="running">Run</button>
           <button class="btn btn-primary" ng-click="run();" ng-show="running" disabled><i class="spinner icon icon-spinner"></i> Run</button>

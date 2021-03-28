@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
-import { Provider, useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -12,7 +10,7 @@ import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as tabs from '../editor/tabState';
 
-import { TitleBar, BrowserTabs, SearchBar, Collection, DropdownMultiSelector } from './Browser';
+import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch();
@@ -421,19 +419,12 @@ const FeaturedArtistCollection = () => {
     return <WindowedSoundCollection { ...props } />;
 };
 
-const SoundBrowser = () => {
-    const theme = useSelector(appState.selectColorTheme);
+export const SoundBrowser = () => {
     const loggedIn = useSelector(user.selectLoggedIn);
 
     return (
-        <div
-            className={`flex flex-col absolute h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
-            style={{marginTop:-12}}
-        >
+        <>
             <div className='flex-grow-0'>
-                <TitleBar />
-                <BrowserTabs selection='SOUNDS' />
-
                 <div className='pb-3'>
                     <SoundSearchBar />
                     <Filters />
@@ -450,16 +441,6 @@ const SoundBrowser = () => {
                 <FeaturedArtistCollection />
                 <WindowedRecommendations />
             </div>
-        </div>
+        </>
     );
 };
-
-const HotSoundBrowser = hot(props => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <SoundBrowser />
-        </Provider>
-    );
-});
-
-app.component('soundBrowser', react2angular(HotSoundBrowser,null,['$ngRedux']));

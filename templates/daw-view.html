@@ -1,17 +1,18 @@
-<div ng-show="isEmbedded && codeHidden" style="display: block;" class="embedded-script-info"> Script {{embeddedScriptName}} by {{embeddedScriptUsername}}</div>
-<div id="dawHeader" width-exceeded>
-    <!--TODO: don't use bootstrap classes-->
-    <!-- DAW Label -->
-    <div class="btn-group" id="daw-label">
-        <span class="panel-label"><span class="icon icon-DAW-Icon" ng-show="showIcon"></span><span ng-show="showFullTitle">Digital Audio Workstation</span><span ng-show="showShortTitle">DAW</span></span>
-    </div>
-    <div ng-show="isEmbedded" >
-        <a target="_blank" ng-href="{{shareScriptLink}}"> Click Here to view in EarSketch </a>
-    </div>
-    <!-- Transport Buttons -->
-    <div class="daw-transport-container">
-        <!-- Beginning -->
-        <span class="daw-transport-button">
+<div class="flex flex-col w-full h-full relative overflow-hidden">
+    <div ng-show="isEmbedded && codeHidden" style="display: block;" class="embedded-script-info"> Script {{embeddedScriptName}} by {{embeddedScriptUsername}}</div>
+    <div id="dawHeader" class="flex-grow-0" ng-style="{'z-index':bubble.active&&[4,9].includes(bubble.currentPage)?35:0}" width-exceeded>
+        <!--TODO: don't use bootstrap classes-->
+        <!-- DAW Label -->
+        <div class="btn-group" id="daw-label">
+            <span class="panel-label"><span class="icon icon-DAW-Icon" ng-show="showIcon"></span><span ng-show="showFullTitle">Digital Audio Workstation</span><span ng-show="showShortTitle">DAW</span></span>
+        </div>
+        <div ng-show="isEmbedded" >
+            <a target="_blank" ng-href="{{shareScriptLink}}"> Click Here to view in EarSketch </a>
+        </div>
+        <!-- Transport Buttons -->
+        <div class="daw-transport-container">
+            <!-- Beginning -->
+            <span class="daw-transport-button">
             <button type="submit" class="btn btn-clear" data-toggle="tooltip" data-placement="bottom" title="Reset" ng-click="reset()">
                 <span class="icon icon-first"></span>
             </button>
@@ -25,14 +26,13 @@
                 </button>
             </span>
 
-                <!-- Pause -->
+            <!-- Pause -->
             <span class="daw-transport-button" ng-show="playing">
                 <button type="submit" class="btn btn-clear" title="Pause" ng-click="pause(true);">
                     <span class="icon icon-pause2"></span>
                 </button>
             </span>
         </span>
-
 
         <!-- Loop -->
         <span class="daw-transport-button">
@@ -74,52 +74,53 @@
                 <input id="dawVolumeSlider" type="range" min="-20" max="0" value="0" ng-model="volume" ng-change="changeVolume()" />
             </span>
         </span>
+        </div>
     </div>
-</div>
 
-
-<div ng-show="result && !hideDaw">
-    <div id="zoom-container" ng-style="dynamicStyle()" size-changed>
-
-        <!-- Effects Toggle -->
-        <button type="submit" class="btn btn-primary btn-effect" data-toggle="tooltip" data-placement="bottom" title="Toggle All Effects" ng-click="toggleEffects()" ng-disabled="!hasEffects()">
-        <span>EFFECTS</span>
-        <span class="icon icon-eye-blocked" ng-show="hasInvisibleEffects()"></span>
-        <span class="icon icon-eye" ng-hide="hasInvisibleEffects()"></span>
-        </button>
-
-        <!-- Vertical Zoom Slider-->
-        <div id="vert-zoom-slider-container">
-            <span class="zoom-out">-</span>
-            <rzslider rz-slider-model="vertSlider.value" rz-slider-options="vertSlider.options" title="Slide to change track height"></rzslider>
-            <span class="zoom-in">+</span>
-        </div>  
-
+    <div id="zoom-container" class="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden" ng-style="{'z-index':bubble.active&&[3,9].includes(bubble.currentPage)?35:0}" ng-show="result && !hideDaw" size-changed>
         <!-- Horizontal Zoom Slider-->
-        <div id="horz-zoom-slider-container">
+        <div id="horz-zoom-slider-container" class="flex-grow-0">
             <span class="zoom-out">-</span>
             <rzslider rz-slider-model="horzSlider.value" rz-slider-options="horzSlider.options" title="Slide to zoom-in/out"></rzslider>
             <span class="zoom-in">+</span>
-        </div>        
+        </div>
 
-        <!-- DAW Container -->
-        <div id="daw-container" daw-container>
-            <div id="daw-main">
-                <div id="daw-clickable" ng-mousedown="startDrag($event)" ng-mouseup="endDrag($event)" ng-mousemove="drag($event)">
-                    <!-- Timescales -->
-                    <div id="daw-timeline" daw-timeline></div>
-                    <div id="daw-measureline" daw-measureline></div>
+        <div class="flex-grow flex overflow-auto">
+            <!-- Vertical Zoom Slider-->
+            <div id="vert-zoom-slider-container" class="flex-grow-0 h-full">
+                <span class="zoom-out">-</span>
+                <rzslider rz-slider-model="vertSlider.value" rz-slider-options="vertSlider.options" title="Slide to change track height"></rzslider>
+                <span class="zoom-in">+</span>
+            </div>
 
-                    <daw-play-head></daw-play-head>
-                    <daw-sched-playhead></daw-sched-playhead>
-                    <daw-cursor></daw-cursor>
-                    <daw-highlight ng-if="((dragging || loop.selection && loop.on) && loop.end != loop.start)" ng-style="{'width':xScale(Math.abs(loop.end - loop.start) + 1) + 'px', 'top': vertScrollPos, 'left':xScale(Math.min(loop.start, loop.end))}"></daw-highlight>
-                </div>
+            <!-- DAW Container -->
+            <div class="flex-grow" id="daw-container" daw-container>
+                <div class="relative">
+                    <!-- Effects Toggle -->
+                    <button track-effect-panel-position type="submit" class="btn-primary btn-effect flex items-center justify-center" data-toggle="tooltip" data-placement="bottom" title="Toggle All Effects" ng-click="toggleEffects()" ng-disabled="!hasEffects()">
+                        <span>EFFECTS</span>
+                        <span class="icon icon-eye-blocked" ng-show="hasInvisibleEffects()"></span>
+                        <span class="icon icon-eye" ng-hide="hasInvisibleEffects()"></span>
+                    </button>
 
-                <div class="daw-track-group-container">
-                    <div ng-repeat="(trackNum, track) in tracks" ng-if="$index == 0" ng-show="track.visible" daw-mix-track>
+                    <div id="daw-clickable" ng-mousedown="startDrag($event)" ng-mouseup="endDrag($event)" ng-mousemove="drag($event)">
+                        <!-- Timescales -->
+                        <div id="daw-timeline" daw-timeline></div>
+                        <div id="daw-measureline" daw-measureline></div>
                     </div>
-                    <div ng-repeat="(trackNum, track) in tracks" ng-if="$index > 0 && $index < tracks.length-1" ng-show="track.visible" daw-track>
+
+                    <div class="daw-track-group-container">
+                        <div ng-repeat="(trackNum, track) in tracks" ng-if="$index == 0" ng-show="track.visible" daw-mix-track>
+                        </div>
+                        <div ng-repeat="(trackNum, track) in tracks" ng-if="$index > 0 && $index < tracks.length-1" ng-show="track.visible" daw-track>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-0 left-0 h-full">
+                        <daw-play-head></daw-play-head>
+                        <daw-sched-playhead></daw-sched-playhead>
+                        <daw-cursor></daw-cursor>
+                        <daw-highlight ng-if="((dragging || loop.selection && loop.on) && loop.end != loop.start)" ng-style="{'width':xScale(Math.abs(loop.end - loop.start) + 1) + 'px', 'top': vertScrollPos, 'left':xScale(Math.min(loop.start, loop.end))}"></daw-highlight>
                     </div>
                 </div>
             </div>

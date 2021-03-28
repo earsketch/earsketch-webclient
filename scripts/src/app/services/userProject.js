@@ -1,6 +1,7 @@
 import xml2js from 'xml2js';
+import * as appState from '../appState';
 
-app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', 'tabs', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, tabs) {
+app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;
@@ -42,17 +43,6 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
     // keep a list of script names that are currently open
     var openScripts = [];
     var openSharedScripts = [];
-
-    // Load scripts from local storage if they are available. When a user logs
-    // in these scripts will be saved to the web service and deleted from local
-    // storage.
-    if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-        scripts = JSON.parse(localStorage.get(LS_SCRIPTS_KEY));
-
-        if (localStorage.checkKey(LS_TABS_KEY)) {
-            openScripts = JSON.parse(localStorage.get(LS_TABS_KEY));
-        }
-    }
 
     // websocket gets closed before onunload in FF
     $window.onbeforeunload = function (e) {
@@ -158,8 +148,22 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
             // console.log('x', e.x,'y', e.y); 
             clearInterval();
         }, 5000);
-    
 
+    function loadLocalScripts() {
+        // Load scripts from local storage if they are available. When a user logs
+        // in these scripts will be saved to the web service and deleted from local
+        // storage.
+        if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
+            scripts = Object.assign(scripts, JSON.parse(localStorage.get(LS_SCRIPTS_KEY)));
+
+            if (localStorage.checkKey(LS_TABS_KEY)) {
+                const storedTabs = JSON.parse(localStorage.get(LS_TABS_KEY));
+                if (storedTabs) {
+                    storedTabs.forEach(tab => openScripts.push(tab));
+                }
+            }
+        }
+    }
     /**
      * Because scripts and openScripts are objects and we can't reset them
      * simply by re-instantiating empty objects, we use resetScripts() to
@@ -294,14 +298,13 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             var storedScripts;
 
-            if (result.data === null) {
-                // no scripts
-                return [];
-            } else if (result.data.scripts instanceof Array) {
-                storedScripts = result.data.scripts;
-            } else {
-                // one script -- somehow this gets parsed to one object
-                storedScripts = [result.data.scripts];
+            if (result.data) {
+                if (result.data.scripts instanceof Array) {
+                    storedScripts = result.data.scripts;
+                } else {
+                    // one script -- somehow this gets parsed to one object
+                    storedScripts = [result.data.scripts];
+                }
             }
 
             resetScripts();
@@ -328,7 +331,8 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             // when the user logs in and his/her scripts are loaded, we can restore
             // their previous tab session stored in the browser's local storage
-            if (localStorage.checkKey(LS_TABS_KEY)) {
+            const embedMode = appState.selectEmbedMode($ngRedux.getState());
+            if (!embedMode && localStorage.checkKey(LS_TABS_KEY)) {
                 var opened = JSON.parse(localStorage.get(LS_TABS_KEY));
 
                 for (var i in opened) {
@@ -361,22 +365,21 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
                 resetOpenScripts();
 
-                $q.all(promises).then(function (savedScripts) {
-                    refreshCodeBrowser().then(function () {
+                return $q.all(promises).then(function (savedScripts) {
+                    localStorage.remove(LS_SCRIPTS_KEY);
+                    localStorage.remove(LS_TABS_KEY);
+
+                    return refreshCodeBrowser().then(function () {
                         // once all scripts have been saved open them
                         angular.forEach(savedScripts, function(savedScript) {
                             openScript(savedScript.shareid);
                         });
                     });
-                });
-
-                localStorage.remove(LS_SCRIPTS_KEY);
-                localStorage.remove(LS_TABS_KEY);
+                }).then(() => getSharedScripts(username, password));
+            } else {
+                // load scripts in shared browser
+                return getSharedScripts(username, password);
             }
-
-            // load scripts in shared browser
-            return getSharedScripts(username, password);
-
         }, function(err) {
             esconsole('Login failure', ['DEBUG','ERROR']);
             esconsole(err.toString(), ['DEBUG','ERROR']); // TODO: this shows as [object object]?
@@ -399,21 +402,22 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
 
             // TODO: base64 encoding is not a secure way to send password
 
-            return $http.post(url, payload, opts).then(function(result) {
-                if (result.data === null) {
-                    // no scripts
-                    return [];
-                } else if (result.data.scripts instanceof Array) {
-                    var r = result.data.scripts;
-                } else {
-                    // one script -- somehow this gets parsed to one object
-                    var r = [result.data.scripts];
+            return $http.post(url, payload, opts).then(result => {
+                let res;
+
+                if (result.data) {
+                    if (result.data.scripts instanceof Array) {
+                        res = result.data.scripts;
+                    } else {
+                        // one script -- somehow this gets parsed to one object
+                        res = [result.data.scripts];
+                    }
                 }
 
                 resetScripts();
 
-                for (var i in r) {
-                    var script = r[i];
+                for (var i in res) {
+                    let script = res[i];
                     // reformat saved date to ISO 8601 format
                     // TODO: moment.js would allow us to format arbitrary date strings
                     // alternatively, dates should be stored in the database
@@ -449,7 +453,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                     scripts[script.shareid] = script;
                 }
             }
-            return new Promise(function(resolve) {resolve()});
+            return Promise.resolve();
         }
     }
 
@@ -583,26 +587,26 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
          };
 
          return $http.post(url, payload, opts).then(function (result) {
-             if (result.data === null) {
-                 // no scripts
-                 sharedScriptsReady = true;
-                 return [];
-             } else if (result.data.scripts instanceof Array) {
-                 var r = result.data.scripts;
-             } else {
-                 // one script -- somehow this gets parsed to one object
-                 var r = [result.data.scripts];
+             let res;
+
+             if (result.data) {
+                 if (result.data.scripts instanceof Array) {
+                     res = result.data.scripts;
+                 } else {
+                     // one script -- somehow this gets parsed to one object
+                     res = [result.data.scripts];
+                 }
              }
 
-             for (var i in r) {
-                 var script = r[i];
+             for (var i in res) {
+                 var script = res[i];
                  script.isShared = true;
                  script = postProcessCollaborators(script, getUsername());
                  sharedScripts[script.shareid] = script;
              }
 
              sharedScriptsReady = true;
-             return r;
+             return res;
          });
      }
 
@@ -1252,6 +1256,38 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 return saveScript(script.name, script.source_code);
             }
         });
+    }
+
+    function importCollaborativeScript(script) {
+        let p, originalScriptName = script.name;
+        if (lookForScriptByName(script.name)) {
+            p = $uibModal.open({
+                templateUrl: 'templates/rename-import-script.html',
+                controller: 'renameController',
+                size: 100,
+                resolve: {
+                    script: function() { return script; }
+                }
+            }).result;
+
+            p.then(newScript => {
+                if (newScript.name === script.name) {
+                    script.name = nextName(script.name);
+                } else {
+                    script.name = newScript.name;
+                }
+                return script;
+            });
+        } else {
+            // Script name is valid, so just return it
+            p = Promise.resolve(script);
+        }
+
+        return p.then(() => collaboration.getScriptText(script.shareid).then(text => {
+            userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`);
+            collaboration.closeScript(script.shareid, getUsername());
+            return saveScript(script.name, text);
+        }));
     }
 
     /**
@@ -1921,6 +1957,7 @@ function uploadCAIHistory(projectName, node) {
 
     self = {
         login: login,
+        loadLocalScripts: loadLocalScripts,
         storeUser: storeUser,
         loadUser: loadUser,
         clearUser: clearUser,
@@ -1964,6 +2001,7 @@ function uploadCAIHistory(projectName, node) {
         setScriptDesc: setScriptDesc,
         importSharedScript: importSharedScript,
         importScript: importScript,
+        importCollaborativeScript: importCollaborativeScript,
         openSharedScriptForEdit: openSharedScriptForEdit,
         addSharedScript: addSharedScript,
         refreshCodeBrowser: refreshCodeBrowser,

@@ -10,7 +10,7 @@ import { proceed, dismissBubble, setLanguage } from './bubbleState';
 
 const Backdrop = () => {
     return (
-        <div className={`w-full h-full z-30 bg-black opacity-75`}/>
+        <div className={`w-full h-full z-30 bg-black opacity-60`}/>
     );
 };
 
@@ -107,7 +107,7 @@ const MessageBox = () => {
     const [arrowElement, setArrowElement] = useState(null);
 
     const placement = pages[currentPage].placement;
-    const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
         placement,
         modifiers: [
             { name: 'arrow', options: { element: arrowElement, padding: -25 } },
@@ -183,11 +183,12 @@ const MessageBox = () => {
 
     useEffect(() => {
         setReferenceElement(document.querySelector(pages[currentPage].ref));
+        update && update();
     }, [currentPage]);
 
     return (
         <div
-            className={`absolute z-40 w-1/3 bg-white p-8`}
+            className={`absolute z-40 w-1/3 bg-white p-8 shadow-xl`}
             ref={setPopperElement}
             style={pages[currentPage].ref===null?{}:styles.popper}
             { ...attributes.popper }
@@ -217,8 +218,7 @@ const Bubble = () => {
     const active = useSelector(state => state.bubble.active);
     return (
         <div
-            className={`absolute w-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
-            style={{ height: 'calc(100% - 60px)',  top: 60 }}
+            className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
         >
             <Backdrop />
             <MessageBox />

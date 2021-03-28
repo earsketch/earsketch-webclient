@@ -3,11 +3,10 @@ import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 
-import { SearchBar } from './Browser'
+import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
-import * as helpers from '../helpers'
-
+import * as layout from '../layout/layoutState'
 
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
@@ -105,7 +104,7 @@ const CurriculumHeader = () => {
     const location = useSelector(curriculum.selectCurrentLocation)
 
     return (
-        <div id="curriculum-header">
+        <div id="curriculum-header" style={{position: 'relative'}}>
             <TitleBar></TitleBar>
             <NavigationBar></NavigationBar>
 
@@ -145,23 +144,19 @@ const CurriculumSearchResults = () => {
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
-    const layoutScope = helpers.getNgController('layoutController').scope()
     const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
 
     return (
         <div className='flex items-center p-3 text-2xl'>
-            <div className='pl-3 pr-4 font-normal'>
+            <div className='pl-3 pr-4 font-semibold truncate'>
                 CURRICULUM
             </div>
             <div>
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
-                    onClick={() => {
-                        layoutScope.toggleLayout('curriculum')
-                        layoutScope.$applyAsync()
-                    }}
+                    onClick={() => dispatch(layout.collapseEast())}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
                 </div>
@@ -174,7 +169,7 @@ export const TitleBar = () => {
                         title="Switch script language"
                         onClick={() => {
                             const newLanguage = (language === 'python' ? 'javascript' : 'python')
-                            // TODO: This line is here to mesh with angular; remove it after rewriting other components.
+                            // TODO: Remove angular $broadcast after moving other components to React.
                             $rootScope.$broadcast('language', newLanguage)
                             dispatch(appState.setScriptLanguage(newLanguage))
                         }}>
@@ -189,16 +184,17 @@ const CurriculumPane = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
+    const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef()
 
     useEffect(() => {
-        if (content) {
+        if (content && curriculumBody.current) {
             curriculumBody.current.appendChild(content)
             curriculumBody.current.scrollTop = 0
             return () => content.remove()
         }
-    }, [content])
+    }, [content, paneIsOpen])
 
     useEffect(() => {
         // <script> tags in the content may add elements to the DOM,
@@ -220,7 +216,7 @@ const CurriculumPane = () => {
                 content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
             }
         }
-    }, [content, language])
+    }, [content, language, paneIsOpen])
 
     // Highlight search text matches found in the curriculum.
     const hilitor = new Hilitor("curriculum-body")
@@ -231,7 +227,7 @@ const CurriculumPane = () => {
         return () => hilitor.remove()
     }, [content, searchText])
 
-    return (
+    return paneIsOpen ? (
         <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
             <CurriculumHeader></CurriculumHeader>
 
@@ -244,7 +240,7 @@ const CurriculumPane = () => {
                   </div>}
             </div>
         </div>
-    )
+    ) : <Collapsed title='CURRICULUM' position='east' />
 }
 
 const NavigationBar = () => {
@@ -331,8 +327,11 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
         }
 
-
         $rootScope = props.$rootScope
+        // TODO: Remove angular $broadcast after moving other components to React.
+        const language = props.$ngRedux.getState().app.scriptLanguage
+        $rootScope.$broadcast('language', language)
+
         // Hack to facilitate Angular loading curriculum page for errors in console.
         // TODO: Remove this after we've ported templates/index.html to React.
         $rootScope.loadChapterForError = (errorMessage) => {

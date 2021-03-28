@@ -1,5 +1,7 @@
 import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
+import * as editor from '../editor/editorState';
+import * as tabs from '../editor/tabState';
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
@@ -68,18 +70,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.currentLanguage = localStorage.get('language', 'python');
     $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
-    /**
-     * Variable that remembers what language is being displayed in the curriculum,
-     * so that the ide language type can be properly changed when copying curriculum code. 
-     */
-    $scope.curriculumLanguage = localStorage.get('language', 'python'); 
-
-
-    $scope.$on('curriculumLanguage', function(event, val){
-        $scope.curriculumLanguage = val;
-    });
-
-
     // TODO: create and handle this in userConsole directive
     $scope.$on('updateConsole', function () {
         $scope.logs = userConsole.getLogs();
@@ -132,6 +122,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      */
     $scope.initEditor = function () {
         esconsole('initEditor called', 'IDE');
+        if (!$scope.editor) return;
 
         $scope.editor.ace.setOptions({
             mode: 'ace/mode/' + $scope.currentLanguage,
@@ -219,6 +210,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             userProject.shareid = shareID;
             $scope.openShare(shareID).then(() => {
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
             });
         }
 
@@ -228,6 +220,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $rootScope.$broadcast('editorLoaded');
 
         colorTheme.load();
+
+        $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
     };
 
     
@@ -286,7 +280,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
                     // user has not opened this shared link before
                     promise = userProject.loadScript(shareid, true).then(function (result) {
-                        if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        if ($scope.isEmbedded) {
+                            $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        }
+
                         if (result.username !== $scope.username) {
                             // the shared script doesn't belong to the logged-in user
                             $scope.switchToShareMode();
@@ -302,10 +299,15 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                             // TODO: use broadcast or service
                             $scope.editor.ace.focus();
 
-                            $rootScope.$broadcast('togglePanesOnOpeningOwnSharedScript')
-                            
-                            $scope.selectScript(result);
-                            userNotification.show('This shared script link points to your own script.');
+                            if ($scope.isEmbedded) {
+                                $scope.selectScript(result);
+
+                                // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
+                                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareid));
+                            } else {
+                                userNotification.show('This shared script link points to your own script.');
+                            }
 
                             // Manually removing the user-owned shared script from the browser.
                             // TODO: Better to have refreshShareBrowser or something.
@@ -481,16 +483,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         esconsole("paste key" + key, 'debug');
-        var ext;
-        var ideTargetLanguage;
-
-        if ($scope.curriculumLanguage === 'python') {
-            ext = '.py';
-            ideTargetLanguage = 'python';
-        } else {
-            ext = '.js';
-            ideTargetLanguage = 'javascript';
-        }
+        const ideTargetLanguage = $ngRedux.getState().app.scriptLanguage;
+        const ext = ideTargetLanguage === 'python' ? '.py' : '.js';
 
         $rootScope.$broadcast('language', ideTargetLanguage);
 
@@ -551,9 +545,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
         $scope.loaded = false; // show spinning icon
 
-        // TODO: use the layout service instead
-        var layoutCtrlScope = angular.element('[ng-controller=layoutController]').scope();
-
         var code = $scope.editor.getValue();
 
         var startTime = Date.now();
@@ -563,6 +554,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         userConsole.clear();
         $scope.clearErrors();
         userConsole.status('Running script...');
+
+        const scriptID = tabs.selectActiveTabID($ngRedux.getState());
+        $ngRedux.dispatch(tabs.removeModifiedScript(scriptID));
 
         promise.then(function (result) {
             var duration = Date.now() - startTime;
@@ -693,6 +687,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     };
 
     colorTheme.subscribe($scope, function (event, theme) {
+        if (!$scope.editor.ace) return;
+
         if (theme === 'dark') {
             $scope.editor.ace.setTheme('ace/theme/monokai');
         } else {
@@ -734,40 +730,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      * @param lang {string} 'python' or 'javascript'
      */
     $scope.languageModeSelect = function (lang) {
-        //var scriptName = $('#scriptName').html();
-        //var scriptName = $scope.scriptName;
-
         if (lang === 'python') {
-            //$scope.tabs[$scope.active()].name = scriptName.replace(/.(^.*)$/, '.py');
-            //$('#scriptName').html(scriptName.replace(/.([^.]*)$/, '.py'));
             $scope.currentLanguage = 'python';
             $scope.scriptExtension = '.py';
-            angular.element("#py i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            angular.element("#js i").removeClass("glyphicon glyphicon-ok-sign").addClass("glyphicon glyphicon-unchecked");
-
-            //Hide javascript and show python code blocks in curriculum
-            angular.element("#curriculum .curriculum-javascript").hide();
-            angular.element("#curriculum .curriculum-python").show();
-
-            //Hide /show copy buttons
-            angular.element(".copy-btn-js").hide();
-            angular.element(".copy-btn-py").show();
-
         } else {
-            //$scope.tabs[$scope.active()].name = scriptName.replace(/.(^.*)$/, '.js');
-            //$('#scriptName').html(scriptName.replace(/.([^.]*)$/, '.js'));
             $scope.currentLanguage = 'javascript';
             $scope.scriptExtension = '.js';
-            angular.element("#js i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            angular.element("#py i").removeClass("glyphicon glyphicon-ok").addClass("glyphicon glyphicon-unchecked");
-
-            //Hide javascript and show python code blocks in curriculum
-            angular.element("#curriculum .curriculum-python").hide();
-            angular.element("#curriculum .curriculum-javascript").show();
-
-            //Hide /show copy buttons
-            angular.element(".copy-btn-py").hide();
-            angular.element(".copy-btn-js").show();
         }
 
         localStorage.set('language', $scope.currentLanguage);
