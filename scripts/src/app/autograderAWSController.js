@@ -84,11 +84,9 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
       esconsole("Running autograder.", ['DEBUG']);
       $scope.entries = document.querySelector('.output').innerText;
       $scope.entrants = document.querySelector('.hiddenOutput').innerText;
-      // var shareUrls = $scope.urls.split('\n');
-      // shareUrls.pop();
+
       var shareID = $scope.entries.split(',');
       var contestID = $scope.entrants.split(',');
-      // console.log(shareUrls);
 
       for (i = 0; i < shareID.length; i++) {
         if (shareID[i][0] == ','){
@@ -98,14 +96,9 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
         $scope.contestDict[shareID[i]] = contestID[i];
       }
 
-      // var re = /\?sharing=([^\s.,;])+/g
-      // var matches = $scope.urls.match(re);
-
       // start with a promise that resolves immediately
       var p = new Promise(function(resolve) { resolve(); });
 
-      //for (var i = 0; i < shareUrls.length; i++) {
-      // angular.forEach(matches, function(match) {
       angular.forEach(shareID, function(id) {
         esconsole("ShareId: " + id, ['DEBUG']);
         p = p.then(function() {
@@ -135,16 +128,30 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
         console.log("Script is incorrectly named.");
         return 0;
       }
-      if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
-        console.log("Script contains readInput, cannot autograde.");
-        return 0;
-      }
+
+      // Temporary: removal of readInput.
+      // if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
+      //   console.log("Script contains readInput, cannot autograde.");
+      //   return 0;
+      // }
 
       var complexity = $scope.read(script.source_code, script.name);
       var complexityScore = reader.total(complexity);
       var complexityPass = complexityScore >= $scope.complexityThreshold;
 
-      return $scope.compile(script.source_code, script.name).then(function(compiler_output) {
+      // TODO: process print statements through Skulpt. Temporary removal of print statements.
+      var sourceCodeLines = script.source_code.split('\n');
+      var sourceCode = [];
+
+      for (var i = 0; i < sourceCodeLines.length; i++) {
+        if (sourceCodeLines[i].indexOf('print') === -1) {
+          sourceCode.push(sourceCodeLines[i]);
+        }
+      }
+
+      sourceCode = sourceCode.join('\n');
+
+      return $scope.compile(sourceCode, script.name).then(function(compiler_output) {
         esconsole(compiler_output, ['DEBUG']);
 
         var analysis = caiAnalysisModule.analyzeMusic(compiler_output);
@@ -185,6 +192,10 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
         }
         $scope.processing = null;
       }).catch(function(err) {
+        $scope.results.push({
+          script:script,
+          error:err
+        });
         esconsole(err, ['ERROR']);
         $scope.processing = null;
     });
@@ -234,7 +245,7 @@ function($scope, compiler, Upload, userConsole, esconsole, reader, caiAnalysisMo
 
     $scope.generateCSVAWS = function() {
       var headers = ['#', 'username', 'script_name', 'shareid', 'error'];
-      var includeReports = ["GRADE", "OVERVIEW"];
+      var includeReports = ["OVERVIEW", "COMPLEXITY", "GRADE"];
       var rows = [];
       var col_map = {};
 
