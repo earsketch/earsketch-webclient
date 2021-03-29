@@ -176,11 +176,6 @@ app.directive('caiwindow', [function () {
                 caiStudentPreferenceModule.addCompileTS(t);
             });
 
-            $scope.$on("curriculumPageView", function (evt, data) {
-                caiDialogue.addCurriculumPageToHistory(data);
-                caiStudentHistoryModule.addCurriculumPage(data);
-            });
-
             $scope.$on('compileError', function (evt, data) {
 
                 var errorReturn = caiDialogue.handleError(data);
@@ -408,6 +403,11 @@ app.directive('caiwindow', [function () {
                 message.date = Date.now();
                 message.sender = userProject.getUsername();
                 return message;
+            };
+
+            $scope.curriculumPageView = function(data) {
+                caiDialogue.addCurriculumPageToHistory(data);
+                caiStudentHistoryModule.addCurriculumPage(data);
             };
 
             $scope.$on("reloadRecommendations", function (evt, data) {
