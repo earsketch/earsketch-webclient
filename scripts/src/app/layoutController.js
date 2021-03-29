@@ -334,10 +334,6 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
         }
     };
 
-    $scope.curriculumPageView = function (title) {
-        $rootScope.$broadcast('curriculumPageView', title);
-    };
-
     $scope.toggleCurriculumMaximization = function () {
         $scope.curriculumMaximized = !$scope.curriculumMaximized;
         var key;

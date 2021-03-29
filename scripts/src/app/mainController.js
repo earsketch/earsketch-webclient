@@ -999,6 +999,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(curriculum.fetchContent({ location: location.split('-') }));
     };
 
+    // Note: Used for general curriculum page changes. Sends rootScope broadcast for CAI student modeling.
+    $scope.curriculumPageView = function(location) {
+        $rootScope.$broadcast('curriculumPageView', location);
+    };
+
     $scope.$on('createScript', () => {
         $ngRedux.dispatch(scripts.syncToNgUserProject());
     });
