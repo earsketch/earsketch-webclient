@@ -107,7 +107,12 @@ const EditorHeader = () => {
                                 px-4 py-1
                                 ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
                             `}
-                            onClick={() => mainScope.shareScript(Object.assign({}, allScripts[activeTab]))}
+                            onClick={() => {
+                                const userProject = helpers.getNgService('userProject');
+                                // This temporary hack assumes any types of not-owned script are not sharable from the editor header.
+                                const unsavedScript = userProject.scripts[activeTab];
+                                mainScope.shareScript(Object.assign({}, unsavedScript));
+                            }}
                         >
                             <i className='icon-share32 pr-2' />
                             SHARE
