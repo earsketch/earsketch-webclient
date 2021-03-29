@@ -33,6 +33,10 @@ const Header = () => {
     const metronome = useSelector(daw.selectMetronome)
     const tracks = useSelector(daw.selectTracks)
 
+    const playbackStartedCallback = () => {
+        dispatch(daw.setPendingPosition(null))
+    }
+
     const playbackEndedCallback = () => {
         dispatch(daw.setPlaying(false))
         dispatch(daw.setPlayPosition(1))
@@ -70,6 +74,7 @@ const Header = () => {
         player.setMutedTracks(muted)
         player.setBypassedEffects(bypass)
     
+        player.setOnStartedCallback(playbackStartedCallback)
         player.setOnFinishedCallback(playbackEndedCallback)
         player.play(playPosition, playLength)
 
@@ -417,7 +422,6 @@ const SchedPlayhead = () => {
 }
 
 const Slider = ({ value, onChange, options, title }) => {
-    console.log("TODO", options)
     return <input type="range" min={options.floor} max={options.ceil} step={options.step} value={value} onChange={onChange} title={title} />
 }
 
@@ -429,8 +433,6 @@ const Measureline = () => {
 
     useEffect(() => {
         let n = 1
-
-        console.log("Measureline intervals", intervals)
 
         // create d3 axis
         const measureline = d3.svg.axis()
@@ -509,8 +511,6 @@ const Timeline = () => {
     const songDuration = useSelector(daw.selectSongDuration)
     const intervals = useSelector(daw.selectTimelineZoomIntervals)
     const element = useRef()
-    console.log("songDuration", songDuration)
-    console.log("Timeline intervals", intervals)
 
     // redraw the timeline when the track width changes
     useEffect(() => {
@@ -614,7 +614,7 @@ const setup = (dispatch, getState) => {
     $scope.$watch('compiled', function (result) {
         _result = result
         const state = getState()
-        console.log("compiled result:", result)
+        // console.log("compiled result:", result)
         if (result === null || result === undefined) return
 
         esconsole('code compiled', 'daw')
@@ -676,9 +676,8 @@ const setup = (dispatch, getState) => {
         if (reset) {
             dispatch(daw.setMetronome(false))
             dispatch(daw.setShowEffects(true))
-            // TODO:
-            // $scope.preserve.playing = false;
-            // $scope.preserve.playPosition = 1;
+            dispatch(daw.setPlaying(false))
+            dispatch(daw.setPlayPosition(1))
             dispatch(daw.shuffleTrackColors())
             dispatch(daw.setSoloMute({}))
             dispatch(daw.setBypass({}))
@@ -731,6 +730,8 @@ const DAW = () => {
     const bypass = useSelector(daw.selectBypass)
     const soloMute = useSelector(daw.selectSoloMute)
     const muted = useSelector(daw.selectMuted)
+    const playPosition = useSelector(daw.selectPlayPosition)
+    const playing = useSelector(daw.selectPlaying)
 
     const toggleBypass = (trackIndex, effectKey) => {
         let effects = bypass[trackIndex] ?? []
@@ -756,15 +757,110 @@ const DAW = () => {
     const codeHidden = false
     const result = true
     const hideDaw = false
-    const dragging = false
     const horzSlider = {value: 0, options: {}}
     const vertSlider = {value: 0, options: {}}
 
-    const startDrag = todo
-    const endDrag = todo
+    const [dragging, setDragging] = useState(false)
+    const [dragOrigin, setDragOrigin] = useState()
+    const [loop, setLoop] = useState({
+        selection: false, // false = loop whole track
+        start: 1,
+        end: 1,
+        on: false, // true = enable looping
+        reset: false,
+    })
+    
 
-    // TODO before commit: fix sizes of clickable area/track group
+    console.log("loop is", loop)
+
+    const onMouseDown = (event) => {
+        console.log("mouse down")
+        event.preventDefault()
+        // calculate x position of the bar from mouse position
+        // TODO: remove angular here
+        const target = angular.element(event.currentTarget)
+        let xpos = event.clientX - target.offset().left
+        if (target[0].className !== "daw-track") {
+            xpos -= X_OFFSET
+        }
+
+        // allow clicking the track controls without affecting dragging
+        if (xpos < horzScrollPos) {
+            return
+        }
+
+        setDragging(true)
+
+        // keep track of what state to revert to if looping is canceled
+        const newLoop = Object.assign({}, loop)
+        newLoop.reset = loop.on
+        // round to nearest beat
+        const measure = Math.round(xScale.invert(xpos))
+        setDragOrigin(measure)
+
+        // Do not drag if beyond playLength
+        if (measure > playLength) {
+            setDragging(false)
+        } else {
+            newLoop.start = measure
+            newLoop.end = measure
+        }
+
+        setLoop(newLoop)
+    }
+
+    const onMouseUp = (event) => {
+        console.log("mouse up")
+        event.preventDefault()
+        // calculate x position of the bar from mouse position
+        // TODO: remove angular here
+        const target = angular.element(event.currentTarget)
+        let xpos = event.clientX - target.offset().left
+        if (target[0].className !== "daw-track") {
+            xpos -= X_OFFSET
+        }
+
+        if (!dragging) {
+            return
+        }
+
+        // round to nearest measure
+        var measure = Math.round(xScale.invert(xpos))
+
+        // Clamp to valid range.
+        if (measure > playLength) {
+            measure = playLength
+        }
+
+        setDragging(false)
+
+        const newLoop = Object.assign({}, loop)
+        if (loop.start === loop.end) {
+            // turn looping off if the loop range is 0 (i.e., no drag)
+            newLoop.selection = false
+            newLoop.on = newLoop.reset
+        } else {
+            newLoop.selection = true
+            newLoop.on = true
+            player.setLoop(newLoop)
+        }
+
+        if (newLoop.selection) {
+            if (!playing || !(playPosition >= loop.start && playPosition <= loop.end)) {
+                dispatch(daw.setPlayPosition(loop.start))
+                dispatch(daw.setPendingPosition(playing ? loop.start : null))
+            }
+        } else {
+            dispatch(daw.setPlayPosition(measure))
+            dispatch(daw.setPendingPosition(playing ? measure : null))
+            player.setPosition(measure)
+        }
+
+        setLoop(newLoop)
+    }
+
     const onMouseMove = (event) => {
+        console.log("mouse move")
         event.preventDefault()
         // calculate x position of the bar from mouse position
         // TODO: remove angular here
@@ -781,27 +877,30 @@ const DAW = () => {
         }
 
         // Prevent dragging beyond playLength
-        // if (measure > $scope.playLength) {
-        //     return;
-        // }
+        if (measure > playLength) {
+            return
+        }
 
-        // if ($scope.dragging) {
-        //     if (measure === origin) {
-        //         $scope.loop.selection = false;
-        //         $scope.loop.start = measure;
-        //         $scope.loop.end = measure;
-        //     } else {
-        //         $scope.loop.selection = true;
+        const newLoop = Object.assign({}, loop)
+        if (dragging) {
+            if (measure === dragOrigin) {
+                newLoop.selection = false
+                newLoop.start = measure
+                newLoop.end = measure
+            } else {
+                newLoop.selection = true
 
-        //         if (measure > origin) {
-        //             $scope.loop.start = origin;
-        //             $scope.loop.end = measure;
-        //         } else if (measure < origin) {
-        //             $scope.loop.start = measure;
-        //             $scope.loop.end = origin;
-        //         }
-        //     }
-        // }
+                if (measure > dragOrigin) {
+                    newLoop.start = dragOrigin
+                    newLoop.end = measure
+                } else if (measure < dragOrigin) {
+                    newLoop.start = measure
+                    newLoop.end = dragOrigin
+                }
+            }
+        }
+
+        setLoop(newLoop)
     }
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
@@ -828,7 +927,7 @@ const DAW = () => {
                 </div>
 
                 {/* DAW Container */}
-                <div className="flex-grow" id="daw-container" onMouseDown={startDrag} onMouseUp={endDrag} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
+                <div className="flex-grow" id="daw-container" onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
                     <div className="relative">
                         {/* Effects Toggle */}
                         <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects" onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
