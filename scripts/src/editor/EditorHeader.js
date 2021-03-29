@@ -57,6 +57,8 @@ const EditorHeader = () => {
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
     const loggedIn = useSelector(state => state.user.loggedIn);
+    const script = allScripts[activeTab];
+    const scriptType = (!script || script.readonly) && 'readonly' || script.isShared && 'shared' || 'regular';
 
     return (
         <div
@@ -96,7 +98,7 @@ const EditorHeader = () => {
                     )
                 }
                 {
-                    loggedIn && (
+                    (loggedIn && scriptType !== 'readonly') && (
                         <div
                             className={`
                                 rounded-full
