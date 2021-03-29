@@ -60,8 +60,8 @@ const dawSlice = createSlice({
         tempo: 120,
         playing: false,
         pendingPosition: null,  // null indicates no position pending.
-        muted: {},  // Track index -> "mute" or "solo"
-        bypassed: {},  // Track index -> [bypassed effect keys]
+        soloMute: {},  // Track index -> "mute" or "solo"
+        bypass: {},  // Track index -> [bypassed effect keys]
     },
     reducers: {
         setTracks(state, { payload }) {
@@ -85,6 +85,9 @@ const dawSlice = createSlice({
         setShowEffects(state, { payload }) {
             state.showEffects = payload
         },
+        toggleEffects(state) {
+            state.showEffects = !state.showEffects
+        },
         setMetronome(state, { payload }) {
             state.metronome = payload
         },
@@ -97,11 +100,11 @@ const dawSlice = createSlice({
         setPendingPosition(state, { payload }) {
             state.pendingPosition = payload
         },
-        setMuted(state, { payload }) {
-            state.muted = payload
+        setSoloMute(state, { payload }) {
+            state.soloMute = payload
         },
-        setBypassed(state, { payload }) {
-            state.bypassed = payload
+        setBypass(state, { payload }) {
+            state.bypass = payload
         }
     }
 })
@@ -115,12 +118,13 @@ export const {
     setTrackHeight,
     shuffleTrackColors,
     setShowEffects,
+    toggleEffects,
     setMetronome,
     setTempo,
     setPlaying,
     setPendingPosition,
-    setMuted,
-    setBypassed,
+    setSoloMute,
+    setBypass,
 } = dawSlice.actions
 
 export const selectTracks = state => state.daw.tracks
@@ -134,8 +138,8 @@ export const selectMetronome = state => state.daw.metronome
 export const selectTempo = state => state.daw.tempo
 export const selectPlaying = state => state.daw.playing
 export const selectPendingPosition = state => state.daw.pendingPosition
-export const selectMuted = state => state.daw.muted
-export const selectBypassed = state => state.daw.bypassed
+export const selectSoloMute = state => state.daw.soloMute
+export const selectBypass = state => state.daw.bypass
 
 export const selectMixTrackHeight = createSelector(
     [selectTrackHeight],
@@ -188,19 +192,16 @@ export const selectTimelineZoomIntervals = createSelector(
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
 )
 
-export const getMutedTracks = (tracks, muted, metronome) => {
+export const getMuted = (tracks, soloMute, metronome) => {
     const keys = Object.keys(tracks).map(x => +x)
-    const soloed = keys.filter(key => muted[key] === "solo")
+    const soloed = keys.filter(key => soloMute[key] === "solo")
     if (soloed.length > 0) {
         // Omit mix track and (if metronome is enabled) metronome track.
         return keys.filter(key => !soloed.includes(key) && key !== 0 && (!metronome || key !== keys.length - 1))
     } else {
-        return [...keys.filter(key => muted[key] === "mute"), ...(metronome ? [] : [keys.length - 1])]
+        return [...keys.filter(key => soloMute[key] === "mute"), ...(metronome ? [] : [keys.length - 1])]
     }
 }
 
 // Returns an array of all tracks that should be muted, by index.
-export const selectMutedTracks = createSelector(
-    [selectTracks, selectMuted, selectMetronome],
-    getMutedTracks
-)
+export const selectMuted = createSelector([selectTracks, selectSoloMute, selectMetronome], getMuted)
