@@ -98,7 +98,7 @@ const EditorHeader = () => {
                     )
                 }
                 {
-                    (loggedIn && scriptType !== 'readonly' && !script.collaborative) && (
+                    (loggedIn && scriptType !== 'readonly' && !(scriptType === 'shared' && script.collaborative)) && (
                         <div
                             className={`
                                 rounded-full
