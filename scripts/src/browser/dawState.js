@@ -62,6 +62,13 @@ const dawSlice = createSlice({
         pendingPosition: null,  // null indicates no position pending.
         soloMute: {},  // Track index -> "mute" or "solo"
         bypass: {},  // Track index -> [bypassed effect keys]
+        loop: {
+            selection: false, // false = loop whole track
+            start: 1,
+            end: 1,
+            on: false, // true = enable looping
+            reset: false,
+        },
     },
     reducers: {
         setTracks(state, { payload }) {
@@ -105,7 +112,10 @@ const dawSlice = createSlice({
         },
         setBypass(state, { payload }) {
             state.bypass = payload
-        }
+        },
+        setLoop(state, { payload }) {
+            state.loop = payload
+        },
     }
 })
 
@@ -125,6 +135,7 @@ export const {
     setPendingPosition,
     setSoloMute,
     setBypass,
+    setLoop,
 } = dawSlice.actions
 
 export const selectTracks = state => state.daw.tracks
@@ -140,6 +151,7 @@ export const selectPlaying = state => state.daw.playing
 export const selectPendingPosition = state => state.daw.pendingPosition
 export const selectSoloMute = state => state.daw.soloMute
 export const selectBypass = state => state.daw.bypass
+export const selectLoop = state => state.daw.loop
 
 export const selectMixTrackHeight = createSelector(
     [selectTrackHeight],

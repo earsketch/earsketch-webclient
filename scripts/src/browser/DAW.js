@@ -19,7 +19,6 @@ const vertScrollPos = 0
 const horzScrollPos = 0
 const isEmbedded = false
 const todo = (...args) => undefined // console.log("TODO", args)
-const loop = {on: false, selection: null, start: null, end: null}
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -32,14 +31,18 @@ const Header = () => {
     const bypass = useSelector(daw.selectBypass)
     const metronome = useSelector(daw.selectMetronome)
     const tracks = useSelector(daw.selectTracks)
+    const loop = useSelector(daw.selectLoop)
 
     const playbackStartedCallback = () => {
+        dispatch(daw.setPlaying(true))
         dispatch(daw.setPendingPosition(null))
     }
 
     const playbackEndedCallback = () => {
-        dispatch(daw.setPlaying(false))
-        dispatch(daw.setPlayPosition(1))
+        if (!loop.on) {
+            dispatch(daw.setPlaying(false))
+            dispatch(daw.setPlayPosition(1))
+        }
     }
 
     const play = () => {
@@ -54,18 +57,11 @@ const Header = () => {
         //     return;
         // }
 
-        // drawPlayhead(false)
+        dispatch(daw.setPlaying(false))
 
         if (playPosition >= playLength) {
-        //  if ($scope.loop.selection) {
-        //      $scope.playPosition = $scope.loop.start
-        //  } else {
-            dispatch(daw.setPlayPosition(1))
-        //  }
+            dispatch(daw.setPlayPosition(loop.selection ? loop.start : 1))
         }
-
-        // Should this get set in playbackStartedCallback, instead?
-        dispatch(daw.setPlaying(true))
 
         // TODO: These should be unnecessary given that they're set upon compile...
         // ...except player calls player.reset() on finish. :-(
@@ -96,6 +92,12 @@ const Header = () => {
         player.setMutedTracks(daw.getMuted(tracks, soloMute, !metronome))
     }
 
+    const toggleLoop = () => {
+        const newLoop = {...loop, on: !loop.on, selection: false}
+        dispatch(daw.setLoop(newLoop))
+        player.setLoop(newLoop)
+    }
+
     // TODO
     const showIcon = true
     const showFullTitle = true
@@ -109,7 +111,6 @@ const Header = () => {
     const volume = 0
 
     const reset = todo
-    const toggleLoop = todo
     const toggleMute = todo
     const changeVolume = todo
     const toggleTimesync = todo
@@ -621,7 +622,9 @@ const setup = (dispatch, getState) => {
         prepareWaveforms(result.tracks, result.tempo)
 
         dispatch(daw.setTempo(result.tempo))
-        dispatch(daw.setPlayLength(result.length + 1))
+
+        const playLength = result.length + 1
+        dispatch(daw.setPlayLength(playLength))
 
         const tracks = []
         result.tracks.forEach((track, index) => {
@@ -704,13 +707,15 @@ const setup = (dispatch, getState) => {
         //     $scope.freshPallete = false;
         // }
 
-        // // sanity checks
-        // if ($scope.loop.start > $scope.playLength) {
-        //     $scope.loop.start = 1;
-        // }
-        // if ($scope.loop.end > $scope.playLength) {
-        //     $scope.loop.end = $scope.playLength;
-        // }
+        // sanity checks
+        const newLoop = Object.assign({}, state.daw.loop)
+        if (state.daw.loop.start > playLength) {
+            newLoop.start = 1
+        }
+        if (state.daw.loop.end > playLength) {
+            newLoop.end = playLength
+        }
+        dispatch(daw.setLoop(newLoop))
 
         // $scope.freshPallete = false;
         // $scope.$broadcast('setPanelPosition');
@@ -760,79 +765,59 @@ const DAW = () => {
     const horzSlider = {value: 0, options: {}}
     const vertSlider = {value: 0, options: {}}
 
-    const [dragging, setDragging] = useState(false)
-    const [dragOrigin, setDragOrigin] = useState()
-    const [loop, setLoop] = useState({
-        selection: false, // false = loop whole track
-        start: 1,
-        end: 1,
-        on: false, // true = enable looping
-        reset: false,
-    })
-    
+    const [dragStart, setDragStart] = useState(null)
 
-    console.log("loop is", loop)
+    // TODO: We might want to avoid dispatching an update to loop until onMouseUp.
+    const loop = useSelector(daw.selectLoop)
 
     const onMouseDown = (event) => {
-        console.log("mouse down")
         event.preventDefault()
         // calculate x position of the bar from mouse position
-        // TODO: remove angular here
-        const target = angular.element(event.currentTarget)
-        let xpos = event.clientX - target.offset().left
-        if (target[0].className !== "daw-track") {
-            xpos -= X_OFFSET
+        let x = event.clientX - event.currentTarget.getBoundingClientRect().left
+        if (event.currentTarget.className !== "daw-track") {
+            x -= X_OFFSET
         }
-
         // allow clicking the track controls without affecting dragging
-        if (xpos < horzScrollPos) {
+        if (x < horzScrollPos) {
             return
         }
-
-        setDragging(true)
-
-        // keep track of what state to revert to if looping is canceled
-        const newLoop = Object.assign({}, loop)
-        newLoop.reset = loop.on
-        // round to nearest beat
-        const measure = Math.round(xScale.invert(xpos))
-        setDragOrigin(measure)
+        // round to nearest measure
+        const measure = Math.round(xScale.invert(x))
 
         // Do not drag if beyond playLength
         if (measure > playLength) {
-            setDragging(false)
+            setDragStart(null)
         } else {
+            setDragStart(measure)
+            // keep track of what state to revert to if looping is canceled
+            const newLoop = Object.assign({}, loop)
+            newLoop.reset = loop.on
             newLoop.start = measure
             newLoop.end = measure
+            dispatch(daw.setLoop(newLoop))
         }
-
-        setLoop(newLoop)
     }
 
     const onMouseUp = (event) => {
-        console.log("mouse up")
         event.preventDefault()
-        // calculate x position of the bar from mouse position
-        // TODO: remove angular here
-        const target = angular.element(event.currentTarget)
-        let xpos = event.clientX - target.offset().left
-        if (target[0].className !== "daw-track") {
-            xpos -= X_OFFSET
-        }
-
-        if (!dragging) {
+        if (dragStart === null) {
             return
         }
 
+        // calculate x position of the bar from mouse position
+        let x = event.clientX - event.currentTarget.getBoundingClientRect().left
+        if (event.currentTarget.className !== "daw-track") {
+            x -= X_OFFSET
+        }
         // round to nearest measure
-        var measure = Math.round(xScale.invert(xpos))
+        const measure = Math.round(xScale.invert(x))
 
         // Clamp to valid range.
         if (measure > playLength) {
             measure = playLength
         }
 
-        setDragging(false)
+        setDragStart(null)
 
         const newLoop = Object.assign({}, loop)
         if (loop.start === loop.end) {
@@ -842,6 +827,7 @@ const DAW = () => {
         } else {
             newLoop.selection = true
             newLoop.on = true
+            // TODO: In the Angular implementation, does dawController implicitly rely on player sharing a reference to the same mutable `loop` object?
             player.setLoop(newLoop)
         }
 
@@ -853,54 +839,50 @@ const DAW = () => {
         } else {
             dispatch(daw.setPlayPosition(measure))
             dispatch(daw.setPendingPosition(playing ? measure : null))
+            console.log("measure", measure, "playLength", playLength)
             player.setPosition(measure)
         }
 
-        setLoop(newLoop)
+        dispatch(daw.setLoop(newLoop))
     }
 
     const onMouseMove = (event) => {
-        console.log("mouse move")
         event.preventDefault()
         // calculate x position of the bar from mouse position
-        // TODO: remove angular here
-        const target = angular.element(event.currentTarget)
-        let xpos = event.clientX - target.offset().left
-        if (target[0].className !== "daw-track") {
-            xpos -= X_OFFSET
+        let x = event.clientX - event.currentTarget.getBoundingClientRect().left
+        if (event.currentTarget.className !== "daw-track") {
+            x -= X_OFFSET
         }
         // round to nearest measure
-        const measure = Math.round(xScale.invert(xpos))
+        const measure = Math.round(xScale.invert(x))
 
         if (measure <= playLength && measure > 0) {
             setCursorPosition(xScale(measure))
         }
 
         // Prevent dragging beyond playLength
-        if (measure > playLength) {
+        if (dragStart === null || measure > playLength) {
             return
         }
 
         const newLoop = Object.assign({}, loop)
-        if (dragging) {
-            if (measure === dragOrigin) {
-                newLoop.selection = false
-                newLoop.start = measure
-                newLoop.end = measure
-            } else {
-                newLoop.selection = true
+        if (measure === dragStart) {
+            newLoop.selection = false
+            newLoop.start = measure
+            newLoop.end = measure
+        } else {
+            newLoop.selection = true
 
-                if (measure > dragOrigin) {
-                    newLoop.start = dragOrigin
-                    newLoop.end = measure
-                } else if (measure < dragOrigin) {
-                    newLoop.start = measure
-                    newLoop.end = dragOrigin
-                }
+            if (measure > dragStart) {
+                newLoop.start = dragStart
+                newLoop.end = measure
+            } else if (measure < dragStart) {
+                newLoop.start = measure
+                newLoop.end = dragStart
             }
         }
 
-        setLoop(newLoop)
+        dispatch(daw.setLoop(newLoop))
     }
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
@@ -961,7 +943,7 @@ const DAW = () => {
                             <Playhead />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
-                            {(dragging || loop.selection && loop.on) && loop.end != loop.start &&
+                            {(dragStart !== null || loop.selection && loop.on) && loop.end != loop.start &&
                             <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
                         </div>
                     </div>
