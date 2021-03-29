@@ -27,8 +27,11 @@ const Header = () => {
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector(state => state.bubble)
     const playing = useSelector(daw.selectPlaying)
+    const soloMute = useSelector(daw.selectSoloMute)
     const muted = useSelector(daw.selectMuted)
     const bypass = useSelector(daw.selectBypass)
+    const metronome = useSelector(daw.selectMetronome)
+    const tracks = useSelector(daw.selectTracks)
 
     const playbackEndedCallback = () => {
         dispatch(daw.setPlaying(false))
@@ -83,6 +86,11 @@ const Header = () => {
         dispatch(daw.setPlaying(false))
     }
 
+    const toggleMetronome = () => {
+        dispatch(daw.setMetronome(!metronome))
+        player.setMutedTracks(daw.getMuted(tracks, soloMute, !metronome))
+    }
+
     // TODO
     const showIcon = true
     const showFullTitle = true
@@ -92,7 +100,6 @@ const Header = () => {
     let autoScroll = true
     const timesync = {available: true}
     const timesyncEnabled = true
-    const metronome = {mute: true}
     const volumeMuted = false
     const volume = 0
 
@@ -100,7 +107,6 @@ const Header = () => {
     const toggleLoop = todo
     const toggleMute = todo
     const changeVolume = todo
-    const toggleMetronome = todo
     const toggleTimesync = todo
 
     return <div id="dawHeader" className="flex-grow-0"> {/* widthExceeded directive */}
@@ -153,7 +159,7 @@ const Header = () => {
 
         {/* Metronome */}
         <span className="daw-transport-button">
-            <button id="dawMetronomeButton" className={"btn btn-clear" + (!metronome.mute ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
+            <button id="dawMetronomeButton" className={"btn btn-clear" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
                 <span className="icon icon-meter3"></span>
             </button>
         </span>
