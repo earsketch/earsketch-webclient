@@ -76,7 +76,7 @@ const EditorHeader = () => {
                 <UndoRedoButtons />
 
                 {
-                    !(allScripts[activeTab] && allScripts[activeTab].collaborative) && (
+                    !(script && script.collaborative) && (
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
@@ -98,7 +98,7 @@ const EditorHeader = () => {
                     )
                 }
                 {
-                    (loggedIn && scriptType !== 'readonly') && (
+                    (loggedIn && scriptType !== 'readonly' && !script.collaborative) && (
                         <div
                             className={`
                                 rounded-full
