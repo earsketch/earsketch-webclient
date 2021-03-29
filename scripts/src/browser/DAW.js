@@ -22,6 +22,7 @@ const todo = (...args) => undefined // console.log("TODO", args)
 
 const Header = () => {
     const dispatch = useDispatch()
+    // TODO: Do we actually want a dependency on this thing that's changing constantly during playback?
     const playPosition = useSelector(daw.selectPlayPosition)
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector(state => state.bubble)
@@ -735,6 +736,7 @@ const DAW = () => {
     const bypass = useSelector(daw.selectBypass)
     const soloMute = useSelector(daw.selectSoloMute)
     const muted = useSelector(daw.selectMuted)
+    // TODO: Do we actually want a dependency on this thing that's changing constantly during playback?
     const playPosition = useSelector(daw.selectPlayPosition)
     const playing = useSelector(daw.selectPlaying)
 
@@ -767,8 +769,11 @@ const DAW = () => {
 
     const [dragStart, setDragStart] = useState(null)
 
-    // TODO: We might want to avoid dispatching an update to loop until onMouseUp.
-    const loop = useSelector(daw.selectLoop)
+    const _loop = useSelector(daw.selectLoop)
+    // We have local loop state which is modified while the user sets the loop selection.
+    const [loop, setLoop] = useState(_loop)
+    // It is synchronized with the loop state in the Redux store when the latter is updated (e.g. on mouse up):
+    useEffect(() => setLoop(_loop), [_loop])
 
     const onMouseDown = (event) => {
         event.preventDefault()
@@ -790,11 +795,7 @@ const DAW = () => {
         } else {
             setDragStart(measure)
             // keep track of what state to revert to if looping is canceled
-            const newLoop = Object.assign({}, loop)
-            newLoop.reset = loop.on
-            newLoop.start = measure
-            newLoop.end = measure
-            dispatch(daw.setLoop(newLoop))
+            setLoop({...loop, reset: loop.on, start: measure, end: measure})
         }
     }
 
@@ -819,17 +820,18 @@ const DAW = () => {
 
         setDragStart(null)
 
-        const newLoop = Object.assign({}, loop)
+        let newLoop;
         if (loop.start === loop.end) {
             // turn looping off if the loop range is 0 (i.e., no drag)
-            newLoop.selection = false
-            newLoop.on = newLoop.reset
+            newLoop = {...loop, selection: false, on: loop.reset}
         } else {
-            newLoop.selection = true
-            newLoop.on = true
-            // TODO: In the Angular implementation, does dawController implicitly rely on player sharing a reference to the same mutable `loop` object?
-            player.setLoop(newLoop)
+            newLoop = {...loop, selection: true, on: true}
+            // NOTE: In the Angular implementation, dawController implicitly relied on player sharing a reference to the mutable `loop` object.
+            // Hence, there was only one call to player.setLoop(), which occurred here.
         }
+
+        player.setLoop(newLoop)
+        dispatch(daw.setLoop(newLoop))
 
         if (newLoop.selection) {
             if (!playing || !(playPosition >= loop.start && playPosition <= loop.end)) {
@@ -839,11 +841,8 @@ const DAW = () => {
         } else {
             dispatch(daw.setPlayPosition(measure))
             dispatch(daw.setPendingPosition(playing ? measure : null))
-            console.log("measure", measure, "playLength", playLength)
             player.setPosition(measure)
         }
-
-        dispatch(daw.setLoop(newLoop))
     }
 
     const onMouseMove = (event) => {
@@ -865,24 +864,13 @@ const DAW = () => {
             return
         }
 
-        const newLoop = Object.assign({}, loop)
-        if (measure === dragStart) {
-            newLoop.selection = false
-            newLoop.start = measure
-            newLoop.end = measure
+        if (measure > dragStart) {
+            setLoop({...loop, selection: true, start: dragStart, end: measure})
+        } else if (measure < dragStart) {
+            setLoop({...loop, selection: true, start: measure, end: dragStart})
         } else {
-            newLoop.selection = true
-
-            if (measure > dragStart) {
-                newLoop.start = dragStart
-                newLoop.end = measure
-            } else if (measure < dragStart) {
-                newLoop.start = measure
-                newLoop.end = dragStart
-            }
+            setLoop({...loop, selection: false, start: measure, end: measure})
         }
-
-        dispatch(daw.setLoop(newLoop))
     }
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
