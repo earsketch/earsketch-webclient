@@ -992,10 +992,20 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     
     $scope.toggleCAIWindow = () => {
         $scope.showCAIWindow = !$scope.showCAIWindow;
+        if ($scope.showCAIWindow) {
+            angular.element('div[caiwindow]').show();
+            angular.element('curriculum').hide();
+        } else {
+            angular.element('div[caiwindow]').hide();
+            angular.element('curriculum').show();
+        }
     };
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
+        if ($scope.showCAIWindow) {
+            $scope.toggleCAIWindow();
+        }
         $ngRedux.dispatch(curriculum.fetchContent({ location: location.split('-') }));
     };
 
