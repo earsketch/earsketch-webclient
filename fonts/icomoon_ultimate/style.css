@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?nq81hf');
-  src:  url('fonts/icomoon.eot?nq81hf#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?nq81hf') format('truetype'),
-    url('fonts/icomoon.woff?nq81hf') format('woff'),
-    url('fonts/icomoon.svg?nq81hf#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?twlwf9');
+  src:  url('fonts/icomoon.eot?twlwf9#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?twlwf9') format('truetype'),
+    url('fonts/icomoon.woff?twlwf9') format('woff'),
+    url('fonts/icomoon.svg?twlwf9#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -27,9 +27,11 @@
 
 .icon-DAW-Icon:before {
   content: "\e91b";
+  color: #adafb2;
 }
 .icon-api-browser .path1:before {
   content: "\e906";
+  color: rgb(173, 175, 178);
 }
 .icon-api-browser .path2:before {
   content: "\e908";
@@ -46,6 +48,7 @@
 }
 .icon-share-browser .path1:before {
   content: "\e90b";
+  color: rgb(173, 175, 178);
 }
 .icon-share-browser .path2:before {
   content: "\e90c";
@@ -59,6 +62,7 @@
 }
 .icon-code-browser .path1:before {
   content: "\e912";
+  color: rgb(211, 210, 90);
 }
 .icon-code-browser .path2:before {
   content: "\e913";
@@ -67,12 +71,14 @@
 }
 .icon-import:before {
   content: "\e914";
+  color: #337ab7;
 }
 .icon-code:before {
   content: "\e915";
 }
 .icon-sound-browser .path1:before {
   content: "\e916";
+  color: rgb(173, 175, 178);
 }
 .icon-sound-browser .path2:before {
   content: "\e917";
@@ -700,4 +706,7 @@
 }
 .icon-shrink2:before {
   content: "\e98e";
+}
+.icon-minus:before {
+  content: "\ea0b";
 }
