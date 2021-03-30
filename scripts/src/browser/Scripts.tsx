@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, LegacyRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { usePopper } from 'react-popper';
 
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 import * as scripts from './scriptsState';
 import * as tabs from '../editor/tabState';
 import * as appState from '../app/appState';
+import * as user from '../user/userState';
+import { RootState } from '../reducers';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 import {
     openScript, openSharedScript, shareScript,
-    generateGetBoundingClientRect, VirtualRef, DropdownMenuCaller
+    generateGetBoundingClientRect, VirtualRef, VirtualReference, DropdownMenuCaller
 } from './ScriptsMenus';
 
 const CreateScriptButton = () => {
@@ -22,7 +24,7 @@ const CreateScriptButton = () => {
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
             onClick={() => {
-                ideScope.createScript();
+                ideScope && ideScope.createScript();
             }}
         >
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
@@ -48,7 +50,7 @@ const ScriptSearchBar = () => {
 const FilterItem = ({ category, value }) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector(state => state.scripts.filters[category].includes(value));
+    const selected = isUtility ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
@@ -152,7 +154,7 @@ const ShowDeletedScripts = () => {
                 <input
                     type="checkbox"
                     style={{margin:0}}
-                    onClick={event => dispatch(scripts.setShowDeleted(event.target.checked))}
+                    onClick={event => dispatch(scripts.setShowDeleted(event.target['checked']))}
                 />
             </div>
             <div className='pr-1'>
@@ -162,7 +164,7 @@ const ShowDeletedScripts = () => {
     );
 };
 
-const PillButton = ({ onClick, children }) => {
+const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     let bgColor;
@@ -211,7 +213,7 @@ const RestoreButton = ({ script }) => {
     );
 };
 
-const sharedInfoPanelVirtualRef = new VirtualRef();
+const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference;
 
 const SharedScriptInfoItem = ({ title, body }) => {
     const theme = useSelector(appState.selectColorTheme);
@@ -237,6 +239,7 @@ const SingletonSharedScriptInfo = () => {
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
     const handleClickAsync = event => {
         setPopperElement(ref => {
+            // @ts-ignore: null warning
             if (!ref.contains(event.target)) {
                 dispatch(scripts.resetSharedScriptInfoAsync());
             }
@@ -251,7 +254,7 @@ const SingletonSharedScriptInfo = () => {
 
     return (
         <div
-            ref={setPopperElement}
+            ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={showSharedScriptInfo ? styles.popper : { display:'none' }}
             { ...attributes.popper }
             className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
@@ -316,14 +319,20 @@ const SharedScriptInfoCaller = ({ script }) => {
     );
 };
 
-const Script = ({ script, bgTint, type }) => {
+interface ScriptType {
+    script: scripts.ScriptEntity
+    bgTint: boolean
+    type: scripts.ScriptType
+}
+
+const Script: React.FC<ScriptType> = ({ script, bgTint, type }) => {
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
     const active = useSelector(tabs.selectActiveTabID) === script.shareid;
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid);
     const tabIndicator = (open||active) ? (active ? (modified ? 'border-red-600' : 'border-green-400') : (modified ? 'border-red-400' : 'border-green-300') + ' opacity-80') : 'opacity-0';
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
     const userProject = helpers.getNgService('userProject');
@@ -341,6 +350,7 @@ const Script = ({ script, bgTint, type }) => {
     const borderColor = theme==='light' ? 'border-gray-500' : 'border-gray-700';
 
     const shared = script.imported || script.isShared;
+    const collaborators = script.collaborators as string[];
 
     return (
         <div
@@ -369,7 +379,7 @@ const Script = ({ script, bgTint, type }) => {
                                 (shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} />)
                             }
                             {
-                                script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${script.collaborators.join(', ')}`} />)
+                                script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} />)
                             }
                         </div>
                     </div>

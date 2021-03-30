@@ -1,7 +1,55 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import { createSelectorCreator, defaultMemoize } from 'reselect';
 import { pickBy, isEqual } from 'lodash';
-import * as helpers from "../helpers";
+import * as helpers from '../helpers';
+
+import { RootState, ThunkAPI } from '../reducers';
+import { UserState } from '../user/userState';
+
+export interface SoundEntity {
+    file_key: string,
+    genregroup: string,
+    file_location: string,
+    folder: string,
+    artist: string,
+    year: string,
+    scope: number,
+    genre: string,
+    tempo: number,
+    instrument: string,
+    tags: string
+}
+
+interface SoundEntities {
+    [key: string]: SoundEntity
+}
+
+interface SoundsState {
+    defaultSounds: {
+        entities: SoundEntities,
+        fileKeys: string[]
+    },
+    userSounds: {
+        entities: SoundEntities,
+        fileKeys: string[]
+    },
+    filters: {
+        searchText: string,
+        favorites: string[],
+        byFavorites: boolean,
+        artists: string[],
+        genres: string[],
+        instruments: string[]
+    },
+    featuredSounds: {
+        visible: boolean,
+        artists: string[]
+    },
+    preview: {
+        fileKey: string | null,
+        bsNode: AudioBufferSourceNode | null
+    }
+}
 
 const soundsSlice = createSlice({
     name: 'sounds',
@@ -30,7 +78,7 @@ const soundsSlice = createSlice({
             fileKey: null,
             bsNode: null
         }
-    },
+    } as SoundsState,
     reducers: {
         setDefaultSounds(state, { payload }) {
             ['entities','fileKeys'].forEach(v => {
@@ -138,7 +186,7 @@ export const {
 } = soundsSlice.actions;
 
 /* Thunk actions */
-export const getDefaultSounds = createAsyncThunk(
+export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
     'sounds/getDefaultSounds',
     async (_, { getState, dispatch }) => {
         const { sounds } = getState();
@@ -163,7 +211,7 @@ export const getDefaultSounds = createAsyncThunk(
     }
 );
 
-export const getUserSounds = createAsyncThunk(
+export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
     'sounds/getUserSounds',
     async (username, { dispatch }) => {
         const endPoint = URL_DOMAIN + '/services/audio/getuseraudiotags';
@@ -186,13 +234,13 @@ export const getUserSounds = createAsyncThunk(
     }
 );
 
-export const getFavorites = createAsyncThunk(
+export const getFavorites = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
     'sounds/getFavorites',
-    async (payload, { dispatch }) => {
+    async ({ username, password }, { dispatch }) => {
         const endPoint = URL_DOMAIN + '/services/audio/getfavorites';
         const body = new FormData();
-        body.append('username', payload.username);
-        body.append('password', btoa(payload.password));
+        body.append('username', username);
+        body.append('password', btoa(password));
 
         try {
             const response = await fetch(endPoint, {
@@ -207,13 +255,13 @@ export const getFavorites = createAsyncThunk(
     }
 );
 
-export const markFavorite = createAsyncThunk(
+export const markFavorite = createAsyncThunk<void, { fileKey: string, isFavorite: boolean }, ThunkAPI>(
     'sounds/markFavorite',
     async ({ fileKey, isFavorite }, { getState, dispatch }) => {
-        const state = getState()
+        const state = getState();
         const { user } = state;
-        if (user.loggedIn) {
-            const { username, password } = user;
+        const { username, password } = user as UserState;
+        if (user.loggedIn && username && password) {
             const entities = selectAllEntities(state);
             const isUserOwned = entities[fileKey].folder === username.toUpperCase();
             const markAsFavorite = !isFavorite;
@@ -223,7 +271,7 @@ export const markFavorite = createAsyncThunk(
             body.append('username', username);
             body.append('password', btoa(password));
             body.append('audio_file_key', fileKey);
-            body.append('userowned', isUserOwned);
+            body.append('userowned', isUserOwned.toString());
 
             if (markAsFavorite) {
                 const endPoint = endPointBase+'/addfavorite';
@@ -252,7 +300,7 @@ export const markFavorite = createAsyncThunk(
     }
 );
 
-export const renameLocalUserSound = createAsyncThunk(
+export const renameLocalUserSound = createAsyncThunk<void, { oldName: string, newName: string }, ThunkAPI>(
     'sounds/renameLocalUserSound',
     ({ oldName, newName }, { getState, dispatch }) => {
         const userSounds = getState().sounds.userSounds;
@@ -262,7 +310,7 @@ export const renameLocalUserSound = createAsyncThunk(
     }
 );
 
-export const deleteLocalUserSound = createAsyncThunk(
+export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     'sounds/deleteLocalUserSound',
     (payload, { getState, dispatch }) => {
         const userSounds = getState().sounds.userSounds;
@@ -272,7 +320,7 @@ export const deleteLocalUserSound = createAsyncThunk(
     }
 );
 
-export const previewSound = createAsyncThunk(
+export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     'sounds/previewSound',
     async (fileKey, { getState, dispatch }) => {
         const previewState = getState().sounds.preview;
@@ -308,7 +356,7 @@ export const previewSound = createAsyncThunk(
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
 const fileKeysByFoldersSelector = (entities, folders) => {
     const result = {};
-    const entitiesList = Object.values(entities);
+    const entitiesList = Object.values(entities) as SoundEntity[];
     folders.forEach(folder => {
         result[folder] = entitiesList.filter(v => v.folder===folder).map(v => v.file_key).sort((a,b) => a.localeCompare(b,undefined,{
             numeric: true,
@@ -318,10 +366,10 @@ const fileKeysByFoldersSelector = (entities, folders) => {
     return result;
 };
 
-const selectDefaultEntities = state => state.sounds.defaultSounds.entities;
-const selectUserEntities = state => state.sounds.userSounds.entities;
-const selectDefaultFileKeys = state => state.sounds.defaultSounds.fileKeys;
-const selectUserFileKeys = state => state.sounds.userSounds.fileKeys;
+const selectDefaultEntities = (state: RootState) => state.sounds.defaultSounds.entities;
+const selectUserEntities = (state: RootState) => state.sounds.userSounds.entities;
+const selectDefaultFileKeys = (state: RootState) => state.sounds.defaultSounds.fileKeys;
+const selectUserFileKeys = (state: RootState) => state.sounds.userSounds.fileKeys;
 
 export const selectAllFileKeys = createSelector(
     [selectDefaultFileKeys, selectUserFileKeys],
@@ -335,8 +383,8 @@ export const selectAllEntities = createSelector(
     })
 );
 
-export const selectFeaturedSoundVisibility = state => state.sounds.featuredSounds.visible;
-export const selectFeaturedArtists = state => state.sounds.featuredSounds.artists;
+export const selectFeaturedSoundVisibility = (state: RootState) => state.sounds.featuredSounds.visible;
+export const selectFeaturedArtists = (state: RootState) => state.sounds.featuredSounds.artists;
 
 const selectFeaturedEntities = createSelector(
     [selectDefaultEntities, selectFeaturedArtists],
@@ -384,10 +432,10 @@ export const selectAllRegularEntities = createSelector(
     })
 );
 
-export const selectFilterByFavorites = state => state.sounds.filters.byFavorites;
-export const selectFavorites = state => state.sounds.filters.favorites;
-export const selectSearchText = state => state.sounds.filters.searchText;
-export const selectFilters = state => state.sounds.filters;
+export const selectFilterByFavorites = (state: RootState) => state.sounds.filters.byFavorites;
+export const selectFavorites = (state: RootState) => state.sounds.filters.favorites;
+export const selectSearchText = (state: RootState) => state.sounds.filters.searchText;
+export const selectFilters = (state: RootState) => state.sounds.filters;
 
 export const selectFilteredRegularEntities = createSelector(
     [selectAllRegularEntities, selectFilters],
@@ -512,8 +560,8 @@ export const selectAllRegularInstruments = createSelector(
     (entities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].instrument)))
 );
 
-export const selectNumArtistsSelected = state => state.sounds.filters.artists.length;
-export const selectNumGenresSelected = state => state.sounds.filters.genres.length;
-export const selectNumInstrumentsSelected = state => state.sounds.filters.instruments.length;
+export const selectNumArtistsSelected = (state: RootState) => state.sounds.filters.artists.length;
+export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length;
+export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length;
 
-export const selectPreviewFileKey = state => state.sounds.preview.fileKey;
+export const selectPreviewFileKey = (state: RootState) => state.sounds.preview.fileKey;

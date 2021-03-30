@@ -1,4 +1,8 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { RootState, ThunkAPI } from '../reducers';
+import Split from 'split.js';
+
+type WestKinds = 'SOUNDS' | 'SCRIPTS' | 'API';
 
 const layoutSlice = createSlice({
     name: 'layout',
@@ -67,38 +71,45 @@ const windowWidth = () => window.innerWidth || document.documentElement.clientWi
 const windowHeight = () => window.innerHeight|| document.documentElement.clientHeight|| document.body.clientHeight;
 
 // TODO: Temporary side-effect elements with DOM-based split.js. To be removed when we switch split.js to the react version.
-const layoutMutableState = {
+interface LayoutMutableState {
+    horizontalSplits: Split.Instance | null,
+    verticalSplits: Split.Instance | null,
+    minSize: number,
+    gutterSize: number
+}
+
+const layoutMutableState: LayoutMutableState = {
     horizontalSplits: null,
     verticalSplits: null,
     minSize: horizontalMinSize,
     gutterSize: 8
 };
 
-export const setHorizontalSplits = ref => {
+export const setHorizontalSplits = (ref: Split.Instance | null) => {
     layoutMutableState.horizontalSplits = ref;
 };
 
-export const setVerticalSplits = ref => {
+export const setVerticalSplits = (ref: Split.Instance | null) => {
     layoutMutableState.verticalSplits = ref;
 };
 
 export const getHorizontalSplits = () => layoutMutableState.horizontalSplits;
 export const getVerticalSplits = () => layoutMutableState.verticalSplits;
 
-export const setMinSize = size => {
+export const setMinSize = (size: number) => {
     layoutMutableState.minSize = size;
 };
 export const getMinSize = () => layoutMutableState.minSize;
 
-export const setGutterSize = size => {
+export const setGutterSize = (size: number) => {
     layoutMutableState.gutterSize = size;
 };
 export const getGutterSize = () => layoutMutableState.gutterSize;
 
-export const isWestOpen = state => state.layout.west.open;
-export const isEastOpen = state => state.layout.east.open;
+export const isWestOpen = (state: RootState) => state.layout.west.open;
+export const isEastOpen = (state: RootState) => state.layout.east.open;
 
-export const setHorizontalSizesFromRatio = createAsyncThunk(
+export const setHorizontalSizesFromRatio = createAsyncThunk<void, number[], ThunkAPI>(
     'layout/setHorizontalSizesFromRatio',
     (ratio, { getState, dispatch }) => {
         const width  = windowWidth();
@@ -108,7 +119,7 @@ export const setHorizontalSizesFromRatio = createAsyncThunk(
     }
 );
 
-export const setVerticalSizesFromRatio = createAsyncThunk(
+export const setVerticalSizesFromRatio = createAsyncThunk<void, number[], ThunkAPI>(
     'layout/setVerticalSizesFromRatio',
     (ratio, { dispatch }) => {
         const height = windowHeight();
@@ -117,13 +128,14 @@ export const setVerticalSizesFromRatio = createAsyncThunk(
     }
 );
 
-export const openWest = createAsyncThunk(
+export const openWest = createAsyncThunk<void, WestKinds|void, ThunkAPI>(
     'layout/openWest',
     (kind, { getState, dispatch }) => {
         if (layoutMutableState.horizontalSplits) {
             dispatch(setWest(kind ? { open: true, kind } : { open: true }));
             layoutMutableState.horizontalSplits.setSizes(selectHorizontalRatio(getState()));
-            document.getElementById(`gutter-horizontal-0`).style['pointer-events'] = 'auto';
+            const gutter = document.getElementById(`gutter-horizontal-0`);
+            if (gutter) gutter.style['pointerEvents'] = 'auto';
         }
     }
 );
@@ -134,18 +146,20 @@ export const collapseWest = createAsyncThunk(
         if (layoutMutableState.horizontalSplits) {
             dispatch(setWest({ open: false }));
             layoutMutableState.horizontalSplits.collapse(0);
-            document.getElementById(`gutter-horizontal-0`).style['pointer-events'] = 'none';
+            const gutter = document.getElementById(`gutter-horizontal-0`);
+            if (gutter) gutter.style['pointerEvents'] = 'none';
         }
     }
 );
 
-export const openEast = createAsyncThunk(
+export const openEast = createAsyncThunk<void, void, ThunkAPI>(
     'layout/openEast',
     (_, { getState, dispatch }) => {
         if (layoutMutableState.horizontalSplits) {
             dispatch(setEast({ open: true }));
             layoutMutableState.horizontalSplits.setSizes(selectHorizontalRatio(getState()));
-            document.getElementById(`gutter-horizontal-1`).style['pointer-events'] = 'auto';
+            const gutter = document.getElementById(`gutter-horizontal-1`);
+            if (gutter) gutter.style['pointerEvents'] = 'auto';
         }
     }
 );
@@ -156,7 +170,8 @@ export const collapseEast = createAsyncThunk(
         if (layoutMutableState.horizontalSplits) {
             dispatch(setEast({ open: false }));
             layoutMutableState.horizontalSplits.collapse(2);
-            document.getElementById(`gutter-horizontal-1`).style['pointer-events'] = 'none';
+            const gutter = document.getElementById(`gutter-horizontal-1`);
+            if (gutter) gutter.style['pointerEvents'] = 'none';
         }
     }
 );
@@ -167,27 +182,29 @@ export const collapseSouth = createAsyncThunk(
         if (layoutMutableState.verticalSplits) {
             dispatch(setSouth({ open: false }));
             layoutMutableState.verticalSplits.collapse(2);
-            document.getElementById(`gutter-vertical-1`).style['pointer-events'] = 'none';
+            const gutter = document.getElementById(`gutter-vertical-1`);
+            if (gutter) gutter.style['pointerEvents'] = 'none';
         }
     }
 );
 
-export const setNorthFromRatio = createAsyncThunk(
+export const setNorthFromRatio = createAsyncThunk<void, number[], ThunkAPI>(
     'layout/setNorthFromRatio',
     (ratio, { getState, dispatch }) => {
         if (layoutMutableState.verticalSplits) {
             dispatch(setNorth({ open: true }));
             dispatch(setVerticalSizesFromRatio(ratio));
             layoutMutableState.verticalSplits.setSizes(selectVerticalRatio(getState()));
-            document.getElementById(`gutter-vertical-0`).style['pointer-events'] = 'auto';
+            const gutter = document.getElementById(`gutter-vertical-0`);
+            if (gutter) gutter.style['pointerEvents'] = 'auto';
         }
     }
 );
 
-const selectWestSize = state => state.layout.west.size;
-const selectEastSize = state => state.layout.east.size;
-const selectNorthSize = state => state.layout.north.size;
-const selectSouthSize = state => state.layout.south.size;
+const selectWestSize = (state: RootState) => state.layout.west.size;
+const selectEastSize = (state: RootState) => state.layout.east.size;
+const selectNorthSize = (state: RootState) => state.layout.north.size;
+const selectSouthSize = (state: RootState) => state.layout.south.size;
 
 export const selectHorizontalRatio = createSelector(
     [selectWestSize, selectEastSize, isWestOpen, isEastOpen],
@@ -209,4 +226,4 @@ export const selectVerticalRatio = createSelector(
     }
 );
 
-export const selectWestKind = state => state.layout.west.kind;
+export const selectWestKind = (state: RootState) => state.layout.west.kind;

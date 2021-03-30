@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { RootState } from '../reducers';
 
 const appSlice = createSlice({
     name: 'app',
@@ -45,8 +46,8 @@ export const {
     setEmbedMode
 } = appSlice.actions;
 
-export const selectScriptLanguage = state => state.app.scriptLanguage;
-export const selectColorTheme = state => state.app.colorTheme;
+export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage;
+export const selectColorTheme = (state: RootState) => state.app.colorTheme;
 // TODO: Figure out the right way to do this with redux-persist.
-export const selectFontSize = state => state.app.fontSize || 14;
-export const selectEmbedMode = state => state.app.embedMode;
+export const selectFontSize = (state: RootState) => state.app.fontSize || 14;
+export const selectEmbedMode = (state: RootState) => state.app.embedMode;

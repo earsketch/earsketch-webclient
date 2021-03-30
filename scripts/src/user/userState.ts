@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { RootState } from '../reducers';
+
 import * as app from '../app/appState';
-import xml2js from 'xml2js';
+// import xml2js from 'xml2js';
 
 // TODO: Eventually replace userProject getUserInfo
 // export const login = createAsyncThunk(
@@ -25,15 +27,19 @@ import xml2js from 'xml2js';
 //     }
 // );
 
+export interface UserState {
+    loggedIn: boolean
+    username: string | null
+    password: string | null
+}
+
 const userSlice = createSlice({
     name: 'user',
     initialState: {
         loggedIn: false,
         username: null,
-        password: null,
-        scripts: {},
-        scriptIDs: []
-    },
+        password: null
+    } as UserState,
     reducers: {
         login(state, { payload }) {
             state.loggedIn = true;
@@ -41,37 +47,16 @@ const userSlice = createSlice({
             state.password = payload.password;
         },
         logout(state) {
-            Object.keys(state).forEach(key => {
-                delete state[key];
-            });
+            state.username = null;
+            state.password = null;
             state.loggedIn = false;
         }
-    },
-    // extraReducers: {
-    //     [login.fulfilled]: (state, { payload }) => {
-    //         // Object.assign(state, payload);
-    //         state.loggedIn = true;
-    //         state.username = payload.username;
-    //         state.password = payload.password;
-    //     },
-    //     [login.rejected]: (state, { payload }) => {
-    //         state.loggedIn = false;
-    //     }
-    // }
+    }
 });
 
 export const { login, logout } = userSlice.actions;
 export default userSlice.reducer;
 
 /* Selectors */
-// TODO: Date format?
-export const mapScriptsToObjectByID = createSelector(
-    state => state.user.scripts,
-    scripts => scripts.reduce((obj, script) => ({
-        ...obj,
-        [script.shareid]: script
-    }), {})
-);
-
-export const selectLoggedIn = state => state.user.loggedIn;
-export const selectUserName = state => state.user.username;
+export const selectLoggedIn = (state: RootState) => state.user.loggedIn;
+export const selectUserName = (state: RootState) => state.user.username;

@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, LegacyRef } from 'react';
+import { Store } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { react2angular } from 'react2angular';
 import { usePopper } from 'react-popper';
+import PopperJS from '@popperjs/core';
 import * as appState from "../app/appState";
+import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
 import * as tabs from "../editor/tabState";
 import * as helpers from "../helpers";
@@ -27,7 +30,7 @@ export const shareScript = script => {
 };
 
 export function generateGetBoundingClientRect(x=0, y=0) {
-    return () => ({
+    return (): ClientRect => ({
         width: 0,
         height: 0,
         top: y,
@@ -37,7 +40,15 @@ export function generateGetBoundingClientRect(x=0, y=0) {
     });
 }
 
+export interface VirtualReference extends PopperJS.VirtualElement {
+    updatePopper: PopperJS.Instance['update'] | null
+}
+
+// TODO: Redundant... Figure out how to implement VirtualReference interface without declaring an unknown-type property.
 export class VirtualRef {
+    getBoundingClientRect: unknown
+    updatePopper: PopperJS.Instance['update'] | null
+
     constructor() {
         this.getBoundingClientRect = generateGetBoundingClientRect();
         this.updatePopper = null;
@@ -73,7 +84,7 @@ const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }) => {
     );
 };
 
-const dropdownMenuVirtualRef = new VirtualRef();
+const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference;
 
 const SingletonDropdownMenu = () => {
     const theme = useSelector(appState.selectColorTheme);
@@ -85,7 +96,7 @@ const SingletonDropdownMenu = () => {
 
     // For some operations, get the most up-to-date script being kept in userProject.
     const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript);
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
     const openTabs = useSelector(tabs.selectOpenTabs);
 
     const [popperElement, setPopperElement] = useState(null);
@@ -95,6 +106,7 @@ const SingletonDropdownMenu = () => {
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
     const handleClickAsync = event => {
         setPopperElement(ref => {
+            // @ts-ignore
             if (!ref.contains(event.target) && event.button===0) {
                 dispatch(scripts.resetDropdownMenuAsync());
             }
@@ -109,7 +121,7 @@ const SingletonDropdownMenu = () => {
 
     return (
         <div
-            ref={setPopperElement}
+            ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={showDropdownMenu ? styles.popper : { display:'none' }}
             { ...attributes.popper }
             className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
@@ -200,12 +212,12 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name='Import' icon='icon-import'
-                visible={['shared','readonly'].includes(type)}
+                visible={['shared','readonly'].includes(type as string)}
                 onClick={async () => {
                     const userProject = helpers.getNgService('userProject');
                     let imported;
 
-                    if (script.collaborative) {
+                    if (script && script.collaborative) {
                         imported = await userProject.importCollaborativeScript(Object.assign({},script));
                     } else {
                         imported = await userProject.importScript(Object.assign({},script));
@@ -214,7 +226,7 @@ const SingletonDropdownMenu = () => {
                     await userProject.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
 
-                    if (openTabs.includes(script.shareid)) {
+                    if (script && openTabs.includes(script.shareid)) {
                         openScript(imported);
                     }
                 }}
@@ -230,7 +242,7 @@ const SingletonDropdownMenu = () => {
                     } else if (type==='shared') {
                         await scope.deleteSharedScript(script);
                     }
-                    await userProject.refreshCodeBrowser();
+                    userProject && await userProject.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
                 }}
             />
@@ -259,7 +271,13 @@ export const DropdownMenuCaller = ({ script, type }) => {
     );
 };
 
-export const DropdownContextMenuCaller = ({ script, type, children, className }) => {
+interface DropdownContextMenuCallerType {
+    script: scripts.ScriptEntity
+    type: scripts.ScriptType
+    className: string
+}
+
+export const DropdownContextMenuCaller: React.FC<DropdownContextMenuCallerType> = ({ script, type, children, className }) => {
     const dispatch = useDispatch();
     return (
         <div
@@ -277,7 +295,7 @@ export const DropdownContextMenuCaller = ({ script, type, children, className })
     );
 };
 
-const DropdownMenuContainer = props => (
+const DropdownMenuContainer = (props: { $ngRedux: Store }) => (
     <Provider store={props.$ngRedux}>
         <SingletonDropdownMenu />
     </Provider>

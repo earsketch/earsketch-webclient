@@ -7,8 +7,9 @@ export const resetHorizontalSplits = () => {
     horizontalSplits && horizontalSplits.setSizes(layout.selectHorizontalRatio(store.getState()));
 };
 
-export const toggleHorizontalDrag = (index, state) => {
-    document.getElementById(`gutter-horizontal-${index}`).style['pointer-events'] = state ? 'auto' : 'none';
+export const toggleHorizontalDrag = (index: number, state: boolean) => {
+    const gutter = document.getElementById(`gutter-horizontal-${index}`);
+    if (gutter) gutter.style['pointerEvents'] = state ? 'auto' : 'none';
 };
 
 export const initialize = () => {

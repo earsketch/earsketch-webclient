@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, LegacyRef } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
+import { Store } from 'redux';
 import { hot } from 'react-hot-loader/root';
 import { react2angular } from 'react2angular';
 import { usePopper } from "react-popper";
@@ -9,7 +10,7 @@ import * as appState from '../app/appState';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
 import * as editor from './editorState';
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 
@@ -24,30 +25,36 @@ const CreateScriptButton = () => {
                 text-lg cursor-pointer
             `}
             id='create-script-button'
-            onClick={() => ideControllerScope.createScript()}
+            onClick={() => ideControllerScope && ideControllerScope.createScript()}
         >
             <i className='icon icon-plus2' />
         </div>
     );
 };
 
-const Tab = ({ scriptID, scriptName, index }) => {
+interface TabProps {
+    scriptID: string
+    scriptName: string
+    index: number
+}
+
+const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
     const dispatch = useDispatch();
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID);
     const ngTabControllerScope = helpers.getNgController('tabController').scope();
-    const [highlight, setHighlight] = useState(false);
 
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const script = allScripts[scriptID];
     const scriptType = script.isShared && 'shared' || script.readonly && 'readonly' || 'regular';
     const activeTabID = useSelector(tabs.selectActiveTabID);
     const active = activeTabID === scriptID;
+    const collaborators = script.collaborators as string[];
 
     useEffect(() => {
         script.collaborative && dispatch(editor.setBlocksMode(false));
     }, [activeTabID]);
 
-    var tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer border',
+    let tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer border',
         {
             'bg-blue border-blue': active,
             'bg-gray-200 hover:bg-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800': !active, // background
@@ -61,7 +68,7 @@ const Tab = ({ scriptID, scriptName, index }) => {
             'text-gray-600 hover:text-white dark:text-gray-400': !active && !modified
         },
         'flex relative');
-    var closeButtonClass = classNames('flex items-center hover:text-gray-800',
+    let closeButtonClass = classNames('flex items-center hover:text-gray-800',
         {
             'hover:bg-gray-400': !active,
             'hover:bg-gray-300': active
@@ -75,10 +82,8 @@ const Tab = ({ scriptID, scriptName, index }) => {
                 dispatch(tabs.setActiveTabAndEditor(scriptID));
 
                 // TODO: This triggers clearHistory
-                ngTabControllerScope.swapTab(index);
+                ngTabControllerScope && ngTabControllerScope.swapTab(index);
             }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
             title={script.name}
         >
             <DropdownContextMenuCaller
@@ -88,12 +93,12 @@ const Tab = ({ scriptID, scriptName, index }) => {
             >
                 <div className='flex items-center space-x-3 truncate'>
                     { (script.isShared && !script.collaborative) && <i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} /> }
-                    { script.collaborative && <i className='icon-users4 align-middle' title={`Shared with ${script.collaborators.join(', ')}`} /> }
+                    { script.collaborative && <i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} /> }
                     <div className='truncate select-none align-middle'>{scriptName}</div>
                 </div>
                 <button
                     className={closeButtonClass}
-                    onClick={(event) => ngTabControllerScope.closeTab(index, event)}
+                    onClick={(event) => ngTabControllerScope && ngTabControllerScope.closeTab(index, event)}
                 >
                     <i className={`icon-cross2 cursor-pointer`} />
                 </button>
@@ -113,7 +118,7 @@ const CloseAllTab = () => {
                 flex items-center
                 text-white bg-gray-800 border border-gray-800    
             `}
-            onClick={() => ngTabControllerScope.closeAllTabs()}
+            onClick={() => ngTabControllerScope && ngTabControllerScope.closeAllTabs()}
         >
             Close All
         </div>
@@ -160,7 +165,7 @@ const TabDropdown = () => {
 
     return (<>
         <div
-            ref={setReferenceElement}
+            ref={setReferenceElement as LegacyRef<HTMLDivElement>}
             className={`flex justify-around items-center flex-shrink-0 
                 h-12 p-3 
                 ${theme==='light' ? 'text-gray-800' : 'text-gray-200'}
@@ -170,7 +175,7 @@ const TabDropdown = () => {
                 cursor-pointer select-none
             `}
             onClick={() => {setShowDropdown(show => {
-                update();
+                update && update();
                 return !show;
             })}}
             onMouseEnter={() => setHighlight(true)}
@@ -180,7 +185,7 @@ const TabDropdown = () => {
             <i className='icon icon-arrow-down2 text-lg p-2' />
         </div>
         <div
-            ref={setPopperElement}
+            ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={showDropdown ? styles.popper : { display:'none' }}
             { ...attributes.popper }
             className={`border border-black z-50 bg-white`}
@@ -220,9 +225,11 @@ const Tabs = () => {
         dispatch(tabs.setNumVisibleTabs(cutoff));
     });
     useEffect(() => {
+        // @ts-ignore: null warning cannot be suppressed?
         containerRef.current && observer.observe(containerRef.current);
 
         return () => {
+            // @ts-ignore
             containerRef.current && observer.unobserve(containerRef.current);
         }
     }, [containerRef, openTabs, truncated]);
@@ -242,7 +249,7 @@ const Tabs = () => {
     );
 };
 
-const HotTabs = hot(props => {
+const HotTabs = hot((props: { $ngRedux: Store }) => {
     return (
         <Provider store={props.$ngRedux}>
             <Tabs />

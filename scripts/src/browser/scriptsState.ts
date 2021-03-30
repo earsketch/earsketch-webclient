@@ -4,7 +4,84 @@ import storage from 'redux-persist/lib/storage';
 import { pickBy, keyBy, cloneDeep, each } from 'lodash';
 import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
+import { RootState, ThunkAPI } from '../reducers';
+
+export interface ScriptEntity {
+    name: string
+    shareid: string
+    source_code: string
+    username: string
+    created: string
+    modified: number
+    file_location: string
+    id: string
+    licenseInfo: string
+    license_id: string
+    saved: boolean
+    tooltipText: string
+    collaborative: boolean
+    collaborators: any // Should be string[] but server can give other data types such as undefined and string
+    imported: boolean
+    isShared: boolean
+    run_status: string
+    readonly: boolean
+    creator: string
+    description?: string
+    soft_delete?: boolean | string
+}
+
+interface ScriptEntities {
+    [key: string]: ScriptEntity
+}
+
+// Note: How about collaborative?
+export type ScriptType = 'regular' | 'shared' | 'readonly' | 'deleted';
+type SortByAttribute = 'Date' | 'A-Z';
+
+interface ScriptsState {
+    regularScripts: {
+        entities: ScriptEntities,
+        scriptIDs: string[]
+    },
+    sharedScripts: {
+        entities: ScriptEntities,
+        scriptIDs: string[]
+    },
+    deletedScripts: {
+        entities: ScriptEntities,
+        scriptIDs: string[]
+    },
+    localScripts: {
+        entities: ScriptEntities,
+        scriptIDs: string[]
+    },
+    readOnlyScripts: {
+        entities: ScriptEntities,
+        scriptIDs: string[]
+    },
+    filters: {
+        searchText: string,
+        showDeleted: boolean,
+        owners: string[],
+        types: string[],
+        sortBy: {
+            attribute: SortByAttribute,
+            ascending: boolean
+        }
+    },
+    featureSharedScript: boolean,
+    dropdownMenu: {
+        show: boolean,
+        script: ScriptEntity | null,
+        type: ScriptType | null,
+        context: boolean
+    },
+    sharedScriptInfo: {
+        show: boolean,
+        script: ScriptEntity | null
+    }
+}
 
 const scriptsSlice = createSlice({
     name: 'scripts',
@@ -51,7 +128,7 @@ const scriptsSlice = createSlice({
             show: false,
             script: null
         }
-    },
+    } as ScriptsState,
     reducers: {
         setRegularScripts(state, { payload }) {
             state.regularScripts.entities = payload;
@@ -131,7 +208,8 @@ const scriptsSlice = createSlice({
             state.dropdownMenu = {
                 show: false,
                 script: null,
-                type: null
+                type: null,
+                context: false
             };
         },
         setSharedScriptInfo(state, { payload }) {
@@ -222,16 +300,18 @@ const removeUnusedFields = script => {
     script.file_location && delete script.file_location;
 };
 
-const setCollaborators = (script, username=null) => {
+const setCollaborators = (script: ScriptEntity, username:string|null = null) => {
     if (script.collaborators === undefined) {
         script.collaborators = [];
     } else if (typeof(script.collaborators) === 'string') {
         script.collaborators = [script.collaborators];
     }
 
+    const collaborators = script.collaborators as string[];
+
     // Provide username for the shared script browser.
     if (username) {
-        if (!!script.collaborators.length && script.collaborators.map(v => v.toLowerCase()).includes(username.toLowerCase())) {
+        if (!!collaborators.length && collaborators.map(v => v.toLowerCase()).includes(username.toLowerCase())) {
             script.collaborative = true;
             script.readonly = false;
         } else {
@@ -240,11 +320,11 @@ const setCollaborators = (script, username=null) => {
         }
     } else {
         // For regular (aka "my") script browser.
-        script.collaborative = !!script.collaborators.length;
+        script.collaborative = !!collaborators.length;
     }
 };
 
-export const getRegularScripts = createAsyncThunk(
+export const getRegularScripts = createAsyncThunk<void, { username: string, password: string}, ThunkAPI>(
     'scripts/getRegularScripts',
     async ({ username, password }, { dispatch }) => {
         const endPoint = URL_DOMAIN + '/services/scripts/findall';
@@ -277,7 +357,7 @@ export const getRegularScripts = createAsyncThunk(
     }
 );
 
-export const getSharedScripts = createAsyncThunk(
+export const getSharedScripts = createAsyncThunk<void, { username: string, password: string}, ThunkAPI>(
     'scripts/getSharedScripts',
     async ({ username, password }, { dispatch }) => {
         const endPoint = URL_DOMAIN + '/services/scripts/getsharedscripts';
@@ -308,31 +388,31 @@ export const getSharedScripts = createAsyncThunk(
     }
 );
 
-export const createScript = createAsyncThunk(
-    'scripts/createScript',
-    ({ name, code, overwrite=true }, { getState }) => {
+// export const createScript = createAsyncThunk(
+//     'scripts/createScript',
+//     ({ name, code, overwrite=true }, { getState }) => {
+//
+//     }
+// );
 
-    }
-);
+// export const saveScript = createAsyncThunk(
+//     'script/saveScript',
+//     () => {}
+// );
 
-export const saveScript = createAsyncThunk(
-    'script/saveScript',
-    () => {}
-);
+// export const saveAllScripts = createAsyncThunk(
+//     'script/saveAllScripts',
+//     () => {}
+// );
 
-export const saveAllScripts = createAsyncThunk(
-    'script/saveAllScripts',
-    () => {}
-);
-
-export const resetDropdownMenuAsync = createAsyncThunk(
+export const resetDropdownMenuAsync = createAsyncThunk<void, void, ThunkAPI>(
     'scripts/resetDropdownMenuAsync',
     (_, { dispatch }) => {
         setTimeout(() => dispatch(resetDropdownMenu()), 0);
     }
 );
 
-export const resetSharedScriptInfoAsync = createAsyncThunk(
+export const resetSharedScriptInfoAsync = createAsyncThunk<void ,void, ThunkAPI>(
     'scripts/resetSharedScriptInfoAsync',
     (_, { dispatch }) => {
         setTimeout(() => dispatch(resetSharedScriptInfo()), 0);
@@ -340,16 +420,16 @@ export const resetSharedScriptInfoAsync = createAsyncThunk(
 );
 
 /*=== Selectors ===*/
-const selectRegularScriptEntities = state => state.scripts.regularScripts.entities;
-const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
-const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
-export const selectSharedScriptIDs = state => state.scripts.sharedScripts.scriptIDs;
-const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
-const selectReadOnlyScriptIDs = state => state.scripts.readOnlyScripts.scriptIDs;
+const selectRegularScriptEntities = (state: RootState) => state.scripts.regularScripts.entities;
+const selectRegularScriptIDs = (state: RootState) => state.scripts.regularScripts.scriptIDs;
+const selectSharedScriptEntities = (state: RootState) => state.scripts.sharedScripts.entities;
+export const selectSharedScriptIDs = (state: RootState) => state.scripts.sharedScripts.scriptIDs;
+const selectReadOnlyScriptEntities = (state: RootState) => state.scripts.readOnlyScripts.entities;
+const selectReadOnlyScriptIDs = (state: RootState) => state.scripts.readOnlyScripts.scriptIDs;
 
 export const selectActiveScriptEntities = createSelector(
     [selectRegularScriptEntities],
-    (entities) => pickBy(entities, v => ![true,'1'].includes(v.soft_delete))
+    (entities) => pickBy(entities, v => ![true,'1'].includes(v.soft_delete as any))
 );
 export const selectActiveScriptIDs = createSelector(
     [selectActiveScriptEntities],
@@ -358,7 +438,7 @@ export const selectActiveScriptIDs = createSelector(
 
 export const selectDeletedScriptEntities = createSelector(
     [selectRegularScriptEntities],
-    (entities) => pickBy(entities, v => [true,'1'].includes(v.soft_delete))
+    (entities) => pickBy(entities, v => [true,'1'].includes(v.soft_delete as any))
 );
 export const selectDeletedScriptIDs = createSelector(
     [selectDeletedScriptEntities],
@@ -373,13 +453,13 @@ export const selectAllScriptIDs = createSelector(
     (regularIDs, sharedIDs, readOnlyIDs) => [...regularIDs, ...sharedIDs, ...readOnlyIDs]
 );
 
-export const selectFilters = state => state.scripts.filters;
-export const selectSearchText = state => state.scripts.filters.searchText;
-export const selectShowDeleted = state => state.scripts.filters.showDeleted;
-export const selectSortByAttribute = state => state.scripts.filters.sortBy.attribute;
-export const selectSortByAscending = state => state.scripts.filters.sortBy.ascending;
+export const selectFilters = (state: RootState) => state.scripts.filters;
+export const selectSearchText = (state: RootState) => state.scripts.filters.searchText;
+export const selectShowDeleted = (state: RootState) => state.scripts.filters.showDeleted;
+export const selectSortByAttribute = (state: RootState) => state.scripts.filters.sortBy.attribute;
+export const selectSortByAscending = (state: RootState) => state.scripts.filters.sortBy.ascending;
 
-const applyFiltersToEntities = (entities, filters) => {
+const applyFiltersToEntities = (entities: ScriptEntity[], filters) => {
     const term = filters.searchText.toLowerCase();
     const extensions = {
         Python: 'py',
@@ -394,7 +474,7 @@ const applyFiltersToEntities = (entities, filters) => {
     });
 };
 
-const sortScriptIDs = (entities, sortBy, ascending) => {
+const sortScriptIDs = (entities: ScriptEntity[], sortBy: SortByAttribute, ascending: boolean) => {
     const lexicalSortOptions = {
         numeric: true,
         sensitivity: 'base'
@@ -442,11 +522,11 @@ export const selectFilteredDeletedScriptIDs = createSelector(
     sortScriptIDs
 );
 
-export const selectFeatureSharedScript = state => state.scripts.featureSharedScript;
-export const selectShowDropdownMenu = state => state.scripts.dropdownMenu.show;
-export const selectDropdownMenuScript = state => state.scripts.dropdownMenu.script;
-export const selectDropdownMenuType = state => state.scripts.dropdownMenu.type;
-export const selectDropdownMenuContext = state => state.scripts.dropdownMenu.context;
+export const selectFeatureSharedScript = (state: RootState) => state.scripts.featureSharedScript;
+export const selectShowDropdownMenu = (state: RootState) => state.scripts.dropdownMenu.show;
+export const selectDropdownMenuScript = (state: RootState) => state.scripts.dropdownMenu.script;
+export const selectDropdownMenuType = (state: RootState) => state.scripts.dropdownMenu.type;
+export const selectDropdownMenuContext = (state: RootState) => state.scripts.dropdownMenu.context;
 
 // TODO: Unsaved scripts should probably be tracked in the editor or tab state.
 export const selectUnsavedDropdownMenuScript = createSelector(
@@ -463,15 +543,16 @@ export const selectUnsavedDropdownMenuScript = createSelector(
     }
 );
 
-export const selectShowSharedScriptInfo = state => state.scripts.sharedScriptInfo.show;
-export const selectSharedInfoScript = state => state.scripts.sharedScriptInfo.script;
+export const selectShowSharedScriptInfo = (state: RootState) => state.scripts.sharedScriptInfo.show;
+export const selectSharedInfoScript = (state: RootState) => state.scripts.sharedScriptInfo.script;
 
 export const selectAllScriptOwners = createSelector(
     [selectUserName, selectSharedScriptEntities, selectSharedScriptIDs],
-    (userName, sharedScriptEntities, sharedScriptIDs) => {
+    (userName, sharedScriptEntities, sharedScriptIDs): any[] => {
+        // TODO: Refactor to return string[].
         return [userName, ...new Set(sharedScriptIDs.map(v => sharedScriptEntities[v].username))];
     }
 );
 
-export const selectNumOwnersSelected = state => state.scripts.filters.owners.length;
-export const selectNumTypesSelected = state => state.scripts.filters.types.length;
+export const selectNumOwnersSelected = (state: RootState) => state.scripts.filters.owners.length;
+export const selectNumTypesSelected = (state: RootState) => state.scripts.filters.types.length;

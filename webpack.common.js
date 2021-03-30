@@ -5,6 +5,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HappyPack = require('happypack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const vendorDir = 'scripts/vendor';
 const libDir = 'scripts/lib';
@@ -118,7 +119,7 @@ module.exports = {
             applyEffects: path.resolve(__dirname,`${modelDir}/applyeffects.js`),
             analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
             wsapi: path.resolve(__dirname,`${modelDir}/wsapi.js`),
-            helpers: path.resolve(__dirname,`scripts/src/helpers.js`),
+            helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
             ngWrappers: path.resolve(__dirname,`${apiDir}/angular-wrappers.js`),
@@ -156,7 +157,6 @@ module.exports = {
             caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
             codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
             recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`)
-
         }
     },
     module: {
@@ -299,6 +299,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'autograderAWS/index.html'),
             template: 'autograderAWS/index.template.html'
+        }),
+        new TsconfigPathsPlugin({
+            configFile: "tsconfig.json"
         })
     ],
     optimization: {

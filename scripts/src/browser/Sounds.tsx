@@ -4,11 +4,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 import * as sounds from './soundsState';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as tabs from '../editor/tabState';
+import { RootState } from '../reducers';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 
@@ -25,7 +26,7 @@ const SoundSearchBar = () => {
 const FilterItem = ({ category, value }) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector(state => state.sounds.filters[category].includes(value));
+    const selected = isUtility ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
@@ -107,7 +108,7 @@ const ShowOnlyFavorites = () => {
                 <input
                     type="checkbox"
                     style={{margin:0}}
-                    onClick={event => dispatch(sounds.setFilterByFavorites(event.target.checked))}
+                    onClick={event => dispatch(sounds.setFilterByFavorites(event.target['checked']))}
                 />
             </div>
             <div className='pr-1'>
@@ -135,7 +136,7 @@ const AddSound = () => {
     );
 };
 
-const Clip = ({ clip, bgcolor }) => {
+const Clip: React.FC<{ clip: sounds.SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
     const dispatch = useDispatch();
     const previewFileKey = useSelector(sounds.selectPreviewFileKey);
     const fileKey = clip.file_key;
@@ -149,9 +150,10 @@ const Clip = ({ clip, bgcolor }) => {
         Original Tempo: ${clip.tempo}
         Year: ${clip.year}`.replace(/\n\s+/g,'\n');
 
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(fileKey);
-    const isUserOwned = loggedIn && clip.folder === useSelector(state => state.user.username).toUpperCase();
+    const userName = useSelector(user.selectUserName) as string;
+    const isUserOwned = loggedIn && clip.folder === userName.toUpperCase();
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
     const ideScope = tabsOpen && helpers.getNgController('ideController').scope();
 
@@ -304,9 +306,9 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
 };
 
 const WindowedRecommendations = () => {
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
-    const recommendations = useSelector(state => state.recommender.recommendations);
+    const recommendations = useSelector((state: RootState) => state.recommender.recommendations);
 
     return (
         <Collection
@@ -336,7 +338,16 @@ const WindowedRecommendations = () => {
     );
 };
 
-const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, filteredListChanged=false, visible=true, initExpanded=true }) => {
+interface WindowedSoundCollection {
+    title: string
+    folders: string[]
+    fileKeysByFolders: any
+    filteredListChanged: boolean | number
+    visible?: boolean
+    initExpanded?: boolean
+}
+
+const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, filteredListChanged=false, visible=true, initExpanded=true }) => {
     const [expanded, setExpanded] = useState(new Set());
     const listRef = useRef(null);
 
@@ -344,14 +355,15 @@ const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, filteredLi
         setExpanded(new Set());
 
         if (listRef && listRef.current) {
+            // @ts-ignore: null warning
             listRef.current.resetAfterIndex(0);
         }
     }, [filteredListChanged]);
 
-    const getItemSize = index => {
+    const getItemSize = (index: number) => {
         const folderHeight = 40;
         const clipHeight = 33;
-        return folderHeight + (expanded.has(index) && clipHeight * fileKeysByFolders[folders[index]].length);
+        return folderHeight + (expanded.has(index) ? clipHeight * fileKeysByFolders[folders[index]].length : 0);
     };
 
     return (

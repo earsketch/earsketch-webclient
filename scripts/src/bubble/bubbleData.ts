@@ -62,7 +62,10 @@ export const pages = [
     }
 ];
 
-export const sampleScript = {
+interface SampleScript {
+    [language: string]: string
+}
+export const sampleScript: SampleScript = {
     python:
 `from earsketch import *
 
@@ -114,4 +117,4 @@ makeBeat(OS_SNARE03, 3, 4, fillA);
 makeBeat(COMMON_LOVE_DRUMBEAT_1, 3, 8, fillB);
 
 finish();`
-}
+};

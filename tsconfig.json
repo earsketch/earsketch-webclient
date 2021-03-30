@@ -1,8 +1,11 @@
 {
     "compilerOptions": {
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
         "outDir": "./dist",
         "sourceMap": true,
-        "noImplicitAny": false,
         "module": "es6",
         "target": "es5",
         "jsx": "react",
@@ -10,7 +13,7 @@
         "moduleResolution": "Node",
         "baseUrl": "./scripts",
         "paths": {
-            "helpers": ["./src/helpers.js"]
+            "*": ["src/types/*.d.ts"]
         }
     }
 }
