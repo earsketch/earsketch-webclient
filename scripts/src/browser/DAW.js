@@ -16,7 +16,6 @@ let _result = null
 
 // TODO
 const vertScrollPos = 0
-const horzScrollPos = 0
 const isEmbedded = false
 
 const Header = () => {
@@ -239,7 +238,7 @@ const Header = () => {
     </div>
 }
 
-const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track }) => {
+const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, horzScrollPos }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -313,7 +312,7 @@ const Clip = ({ color, clip }) => {
             const waveform = WaveformCache.get(clip)
             drawWaveform(element.current, waveform, width, trackHeight)
         }
-    }, [clip, trackHeight])
+    }, [clip, xScale, trackHeight])
 
     return <div ref={element} className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: color, width: width + 'px', left: offset + 'px'}}>
         <div className="clipWrapper">
@@ -408,7 +407,7 @@ const Effect = ({ name, color, effect, bypass, mute }) => {
     </div>
 }
 
-const MixTrack = ({ color, bypass, toggleBypass, track }) => {
+const MixTrack = ({ color, bypass, toggleBypass, track, horzScrollPos }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -784,6 +783,21 @@ const DAW = () => {
     const playPosition = useSelector(daw.selectPlayPosition)
     const playing = useSelector(daw.selectPlaying)
 
+    const trackWidth = useSelector(daw.selectTrackWidth)
+    const trackHeight = useSelector(daw.selectTrackHeight)
+    const totalTrackHeight = useSelector(daw.selectTotalTrackHeight)
+
+    const zoomX = (steps) => {
+        dispatch(daw.setTrackWidth(Math.min(Math.max(650, trackWidth + steps * 100), 50000)))
+    }
+    const zoomY = (steps) => {
+        dispatch(daw.setTrackHeight(Math.min(Math.max(25, trackHeight + steps * 10), 125)))
+    }
+
+    const [xScroll, setXScroll] = useState(0)
+    const horzScrollPos = xScroll
+    const el = useRef()
+
     const toggleBypass = (trackIndex, effectKey) => {
         let effects = bypass[trackIndex] ?? []
         if (effects.includes(effectKey)) {
@@ -808,8 +822,6 @@ const DAW = () => {
     const codeHidden = false
     const result = true
     const hideDaw = false
-    const horzSlider = {value: 0, options: {}}
-    const vertSlider = {value: 0, options: {}}
 
     const [dragStart, setDragStart] = useState(null)
 
@@ -928,26 +940,20 @@ const DAW = () => {
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             {/* Directive sizeChanged */}
             {/* Horizontal Zoom Slider */}
-            <div id="horz-zoom-slider-container" className="flex-grow-0">
+            {/* <div id="horz-zoom-slider-container" className="flex-grow-0">
                 <span className="zoom-out">-</span>
                 <Slider value={horzSlider.value} onChange={(x) => horzSlider.value = x} options={horzSlider.options} title="Slide to zoom-in/out"/>
                 <span className="zoom-in">+</span>
-            </div>
+            </div> */}
 
-            <div className="flex-grow flex overflow-auto">
-                {/* Vertical Zoom Slider */}
-                <div id="vert-zoom-slider-container" className="flex-grow-0 h-full">
-                    <span className="zoom-out">-</span>
-                    <Slider value={vertSlider.value} onChange={(x) => vertSlider.value = x} options={vertSlider.options} title="Slide to change track height"/>
-                    <span className="zoom-in">+</span>
-                </div>
-
+            <div className="flex-grow flex h-full relative">
                 {/* DAW Container */}
-                <div className="flex-grow" id="daw-container" onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
+                <div ref={el} className="flex-grow overflow-hidden" id="daw-container" onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
                     <div className="relative">
                         {/* Effects Toggle */}
-                        <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects" onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                            {/* Directive trackEffectPanelPosition */}
+                        <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects"
+                                style={{left: horzScrollPos + 'px'}}
+                                onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
                             <span>EFFECTS</span>
                             <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
                         </button>
@@ -963,11 +969,11 @@ const DAW = () => {
                                 if (track.visible) {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
-                                                         bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} />
+                                                         bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} horzScrollPos={horzScrollPos} />
                                     } else if (index < tracks.length - 1) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
                                                       mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
-                                                      bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} />
+                                                      bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} horzScrollPos={horzScrollPos} />
                                     }
                                 }
                             })}
@@ -981,6 +987,35 @@ const DAW = () => {
                             <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
                         </div>
                     </div>
+                </div>
+
+                <div className="absolute overflow-y-scroll" style={{width: "15px", top: 0, right: "1px", bottom: "40px"}}
+                     onScroll={e => {
+                         const fracY = e.target.scrollTop / (e.target.scrollHeight - e.target.clientHeight)
+                         console.log("scrollY", fracY)
+                         el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
+                    }}>
+                    <div style={{width: "1px", height: `max(${totalTrackHeight}px, 100.5%)`}}></div>
+                </div>
+
+                <div className="absolute overflow-x-scroll" style={{height: "15px", left: "100px", right: "45px", bottom: "1px"}}
+                     onScroll={e => {
+                         const fracX = e.target.scrollLeft / (e.target.scrollWidth - e.target.clientWidth)
+                         console.log("scrollX", fracX)
+                         el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
+                         setXScroll(el.current.scrollLeft)
+                    }}>
+                    <div style={{width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px"}}></div>
+                </div>
+
+                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5">
+                    <button onClick={() => zoomX(1)} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onClick={() => zoomX(-1)} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
+                </div>
+
+                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5">
+                    <button onClick={() => zoomY(1)} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onClick={() => zoomY(-1)} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
             </div>
         </div>}

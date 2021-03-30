@@ -223,3 +223,19 @@ export const getMuted = (tracks, soloMute, metronome) => {
 
 // Returns an array of all tracks that should be muted, by index.
 export const selectMuted = createSelector([selectTracks, selectSoloMute, selectMetronome], getMuted)
+
+export const selectTotalTrackHeight = createSelector(
+    [selectTracks, selectShowEffects, selectTrackHeight, selectMixTrackHeight],
+    (tracks, effects, height, mixHeight) => {
+        let total = 0
+        tracks.forEach((track, index) => {
+            if (track.visible) {
+                total += (index === 0 ? mixHeight : height)
+                if (effects) {
+                    total += height * Object.keys(track.effects).length
+                }
+            }
+        })
+        return total
+    }
+)
