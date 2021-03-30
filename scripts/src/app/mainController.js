@@ -999,6 +999,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
         }
+        $scope.$apply();
     };
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
