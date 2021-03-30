@@ -69,6 +69,7 @@ const dawSlice = createSlice({
             on: false, // true = enable looping
             reset: false,
         },
+        autoScroll: true,
     },
     reducers: {
         setTracks(state, { payload }) {
@@ -116,6 +117,9 @@ const dawSlice = createSlice({
         setLoop(state, { payload }) {
             state.loop = payload
         },
+        setAutoScroll(state, { payload }) {
+            state.autoScroll = payload
+        },
     }
 })
 
@@ -136,6 +140,7 @@ export const {
     setSoloMute,
     setBypass,
     setLoop,
+    setAutoScroll,
 } = dawSlice.actions
 
 export const selectTracks = state => state.daw.tracks
@@ -152,6 +157,7 @@ export const selectPendingPosition = state => state.daw.pendingPosition
 export const selectSoloMute = state => state.daw.soloMute
 export const selectBypass = state => state.daw.bypass
 export const selectLoop = state => state.daw.loop
+export const selectAutoScroll = state => state.daw.autoScroll
 
 export const selectMixTrackHeight = createSelector(
     [selectTrackHeight],

@@ -448,10 +448,10 @@ app.factory('player', ['audioContext', 'applyEffects', 'ESUtils', 'esconsole', '
      * @param {float} gain The volume to play at in decibels.
      */
 
-    function setVolume(result, gain) {
+    function setVolume(gain) {
         esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER']);
-        if (result.master !== undefined) {
-            result.master.gain.setValueAtTime(applyEffects.dbToFloat(gain), context.currentTime);
+        if (context.master !== undefined) {
+            context.master.gain.setValueAtTime(applyEffects.dbToFloat(gain), context.currentTime);
         }
     }
 

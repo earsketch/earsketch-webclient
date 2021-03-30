@@ -33,6 +33,7 @@ const Header = () => {
     const metronome = useSelector(daw.selectMetronome)
     const tracks = useSelector(daw.selectTracks)
     const loop = useSelector(daw.selectLoop)
+    const autoScroll = useSelector(daw.selectAutoScroll)
 
     const playbackStartedCallback = () => {
         dispatch(daw.setPlaying(true))
@@ -75,12 +76,8 @@ const Header = () => {
         player.setOnFinishedCallback(playbackEndedCallback)
         player.play(playPosition, playLength)
 
-        // volume state is not preserved between plays
-        // if ($scope.volumeMuted) {
-        //     $scope.mute()
-        // } else {
-        //     $scope.changeVolume()
-        // }
+        // player does not preserve volume state between plays
+        player.setVolume(volumeMuted ? -60 : volume)
     }
 
     const pause = () => {
@@ -104,17 +101,27 @@ const Header = () => {
     const showFullTitle = true
     const showShortTitle = false
     const shareScriptLink = "TODO"
-    const horzOverflow = false
-    let autoScroll = true
-    const timesync = {available: true}
-    const timesyncEnabled = true
-    const volumeMuted = false
-    const volume = 0
 
     const reset = todo
-    const toggleMute = todo
-    const changeVolume = todo
-    const toggleTimesync = todo
+
+    const [volume, setVolume] = useState(0)  // in dB
+    const [volumeMuted, setVolumeMuted] = useState(false)
+    const minVolume = -20
+
+    const mute = (value) => {
+        setVolumeMuted(value)
+        player.setVolume(value ? -60 : volume)
+    }
+
+    const changeVolume = (value) => {
+        setVolume(value)
+        if (value == minVolume) {
+            mute(true)
+        } else {
+            setVolumeMuted(false)
+            player.setVolume(value)
+        }
+    }
 
     return <div id="dawHeader" className="flex-grow-0"> {/* widthExceeded directive */}
         {/* TODO: don't use bootstrap classes */}
@@ -129,67 +136,70 @@ const Header = () => {
         <div className="daw-transport-container">
             {/* Beginning */}
             <span className="daw-transport-button">
-            <button type="submit" className="btn btn-clear" data-toggle="tooltip" data-placement="bottom" title="Reset" onClick={reset}>
-                <span className="icon icon-first"></span>
-            </button>
-        </span>
-
-        <span id="daw-play-button" uib-popover-html="getPopoverContent('play')" popover-placement="bottom" popover-is-open="showDAWKeyShortcuts" popover-animation="true" popover-trigger="'none'">
-            {/* Play */}
-            {!playing && <span className="daw-transport-button">
-                <button type="submit" className="btn btn-play btn-clear" title="Play" onClick={play}>
-                    <span className="icon icon-play4"></span>
-                </button>
-            </span>}
-
-            {/* Pause */}
-            {playing && <span className="daw-transport-button">
-                <button type="submit" className="btn btn-clear" title="Pause" onClick={pause}>
-                    <span className="icon icon-pause2"></span>
-                </button>
-            </span>}
-        </span>
-
-        {/* Loop */}
-        <span className="daw-transport-button">
-            <button type="submit" className={"btn btn-clear" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Loop Project" onClick={toggleLoop}>
-                <span className="icon icon-loop"></span>
-            </button>
-        </span>
-
-        {/* Follow through */}
-        {horzOverflow && <span className="daw-transport-button follow-icon">
-            <button type="submit" className={"btn btn-clear" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Auto-scroll to follow the playback" onClick={() => autoScroll = !autoScroll}>
-                <span className="icon icon-move-up"></span>
-            </button>
-        </span>}
-
-        {/* Metronome */}
-        <span className="daw-transport-button">
-            <button id="dawMetronomeButton" className={"btn btn-clear" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
-                <span className="icon icon-meter3"></span>
-            </button>
-        </span>
-
-        {/* Time Sync */}
-        {timesync.available &&
-        <span className="daw-transport-button">
-            <button id="dawTimesyncButton" className={"btn btn-clear" + (timesyncEnabled ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Play together" data-placement="bottom" onClick={toggleTimesync}>
-                <span className="icon icon-link"></span>
-            </button>
-        </span>}
-
-        {/* Volume Control */}
-        <span className="daw-transport-button" id="volume-control">
-            <span onClick={toggleMute}>
-                <button id="muteButton" className="btn btn-clear" style={{width: "40px"}} title="Toggle Volume" data-toggle="tooltip" data-placement="bottom">
-                    <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
+                <button type="submit" className="btn btn-clear" data-toggle="tooltip" data-placement="bottom" title="Reset" onClick={reset}>
+                    <span className="icon icon-first"></span>
                 </button>
             </span>
+
+            <span id="daw-play-button" uib-popover-html="getPopoverContent('play')" popover-placement="bottom" popover-is-open="showDAWKeyShortcuts" popover-animation="true" popover-trigger="'none'">
+                {/* Play */}
+                {!playing && <span className="daw-transport-button">
+                    <button type="submit" className="btn btn-play btn-clear" title="Play" onClick={play}>
+                        <span className="icon icon-play4"></span>
+                    </button>
+                </span>}
+
+                {/* Pause */}
+                {playing && <span className="daw-transport-button">
+                    <button type="submit" className="btn btn-clear" title="Pause" onClick={pause}>
+                        <span className="icon icon-pause2"></span>
+                    </button>
+                </span>}
+            </span>
+
+            {/* Loop */}
             <span className="daw-transport-button">
-                <input id="dawVolumeSlider" type="range" min="-20" max="0" value={volume} onChange={changeVolume} />
+                <button type="submit" className={"btn btn-clear" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Loop Project" onClick={toggleLoop}>
+                    <span className="icon icon-loop"></span>
+                </button>
             </span>
-        </span>
+
+            {/* Follow through 
+                NOTE: In Angular implementation, this was conditional on `horzOverflow`, but it was 'always on for now'.
+                Hence, I have simply made it unconditional here. */}
+            <span className="daw-transport-button follow-icon">
+                <button type="submit" className={"btn btn-clear" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Auto-scroll to follow the playback" onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+                    <span className="icon icon-move-up"></span>
+                </button>
+            </span>
+
+            {/* Metronome */}
+            <span className="daw-transport-button">
+                <button id="dawMetronomeButton" className={"btn btn-clear" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
+                    <span className="icon icon-meter3"></span>
+                </button>
+            </span>
+
+            {/* Time Sync
+                TODO: Is this a real, supported feature? */}
+            {/* {timesync.available &&
+            <span className="daw-transport-button">
+                <button id="dawTimesyncButton" className={"btn btn-clear" + (timesyncEnabled ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Play together" data-placement="bottom" onClick={toggleTimesync}>
+                    <span className="icon icon-link"></span>
+                </button>
+            </span>} */}
+
+            {/* Volume Control */}
+            <span className="daw-transport-button" id="volume-control">
+                <span onClick={() => mute(!volumeMuted)}>
+                    <button id="muteButton" className="btn btn-clear" style={{width: "40px"}} title="Toggle Volume" data-toggle="tooltip" data-placement="bottom">
+                        <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
+                    </button>
+                </span>
+                <span className="daw-transport-button">
+                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(e.target.value)} />
+                </span>
+            </span>
         </div>
     </div>
 }
@@ -872,6 +882,8 @@ const DAW = () => {
             setLoop({...loop, selection: false, start: measure, end: measure})
         }
     }
+
+    // TODO: Autoscroll via useEffect.
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
         {isEmbedded && codeHidden &&
