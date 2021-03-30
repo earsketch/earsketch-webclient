@@ -18,7 +18,6 @@ let _result = null
 const vertScrollPos = 0
 const horzScrollPos = 0
 const isEmbedded = false
-const todo = (...args) => undefined // console.log("TODO", args)
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -102,8 +101,6 @@ const Header = () => {
     const showShortTitle = false
     const shareScriptLink = "TODO"
 
-    const reset = todo
-
     const [volume, setVolume] = useState(0)  // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
     const minVolume = -20
@@ -120,6 +117,18 @@ const Header = () => {
         } else {
             setVolumeMuted(false)
             player.setVolume(value)
+        }
+    }
+
+    const reset = () => {
+        // Rewind to start (of loop or timeline).
+        const pos = loop.selection ? loop.start : 1
+        player.setPosition(pos)
+
+        if (playing) {
+            dispatch(daw.setPendingPosition(pos))
+        } else {
+            dispatch(daw.setPlayPosition(pos))
         }
     }
 
@@ -415,7 +424,6 @@ const Playhead = () => {
     const dispatch = useDispatch()
     const playing = useSelector(daw.selectPlaying)
     const playPosition = useSelector(daw.selectPlayPosition)
-    const pendingPosition = useSelector(daw.selectPendingPosition)
     const xScale = useSelector(daw.selectXScale)
     useEffect(() => {
         if (playing) {
@@ -424,7 +432,7 @@ const Playhead = () => {
             return () => clearInterval(interval)
         }
     }, [playing])
-    return pendingPosition === null && <div className="daw-marker" style={{top: vertScrollPos + 'px', left: xScale(playPosition) + 'px'}}></div>
+    return <div className="daw-marker" style={{top: vertScrollPos + 'px', left: xScale(playPosition) + 'px'}}></div>
 }
 
 const SchedPlayhead = () => {
