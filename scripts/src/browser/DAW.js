@@ -96,9 +96,6 @@ const Header = () => {
     }
 
     // TODO
-    const showIcon = true
-    const showFullTitle = true
-    const showShortTitle = false
     const shareScriptLink = "TODO"
 
     const [volume, setVolume] = useState(0)  // in dB
@@ -132,11 +129,40 @@ const Header = () => {
         }
     }
 
-    return <div id="dawHeader" className="flex-grow-0"> {/* widthExceeded directive */}
+    const [decoration, setDecoration] = useState({title: "full", icon: true})
+
+    const el = useRef()
+    const handleResize = () => {
+        const width = el.current.offsetWidth
+        if (isEmbedded) {
+            setDecoration({title: "short", icon: true})
+        } else if (width > 540) {
+            setDecoration({title: "full", icon: true})
+        } else if (width > 412) {
+            setDecoration({title: "short", icon: true})
+        } else if (width > 375) {
+            setDecoration({title: "none", icon: true})
+        } else {
+            setDecoration({title: "none", icon: false})
+        }
+    }
+
+    // TODO: How to trigger this whenever the element resizes? Do we already have a preferred library for this?
+    useEffect(() => {
+        window.addEventListener('resize', handleResize)
+        handleResize()
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
+
+    return <div ref={el} id="dawHeader" className="flex-grow-0"> {/* widthExceeded directive */}
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
-            <span className="panel-label">{showIcon && <span className="icon icon-DAW-Icon"></span>}{showFullTitle && <span>Digital Audio Workstation</span>}{showShortTitle && <span>DAW</span>}</span>
+            <span className="panel-label">{decoration.icon && <span className="icon icon-DAW-Icon"></span>}
+                {decoration.title === "full"
+                ? <span>Digital Audio Workstation</span>
+                : (decoration.title === "short" && <span>DAW</span>)}
+            </span>
         </div>
         {isEmbedded && <div>
             <a target="_blank" href={shareScriptLink}> Click Here to view in EarSketch </a>
