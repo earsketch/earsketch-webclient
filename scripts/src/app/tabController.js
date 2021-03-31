@@ -470,6 +470,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             if (newTabIndex >= 0 ) {
                 if ($scope.tabs.length) {
                     $scope.activeTabID = $scope.tabs[newTabIndex].shareid;
+                    $ngRedux.dispatch(tabs.setActiveTabAndEditor($scope.activeTabID));
                     $ngRedux.dispatch(tabs.setOpenTabs($scope.tabs.map(v => v.shareid)));
                     $ngRedux.dispatch(tabs.setActiveTabID($scope.activeTabID));
                 }

@@ -72,7 +72,7 @@ const Tab = ({ scriptID, scriptName, index }) => {
             className={tabClass}
             key={scriptID}
             onClick={() => {
-                dispatch(tabs.setActiveTabAndEditor(scriptID));
+                //dispatch(tabs.setActiveTabAndEditor(scriptID));
 
                 // TODO: This triggers clearHistory
                 ngTabControllerScope.swapTab(index);
