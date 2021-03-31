@@ -1,4 +1,4 @@
-import React, { useState, useEffect, LegacyRef, ReactChild } from 'react';
+import React, { useState, useEffect, LegacyRef, ChangeEventHandler, MouseEventHandler } from 'react';
 import { Store } from 'Redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
@@ -91,7 +91,12 @@ export const Header = ({ title }: { title: string }) => (
     <div className={'p-3 text-2xl hidden'}>{title}</div>
 );
 
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }) => {
+interface SearchBarProps {
+    searchText: string
+    dispatchSearch: ChangeEventHandler<HTMLInputElement>
+    dispatchReset: MouseEventHandler<HTMLElement>
+}
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme);
     return (
         <form className='p-3 pb-1' onSubmit={e => e.preventDefault()}>
@@ -129,17 +134,16 @@ interface DropdownMultiSelectorProps {
 export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ title, category, items, position, numSelected, FilterItem }) => {
     const theme = useSelector(appState.selectColorTheme);
     const [showTooltip, setShowTooltip] = useState(false);
-    const [referenceElement, setReferenceElement] = useState(null);
-    const [popperElement, setPopperElement] = useState(null);
+    const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null);
+    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null);
     const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
         modifiers: [{ name: 'offset', options: { offset: [0,5] } }]
     });
 
-    const handleClick = event => {
+    const handleClick = (event: Event & { target: HTMLElement }) => {
         setPopperElement(ref => {
             setReferenceElement(rref => {
                 // TODO: Pretty hacky way to get the non-null (popper-initialized) multiple refs. Refactor if possible.
-                // @ts-ignore: ref.contains and rref.contains throw null warnings
                 if (ref && rref && !ref.contains(event.target) && !rref.contains(event.target)) {
                     setShowTooltip(false);
                 }
@@ -288,7 +292,7 @@ export const Collapsed:React.FC<{ position:'west'|'east', title?:string|void }> 
 };
 
 // Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
-const BrowserComponents = {
+const BrowserComponents: { [key:string]: React.FC } = {
     SOUNDS: SoundBrowser,
     SCRIPTS: ScriptBrowser,
     API: APIBrowser

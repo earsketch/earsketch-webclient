@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import * as layout from '../layout/layoutState'
+import { RootState, ThunkAPI } from '../reducers'
+import angular from 'angular';
 
-export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
+export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
     const {href: _url, loc: _location} = fixLocation(url, location)
     dispatch(loadChapter({location: _location}))
@@ -31,13 +33,13 @@ const processContent = (location, html, dispatch) => {
     root.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
 
     // Fix internal cross-references.
-    root.querySelectorAll('a[href^="#"]').forEach(el => {
+    root.querySelectorAll('a[href^="#"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2)] + el.getAttribute("href") }))
         }
     })
-    root.querySelectorAll('a[data-es-internallink="true"]').forEach(el => {
+    root.querySelectorAll('a[data-es-internallink="true"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: el.getAttribute("href") }))
@@ -45,7 +47,7 @@ const processContent = (location, html, dispatch) => {
     })
 
     // Used in 4.1, 27.
-    root.querySelectorAll('a[href="<api>"]').forEach(el => {
+    root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(layout.openWest("API"))
@@ -77,17 +79,28 @@ const processContent = (location, html, dispatch) => {
     }
 
     // Chop the chapter up into sections.
-    const body = root.querySelector('div.sect1').parentNode
+    const sect1 = root.querySelector('div.sect1')
+    const body = sect1 ? sect1.parentNode : null
     // Special case: first section (sect2) should come with the opening blurb (sect1).
     // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
     const chapterLocation = location.slice(0, 2)
     const map = {}
-    for (let [idx, el] of [...root.querySelectorAll('div.sect2')].slice(1).entries()) {
+    const sect2 = Array.from(root.querySelectorAll('div.sect2'))
+    for (let [idx, el] of sect2.slice(1).entries()) {
         map[chapterLocation.concat([idx + 1])] = el
         el.remove()
     }
     map[chapterLocation.concat([0])] = body
     return map
+}
+
+interface CurriculumState {
+    searchText: string
+    showResults: boolean
+    currentLocation: number[]
+    focus: [string|null, string|null]
+    showTableOfContents: boolean
+    contentCache: any
 }
 
 const curriculumSlice = createSlice({
@@ -99,7 +112,7 @@ const curriculumSlice = createSlice({
         focus: [null, null], // unit, chapter
         showTableOfContents: false,
         contentCache: {},
-    },
+    } as CurriculumState,
     reducers: {
         setSearchText(state, { payload }) {
             state.searchText = payload
@@ -135,14 +148,15 @@ const curriculumSlice = createSlice({
             state.showResults = payload
         },
     },
-    extraReducers: {
-        [fetchContent.fulfilled]: (state, action) => {
+    extraReducers: builder => {
+        builder.addCase(fetchContent.fulfilled, (state: CurriculumState, action: { payload: any }) => {
             // Update the cache.
-            state.contentCache = {...state.contentCache, ...action.payload}   
-        },
-        [fetchContent.rejected]: (...args) => {
+            state.contentCache = {...state.contentCache, ...action.payload}
+        })
+
+        builder.addCase(fetchContent.rejected, (...args) => {
             esconsole("Fetch failed! " + JSON.stringify(args), 'error')
-        }
+        })
     }
 })
 
@@ -156,17 +170,17 @@ export const {
     showResults,
 } = curriculumSlice.actions
 
-export const selectSearchText = state => state.curriculum.searchText
+export const selectSearchText = (state: RootState) => state.curriculum.searchText
 
-export const selectShowResults = state => state.curriculum.showResults
+export const selectShowResults = (state: RootState) => state.curriculum.showResults
 
-export const selectCurrentLocation = state => state.curriculum.currentLocation
+export const selectCurrentLocation = (state: RootState) => state.curriculum.currentLocation
 
-export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
+export const selectContent = (state: RootState) => state.curriculum.contentCache[state.curriculum.currentLocation.join(',')]
 
-export const selectShowTableOfContents = state => state.curriculum.showTableOfContents
+export const selectShowTableOfContents = (state: RootState) => state.curriculum.showTableOfContents
 
-export const selectFocus = state => state.curriculum.focus
+export const selectFocus = (state: RootState) => state.curriculum.focus
 
 // Search through chapter descriptions.
 const documents = ESCurr_SearchDoc
@@ -270,18 +284,25 @@ export const adjustLocation = (location, delta) => {
     return tocPages[pageIdx]
 }
 
+export interface TOCItem {
+    URL: string
+    title: string
+    sections?: any[]
+    chapters?: any[]
+    displayChNum?: number
+}
 
 const urlToLocation = {}
 const locationToUrl = {}
-toc.forEach((unit, unitIdx) => {
+toc.forEach((unit: TOCItem, unitIdx: number) => {
     urlToLocation[unit.URL] = [unitIdx]
-    locationToUrl[[unitIdx]] = unit.URL
-    unit.chapters.forEach((ch, chIdx) => {
+    locationToUrl[[unitIdx].join(',')] = unit.URL
+    unit.chapters && unit.chapters.forEach((ch, chIdx) => {
         urlToLocation[ch.URL] = [unitIdx, chIdx]
-        locationToUrl[[unitIdx, chIdx]] = ch.URL
+        locationToUrl[[unitIdx, chIdx].join(',')] = ch.URL
         ch.sections.forEach((sec, secIdx) => {
             urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
-            locationToUrl[[unitIdx, chIdx, secIdx]] = sec.URL
+            locationToUrl[[unitIdx, chIdx, secIdx].join(',')] = sec.URL
         })
     })
 })

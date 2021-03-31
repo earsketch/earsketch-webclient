@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { VariableSizeList as List } from 'react-window';
@@ -10,20 +10,21 @@ import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as tabs from '../editor/tabState';
 import { RootState } from '../reducers';
+import { SoundEntity } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch();
     const searchText = useSelector(sounds.selectSearchText);
-    const dispatchSearch = event => dispatch(sounds.setSearchText(event.target.value));
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value));
     const dispatchReset = () => dispatch(sounds.setSearchText(''));
     const props = { searchText, dispatchSearch, dispatchReset };
 
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }) => {
+const FilterItem = ({ category, value }: { category: keyof sounds.Filters, value: string }) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
     const selected = isUtility ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value));
@@ -108,7 +109,10 @@ const ShowOnlyFavorites = () => {
                 <input
                     type="checkbox"
                     style={{margin:0}}
-                    onClick={event => dispatch(sounds.setFilterByFavorites(event.target['checked']))}
+                    onClick={(event: MouseEvent) => {
+                        const elem = event.target as HTMLInputElement;
+                        dispatch(sounds.setFilterByFavorites(elem.checked));
+                    }}
                 />
             </div>
             <div className='pr-1'>
@@ -136,7 +140,7 @@ const AddSound = () => {
     );
 };
 
-const Clip: React.FC<{ clip: sounds.SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
+const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
     const dispatch = useDispatch();
     const previewFileKey = useSelector(sounds.selectPreviewFileKey);
     const fileKey = clip.file_key;
@@ -235,14 +239,14 @@ const Clip: React.FC<{ clip: sounds.SoundEntity, bgcolor: string }> = ({ clip, b
     );
 };
 
-const ClipList = ({ fileKeys }) => {
+const ClipList = ({ fileKeys }: { fileKeys: string[] }) => {
     const entities = useSelector(sounds.selectAllEntities);
     const theme = useSelector(appState.selectColorTheme);
 
     return (
         <div className='flex flex-col'>
             {
-                fileKeys && fileKeys.map(v =>
+                fileKeys && fileKeys.map((v: string) =>
                     <Clip
                         key={v} clip={entities[v]}
                         bgcolor={theme==='light' ? 'bg-white' : 'bg-gray-900'}
@@ -253,7 +257,17 @@ const ClipList = ({ fileKeys }) => {
     );
 };
 
-const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }) => {
+interface Folder {
+    folder: string,
+    fileKeys: string[],
+    bgTint: boolean,
+    index: number,
+    expanded: boolean,
+    setExpanded: React.Dispatch<React.SetStateAction<Set<number>>>
+    listRef: React.RefObject<any>
+}
+
+const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }: Folder) => {
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
 
@@ -278,7 +292,7 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
                 className={`flex flex-grow truncate justify-between items-center p-3 text-2xl ${bgColor} cursor-pointer border-b border-r ${theme==='light' ? 'border-gray-500' : 'border-gray-700'}`}
                 title={folder}
                 onClick={() => {
-                    setExpanded(v => {
+                    setExpanded((v: Set<number>) => {
                         if (expanded) {
                             v.delete(index);
                             return new Set(v);
@@ -349,13 +363,12 @@ interface WindowedSoundCollection {
 
 const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, filteredListChanged=false, visible=true, initExpanded=true }) => {
     const [expanded, setExpanded] = useState(new Set());
-    const listRef = useRef(null);
+    const listRef = useRef<List>(null);
 
     useEffect(() => {
         setExpanded(new Set());
 
         if (listRef && listRef.current) {
-            // @ts-ignore: null warning
             listRef.current.resetAfterIndex(0);
         }
     }, [filteredListChanged]);

@@ -2,8 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
 import * as helpers from '../helpers';
 import { sampleScript } from "./bubbleData";
-import { ScriptEntity } from '../browser/scriptsState';
 import { RootState } from '../reducers';
+import { ScriptEntity } from 'common';
 
 interface BubbleState {
     active: boolean
@@ -123,4 +123,3 @@ export const proceed = createAsyncThunk(
 export const selectBubbleActive = (state: RootState) => state.bubble.active;
 export const selectCurrentPage = (state: RootState) => state.bubble.currentPage;
 export const selectReadyToProceed = (state: RootState) => state.bubble.readyToProceed;
-export const selectLanguage = (state: RootState) => state.bubble.language;

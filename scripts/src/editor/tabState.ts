@@ -96,7 +96,7 @@ export const selectVisibleTabs = createSelector(
 
 export const selectHiddenTabs = createSelector(
     [selectOpenTabs, selectVisibleTabs],
-    (openTabs, visibleTabs) => openTabs.filter(tab => !visibleTabs.includes(tab))
+    (openTabs: string[], visibleTabs: string[]) => openTabs.filter((tab: string) => !visibleTabs.includes(tab))
 );
 
 export const selectModifiedScripts = (state: RootState) => state.tabs.modifiedScripts;
@@ -139,7 +139,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
 export const closeDeletedScript = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/closeDeletedScript',
     (scriptID, { getState, dispatch }) => {
-        const openTabs = selectOpenTabs(getState());
+        const openTabs: string[] = selectOpenTabs(getState());
         if (openTabs.includes(scriptID)) {
             const filteredOpenTabs = openTabs.filter(v => v !== scriptID);
             dispatch(setOpenTabs(filteredOpenTabs));

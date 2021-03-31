@@ -9,22 +9,23 @@ import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
 import * as tabs from "../editor/tabState";
 import * as helpers from "../helpers";
+import { ScriptEntity, ScriptType } from 'common';
 
-export const openScript = script => {
+export const openScript = (script: ScriptEntity) => {
     const userProject = helpers.getNgService('userProject');
     const rootScope = helpers.getNgRootScope();
     userProject.openScript(script.shareid);
     rootScope.$broadcast('selectScript', script.shareid);
 };
 
-export const openSharedScript = script => {
+export const openSharedScript = (script: ScriptEntity) => {
     const userProject = helpers.getNgService('userProject');
     const rootScope = helpers.getNgRootScope();
     userProject.openSharedScript(script.shareid);
     rootScope.$broadcast('selectSharedScript', script);
 };
 
-export const shareScript = script => {
+export const shareScript = (script: ScriptEntity) => {
     const scope = helpers.getNgMainController().scope();
     scope.shareScript(Object.assign({}, script));
 };
@@ -55,7 +56,15 @@ export class VirtualRef {
     }
 }
 
-const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }) => {
+interface MenuItemProps {
+    name: string
+    icon: string
+    onClick: Function
+    disabled?: boolean
+    visible?: boolean
+}
+
+const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }: MenuItemProps) => {
     const [highlight, setHighlight] = useState(false);
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
@@ -99,15 +108,14 @@ const SingletonDropdownMenu = () => {
     const loggedIn = useSelector(user.selectLoggedIn);
     const openTabs = useSelector(tabs.selectOpenTabs);
 
-    const [popperElement, setPopperElement] = useState(null);
+    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null);
     const { styles, attributes, update } = usePopper(dropdownMenuVirtualRef, popperElement);
     dropdownMenuVirtualRef.updatePopper = update;
 
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = event => {
+    const handleClickAsync: EventListener = (event: Event & { target: HTMLElement, button: number }) => {
         setPopperElement(ref => {
-            // @ts-ignore
-            if (!ref.contains(event.target) && event.button===0) {
+            if (ref && !ref.contains(event.target) && event.button===0) {
                 dispatch(scripts.resetDropdownMenuAsync());
             }
             return ref;
@@ -142,9 +150,9 @@ const SingletonDropdownMenu = () => {
                 visible={!context}
                 onClick={() => {
                     if (type==='regular') {
-                        openScript(script);
+                        script && openScript(script);
                     } else if (type==='shared') {
-                        openSharedScript(script);
+                        script && openSharedScript(script);
                     }
                 }}
             />
@@ -250,7 +258,7 @@ const SingletonDropdownMenu = () => {
     );
 };
 
-export const DropdownMenuCaller = ({ script, type }) => {
+export const DropdownMenuCaller = ({ script, type }: { script: ScriptEntity, type: ScriptType }) => {
     const dispatch = useDispatch();
 
     return (
@@ -272,8 +280,8 @@ export const DropdownMenuCaller = ({ script, type }) => {
 };
 
 interface DropdownContextMenuCallerType {
-    script: scripts.ScriptEntity
-    type: scripts.ScriptType
+    script: ScriptEntity
+    type: ScriptType
     className: string
 }
 

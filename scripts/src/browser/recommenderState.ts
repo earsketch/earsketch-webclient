@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../reducers';
 
 interface RecommenderState {
     recommendations: string[],
@@ -48,8 +47,3 @@ export const {
     setRecommendations,
     resetRecommendations
 } = recommenderSlice.actions;
-
-export const selectLabels = (state: RootState) => {
-    const data = state.recommender;
-    return data.typeIDs.map(v => data.typeInformation.labels[v]);
-};

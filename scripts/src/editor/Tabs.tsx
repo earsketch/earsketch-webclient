@@ -135,7 +135,7 @@ const MainTabGroup = () => {
             className={`flex items-center truncate`}
         >
             {
-                visibleTabs.map(ID => allScripts[ID] &&(
+                visibleTabs.map((ID: string) => allScripts[ID] &&(
                     <Tab
                         scriptID={ID}
                         scriptName={allScripts[ID].name}
@@ -191,7 +191,7 @@ const TabDropdown = () => {
             className={`border border-black z-50 bg-white`}
         >
             {
-                hiddenTabs.map(ID => allScripts[ID] && (
+                hiddenTabs.map((ID: string) => allScripts[ID] && (
                     <Tab
                         scriptID={ID}
                         scriptName={allScripts[ID].name}
@@ -215,7 +215,7 @@ const Tabs = () => {
     const tabWidth = 120;
     const createButtonWidth = 35;
     const dropdownWidth = 95;
-    const containerRef = useRef(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // Note: Manually compute the visible tabs from the content width.
     // IntersectionObserver API would be more desirable but it is hard to accommodate the appended createButton and dropdown menu.
@@ -225,11 +225,9 @@ const Tabs = () => {
         dispatch(tabs.setNumVisibleTabs(cutoff));
     });
     useEffect(() => {
-        // @ts-ignore: null warning cannot be suppressed?
         containerRef.current && observer.observe(containerRef.current);
 
         return () => {
-            // @ts-ignore
             containerRef.current && observer.unobserve(containerRef.current);
         }
     }, [containerRef, openTabs, truncated]);

@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, MutableRefObject } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
+import { ClipboardService } from 'angular-clipboard'
 
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
@@ -11,21 +12,23 @@ import * as layout from '../layout/layoutState'
 const toc = ESCurr_TOC
 const tocPages = ESCurr_Pages
 
-let clipboard = null
-
+let clipboard: ClipboardService|null = null
 
 const copyURL = (language, currentLocation) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
-    clipboard.copyText(url)
+    clipboard && clipboard.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
-const useHeightLimiter = (show, marginBottom) => {
+const useHeightLimiter = (show, marginBottom:string|null=null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
     const [height, setHeight] = useState('100vh')
-    const el = useRef()
+    const el = useRef<HTMLDivElement|null>(null)
 
-    const handleResize = () => setHeight(`calc(100vh - ${el.current.getBoundingClientRect().top}px${marginBottom ? ' - ' + marginBottom : ''})`)
+    const handleResize = () => {
+        const elem = el.current
+        elem && setHeight(`calc(100vh - ${elem.getBoundingClientRect().top}px${marginBottom ? ' - ' + marginBottom : ''})`)
+    }
 
     useEffect(() => {
         if (show) {
@@ -43,20 +46,20 @@ const TableOfContentsChapter = ({ unit, unitIdx, ch, chIdx }) => {
     const focus = useSelector(curriculum.selectFocus)
     const theme = useSelector(appState.selectColorTheme)
     const textClass = 'text-' + (theme === 'light' ? 'black' : 'white')
-    const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx, ch.title, unit.withIntro)
+    const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
     return (
         <li className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
             <div className="toc-item">
                 &emsp;
                 {ch.sections.length > 0 &&
-                <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`}></i></button>}
+                <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`} /></button>}
                 <a href="#" className={textClass} onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
                     {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                 </a>
             </div>
             <ul>
                 {focus[1] == chIdx &&
-                Object.entries(ch.sections).map(([secIdx, sec]) =>
+                Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li key={secIdx} className="toc-sections py-1">
                         <div className="toc-item">
                             &emsp;&emsp;
@@ -81,15 +84,15 @@ const TableOfContents = () => {
             <div className="inline-block font-bold text-center w-full">Table of Contents</div>
             <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />
             <ul id="toc" className="select-none">
-            {Object.entries(toc).map(([unitIdx, unit]) => (
+            {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
                 <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                     <div className="toc-item">
-                        {unit.chapters.length > 0 &&
-                        <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`}></i></button>}
+                        {unit.chapters && unit.chapters.length > 0 &&
+                        <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`} /></button>}
                         <a href="#" className={textClass} onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
                     </div>
                     <ul>
-                        {focus[0] === unitIdx &&
+                        {focus[0] === unitIdx && unit.chapters &&
                         Object.entries(unit.chapters).map(([chIdx, ch]) => <TableOfContentsChapter key={chIdx} {...{unit, unitIdx, ch, chIdx}} />)}
                     </ul>
                 </li>
@@ -105,13 +108,13 @@ const CurriculumHeader = () => {
 
     return (
         <div id="curriculum-header" style={{position: 'relative'}}>
-            <TitleBar></TitleBar>
-            <NavigationBar></NavigationBar>
+            <TitleBar />
+            <NavigationBar />
 
             <div onFocus={() => dispatch(curriculum.showResults(true))}
-                 onBlur={e => (!e.currentTarget.contains(e.relatedTarget)) && dispatch(curriculum.showResults(false)) }>
-                <CurriculumSearchBar></CurriculumSearchBar>
-                <CurriculumSearchResults></CurriculumSearchResults>
+                 onBlur={(e: React.FocusEvent<HTMLDivElement>) => (!e.currentTarget.contains(e.relatedTarget as Node)) && dispatch(curriculum.showResults(false)) }>
+                <CurriculumSearchBar />
+                <CurriculumSearchResults />
             </div>
         </div>
     )
@@ -122,7 +125,7 @@ const CurriculumSearchBar = () => {
     const searchText = useSelector(curriculum.selectSearchText)
     const dispatchSearch = (event) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(''))
-    return <SearchBar {... {searchText, dispatchSearch, dispatchReset}}></SearchBar>
+    return <SearchBar {... {searchText, dispatchSearch, dispatchReset}} />
 }
 
 const CurriculumSearchResults = () => {
@@ -132,14 +135,14 @@ const CurriculumSearchResults = () => {
     const theme = useSelector(appState.selectColorTheme)
     const [resultsRef, resultsStyle] = useHeightLimiter(showResults)
 
-    return (showResults &&
+    return showResults ? (
         <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
-            <a tabIndex="0" key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
+            <a tabIndex={0} key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                 <div className={`px-5 py-2 search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
             </a>)}
         </div>
-    )
+    ) : null
 }
 
 export const TitleBar = () => {
@@ -170,7 +173,7 @@ export const TitleBar = () => {
                         onClick={() => {
                             const newLanguage = (language === 'python' ? 'javascript' : 'python')
                             // TODO: Remove angular $broadcast after moving other components to React.
-                            $rootScope.$broadcast('language', newLanguage)
+                            $rootScope && $rootScope.$broadcast('language', newLanguage)
                             dispatch(appState.setScriptLanguage(newLanguage))
                         }}>
                     {language === 'python' ? 'PY' : 'JS'}
@@ -186,7 +189,7 @@ const CurriculumPane = () => {
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
-    const curriculumBody = useRef()
+    const curriculumBody = useRef<HTMLElement>(null)
 
     useEffect(() => {
         if (content && curriculumBody.current) {
@@ -229,14 +232,14 @@ const CurriculumPane = () => {
 
     return paneIsOpen ? (
         <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
-            <CurriculumHeader></CurriculumHeader>
+            <CurriculumHeader />
 
             <div id="curriculum" className={theme === 'light' ? 'curriculum-light' : 'dark'} style={{fontSize}}>
                 {content ? 
-                  <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-8 h-full max-w-none overflow-y-auto" style={{fontSize}}></article>
+                  <article ref={curriculumBody} id="curriculum-body" className="prose dark:prose-dark px-8 h-full max-w-none overflow-y-auto" style={{fontSize}} />
                 : <div>
                       <div className="text-4xl text-center py-16">Loading curriculum...</div>
-                      <div className="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}}></div>
+                      <div className="loading-spinner" style={{width: '90px', height: '90px', borderWidth: '9px'}} />
                   </div>}
             </div>
         </div>
@@ -250,7 +253,7 @@ const NavigationBar = () => {
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)
-    const triggerRef = useRef(null)
+    const triggerRef = useRef<HTMLButtonElement>(null)
     const [highlight, setHighlight] = useState(false)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, '8px')
 
@@ -273,35 +276,35 @@ const NavigationBar = () => {
                  onMouseEnter={() => setHighlight(true)}
                  onMouseLeave={() => setHighlight(false)}>
                 {((location + "") === (tocPages[0] + "")) ?
-                    <span></span>
+                    <span />
                 : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
-                    <i className="icon icon-arrow-left2"></i>
+                    <i className="icon icon-arrow-left2" />
                     </button>}
                 <button ref={triggerRef} className="w-full" title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
                     {pageTitle}
                     <i className='icon icon-arrow-down2 text-lg p-2' />
                 </button>
                 {((location + "") === (tocPages[tocPages.length-1] + "")) ?
-                    <span></span>
+                    <span />
                 : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
-                    <i className="icon icon-arrow-right2"></i>
+                    <i className="icon icon-arrow-right2" />
                     </button>}
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? '' : 'hidden'}`}>
                 <div ref={dropdownRef} style={tocStyle}
                      className={`w-full pointer-events-auto p-5 border border-black bg-${theme === 'light' ? 'white' : 'black'}`}>
-                    <TableOfContents></TableOfContents>
+                    <TableOfContents />
                 </div>
             </div>
             <div className="w-full" style={{height: '7px'}}>
-                <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}}></div>
+                <div className="h-full" style={{width: progress * 100 + '%', backgroundColor: '#5872AD'}} />
             </div>
         </>
     )
 }
 
 let initialized = false
-let $rootScope = null
+let $rootScope: angular.IRootScopeService & { loadChapterForError: any } | null = null
 
 const HotCurriculum = hot(props => {
     if (!initialized) {
@@ -330,25 +333,28 @@ const HotCurriculum = hot(props => {
         $rootScope = props.$rootScope
         // TODO: Remove angular $broadcast after moving other components to React.
         const language = props.$ngRedux.getState().app.scriptLanguage
-        $rootScope.$broadcast('language', language)
 
-        // Hack to facilitate Angular loading curriculum page for errors in console.
-        // TODO: Remove this after we've ported templates/index.html to React.
-        $rootScope.loadChapterForError = (errorMessage) => {
-            const aliases = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
-            const types = ["importerror", "indentationerror", "indexerror", "nameerror",
-                           "parseerror", "syntaxerror", "typeerror", "valueerror"]
-            let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
-            type = aliases[type] || type
-            const anchor = types.includes(type) ? '#' + type : ''
-            props.$ngRedux.dispatch(curriculum.fetchContent({ url: `every-error-explained-in-detail.html${anchor}` }))
+        if ($rootScope) {
+            $rootScope.$broadcast('language', language)
+
+            // Hack to facilitate Angular loading curriculum page for errors in console.
+            // TODO: Remove this after we've ported templates/index.html to React.
+            $rootScope.loadChapterForError = (errorMessage) => {
+                const aliases = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
+                const types = ["importerror", "indentationerror", "indexerror", "nameerror",
+                    "parseerror", "syntaxerror", "typeerror", "valueerror"]
+                let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+                type = aliases[type] || type
+                const anchor = types.includes(type) ? '#' + type : ''
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url: `every-error-explained-in-detail.html${anchor}` }))
+            }
+            initialized = true
         }
-        initialized = true
     }
 
     return (
         <Provider store={props.$ngRedux}>
-            <CurriculumPane></CurriculumPane>
+            <CurriculumPane />
         </Provider>
     )
 })

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, LegacyRef } from 'react';
+import React, {useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { FixedSizeList as List } from 'react-window';
@@ -11,6 +11,7 @@ import * as tabs from '../editor/tabState';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import { RootState } from '../reducers';
+import { ScriptEntity, ScriptType } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 import {
@@ -40,14 +41,14 @@ const CreateScriptButton = () => {
 const ScriptSearchBar = () => {
     const dispatch = useDispatch();
     const searchText = useSelector(scripts.selectSearchText);
-    const dispatchSearch = event => dispatch(scripts.setSearchText(event.target.value));
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value));
     const dispatchReset = () => dispatch(scripts.setSearchText(''));
     const props = { searchText, dispatchSearch, dispatchReset };
 
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }) => {
+const FilterItem = ({ category, value }: { category: keyof scripts.Filters, value: string }) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
     const selected = isUtility ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
@@ -78,7 +79,7 @@ const FilterItem = ({ category, value }) => {
     );
 };
 
-const SortOptionsItem = ({ value }) => {
+const SortOptionsItem = ({ value }: { value: scripts.SortByAttribute | 'Clear'}) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
     const selected = isUtility ? false : useSelector(scripts.selectSortByAttribute)===value;
@@ -154,7 +155,10 @@ const ShowDeletedScripts = () => {
                 <input
                     type="checkbox"
                     style={{margin:0}}
-                    onClick={event => dispatch(scripts.setShowDeleted(event.target['checked']))}
+                    onClick={(event: MouseEvent) => {
+                        const elem = event.target as HTMLInputElement;
+                        dispatch(scripts.setShowDeleted(elem.checked));
+                    }}
                 />
             </div>
             <div className='pr-1'>
@@ -190,7 +194,7 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     );
 };
 
-const ShareButton = ({ script }) => (
+const ShareButton = ({ script }: { script: ScriptEntity }) => (
     <PillButton onClick={() => {
         shareScript(script);
     }}>
@@ -199,7 +203,7 @@ const ShareButton = ({ script }) => (
     </PillButton>
 );
 
-const RestoreButton = ({ script }) => {
+const RestoreButton = ({ script }: { script: ScriptEntity }) => {
     const dispatch = useDispatch();
     return (
         <PillButton onClick={async () => {
@@ -215,7 +219,7 @@ const RestoreButton = ({ script }) => {
 
 const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference;
 
-const SharedScriptInfoItem = ({ title, body }) => {
+const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) => {
     const theme = useSelector(appState.selectColorTheme);
 
     return (
@@ -232,15 +236,14 @@ const SingletonSharedScriptInfo = () => {
     const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo);
     const script = useSelector(scripts.selectSharedInfoScript);
 
-    const [popperElement, setPopperElement] = useState(null);
+    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null);
     const { styles, attributes, update } = usePopper(sharedInfoPanelVirtualRef, popperElement);
     sharedInfoPanelVirtualRef.updatePopper = update;
 
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = event => {
+    const handleClickAsync = (event: Event & { target: HTMLElement }) => {
         setPopperElement(ref => {
-            // @ts-ignore: null warning
-            if (!ref.contains(event.target)) {
+            if (ref && !ref.contains(event.target)) {
                 dispatch(scripts.resetSharedScriptInfoAsync());
             }
             return ref;
@@ -289,7 +292,7 @@ const SingletonSharedScriptInfo = () => {
                     />
                     <SharedScriptInfoItem
                         title='Last Modified'
-                        body={script.modified}
+                        body={script.modified as string}
                     />
                     <SharedScriptInfoItem
                         title='View-Only Script Link'
@@ -301,7 +304,7 @@ const SingletonSharedScriptInfo = () => {
     );
 };
 
-const SharedScriptInfoCaller = ({ script }) => {
+const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
     const dispatch = useDispatch();
 
     return (
@@ -319,13 +322,13 @@ const SharedScriptInfoCaller = ({ script }) => {
     );
 };
 
-interface ScriptType {
-    script: scripts.ScriptEntity
+interface ScriptProps {
+    script: ScriptEntity
     bgTint: boolean
-    type: scripts.ScriptType
+    type: ScriptType
 }
 
-const Script: React.FC<ScriptType> = ({ script, bgTint, type }) => {
+const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
@@ -400,7 +403,15 @@ const Script: React.FC<ScriptType> = ({ script, bgTint, type }) => {
     );
 };
 
-const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=true, initExpanded=true }) => (
+interface WindowedScriptCollectionProps {
+    title: string
+    entities: scripts.ScriptEntities
+    scriptIDs: string[]
+    type: ScriptType
+    visible?: boolean
+    initExpanded?: boolean
+}
+const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=true, initExpanded=true }: WindowedScriptCollectionProps) => (
     <Collection
         title={title}
         visible={visible}
@@ -434,7 +445,7 @@ const RegularScriptCollection = () => {
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length;
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
-    const type = 'regular';
+    const type: ScriptType = 'regular';
     const title = `MY SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
     const initExpanded = !useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
@@ -448,7 +459,7 @@ const SharedScriptCollection = () => {
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const title = `SHARED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
-    const type = 'shared'
+    const type: ScriptType = 'shared'
     const initExpanded = useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
     return <WindowedScriptCollection { ...props } />;
@@ -461,7 +472,7 @@ const DeletedScriptCollection = () => {
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const title = `DELETED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
-    const type = 'deleted';
+    const type: ScriptType = 'deleted';
     const visible = useSelector(scripts.selectShowDeleted);
     const initExpanded = false;
     const props = { title, entities, scriptIDs, type, visible, initExpanded };

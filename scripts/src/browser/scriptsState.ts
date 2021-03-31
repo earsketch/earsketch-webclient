@@ -6,79 +6,49 @@ import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
 import * as helpers from '../helpers';
 import { RootState, ThunkAPI } from '../reducers';
+import { ScriptEntity, ScriptType } from 'common';
 
-export interface ScriptEntity {
-    name: string
-    shareid: string
-    source_code: string
-    username: string
-    created: string
-    modified: number
-    file_location: string
-    id: string
-    licenseInfo: string
-    license_id: string
-    saved: boolean
-    tooltipText: string
-    collaborative: boolean
-    collaborators: any // Should be string[] but server can give other data types such as undefined and string
-    imported: boolean
-    isShared: boolean
-    run_status: string
-    readonly: boolean
-    creator: string
-    description?: string
-    soft_delete?: boolean | string
+export interface ScriptEntities {
+    [scriptID: string]: ScriptEntity
 }
 
-interface ScriptEntities {
-    [key: string]: ScriptEntity
+interface Scripts {
+    entities: ScriptEntities,
+    scriptIDs: string[]
 }
 
-// Note: How about collaborative?
-export type ScriptType = 'regular' | 'shared' | 'readonly' | 'deleted';
-type SortByAttribute = 'Date' | 'A-Z';
+export type SortByAttribute = 'Date' | 'A-Z';
+
+export interface Filters {
+    owners: string[]
+    types: string[]
+}
+
+interface AllFilters extends Filters {
+    searchText: string
+    showDeleted: boolean
+    sortBy: {
+        attribute: SortByAttribute
+        ascending: boolean
+    }
+}
 
 interface ScriptsState {
-    regularScripts: {
-        entities: ScriptEntities,
-        scriptIDs: string[]
-    },
-    sharedScripts: {
-        entities: ScriptEntities,
-        scriptIDs: string[]
-    },
-    deletedScripts: {
-        entities: ScriptEntities,
-        scriptIDs: string[]
-    },
-    localScripts: {
-        entities: ScriptEntities,
-        scriptIDs: string[]
-    },
-    readOnlyScripts: {
-        entities: ScriptEntities,
-        scriptIDs: string[]
-    },
-    filters: {
-        searchText: string,
-        showDeleted: boolean,
-        owners: string[],
-        types: string[],
-        sortBy: {
-            attribute: SortByAttribute,
-            ascending: boolean
-        }
-    },
-    featureSharedScript: boolean,
+    regularScripts: Scripts
+    sharedScripts: Scripts
+    deletedScripts: Scripts
+    localScripts: Scripts
+    readOnlyScripts: Scripts
+    filters: AllFilters
+    featureSharedScript: boolean
     dropdownMenu: {
-        show: boolean,
-        script: ScriptEntity | null,
-        type: ScriptType | null,
+        show: boolean
+        script: ScriptEntity | null
+        type: ScriptType | null
         context: boolean
-    },
+    }
     sharedScriptInfo: {
-        show: boolean,
+        show: boolean
         script: ScriptEntity | null
     }
 }
@@ -173,13 +143,13 @@ const scriptsSlice = createSlice({
             state.filters.showDeleted = payload;
         },
         addFilterItem(state, { payload }) {
-            state.filters[payload.category].push(payload.value);
+            state.filters[payload.category as keyof Filters].push(payload.value);
         },
         removeFilterItem(state, { payload }) {
-            state.filters[payload.category].splice(state.filters[payload.category].indexOf(payload.value), 1);
+            state.filters[payload.category as keyof Filters].splice(state.filters[payload.category as keyof Filters].indexOf(payload.value), 1);
         },
         resetFilter(state, { payload }) {
-            state.filters[payload] = [];
+            state.filters[payload as keyof Filters] = [];
         },
         setSorter(state, { payload }) {
             if (state.filters.sortBy.attribute === payload) {
@@ -278,7 +248,7 @@ export const syncToNgUserProject = createAsyncThunk(
     }
 );
 
-const encloseScripts = scriptsData => {
+const encloseScripts = (scriptsData: any) => {
     if (scriptsData === null) {
         return [];
     } else if (scriptsData.scripts instanceof Array) {
@@ -288,14 +258,14 @@ const encloseScripts = scriptsData => {
     }
 };
 
-const formatDate = script => {
+const formatDate = (script: ScriptEntity) => {
     // Overwriting the date format for no good reason.
     // TODO: save script API should accommodate UTC format, etc.
     script.created = dayjs(script.created).valueOf();
     script.modified = dayjs(script.modified).valueOf();
 };
 
-const removeUnusedFields = script => {
+const removeUnusedFields = (script: ScriptEntity) => {
     script.id && delete script.id;
     script.file_location && delete script.file_location;
 };
@@ -341,7 +311,7 @@ export const getRegularScripts = createAsyncThunk<void, { username: string, pass
             const scriptList = encloseScripts(data);
 
             // Mutating each script's data...
-            scriptList.forEach(script => {
+            scriptList.forEach((script: ScriptEntity) => {
                 script.saved = true;
                 script.tooltipText = ''; // For dirty tabs. Probably redundant.
                 script.imported = !!script.creator;
@@ -373,7 +343,7 @@ export const getSharedScripts = createAsyncThunk<void, { username: string, passw
             const data = await response.json();
             const scriptList = encloseScripts(data);
 
-            scriptList.forEach(script => {
+            scriptList.forEach((script: ScriptEntity) => {
                 script.saved = true;
                 script.tooltipText = ''; // For dirty tabs. Probably redundant.
                 script.isShared = true; // TODO: Call it shared.
@@ -459,7 +429,7 @@ export const selectShowDeleted = (state: RootState) => state.scripts.filters.sho
 export const selectSortByAttribute = (state: RootState) => state.scripts.filters.sortBy.attribute;
 export const selectSortByAscending = (state: RootState) => state.scripts.filters.sortBy.ascending;
 
-const applyFiltersToEntities = (entities: ScriptEntity[], filters) => {
+const applyFiltersToEntities = (entities: ScriptEntities, filters: AllFilters) => {
     const term = filters.searchText.toLowerCase();
     const extensions = {
         Python: 'py',
@@ -467,20 +437,20 @@ const applyFiltersToEntities = (entities: ScriptEntity[], filters) => {
     };
     return pickBy(entities, v => {
         const field = `${v.name.toLowerCase()}${v.username ? v.username.toLowerCase(): ''}`;
-        const types = filters.types.map(a => extensions[a]);
+        const types = filters.types.map(a => extensions[a as 'Python'|'JavaScript']);
         return (term.length ? field.includes(term) : true)
             && (filters.owners.length ? filters.owners.includes(v.username) : true)
             && (filters.types.length ? types.includes(v.name.slice(-2)) : true);
     });
 };
 
-const sortScriptIDs = (entities: ScriptEntity[], sortBy: SortByAttribute, ascending: boolean) => {
+const sortScriptIDs = (entities: ScriptEntities, sortBy: SortByAttribute, ascending: boolean) => {
     const lexicalSortOptions = {
         numeric: true,
         sensitivity: 'base'
     };
     return Object.values(entities).sort((a, b) => {
-        let c, d;
+        let c:any, d:any;
         if (sortBy === 'A-Z') {
             c = a.name;
             d = b.name;
@@ -550,7 +520,7 @@ export const selectAllScriptOwners = createSelector(
     [selectUserName, selectSharedScriptEntities, selectSharedScriptIDs],
     (userName, sharedScriptEntities, sharedScriptIDs): any[] => {
         // TODO: Refactor to return string[].
-        return [userName, ...new Set(sharedScriptIDs.map(v => sharedScriptEntities[v].username))];
+        return [userName, ...new Set(sharedScriptIDs.map((v:string) => sharedScriptEntities[v].username))];
     }
 );
 
