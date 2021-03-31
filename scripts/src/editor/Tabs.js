@@ -72,6 +72,7 @@ const Tab = ({ scriptID, scriptName, index }) => {
             className={tabClass}
             key={scriptID}
             onClick={() => {
+                // TODO: may need to uncomment once tabController is replaced
                 //dispatch(tabs.setActiveTabAndEditor(scriptID));
 
                 // TODO: This triggers clearHistory
