@@ -72,8 +72,7 @@ const Tab = ({ scriptID, scriptName, index }) => {
             className={tabClass}
             key={scriptID}
             onClick={() => {
-                // TODO: may need to uncomment once tabController is replaced
-                //dispatch(tabs.setActiveTabAndEditor(scriptID));
+                dispatch(tabs.setActiveTabAndEditor(scriptID));
 
                 // TODO: This triggers clearHistory
                 ngTabControllerScope.swapTab(index);
@@ -94,7 +93,10 @@ const Tab = ({ scriptID, scriptName, index }) => {
                 </div>
                 <button
                     className={closeButtonClass}
-                    onClick={(event) => ngTabControllerScope.closeTab(index, event)}
+                    onClick={(event) => {
+                        ngTabControllerScope.closeTab(index, event);
+                        dispatch(tabs.closeAndSwitchTab(scriptID));
+                    }}
                 >
                     <i className={`icon-cross2 cursor-pointer`} />
                 </button>

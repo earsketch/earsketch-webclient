@@ -317,6 +317,7 @@ const SharedScriptInfoCaller = ({ script }) => {
 };
 
 const Script = ({ script, bgTint, type }) => {
+    const dispatch = useDispatch();
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
@@ -350,8 +351,10 @@ const Script = ({ script, bgTint, type }) => {
             onClick={() => {
                 if (type === 'regular') {
                     openScript(script);
+                    dispatch(tabs.setActiveTabAndEditor(script.shareid));
                 } else if (type === 'shared') {
                     openSharedScript(script);
+                    dispatch(tabs.setActiveTabAndEditor(script.shareid));
                 }
             }}
         >

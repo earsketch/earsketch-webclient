@@ -2,6 +2,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
 import * as editor from '../editor/editorState';
 import * as tabs from '../editor/tabState';
+import { openAndActivateTab } from "../editor/tabState";
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
@@ -401,6 +402,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }).then(function (script) {
             // script saved and opened
             script && $rootScope.$broadcast('createScript', script.shareid);
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
         });
     };
 
@@ -500,6 +502,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $scope.$apply(function () {
             $scope.$broadcast('openCurriculumCode', fake_script);
             $scope.editor.ace.focus();
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
 
     };

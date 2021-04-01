@@ -1,5 +1,7 @@
 import xml2js from 'xml2js';
 import * as appState from '../appState';
+import * as scriptsState from '../../browser/scriptsState';
+import * as tabs from '../../editor/tabState';
 
 app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
     var self = {};
@@ -155,11 +157,15 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         // storage.
         if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
             scripts = Object.assign(scripts, JSON.parse(localStorage.get(LS_SCRIPTS_KEY)));
+            $ngRedux.dispatch(scriptsState.syncToNgUserProject());
 
             if (localStorage.checkKey(LS_TABS_KEY)) {
                 const storedTabs = JSON.parse(localStorage.get(LS_TABS_KEY));
                 if (storedTabs) {
-                    storedTabs.forEach(tab => openScripts.push(tab));
+                    storedTabs.forEach(tab => {
+                        openScripts.push(tab);
+                        $ngRedux.dispatch(tabs.openAndActivateTab(tab));
+                    });
                 }
             }
         }
@@ -340,6 +346,10 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                         openScripts.push(opened[i]);
                     }
                 }
+                if (openScripts.length) {
+                    $ngRedux.dispatch(tabs.setOpenTabs(openScripts.slice()));
+                    $ngRedux.dispatch(tabs.setActiveTabID(openScripts[0]))
+                }
             }
 
             // Clear Recommendations in Sound Browser
@@ -373,6 +383,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                         // once all scripts have been saved open them
                         angular.forEach(savedScripts, function(savedScript) {
                             openScript(savedScript.shareid);
+                            $ngRedux.dispatch(tabs.openAndActivateTab(savedScript.shareid));
                         });
                     });
                 }).then(() => getSharedScripts(username, password));

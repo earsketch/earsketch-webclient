@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import * as helpers from 'helpers';
+import * as scripts from '../browser/scriptsState';
 
 const tabSlice = createSlice({
     name: 'tabs',
@@ -17,9 +18,16 @@ const tabSlice = createSlice({
         setActiveTabID(state, { payload }) {
             state.activeTabID = payload;
         },
-        addAndActivateTabID(state, { payload }) {
-            state.openTabs.push(payload);
+        openAndActivateTab(state, { payload }) {
+            if (!state.openTabs.includes(payload)) {
+                state.openTabs.push(payload);
+            }
             state.activeTabID = payload;
+        },
+        closeTab(state, { payload }) {
+            if (state.openTabs.includes(payload)) {
+                state.openTabs.splice(state.openTabs.indexOf(payload), 1);
+            }
         },
         resetTabs(state) {
             state.openTabs = [];
@@ -47,7 +55,8 @@ export default tabSlice.reducer;
 export const {
     setOpenTabs,
     setActiveTabID,
-    addAndActivateTab,
+    openAndActivateTab,
+    closeTab,
     resetTabs,
     setNumVisibleTabs,
     setShowTabDropdown,
@@ -97,25 +106,45 @@ export const setActiveTabAndEditor = createAsyncThunk(
     'tabs/setActiveTabAndEditor',
     (scriptID, { getState, dispatch }) => {
         const ideScope = helpers.getNgController('ideController').scope();
+        const prevTabID = selectActiveTabID(getState());
 
-        setEditorSession(
-            selectActiveTabID(getState()),
-            ideScope.editor.ace.getSession()
-        );
+        prevTabID && setEditorSession(prevTabID, ideScope.editor.ace.getSession());
 
         const storedSession = getEditorSession(scriptID);
         if (storedSession) {
             ideScope.editor.ace.setSession(storedSession);
         } else {
-            const userProject = helpers.getNgService('userProject');
-            const script = userProject.scripts[scriptID];
+            const script = scripts.selectAllScriptEntities(getState())[scriptID];
             const language = script.name.slice(-2) === 'py' ? 'python' : 'javascript';
             ideScope.editor.ace.setSession(ace.createEditSession(script.source_code, `ace/mode/${language}`));
         }
 
-        dispatch(setActiveTabID(scriptID));
+        dispatch(openAndActivateTab(scriptID));
     }
 );
+
+export const closeAndSwitchTab = createAsyncThunk(
+    'tabs/closeAndSwitchTab',
+    (scriptID, { getState, dispatch }) => {
+        const openTabs = selectOpenTabs(getState());
+        const activeTabID = selectActiveTabID(getState());
+        const closedTabIndex = openTabs.indexOf(scriptID);
+
+        if (openTabs.length === 1) {
+            dispatch(resetTabs());
+        } else if (activeTabID !== scriptID) {
+            dispatch(closeTab(scriptID));
+        } else if (openTabs.length > 1 && closedTabIndex === openTabs.length-1) {
+            const nextActiveTabID = openTabs[openTabs.length-2];
+            dispatch(setActiveTabAndEditor(nextActiveTabID));
+            dispatch(closeTab(scriptID));
+        } else if (closedTabIndex < openTabs.length-1) {
+            const nextActiveTabID = openTabs[closedTabIndex+1];
+            dispatch(setActiveTabAndEditor(nextActiveTabID));
+            dispatch(closeTab(scriptID));
+        }
+    }
+)
 
 export const closeDeletedScript = createAsyncThunk(
     'tabs/closeDeletedScript',
