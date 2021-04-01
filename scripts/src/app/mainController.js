@@ -664,6 +664,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
             $scope.openSharedScript(shareID);
             // collaboration.openScript(userProject.sharedScripts[shareID], userProject.getUsername());
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
         } else {
             $scope.showNotification = false;
             userNotification.show('Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser', 'failure1');
