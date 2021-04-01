@@ -467,18 +467,8 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             $scope.editor.ace.renderer.scrollBarH.setInnerWidth($scope.editor.ace.renderer.content.clientWidth);
             $scope.editor.ace.resize();
 
-            if (newTabIndex >= 0 ) {
-                if ($scope.tabs.length) {
-                    $scope.activeTabID = $scope.tabs[newTabIndex].shareid;
-                    // $ngRedux.dispatch(tabs.setOpenTabs($scope.tabs.map(v => v.shareid)));
-                    // $ngRedux.dispatch(tabs.setActiveTabID($scope.activeTabID));
-                    // $ngRedux.dispatch(tabs.setActiveTabAndEditor($scope.activeTabID));
-                }
-            } else if ($scope.tabs.length) {
-                // $ngRedux.dispatch(tabs.setOpenTabs($scope.tabs.map(v => v.shareid)));
-                // $ngRedux.dispatch(tabs.setActiveTabID($scope.activeTabID));
-            } else {
-                // $ngRedux.dispatch(tabs.resetTabs());
+            if (newTabIndex >= 0 && $scope.tabs[newTabIndex]) {
+                $scope.activeTabID = $scope.tabs[newTabIndex].shareid;
             }
         }
     };
@@ -521,6 +511,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         var script = $scope.tabs[id];
+        if (!script) return;
 
         if (script.collaborative) {
             collaboration.closeScript(script.shareid, userProject.getUsername());

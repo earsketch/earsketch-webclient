@@ -335,23 +335,6 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 script = postProcessCollaborators(script);
             }
 
-            // when the user logs in and his/her scripts are loaded, we can restore
-            // their previous tab session stored in the browser's local storage
-            const embedMode = appState.selectEmbedMode($ngRedux.getState());
-            if (!embedMode && localStorage.checkKey(LS_TABS_KEY)) {
-                var opened = JSON.parse(localStorage.get(LS_TABS_KEY));
-
-                for (var i in opened) {
-                    if (opened.hasOwnProperty(i)) {
-                        openScripts.push(opened[i]);
-                    }
-                }
-                if (openScripts.length) {
-                    $ngRedux.dispatch(tabs.setOpenTabs(openScripts.slice()));
-                    $ngRedux.dispatch(tabs.setActiveTabID(openScripts[0]))
-                }
-            }
-
             // Clear Recommendations in Sound Browser
             $rootScope.$broadcast('clearRecommender');
 

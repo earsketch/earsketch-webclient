@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
+import * as tabs from '../editor/tabState';
 import * as helpers from 'helpers';
 import { sampleScript } from "./bubbleData";
 
@@ -31,7 +32,7 @@ export const { reset, resume, suspend, increment, setReady, setLanguage } = bubb
 
 const createSampleScript = createAsyncThunk(
     'bubble/createSampleScript',
-    (_, { getState }) => {
+    (_, { getState, dispatch }) => {
         const language = getState().bubble.language;
         const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
@@ -39,7 +40,8 @@ const createSampleScript = createAsyncThunk(
         const rootScope = helpers.getNgService('$rootScope');
         return userProject.saveScript(fileName, code, true)
             .then(script => {
-                userProject.openScript(script.shareid)
+                userProject.openScript(script.shareid);
+                dispatch(tabs.openAndActivateTab(script.shareid));
 
                 // tabController also needs to call refresh.
                 rootScope.$broadcast('createScript', script.shareid);
