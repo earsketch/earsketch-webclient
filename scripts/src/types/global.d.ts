@@ -10,15 +10,18 @@ declare var BUILD_NUM: string;
 declare var FLAGS: any;
 declare var ESApiDoc: any;
 declare var ESCurr_TOC: any;
-declare var ESCurr_Pages: any;
-declare var ESCurr_SearchDoc: any;
+declare var ESCurr_Pages: number[][];
+declare var ESCurr_SearchDoc: {
+    title: string
+    id: string
+    text: string
+}[];
 
 declare var app: any;
 declare var esconsole: any;
 declare var userNotification: any;
 declare var hljs: any;
 declare var Hilitor: any;
-declare var lunr: any;
 
 declare module 'angular' {
     var element: any

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, MutableRefObject } from 'react'
+import React, { useEffect, useState, useRef, MutableRefObject, ChangeEvent } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
@@ -9,19 +9,19 @@ import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
 import * as layout from '../layout/layoutState'
 
-const toc = ESCurr_TOC
+const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
 
 let clipboard: ClipboardService|null = null
 
-const copyURL = (language, currentLocation) => {
+const copyURL = (language: string, currentLocation: number[]) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
     clipboard && clipboard.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
-const useHeightLimiter = (show, marginBottom:string|null=null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
+const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
     const [height, setHeight] = useState('100vh')
     const el = useRef<HTMLDivElement|null>(null)
 
@@ -41,7 +41,7 @@ const useHeightLimiter = (show, marginBottom:string|null=null): [MutableRefObjec
     return [el, { maxHeight: height, overflowY: 'scroll' }]
 }
 
-const TableOfContentsChapter = ({ unit, unitIdx, ch, chIdx }) => {
+const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx:string, ch:curriculum.TOCItem, chIdx:string }) => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
     const theme = useSelector(appState.selectColorTheme)
@@ -51,14 +51,14 @@ const TableOfContentsChapter = ({ unit, unitIdx, ch, chIdx }) => {
         <li className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
             <div className="toc-item">
                 &emsp;
-                {ch.sections.length > 0 &&
+                {ch.sections && ch.sections.length > 0 &&
                 <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`} /></button>}
                 <a href="#" className={textClass} onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
                     {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                 </a>
             </div>
             <ul>
-                {focus[1] == chIdx &&
+                {focus[1] == chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li key={secIdx} className="toc-sections py-1">
                         <div className="toc-item">
@@ -123,7 +123,7 @@ const CurriculumHeader = () => {
 const CurriculumSearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(curriculum.selectSearchText)
-    const dispatchSearch = (event) => dispatch(curriculum.setSearchText(event.target.value))
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(curriculum.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(curriculum.setSearchText(''))
     return <SearchBar {... {searchText, dispatchSearch, dispatchReset}} />
 }
@@ -205,18 +205,18 @@ const CurriculumPane = () => {
         if (content) {
             // Filter content by language.
             const p = (language === 'python')
-            content.querySelectorAll(".curriculum-python").forEach(e => e.hidden = !p)
-            content.querySelectorAll(".copy-btn-py").forEach(e => e.hidden = !p)
-            content.querySelectorAll(".curriculum-javascript").forEach(e => e.hidden = p)
-            content.querySelectorAll(".copy-btn-js").forEach(e => e.hidden = p)
+            content.querySelectorAll(".curriculum-python").forEach((e:HTMLElement) => e.hidden = !p)
+            content.querySelectorAll(".copy-btn-py").forEach((e:HTMLElement) => e.hidden = !p)
+            content.querySelectorAll(".curriculum-javascript").forEach((e:HTMLElement) => e.hidden = p)
+            content.querySelectorAll(".copy-btn-js").forEach((e:HTMLElement) => e.hidden = p)
 
             // Apply color theme to code blocks.
             if (theme === 'light') {
-                content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.add('default-pygment'))
-                content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.add('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach((el:HTMLElement) => el.classList.add('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach((el:HTMLElement) => el.classList.add('default-pygment'))
             } else {
-                content.querySelectorAll(".listingblock.curriculum-javascript").forEach(el => el.classList.remove('default-pygment'))
-                content.querySelectorAll(".listingblock.curriculum-python").forEach(el => el.classList.remove('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach((el:HTMLElement) => el.classList.remove('default-pygment'))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach((el:HTMLElement) => el.classList.remove('default-pygment'))
             }
         }
     }, [content, language, paneIsOpen])
@@ -249,6 +249,7 @@ const CurriculumPane = () => {
 const NavigationBar = () => {
     const dispatch = useDispatch()
     const location = useSelector(curriculum.selectCurrentLocation)
+    // @ts-ignore: Assuming the structure is correct.
     const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / toc[location[0]].chapters[location[1]].sections.length)
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
@@ -257,7 +258,7 @@ const NavigationBar = () => {
     const [highlight, setHighlight] = useState(false)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, '8px')
 
-    const handleClick = event => {
+    const handleClick = (event: Event & { target: HTMLElement }) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
             triggerRef.current && !triggerRef.current.contains(event.target)) {
             dispatch(curriculum.showTableOfContents(false))
@@ -304,9 +305,15 @@ const NavigationBar = () => {
 }
 
 let initialized = false
-let $rootScope: angular.IRootScopeService & { loadChapterForError: any } | null = null
+type RootScope = angular.IRootScopeService & { loadChapterForError: any } | null
+let $rootScope: RootScope = null
 
-const HotCurriculum = hot(props => {
+const HotCurriculum = hot((props: {
+    clipboard: ClipboardService,
+    ESUtils: any,
+    $ngRedux: any, // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
+    $rootScope: RootScope
+}) => {
     if (!initialized) {
         clipboard = props.clipboard
 
@@ -318,8 +325,8 @@ const HotCurriculum = hot(props => {
             props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
         } else {
             // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
-            const loc = locstr.split('-').map((x) => parseInt(x))
-            if (loc.every((idx) => !isNaN(idx))) {
+            const loc = locstr.split('-').map((x: string) => parseInt(x))
+            if (loc.every((idx: number) => !isNaN(idx))) {
                 props.$ngRedux.dispatch(curriculum.fetchContent({ location: loc }))
             }
         }
@@ -339,8 +346,8 @@ const HotCurriculum = hot(props => {
 
             // Hack to facilitate Angular loading curriculum page for errors in console.
             // TODO: Remove this after we've ported templates/index.html to React.
-            $rootScope.loadChapterForError = (errorMessage) => {
-                const aliases = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
+            $rootScope.loadChapterForError = (errorMessage: string) => {
+                const aliases: any = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
                 const types = ["importerror", "indentationerror", "indexerror", "nameerror",
                     "parseerror", "syntaxerror", "typeerror", "valueerror"]
                 let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()

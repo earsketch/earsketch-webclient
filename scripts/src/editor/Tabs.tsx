@@ -242,7 +242,7 @@ const Tabs = () => {
             ref={containerRef}
         >
             <MainTabGroup />
-            { truncated && (<TabDropdown />) }
+            { truncated ? <TabDropdown /> : '' }
         </div>
     );
 };

@@ -24,7 +24,7 @@ export class CodeHighlight extends Component<CodeHighlightProps> {
     private codeNode: LegacyRef<HTMLElement> & { current: any }
     public static propTypes = {}
 
-    constructor(props) {
+    constructor(props: CodeHighlightProps) {
         super(props)
         // create a ref to highlight only the rendered node and not fetch all the DOM
         this.codeNode = React.createRef()
@@ -62,7 +62,7 @@ function useForceUpdate() {
 }
 
 
-const paste = (name, obj) => {
+const paste = (name: string, obj: api.APIItem) => {
     let args: string[] = []
     for (var param in obj.parameters) {
         args.push(param)
@@ -76,7 +76,7 @@ const paste = (name, obj) => {
 }
 
 // Main point of this module.
-const Entry = ({ name, obj }) => {
+const Entry = ({ name, obj }: { name: string, obj: api.APIItem & { details?: boolean } }) => {
     // TODO don't mutate obj.details
     const forceUpdate = useForceUpdate()
     const [highlight, setHighlight] = useState(false)
@@ -194,9 +194,9 @@ const Details = ({ obj }: { obj: api.APIItem }) => {
 const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
-        {entries.map(([name, obj]) => {
+        {entries.map(([name, obj]: [string, api.APIItem]) => {
             const arr = isArray(obj) ? obj : [obj]
-            return arr.map((o, index) => <Entry key={name + index} name={name} obj={o} />)
+            return arr.map((o: api.APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}
     </>)
 }
