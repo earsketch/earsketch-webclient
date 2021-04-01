@@ -434,7 +434,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                         $scope.editor.droplet.setValue(nextScript.source_code, -1);
                     } else {
                         $scope.editor.ace.setValue(nextScript.source_code, -1);
-                        console.log('tabController setting ace value for non collab nextScript: ' + nextScript.source_code);
                     }
                     $scope.editor.setReadOnly(!!nextScript.readonly || $scope.isEmbedded); //isEmbedded inherited from ideController
                 }
