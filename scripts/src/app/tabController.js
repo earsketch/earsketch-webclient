@@ -579,7 +579,7 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             //closed tab is the last tab OR
             //focused tab is to the right closed tab, then decrease the index by one
             if (id === $scope.tabs.length || $scope.activeTab > id) {
-                $scope.swapTab(id - 1);
+                $scope.swapTab($scope.activeTab - 1);
             } else {
                 $scope.swapTab(id);
             }
