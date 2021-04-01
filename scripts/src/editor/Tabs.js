@@ -94,8 +94,8 @@ const Tab = ({ scriptID, scriptName, index }) => {
                 <button
                     className={closeButtonClass}
                     onClick={(event) => {
-                        ngTabControllerScope.closeTab(index, event);
                         dispatch(tabs.closeAndSwitchTab(scriptID));
+                        ngTabControllerScope.closeTab(index, event);
                     }}
                 >
                     <i className={`icon-cross2 cursor-pointer`} />

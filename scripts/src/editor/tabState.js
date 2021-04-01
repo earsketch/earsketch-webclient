@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import * as helpers from 'helpers';
 import * as scripts from '../browser/scriptsState';
+import * as user from '../user/userState';
 
 const tabSlice = createSlice({
     name: 'tabs',
@@ -108,11 +109,14 @@ export const setActiveTabAndEditor = createAsyncThunk(
         const ideScope = helpers.getNgController('ideController').scope();
         const prevTabID = selectActiveTabID(getState());
 
-        prevTabID && setEditorSession(prevTabID, ideScope.editor.ace.getSession());
+        // Note: Watch out that prevSession actually can be a new session already created somewhere else.
+        const prevSession = ideScope.editor.ace.getSession();
+        prevTabID && setEditorSession(prevTabID, prevSession);
+        dispatch(ensureCollabScriptIsClosed(prevTabID));
 
-        const storedSession = getEditorSession(scriptID);
-        if (storedSession) {
-            ideScope.editor.ace.setSession(storedSession);
+        const restoredSession = getEditorSession(scriptID);
+        if (restoredSession) {
+            ideScope.editor.ace.setSession(restoredSession);
         } else {
             const script = scripts.selectAllScriptEntities(getState())[scriptID];
             const language = script.name.slice(-2) === 'py' ? 'python' : 'javascript';
@@ -143,8 +147,22 @@ export const closeAndSwitchTab = createAsyncThunk(
             dispatch(setActiveTabAndEditor(nextActiveTabID));
             dispatch(closeTab(scriptID));
         }
+        deleteEditorSession(scriptID);
+        dispatch(ensureCollabScriptIsClosed(scriptID));
     }
-)
+);
+
+const ensureCollabScriptIsClosed = createAsyncThunk(
+    'tabs/ensureCollabScriptIsClosed',
+    (scriptID, { getState }) => {
+        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        if (script.collaborative) {
+            const collabService = helpers.getNgService('collaboration');
+            const userName = user.selectUserName(getState());
+            collabService.closeScript(scriptID, userName);
+        }
+    }
+);
 
 export const closeDeletedScript = createAsyncThunk(
     'tabs/closeDeletedScript',
@@ -162,14 +180,20 @@ export const closeDeletedScript = createAsyncThunk(
     }
 );
 
-export const setEditorSession = (scriptID, session) => {
+const setEditorSession = (scriptID, session) => {
     tabsMutableState.editorSessions[scriptID] = session;
 };
 
-export const getEditorSession = scriptID => {
+const getEditorSession = scriptID => {
     return tabsMutableState.editorSessions[scriptID];
 };
 
-export const resetEditorSession = () => {
+const deleteEditorSession = scriptID => {
+    if (scriptID in tabsMutableState.editorSessions) {
+        delete tabsMutableState.editorSessions[scriptID];
+    }
+};
+
+const resetEditorSession = () => {
     tabsMutableState.editorSessions = {};
 };

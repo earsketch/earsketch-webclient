@@ -350,11 +350,11 @@ const Script = ({ script, bgTint, type }) => {
             onMouseLeave={() => setHighlight(false)}
             onClick={() => {
                 if (type === 'regular') {
+                    dispatch(tabs.setActiveTabAndEditor(script.shareid));
                     openScript(script);
-                    dispatch(tabs.setActiveTabAndEditor(script.shareid));
                 } else if (type === 'shared') {
-                    openSharedScript(script);
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
+                    openSharedScript(script);
                 }
             }}
         >
