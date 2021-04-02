@@ -357,6 +357,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 }
 
                 resetOpenScripts();
+                $ngRedux.dispatch(tabs.resetTabs());
 
                 return $q.all(promises).then(function (savedScripts) {
                     localStorage.remove(LS_SCRIPTS_KEY);
