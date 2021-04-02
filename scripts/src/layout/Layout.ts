@@ -4,7 +4,7 @@ import store from '../reducers';
 
 export const resetHorizontalSplits = () => {
     const horizontalSplits = layout.getHorizontalSplits();
-    horizontalSplits && horizontalSplits.setSizes(layout.selectHorizontalRatio(store.getState()));
+    horizontalSplits?.setSizes(layout.selectHorizontalRatio(store.getState()));
 };
 
 export const toggleHorizontalDrag = (index: number, state: boolean) => {
@@ -77,8 +77,8 @@ export const initialize = () => {
 export const destroy = () => {
     const horizontalSplits = layout.getHorizontalSplits();
     const verticalSplits = layout.getVerticalSplits();
-    horizontalSplits && horizontalSplits.destroy();
-    verticalSplits && verticalSplits.destroy();
+    horizontalSplits?.destroy();
+    verticalSplits?.destroy();
     layout.setHorizontalSplits(null);
     layout.setVerticalSplits(null);
 };

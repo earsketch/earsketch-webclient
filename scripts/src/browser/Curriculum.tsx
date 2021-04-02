@@ -16,7 +16,7 @@ let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
     const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
-    clipboard && clipboard.copyText(url)
+    clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
 
@@ -173,7 +173,7 @@ export const TitleBar = () => {
                         onClick={() => {
                             const newLanguage = (language === 'python' ? 'javascript' : 'python')
                             // TODO: Remove angular $broadcast after moving other components to React.
-                            $rootScope && $rootScope.$broadcast('language', newLanguage)
+                            $rootScope?.$broadcast('language', newLanguage)
                             dispatch(appState.setScriptLanguage(newLanguage))
                         }}>
                     {language === 'python' ? 'PY' : 'JS'}
@@ -259,8 +259,7 @@ const NavigationBar = () => {
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, '8px')
 
     const handleClick = (event: Event & { target: HTMLElement }) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
-            triggerRef.current && !triggerRef.current.contains(event.target)) {
+        if (!dropdownRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) {
             dispatch(curriculum.showTableOfContents(false))
         }
     }

@@ -119,17 +119,17 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
 
         setEditorSession(
             selectActiveTabID(getState()),
-            ideScope && ideScope.editor.ace.getSession()
+            ideScope?.editor.ace.getSession()
         );
 
         const storedSession = getEditorSession(scriptID);
         if (storedSession) {
-            ideScope && ideScope.editor.ace.setSession(storedSession);
+            ideScope?.editor.ace.setSession(storedSession);
         } else {
             const userProject = helpers.getNgService('userProject');
             const script = userProject.scripts[scriptID];
             const syntaxMode = script.name.slice(-2) === 'py' ? PythonMode : JavaScriptMode;
-            ideScope && ideScope.editor.ace.setSession(ace.createEditSession(script.source_code, syntaxMode));
+            ideScope?.editor.ace.setSession(ace.createEditSession(script.source_code, syntaxMode));
         }
 
         dispatch(setActiveTabID(scriptID));

@@ -53,7 +53,7 @@ export const selectFilteredEntries = createSelector(
     (entries, searchText, language) => {
         searchText = searchText.toLowerCase()
         return entries.filter(([name, obj]: [name:string, obj:APIItem]) => {
-            const description = obj.description && obj.description.toLowerCase();
+            const description = obj.description?.toLowerCase();
             const params = obj.parameters && Object.keys(obj.parameters)
             const field = `${name.toLowerCase()}${description}${params}`
             return field.includes(searchText) && (!obj.meta || (obj.meta.language === language))

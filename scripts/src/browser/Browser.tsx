@@ -144,7 +144,7 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
         setPopperElement(ref => {
             setReferenceElement(rref => {
                 // TODO: Pretty hacky way to get the non-null (popper-initialized) multiple refs. Refactor if possible.
-                if (ref && rref && !ref.contains(event.target) && !rref.contains(event.target)) {
+                if (!ref?.contains(event.target) && !rref?.contains(event.target)) {
                     setShowTooltip(false);
                 }
                 return rref;
@@ -167,7 +167,7 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
         <div
             ref={setReferenceElement as LegacyRef<HTMLDivElement>}
             onClick={() => {setShowTooltip(show => {
-                update && update();
+                update?.();
                 return !show;
             })}}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme==='light' ? 'border-black' : 'border-white'}`}

@@ -25,7 +25,7 @@ const CreateScriptButton = () => {
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
             onClick={() => {
-                ideScope && ideScope.createScript();
+                ideScope?.createScript();
             }}
         >
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
@@ -184,7 +184,7 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
             onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                onClick && onClick();
+                onClick?.();
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
@@ -243,7 +243,7 @@ const SingletonSharedScriptInfo = () => {
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
     const handleClickAsync = (event: Event & { target: HTMLElement }) => {
         setPopperElement(ref => {
-            if (ref && !ref.contains(event.target)) {
+            if (!ref?.contains(event.target)) {
                 dispatch(scripts.resetSharedScriptInfoAsync());
             }
             return ref;
@@ -273,7 +273,7 @@ const SingletonSharedScriptInfo = () => {
                     <SharedScriptInfoItem
                         title={script.name}
                         body={
-                            script.description && script.description.length
+                            script.description?.length
                                 ? script.description
                                 : 'This script has no description.'
                         }
@@ -313,7 +313,7 @@ const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
                 event.preventDefault();
                 event.stopPropagation();
                 sharedInfoPanelVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY);
-                sharedInfoPanelVirtualRef.updatePopper && sharedInfoPanelVirtualRef.updatePopper();
+                sharedInfoPanelVirtualRef.updatePopper?.();
                 dispatch(scripts.setSharedScriptInfo({ script }));
             }}
         >

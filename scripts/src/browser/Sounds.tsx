@@ -246,7 +246,7 @@ const ClipList = ({ fileKeys }: { fileKeys: string[] }) => {
     return (
         <div className='flex flex-col'>
             {
-                fileKeys && fileKeys.map((v: string) =>
+                fileKeys?.map((v: string) =>
                     <Clip
                         key={v} clip={entities[v]}
                         bgcolor={theme==='light' ? 'bg-white' : 'bg-gray-900'}
@@ -300,7 +300,7 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
                             return new Set(v.add(index));
                         }
                     });
-                    listRef && listRef.current.resetAfterIndex(index);
+                    listRef?.current?.resetAfterIndex(index);
                 }}
                 onMouseEnter={() => setHighlight(true)}
                 onMouseLeave={() => setHighlight(false)}
@@ -368,7 +368,7 @@ const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, fol
     useEffect(() => {
         setExpanded(new Set());
 
-        if (listRef && listRef.current) {
+        if (listRef?.current) {
             listRef.current.resetAfterIndex(0);
         }
     }, [filteredListChanged]);

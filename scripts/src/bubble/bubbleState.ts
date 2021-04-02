@@ -63,7 +63,7 @@ const setEditorReadOnly = createAsyncThunk(
     async (payload: boolean) => {
         return new Promise(resolve => {
             const editorScope = helpers.getNgDirective('editor').scope();
-            editorScope && editorScope.editor.setReadOnly(payload);
+            editorScope?.editor.setReadOnly(payload);
             setTimeout(resolve, 100);
         });
     }

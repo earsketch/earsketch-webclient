@@ -187,7 +187,7 @@ const MessageBox = () => {
         const ref = pages[currentPage].ref;
         const elem = document.querySelector(ref as string);
         if (ref && elem) setReferenceElement(elem);
-        update && update();
+        update?.();
     }, [currentPage]);
 
     return (

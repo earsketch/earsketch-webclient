@@ -115,7 +115,7 @@ const SingletonDropdownMenu = () => {
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
     const handleClickAsync: EventListener = (event: Event & { target: HTMLElement, button: number }) => {
         setPopperElement(ref => {
-            if (ref && !ref.contains(event.target) && event.button===0) {
+            if (!ref?.contains(event.target) && event.button===0) {
                 dispatch(scripts.resetDropdownMenuAsync());
             }
             return ref;
@@ -136,7 +136,7 @@ const SingletonDropdownMenu = () => {
         >
             <div className={`flex justify-between items-center p-2 space-x-2 pb-4 border-b mb-2 ${theme==='light' ? 'text-black border-black' : 'text-white border-white'}`}>
                 <div className='truncate'>
-                    {script && script.name}
+                    {script?.name}
                 </div>
                 <i
                     className={`icon-cross2 pr-1 align-middle cursor-pointer ${theme==='light' ? 'text-gray-700' : 'text-gray-500'}`}
@@ -225,7 +225,7 @@ const SingletonDropdownMenu = () => {
                     const userProject = helpers.getNgService('userProject');
                     let imported;
 
-                    if (script && script.collaborative) {
+                    if (script?.collaborative) {
                         imported = await userProject.importCollaborativeScript(Object.assign({},script));
                     } else {
                         imported = await userProject.importScript(Object.assign({},script));
@@ -250,7 +250,7 @@ const SingletonDropdownMenu = () => {
                     } else if (type==='shared') {
                         await scope.deleteSharedScript(script);
                     }
-                    userProject && await userProject.refreshCodeBrowser();
+                    await userProject?.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
                 }}
             />
@@ -267,7 +267,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: ScriptEntity, typ
                 event.preventDefault();
                 event.stopPropagation();
                 dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY);
-                dropdownMenuVirtualRef.updatePopper && dropdownMenuVirtualRef.updatePopper();
+                dropdownMenuVirtualRef.updatePopper?.();
                 dispatch(scripts.setDropdownMenu({ script, type }));
             }}
             className='flex justify-left truncate'
@@ -294,7 +294,7 @@ export const DropdownContextMenuCaller: React.FC<DropdownContextMenuCallerType> 
                 event.preventDefault();
                 event.stopPropagation();
                 dropdownMenuVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY);
-                dropdownMenuVirtualRef.updatePopper && dropdownMenuVirtualRef.updatePopper();
+                dropdownMenuVirtualRef.updatePopper?.();
                 dispatch(scripts.setDropdownMenu({ script, type, context:true }));
             }}
         >

@@ -306,10 +306,10 @@ const locationToUrl: { [key:string]: string } = {}
 toc.forEach((unit: TOCItem, unitIdx: number) => {
     urlToLocation[unit.URL] = [unitIdx]
     locationToUrl[[unitIdx].join(',')] = unit.URL
-    unit.chapters && unit.chapters.forEach((ch, chIdx) => {
+    unit.chapters?.forEach((ch, chIdx) => {
         urlToLocation[ch.URL] = [unitIdx, chIdx]
         locationToUrl[[unitIdx, chIdx].join(',')] = ch.URL
-        ch.sections && ch.sections.forEach((sec, secIdx) => {
+        ch.sections?.forEach((sec, secIdx) => {
             urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
             locationToUrl[[unitIdx, chIdx, secIdx].join(',')] = sec.URL
         })

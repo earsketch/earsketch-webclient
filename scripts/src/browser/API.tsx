@@ -39,7 +39,7 @@ export class CodeHighlight extends Component<CodeHighlightProps> {
     }
 
     highlight() {
-        this.codeNode && this.codeNode.current && hljs.highlightBlock(this.codeNode.current)
+        this.codeNode?.current && hljs.highlightBlock(this.codeNode.current)
     }
 
     render() {

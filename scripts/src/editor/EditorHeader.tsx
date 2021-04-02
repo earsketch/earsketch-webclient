@@ -24,7 +24,7 @@ const UndoRedoButtons = () => {
     const onChangeTask = () => {
         // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
         setTimeout(() => {
-            if (editorScope && editorScope.editor) {
+            if (editorScope?.editor) {
                 setHasUndo(editorScope.editor.checkUndo());
                 setHasRedo(editorScope.editor.checkRedo());
             }
@@ -41,11 +41,11 @@ const UndoRedoButtons = () => {
         <i
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: 'scaleX(-1)' }}
-            onClick={() => editorScope && editorScope.editor.undo()}
+            onClick={() => editorScope?.editor.undo()}
         />
         <i
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
-            onClick={() => editorScope && editorScope.editor.redo()}
+            onClick={() => editorScope?.editor.redo()}
         />
     </>);
 };
@@ -80,7 +80,7 @@ const EditorHeader = () => {
                 <UndoRedoButtons />
 
                 {
-                    !(script && script.collaborative) && (
+                    !(script?.collaborative) && (
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
@@ -104,7 +104,7 @@ const EditorHeader = () => {
                     )
                 }
                 {
-                    (loggedIn && scriptType !== 'readonly' && !(scriptType === 'shared' && script.collaborative)) && (
+                    (loggedIn && scriptType !== 'readonly' && !(scriptType === 'shared' && script?.collaborative)) && (
                         <div
                             className={`
                                 rounded-full
@@ -133,7 +133,7 @@ const EditorHeader = () => {
                         text-white cursor-pointer
                     `}
                     id='run-button'
-                    onClick={() => ideScope && ideScope.compileCode()}
+                    onClick={() => ideScope?.compileCode()}
                 >
                     <div className='flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1'>
                         <i className='icon-arrow-right22 font-bold text-green-600' />

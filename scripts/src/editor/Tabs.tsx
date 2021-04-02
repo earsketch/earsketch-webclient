@@ -25,7 +25,7 @@ const CreateScriptButton = () => {
                 text-lg cursor-pointer
             `}
             id='create-script-button'
-            onClick={() => ideControllerScope && ideControllerScope.createScript()}
+            onClick={() => ideControllerScope?.createScript()}
         >
             <i className='icon icon-plus2' />
         </div>
@@ -82,7 +82,7 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
                 dispatch(tabs.setActiveTabAndEditor(scriptID));
 
                 // TODO: This triggers clearHistory
-                ngTabControllerScope && ngTabControllerScope.swapTab(index);
+                ngTabControllerScope?.swapTab(index);
             }}
             title={script.name}
         >
@@ -98,7 +98,7 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
                 </div>
                 <button
                     className={closeButtonClass}
-                    onClick={(event) => ngTabControllerScope && ngTabControllerScope.closeTab(index, event)}
+                    onClick={(event) => ngTabControllerScope?.closeTab(index, event)}
                 >
                     <i className={`icon-cross2 cursor-pointer`} />
                 </button>
@@ -118,7 +118,7 @@ const CloseAllTab = () => {
                 flex items-center
                 text-white bg-gray-800 border border-gray-800    
             `}
-            onClick={() => ngTabControllerScope && ngTabControllerScope.closeAllTabs()}
+            onClick={() => ngTabControllerScope?.closeAllTabs()}
         >
             Close All
         </div>
@@ -175,7 +175,7 @@ const TabDropdown = () => {
                 cursor-pointer select-none
             `}
             onClick={() => {setShowDropdown(show => {
-                update && update();
+                update?.();
                 return !show;
             })}}
             onMouseEnter={() => setHighlight(true)}
