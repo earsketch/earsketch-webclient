@@ -985,9 +985,12 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(scripts.syncToNgUserProject());
 
         const openTabs = tabs.selectOpenTabs($ngRedux.getState());
+        $ngRedux.dispatch(tabs.closeTab(script.shareid));
+
         if (openTabs.includes(script.shareid)) {
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(imported.shareid));
             userProject.openScript(imported.shareid);
-            $rootScope.$broadcast('selectScript', script.shareid);
+            $rootScope.$broadcast('selectScript', imported.shareid);
         }
     };
     

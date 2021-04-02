@@ -759,8 +759,11 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
                     $scope.closeTab($scope.getTabId(script.shareid));
                 }
 
+                $ngRedux.dispatch(tabs.closeTab(script.shareid));
+
                 $scope.refreshCodeBrowser().then(function() {
                     $ngRedux.dispatch(scripts.syncToNgUserProject());
+                    $ngRedux.dispatch(tabs.setActiveTabAndEditor(importedScript.shareid));
                     return $scope.selectScript(importedScript);
                 });
             }).catch(function(err) {

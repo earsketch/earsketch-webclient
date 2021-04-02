@@ -214,7 +214,9 @@ const SingletonDropdownMenu = () => {
                     await userProject.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
 
-                    if (openTabs.includes(script.shareid)) {
+                    if (openTabs.includes(script.shareid) && !script.collaborative) {
+                        dispatch(tabs.closeTab(script.shareid));
+                        dispatch(tabs.openAndActivateTab(imported.shareid));
                         openScript(imported);
                     }
                 }}
