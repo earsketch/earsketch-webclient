@@ -15,8 +15,6 @@ const X_OFFSET = 100
 // TODO: remove after refactoring player
 let _result = null
 
-// TODO
-const vertScrollPos = 0
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -444,7 +442,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, horzScrollPos }) => {
 
 const Cursor = ({ position }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null && <div className="daw-cursor" style={{top: vertScrollPos + 'px', left: position + 'px'}}></div>
+    return pendingPosition === null && <div className="daw-cursor" style={{left: position + 'px'}}></div>
 }
 
 const Playhead = () => {
@@ -459,13 +457,13 @@ const Playhead = () => {
             return () => clearInterval(interval)
         }
     }, [playing])
-    return <div className="daw-marker" style={{top: vertScrollPos + 'px', left: xScale(playPosition) + 'px'}}></div>
+    return <div className="daw-marker" style={{left: xScale(playPosition) + 'px'}}></div>
 }
 
 const SchedPlayhead = () => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
     const xScale = useSelector(daw.selectXScale)
-    return pendingPosition !== null && <div className="daw-sched-marker" style={{top: vertScrollPos + 'px', left: xScale(pendingPosition)}}></div>
+    return pendingPosition !== null && <div className="daw-sched-marker" style={{left: xScale(pendingPosition)}}></div>
 }
 
 const Measureline = () => {
@@ -540,7 +538,7 @@ const Measureline = () => {
         }
     })
 
-    return <div ref={element} id="daw-measureline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: vertScrollPos + 15 + 'px'}}>
+    return <div ref={element} id="daw-measureline" className="relative" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: '-1px'}}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -574,7 +572,7 @@ const Timeline = () => {
             .attr('x', 2)
     })
 
-    return <div ref={element} id="daw-timeline" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: vertScrollPos + 'px'}}>
+    return <div ref={element} id="daw-timeline" className="relative" style={{width: X_OFFSET + xScale(playLength + 1) + 'px'}}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -799,6 +797,7 @@ const DAW = () => {
 
     const [xScroll, setXScroll] = useState(0)
     const horzScrollPos = xScroll
+    const [yScroll, setYScroll] = useState(0)
     const el = useRef()
 
     const toggleBypass = (trackIndex, effectKey) => {
@@ -943,7 +942,7 @@ const DAW = () => {
     useEffect(() => {
         if (!el.current) return
         el.current.addEventListener('wheel', onWheel)
-        return () => el.current.removeEventListener('wheel', onWheel)
+        return () => { if (el.current) el.current.removeEventListener('wheel', onWheel) }
     }, [onWheel])
 
     // Keep triggering an action while the mouse button is held.
@@ -1001,21 +1000,20 @@ const DAW = () => {
 
         {_result && !hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
+            {/* Effects Toggle */}
+            <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects"
+                    onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                <span>EFFECTS</span>
+                <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
+            </button>
+
             <div className="flex-grow flex h-full relative">
                 {/* DAW Container */}
                 <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
                      onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     {/* Directive dawContainer */}
                     <div className="relative">
-                        {/* Effects Toggle */}
-                        <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects"
-                                style={{left: horzScrollPos + 'px'}}
-                                onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                            <span>EFFECTS</span>
-                            <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
-                        </button>
-
-                        <div id="daw-clickable">
+                        <div id="daw-clickable" style={{position: 'relative', top: yScroll + 'px'}}>
                             {/* Timescales */}
                             <Timeline />
                             <Measureline />
@@ -1036,21 +1034,21 @@ const DAW = () => {
                             })}
                         </div>
 
-                        <div className="absolute top-0 left-0 h-full">
+                        <div className="absolute left-0 h-full" style={{top: yScroll + 'px'}}>
                             <Playhead />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
                             {(dragStart !== null || loop.selection && loop.on) && loop.end != loop.start &&
-                            <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', top: vertScrollPos + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
+                            <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
                         </div>
                     </div>
                 </div>
 
-                <div className="absolute overflow-y-scroll" style={{width: "15px", top: 0, right: "1px", bottom: "40px"}}
+                <div className="absolute overflow-y-scroll" style={{width: "15px", top: "32px", right: "1px", bottom: "40px"}}
                      onScroll={e => {
                          const fracY = e.target.scrollTop / (e.target.scrollHeight - e.target.clientHeight)
-                         console.log("scrollY", fracY)
                          el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
+                         setYScroll(el.current.scrollTop)
                     }}>
                     <div style={{width: "1px", height: `max(${totalTrackHeight}px, 100.5%)`}}></div>
                 </div>
