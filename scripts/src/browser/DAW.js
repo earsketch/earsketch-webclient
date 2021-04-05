@@ -972,7 +972,28 @@ const DAW = () => {
     const [zoomOutXMouseDown, zoomOutXMouseUp] = repeatClick(() => zoomXRef.current(-2))
     const [zoomOutYMouseDown, zoomOutYMouseUp] = repeatClick(() => zoomYRef.current(-1))
 
-    // TODO: Autoscroll via useEffect.
+    const autoScroll = useSelector(daw.selectAutoScroll)
+    const xScrollEl = useRef()
+    useEffect(() => {
+        const viewMin = xScale.invert(horzScrollPos)
+        const viewMax = xScale.invert(
+            horzScrollPos + xScrollEl.current.parentElement.offsetWidth - X_OFFSET - 16
+        )
+
+        if (playPosition > viewMax) {
+            // Flip right
+            xScrollEl.current.scrollLeft += xScrollEl.current.parentElement.offsetWidth - X_OFFSET
+        } else if (playPosition < viewMin) {
+            // Flip left
+            var jump = xScale(playPosition)
+            xScrollEl.current.scrollLeft = jump
+        }
+
+        // Follow playback continuously if autoscroll is enabled
+        if (autoScroll && (xScale(playPosition) - xScrollEl.current.scrollLeft) > (xScrollEl.current.clientWidth-115)/2) {
+            xScrollEl.current.scrollLeft = xScale(playPosition) - (xScrollEl.current.clientWidth-115)/2
+        }
+    }, [horzScrollPos, xScale, playPosition, autoScroll])
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
         {isEmbedded && codeHidden &&
@@ -1035,10 +1056,9 @@ const DAW = () => {
                     <div style={{width: "1px", height: `max(${totalTrackHeight}px, 100.5%)`}}></div>
                 </div>
 
-                <div className="absolute overflow-x-scroll" style={{height: "15px", left: "100px", right: "45px", bottom: "1px"}}
+                <div ref={xScrollEl} className="absolute overflow-x-scroll" style={{height: "15px", left: "100px", right: "45px", bottom: "1px"}}
                      onScroll={e => {
                          const fracX = e.target.scrollLeft / (e.target.scrollWidth - e.target.clientWidth)
-                         console.log("scrollX", fracX)
                          el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
                          setXScroll(el.current.scrollLeft)
                     }}>
