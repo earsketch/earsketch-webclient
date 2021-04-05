@@ -3,6 +3,7 @@ import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 
+import * as appState from '../app/appState'
 import * as daw from './dawState'
 
 import { setReady } from '../bubble/bubbleState'
@@ -16,7 +17,6 @@ let _result = null
 
 // TODO
 const vertScrollPos = 0
-const isEmbedded = false
 
 const Header = () => {
     const dispatch = useDispatch()
@@ -32,6 +32,8 @@ const Header = () => {
     const tracks = useSelector(daw.selectTracks)
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
+    const embedMode = useSelector(appState.selectEmbedMode)
+    const [needCompile, setNeedCompile] = useState(embedMode)
 
     const playbackStartedCallback = () => {
         dispatch(daw.setPlaying(true))
@@ -50,12 +52,12 @@ const Header = () => {
             dispatch(setReady(true))
         }
 
-        // if ($scope.trackIsembeddedAndUncompiled) {
-        //     $rootScope.$broadcast('compileembeddedTrack', true);
-        //     $(".btn-play").removeClass("flashButton");
-        //     $scope.trackIsembeddedAndUncompiled = false;
-        //     return;
-        // }
+        // TODO: Update after relevant components get ported.
+        if (needCompile) {
+            $rootScope.$broadcast('compileembeddedTrack', true)
+            setNeedCompile(false)
+            return
+        }
 
         dispatch(daw.setPlaying(false))
 
@@ -133,7 +135,7 @@ const Header = () => {
     const el = useRef()
     const handleResize = () => {
         const width = el.current.offsetWidth
-        if (isEmbedded) {
+        if (embedMode) {
             setDecoration({title: "short", icon: true})
         } else if (width > 540) {
             setDecoration({title: "full", icon: true})
@@ -163,7 +165,7 @@ const Header = () => {
                 : (decoration.title === "short" && <span>DAW</span>)}
             </span>
         </div>
-        {isEmbedded && <div>
+        {embedMode && <div>
             <a target="_blank" href={shareScriptLink}> Click Here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
@@ -178,7 +180,7 @@ const Header = () => {
             <span id="daw-play-button" uib-popover-html="getPopoverContent('play')" popover-placement="bottom" popover-is-open="showDAWKeyShortcuts" popover-animation="true" popover-trigger="'none'">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn btn-play btn-clear" title="Play" onClick={play}>
+                    <button type="submit" className={"btn btn-play btn-clear" + (needCompile ? " flashButton" : "")} title="Play" onClick={play}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
@@ -466,10 +468,6 @@ const SchedPlayhead = () => {
     return pendingPosition !== null && <div className="daw-sched-marker" style={{top: vertScrollPos + 'px', left: xScale(pendingPosition)}}></div>
 }
 
-const Slider = ({ value, onChange, options, title }) => {
-    return <input type="range" min={options.floor} max={options.ceil} step={options.step} value={value} onChange={onChange} title={title} />
-}
-
 const Measureline = () => {
     const xScale = useSelector(daw.selectXScale)
     const intervals = useSelector(daw.selectMeasurelineZoomIntervals)
@@ -583,10 +581,10 @@ const Timeline = () => {
     </div>
 }
 
-// More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition, dawTimeline, dawMeasureline
+// More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition
 
 // Pulled in via angular dependencies
-let WaveformCache, ESUtils, applyEffects, player
+let WaveformCache, ESUtils, applyEffects, player, $rootScope
 
 const rms = (array) => {
     return Math.sqrt(array.map(function (v) {
@@ -783,6 +781,11 @@ const DAW = () => {
     const playPosition = useSelector(daw.selectPlayPosition)
     const playing = useSelector(daw.selectPlaying)
 
+    const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
+    const embeddedScriptUsername = useSelector(appState.selectEmbeddedScriptUsername)
+    const hideDAW = useSelector(appState.selectHideDAW)
+    const hideEditor = useSelector(appState.selectHideEditor)
+
     const trackWidth = useSelector(daw.selectTrackWidth)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const totalTrackHeight = useSelector(daw.selectTotalTrackHeight)
@@ -815,13 +818,6 @@ const DAW = () => {
         dispatch(daw.setSoloMute(updated))
         player.setMutedTracks(daw.getMuted(tracks, updated, metronome))
     }
-
-    // TODO
-    const embeddedScriptName = "TODO"
-    const embeddedScriptUsername = "TODO"
-    const codeHidden = false
-    const result = true
-    const hideDaw = false
 
     const [dragStart, setDragStart] = useState(null)
 
@@ -945,6 +941,7 @@ const DAW = () => {
 
     // This is regrettably necessary for reasons describe here: https://github.com/facebook/react/issues/14856
     useEffect(() => {
+        if (!el.current) return
         el.current.addEventListener('wheel', onWheel)
         return () => el.current.removeEventListener('wheel', onWheel)
     }, [onWheel])
@@ -975,6 +972,8 @@ const DAW = () => {
     const autoScroll = useSelector(daw.selectAutoScroll)
     const xScrollEl = useRef()
     useEffect(() => {
+        if (!xScrollEl.current) return
+    
         const viewMin = xScale.invert(horzScrollPos)
         const viewMax = xScale.invert(
             horzScrollPos + xScrollEl.current.parentElement.offsetWidth - X_OFFSET - 16
@@ -993,14 +992,14 @@ const DAW = () => {
         if (autoScroll && (xScale(playPosition) - xScrollEl.current.scrollLeft) > (xScrollEl.current.clientWidth-115)/2) {
             xScrollEl.current.scrollLeft = xScale(playPosition) - (xScrollEl.current.clientWidth-115)/2
         }
-    }, [horzScrollPos, xScale, playPosition, autoScroll])
+    }, [xScale, playPosition, autoScroll])
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
-        {isEmbedded && codeHidden &&
+        {hideEditor &&
         <div style={{display: "block"}} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header></Header>
 
-        {result && !hideDaw &&
+        {_result && !hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             <div className="flex-grow flex h-full relative">
                 {/* DAW Container */}
@@ -1084,6 +1083,7 @@ const HotDAW = hot(props => {
     ESUtils = props.ESUtils
     applyEffects = props.applyEffects
     player = props.player
+    $rootScope = props.$rootScope
     setup(props.$ngRedux.dispatch, props.$ngRedux.getState)
     return (
         <Provider store={props.$ngRedux}>
@@ -1092,4 +1092,4 @@ const HotDAW = hot(props => {
     );
 });
 
-app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player']))
+app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player', '$rootScope']))
