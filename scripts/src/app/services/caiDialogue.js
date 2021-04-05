@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule, caiStudentHistoryModule) {
+app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule, caiStudentHistoryModule, caiProjectModel) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};
