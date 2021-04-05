@@ -832,7 +832,6 @@ const DAW = () => {
     useEffect(() => setLoop(_loop), [_loop])
 
     const onMouseDown = (event) => {
-        event.preventDefault()
         // calculate x position of the bar from mouse position
         let x = event.clientX - event.currentTarget.getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
@@ -856,7 +855,6 @@ const DAW = () => {
     }
 
     const onMouseUp = (event) => {
-        event.preventDefault()
         if (dragStart === null) {
             return
         }
@@ -902,7 +900,6 @@ const DAW = () => {
     }
 
     const onMouseMove = (event) => {
-        event.preventDefault()
         // calculate x position of the bar from mouse position
         let x = event.clientX - event.currentTarget.getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
@@ -929,6 +926,52 @@ const DAW = () => {
         }
     }
 
+    const onKeyDown = (event) => {
+        if (event.key === "+" || event.key === "=") {
+            zoomX(1)
+        } else if (event.key === "-") {
+            zoomX(-1)
+        }
+    }
+
+    const onWheel = (event) => {
+        event.preventDefault()
+        if (event.ctrlKey) {
+            zoomY(-event.deltaY)
+        } else {
+            zoomX(-event.deltaY)
+        }
+    }
+
+    // This is regrettably necessary for reasons describe here: https://github.com/facebook/react/issues/14856
+    useEffect(() => {
+        el.current.addEventListener('wheel', onWheel)
+        return () => el.current.removeEventListener('wheel', onWheel)
+    }, [onWheel])
+
+    // Keep triggering an action while the mouse button is held.
+    const repeatClick = (action, interval=125) => {
+        let timer = useRef()
+        const down = () => {
+            timer.current = setInterval(action, interval)
+            action()
+        }
+        const up = () => {
+            clearInterval(timer.current)
+        }
+        return [down, up]
+    }
+
+    // A bit hacky; this allows the interval to continue working after a re-render.
+    const zoomXRef = useRef(), zoomYRef = useRef()
+    zoomXRef.current = zoomX
+    zoomYRef.current = zoomY
+
+    const [zoomInXMouseDown, zoomInXMouseUp] = repeatClick(() => zoomXRef.current(2))
+    const [zoomInYMouseDown, zoomInYMouseUp] = repeatClick(() => zoomYRef.current(1))
+    const [zoomOutXMouseDown, zoomOutXMouseUp] = repeatClick(() => zoomXRef.current(-2))
+    const [zoomOutYMouseDown, zoomOutYMouseUp] = repeatClick(() => zoomYRef.current(-1))
+
     // TODO: Autoscroll via useEffect.
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
@@ -938,17 +981,11 @@ const DAW = () => {
 
         {result && !hideDaw &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
-            {/* Directive sizeChanged */}
-            {/* Horizontal Zoom Slider */}
-            {/* <div id="horz-zoom-slider-container" className="flex-grow-0">
-                <span className="zoom-out">-</span>
-                <Slider value={horzSlider.value} onChange={(x) => horzSlider.value = x} options={horzSlider.options} title="Slide to zoom-in/out"/>
-                <span className="zoom-in">+</span>
-            </div> */}
-
             <div className="flex-grow flex h-full relative">
                 {/* DAW Container */}
-                <div ref={el} className="flex-grow overflow-hidden" id="daw-container" onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove}> {/* Directive dawContainer */}
+                <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
+                     onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
+                    {/* Directive dawContainer */}
                     <div className="relative">
                         {/* Effects Toggle */}
                         <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects"
@@ -1009,13 +1046,13 @@ const DAW = () => {
                 </div>
 
                 <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5">
-                    <button onClick={() => zoomX(1)} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onClick={() => zoomX(-1)} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInXMouseDown} onMouseUp={zoomInXMouseUp} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutXMouseDown} onMouseUp={zoomOutXMouseUp} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5">
-                    <button onClick={() => zoomY(1)} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onClick={() => zoomY(-1)} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInYMouseDown} onMouseUp={zoomInYMouseUp} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutYMouseDown} onMouseUp={zoomOutYMouseUp} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
             </div>
         </div>}
