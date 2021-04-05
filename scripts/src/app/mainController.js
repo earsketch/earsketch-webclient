@@ -993,13 +993,15 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.toggleCAIWindow = () => {
         $scope.showCAIWindow = !$scope.showCAIWindow;
         if ($scope.showCAIWindow) {
+            $ngRedux.dispatch(layout.setEast({ open: true }));
+            Layout.resetHorizontalSplits();
             angular.element('div[caiwindow]').show();
             angular.element('curriculum').hide();
+            // $scope.$apply();
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
         }
-        $scope.$apply();
     };
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
