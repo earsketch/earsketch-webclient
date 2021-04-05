@@ -1,5 +1,4 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit'
-import { keys } from 'lodash'
 
 const shuffle = (array) => {
     let i = array.length
@@ -38,6 +37,20 @@ const TIMELINE_ZOOM_INTERVALS = [
     {start: 3950, end: 7850, tickInterval: 2},
     {start: 7850, end: 9150, tickInterval: 1},
     {start: 9150, end: 50000, tickInterval: 1}
+]
+
+// List of default zoom lengths for ranges of measures.
+// This list is referred when the song is renderred for the first time
+// to approximate a zoom level based on the song length
+const ZOOM_LEVELS = [
+    {start: 1, end: 4, zoomLevel: 12000},
+    {start: 4, end: 8, zoomLevel: 4600},
+    {start: 8, end: 16, zoomLevel: 2700},
+    {start: 16, end: 24, zoomLevel: 1700},
+    {start: 24, end: 30, zoomLevel: 1250},
+    {start: 30, end: 36, zoomLevel: 1050},
+    {start: 36, end: 45, zoomLevel: 850},
+    {start: 45, end: 10000, zoomLevel: 650}
 ]
 
 // We want to keep the length of a bar proportional to number of pixels on the screen.
@@ -208,6 +221,11 @@ export const selectMeasurelineZoomIntervals = createSelector(
 export const selectTimelineZoomIntervals = createSelector(
     [selectTrackWidth],
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
+)
+
+export const selectZoomLevel = createSelector(
+    [selectPlayLength],
+    playLength => getZoomIntervals(ZOOM_LEVELS, playLength)
 )
 
 export const getMuted = (tracks, soloMute, metronome) => {

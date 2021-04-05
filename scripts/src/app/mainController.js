@@ -115,6 +115,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $scope.embeddedScriptName = data.scriptName;
         $ngRedux.dispatch(appState.setEmbeddedScriptUsername(data.username));
         $ngRedux.dispatch(appState.setEmbeddedScriptName(data.scriptName));
+        $ngRedux.dispatch(appState.setEmbeddedShareID(data.shareid));
     });
 
     $scope.activeTabID = null;

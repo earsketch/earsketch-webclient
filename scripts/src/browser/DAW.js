@@ -94,8 +94,7 @@ const Header = () => {
         player.setLoop(newLoop)
     }
 
-    // TODO
-    const shareScriptLink = "TODO"
+    const shareScriptLink = `${SITE_BASE_URI}?sharing=${useSelector(appState.selectEmbeddedShareID)}`
 
     const [volume, setVolume] = useState(0)  // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
@@ -153,7 +152,7 @@ const Header = () => {
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
-    return <div ref={el} id="dawHeader" className="flex-grow-0"> {/* widthExceeded directive */}
+    return <div ref={el} id="dawHeader" className="flex-grow-0">
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
@@ -214,15 +213,6 @@ const Header = () => {
                 </button>
             </span>
 
-            {/* Time Sync
-                TODO: Is this a real, supported feature? */}
-            {/* {timesync.available &&
-            <span className="daw-transport-button">
-                <button id="dawTimesyncButton" className={"btn btn-clear" + (timesyncEnabled ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Play together" data-placement="bottom" onClick={toggleTimesync}>
-                    <span className="icon icon-link"></span>
-                </button>
-            </span>} */}
-
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
@@ -238,7 +228,7 @@ const Header = () => {
     </div>
 }
 
-const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, horzScrollPos }) => {
+const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -246,7 +236,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
 
     return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
-            <div className="dawTrackCtrl" style={{left: horzScrollPos + 'px'}}>
+            <div className="dawTrackCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
@@ -261,7 +251,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         {showEffects &&
         Object.entries(track.effects).map(([key, effect], index) => 
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
-            <div className="dawEffectCtrl" style={{left: horzScrollPos + 'px'}}>
+            <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">Effect {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
@@ -407,28 +397,28 @@ const Effect = ({ name, color, effect, bypass, mute }) => {
     </div>
 }
 
-const MixTrack = ({ color, bypass, toggleBypass, track, horzScrollPos }) => {
+const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
     const showEffects = useSelector(daw.selectShowEffects)
-    // TODO
-    const hideMasterTrackLabel = false
+    const trackWidth = useSelector(daw.selectTrackWidth)
+    const hideMixTrackLabel = trackWidth < 950
 
     return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
-            <div className="dawTrackCtrl" style={{left: horzScrollPos + 'px'}}>
+            <div className="dawTrackCtrl" style={{left: xScroll + 'px'}}>
                 <div className="mixTrackFiller">{track.label}</div>
             </div>
             <div className="daw-track">
-                <div className="mixTrackFiller" style={{background: color}}>{!hideMasterTrackLabel && <span>MIX TRACK</span>}</div>
+                <div className="mixTrackFiller" style={{background: color}}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
             </div>
         </div>
         {showEffects &&
         Object.entries(track.effects).map(([key, effect], index) => 
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
-            <div className="dawEffectCtrl" style={{left: horzScrollPos + 'px'}}>
+            <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">Effect {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
@@ -579,15 +569,12 @@ const Timeline = () => {
     </div>
 }
 
-// More directives: widthExceeded, sizeChanged, dawContainer, trackPanelPosition, trackEffectPanelPosition
 
 // Pulled in via angular dependencies
 let WaveformCache, ESUtils, applyEffects, player, $rootScope
 
 const rms = (array) => {
-    return Math.sqrt(array.map(function (v) {
-        return Math.pow(v, 2);
-    }).reduce(function (a, b) { return a + b; }) / array.length);
+    return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
 }
 
 const prepareWaveforms = (tracks, tempo) => {
@@ -595,41 +582,40 @@ const prepareWaveforms = (tracks, tempo) => {
 
     // ignore the mix track (0) and metronome track (len-1)
     for (var i = 1; i < tracks.length - 1; i++) {
-        tracks[i].clips.forEach(function (clip) {
+        tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
-                var waveform = clip.audio.getChannelData(0);
+                const waveform = clip.audio.getChannelData(0)
 
                 // uncut clip duration
-                var wfDurInMeasure = ESUtils.timeToMeasure(clip.audio.duration, tempo);
+                const wfDurInMeasure = ESUtils.timeToMeasure(clip.audio.duration, tempo)
 
                 // clip start in samples
-                var sfStart = (clip.start-1) / wfDurInMeasure  * waveform.length;
-                var sfEnd = (clip.end-1) / wfDurInMeasure  * waveform.length;
+                const sfStart = (clip.start-1) / wfDurInMeasure  * waveform.length
+                const sfEnd = (clip.end-1) / wfDurInMeasure  * waveform.length
 
                 // suppress error when clips are overlapped
                 if (sfEnd <= sfStart) {
-                    return null;
+                    return null
                 }
 
                 // extract waveform portion actually used
-                var subFrames = waveform.subarray(sfStart, sfEnd);
+                const subFrames = waveform.subarray(sfStart, sfEnd)
 
-                var out = [];
-                var N = 30; // resolution; total samples to draw per measure
+                const out = []
+                const N = 30 // resolution; total samples to draw per measure
 
                 // downsample to N values using block-wise RMS
-                var outNumSamps = (clip.end-clip.start) * N;
-                for (var i = 0; i < outNumSamps; i++) {
-                    var blStart = i/outNumSamps * subFrames.length;
-                    var blEnd = (i+1)/outNumSamps * subFrames.length;
-                    out[i] = rms(subFrames.subarray(blStart, blEnd));
+                const outNumSamps = (clip.end-clip.start) * N
+                for (let i = 0; i < outNumSamps; i++) {
+                    const blStart = i/outNumSamps * subFrames.length
+                    const blEnd = (i+1)/outNumSamps * subFrames.length
+                    out[i] = rms(subFrames.subarray(blStart, blEnd))
                 }
 
                 // check: makebeat need special loop treatment or not???
-
-                WaveformCache.add(clip, out);
+                WaveformCache.add(clip, out)
             }
-        });
+        })
     }
 }
 
@@ -653,7 +639,6 @@ const setup = (dispatch, getState) => {
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
     $scope.$watch('compiled', function (result) {
-        _result = result
         const state = getState()
         // console.log("compiled result:", result)
         if (result === null || result === undefined) return
@@ -733,19 +718,13 @@ const setup = (dispatch, getState) => {
         player.setMutedTracks(daw.selectMuted(state))
         player.setBypassedEffects(daw.selectBypass(state))
 
-        // TODO:
-        // $scope.$on('resetScrollBars', function () {
-        //     $scope.resetScrollPos();
-        // });
-
-        // if ($scope.freshPallete) {
-        //     var result_ = $scope.getZoomIntervals($scope.playLength,$scope.zoomLevels);
-        //     if (result_) {
-        //         $scope.horzSlider.value = result_.zoomLevel;
-        //         $scope.updateTrackWidth($scope.horzSlider.value);
-        //     }
-        //     $scope.freshPallete = false;
-        // }
+        if (_result === null) {
+            // First run only: set zoom based on play length.
+            const level = daw.selectZoomLevel(state)
+            if (level) {
+                dispatch(daw.setTrackWidth(level.zoomLevel))
+            }
+        }
 
         // sanity checks
         const newLoop = Object.assign({}, state.daw.loop)
@@ -757,9 +736,8 @@ const setup = (dispatch, getState) => {
         }
         dispatch(daw.setLoop(newLoop))
 
-        // $scope.freshPallete = false;
-        // $scope.$broadcast('setPanelPosition');
-    });
+        _result = result
+    })
 }
 
 const DAW = () => {
@@ -796,7 +774,6 @@ const DAW = () => {
     }
 
     const [xScroll, setXScroll] = useState(0)
-    const horzScrollPos = xScroll
     const [yScroll, setYScroll] = useState(0)
     const el = useRef()
 
@@ -833,7 +810,7 @@ const DAW = () => {
             x -= X_OFFSET
         }
         // allow clicking the track controls without affecting dragging
-        if (x < horzScrollPos) {
+        if (x < xScroll) {
             return
         }
         // round to nearest measure
@@ -973,9 +950,9 @@ const DAW = () => {
     useEffect(() => {
         if (!xScrollEl.current) return
     
-        const viewMin = xScale.invert(horzScrollPos)
+        const viewMin = xScale.invert(xScroll)
         const viewMax = xScale.invert(
-            horzScrollPos + xScrollEl.current.parentElement.offsetWidth - X_OFFSET - 16
+            xScroll + xScrollEl.current.parentElement.offsetWidth - X_OFFSET - 16
         )
 
         if (playPosition > viewMax) {
@@ -1011,7 +988,6 @@ const DAW = () => {
                 {/* DAW Container */}
                 <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
                      onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
-                    {/* Directive dawContainer */}
                     <div className="relative">
                         <div id="daw-clickable" style={{position: 'relative', top: yScroll + 'px'}}>
                             {/* Timescales */}
@@ -1024,11 +1000,11 @@ const DAW = () => {
                                 if (track.visible) {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
-                                                         bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} horzScrollPos={horzScrollPos} />
+                                                         bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
                                     } else if (index < tracks.length - 1) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
                                                       mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
-                                                      bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} horzScrollPos={horzScrollPos} />
+                                                      bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
                                     }
                                 }
                             })}

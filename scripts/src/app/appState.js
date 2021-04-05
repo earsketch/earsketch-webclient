@@ -14,6 +14,7 @@ const appSlice = createSlice({
         hideEditor: false,
         embeddedScriptName: null,
         embeddedScriptUsername: null,
+        embeddedShareID: null,
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -43,13 +44,16 @@ const appSlice = createSlice({
         },
         setEmbeddedScriptName(state, { payload }) {
             state.embeddedScriptName = payload;
+        },
+        setEmbeddedShareID(state, { payload }) {
+            state.embeddedShareID = payload;
         }
     }
 });
 
 const persistConfig = {
     key: 'app',
-    blacklist: ['embedMode', 'hideDAW', 'hideEditor', 'embeddedScriptUsername', 'embeddedScriptName'],
+    blacklist: ['embedMode', 'hideDAW', 'hideEditor', 'embeddedScriptUsername', 'embeddedScriptName', 'embeddedShareID'],
     storage
 };
 
@@ -64,6 +68,7 @@ export const {
     setHideEditor,
     setEmbeddedScriptUsername,
     setEmbeddedScriptName,
+    setEmbeddedShareID,
 } = appSlice.actions;
 
 export const selectScriptLanguage = state => state.app.scriptLanguage;
@@ -75,3 +80,4 @@ export const selectHideDAW = state => state.app.hideDAW;
 export const selectHideEditor = state => state.app.hideEditor;
 export const selectEmbeddedScriptUsername = state => state.app.embeddedScriptUsername;
 export const selectEmbeddedScriptName = state => state.app.embeddedScriptName;
+export const selectEmbeddedShareID = state => state.app.embeddedShareID;
