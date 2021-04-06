@@ -291,7 +291,8 @@ const drawWaveform = (element, waveform, width, height) => {
 const Clip = ({ color, clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
-    const width = xScale(clip.end - clip.start + 1)
+    // Minimum width prevents clips from vanishing on zoom out.
+    const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
     const element = useRef()
 
