@@ -16,10 +16,8 @@ const X_OFFSET = 100
 let _result = null
 
 
-const Header = () => {
+const Header = ({ playPosition, setPlayPosition }) => {
     const dispatch = useDispatch()
-    // TODO: Do we actually want a dependency on this thing that's changing constantly during playback?
-    const playPosition = useSelector(daw.selectPlayPosition)
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector(state => state.bubble)
     const playing = useSelector(daw.selectPlaying)
@@ -41,7 +39,7 @@ const Header = () => {
     const playbackEndedCallback = () => {
         if (!loop.on) {
             dispatch(daw.setPlaying(false))
-            dispatch(daw.setPlayPosition(1))
+            setPlayPosition(1)
         }
     }
 
@@ -60,7 +58,7 @@ const Header = () => {
         dispatch(daw.setPlaying(false))
 
         if (playPosition >= playLength) {
-            dispatch(daw.setPlayPosition(loop.selection ? loop.start : 1))
+            setPlayPosition(loop.selection ? loop.start : 1)
         }
 
         // TODO: These should be unnecessary given that they're set upon compile...
@@ -123,7 +121,7 @@ const Header = () => {
         if (playing) {
             dispatch(daw.setPendingPosition(pos))
         } else {
-            dispatch(daw.setPlayPosition(pos))
+            setPlayPosition(pos)
         }
     }
 
@@ -435,15 +433,13 @@ const Cursor = ({ position }) => {
     return pendingPosition === null && <div className="daw-cursor" style={{left: position + 'px'}}></div>
 }
 
-const Playhead = () => {
-    const dispatch = useDispatch()
+const Playhead = ({ playPosition, setPlayPosition }) => {
     const playing = useSelector(daw.selectPlaying)
-    const playPosition = useSelector(daw.selectPlayPosition)
     const xScale = useSelector(daw.selectXScale)
     useEffect(() => {
         if (playing) {
             // TODO: Perhaps we could make this smoother and cheaper with CSS animation?
-            const interval = setInterval(() => dispatch(daw.setPlayPosition(player.getCurrentPosition())), 60)
+            const interval = setInterval(() => setPlayPosition(player.getCurrentPosition()), 60)
             return () => clearInterval(interval)
         }
     }, [playing])
@@ -620,6 +616,8 @@ const prepareWaveforms = (tracks, tempo) => {
 }
 
 let reset = true
+// TODO: Temporary hack:
+let _setPlayPosition
 
 let setupDone = false
 const setup = (dispatch, getState) => {
@@ -705,7 +703,7 @@ const setup = (dispatch, getState) => {
             dispatch(daw.setMetronome(false))
             dispatch(daw.setShowEffects(true))
             dispatch(daw.setPlaying(false))
-            dispatch(daw.setPlayPosition(1))
+            _setPlayPosition(1)
             dispatch(daw.shuffleTrackColors())
             dispatch(daw.setSoloMute({}))
             dispatch(daw.setBypass({}))
@@ -753,8 +751,8 @@ const DAW = () => {
     const bypass = useSelector(daw.selectBypass)
     const soloMute = useSelector(daw.selectSoloMute)
     const muted = useSelector(daw.selectMuted)
-    // TODO: Do we actually want a dependency on this thing that's changing constantly during playback?
-    const playPosition = useSelector(daw.selectPlayPosition)
+    const [playPosition, setPlayPosition] = useState(1)
+    _setPlayPosition = setPlayPosition
     const playing = useSelector(daw.selectPlaying)
 
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
@@ -973,7 +971,7 @@ const DAW = () => {
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
         {hideEditor &&
         <div style={{display: "block"}} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
-        <Header></Header>
+        <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {_result && !hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
@@ -1011,7 +1009,7 @@ const DAW = () => {
                         </div>
 
                         <div className="absolute left-0 h-full" style={{top: yScroll + 'px'}}>
-                            <Playhead />
+                            <Playhead playPosition={playPosition} setPlayPosition={setPlayPosition} />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
                             {(dragStart !== null || loop.selection && loop.on) && loop.end != loop.start &&

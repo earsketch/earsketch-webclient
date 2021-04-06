@@ -62,8 +62,6 @@ const dawSlice = createSlice({
     name: 'daw',
     initialState: {
         tracks: [],
-        // TODO: I suspect this should not really be necessary (player also has stores this), but for some reason player.pause() also resets the play position.
-        playPosition: 1,  // Current play position in measures.
         playLength: 0,
         trackWidth: 2750,  // TODO: Not sure why this changes from its initial value (650).
         trackHeight: 45,
