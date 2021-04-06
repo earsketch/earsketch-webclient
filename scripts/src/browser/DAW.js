@@ -434,16 +434,8 @@ const Cursor = ({ position }) => {
     return pendingPosition === null && <div className="daw-cursor" style={{left: position + 'px'}}></div>
 }
 
-const Playhead = ({ playPosition, setPlayPosition }) => {
-    const playing = useSelector(daw.selectPlaying)
+const Playhead = ({ playPosition }) => {
     const xScale = useSelector(daw.selectXScale)
-    useEffect(() => {
-        if (playing) {
-            // TODO: Perhaps we could make this smoother and cheaper with CSS animation?
-            const interval = setInterval(() => setPlayPosition(player.getCurrentPosition()), 60)
-            return () => clearInterval(interval)
-        }
-    }, [playing])
     return <div className="daw-marker" style={{left: xScale(playPosition) + 'px'}}></div>
 }
 
@@ -946,28 +938,40 @@ const DAW = () => {
 
     const autoScroll = useSelector(daw.selectAutoScroll)
     const xScrollEl = useRef()
-    useEffect(() => {
-        if (!xScrollEl.current) return
-    
-        const viewMin = xScale.invert(xScroll)
-        const viewMax = xScale.invert(
-            xScroll + xScrollEl.current.parentElement.offsetWidth - X_OFFSET - 16
-        )
 
-        if (playPosition > viewMax) {
+    // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
+    // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
+    const updatePlayPositionAndScroll = () => {
+        const position = player.getCurrentPosition()
+        setPlayPosition(position)
+
+        if (!(el.current && xScrollEl.current)) return
+    
+        const xScroll = el.current.scrollLeft
+        const viewMin = xScale.invert(xScroll)
+        const viewMax = xScale.invert(xScroll + el.current.clientWidth - X_OFFSET)
+
+        if (position > viewMax) {
             // Flip right
-            xScrollEl.current.scrollLeft += xScrollEl.current.parentElement.offsetWidth - X_OFFSET
-        } else if (playPosition < viewMin) {
+            xScrollEl.current.scrollLeft += xScrollEl.current.clientWidth
+        } else if (position < viewMin) {
             // Flip left
-            var jump = xScale(playPosition)
-            xScrollEl.current.scrollLeft = jump
+            xScrollEl.current.scrollLeft -= xScrollEl.current.clientWidth
         }
 
         // Follow playback continuously if autoscroll is enabled
-        if (autoScroll && (xScale(playPosition) - xScrollEl.current.scrollLeft) > (xScrollEl.current.clientWidth-115)/2) {
-            xScrollEl.current.scrollLeft = xScale(playPosition) - (xScrollEl.current.clientWidth-115)/2
+        if (autoScroll && (xScale(position) - xScroll) > (el.current.clientWidth-115)/2) {
+            const fracX = (xScale(position) - (el.current.clientWidth-115)/2) / (el.current.scrollWidth - el.current.clientWidth)
+            xScrollEl.current.scrollLeft = fracX * (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
         }
-    }, [xScale, playPosition, autoScroll])
+    }
+
+    useEffect(() => {
+        if (playing) {
+            const interval = setInterval(updatePlayPositionAndScroll, 60)
+            return () => clearInterval(interval)
+        }
+    }, [playing, xScale, autoScroll])
 
     return <div className="flex flex-col w-full h-full relative overflow-hidden">
         {hideEditor &&
@@ -1010,7 +1014,7 @@ const DAW = () => {
                         </div>
 
                         <div className="absolute left-0 h-full" style={{top: yScroll + 'px'}}>
-                            <Playhead playPosition={playPosition} setPlayPosition={setPlayPosition} />
+                            <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
                             {(dragStart !== null || loop.selection && loop.on) && loop.end != loop.start &&
