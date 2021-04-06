@@ -41,10 +41,10 @@ const createSampleScript = createAsyncThunk(
         return userProject.saveScript(fileName, code, true)
             .then(script => {
                 userProject.openScript(script.shareid);
-                dispatch(tabs.openAndActivateTab(script.shareid));
-
                 // tabController also needs to call refresh.
                 rootScope.$broadcast('createScript', script.shareid);
+
+                dispatch(tabs.setActiveTabAndEditor(script.shareid));
             });
     }
 );
@@ -63,8 +63,10 @@ const setEditorReadOnly = createAsyncThunk(
 
 export const dismissBubble = createAsyncThunk(
     'bubble/dismissBubble',
-    (_, { dispatch }) => {
-        dispatch(setEditorReadOnly(false));
+    (_, { dispatch, getState }) => {
+        if (getState().bubble.currentPage !== 0) {
+            dispatch(setEditorReadOnly(false));
+        }
         dispatch(suspend());
     }
 );

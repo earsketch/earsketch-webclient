@@ -10,6 +10,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
     var USER_STATE_KEY = 'userstate';
 
     var LS_TABS_KEY = 'tabs_v2';
+    var LS_SHARED_TABS_KEY = 'shared_tabs_v1';
     var LS_SCRIPTS_KEY = 'scripts_v1';
 
     var STATUS_UNKNOWN = 0;
@@ -164,7 +165,17 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 if (storedTabs) {
                     storedTabs.forEach(tab => {
                         openScripts.push(tab);
-                        $ngRedux.dispatch(tabs.openAndActivateTab(tab));
+                        $ngRedux.dispatch(tabs.setActiveTabAndEditor(tab));
+                    });
+                }
+            }
+
+            if (localStorage.checkKey(LS_SHARED_TABS_KEY)) {
+                const storedTabs = JSON.parse(localStorage.get(LS_SHARED_TABS_KEY));
+                if (storedTabs) {
+                    storedTabs.forEach(tab => {
+                        openSharedScripts.push(tab);
+                        $ngRedux.dispatch(tabs.setActiveTabAndEditor(tab));
                     });
                 }
             }
@@ -335,6 +346,34 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 script = postProcessCollaborators(script);
             }
 
+            // when the user logs in and his/her scripts are loaded, we can restore
+            // their previous tab session stored in the browser's local storage
+            const embedMode = appState.selectEmbedMode($ngRedux.getState());
+            if (!embedMode) {
+                if (localStorage.checkKey(LS_TABS_KEY)) {
+                    const opened = JSON.parse(localStorage.get(LS_TABS_KEY));
+
+                    for (let i in opened) {
+                        if (opened.hasOwnProperty(i)) {
+                            openScripts.push(opened[i]);
+                        }
+                    }
+                }
+                if (localStorage.checkKey(LS_SHARED_TABS_KEY)) {
+                    const opened = JSON.parse(localStorage.get(LS_SHARED_TABS_KEY));
+
+                    for (let i in opened) {
+                        if (opened.hasOwnProperty(i)) {
+                            openSharedScripts.push(opened[i]);
+                        }
+                    }
+                }
+                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+                if (activeTabID) {
+                    $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+                }
+            }
+
             // Clear Recommendations in Sound Browser
             $rootScope.$broadcast('clearRecommender');
 
@@ -351,7 +390,8 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                         if (saved[i].hasOwnProperty('creator') && (saved[i].creator !== username)) {
                             promises.push(importSharedScript(saved[i].original_id));
                         } else {
-                            promises.push(saveScript(saved[i].name, saved[i].source_code, false));
+                            // promises.push(saveScript(saved[i].name, saved[i].source_code, false));
+                            promises.push(saveScript(saved[i].name, tabs.getEditorSession(saved[i].shareid).getValue(), false));
                         }
                     }
                 }
@@ -362,12 +402,13 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 return $q.all(promises).then(function (savedScripts) {
                     localStorage.remove(LS_SCRIPTS_KEY);
                     localStorage.remove(LS_TABS_KEY);
+                    localStorage.remove(LS_SHARED_TABS_KEY);
 
                     return refreshCodeBrowser().then(function () {
                         // once all scripts have been saved open them
                         angular.forEach(savedScripts, function(savedScript) {
                             openScript(savedScript.shareid);
-                            $ngRedux.dispatch(tabs.openAndActivateTab(savedScript.shareid));
+                            $ngRedux.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid));
                         });
                     });
                 }).then(() => getSharedScripts(username, password));
@@ -1827,8 +1868,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
         if (openSharedScripts.indexOf(shareid) === -1) {
             openSharedScripts.push(shareid);
 
-            /*Not maintaing open shared scripts in local storage yet*/
-            // localStorage[LS_TABS_KEY] = JSON.stringify(openScripts);
+            localStorage.set(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
         }
     }
 
@@ -1840,11 +1880,19 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
      */
     function closeScript(shareid) {
         if (isOpen(shareid)) {
-            openScripts.splice(openScripts.indexOf(shareid), 1);
-            // save tabs state
-            localStorage.set(LS_TABS_KEY, JSON.stringify(openScripts));
+            if (openScripts.includes(shareid)) {
+                openScripts.splice(openScripts.indexOf(shareid), 1);
+                // save tabs state
+                localStorage.set(LS_TABS_KEY, JSON.stringify(openScripts));
+            }
+        } else if (isSharedScriptOpen(shareid)) {
+            if (openSharedScripts.includes(shareid)) {
+                openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1);
+                // save tabs state
+                localStorage.set(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
+            }
         }
-        return openScripts;
+        return tabs.selectOpenTabs($ngRedux.getState()).slice();
     }
 
     /**
@@ -1856,8 +1904,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
     function closeSharedScript(shareid) {
         if (isSharedScriptOpen(shareid)) {
             openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1);
-            // not saving shared tabs in local storage yet
-            // localStorage[LS_TABS_KEY] = JSON.stringify(openScripts);
+            localStorage[LS_SHARED_TABS_KEY] = JSON.stringify(openSharedScripts);
         }
         return openSharedScripts;
     }

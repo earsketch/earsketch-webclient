@@ -130,8 +130,10 @@ const SingletonDropdownMenu = () => {
                 visible={!context}
                 onClick={() => {
                     if (type==='regular') {
+                        dispatch(tabs.setActiveTabAndEditor(script.shareid));
                         openScript(script);
                     } else if (type==='shared') {
+                        dispatch(tabs.setActiveTabAndEditor(script.shareid));
                         openSharedScript(script);
                     }
                 }}
@@ -216,7 +218,7 @@ const SingletonDropdownMenu = () => {
 
                     if (openTabs.includes(script.shareid) && !script.collaborative) {
                         dispatch(tabs.closeTab(script.shareid));
-                        dispatch(tabs.openAndActivateTab(imported.shareid));
+                        dispatch(tabs.setActiveTabAndEditor(imported.shareid));
                         openScript(imported);
                     }
                 }}

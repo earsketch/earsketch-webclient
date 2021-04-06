@@ -121,6 +121,7 @@ const scriptsSlice = createSlice({
         setFeatureSharedScript(state, { payload }) {
             state.featureSharedScript = payload;
         },
+        // TODO: Move dropdown stuff to temporary / mutable state.
         setDropdownMenu(state, { payload }) {
             state.dropdownMenu.show = payload.show ? payload.show : true;
             state.dropdownMenu.script = payload.script;
@@ -149,7 +150,7 @@ const scriptsSlice = createSlice({
 
 const persistConfig = {
     key: 'scripts',
-    whitelist: ['localScripts'],
+    whitelist: ['localScripts','readOnlyScripts'],
     storage
 };
 

@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import * as helpers from 'helpers';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
+import * as editor from "./editorState";
 
 const tabSlice = createSlice({
     name: 'tabs',
@@ -41,6 +44,7 @@ const tabSlice = createSlice({
             state.showTabDropdown = payload;
         },
         addModifiedScript(state, { payload }) {
+            // TODO: This is being triggered by keystrokes. Move to mutable state.
             !state.modifiedScripts.includes(payload) && state.modifiedScripts.push(payload);
         },
         removeModifiedScript(state, { payload }) {
@@ -52,7 +56,13 @@ const tabSlice = createSlice({
     }
 });
 
-export default tabSlice.reducer;
+const persistConfig = {
+    key: 'tabs',
+    whitelist: ['openTabs', 'activeTabID'],
+    storage
+};
+
+export default persistReducer(persistConfig, tabSlice.reducer);
 export const {
     setOpenTabs,
     setActiveTabID,
@@ -96,11 +106,18 @@ export const selectHiddenTabs = createSelector(
 );
 
 export const selectModifiedScripts = state => state.tabs.modifiedScripts;
-
+export const selectActiveTabScript = createSelector(
+    [selectActiveTabID, scripts.selectAllScriptEntities],
+    (activeTabID, scriptEntities) => scriptEntities[activeTabID]
+)
 
 // Note: Do not export and modify directly.
 const tabsMutableState = {
-    editorSessions: {}
+    editorSessions: {},
+    modifiedScripts: {
+        entities: {},
+        scriptIDs: []
+    }
 };
 
 export const setActiveTabAndEditor = createAsyncThunk(
@@ -108,22 +125,38 @@ export const setActiveTabAndEditor = createAsyncThunk(
     (scriptID, { getState, dispatch }) => {
         const ideScope = helpers.getNgController('ideController').scope();
         const prevTabID = selectActiveTabID(getState());
+        const script = scripts.selectAllScriptEntities(getState())[scriptID];
 
-        // Note: Watch out that prevSession actually can be a new session already created somewhere else.
-        const prevSession = ideScope.editor.ace.getSession();
-        prevTabID && setEditorSession(prevTabID, prevSession);
-        dispatch(ensureCollabScriptIsClosed(prevTabID));
+        if (!script) return;
+
+        if (editor.selectBlocksMode(getState())) {
+            // ideScope.editor.droplet.setValue(editSession.getValue(), -1);
+            ideScope.toggleBlocks();
+            dispatch(editor.setBlocksMode(false));
+        }
+
+        let editSession;
 
         const restoredSession = getEditorSession(scriptID);
         if (restoredSession) {
-            ideScope.editor.ace.setSession(restoredSession);
+            editSession = restoredSession;
         } else {
-            const script = scripts.selectAllScriptEntities(getState())[scriptID];
             const language = script.name.slice(-2) === 'py' ? 'python' : 'javascript';
-            ideScope.editor.ace.setSession(ace.createEditSession(script.source_code, `ace/mode/${language}`));
+            editSession = ace.createEditSession(script.source_code, `ace/mode/${language}`);
+            setEditorSession(scriptID, editSession);
+        }
+        editor.setSession(editSession);
+
+        ideScope.activeScript = script;
+        editor.setReadOnly(script.readonly);
+
+        if (script.collaborative) {
+            const collaboration = helpers.getNgService('collaboration');
+            collaboration.openScript(Object.assign({},script), user.selectUserName(getState()));
         }
 
-        dispatch(openAndActivateTab(scriptID));
+        (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID));
+        scriptID && dispatch(openAndActivateTab(scriptID));
     }
 );
 
@@ -133,6 +166,10 @@ export const closeAndSwitchTab = createAsyncThunk(
         const openTabs = selectOpenTabs(getState());
         const activeTabID = selectActiveTabID(getState());
         const closedTabIndex = openTabs.indexOf(scriptID);
+        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+
+        dispatch(saveScriptIfModified(scriptID));
+        dispatch(ensureCollabScriptIsClosed(scriptID));
 
         if (openTabs.length === 1) {
             dispatch(resetTabs());
@@ -148,15 +185,69 @@ export const closeAndSwitchTab = createAsyncThunk(
             dispatch(closeTab(scriptID));
         }
         deleteEditorSession(scriptID);
-        dispatch(ensureCollabScriptIsClosed(scriptID));
+        script.readonly && dispatch(removeReadOnlyScript(scriptID));
+    }
+);
+
+export const closeAllTabs = createAsyncThunk(
+    'tabs/closeAllTabs',
+    (_, { getState, dispatch }) => {
+        const openTabs = selectOpenTabs(getState());
+
+        openTabs.forEach(scriptID => {
+            dispatch(saveScriptIfModified(scriptID));
+            dispatch(ensureCollabScriptIsClosed(scriptID));
+            dispatch(closeTab(scriptID));
+            deleteEditorSession(scriptID);
+
+            const script = scripts.selectAllScriptEntities(getState())[scriptID];
+            script.readonly && dispatch(removeReadOnlyScript(scriptID));
+        });
+
+        if (editor.selectBlocksMode(getState())) {
+            const ideScope = helpers.getNgController('ideController').scope();
+            ideScope.toggleBlocks();
+            dispatch(editor.setBlocksMode(false));
+        }
+
+        // These are probably redundant except for resetting the activeTabID.
+        dispatch(resetTabs());
+        dispatch(resetModifiedScripts());
+        dispatch(scripts.resetReadOnlyScripts());
+    }
+)
+
+export const saveScriptIfModified = createAsyncThunk(
+    'tabs/saveScriptIfModified',
+    (scriptID, { getState, dispatch }) => {
+        const modified = selectModifiedScripts(getState()).includes(scriptID);
+        if (modified) {
+            const restoredSession = getEditorSession(scriptID);
+
+            if (restoredSession) {
+                const userProject = helpers.getNgService('userProject');
+                const script = scripts.selectAllScriptEntities(getState())[scriptID];
+                userProject.saveScript(script.name, restoredSession.getValue()).then(() => {
+                    userProject.closeScript(scriptID);
+                });
+            }
+
+            dispatch(removeModifiedScript(scriptID));
+            dispatch(scripts.syncToNgUserProject());
+
+            // TODO: Save successful notification
+
+        }
     }
 );
 
 const ensureCollabScriptIsClosed = createAsyncThunk(
     'tabs/ensureCollabScriptIsClosed',
     (scriptID, { getState }) => {
+        // Note: Watch out for the order with closeScript.
+        const activeTabID = selectActiveTabID(getState());
         const script = scripts.selectAllScriptEntities(getState())[scriptID];
-        if (script.collaborative) {
+        if (scriptID === activeTabID && script.collaborative) {
             const collabService = helpers.getNgService('collaboration');
             const userName = user.selectUserName(getState());
             collabService.closeScript(scriptID, userName);
@@ -169,22 +260,23 @@ export const closeDeletedScript = createAsyncThunk(
     (scriptID, { getState, dispatch }) => {
         const openTabs = selectOpenTabs(getState());
         if (openTabs.includes(scriptID)) {
-            const filteredOpenTabs = openTabs.filter(v => v !== scriptID);
-            dispatch(setOpenTabs(filteredOpenTabs));
-            if (filteredOpenTabs.length) {
-                dispatch(setActiveTabAndEditor(filteredOpenTabs[Math.min(openTabs.indexOf(scriptID),filteredOpenTabs.length-1)]));
-            } else {
-                dispatch(setActiveTabID(null));
-            }
+            dispatch(closeAndSwitchTab(scriptID));
+            // const filteredOpenTabs = openTabs.filter(v => v !== scriptID);
+            // dispatch(setOpenTabs(filteredOpenTabs));
+            // if (filteredOpenTabs.length) {
+            //     dispatch(setActiveTabAndEditor(filteredOpenTabs[Math.min(openTabs.indexOf(scriptID),filteredOpenTabs.length-1)]));
+            // } else {
+            //     dispatch(setActiveTabID(null));
+            // }
         }
     }
 );
 
-const setEditorSession = (scriptID, session) => {
+export const setEditorSession = (scriptID, session) => {
     tabsMutableState.editorSessions[scriptID] = session;
 };
 
-const getEditorSession = scriptID => {
+export const getEditorSession = scriptID => {
     return tabsMutableState.editorSessions[scriptID];
 };
 

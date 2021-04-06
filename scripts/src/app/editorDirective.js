@@ -1,7 +1,7 @@
 import * as tabs from '../editor/tabState';
 import * as config from '../editor/editorConfig';
 
-app.directive('editor', ['$rootScope', 'collaboration', 'esconsole', '$timeout', '$ngRedux', function ($rootScope, collaboration, esconsole, $timeout, $ngRedux) {
+app.directive('editor', ['$rootScope', 'collaboration', 'esconsole', '$timeout', '$ngRedux', 'userProject', function ($rootScope, collaboration, esconsole, $timeout, $ngRedux, userProject) {
     return {
         transclude: false,
         restrict: 'EA',
@@ -167,6 +167,24 @@ app.directive('editor', ['$rootScope', 'collaboration', 'esconsole', '$timeout',
                     $rootScope.$broadcast('reloadRecommendations');
                 }, 1000);
 
+                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+                const editSession = scope.editor.ace.getSession();
+                tabs.setEditorSession(activeTabID, editSession);
+
+                let script = null;
+
+                if (activeTabID in userProject.scripts) {
+                    script = userProject.scripts[activeTabID];
+                } else if (activeTabID in userProject.sharedScripts) {
+                    script = userProject.sharedScripts[activeTabID];
+                }
+                if (script) {
+                    script.source_code = editSession.getValue();
+                    if (!script.collaborative) {
+                        script.saved = false;
+                        $ngRedux.dispatch(tabs.addModifiedScript(activeTabID));
+                    }
+                }
             });
 
             scope.editor.ace.getSession().selection.on('changeSelection', function () {

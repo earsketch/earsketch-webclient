@@ -431,6 +431,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(scripts.resetReadOnlyScripts());
             $ngRedux.dispatch(tabs.resetTabs());
+            $ngRedux.dispatch(tabs.resetModifiedScripts());
         }).catch(function (err) {
             $confirm({text: ESMessages.idecontroller.saveallfailed,
                 cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
@@ -916,6 +917,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.deleteScript = script => {
+        const tabScope = helpers.getNgController('tabController').scope();
+
         $confirm({
             text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
             ok: "Delete"
@@ -930,6 +933,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
             $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
+            tabScope.tabs = tabScope.getOpenTabEntities();
         });
     };
 
@@ -949,8 +953,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                 $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
                 // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
                 collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
-
-                tabScope.tabs = tabScope.tabs.filter(v => v.shareid===script.shareid);
+                tabScope.tabs = tabScope.getOpenTabEntities();
             })
         } else {
             $confirm({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
@@ -958,7 +961,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                     $ngRedux.dispatch(scripts.syncToNgUserProject());
                     $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
                     $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
-                    tabScope.tabs = tabScope.tabs.filter(v => v.shareid===script.shareid);
+                    tabScope.tabs = tabScope.getOpenTabEntities();
                 });
             });
         }
