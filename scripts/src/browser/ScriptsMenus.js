@@ -190,7 +190,7 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn || type==='readonly'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.openScriptHistory(unsavedScript, true);
+                    scope.openScriptHistory(unsavedScript, !script.isShared);
                 }}
             />
             <MenuItem

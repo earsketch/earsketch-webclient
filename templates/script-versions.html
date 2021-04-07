@@ -2,6 +2,7 @@
     <button type="button" class="close" id="script-history-close" ng-click="close()">&times;</button>
     <h4 class="modal-title">
       Version history for "{{script.name}}"
+      <span ng-hide="allowRevert">(You can only revert the scripts under MY SCRIPTS)</span>
     </h4>
 </div>
 
