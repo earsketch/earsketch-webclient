@@ -192,6 +192,12 @@ export const closeAndSwitchTab = createAsyncThunk(
 export const closeAllTabs = createAsyncThunk(
     'tabs/closeAllTabs',
     (_, { getState, dispatch }) => {
+        if (editor.selectBlocksMode(getState())) {
+            const ideScope = helpers.getNgController('ideController').scope();
+            ideScope.toggleBlocks();
+            dispatch(editor.setBlocksMode(false));
+        }
+
         const openTabs = selectOpenTabs(getState());
 
         openTabs.forEach(scriptID => {
@@ -203,12 +209,6 @@ export const closeAllTabs = createAsyncThunk(
             const script = scripts.selectAllScriptEntities(getState())[scriptID];
             script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID));
         });
-
-        if (editor.selectBlocksMode(getState())) {
-            const ideScope = helpers.getNgController('ideController').scope();
-            ideScope.toggleBlocks();
-            dispatch(editor.setBlocksMode(false));
-        }
 
         // These are probably redundant except for resetting the activeTabID.
         dispatch(resetTabs());
@@ -247,7 +247,7 @@ const ensureCollabScriptIsClosed = createAsyncThunk(
         // Note: Watch out for the order with closeScript.
         const activeTabID = selectActiveTabID(getState());
         const script = scripts.selectAllScriptEntities(getState())[scriptID];
-        if (scriptID === activeTabID && script.collaborative) {
+        if (scriptID === activeTabID && script?.collaborative) {
             const collabService = helpers.getNgService('collaboration');
             const userName = user.selectUserName(getState());
             collabService.closeScript(scriptID, userName);
