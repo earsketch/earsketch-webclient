@@ -201,7 +201,7 @@ export const closeAllTabs = createAsyncThunk(
             deleteEditorSession(scriptID);
 
             const script = scripts.selectAllScriptEntities(getState())[scriptID];
-            script.readonly && dispatch(removeReadOnlyScript(scriptID));
+            script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID));
         });
 
         if (editor.selectBlocksMode(getState())) {
