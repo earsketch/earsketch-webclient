@@ -130,7 +130,6 @@ export const setActiveTabAndEditor = createAsyncThunk(
         if (!script) return;
 
         if (editor.selectBlocksMode(getState())) {
-            // ideScope.editor.droplet.setValue(editSession.getValue(), -1);
             ideScope.toggleBlocks();
             dispatch(editor.setBlocksMode(false));
         }
