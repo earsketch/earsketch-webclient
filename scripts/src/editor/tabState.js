@@ -136,18 +136,19 @@ export const setActiveTabAndEditor = createAsyncThunk(
         }
 
         let editSession;
+        const language = script.name.slice(-2) === 'py' ? 'python' : 'javascript';
 
         const restoredSession = getEditorSession(scriptID);
         if (restoredSession) {
             editSession = restoredSession;
         } else {
-            const language = script.name.slice(-2) === 'py' ? 'python' : 'javascript';
             editSession = ace.createEditSession(script.source_code, `ace/mode/${language}`);
             setEditorSession(scriptID, editSession);
         }
         editor.setSession(editSession);
 
         ideScope.activeScript = script;
+        ideScope.setLanguage(language);
         editor.setReadOnly(script.readonly);
 
         if (script.collaborative) {
