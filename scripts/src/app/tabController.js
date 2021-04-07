@@ -151,18 +151,18 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $scope.copyScript(script);
     });
 
-    $scope.$on('showTabAfterScriptVersionChange', function(event, script){
-        var tabId = $scope.getTabId(script.shareid);
-
-        if (tabId === -1) {
-            // open the script in tab
-            //note - selectScript() is inherited from IDE controller
-            $scope.selectScript(script);
-        } else {
-            // it is already open, set focus on it
-            $scope.swapTab(tabId);
-        }
-    });
+    // $scope.$on('showTabAfterScriptVersionChange', function(event, script){
+    //     var tabId = $scope.getTabId(script.shareid);
+    //
+    //     if (tabId === -1) {
+    //         // open the script in tab
+    //         //note - selectScript() is inherited from IDE controller
+    //         $scope.selectScript(script);
+    //     } else {
+    //         // it is already open, set focus on it
+    //         $scope.swapTab(tabId);
+    //     }
+    // });
 
     $scope.$on('saveCollaborativeScriptAttempt', function(){
         var script = $scope.tabs[$scope.activeTab];

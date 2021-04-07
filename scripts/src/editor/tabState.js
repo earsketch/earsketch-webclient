@@ -262,13 +262,6 @@ export const closeDeletedScript = createAsyncThunk(
         const openTabs = selectOpenTabs(getState());
         if (openTabs.includes(scriptID)) {
             dispatch(closeAndSwitchTab(scriptID));
-            // const filteredOpenTabs = openTabs.filter(v => v !== scriptID);
-            // dispatch(setOpenTabs(filteredOpenTabs));
-            // if (filteredOpenTabs.length) {
-            //     dispatch(setActiveTabAndEditor(filteredOpenTabs[Math.min(openTabs.indexOf(scriptID),filteredOpenTabs.length-1)]));
-            // } else {
-            //     dispatch(setActiveTabID(null));
-            // }
         }
     }
 );
@@ -281,7 +274,7 @@ export const getEditorSession = scriptID => {
     return tabsMutableState.editorSessions[scriptID];
 };
 
-const deleteEditorSession = scriptID => {
+export const deleteEditorSession = scriptID => {
     if (scriptID in tabsMutableState.editorSessions) {
         delete tabsMutableState.editorSessions[scriptID];
     }
