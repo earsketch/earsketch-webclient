@@ -99,9 +99,18 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     // });
 
     $scope.$on('updateTabFromEditorSave', function () {
-        if ($scope.tabs.length > 0 && !$scope.tabs[$scope.activeTab].saved) {
-            $scope.saveScript();
-        } else if ($scope.tabs[$scope.activeTab].collaborative) {
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        let script = null;
+
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+
+        if (!script?.saved) {
+            $ngRedux.dispatch(tabs.saveScriptIfModified(activeTabID));
+        } else if (script?.collaborative) {
             collaboration.saveScript();
         }
         $scope.activeTabID && $ngRedux.dispatch(tabs.removeModifiedScript($scope.activeTabID));
