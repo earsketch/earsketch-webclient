@@ -679,9 +679,10 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
             userProject.importScript(script).then(function(importedScript) {
                 userNotification.show('Imported a copy of script "' + script.name + '" (created by ' + author + ') into your local Script Browser.');
                 // For some reason, closing is only required for read-only script
-                if (!script.isShared) {
-                    $scope.closeTab($scope.getTabId(script.shareid));
-                }
+
+                // if (!script.isShared) {
+                //     $scope.closeTab($scope.getTabId(script.shareid));
+                // }
 
                 $ngRedux.dispatch(tabs.closeTab(script.shareid));
 
