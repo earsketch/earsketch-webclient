@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
+import * as tabs from '../editor/tabState';
 import * as helpers from '../helpers';
 import { sampleScript } from "./bubbleData";
-import { RootState } from '../reducers';
+import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity } from 'common';
 
 interface BubbleState {
@@ -40,19 +41,20 @@ export const { reset, resume, suspend, increment, setReady, setLanguage } = bubb
 
 const createSampleScript = createAsyncThunk(
     'bubble/createSampleScript',
-    (_, { getState }) => {
+    (_, { getState, dispatch }) => {
         const { bubble: { language } } = getState() as { bubble: BubbleState };
-
         const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
         const userProject = helpers.getNgService('userProject');
         const rootScope = helpers.getNgService('$rootScope');
         return userProject.saveScript(fileName, code, true)
             .then((script: ScriptEntity) => {
-                userProject.openScript(script.shareid)
+                userProject.openScript(script.shareid);
 
                 // tabController also needs to call refresh.
                 rootScope.$broadcast('createScript', script.shareid);
+
+                dispatch(tabs.setActiveTabAndEditor(script.shareid));
             });
     }
 );
@@ -69,10 +71,12 @@ const setEditorReadOnly = createAsyncThunk(
     }
 );
 
-export const dismissBubble = createAsyncThunk(
+export const dismissBubble = createAsyncThunk<void, void, ThunkAPI>(
     'bubble/dismissBubble',
-    (_, { dispatch }) => {
-        dispatch(setEditorReadOnly(false));
+    (_, { dispatch, getState }) => {
+        if (getState().bubble.currentPage !== 0) {
+            dispatch(setEditorReadOnly(false));
+        }
         dispatch(suspend());
     }
 );

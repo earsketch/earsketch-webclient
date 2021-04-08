@@ -329,6 +329,7 @@ interface ScriptProps {
 }
 
 const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
+    const dispatch = useDispatch();
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid);
@@ -362,8 +363,10 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
             onMouseLeave={() => setHighlight(false)}
             onClick={() => {
                 if (type === 'regular') {
+                    dispatch(tabs.setActiveTabAndEditor(script.shareid));
                     openScript(script);
                 } else if (type === 'shared') {
+                    dispatch(tabs.setActiveTabAndEditor(script.shareid));
                     openSharedScript(script);
                 }
             }}

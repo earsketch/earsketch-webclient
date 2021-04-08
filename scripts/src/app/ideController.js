@@ -26,11 +26,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.compiled = null;
 
     $scope.activeTab = 0;
-    // $scope.$watch('activeTab', function(newVal, oldVal){
-    //     //AVN LOG
-    //     console.log("ACTIVE TAB IDE LOG", newVal, oldVal);
-    // });
-
+    $scope.activeScript = null;
     /**
      * Flag to prevent successive compilation / script save request
      * @type {boolean}
@@ -68,7 +64,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
 
     $scope.currentLanguage = localStorage.get('language', 'python');
-    $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
+    // $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
     // TODO: create and handle this in userConsole directive
     $scope.$on('updateConsole', function () {
@@ -176,28 +172,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             }
         });
 
-        // setting initial state of the editor to text mode if flag for blocks mode is null
-        if (!localStorage.checkKey('blocks')) {
-            $scope.editor.droplet.setEditorState(false);
-            localStorage.set('blocks', 'no');
-        } else if (localStorage.get('blocks') === 'yes') {
-            $scope.editor.droplet.setEditorState(true);
-        } else {
-            $scope.editor.droplet.setEditorState(false);
-        }
-        // // monitor the editor for changes, and update the tab value
-        $scope.editor.ace.on('change', function () {
-            // if ($scope.tabs[$scope.activeTab].saved) {
-            $scope.$broadcast('updateTabValueOnEditorChange');
-            
-            if ($scope.editor.ace.curOp && $scope.editor.ace.curOp.command.name) {
-                $scope.$broadcast('markCurrentTabDirty');
-            }
-        });
-
-        $scope.editor.ace.on('paste', function () {
-            $scope.$broadcast('markCurrentTabDirty');
-        });
+        $scope.editor.droplet.setEditorState(false);
 
         if (localStorage.checkKey(LS_FONT_KEY)) {
             $scope.setFontSize(parseInt(localStorage.get(LS_FONT_KEY)));
@@ -214,14 +189,11 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             });
         }
 
-        $scope.editor.setReadOnly($scope.isEmbedded);
-
-        $rootScope.$broadcast("swapTabAfterIDEinit");
-        $rootScope.$broadcast('editorLoaded');
-
-        colorTheme.load();
-
         $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
+        $rootScope.$broadcast("swapTabAfterIDEinit");
+        const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
+        $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
+        colorTheme.load();
     };
 
     
@@ -245,11 +217,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         esconsole('toggling blocks mode to: ' + !$scope.editor.droplet.currentlyUsingBlocks, 'ide');
+        localStorage.set('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
 
-        $scope.editor.droplet.toggleBlocks();
-        $scope.editor.clearHistory();
-
-        return localStorage.set('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
+        return $scope.editor.droplet.toggleBlocks();
     };
 
     /**
@@ -401,6 +371,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }).then(function (script) {
             // script saved and opened
             script && $rootScope.$broadcast('createScript', script.shareid);
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
         });
     };
 
@@ -454,9 +425,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         // TODO: questionable code: localStorage.get('blocks') === 'yes'
         // currentlyUsingBlocks would be off when we switch the language
         // maybe we need a global-state scope variable
-        if (localStorage.get('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
-            $scope.toggleBlocks();
-        }
+        // if (localStorage.get('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
+        //     $scope.toggleBlocks();
+        // }
 
         // switch global language mode and save current language to local storage.
         $scope.languageModeSelect($scope.currentLanguage);
@@ -500,6 +471,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         $scope.$apply(function () {
             $scope.$broadcast('openCurriculumCode', fake_script);
             $scope.editor.ace.focus();
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
 
     };
@@ -802,8 +774,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             $scope.editor.ace.session.getTextRange($scope.editor.ace.getSelectionRange($scope.editor.ace.insert(key)));
             $scope.editor.ace.focus();
         }
-
-        $scope.$broadcast('markCurrentTabDirty');
         return key;
     };
 

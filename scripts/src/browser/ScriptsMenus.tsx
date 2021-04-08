@@ -149,9 +149,13 @@ const SingletonDropdownMenu = () => {
                 name='Open' icon='icon-file-empty'
                 visible={!context}
                 onClick={() => {
+                    if (!script) return;
+
                     if (type==='regular') {
+                        dispatch(tabs.setActiveTabAndEditor(script.shareid));
                         script && openScript(script);
                     } else if (type==='shared') {
+                        dispatch(tabs.setActiveTabAndEditor(script.shareid));
                         script && openSharedScript(script);
                     }
                 }}
@@ -208,7 +212,7 @@ const SingletonDropdownMenu = () => {
                 disabled={!loggedIn || type==='readonly'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.openScriptHistory(unsavedScript, true);
+                    script && scope.openScriptHistory(unsavedScript, !script.isShared);
                 }}
             />
             <MenuItem
@@ -234,7 +238,9 @@ const SingletonDropdownMenu = () => {
                     await userProject.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
 
-                    if (script && openTabs.includes(script.shareid)) {
+                    if (script && openTabs.includes(script.shareid) && !script.collaborative) {
+                        dispatch(tabs.closeTab(script.shareid));
+                        dispatch(tabs.setActiveTabAndEditor(imported.shareid));
                         openScript(imported);
                     }
                 }}
