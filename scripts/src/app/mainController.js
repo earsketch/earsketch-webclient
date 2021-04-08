@@ -993,15 +993,17 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.toggleCAIWindow = () => {
         $scope.showCAIWindow = !$scope.showCAIWindow;
         if ($scope.showCAIWindow) {
-            $ngRedux.dispatch(layout.setEast({ open: true }));
-            Layout.resetHorizontalSplits();
             angular.element('div[caiwindow]').show();
             angular.element('curriculum').hide();
-            // $scope.$apply();
+            $ngRedux.dispatch(layout.setEast({ open: true }));
+            Layout.resetHorizontalSplits();
+            document.getElementById('caiButton').classList.remove('flashNavButton');
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
+            document.getElementById('caiButton').classList.add('flashNavButton');
         }
+        // $scope.$apply();
     };
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
