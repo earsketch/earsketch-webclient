@@ -4,7 +4,7 @@
  *
  * @author Jason Smith
  */
-app.factory('caiProjectModel', function () {
+app.factory('caiProjectModel', [function () {
 
     // Initialize empty model.
     var defaultProjectModel = {'genre': [], 'instrument': [], 'form': []};
@@ -50,4 +50,4 @@ app.factory('caiProjectModel', function () {
         clearProperty: clearProperty
     };
 
-});
+}]);

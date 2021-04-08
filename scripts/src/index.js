@@ -185,6 +185,7 @@ require(['angular'], () => {
     require('caiErrorHandling');
     require('codeSuggestion');
     require('recommender');
+    require('caiProjectModel');
 
     // TODO: Use a module.
     window.REPORT_LOG = [];
