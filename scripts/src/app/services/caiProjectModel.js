@@ -7,7 +7,34 @@
 app.factory('caiProjectModel', [function () {
 
     // Initialize empty model.
-    var defaultProjectModel = {'genre': [], 'instrument': [], 'form': []};
+    var defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [] };
+
+
+    var propertyOptions = {
+        'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
+        'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
+        'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
+        'complexity': ['forLoop', 'function', 'consoleInput', 'conditional']
+    };
+
+    var projectModel = {};
+    clearModel();
+
+    //returns a list of all properties that can be set/adjusted
+    function getProperties() {
+        var properties = Object.keys(propertyOptions);
+        return properties;
+    }
+
+    function getOptions(propertyString) {
+        if (Object.keys(propertyOptions).includes(propertyString)) {
+            return propertyOptions[propertyString].slice(0);
+        }
+        else return [];
+    }
+
+
+
     var projectModel = {};
     clearModel();
 
@@ -47,7 +74,9 @@ app.factory('caiProjectModel', [function () {
         getModel: getModel,
         updateModel: updateModel,
         clearModel: clearModel,
-        clearProperty: clearProperty
+        clearProperty: clearProperty,
+        getOptions: getOptions,
+        getProperties: getProperties
     };
 
 }]);

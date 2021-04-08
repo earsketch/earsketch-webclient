@@ -11,7 +11,7 @@
         title: "Okay",
         utterance: "let's get started",
         parameters: {},
-        options: [3, 4]
+        options: [76,77]
     },
     {
         id: 2,
@@ -542,7 +542,94 @@
         parameters: {},
         event: ["soundRequest"],
         options: [19, 6]
-    }
+    },
+    {
+        id: 76,
+        title: "i have some ideas",
+        utterance: "cool, what were you thinking?",
+        parameters: {},
+        dropup: "Project attributes",
+        options: ["PROPERTIES|78"]
+    },
+    {
+        id: 77,
+        title: "i'm not sure. do you have any ideas?",
+        utterance: "sure. what about [SUGGESTPROPERTY]?",
+        parameters: {},
+        options: [82, 84, 85]
+    },
+    {
+        id: 78,
+        title: "",
+        utterance: "what were you thinking for [CURRENTPROPERTY]?",
+        parameters: {},
+        options: ["PROPERTYOPTIONS|79"]
+        },
+        {
+            id: 79,
+            title: "",
+            utterance: "[STOREPROPERTY]sounds good. do you have more ideas, or do you want to start working?",
+            parameters: {},
+            options: [80, 81]
+        },
+        {
+            id: 80,
+            title: "i have some other thoughts",
+            utterance: "ok, what else are you thinking?",
+            parameters: {},
+            dropup: "Project attributes",
+            options: ["PROPERTIES|78"]
+        },
+        {
+            id: 81,
+            title: "let's start working",
+            utterance: "sounds good. do you want to pick sounds first, or should i?",
+            parameters: {},
+            options: [3, 4]
+        },
+        {
+            id: 82,
+            title: "yeah, i like that",
+            utterance: "[STOREPROPERTY]great. do you wanna get started?",
+            parameters: {},
+            options: [83, 86]
+        },
+        {
+            id: 83,
+            title: "wait, i have an idea about our project",
+            utterance: "ok, what were you thinking?",
+            parameters: {},
+            dropup: "Project attributes",
+            options: ["PROPERTIES|78"]
+        },
+        {
+            id: 84,
+            title: "i don't know. what about something else?",
+            utterance: "how about [SUGGESTPROPERTY] instead?",
+            parameters: {},
+            options: [83, 87, 85]
+        },
+        {
+            id: 85,
+            title: "we can just get started",
+            utterance: "ok. do you wanna pick some sounds?",
+            parameters: {},
+            options: [3,4]
+        },
+        {
+            id: 86,
+            title: "ok",
+            utterance: "do you want to start off by picking some sounds?",
+            parameters: {},
+            options: [3, 4]
+        },
+        {
+            id: 87,
+            title: "sounds good",
+            utterance: "[STOREPROPERTY]ok. do you wanna get started?",
+            parameters: {},
+            options: [83, 86]
+        }
     ];
 
 

@@ -28,6 +28,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     var currentInstr = null;
     var currentGenre = null;
 
+    var currentProperty = "";
+    var currentPropertyValue = "";
+
     var complexityUpdated = true;
     var errorSuccess = 0;
     var errorFail = 0;
@@ -76,6 +79,13 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function getDropup() {
         return currentDropup;
     }
+
+    function storeProperty() {
+        if (currentProperty != "" && currentPropertyValue != "") {
+            caiProjectModel.updateModel(currentProperty, currentPropertyValue);
+        }
+    }
+
 
     function studentInteract(didInt = true) {
         studentInteracted = didInt;
@@ -131,6 +141,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         measures = [];
         lineNodes = [];
         parameterNodes = [];
+
+        currentProperty = "";
 
         currentSuggestion = {};
         utteranceObj;
@@ -438,6 +450,68 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 currentTreeNode[activeProject].options = [73];
             }
         }
+        else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("PROPERTIES")) {
+     
+            var highestNumber = 0;
+            for (var i = 0; i < caiTree.length; i++) {
+                if (caiTree[i].id > highestNumber) {
+                    highestNumber = caiTree[i].id;
+                }
+            }
+
+            var templateNodeID = parseInt(currentTreeNode[activeProject].options[0].split("|")[1]);
+            var templateNode = caiTree[templateNodeID];
+
+            var tempID = highestNumber + 1;
+
+            currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
+            currentTreeNode[activeProject].options = [];
+
+            var keys = caiProjectModel.getProperties();
+
+            for (var j = 0; j < keys.length; j++) {
+                var newNode = Object.assign({}, templateNode);
+                newNode["id"] = tempID;
+                newNode["title"] = keys[j];
+                newNode["parameters"] = { property: keys[j] };
+                caiTree.push(newNode);
+                buttons.push({ label: newNode.title, value: newNode.id });
+                currentTreeNode[activeProject].options.push(tempID);
+                tempID++;
+            }
+
+        }
+        else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("PROPERTYOPTIONS")) {
+         
+            var highestNumber = 0;
+            for (var i = 0; i < caiTree.length; i++) {
+                if (caiTree[i].id > highestNumber) {
+                    highestNumber = caiTree[i].id;
+                }
+            }
+
+            var templateNodeID = parseInt(currentTreeNode[activeProject].options[0].split("|")[1]);
+            var templateNode = caiTree[templateNodeID];
+
+            var tempID = highestNumber + 1;
+
+            currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
+            currentTreeNode[activeProject].options = [];
+
+            var keys = caiProjectModel.getOptions(currentProperty);
+
+            for (var j = 0; j < keys.length; j++) {
+                var newNode = Object.assign({}, templateNode);
+                newNode["id"] = tempID;
+                newNode["title"] = keys[j];
+                newNode["parameters"] = { propertyvalue: keys[j] };
+                caiTree.push(newNode);
+                buttons.push({ label: newNode.title, value: newNode.id });
+                currentTreeNode[activeProject].options.push(tempID);
+                tempID++;
+            }
+
+        }
         else {
             for (var i in currentTreeNode[activeProject].options) {
                 var nextNode = currentTreeNode[activeProject].options[i];
@@ -502,6 +576,19 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         var parameters = []
 
+
+
+        //get properties
+        if ("property" in currentTreeNode[activeProject].parameters) {
+            currentProperty = currentTreeNode[activeProject].parameters['property'];
+        }
+        if ("propertyvalue" in currentTreeNode[activeProject].parameters) {
+            currentPropertyValue = currentTreeNode[activeProject].parameters['propertyvalue'];
+
+        }
+
+
+
         if (utterance.includes("[RESET_PARAMS]")) {
             currentInstr = null;
             currentGenre = null;
@@ -509,7 +596,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             utterance = utterance.substring(0, utterance.indexOf("[RESET_PARAMS]"));
         }
-
+        if (utterance.includes("[STOREPROPERTY]")) {
+            utterance = utterance.substring(15);
+            storeProperty();
+            console.log(caiProjectModel.getModel());
+        }
         //actions first
         if (utterance.includes("ERROREXPLAIN")) {
             utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14);
@@ -520,6 +611,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             parameters.push(["SUGGESTION", utteranceObj.id]);
             utterance = utteranceObj.utterance;
         }
+
+        if (utterance.includes("[CURRENTPROPERTY]")) {
+            utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty);
+        }
+        
         else if (currentTreeNode[activeProject].utterance in actions) {
             utterance = actions[currentTreeNode[activeProject].utterance]();
             if (currentTreeNode[activeProject].utterance == "[SUGGESTIONEXPLAIN]" || currentTreeNode[activeProject].utterance == "[SUGGESTIONEXAMPLE]") {
@@ -754,63 +850,63 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 // keyword = keyword.link("google.com")
                 link = LINKS[keyword];
                 utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
-                utteranceSecondHalf = utterance.substring(utterance.indexOf("]")+1, utterance.length);
+                utteranceSecondHalf = utterance.substring(utterance.indexOf("]") + 1, utterance.length);
                 utterance = utteranceSecondHalf;
                 textPieces.push(utteranceFirstHalf);
-                keywordLinks.push([keyword,link]);
-    
+                keywordLinks.push([keyword, link]);
+
                 console.log(utterance);
             }
         }
         else {
-            keywordLinks.push(["",""]);
+            keywordLinks.push(["", ""]);
         }
         textPieces.push(utterance);
 
-        while (textPieces.length<6) {
+        while (textPieces.length < 6) {
             textPieces.push("");
-            keywordLinks.push(["",""]);
+            keywordLinks.push(["", ""]);
         }
 
-        
+
         var structure = [textPieces, keywordLinks]
         return structure;
     }
 
     var dummyLink = "https://earsketch.gatech.edu/landing/#/"
     const LINKS = {
-        "fitMedia":"1-1-9",
-        "setEffect":"1-4-0",
+        "fitMedia": "1-1-9",
+        "setEffect": "1-4-0",
         "effect ramp": "1-4-0",
         "function": "1-2-2",
         "functions": "1-2-2",
         "parameters": "1-2-2",
-        "variable":"1-2-4",
-        "variables":"1-2-4",
-        "section":"2-1-0",
-        "sections":"2-1-0",
-        "ABA":"2-1-1",
+        "variable": "1-2-4",
+        "variables": "1-2-4",
+        "section": "2-1-0",
+        "sections": "2-1-0",
+        "ABA": "2-1-1",
         "custom function": "2-1-1",
-        "makeBeat":"2-3-2",
-        "loop":"2-4-0",
-        "for loop":"2-4-0",
-        "loops":"2-4-0",
-        "range":"2-4-1",
-        "console input":"3-1-0",
+        "makeBeat": "2-3-2",
+        "loop": "2-4-0",
+        "for loop": "2-4-0",
+        "loops": "2-4-0",
+        "range": "2-4-1",
+        "console input": "3-1-0",
         "if statement": "3-1-2",
         "if": "3-1-2",
-        "conditional":"3-1-2",
-        "list":"3-2-0",
+        "conditional": "3-1-2",
+        "list": "3-2-0",
         "randomness": "3-4-0",
         "nested loops": "4-1-3",
-        "importing":"5-2-0",
-        "indented":"5-2-1",
-        "index":"5-2-2",
-        "name":"5-2-3",
+        "importing": "5-2-0",
+        "indented": "5-2-1",
+        "index": "5-2-2",
+        "name": "5-2-3",
         "parse error": "5-2-4",
-        "syntax error":"5-2-5",
-        "type error":"5-2-6",
-        "function arguments":"5-2-7",
+        "syntax error": "5-2-5",
+        "type error": "5-2-6",
+        "function arguments": "5-2-7",
     }
 
 
@@ -936,9 +1032,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
     /**
-   * Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
-   * @returns {dict} - dialogue representation of object describing suggestion utterance output.
-   */
+    * Generates a suggestion for music or code additions/changes and outputs a representative dialogue object
+    * @returns {dict} - dialogue representation of object describing suggestion utterance output.
+    */
     function generateSuggestion() {
         if (isPrompted) {
             studentInteracted = true;
