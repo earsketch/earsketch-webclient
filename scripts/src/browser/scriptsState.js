@@ -345,7 +345,7 @@ const selectRegularScriptEntities = state => state.scripts.regularScripts.entiti
 const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
 const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
 export const selectSharedScriptIDs = state => state.scripts.sharedScripts.scriptIDs;
-const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
+export const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
 const selectReadOnlyScriptIDs = state => state.scripts.readOnlyScripts.scriptIDs;
 
 export const selectActiveScriptEntities = createSelector(

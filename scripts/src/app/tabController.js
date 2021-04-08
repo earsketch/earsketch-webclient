@@ -43,11 +43,14 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.openSharedScripts = userProject.openSharedScripts;
 
     $scope.getOpenTabEntities = () => {
+        const readOnlyScripts = scripts.selectReadOnlyScriptEntities($ngRedux.getState());
         return tabs.selectOpenTabs($ngRedux.getState()).map(scriptID => {
             if (scriptID in $scope.scripts) {
                 return $scope.scripts[scriptID];
             } else if (scriptID in $scope.sharedScripts) {
                 return $scope.sharedScripts[scriptID];
+            } else if (scriptID in readOnlyScripts) {
+                return readOnlyScripts[scriptID];
             } else {
                 return null;
             }
