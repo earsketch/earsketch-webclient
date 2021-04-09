@@ -185,7 +185,7 @@ export const closeAndSwitchTab = createAsyncThunk(
             dispatch(closeTab(scriptID));
         }
         deleteEditorSession(scriptID);
-        script.readonly && dispatch(removeReadOnlyScript(scriptID));
+        script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID));
     }
 );
 
