@@ -387,8 +387,10 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 var promises = [];
                 for (var i in saved) {
                     if (saved.hasOwnProperty(i) && !saved[i].soft_delete) {
-                        if (saved[i].hasOwnProperty('creator') && (saved[i].creator !== username) && saved[i].hasOwnProperty('original_id')) {
-                            promises.push(importSharedScript(saved[i].original_id));
+                        if (saved[i].hasOwnProperty('creator') && (saved[i].creator !== username)) {
+                            if(saved[i].hasOwnProperty('original_id')) {
+                                promises.push(importSharedScript(saved[i].original_id));
+                            }
                         } else {
                             // promises.push(saveScript(saved[i].name, saved[i].source_code, false));
                             const tabEditorSession = tabs.getEditorSession(saved[i].shareid);
