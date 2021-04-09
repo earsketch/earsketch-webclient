@@ -6,8 +6,6 @@ import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
 import * as helpers from 'helpers';
 
-// TODO: Fix for users with bad state from #2297 (see #2298). Remove this later.
-window.localStorage.removeItem("scripts_v1")
 
 const scriptsSlice = createSlice({
     name: 'scripts',
