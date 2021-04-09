@@ -6,7 +6,6 @@ import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
 import * as helpers from 'helpers';
 
-
 const scriptsSlice = createSlice({
     name: 'scripts',
     initialState: {
