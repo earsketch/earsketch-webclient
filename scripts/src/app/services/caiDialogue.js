@@ -636,9 +636,16 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 currentInstr = currentTreeNode[activeProject].parameters.INSTRUMENT;
                 parameters.push(["INSTRUMENT", currentInstr])
             }
-            else if ("GENRE" in currentTreeNode[activeProject].parameters) {
+
+            var genreArray = [];
+
+            if ("GENRE" in currentTreeNode[activeProject].parameters) {
                 currentGenre = currentTreeNode[activeProject].parameters.GENRE;
                 parameters.push(["GENRE", currentGenre])
+                genreArray = [currentGenre]
+            }
+            else if (caiProjectModel.getModel()['genre'].length > 0) {
+                genreArray = caiProjectModel.getModel()['genre'].slice(0);
             }
 
 
@@ -652,7 +659,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var recs = [];
             var usedRecs = [];
-            recs = recommender.recommend([], allSamples, 1, 1, [currentGenre], [currentInstr], recommendationHistory[activeProject], count);
+            recs = recommender.recommend([], allSamples, 1, 1, genreArray, [currentInstr], recommendationHistory[activeProject], count);
             for (var idx in recs)
                 recommendationHistory[activeProject].push(recs[idx]);
             var recIndex = 0;
@@ -674,6 +681,15 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     }
                 }
                 shuffle(recs);
+            }
+
+            if (recs.length < count) {
+                //fill recs with additional suggestions if too few from the selected genres/instruments are available
+                var numNewRecs = count - recs.length;
+                var newRecs = recommender.recommend([], allSamples, 1, 1, [], [], recommendationHistory[activeProject], numNewRecs)
+                for (var k = 0; k < newRecs.length; k++) {
+                    recs.push(newRecs[k]);
+                }
             }
 
             while (utterance.includes("[sound_rec]")) {
