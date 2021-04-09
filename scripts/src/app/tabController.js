@@ -43,11 +43,14 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.openSharedScripts = userProject.openSharedScripts;
 
     $scope.getOpenTabEntities = () => {
+        const readOnlyScripts = scripts.selectReadOnlyScriptEntities($ngRedux.getState());
         return tabs.selectOpenTabs($ngRedux.getState()).map(scriptID => {
             if (scriptID in $scope.scripts) {
                 return $scope.scripts[scriptID];
             } else if (scriptID in $scope.sharedScripts) {
                 return $scope.sharedScripts[scriptID];
+            } else if (scriptID in readOnlyScripts) {
+                return readOnlyScripts[scriptID];
             } else {
                 return null;
             }
@@ -678,10 +681,6 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
         } else {
             userProject.importScript(script).then(function(importedScript) {
                 userNotification.show('Imported a copy of script "' + script.name + '" (created by ' + author + ') into your local Script Browser.');
-                // For some reason, closing is only required for read-only script
-                if (!script.isShared) {
-                    $scope.closeTab($scope.getTabId(script.shareid));
-                }
 
                 $ngRedux.dispatch(tabs.closeTab(script.shareid));
 
