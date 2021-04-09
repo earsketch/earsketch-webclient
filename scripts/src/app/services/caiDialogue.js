@@ -660,8 +660,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var recs = [];
             var usedRecs = [];
             recs = recommender.recommend([], allSamples, 1, 1, genreArray, [currentInstr], recommendationHistory[activeProject], count);
-            for (var idx in recs)
-                recommendationHistory[activeProject].push(recs[idx]);
+
             var recIndex = 0;
 
 
@@ -691,6 +690,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     recs.push(newRecs[k]);
                 }
             }
+
+            for (var idx in recs)
+                recommendationHistory[activeProject].push(recs[idx]);
 
             while (utterance.includes("[sound_rec]")) {
                 var recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11];
