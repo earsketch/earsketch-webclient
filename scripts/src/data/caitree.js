@@ -554,7 +554,7 @@
     {
         id: 77,
         title: "i'm not sure. do you have any ideas?",
-        utterance: "sure. what about [SUGGESTPROPERTY]?",
+        utterance: "sure. [SUGGESTPROPERTY]",
         parameters: {},
         options: [82, 84, 85]
     },
@@ -599,13 +599,13 @@
             title: "wait, i have an idea about our project",
             utterance: "ok, what were you thinking?",
             parameters: {},
-            dropup: "Project attributes",
+            dropup: "Project Properties",
             options: ["PROPERTIES|78"]
         },
         {
             id: 84,
             title: "i don't know. what about something else?",
-            utterance: "how about [SUGGESTPROPERTY] instead?",
+            utterance: "[SUGGESTPROPERTY]",
             parameters: {},
             options: [83, 87, 85]
         },
@@ -629,11 +629,19 @@
             utterance: "[STOREPROPERTY]ok. do you wanna get started?",
             parameters: {},
             options: [83, 86]
+        },
+        {
+            id: 88,
+            title: "i have some ideas about our project",
+            utterance: "sure, what were you thinking?",
+            parameters: {},
+            dropup: "Project Properties",
+            options: ["PROPERTIES|78"]
         }
     ];
 
 
-const CAI_TREES = { "Chat with CAI": 0, 'error': 26, 'begin': 1, 'sound_select': 72, 'suggest': 34, 'wrapup': 68, 'selectinstr': 71 };
+const CAI_TREES = { "Chat with CAI": 0, 'error': 26, 'begin': 1, 'sound_select': 72, 'suggest': 34, 'wrapup': 68, 'selectinstr': 71 , 'properties': 88};
 
 const CAI_MUSIC_ANALYSIS = null;
 

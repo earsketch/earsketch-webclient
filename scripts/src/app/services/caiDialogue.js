@@ -122,6 +122,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             soundSuggestionsUsed[p] = 0;
         }
         caiStudentPreferenceModule.setActiveProject(p);
+        caiProjectModel.setActiveProject(p);
         codeSuggestionsUsed[p] = caiStudentPreferenceModule.getCodeSuggestionsUsed().length;
         soundSuggestionsUsed[p] = caiStudentPreferenceModule.getSoundSuggestionsUsed().length;
 
@@ -602,6 +603,25 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             console.log(caiProjectModel.getModel());
         }
         //actions first
+        if (utterance.includes("[SUGGESTPROPERTY]")) {
+            var output = caiProjectModel.randomPropertySuggestion();
+            var utterReplace = "";
+            if (Object.keys(output).length > 0) {
+                if (output.isAdded) {
+                    utterReplace = "what if we also did " + output.value + " for our " + output.property + "?";
+
+                }
+                else {
+                    utterReplace = "what if we did " + output.value + " for our " + output.property + "?"
+                }
+
+                utterance = utterance.replace("[SUGGESTPROPERTY]", utterReplace);
+            }
+            else {
+                utterance = "I'm not sure what to suggest right now. Let's get started working, and then I can come up with some more ideas."
+            }
+        }
+
         if (utterance.includes("ERROREXPLAIN")) {
             utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14);
             parameters.push(["ERROREXPLAIN", explainError()])
@@ -632,9 +652,15 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         //set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
         if (utterance.includes("[sound_rec]")) {
 
+            var instrumentArray = [];
+
             if ("INSTRUMENT" in currentTreeNode[activeProject].parameters) {
                 currentInstr = currentTreeNode[activeProject].parameters.INSTRUMENT;
+                instrumentArray = [currentInstr];
                 parameters.push(["INSTRUMENT", currentInstr])
+            }
+            else if (caiProjectModel.getModel()['instrument'].length > 0) {
+                instrumentArray = caiProjectModel.getModel()['instrument'].slice(0);
             }
 
             var genreArray = [];
@@ -659,7 +685,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var recs = [];
             var usedRecs = [];
-            recs = recommender.recommend([], allSamples, 1, 1, genreArray, [currentInstr], recommendationHistory[activeProject], count);
+            recs = recommender.recommend([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
 
             var recIndex = 0;
 

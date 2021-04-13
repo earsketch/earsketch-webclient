@@ -6,8 +6,10 @@
  */
 app.factory('caiProjectModel', [function () {
 
+    var activeProject = "";
+
     // Initialize empty model.
-    var defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [] };
+    var defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [], 'complexity': [] };
 
 
     var propertyOptions = {
@@ -17,8 +19,17 @@ app.factory('caiProjectModel', [function () {
         'complexity': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
+    var suggestableProperties = {
+        'multiple': {
+            'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
+            'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"]
+        },
+        'one': {
+            'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
+        }
+    }
+
     var projectModel = {};
-    clearModel();
 
     //returns a list of all properties that can be set/adjusted
     function getProperties() {
@@ -33,41 +44,129 @@ app.factory('caiProjectModel', [function () {
         else return [];
     }
 
+    function randomPropertySuggestion() {
+
+        var add = false;
+        var selectedProperty;
+        var selectedValue;
+
+        //gather all properties that can be suggested at the moment (all with multiple options, plus those one-offs that have not yet been filled)
+        possibleProperties = [];
+        var multiples = Object.keys(suggestableProperties.multiple);
+        var singles = Object.keys(suggestableProperties.one);
+
+        for (var i = 0; i < multiples.length; i++) {
+            if (projectModel[activeProject][multiples[i]].length < multiples.length) {
+                possibleProperties.push(multiples[i]);
+            }
+        }
 
 
-    var projectModel = {};
-    clearModel();
+        for (var i = 0; i < singles.length; i++) {
+            if (projectModel[activeProject][singles[i]].length == 0) {
+                possibleProperties.push(singles[i]);
+            }
+        }
+
+        if (possibleProperties.length == 0) {
+            return {};
+        }
+
+        //select a property at random
+        var propertyIndex = getRandomInt(0, possibleProperties.length - 1);
+        selectedProperty = possibleProperties[propertyIndex];
+
+        //if this is a property that can hold multiple values, mark if we are adding to an extant list or providing a first value
+        if (multiples.includes(selectedProperty) && projectModel[activeProject][selectedProperty].length > 0) {
+            add = true;
+        }
+
+        //list possible values, avoiding repeating existing values in the model
+        var possibleValues = [];
+
+        for (var i = 0; i < propertyOptions[selectedProperty].length; i++) {
+            var valueOption = propertyOptions[selectedProperty][i];
+            if (!projectModel[activeProject][selectedProperty].includes(valueOption)) {
+                possibleValues.push(valueOption);
+            }
+        }
+
+        //select one at random
+        if (possibleValues.length > 0) {
+            var valueIndex = getRandomInt(0, possibleValues.length - 1);
+            selectedValue = possibleValues[valueIndex];
+        }
+        else return {};
+
+        return { property: selectedProperty, value: selectedValue, isAdded: add };
+    }
+
+    function setActiveProject(projectName) {
+
+        if (projectName in projectModel) {
+
+            activeProject = projectName;
+        }
+        else {
+
+            //create empty, default project model
+            activeProject = projectName;
+            clearModel();
+        }
+
+    }
+
 
     // Public getter.
     function getModel() {
-        return projectModel;
+        return projectModel[activeProject];
     }
 
     // Update model with key/value pair.
     function updateModel(property, value) {
 
-        switch(property) {
+        switch (property) {
             case 'genre':
+            case 'complexity':
             case 'instrument':
-                projectModel[property].push(value); // Unlimited number of genres/instruments.
+                projectModel[activeProject][property].push(value); // Unlimited number of genres/instruments.
                 break;
             case 'form':
-                projectModel['form'][0] = value; // Only one form at a time.
+                projectModel[activeProject]['form'][0] = value; // Only one form at a time.
                 break;
             default:
                 console.log('Invalid project model entry.');
         }
 
+        console.log(projectModel);
+
     }
 
     // Return to empty/default model.
     function clearModel() {
-        projectModel = Object.assign({}, defaultProjectModel);
+        projectModel[activeProject] = {};
+        for (var i in defaultProjectModel) {
+            projectModel[activeProject][i] = [];
+        }
+       // projectModel[activeProject] = Object.assign({}, defaultProjectModel);
     }
 
     // Empty single property array.
     function clearProperty(property) {
-        projectModel[property] = [];
+        projectModel[activeProject][property] = [];
+    }
+
+    /** FROM STACKOVERFLOW
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     return {
@@ -76,7 +175,9 @@ app.factory('caiProjectModel', [function () {
         clearModel: clearModel,
         clearProperty: clearProperty,
         getOptions: getOptions,
-        getProperties: getProperties
+        getProperties: getProperties,
+        randomPropertySuggestion: randomPropertySuggestion,
+        setActiveProject: setActiveProject
     };
 
 }]);
