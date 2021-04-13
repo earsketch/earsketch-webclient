@@ -128,11 +128,13 @@ const Header = ({ playPosition, setPlayPosition }) => {
     const [decoration, setDecoration] = useState({title: "full", icon: true})
 
     const el = useRef()
-    const handleResize = () => {
-        const width = el.current.offsetWidth
+
+    // Update title/icon display whenever element size changes.
+    const observer = new ResizeObserver(entries => {
+        const width = entries[0].contentRect.width
         if (embedMode) {
             setDecoration({title: "short", icon: true})
-        } else if (width > 540) {
+        } else if (width > 590) {
             setDecoration({title: "full", icon: true})
         } else if (width > 412) {
             setDecoration({title: "short", icon: true})
@@ -141,14 +143,12 @@ const Header = ({ playPosition, setPlayPosition }) => {
         } else {
             setDecoration({title: "none", icon: false})
         }
-    }
+    })
 
-    // TODO: How to trigger this whenever the element resizes? Do we already have a preferred library for this?
     useEffect(() => {
-        window.addEventListener('resize', handleResize)
-        handleResize()
-        return () => window.removeEventListener('resize', handleResize)
-    }, [])
+        el.current && observer.observe(el.current)
+        return () => el.current && observer.unobserve(el.current)
+    }, [el])
 
     return <div ref={el} id="dawHeader" className="flex-grow-0">
         {/* TODO: don't use bootstrap classes */}
@@ -156,8 +156,8 @@ const Header = ({ playPosition, setPlayPosition }) => {
         <div className="btn-group" id="daw-label">
             <span className="panel-label">{decoration.icon && <span className="icon icon-DAW-Icon"></span>}
                 {decoration.title === "full"
-                ? <span>Digital Audio Workstation</span>
-                : (decoration.title === "short" && <span>DAW</span>)}
+                ? <span className="font-semibold">DIGITAL AUDIO WORKSTATION</span>
+                : (decoration.title === "short" && <span className="font-semibold">DAW</span>)}
             </span>
         </div>
         {embedMode && <div>
