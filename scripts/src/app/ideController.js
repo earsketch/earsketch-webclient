@@ -905,8 +905,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
             }
 
             var localStorageLog = "";
-
-
+            
             Object.keys(localStorage).forEach(function (key) {
                 try {
                     if (key === "userstate") {
