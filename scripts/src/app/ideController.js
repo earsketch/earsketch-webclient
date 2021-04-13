@@ -906,15 +906,22 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
 
             var localStorageLog = "";
 
-            Object.keys(localStorage).forEach(function(key) {
-                if(key === "userstate") {
-                    var localUserState = JSON.parse(localStorage.getItem(key));
-                    if(localUserState.hasOwnProperty('password')){
-                        localUserState.password = '';
+
+            Object.keys(localStorage).forEach(function (key) {
+                try {
+                    if (key === "userstate") {
+                        var localUserState = JSON.parse(localStorage.getItem(key));
+                        if (localUserState.hasOwnProperty('password')) {
+                            localUserState.password = '';
+                        }
+                        localStorageLog += key + ": " + JSON.stringify(localUserState) + "\r\n";
+                    } else {
+                        localStorageLog += key + ": " + localStorage.getItem(key) + "\r\n";
                     }
-                    localStorageLog += key + ": " + JSON.stringify(localUserState)+ "\r\n";
-                } else {
-                    localStorageLog += key + ": " + localStorage.getItem(key) + "\r\n";
+                } catch (e) {
+                    if (e && e.hasOwnProperty(message)) {
+                        localStorageLog += "exception for key ["+key+"]: " + e.message;
+                    }
                 }
             });
 
