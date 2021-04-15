@@ -452,7 +452,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             }
         }
         else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("PROPERTIES")) {
-     
+
             var highestNumber = 0;
             for (var i = 0; i < caiTree.length; i++) {
                 if (caiTree[i].id > highestNumber) {
@@ -473,7 +473,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             for (var j = 0; j < keys.length; j++) {
                 var newNode = Object.assign({}, templateNode);
                 newNode["id"] = tempID;
-                newNode["title"] = keys[j];
+                newNode["title"] = caiProjectModel.propertyButtons[keys[j]];
                 newNode["parameters"] = { property: keys[j] };
                 caiTree.push(newNode);
                 buttons.push({ label: newNode.title, value: newNode.id });
@@ -483,7 +483,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         }
         else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("PROPERTYOPTIONS")) {
-         
+
             var highestNumber = 0;
             for (var i = 0; i < caiTree.length; i++) {
                 if (caiTree[i].id > highestNumber) {
@@ -498,7 +498,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
             currentTreeNode[activeProject].options = [];
-
+            currentDropup = currentProperty;
             var keys = caiProjectModel.getOptions(currentProperty);
 
             for (var j = 0; j < keys.length; j++) {
@@ -633,9 +633,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         if (utterance.includes("[CURRENTPROPERTY]")) {
+          if(currentProperty != "complexity"){
             utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty);
+          }
+          else{
+            utterance = utterance.replace("[CURRENTPROPERTY]", "the code");
+          }
         }
-        
+
         else if (currentTreeNode[activeProject].utterance in actions) {
             utterance = actions[currentTreeNode[activeProject].utterance]();
             if (currentTreeNode[activeProject].utterance == "[SUGGESTIONEXPLAIN]" || currentTreeNode[activeProject].utterance == "[SUGGESTIONEXAMPLE]") {

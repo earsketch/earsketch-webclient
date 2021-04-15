@@ -95,27 +95,7 @@ var CAI_DELTA_LIBRARY = [
         utterance: "we can use the [LINK|console input] when we make our song to give the user some input",
         complexity: { consoleInput: 1 }
     },
-    {
-        start: { variables: 0 },
-        end: { variables: 3 },
-        id: 42,
-        utterance: "since we're storing values in [LINK|variables], we should take advantage of that and change the value",
-        complexity: {variables: 4}
-    },
-    {
-        start: { variables: 1 },
-        end: { variables: 3 },
-        id: 43,
-        utterance: "since we're storing values in [LINK|variables], we should take advantage of that and change the value",
-        complexity: { variables: 4 }
-    },
-    {
-        start: { variables: 2 },
-        end: { variables: 3 },
-        id: 44,
-        utterance: "since we're storing values in [LINK|variables], we should take advantage of that and change the value",
-        complexity: { variables: 4 }
-    },
+
     {
         start: { conditionals: 0 },
         end: { conditionals: 2 },
@@ -244,7 +224,7 @@ var CAI_RECOMMENDATIONS =
             id: 11,
             example: "",
             explain: "",
-            utterance: "i like how we're branching into another genre. let's add [sound_rec] next"
+            utterance: "let's add [sound_rec] next?"
         },
         {
             id: 12,
@@ -254,9 +234,9 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 13,
-            example: "we can include a sound from a really different genre which keeps things interesting",
-            explain: "this can give us a new direction to work on",
-            utterance: "let's try something more adventurous like [sound_rec]"
+            example: "",
+            explain: "",
+            utterance: "let's try something like [sound_rec]"
         },
         {
             id: 14,
@@ -450,3 +430,25 @@ var CAI_NUCLEI = [
 ]
 
 export {CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI};
+
+//{
+//     start: { variables: 0 },
+//     end: { variables: 3 },
+//     id: 42,
+//     utterance: "since we're storing values in [LINK|variables], we should take advantage of that and change the value",
+//     complexity: {variables: 4}
+// },
+// {
+//     start: { variables: 1 },
+//     end: { variables: 3 },
+//     id: 43,
+//     utterance: "since we're storing values in [LINK|variables], we should take advantage of that and change the value",
+//     complexity: { variables: 4 }
+// },
+// {
+//     start: { variables: 2 },
+//     end: { variables: 3 },
+//     id: 44,
+//     utterance: "since we're storing values in [LINK|variables], we should take advantage of that and change the value",
+//     complexity: { variables: 4 }
+// },

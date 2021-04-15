@@ -19,6 +19,13 @@ app.factory('caiProjectModel', [function () {
         'complexity': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
+    var propertyButtons ={
+      'genre': "i have a genre I want to include",
+      'instrument': "there's an instrument i want to make sure is in the project",
+      'form': "i have a form in mind",
+      'complexity': "i need to use a specific code structure"
+    };
+
     var suggestableProperties = {
         'multiple': {
             'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
@@ -177,7 +184,8 @@ app.factory('caiProjectModel', [function () {
         getOptions: getOptions,
         getProperties: getProperties,
         randomPropertySuggestion: randomPropertySuggestion,
-        setActiveProject: setActiveProject
+        setActiveProject: setActiveProject,
+        propertyButtons: propertyButtons
     };
 
 }]);
