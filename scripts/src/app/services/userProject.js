@@ -388,10 +388,15 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                 for (var i in saved) {
                     if (saved.hasOwnProperty(i) && !saved[i].soft_delete) {
                         if (saved[i].hasOwnProperty('creator') && (saved[i].creator !== username)) {
-                            promises.push(importSharedScript(saved[i].original_id));
+                            if(saved[i].hasOwnProperty('original_id')) {
+                                promises.push(importSharedScript(saved[i].original_id));
+                            }
                         } else {
                             // promises.push(saveScript(saved[i].name, saved[i].source_code, false));
-                            promises.push(saveScript(saved[i].name, tabs.getEditorSession(saved[i].shareid).getValue(), false));
+                            const tabEditorSession = tabs.getEditorSession(saved[i].shareid);
+                            if(tabEditorSession) {
+                                promises.push(saveScript(saved[i].name, tabs.getEditorSession(saved[i].shareid).getValue(), false));
+                            }
                         }
                     }
                 }
@@ -407,8 +412,10 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                     return refreshCodeBrowser().then(function () {
                         // once all scripts have been saved open them
                         angular.forEach(savedScripts, function(savedScript) {
-                            openScript(savedScript.shareid);
-                            $ngRedux.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid));
+                            if(savedScript) {
+                                openScript(savedScript.shareid);
+                                $ngRedux.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid));
+                            }
                         });
                     });
                 }).then(() => getSharedScripts(username, password));

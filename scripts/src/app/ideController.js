@@ -904,6 +904,26 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
                 body = body + "\r\n";
             }
 
+            var localStorageLog = "";
+            
+            Object.keys(localStorage).forEach(function (key) {
+                try {
+                    if (key === "userstate") {
+                        var localUserState = JSON.parse(localStorage.getItem(key));
+                        if (localUserState.hasOwnProperty('password')) {
+                            localUserState.password = '';
+                        }
+                        localStorageLog += key + ": " + JSON.stringify(localUserState) + "\r\n";
+                    } else {
+                        localStorageLog += key + ": " + localStorage.getItem(key) + "\r\n";
+                    }
+                } catch (e) {
+                    if (e && e.hasOwnProperty(message)) {
+                        localStorageLog += "exception for key ["+key+"]: " + e.message;
+                    }
+                }
+            });
+
             body = body + "\r\n**OS:** "+ESUtils.whichOS()+"\t **Browser:** "+ESUtils.whichBrowser()+"\r\n";
 
             if (errorDesc) {
@@ -912,6 +932,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
 
             body = body + "\r\n**SOURCE CODE:** \r\n```"+lang+"\r\n" + $scope.editor.getValue() + "\r\n```";
             body = body + "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```";
+            body = body + "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageLog + "\r\n```";
 
             var errorinfo = {};
             errorinfo.title = "User reported bug";
