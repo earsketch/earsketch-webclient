@@ -691,7 +691,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var recs = [];
             var usedRecs = [];
             recs = recommender.recommend([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
-
             var recIndex = 0;
 
 
@@ -713,13 +712,23 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 shuffle(recs);
             }
 
-            if (recs.length < count) {
-                //fill recs with additional suggestions if too few from the selected genres/instruments are available
+            //fill recs with additional suggestions if too few from the selected genres/instruments are available
+            findrecs: if (recs.length < count) {
+                var combinations = [[genreArray,[]],[[],instrumentArray],[[],[]]]
                 var numNewRecs = count - recs.length;
-                var newRecs = recommender.recommend([], allSamples, 1, 1, [], [], recommendationHistory[activeProject], numNewRecs)
-                for (var k = 0; k < newRecs.length; k++) {
-                    recs.push(newRecs[k]);
-                }
+                for(var i = 0; i < combinations.length; i++) {
+                    
+                    var newRecs = recommender.recommend([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
+
+                    for (var k = 0; k < newRecs.length; k++) {
+                        if (!recs.includes(newRecs[k]))
+                            recs.push(newRecs[k]);
+                    }
+                    numNewRecs = count - recs.length;
+                    if (numNewRecs === 0) {
+                        break findrecs;
+                    }
+                } 
             }
 
             for (var idx in recs)
@@ -880,6 +889,35 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         return structure;
+    }
+
+    function binomial(genre,instruments) {
+        var genreLength = genre.length;
+        var instrumentsLength = instruments.length;
+        var totalOptions = genreLength + instrumentsLength;
+
+        var subOptions = binomialPos(totalOptions,4).concat(binomialPos(totalOptions,1))
+    }
+
+    function binomialPos(n,k) {
+        var pos = Array(n).fill(true);
+        var posList = [];
+        if (k == n)
+            return [pos]
+        else if (k == 1 || k == n-1) {
+            for(i=0;i<pos.length;i++) {
+                posList.push(pos.slice());
+                posList[posList.length-1][i] = false;
+            }
+            if (k==1) posList = posList.map(function(loc) {return inverted(loc)})
+            return posList
+        }
+        else
+            return [inverted(pos)]
+        
+    }
+    function inverted(bools) {
+        return bools.map(function(bool) {return !bool})
     }
 
     function getLinks(utterance) {
