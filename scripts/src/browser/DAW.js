@@ -907,7 +907,7 @@ const DAW = () => {
         } else {
             // Would prefer to forward the wheel event to the correct element, by experiments with this (dispatchEvent) proved fruitless.
             // (The element received the event but did not scroll.)
-            yScrollEl.current.scrollBy({top: Math.sign(event.deltaY) * 60, behavior: 'smooth'})
+            yScrollEl.current.scrollBy({top: Math.sign(event.deltaY) * 100, behavior: 'smooth'})
         }
     }
 
@@ -999,7 +999,6 @@ const DAW = () => {
                      onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     <div className="relative">
                         <div id="daw-clickable" style={{position: 'relative', top: yScroll + 'px'}}>
-                            {/* Timescales */}
                             <Timeline />
                             <Measureline />
                         </div>
@@ -1019,7 +1018,7 @@ const DAW = () => {
                             })}
                         </div>
 
-                        <div className="absolute left-0 h-full" style={{top: yScroll + 'px'}}>
+                        <div className="absolute left-0 h-full" style={{top: 0}}>
                             <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
@@ -1033,7 +1032,7 @@ const DAW = () => {
                      style={{width: "15px", top: "32px", right: "1px", bottom: "40px"}}
                      onScroll={e => {
                          const fracY = e.target.scrollTop / (e.target.scrollHeight - e.target.clientHeight)
-                         el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
+                         el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)                        
                          setYScroll(el.current.scrollTop)
                     }}>
                     <div style={{width: "1px", height: `max(${totalTrackHeight}px, 100.5%)`}}></div>
