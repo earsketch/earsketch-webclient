@@ -125,23 +125,23 @@ const Header = ({ playPosition, setPlayPosition }) => {
         }
     }
 
-    const [decoration, setDecoration] = useState({title: "full", icon: true})
+    const [title, setTitle] = useState(null)
 
     const el = useRef()
 
     // Update title/icon display whenever element size changes.
     const observer = new ResizeObserver(entries => {
         const width = entries[0].contentRect.width
+        const short = "DAW"
+        const long = "DIGITAL AUDIO WORKSTATION"
         if (embedMode) {
-            setDecoration({title: "short", icon: true})
-        } else if (width > 590) {
-            setDecoration({title: "full", icon: true})
-        } else if (width > 412) {
-            setDecoration({title: "short", icon: true})
-        } else if (width > 375) {
-            setDecoration({title: "none", icon: true})
+            setTitle(short)
+        } else if (width > 570) {
+            setTitle(long)
+        } else if (width > 390) {
+            setTitle(short)
         } else {
-            setDecoration({title: "none", icon: false})
+            setTitle(null)
         }
     })
 
@@ -154,10 +154,9 @@ const Header = ({ playPosition, setPlayPosition }) => {
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
-            <span className="panel-label">{decoration.icon && <span className="icon icon-DAW-Icon"></span>}
-                {decoration.title === "full"
-                ? <span className="font-semibold">DIGITAL AUDIO WORKSTATION</span>
-                : (decoration.title === "short" && <span className="font-semibold">DAW</span>)}
+            <span className="panel-label">
+                {title
+                && <span className="font-semibold">{title}</span>}
             </span>
         </div>
         {embedMode && <div>
@@ -435,7 +434,6 @@ const Cursor = ({ position }) => {
 }
 
 const Playhead = ({ playPosition }) => {
-    console.log("playPosition is", playPosition)
     const xScale = useSelector(daw.selectXScale)
     return <div className="daw-marker" style={{left: xScale(playPosition) + 'px'}}></div>
 }
