@@ -86,9 +86,6 @@ const dawSlice = createSlice({
         setTracks(state, { payload }) {
             state.tracks = payload
         },
-        setPlayPosition(state, { payload }) {
-            state.playPosition = payload
-        },
         setPlayLength(state, { payload }) {
             state.playLength = payload
         },
@@ -137,7 +134,6 @@ const dawSlice = createSlice({
 export default dawSlice.reducer
 export const {
     setTracks,
-    setPlayPosition,
     setPlayLength,
     setTrackWidth,
     setTrackHeight,
@@ -155,7 +151,6 @@ export const {
 } = dawSlice.actions
 
 export const selectTracks = state => state.daw.tracks
-export const selectPlayPosition = state => state.daw.playPosition
 export const selectPlayLength = state => state.daw.playLength
 export const selectTrackWidth = state => state.daw.trackWidth
 export const selectTrackHeight = state => state.daw.trackHeight

@@ -435,6 +435,7 @@ const Cursor = ({ position }) => {
 }
 
 const Playhead = ({ playPosition }) => {
+    console.log("playPosition is", playPosition)
     const xScale = useSelector(daw.selectXScale)
     return <div className="daw-marker" style={{left: xScale(playPosition) + 'px'}}></div>
 }
@@ -852,11 +853,11 @@ const DAW = () => {
 
         if (newLoop.selection) {
             if (!playing || !(playPosition >= loop.start && playPosition <= loop.end)) {
-                dispatch(daw.setPlayPosition(loop.start))
+                setPlayPosition(loop.start)
                 dispatch(daw.setPendingPosition(playing ? loop.start : null))
             }
         } else {
-            dispatch(daw.setPlayPosition(measure))
+            setPlayPosition(measure)
             dispatch(daw.setPendingPosition(playing ? measure : null))
             player.setPosition(measure)
         }
@@ -943,6 +944,7 @@ const DAW = () => {
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
         const position = player.getCurrentPosition()
+        console.log("playPosition", position)
         setPlayPosition(position)
 
         if (!(el.current && xScrollEl.current)) return
