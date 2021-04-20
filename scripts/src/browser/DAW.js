@@ -897,11 +897,17 @@ const DAW = () => {
     }
 
     const onWheel = (event) => {
-        event.preventDefault()
         if (event.ctrlKey) {
-            zoomY(-event.deltaY)
+            event.preventDefault()
+            if (event.shiftKey) {
+                zoomY(-Math.sign(event.deltaY))
+            } else {
+                zoomX(-Math.sign(event.deltaY)*5)
+            }
         } else {
-            zoomX(-event.deltaY)
+            // Would prefer to forward the wheel event to the correct element, by experiments with this (dispatchEvent) proved fruitless.
+            // (The element received the event but did not scroll.)
+            yScrollEl.current.scrollBy({top: Math.sign(event.deltaY) * 60, behavior: 'smooth'})
         }
     }
 
@@ -937,12 +943,12 @@ const DAW = () => {
 
     const autoScroll = useSelector(daw.selectAutoScroll)
     const xScrollEl = useRef()
+    const yScrollEl = useRef()
 
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
         const position = player.getCurrentPosition()
-        console.log("playPosition", position)
         setPlayPosition(position)
 
         if (!(el.current && xScrollEl.current)) return
@@ -1023,7 +1029,8 @@ const DAW = () => {
                     </div>
                 </div>
 
-                <div className="absolute overflow-y-scroll" style={{width: "15px", top: "32px", right: "1px", bottom: "40px"}}
+                <div ref={yScrollEl} className="absolute overflow-y-scroll"
+                     style={{width: "15px", top: "32px", right: "1px", bottom: "40px"}}
                      onScroll={e => {
                          const fracY = e.target.scrollTop / (e.target.scrollHeight - e.target.clientHeight)
                          el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
