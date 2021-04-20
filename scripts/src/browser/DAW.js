@@ -795,7 +795,7 @@ const DAW = () => {
 
     const onMouseDown = (event) => {
         // calculate x position of the bar from mouse position
-        let x = event.clientX - event.currentTarget.getBoundingClientRect().left
+        let x = event.clientX - event.currentTarget.firstChild.getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -822,7 +822,7 @@ const DAW = () => {
         }
 
         // calculate x position of the bar from mouse position
-        let x = event.clientX - event.currentTarget.getBoundingClientRect().left
+        let x = event.clientX - event.currentTarget.firstChild.getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -863,7 +863,7 @@ const DAW = () => {
 
     const onMouseMove = (event) => {
         // calculate x position of the bar from mouse position
-        let x = event.clientX - event.currentTarget.getBoundingClientRect().left
+        let x = event.clientX - event.currentTarget.firstChild.getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
