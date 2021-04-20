@@ -156,7 +156,7 @@ const Header = ({ playPosition, setPlayPosition }) => {
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
                 {title
-                && <span className="font-semibold">{title}</span>}
+                && <span className="font-semibold text-black pl-2">{title}</span>}
             </span>
         </div>
         {embedMode && <div>
