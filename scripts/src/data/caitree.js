@@ -641,7 +641,7 @@
     {
         id: 89,
         title: "i want to change something",
-        utterance: "which of these do you want to clear?",
+        utterance: "which of these do you want to start over on?",
         parameters: {},
         options:["CLEARPROPERTYOPTIONS|90"]
     },
