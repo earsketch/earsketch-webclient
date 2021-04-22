@@ -72,10 +72,10 @@ const Tab = ({ scriptID, scriptName, index }) => {
             className={tabClass}
             key={scriptID}
             onClick={() => {
-                dispatch(tabs.setActiveTabAndEditor(scriptID));
-
-                // TODO: This triggers clearHistory
-                ngTabControllerScope.swapTab(index);
+                if (activeTabID !== scriptID) {
+                    dispatch(tabs.setActiveTabAndEditor(scriptID));
+                    ngTabControllerScope.activeTabID = scriptID;
+                }
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
@@ -93,7 +93,17 @@ const Tab = ({ scriptID, scriptName, index }) => {
                 </div>
                 <button
                     className={closeButtonClass}
-                    onClick={(event) => ngTabControllerScope.closeTab(index, event)}
+                    onClick={(event) => {
+                        dispatch(tabs.closeAndSwitchTab(scriptID));
+                        ngTabControllerScope.closeTab(index, event);
+
+                        const userProject = helpers.getNgService('userProject');
+                        userProject.closeScript(scriptID);
+
+                        // The tab is reselected otherwise.
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }}
                 >
                     <i className={`icon-cross2 cursor-pointer`} />
                 </button>
@@ -113,7 +123,10 @@ const CloseAllTab = () => {
                 flex items-center
                 text-white bg-gray-800 border border-gray-800    
             `}
-            onClick={() => ngTabControllerScope.closeAllTabs()}
+            onClick={() => {
+                // Dispatch needs to be inside $confirm.
+                ngTabControllerScope.closeAllTabs();
+            }}
         >
             Close All
         </div>

@@ -97,7 +97,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
     function addCurriculumPageToHistory(page) {
-        addToNodeHistory(["curriculum", page]);
+        if (nodeHistory[activeProject]) {
+            if (nodeHistory[activeProject][nodeHistory[activeProject].length - 1][1] !== page) {
+                addToNodeHistory(["curriculum", page]);
+                caiStudentHistoryModule.addCurriculumPage(page);
+            }
+        }
     }
 
     function setActiveProject(p) {

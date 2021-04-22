@@ -121,6 +121,7 @@ const scriptsSlice = createSlice({
         setFeatureSharedScript(state, { payload }) {
             state.featureSharedScript = payload;
         },
+        // TODO: Move dropdown stuff to temporary / mutable state.
         setDropdownMenu(state, { payload }) {
             state.dropdownMenu.show = payload.show ? payload.show : true;
             state.dropdownMenu.script = payload.script;
@@ -149,7 +150,7 @@ const scriptsSlice = createSlice({
 
 const persistConfig = {
     key: 'scripts',
-    whitelist: ['localScripts'],
+    whitelist: ['localScripts','readOnlyScripts'],
     storage
 };
 
@@ -344,7 +345,7 @@ const selectRegularScriptEntities = state => state.scripts.regularScripts.entiti
 const selectRegularScriptIDs = state => state.scripts.regularScripts.scriptIDs;
 const selectSharedScriptEntities = state => state.scripts.sharedScripts.entities;
 export const selectSharedScriptIDs = state => state.scripts.sharedScripts.scriptIDs;
-const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
+export const selectReadOnlyScriptEntities = state => state.scripts.readOnlyScripts.entities;
 const selectReadOnlyScriptIDs = state => state.scripts.readOnlyScripts.scriptIDs;
 
 export const selectActiveScriptEntities = createSelector(

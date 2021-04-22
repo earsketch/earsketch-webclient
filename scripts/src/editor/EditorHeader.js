@@ -57,6 +57,8 @@ const EditorHeader = () => {
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
     const loggedIn = useSelector(state => state.user.loggedIn);
+    const script = allScripts[activeTab];
+    const scriptType = (!script || script.readonly) && 'readonly' || script.isShared && 'shared' || 'regular';
 
     return (
         <div
@@ -74,7 +76,7 @@ const EditorHeader = () => {
                 <UndoRedoButtons />
 
                 {
-                    !(allScripts[activeTab] && allScripts[activeTab].collaborative) && (
+                    !(script && script.collaborative) && (
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
@@ -96,7 +98,7 @@ const EditorHeader = () => {
                     )
                 }
                 {
-                    loggedIn && (
+                    (loggedIn && scriptType !== 'readonly' && !(scriptType === 'shared' && script.collaborative)) && (
                         <div
                             className={`
                                 rounded-full
@@ -105,7 +107,12 @@ const EditorHeader = () => {
                                 px-4 py-1
                                 ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
                             `}
-                            onClick={() => mainScope.shareScript(Object.assign({}, allScripts[activeTab]))}
+                            onClick={() => {
+                                const userProject = helpers.getNgService('userProject');
+                                // This temporary hack assumes any types of not-owned script are not sharable from the editor header.
+                                const unsavedScript = userProject.scripts[activeTab];
+                                mainScope.shareScript(Object.assign({}, unsavedScript));
+                            }}
                         >
                             <i className='icon-share32 pr-2' />
                             SHARE
