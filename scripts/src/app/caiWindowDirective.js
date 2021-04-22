@@ -1,8 +1,13 @@
+import * as tabs from '../editor/tabState';
+import * as user from '../user/userState';
+import * as curriculum from '../browser/curriculumState';
+import * as helpers from '../helpers';
+
 app.directive('caiwindow', [function () {
 
     return {
         templateUrl: 'templates/cai-window.html',
-        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', 'caiStudentHistoryModule', 'caiStudentPreferenceModule', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion, caiStudentHistoryModule, caiStudentPreferenceModule) {
+        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', 'caiStudentHistoryModule', 'caiStudentPreferenceModule', '$ngRedux', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion, caiStudentHistoryModule, caiStudentPreferenceModule, $ngRedux) {
 
             $scope.activeProject = ''
 
@@ -45,29 +50,6 @@ app.directive('caiwindow', [function () {
                 }
             };
 
-            $scope.$on('caiSwapTab', function (event, name) {
-                $scope.activeProject = name;
-                caiDialogue.setActiveProject($scope.activeProject);
-                if (!$scope.messageListCAI[$scope.activeProject]) {
-                    $scope.messageListCAI[$scope.activeProject] = [];
-                    $scope.introduceCAI();
-                }
-                $scope.inputOptions = caiDialogue.createButtons();
-                if ($scope.inputOptions.length === 0) {
-                    $scope.inputOptions = $scope.defaultInputOptions;
-                }
-                autoScrollCAI();
-            });
-
-            $scope.$on('caiClose', function (event) {
-                $scope.activeProject = ''
-                caiDialogue.clearNodeHistory();
-                $scope.messageListCAI = {};
-                $scope.inputTextCAI = { label: '', value: '' };
-                $scope.inputOptions = [];
-                $scope.dropupLabel = "Dropup";
-            });
-
             $scope.introduceCAI = function () {
                 var msgText = caiDialogue.generateOutput("Chat with CAI");
                 caiDialogue.studentInteract(false);
@@ -93,10 +75,48 @@ app.directive('caiwindow', [function () {
                         $scope.$applyAsync();
                     }
                 }
-            }
+            }  
 
+            $scope.setActiveProject = function (activeProject) {
+                if (activeProject === null || activeProject === undefined) {
+                    $scope.activeProject = '';
+                    caiDialogue.clearNodeHistory();
+                    $scope.messageListCAI = {};
+                    $scope.inputTextCAI = { label: '', value: '' };
+                    $scope.inputOptions = [];
+                    $scope.dropupLabel = "Dropup";
+                }
+                else {
+                    $scope.activeProject = activeProject;
+                    caiDialogue.setActiveProject($scope.activeProject);
+                    if (!$scope.messageListCAI[$scope.activeProject]) {
+                        $scope.messageListCAI[$scope.activeProject] = [];
+                        $scope.introduceCAI();
+                    }
+                    $scope.inputOptions = caiDialogue.createButtons();
+                    if ($scope.inputOptions.length === 0) {
+                        $scope.inputOptions = $scope.defaultInputOptions;
+                    }
+                    autoScrollCAI();
+                }
+            };
 
-            // $scope.introduceCAI();
+            $scope.checkForActiveProject = function () {
+                const ideScope = helpers.getNgController('ideController').scope();
+
+                if (ideScope.activeScript) {
+                    $scope.setActiveProject(ideScope.activeScript.name);       
+                }
+            };
+ 
+            $ngRedux.connect(state => ({ ...state.tabs }))(state => {
+                if (!state.activeTabID) {
+                    $scope.setActiveProject(null);
+                }
+                else {
+                    $scope.checkForActiveProject();
+                }
+            });  
 
             $scope.periodicCheckOn = false;
             $scope.periodicCheck;
@@ -405,10 +425,11 @@ app.directive('caiwindow', [function () {
                 return message;
             };
 
-            $scope.curriculumPageView = function(data) {
-                caiDialogue.addCurriculumPageToHistory(data);
-                caiStudentHistoryModule.addCurriculumPage(data);
-            };
+
+            $ngRedux.connect(state => ({ ...state.curriculum.currentLocation }))(currentLocation => {
+                caiDialogue.addCurriculumPageToHistory(currentLocation);
+            });
+
 
             $scope.$on("reloadRecommendations", function (evt, data) {
                 var editorCode = $scope.editor.ace.session.doc.$lines.join("\n");

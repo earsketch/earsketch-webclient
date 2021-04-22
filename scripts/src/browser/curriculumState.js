@@ -224,9 +224,6 @@ export const selectPageTitle = createSelector(
         let title = ''
 
         if (location.length === 1) {
-            if (FLAGS.SHOW_CAI) {
-                angular.element('div[caiwindow]').scope().curriculumPageView(toc[location[0]].title)
-            }
             return toc[location[0]].title
         } else if (location.length === 2) {
             const h2 = content.querySelector("h2")
@@ -237,9 +234,6 @@ export const selectPageTitle = createSelector(
             if (chNumForDisplay) {
                 title = chNumForDisplay + ': ' + title
             }
-            if (FLAGS.SHOW_CAI) {
-                angular.element('div[caiwindow]').scope().curriculumPageView(title)
-            }
             return title
         } else if (location.length === 3) {
             const h3 = content.querySelector("h3")
@@ -249,9 +243,6 @@ export const selectPageTitle = createSelector(
             const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
             if (chNumForDisplay) {
                 title = chNumForDisplay + '.' + title
-            }
-            if (FLAGS.SHOW_CAI) {
-                angular.element('div[caiwindow]').scope().curriculumPageView(title)
             }
             return title
         }
