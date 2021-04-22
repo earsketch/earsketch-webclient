@@ -1,4 +1,7 @@
-app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'script', 'userProject', 'compiler', '$rootScope', 'ESUtils', 'reporter', 'collaboration', 'allowRevert', function ($scope, $uibModalInstance, script, userProject, compiler, rootScope, ESUtils, reporter, collaboration, allowRevert) {
+import * as tabs from '../editor/tabState';
+import * as scripts from '../browser/scriptsState';
+
+app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'script', 'userProject', 'compiler', '$rootScope', 'ESUtils', 'reporter', 'collaboration', 'allowRevert', '$ngRedux', function ($scope, $uibModalInstance, script, userProject, compiler, rootScope, ESUtils, reporter, collaboration, allowRevert, $ngRedux) {
     $scope.script = script;
     $scope.allowRevert = allowRevert;
 
@@ -53,7 +56,14 @@ app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'scrip
                 p.then(function() {
                     // TODO: this really isn't ideal
                     // //close the script and then reload to reflect latest changes
-                    rootScope.$broadcast('showTabAfterScriptVersionChange', script);
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
+
+                    if (tabs.selectOpenTabs($ngRedux.getState()).includes(script.shareid)) {
+                        tabs.deleteEditorSession(script.shareid);
+
+                        if (script.shareid === tabs.selectActiveTabID($ngRedux.getState()))
+                        $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
+                    }
                 });
             }
 

@@ -18,7 +18,7 @@ const editorSlice = createSlice({
 
 const persistConfig = {
     key: 'editor',
-    whitelist: ['blocksMode'],
+    whitelist: [],
     storage
 };
 
@@ -29,16 +29,7 @@ export const {
 
 // Note: Do not export. Only modify through asyncThunk as side effects.
 const editorMutableState = {
-    editor: null,
-    init() {},
-    setReadOnly(bool) {
-        this.editor.ace.setReadOnly(bool);
-        this.editor.droplet.setReadOnly(bool);
-    },
-    setFontSize(value) {
-        this.editor.ace.setFontSize(value);
-        this.editor.droplet.setFontSize(value);
-    }
+    editor: null
 };
 
 export const setEditorInstance = createAsyncThunk(
@@ -49,3 +40,10 @@ export const setEditorInstance = createAsyncThunk(
 );
 
 export const selectBlocksMode = state => state.editor.blocksMode;
+export const setReadOnly = (bool) => {
+    editorMutableState.editor?.ace.setReadOnly(bool);
+    editorMutableState.editor?.droplet.setReadOnly(bool);
+};
+export const setSession = (editSession) => {
+    editorMutableState.editor?.ace.setSession(editSession);
+};
