@@ -176,6 +176,12 @@ app.factory('caiProjectModel', [function () {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    function isEmpty() {
+        console.log(projectModel[activeProject], defaultProjectModel)
+        // return projectModel[activeProject] === defaultProjectModel;
+        return true;
+    }
+
     return {
         getModel: getModel,
         updateModel: updateModel,
@@ -185,7 +191,8 @@ app.factory('caiProjectModel', [function () {
         getProperties: getProperties,
         randomPropertySuggestion: randomPropertySuggestion,
         setActiveProject: setActiveProject,
-        propertyButtons: propertyButtons
+        propertyButtons: propertyButtons,
+        isEmpty: isEmpty
     };
 
 }]);

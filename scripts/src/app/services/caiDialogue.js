@@ -1,4 +1,5 @@
 ﻿import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree';
+import { current } from 'immer';
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
@@ -86,6 +87,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
     }
 
+    function clearProperty() {
+        caiProjectModel.clearProperty(currentPropertyValue);
+    }
 
     function studentInteract(didInt = true) {
         studentInteracted = didInt;
@@ -480,6 +484,15 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 currentTreeNode[activeProject].options.push(tempID);
                 tempID++;
             }
+            if(caiProjectModel.isEmpty()) {
+                var newNode = Object.assign({}, caiTree[89]);
+                newNode["id"] = tempID;
+                newNode["parameters"] = {};
+                caiTree.push(newNode);
+                buttons.push({ label: newNode.title, value: newNode.id });
+                currentTreeNode[activeProject].options.push(tempID);
+                tempID++;
+            }
 
         }
         else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("PROPERTYOPTIONS")) {
@@ -496,11 +509,19 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var tempID = highestNumber + 1;
 
+            var clearBool = currentTreeNode[activeProject].options[0].includes("CLEAR");
+
             currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
             currentTreeNode[activeProject].options = [];
             currentDropup = currentProperty;
-            var keys = caiProjectModel.getOptions(currentProperty);
+            
 
+            if (clearBool) {
+                var keys = caiProjectModel.getProperties();         
+            }
+            else {
+                var keys = caiProjectModel.getOptions(currentProperty);
+            }
             for (var j = 0; j < keys.length; j++) {
                 var newNode = Object.assign({}, templateNode);
                 newNode["id"] = tempID;
@@ -600,6 +621,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (utterance.includes("[STOREPROPERTY]")) {
             utterance = utterance.substring(15);
             storeProperty();
+            console.log(caiProjectModel.getModel());
+        }
+        if (utterance.includes("[CLEARPROPERTY]")) {
+            utterance = utterance.substring(15);
+            clearProperty();
             console.log(caiProjectModel.getModel());
         }
         //actions first
@@ -888,6 +914,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             // reconstituteNodeHistory();
         }
 
+        console.log("show next dialogue", structure)
         return structure;
     }
 
