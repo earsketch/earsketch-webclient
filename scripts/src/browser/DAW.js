@@ -136,9 +136,9 @@ const Header = ({ playPosition, setPlayPosition }) => {
         const long = "DIGITAL AUDIO WORKSTATION"
         if (embedMode) {
             setTitle(short)
-        } else if (width > 570) {
+        } else if (width > 590) {
             setTitle(long)
-        } else if (width > 390) {
+        } else if (width > 405) {
             setTitle(short)
         } else {
             setTitle(null)
@@ -156,7 +156,7 @@ const Header = ({ playPosition, setPlayPosition }) => {
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
                 {title
-                && <span className="font-semibold text-black pl-2">{title}</span>}
+                && <span className="font-semibold font-sans text-black text-2xl pl-2">{title}</span>}
             </span>
         </div>
         {embedMode && <div>
