@@ -603,18 +603,13 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         var parameters = []
 
-
-
         //get properties
         if ("property" in currentTreeNode[activeProject].parameters) {
             currentProperty = currentTreeNode[activeProject].parameters['property'];
         }
         if ("propertyvalue" in currentTreeNode[activeProject].parameters) {
             currentPropertyValue = currentTreeNode[activeProject].parameters['propertyvalue'];
-
         }
-
-
 
         if (utterance.includes("[RESET_PARAMS]")) {
             currentInstr = null;
@@ -626,18 +621,22 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (utterance.includes("[STOREPROPERTY]")) {
             utterance = utterance.substring(15);
             storeProperty();
-            console.log(caiProjectModel.getModel());
+            console.log('PROJECT MODEL', caiProjectModel.getModel());
         }
         if (utterance.includes("[CLEARPROPERTY]")) {
             utterance = utterance.substring(15);
             clearProperty();
-            console.log(caiProjectModel.getModel());
+            console.log('PROJECT MODEL',caiProjectModel.getModel());
         }
+
         //actions first
         if (utterance.includes("[SUGGESTPROPERTY]")) {
             var output = caiProjectModel.randomPropertySuggestion();
             var utterReplace = "";
             if (Object.keys(output).length > 0) {
+                currentProperty = output.property;
+                currentPropertyValue = output.value;
+
                 if (output.isAdded) {
                     utterReplace = "what if we also did " + output.value + " for our " + output.property + "?";
 
@@ -653,6 +652,16 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             }
         }
 
+        // use current property
+        if (utterance.includes("[CURRENTPROPERTY]")) {
+          if(currentProperty != "complexity"){
+            utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty);
+          }
+          else{
+            utterance = utterance.replace("[CURRENTPROPERTY]", "the code");
+          }
+        }
+
         if (utterance.includes("ERROREXPLAIN")) {
             utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14);
             parameters.push(["ERROREXPLAIN", explainError()])
@@ -661,15 +670,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             utteranceObj = actions["[SUGGESTION]"]();
             parameters.push(["SUGGESTION", utteranceObj.id]);
             utterance = utteranceObj.utterance;
-        }
-
-        if (utterance.includes("[CURRENTPROPERTY]")) {
-          if(currentProperty != "complexity"){
-            utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty);
-          }
-          else{
-            utterance = utterance.replace("[CURRENTPROPERTY]", "the code");
-          }
         }
 
         else if (currentTreeNode[activeProject].utterance in actions) {
@@ -919,7 +919,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             // reconstituteNodeHistory();
         }
 
-        console.log("show next dialogue", structure)
         return structure;
     }
 
