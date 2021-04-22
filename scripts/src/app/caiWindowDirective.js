@@ -118,6 +118,11 @@ app.directive('caiwindow', [function () {
                 }
             });  
 
+            $scope.$on('swapTabAfterIDEinit', function (evt) {
+                $scope.checkForActiveProject();          
+            });  
+
+
             $scope.periodicCheckOn = false;
             $scope.periodicCheck;
             $scope.enablePeriodicCheck = true;
