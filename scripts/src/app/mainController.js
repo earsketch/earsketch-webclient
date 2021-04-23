@@ -1000,10 +1000,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.toggleCAIWindow = () => {
         $scope.showCAIWindow = !$scope.showCAIWindow;
         if ($scope.showCAIWindow) {
-            angular.element('div[caiwindow]').show();
-            angular.element('curriculum').hide();
             $ngRedux.dispatch(layout.setEast({ open: true }));
             Layout.resetHorizontalSplits();
+            angular.element('curriculum').hide();
+            angular.element('div[caiwindow]').show();
             document.getElementById('caiButton').classList.remove('flashNavButton');
         } else {
             angular.element('div[caiwindow]').hide();

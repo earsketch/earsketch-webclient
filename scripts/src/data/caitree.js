@@ -11,7 +11,7 @@
         title: "Okay",
         utterance: "let's get started",
         parameters: {},
-        options: [76,77]
+        options: [76,77,3,4]
     },
     {
         id: 2,
@@ -656,7 +656,7 @@
     {
         id: 91,
         title: "let's start working",
-        utterance: "sounds good"",
+        utterance: "sounds good",
         parameters: {},
         options: []
     },
