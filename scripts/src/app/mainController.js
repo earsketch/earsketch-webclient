@@ -1020,10 +1020,12 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
         $ngRedux.dispatch(curriculum.fetchContent({ location: location.split('-') }));
 
-        // Note: delay $scope.$apply() to update the angular CAI Window.
-        $setTimeout(function() {
-            $scope.$apply();
-        }, 100);
+        if (FLAGS.SHOW_CAI) {
+            // Note: delay $scope.$apply() to update the angular CAI Window.
+            $setTimeout(function() {
+                $scope.$apply();
+            }, 100);
+        }
     };
 
     $scope.$on('createScript', () => {
