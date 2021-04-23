@@ -9,21 +9,20 @@ app.factory('caiProjectModel', [function () {
     var activeProject = "";
 
     // Initialize empty model.
-    var defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [], 'complexity': [] };
-
+    var defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [], 'code structure': [] };
 
     var propertyOptions = {
         'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
         'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
         'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
-        'complexity': ['forLoop', 'function', 'consoleInput', 'conditional']
+        'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
     var propertyButtons ={
       'genre': "i have a genre I want to include",
       'instrument': "there's an instrument i want to make sure is in the project",
       'form': "i have a form in mind",
-      'complexity': "i need to use a specific code structure"
+      'code structure': "i need to use a specific code structure"
     };
 
     var suggestableProperties = {
@@ -48,7 +47,9 @@ app.factory('caiProjectModel', [function () {
         if (Object.keys(propertyOptions).includes(propertyString)) {
             return propertyOptions[propertyString].slice(0);
         }
-        else return [];
+        else {
+            return [];
+        }
     }
 
     function randomPropertySuggestion() {
@@ -67,7 +68,6 @@ app.factory('caiProjectModel', [function () {
                 possibleProperties.push(multiples[i]);
             }
         }
-
 
         for (var i = 0; i < singles.length; i++) {
             if (projectModel[activeProject][singles[i]].length == 0) {
@@ -108,14 +108,13 @@ app.factory('caiProjectModel', [function () {
         return { property: selectedProperty, value: selectedValue, isAdded: add };
     }
 
+
     function setActiveProject(projectName) {
 
         if (projectName in projectModel) {
-
             activeProject = projectName;
         }
         else {
-
             //create empty, default project model
             activeProject = projectName;
             clearModel();
@@ -134,7 +133,7 @@ app.factory('caiProjectModel', [function () {
 
         switch (property) {
             case 'genre':
-            case 'complexity':
+            case 'code structure':
             case 'instrument':
                 projectModel[activeProject][property].push(value); // Unlimited number of genres/instruments.
                 break;
@@ -155,7 +154,6 @@ app.factory('caiProjectModel', [function () {
         for (var i in defaultProjectModel) {
             projectModel[activeProject][i] = [];
         }
-       // projectModel[activeProject] = Object.assign({}, defaultProjectModel);
     }
 
     // Empty single property array.
@@ -164,12 +162,12 @@ app.factory('caiProjectModel', [function () {
     }
 
     /** FROM STACKOVERFLOW
- * Returns a random integer between min (inclusive) and max (inclusive).
- * The value is no lower than min (or the next integer greater than min
- * if min isn't an integer) and no greater than max (or the next integer
- * lower than max if max isn't an integer).
- * Using Math.round() will give you a non-uniform distribution!
- */
+     * Returns a random integer between min (inclusive) and max (inclusive).
+     * The value is no lower than min (or the next integer greater than min
+     * if min isn't an integer) and no greater than max (or the next integer
+     * lower than max if max isn't an integer).
+     * Using Math.round() will give you a non-uniform distribution!
+     */
     function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);

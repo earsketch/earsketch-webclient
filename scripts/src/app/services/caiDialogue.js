@@ -654,7 +654,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         // use current property
         if (utterance.includes("[CURRENTPROPERTY]")) {
-          if(currentProperty != "complexity"){
+          if(currentProperty != "code structure"){
             utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty);
           }
           else{
