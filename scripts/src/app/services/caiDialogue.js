@@ -489,7 +489,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 currentTreeNode[activeProject].options.push(tempID);
                 tempID++;
             }
-            if(caiProjectModel.isEmpty()) {
+            if(!caiProjectModel.isEmpty()) {
                 var newNode = Object.assign({}, caiTree[89]);
                 newNode["id"] = tempID;
                 newNode["parameters"] = {};
@@ -522,7 +522,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             
 
             if (clearBool) {
-                var keys = caiProjectModel.getProperties();         
+                var keys = caiProjectModel.getNonEmptyFeatures();         
             }
             else {
                 var keys = caiProjectModel.getOptions(currentProperty);

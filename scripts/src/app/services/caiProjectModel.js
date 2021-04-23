@@ -177,9 +177,20 @@ app.factory('caiProjectModel', [function () {
     }
 
     function isEmpty() {
-        console.log(projectModel[activeProject], defaultProjectModel)
-        // return projectModel[activeProject] === defaultProjectModel;
+        for(var key in projectModel[activeProject]) {
+            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0)
+                return false
+        }
         return true;
+    }
+
+    function getNonEmptyFeatures() {
+        var features = []
+        for(var key in projectModel[activeProject]) {
+            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0)
+                features.push(key)
+        }
+        return features;
     }
 
     return {
@@ -192,7 +203,8 @@ app.factory('caiProjectModel', [function () {
         randomPropertySuggestion: randomPropertySuggestion,
         setActiveProject: setActiveProject,
         propertyButtons: propertyButtons,
-        isEmpty: isEmpty
+        isEmpty: isEmpty,
+        getNonEmptyFeatures: getNonEmptyFeatures
     };
 
 }]);
