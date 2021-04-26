@@ -761,7 +761,7 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     };
 
     this.onScriptSaved = function (data) {
-        if (!userIsCAI(data.sender))
+        if (!this.userIsCAI(data.sender))
             userNotification.show(data.sender + ' saved the current version of the script.', 'success');
 
         $ngRedux.dispatch(scripts.syncToNgUserProject());
