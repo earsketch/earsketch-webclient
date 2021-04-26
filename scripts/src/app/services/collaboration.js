@@ -1229,10 +1229,6 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         if (this.refreshSharedScriptBrowser) {
             await this.refreshSharedScriptBrowser();
             $ngRedux.dispatch(scripts.syncToNgUserProject());
-
-            if (self.refreshTabStateForSharedScripts) {
-                self.refreshTabStateForSharedScripts();
-            }
         }
     };
 
