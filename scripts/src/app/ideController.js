@@ -142,7 +142,22 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 sender: 'editor|cli'
             },
             exec: function () {
-                $scope.$broadcast('updateTabFromEditorSave');
+                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+
+                // TODO: Potentially could use $scope.activeScript instead.
+                let script = null;
+                if (activeTabID in userProject.scripts) {
+                    script = userProject.scripts[activeTabID];
+                } else if (activeTabID in userProject.sharedScripts) {
+                    script = userProject.sharedScripts[activeTabID];
+                }
+
+                if (!script?.saved) {
+                    $ngRedux.dispatch(tabs.saveScriptIfModified(activeTabID));
+                } else if (script?.collaborative) {
+                    collaboration.saveScript();
+                }
+                activeTabID && $ngRedux.dispatch(tabs.removeModifiedScript(activeTabID));
             }
         });
 
