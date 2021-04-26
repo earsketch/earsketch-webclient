@@ -18,6 +18,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $scope.bubble = state;
     });
 
+    $scope.numTabs = 0;
+    $ngRedux.connect(state => ({ openTabs: state.tabs.openTabs }))(tabs => {
+        $scope.numTabs = tabs.openTabs.length;
+    });
+
     $ngRedux.dispatch(sounds.getDefaultSounds());
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
         $ngRedux.dispatch(sounds.setFeaturedSoundVisibility(true));
@@ -427,7 +432,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             reporter.logout();
 
             // Note: Temporary scripts like read-only curriculum code may linger in tabController variables.
-            helpers.getNgController('tabController').scope().tabs = [];
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(scripts.resetReadOnlyScripts());
             $ngRedux.dispatch(tabs.resetTabs());
@@ -917,8 +921,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.deleteScript = script => {
-        const tabScope = helpers.getNgController('tabController').scope();
-
         $confirm({
             text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
             ok: "Delete"
@@ -933,13 +935,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
             $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
-            tabScope.tabs = tabScope.getOpenTabEntities();
         });
     };
 
     $scope.deleteSharedScript = script => {
-        const tabScope = helpers.getNgController('tabController').scope();
-
         if (script.collaborative) {
             $confirm({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(() => {
                 if (script.shareid === collaboration.scriptID && collaboration.active) {
@@ -953,7 +952,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                 $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
                 // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
                 collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
-                tabScope.tabs = tabScope.getOpenTabEntities();
             })
         } else {
             $confirm({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
@@ -961,7 +959,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                     $ngRedux.dispatch(scripts.syncToNgUserProject());
                     $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
                     $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
-                    tabScope.tabs = tabScope.getOpenTabEntities();
                 });
             });
         }
