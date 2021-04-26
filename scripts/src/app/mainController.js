@@ -1025,6 +1025,19 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     };
 
+    $scope.closeAllTabs = () => {
+        $confirm({text: ESMessages.idecontroller.closealltabs, ok: "Close All"}).then(() => {
+            const promises = userProject.saveAll();
+            $q.all(promises).then(() => {
+                userNotification.show(ESMessages.user.allscriptscloud);
+                $ngRedux.dispatch(tabs.closeAllTabs());
+            }).catch(() => userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1'));
+
+            $scope.$applyAsync();
+        });
+    };
+
+    // TODO: Remove this.
     $scope.$on('createScript', () => {
         $ngRedux.dispatch(scripts.syncToNgUserProject());
     });
