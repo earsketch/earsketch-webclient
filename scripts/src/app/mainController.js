@@ -1063,6 +1063,19 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     });
 
+    $scope.$on('reloadRecommendations', () => {
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+
+        // Get the modified / unsaved script.
+        let script = null;
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        script && $rootScope.$broadcast('recommenderScript', script);
+    });
+
     $scope.$on('language', (event, language) => {
         $ngRedux.dispatch(appState.setScriptLanguage(language));
     })
