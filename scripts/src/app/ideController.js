@@ -25,7 +25,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.fontSizNum = 14;
     $scope.compiled = null;
 
-    $scope.activeTab = 0;
+    // Tracks the selected tab data (script). Note that it might not be most up to date (modified / unsaved).
     $scope.activeScript = null;
     /**
      * Flag to prevent successive compilation / script save request

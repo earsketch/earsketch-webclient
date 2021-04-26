@@ -74,7 +74,6 @@ const Tab = ({ scriptID, scriptName, index }) => {
             onClick={() => {
                 if (activeTabID !== scriptID) {
                     dispatch(tabs.setActiveTabAndEditor(scriptID));
-                    ngTabControllerScope.activeTabID = scriptID;
                 }
             }}
             onMouseEnter={() => setHighlight(true)}

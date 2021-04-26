@@ -112,8 +112,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $scope.embeddedScriptName = data.scriptName;
     });
 
-    $scope.activeTabID = null;
-
     /**
      * get trusted HTML content for Popover
      */
