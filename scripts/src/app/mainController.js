@@ -978,6 +978,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.importScript = async script => {
+        if (!script) {
+            script = tabs.selectActiveTabScript($ngRedux.getState());
+        }
+
         const imported = await userProject.importScript(Object.assign({},script));
         await userProject.refreshCodeBrowser();
         $ngRedux.dispatch(scripts.syncToNgUserProject());

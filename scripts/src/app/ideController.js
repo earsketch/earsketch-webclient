@@ -408,14 +408,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
     };
 
-    $scope.importScript = function (script) {
-        $scope.$broadcast('importScript', script);
-    };
-
-    $scope.copyScript = function(script){
-        $scope.$broadcast('copyScript', script);
-    };
-
     /**
      * @name setLanguage
      * @function
@@ -478,13 +470,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         var fake_script = {
             'name': scriptName + ext,
             'source_code': key,
-            'shareid': ESUtils.randomString(22)
+            'shareid': ESUtils.randomString(22),
+            'readonly': true
         };
 
         // force a digest cycle because the click is registered by jQuery, and
         // does not trigger Angular digest.
         $scope.$apply(function () {
-            $scope.$broadcast('openCurriculumCode', fake_script);
+            $ngRedux.dispatch(scripts.addReadOnlyScript(Object.assign({}, fake_script)));
             $scope.editor.ace.focus();
             $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
