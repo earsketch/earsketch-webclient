@@ -114,7 +114,7 @@ const Tab = ({ scriptID, scriptName, index }) => {
 };
 
 const CloseAllTab = () => {
-    const ngTabControllerScope = helpers.getNgController('tabController').scope();
+    const mainControllerScope = helpers.getNgMainController().scope();
 
     return (
         <div
@@ -125,7 +125,7 @@ const CloseAllTab = () => {
             `}
             onClick={() => {
                 // Dispatch needs to be inside $confirm.
-                ngTabControllerScope.closeAllTabs();
+                mainControllerScope.closeAllTabs();
             }}
         >
             Close All
