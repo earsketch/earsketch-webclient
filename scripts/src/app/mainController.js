@@ -528,6 +528,14 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(appState.setColorTheme(theme));
         $ngRedux.dispatch(scripts.syncToNgUserProject());
 
+        const openTabs = tabs.selectOpenTabs($ngRedux.getState());
+        const allScripts = scripts.selectAllScriptEntities($ngRedux.getState());
+        openTabs.forEach(scriptID => {
+            if (!allScripts.hasOwnProperty(scriptID)) {
+                $ngRedux.dispatch(tabs.closeAndSwitchTab(scriptID));
+            }
+        });
+
         // Show bubble tutorial when not opening a share link.
         if (!$location.search()['sharing']) {
             $ngRedux.dispatch(bubble.resume());
