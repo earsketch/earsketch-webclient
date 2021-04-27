@@ -921,14 +921,18 @@ const DAW = () => {
     // Keep triggering an action while the mouse button is held.
     const repeatClick = (action, interval=125) => {
         let timer = useRef()
+        const up = () => {
+            clearInterval(timer.current)
+            document.removeEventListener('mouseup', up)
+        }
         const down = () => {
             timer.current = setInterval(action, interval)
             action()
+            // NOTE: We bind this to the document (instead of the same element `down` gets bound to)
+            //   in case the user releases the mouse somewhere else.
+            document.addEventListener('mouseup', up)
         }
-        const up = () => {
-            clearInterval(timer.current)
-        }
-        return [down, up]
+        return down
     }
 
     // A bit hacky; this allows the interval to continue working after a re-render.
@@ -936,10 +940,10 @@ const DAW = () => {
     zoomXRef.current = zoomX
     zoomYRef.current = zoomY
 
-    const [zoomInXMouseDown, zoomInXMouseUp] = repeatClick(() => zoomXRef.current(2))
-    const [zoomInYMouseDown, zoomInYMouseUp] = repeatClick(() => zoomYRef.current(1))
-    const [zoomOutXMouseDown, zoomOutXMouseUp] = repeatClick(() => zoomXRef.current(-2))
-    const [zoomOutYMouseDown, zoomOutYMouseUp] = repeatClick(() => zoomYRef.current(-1))
+    const zoomInX = repeatClick(() => zoomXRef.current(2))
+    const zoomInY = repeatClick(() => zoomYRef.current(1))
+    const zoomOutX = repeatClick(() => zoomXRef.current(-2))
+    const zoomOutY = repeatClick(() => zoomYRef.current(-1))
 
     const autoScroll = useSelector(daw.selectAutoScroll)
     const xScrollEl = useRef()
@@ -1048,13 +1052,13 @@ const DAW = () => {
                 </div>
 
                 <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5">
-                    <button onMouseDown={zoomInXMouseDown} onMouseUp={zoomInXMouseUp} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutXMouseDown} onMouseUp={zoomOutXMouseUp} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5">
-                    <button onMouseDown={zoomInYMouseDown} onMouseUp={zoomInYMouseUp} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutYMouseDown} onMouseUp={zoomOutYMouseUp} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutY}  className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
             </div>
         </div>}
