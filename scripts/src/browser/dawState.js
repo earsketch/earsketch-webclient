@@ -39,20 +39,6 @@ const TIMELINE_ZOOM_INTERVALS = [
     {start: 9150, end: 50000, tickInterval: 1}
 ]
 
-// List of default zoom lengths for ranges of measures.
-// This list is referred when the song is renderred for the first time
-// to approximate a zoom level based on the song length
-const ZOOM_LEVELS = [
-    {start: 1, end: 4, zoomLevel: 12000},
-    {start: 4, end: 8, zoomLevel: 4600},
-    {start: 8, end: 16, zoomLevel: 2700},
-    {start: 16, end: 24, zoomLevel: 1700},
-    {start: 24, end: 30, zoomLevel: 1250},
-    {start: 30, end: 36, zoomLevel: 1050},
-    {start: 36, end: 45, zoomLevel: 850},
-    {start: 45, end: 10000, zoomLevel: 650}
-]
-
 // We want to keep the length of a bar proportional to number of pixels on the screen.
 // We also don't want this proportion to change based on songs of different length.
 // So, we set a default number of measures that we want the screen to fit in.
@@ -214,11 +200,6 @@ export const selectMeasurelineZoomIntervals = createSelector(
 export const selectTimelineZoomIntervals = createSelector(
     [selectTrackWidth],
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
-)
-
-export const selectZoomLevel = createSelector(
-    [selectPlayLength],
-    playLength => getZoomIntervals(ZOOM_LEVELS, playLength)
 )
 
 export const getMuted = (tracks, soloMute, metronome) => {

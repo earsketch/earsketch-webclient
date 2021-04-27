@@ -516,7 +516,7 @@ const Measureline = () => {
         }
     })
 
-    return <div ref={element} id="daw-measureline" className="relative" style={{width: X_OFFSET + xScale(playLength + 1) + 'px', top: '-1px'}}>
+    return <div ref={element} id="daw-measureline" className="relative w-full" style={{top: '-1px', minWidth: X_OFFSET + xScale(playLength + 1) + 'px'}}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -550,7 +550,7 @@ const Timeline = () => {
             .attr('x', 2)
     })
 
-    return <div ref={element} id="daw-timeline" className="relative" style={{width: X_OFFSET + xScale(playLength + 1) + 'px'}}>
+    return <div ref={element} id="daw-timeline" className="relative w-full" style={{minWidth: X_OFFSET + xScale(playLength + 1) + 'px'}}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -673,23 +673,8 @@ const setup = (dispatch, getState) => {
             metronome.effects = {}
         }
 
-        // Without copying clips above, this dispatch somehow freezes all of the clips, which breaks player.
-
-        // result.tracks.forEach((track, index) => {
-        //     console.log("frozen conspiracy before: track", index)
-        //     track.clips.forEach((clip, index) => {
-        //         console.log("clip", index, Object.isExtensible(clip))
-        //     })
-        // })
-
+        // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
         dispatch(daw.setTracks(tracks))
-
-        // result.tracks.forEach((track, index) => {
-        //     console.log("frozen conspiracy after: track", index)
-        //     track.clips.forEach((clip, index) => {
-        //         console.log("clip", index, Object.isExtensible(clip))
-        //     })
-        // })
 
         if (reset) {
             dispatch(daw.setMetronome(false))
@@ -710,10 +695,7 @@ const setup = (dispatch, getState) => {
 
         if (_result === null) {
             // First run only: set zoom based on play length.
-            const level = daw.selectZoomLevel(state)
-            if (level) {
-                dispatch(daw.setTrackWidth(level.zoomLevel))
-            }
+            dispatch(daw.setTrackWidth(64000 / playLength))
         }
 
         // sanity checks
@@ -1029,8 +1011,18 @@ const DAW = () => {
                     </div>
                 </div>
 
-                <div ref={yScrollEl} className="absolute overflow-y-scroll"
-                     style={{width: "15px", top: "32px", right: "1px", bottom: "40px"}}
+                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{boxShadow: "0 -6px 3px -6px black"}}>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
+                </div>
+
+                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black"}}>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutY}  className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
+                </div>
+
+                <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
+                     style={{width: "15px", top: "32px", right: "2px", bottom: "40px"}}
                      onScroll={e => {
                          const fracY = e.target.scrollTop / (e.target.scrollHeight - e.target.clientHeight)
                          el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)                        
@@ -1039,23 +1031,13 @@ const DAW = () => {
                     <div style={{width: "1px", height: `max(${totalTrackHeight}px, 100.5%)`}}></div>
                 </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll" style={{height: "15px", left: "100px", right: "45px", bottom: "1px"}}
+                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{height: "15px", left: "100px", right: "45px", bottom: "2px"}}
                      onScroll={e => {
                          const fracX = e.target.scrollLeft / (e.target.scrollWidth - e.target.clientWidth)
                          el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
                          setXScroll(el.current.scrollLeft)
                     }}>
                     <div style={{width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px"}}></div>
-                </div>
-
-                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5">
-                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
-                </div>
-
-                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5">
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutY}  className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
             </div>
         </div>}
