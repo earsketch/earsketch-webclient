@@ -150,13 +150,13 @@ const Header = ({ playPosition, setPlayPosition }) => {
         return () => el.current && observer.unobserve(el.current)
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="flex-grow-0">
+    return <div ref={el} id="dawHeader" className="flex-grow-0 bg-gray-900">
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
                 {title
-                && <span className="font-semibold font-sans text-black text-2xl pl-2">{title}</span>}
+                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{title}</span>}
             </span>
         </div>
         {embedMode && <div>
@@ -166,7 +166,7 @@ const Header = ({ playPosition, setPlayPosition }) => {
         <div className="daw-transport-container">
             {/* Beginning */}
             <span className="daw-transport-button">
-                <button type="submit" className="btn btn-clear" data-toggle="tooltip" data-placement="bottom" title="Reset" onClick={reset}>
+                <button type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title="Reset" onClick={reset}>
                     <span className="icon icon-first"></span>
                 </button>
             </span>
@@ -174,14 +174,14 @@ const Header = ({ playPosition, setPlayPosition }) => {
             <span id="daw-play-button" uib-popover-html="getPopoverContent('play')" popover-placement="bottom" popover-is-open="showDAWKeyShortcuts" popover-animation="true" popover-trigger="'none'">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn btn-play btn-clear" + (needCompile ? " flashButton" : "")} title="Play" onClick={play}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title="Play" onClick={play}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn btn-clear" title="Pause" onClick={pause}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title="Pause" onClick={pause}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -189,7 +189,7 @@ const Header = ({ playPosition, setPlayPosition }) => {
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button type="submit" className={"btn btn-clear" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Loop Project" onClick={toggleLoop}>
+                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Loop Project" onClick={toggleLoop}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
@@ -198,14 +198,14 @@ const Header = ({ playPosition, setPlayPosition }) => {
                 NOTE: In Angular implementation, this was conditional on `horzOverflow`, but it was 'always on for now'.
                 Hence, I have simply made it unconditional here. */}
             <span className="daw-transport-button follow-icon">
-                <button type="submit" className={"btn btn-clear" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Auto-scroll to follow the playback" onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Auto-scroll to follow the playback" onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
                 </button>
             </span>
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button id="dawMetronomeButton" className={"btn btn-clear" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
+                <button id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -213,7 +213,7 @@ const Header = ({ playPosition, setPlayPosition }) => {
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
-                    <button id="muteButton" className="btn btn-clear" style={{width: "40px"}} title="Toggle Volume" data-toggle="tooltip" data-placement="bottom">
+                    <button id="muteButton" className="btn dark:text-white hover:opacity-70" style={{width: "40px"}} title="Toggle Volume" data-toggle="tooltip" data-placement="bottom">
                         <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
                     </button>
                 </span>
@@ -237,8 +237,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"btn btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title="Solo">S</button>
-                    <button className={"btn btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title="Mute">M</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title="Solo">S</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title="Mute">M</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
@@ -251,7 +251,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">Effect {index+1}</div>
-                <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
+                <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
                     Bypass
                 </button>
             </div>
@@ -944,6 +944,8 @@ const DAW = () => {
     const xScrollEl = useRef()
     const yScrollEl = useRef()
 
+    const theme = useSelector(appState.selectColorTheme)
+
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
@@ -978,7 +980,7 @@ const DAW = () => {
         }
     }, [playing, xScale, autoScroll])
 
-    return <div className="flex flex-col w-full h-full relative overflow-hidden">
+    return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
         {hideEditor &&
         <div style={{display: "block"}} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
@@ -986,9 +988,9 @@ const DAW = () => {
         {_result && !hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             {/* Effects Toggle */}
-            <button className="btn-primary btn-effect flex items-center justify-center" title="Toggle All Effects"
-                    onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span>EFFECTS</span>
+            <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
+                    title="Toggle All Effects" onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                <span className="mr-1">EFFECTS</span>
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
 
