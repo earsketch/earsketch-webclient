@@ -16,9 +16,7 @@ export const openScript = script => {
 
 export const openSharedScript = script => {
     const userProject = helpers.getNgService('userProject');
-    const rootScope = helpers.getNgRootScope();
     userProject.openSharedScript(script.shareid);
-    rootScope.$broadcast('selectSharedScript', script);
 };
 
 export const shareScript = script => {

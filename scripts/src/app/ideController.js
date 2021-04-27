@@ -354,10 +354,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         userProject.openSharedScriptForEdit(scriptID);
     };
 
-
-    $scope.selectSharedScript = function(sharedScript){
-        $scope.$broadcast('selectSharedScript', sharedScript);
-    }
+    $scope.selectSharedScript = function (sharedScript) {
+        userProject.openSharedScript(sharedScript.shareid);
+    };
 
     /**
      * Prompts the user for a name and language, then calls the userProject
