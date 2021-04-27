@@ -61,7 +61,6 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     this.refreshScriptBrowser = null;
     this.refreshSharedScriptBrowser = null;
     this.closeSharedScriptIfOpen = null;
-    this.refreshTabStateForSharedScripts = null;
 
     var editTimeout = 5000; // sync (rejoin) session if there is no server response
     var syncTimeout = 5000; // when time out, the websocket connection is likely lost

@@ -8,7 +8,6 @@ import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
-import * as helpers from '../helpers';
 
 /**
  * @module mainController

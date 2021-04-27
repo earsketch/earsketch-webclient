@@ -41,7 +41,6 @@ const createSampleScript = createAsyncThunk(
         return userProject.saveScript(fileName, code, true)
             .then(script => {
                 userProject.openScript(script.shareid);
-                // tabController also needs to call refresh.
                 rootScope.$broadcast('createScript', script.shareid);
 
                 dispatch(tabs.setActiveTabAndEditor(script.shareid));
