@@ -205,10 +205,15 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
-        $rootScope.$broadcast("swapTabAfterIDEinit");
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+
         const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
         $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
         colorTheme.load();
+
+        // Used in CAI
+        $rootScope.$broadcast("swapTabAfterIDEinit");
     };
 
     

@@ -380,7 +380,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                         }
 
                         $scope.loggedInUserName = $scope.username;
-                        $rootScope.$broadcast('scriptsLoaded');
+
+                        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+                        activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+
+                        // Used in CAI
                         $rootScope.$broadcast('swapTabAfterIDEinit');
                     }
 
