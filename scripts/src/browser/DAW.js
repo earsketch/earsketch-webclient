@@ -986,7 +986,7 @@ const DAW = () => {
                             <Measureline />
                         </div>
 
-                        <div className="daw-track-group-container">
+                        <div className="daw-track-group-container" style={{marginBottom: '14px'}}>
                             {tracks.map((track, index) => {
                                 if (track.visible) {
                                     if (index === 0) {
