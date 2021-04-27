@@ -827,12 +827,7 @@ const DAW = () => {
             x -= X_OFFSET
         }
         // round to nearest measure
-        const measure = Math.round(xScale.invert(x))
-
-        // Clamp to valid range.
-        if (measure > playLength) {
-            measure = playLength
-        }
+        const measure = Math.min(Math.round(xScale.invert(x)), playLength)
 
         setDragStart(null)
 
