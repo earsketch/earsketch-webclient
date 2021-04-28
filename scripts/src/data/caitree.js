@@ -40,7 +40,7 @@
         title: "ok, i'll add it",
         utterance: "should we add more samples?",
         parameters: {},
-        options: [8]
+        options: [8, 91]
     },
     {
         id: 6,
@@ -113,7 +113,7 @@
         title: "ok, i like one of those",
         utterance: "i have another one we could add if you want",
         parameters: {},
-        options: [18, 19]
+        options: [18, 19, 91]
     },
     {
         id: 16,
@@ -660,6 +660,13 @@
         parameters: {},
         options: []
     },
+    {
+        id: 92,
+        title: "How can I add these?",
+        utterance: "you can use the [LINK|fitMedia] function",
+        parameters: {},
+        options: []
+    }
     ];
 
 

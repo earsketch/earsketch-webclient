@@ -375,13 +375,13 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 68,
-            example: "something like:\n\n[LINK|setEffect](1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)",
+            example: "something like:\n\n[LINK|setEffect](1, [LINK|FILTER], FILTER_FREQ, 20, pointA, 10000, pointB)",
             explain: "we can customize our sounds a little more, and it gives us more control",
-            utterance: "let's put in some effects, like a filter or volume mixing"
+            utterance: "let's put in some effects, like a [LINK|filter] or volume mixing"
         },
         {
             id: 69,
-            example: "something like:\n\n[LINK|setEffect](1, FILTER, FILTER_FREQ, 20, pointA, 10000, pointB)",
+            example: "something like:\n\n[LINK|setEffect](1, [LINK|FILTER], FILTER_FREQ, 20, pointA, 10000, pointB)",
             explain: "we can specify start and end values, and chain them together if we want",
             utterance: "we could use an envelope with our effects to give us more control over how they behave."
         }

@@ -720,7 +720,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         //set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
         if (utterance.includes("[sound_rec]")) {
 
-
+            currentTreeNode[activeProject].options.push(92);
             var instrumentArray = [];
 
             if ("INSTRUMENT" in currentTreeNode[activeProject].parameters) {
@@ -1044,7 +1044,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         "section": "2-1-0",
         "sections": "2-1-0",
         "ABA": "2-1-1",
-        "custom function": "2-1-1",
+        "custom function": "2-1-2",
         "makeBeat": "2-3-2",
         "loop": "2-4-0",
         "for loop": "2-4-0",
@@ -1065,6 +1065,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         "syntax error": "5-2-5",
         "type error": "5-2-6",
         "function arguments": "5-2-7",
+        "filter": "5-1-6",
+        "FILTER": "5-1-6",
+        "FILTER_FREQ": "5-1-6"
     }
 
 
