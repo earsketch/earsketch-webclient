@@ -632,7 +632,7 @@
     },
     {
         id: 88,
-        title: "i have some ideas about our project",
+        title: "i want to tell you what i think we should make",
         utterance: "sure, what were you thinking?",
         parameters: {},
         dropup: "Project Properties",
@@ -640,8 +640,8 @@
     },
     {
         id: 89,
-        title: "i want to change something",
-        utterance: "which of these do you want to start over on?",
+        title: "i want to change something we agreed on about the project",
+        utterance: "which of these do you want to remove from our list?",
         parameters: {},
         options:["CLEARPROPERTYOPTIONS|90"]
     },
