@@ -161,6 +161,16 @@ app.factory('caiProjectModel', [function () {
         projectModel[activeProject][property] = [];
     }
 
+    // Remove single property from array.
+    function removeProperty(property, propertyValue) {
+        if (projectModel[activeProject][property]) {
+            var index = projectModel[activeProject][property].indexOf(propertyValue);
+            if (index > -1) {
+              projectModel[activeProject][property].splice(index, 1);
+            }
+        }
+    }
+
     /** FROM STACKOVERFLOW
      * Returns a random integer between min (inclusive) and max (inclusive).
      * The value is no lower than min (or the next integer greater than min
@@ -176,19 +186,33 @@ app.factory('caiProjectModel', [function () {
 
     function isEmpty() {
         for(var key in projectModel[activeProject]) {
-            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0)
+            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
                 return false
+            }
         }
         return true;
     }
 
     function getNonEmptyFeatures() {
-        var features = []
+        var features = [];
         for(var key in projectModel[activeProject]) {
-            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0)
+            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
                 features.push(key)
+            }
         }
         return features;
+    }
+
+    function getAllProperties() {
+        var properties = [];
+        for (var key in projectModel[activeProject]) {
+            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
+                for (var pVal in projectModel[activeProject][key]) {
+                    properties.push([key,projectModel[activeProject][key][pVal]]);
+                }
+            }
+        }
+        return properties;
     }
 
     return {
@@ -196,13 +220,15 @@ app.factory('caiProjectModel', [function () {
         updateModel: updateModel,
         clearModel: clearModel,
         clearProperty: clearProperty,
+        removeProperty: removeProperty,
         getOptions: getOptions,
         getProperties: getProperties,
         randomPropertySuggestion: randomPropertySuggestion,
         setActiveProject: setActiveProject,
         propertyButtons: propertyButtons,
         isEmpty: isEmpty,
-        getNonEmptyFeatures: getNonEmptyFeatures
+        getNonEmptyFeatures: getNonEmptyFeatures,
+        getAllProperties: getAllProperties
     };
 
 }]);

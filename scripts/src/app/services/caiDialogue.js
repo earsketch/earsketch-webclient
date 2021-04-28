@@ -522,20 +522,31 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
             if (clearBool) {
-                var keys = caiProjectModel.getNonEmptyFeatures();
+                var properties = caiProjectModel.getAllProperties();   
+
+                for (var j = 0; j < properties.length; j++) {
+                    var newNode = Object.assign({}, templateNode);
+                    newNode["id"] = tempID;
+                    newNode["title"] = properties[j][0] + ": " + properties[j][1];
+                    newNode["parameters"] = { property: properties[j][0], propertyvalue: properties[j][1] };
+                    caiTree.push(newNode);
+                    buttons.push({ label: newNode.title, value: newNode.id });
+                    currentTreeNode[activeProject].options.push(tempID);
+                    tempID++;
+                }
             }
             else {
                 var keys = caiProjectModel.getOptions(currentProperty);
-            }
-            for (var j = 0; j < keys.length; j++) {
-                var newNode = Object.assign({}, templateNode);
-                newNode["id"] = tempID;
-                newNode["title"] = keys[j];
-                newNode["parameters"] = { propertyvalue: keys[j] };
-                caiTree.push(newNode);
-                buttons.push({ label: newNode.title, value: newNode.id });
-                currentTreeNode[activeProject].options.push(tempID);
-                tempID++;
+                for (var j = 0; j < keys.length; j++) {
+                    var newNode = Object.assign({}, templateNode);
+                    newNode["id"] = tempID;
+                    newNode["title"] = keys[j];
+                    newNode["parameters"] = { propertyvalue: keys[j] };
+                    caiTree.push(newNode);
+                    buttons.push({ label: newNode.title, value: newNode.id });
+                    currentTreeNode[activeProject].options.push(tempID);
+                    tempID++;
+                }
             }
 
         }
@@ -625,7 +636,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         if (utterance.includes("[CLEARPROPERTY]")) {
             utterance = utterance.substring(15);
-            clearProperty();
+            caiProjectModel.removeProperty(currentProperty, currentPropertyValue);
+            // clearProperty();
             console.log('PROJECT MODEL',caiProjectModel.getModel());
         }
 
