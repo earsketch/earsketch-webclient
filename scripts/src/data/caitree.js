@@ -525,7 +525,7 @@
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
         event: ["soundRequest"],
-        options: [19, 6]
+        options: [19, 6, 92]
     },
     {
         id: 74,
@@ -640,7 +640,7 @@
     },
     {
         id: 89,
-        title: "i want to change something we agreed on about the project",
+        title: "i want to change one of our ideas about the project",
         utterance: "which of these do you want to remove from our list?",
         parameters: {},
         options:["CLEARPROPERTYOPTIONS|90"]
