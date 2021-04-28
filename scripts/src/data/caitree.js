@@ -643,6 +643,7 @@
         title: "i want to change one of our ideas about the project",
         utterance: "which of these do you want to remove from our list?",
         parameters: {},
+        dropup: "ideas",
         options:["CLEARPROPERTYOPTIONS|90"]
     },
     {
