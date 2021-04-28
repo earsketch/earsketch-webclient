@@ -135,7 +135,10 @@ app.factory('caiProjectModel', [function () {
             case 'genre':
             case 'code structure':
             case 'instrument':
-                projectModel[activeProject][property].push(value); // Unlimited number of genres/instruments.
+                var index = projectModel[activeProject][property].indexOf(value);
+                if (index === -1) {
+                    projectModel[activeProject][property].push(value); // Unlimited number of genres/instruments.
+                }
                 break;
             case 'form':
                 projectModel[activeProject]['form'][0] = value; // Only one form at a time.
