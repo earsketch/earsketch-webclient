@@ -250,14 +250,14 @@
         utterance: "[SUGGESTION][RESET_PARAMS]",
         event: ["codeRequest"],
         parameters: {},
-        options: [35]
+        options: [35, 92]
     },
     {
         id: 35,
         title: "can you explain more?",
         utterance: "[SUGGESTIONEXPLAIN]",
         parameters: {},
-        options: [36]
+        options: [36, 92]
     },
     {
         id: 36,
@@ -525,7 +525,7 @@
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
         event: ["soundRequest"],
-        options: [19, 6]
+        options: [19, 6, 92]
     },
     {
         id: 74,
@@ -632,7 +632,7 @@
     },
     {
         id: 88,
-        title: "i have some ideas about our project",
+        title: "i want to tell you what i think we should make",
         utterance: "sure, what were you thinking?",
         parameters: {},
         dropup: "Project Properties",
@@ -640,8 +640,8 @@
     },
     {
         id: 89,
-        title: "i want to change something",
-        utterance: "which of these do you want to start over on?",
+        title: "i want to change one of our ideas about the project",
+        utterance: "which of these do you want to remove from our list?",
         parameters: {},
         options:["CLEARPROPERTYOPTIONS|90"]
     },
@@ -662,11 +662,18 @@
     },
     {
         id: 92,
+        title: "ok",
+        utterance: "cool, go ahead",
+        parameters: {},
+        options: []
+    },
+    {
+        id: 93,
         title: "How can I add these?",
         utterance: "you can use the [LINK|fitMedia] function",
         parameters: {},
         options: []
-    }
+        }
     ];
 
 

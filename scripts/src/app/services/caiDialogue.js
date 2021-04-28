@@ -720,7 +720,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         //set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
         if (utterance.includes("[sound_rec]")) {
 
-            currentTreeNode[activeProject].options.push(92);
+            currentTreeNode[activeProject].options.push(93);
             var instrumentArray = [];
 
             if ("INSTRUMENT" in currentTreeNode[activeProject].parameters) {
