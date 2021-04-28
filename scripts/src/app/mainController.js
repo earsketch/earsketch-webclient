@@ -527,13 +527,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $ngRedux.dispatch(bubble.resume());
         }
 
-        // If in CAI study mode, switch to active CAI view.
-        if (FLAGS.SHOW_CAI) {
-            $ngRedux.dispatch(layout.setEast({ open: true }));
-            Layout.resetHorizontalSplits();
-            angular.element('curriculum').hide();
-            angular.element('div[caiwindow]').show();
-        }
     }
 
 
@@ -1020,6 +1013,14 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
         // $scope.$apply();
     };
+
+        // If in CAI study mode, switch to active CAI view.
+    if (FLAGS.SHOW_CAI) {
+        $ngRedux.dispatch(layout.setEast({ open: true }));
+        Layout.resetHorizontalSplits();
+        angular.element('curriculum').hide();
+        angular.element('div[caiwindow]').show();
+    }
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
