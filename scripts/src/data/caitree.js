@@ -250,14 +250,14 @@
         utterance: "[SUGGESTION][RESET_PARAMS]",
         event: ["codeRequest"],
         parameters: {},
-        options: [35]
+        options: [35, 92]
     },
     {
         id: 35,
         title: "can you explain more?",
         utterance: "[SUGGESTIONEXPLAIN]",
         parameters: {},
-        options: [36]
+        options: [36, 92]
     },
     {
         id: 36,
@@ -660,6 +660,13 @@
         parameters: {},
         options: []
     },
+    {
+        id: 92,
+        title: "ok",
+        utterance: "cool, go ahead",
+        parameters: {},
+        options: []
+    }
     ];
 
 
