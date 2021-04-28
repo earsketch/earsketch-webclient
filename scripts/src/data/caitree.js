@@ -2,7 +2,7 @@
     [{
         id: 0,
         title: "",
-        utterance: "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us.",
+        utterance: "[GREETING]",
         parameters: {},
         options: [1]
     },

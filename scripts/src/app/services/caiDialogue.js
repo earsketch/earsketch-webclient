@@ -94,8 +94,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function studentInteract(didInt = true) {
         studentInteracted = didInt;
     }
-
-
     function addCurriculumPageToHistory(page) {
         if (nodeHistory[activeProject]) {
             if (nodeHistory[activeProject][nodeHistory[activeProject].length - 1][1] !== page) {
@@ -274,6 +272,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (!studentInteracted) {
             return "";
         }
+
+        currentError = ["", ""];
 
         if (currentWait != -1) {
             currentTreeNode[activeProject] = Object.assign({}, caiTree[currentWait]);
@@ -519,10 +519,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
             currentTreeNode[activeProject].options = [];
             currentDropup = currentProperty;
-            
+
 
             if (clearBool) {
-                var keys = caiProjectModel.getNonEmptyFeatures();         
+                var keys = caiProjectModel.getNonEmptyFeatures();
             }
             else {
                 var keys = caiProjectModel.getOptions(currentProperty);
@@ -630,6 +630,17 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         //actions first
+
+
+        if(utterance == "[GREETING]"){
+          if(Object.keys(nodeHistory).length < 2){
+            utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us.";
+          }
+          else{
+            utterance = "good to see you again. let's get started.";
+          }
+        }
+
         if (utterance.includes("[SUGGESTPROPERTY]")) {
             var output = caiProjectModel.randomPropertySuggestion();
             var utterReplace = "";
@@ -662,15 +673,17 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
           }
         }
 
-        if (utterance.includes("ERROREXPLAIN")) {
-            utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14);
-            parameters.push(["ERROREXPLAIN", explainError()])
-        }
-        else if (utterance.includes("[SUGGESTION]")) {
-            utteranceObj = actions["[SUGGESTION]"]();
-            parameters.push(["SUGGESTION", utteranceObj.id]);
-            utterance = utteranceObj.utterance;
-        }
+    //    if(utterance.includes("[SUGGESTION]") || utterance.includes("ERROREXPLAIN")){
+          if (utterance.includes("[SUGGESTION]")) {
+              utteranceObj = actions["[SUGGESTION]"]();
+              parameters.push(["SUGGESTION", utteranceObj.id]);
+              utterance = utteranceObj.utterance;
+           }
+      //     if (utterance.includes("ERROREXPLAIN")) {
+      //         utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14);
+      //         parameters.push(["ERROREXPLAIN", explainError()])
+      //     }
+      // }
 
         else if (currentTreeNode[activeProject].utterance in actions) {
             utterance = actions[currentTreeNode[activeProject].utterance]();
@@ -685,8 +698,16 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             currentTreeNode[activeProject].options = actions[currentTreeNode[activeProject].options]();
         }
 
+        if(utterance == "sure, do you want ideas for a specific section or measure?"){
+          if(currentError[0] != ""){
+            currentTreeNode[activeProject] = Object.assign({}, caiTree[CAI_TREES["error"]]);
+            utterance = "let's fix our error first. [ERROREXPLAIN]";
+          }
+        }
+
         //set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
         if (utterance.includes("[sound_rec]")) {
+
 
             var instrumentArray = [];
 
@@ -748,7 +769,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 var combinations = [[genreArray,[]],[[],instrumentArray],[[],[]]]
                 var numNewRecs = count - recs.length;
                 for(var i = 0; i < combinations.length; i++) {
-                    
+
                     var newRecs = recommender.recommend([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
 
                     for (var k = 0; k < newRecs.length; k++) {
@@ -759,7 +780,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     if (numNewRecs === 0) {
                         break findrecs;
                     }
-                } 
+                }
             }
 
             for (var idx in recs)
@@ -795,6 +816,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             caiStudentPreferenceModule.addSoundSuggestion(usedRecs);
 
         }
+
+        if (utterance.includes("ERROREXPLAIN")) {
+            utterance = utterance.substring(0, utterance.indexOf("[ERROREXPLAIN]")) + explainError() + utterance.substring(utterance.lastIndexOf("[ERROREXPLAIN]") + 14);
+            parameters.push(["ERROREXPLAIN", explainError()])
+        }
+
         while (utterance.includes("[SECTION]")) {
             var recBounds = [utterance.indexOf("[SECTION]"), utterance.indexOf("[SECTION]") + 11];
 
@@ -904,6 +931,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             soundWait.sounds = [];
         }
 
+
         var structure = getLinks(utterance);
 
         if (nodeHistory[activeProject] && utterance != "") {
@@ -945,7 +973,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else
             return [inverted(pos)]
-        
+
     }
     function inverted(bools) {
         return bools.map(function(bool) {return !bool})
@@ -1154,6 +1182,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     * @returns {dict} - dialogue representation of object describing suggestion utterance output.
     */
     function generateSuggestion() {
+      if(currentError[0] != ""){
+        if(isPrompted){
+        outputObj = Object.assign({}, caiTree[CAI_TREES["error"]]);
+        outputObj.utterance = "let's fix our error first. " + outputObj.utterance;
+        return outputObj;
+      }
+        else return "";
+      }
         if (isPrompted) {
             studentInteracted = true;
 
