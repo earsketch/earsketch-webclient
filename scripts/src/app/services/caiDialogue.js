@@ -424,7 +424,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("SECTIONS") && codeSuggestion.getMusic() != null) {
             var musicResults = codeSuggestion.getMusic();
-            if (musicResults != null && Object.keys(musicResults).length > 0) {
+            if (musicResults != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
                 var highestNumber = 0;
                 for (var i = 0; i < caiTree.length; i++) {
                     if (caiTree[i].id > highestNumber) {
@@ -522,7 +522,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
             if (clearBool) {
-                var properties = caiProjectModel.getAllProperties();   
+                var properties = caiProjectModel.getAllProperties();
 
                 for (var j = 0; j < properties.length; j++) {
                     var newNode = Object.assign({}, templateNode);
