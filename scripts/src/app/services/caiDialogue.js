@@ -424,7 +424,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("SECTIONS") && codeSuggestion.getMusic() != null) {
             var musicResults = codeSuggestion.getMusic();
-            if (musicResults != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
+            if (musicResults != null && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
                 var highestNumber = 0;
                 for (var i = 0; i < caiTree.length; i++) {
                     if (caiTree[i].id > highestNumber) {
@@ -720,7 +720,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         //set up sound recs. if theres "[SOUNDWAIT|x]" we need to fill that in (for each sound rec, add "|" + recname)
         if (utterance.includes("[sound_rec]")) {
 
+          if(!currentTreeNode[activeProject].options.includes(93)){
             currentTreeNode[activeProject].options.push(93);
+          }
             var instrumentArray = [];
 
             if ("INSTRUMENT" in currentTreeNode[activeProject].parameters) {
