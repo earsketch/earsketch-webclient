@@ -48,7 +48,7 @@
         utterance: "we could use one of these\n\n[sound_rec]\n[sound_rec]\n[sound_rec]",
         parameters: {},
         event: ["soundRequest"],
-        options: [15, 16]
+        options: [15, 16, 91]
     },
     {
         id: 7,
@@ -150,7 +150,7 @@
         title: "what about something else?",
         utterance: "Sure! Will these suggestions work?\n[sound_rec]\n[sound_rec]\n[sound_rec]",
         parameters: {},
-        options: [15, 16, 17]
+        options: [15, 16, 17, 91]
     },
     {
         id: 21,
