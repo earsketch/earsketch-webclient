@@ -75,7 +75,7 @@ app.directive('caiwindow', [function () {
                         $scope.$applyAsync();
                     }
                 }
-            }  
+            }
 
             $scope.setActiveProject = function (activeProject) {
                 if (activeProject === null || activeProject === undefined) {
@@ -105,10 +105,10 @@ app.directive('caiwindow', [function () {
                 const ideScope = helpers.getNgController('ideController').scope();
 
                 if (ideScope.activeScript) {
-                    $scope.setActiveProject(ideScope.activeScript.name);       
+                    $scope.setActiveProject(ideScope.activeScript.name);
                 }
             };
- 
+
             $ngRedux.connect(state => ({ ...state.tabs }))(state => {
                 if (!state.activeTabID) {
                     $scope.setActiveProject(null);
@@ -116,11 +116,11 @@ app.directive('caiwindow', [function () {
                 else {
                     $scope.checkForActiveProject();
                 }
-            });  
+            });
 
             $scope.$on('swapTabAfterIDEinit', function (evt) {
-                $scope.checkForActiveProject();          
-            });  
+                $scope.checkForActiveProject();
+            });
 
 
             $scope.periodicCheckOn = false;
@@ -158,7 +158,7 @@ app.directive('caiwindow', [function () {
                 $scope.inputTextCAI = Object.assign({}, input);
                 return $scope.sendCAIMessage();
             }
-            
+
 
             $scope.$on('compileCAI', function (evt, data) {
 
@@ -178,7 +178,7 @@ app.directive('caiwindow', [function () {
                 caiStudentHistoryModule.addScoreToAggregate(code, language);
                 setTimeout(() => {
                     var output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results);
-                    if (output != null && output != "") {
+                    if (output != null && output[0][0] != "") {
 
                         var message = sendCAIOutputMessage(output);
                         $scope.messageListCAI[$scope.activeProject].push(message);
@@ -196,7 +196,7 @@ app.directive('caiwindow', [function () {
                     autoScrollCAI();
                     $scope.dropupLabel = caiDialogue.getDropup();
                 }, 0);
-                
+
                 var t = Date.now();
                 caiStudentPreferenceModule.addCompileTS(t);
             });
@@ -390,7 +390,7 @@ app.directive('caiwindow', [function () {
             };
 
             $scope.openCurr = function(message,loc) {
-                layoutScope.loadCurriculumChapter(message.keyword[loc][1]); 
+                layoutScope.loadCurriculumChapter(message.keyword[loc][1]);
                 layoutScope.toggleLayout('curriculum')
             }
 
