@@ -599,6 +599,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (currentTreeNode[activeProject].id == 69) {
             done = true;
         }
+
+        var musicResults = codeSuggestion.getMusic();
+
+
+
+
         if ("event" in currentTreeNode[activeProject]) {
             for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
                 if (currentTreeNode[activeProject].event[k] != 'codeRequest') {
@@ -621,6 +627,31 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if ("propertyvalue" in currentTreeNode[activeProject].parameters) {
             currentPropertyValue = currentTreeNode[activeProject].parameters['propertyvalue'];
         }
+
+        if(utterance.includes("[SECTIONSELECT")){
+          var lastIndex = utterance.indexOf("]");
+          var cut = utterance.substring(1, lastIndex).split("|")
+          var newUtterance = "";
+
+          if(musicResults != null && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 1){
+              //utterance asks; present set of options
+              currentTreeNode[activeProject].options = [];
+              var optionList = cut[1].split(",");
+              for(var g = 0; g < optionList.length; g++){
+                currentTreeNode[activeProject].options.push(parseInt(optionList[g]));
+              }
+              newUtterance = "sure, do you want ideas for a specific section?";
+          }
+          else{
+            //move directly to node indicated in secodn #
+             currentTreeNode[activeProject] = Object.assign({}, caiTree[parseInt(cut[2])]);
+             newUtterance = currentTreeNode[activeProject].utterance;
+          }
+
+          utterance = newUtterance + utterance.substring(lastIndex);
+
+        }
+
 
         if (utterance.includes("[RESET_PARAMS]")) {
             currentInstr = null;
@@ -760,7 +791,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var recIndex = 0;
 
 
-            var musicResults = codeSuggestion.getMusic();
+
             if (currentSection != null && musicResults != null) {
                 recs = [];
                 var measureBounds = musicResults.SOUNDPROFILE[currentSection].measure.slice(0);

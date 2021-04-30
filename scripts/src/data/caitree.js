@@ -515,7 +515,7 @@
     {
         id: 72,
         title: "do you want to come up with some sound ideas",
-        utterance: "sure, do you want ideas for a specific section or measure?[RESET_PARAMS]",
+        utterance: "[SECTIONSELECT|73,74|75][RESET_PARAMS]",
         parameters: {},
         options: [73, 74]
     },
@@ -541,7 +541,7 @@
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
         event: ["soundRequest"],
-        options: [19, 6]
+        options: [19, 6, 92]
     },
     {
         id: 76,
