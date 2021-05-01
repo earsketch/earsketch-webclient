@@ -52,9 +52,22 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     }
 
 
-    function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [null], instrumentLimit = [null], previousRecommendations = [], bestLimit = 3) {
+    function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
         var recs = generateRecommendations(recommendedSounds, inputSamples, coUsage, similarity);
-        return filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
+        var filteredRecs = [];
+        while (filteredRecs.length < bestLimit) {
+            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
+            if (genreLimit.length > 0) {
+                genreLimit.pop();
+            }
+            else if (instrumentLimit.length > 0) {
+                instrumentLimit.pop();
+            }
+            else {
+                return filteredRecs;
+            }
+        }
+        return filteredRecs;
     };
 
 
@@ -103,13 +116,13 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
                 var maxRec = _.max(Object.keys(recs), function (o) { return recs[o]; });
 
                 if (maxRec === -Infinity || maxRec === undefined) {
-                    break;
+                    return recommendedSounds;
                 }
 
                 if (!recommendedSounds.includes(maxRec) && !inputSamples.includes(maxRec) && maxRec.slice(0,3) !== 'OS_') {
-                    if (genreLimit[0] == null || keyGenreDict == null || genreLimit.includes(keyGenreDict[maxRec])) {
+                    if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
                         var s = keyInstrumentDict[maxRec];
-                        if (instrumentLimit[0] == null || keyInstrumentDict == null || instrumentLimit.includes(s)) {
+                        if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
                             if (!previousRecommendations.includes(maxRec)) {
                                 recommendedSounds.push(maxRec);
                                 i += 1;
