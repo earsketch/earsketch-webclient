@@ -674,7 +674,7 @@
         utterance: "you can use the [LINK|fitMedia] function",
         parameters: {},
         options: []
-        }
+    }
     ];
 
 

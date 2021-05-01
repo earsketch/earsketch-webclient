@@ -677,7 +677,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         if(utterance == "[GREETING]"){
           if(Object.keys(nodeHistory).length < 2){
-            utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us.";
+            utterance = "hey, I'm CAI (short for Co-creative AI). I'll be your partner in EarSketch. I'm still learning programming but working together can help both of us. Watch this video to learn more about how to talk to me.";
           }
           else{
             utterance = "good to see you again. let's get started.";
@@ -1071,7 +1071,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         "effect ramp": "1-4-0",
         "function": "1-2-2",
         "functions": "1-2-2",
-        "parameters": "1-2-2",
+        "parameters": "2-1-2",
         "variable": "1-2-4",
         "variables": "1-2-4",
         "section": "2-1-0",
