@@ -1006,12 +1006,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             angular.element('curriculum').hide();
             angular.element('div[caiwindow]').show();
             document.getElementById('caiButton').classList.remove('flashNavButton');
+            $rootScope.$broadcast('switchToCAI');
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
-            // document.getElementById('caiButton').classList.add('flashNavButton');
         }
-        // $scope.$apply();
     };
 
     // If in CAI study mode, switch to active CAI view.

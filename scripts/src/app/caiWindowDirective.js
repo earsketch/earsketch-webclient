@@ -372,6 +372,7 @@ app.directive('caiwindow', [function () {
             function addToCAIMessageList(message) {
                     $scope.messageListCAI[$scope.activeProject].push(message);
                     $rootScope.$broadcast('newCAIMessage');
+                    autoScrollCAI();
                     $scope.$applyAsync();
             }
 
@@ -432,6 +433,10 @@ app.directive('caiwindow', [function () {
 
             $ngRedux.connect(state => ({ ...state.curriculum.currentLocation }))(currentLocation => {
                 caiDialogue.addCurriculumPageToHistory(currentLocation);
+            });
+
+            $scope.$on('switchToCAI', function () {
+                autoScrollCAI();
             });
 
 
