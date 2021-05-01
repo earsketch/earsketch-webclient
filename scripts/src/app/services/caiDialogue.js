@@ -480,14 +480,18 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var keys = caiProjectModel.getProperties();
 
             for (var j = 0; j < keys.length; j++) {
-                var newNode = Object.assign({}, templateNode);
-                newNode["id"] = tempID;
-                newNode["title"] = caiProjectModel.propertyButtons[keys[j]];
-                newNode["parameters"] = { property: keys[j] };
-                caiTree.push(newNode);
-                buttons.push({ label: newNode.title, value: newNode.id });
-                currentTreeNode[activeProject].options.push(tempID);
-                tempID++;
+                var options = caiProjectModel.getOptions(keys[j]);
+                var model = caiProjectModel.getModel();
+                if (model[keys[j]].length < options.length) {
+                    var newNode = Object.assign({}, templateNode);
+                    newNode["id"] = tempID;
+                    newNode["title"] = caiProjectModel.propertyButtons[keys[j]];
+                    newNode["parameters"] = { property: keys[j] };
+                    caiTree.push(newNode);
+                    buttons.push({ label: newNode.title, value: newNode.id });
+                    currentTreeNode[activeProject].options.push(tempID);
+                    tempID++;
+                }
             }
             if(!caiProjectModel.isEmpty()) {
                 var newNode = Object.assign({}, caiTree[89]);
@@ -520,10 +524,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             currentTreeNode[activeProject].options = [];
             currentDropup = currentProperty;
 
+            var properties = caiProjectModel.getAllProperties();
 
             if (clearBool) {
-                var properties = caiProjectModel.getAllProperties();
-
                 for (var j = 0; j < properties.length; j++) {
                     var newNode = Object.assign({}, templateNode);
                     newNode["id"] = tempID;
@@ -538,14 +541,16 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             else {
                 var keys = caiProjectModel.getOptions(currentProperty);
                 for (var j = 0; j < keys.length; j++) {
-                    var newNode = Object.assign({}, templateNode);
-                    newNode["id"] = tempID;
-                    newNode["title"] = keys[j];
-                    newNode["parameters"] = { propertyvalue: keys[j] };
-                    caiTree.push(newNode);
-                    buttons.push({ label: newNode.title, value: newNode.id });
-                    currentTreeNode[activeProject].options.push(tempID);
-                    tempID++;
+                    if (!caiProjectModel.hasProperty(keys[j])) {
+                        var newNode = Object.assign({}, templateNode);
+                        newNode["id"] = tempID;
+                        newNode["title"] = keys[j];
+                        newNode["parameters"] = { propertyvalue: keys[j] };
+                        caiTree.push(newNode);
+                        buttons.push({ label: newNode.title, value: newNode.id });
+                        currentTreeNode[activeProject].options.push(tempID);
+                        tempID++;
+                    }
                 }
             }
 

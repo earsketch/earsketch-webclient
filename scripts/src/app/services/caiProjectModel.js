@@ -218,6 +218,20 @@ app.factory('caiProjectModel', [function () {
         return properties;
     }
 
+    function hasProperty(property) {
+
+        for (var key in projectModel[activeProject]) {
+            if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
+                for (var pVal in projectModel[activeProject][key]) {
+                    if (projectModel[activeProject][key][pVal] === property) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     return {
         getModel: getModel,
         updateModel: updateModel,
@@ -231,7 +245,8 @@ app.factory('caiProjectModel', [function () {
         propertyButtons: propertyButtons,
         isEmpty: isEmpty,
         getNonEmptyFeatures: getNonEmptyFeatures,
-        getAllProperties: getAllProperties
+        getAllProperties: getAllProperties,
+        hasProperty: hasProperty
     };
 
 }]);
