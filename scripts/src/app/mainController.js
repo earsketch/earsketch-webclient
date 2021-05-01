@@ -1009,12 +1009,12 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
-            document.getElementById('caiButton').classList.add('flashNavButton');
+            // document.getElementById('caiButton').classList.add('flashNavButton');
         }
         // $scope.$apply();
     };
 
-        // If in CAI study mode, switch to active CAI view.
+    // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
         $ngRedux.dispatch(layout.setEast({ open: true }));
         Layout.resetHorizontalSplits();
@@ -1068,6 +1068,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
 
     $scope.$on('fontSizeChanged', (event, val) => $ngRedux.dispatch(appState.setFontSize(val)))
 
+    $scope.$on('newCAIMessage', () => {
+        if (FLAGS.SHOW_CAI && !$scope.showCAIWindow) {
+            document.getElementById('caiButton').classList.add('flashNavButton');
+        }
+    });
     // for Chrome 66+ web-audio restriction
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=807017
     function resumeAudioContext() {
