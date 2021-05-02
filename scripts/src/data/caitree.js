@@ -614,14 +614,14 @@
         title: "we can just get started",
         utterance: "ok. do you wanna pick some sounds?",
         parameters: {},
-        options: [3,4]
+        options: [3, 4, 14, 88, 91]
     },
     {
         id: 86,
         title: "ok",
         utterance: "do you want to start off by picking some sounds?",
         parameters: {},
-        options: [3, 4]
+        options: [3, 4, 14, 88, 91]
     },
     {
         id: 87,
