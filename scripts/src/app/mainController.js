@@ -433,7 +433,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $scope.notificationList = [];
             reporter.logout();
 
-            // Note: Temporary scripts like read-only curriculum code may linger in tabController variables.
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(scripts.resetReadOnlyScripts());
             $ngRedux.dispatch(tabs.resetTabs());

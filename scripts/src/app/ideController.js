@@ -42,9 +42,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
     //TODO AVN - quick hack, but it might also be the cleanest way to fix the shared script issue rather than
     //moving openShare() to tabController
-    $scope.sharedScripts = userProject.sharedScripts; 
+    $scope.sharedScripts = userProject.sharedScripts;
 
-    //The editor object is passed to the tabController via scope inheritance
     $scope.editor = {}; // need to pass object to the editor directive for two-way binding
 
     $scope.loaded = true; // shows spinning icon when false
@@ -391,7 +390,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         });
     };
 
-    //note - select script is used via inheritance in tabController
     /**
      * @name selectScript
      * @function
