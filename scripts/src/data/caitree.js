@@ -644,7 +644,7 @@
         utterance: "which of these do you want to remove from our list?",
         parameters: {},
         dropup: "ideas",
-        options:["CLEARPROPERTYOPTIONS|90"]
+        options:[94,95]
     },
     {
         id: 90,
@@ -674,6 +674,37 @@
         utterance: "you can use the [LINK|fitMedia] function",
         parameters: {},
         options: []
+    },
+    {
+        id: 94,
+        title: "i want to remove one of our ideas",
+        utterance: "which of these do you want to remove from our list?",
+        parameters: {},
+        dropup: "ideas",
+        options:["CLEARPROPERTYOPTIONS|90"]
+    },
+    {
+        id: 95,
+        title: "i want to change one of our ideas",
+        utterance: "which of these do you want to change?",
+        parameters: {},
+        dropup: "ideas",
+        options:["[CHANGEPROPERTYOPTIONS|96]"]
+    },
+    {
+        id: 96,
+        title: "",
+        utterance: "ok, what do you want to change it out for?",
+        parameters: {},
+        dropup: "ideas",
+        options:["[SWAPPROPERTYOPTIONS|97]"]
+    },
+    {
+        id: 97,
+        title: "",
+        utterance: "[REPLACEPROPERTY]ok, got it.",
+        parameters: {},
+        options:[]
     }
     ];
 

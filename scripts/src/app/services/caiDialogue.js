@@ -31,6 +31,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     var currentProperty = "";
     var currentPropertyValue = "";
+    var propertyValueToChange = "";
 
     var complexityUpdated = true;
     var errorSuccess = 0;
@@ -527,6 +528,10 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var clearBool = currentTreeNode[activeProject].options[0].includes("CLEAR");
 
+            var changeBool = currentTreeNode[activeProject].options[0].includes("CHANGE");
+
+              var swapBool = currentTreeNode[activeProject].options[0].includes("SWAP");
+
             currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
             currentTreeNode[activeProject].options = [];
             currentDropup = currentProperty;
@@ -544,6 +549,52 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     currentTreeNode[activeProject].options.push(tempID);
                     tempID++;
                 }
+            }
+            else if(changeBool){
+              for (var j = 0; j < properties.length; j++) {
+                  var newNode = Object.assign({}, templateNode);
+                  newNode["id"] = tempID;
+                  newNode["title"] = properties[j][0] + ": " + properties[j][1];
+                  newNode["parameters"] = { property: properties[j][0], changePropertyvalue: properties[j][1] };
+                  caiTree.push(newNode);
+                  buttons.push({ label: newNode.title, value: newNode.id });
+                  currentTreeNode[activeProject].options.push(tempID);
+                  tempID++;
+              }
+            }
+            else if(swapBool){
+              var allProps = caiProjectModel.getOptions(currentProperty);
+              var propsToUse = [];
+
+              for(var k = 0; k < allProps.length; k++){
+                if(allProps[k] == propertyValueToChange ){
+                  propsToUse.push(allProps[k]);
+                }
+                else{
+                    var isInProject = false;
+                    for(var g = 0; g < properties.length; g++){
+                        if(properties[g][0] == currentProperty && properties[g][1] == allProps[k]){
+                          isInProject = true;
+                          break;
+                        }
+                    }
+                    if(!isInProject){
+                      propsToUse.push(allProps[k]);
+                    }
+                }
+              }
+
+              for (var j = 0; j < propsToUse.length; j++) {
+                  var newNode = Object.assign({}, templateNode);
+                  newNode["id"] = tempID;
+                 newNode["title"] = propsToUse[j];
+                newNode["parameters"] = { property: currentProperty, propertyvalue: propsToUse[j] };
+                  currentDropup = currentProperty;
+                  caiTree.push(newNode);
+                  buttons.push({ label: newNode.title, value: newNode.id });
+                  currentTreeNode[activeProject].options.push(tempID);
+                  tempID++;
+              }
             }
             else {
                 var keys = caiProjectModel.getOptions(currentProperty);
@@ -640,6 +691,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if ("propertyvalue" in currentTreeNode[activeProject].parameters) {
             currentPropertyValue = currentTreeNode[activeProject].parameters['propertyvalue'];
         }
+        if("changePropertyvalue" in currentTreeNode[activeProject].parameters){
+            propertyValueToChange = currentTreeNode[activeProject].parameters['changePropertyvalue'];
+        }
 
         if(utterance.includes("[SECTIONSELECT")){
           var lastIndex = utterance.indexOf("]");
@@ -683,6 +737,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             caiProjectModel.removeProperty(currentProperty, currentPropertyValue);
             // clearProperty();
             console.log('PROJECT MODEL',caiProjectModel.getModel());
+        }
+        if(utterance.includes("[REPLACEPROPERTY]")){
+          utterance = utterance.substring(17);
+          caiProjectModel.removeProperty(currentProperty, propertyValueToChange);
+          caiProjectModel.updateModel(currentProperty, currentPropertyValue);
+          propertyValueToChange = "";
+          // clearProperty();
+          console.log('PROJECT MODEL',caiProjectModel.getModel());
         }
 
         //actions first
