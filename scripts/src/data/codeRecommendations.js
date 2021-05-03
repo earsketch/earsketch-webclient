@@ -221,10 +221,10 @@ var CAI_RECOMMENDATIONS =
             utterance: "if we use an [LINK|if statement] in our [LINK|loop], we can alternate some sounds in the [LINK|section]"
         },
         {
-            id: 11,
-            example: "",
-            explain: "",
-            utterance: "let's add [sound_rec] next?"
+          id: 11,
+          example: "",
+          explain: "",
+          utterance: "We need to use [COMPLEXITYGOAL], right? Let's make sure we get that in there."
         },
         {
             id: 12,
@@ -369,15 +369,15 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 67,
-            example: "things like ABBA or ABACAB are things people are used to hearing",
-            explain: "this way our song matches a recognizable format",
-            utterance: "what if we extend this into [FORM] form?"
+            example: "We wanted to do a [FORMGOAL] form, right?",
+            explain: "It'll move us closer to our form goal",
+            utterance: "Let's start a new, contrasting section"
         },
         {
             id: 68,
-            example: "something like:\n\n[LINK|setEffect](1, [LINK|FILTER], FILTER_FREQ, 20)",
+            example: "something like:\n\n[LINK|setEffect](your_track_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here)",
             explain: "we can customize our sounds a little more, and it gives us more control",
-            utterance: "let's put in some effects, like a [LINK|filter] or volume mixing"
+            utterance: "let's put in some effects with [LINK|setEffect], like a [LINK|filter] or [LINK|volume mixing]"
         },
         {
             id: 69,

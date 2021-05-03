@@ -58,6 +58,13 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
     var allForms = ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"];
 
+    var codeGoalReplacements = {
+      "function": "a [LINK|function]",
+      "consoleInput": "[LINK|console input]",
+      "forLoop": "a [LINK|for loop]",
+      "conditional": "a [LINK|conditional statement]"
+    }
+
     //defines creation rules for generated utterances/button options (ex. creates option items for every line of student code for line selection)
     var actions = {
 
@@ -571,6 +578,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     function addToNodeHistory(nodeObj) {
         if (nodeHistory[activeProject]) {
             nodeHistory[activeProject].push(nodeObj);
+            codeSuggestion.storeHistory(nodeHistory[activeProject]);
             if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0)
                 userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
         }
@@ -929,6 +937,26 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         }
 
+        if(utterance.includes("[FORMGOAL]")){
+          var formGoal = caiProjectModel.getModel()["form"];
+
+        }
+
+        if(utterance.includes("[COMPLEXITYGOAL]")){
+         var selectedComplexityGoal = caiProjectModel.getModel()['code structure'];
+
+         utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal]);
+       }
+
+       if (utterance.includes("[CURRENTPROPERTY]")) {
+         if(currentProperty != "code structure"){
+           utterance = utterance.replace("[CURRENTPROPERTY]", currentProperty);
+         }
+         else{
+           utterance = utterance.replace("[CURRENTPROPERTY]", "the code");
+         }
+       }
+
         //then set waits and whatnot
         if (utterance.includes("[WAIT")) {
             //get the number and set currentWait
@@ -1095,6 +1123,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         "if statement": "3-1-2",
         "if": "3-1-2",
         "conditional": "3-1-2",
+        "conditional statement": "3-1-2",
         "list": "3-2-0",
         "randomness": "3-4-0",
         "nested loops": "4-1-3",
@@ -1108,7 +1137,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         "function arguments": "5-2-7",
         "filter": "5-1-6",
         "FILTER": "5-1-6",
-        "FILTER_FREQ": "5-1-6"
+        "FILTER_FREQ": "5-1-6",
+        "volume mixing": "5-1-14"
     }
 
 
