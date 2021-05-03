@@ -392,7 +392,7 @@ var CAI_NUCLEI = [
     { id: 64, utterance: "i think we could use a bigger variety of instruments" },
     {
         id: 55, utterance:
-            "let's change up our beat a little bit"
+            "we could try [sound_rec]"
     },
     {
         id: 56, utterance:
