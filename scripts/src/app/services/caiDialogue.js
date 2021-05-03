@@ -1288,7 +1288,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (outputObj != null) {
 
             if (outputObj.utterance == "" && isPrompted) {
-                outputObj = codeSuggestion.randomNucleus(nodeHistory[activeProject]);
+                outputObj = codeSuggestion.randomNucleus(nodeHistory[activeProject], false);
             }
 
             if (outputObj.utterance.includes("[STARTTREE|")) {

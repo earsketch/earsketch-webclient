@@ -618,7 +618,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
     }
 
 
-    function randomNucleus(history) {
+    function randomNucleus(history, suppressRepetition = true) {
 
         var isAlreadySaid = true;
         var newNucleus = "";
@@ -627,22 +627,24 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
         while (isAlreadySaid) {
             threshold -= 1;
             if (threshold < 0) {
-                return "I don't have any suggestions right now. if you add something, i can work off that.";
+                return {utterance: ""}; // "I don't have any suggestions right now. if you add something, i can work off that.";
             }
             newNucleus = CAI_NUCLEI[getRandomInt(0, CAI_NUCLEI.length - 1)];
             isAlreadySaid = false;
-            for (var i in history) {
-                //get utterance
-                if (history[i].length > 1) {
-                    for (var j in history[i][1]) {
-                        var oldUtterance = history[i][1][j][1];
+            if(suppressRepetition){
+              for (var i in history) {
+                  //get utterance
+                  if (history[i].length > 1) {
+                      for (var j in history[i][1]) {
+                          var oldUtterance = history[i][1][j][1];
 
-                        if (oldUtterance != null && oldUtterance == newNucleus) {
-                            isAlreadySaid = true;
-                        }
-                    }
-                }
-            }
+                          if (oldUtterance != null && oldUtterance == newNucleus.id) {
+                              isAlreadySaid = true;
+                          }
+                      }
+                  }
+              }
+           }
         }
 
         return newNucleus;
