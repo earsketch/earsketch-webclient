@@ -79,6 +79,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.isEmbedded = $location.search()["embedded"] === "true";
     $scope.hideDAW = $scope.isEmbedded && $location.search()['hideDaw'];
     $scope.hideEditor = $scope.isEmbedded && $location.search()['hideCode'];
+    $scope.embeddedScriptUsername = "";
     $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
