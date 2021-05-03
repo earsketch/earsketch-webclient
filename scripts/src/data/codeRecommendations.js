@@ -399,32 +399,8 @@ var CAI_NUCLEI = [
             "what about adding [sound_rec] and [sound_rec] next?"
     },
     {
-        id: 57, utterance:
-            "let's add some bass"
-    },
-    {
-        id: 58, utterance:
-            "we should add some drums next"
-    },
-    {
-        id: 59, utterance:
-            "what about adding a synth?"
-    },
-    {
         id: 60, utterance:
             "maybe we could put in [sound_rec]?"
-    },
-    {
-        id: 61, utterance:
-            "hmm. what if we made a [LINK|section] that really contrasts with what we have right now?"
-    },
-    {
-        id: 62, utterance:
-            "some repetition might be good to tie this whole piece together"
-    },
-    {
-        id: 70, utterance:
-            "let's start making a new, contrasting [LINK|section]."
     }
 
 ]

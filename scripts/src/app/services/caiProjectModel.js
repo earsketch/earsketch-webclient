@@ -18,6 +18,13 @@ app.factory('caiProjectModel', [function () {
         'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
+    var suggestablePropertyOptions =  {
+          'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
+          'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
+          'form': ["[FORM]"],
+          'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
+      };
+
     var propertyButtons ={
       'genre': "i have a genre I want to include",
       'instrument': "there's an instrument i want to make sure is in the project",
@@ -31,7 +38,7 @@ app.factory('caiProjectModel', [function () {
             'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"]
         },
         'one': {
-            'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"]
+            'form': ["[FORM]"]
         }
     }
 
@@ -91,8 +98,8 @@ app.factory('caiProjectModel', [function () {
         //list possible values, avoiding repeating existing values in the model
         var possibleValues = [];
 
-        for (var i = 0; i < propertyOptions[selectedProperty].length; i++) {
-            var valueOption = propertyOptions[selectedProperty][i];
+        for (var i = 0; i < suggestablePropertyOptions[selectedProperty].length; i++) {
+            var valueOption = suggestablePropertyOptions[selectedProperty][i];
             if (!projectModel[activeProject][selectedProperty].includes(valueOption)) {
                 possibleValues.push(valueOption);
             }

@@ -904,7 +904,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
 
                 for (var i in allForms) {
-                    if (allForms[i].startsWith(currentForm)) {
+                    if (allForms[i].startsWith(currentForm) && allForms[i] != currentForm) {
                         validForms.push(allForms[i]);
                     }
                 }
@@ -914,6 +914,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 utterance = utterance.replace("[FORM]", newForm);
                 if (newForm.includes("undefined")) {
                     utterance = codeSuggestion.randomNucleus();
+                }
+                else if(currentPropertyValue == "[FORM]"){
+                  currentPropertyValue = newForm;
                 }
             }
             else {
