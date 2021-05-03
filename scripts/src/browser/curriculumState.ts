@@ -248,7 +248,6 @@ export const selectPageTitle = createSelector(
         let title = ''
 
         if (location.length === 1) {
-            angular.element('[ng-controller=layoutController]').scope().curriculumPageView(toc[location[0]].title)
             return toc[location[0]].title
         } else if (location.length === 2) {
             const h2 = content.querySelector("h2")
@@ -259,7 +258,6 @@ export const selectPageTitle = createSelector(
             if (chNumForDisplay) {
                 title = chNumForDisplay + ': ' + title
             }
-            angular.element('[ng-controller=layoutController]').scope().curriculumPageView(title)
             return title
         } else if (location.length === 3) {
             const h3 = content.querySelector("h3")
@@ -270,7 +268,6 @@ export const selectPageTitle = createSelector(
             if (chNumForDisplay) {
                 title = chNumForDisplay + '.' + title
             }
-            angular.element('[ng-controller=layoutController]').scope().curriculumPageView(title)
             return title
         }
     }

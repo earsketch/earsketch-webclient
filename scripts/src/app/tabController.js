@@ -168,16 +168,22 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     // });
 
     $scope.$on('saveCollaborativeScriptAttempt', function(){
-        var script = $scope.tabs[$scope.activeTab];
-        if (script.collaborative) {
-            // if (script.username === userProject.getUsername()) {
-                collaboration.saveScript(script.shareid);
-            // }
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        let script = null;
+
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        if (script?.collaborative) {
+            script && collaboration.saveScript(script.shareid);
             $rootScope.$broadcast('scriptSaveResponseRecieved');
-        } else if (!script.readonly && !script.isShared && !script.saved) {
+        } else if (script && !script.readonly && !script.isShared && !script.saved) {
             // save the script on a successful run
             userProject.saveScript(script.name, script.source_code, true, userProject.STATUS_SUCCESSFUL)
                 .then(function () {
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
                     $rootScope.$broadcast('scriptSaveResponseRecieved');
                 }).catch(function (err) {
                     $rootScope.$broadcast('scriptSaveResponseRecieved');
@@ -189,15 +195,21 @@ app.controller("tabController", ['$rootScope', '$scope', '$http', '$uibModal', '
     });
 
     $scope.$on('saveCollaborativeScriptFailure', function(){
-        var script = $scope.tabs[$scope.activeTab];
-        if (script.collaborative) {
-            // if (script.username === userProject.getUsername()) {
-                collaboration.saveScript(script.shareid);
-            // }
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        let script = null;
+
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        if (script?.collaborative) {
+            script && collaboration.saveScript(script.shareid);
             $rootScope.$broadcast('scriptSaveResponseRecieved');
-        } else if (!script.readonly && !script.isShared && !script.saved) {
+        } else if (script && !script.readonly && !script.isShared && !script.saved) {
             userProject.saveScript(script.name, script.source_code, true, userProject.STATUS_UNSUCCESSFUL)
                 .then(function () {
+                    $ngRedux.dispatch(scripts.syncToNgUserProject());
                     $rootScope.$broadcast('scriptSaveResponseRecieved');
                 }).catch(function (err) {
                 $rootScope.$broadcast('scriptSaveResponseRecieved');

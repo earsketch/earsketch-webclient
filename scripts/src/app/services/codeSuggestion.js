@@ -150,7 +150,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                }
                else return false;
            },
-           yes: 27,
+           yes: 28,
            no: 28
 
        },
@@ -281,7 +281,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
        },
        {
            node: 27,
-           suggestion: 67
+           suggestion: 1
        },
        {
            node: 28,

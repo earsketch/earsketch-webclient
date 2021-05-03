@@ -141,22 +141,27 @@ module.exports = {
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
             audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
-            ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
-            caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
-            codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
-            complexityCalculatorStorage: path.resolve(__dirname,`${dataDir}/complexityCalculatorStorage.js`),
+            recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`),
 
             // CAI
             complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
+            ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
+            complexityCalculatorStorage: path.resolve(__dirname,`${dataDir}/complexityCalculatorStorage.js`),
             complexityCalculatorHelperFunctions: path.resolve(__dirname, `${servicesDir}/complexityCalculatorHelperFunctions.js`),
+            caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
+
+            caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
+            caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
+            caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
+            codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
+            codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
+
             caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
             caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
             caiStudent: path.resolve(__dirname, `${servicesDir}/caiStudent.js`),
-            caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
-            caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
-            caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
-            codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
-            recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`)
+
+            caiProjectModel: path.resolve(__dirname, `${servicesDir}/caiProjectModel.js`)
+
         }
     },
     module: {

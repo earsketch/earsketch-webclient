@@ -944,3 +944,39 @@ svg:hover path, .sound-browser-tab-icon path {
     padding-left: 10px;
   }
 }
+
+@keyframes playNavFlash {
+    0% { color: black; }
+    50% { color: yellow; }
+    100% { color: black; }
+}
+
+.flashNavButton {
+  -moz-animation: playNavFlash 1s ease-out;
+  -moz-animation-iteration-count: infinite;
+
+  -webkit-animation: playNavFlash 1s ease-out;
+  -webkit-animation-iteration-count: infinite;
+
+  -ms-animation: playNavFlash 1s ease-out;
+  -ms-animation-iteration-count: infinite;
+}
+
+
+@-webkit-keyframes playNavFlash {
+    0% { color: black; }
+    50% { color: yellow; }
+    100% { color: black; }
+}
+
+@-moz-keyframes playNavFlash {
+    0% { color: black; }
+    50% { color: yellow; }
+    100% { color: black; }
+}
+
+@-ms-keyframes playNavFlash {
+    0% { color: black; }
+    50% { color: yellow; }
+    100% { color: black; }
+}

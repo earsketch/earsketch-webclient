@@ -13,13 +13,13 @@
     </div>
 </div>
 <div id="cai-body">
-    <iframe src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" allow="fullscreen" style="margin:auto;">    
+    <iframe src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" allow="fullscreen" style="margin: auto; max-width: -webkit-fill-available;">    
     </iframe>
     <div class="chat-message-container" ng-repeat="message in messageListCAI[activeProject] track by $index">
         <div class="chat-message" ng-style="senderIsUser(message) ? messageStyles.sender : messageStyles.collaborator">
             <div class="chat-message-bubble" ng-style="senderIsUser(message) ? messageBubbleStyles.sender : messageBubbleStyles.collaborator">
                 <div class="chat-message-sender">{{message.sender}}</div>
-                <div class="chat-message-text" ng-style="selectBubbleStyles(message)">{{message.text}}</div>
+                <div id="text" class="chat-message-text" ng-style="selectBubbleStyles(message)">{{message.returnText}} {{message.text[0]}}<a href="#" ng-click="openCurr(message,0)" style="color:blue">{{message.keyword[0][0]}}</a>{{message.text[1]}}<a href="#" ng-click="openCurr(message,1)" style="color:blue">{{message.keyword[1][0]}}</a>{{message.text[2]}}<a href="#" ng-click="openCurr(message,2)" style="color:blue">{{message.keyword[2][0]}}</a>{{message.text[3]}}<a href="#" ng-click="openCurr(message,3)" style="color:blue">{{message.keyword[3][0]}}</a>{{message.text[4]}}<a href="#" ng-click="openCurr(message,4)" style="color:blue">{{message.keyword[4][0]}}</a>{{message.text[5]}}</div>
             </div>
             <div class="chat-message-date" ng-style="senderIsUser(message) ? messageDateStyles.sender : messageDateStyles.collaborator">
                 {{calcDate(message) | formatTimer}}
@@ -27,10 +27,10 @@
         </div>
     </div>
 </div>
-<div id="chat-footer" style="height:auto;" ng-show="activeProject.length > 0">
-    <div ng-show="inputOptions.length < 6">
+<div id="chat-footer" style="margin-top: auto;" ng-show="activeProject.length > 0">
+    <div ng-show="inputOptions.length < 6" style="width: 100%;">
         <div ng-repeat="input in inputOptions">
-            <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px;">{{input.label}}</button>
+            <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px; max-width: 90%; white-space: initial; text-align: left;">{{input.label}}</button>
         </div>
     </div>
 

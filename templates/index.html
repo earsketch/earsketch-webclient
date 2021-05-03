@@ -157,7 +157,7 @@
         <div id="top-header-nav-form">
             <!-- CAI-window toggle -->
             <button ng-if="enableCAI" class="top-header-nav-button btn" ng-style="{color:showCAIWindow?'white':'#939393'}" ng-click="toggleCAIWindow()" data-toggle="tooltip" title="CAI">
-                <i class="icon icon-bubbles"></i>
+                <i id ="caiButton" class="icon icon-bubbles"></i>
             </button>
 
             <!-- keyboard shortcuts -->
@@ -327,7 +327,7 @@
                             <curriculum style="height:inherit"></curriculum>
                         </div>
                         <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
-                        <div caiwindow ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
+                        <div caiwindow style="display:flex;" ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
                     </div>
                 </div>
             </div>
