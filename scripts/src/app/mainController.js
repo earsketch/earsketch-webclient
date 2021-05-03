@@ -526,6 +526,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         const theme = colorTheme.load();
         $ngRedux.dispatch(appState.setColorTheme(theme));
         $ngRedux.dispatch(scripts.syncToNgUserProject());
+                                  
 
         const openTabs = tabs.selectOpenTabs($ngRedux.getState());
         const allScripts = scripts.selectAllScriptEntities($ngRedux.getState());
@@ -535,8 +536,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             }
         });
 
-        // Show bubble tutorial when not opening a share link.
-        if (!$location.search()['sharing']) {
+        // Show bubble tutorial when not opening a share link or in a CAI study mode.
+        if (!$location.search()['sharing'] && !FLAGS.SHOW_CAI) {
             $ngRedux.dispatch(bubble.resume());
         }
     }
@@ -1022,6 +1023,14 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
         // $scope.$apply();
     };
+
+        // If in CAI study mode, switch to active CAI view.
+    if (FLAGS.SHOW_CAI) {
+        $ngRedux.dispatch(layout.setEast({ open: true }));
+        Layout.resetHorizontalSplits();
+        angular.element('curriculum').hide();
+        angular.element('div[caiwindow]').show();
+    }
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
