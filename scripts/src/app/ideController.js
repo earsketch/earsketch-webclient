@@ -32,9 +32,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      * @type {boolean}
      */
     $scope.isWaitingForServerResponse = false;
-    $scope.$on('scriptSaveResponseRecieved', function(){
-        $scope.isWaitingForServerResponse = false;
-    });
 
     // for report error
     $scope.userName = '';
@@ -553,7 +550,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             userNotification.showBanner(ESMessages.interpreter.runSuccess, 'success');
 
-            $scope.$broadcast('saveCollaborativeScriptAttempt');
+            $scope.saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL);
 
             // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
             $timeout(function () {
@@ -616,7 +613,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             userNotification.showBanner(ESMessages.interpreter.runFailed, 'failure1');
 
-            $scope.$broadcast('saveCollaborativeScriptFailure');
+            $scope.saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL);
 
             // auto-opens the user console if there is an error and if the console is currently closed
             $rootScope.$broadcast('openConsoleOnCodeCompileError');
@@ -625,6 +622,32 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 collaboration.sendCompilationRecord(errType);
             }
         });
+    };
+
+    $scope.saveActiveScriptWithRunStatus = status => {
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        let script = null;
+
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        if (script?.collaborative) {
+            script && collaboration.saveScript(script.shareid);
+            $scope.isWaitingForServerResponse = false;
+        } else if (script && !script.readonly && !script.isShared && !script.saved) {
+            // save the script on a successful run
+            userProject.saveScript(script.name, script.source_code, true, status).then(function () {
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $scope.isWaitingForServerResponse = false;
+            }).catch(function (err) {
+                userNotification.show(ESMessages.idecontroller.savefailed, 'failure1');
+                $scope.isWaitingForServerResponse = false;
+            });
+        } else {
+            $scope.isWaitingForServerResponse = false;
+        }
     };
 
     /**
