@@ -715,7 +715,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
              newUtterance = currentTreeNode[activeProject].utterance;
           }
 
-          utterance = newUtterance + utterance.substring(lastIndex - 1);
+          utterance = newUtterance + utterance.substring(lastIndex + 1);
 
         }
 
