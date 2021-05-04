@@ -271,217 +271,217 @@
         title: "Bass",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "BASS" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 38,
         title: "Drums",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "DRUMS" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 39,
         title: "Freesound[WAIT|34]",
         utterance: "How about [sound_rec]?",
         parameters: { INSTRUMENT: "FREESOUND" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 40,
         title: "Keyboard",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "KEYBOARD" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 41,
         title: "SFX",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "SFX" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 42,
         title: "Strings",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "STRINGS" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 43,
         title: "Synth",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "SYNTH" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 44,
         title: "Vocals",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "VOCALS" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 45,
         title: "Winds",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { INSTRUMENT: "WINDS" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 46,
         title: "Alt Pop",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "ALT POP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 47,
         title: "Cinematic Score",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "CINEMATIC SCORE" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 48,
         title: "Dubstep",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "DUBSTEP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 49,
         title: "EDM",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "EDM" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 50,
         title: "EIGHTBIT",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "EIGHTBIT" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 51,
         title: "Electro",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "ELECTRO" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 52,
         title: "FUNK",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "FUNK" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 53,
         title: "Free Sound",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "FreeSound" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 54,
         title: "Gospel",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "GOSPEL" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 55,
         title: "Hip Hop",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "HIP HOP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 56,
         title: "House",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "HOUSE" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 57,
         title: "New Funk",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "NEW FUNK" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 58,
         title: "New Hip Hop",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "NEW HIP HOP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 59,
         title: "Pop",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "POP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 60,
         title: "R & B",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "RNB" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 61,
         title: "R & B Funk",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "RNB FUNK" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 62,
         title: "Rock",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "ROCK" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 63,
         title: "Techno",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "TECHNO" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 64,
         title: "Trap",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "TRAP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 65,
         title: "UK House",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "UK HOUSE" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 66,
         title: "West Coast Hip Hop",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "WEST COAST HIP HOP" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 67,
         title: "World Percussion",
         utterance: "How about [sound_rec]?[WAIT|34]",
         parameters: { GENRE: "WORLD PERCUSSION" },
-        options: []
+        options: [19, 6,5]
     },
     {
         id: 68,
@@ -515,7 +515,7 @@
     {
         id: 72,
         title: "do you want to come up with some sound ideas",
-        utterance: "sure, do you want ideas for a specific section or measure?[RESET_PARAMS]",
+        utterance: "[SECTIONSELECT|73,74|75][RESET_PARAMS]",
         parameters: {},
         options: [73, 74]
     },
@@ -541,7 +541,7 @@
         utterance: "we could try [sound_rec][SOUNDWAIT|10]",
         parameters: {},
         event: ["soundRequest"],
-        options: [19, 6]
+        options: [19, 6, 92]
     },
     {
         id: 76,
@@ -614,14 +614,14 @@
         title: "we can just get started",
         utterance: "ok. do you wanna pick some sounds?",
         parameters: {},
-        options: [3,4]
+        options: [3, 4, 14, 88, 91]
     },
     {
         id: 86,
         title: "ok",
         utterance: "do you want to start off by picking some sounds?",
         parameters: {},
-        options: [3, 4]
+        options: [3, 4, 14, 88, 91]
     },
     {
         id: 87,
@@ -635,7 +635,7 @@
         title: "i want to tell you what i think we should make",
         utterance: "sure, what were you thinking?",
         parameters: {},
-        dropup: "Project Properties",
+        dropup: "ideas",
         options: ["PROPERTIES|78"]
     },
     {
@@ -644,7 +644,7 @@
         utterance: "which of these do you want to remove from our list?",
         parameters: {},
         dropup: "ideas",
-        options:["CLEARPROPERTYOPTIONS|90"]
+        options:[94,95]
     },
     {
         id: 90,
@@ -674,7 +674,77 @@
         utterance: "you can use the [LINK|fitMedia] function",
         parameters: {},
         options: []
-        }
+    },
+    {
+        id: 94,
+        title: "i want to remove one of our ideas",
+        utterance: "which of these do you want to remove from our list?",
+        parameters: {},
+        dropup: "ideas",
+        options:["CLEARPROPERTYOPTIONS|90"]
+    },
+    {
+        id: 95,
+        title: "i want to change one of our ideas",
+        utterance: "which of these do you want to change?",
+        parameters: {},
+        dropup: "ideas",
+        options:["[CHANGEPROPERTYOPTIONS|96]"]
+    },
+    {
+        id: 96,
+        title: "",
+        utterance: "ok, what do you want to change it out for?",
+        parameters: {},
+        dropup: "ideas",
+        options:["[SWAPPROPERTYOPTIONS|97]"]
+    },
+    {
+        id: 97,
+        title: "",
+        utterance: "[REPLACEPROPERTY]ok, got it.",
+        parameters: {},
+        options:[81, 100, 94, 101]
+    },
+    {
+        id: 98,
+        title: "i don't think i like that",
+        utterance: "no worries",
+        parameters: {},
+        options:[]
+    },
+
+    {
+        id: 99,
+        title: "yeah, that sounds good",
+        utterance: "ok sweet.[SOUNDWAIT|10]",
+        parameters: {},
+        options:[]
+    },
+    {
+        id: 100,
+        title: "i want to change something else",
+        utterance: "what do you want to change?",
+        parameters: {},
+        dropup: "ideas",
+        options:["[CHANGEPROPERTYOPTIONS|96]"]
+    },
+    {
+        id: 101,
+        title: "i've got another idea",
+        utterance: "what should we add?",
+        parameters: {},
+        dropup: "ideas",
+        options: ["PROPERTIES|78"]
+    },
+    {
+        id: 102,
+        title: "I have a specific instrument I want to add",
+        utterance: "what instrument?",
+        parameters: {},
+        dropup: "Instruments",
+        options: [37, 38, 39, 40, 41, 42, 43, 44, 45]
+    },
     ];
 
 
