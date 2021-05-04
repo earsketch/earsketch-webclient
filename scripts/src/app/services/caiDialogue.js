@@ -383,12 +383,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 }
 
                 var recs = [];
-
                 recs = recommender.generateRecommendations([], allSamples, 1, 1);
-
-
                 availableGenres = recommender.genreRecommendations(recs);
-
 
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
@@ -409,12 +405,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 }
 
                 var recs = [];
-
                 recs = recommender.generateRecommendations([], allSamples, 1, 1);
-
-
                 availableInstruments = recommender.instrumentRecommendations(recs);
-
 
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
@@ -485,6 +477,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
             currentTreeNode[activeProject].options = [];
 
+            caiProjectModel.setOptions();
+
             var keys = caiProjectModel.getProperties();
 
             for (var j = 0; j < keys.length; j++) {
@@ -523,18 +517,17 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var templateNodeID = parseInt(currentTreeNode[activeProject].options[0].split("|")[1]);
             var templateNode = caiTree[templateNodeID];
-
             var tempID = highestNumber + 1;
 
             var clearBool = currentTreeNode[activeProject].options[0].includes("CLEAR");
-
             var changeBool = currentTreeNode[activeProject].options[0].includes("CHANGE");
-
             var swapBool = currentTreeNode[activeProject].options[0].includes("SWAP");
 
             currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject])
             currentTreeNode[activeProject].options = [];
             currentDropup = currentProperty;
+
+            caiProjectModel.setOptions();
 
             var properties = caiProjectModel.getAllProperties();
 
@@ -851,7 +844,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var recs = [];
             var usedRecs = [];
-            recs = recommender.recommend([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
+            // recs = recommender.recommend([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
+            // recs = recommender.findGenreInstrumentCombinations(genreArray, instrumentArray);
+            recs = recommender.recommendReverse([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
+
+            recs = recs.slice(0,count);
             var recIndex = 0;
 
             if (currentSection != null && musicResults != null) {
@@ -1314,7 +1311,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         currentSuggestion[activeProject] = Object.assign({}, outputObj);
 
         if (outputObj != null) {
-            
+
             if (outputObj.utterance == "" && isPrompted) {
                 outputObj = codeSuggestion.randomNucleus(nodeHistory[activeProject], false);
             }

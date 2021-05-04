@@ -4,23 +4,26 @@
  *
  * @author Jason Smith
  */
-app.factory('caiProjectModel', [function () {
+app.factory('caiProjectModel', ['recommender', function (recommender) {
 
     var activeProject = "";
+
+    var availableGenres = [];
+    var availableInstruments = [];
 
     // Initialize empty model.
     var defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [], 'code structure': [] };
 
     var propertyOptions = {
-        'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
-        'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
+        'genre': availableGenres,
+        'instrument': availableInstruments,
         'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
         'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
     var suggestablePropertyOptions =  {
-        'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
-        'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
+        'genre': availableGenres,
+        'instrument': availableInstruments,
         'form': ["[FORM]"],
         'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
@@ -34,8 +37,8 @@ app.factory('caiProjectModel', [function () {
 
     var suggestableProperties = {
         'multiple': {
-            'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
-            'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"]
+            'genre': availableGenres,
+            'instrument': availableInstruments,
         },
         'one': {
             'form': ["[FORM]"]
@@ -235,6 +238,18 @@ app.factory('caiProjectModel', [function () {
         return false;
     }
 
+    function setOptions() {
+        availableGenres = recommender.availableGenres();
+        propertyOptions['genre'] = availableGenres;
+        suggestablePropertyOptions['genre'] = availableGenres;
+        suggestableProperties['multiple']['genre'] = availableGenres;
+        
+        availableInstruments = recommender.availableInstruments();
+        propertyOptions['instrument'] = availableInstruments;
+        suggestablePropertyOptions['instrument'] = availableInstruments;
+        suggestableProperties['multiple']['instrument'] = availableInstruments;
+    }
+
 
     return {
         getModel: getModel,
@@ -250,7 +265,8 @@ app.factory('caiProjectModel', [function () {
         isEmpty: isEmpty,
         getNonEmptyFeatures: getNonEmptyFeatures,
         getAllProperties: getAllProperties,
-        hasProperty: hasProperty
+        hasProperty: hasProperty,
+        setOptions: setOptions
     };
 
 }]);
