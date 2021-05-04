@@ -811,6 +811,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             if(!currentTreeNode[activeProject].options.includes(93)){
                 currentTreeNode[activeProject].options.push(93);
+                currentTreeNode[activeProject].options.push(102);
             }
             var instrumentArray = [];
 

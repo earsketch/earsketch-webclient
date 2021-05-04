@@ -737,6 +737,14 @@
         dropup: "ideas",
         options: ["PROPERTIES|78"]
     },
+    {
+        id: 102,
+        title: "I have a specific instrument I want to add",
+        utterance: "what instrument?",
+        parameters: {},
+        dropup: "Instruments",
+        options: [37, 38, 39, 40, 41, 42, 43, 44, 45]
+    },
     ];
 
 
