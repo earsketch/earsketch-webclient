@@ -828,6 +828,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
           if(!currentTreeNode[activeProject].options.includes(93)){
             currentTreeNode[activeProject].options.push(93);
+            currentTreeNode[activeProject].options.push(98);
+            currentTreeNode[activeProject].options.push(99);
           }
             var instrumentArray = [];
 

@@ -635,7 +635,7 @@
         title: "i want to tell you what i think we should make",
         utterance: "sure, what were you thinking?",
         parameters: {},
-        dropup: "Project Properties",
+        dropup: "ideas",
         options: ["PROPERTIES|78"]
     },
     {
@@ -704,8 +704,39 @@
         title: "",
         utterance: "[REPLACEPROPERTY]ok, got it.",
         parameters: {},
+        options:[81, 100, 94, 101]
+    },
+    {
+        id: 98,
+        title: "i don't think i like that",
+        utterance: "no worries",
+        parameters: {},
         options:[]
-    }
+    },
+
+    {
+        id: 99,
+        title: "yeah, that sounds good",
+        utterance: "ok sweet.[SOUNDWAIT|10]",
+        parameters: {},
+        options:[]
+    },
+    {
+        id: 100,
+        title: "i want to change something else",
+        utterance: "what do you want to change?",
+        parameters: {},
+        dropup: "ideas",
+        options:["[CHANGEPROPERTYOPTIONS|96]"]
+    },
+    {
+        id: 101,
+        title: "i've got another idea",
+        utterance: "what should we add?",
+        parameters: {},
+        dropup: "ideas",
+        options: ["PROPERTIES|78"]
+    },
     ];
 
 
