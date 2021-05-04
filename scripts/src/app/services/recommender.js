@@ -160,7 +160,14 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         if (inputSamples.length > 0) {
             var i = 0;
             while (i < bestLimit) {
-                var maxRec = _.max(Object.keys(recs), function (o) { return recs[o]; });
+                var maxScore = _.max(Object.values(recs), function (o) { return recs[o]; }); 
+                var maxRecs = [];
+                for (var key in recs) {
+                    if (recs[key] === maxScore) {
+                        maxRecs.push(key);
+                    }
+                }
+                var maxRec = maxRecs[Math.floor(Math.random() * maxRecs.length)];
 
                 if (maxRec === -Infinity || maxRec === undefined) {
                     return recommendedSounds;
