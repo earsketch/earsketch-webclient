@@ -996,13 +996,16 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 if (newForm.includes("undefined")) {
                     utterance = codeSuggestion.randomNucleus();
                 }
-                else if(currentPropertyValue == "[FORM]"){
+                else{
                   currentPropertyValue = newForm;
                 }
+
             }
             else {
                 //return random form from allForms
-                utterance = utterance.replace("[FORM]", allForms[randomIntFromInterval(0, allForms.length - 1)]);
+                var newFormVal = allForms[randomIntFromInterval(0, allForms.length - 1)];
+                currentPropertyValue = newFormVal;
+                utterance = utterance.replace("[FORM]", newFormVal);
                 if (utterance.includes("undefined")) {
                     utterance = codeSuggestion.randomNucleus();
                 }
