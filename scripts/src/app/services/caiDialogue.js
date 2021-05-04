@@ -715,7 +715,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
              newUtterance = currentTreeNode[activeProject].utterance;
           }
 
-          utterance = newUtterance + utterance.substring(lastIndex);
+          utterance = newUtterance + utterance.substring(lastIndex - 1);
 
         }
 
@@ -828,8 +828,9 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
           if(!currentTreeNode[activeProject].options.includes(93)){
             currentTreeNode[activeProject].options.push(93);
-            currentTreeNode[activeProject].options.push(98);
-            currentTreeNode[activeProject].options.push(99);
+            //currentTreeNode[activeProject].options.push(98);
+            //currentTreeNode[activeProject].options.push(99);
+            //currentDropup = ""
           }
             var instrumentArray = [];
 
@@ -1015,7 +1016,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         if(utterance.includes("[COMPLEXITYGOAL]")){
-         var selectedComplexityGoal = caiProjectModel.getModel()['code structure'];
+         var selectedComplexityGoal = caiProjectModel.getModel()['code structure'][randomIntFromInterval(0, caiProjectModel.getModel()['code structure'].length - 1)];
 
          utterance = utterance.replace("[COMPLEXITYGOAL]", codeGoalReplacements[selectedComplexityGoal]);
        }
@@ -1030,7 +1031,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
        }
 
         //then set waits and whatnot
-        if (utterance.includes("[WAIT")) {
+        if (utterance.includes("[WAIT")){
             //get the number and set currentWait
 
             currentWait = Number.parseInt(utterance.substring(utterance.indexOf("[WAIT") + 6, utterance.length - 1));
