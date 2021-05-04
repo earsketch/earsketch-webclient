@@ -806,7 +806,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 parameters.push(["INSTRUMENT", currentInstr]);
                   instrumentArray = [currentInstr];
             }
-            if (caiProjectModel.getModel()['instrument'].length > 0) {
+            else if (currentInstr == null && caiProjectModel.getModel()['instrument'].length > 0) {
                 instrumentArray = caiProjectModel.getModel()['instrument'].slice(0);
             }
             else if(currentInstr != null){
@@ -820,7 +820,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 parameters.push(["GENRE", currentGenre]);
                 genreArray = [currentGenre];
             }
-            else if (caiProjectModel.getModel()['genre'].length > 0) {
+            else if (currentGenre == null && caiProjectModel.getModel()['genre'].length > 0) {
                 genreArray = caiProjectModel.getModel()['genre'].slice(0);
             }
             else if(currentGenre != null){
