@@ -19,17 +19,17 @@ app.factory('caiProjectModel', [function () {
     };
 
     var suggestablePropertyOptions =  {
-          'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
-          'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
-          'form': ["[FORM]"],
-          'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
-      };
+        'genre': ["HIP HOP", "RNB", "DUBSTEP", "EIGHTBIT", "ELECTRO", "HOUSE", "LATIN", "URBANO LATINO", "CINEMATIC SCORE", "EDM", "POP", "ROCK", "TRAP", "UK HOUSE", "WORLD PERCUSSION", "TECHNO", "WEST COAST HIP HOP", "RNB FUNK", "GOSPEL", "NEW HIP HOP", "ALT POP", "FUNK", "NEW FUNK"],
+        'instrument': ["DRUMS", "VOCALS", "WINDS", "SYNTH", "KEYBOARD", "STRINGS", "SFX", "BASS"],
+        'form': ["[FORM]"],
+        'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
+    };
 
     var propertyButtons ={
-      'genre': "i have a genre I want to include",
-      'instrument': "there's an instrument i want to make sure is in the project",
-      'form': "i have a form in mind",
-      'code structure': "i need to use a specific code structure"
+        'genre': "i have a genre I want to include",
+        'instrument': "there's an instrument i want to make sure is in the project",
+        'form': "i have a form in mind",
+        'code structure': "i need to use a specific code structure"
     };
 
     var suggestableProperties = {
@@ -110,7 +110,9 @@ app.factory('caiProjectModel', [function () {
             var valueIndex = getRandomInt(0, possibleValues.length - 1);
             selectedValue = possibleValues[valueIndex];
         }
-        else return {};
+        else {
+            return {}
+        };
 
         return { property: selectedProperty, value: selectedValue, isAdded: add };
     }
@@ -126,9 +128,7 @@ app.factory('caiProjectModel', [function () {
             activeProject = projectName;
             clearModel();
         }
-
     }
-
 
     // Public getter.
     function getModel() {
@@ -137,7 +137,6 @@ app.factory('caiProjectModel', [function () {
 
     // Update model with key/value pair.
     function updateModel(property, value) {
-
         switch (property) {
             case 'genre':
             case 'code structure':
@@ -153,9 +152,7 @@ app.factory('caiProjectModel', [function () {
             default:
                 console.log('Invalid project model entry.');
         }
-
         console.log(projectModel);
-
     }
 
     // Return to empty/default model.
@@ -176,7 +173,7 @@ app.factory('caiProjectModel', [function () {
         if (projectModel[activeProject][property]) {
             var index = projectModel[activeProject][property].indexOf(propertyValue);
             if (index > -1) {
-              projectModel[activeProject][property].splice(index, 1);
+                projectModel[activeProject][property].splice(index, 1);
             }
         }
     }
@@ -226,7 +223,6 @@ app.factory('caiProjectModel', [function () {
     }
 
     function hasProperty(property) {
-
         for (var key in projectModel[activeProject]) {
             if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
                 for (var pVal in projectModel[activeProject][key]) {
