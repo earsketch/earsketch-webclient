@@ -54,9 +54,12 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
 
     function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
         var recs = generateRecommendations(recommendedSounds, inputSamples, coUsage, similarity);
-        var filteredRecs = [];
+        var originalGenre = genreLimit.map((g) => g);
+        var originalInstrument = instrumentLimit.map((i) => i);
+
+        var filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
+
         while (filteredRecs.length < bestLimit) {
-            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
             if (genreLimit.length > 0) {
                 genreLimit.pop();
             }
@@ -65,7 +68,10 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
             }
             else if (filteredRecs.length < bestLimit) {
                 recs = generateRecommendations(recommendedSounds, addRandomRecInput([]), coUsage, similarity);
+                genreLimit = originalGenre.map((g) => g);
+                instrumentLimit = instrumentLimit.map((i) => i);
             }
+            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
         }
         return filteredRecs;
     };
@@ -108,8 +114,10 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     };
 
 
-    function filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit) {
+    function filterRecommendations(inputRecs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit) {
 
+        var recs = {};
+        Object.assign(recs, inputRecs);
         if (inputSamples.length > 0) {
             var i = 0;
             while (i < bestLimit) {
