@@ -239,6 +239,7 @@ app.factory('caiProjectModel', [function () {
         return false;
     }
 
+
     return {
         getModel: getModel,
         updateModel: updateModel,

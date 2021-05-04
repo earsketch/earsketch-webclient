@@ -736,7 +736,7 @@
         parameters: {},
         dropup: "ideas",
         options: ["PROPERTIES|78"]
-    },
+    }
     ];
 
 
