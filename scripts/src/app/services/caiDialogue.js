@@ -803,22 +803,28 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             if ("INSTRUMENT" in currentTreeNode[activeProject].parameters) {
                 currentInstr = currentTreeNode[activeProject].parameters.INSTRUMENT;
-                instrumentArray = [currentInstr];
-                parameters.push(["INSTRUMENT", currentInstr])
+                parameters.push(["INSTRUMENT", currentInstr]);
+                  instrumentArray = [currentInstr];
             }
-            else if (caiProjectModel.getModel()['instrument'].length > 0) {
+            if (caiProjectModel.getModel()['instrument'].length > 0) {
                 instrumentArray = caiProjectModel.getModel()['instrument'].slice(0);
+            }
+            else if(currentInstr != null){
+              instrumentArray = [currentInstr];
             }
 
             var genreArray = [];
 
             if ("GENRE" in currentTreeNode[activeProject].parameters) {
                 currentGenre = currentTreeNode[activeProject].parameters.GENRE;
-                parameters.push(["GENRE", currentGenre])
-                genreArray = [currentGenre]
+                parameters.push(["GENRE", currentGenre]);
+                genreArray = [currentGenre];
             }
             else if (caiProjectModel.getModel()['genre'].length > 0) {
                 genreArray = caiProjectModel.getModel()['genre'].slice(0);
+            }
+            else if(currentGenre != null){
+              genreArray = [currentGenre];
             }
 
             var count = (utterance.match(/sound_rec/g) || []).length;
