@@ -16,21 +16,21 @@ app.factory('caiProjectModel', ['recommender', function (recommender) {
 
     var propertyOptions = {
         'genre': availableGenres,
-        'instrument': availableInstruments,
+        // 'instrument': availableInstruments,
         'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
         'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
     var suggestablePropertyOptions =  {
         'genre': availableGenres,
-        'instrument': availableInstruments,
+        // 'instrument': availableInstruments,
         'form': ["[FORM]"],
         'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
     };
 
     var propertyButtons ={
         'genre': "i have a genre I want to include",
-        'instrument': "there's an instrument i want to make sure is in the project",
+        // 'instrument': "there's an instrument i want to make sure is in the project",
         'form': "i have a form in mind",
         'code structure': "i need to use a specific code structure"
     };
@@ -38,7 +38,7 @@ app.factory('caiProjectModel', ['recommender', function (recommender) {
     var suggestableProperties = {
         'multiple': {
             'genre': availableGenres,
-            'instrument': availableInstruments,
+            // 'instrument': availableInstruments,
         },
         'one': {
             'form': ["[FORM]"]
@@ -244,10 +244,10 @@ app.factory('caiProjectModel', ['recommender', function (recommender) {
         suggestablePropertyOptions['genre'] = availableGenres;
         suggestableProperties['multiple']['genre'] = availableGenres;
         
-        availableInstruments = recommender.availableInstruments();
-        propertyOptions['instrument'] = availableInstruments;
-        suggestablePropertyOptions['instrument'] = availableInstruments;
-        suggestableProperties['multiple']['instrument'] = availableInstruments;
+        // availableInstruments = recommender.availableInstruments();
+        // propertyOptions['instrument'] = availableInstruments;
+        // suggestablePropertyOptions['instrument'] = availableInstruments;
+        // suggestableProperties['multiple']['instrument'] = availableInstruments;
     }
 
 
