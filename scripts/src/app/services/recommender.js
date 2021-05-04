@@ -63,8 +63,8 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
             else if (instrumentLimit.length > 0) {
                 instrumentLimit.pop();
             }
-            else {
-                return filteredRecs;
+            else if (filteredRecs.length < bestLimit) {
+                recs = generateRecommendations(recommendedSounds, addRandomRecInput([]), coUsage, similarity);
             }
         }
         return filteredRecs;
