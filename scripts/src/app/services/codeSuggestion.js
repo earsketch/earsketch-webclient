@@ -13,7 +13,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
     var averageGenreThreshold = .8;
     var musicResults;
     var genreListCurrent;
-    var currentEffects;
+    var currentEffects = [];
     var sectionLines = [];
     var CAI_DICT = {};
     var possibleDeltaSuggs = [];
