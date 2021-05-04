@@ -906,6 +906,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             for (var idx in recs)
                 recommendationHistory[activeProject].push(recs[idx]);
 
+            var numLoops = 0;
+
             while (utterance.includes("[sound_rec]")) {
                 var recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11];
 
@@ -917,6 +919,12 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 if (newRecString !== undefined) {
                     utterance = utterance.substring(0, recBounds[0]) + newRecString + utterance.substring(recBounds[1]);
                     recIndex++;
+                }
+
+                numLoops++;
+                if(numLoops > 10){
+                  utterance = "I'm out of ideas. You can add some sounds to inspire me.";
+                  break;
                 }
 
             }
