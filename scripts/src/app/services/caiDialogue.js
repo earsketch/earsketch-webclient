@@ -731,12 +731,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             utterance = utterance.substring(15);
             storeProperty();
             console.log('PROJECT MODEL', caiProjectModel.getModel());
+            addToNodeHistory(["projectModel", caiProjectModel.getModel()]);
         }
         if (utterance.includes("[CLEARPROPERTY]")) {
             utterance = utterance.substring(15);
             caiProjectModel.removeProperty(currentProperty, currentPropertyValue);
             // clearProperty();
             console.log('PROJECT MODEL',caiProjectModel.getModel());
+            addToNodeHistory(["projectModel", caiProjectModel.getModel()]);
         }
         if(utterance.includes("[REPLACEPROPERTY]")){
           utterance = utterance.substring(17);
@@ -745,6 +747,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
           propertyValueToChange = "";
           // clearProperty();
           console.log('PROJECT MODEL',caiProjectModel.getModel());
+          addToNodeHistory(["projectModel", caiProjectModel.getModel()]);
         }
 
         //actions first
@@ -854,7 +857,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 genreArray = caiProjectModel.getModel()['genre'].slice(0);
             }
 
-
             var count = (utterance.match(/sound_rec/g) || []).length;
             var allSamples = recommender.addRecInput([], { source_code: studentCodeObj });
 
@@ -867,8 +869,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var usedRecs = [];
             recs = recommender.recommend([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
             var recIndex = 0;
-
-
 
             if (currentSection != null && musicResults != null) {
                 recs = [];
@@ -964,8 +964,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             if (musicResults != {} && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
                 var indexVal = Object.keys(musicResults.SOUNDPROFILE)[randomIntFromInterval(0, Object.keys(musicResults.SOUNDPROFILE).length - 1)];
                 var bounds = musicResults.SOUNDPROFILE[indexVal].measure;
-
-
 
                 newRecString = "the section between measures " + bounds[0] + " and " + bounds[1];
             }

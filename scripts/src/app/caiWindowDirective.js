@@ -308,10 +308,10 @@ app.directive('caiwindow', [function () {
             // TODO: update following so message stops if user is completely off the page
             function onPeriodicCheck() {
                 var pageStatus = caiStudentPreferenceModule.returnPageStatus();
-                secondsOffPage = 0;
-                if (pageStatus==0) {
-                    secondsOffPage = Date.now()/1000 - pageStatus[1]/1000;
-                }
+                // secondsOffPage = 0;
+                // if (pageStatus==0) {
+                //     secondsOffPage = Date.now()/1000 - pageStatus[1]/1000;
+                // }
                 // console.log(pageStatus, secondsOffPage, Date.now()/1000);
                 // var message = sendCAIOutputMessage("Looking at your code updates...");
                 if ($scope.messageListCAI[$scope.activeProject]) {
