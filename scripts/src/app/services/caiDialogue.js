@@ -255,7 +255,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 addToNodeHistory(["Sound Suggestion Used", suggestionRecord[i]])
             }
             soundSuggestionsUsed[activeProject] += suggestionRecord.length - soundSuggestionsUsed[activeProject];
-
         }
 
         var codeSuggestionRecord = caiStudentPreferenceModule.getCodeSuggestionsUsed();
@@ -304,18 +303,15 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     break;
                 }
             }
-
             if (soundFound) {
                 currentTreeNode[activeProject] = Object.assign({}, caiTree[soundWait.node]);
                 soundWait.node = -1;
                 soundWait.sounds = [];
                 return showNextDialogue();
             }
-
         }
 
         else if (complexityWait.node != -1) {
-
             var meetsRequirements = true;
             for (var i in complexityWait.complexity) {
                 if (currentComplexity[i] < complexityWait.complexity[i]) {
@@ -323,7 +319,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                     break;
                 }
             }
-
 
             if (meetsRequirements) {
                 currentTreeNode[activeProject] = Object.assign({}, caiTree[soundWait.node]);
@@ -347,7 +342,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 currentNoSuggRuns += 1;
             }
         }
-
     }
 
     function setCodeObj(newCode) {
@@ -368,7 +362,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         if (currentTreeNode[activeProject].id == 34 && (currentSuggestion[activeProject] == null || (currentSuggestion[activeProject].explain == null || currentSuggestion[activeProject].explain == ""))) {
             currentSuggestion[activeProject] = null;
             return [];
-
         }
 
         if (Number.isInteger(currentTreeNode[activeProject].options[0])) {
@@ -382,9 +375,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                         allSamples = recommender.addRandomRecInput(allSamples);
                 }
 
-                var recs = [];
-                recs = recommender.generateRecommendations([], allSamples, 1, 1);
-                availableGenres = recommender.genreRecommendations(recs);
+                availableGenres = recommender.availableGenres();
 
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
@@ -404,9 +395,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                         allSamples = recommender.addRandomRecInput(allSamples);
                 }
 
-                var recs = [];
-                recs = recommender.generateRecommendations([], allSamples, 1, 1);
-                availableInstruments = recommender.instrumentRecommendations(recs);
+                availableInstruments = recommender.availableInstruments();
 
                 for (var i in currentTreeNode[activeProject].options) {
                     var nextNode = currentTreeNode[activeProject].options[i];
@@ -654,9 +643,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         var musicResults = codeSuggestion.getMusic();
-
-
-
 
         if ("event" in currentTreeNode[activeProject]) {
             for (var k = 0; k < currentTreeNode[activeProject].event.length; k++) {
