@@ -158,10 +158,11 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         var recs = {};
 
         for (var key in inputRecs) {
-            if (!recommendedSounds.includes(maxRec) && !inputSamples.includes(maxRec) && maxRec.slice(0,3) !== 'OS_') {
-                recs[key] = inputRecs[key];
+            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && key.slice(0,3) !== 'OS_') {
+                recs[key] = inputRecs[key]
+            }
         }
-        
+
         if (inputSamples.length > 0) {
             var i = 0;
             while (i < bestLimit) {
