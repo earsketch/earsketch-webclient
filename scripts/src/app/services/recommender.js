@@ -156,7 +156,12 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     function filterRecommendations(inputRecs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit) {
 
         var recs = {};
-        Object.assign(recs, inputRecs);
+
+        for (var key in inputRecs) {
+            if (!recommendedSounds.includes(maxRec) && !inputSamples.includes(maxRec) && maxRec.slice(0,3) !== 'OS_') {
+                recs[key] = inputRecs[key];
+        }
+        
         if (inputSamples.length > 0) {
             var i = 0;
             while (i < bestLimit) {
@@ -173,14 +178,12 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
                     return recommendedSounds;
                 }
 
-                if (!recommendedSounds.includes(maxRec) && !inputSamples.includes(maxRec) && maxRec.slice(0,3) !== 'OS_') {
-                    if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
-                        var s = keyInstrumentDict[maxRec];
-                        if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
-                            if (!previousRecommendations.includes(maxRec)) {
-                                recommendedSounds.push(maxRec);
-                                i += 1;
-                            }
+                if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
+                    var s = keyInstrumentDict[maxRec];
+                    if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
+                        if (!previousRecommendations.includes(maxRec)) {
+                            recommendedSounds.push(maxRec);
+                            i += 1;
                         }
                     }
                 }
