@@ -981,6 +981,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
         if (utterance.includes("[FORMGOAL]")) {
             var formGoal = caiProjectModel.getModel()["form"];
+            utterance = utterance.replace("[FORMGOAL]", formGoal);
         }
 
         if (utterance.includes("[COMPLEXITYGOAL]")) {
