@@ -15,6 +15,18 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         keyInstrumentDict = instrument;
     }
 
+    function getKeyDict(type) {
+        if (type === 'genre') {
+            return keyGenreDict;
+        }
+        else if (type === 'insturment') {
+            return keyInstrumentDict;
+        }
+        else {
+            return null;
+        }
+    }
+
 	// Load lists of numbers and keys
     var AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS);
 
@@ -70,25 +82,28 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
 
     function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
         var recs = generateRecommendations(inputSamples, coUsage, similarity);
-        // var originalGenre = genreLimit.map((g) => g);
-        // var originalInstrument = instrumentLimit.map((i) => i);
-
         var filteredRecs = [];
-        while (filteredRecs.length < bestLimit) {
-            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
-            if (genreLimit.length > 0) {
-                genreLimit.pop();
-            }
-            else if (instrumentLimit.length > 0) {
-                instrumentLimit.pop();
-            }
+
+        if (Object.keys(recs).length === 0) {
+            recs = generateRecommendations([addRandomRecInput(), addRandomRecInput(), addRandomRecInput()], coUsage, similarity);
         }
+
+        if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+            previousRecommendations = [];
+        }
+
+        filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
         return filteredRecs;
     }
 
 
     function recommendReverse(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
         var filteredRecs = [];
+
+        if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+            previousRecommendations = [];
+        }
+
         while (filteredRecs.length < bestLimit) {
             var recs = {};
             var outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit);
@@ -110,6 +125,9 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
             }
             else if (instrumentLimit.length > 0) {
                 instrumentLimit.pop();
+            }
+            else {
+                return filteredRecs;
             }
         }
         return filteredRecs;
@@ -158,7 +176,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         var recs = {};
 
         for (var key in inputRecs) {
-            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && key.slice(0,3) !== 'OS_') {
+            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && Object.keys(keyGenreDict).includes(key) && key.slice(0,3) !== 'OS_') {
                 recs[key] = inputRecs[key]
             }
         }
@@ -249,6 +267,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
   	addRecInput: addRecInput,
     addRandomRecInput: addRandomRecInput,
     setKeyDict: setKeyDict,
+    getKeyDict: getKeyDict,
     genreRecommendations: genreRecommendations,
     instrumentRecommendations: instrumentRecommendations,
     availableGenres: availableGenres,
