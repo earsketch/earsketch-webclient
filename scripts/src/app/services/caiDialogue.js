@@ -413,7 +413,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
         else if (currentTreeNode[activeProject].options[0] != null && currentTreeNode[activeProject].options[0].includes("SECTIONS") && codeSuggestion.getMusic() != null) {
             var musicResults = codeSuggestion.getMusic();
-            if (musicResults != null && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
+            if (musicResults != {} && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
                 var highestNumber = 0;
                 for (var i = 0; i < caiTree.length; i++) {
                     if (caiTree[i].id > highestNumber) {
@@ -675,7 +675,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var cut = utterance.substring(1, lastIndex).split("|")
             var newUtterance = "";
 
-            if (musicResults != null && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 1) {
+            if (musicResults != {} && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 1) {
                 //utterance asks; present set of options
                 currentTreeNode[activeProject].options = [];
                 var optionList = cut[1].split(",");
@@ -809,7 +809,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             else if (currentInstr == null && caiProjectModel.getModel()['instrument'].length > 0) {
                 instrumentArray = caiProjectModel.getModel()['instrument'].slice(0);
             }
-            else if(currentInstr != null){
+            else if (currentInstr != null) {
               instrumentArray = [currentInstr];
             }
 
@@ -849,7 +849,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             recs = recs.slice(0,count);
             var recIndex = 0;
 
-            if (currentSection != null && musicResults != null) {
+            if (currentSection != null && musicResults != {} && musicResults.SOUNDPROFILE != nu;;) {
                 recs = [];
                 var measureBounds = musicResults.SOUNDPROFILE[currentSection].measure.slice(0);
                 measureBounds[0] -= 1;
@@ -945,7 +945,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             var validForms = [];
             var currentForm = "";
             var musicResults = codeSuggestion.getMusic();
-            if (musicResults != null && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
+            if (musicResults != {} && musicResults.SOUNDPROFILE != null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
                 var keys = Object.keys(musicResults.SOUNDPROFILE);
                 for (var i in keys) {
                     currentForm += (keys[i][0]);
@@ -1126,8 +1126,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             textPieces.push("");
             keywordLinks.push(["", ""]);
         }
-
-
         var structure = [textPieces, keywordLinks]
         return structure;
     }
