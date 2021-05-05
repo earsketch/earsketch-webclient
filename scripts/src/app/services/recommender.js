@@ -176,7 +176,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         var recs = {};
 
         for (var key in inputRecs) {
-            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && Object.keys(keyGenreDict).includes(maxRec) && key.slice(0,3) !== 'OS_') {
+            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && Object.keys(keyGenreDict).includes(key) && key.slice(0,3) !== 'OS_') {
                 recs[key] = inputRecs[key]
             }
         }
