@@ -871,7 +871,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 var combinations = [[genreArray,[]],[[],instrumentArray],[[],[]]]
                 var numNewRecs = count - recs.length;
                 for(var i = 0; i < combinations.length; i++) {
-                    var newRecs = recommender.recommend([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
+                    var newRecs = recommender.recommendReverse([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
                     for (var k = 0; k < newRecs.length; k++) {
                         if (!recs.includes(newRecs[k]))
                             recs.push(newRecs[k]);
@@ -1114,7 +1114,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 textPieces.push(utteranceFirstHalf);
                 keywordLinks.push([keyword, link]);
 
-                console.log(utterance);
+                // console.log(utterance);
             }
         }
         else {

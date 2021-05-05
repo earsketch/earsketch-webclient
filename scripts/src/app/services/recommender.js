@@ -82,27 +82,17 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
 
     function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
         var recs = generateRecommendations(inputSamples, coUsage, similarity);
-        // var originalGenre = genreLimit.map((g) => g);
-        // var originalInstrument = instrumentLimit.map((i) => i);
         var filteredRecs = [];
 
         if (Object.keys(recs).length === 0) {
-            return filteredRecs;
+            recs = generateRecommendations([addRandomRecInput(), addRandomRecInput(), addRandomRecInput()], coUsage, similarity);
         }
 
         if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
             previousRecommendations = [];
         }
 
-        while (filteredRecs.length < bestLimit) {
-            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
-            if (genreLimit.length > 0) {
-                genreLimit.pop();
-            }
-            else if (instrumentLimit.length > 0) {
-                instrumentLimit.pop();
-            }
-        }
+        filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
         return filteredRecs;
     }
 
@@ -210,7 +200,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
                 if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
                     var s = keyInstrumentDict[maxRec];
                     if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
-                        if (!previousRecommendations.includes(maxRec)) {
+                        if (!previousRecommendations.includes(maxRec) && Object.keys(keyGenreDict).includes(maxRec)) {
                             recommendedSounds.push(maxRec);
                             i += 1;
                         }
