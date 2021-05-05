@@ -20,9 +20,7 @@ export const openScript = (script: ScriptEntity) => {
 
 export const openSharedScript = (script: ScriptEntity) => {
     const userProject = helpers.getNgService('userProject');
-    const rootScope = helpers.getNgRootScope();
     userProject.openSharedScript(script.shareid);
-    rootScope.$broadcast('selectSharedScript', script);
 };
 
 export const shareScript = (script: ScriptEntity) => {

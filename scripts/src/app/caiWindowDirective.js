@@ -17,6 +17,7 @@ app.directive('caiwindow', [function () {
             $scope.beginningInputOptions = [{ label: "Chat with CAI", value: "begin" }];
             $scope.inputOptions = $scope.beginningInputOptions.slice();
             $scope.dropupLabel = "Dropup";
+            $scope.errorOptions = [];
 
             $scope.messageStyles = {
                 sender: {
@@ -54,6 +55,7 @@ app.directive('caiwindow', [function () {
                 var msgText = caiDialogue.generateOutput("Chat with CAI");
                 caiDialogue.studentInteract(false);
                 $scope.inputOptions = caiDialogue.createButtons();
+                $scope.errorOptions = [];
 
                 $scope.inputTextCAI.label = '';
                 $scope.inputTextCAI.value = '';
@@ -84,6 +86,7 @@ app.directive('caiwindow', [function () {
                     $scope.inputTextCAI = { label: '', value: '' };
                     $scope.inputOptions = [];
                     $scope.dropupLabel = "Dropup";
+                    $scope.errorOptions = [];
                 }
                 else {
                     $scope.activeProject = activeProject;
@@ -178,10 +181,10 @@ app.directive('caiwindow', [function () {
                 setTimeout(() => {
                     var output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results);
                     if (output != null && output[0][0] != "") {
-
                         var message = sendCAIOutputMessage(output);
                         addToCAIMessageList(message);
                         $scope.inputOptions = caiDialogue.createButtons();
+                        $scope.errorOptions = [];
                         if ($scope.inputOptions.length === 0) {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
@@ -211,11 +214,12 @@ app.directive('caiwindow', [function () {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
-                        if ($scope.inputOptions != null) {
-                            $scope.inputOptions.push({ label: "do you know anything about this error i'm getting", value: "error" });
-                        }
+                        $scope.errorOptions = [{ label: "do you know anything about this error i'm getting", value: "error" }];
                         autoScrollCAI();
                     }, 0);
+                }
+                else {
+                    $scope.errorOptions = [];
                 }
             });
 
@@ -240,6 +244,11 @@ app.directive('caiwindow', [function () {
                     addToCAIMessageList(message);
 
                     var msgText = caiDialogue.generateOutput($scope.inputTextCAI.value);
+
+                    if ($scope.inputTextCAI.value === 'error') {
+                        $scope.errorOptions = [];
+                    }
+
                     if (msgText.includes("[ERRORFIX")) {
 
                         var errorS = msgText.substring(msgText.indexOf("[ERRORFIX") + 10, msgText.lastIndexOf("|"));

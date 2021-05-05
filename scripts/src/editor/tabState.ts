@@ -178,6 +178,8 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
 
         prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID));
         scriptID && dispatch(openAndActivateTab(scriptID));
+        
+        helpers.getNgRootScope().$broadcast('reloadRecommendations');
     }
 );
 

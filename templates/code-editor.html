@@ -7,6 +7,7 @@
     </div>
 </div>
 
+<!-- Note: activeScript managed in ideController and tabState -->
 <div id="collab-badges-container" ng-if="activeScript.collaborative">
     <div ng-repeat="(name, state) in collaboration.otherMembers track by $index">
         <div class="collaborator-badge prevent-selection" ng-style="{'border-color':state.active?'rgba('+collaboration.colors[$index%6].join()+',0.75)':'#666','background-color':state.active?'rgba('+collaboration.colors[$index%6].join()+',0.5)':'#666'}" uib-tooltip="{{name}}" tooltip-placement="left" uib-popover="{{collaboration.chat[name].text}}" popover-placement="left" popover-is-open="collaboration.chat[name].popover" popover-trigger="'none'">{{name[0].toUpperCase()}}</div>

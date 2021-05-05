@@ -87,7 +87,7 @@ app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$win
                             script.tooltipText = '';
                             postProcessCollaborators(script);
                             scripts[script.shareid] = script;
-                            $rootScope.$broadcast('refreshTabState');
+                            $ngRedux.dispatch(scriptsState.syncToNgUserProject());
                             userNotification.show(ESMessages.user.scriptcloud, 'success');
                         });
                 }

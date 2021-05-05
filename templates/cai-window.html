@@ -27,21 +27,30 @@
         </div>
     </div>
 </div>
-<div id="chat-footer" style="margin-top: auto;" ng-show="activeProject.length > 0">
-    <div ng-show="inputOptions.length < 6" style="width: 100%;">
-        <div ng-repeat="input in inputOptions">
-            <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px; max-width: 90%; white-space: initial; text-align: left;">{{input.label}}</button>
+<div id="chat-footer" style="margin-top: auto; display: block;" ng-show="activeProject.length > 0">
+    <div style="flex: auto;">
+        <div ng-show="inputOptions.length < 6" style="width: 100%;">
+            <div ng-repeat="input in inputOptions">
+                <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px; max-width: 90%; white-space: initial; text-align: left;">{{input.label}}</button>
+            </div>
         </div>
-    </div>
 
-    <div class="dropup-cai" ng-hide="inputOptions.length < 6">
-        <button class="dropbtn-cai">{{dropupLabel}}</button>
-        <div class="dropup-cai-content">
-        	<li ng-repeat="input in inputOptions">
-	            <option href="#" ng-click="sendCAIMessageButton(input)">{{::input.label}}</a>
-	            </a>
-            </li>
+        <div class="dropup-cai" ng-hide="inputOptions.length < 6" style="width: 100%;">
+            <button class="dropbtn-cai" style="margin-left: auto; display: block; margin-right: auto;">{{dropupLabel}}</button>
+            <div class="dropup-cai-content" style="left:100px;">
+            	<li ng-repeat="input in inputOptions">
+    	            <option href="#" ng-click="sendCAIMessageButton(input)">{{::input.label}}</a>
+    	            </a>
+                </li>
+            </div>
         </div>
     </div>
+    <div style="flex: auto;">
+        <div ng-show="errorOptions.length > 0" style="width: 100%;">
+            <div ng-repeat="input in errorOptions">
+                <button type ="button" class="btn btn-cai" ng-click="sendCAIMessageButton(input)" style="margin: 10px; max-width: 90%; white-space: initial; text-align: left;">{{input.label}}</button>
+            </div>
+        </div>
+    <div>
 
 </div>

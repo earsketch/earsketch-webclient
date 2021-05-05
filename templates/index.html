@@ -255,11 +255,11 @@
                             </div>
                         </div>
 
-                        <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&[1,2,9].includes(bubble.currentPage)?35:0}" ng-controller="tabController" ng-show="!hideEditor">
+                        <div class="split flex flex-col" id="coder" ng-style="{'z-index':bubble.active&&[1,2,9].includes(bubble.currentPage)?35:0}" ng-show="!hideEditor">
                             <editor-header></editor-header>
 
                             <div class="flex-grow h-full overflow-y-hidden">
-                                <div class="h-full flex flex-col" ng-hide="tabs.length === 0">
+                                <div class="h-full flex flex-col" ng-hide="numTabs === 0">
                                     <script-tabs></script-tabs>
                                     <div ng-show="isEmbedded" class="embedded-script-info h-auto" >
                                         <p>Script: {{embeddedScriptName}}</p>
@@ -271,7 +271,7 @@
 
 <!--                                <span ng-show="isEmbedded" class="embedded-script-info" style="padding-top: 5px;"> Script: {{embeddedScriptName}}</span>-->
 
-                                <div class="h-full flex flex-col justify-evenly text-4xl" ng-hide="tabs.length !== 0" style="text-align: center">
+                                <div class="h-full flex flex-col justify-evenly text-4xl" ng-hide="numTabs !== 0" style="text-align: center">
                                     <div class="leading-relaxed">
                                         <div id="no-scripts-warning">You have no scripts loaded.</div>
                                         <a href="#" ng-click="createScript()">Click here to create a new script!</a>

@@ -61,7 +61,6 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     this.refreshScriptBrowser = null;
     this.refreshSharedScriptBrowser = null;
     this.closeSharedScriptIfOpen = null;
-    this.refreshTabStateForSharedScripts = null;
 
     var editTimeout = 5000; // sync (rejoin) session if there is no server response
     var syncTimeout = 5000; // when time out, the websocket connection is likely lost
@@ -761,7 +760,7 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     };
 
     this.onScriptSaved = function (data) {
-        if (!userIsCAI(data.sender))
+        if (!this.userIsCAI(data.sender))
             userNotification.show(data.sender + ' saved the current version of the script.', 'success');
 
         $ngRedux.dispatch(scripts.syncToNgUserProject());
@@ -1229,10 +1228,6 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         if (this.refreshSharedScriptBrowser) {
             await this.refreshSharedScriptBrowser();
             $ngRedux.dispatch(scripts.syncToNgUserProject());
-
-            if (self.refreshTabStateForSharedScripts) {
-                self.refreshTabStateForSharedScripts();
-            }
         }
     };
 
