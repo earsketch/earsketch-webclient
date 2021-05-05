@@ -731,6 +731,8 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         }
 
         if (utterance.includes("[SUGGESTPROPERTY]")) {
+            caiProjectModel.setOptions();
+
             var output = caiProjectModel.randomPropertySuggestion();
             var utterReplace = "";
             if (Object.keys(output).length > 0) {
