@@ -84,8 +84,11 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         var recs = generateRecommendations(inputSamples, coUsage, similarity);
         // var originalGenre = genreLimit.map((g) => g);
         // var originalInstrument = instrumentLimit.map((i) => i);
-
         var filteredRecs = [];
+
+        if (Object.keys(recs).length === 0) {
+            return filteredRecs;
+        }
 
         if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
             previousRecommendations = [];
@@ -132,6 +135,9 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
             }
             else if (instrumentLimit.length > 0) {
                 instrumentLimit.pop();
+            }
+            else {
+                return filteredRecs;
             }
         }
         return filteredRecs;
