@@ -13,8 +13,8 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
   var keyInstrumentDict = {};
   var genreDist = [];
   var soundsLoaded = false;
-    var savedReport = {};
-    var savedAnalysis = {};
+  var savedReport = {};
+  var savedAnalysis = {};
 
   var apiCalls = [];
 

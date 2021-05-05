@@ -224,7 +224,7 @@ var CAI_RECOMMENDATIONS =
             id: 11,
             example: "",
             explain: "",
-            utterance: "let's add [sound_rec] next?"
+            utterance: "We need to use [COMPLEXITYGOAL], right? Let's make sure we get that in there."
         },
         {
             id: 12,
@@ -369,15 +369,15 @@ var CAI_RECOMMENDATIONS =
         },
         {
             id: 67,
-            example: "things like ABBA or ABACAB are things people are used to hearing",
-            explain: "this way our song matches a recognizable format",
-            utterance: "what if we extend this into [FORM] form?"
+            example: "We wanted to do a [FORMGOAL] form, right?",
+            explain: "It'll move us closer to our form goal",
+            utterance: "Let's start a new, contrasting section"
         },
         {
             id: 68,
-            example: "something like:\n\n[LINK|setEffect](1, [LINK|FILTER], FILTER_FREQ, 20)",
+            example: "something like:\n\n[LINK|setEffect](your_track_here, FILTER, FILTER_FREQ, 20, your_start_measure_here, 10000, your_end_measure_here)",
             explain: "we can customize our sounds a little more, and it gives us more control",
-            utterance: "let's put in some effects, like a [LINK|filter] or volume mixing"
+            utterance: "let's put in some effects with [LINK|setEffect], like a [LINK|filter] or [LINK|volume mixing]"
         },
         {
             id: 69,
@@ -392,39 +392,15 @@ var CAI_NUCLEI = [
     { id: 64, utterance: "i think we could use a bigger variety of instruments" },
     {
         id: 55, utterance:
-            "let's change up our beat a little bit"
+            "we could try [sound_rec]"
     },
     {
         id: 56, utterance:
             "what about adding [sound_rec] and [sound_rec] next?"
     },
     {
-        id: 57, utterance:
-            "let's add some bass"
-    },
-    {
-        id: 58, utterance:
-            "we should add some drums next"
-    },
-    {
-        id: 59, utterance:
-            "what about adding a synth?"
-    },
-    {
         id: 60, utterance:
             "maybe we could put in [sound_rec]?"
-    },
-    {
-        id: 61, utterance:
-            "hmm. what if we made a [LINK|section] that really contrasts with what we have right now?"
-    },
-    {
-        id: 62, utterance:
-            "some repetition might be good to tie this whole piece together"
-    },
-    {
-        id: 70, utterance:
-            "let's start making a new, contrasting [LINK|section]."
     }
 
 ]
