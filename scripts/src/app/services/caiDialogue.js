@@ -849,7 +849,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             recs = recs.slice(0,count);
             var recIndex = 0;
 
-            if (currentSection != null && musicResults != {} && musicResults.SOUNDPROFILE != nu;;) {
+            if (currentSection != null && musicResults != {} && musicResults.SOUNDPROFILE != null) {
                 recs = [];
                 var measureBounds = musicResults.SOUNDPROFILE[currentSection].measure.slice(0);
                 measureBounds[0] -= 1;
