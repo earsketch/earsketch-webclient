@@ -2,14 +2,12 @@ import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import * as ace from 'ace-builds';
+
 import * as helpers from '../helpers';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
 import * as editor from "./editorState";
-
-import * as ace from 'ace-builds';
-import { Mode as PythonMode } from 'ace-builds/src-noconflict/mode-python';
-import { Mode as JavaScriptMode } from 'ace-builds/src-noconflict/mode-javascript';
 
 interface TabState {
     openTabs: string[],
@@ -162,7 +160,8 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (restoredSession) {
             editSession = restoredSession;
         } else {
-            editSession = ace.createEditSession(script.source_code, language==='python' ? PythonMode : JavaScriptMode);
+            editSession = new ace.EditSession(script.source_code);
+            editSession.setMode(language);
             setEditorSession(scriptID, editSession);
         }
         editor.setSession(editSession);

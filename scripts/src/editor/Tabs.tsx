@@ -41,7 +41,6 @@ interface TabProps {
 const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
     const dispatch = useDispatch();
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID);
-    const [highlight, setHighlight] = useState(false);
 
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const script = allScripts[scriptID];
