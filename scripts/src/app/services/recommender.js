@@ -15,6 +15,18 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         keyInstrumentDict = instrument;
     }
 
+    function getKeyDict(type) {
+        if (type === 'genre') {
+            return keyGenreDict;
+        }
+        else if (type === 'insturment') {
+            return keyInstrumentDict;
+        }
+        else {
+            return null;
+        }
+    }
+
 	// Load lists of numbers and keys
     var AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS);
 
@@ -74,6 +86,11 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         // var originalInstrument = instrumentLimit.map((i) => i);
 
         var filteredRecs = [];
+
+        if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+            previousRecommendations = [];
+        }
+
         while (filteredRecs.length < bestLimit) {
             filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
             if (genreLimit.length > 0) {
@@ -89,6 +106,11 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
 
     function recommendReverse(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
         var filteredRecs = [];
+
+        if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+            previousRecommendations = [];
+        }
+
         while (filteredRecs.length < bestLimit) {
             var recs = {};
             var outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit);
@@ -249,6 +271,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
   	addRecInput: addRecInput,
     addRandomRecInput: addRandomRecInput,
     setKeyDict: setKeyDict,
+    getKeyDict: getKeyDict,
     genreRecommendations: genreRecommendations,
     instrumentRecommendations: instrumentRecommendations,
     availableGenres: availableGenres,

@@ -837,6 +837,11 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
 
             var recs = [];
             var usedRecs = [];
+
+            if (recommendationHistory[activeProject].length === Object.keys(recommender.getKeyDict('genre')).length) {
+                recommendationHistory[activeProject] = [];
+            }
+
             // recs = recommender.recommend([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
             // recs = recommender.findGenreInstrumentCombinations(genreArray, instrumentArray);
             recs = recommender.recommendReverse([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count);
