@@ -11,8 +11,8 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
     var noDeltaCount = 0;
     var currentResults = {};
     var averageGenreThreshold = .8;
-    var musicResults;
-    var genreListCurrent;
+    var musicResults = {};
+    var genreListCurrent = [];
     var currentEffects = [];
     var sectionLines = [];
     var CAI_DICT = {};
@@ -31,14 +31,16 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                     total += currentResults[resKeys[i]];
                 }
 
-                if (total != 1 && total != 0) {
+                if (total !== 1 && total !== 0) {
                     return false;
                 }
                 else {
-                    if (currentResults["ints"] == 1) {
+                    if (currentResults["ints"] === 1) {
                         return true;
                     }
-                    else return false;
+                    else { 
+                      return false;
+                    }
                 }
 
             },
@@ -54,10 +56,12 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             condition: function () {
                 //"is music empty?"
                 //empty implies there is no music.
-                if (musicResults != null && musicResults.OVERVIEW != null && musicResults.OVERVIEW.measures == 0) {
+                if (!isEmpty(musicResults) && musicResults.OVERVIEW !== null && musicResults.OVERVIEW.measures === 0) {
                     return true;
                 }
-                else return false;
+                else {
+                  return false;
+                }
 
             },
             yes: 4,
@@ -87,7 +91,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                    //get current value and compare to end value
                    var endValuesMatch = true;
                    for (var j in CAI_DELTA_LIBRARY[i].end) {
-                       if (CAI_DELTA_LIBRARY[i].end[j] != results[j]) {
+                       if (CAI_DELTA_LIBRARY[i].end[j] !== results[j]) {
                            endValuesMatch = false;
                        }
                    }
@@ -95,7 +99,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                    var startValuesMatch = true;
                    if (endValuesMatch) {
                        for (var j in CAI_DELTA_LIBRARY[i].start) {
-                           if (CAI_DELTA_LIBRARY[i].start[j] != (results[j] - currentDelta[j])) {
+                           if (CAI_DELTA_LIBRARY[i].start[j] !== (results[j] - currentDelta[j])) {
                                startValuesMatch = false;
                            }
                        }
@@ -142,7 +146,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                   //get current value and compare to end value
                   var endValuesMatch = true;
                   for (var j in CAI_DELTA_LIBRARY[i].end) {
-                      if (CAI_DELTA_LIBRARY[i].end[j] != results[j]) {
+                      if (CAI_DELTA_LIBRARY[i].end[j] !== results[j]) {
                           endValuesMatch = false;
                       }
                   }
@@ -150,7 +154,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                   var startValuesMatch = true;
                   if (endValuesMatch) {
                       for (var j in CAI_DELTA_LIBRARY[i].start) {
-                          if (CAI_DELTA_LIBRARY[i].start[j] != (results[j] - currentDelta[j])) {
+                          if (CAI_DELTA_LIBRARY[i].start[j] !== (results[j] - currentDelta[j])) {
                               startValuesMatch = false;
                           }
                       }
@@ -165,8 +169,8 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
               var sugg = possibleDeltaSuggs[0].id;
 
               for(var i in storedHistory){
-                if(storedHistory[i][0] == 34){
-                  if(storedHistory[i][1][0][1] == sugg){
+                if(storedHistory[i][0] === 34){
+                  if(storedHistory[i][1][0][1] === sugg){
                     return true;
                   }
                 }
@@ -195,7 +199,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
        {
            node: 12,
            condition: function () {
-             if (currentResults != null && currentResults.userFunc != null && currentResults.userFunc < 2) {
+             if (!isEmpty(currentResults) && currentResults.userFunc !== null && currentResults.userFunc < 2) {
                  return true;
              }
              return false;
@@ -206,7 +210,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
        {
            node: 13,
            condition: function () {
-             if (musicResults != null && musicResults.SOUNDPROFILE != null) {
+             if (!isEmpty(musicResults) && musicResults.SOUNDPROFILE !== null) {
                  var keys = Object.keys(musicResults.SOUNDPROFILE);
                  for (var i in keys) {
                      if (keys[i].includes("'")) {
@@ -215,7 +219,9 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                  }
                  return false;
              }
-             else return false;
+             else {
+              return false;
+            }
            },
            yes: 16,
            no: 15
@@ -223,7 +229,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
        {
            node: 14,
            condition: function () {
-               if (currentResults != null && currentResults.userFunc != null && currentResults.userFunc < 2) {
+               if (!isEmpty(currentResults) && currentResults.userFunc !== null && currentResults.userFunc < 2) {
                    return true;
                }
                return false;
@@ -234,7 +240,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
        {
            node: 15,
            condition: function () {
-               if (currentResults != null && currentResults.userFunc != null && currentResults.userFunc > 3) {
+               if (!isEmpty(currentResults) && currentResults.userFunc !== null && currentResults.userFunc > 3) {
                    return true;
                }
                return false;
@@ -278,7 +284,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
        {
            node: 21,
            condition: function () {
-               if (currentResults != null && currentResults.forLoops != null && currentResults.forLoops > 2) {
+               if (!isEmpty(currentResults) && currentResults.forLoops !== null && currentResults.forLoops > 2) {
                    return true;
                }
                return false;
@@ -354,7 +360,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                              argsMatch = false;
                              break;
                          }
-                         else if (newEffects[i][p] != currentEffects[j][p]) {
+                         else if (newEffects[i][p] !== currentEffects[j][p]) {
                              argsMatch = false;
                          }
                      }
@@ -400,7 +406,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             node: 30,
             condition: function () {
               //high section similarity?
-              if(musicResults == null){
+              if(isEmpty(musicResults)){
                   return false;
               }
 
@@ -449,30 +455,34 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
 
               //first, is there a form goal?
 
-              if(caiProjectModel.getModel()['form'].length == 0){
+              if(caiProjectModel.getModel()['form'].length === 0){
                 return false;
               }
-              var projectformgoal = caiProjectModel.getModel()['form'][0];
+              var projectFormGoal = caiProjectModel.getModel()['form'][0];
               //what is the current form?
               var currentForm = ""
 
-              if(musicResults != null){
+              if(!isEmpty(musicResults)){
                 var sectionKeys = Object.keys(musicResults.SOUNDPROFILE);
                 for(var i in sectionKeys){
                   currentForm += sectionKeys[i][0];
                 }
 
-                if(projectformgoal.startsWith(currentForm) && projectformgoal != currentForm){
-                    var nextSection = projectformgoal.substring(currentForm.length, currentForm.length + 1);
+                if(projectFormGoal.startsWith(currentForm) && projectFormGoal !== currentForm){
+                    var nextSection = projectFormGoal.substring(currentForm.length, currentForm.length + 1);
                     if(!currentForm.includes(nextSection)){
                       return true;
                     }
                 }
-                else return false;
+                else {
+                  return false;
+                }
 
 
               }
-              else return false;
+              else {
+                return false;
+              }
 
             },
             yes:36,
@@ -485,12 +495,16 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
 
     ];
 
-    var currentLineDict;
+    var currentLineDict = {};
     var suggestionTypes = ["augmentation", "modification", "organization"];
     var currentSections;
-    var currentSounds;
-    var currentResults;
-    var currentDelta;
+    var currentSounds = [];
+    var currentResults = {};
+    var currentDelta = {};
+
+    function isEmpty(dict) {
+      return Object.keys(dict).length === 0;
+    }
 
     /**
     * Returns a random integer between min (inclusive) and max (inclusive).
@@ -507,7 +521,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
 
     function getSuggestionByID(suggID) {
         for (var i in CAI_RECOMMENDATIONS) {
-            if (CAI_RECOMMENDATIONS[i].id == suggID) {
+            if (CAI_RECOMMENDATIONS[i].id === suggID) {
                 var suggestion = Object.assign({}, CAI_RECOMMENDATIONS[i]);
                 return suggestion;
             }
@@ -563,8 +577,8 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             if (history[i].length > 1) {
                 if (Array.isArray(history[i][1])) {
                     for (var j in history[i][1]) {
-                        if (history[i][1][j][0] == "SUGGESTION") {
-                            if (history[i][1][j][1] == CAI_REC_DECISION_TREE[nodeIndex].suggestion) {
+                        if (history[i][1][j][0] === "SUGGESTION") {
+                            if (history[i][1][j][1] === CAI_REC_DECISION_TREE[nodeIndex].suggestion) {
                                 isNew = false;
                             }
                         }
@@ -594,9 +608,9 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             sugg = deltaSugg();
             //if cai already suggested this, return empty
             for (var i in history) {
-                if (history[i][0] ==34) {
+                if (history[i][0] === 34) {
                     var oldUtterance = history[i][1][0][1];
-                    if (sugg.id == oldUtterance) {
+                    if (sugg.id === oldUtterance) {
                         sugg.utterance = "";
                         return sugg;
                     }
@@ -638,7 +652,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
                       for (var j in history[i][1]) {
                           var oldUtterance = history[i][1][j][1];
 
-                          if (oldUtterance != null && oldUtterance == newNucleus.id) {
+                          if (oldUtterance !== null && oldUtterance === newNucleus.id) {
                               isAlreadySaid = true;
                           }
                       }
@@ -695,7 +709,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
         var totalScore = 0;
         var somethingChanged = false;
 
-        if (currentResults != null) {
+        if (!isEmpty(currentResults)) {
 
             if (currentResults["userFunc"] === "Args" || currentResults["userFunc"] === "Returns") {
                 currentResults["userFunc"] = 3;
@@ -712,13 +726,13 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             }
 
             for (var i in keys) {
-                if (results[keys[i]] != 0) {
+                if (results[keys[i]] !== 0) {
                     allZeros = false;
                 }
-                if (currentResults != null) {
+                if (!isEmpty(currentResults)) {
                     totalScore += currentResults[keys[i]];
                 }
-                if (results[keys[i]] != currentResults[keys[i]]) {
+                if (results[keys[i]] !== currentResults[keys[i]]) {
                     somethingChanged = true;
                 }
             }
@@ -727,7 +741,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             }
 
             var prevScore = 0;
-            if (currentResults != null) {
+            if (!isEmpty(currentResults)) {
                 for (var i in keys) {
 
                     prevScore += currentResults[keys[i]];
@@ -752,19 +766,27 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
 
 
         //do the music delta
-        if (currentResults != null && musicResults != null && musicResults.SOUNDPROFILE != null) {
+        if (!isEmpty(currentResults) && !isEmpty(musicResults)) {
+          if (!isEmpty(musicResults.SOUNDPROFILE)) {
             currentDelta.sections = Object.keys(musicResults.SOUNDPROFILE).length - currentSections;
+          }
         }
 
-        if (musicResults == null || musicResults.SOUNDPROFILE == null) {
+        if (isEmpty(musicResults)) {
             currentSections = 0;
             currentDelta.sections = 0;
         }
         else {
-            currentSections = Object.keys(musicResults.SOUNDPROFILE).length;
+            if (isEmpty(musicResults.SOUNDPROFILE)) {
+              currentSections = 0;
+              currentDelta.sections = 0;
+            }
+            else {
+              currentSections = Object.keys(musicResults.SOUNDPROFILE).length;
+            }
         }
 
-        if (Object.keys(currentResults).length == 0) {
+        if (Object.keys(currentResults).length === 0) {
             currentDelta.sections = 0;
         }
 
@@ -782,7 +804,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
         var soundsAdded = [];
         var soundsRemoved = [];
 
-        if (currentSounds != null) {
+        if (currentSounds.length > 0) {
             for (var i in newSounds) {
                 if (!currentSounds.includes(newSounds[i]) && !soundsAdded.includes(newSounds[i])) {
                     soundsAdded.push(newSounds[i]);
@@ -804,7 +826,7 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
 
 
         currentDeltaSum = 0;
-        if (currentResults != null) {
+        if (!isEmpty(currentResults)) {
             for (var i in currentDelta) {
                 if (typeof currentDelta[i] === 'number') {
                     currentDeltaSum += currentDelta[i];
@@ -823,17 +845,19 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'cai
             noDeltaCount = 0;
         }
 
-        if (currentResults == null || validChange) {
+        if (!isEmpty(currentResults) || validChange) {
             currentResults = results;
             currentLineDict = CAI_DICT;
         }
 
 
-        if (currentResults["userFunc"] === "Args" || currentResults["userFunc"] === "Returns") {
-            currentResults["userFunc"] = 3;
-        }
-        else if (currentResults["userFunc"] === "ReturnAndArgs") {
-            currentResults["userFunc"] = 4;
+        if (!isEmpty(currentResults)) {
+          if (currentResults["userFunc"] === "Args" || currentResults["userFunc"] === "Returns") {
+              currentResults["userFunc"] = 3;
+          }
+          else if (currentResults["userFunc"] === "ReturnAndArgs") {
+              currentResults["userFunc"] = 4;
+          }
         }
 
     }
