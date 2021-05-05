@@ -200,7 +200,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
                 if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
                     var s = keyInstrumentDict[maxRec];
                     if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
-                        if (!previousRecommendations.includes(maxRec) && Object.keys(keyGenreDict).includes(maxRec)) {
+                        if (!previousRecommendations.includes(maxRec)) {
                             recommendedSounds.push(maxRec);
                             i += 1;
                         }
