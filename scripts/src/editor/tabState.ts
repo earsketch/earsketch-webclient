@@ -161,7 +161,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
             editSession = restoredSession;
         } else {
             editSession = new ace.EditSession(script.source_code);
-            editSession.setMode(language);
+            editSession.setMode(`ace/mode/${language}`);
             setEditorSession(scriptID, editSession);
         }
         editor.setSession(editSession);
