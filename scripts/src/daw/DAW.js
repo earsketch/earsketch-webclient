@@ -607,7 +607,7 @@ const prepareWaveforms = (tracks, tempo) => {
     }
 }
 
-let reset = true
+let lastTab = null
 // TODO: Temporary hack:
 let _setPlayPosition
 
@@ -619,12 +619,6 @@ const setup = ($ngRedux) => {
     setupDone = true
 
     const $scope = helpers.getNgController('ideController').scope()
-    // TODO: remember which tab we came from, so if the user switches back and forth without re-running, we don't forget everything.
-    $ngRedux.connect(state => ({ activeTabID: state.tabs.activeTabID }))(activeTabID => {
-        reset = true
-        // Set a dirty flag for next run.
-        // Don't need this to change anything yet, so it's outside of the store.
-    })
 
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
@@ -676,7 +670,8 @@ const setup = ($ngRedux) => {
         // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
         dispatch(daw.setTracks(tracks))
 
-        if (reset) {
+        if (lastTab !== state.tabs.activeTabID) {
+            // User switched tabs since the last run.
             dispatch(daw.setMetronome(false))
             dispatch(daw.setShowEffects(true))
             dispatch(daw.setPlaying(false))
@@ -684,19 +679,14 @@ const setup = ($ngRedux) => {
             dispatch(daw.shuffleTrackColors())
             dispatch(daw.setSoloMute({}))
             dispatch(daw.setBypass({}))
+            // Set zoom based on play length.
+            dispatch(daw.setTrackWidth(64000 / playLength))
+            lastTab = state.tabs.activeTabID
         }
-
-        // Reset the dirty flag.
-        reset = false
 
         player.setRenderingData(result)
         player.setMutedTracks(daw.selectMuted(state))
         player.setBypassedEffects(daw.selectBypass(state))
-
-        if (_result === null) {
-            // First run only: set zoom based on play length.
-            dispatch(daw.setTrackWidth(64000 / playLength))
-        }
 
         // sanity checks
         const newLoop = Object.assign({}, state.daw.loop)
