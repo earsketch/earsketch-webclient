@@ -612,15 +612,15 @@ let reset = true
 let _setPlayPosition
 
 let setupDone = false
-const setup = (dispatch, getState) => {
+const setup = ($ngRedux) => {
+    const { dispatch, getState } = $ngRedux;
+
     if (setupDone) return
     setupDone = true
 
     const $scope = helpers.getNgController('ideController').scope()
     // TODO: remember which tab we came from, so if the user switches back and forth without re-running, we don't forget everything.
-    // Holding off for the moment because tabs are getting moved to React/Redux.
-    $scope.$on('swapTab', function () {
-        console.log("TODO: swapTab")
+    $ngRedux.connect(state => ({ activeTabID: state.tabs.activeTabID }))(activeTabID => {
         reset = true
         // Set a dirty flag for next run.
         // Don't need this to change anything yet, so it's outside of the store.
@@ -1050,7 +1050,7 @@ const HotDAW = hot(props => {
     applyEffects = props.applyEffects
     player = props.player
     $rootScope = props.$rootScope
-    setup(props.$ngRedux.dispatch, props.$ngRedux.getState)
+    setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
             <DAW />
