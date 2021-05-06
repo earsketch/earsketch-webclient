@@ -25,16 +25,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.fontSizNum = 14;
     $scope.compiled = null;
 
-    $scope.activeTab = 0;
+    // Tracks the selected tab data (script). Note that it might not be most up to date (modified / unsaved).
     $scope.activeScript = null;
     /**
      * Flag to prevent successive compilation / script save request
      * @type {boolean}
      */
     $scope.isWaitingForServerResponse = false;
-    $scope.$on('scriptSaveResponseRecieved', function(){
-        $scope.isWaitingForServerResponse = false;
-    });
 
     // for report error
     $scope.userName = '';
@@ -45,9 +42,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
     //TODO AVN - quick hack, but it might also be the cleanest way to fix the shared script issue rather than
     //moving openShare() to tabController
-    $scope.sharedScripts = userProject.sharedScripts; 
+    $scope.sharedScripts = userProject.sharedScripts;
 
-    //The editor object is passed to the tabController via scope inheritance
     $scope.editor = {}; // need to pass object to the editor directive for two-way binding
 
     $scope.loaded = true; // shows spinning icon when false
@@ -142,7 +138,22 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 sender: 'editor|cli'
             },
             exec: function () {
-                $scope.$broadcast('updateTabFromEditorSave');
+                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+
+                // TODO: Potentially could use $scope.activeScript instead.
+                let script = null;
+                if (activeTabID in userProject.scripts) {
+                    script = userProject.scripts[activeTabID];
+                } else if (activeTabID in userProject.sharedScripts) {
+                    script = userProject.sharedScripts[activeTabID];
+                }
+
+                if (!script?.saved) {
+                    $ngRedux.dispatch(tabs.saveScriptIfModified(activeTabID));
+                } else if (script?.collaborative) {
+                    collaboration.saveScript();
+                }
+                activeTabID && $ngRedux.dispatch(tabs.removeModifiedScript(activeTabID));
             }
         });
 
@@ -190,10 +201,15 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
-        $rootScope.$broadcast("swapTabAfterIDEinit");
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+
         const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
         $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
         colorTheme.load();
+
+        // Used in CAI
+        $rootScope.$broadcast("swapTabAfterIDEinit");
     };
 
     
@@ -334,10 +350,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         userProject.openSharedScriptForEdit(scriptID);
     };
 
-
-    $scope.selectSharedScript = function(sharedScript){
-        $scope.$broadcast('selectSharedScript', sharedScript);
-    }
+    $scope.selectSharedScript = function (sharedScript) {
+        userProject.openSharedScript(sharedScript.shareid);
+    };
 
     /**
      * Prompts the user for a name and language, then calls the userProject
@@ -375,7 +390,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         });
     };
 
-    //note - select script is used via inheritance in tabController
     /**
      * @name selectScript
      * @function
@@ -391,14 +405,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             // refresh tab state to keep $scope.tabs up-to-date before we call getTabId
             $scope.$broadcast('selectScript', script.shareid);
         }
-    };
-
-    $scope.importScript = function (script) {
-        $scope.$broadcast('importScript', script);
-    };
-
-    $scope.copyScript = function(script){
-        $scope.$broadcast('copyScript', script);
     };
 
     /**
@@ -463,13 +469,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         var fake_script = {
             'name': scriptName + ext,
             'source_code': key,
-            'shareid': ESUtils.randomString(22)
+            'shareid': ESUtils.randomString(22),
+            'readonly': true
         };
 
         // force a digest cycle because the click is registered by jQuery, and
         // does not trigger Angular digest.
         $scope.$apply(function () {
-            $scope.$broadcast('openCurriculumCode', fake_script);
+            $ngRedux.dispatch(scripts.addReadOnlyScript(Object.assign({}, fake_script)));
             $scope.editor.ace.focus();
             $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
@@ -541,7 +548,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             userNotification.showBanner(ESMessages.interpreter.runSuccess, 'success');
 
-            $scope.$broadcast('saveCollaborativeScriptAttempt');
+            $scope.saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL);
 
             // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
             $timeout(function () {
@@ -604,7 +611,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             userNotification.showBanner(ESMessages.interpreter.runFailed, 'failure1');
 
-            $scope.$broadcast('saveCollaborativeScriptFailure');
+            $scope.saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL);
 
             // auto-opens the user console if there is an error and if the console is currently closed
             $rootScope.$broadcast('openConsoleOnCodeCompileError');
@@ -613,6 +620,32 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 collaboration.sendCompilationRecord(errType);
             }
         });
+    };
+
+    $scope.saveActiveScriptWithRunStatus = status => {
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        let script = null;
+
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        if (script?.collaborative) {
+            script && collaboration.saveScript(script.shareid);
+            $scope.isWaitingForServerResponse = false;
+        } else if (script && !script.readonly && !script.isShared && !script.saved) {
+            // save the script on a successful run
+            userProject.saveScript(script.name, script.source_code, true, status).then(function () {
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $scope.isWaitingForServerResponse = false;
+            }).catch(function (err) {
+                userNotification.show(ESMessages.idecontroller.savefailed, 'failure1');
+                $scope.isWaitingForServerResponse = false;
+            });
+        } else {
+            $scope.isWaitingForServerResponse = false;
+        }
     };
 
     /**

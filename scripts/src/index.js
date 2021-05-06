@@ -101,7 +101,6 @@ require(['angular'], () => {
     require('audioLibrary');
     require('websocket');
     require('collaboration');
-    require('tabs');
     require('colorTheme');
     require('layout');
     require('timesync');
@@ -126,7 +125,6 @@ require(['angular'], () => {
     require('mainController');
     require('ideController');
     require('layoutController');
-    require('tabController');
     require('notificationUI');
     require('editorDirective');
     require('promptController');

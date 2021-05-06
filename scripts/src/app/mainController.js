@@ -8,7 +8,6 @@ import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
-import * as helpers from '../helpers';
 
 /**
  * @module mainController
@@ -16,6 +15,11 @@ import * as helpers from '../helpers';
 app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, timesync, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
+    });
+
+    $scope.numTabs = 0;
+    $ngRedux.connect(state => ({ openTabs: state.tabs.openTabs }))(tabs => {
+        $scope.numTabs = tabs.openTabs.length;
     });
 
     $ngRedux.dispatch(sounds.getDefaultSounds());
@@ -75,6 +79,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     $scope.isEmbedded = $location.search()["embedded"] === "true";
     $scope.hideDAW = $scope.isEmbedded && $location.search()['hideDaw'];
     $scope.hideEditor = $scope.isEmbedded && $location.search()['hideCode'];
+    $scope.embeddedScriptUsername = "";
     $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
@@ -117,8 +122,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(appState.setEmbeddedScriptName(data.scriptName));
         $ngRedux.dispatch(appState.setEmbeddedShareID(data.shareid));
     });
-
-    $scope.activeTabID = null;
 
     /**
      * get trusted HTML content for Popover
@@ -388,7 +391,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                         }
 
                         $scope.loggedInUserName = $scope.username;
-                        $rootScope.$broadcast('scriptsLoaded');
+
+                        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+                        activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+
+                        // Used in CAI
                         $rootScope.$broadcast('swapTabAfterIDEinit');
                     }
 
@@ -437,8 +444,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $scope.notificationList = [];
             reporter.logout();
 
-            // Note: Temporary scripts like read-only curriculum code may linger in tabController variables.
-            helpers.getNgController('tabController').scope().tabs = [];
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(scripts.resetReadOnlyScripts());
             $ngRedux.dispatch(tabs.resetTabs());
@@ -532,9 +537,18 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         const theme = colorTheme.load();
         $ngRedux.dispatch(appState.setColorTheme(theme));
         $ngRedux.dispatch(scripts.syncToNgUserProject());
+                                  
 
-        // Show bubble tutorial when not opening a share link.
-        if (!$location.search()['sharing']) {
+        const openTabs = tabs.selectOpenTabs($ngRedux.getState());
+        const allScripts = scripts.selectAllScriptEntities($ngRedux.getState());
+        openTabs.forEach(scriptID => {
+            if (!allScripts.hasOwnProperty(scriptID)) {
+                $ngRedux.dispatch(tabs.closeAndSwitchTab(scriptID));
+            }
+        });
+
+        // Show bubble tutorial when not opening a share link or in a CAI study mode.
+        if (!$location.search()['sharing'] && !FLAGS.SHOW_CAI) {
             $ngRedux.dispatch(bubble.resume());
         }
     }
@@ -928,8 +942,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.deleteScript = script => {
-        const tabScope = helpers.getNgController('tabController').scope();
-
         $confirm({
             text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
             ok: "Delete"
@@ -944,13 +956,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
             $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
-            tabScope.tabs = tabScope.getOpenTabEntities();
         });
     };
 
     $scope.deleteSharedScript = script => {
-        const tabScope = helpers.getNgController('tabController').scope();
-
         if (script.collaborative) {
             $confirm({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(() => {
                 if (script.shareid === collaboration.scriptID && collaboration.active) {
@@ -964,7 +973,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                 $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
                 // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
                 collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
-                tabScope.tabs = tabScope.getOpenTabEntities();
             })
         } else {
             $confirm({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
@@ -972,7 +980,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
                     $ngRedux.dispatch(scripts.syncToNgUserProject());
                     $ngRedux.dispatch(tabs.closeDeletedScript(script.shareid));
                     $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
-                    tabScope.tabs = tabScope.getOpenTabEntities();
                 });
             });
         }
@@ -994,6 +1001,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
     };
 
     $scope.importScript = async script => {
+        if (!script) {
+            script = tabs.selectActiveTabScript($ngRedux.getState());
+        }
+
         const imported = await userProject.importScript(Object.assign({},script));
         await userProject.refreshCodeBrowser();
         $ngRedux.dispatch(scripts.syncToNgUserProject());
@@ -1016,13 +1027,20 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             angular.element('curriculum').hide();
             angular.element('div[caiwindow]').show();
             document.getElementById('caiButton').classList.remove('flashNavButton');
+            $rootScope.$broadcast('switchToCAI');
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
-            document.getElementById('caiButton').classList.add('flashNavButton');
         }
-        // $scope.$apply();
     };
+
+    // If in CAI study mode, switch to active CAI view.
+    if (FLAGS.SHOW_CAI) {
+        $ngRedux.dispatch(layout.setEast({ open: true }));
+        Layout.resetHorizontalSplits();
+        angular.element('curriculum').hide();
+        angular.element('div[caiwindow]').show();
+    }
 
     // Note: Used in api_doc.js links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
@@ -1039,6 +1057,19 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     };
 
+    $scope.closeAllTabs = () => {
+        $confirm({text: ESMessages.idecontroller.closealltabs, ok: "Close All"}).then(() => {
+            const promises = userProject.saveAll();
+            $q.all(promises).then(() => {
+                userNotification.show(ESMessages.user.allscriptscloud);
+                $ngRedux.dispatch(tabs.closeAllTabs());
+            }).catch(() => userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1'));
+
+            $scope.$applyAsync();
+        });
+    };
+
+    // TODO: Remove this.
     $scope.$on('createScript', () => {
         $ngRedux.dispatch(scripts.syncToNgUserProject());
     });
@@ -1064,12 +1095,30 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         }
     });
 
+    $scope.$on('reloadRecommendations', () => {
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+
+        // Get the modified / unsaved script.
+        let script = null;
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        script && $rootScope.$broadcast('recommenderScript', script);
+    });
+
     $scope.$on('language', (event, language) => {
         $ngRedux.dispatch(appState.setScriptLanguage(language));
     })
 
     $scope.$on('fontSizeChanged', (event, val) => $ngRedux.dispatch(appState.setFontSize(val)))
 
+    $scope.$on('newCAIMessage', () => {
+        if (FLAGS.SHOW_CAI && !$scope.showCAIWindow) {
+            document.getElementById('caiButton').classList.add('flashNavButton');
+        }
+    });
     // for Chrome 66+ web-audio restriction
     // see: https://bugs.chromium.org/p/chromium/issues/detail?id=807017
     function resumeAudioContext() {

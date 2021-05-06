@@ -17,6 +17,7 @@ app.directive('caiwindow', [function () {
             $scope.beginningInputOptions = [{ label: "Chat with CAI", value: "begin" }];
             $scope.inputOptions = $scope.beginningInputOptions.slice();
             $scope.dropupLabel = "Dropup";
+            $scope.errorOptions = [];
 
             $scope.messageStyles = {
                 sender: {
@@ -54,6 +55,7 @@ app.directive('caiwindow', [function () {
                 var msgText = caiDialogue.generateOutput("Chat with CAI");
                 caiDialogue.studentInteract(false);
                 $scope.inputOptions = caiDialogue.createButtons();
+                $scope.errorOptions = [];
 
                 $scope.inputTextCAI.label = '';
                 $scope.inputTextCAI.value = '';
@@ -71,11 +73,10 @@ app.directive('caiwindow', [function () {
                         if (messages[msg] === "OK, I'll wait.")
                             startPeriodicCheck();
 
-                        $scope.messageListCAI[$scope.activeProject].push(message);
-                        $scope.$applyAsync();
+                        addToCAIMessageList(message);
                     }
                 }
-            }  
+            }
 
             $scope.setActiveProject = function (activeProject) {
                 if (activeProject === null || activeProject === undefined) {
@@ -85,6 +86,7 @@ app.directive('caiwindow', [function () {
                     $scope.inputTextCAI = { label: '', value: '' };
                     $scope.inputOptions = [];
                     $scope.dropupLabel = "Dropup";
+                    $scope.errorOptions = [];
                 }
                 else {
                     $scope.activeProject = activeProject;
@@ -105,10 +107,10 @@ app.directive('caiwindow', [function () {
                 const ideScope = helpers.getNgController('ideController').scope();
 
                 if (ideScope.activeScript) {
-                    $scope.setActiveProject(ideScope.activeScript.name);       
+                    $scope.setActiveProject(ideScope.activeScript.name);
                 }
             };
- 
+
             $ngRedux.connect(state => ({ ...state.tabs }))(state => {
                 if (!state.activeTabID) {
                     $scope.setActiveProject(null);
@@ -116,11 +118,11 @@ app.directive('caiwindow', [function () {
                 else {
                     $scope.checkForActiveProject();
                 }
-            });  
+            });
 
             $scope.$on('swapTabAfterIDEinit', function (evt) {
-                $scope.checkForActiveProject();          
-            });  
+                $scope.checkForActiveProject();
+            });
 
 
             $scope.periodicCheckOn = false;
@@ -158,7 +160,7 @@ app.directive('caiwindow', [function () {
                 $scope.inputTextCAI = Object.assign({}, input);
                 return $scope.sendCAIMessage();
             }
-            
+
 
             $scope.$on('compileCAI', function (evt, data) {
 
@@ -178,12 +180,11 @@ app.directive('caiwindow', [function () {
                 caiStudentHistoryModule.addScoreToAggregate(code, language);
                 setTimeout(() => {
                     var output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results);
-                    if (output != null && output != "") {
-
+                    if (output != null && output[0][0] != "") {
                         var message = sendCAIOutputMessage(output);
-                        $scope.messageListCAI[$scope.activeProject].push(message);
-                        $scope.$applyAsync();
+                        addToCAIMessageList(message);
                         $scope.inputOptions = caiDialogue.createButtons();
+                        $scope.errorOptions = [];
                         if ($scope.inputOptions.length === 0) {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
@@ -196,7 +197,7 @@ app.directive('caiwindow', [function () {
                     autoScrollCAI();
                     $scope.dropupLabel = caiDialogue.getDropup();
                 }, 0);
-                
+
                 var t = Date.now();
                 caiStudentPreferenceModule.addCompileTS(t);
             });
@@ -207,18 +208,18 @@ app.directive('caiwindow', [function () {
                 if (errorReturn != "") {
                     setTimeout(() => {
                         //var message = sendCAIOutputMessage(errorReturn);
-                        //$scope.messageListCAI[$scope.activeProject].push(message);
-                       // $scope.$applyAsync();
+                        // addToCAIMessageList(message);
                         $scope.inputOptions = caiDialogue.createButtons();
                         if ($scope.inputOptions.length === 0) {
                             // With no options available to user, default to tree selection.
                             $scope.inputOptions = $scope.defaultInputOptions.slice();
                         }
-                        if ($scope.inputOptions != null) {
-                            $scope.inputOptions.push({ label: "do you know anything about this error i'm getting", value: "error" });
-                        }
+                        $scope.errorOptions = [{ label: "do you know anything about this error i'm getting", value: "error" }];
                         autoScrollCAI();
                     }, 0);
+                }
+                else {
+                    $scope.errorOptions = [];
                 }
             });
 
@@ -240,10 +241,14 @@ app.directive('caiwindow', [function () {
                     codeSuggestion.generateResults(text, lang);
                     caiDialogue.setCodeObj($scope.editor.ace.session.doc.$lines.join("\n"));
 
-                    $scope.messageListCAI[$scope.activeProject].push(message);
-                    $scope.$applyAsync();
+                    addToCAIMessageList(message);
 
                     var msgText = caiDialogue.generateOutput($scope.inputTextCAI.value);
+
+                    if ($scope.inputTextCAI.value === 'error') {
+                        $scope.errorOptions = [];
+                    }
+
                     if (msgText.includes("[ERRORFIX")) {
 
                         var errorS = msgText.substring(msgText.indexOf("[ERRORFIX") + 10, msgText.lastIndexOf("|"));
@@ -288,8 +293,7 @@ app.directive('caiwindow', [function () {
                                     if (messages[msg] === "OK, I'll wait.")
                                         startPeriodicCheck();
 
-                                    $scope.messageListCAI[$scope.activeProject].push(message);
-                                    $scope.$applyAsync();
+                                    addToCAIMessageList(message);
                                 }
                             }
                         }
@@ -313,16 +317,14 @@ app.directive('caiwindow', [function () {
             // TODO: update following so message stops if user is completely off the page
             function onPeriodicCheck() {
                 var pageStatus = caiStudentPreferenceModule.returnPageStatus();
-                secondsOffPage = 0;
-                if (pageStatus==0) {
-                    secondsOffPage = Date.now()/1000 - pageStatus[1]/1000;
-                }
+                // secondsOffPage = 0;
+                // if (pageStatus==0) {
+                //     secondsOffPage = Date.now()/1000 - pageStatus[1]/1000;
+                // }
                 // console.log(pageStatus, secondsOffPage, Date.now()/1000);
                 // var message = sendCAIOutputMessage("Looking at your code updates...");
                 if ($scope.messageListCAI[$scope.activeProject]) {
-                    // $scope.messageListCAI[$scope.activeProject].push(message);
-                    // autoScrollCAI();
-                    // $scope.$applyAsync();
+                    // addToCAIMessageList(message);
 
                     $scope.periodicCheckOn = false;
                     startPeriodicCheck();
@@ -376,6 +378,13 @@ app.directive('caiwindow', [function () {
 
             }
 
+            function addToCAIMessageList(message) {
+                    $scope.messageListCAI[$scope.activeProject].push(message);
+                    $rootScope.$broadcast('newCAIMessage');
+                    autoScrollCAI();
+                    $scope.$applyAsync();
+            }
+
             /**
              * Checks if the sender is the logged in user.
              * @param message
@@ -390,7 +399,7 @@ app.directive('caiwindow', [function () {
             };
 
             $scope.openCurr = function(message,loc) {
-                layoutScope.loadCurriculumChapter(message.keyword[loc][1]); 
+                layoutScope.loadCurriculumChapter(message.keyword[loc][1]);
                 layoutScope.toggleLayout('curriculum')
             }
 
@@ -433,6 +442,10 @@ app.directive('caiwindow', [function () {
 
             $ngRedux.connect(state => ({ ...state.curriculum.currentLocation }))(currentLocation => {
                 caiDialogue.addCurriculumPageToHistory(currentLocation);
+            });
+
+            $scope.$on('switchToCAI', function () {
+                autoScrollCAI();
             });
 
 

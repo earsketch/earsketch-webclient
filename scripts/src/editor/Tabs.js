@@ -34,7 +34,6 @@ const CreateScriptButton = () => {
 const Tab = ({ scriptID, scriptName, index }) => {
     const dispatch = useDispatch();
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID);
-    const ngTabControllerScope = helpers.getNgController('tabController').scope();
     const [highlight, setHighlight] = useState(false);
 
     const allScripts = useSelector(scripts.selectAllScriptEntities);
@@ -74,7 +73,6 @@ const Tab = ({ scriptID, scriptName, index }) => {
             onClick={() => {
                 if (activeTabID !== scriptID) {
                     dispatch(tabs.setActiveTabAndEditor(scriptID));
-                    ngTabControllerScope.activeTabID = scriptID;
                 }
             }}
             onMouseEnter={() => setHighlight(true)}
@@ -95,7 +93,6 @@ const Tab = ({ scriptID, scriptName, index }) => {
                     className={closeButtonClass}
                     onClick={(event) => {
                         dispatch(tabs.closeAndSwitchTab(scriptID));
-                        ngTabControllerScope.closeTab(index, event);
 
                         const userProject = helpers.getNgService('userProject');
                         userProject.closeScript(scriptID);
@@ -114,7 +111,7 @@ const Tab = ({ scriptID, scriptName, index }) => {
 };
 
 const CloseAllTab = () => {
-    const ngTabControllerScope = helpers.getNgController('tabController').scope();
+    const mainControllerScope = helpers.getNgMainController().scope();
 
     return (
         <div
@@ -125,7 +122,7 @@ const CloseAllTab = () => {
             `}
             onClick={() => {
                 // Dispatch needs to be inside $confirm.
-                ngTabControllerScope.closeAllTabs();
+                mainControllerScope.closeAllTabs();
             }}
         >
             Close All
