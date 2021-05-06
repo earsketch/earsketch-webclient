@@ -1058,4 +1058,4 @@ const HotDAW = hot(props => {
     );
 });
 
-app.component('reactdaw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player', '$rootScope']))
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player', '$rootScope']))
