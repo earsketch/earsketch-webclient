@@ -67,12 +67,11 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
       Our main source directory.
       Contains a variety of controllers, including:
-      - `dawController.js`
       - `ideController.js`
 
       And many others. If you're looking at some big, visible piece of client functionality and you're wondering where it lives, the answer is probably `webclient/scripts/src/app`.
 
-      More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js` uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
+      More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js`(deprecated/removed) uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
 
 ## Notes and Maintenance TODOs
 
