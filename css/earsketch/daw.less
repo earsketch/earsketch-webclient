@@ -3,8 +3,8 @@
 @timeline-height: 15px;
 @measureline-height: 15px;
 @control-height: 30px;
-@vert-zoom-offset: 15px;
-@horz-zoom-offset: 15px;
+@vert-zoom-offset: 14px;
+@horz-zoom-offset: 14px;
 @border-width:1px;
 
 #daw-label {
@@ -14,7 +14,6 @@
 #daw-container {
   position: relative;
   width: 100%;
-  overflow: auto;
   border-left: @border-width solid @med-bg;
   border-top: @border-width solid @med-bg;
 }
@@ -57,7 +56,7 @@
   height: 100%;
   z-index: 0;
 }
-.daw-track.muted {
+.daw-track.mute {
   background: #696969;
   opacity: 0.2;
 }
@@ -120,43 +119,28 @@
   cursor: pointer;
 }
 
-/* Firefox slider styles */
-#dawVolumeSlider::-moz-range-track {
-  width: 80px;
-  border-radius: @border-radius-small;
-  height: 14px;
-  vertical-align:middle;
-  margin-top:12px;
-  background-color: #fff;
-}
 #dawVolumeSlider::-moz-range-thumb {
   border: none;
-  background: rgb(66, 139, 202);
-  width: 12px;
-  height: 34px;
-  border-radius: @border-radius-small;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
   cursor: pointer;
 }
 /* IE slider styles */
 #dawVolumeSlider::-ms-fill-upper, #dawVolumeSlider::-ms-fill-lower {
   background:transparent;
 }
-#dawVolumeSlider::-ms-track {
-  width: 80px;
-  border-radius: @border-radius-small;
-  height: 14px;
-  vertical-align:middle;
-  margin-top:12px;
-  background-color: #fff;
-}
+
 #dawVolumeSlider::-ms-thumb {
   border: none;
-  background: rgb(66, 139, 202);
-  width: 12px;
-  height: 34px;
-  border-radius: @border-radius-small;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
   cursor: pointer;
 }
+
 .volumeLabel {
   color: @light-font;
   line-height: 30px;
@@ -398,26 +382,16 @@ svg.effectSvg path {
   float: right;
 }
 
-.btn-play {
-  color:@gen-play !important;
-}
-
-.btn-play:hover, .play-run:active, .play-run:focus{
-  opacity: 0.7;
-}
-
 .btn-effect{
   position:absolute;
   height:@control-height;
   z-index: 34;
   width: 100px;
   border-radius: 0;
-  background: @selected-bg;
-  color: @tab-text;
 }
 
 .btn-effect > span {
-  letter-spacing : 2px;
+  letter-spacing : 1px;
 }
 
 .btn-effect span:nth-child(1) {
@@ -526,20 +500,11 @@ svg.effectSvg path {
 /* Zoom Sliders */
 
 #horz-zoom-slider-container {
-  position: relative;
-  padding-left: 16px;
-  display: flex;
   outline: none;
-  overflow: hidden;
   height: @horz-zoom-offset;
   min-height: @horz-zoom-offset;
-  top: 0;
-
-  -moz-animation: fadeout 25s linear forwards;
-  -ms-animation: fadeout 25s linear forwards;
-  -o-animation: fadeout 25s linear forwards;
-  -webkit-animation: fadeout 25s linear forwards;
-  animation: fadeout 25s linear forwards;
+  bottom: 0;
+  right: 0;
 }
 
 #horz-zoom-slider-container:hover {
@@ -555,23 +520,6 @@ svg.effectSvg path {
 #horz-zoom-slider-container > span {
   color: grey;
 }
-
-.zoom-out, .zoom-in {
-  position: absolute;
-}
-
-#horz-zoom-slider-container .zoom-out {
-  font-size: 38px;
-  left: 20px;
-  bottom: -18px;
-}
-
-#horz-zoom-slider-container .zoom-in {
-  right: 3px;
-  font-size: 22px;
-  bottom: -8px;
-}
-
 
 #horz-zoom-slider-container .rzslider {
   margin: 0px;
@@ -611,23 +559,8 @@ svg.effectSvg path {
 
 #vert-zoom-slider-container {
   width: @vert-zoom-offset;
-  top: @vert-zoom-offset + @control-height;
-
-  -moz-animation: fadeout 8s linear forwards;
-  -ms-animation: fadeout 8s linear forwards;
-  -o-animation: fadeout 8s linear forwards;
-  -webkit-animation: fadeout 8s linear forwards;
-  animation: fadeout 8s linear forwards;
-}
-
-#vert-zoom-slider-container:hover {
-  opacity: 1;
-
-  -moz-animation: fadein 1s linear forwards;
-  -ms-animation: fadein 1s linear forwards;
-  -o-animation: fadein 1s linear forwards;
-  -webkit-animation: fadein 1s linear forwards;
-  animation: fadein 1s linear forwards;
+  right: 0;
+  bottom: 0;
 }
 
 @-webkit-keyframes fadein {
@@ -644,23 +577,6 @@ svg.effectSvg path {
 
 @keyframes fadeout {
   0% { opacity: 1; }
-}
-
-#vert-zoom-slider-container > span {
-  color: grey;
-  position: absolute;
-}
-
-#vert-zoom-slider-container .zoom-out {
-  font-size: 38px;
-  left: 2px;
-  top: -8px;
-}
-
-#vert-zoom-slider-container .zoom-in {
-  left: 2px;
-  font-size: 22px;
-  bottom: -6px;
 }
 
 #vert-zoom-slider-container .rzslider {

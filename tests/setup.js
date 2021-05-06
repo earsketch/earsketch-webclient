@@ -254,7 +254,6 @@ require('layoutController');
 require('notificationUI');
 require('editorDirective');
 require('promptController');
-require('dawController');
 require('uploadController');
 require('recorderController');
 require('createScriptController');

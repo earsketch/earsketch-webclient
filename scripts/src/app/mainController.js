@@ -107,9 +107,20 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
         $ngRedux.dispatch(scripts.syncToNgUserProject());
     }
 
+    if ($scope.hideDAW) {
+        $ngRedux.dispatch(appState.setHideDAW(true));
+    }
+
+    if ($scope.hideEditor) {
+        $ngRedux.dispatch(appState.setHideEditor(true));
+    }
+
     $scope.$on('embeddedScriptLoaded', function(event, data){
         $scope.embeddedScriptUsername = data.username;
         $scope.embeddedScriptName = data.scriptName;
+        $ngRedux.dispatch(appState.setEmbeddedScriptUsername(data.username));
+        $ngRedux.dispatch(appState.setEmbeddedScriptName(data.scriptName));
+        $ngRedux.dispatch(appState.setEmbeddedShareID(data.shareid));
     });
 
     /**

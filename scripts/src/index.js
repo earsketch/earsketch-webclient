@@ -128,7 +128,6 @@ require(['angular'], () => {
     require('notificationUI');
     require('editorDirective');
     require('promptController');
-    require('dawController');
     require('uploadController');
     require('recorderController');
     require('createScriptController');
@@ -156,6 +155,7 @@ require(['angular'], () => {
     require('./browser/Scripts');
     require('./browser/Curriculum');
     require('./browser/ScriptsMenus');
+    require('./daw/DAW');
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');

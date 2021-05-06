@@ -100,7 +100,7 @@ app.factory('player', ['audioContext', 'applyEffects', 'ESUtils', 'esconsole', '
             if (mutedTracks.indexOf(t) > -1) { continue; }
 
             // get the list of bypassed effects for this track
-            var trackBypass = bypassedEffects[t];
+            var trackBypass = bypassedEffects[t] ?? [];
             esconsole('Bypassing effects: ' + JSON.stringify(trackBypass), ['DEBUG','PLAYER']);
 
             // construct the effect graph
@@ -448,10 +448,10 @@ app.factory('player', ['audioContext', 'applyEffects', 'ESUtils', 'esconsole', '
      * @param {float} gain The volume to play at in decibels.
      */
 
-    function setVolume(result, gain) {
+    function setVolume(gain) {
         esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER']);
-        if (result.master !== undefined) {
-            result.master.gain.setValueAtTime(applyEffects.dbToFloat(gain), context.currentTime);
+        if (context.master !== undefined) {
+            context.master.gain.setValueAtTime(applyEffects.dbToFloat(gain), context.currentTime);
         }
     }
 
@@ -603,35 +603,16 @@ app.factory('player', ['audioContext', 'applyEffects', 'ESUtils', 'esconsole', '
         };
     }
 
-    function setMutedTracks(tracks) {
-        mutedTracks = [];
-
-        for (var i = 0; i < tracks.length; i++) {
-            if (tracks[i].mute) {
-                mutedTracks.push(i);
-            }
-        }
+    function setMutedTracks(_mutedTracks) {
+        mutedTracks = _mutedTracks;
 
         if (isPlaying) {
             timedRefresh(true);
         }
     }
 
-    function setBypassedEffects(tracks) {
-        bypassedEffects = [];
-
-        for (var i = 0; i < tracks.length; i++) {
-            var trackBypass = [];
-            for (var key in tracks[i].effects) {
-                if (tracks[i].effects.hasOwnProperty(key)) {
-                    var effect = tracks[i].effects[key];
-                    if (effect.bypass) {
-                        trackBypass.push(key);
-                    }
-                }
-            }
-            bypassedEffects.push(trackBypass);
-        }
+    function setBypassedEffects(_bypassedEffects) {
+        bypassedEffects = _bypassedEffects;
 
         if (isPlaying) {
             timedRefresh(true);
