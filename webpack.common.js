@@ -192,6 +192,18 @@ module.exports = {
                 }
             }],
         }, {
+            // TODO: Do this instead when we switch to Webpack 5
+            // test: /\.(woff|woff2|eot|ttf|otf)$/i,
+            // type: 'asset/resource',
+            test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+            use: [{
+                loader: 'file-loader',
+                options: {
+                  name: '[hash]-[name].[ext]',
+                  outputPath: 'fonts/'
+                }
+              }],
+        }, {
             test: path.resolve(__dirname,'scripts/src/setup.js'),
             loader: 'exports-loader',
             options: {
