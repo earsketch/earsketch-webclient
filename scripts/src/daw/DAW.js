@@ -681,6 +681,7 @@ const setup = ($ngRedux) => {
             dispatch(daw.setBypass({}))
             // Set zoom based on play length.
             dispatch(daw.setTrackWidth(64000 / playLength))
+            dispatch(daw.setTrackHeight(45))
             lastTab = state.tabs.activeTabID
         }
 
@@ -944,6 +945,22 @@ const DAW = () => {
             xScrollEl.current.scrollLeft = fracX * (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
         }
     }
+
+    // HACK: Prevent xScroll and yScroll from getting desync'd after some updates.
+    // TODO: We should remove this when we come back to make scroll/zoom enhancements.
+    useEffect(() => {
+        if (!el.current) return
+        if (yScrollEl.current) {
+            const fracY = yScrollEl.current.scrollTop / (yScrollEl.current.scrollHeight - yScrollEl.current.clientHeight)
+            el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)                        
+            setYScroll(el.current.scrollTop)
+        }
+        if (xScrollEl.current) {
+            const fracX = xScrollEl.current.scrollLeft / (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
+            el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
+            setXScroll(el.current.scrollLeft)
+        }
+    })
 
     useEffect(() => {
         if (playing) {
