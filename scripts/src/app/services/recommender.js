@@ -13,6 +13,10 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     function setKeyDict(genre, instrument) {
         keyGenreDict = genre;
         keyInstrumentDict = instrument;
+
+        AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter(function(key) {
+            return Object.keys(keyGenreDict).includes(key);
+        });
     }
 
     function getKeyDict(type) {
@@ -176,7 +180,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         var recs = {};
 
         for (var key in inputRecs) {
-            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && Object.keys(keyGenreDict).includes(key) && key.slice(0,3) !== 'OS_') {
+            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && !previousRecommendations.includes(key) && key.slice(0,3) !== 'OS_') {
                 recs[key] = inputRecs[key]
             }
         }
