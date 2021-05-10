@@ -10,6 +10,7 @@ window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
 window.Question = Question; // Used inside curriculum HTMLs.
 
 import 'angularjs-slider/dist/rzslider.css';
+import '../../fonts/icomoon_ultimate/style.css';
 
 import * as ace from 'ace-builds';
 // ace.config.set('basePath', 'dist');

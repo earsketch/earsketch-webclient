@@ -889,11 +889,14 @@ const DAW = () => {
     // Keep triggering an action while the mouse button is held.
     const repeatClick = (action, interval=125) => {
         let timer = useRef()
-        const up = () => {
+        const up = (event) => {
+            if (event.button !== 0) return
             clearInterval(timer.current)
             document.removeEventListener('mouseup', up)
         }
-        const down = () => {
+        const down = (event) => {
+            // Only respond to left-click. (Right-click does weird things in some browsers, maybe because of the context menu.)
+            if (event.button !== 0) return
             timer.current = setInterval(action, interval)
             action()
             // NOTE: We bind this to the document (instead of the same element `down` gets bound to)
