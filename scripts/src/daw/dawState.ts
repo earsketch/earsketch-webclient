@@ -1,4 +1,5 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit'
+
 import { RootState } from '../reducers'
 
 const shuffle = (array : any[]) => {
@@ -16,13 +17,6 @@ const TRACK_COLORS = ['#f2fdbf','#f3d8b2','#ff8080','#9fa2fd','#9fb2fd','#9fc2fd
                       '#9ff2fd','#9fe29d','#9fe2bd','#bfe2bf','#dfe2bf','#ffe2bf','#ffff00','#ffc0cb']
 
 const BEATS_PER_MEASURE = 4
-
-interface Interval {
-    end: number,
-    tickInterval: number,
-    labelInterval?: number,
-    tickDivsion?: number,
-}
 
 // Intervals of measure line based on zoom levels
 // This list is referred during zoom in/out
@@ -52,16 +46,50 @@ const TIMELINE_ZOOM_INTERVALS = [
 // So, we set a default number of measures that we want the screen to fit in.
 const MEASURES_FIT_TO_SCREEN = 61
 
+// TODO: Move these types to player when it gets updated.
+export interface Clip {
+    filekey: string
+    loopChild: boolean
+    measure: number
+    start: number
+    end: number
+    audio: AudioBuffer
+}
+
+export interface EffectRange {
+    name: string
+    parameter: string
+    startMeasure: number
+    endMeasure: number
+    inputStartValue: number
+    inputEndValue: number
+}
+
+export type Effect = EffectRange[]
+
+export interface Track {
+    clips: Clip[]
+    effects: {[key: string]: Effect}
+    label?: string | number
+    visible?: boolean
+    buttons?: boolean
+    mute?: boolean
+}
+
+export type Color = string
+
+export type SoloMute = "solo" | "mute" | undefined
+
 interface SoloMuteConfig {
-    [key: number]: string
+    [key: number]: SoloMute
 }
 
 interface DAWState {
-    tracks: any[] // TODO
+    tracks: Track[]
     playLength: number
     trackWidth: number
     trackHeight: number
-    trackColors: string[]
+    trackColors: Color[]
     showEffects: boolean
     metronome: boolean
     tempo: number
@@ -219,13 +247,14 @@ export const selectSongDuration = createSelector(
     (playLength, tempo) => playLength*BEATS_PER_MEASURE/(tempo/60)
 )
 
-const getZoomIntervals = (intervals: Interval[], width: number) => {
+const getZoomIntervals = (intervals: ({end: number} & any)[], width: number) => {
     // Assumes intervals are sorted in increasing order.
     for (const zoomIntervals of intervals) {
         if (width <= zoomIntervals.end) {
             return zoomIntervals
         }
     }
+    return intervals[intervals.length-1]
 }
 
 export const selectMeasurelineZoomIntervals = createSelector(
@@ -238,7 +267,7 @@ export const selectTimelineZoomIntervals = createSelector(
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
 )
 
-export const getMuted = (tracks: any[], soloMute: SoloMuteConfig, metronome: boolean) => {
+export const getMuted = (tracks: Track[], soloMute: SoloMuteConfig, metronome: boolean) => {
     const keys = Object.keys(tracks).map(x => +x)
     const soloed = keys.filter(key => soloMute[key] === "solo")
     if (soloed.length > 0) {
@@ -256,7 +285,7 @@ export const selectTotalTrackHeight = createSelector(
     [selectTracks, selectShowEffects, selectTrackHeight, selectMixTrackHeight],
     (tracks, effects, height, mixHeight) => {
         let total = 0
-        tracks.forEach((track: any, index: number) => {
+        tracks.forEach((track: Track, index: number) => {
             if (track.visible) {
                 total += (index === 0 ? mixHeight : height)
                 if (effects) {

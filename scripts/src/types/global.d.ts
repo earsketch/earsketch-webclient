@@ -22,6 +22,9 @@ declare var esconsole: any;
 declare var userNotification: any;
 declare var hljs: any;
 declare var Hilitor: any;
+// NOTE: It looks like bringing in d3 types would require upgrading past d3 v3,
+// which is a nontrivial undertaking because of significant API changes.
+// (I spent some time of this and decided against it; we might just drop the d3 dependency anyway.)
 declare var d3: any;
 
 declare module 'angular' {
