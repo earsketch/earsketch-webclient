@@ -6,6 +6,9 @@ window.BUILD_NUM = 0;
 window.REPORT_LOG = [];
 window.URL_LOADAUDIO = URL_LOADAUDIO;
 window.ES_PASSTHROUGH = ES_PASSTHROUGH;
+window.ESCurr_TOC = ESCurr_TOC;
+window.ESCurr_Pages = ESCurr_Pages;
+window.ESCurr_SearchDoc = ESCurr_SearchDoc;
 
 window.customMatchers = {
     toMatchResult: function(util, customEqualityTesters) {
@@ -155,18 +158,7 @@ function checkSimilarity(actual, expected) {
     return valid;
 }
 
-import { configureStore } from "@reduxjs/toolkit";
-import rootReducer from "../scripts/src/reducers";
-
-const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware({
-            immutableCheck: false,
-            serializableCheck: false
-        });
-    }
-});
+import store from "../scripts/src/reducers";
 
 require('angular');
 window.angular = angular;
