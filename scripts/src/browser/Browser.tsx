@@ -1,5 +1,5 @@
 import React, { useState, useEffect, LegacyRef, ChangeEventHandler, MouseEventHandler } from 'react';
-import { Store } from 'Redux';
+import { Store } from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
 import { hot } from 'react-hot-loader/root';

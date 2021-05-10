@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import * as layout from '../layout/layoutState'
 import { RootState, ThunkAPI, AppDispatch } from '../reducers'
-import angular from 'angular';
 import lunr from 'lunr';
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
