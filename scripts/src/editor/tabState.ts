@@ -160,8 +160,9 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         if (restoredSession) {
             editSession = restoredSession;
         } else {
-            editSession = new ace.EditSession(script.source_code);
-            editSession.setMode(`ace/mode/${language}`);
+            // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
+            // There may be a more proper way to set the language mode.
+            editSession = ace.createEditSession(script.source_code, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode);
             setEditorSession(scriptID, editSession);
         }
         editor.setSession(editSession);
