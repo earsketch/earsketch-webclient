@@ -2,15 +2,16 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
+import angular from 'angular'
+import ngRedux from 'ng-redux'
 
 import * as appState from '../app/appState'
-import * as daw from './dawState'
-
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
-import angular from 'angular'
 import { RootState } from '../reducers'
-import ngRedux from 'ng-redux'
+import { Player } from '../app/player'
+
+import * as daw from './dawState'
 
 // Width of track control box
 const X_OFFSET = 100
@@ -573,8 +574,8 @@ const Timeline = () => {
 let WaveformCache: any = null
 let ESUtils: any = null
 let applyEffects: any = null
-let player: any = null
 let $rootScope: angular.IRootScopeService | null = null
+let player: any = null
 
 const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
@@ -1080,15 +1081,17 @@ const HotDAW = hot((props: {
     WaveformCache: any,
     ESUtils: any,
     applyEffects: any,
-    player: any,
     $rootScope: angular.IRootScopeService,
     $ngRedux: any,
+    // Extra dependencies for player:
+    audioContext: any,
+    timesync: any,
 }) => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
     applyEffects = props.applyEffects
-    player = props.player
     $rootScope = props.$rootScope
+    player = Player(props.audioContext, applyEffects, ESUtils, props.timesync)
     setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
@@ -1097,4 +1100,5 @@ const HotDAW = hot((props: {
     );
 });
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player', '$rootScope']))
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', '$rootScope',
+                                                  'audioContext', 'timesync']))  // Extra dependencies for player
