@@ -1,14 +1,54 @@
-/**
- * An angular factory that provides a service for playing sounds from the JSON
- * object output of scripts.
- *
- * @module player
- * @author Creston Bunch
- */
+// Play sounds from the JSON object output of scripts.
 
-// TODO: Bring in Result type from DAW.
+// TODO: Move to compiler?
+export interface Pitchshift {
+    audio: AudioBuffer
+    start: number
+    end: number
+}
 
-export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: any) => {
+export interface Clip {
+    filekey: string
+    loopChild: boolean
+    measure: number
+    start: number
+    end: number
+    audio: AudioBuffer
+    pitchshift?: Pitchshift
+    playing?: boolean
+    source?: AudioBufferSourceNode
+    gain?: GainNode
+}
+
+export interface EffectRange {
+    name: string
+    parameter: string
+    startMeasure: number
+    endMeasure: number
+    inputStartValue: number
+    inputEndValue: number
+}
+
+export type Effect = EffectRange[] & {bypass?: boolean}
+
+export interface Track {
+    clips: Clip[]
+    effects: {[key: string]: Effect}
+    analyser: AnalyserNode
+    label?: string | number
+    visible?: boolean
+    buttons?: boolean
+    mute?: boolean
+}
+
+export interface Result {
+    tempo: number
+    length: number
+    tracks: Track[]
+    master: GainNode
+}
+
+export const Player = (context: AudioContext & {master: GainNode}, applyEffects: any, ESUtils: any, timesync: any) => {
     let isPlaying = false
 
     let waTimeStarted = 0
@@ -33,7 +73,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
     let loopScheduledWhilePaused = false
     let firstCycle = true
 
-    let renderingDataQueue: any[] = [null, null]
+    let renderingDataQueue: (Result | null)[] = [null, null]
     let mutedTracks: number[] = []
     let bypassedEffects: {[key: number]: string[]} = {}
 
@@ -76,6 +116,11 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
             endMes = loop.end
         }
 
+        if (renderingDataQueue[1] === null) {
+            esconsole('null in render queue', ['player', 'error'])
+            return
+        }
+
         let renderingData = renderingDataQueue[1]
 
         let tempo = renderingData.tempo
@@ -98,7 +143,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
             let track = renderingData.tracks[t]
 
             // skip muted tracks
-            if (mutedTracks.indexOf(t) > -1) { continue }
+            if (mutedTracks.indexOf(t) > -1) continue
 
             // get the list of bypassed effects for this track
             let trackBypass = bypassedEffects[t] ?? []
@@ -124,9 +169,9 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
                 // set buffer & start/end time within clip
                 if (pitchShift && !pitchShift.bypass) {
                     esconsole('Using pitchshifted audio for ' + clipData.filekey + ' on track ' + t, ['player', 'debug'])
-                    clipSource.buffer = clipData.pitchshift.audio
-                    startTimeInClip = ESUtils.measureToTime(clipData.pitchshift.start, tempo)
-                    endTimeInClip = ESUtils.measureToTime(clipData.pitchshift.end, tempo)
+                    clipSource.buffer = clipData.pitchshift!.audio
+                    startTimeInClip = ESUtils.measureToTime(clipData.pitchshift!.start, tempo)
+                    endTimeInClip = ESUtils.measureToTime(clipData.pitchshift!.end, tempo)
                 } else {
                     clipSource.buffer = clipData.audio
                     startTimeInClip = ESUtils.measureToTime(clipData.start, tempo)
@@ -252,7 +297,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
                 } else {
                     playbackData.startOffset = startMes - 1
                     startMes = 1
-                    endMes = renderingDataQueue[1].length + 1
+                    endMes = renderingDataQueue[1]!.length + 1
                 }
 
                 playbackData.startMeasure = startMes
@@ -311,7 +356,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
         clearTimeout(loopSchedTimer)
     }
 
-    function stopAllClips(renderingData: any, delay: number) {
+    function stopAllClips(renderingData: Result | null, delay: number) {
         if (!renderingData) {
             return
         }
@@ -350,27 +395,30 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
             if (!delay) {
                 stopAllClips(renderingDataQueue[idx], delay)
             } else {
-                if (!renderingDataQueue[idx]) {
+                const renderData = renderingDataQueue[idx]
+                if (renderData === null) {
                     return
                 }
 
-                for (let t = 0; t < renderingDataQueue[idx].tracks.length; t++) {
-                    let track = renderingDataQueue[idx].tracks[t]
+                for (let t = 0; t < renderData.tracks.length; t++) {
+                    let track = renderData.tracks[t]
                     for (let c = 0; c < track.clips.length; c++) {
                         let clip = track.clips[c]
 
                         if (clip.source !== undefined) {
                             try {
                                 clip.source.stop(context.currentTime + delay)
-                                clip.gain.setValueAtTime(0, context.currentTime + delay)
-                            } catch (e) {}
+                                clip.gain!.gain.setValueAtTime(0, context.currentTime + delay)
+                            } catch (e) {
+                                esconsole(e.toString(), ['player', 'warning'])
+                            }
                             clip.playing = false
                         }
                     }
                 }
 
-                if (renderingDataQueue[idx].master !== undefined) {
-                    renderingDataQueue[idx].master.gain.setValueAtTime(0, context.currentTime + delay)
+                if (renderData.master !== undefined) {
+                    renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
                 }
             }
         }
@@ -387,7 +435,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
             esconsole('refreshing the rendering data', ['player', 'debug'])
             let currentMeasure = getCurrentPosition()
             let nextMeasure = Math.ceil(currentMeasure)
-            let timeTillNextBar = ESUtils.measureToTime(nextMeasure-currentMeasure+1, renderingDataQueue[1].tempo)
+            let timeTillNextBar = ESUtils.measureToTime(nextMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
 
             if (clearAllGraphs) {
                 clearAllAudioGraphs(timeTillNextBar)
@@ -407,11 +455,12 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
      * reference obtained from player.play().
      * @param {int} num The track number to mute.
      */
-    function muteTrack(result: any, num: number) {
+    function muteTrack(result: Result, num: number) {
         let track = result.tracks[num]
         for (let i = 0; i < track.clips.length; i++) {
-            if (track.clips[i].gain !== undefined) {
-                track.clips[i].gain.gain.setValueAtTime(0.0, context.currentTime)
+            const gain = track.clips[i].gain
+            if (gain !== undefined) {
+                gain.gain.setValueAtTime(0.0, context.currentTime)
             }
         }
     }
@@ -423,11 +472,12 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
      * reference obtained from player.play().
      * @param {int} num The track number to unmute.
      */
-    function unmuteTrack(result: any, num: number) {
+    function unmuteTrack(result: Result, num: number) {
         let track = result.tracks[num]
         for (let i = 0; i < track.clips.length; i++) {
-            if (track.clips[i].gain !== undefined) {
-                track.clips[i].gain.gain.setValueAtTime(1.0, context.currentTime)
+            const gain = track.clips[i].gain
+            if (gain !== undefined) {
+                gain.gain.setValueAtTime(1.0, context.currentTime)
             }
         }
     }
@@ -455,7 +505,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
 
             // use max range
             playbackData.startMeasure = 1
-            playbackData.endMeasure = renderingDataQueue[1].length + 1
+            playbackData.endMeasure = renderingDataQueue[1]!.length + 1
         }
         esconsole('setting loop: ' + loop.on, ['player', 'debug'])
 
@@ -478,17 +528,17 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
                     if (currentMeasure >= startMes && currentMeasure < endMes) {
                         if (currentMeasure < endMes - 1) {
                             startMes = Math.ceil(currentMeasure)
-                            timeTillLoopingBack = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1].tempo)
+                            timeTillLoopingBack = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
                         } else {
-                            timeTillLoopingBack = ESUtils.measureToTime(endMes-currentMeasure+1, renderingDataQueue[1].tempo)
+                            timeTillLoopingBack = ESUtils.measureToTime(endMes-currentMeasure+1, renderingDataQueue[1]!.tempo)
                         }
                     } else {
-                        timeTillLoopingBack = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1].tempo)
+                        timeTillLoopingBack = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
                     }
                 } else {
-                    timeTillLoopingBack = ESUtils.measureToTime(renderingDataQueue[1].length-currentMeasure+2, renderingDataQueue[1].tempo)
+                    timeTillLoopingBack = ESUtils.measureToTime(renderingDataQueue[1]!.length-currentMeasure+2, renderingDataQueue[1]!.tempo)
                     startMes = 1
-                    endMes = renderingDataQueue[1].length + 1
+                    endMes = renderingDataQueue[1]!.length + 1
                 }
 
                 esconsole(`timeTillLoopingBack = ${timeTillLoopingBack}, startMes = ${startMes}, endMes = ${endMes}`, ['player', 'debug'])
@@ -517,15 +567,15 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
                 esconsole('loop switched off while playing', ['player', 'debug'])
                 currentMeasure = getCurrentPosition()
 
-                esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1].length}`, ['player', 'debug'])
-                if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1].length+1)) {
+                esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ['player', 'debug'])
+                if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length+1)) {
                     clearTimeout(playStartTimer)
                     clearTimeout(playEndTimer)
 
-                    let timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure-currentMeasure+1, renderingDataQueue[1].tempo)
+                    let timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
 
                     startMes = playbackData.endMeasure
-                    endMes = renderingDataQueue[1].length+1
+                    endMes = renderingDataQueue[1]!.length+1
 
                     clearAllAudioGraphs(timeTillContinuedPoint)
                     play(startMes, endMes, timeTillContinuedPoint)
@@ -534,7 +584,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
         }
     }
 
-    function setRenderingData(result: any) {
+    function setRenderingData(result: Result) {
         esconsole('setting new rendering data', ['player', 'debug'])
 
         clearAudioGraph(0)
@@ -564,11 +614,11 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
                     // playbackData.startMeasure = loop.start
                     // playbackData.endMeasure = loop.end
                 } else {
-                    playbackData.endMeasure = renderingDataQueue[1].length+1
+                    playbackData.endMeasure = renderingDataQueue[1]!.length+1
                 }
             }
 
-            timeTillNextBar = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1].tempo)
+            timeTillNextBar = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
 
             clearAllAudioGraphs(timeTillNextBar)
             play(position, playbackData.endMeasure, timeTillNextBar)
@@ -579,7 +629,7 @@ export const Player = (context: any, applyEffects: any, ESUtils: any, timesync: 
 
     function getCurrentPosition() {
         if (isPlaying) {
-            playbackData.playheadPos = (context.currentTime-waTimeStarted) * renderingDataQueue[1].tempo/60/4 + playbackData.startMeasure + playbackData.startOffset
+            playbackData.playheadPos = (context.currentTime-waTimeStarted) * renderingDataQueue[1]!.tempo/60/4 + playbackData.startMeasure + playbackData.startOffset
         }
         return playbackData.playheadPos
     }

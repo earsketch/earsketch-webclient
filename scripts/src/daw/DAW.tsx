@@ -9,19 +9,12 @@ import * as appState from '../app/appState'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
 import { RootState } from '../reducers'
-import { Player } from '../app/player'
+import { Player, Clip, Effect, Track, Result } from '../app/player'
 
 import * as daw from './dawState'
 
 // Width of track control box
 const X_OFFSET = 100
-
-interface Result {
-    tempo: number
-    length: number
-    tracks: daw.Track[]
-    // ...plus some other properties the DAW doesn't care about.
-}
 
 // TODO: remove after refactoring player
 let _result : Result | null = null
@@ -239,7 +232,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
                { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                 toggleBypass: (a: string) => void, track: daw.Track, xScroll: number }) => {
+                 toggleBypass: (a: string) => void, track: Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -256,7 +249,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
-                {track.clips.map((clip: daw.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {track.clips.map((clip: Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
@@ -300,7 +293,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: daw.Clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color, clip: Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // Minimum width prevents clips from vanishing on zoom out.
@@ -324,7 +317,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: daw.Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }:
-                { name: string, color: daw.Color, effect: daw.Effect, bypass: boolean, mute: boolean }) => {
+                { name: string, color: daw.Color, effect: Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -406,7 +399,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
-                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: daw.Track, xScroll: number }) => {
+                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -581,12 +574,12 @@ const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: daw.Track[], tempo: number) => {
+const prepareWaveforms = (tracks: Track[], tempo: number) => {
     esconsole('preparing a waveform to draw', 'daw');
 
     // ignore the mix track (0) and metronome track (len-1)
     for (var i = 1; i < tracks.length - 1; i++) {
-        tracks[i].clips.forEach((clip: daw.Clip) => {
+        tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 const waveform = clip.audio.getChannelData(0)
 
@@ -651,8 +644,8 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
         const playLength = result.length + 1
         dispatch(daw.setPlayLength(playLength))
 
-        const tracks: daw.Track[] = []
-        result.tracks.forEach((track: daw.Track, index: number) => {
+        const tracks: Track[] = []
+        result.tracks.forEach((track, index) => {
             // create a (shallow) copy of the track so that we can
             // add stuff to it without affecting the reference which
             // we want to preserve (e.g., for the autograder)
