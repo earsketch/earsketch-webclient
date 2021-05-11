@@ -77,10 +77,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
     let mutedTracks: number[] = []
     let bypassedEffects: {[key: number]: string[]} = {}
 
-    let onStartedCallback = () => {}
-    let onFinishedCallback = reset
-
-    function reset() {
+    const reset = () => {
         esconsole('resetting', ['player', 'debug'])
 
         clearAllAudioGraphs()
@@ -99,13 +96,13 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    function clearAllTimers() {
+    const clearAllTimers = () => {
         clearTimeout(playStartTimer)
         clearTimeout(playEndTimer)
         clearTimeout(loopSchedTimer)
     }
 
-    function play(startMes: number, endMes: number, manualOffset=0) {
+    const play = (startMes: number, endMes: number, manualOffset=0) => {
         esconsole('starting playback',  ['player', 'debug'])
         esconsole('timesync state: ' + timesync.enabled, ['player', 'debug'])
 
@@ -121,15 +118,15 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
             return
         }
 
-        let renderingData = renderingDataQueue[1]
+        const renderingData = renderingDataQueue[1]
 
-        let tempo = renderingData.tempo
-        let startTime = ESUtils.measureToTime(startMes, tempo)
-        let endTime = ESUtils.measureToTime(endMes, tempo)
-        let timesyncOffset = (timesync.enabled && firstCycle) ? timesync.getSyncOffset(tempo, startTime) : 0
+        const tempo = renderingData.tempo
+        const startTime = ESUtils.measureToTime(startMes, tempo)
+        const endTime = ESUtils.measureToTime(endMes, tempo)
+        const timesyncOffset = (timesync.enabled && firstCycle) ? timesync.getSyncOffset(tempo, startTime) : 0
 
-        let startTimeOffset = timesyncOffset + manualOffset
-        let waStartTime = context.currentTime + startTimeOffset
+        const startTimeOffset = timesyncOffset + manualOffset
+        const waStartTime = context.currentTime + startTimeOffset
 
         //==========================================
         // construct webaudio graph
@@ -140,31 +137,29 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         renderingData.master.gain.setValueAtTime(1, context.currentTime)
 
         for (let t = 0; t < renderingData.tracks.length; t++) {
-            let track = renderingData.tracks[t]
+            const track = renderingData.tracks[t]
 
             // skip muted tracks
             if (mutedTracks.indexOf(t) > -1) continue
 
             // get the list of bypassed effects for this track
-            let trackBypass = bypassedEffects[t] ?? []
+            const trackBypass = bypassedEffects[t] ?? []
             esconsole('Bypassing effects: ' + JSON.stringify(trackBypass), ['DEBUG','PLAYER'])
 
             // construct the effect graph
             applyEffects.resetAudioNodeFlags()
-            let startNode = applyEffects.buildAudioNodeGraph(context, track, t, tempo, startTime, renderingData.master, trackBypass, 0)
+            const startNode = applyEffects.buildAudioNodeGraph(context, track, t, tempo, startTime, renderingData.master, trackBypass, 0)
 
-            let trackGain = context.createGain()
+            const trackGain = context.createGain()
             trackGain.gain.setValueAtTime(1.0, context.currentTime)
 
             //======== process each clip in the track ==========
-            for (let c = 0; c < track.clips.length; c++) {
-                let clipData = track.clips[c]
-
-                let clipStartTime = ESUtils.measureToTime(clipData.measure, tempo)
+            for (const clipData of track.clips) {
+                const clipStartTime = ESUtils.measureToTime(clipData.measure, tempo)
                 let startTimeInClip, endTimeInClip // start/end locations within clip
 
-                let clipSource = context.createBufferSource()
-                let pitchShift = track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT']
+                const clipSource = context.createBufferSource()
+                const pitchShift = track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT']
 
                 // set buffer & start/end time within clip
                 if (pitchShift && !pitchShift.bypass) {
@@ -180,14 +175,14 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
 
                 // the clip duration may be shorter than the buffer duration
                 let clipDuration = endTimeInClip - startTimeInClip
-                let clipEndTime = clipStartTime + clipDuration
+                const clipEndTime = clipStartTime + clipDuration
 
                 if (startTime >= clipEndTime) {
                     // case: clip is in the past: skip the clip
                     continue
                 } else if (startTime >= clipStartTime && startTime < clipEndTime) {
                     // case: clip is playing from the middle
-                    let clipStartOffset = startTime - clipStartTime
+                    const clipStartOffset = startTime - clipStartTime
 
                     // if the loop end is set before the clip end
                     if (clipEndTime > endTime) {
@@ -199,14 +194,10 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                     clipSource.start(waStartTime, startTimeInClip+clipStartOffset, clipDuration-clipStartOffset)
 
                     // keep this flag so we only stop clips that are playing (otherwise we get an exception raised)
-                    setTimeout((function (clip_) {
-                        return function () {
-                            clip_.playing = true
-                        }
-                    })(clipData), startTimeOffset * 1000)
+                    setTimeout(() => clipData.playing = true, startTimeOffset * 1000)
                 } else {
                     // case: clip is in the future
-                    let untilClipStart = clipStartTime - startTime
+                    const untilClipStart = clipStartTime - startTime
 
                     // if the loop end is set before the clip
                     if (clipStartTime > endTime) {
@@ -221,11 +212,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                     clipSource.connect(trackGain)
                     clipSource.start(waStartTime+untilClipStart, startTimeInClip, clipDuration)
 
-                    setTimeout((function (clip_) {
-                        return function () {
-                            clip_.playing = true
-                        }
-                    })(clipData), (startTimeOffset + untilClipStart) * 1000)
+                    setTimeout(() => clipData.playing = true, (startTimeOffset + untilClipStart) * 1000)
                 }
 
                 // keep a reference to this audio source so we can pause it
@@ -233,11 +220,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                 clipData.gain = trackGain // used to mute the track/clip
 
                 if (ESUtils.whichBrowser().indexOf('Chrome') === -1) {
-                    clipData.source.onended = (function (source) {
-                        return function () {
-                            source.disconnect()
-                        }
-                    })(clipData.source)
+                    clipSource.onended = () => clipSource.disconnect()
                 }
             }
 
@@ -272,8 +255,8 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
 
             // for setValueAtTime bug in chrome v52
             if (ESUtils.whichBrowser().indexOf('Chrome') > -1 && typeof(startNode) !== 'undefined') {
-                let dummyOsc = context.createOscillator()
-                let dummyGain = context.createGain()
+                const dummyOsc = context.createOscillator()
+                const dummyGain = context.createGain()
                 dummyGain.gain.value = 0
                 dummyOsc.connect(dummyGain).connect(startNode.input)
                 dummyOsc.start(startTime)
@@ -284,7 +267,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         //==========================================
         // set flags
         clearTimeout(playStartTimer)
-        playStartTimer = window.setTimeout(function () {
+        playStartTimer = window.setTimeout(() => {
             if (loop.on) {
                 if (loop.selection) {
                     playbackData.startOffset = 0
@@ -312,7 +295,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
 
             waTimeStarted = waStartTime
             isPlaying = true
-            onStartedCallback()
+            self.onStartedCallback()
         }, startTimeOffset * 1000)
 
         firstCycle = false
@@ -321,11 +304,11 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         // check the loop state and schedule loop near the end also cancel the onFinished callback
         if (loop.on && loopScheduledWhilePaused) {
             clearTimeout(loopSchedTimer)
-            loopSchedTimer = window.setTimeout(function () {
+            loopSchedTimer = window.setTimeout(() => {
                 esconsole('scheduling loop', ['player', 'debug'])
                 clearTimeout(loopSchedTimer)
                 clearTimeout(playEndTimer)
-                let offset = timesync.enabled ? timesync.getSyncOffset(tempo, 0) : (endTime-startTime)-(context.currentTime-waTimeStarted)
+                const offset = timesync.enabled ? timesync.getSyncOffset(tempo, 0) : (endTime-startTime)-(context.currentTime-waTimeStarted)
                 clearAllAudioGraphs(offset)
                 loopScheduledWhilePaused = true
                 play(startMes, endMes, offset)
@@ -335,19 +318,20 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         //==========================================
         // schedule to call the onFinished callback
         clearTimeout(playEndTimer)
-        playEndTimer = window.setTimeout(function () {
+        playEndTimer = window.setTimeout(() => {
             esconsole('playbackTimer ended', 'player')
             pause()
-            onFinishedCallback()
+            reset()
+            self.onFinishedCallback()
         }, (endTime-startTime+startTimeOffset) * 1000)
     }
 
-    function pause(delay=0) {
+    const pause = (delay=0) => {
         esconsole('pausing',  ['player', 'debug'])
 
         clearAllAudioGraphs(delay)
 
-        setTimeout(function () {
+        setTimeout(() => {
             isPlaying = false
             playbackData.playheadPos = playbackData.startMeasure
         }, delay * 1000)
@@ -356,28 +340,22 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         clearTimeout(loopSchedTimer)
     }
 
-    function stopAllClips(renderingData: Result | null, delay: number) {
+    const stopAllClips = (renderingData: Result | null, delay: number) => {
         if (!renderingData) {
             return
         }
 
-        for (let t = 0; t < renderingData.tracks.length; t++) {
-            let track = renderingData.tracks[t]
-            for (let c = 0; c < track.clips.length; c++) {
-                let clip = track.clips[c]
-
-                if (clip.source !== undefined) {
+        for (const track of renderingData.tracks) {
+            for (const clip of track.clips) {
+                const source = clip.source
+                if (source !== undefined) {
                     try {
-                        clip.source.stop(context.currentTime + delay)
+                        source.stop(context.currentTime + delay)
                     } catch (e) {
                         // TODO: Why does Safari throw an InvalidStateError?
                         esconsole(e.toString(), ['WARNING','PLAYER'])
                     }
-                    setTimeout((function (source) {
-                        return function () {
-                            source.disconnect()
-                        }
-                    })(clip.source), delay * 999)
+                    setTimeout(() => source.disconnect(), delay * 999)
                     clip.playing = false
                 }
             }
@@ -388,7 +366,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         // }
     }
 
-    function clearAudioGraph(idx: number, delay=0) {
+    const clearAudioGraph = (idx: number, delay=0) => {
         if (ESUtils.whichBrowser().indexOf('Chrome') !== -1) {
             stopAllClips(renderingDataQueue[idx], delay)
         } else {
@@ -400,11 +378,8 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                     return
                 }
 
-                for (let t = 0; t < renderData.tracks.length; t++) {
-                    let track = renderData.tracks[t]
-                    for (let c = 0; c < track.clips.length; c++) {
-                        let clip = track.clips[c]
-
+                for (const track of renderData.tracks) {
+                    for (const clip of track.clips) {
                         if (clip.source !== undefined) {
                             try {
                                 clip.source.stop(context.currentTime + delay)
@@ -424,18 +399,18 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    function clearAllAudioGraphs(delay=0) {
+    const clearAllAudioGraphs = (delay=0) => {
         esconsole('clearing the audio graphs',  ['player', 'debug'])
         clearAudioGraph(0, delay)
         clearAudioGraph(1, delay)
     }
 
-    function timedRefresh(clearAllGraphs=false) {
+    const refresh = (clearAllGraphs=false) => {
         if (isPlaying) {
             esconsole('refreshing the rendering data', ['player', 'debug'])
-            let currentMeasure = getCurrentPosition()
-            let nextMeasure = Math.ceil(currentMeasure)
-            let timeTillNextBar = ESUtils.measureToTime(nextMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
+            const currentMeasure = getCurrentPosition()
+            const nextMeasure = Math.ceil(currentMeasure)
+            const timeTillNextBar = ESUtils.measureToTime(nextMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
 
             if (clearAllGraphs) {
                 clearAllAudioGraphs(timeTillNextBar)
@@ -443,42 +418,8 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                 clearAudioGraph(0, timeTillNextBar)
             }
 
-            let startMeasure = nextMeasure === playbackData.endMeasure ? playbackData.startMeasure : nextMeasure
+            const startMeasure = nextMeasure === playbackData.endMeasure ? playbackData.startMeasure : nextMeasure
             play(startMeasure, playbackData.endMeasure, timeTillNextBar)
-        }
-    }
-
-    /**
-     * Mute a track currently playing in a given result object.
-     *
-     * @param {object} result The compiled result object
-     * reference obtained from player.play().
-     * @param {int} num The track number to mute.
-     */
-    function muteTrack(result: Result, num: number) {
-        let track = result.tracks[num]
-        for (let i = 0; i < track.clips.length; i++) {
-            const gain = track.clips[i].gain
-            if (gain !== undefined) {
-                gain.gain.setValueAtTime(0.0, context.currentTime)
-            }
-        }
-    }
-
-    /**
-     * Unmute a track currently playing.
-     *
-     * @param {object} result The compiled result object
-     * reference obtained from player.play().
-     * @param {int} num The track number to unmute.
-     */
-    function unmuteTrack(result: Result, num: number) {
-        let track = result.tracks[num]
-        for (let i = 0; i < track.clips.length; i++) {
-            const gain = track.clips[i].gain
-            if (gain !== undefined) {
-                gain.gain.setValueAtTime(1.0, context.currentTime)
-            }
         }
     }
 
@@ -490,14 +431,14 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
      * @param {float} gain The volume to play at in decibels.
      */
 
-    function setVolume(gain: number) {
+    const setVolume = (gain: number) => {
         esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER'])
         if (context.master !== undefined) {
             context.master.gain.setValueAtTime(applyEffects.dbToFloat(gain), context.currentTime)
         }
     }
 
-    function setLoop(loopObj: typeof loop) {
+    const setLoop = (loopObj: typeof loop) => {
         if (loopObj && loopObj.hasOwnProperty('on')) {
             loop = loopObj
         } else {
@@ -572,7 +513,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                     clearTimeout(playStartTimer)
                     clearTimeout(playEndTimer)
 
-                    let timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
+                    const timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
 
                     startMes = playbackData.endMeasure
                     endMes = renderingDataQueue[1]!.length+1
@@ -584,7 +525,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    function setRenderingData(result: Result) {
+    const setRenderingData = (result: Result) => {
         esconsole('setting new rendering data', ['player', 'debug'])
 
         clearAudioGraph(0)
@@ -592,20 +533,19 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         renderingDataQueue.push(result)
 
         if (isPlaying) {
-            timedRefresh()
+            refresh()
         } else {
             clearAllAudioGraphs()
         }
     }
 
-    function setPosition(position: number) {
+    const setPosition = (position: number) => {
         esconsole('setting position: ' + position, ['player', 'debug'])
 
         clearAllTimers()
 
         if (isPlaying) {
-            let currentMeasure, timeTillNextBar
-            currentMeasure = getCurrentPosition()
+            const currentMeasure = getCurrentPosition()
 
             if (loop.on) {
                 loopScheduledWhilePaused = true
@@ -618,7 +558,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                 }
             }
 
-            timeTillNextBar = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
+            const timeTillNextBar = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
 
             clearAllAudioGraphs(timeTillNextBar)
             play(position, playbackData.endMeasure, timeTillNextBar)
@@ -627,55 +567,45 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    function getCurrentPosition() {
+    const getCurrentPosition = () => {
         if (isPlaying) {
             playbackData.playheadPos = (context.currentTime-waTimeStarted) * renderingDataQueue[1]!.tempo/60/4 + playbackData.startMeasure + playbackData.startOffset
         }
         return playbackData.playheadPos
     }
 
-    function setOnStartedCallback(callbackFn: () => void) {
-        onStartedCallback = callbackFn
-    }
-
-    function setOnFinishedCallback(callbackFn: () => void) {
-        onFinishedCallback = function () {
-            reset()
-            callbackFn()
-        }
-    }
-
-    function setMutedTracks(_mutedTracks: number[]) {
+    const setMutedTracks = (_mutedTracks: number[]) => {
         mutedTracks = _mutedTracks
 
         if (isPlaying) {
-            timedRefresh(true)
+            refresh(true)
         }
     }
 
-    function setBypassedEffects(_bypassedEffects: {[key: number]: string[]}) {
+    const setBypassedEffects = (_bypassedEffects: {[key: number]: string[]}) => {
         bypassedEffects = _bypassedEffects
 
         if (isPlaying) {
-            timedRefresh(true)
+            refresh(true)
         }
     }
 
-    return {
-        play: play,
-        pause: pause,
-        reset: reset,
-        refresh: timedRefresh,
-        setOnStartedCallback: setOnStartedCallback,
-        setOnFinishedCallback: setOnFinishedCallback,
-        setMutedTracks: setMutedTracks,
-        setBypassedEffects: setBypassedEffects,
-        muteTrack: muteTrack,
-        unmuteTrack: unmuteTrack,
-        setVolume: setVolume,
-        setRenderingData: setRenderingData,
-        setPosition: setPosition,
-        setLoop: setLoop,
-        getCurrentPosition: getCurrentPosition
+    const self = {
+        play,
+        pause,
+        reset,
+        refresh,
+        setMutedTracks,
+        setBypassedEffects,
+        setVolume,
+        setRenderingData,
+        setPosition,
+        setLoop,
+        getCurrentPosition,
+
+        onStartedCallback: () => {},
+        onFinishedCallback: () => {},
     }
+
+    return self
 }

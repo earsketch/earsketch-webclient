@@ -71,8 +71,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.setMutedTracks(muted)
         player.setBypassedEffects(bypass)
     
-        player.setOnStartedCallback(playbackStartedCallback)
-        player.setOnFinishedCallback(playbackEndedCallback)
+        player.onStartedCallback = playbackStartedCallback
+        player.onFinishedCallback = playbackEndedCallback
         player.play(playPosition, playLength)
 
         // player does not preserve volume state between plays
