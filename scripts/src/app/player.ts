@@ -1,6 +1,7 @@
 // Play sounds from the JSON object output of scripts.
 
-// TODO: Move to compiler?
+// Preliminary type declarations
+// TODO: Move some to compiler?
 export interface Pitchshift {
     audio: AudioBuffer
     start: number
@@ -41,7 +42,7 @@ export interface Track {
     mute?: boolean
 }
 
-export interface Result {
+export interface DAWData {
     tempo: number
     length: number
     tracks: Track[]
@@ -73,7 +74,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
     let loopScheduledWhilePaused = false
     let firstCycle = true
 
-    let renderingDataQueue: (Result | null)[] = [null, null]
+    let renderingDataQueue: (DAWData | null)[] = [null, null]
     let mutedTracks: number[] = []
     let bypassedEffects: {[key: number]: string[]} = {}
 
@@ -340,7 +341,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         clearTimeout(loopSchedTimer)
     }
 
-    const stopAllClips = (renderingData: Result | null, delay: number) => {
+    const stopAllClips = (renderingData: DAWData | null, delay: number) => {
         if (!renderingData) {
             return
         }
@@ -408,7 +409,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
     const refresh = (clearAllGraphs=false) => {
         if (isPlaying) {
             esconsole('refreshing the rendering data', ['player', 'debug'])
-            const currentMeasure = getCurrentPosition()
+            const currentMeasure = getPosition()
             const nextMeasure = Math.ceil(currentMeasure)
             const timeTillNextBar = ESUtils.measureToTime(nextMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
 
@@ -459,7 +460,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                 esconsole('loop switched on while playing', ['player', 'debug'])
                 loopScheduledWhilePaused = false
 
-                currentMeasure = getCurrentPosition()
+                currentMeasure = getPosition()
                 let timeTillLoopingBack = 0
 
                 if (loop.selection) {
@@ -506,7 +507,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
 
             if (isPlaying) {
                 esconsole('loop switched off while playing', ['player', 'debug'])
-                currentMeasure = getCurrentPosition()
+                currentMeasure = getPosition()
 
                 esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ['player', 'debug'])
                 if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length+1)) {
@@ -525,7 +526,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    const setRenderingData = (result: Result) => {
+    const setRenderingData = (result: DAWData) => {
         esconsole('setting new rendering data', ['player', 'debug'])
 
         clearAudioGraph(0)
@@ -545,7 +546,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         clearAllTimers()
 
         if (isPlaying) {
-            const currentMeasure = getCurrentPosition()
+            const currentMeasure = getPosition()
 
             if (loop.on) {
                 loopScheduledWhilePaused = true
@@ -567,7 +568,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    const getCurrentPosition = () => {
+    const getPosition = () => {
         if (isPlaying) {
             playbackData.playheadPos = (context.currentTime-waTimeStarted) * renderingDataQueue[1]!.tempo/60/4 + playbackData.startMeasure + playbackData.startOffset
         }
@@ -593,15 +594,13 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
     const self = {
         play,
         pause,
-        reset,
-        refresh,
         setMutedTracks,
         setBypassedEffects,
         setVolume,
         setRenderingData,
-        setPosition,
         setLoop,
-        getCurrentPosition,
+        setPosition,
+        getPosition,
 
         onStartedCallback: () => {},
         onFinishedCallback: () => {},

@@ -9,7 +9,7 @@ import * as appState from '../app/appState'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
 import { RootState } from '../reducers'
-import { Player, Clip, Effect, Track, Result } from '../app/player'
+import { Player, Clip, Effect, Track, DAWData } from '../app/player'
 
 import * as daw from './dawState'
 
@@ -17,7 +17,7 @@ import * as daw from './dawState'
 const X_OFFSET = 100
 
 // TODO: remove after refactoring player
-let _result : Result | null = null
+let _result : DAWData | null = null
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
@@ -631,7 +631,7 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
 
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', function (result: Result | null | undefined) {
+    $scope.$watch('compiled', function (result: DAWData | null | undefined) {
         const state = getState()
         if (result === null || result === undefined) return
         console.log("result:", result)
@@ -936,7 +936,7 @@ const DAW = () => {
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
-        const position = player.getCurrentPosition()
+        const position = player.getPosition()
         setPlayPosition(position)
 
         if (!(el.current && xScrollEl.current)) return
