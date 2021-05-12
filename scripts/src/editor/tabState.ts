@@ -1,10 +1,21 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { RootState, ThunkAPI } from '../reducers';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import * as helpers from 'helpers';
+import * as ace from 'ace-builds';
+
+import * as helpers from '../helpers';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
 import * as editor from "./editorState";
+
+interface TabState {
+    openTabs: string[],
+    activeTabID: string | null,
+    numVisibleTabs: number,
+    showTabDropdown: boolean,
+    modifiedScripts: string[]
+}
 
 const tabSlice = createSlice({
     name: 'tabs',
@@ -14,7 +25,7 @@ const tabSlice = createSlice({
         numVisibleTabs: 0,
         showTabDropdown: false,
         modifiedScripts: []
-    },
+    } as TabState,
     reducers: {
         setOpenTabs(state, { payload }) {
             state.openTabs = payload;
@@ -76,23 +87,25 @@ export const {
     resetModifiedScripts
 } = tabSlice.actions;
 
-export const selectOpenTabs = state => state.tabs.openTabs;
-export const selectActiveTabID = state => state.tabs.activeTabID;
-export const selectNumVisibleTabs = state => state.tabs.numVisibleTabs;
+export const selectOpenTabs = (state: RootState) => state.tabs.openTabs;
+export const selectActiveTabID = (state: RootState) => state.tabs.activeTabID;
+export const selectNumVisibleTabs = (state: RootState) => state.tabs.numVisibleTabs;
 
 export const selectTabsTruncated = createSelector(
     [selectOpenTabs, selectNumVisibleTabs],
-    (openTabs, numVisibleTabs) => openTabs.length > numVisibleTabs
+    (openTabs, numVisibleTabs) => openTabs.length > numVisibleTabs ? 1 : 0
 );
 
 export const selectVisibleTabs = createSelector(
     [selectOpenTabs, selectActiveTabID, selectNumVisibleTabs],
     (openTabs, activeTabID, numVisibleTabs) => {
+        if (!activeTabID) return [];
+
         const activeTabPosition = openTabs.indexOf(activeTabID);
 
         if (activeTabPosition >= numVisibleTabs && numVisibleTabs) {
             const visibleTabs = openTabs.slice();
-            visibleTabs.splice(activeTabID,activeTabID+1);
+            visibleTabs.splice(numVisibleTabs, numVisibleTabs+1);
             return visibleTabs.slice(0, numVisibleTabs-1).concat(activeTabID);
         } else {
             return openTabs.slice(0, numVisibleTabs);
@@ -102,17 +115,23 @@ export const selectVisibleTabs = createSelector(
 
 export const selectHiddenTabs = createSelector(
     [selectOpenTabs, selectVisibleTabs],
-    (openTabs, visibleTabs) => openTabs.filter(tab => !visibleTabs.includes(tab))
+    (openTabs: string[], visibleTabs: string[]) => openTabs.filter((tab: string) => !visibleTabs.includes(tab))
 );
 
-export const selectModifiedScripts = state => state.tabs.modifiedScripts;
+export const selectModifiedScripts = (state: RootState) => state.tabs.modifiedScripts;
 export const selectActiveTabScript = createSelector(
     [selectActiveTabID, scripts.selectAllScriptEntities],
-    (activeTabID, scriptEntities) => scriptEntities[activeTabID]
+    (activeTabID: string, scriptEntities: scripts.ScriptEntities) => scriptEntities[activeTabID]
 )
 
 // Note: Do not export and modify directly.
-const tabsMutableState = {
+interface TabsMutableState {
+    editorSessions: {
+        [key: string]: ace.Ace.EditSession
+    }
+    modifiedScripts: scripts.Scripts
+}
+const tabsMutableState: TabsMutableState = {
     editorSessions: {},
     modifiedScripts: {
         entities: {},
@@ -120,7 +139,7 @@ const tabsMutableState = {
     }
 };
 
-export const setActiveTabAndEditor = createAsyncThunk(
+export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/setActiveTabAndEditor',
     (scriptID, { getState, dispatch }) => {
         const ideScope = helpers.getNgController('ideController').scope();
@@ -141,7 +160,9 @@ export const setActiveTabAndEditor = createAsyncThunk(
         if (restoredSession) {
             editSession = restoredSession;
         } else {
-            editSession = ace.createEditSession(script.source_code, `ace/mode/${language}`);
+            // TODO: Using a syntax mode obj causes an error, and string is not accepted as valid type in this API.
+            // There may be a more proper way to set the language mode.
+            editSession = ace.createEditSession(script.source_code, `ace/mode/${language}` as unknown as ace.Ace.SyntaxMode);
             setEditorSession(scriptID, editSession);
         }
         editor.setSession(editSession);
@@ -155,14 +176,14 @@ export const setActiveTabAndEditor = createAsyncThunk(
             collaboration.openScript(Object.assign({},script), user.selectUserName(getState()));
         }
 
-        (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID));
+        prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID));
         scriptID && dispatch(openAndActivateTab(scriptID));
         
         helpers.getNgRootScope().$broadcast('reloadRecommendations');
     }
 );
 
-export const closeAndSwitchTab = createAsyncThunk(
+export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/closeAndSwitchTab',
     (scriptID, { getState, dispatch }) => {
         const openTabs = selectOpenTabs(getState());
@@ -191,7 +212,7 @@ export const closeAndSwitchTab = createAsyncThunk(
     }
 );
 
-export const closeAllTabs = createAsyncThunk(
+export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
     'tabs/closeAllTabs',
     (_, { getState, dispatch }) => {
         if (editor.selectBlocksMode(getState())) {
@@ -219,7 +240,7 @@ export const closeAllTabs = createAsyncThunk(
     }
 )
 
-export const saveScriptIfModified = createAsyncThunk(
+export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/saveScriptIfModified',
     (scriptID, { getState, dispatch }) => {
         const modified = selectModifiedScripts(getState()).includes(scriptID);
@@ -243,7 +264,7 @@ export const saveScriptIfModified = createAsyncThunk(
     }
 );
 
-const ensureCollabScriptIsClosed = createAsyncThunk(
+const ensureCollabScriptIsClosed = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/ensureCollabScriptIsClosed',
     (scriptID, { getState }) => {
         // Note: Watch out for the order with closeScript.
@@ -257,25 +278,27 @@ const ensureCollabScriptIsClosed = createAsyncThunk(
     }
 );
 
-export const closeDeletedScript = createAsyncThunk(
+export const closeDeletedScript = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/closeDeletedScript',
     (scriptID, { getState, dispatch }) => {
-        const openTabs = selectOpenTabs(getState());
+        const openTabs: string[] = selectOpenTabs(getState());
         if (openTabs.includes(scriptID)) {
             dispatch(closeAndSwitchTab(scriptID));
         }
     }
 );
 
-export const setEditorSession = (scriptID, session) => {
-    tabsMutableState.editorSessions[scriptID] = session;
+export const setEditorSession = (scriptID: string | null, session: ace.Ace.EditSession | null) => {
+    if (scriptID && session) {
+        tabsMutableState.editorSessions[scriptID] = session;
+    }
 };
 
-export const getEditorSession = scriptID => {
+export const getEditorSession = (scriptID: string) => {
     return tabsMutableState.editorSessions[scriptID];
 };
 
-export const deleteEditorSession = scriptID => {
+export const deleteEditorSession = (scriptID: string) => {
     if (scriptID in tabsMutableState.editorSessions) {
         delete tabsMutableState.editorSessions[scriptID];
     }

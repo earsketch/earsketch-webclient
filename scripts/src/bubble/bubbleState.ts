@@ -1,8 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
 import * as tabs from '../editor/tabState';
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 import { sampleScript } from "./bubbleData";
+import { RootState, ThunkAPI } from '../reducers';
+import { ScriptEntity } from 'common';
+
+interface BubbleState {
+    active: boolean
+    currentPage: number,
+    readyToProceed: true,
+    language: 'Python' | 'JavaScript'
+}
 
 const bubbleSlice = createSlice({
     name: 'bubble',
@@ -11,7 +20,7 @@ const bubbleSlice = createSlice({
         currentPage: 0,
         readyToProceed: true,
         language: 'Python'
-    },
+    } as BubbleState,
     reducers: {
         reset(state) {
             state['active'] = false;
@@ -33,13 +42,13 @@ export const { reset, resume, suspend, increment, setReady, setLanguage } = bubb
 const createSampleScript = createAsyncThunk(
     'bubble/createSampleScript',
     (_, { getState, dispatch }) => {
-        const language = getState().bubble.language;
+        const { bubble: { language } } = getState() as { bubble: BubbleState };
         const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
         const userProject = helpers.getNgService('userProject');
         const rootScope = helpers.getNgService('$rootScope');
         return userProject.saveScript(fileName, code, true)
-            .then(script => {
+            .then((script: ScriptEntity) => {
                 userProject.openScript(script.shareid);
                 rootScope.$broadcast('createScript', script.shareid);
 
@@ -51,16 +60,16 @@ const createSampleScript = createAsyncThunk(
 // TODO: Should be an action in the editor reducer.
 const setEditorReadOnly = createAsyncThunk(
     'bubble/setEditorWritable',
-    async (payload) => {
+    async (payload: boolean) => {
         return new Promise(resolve => {
             const editorScope = helpers.getNgDirective('editor').scope();
-            editorScope.editor.setReadOnly(payload);
+            editorScope?.editor.setReadOnly(payload);
             setTimeout(resolve, 100);
         });
     }
 );
 
-export const dismissBubble = createAsyncThunk(
+export const dismissBubble = createAsyncThunk<void, void, ThunkAPI>(
     'bubble/dismissBubble',
     (_, { dispatch, getState }) => {
         if (getState().bubble.currentPage !== 0) {
@@ -73,7 +82,7 @@ export const dismissBubble = createAsyncThunk(
 export const proceed = createAsyncThunk(
     'bubble/proceed',
     async (payload, { getState, dispatch }) => {
-        const { currentPage, readyToProceed } = getState().bubble;
+        const { bubble: { currentPage, readyToProceed } } = getState() as { bubble: BubbleState };
 
         if (!readyToProceed) {
             return;
@@ -112,3 +121,7 @@ export const proceed = createAsyncThunk(
         dispatch(increment());
     }
 );
+
+export const selectBubbleActive = (state: RootState) => state.bubble.active;
+export const selectCurrentPage = (state: RootState) => state.bubble.currentPage;
+export const selectReadyToProceed = (state: RootState) => state.bubble.readyToProceed;

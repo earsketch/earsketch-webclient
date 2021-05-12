@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { RootState } from '../reducers';
 
 const appSlice = createSlice({
     name: 'app',
@@ -71,13 +72,13 @@ export const {
     setEmbeddedShareID,
 } = appSlice.actions;
 
-export const selectScriptLanguage = state => state.app.scriptLanguage;
-export const selectColorTheme = state => state.app.colorTheme;
+export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage;
+export const selectColorTheme = (state: RootState) => state.app.colorTheme;
 // TODO: Figure out the right way to do this with redux-persist.
-export const selectFontSize = state => state.app.fontSize || 14;
-export const selectEmbedMode = state => state.app.embedMode;
-export const selectHideDAW = state => state.app.hideDAW;
-export const selectHideEditor = state => state.app.hideEditor;
-export const selectEmbeddedScriptUsername = state => state.app.embeddedScriptUsername;
-export const selectEmbeddedScriptName = state => state.app.embeddedScriptName;
-export const selectEmbeddedShareID = state => state.app.embeddedShareID;
+export const selectFontSize = (state: RootState) => state.app.fontSize || 14;
+export const selectEmbedMode = (state: RootState) => state.app.embedMode;
+export const selectHideDAW = (state: RootState) => state.app.hideDAW;
+export const selectHideEditor = (state: RootState) => state.app.hideEditor;
+export const selectEmbeddedScriptUsername = (state: RootState) => state.app.embeddedScriptUsername;
+export const selectEmbeddedScriptName = (state: RootState) => state.app.embeddedScriptName;
+export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedShareID;

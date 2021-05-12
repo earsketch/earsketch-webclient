@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, LegacyRef, ChangeEventHandler, MouseEventHandler } from 'react';
+import { Store } from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
 import { hot } from 'react-hot-loader/root';
@@ -10,6 +11,7 @@ import * as layout from '../layout/layoutState';
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
+import { RootState } from '../reducers';
 
 const darkBgColor = '#223546';
 
@@ -39,7 +41,7 @@ export const TitleBar = () => {
     );
 };
 
-const BrowserTab = ({ name, children }) => {
+const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
     const dispatch = useDispatch();
     const isSelected = useSelector(layout.selectWestKind)===name;
 
@@ -85,11 +87,16 @@ export const BrowserTabs = () => {
     );
 };
 
-export const Header = ({ title }) => (
+export const Header = ({ title }: { title: string }) => (
     <div className={'p-3 text-2xl hidden'}>{title}</div>
 );
 
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }) => {
+interface SearchBarProps {
+    searchText: string
+    dispatchSearch: ChangeEventHandler<HTMLInputElement>
+    dispatchReset: MouseEventHandler<HTMLElement>
+}
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme);
     return (
         <form className='p-3 pb-1' onSubmit={e => e.preventDefault()}>
@@ -115,20 +122,29 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }) => {
     );
 };
 
-export const DropdownMultiSelector = ({ title, category, items, position, numSelected, FilterItem }) => {
+interface DropdownMultiSelectorProps {
+    title: string
+    category: string
+    items: string[]
+    position: 'center' | 'left' | 'right'
+    numSelected?: number
+    FilterItem: React.FC<any>
+}
+
+export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ title, category, items, position, numSelected, FilterItem }) => {
     const theme = useSelector(appState.selectColorTheme);
     const [showTooltip, setShowTooltip] = useState(false);
-    const [referenceElement, setReferenceElement] = useState(null);
-    const [popperElement, setPopperElement] = useState(null);
+    const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null);
+    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null);
     const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
         modifiers: [{ name: 'offset', options: { offset: [0,5] } }]
     });
 
-    const handleClick = event => {
+    const handleClick = (event: Event & { target: HTMLElement }) => {
         setPopperElement(ref => {
             setReferenceElement(rref => {
                 // TODO: Pretty hacky way to get the non-null (popper-initialized) multiple refs. Refactor if possible.
-                if (ref && rref && !ref.contains(event.target) && !rref.contains(event.target)) {
+                if (!ref?.contains(event.target) && !rref?.contains(event.target)) {
                     setShowTooltip(false);
                 }
                 return rref;
@@ -149,9 +165,9 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
 
     return (<>
         <div
-            ref={setReferenceElement}
+            ref={setReferenceElement as LegacyRef<HTMLDivElement>}
             onClick={() => {setShowTooltip(show => {
-                update();
+                update?.();
                 return !show;
             })}}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme==='light' ? 'border-black' : 'border-white'}`}
@@ -167,7 +183,7 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
             <i className='icon icon-arrow-down2 text-lg p-2' />
         </div>
         <div
-            ref={setPopperElement}
+            ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={showTooltip ? styles.popper : { display:'none' }}
             {...attributes.popper}
             className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
@@ -190,7 +206,13 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
     </>);
 };
 
-export const Collection = ({ title, visible=true, initExpanded=true, children, className='' }) => {
+interface CollectionType {
+    title: string
+    visible: boolean
+    initExpanded: boolean
+    className?: string
+}
+export const Collection:React.FC<CollectionType> = ({ title, visible=true, initExpanded=true, children, className='' }) => {
     const [expanded, setExpanded] = useState(initExpanded);
     const [highlight, setHighlight] = useState(false);
 
@@ -232,7 +254,7 @@ export const Collection = ({ title, visible=true, initExpanded=true, children, c
     );
 };
 
-export const Collapsed = ({ position='west', title=null }) => {
+export const Collapsed:React.FC<{ position:'west'|'east', title?:string|void }> = ({ position='west', title=null }) => {
     const theme = useSelector(appState.selectColorTheme);
     const embedMode = useSelector(appState.selectEmbedMode);
     const dispatch = useDispatch();
@@ -270,7 +292,7 @@ export const Collapsed = ({ position='west', title=null }) => {
 };
 
 // Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
-const BrowserComponents = {
+const BrowserComponents: { [key:string]: React.FC } = {
     SOUNDS: SoundBrowser,
     SCRIPTS: ScriptBrowser,
     API: APIBrowser
@@ -278,7 +300,7 @@ const BrowserComponents = {
 
 const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
-    const open = useSelector(state => state.layout.west.open);
+    const open = useSelector((state: RootState) => state.layout.west.open);
     let kind = useSelector(layout.selectWestKind);
     if (!Object.keys(BrowserComponents).includes(kind)) {
         kind = 'SOUNDS';
@@ -303,7 +325,7 @@ const Browser = () => {
     );
 };
 
-const HotBrowser = hot(props => {
+const HotBrowser = hot((props: { $ngRedux: Store }) => {
     return (
         <Provider store={props.$ngRedux}>
             <Browser />

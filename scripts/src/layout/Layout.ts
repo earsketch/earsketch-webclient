@@ -4,11 +4,12 @@ import store from '../reducers';
 
 export const resetHorizontalSplits = () => {
     const horizontalSplits = layout.getHorizontalSplits();
-    horizontalSplits && horizontalSplits.setSizes(layout.selectHorizontalRatio(store.getState()));
+    horizontalSplits?.setSizes(layout.selectHorizontalRatio(store.getState()));
 };
 
-export const toggleHorizontalDrag = (index, state) => {
-    document.getElementById(`gutter-horizontal-${index}`).style['pointer-events'] = state ? 'auto' : 'none';
+export const toggleHorizontalDrag = (index: number, state: boolean) => {
+    const gutter = document.getElementById(`gutter-horizontal-${index}`);
+    if (gutter) gutter.style['pointerEvents'] = state ? 'auto' : 'none';
 };
 
 export const initialize = () => {
@@ -76,8 +77,8 @@ export const initialize = () => {
 export const destroy = () => {
     const horizontalSplits = layout.getHorizontalSplits();
     const verticalSplits = layout.getVerticalSplits();
-    horizontalSplits && horizontalSplits.destroy();
-    verticalSplits && verticalSplits.destroy();
+    horizontalSplits?.destroy();
+    verticalSplits?.destroy();
     layout.setHorizontalSplits(null);
     layout.setVerticalSplits(null);
 };

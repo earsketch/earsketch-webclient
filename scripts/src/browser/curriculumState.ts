@@ -1,12 +1,14 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import * as layout from '../layout/layoutState'
+import { RootState, ThunkAPI, AppDispatch } from '../reducers'
+import lunr from 'lunr';
 
-export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
+export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
     const {href: _url, loc: _location} = fixLocation(url, location)
     dispatch(loadChapter({location: _location}))
     // Check cache before fetching.
-    if (state.curriculum.contentCache[_location] !== undefined) {
+    if (state.curriculum.contentCache[_location.join(',')] !== undefined) {
         esconsole(`${_location} is in the cache, nothing else to do.`, 'debug')
         return {}
     }
@@ -18,7 +20,7 @@ export const fetchContent = createAsyncThunk('curriculum/fetchContent', async ({
     return processContent(_location, await response.text(), dispatch)
 })
 
-const processContent = (location, html, dispatch) => {
+const processContent = (location: number[], html: string, dispatch: AppDispatch) => {
     const doc = new DOMParser().parseFromString(html, "text/html")
 
     // Bring these nodes into our document context, but replace the <body> with a <div>.
@@ -31,13 +33,13 @@ const processContent = (location, html, dispatch) => {
     root.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
 
     // Fix internal cross-references.
-    root.querySelectorAll('a[href^="#"]').forEach(el => {
+    root.querySelectorAll('a[href^="#"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2)] + el.getAttribute("href") }))
+            dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2).join(',')] + el.getAttribute("href") }))
         }
     })
-    root.querySelectorAll('a[data-es-internallink="true"]').forEach(el => {
+    root.querySelectorAll('a[data-es-internallink="true"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(fetchContent({ url: el.getAttribute("href") }))
@@ -45,7 +47,7 @@ const processContent = (location, html, dispatch) => {
     })
 
     // Used in 4.1, 27.
-    root.querySelectorAll('a[href="<api>"]').forEach(el => {
+    root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
             dispatch(layout.openWest("API"))
@@ -73,21 +75,32 @@ const processContent = (location, html, dispatch) => {
 
     if (location.length < 3) {
         // No sections, leave as-is.
-        return {[location]: root}
+        return {[location.join(',')]: root}
     }
 
     // Chop the chapter up into sections.
-    const body = root.querySelector('div.sect1').parentNode
+    const sect1 = root.querySelector('div.sect1')
+    const body = sect1 ? sect1.parentNode : null
     // Special case: first section (sect2) should come with the opening blurb (sect1).
     // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
     const chapterLocation = location.slice(0, 2)
-    const map = {}
-    for (let [idx, el] of [...root.querySelectorAll('div.sect2')].slice(1).entries()) {
-        map[chapterLocation.concat([idx + 1])] = el
+    const map: { [key:string]: any } = {}
+    const sect2 = Array.from(root.querySelectorAll('div.sect2'))
+    for (let [idx, el] of sect2.slice(1).entries()) {
+        map[chapterLocation.concat([idx + 1]).join(',')] = el
         el.remove()
     }
-    map[chapterLocation.concat([0])] = body
+    map[chapterLocation.concat([0]).join(',')] = body
     return map
+}
+
+interface CurriculumState {
+    searchText: string
+    showResults: boolean
+    currentLocation: number[]
+    focus: [string|null, string|null]
+    showTableOfContents: boolean
+    contentCache: any
 }
 
 const curriculumSlice = createSlice({
@@ -99,7 +112,7 @@ const curriculumSlice = createSlice({
         focus: [null, null], // unit, chapter
         showTableOfContents: false,
         contentCache: {},
-    },
+    } as CurriculumState,
     reducers: {
         setSearchText(state, { payload }) {
             state.searchText = payload
@@ -135,14 +148,15 @@ const curriculumSlice = createSlice({
             state.showResults = payload
         },
     },
-    extraReducers: {
-        [fetchContent.fulfilled]: (state, action) => {
+    extraReducers: builder => {
+        builder.addCase(fetchContent.fulfilled, (state: CurriculumState, action: { payload: any }) => {
             // Update the cache.
-            state.contentCache = {...state.contentCache, ...action.payload}   
-        },
-        [fetchContent.rejected]: (...args) => {
+            state.contentCache = {...state.contentCache, ...action.payload}
+        })
+
+        builder.addCase(fetchContent.rejected, (...args) => {
             esconsole("Fetch failed! " + JSON.stringify(args), 'error')
-        }
+        })
     }
 })
 
@@ -156,17 +170,17 @@ export const {
     showResults,
 } = curriculumSlice.actions
 
-export const selectSearchText = state => state.curriculum.searchText
+export const selectSearchText = (state: RootState) => state.curriculum.searchText
 
-export const selectShowResults = state => state.curriculum.showResults
+export const selectShowResults = (state: RootState) => state.curriculum.showResults
 
-export const selectCurrentLocation = state => state.curriculum.currentLocation
+export const selectCurrentLocation = (state: RootState) => state.curriculum.currentLocation
 
-export const selectContent = state => state.curriculum.contentCache[state.curriculum.currentLocation]
+export const selectContent = (state: RootState) => state.curriculum.contentCache[state.curriculum.currentLocation.join(',')]
 
-export const selectShowTableOfContents = state => state.curriculum.showTableOfContents
+export const selectShowTableOfContents = (state: RootState) => state.curriculum.showTableOfContents
 
-export const selectFocus = state => state.curriculum.focus
+export const selectFocus = (state: RootState) => state.curriculum.focus
 
 // Search through chapter descriptions.
 const documents = ESCurr_SearchDoc
@@ -181,13 +195,19 @@ const idx = lunr(function () {
     }, this)
 })
 
+export interface SearchResult {
+    id: lunr.Index.Result['ref'],
+    title: string
+}
+
 export const selectSearchResults = createSelector(
     [selectSearchText],
-    (searchText) => {
+    (searchText): SearchResult[] => {
         if (!searchText)
             return []
         try {
             return idx.search(searchText).map((res) => {
+                // @ts-ignore: TODO: handle not-found cases.
                 const title = documents.find((doc) => {
                     return doc.id === res.ref
                 }).title
@@ -204,11 +224,14 @@ export const selectSearchResults = createSelector(
     }
 )
 
-export const getChNumberForDisplay = (unitIdx, chIdx) => {
-    if (toc[unitIdx].chapters[chIdx] === undefined || toc[unitIdx].chapters[chIdx].displayChNum === -1) {
+export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|string) => {
+    unitIdx = typeof(unitIdx)==='number' ? unitIdx : parseInt(unitIdx)
+    chIdx = typeof(chIdx)==='number' ? chIdx : parseInt(chIdx)
+    const unit = toc[unitIdx]
+    if (unit.chapters && (unit.chapters[chIdx] === undefined || unit.chapters[chIdx].displayChNum === -1)) {
         return ''
     } else {
-        return toc[unitIdx].chapters[chIdx].displayChNum
+        return unit.chapters && unit.chapters[chIdx].displayChNum
     }
 }
 
@@ -249,15 +272,22 @@ export const selectPageTitle = createSelector(
     }
 )
 
+export interface TOCItem {
+    URL: string
+    title: string
+    sections?: TOCItem[]
+    chapters?: TOCItem[]
+    displayChNum?: number
+}
 
-const toc = ESCurr_TOC
+const toc = ESCurr_TOC as [TOCItem]
 const tocPages = ESCurr_Pages
 
-const locationToPage = {}
-tocPages.forEach((location, pageIdx) => locationToPage[location] = pageIdx)
+const locationToPage: { [location:string]: number } = {}
+tocPages.forEach((location, pageIdx) => locationToPage[location.join(',')] = pageIdx)
 
-export const adjustLocation = (location, delta) => {
-    let pageIdx = locationToPage[location] + delta
+export const adjustLocation = (location: number[], delta: number) => {
+    let pageIdx = locationToPage[location.join(',')] + delta
     if (pageIdx < 0) {
         pageIdx = 0
     } else if (pageIdx >= tocPages.length) {
@@ -267,31 +297,32 @@ export const adjustLocation = (location, delta) => {
     return tocPages[pageIdx]
 }
 
-
-const urlToLocation = {}
-const locationToUrl = {}
-toc.forEach((unit, unitIdx) => {
+const urlToLocation: { [key:string]: number[] } = {}
+const locationToUrl: { [key:string]: string } = {}
+toc.forEach((unit: TOCItem, unitIdx: number) => {
     urlToLocation[unit.URL] = [unitIdx]
-    locationToUrl[[unitIdx]] = unit.URL
-    unit.chapters.forEach((ch, chIdx) => {
+    locationToUrl[[unitIdx].join(',')] = unit.URL
+    unit.chapters?.forEach((ch, chIdx) => {
         urlToLocation[ch.URL] = [unitIdx, chIdx]
-        locationToUrl[[unitIdx, chIdx]] = ch.URL
-        ch.sections.forEach((sec, secIdx) => {
+        locationToUrl[[unitIdx, chIdx].join(',')] = ch.URL
+        ch.sections?.forEach((sec, secIdx) => {
             urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
-            locationToUrl[[unitIdx, chIdx, secIdx]] = sec.URL
+            locationToUrl[[unitIdx, chIdx, secIdx].join(',')] = sec.URL
         })
     })
 })
 
-const fixLocation = (href, loc) => {
+const fixLocation = (href: string, loc: number[]) => {
     if (loc === undefined) {
         loc = urlToLocation[href]
     } else if (href === undefined) {
-        href = locationToUrl[loc]
+        href = locationToUrl[loc.join(',')]
     }
 
-    if (loc.length === 1) {
+    if (loc.length === 1 && toc[loc[0]].chapters) {
+        // @ts-ignore
         if (toc[loc[0]].chapters.length > 0) {
+            // @ts-ignore
             if (toc[loc[0]].chapters[0].length > 0) {
                 loc = [loc[0], 0, 0]
             } else {
@@ -300,10 +331,11 @@ const fixLocation = (href, loc) => {
         }
     }
 
-    if (loc.length === 2) {
+    if (loc.length === 2 && toc[loc[0]].chapters) {
+        // @ts-ignore
         var currChapter = toc[loc[0]].chapters[loc[1]]
 
-        if (currChapter.sections.length > 0) {
+        if (currChapter.sections && currChapter.sections.length > 0) {
             const sectionDiv = href.split('#')[1]
             if (sectionDiv === undefined) {
                 // when opening a chapter-level page, also present the first section

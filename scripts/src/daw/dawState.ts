@@ -1,6 +1,8 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit'
 
-const shuffle = (array) => {
+import { RootState } from '../reducers'
+
+const shuffle = (array : any[]) => {
     let i = array.length
     while (i) {
         const r = Math.floor(Math.random() * i--)
@@ -44,6 +46,67 @@ const TIMELINE_ZOOM_INTERVALS = [
 // So, we set a default number of measures that we want the screen to fit in.
 const MEASURES_FIT_TO_SCREEN = 61
 
+// TODO: Move these types to player when it gets updated.
+export interface Clip {
+    filekey: string
+    loopChild: boolean
+    measure: number
+    start: number
+    end: number
+    audio: AudioBuffer
+}
+
+export interface EffectRange {
+    name: string
+    parameter: string
+    startMeasure: number
+    endMeasure: number
+    inputStartValue: number
+    inputEndValue: number
+}
+
+export type Effect = EffectRange[]
+
+export interface Track {
+    clips: Clip[]
+    effects: {[key: string]: Effect}
+    label?: string | number
+    visible?: boolean
+    buttons?: boolean
+    mute?: boolean
+}
+
+export type Color = string
+
+export type SoloMute = "solo" | "mute" | undefined
+
+interface SoloMuteConfig {
+    [key: number]: SoloMute
+}
+
+interface DAWState {
+    tracks: Track[]
+    playLength: number
+    trackWidth: number
+    trackHeight: number
+    trackColors: Color[]
+    showEffects: boolean
+    metronome: boolean
+    tempo: number
+    playing: boolean
+    pendingPosition: number | null
+    soloMute: SoloMuteConfig
+    bypass: {[key: number]: string[]}
+    loop: {
+        selection: boolean,
+        start: number,
+        end: number,
+        on: boolean,
+        reset: boolean,
+    }
+    autoScroll: boolean
+}
+
 const dawSlice = createSlice({
     name: 'daw',
     initialState: {
@@ -67,7 +130,7 @@ const dawSlice = createSlice({
             reset: false,
         },
         autoScroll: true,
-    },
+    } as DAWState,
     reducers: {
         setTracks(state, { payload }) {
             state.tracks = payload
@@ -136,20 +199,20 @@ export const {
     setAutoScroll,
 } = dawSlice.actions
 
-export const selectTracks = state => state.daw.tracks
-export const selectPlayLength = state => state.daw.playLength
-export const selectTrackWidth = state => state.daw.trackWidth
-export const selectTrackHeight = state => state.daw.trackHeight
-export const selectTrackColors = state => state.daw.trackColors
-export const selectShowEffects = state => state.daw.showEffects
-export const selectMetronome = state => state.daw.metronome
-export const selectTempo = state => state.daw.tempo
-export const selectPlaying = state => state.daw.playing
-export const selectPendingPosition = state => state.daw.pendingPosition
-export const selectSoloMute = state => state.daw.soloMute
-export const selectBypass = state => state.daw.bypass
-export const selectLoop = state => state.daw.loop
-export const selectAutoScroll = state => state.daw.autoScroll
+export const selectTracks = (state: RootState) => state.daw.tracks
+export const selectPlayLength = (state: RootState) => state.daw.playLength
+export const selectTrackWidth = (state: RootState) => state.daw.trackWidth
+export const selectTrackHeight = (state: RootState) => state.daw.trackHeight
+export const selectTrackColors = (state: RootState) => state.daw.trackColors
+export const selectShowEffects = (state: RootState) => state.daw.showEffects
+export const selectMetronome = (state: RootState) => state.daw.metronome
+export const selectTempo = (state: RootState) => state.daw.tempo
+export const selectPlaying = (state: RootState) => state.daw.playing
+export const selectPendingPosition = (state: RootState) => state.daw.pendingPosition
+export const selectSoloMute = (state: RootState) => state.daw.soloMute
+export const selectBypass = (state: RootState) => state.daw.bypass
+export const selectLoop = (state: RootState) => state.daw.loop
+export const selectAutoScroll = (state: RootState) => state.daw.autoScroll
 
 export const selectMixTrackHeight = createSelector(
     [selectTrackHeight],
@@ -184,13 +247,14 @@ export const selectSongDuration = createSelector(
     (playLength, tempo) => playLength*BEATS_PER_MEASURE/(tempo/60)
 )
 
-const getZoomIntervals = (intervals, width) => {
+const getZoomIntervals = (intervals: ({end: number} & any)[], width: number) => {
     // Assumes intervals are sorted in increasing order.
     for (const zoomIntervals of intervals) {
         if (width <= zoomIntervals.end) {
             return zoomIntervals
         }
     }
+    return intervals[intervals.length-1]
 }
 
 export const selectMeasurelineZoomIntervals = createSelector(
@@ -203,7 +267,7 @@ export const selectTimelineZoomIntervals = createSelector(
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
 )
 
-export const getMuted = (tracks, soloMute, metronome) => {
+export const getMuted = (tracks: Track[], soloMute: SoloMuteConfig, metronome: boolean) => {
     const keys = Object.keys(tracks).map(x => +x)
     const soloed = keys.filter(key => soloMute[key] === "solo")
     if (soloed.length > 0) {
@@ -221,7 +285,7 @@ export const selectTotalTrackHeight = createSelector(
     [selectTracks, selectShowEffects, selectTrackHeight, selectMixTrackHeight],
     (tracks, effects, height, mixHeight) => {
         let total = 0
-        tracks.forEach((track, index) => {
+        tracks.forEach((track: Track, index: number) => {
             if (track.visible) {
                 total += (index === 0 ? mixHeight : height)
                 if (effects) {

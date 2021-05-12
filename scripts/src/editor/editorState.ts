@@ -3,6 +3,8 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import * as config from './editorConfig';
 import * as app from '../app/appState';
+import { Ace } from 'ace-builds';
+import { RootState } from '../reducers';
 
 const editorSlice = createSlice({
     name: 'editor',
@@ -28,22 +30,26 @@ export const {
 } = editorSlice.actions;
 
 // Note: Do not export. Only modify through asyncThunk as side effects.
-const editorMutableState = {
+interface EditorMutableState {
+    editor: { ace: Ace.Editor, droplet: any } | null
+}
+
+const editorMutableState: EditorMutableState = {
     editor: null
 };
 
 export const setEditorInstance = createAsyncThunk(
     'editor/setEditorInstance',
-    (editor) => {
+    (editor: { ace: Ace.Editor, droplet: any }) => {
         editorMutableState.editor = editor;
     }
 );
 
-export const selectBlocksMode = state => state.editor.blocksMode;
-export const setReadOnly = (bool) => {
+export const selectBlocksMode = (state: RootState) => state.editor.blocksMode;
+export const setReadOnly = (bool: boolean) => {
     editorMutableState.editor?.ace.setReadOnly(bool);
     editorMutableState.editor?.droplet.setReadOnly(bool);
 };
-export const setSession = (editSession) => {
+export const setSession = (editSession: Ace.EditSession) => {
     editorMutableState.editor?.ace.setSession(editSession);
 };

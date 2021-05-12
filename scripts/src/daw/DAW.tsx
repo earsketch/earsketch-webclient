@@ -8,18 +8,27 @@ import * as daw from './dawState'
 
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
+import angular from 'angular'
+import { RootState } from '../reducers'
+import ngRedux from 'ng-redux'
 
 // Width of track control box
 const X_OFFSET = 100
 
+interface Result {
+    tempo: number
+    length: number
+    tracks: daw.Track[]
+    // ...plus some other properties the DAW doesn't care about.
+}
+
 // TODO: remove after refactoring player
-let _result = null
+let _result : Result | null = null
 
-
-const Header = ({ playPosition, setPlayPosition }) => {
+const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
     const playLength = useSelector(daw.selectPlayLength)
-    const bubble = useSelector(state => state.bubble)
+    const bubble = useSelector((state: RootState) => state.bubble)
     const playing = useSelector(daw.selectPlaying)
     const soloMute = useSelector(daw.selectSoloMute)
     const muted = useSelector(daw.selectMuted)
@@ -50,7 +59,7 @@ const Header = ({ playPosition, setPlayPosition }) => {
 
         // TODO: Update after relevant components get ported.
         if (needCompile) {
-            $rootScope.$broadcast('compileembeddedTrack', true)
+            $rootScope?.$broadcast('compileembeddedTrack', true)
             setNeedCompile(false)
             return
         }
@@ -98,12 +107,12 @@ const Header = ({ playPosition, setPlayPosition }) => {
     const [volumeMuted, setVolumeMuted] = useState(false)
     const minVolume = -20
 
-    const mute = (value) => {
+    const mute = (value: boolean) => {
         setVolumeMuted(value)
         player.setVolume(value ? -60 : volume)
     }
 
-    const changeVolume = (value) => {
+    const changeVolume = (value: number) => {
         setVolume(value)
         if (value == minVolume) {
             mute(true)
@@ -125,9 +134,9 @@ const Header = ({ playPosition, setPlayPosition }) => {
         }
     }
 
-    const [title, setTitle] = useState(null)
+    const [title, setTitle] = useState<string | null>(null)
 
-    const el = useRef()
+    const el = useRef<HTMLDivElement>(null)
 
     // Update title/icon display whenever element size changes.
     const observer = new ResizeObserver(entries => {
@@ -147,7 +156,9 @@ const Header = ({ playPosition, setPlayPosition }) => {
 
     useEffect(() => {
         el.current && observer.observe(el.current)
-        return () => el.current && observer.unobserve(el.current)
+        return () => {
+            if (el.current) observer.unobserve(el.current)
+        }
     }, [el])
 
     return <div ref={el} id="dawHeader" className="flex-grow-0 bg-gray-900">
@@ -218,14 +229,16 @@ const Header = ({ playPosition, setPlayPosition }) => {
                     </button>
                 </span>
                 <span className="daw-transport-button">
-                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(e.target.value)} />
+                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} />
                 </span>
             </span>
         </div>
     </div>
 }
 
-const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }) => {
+const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
+               { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
+                 toggleBypass: (a: string) => void, track: daw.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -242,7 +255,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
-                {track.clips.map((clip, index) => <Clip key={index} color={color} clip={clip} />)}
+                {track.clips.map((clip: daw.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
@@ -261,25 +274,24 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
 }
 
 
-const drawWaveform = (element, waveform, width, height) => {
-    var cvs = d3.select(element).select('canvas')
+const drawWaveform = (element: HTMLElement, waveform: number[], width: number, height: number) => {
+    const cvs = d3.select(element).select('canvas')
         .attr('width', width)
         .attr('height', height)
+        .node() as HTMLCanvasElement
 
-    var interval = width / waveform.length
-    var pos = 0
-    var zero = height / 2
-    var magScaled = 0
+    const interval = width / waveform.length
+    const zero = height / 2
 
-    var ctx = cvs.node().getContext('2d')
+    const ctx = cvs.getContext('2d')!
     ctx.strokeStyle = '#427EB0'
     ctx.fillStyle = "#181818"
     ctx.lineWidth = interval > 1 ? interval * 0.9 : interval // give some space between bins
     ctx.beginPath()
     for (var i = 0; i < waveform.length; i++) {
-        pos = i * interval + 0.5 // pixel offset needed to avoid canvas blurriness
+        const pos = i * interval + 0.5 // pixel offset needed to avoid canvas blurriness
         // TODO: include this scaling in the preprocessing if possible
-        magScaled = waveform[i] * height / 2
+        const magScaled = waveform[i] * height / 2
         ctx.moveTo(pos, zero + magScaled)
         ctx.lineTo(pos, zero - magScaled)
     }
@@ -287,22 +299,22 @@ const drawWaveform = (element, waveform, width, height) => {
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color, clip: daw.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // Minimum width prevents clips from vanishing on zoom out.
     const width = Math.max(xScale(clip.end - clip.start + 1), 2)
     const offset = xScale(clip.measure)
-    const element = useRef()
+    const element = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (WaveformCache.checkIfExists(clip)) {
+        if (element.current && WaveformCache.checkIfExists(clip)) {
             const waveform = WaveformCache.get(clip)
             drawWaveform(element.current, waveform, width, trackHeight)
         }
     }, [clip, xScale, trackHeight])
 
-    return <div ref={element} className={clip.loopChild ? 'loop' : ''} className="dawAudioClipContainer" style={{background: color, width: width + 'px', left: offset + 'px'}}>
+    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? ' loop' : ''}`} style={{background: color, width: width + 'px', left: offset + 'px'}}>
         <div className="clipWrapper">
             <div style={{width: width + 'px'}} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
@@ -310,22 +322,19 @@ const Clip = ({ color, clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect, bypass, mute }) => {
+const Effect = ({ name, color, effect, bypass, mute }:
+                { name: string, color: daw.Color, effect: daw.Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
-    const element = useRef()
+    const element = useRef<HTMLDivElement>(null)
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
-        const points = []
+        type Point = {x: number, y: number}
+        const points: Point[] = []
 
-        // scope.effect = { 0: segment1, 1: segment2, etc., visible, bypass }
-        // TODO: hacky and will probably introduce bugs
-        const fxSegmentIdx = Object.keys(effect).filter(v => !isNaN(parseInt(v)))
-
-        fxSegmentIdx.forEach(v => {
-            const range = effect[v]
+        effect.forEach(range => {
             points.push({x: range.startMeasure, y: range.inputStartValue})
             points.push({x: range.endMeasure, y: range.inputEndValue})
         })
@@ -343,7 +352,7 @@ const Effect = ({ name, color, effect, bypass, mute }) => {
             .range([trackHeight - 5, 5])
 
         // map (x,y) pairs into a line
-        const line = d3.svg.line().interpolate("linear").x(d => x(d.x)).y(d => y(d.y))
+        const line = d3.svg.line().interpolate("linear").x((d: Point) => x(d.x)).y((d: Point) => y(d.y))
 
         return line(points)
     }
@@ -395,7 +404,8 @@ const Effect = ({ name, color, effect, bypass, mute }) => {
     </div>
 }
 
-const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }) => {
+const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
+                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: daw.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -428,12 +438,12 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }) => {
     </div>
 }
 
-const Cursor = ({ position }) => {
+const Cursor = ({ position }: { position: number }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null && <div className="daw-cursor" style={{left: position + 'px'}}></div>
+    return pendingPosition === null ? <div className="daw-cursor" style={{left: position + 'px'}}></div> : null
 }
 
-const Playhead = ({ playPosition }) => {
+const Playhead = ({ playPosition }: { playPosition: number }) => {
     const xScale = useSelector(daw.selectXScale)
     return <div className="daw-marker" style={{left: xScale(playPosition) + 'px'}}></div>
 }
@@ -441,14 +451,14 @@ const Playhead = ({ playPosition }) => {
 const SchedPlayhead = () => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
     const xScale = useSelector(daw.selectXScale)
-    return pendingPosition !== null && <div className="daw-sched-marker" style={{left: xScale(pendingPosition)}}></div>
+    return pendingPosition === null ? null : <div className="daw-sched-marker" style={{left: xScale(pendingPosition)}}></div>
 }
 
 const Measureline = () => {
     const xScale = useSelector(daw.selectXScale)
     const intervals = useSelector(daw.selectMeasurelineZoomIntervals)
     const playLength = useSelector(daw.selectPlayLength)
-    const element = useRef()
+    const element = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         let n = 1
@@ -459,7 +469,7 @@ const Measureline = () => {
             .orient("bottom")
             .tickValues(d3.range(1, playLength + 1, intervals.tickInterval))
             .tickSize(15)
-            .tickFormat(d => {
+            .tickFormat((d: any) => {
                 // choose the next tick based on interval
                 if (n === 1) {
                     n = intervals.labelInterval + d
@@ -485,7 +495,7 @@ const Measureline = () => {
         if (intervals.tickDivision > 1) {
             let n = 1
             d3.select(element.current).selectAll('svg .tick')
-                .filter(d => {
+                .filter((d: any) => {
                     if (n === 1) {
                         n = intervals.tickDivision + d
                         return false
@@ -503,13 +513,13 @@ const Measureline = () => {
 
         } else {
             d3.select(element.current).selectAll('svg .tick')
-                .filter(d => d % 1 !== 0)
+                .filter((d: number) => d % 1 !== 0)
                 .select('line')
                 .attr('y1', 8)
                 .attr('y2', 15)
 
             d3.select(element.current).selectAll('svg .tick')
-                .filter(d => d % 1 === 0)
+                .filter((d: number) => d % 1 === 0)
                 .select('line')
                 .attr('y1', 0)
                 .attr('y2', 15)
@@ -529,7 +539,7 @@ const Timeline = () => {
     const timeScale = useSelector(daw.selectTimeScale)
     const songDuration = useSelector(daw.selectSongDuration)
     const intervals = useSelector(daw.selectTimelineZoomIntervals)
-    const element = useRef()
+    const element = useRef<HTMLDivElement>(null)
 
     // redraw the timeline when the track width changes
     useEffect(() => {
@@ -538,7 +548,7 @@ const Timeline = () => {
             .scale(timeScale) // scale ticks according to zoom
             .orient("bottom")
             .tickValues(d3.range(0, songDuration + 1, intervals.tickInterval))
-            .tickFormat(d => (d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, d))))
+            .tickFormat((d: any) => (d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, d))))
 
         // append axis to timeline dom element
         d3.select(element.current).select('svg.axis g')
@@ -559,18 +569,23 @@ const Timeline = () => {
 
 
 // Pulled in via angular dependencies
-let WaveformCache, ESUtils, applyEffects, player, $rootScope
+// TODO: Replace 'any' with more specific types.
+let WaveformCache: any = null
+let ESUtils: any = null
+let applyEffects: any = null
+let player: any = null
+let $rootScope: angular.IRootScopeService | null = null
 
-const rms = (array) => {
+const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks, tempo) => {
+const prepareWaveforms = (tracks: daw.Track[], tempo: number) => {
     esconsole('preparing a waveform to draw', 'daw');
 
     // ignore the mix track (0) and metronome track (len-1)
     for (var i = 1; i < tracks.length - 1; i++) {
-        tracks[i].clips.forEach(clip => {
+        tracks[i].clips.forEach((clip: daw.Clip) => {
             if (!WaveformCache.checkIfExists(clip)) {
                 const waveform = clip.audio.getChannelData(0)
 
@@ -607,13 +622,13 @@ const prepareWaveforms = (tracks, tempo) => {
     }
 }
 
-let lastTab = null
+let lastTab: string | null = null
 // TODO: Temporary hack:
-let _setPlayPosition
+let _setPlayPosition: ((a: number) => void) | null = null
 
 let setupDone = false
-const setup = ($ngRedux) => {
-    const { dispatch, getState } = $ngRedux;
+const setup = ($ngRedux: ngRedux.INgRedux) => {
+    const { dispatch, getState } = $ngRedux
 
     if (setupDone) return
     setupDone = true
@@ -622,10 +637,10 @@ const setup = ($ngRedux) => {
 
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', function (result) {
+    $scope.$watch('compiled', function (result: Result | null | undefined) {
         const state = getState()
-        // console.log("compiled result:", result)
         if (result === null || result === undefined) return
+        console.log("result:", result)
 
         esconsole('code compiled', 'daw')
         prepareWaveforms(result.tracks, result.tempo)
@@ -635,8 +650,8 @@ const setup = ($ngRedux) => {
         const playLength = result.length + 1
         dispatch(daw.setPlayLength(playLength))
 
-        const tracks = []
-        result.tracks.forEach((track, index) => {
+        const tracks: daw.Track[] = []
+        result.tracks.forEach((track: daw.Track, index: number) => {
             // create a (shallow) copy of the track so that we can
             // add stuff to it without affecting the reference which
             // we want to preserve (e.g., for the autograder)
@@ -675,7 +690,7 @@ const setup = ($ngRedux) => {
             dispatch(daw.setMetronome(false))
             dispatch(daw.setShowEffects(true))
             dispatch(daw.setPlaying(false))
-            _setPlayPosition(1)
+            _setPlayPosition!(1)
             dispatch(daw.shuffleTrackColors())
             dispatch(daw.setSoloMute({}))
             dispatch(daw.setBypass({}))
@@ -729,18 +744,18 @@ const DAW = () => {
     const trackHeight = useSelector(daw.selectTrackHeight)
     const totalTrackHeight = useSelector(daw.selectTotalTrackHeight)
 
-    const zoomX = (steps) => {
+    const zoomX = (steps: number) => {
         dispatch(daw.setTrackWidth(Math.min(Math.max(650, trackWidth + steps * 100), 50000)))
     }
-    const zoomY = (steps) => {
+    const zoomY = (steps: number) => {
         dispatch(daw.setTrackHeight(Math.min(Math.max(25, trackHeight + steps * 10), 125)))
     }
 
     const [xScroll, setXScroll] = useState(0)
     const [yScroll, setYScroll] = useState(0)
-    const el = useRef()
+    const el = useRef<HTMLDivElement>(null)
 
-    const toggleBypass = (trackIndex, effectKey) => {
+    const toggleBypass = (trackIndex: number, effectKey: string) => {
         let effects = bypass[trackIndex] ?? []
         if (effects.includes(effectKey)) {
             effects = effects.filter(k => k !== effectKey)
@@ -752,13 +767,13 @@ const DAW = () => {
         player.setBypassedEffects(updated)
     }
 
-    const toggleSoloMute = (trackIndex, kind) => {
+    const toggleSoloMute = (trackIndex: number, kind: daw.SoloMute) => {
         const updated = {...soloMute, [trackIndex]: soloMute[trackIndex] === kind ? undefined : kind}
         dispatch(daw.setSoloMute(updated))
         player.setMutedTracks(daw.getMuted(tracks, updated, metronome))
     }
 
-    const [dragStart, setDragStart] = useState(null)
+    const [dragStart, setDragStart] = useState<number | null>(null)
 
     const _loop = useSelector(daw.selectLoop)
     // We have local loop state which is modified while the user sets the loop selection.
@@ -766,9 +781,9 @@ const DAW = () => {
     // It is synchronized with the loop state in the Redux store when the latter is updated (e.g. on mouse up):
     useEffect(() => setLoop(_loop), [_loop])
 
-    const onMouseDown = (event) => {
+    const onMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
         // calculate x position of the bar from mouse position
-        let x = event.clientX - event.currentTarget.firstChild.getBoundingClientRect().left
+        let x = event.clientX - (event.currentTarget.firstChild as Element).getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -789,13 +804,13 @@ const DAW = () => {
         }
     }
 
-    const onMouseUp = (event) => {
+    const onMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
         if (dragStart === null) {
             return
         }
 
         // calculate x position of the bar from mouse position
-        let x = event.clientX - event.currentTarget.firstChild.getBoundingClientRect().left
+        let x = event.clientX - (event.currentTarget.firstChild as Element).getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -829,9 +844,9 @@ const DAW = () => {
         }
     }
 
-    const onMouseMove = (event) => {
+    const onMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
         // calculate x position of the bar from mouse position
-        let x = event.clientX - event.currentTarget.firstChild.getBoundingClientRect().left
+        let x = event.clientX - (event.currentTarget.firstChild as Element).getBoundingClientRect().left
         if (event.currentTarget.className !== "daw-track") {
             x -= X_OFFSET
         }
@@ -856,7 +871,7 @@ const DAW = () => {
         }
     }
 
-    const onKeyDown = (event) => {
+    const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === "+" || event.key === "=") {
             zoomX(1)
         } else if (event.key === "-") {
@@ -864,7 +879,7 @@ const DAW = () => {
         }
     }
 
-    const onWheel = (event) => {
+    const onWheel = (event: WheelEvent) => {
         if (event.ctrlKey) {
             event.preventDefault()
             if (event.shiftKey) {
@@ -872,7 +887,7 @@ const DAW = () => {
             } else {
                 zoomX(-Math.sign(event.deltaY)*5)
             }
-        } else {
+        } else if (yScrollEl.current) {
             // Would prefer to forward the wheel event to the correct element, by experiments with this (dispatchEvent) proved fruitless.
             // (The element received the event but did not scroll.)
             yScrollEl.current.scrollBy({top: Math.sign(event.deltaY) * 100, behavior: 'smooth'})
@@ -887,17 +902,18 @@ const DAW = () => {
     }, [onWheel])
 
     // Keep triggering an action while the mouse button is held.
-    const repeatClick = (action, interval=125) => {
-        let timer = useRef()
-        const up = (event) => {
+    const repeatClick = (action: () => void, interval=125) => {
+        let timer = useRef(0)
+        const up = (event: MouseEvent) => {
             if (event.button !== 0) return
             clearInterval(timer.current)
             document.removeEventListener('mouseup', up)
         }
-        const down = (event) => {
+        const down = (event: React.MouseEvent<HTMLButtonElement>) => {
             // Only respond to left-click. (Right-click does weird things in some browsers, maybe because of the context menu.)
             if (event.button !== 0) return
-            timer.current = setInterval(action, interval)
+            // NOTE: The `window.` is so TypeScript doesn't get confused by NodeJS.setInterval. :-/
+            timer.current = window.setInterval(action, interval)
             action()
             // NOTE: We bind this to the document (instead of the same element `down` gets bound to)
             //   in case the user releases the mouse somewhere else.
@@ -907,7 +923,8 @@ const DAW = () => {
     }
 
     // A bit hacky; this allows the interval to continue working after a re-render.
-    const zoomXRef = useRef(), zoomYRef = useRef()
+    const zoomXRef = useRef(zoomX), zoomYRef = useRef(zoomY)
+    // Update on re-render:
     zoomXRef.current = zoomX
     zoomYRef.current = zoomY
 
@@ -917,8 +934,8 @@ const DAW = () => {
     const zoomOutY = repeatClick(() => zoomYRef.current(-1))
 
     const autoScroll = useSelector(daw.selectAutoScroll)
-    const xScrollEl = useRef()
-    const yScrollEl = useRef()
+    const xScrollEl = useRef<HTMLDivElement>(null)
+    const yScrollEl = useRef<HTMLDivElement>(null)
 
     const theme = useSelector(appState.selectColorTheme)
 
@@ -1034,7 +1051,9 @@ const DAW = () => {
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
                      style={{width: "15px", top: "32px", right: "2px", bottom: "40px"}}
                      onScroll={e => {
-                         const fracY = e.target.scrollTop / (e.target.scrollHeight - e.target.clientHeight)
+                         if (!el.current) return
+                         const target = e.target as Element
+                         const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
                          el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)                        
                          setYScroll(el.current.scrollTop)
                     }}>
@@ -1043,7 +1062,9 @@ const DAW = () => {
 
                 <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{height: "15px", left: "100px", right: "45px", bottom: "2px"}}
                      onScroll={e => {
-                         const fracX = e.target.scrollLeft / (e.target.scrollWidth - e.target.clientWidth)
+                         if (!el.current) return
+                         const target = e.target as Element
+                         const fracX = target.scrollLeft / (target.scrollWidth - target.clientWidth)
                          el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
                          setXScroll(el.current.scrollLeft)
                     }}>
@@ -1054,7 +1075,15 @@ const DAW = () => {
     </div>
 }
 
-const HotDAW = hot(props => {
+const HotDAW = hot((props: {
+    // TODO: better types
+    WaveformCache: any,
+    ESUtils: any,
+    applyEffects: any,
+    player: any,
+    $rootScope: angular.IRootScopeService,
+    $ngRedux: any,
+}) => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
     applyEffects = props.applyEffects

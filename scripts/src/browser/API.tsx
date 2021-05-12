@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useState, ChangeEvent, LegacyRef } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -12,12 +12,19 @@ import * as helpers from "../helpers";
 import * as appState from "../app/appState";
 import * as tabs from '../editor/tabState';
 
+interface CodeHighlightProps {
+    language: string
+    children: React.ReactChild | React.ReactChildren
+}
 
 // Highlight.js helper, adapted from https://github.com/highlightjs/highlight.js/issues/925#issuecomment-471272598
 // Is there a better way to do this? If not, we should move this to its own module.
 
-export class CodeHighlight extends Component {
-    constructor(props) {
+export class CodeHighlight extends Component<CodeHighlightProps> {
+    private codeNode: LegacyRef<HTMLElement> & { current: any }
+    public static propTypes = {}
+
+    constructor(props: CodeHighlightProps) {
         super(props)
         // create a ref to highlight only the rendered node and not fetch all the DOM
         this.codeNode = React.createRef()
@@ -32,7 +39,7 @@ export class CodeHighlight extends Component {
     }
 
     highlight() {
-        this.codeNode && this.codeNode.current && hljs.highlightBlock(this.codeNode.current)
+        this.codeNode?.current && hljs.highlightBlock(this.codeNode.current)
     }
 
     render() {
@@ -55,22 +62,21 @@ function useForceUpdate() {
 }
 
 
-const paste = (name, obj) => {
-    let args = []
+const paste = (name: string, obj: api.APIItem) => {
+    let args: string[] = []
     for (var param in obj.parameters) {
         args.push(param)
         if (obj.parameters[param].hasOwnProperty('default')) {
             args[args.length-1] = args[args.length-1].concat('=' + obj.parameters[param].default)
         }
     }
-    args = args.join(', ')
 
     const ideScope = helpers.getNgController('ideController').scope()
-    ideScope.pasteCode(`${name}(${args})`)
+    ideScope.pasteCode(`${name}(${args.join(', ')})`)
 }
 
 // Main point of this module.
-const Entry = ({ name, obj }) => {
+const Entry = ({ name, obj }: { name: string, obj: api.APIItem & { details?: boolean } }) => {
     // TODO don't mutate obj.details
     const forceUpdate = useForceUpdate()
     const [highlight, setHighlight] = useState(false)
@@ -107,7 +113,7 @@ const Entry = ({ name, obj }) => {
             {obj.parameters
             ? (<div className="text-lg font-light break-word">
                 <span className="px-1">(</span>
-                {Object.entries(obj.parameters).map(([param, paramVal]) => (
+                {Object.entries(obj.parameters).map(([param, paramVal]: [string, api.APIParameter]) => (
                     <span key={param}>
                         <span title={`${param} (${paramVal.type}) - ${paramVal.description}`}>{param}</span>
                         {paramVal.hasOwnProperty('default') &&
@@ -116,7 +122,7 @@ const Entry = ({ name, obj }) => {
                             <span className="text-blue-600">{paramVal.default}</span>
                         </span>}
                     </span>
-                )).reduce((prev, curr) => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
+                )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                 <span className="px-1">)</span>
             </div>)
             : (<div className="text-lg font-light">No Parameters</div>)}
@@ -126,7 +132,7 @@ const Entry = ({ name, obj }) => {
 }
 
 
-const Details = ({ obj }) => {
+const Details = ({ obj }: { obj: api.APIItem }) => {
     const language = useSelector(selectScriptLanguage)
     const theme = useSelector(appState.selectColorTheme)
 
@@ -188,9 +194,9 @@ const Details = ({ obj }) => {
 const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
-        {entries.map(([name, obj]) => {
+        {entries.map(([name, obj]: [string, api.APIItem]) => {
             const arr = isArray(obj) ? obj : [obj]
-            return arr.map((o, index) => <Entry key={name + index} name={name} obj={o} />)
+            return arr.map((o: api.APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}
     </>)
 }
@@ -198,7 +204,7 @@ const EntryList = () => {
 const APISearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(api.selectSearchText)
-    const dispatchSearch = event => dispatch(api.setSearchText(event.target.value))
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(api.setSearchText(event.target.value))
     const dispatchReset = () => dispatch(api.setSearchText(''))
     const props = { searchText, dispatchSearch, dispatchReset }
 

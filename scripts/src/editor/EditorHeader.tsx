@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Store } from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { hot } from 'react-hot-loader/root';
 import { react2angular } from 'react2angular';
 
 import * as appState from '../app/appState';
+import * as user from '../user/userState';
 import * as editor from './editorState';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 
 const UndoRedoButtons = () => {
     const editorScope = helpers.getNgDirective('editor').scope();
@@ -22,13 +24,15 @@ const UndoRedoButtons = () => {
     const onChangeTask = () => {
         // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
         setTimeout(() => {
-            setHasUndo(editorScope.editor.checkUndo());
-            setHasRedo(editorScope.editor.checkRedo());
+            if (editorScope?.editor) {
+                setHasUndo(editorScope.editor.checkUndo());
+                setHasRedo(editorScope.editor.checkRedo());
+            }
         });
     };
 
     useEffect(() => {
-        if (!editorScope.onChangeTasks) return;
+        if (!editorScope || !editorScope.onChangeTasks) return;
         editorScope.onChangeTasks.add(onChangeTask)
         return () => editorScope.onChangeTasks.delete(onChangeTask);
     });
@@ -37,11 +41,11 @@ const UndoRedoButtons = () => {
         <i
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: 'scaleX(-1)' }}
-            onClick={() => editorScope.editor.undo()}
+            onClick={() => editorScope?.editor.undo()}
         />
         <i
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
-            onClick={() => editorScope.editor.redo()}
+            onClick={() => editorScope?.editor.redo()}
         />
     </>);
 };
@@ -51,12 +55,12 @@ const EditorHeader = () => {
     const mainScope = helpers.getNgMainController().scope();
     const ideScope = helpers.getNgController('ideController').scope();
     const openTabs = useSelector(tabs.selectOpenTabs);
-    const activeTab = useSelector(tabs.selectActiveTabID);
+    const activeTab = useSelector(tabs.selectActiveTabID) as string;
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const blocksMode = useSelector(editor.selectBlocksMode);
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
     const script = allScripts[activeTab];
     const scriptType = (!script || script.readonly) && 'readonly' || script.isShared && 'shared' || 'regular';
 
@@ -76,12 +80,14 @@ const EditorHeader = () => {
                 <UndoRedoButtons />
 
                 {
-                    !(script && script.collaborative) && (
+                    !(script?.collaborative) && (
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
-                                ideScope.toggleBlocks();
-                                dispatch(editor.setBlocksMode(ideScope.editor.droplet.currentlyUsingBlocks));
+                                if (ideScope) {
+                                    ideScope.toggleBlocks();
+                                    dispatch(editor.setBlocksMode(ideScope.editor.droplet.currentlyUsingBlocks));
+                                }
                             }}
                         >
                             <div
@@ -98,7 +104,7 @@ const EditorHeader = () => {
                     )
                 }
                 {
-                    (loggedIn && scriptType !== 'readonly' && !(scriptType === 'shared' && script.collaborative)) && (
+                    (loggedIn && scriptType !== 'readonly' && !(scriptType === 'shared' && script?.collaborative)) && (
                         <div
                             className={`
                                 rounded-full
@@ -127,7 +133,7 @@ const EditorHeader = () => {
                         text-white cursor-pointer
                     `}
                     id='run-button'
-                    onClick={() => ideScope.compileCode()}
+                    onClick={() => ideScope?.compileCode()}
                 >
                     <div className='flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1'>
                         <i className='icon-arrow-right22 font-bold text-green-600' />
@@ -139,7 +145,7 @@ const EditorHeader = () => {
     );
 };
 
-const HotEditorHeader = hot(props => {
+const HotEditorHeader = hot((props: { $ngRedux: Store }) => {
     return (
         <Provider store={props.$ngRedux}>
             <EditorHeader />

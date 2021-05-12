@@ -1,12 +1,14 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, LegacyRef } from 'react';
 import { hot } from 'react-hot-loader/root';
+import { Store } from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { react2angular } from 'react2angular';
 import { usePopper } from 'react-popper';
+import { Placement } from '@popperjs/core';
 import parse from 'html-react-parser';
 
 import { pages } from './bubbleData';
-import { proceed, dismissBubble, setLanguage } from './bubbleState';
+import * as bubble from './bubbleState';
 
 const Backdrop = () => {
     return (
@@ -14,11 +16,11 @@ const Backdrop = () => {
     );
 };
 
-const NavButton = props => {
+const NavButton = (props: { tag: string, primary?: boolean, name: string}) => {
     const dispatch = useDispatch();
-    const action = props.tag==='proceed' ? proceed : dismissBubble;
+    const action = props.tag==='proceed' ? bubble.proceed : bubble.dismissBubble;
     const primary = props.primary;
-    const { readyToProceed } = useSelector(state => state.bubble);
+    const readyToProceed = useSelector(bubble.selectReadyToProceed);
     const backgroundColor = primary ? (readyToProceed ? 'bg-black' : 'bg-gray-300') + ' text-white' : 'bg-white';
     const borderColor = primary && !readyToProceed ? 'border-transparent' : 'border-black';
     const pointer = primary && !readyToProceed ? 'cursor-not-allowed' : 'cursor-pointer';
@@ -34,7 +36,7 @@ const NavButton = props => {
 };
 
 const MessageFooter = () => {
-    const { currentPage } = useSelector(state => state.bubble);
+    const currentPage = useSelector(bubble.selectCurrentPage);
     const dispatch = useDispatch();
 
     let buttons;
@@ -71,7 +73,7 @@ const MessageFooter = () => {
                             className='border-0 border-b-2 border-black outline-none'
                             name="lang"
                             id="lang"
-                            onChange={e => dispatch(setLanguage(e.currentTarget.value))}
+                            onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                         >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>
@@ -92,7 +94,7 @@ const DismissButton = () => {
     return (
         <div
             className='absolute top-0 right-0 m-4 text-3xl cursor-pointer'
-            onClick={() => dispatch(dismissBubble())}
+            onClick={() => dispatch(bubble.dismissBubble())}
         >
             <span className="icon icon-cross2" />
         </div>
@@ -100,13 +102,13 @@ const DismissButton = () => {
 };
 
 const MessageBox = () => {
-    const { currentPage } = useSelector(state => state.bubble);
+    const currentPage = useSelector(bubble.selectCurrentPage);
 
-    const [referenceElement, setReferenceElement] = useState(null);
+    const [referenceElement, setReferenceElement] = useState<Element|null>(null);
     const [popperElement, setPopperElement] = useState(null);
     const [arrowElement, setArrowElement] = useState(null);
 
-    const placement = pages[currentPage].placement;
+    const placement = pages[currentPage].placement as Placement;
     const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
         placement,
         modifiers: [
@@ -182,14 +184,16 @@ const MessageBox = () => {
     }
 
     useEffect(() => {
-        setReferenceElement(document.querySelector(pages[currentPage].ref));
-        update && update();
+        const ref = pages[currentPage].ref;
+        const elem = document.querySelector(ref as string);
+        if (ref && elem) setReferenceElement(elem);
+        update?.();
     }, [currentPage]);
 
     return (
         <div
             className={`absolute z-40 w-1/3 bg-white p-8 shadow-xl`}
-            ref={setPopperElement}
+            ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={pages[currentPage].ref===null?{}:styles.popper}
             { ...attributes.popper }
         >
@@ -198,16 +202,12 @@ const MessageBox = () => {
                 { pages[currentPage].header }
             </div>
             <div>
-                {/*<pre style={{*/}
-                {/*    all: 'revert',*/}
-                {/*    whiteSpace: 'pre-line'*/}
-                {/*}}>{ pages[currentPage].body }</pre>*/}
                 { parse(pages[currentPage].body) }
             </div>
             <MessageFooter />
             <div
                 className='w-0 h-0'
-                ref={setArrowElement}
+                ref={setArrowElement as LegacyRef<HTMLDivElement>}
                 style={pages[currentPage].ref===null ? {} : arrowStyle}
             />
         </div>
@@ -215,7 +215,7 @@ const MessageBox = () => {
 };
 
 const Bubble = () => {
-    const active = useSelector(state => state.bubble.active);
+    const active = useSelector(bubble.selectBubbleActive);
     return (
         <div
             className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
@@ -226,7 +226,7 @@ const Bubble = () => {
     );
 };
 
-const HotBubble = hot(props => (
+const HotBubble = hot((props: { $ngRedux: Store }) => (
     <Provider store={props.$ngRedux}>
         <Bubble />
     </Provider>

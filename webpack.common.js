@@ -5,6 +5,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HappyPack = require('happypack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const vendorDir = 'scripts/vendor';
 const libDir = 'scripts/lib';
@@ -19,7 +20,7 @@ module.exports = {
         main: './scripts/src/index.js'
     },
     resolve: {
-        extensions: ['*','.js','.jsx','.mjs','.wasm','.json','.css'],
+        extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
             tabdrop: 'bootstrap-tabdrop-ro/js/bootstrap-tabdrop.js',
@@ -115,7 +116,7 @@ module.exports = {
             applyEffects: path.resolve(__dirname,`${modelDir}/applyeffects.js`),
             analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
             wsapi: path.resolve(__dirname,`${modelDir}/wsapi.js`),
-            helpers: path.resolve(__dirname,`scripts/src/helpers.js`),
+            helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
             ngWrappers: path.resolve(__dirname,`${apiDir}/angular-wrappers.js`),
@@ -179,6 +180,10 @@ module.exports = {
             test: /\.(js|jsx|mjs)$/,
             use: 'react-hot-loader/webpack',
             include: /node_modules/
+        }, {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/
         }, {
             test: /\.css$/,
             use: ['style-loader','css-loader','postcss-loader']
@@ -308,6 +313,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'autograderAWS/index.html'),
             template: 'autograderAWS/index.template.html'
+        }),
+        new TsconfigPathsPlugin({
+            configFile: "tsconfig.json"
         })
     ],
     optimization: {

@@ -1,31 +1,33 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 import * as sounds from './soundsState';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as tabs from '../editor/tabState';
+import { RootState } from '../reducers';
+import { SoundEntity } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch();
     const searchText = useSelector(sounds.selectSearchText);
-    const dispatchSearch = event => dispatch(sounds.setSearchText(event.target.value));
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(sounds.setSearchText(event.target.value));
     const dispatchReset = () => dispatch(sounds.setSearchText(''));
     const props = { searchText, dispatchSearch, dispatchReset };
 
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }) => {
+const FilterItem = ({ category, value }: { category: keyof sounds.Filters, value: string }) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector(state => state.sounds.filters[category].includes(value));
+    const selected = isUtility ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
@@ -107,7 +109,10 @@ const ShowOnlyFavorites = () => {
                 <input
                     type="checkbox"
                     style={{margin:0}}
-                    onClick={event => dispatch(sounds.setFilterByFavorites(event.target.checked))}
+                    onClick={(event: MouseEvent) => {
+                        const elem = event.target as HTMLInputElement;
+                        dispatch(sounds.setFilterByFavorites(elem.checked));
+                    }}
                 />
             </div>
             <div className='pr-1'>
@@ -135,7 +140,7 @@ const AddSound = () => {
     );
 };
 
-const Clip = ({ clip, bgcolor }) => {
+const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
     const dispatch = useDispatch();
     const previewFileKey = useSelector(sounds.selectPreviewFileKey);
     const fileKey = clip.file_key;
@@ -149,9 +154,10 @@ const Clip = ({ clip, bgcolor }) => {
         Original Tempo: ${clip.tempo}
         Year: ${clip.year}`.replace(/\n\s+/g,'\n');
 
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(fileKey);
-    const isUserOwned = loggedIn && clip.folder === useSelector(state => state.user.username).toUpperCase();
+    const userName = useSelector(user.selectUserName) as string;
+    const isUserOwned = loggedIn && clip.folder === userName.toUpperCase();
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
     const ideScope = tabsOpen && helpers.getNgController('ideController').scope();
 
@@ -233,14 +239,14 @@ const Clip = ({ clip, bgcolor }) => {
     );
 };
 
-const ClipList = ({ fileKeys }) => {
+const ClipList = ({ fileKeys }: { fileKeys: string[] }) => {
     const entities = useSelector(sounds.selectAllEntities);
     const theme = useSelector(appState.selectColorTheme);
 
     return (
         <div className='flex flex-col'>
             {
-                fileKeys && fileKeys.map(v =>
+                fileKeys?.map((v: string) =>
                     <Clip
                         key={v} clip={entities[v]}
                         bgcolor={theme==='light' ? 'bg-white' : 'bg-gray-900'}
@@ -251,7 +257,17 @@ const ClipList = ({ fileKeys }) => {
     );
 };
 
-const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }) => {
+interface Folder {
+    folder: string,
+    fileKeys: string[],
+    bgTint: boolean,
+    index: number,
+    expanded: boolean,
+    setExpanded: React.Dispatch<React.SetStateAction<Set<number>>>
+    listRef: React.RefObject<any>
+}
+
+const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }: Folder) => {
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
 
@@ -276,7 +292,7 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
                 className={`flex flex-grow truncate justify-between items-center p-3 text-2xl ${bgColor} cursor-pointer border-b border-r ${theme==='light' ? 'border-gray-500' : 'border-gray-700'}`}
                 title={folder}
                 onClick={() => {
-                    setExpanded(v => {
+                    setExpanded((v: Set<number>) => {
                         if (expanded) {
                             v.delete(index);
                             return new Set(v);
@@ -284,7 +300,7 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
                             return new Set(v.add(index));
                         }
                     });
-                    listRef && listRef.current.resetAfterIndex(index);
+                    listRef?.current?.resetAfterIndex(index);
                 }}
                 onMouseEnter={() => setHighlight(true)}
                 onMouseLeave={() => setHighlight(false)}
@@ -304,9 +320,9 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
 };
 
 const WindowedRecommendations = () => {
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
-    const recommendations = useSelector(state => state.recommender.recommendations);
+    const recommendations = useSelector((state: RootState) => state.recommender.recommendations);
 
     return (
         <Collection
@@ -336,22 +352,31 @@ const WindowedRecommendations = () => {
     );
 };
 
-const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, filteredListChanged=false, visible=true, initExpanded=true }) => {
+interface WindowedSoundCollection {
+    title: string
+    folders: string[]
+    fileKeysByFolders: any
+    filteredListChanged: boolean | number
+    visible?: boolean
+    initExpanded?: boolean
+}
+
+const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, filteredListChanged=false, visible=true, initExpanded=true }) => {
     const [expanded, setExpanded] = useState(new Set());
-    const listRef = useRef(null);
+    const listRef = useRef<List>(null);
 
     useEffect(() => {
         setExpanded(new Set());
 
-        if (listRef && listRef.current) {
+        if (listRef?.current) {
             listRef.current.resetAfterIndex(0);
         }
     }, [filteredListChanged]);
 
-    const getItemSize = index => {
+    const getItemSize = (index: number) => {
         const folderHeight = 40;
         const clipHeight = 33;
-        return folderHeight + (expanded.has(index) && clipHeight * fileKeysByFolders[folders[index]].length);
+        return folderHeight + (expanded.has(index) ? clipHeight * fileKeysByFolders[folders[index]].length : 0);
     };
 
     return (

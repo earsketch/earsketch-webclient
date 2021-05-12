@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { usePopper } from 'react-popper';
 
-import * as helpers from 'helpers';
+import * as helpers from '../helpers';
 import * as scripts from './scriptsState';
 import * as tabs from '../editor/tabState';
 import * as appState from '../app/appState';
+import * as user from '../user/userState';
+import { RootState } from '../reducers';
+import { ScriptEntity, ScriptType } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 import {
     openScript, openSharedScript, shareScript,
-    generateGetBoundingClientRect, VirtualRef, DropdownMenuCaller
+    generateGetBoundingClientRect, VirtualRef, VirtualReference, DropdownMenuCaller
 } from './ScriptsMenus';
 
 const CreateScriptButton = () => {
@@ -22,7 +25,7 @@ const CreateScriptButton = () => {
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
             onClick={() => {
-                ideScope.createScript();
+                ideScope?.createScript();
             }}
         >
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
@@ -38,17 +41,17 @@ const CreateScriptButton = () => {
 const ScriptSearchBar = () => {
     const dispatch = useDispatch();
     const searchText = useSelector(scripts.selectSearchText);
-    const dispatchSearch = event => dispatch(scripts.setSearchText(event.target.value));
+    const dispatchSearch = (event: ChangeEvent<HTMLInputElement>) => dispatch(scripts.setSearchText(event.target.value));
     const dispatchReset = () => dispatch(scripts.setSearchText(''));
     const props = { searchText, dispatchSearch, dispatchReset };
 
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }) => {
+const FilterItem = ({ category, value }: { category: keyof scripts.Filters, value: string }) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector(state => state.scripts.filters[category].includes(value));
+    const selected = isUtility ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
@@ -76,7 +79,7 @@ const FilterItem = ({ category, value }) => {
     );
 };
 
-const SortOptionsItem = ({ value }) => {
+const SortOptionsItem = ({ value }: { value: scripts.SortByAttribute | 'Clear'}) => {
     const [highlight, setHighlight] = useState(false);
     const isUtility = value==='Clear';
     const selected = isUtility ? false : useSelector(scripts.selectSortByAttribute)===value;
@@ -152,7 +155,10 @@ const ShowDeletedScripts = () => {
                 <input
                     type="checkbox"
                     style={{margin:0}}
-                    onClick={event => dispatch(scripts.setShowDeleted(event.target.checked))}
+                    onClick={(event: MouseEvent) => {
+                        const elem = event.target as HTMLInputElement;
+                        dispatch(scripts.setShowDeleted(elem.checked));
+                    }}
                 />
             </div>
             <div className='pr-1'>
@@ -162,7 +168,7 @@ const ShowDeletedScripts = () => {
     );
 };
 
-const PillButton = ({ onClick, children }) => {
+const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     let bgColor;
@@ -178,7 +184,7 @@ const PillButton = ({ onClick, children }) => {
             onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                onClick && onClick();
+                onClick?.();
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
@@ -188,7 +194,7 @@ const PillButton = ({ onClick, children }) => {
     );
 };
 
-const ShareButton = ({ script }) => (
+const ShareButton = ({ script }: { script: ScriptEntity }) => (
     <PillButton onClick={() => {
         shareScript(script);
     }}>
@@ -197,7 +203,7 @@ const ShareButton = ({ script }) => (
     </PillButton>
 );
 
-const RestoreButton = ({ script }) => {
+const RestoreButton = ({ script }: { script: ScriptEntity }) => {
     const dispatch = useDispatch();
     return (
         <PillButton onClick={async () => {
@@ -211,9 +217,9 @@ const RestoreButton = ({ script }) => {
     );
 };
 
-const sharedInfoPanelVirtualRef = new VirtualRef();
+const sharedInfoPanelVirtualRef = new VirtualRef() as VirtualReference;
 
-const SharedScriptInfoItem = ({ title, body }) => {
+const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) => {
     const theme = useSelector(appState.selectColorTheme);
 
     return (
@@ -230,14 +236,14 @@ const SingletonSharedScriptInfo = () => {
     const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo);
     const script = useSelector(scripts.selectSharedInfoScript);
 
-    const [popperElement, setPopperElement] = useState(null);
+    const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null);
     const { styles, attributes, update } = usePopper(sharedInfoPanelVirtualRef, popperElement);
     sharedInfoPanelVirtualRef.updatePopper = update;
 
     // Note: Synchronous dispatches inside a setState can conflict with components rendering.
-    const handleClickAsync = event => {
+    const handleClickAsync = (event: Event & { target: HTMLElement }) => {
         setPopperElement(ref => {
-            if (!ref.contains(event.target)) {
+            if (!ref?.contains(event.target)) {
                 dispatch(scripts.resetSharedScriptInfoAsync());
             }
             return ref;
@@ -251,7 +257,7 @@ const SingletonSharedScriptInfo = () => {
 
     return (
         <div
-            ref={setPopperElement}
+            ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={showSharedScriptInfo ? styles.popper : { display:'none' }}
             { ...attributes.popper }
             className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
@@ -267,7 +273,7 @@ const SingletonSharedScriptInfo = () => {
                     <SharedScriptInfoItem
                         title={script.name}
                         body={
-                            script.description && script.description.length
+                            script.description?.length
                                 ? script.description
                                 : 'This script has no description.'
                         }
@@ -286,7 +292,7 @@ const SingletonSharedScriptInfo = () => {
                     />
                     <SharedScriptInfoItem
                         title='Last Modified'
-                        body={script.modified}
+                        body={script.modified as string}
                     />
                     <SharedScriptInfoItem
                         title='View-Only Script Link'
@@ -298,7 +304,7 @@ const SingletonSharedScriptInfo = () => {
     );
 };
 
-const SharedScriptInfoCaller = ({ script }) => {
+const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
     const dispatch = useDispatch();
 
     return (
@@ -307,7 +313,7 @@ const SharedScriptInfoCaller = ({ script }) => {
                 event.preventDefault();
                 event.stopPropagation();
                 sharedInfoPanelVirtualRef.getBoundingClientRect = generateGetBoundingClientRect(event.clientX, event.clientY);
-                sharedInfoPanelVirtualRef.updatePopper && sharedInfoPanelVirtualRef.updatePopper();
+                sharedInfoPanelVirtualRef.updatePopper?.();
                 dispatch(scripts.setSharedScriptInfo({ script }));
             }}
         >
@@ -316,7 +322,13 @@ const SharedScriptInfoCaller = ({ script }) => {
     );
 };
 
-const Script = ({ script, bgTint, type }) => {
+interface ScriptProps {
+    script: ScriptEntity
+    bgTint: boolean
+    type: ScriptType
+}
+
+const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
     const dispatch = useDispatch();
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
@@ -324,7 +336,7 @@ const Script = ({ script, bgTint, type }) => {
     const active = useSelector(tabs.selectActiveTabID) === script.shareid;
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid);
     const tabIndicator = (open||active) ? (active ? (modified ? 'border-red-600' : 'border-green-400') : (modified ? 'border-red-400' : 'border-green-300') + ' opacity-80') : 'opacity-0';
-    const loggedIn = useSelector(state => state.user.loggedIn);
+    const loggedIn = useSelector(user.selectLoggedIn);
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
     const userProject = helpers.getNgService('userProject');
@@ -342,6 +354,7 @@ const Script = ({ script, bgTint, type }) => {
     const borderColor = theme==='light' ? 'border-gray-500' : 'border-gray-700';
 
     const shared = script.imported || script.isShared;
+    const collaborators = script.collaborators as string[];
 
     return (
         <div
@@ -372,7 +385,7 @@ const Script = ({ script, bgTint, type }) => {
                                 (shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} />)
                             }
                             {
-                                script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${script.collaborators.join(', ')}`} />)
+                                script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} />)
                             }
                         </div>
                     </div>
@@ -393,7 +406,15 @@ const Script = ({ script, bgTint, type }) => {
     );
 };
 
-const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=true, initExpanded=true }) => (
+interface WindowedScriptCollectionProps {
+    title: string
+    entities: scripts.ScriptEntities
+    scriptIDs: string[]
+    type: ScriptType
+    visible?: boolean
+    initExpanded?: boolean
+}
+const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=true, initExpanded=true }: WindowedScriptCollectionProps) => (
     <Collection
         title={title}
         visible={visible}
@@ -427,7 +448,7 @@ const RegularScriptCollection = () => {
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length;
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
-    const type = 'regular';
+    const type: ScriptType = 'regular';
     const title = `MY SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
     const initExpanded = !useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
@@ -441,7 +462,7 @@ const SharedScriptCollection = () => {
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const title = `SHARED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
-    const type = 'shared'
+    const type: ScriptType = 'shared'
     const initExpanded = useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
     return <WindowedScriptCollection { ...props } />;
@@ -454,7 +475,7 @@ const DeletedScriptCollection = () => {
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const title = `DELETED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
-    const type = 'deleted';
+    const type: ScriptType = 'deleted';
     const visible = useSelector(scripts.selectShowDeleted);
     const initExpanded = false;
     const props = { title, entities, scriptIDs, type, visible, initExpanded };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Store } from 'redux';
 import { Provider, useSelector } from 'react-redux';
 import { react2angular } from 'react2angular';
 import * as appState from '../app/appState';
@@ -17,7 +18,7 @@ const Footer = () => {
     );
 };
 
-const FooterContainer = props => {
+const FooterContainer = (props: { $ngRedux: Store }) => {
     return (
         <Provider store={props.$ngRedux}>
             <Footer />
