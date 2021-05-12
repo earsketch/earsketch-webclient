@@ -1,2 +1,0 @@
-// TODO: currently hard coded (count_slides.py not working properly with the TOC structure)
-var ESNum_Slides = [[], [0, 10, 9, 12, 8, 7, 12, 9, 10, 0], [0, 14, 16, 12, 9, 9, 8, 11, 8, 0], [0, 14, 22, 17, 14, 8, 0], [], [], [], [], []];

@@ -12,7 +12,7 @@ import * as Layout from '../layout/Layout';
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', 'timesync', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, timesync, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$uibModal', '$timeout', '$location', 'userProject', 'userNotification', 'ESUtils', 'esconsole', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $state, $http, $uibModal, $timeout, $location, userProject, userNotification, ESUtils, esconsole, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -751,16 +751,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$state', '$http', '$u
             $scope.hljsTheme = 'vs';
         }
     });
-
-    $scope.showTimesync = timesync.available = (localStorage.get('showTimesync', false) === 'true');
-    $scope.toggleTimesyncOption = function () {
-        $scope.showTimesync = timesync.available = !timesync.available;
-        localStorage.set('showTimesync', $scope.showTimesync);
-
-        if (!timesync.available && timesync.enabled) {
-            timesync.disable();
-        }
-    };
 
     $scope.reportError = function () {
         angular.element('[ng-controller=ideController]').scope().reportError();

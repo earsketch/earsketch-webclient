@@ -107,7 +107,6 @@ module.exports = {
             colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
             websocket: path.resolve(__dirname,`${servicesDir}/websocket.js`),
             collaboration: path.resolve(__dirname,`${servicesDir}/collaboration.js`),
-            timesync: path.resolve(__dirname,`${servicesDir}/timesync.js`),
             reporter: path.resolve(__dirname,`${servicesDir}/reporter.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
@@ -127,12 +126,8 @@ module.exports = {
             // Data
             messages: path.resolve(__dirname,`${dataDir}/messages.js`),
             apiDoc: path.resolve(__dirname,`${dataDir}/api_doc.js`),
-            numSlides: path.resolve(__dirname,`${dataDir}/num_slides.js`),
             
             // Curriculum Data
-            // currToC: path.resolve(__dirname,`${dataDir}/curr_toc.js`),
-            // currPages: path.resolve(__dirname,`${dataDir}/curr_pages.js`),
-            // currSearchDoc: path.resolve(__dirname,`${dataDir}/curr_searchdoc.js`),
             currQuestions: path.resolve(__dirname,`scripts/src/browser/questions.js`),
 
             // Recommendation JSON/js file
