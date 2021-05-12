@@ -64,6 +64,17 @@ describe('AudioLibrary tests', function() {
             ]}
         );
 
+        $httpBackend.when(
+            'GET', URL_DOMAIN + '/services/audio/verifyclip?key=TEST_KEY'
+        ).respond([200, {'file_key': 'TEST_KEY'}]);
+
+        $httpBackend.when(
+            'GET', URL_DOMAIN + '/services/audio/verifyclip?key=NOT_VALID'
+        ).respond([400, 'Not found.']);
+
+        $httpBackend.when(
+            'GET', URL_DOMAIN + '/services/getunstretchedsample?key=TEST_KEY'
+        ).respond([200, HELLO_BUFFER]);
     }));
 
     // Here we load the Audio Library service for unit testing
