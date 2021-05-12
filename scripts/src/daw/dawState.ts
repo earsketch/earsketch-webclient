@@ -1,6 +1,7 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit'
 
 import { RootState } from '../reducers'
+import { Track } from '../app/player'
 
 const shuffle = (array : any[]) => {
     let i = array.length
@@ -45,36 +46,6 @@ const TIMELINE_ZOOM_INTERVALS = [
 // We also don't want this proportion to change based on songs of different length.
 // So, we set a default number of measures that we want the screen to fit in.
 const MEASURES_FIT_TO_SCREEN = 61
-
-// TODO: Move these types to player when it gets updated.
-export interface Clip {
-    filekey: string
-    loopChild: boolean
-    measure: number
-    start: number
-    end: number
-    audio: AudioBuffer
-}
-
-export interface EffectRange {
-    name: string
-    parameter: string
-    startMeasure: number
-    endMeasure: number
-    inputStartValue: number
-    inputEndValue: number
-}
-
-export type Effect = EffectRange[]
-
-export interface Track {
-    clips: Clip[]
-    effects: {[key: string]: Effect}
-    label?: string | number
-    visible?: boolean
-    buttons?: boolean
-    mute?: boolean
-}
 
 export type Color = string
 

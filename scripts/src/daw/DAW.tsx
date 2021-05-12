@@ -2,28 +2,19 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
+import angular from 'angular'
+import ngRedux from 'ng-redux'
 
 import * as appState from '../app/appState'
-import * as daw from './dawState'
-
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
-import angular from 'angular'
 import { RootState } from '../reducers'
-import ngRedux from 'ng-redux'
+import { Player, Clip, Effect, Track, DAWData } from '../app/player'
+
+import * as daw from './dawState'
 
 // Width of track control box
 const X_OFFSET = 100
-
-interface Result {
-    tempo: number
-    length: number
-    tracks: daw.Track[]
-    // ...plus some other properties the DAW doesn't care about.
-}
-
-// TODO: remove after refactoring player
-let _result : Result | null = null
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
@@ -69,16 +60,9 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         if (playPosition >= playLength) {
             setPlayPosition(loop.selection ? loop.start : 1)
         }
-
-        // TODO: These should be unnecessary given that they're set upon compile...
-        // ...except player calls player.reset() on finish. :-(
-        // Remove this after refactoring player.
-        player.setRenderingData(_result)
-        player.setMutedTracks(muted)
-        player.setBypassedEffects(bypass)
     
-        player.setOnStartedCallback(playbackStartedCallback)
-        player.setOnFinishedCallback(playbackEndedCallback)
+        player.onStartedCallback = playbackStartedCallback
+        player.onFinishedCallback = playbackEndedCallback
         player.play(playPosition, playLength)
 
         // player does not preserve volume state between plays
@@ -238,7 +222,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
                { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                 toggleBypass: (a: string) => void, track: daw.Track, xScroll: number }) => {
+                 toggleBypass: (a: string) => void, track: Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -255,7 +239,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
-                {track.clips.map((clip: daw.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {track.clips.map((clip: Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
@@ -299,7 +283,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: daw.Clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color, clip: Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // Minimum width prevents clips from vanishing on zoom out.
@@ -323,7 +307,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: daw.Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }:
-                { name: string, color: daw.Color, effect: daw.Effect, bypass: boolean, mute: boolean }) => {
+                { name: string, color: daw.Color, effect: Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -405,7 +389,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
-                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: daw.Track, xScroll: number }) => {
+                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -573,19 +557,21 @@ const Timeline = () => {
 let WaveformCache: any = null
 let ESUtils: any = null
 let applyEffects: any = null
-let player: any = null
 let $rootScope: angular.IRootScopeService | null = null
+// TODO: For now this is null at declaration (as it must be initialized with Angular dependencies);
+//       when possible, let's initialize this at declaration and avoid this ugly type assertion.
+let player: ReturnType<typeof Player> = null as unknown as ReturnType<typeof Player>
 
 const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: daw.Track[], tempo: number) => {
+const prepareWaveforms = (tracks: Track[], tempo: number) => {
     esconsole('preparing a waveform to draw', 'daw');
 
     // ignore the mix track (0) and metronome track (len-1)
     for (var i = 1; i < tracks.length - 1; i++) {
-        tracks[i].clips.forEach((clip: daw.Clip) => {
+        tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 const waveform = clip.audio.getChannelData(0)
 
@@ -637,7 +623,7 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
 
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', function (result: Result | null | undefined) {
+    $scope.$watch('compiled', function (result: DAWData | null | undefined) {
         const state = getState()
         if (result === null || result === undefined) return
         console.log("result:", result)
@@ -650,8 +636,8 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
         const playLength = result.length + 1
         dispatch(daw.setPlayLength(playLength))
 
-        const tracks: daw.Track[] = []
-        result.tracks.forEach((track: daw.Track, index: number) => {
+        const tracks: Track[] = []
+        result.tracks.forEach((track, index) => {
             // create a (shallow) copy of the track so that we can
             // add stuff to it without affecting the reference which
             // we want to preserve (e.g., for the autograder)
@@ -701,7 +687,7 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
         }
 
         player.setRenderingData(result)
-        player.setMutedTracks(daw.selectMuted(state))
+        player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
         player.setBypassedEffects(daw.selectBypass(state))
 
         // sanity checks
@@ -713,8 +699,6 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
             newLoop.end = playLength
         }
         dispatch(daw.setLoop(newLoop))
-
-        _result = result
     })
 }
 
@@ -942,7 +926,7 @@ const DAW = () => {
     // It's important that updating the play position and scrolling happen at the same time to avoid visual jitter.
     // (e.g. *first* the cursor moves, *then* the scroll catches up - looks flickery.)
     const updatePlayPositionAndScroll = () => {
-        const position = player.getCurrentPosition()
+        const position = player.getPosition()
         setPlayPosition(position)
 
         if (!(el.current && xScrollEl.current)) return
@@ -994,7 +978,7 @@ const DAW = () => {
         <div style={{display: "block"}} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
-        {_result && !hideDAW &&
+        {!hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
@@ -1080,15 +1064,16 @@ const HotDAW = hot((props: {
     WaveformCache: any,
     ESUtils: any,
     applyEffects: any,
-    player: any,
     $rootScope: angular.IRootScopeService,
     $ngRedux: any,
+    // Extra dependencies for player:
+    audioContext: any,
 }) => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
     applyEffects = props.applyEffects
-    player = props.player
     $rootScope = props.$rootScope
+    player = Player(props.audioContext, applyEffects, ESUtils)
     setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
@@ -1097,4 +1082,5 @@ const HotDAW = hot((props: {
     );
 });
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', 'player', '$rootScope']))
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', '$rootScope',
+                                                  'audioContext']))  // Extra dependencies for player
