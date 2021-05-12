@@ -687,7 +687,7 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
         }
 
         player.setRenderingData(result)
-        player.setMutedTracks(daw.selectMuted(state))
+        player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
         player.setBypassedEffects(daw.selectBypass(state))
 
         // sanity checks
