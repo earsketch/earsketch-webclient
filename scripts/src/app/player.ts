@@ -49,7 +49,7 @@ export interface DAWData {
     master: GainNode
 }
 
-export const Player = (context: AudioContext & {master: GainNode}, applyEffects: any, ESUtils: any, timesync: any) => {
+export const Player = (context: AudioContext & {master: GainNode}, applyEffects: any, ESUtils: any) => {
     let isPlaying = false
 
     let waTimeStarted = 0
@@ -72,7 +72,6 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         selection: false,
     }
     let loopScheduledWhilePaused = false
-    let firstCycle = true
 
     let renderingDataQueue: (DAWData | null)[] = [null, null]
     let mutedTracks: number[] = []
@@ -82,8 +81,6 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         esconsole('resetting', ['player', 'debug'])
 
         clearAllAudioGraphs()
-        firstCycle = true
-
         clearAllTimers()
 
         playbackData = {
@@ -102,7 +99,6 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
 
     const play = (startMes: number, endMes: number, manualOffset=0) => {
         esconsole('starting playback',  ['player', 'debug'])
-        esconsole('timesync state: ' + timesync.enabled, ['player', 'debug'])
 
         //==========================================
         // init / convert
@@ -121,10 +117,8 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         const tempo = renderingData.tempo
         const startTime = ESUtils.measureToTime(startMes, tempo)
         const endTime = ESUtils.measureToTime(endMes, tempo)
-        const timesyncOffset = (timesync.enabled && firstCycle) ? timesync.getSyncOffset(tempo, startTime) : 0
 
-        const startTimeOffset = timesyncOffset + manualOffset
-        const waStartTime = context.currentTime + startTimeOffset
+        const waStartTime = context.currentTime + manualOffset
 
         //==========================================
         // construct webaudio graph
@@ -192,7 +186,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                     clipSource.start(waStartTime, startTimeInClip+clipStartOffset, clipDuration-clipStartOffset)
 
                     // keep this flag so we only stop clips that are playing (otherwise we get an exception raised)
-                    setTimeout(() => clipData.playing = true, startTimeOffset * 1000)
+                    setTimeout(() => clipData.playing = true, manualOffset * 1000)
                 } else {
                     // case: clip is in the future
                     const untilClipStart = clipStartTime - startTime
@@ -210,7 +204,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                     clipSource.connect(trackGain)
                     clipSource.start(waStartTime+untilClipStart, startTimeInClip, clipDuration)
 
-                    setTimeout(() => clipData.playing = true, (startTimeOffset + untilClipStart) * 1000)
+                    setTimeout(() => clipData.playing = true, (manualOffset + untilClipStart) * 1000)
                 }
 
                 // keep a reference to this audio source so we can pause it
@@ -294,9 +288,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
             waTimeStarted = waStartTime
             isPlaying = true
             self.onStartedCallback()
-        }, startTimeOffset * 1000)
-
-        firstCycle = false
+        }, manualOffset * 1000)
 
         //==========================================
         // check the loop state and schedule loop near the end also cancel the onFinished callback
@@ -306,11 +298,11 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                 esconsole('scheduling loop', ['player', 'debug'])
                 clearTimeout(loopSchedTimer)
                 clearTimeout(playEndTimer)
-                const offset = timesync.enabled ? timesync.getSyncOffset(tempo, 0) : (endTime-startTime)-(context.currentTime-waTimeStarted)
+                const offset = (endTime-startTime)-(context.currentTime-waTimeStarted)
                 clearAllAudioGraphs(offset)
                 loopScheduledWhilePaused = true
                 play(startMes, endMes, offset)
-            }, (endTime-startTime+startTimeOffset) * 1000 * .95)
+            }, (endTime-startTime+manualOffset) * 1000 * .95)
         }
 
         //==========================================
@@ -321,7 +313,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
             pause()
             reset()
             self.onFinishedCallback()
-        }, (endTime-startTime+startTimeOffset) * 1000)
+        }, (endTime-startTime+manualOffset) * 1000)
     }
 
     const pause = (delay=0) => {
@@ -358,10 +350,6 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
                 }
             }
         }
-
-        // if (renderingData.master !== undefined) {
-            // renderingData.master.disconnect()
-        // }
     }
 
     const clearAudioGraph = (idx: number, delay=0) => {
@@ -421,14 +409,7 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         }
     }
 
-    /**
-     * Set the playback volume of a result.
-     *
-     * @param {object} result The compiled result object
-     * reference obtained from player.play().
-     * @param {float} gain The volume to play at in decibels.
-     */
-
+    // Set playback volume in decibels.
     const setVolume = (gain: number) => {
         esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER'])
         if (context.master !== undefined) {

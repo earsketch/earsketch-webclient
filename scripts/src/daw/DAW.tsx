@@ -1068,13 +1068,12 @@ const HotDAW = hot((props: {
     $ngRedux: any,
     // Extra dependencies for player:
     audioContext: any,
-    timesync: any,
 }) => {
     WaveformCache = props.WaveformCache
     ESUtils = props.ESUtils
     applyEffects = props.applyEffects
     $rootScope = props.$rootScope
-    player = Player(props.audioContext, applyEffects, ESUtils, props.timesync)
+    player = Player(props.audioContext, applyEffects, ESUtils)
     setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
@@ -1084,4 +1083,4 @@ const HotDAW = hot((props: {
 });
 
 app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', '$rootScope',
-                                                  'audioContext', 'timesync']))  // Extra dependencies for player
+                                                  'audioContext']))  // Extra dependencies for player
