@@ -16,9 +16,6 @@ import * as daw from './dawState'
 // Width of track control box
 const X_OFFSET = 100
 
-// TODO: remove after refactoring player
-let _result : DAWData | null = null
-
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
     const playLength = useSelector(daw.selectPlayLength)
@@ -63,13 +60,6 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         if (playPosition >= playLength) {
             setPlayPosition(loop.selection ? loop.start : 1)
         }
-
-        // TODO: These should be unnecessary given that they're set upon compile...
-        // ...except player calls player.reset() on finish. :-(
-        // Remove this after refactoring player.
-        player.setRenderingData(_result)
-        player.setMutedTracks(muted)
-        player.setBypassedEffects(bypass)
     
         player.onStartedCallback = playbackStartedCallback
         player.onFinishedCallback = playbackEndedCallback
@@ -568,7 +558,9 @@ let WaveformCache: any = null
 let ESUtils: any = null
 let applyEffects: any = null
 let $rootScope: angular.IRootScopeService | null = null
-let player: any = null
+// TODO: For now this is null at declaration (as it must be initialized with Angular dependencies);
+//       when possible, let's initialize this at declaration and avoid this ugly type assertion.
+let player: ReturnType<typeof Player> = null as unknown as ReturnType<typeof Player>
 
 const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
@@ -707,8 +699,6 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
             newLoop.end = playLength
         }
         dispatch(daw.setLoop(newLoop))
-
-        _result = result
     })
 }
 
@@ -988,7 +978,7 @@ const DAW = () => {
         <div style={{display: "block"}} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
-        {_result && !hideDAW &&
+        {!hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"

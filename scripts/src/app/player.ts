@@ -82,9 +82,6 @@ export const Player = (context: AudioContext & {master: GainNode}, applyEffects:
         esconsole('resetting', ['player', 'debug'])
 
         clearAllAudioGraphs()
-        mutedTracks = []
-        bypassedEffects = {}
-        renderingDataQueue = [null, null]
         firstCycle = true
 
         clearAllTimers()
