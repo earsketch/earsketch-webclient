@@ -7,7 +7,7 @@ app.directive('caiwindow', [function () {
 
     return {
         templateUrl: 'templates/cai-window.html',
-        controller: ['$rootScope', '$scope', 'collaboration', 'userProject', 'caiDialogue', 'complexityCalculator', 'caiAnalysisModule', 'codeSuggestion', 'caiStudentHistoryModule', 'caiStudentPreferenceModule', '$ngRedux', function ($rootScope, $scope, collaboration, userProject, caiDialogue, complexityCalculator, caiAnalysisModule, codeSuggestion, caiStudentHistoryModule, caiStudentPreferenceModule, $ngRedux) {
+        controller: ['$rootScope', '$scope', 'userProject', 'caiDialogue', 'complexityCalculator', 'codeSuggestion', 'caiStudentHistoryModule', 'caiStudentPreferenceModule', '$ngRedux', function ($rootScope, $scope, userProject, caiDialogue, complexityCalculator, codeSuggestion, caiStudentHistoryModule, caiStudentPreferenceModule, $ngRedux) {
 
             $scope.activeProject = ''
 

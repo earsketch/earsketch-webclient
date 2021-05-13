@@ -16,7 +16,7 @@
  * userNotification.show('Show this message for a long time', null, 10);
  * userNotification.hide(); // hide at any time.
  */
-app.directive('notificationBar', ['userNotification', 'esconsole', function (userNotification, esconsole) {
+app.directive('notificationBar', ['userNotification', function (userNotification) {
     return {
         restrict: 'E',
         template: '<div>{{text}}</div>',

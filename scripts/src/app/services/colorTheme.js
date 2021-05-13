@@ -4,7 +4,7 @@
  * @module colorTheme
  * @author Takahiko Tsuchiya
  */
-app.factory('colorTheme', ['localStorage', '$rootScope', 'esconsole', function (localStorage, $rootScope, esconsole) {
+app.factory('colorTheme', ['localStorage', '$rootScope', function (localStorage, $rootScope) {
     var currentTheme = 'light';
 
     function setTheme(theme) {

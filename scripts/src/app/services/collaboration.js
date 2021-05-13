@@ -6,7 +6,7 @@ import * as scripts from '../../browser/scriptsState';
  * @module collaboration
  * @author Takahiko Tsuchiya
  */
-app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esconsole', 'reporter', '$rootScope', '$ngRedux', function (userNotification, $uibModal, websocket, esconsole, reporter, $rootScope, $ngRedux) {
+app.service('collaboration', ['userNotification', 'websocket', 'reporter', '$rootScope', '$ngRedux', function (userNotification, websocket, reporter, $rootScope, $ngRedux) {
     var self = this;
     this.script = null; // script object: only used for the off-line mode
     this.scriptID = null; // collaboration session identity (both local and remote)

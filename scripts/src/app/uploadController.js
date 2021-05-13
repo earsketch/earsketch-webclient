@@ -1,6 +1,6 @@
 import * as sounds from '../browser/soundsState';
 
-app.controller("UploadSoundCtrl", ['$scope','$rootScope','$uibModalInstance','RecorderService','userProject','userConsole','userNotification','audioLibrary','ESUtils','esconsole', '$sce', '$timeout', '$http', 'audioContext', '$ngRedux' , function($scope, $rootScope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, audioLibrary, ESUtils, esconsole, $sce, $timeout, $http, audioContext, $ngRedux) {
+app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService','userProject','userConsole','userNotification','audioLibrary','ESUtils','$sce', '$timeout', '$http', 'audioContext', '$ngRedux' , function($scope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, audioLibrary, ESUtils, $sce, $timeout, $http, audioContext, $ngRedux) {
     $scope.file = {
         data: null,
         key: null,

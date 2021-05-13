@@ -5,7 +5,7 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
  *
  * @author Jason Smith
  */
-app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) {
+app.factory('recommender', function () {
 
     var keyGenreDict = {};
     var keyInstrumentDict = {};
@@ -280,5 +280,5 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     recommendReverse: recommendReverse
   };
 
-}]);
+});
 

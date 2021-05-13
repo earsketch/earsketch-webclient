@@ -5,7 +5,7 @@
  * @module complexityCalculator
  * @author Erin Truesdell
  */
-app.factory('complexityCalculatorHelperFunctions', [function complexityCalculatorHelperFunctions() {
+app.factory('complexityCalculatorHelperFunctions', function complexityCalculatorHelperFunctions() {
 
     //variable init
 
@@ -4165,4 +4165,4 @@ app.factory('complexityCalculatorHelperFunctions', [function complexityCalculato
         allReturnsFilled: allReturnsFilled,
         getNestedVariables: getNestedVariables
     };
-}]);
+});

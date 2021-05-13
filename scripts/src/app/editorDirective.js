@@ -1,7 +1,7 @@
 import * as tabs from '../editor/tabState';
 import * as config from '../editor/editorConfig';
 
-app.directive('editor', ['$rootScope', 'collaboration', 'esconsole', '$timeout', '$ngRedux', 'userProject', function ($rootScope, collaboration, esconsole, $timeout, $ngRedux, userProject) {
+app.directive('editor', ['$rootScope', 'collaboration', '$timeout', '$ngRedux', 'userProject', function ($rootScope, collaboration, $timeout, $ngRedux, userProject) {
     return {
         transclude: false,
         restrict: 'EA',

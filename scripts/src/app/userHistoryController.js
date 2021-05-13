@@ -3,7 +3,7 @@
  */
 
 
-app.controller("userHistoryController", ['$scope','userConsole','esconsole','ESUtils', 'userProject', '$http','localStorage', function($scope, userConsole, esconsole, ESUtils, userProject, $http, localStorage) {
+app.controller("userHistoryController", ['$scope', 'userProject', '$http', 'localStorage', function($scope, userProject, $http, localStorage) {
 
     /**
      * Parse shareids and return a history of versions of all scripts modified by the unique shared script authors

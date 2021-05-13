@@ -5,7 +5,7 @@
  * @module reader
  * @author Creston Bunch
  */
-app.factory('reader', ['esconsole', 'userNotification', function reader(esconsole, userNotification) {
+app.factory('reader', ['userNotification', function reader(userNotification) {
     var PY_LIST_FUNCS = [
         'append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort'
     ];

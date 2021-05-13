@@ -4,7 +4,7 @@ import {CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI} from 'codeRecommenda
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'caiStudent', 'caiProjectModel', function (caiAnalysisModule, complexityCalculator, caiStudent, caiProjectModel) {
+app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'caiProjectModel', function (caiAnalysisModule, complexityCalculator, caiProjectModel) {
 
     var currentDelta = { soundsAdded: [], sections: 0 };
     var currentDeltaSum = 0;

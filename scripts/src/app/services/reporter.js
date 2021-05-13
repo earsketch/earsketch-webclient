@@ -4,7 +4,7 @@
  *
  * @author Creston Bunch
  */
-app.factory('reporter', ['esconsole', 'reader', function (esconsole, reader) {
+app.factory('reporter', ['reader', function (reader) {
 
   var PAGE_LOADED = false;
 

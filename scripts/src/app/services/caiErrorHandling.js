@@ -4,7 +4,7 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiErrorHandling', ['complexityCalculatorHelperFunctions', function (complexityCalculatorHelperFunctions) {
+app.factory('caiErrorHandling', function () {
 
 	var studentCode;
 
@@ -279,4 +279,4 @@ app.factory('caiErrorHandling', ['complexityCalculatorHelperFunctions', function
 		updateNames: updateNames
     };
 
-}]);
+});

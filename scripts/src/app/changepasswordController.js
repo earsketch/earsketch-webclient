@@ -2,7 +2,7 @@
  * Angular controller for change-password services. Members can be addressed with $scope.name from JS, or just with name from within the controller-bound HTML.
  * @module changepasswordController
  */
-app.controller("changepasswordController", ['$scope', '$uibModalInstance', 'RecorderService', 'userProject', 'userConsole', 'userNotification', 'esconsole', function ($scope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, esconsole) {
+app.controller("changepasswordController", ['$scope', '$uibModalInstance', 'userProject', 'userConsole', 'userNotification', 'esconsole', function ($scope, $uibModalInstance, userProject, userConsole, userNotification, esconsole) {
     $scope.pwError = "";
 
     /**

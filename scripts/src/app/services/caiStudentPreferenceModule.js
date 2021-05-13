@@ -8,7 +8,7 @@ import { parseString } from "xml2js";
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentPreferenceModule', ['caiStudent', 'userProject', function (caiStudent, userProject) {
+app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
 
     //var init
     var suggestionsAccepted = {};

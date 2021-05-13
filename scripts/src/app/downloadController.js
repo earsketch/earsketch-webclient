@@ -1,5 +1,5 @@
-app.controller("downloadController", ['$scope', '$uibModalInstance', '$uibModal', 'script', 'quality', 'exporter', 'esconsole', 'userConsole', 'ESUtils', 'userNotification',
-    function ($scope, $uibModalInstance, $uibModal, script, quality, exporter, esconsole, userConsole, ESUtils, userNotification) {
+app.controller("downloadController", ['$scope', '$uibModalInstance', '$uibModal', 'script', 'quality', 'exporter', 'esconsole', 'ESUtils', 'userNotification',
+    function ($scope, $uibModalInstance, $uibModal, script, quality, exporter, esconsole, ESUtils, userNotification) {
         $scope.messages = ESMessages.download;
 
         $scope.script = script;

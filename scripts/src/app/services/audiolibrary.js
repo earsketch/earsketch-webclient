@@ -12,8 +12,8 @@
  * @author Creston Bunch
  */
 app.factory('audioLibrary', ['$http', 'audioContext', '$q',
-            '$cacheFactory', 'esconsole',
-function audioLibraryFactory($http, ctx, $q, $cacheFactory, esconsole) {
+            '$cacheFactory',
+function audioLibraryFactory($http, ctx, $q, $cacheFactory) {
 
     var SOUND_CACHE = [];
     var CLIP_CACHE = {};

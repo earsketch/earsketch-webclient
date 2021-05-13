@@ -1,4 +1,4 @@
-app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout', '$window', '$location', 'ESUtils', 'userConsole', 'esconsole', 'reporter', 'collaboration', 'userNotification', function (layout, $rootScope, $scope, $timeout, $window, $location, ESUtils, userConsole, esconsole, reporter, collaboration, userNotification) {
+app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout', '$window', '$location', 'ESUtils', 'userConsole', 'reporter', 'collaboration', 'userNotification', function (layout, $rootScope, $scope, $timeout, $window, $location, ESUtils, userConsole, reporter, collaboration, userNotification) {
     // TODO: use the localStorage service
     var localStorage = $window.localStorage;
 
