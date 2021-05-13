@@ -47,7 +47,6 @@ module.exports = {
             esAppDSP: path.resolve(__dirname,`${libDir}/earsketch-appdsp.js`),
 
             ngClipboard: 'angular-clipboard',
-            uiLayout: path.resolve(__dirname,`${libDir}/ui-layout.js`),
             uiUtils: path.resolve(__dirname,`${vendorDir}/angular/angular-ui-utils.min.js`),
             uiScroll: path.resolve(__dirname,`${libDir}/ui-scroll.min.js`),
             uiScrollGrid: path.resolve(__dirname,`${libDir}/ui-scroll-grid.min.js`),
@@ -74,7 +73,6 @@ module.exports = {
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             caiWindowDirective: path.resolve(__dirname,`${appDir}/caiWindowDirective.js`),
             createScriptController: path.resolve(__dirname,`${appDir}/createScriptController.js`),
-            layoutController: path.resolve(__dirname,`${appDir}/layoutController.js`),
             promptController: path.resolve(__dirname,`${appDir}/promptController.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
             autograder2Controller: path.resolve(__dirname,`${appDir}/autograder2Controller.js`),

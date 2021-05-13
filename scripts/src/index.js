@@ -48,7 +48,6 @@ require(['angular'], () => {
     require('ng-redux');
 
     // vendor files
-    require('uiLayout');
     require('uiUtils');
     require('uiScroll');
     require('uiScrollGrid');
@@ -71,7 +70,6 @@ require(['angular'], () => {
     window.app = angular.module('EarSketchApp', [
         'ui.router',
         'ui.bootstrap',
-        'ui.layout',
         'ui.utils',
         'ngAnimate',
         'ngFileUpload',
@@ -122,7 +120,6 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('layoutController');
     require('notificationUI');
     require('editorDirective');
     require('promptController');

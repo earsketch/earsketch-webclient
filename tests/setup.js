@@ -242,7 +242,6 @@ Object.assign(window,require('esAppDSP'));
 // Controllers
 require('mainController');
 require('ideController');
-require('layoutController');
 require('notificationUI');
 require('editorDirective');
 require('promptController');
