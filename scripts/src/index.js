@@ -92,7 +92,6 @@ require(['angular'], () => {
 
     // In-house modules
     require('audioContext');
-    require('esconsole');
     require('reporter');
     require('reader');
     require('userNotification');
@@ -188,7 +187,7 @@ require(['angular'], () => {
     window.REPORT_LOG = [];
     window.ES_PASSTHROUGH = ES_PASSTHROUGH;
 
-    app.factory('$exceptionHandler', ['esconsole', '$injector', function(esconsole, $injector) {
+    app.factory('$exceptionHandler', ['$injector', function($injector) {
         return function(exception, cause) {
             console.log(exception);
             esconsole(exception, ['ERROR','ANGULAR']);

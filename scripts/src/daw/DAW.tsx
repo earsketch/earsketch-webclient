@@ -10,6 +10,7 @@ import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
 import { RootState } from '../reducers'
 import { Player, Clip, Effect, Track, DAWData } from '../app/player'
+import esconsole from '../app/esconsole'
 
 import * as daw from './dawState'
 
@@ -567,7 +568,7 @@ const rms = (array: Float32Array) => {
 }
 
 const prepareWaveforms = (tracks: Track[], tempo: number) => {
-    esconsole('preparing a waveform to draw', 'daw');
+    esconsole('preparing a waveform to draw', 'daw')
 
     // ignore the mix track (0) and metronome track (len-1)
     for (var i = 1; i < tracks.length - 1; i++) {
@@ -626,7 +627,6 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
     $scope.$watch('compiled', function (result: DAWData | null | undefined) {
         const state = getState()
         if (result === null || result === undefined) return
-        console.log("result:", result)
 
         esconsole('code compiled', 'daw')
         prepareWaveforms(result.tracks, result.tempo)

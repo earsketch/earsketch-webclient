@@ -93,7 +93,7 @@ app.directive('notificationBar', ['userNotification', function (userNotification
     }
 }]);
 
-app.directive('notificationPopup', ['userNotification', 'esconsole', 'colorTheme', function (userNotification, esconsole, colorTheme) {
+app.directive('notificationPopup', ['userNotification', 'colorTheme', function (userNotification, colorTheme) {
     return {
         restrict: 'E',
         template: '<div class="arrow" style="position:absolute; top:-11px; right:21px; height:0; width:0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 14px solid;"></div><div><span style="float:left; overflow:hidden; width: 210px;  text-overflow:ellipsis;">{{popupText}}</span><span style="float:right; cursor:pointer; color:indianred" ng-click="hidePopup()">X</span></div>',

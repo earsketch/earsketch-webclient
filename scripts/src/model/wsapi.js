@@ -5,7 +5,7 @@ ES_WORKSPACE = '';
 ES_IMAGE_DATA = '';
 ES_FILE_DATA = '';
 
-app.factory('wsapi', ['esconsole', function (esconsole) {
+app.factory('wsapi', function () {
     //TODO: many unused functions?
 
     function wsapiGetWorkspace(username) {
@@ -170,4 +170,4 @@ app.factory('wsapi', ['esconsole', function (esconsole) {
         sendReport: wsapiSendReport,
         createIssue: wsapiCreateIssue
     };
-}]);
+});

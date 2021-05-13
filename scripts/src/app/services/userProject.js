@@ -3,7 +3,7 @@ import * as appState from '../appState';
 import * as scriptsState from '../../browser/scriptsState';
 import * as tabs from '../../editor/tabState';
 
-app.factory('userProject', ['$rootScope', '$http', 'ESUtils', 'esconsole', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, ESUtils, esconsole, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
+app.factory('userProject', ['$rootScope', '$http', 'ESUtils', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, ESUtils, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;
