@@ -234,7 +234,6 @@ require('wsapi');
 require('completer');
 require('exporter');
 require('analysis');
-require('player');
 require('esrecorder');
 require('recorder');
 
