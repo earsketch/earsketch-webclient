@@ -169,18 +169,19 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
     let log = date.toLocaleTimeString('en-GB') + '.' + ('000'+date.getMilliseconds()).slice(-3) + ' '
     let output
     let TAG: string | string[] = ''
-    let trace
     const defaultTraceLevel = 3
     const defaultIndentation = 4
-    let location = ''
     let messageIsError = false
 
-    // Previously, we could use `esconsole.caller`, but this is deprecated and disallowed in strict mode.
     const stack = new Error().stack!
-    // This mess is intended to get the name of the second function in the stack trace (after esconsole) across browsers.
-    // (Different browsers have different formats for error.stack. :-()
-    const callerMatch = (/[^@\s]*(?:@|at )\S+ *[^@\s]*\s*([^@\s]*)(?:@|at )(\S+)/m).exec(stack)
-    const caller = callerMatch ? (callerMatch[1] || callerMatch[2]).split("/")[0] : null
+    const trace = stack.toString().split(/\r\n|\n/)
+    const location = (trace[0] === 'Error') ? trace[2] : trace[1]
+
+    // This is intended to get the name of the second function in the stack trace (after esconsole) across browsers.
+    // (Different browsers have different formats for error.stack.)
+    // Previously, we could use `esconsole.caller`, but this is deprecated and disallowed in strict mode. :-(
+    const callerMatch = (/(?:\s*at )?([^\s@]+)(?:@.*)?/).exec(location)
+    const caller = callerMatch ? callerMatch[1].split("/")[0] : null
 
     // TODO: always set the trace level of logs to 2?
 
@@ -273,24 +274,11 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
             console.log(e)
         }
 
-        trace = stack.toString().split(/\r\n|\n/)
-        if (trace[0] === 'Error') {
-            location = trace[2]
-        } else {
-            location = trace[1]
-        }
-
         const match = location.match(/\/\w+\.js\:\d+\:\d+/)
         if (match) {
             log += ' @ ' + match[0].substring(1)
         }
     } else if (traceLevel === 3) {
-        trace = stack.toString().split(/\r\n|\n/)
-        if (trace[0] === 'Error') {
-            location = trace[2]
-        } else {
-            location = trace[1]
-        }
         log += ' ' + location
     } else if (traceLevel === 4) {
         if (messageIsError) {
