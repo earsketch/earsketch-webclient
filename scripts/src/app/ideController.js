@@ -1,4 +1,5 @@
 import { setReady, dismissBubble } from "../bubble/bubbleState";
+import * as ESUtils from '../esutils'
 import * as scripts from '../browser/scriptsState';
 import * as editor from '../editor/editorState';
 import * as tabs from '../editor/tabState';
@@ -7,7 +8,7 @@ import * as tabs from '../editor/tabState';
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'localStorage', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, WaveformCache, compiler, userProject, userConsole, userNotification, wsapi, ESUtils, localStorage, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'localStorage', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, WaveformCache, compiler, userProject, userConsole, userNotification, wsapi, localStorage, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -895,8 +896,8 @@ app.directive('fileModel', ['$parse', function ($parse) {
 /**
  * @module ReportErrorCtrl
  */
-app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsapi','esconsole','ESUtils',
-    function ($scope,$http,$uibModalInstance,wsapi,esconsole, ESUtils) {
+app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance', 'wsapi',
+    function ($scope,$uibModalInstance,wsapi) {
         /**
          * Closes the modal instance.
          * @name cancel

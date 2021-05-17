@@ -5,7 +5,9 @@
  * @module analyzer
  */
 
-app.service('analyzer', ['ESUtils', function (ESUtils) {
+ import * as ESUtils from '../esutils'
+
+app.service('analyzer', function () {
     /**
      * @name computeFeatureForBuffer
      * @function
@@ -142,4 +144,4 @@ app.service('analyzer', ['ESUtils', function (ESUtils) {
         var digits = 2;
         return Math.round(ESUtils.timeToMeasure(buffer.duration, tempo) * Math.pow(10, digits)) / Math.pow(10, digits);
     };
-}]);
+});

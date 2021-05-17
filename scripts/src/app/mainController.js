@@ -1,4 +1,5 @@
 import * as appState from '../app/appState';
+import * as ESUtils from '../esutils'
 import * as user from '../user/userState';
 import * as scripts from '../browser/scriptsState';
 import * as sounds from '../browser/soundsState';
@@ -12,7 +13,7 @@ import * as Layout from '../layout/Layout';
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', 'userNotification', 'ESUtils', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, userNotification, ESUtils, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', 'userNotification', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, userNotification, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -757,7 +758,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     try {
-        var shareID = ESUtils.getURLParameters('edit');
+        var shareID = ESUtils.getURLParameter('edit');
 
         if (shareID) {
             esconsole('opening a shared script in edit mode', ['main', 'url']);
@@ -768,7 +769,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     }
 
     try {
-        var layoutParamString = ESUtils.getURLParameters('layout');
+        var layoutParamString = ESUtils.getURLParameter('layout');
         if (layoutParamString && layoutParamString.hasOwnProperty('split')) {
             layoutParamString.split(',').forEach(function (item) {
                 var keyval = item.split(':');

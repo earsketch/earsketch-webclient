@@ -3,7 +3,9 @@
  * @module applyEffects
  */
 
-app.factory('applyEffects', ['ESUtils', function (ESUtils) {
+ import * as ESUtils from '../esutils'
+
+app.factory('applyEffects', function () {
     /********************* EFFECT OBJECTS *******************************/
     // Some effects are not available as native Webaudio nodes. We use the
     // existing audioNodes to create these desired effects
@@ -3045,4 +3047,4 @@ function LowpassCombFilter (context) {
         resetAudioNodeFlags: resetAudioNodeFlags,
         buildAudioNodeGraph: buildAudioNodeGraph
     }
-}]);
+});

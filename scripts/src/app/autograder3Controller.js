@@ -2,9 +2,11 @@
  * @module autograder3Controller
  */
 
+import * as ESUtils from '../esutils'
+
 app.controller("autograder3Controller",
-['$scope','compiler', 'Upload','userConsole','caiAnalysisModule','ESUtils', 'userProject', '$http',
-function($scope, compiler, Upload, userConsole, caiAnalysisModule, ESUtils, userProject, $http) {
+['$scope','compiler', 'userConsole','caiAnalysisModule', 'userProject',
+function($scope, compiler, userConsole, caiAnalysisModule, userProject) {
 
     $scope.prompts = [0];
     $scope.allowPrompts = false;

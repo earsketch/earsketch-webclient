@@ -2,9 +2,11 @@
  * @module autograderController
  */
 
+import * as ESUtils from '../esutils'
+
 app.controller("autograderController",
-['$scope','compiler', 'userConsole','ESUtils',
-function($scope, compiler, userConsole, ESUtils) {
+['$scope','compiler', 'userConsole',
+function($scope, compiler, userConsole) {
 
     $scope.uploads = [];
     $scope.referenceFile = null;

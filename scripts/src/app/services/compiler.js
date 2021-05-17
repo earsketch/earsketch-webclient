@@ -4,9 +4,12 @@
  * @module compiler
  * @author Creston Bunch
  */
+
+import * as ESUtils from '../../esutils'
+
 app.factory('compiler',
-['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','ESUtils','$q',
-function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,ESUtils,$q) {
+['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','$q',
+function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,$q) {
     let testRun = false;
 
     /**
@@ -181,8 +184,7 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
                 var undefinedName = e.toString().split("'")[1];
 
                 // Create a dummy constant and repeat.
-                undefinedNamePy = Sk.ffi.remapToPy(undefinedName);
-                Sk.builtins[undefinedName] = undefinedNamePy;
+                Sk.builtins[undefinedName] = Sk.ffi.remapToPy(undefinedName);
 
                 if (undefinedNames.indexOf(undefinedName) === -1)
                 {

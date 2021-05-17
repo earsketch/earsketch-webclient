@@ -7,6 +7,7 @@ import { ClipboardService } from 'angular-clipboard'
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
+import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
@@ -309,7 +310,6 @@ let $rootScope: RootScope = null
 
 const HotCurriculum = hot((props: {
     clipboard: ClipboardService,
-    ESUtils: any,
     $ngRedux: any, // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
     $rootScope: RootScope
 }) => {
@@ -317,8 +317,7 @@ const HotCurriculum = hot((props: {
         clipboard = props.clipboard
 
         // Handle URL parameters.
-        const ESUtils = props.ESUtils
-        const locstr = ESUtils.getURLParameters('curriculum')
+        const locstr = ESUtils.getURLParameter('curriculum')
         if (locstr === null) {
             // Load welcome page initially.
             props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
@@ -330,10 +329,11 @@ const HotCurriculum = hot((props: {
             }
         }
 
-        if (['python', 'javascript'].indexOf(ESUtils.getURLParameters('language')) > -1) {
+        const languageParam = ESUtils.getURLParameter('language')
+        if (languageParam && ['python', 'javascript'].indexOf(languageParam) > -1) {
             // If the user has a script open, that language overwrites this one due to ideController;
             // this is probably a bug, but the old curriculumPaneController has the same behavior.
-            props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
+            props.$ngRedux.dispatch(appState.setScriptLanguage(languageParam))
         }
 
         $rootScope = props.$rootScope
@@ -365,4 +365,4 @@ const HotCurriculum = hot((props: {
     )
 })
 
-app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils', '$rootScope']))
+app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', '$rootScope']))

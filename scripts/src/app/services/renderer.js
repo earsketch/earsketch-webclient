@@ -5,7 +5,10 @@
  * @module renderer
  * @author Creston Bunch
  */
-app.factory('renderer', ['applyEffects', 'ESUtils', function rendererFactory(applyEffects, ESUtils) {
+
+import * as ESUtils from '../../esutils'
+
+app.factory('renderer', ['applyEffects', function rendererFactory(applyEffects) {
 
     var NUM_CHANNELS = 2;
     var SAMPLE_RATE = 44100;

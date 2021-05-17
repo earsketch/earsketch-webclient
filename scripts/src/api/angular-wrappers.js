@@ -38,9 +38,6 @@ function ServiceWrapper() {
     // Load the reader service outside angular
     var ApiReader = injector.get('reader');
 
-    // Load the esutils service outside angular
-    var ESUtils = injector.get('ESUtils');
-
     return {
         audioLibrary: ApiAudioLibrary,
         compiler: ApiCompiler,
@@ -51,6 +48,5 @@ function ServiceWrapper() {
         analyzer: ApiAnalyzer,
         applyEffects: ApiApplyEffects,
         reader: ApiReader,
-        ESUtils: ESUtils,
     }
 }

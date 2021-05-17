@@ -28,6 +28,8 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
+import * as ESUtils from './esutils'
+
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
@@ -95,7 +97,6 @@ require(['angular'], () => {
     require('userNotification');
     require('localStorage');
     require('userProject');
-    require('esutils');
     require('audioLibrary');
     require('websocket');
     require('collaboration');
@@ -197,7 +198,7 @@ require(['angular'], () => {
         };
     }]);
 
-    app.run(['$window', 'ESUtils', function ($window, ESUtils) {
+    app.run(['$window', function ($window) {
         // Returns the version of Internet Explorer or a -1
         // (indicating the use of another browser).
         function getInternetExplorerVersion() {

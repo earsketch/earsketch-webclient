@@ -4,8 +4,11 @@
  * @module exporter
  * @author Creston Bunch
  */
-app.factory('exporter', ['compiler', 'renderer', 'ESUtils', '$rootScope',
-function exporter(compiler, renderer, ESUtils, $rootScope) {
+
+import * as ESUtils from '../../esutils'
+
+app.factory('exporter', ['compiler', 'renderer', '$rootScope',
+function exporter(compiler, renderer, $rootScope) {
 
     /**
      * Export the script as a text file. This function is wrapped in a closure

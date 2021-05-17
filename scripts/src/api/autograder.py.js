@@ -8,6 +8,8 @@
  * @author Creston Bunch
  */
 
+import * as ESUtils from '../esutils'
+
 var $builtinmodule = function (name) {
 
     var mod = {};
@@ -15,7 +17,6 @@ var $builtinmodule = function (name) {
     var compiler = ServiceWrapper().compiler;
     var analyzer = ServiceWrapper().reader;
     var autograder = ServiceWrapper().autograder;
-    var ESUtils = ServiceWrapper().ESUtils;
     var nativePrompt = userConsole.prompt;
     var prompts = [];
     var prints = [];

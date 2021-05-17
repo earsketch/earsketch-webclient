@@ -11,6 +11,7 @@ import * as helpers from "../helpers"
 import { RootState } from '../reducers'
 import { Player, Clip, Effect, Track, DAWData } from '../app/player'
 import esconsole from '../app/esconsole'
+import * as ESUtils from '../esutils'
 
 import * as daw from './dawState'
 
@@ -556,7 +557,6 @@ const Timeline = () => {
 // Pulled in via angular dependencies
 // TODO: Replace 'any' with more specific types.
 let WaveformCache: any = null
-let ESUtils: any = null
 let applyEffects: any = null
 let $rootScope: angular.IRootScopeService | null = null
 // TODO: For now this is null at declaration (as it must be initialized with Angular dependencies);
@@ -1062,7 +1062,6 @@ const DAW = () => {
 const HotDAW = hot((props: {
     // TODO: better types
     WaveformCache: any,
-    ESUtils: any,
     applyEffects: any,
     $rootScope: angular.IRootScopeService,
     $ngRedux: any,
@@ -1070,7 +1069,6 @@ const HotDAW = hot((props: {
     audioContext: any,
 }) => {
     WaveformCache = props.WaveformCache
-    ESUtils = props.ESUtils
     applyEffects = props.applyEffects
     $rootScope = props.$rootScope
     player = Player(props.audioContext, applyEffects, ESUtils)
@@ -1082,5 +1080,5 @@ const HotDAW = hot((props: {
     );
 });
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'ESUtils', 'WaveformCache', 'applyEffects', '$rootScope',
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'WaveformCache', 'applyEffects', '$rootScope',
                                                   'audioContext']))  // Extra dependencies for player

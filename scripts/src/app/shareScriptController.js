@@ -1,3 +1,4 @@
+import * as ESUtils from '../esutils'
 import * as scripts from '../browser/scriptsState';
 import * as tabs from '../editor/tabState';
 
@@ -5,7 +6,7 @@ import * as tabs from '../editor/tabState';
  * Angular controller for the share script modal dialog.
  * @module shareScriptCtroller
  */
-app.controller("shareScriptController", ['$scope', '$uibModalInstance', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'colorTheme', 'collaboration', '$ngRedux', function($scope, $uibModalInstance, $window, userProject, script, quality, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, colorTheme, collaboration, $ngRedux) {
+app.controller("shareScriptController", ['$scope', '$uibModalInstance', '$window', 'userProject', 'script', 'quality', 'exporter', 'licenses', 'clipboard', 'userNotification', 'reporter', '$http', 'colorTheme', 'collaboration', '$ngRedux', function($scope, $uibModalInstance, $window, userProject, script, quality, exporter, licenses, clipboard, userNotification, reporter, $http, colorTheme, collaboration, $ngRedux) {
 
     $scope.sharelink = location.origin + location.pathname +'?sharing=' + script.shareid;
     $scope.lockedShareLink = "";
