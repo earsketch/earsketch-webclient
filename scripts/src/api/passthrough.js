@@ -1202,13 +1202,13 @@ const ES_PASSTHROUGH = {
         if (parameter !== undefined) {
             ptCheckType('parameter', 'string', parameter);
         } else {
-            parameter = applyEffects.effectDefaults[effect].DEFAULT_PARAM;
+            parameter = applyEffects.EFFECT_DEFAULTS[effect].DEFAULT_PARAM;
         }
 
         if (effectStartValue !== undefined) {
             ptCheckType('effectStartValue', 'number', effectStartValue);
         } else {
-            effectStartValue = applyEffects.effectDefaults[effect][parameter].defaultVal;
+            effectStartValue = applyEffects.EFFECT_DEFAULTS[effect][parameter].defaultVal;
         }
 
         if (effectStartLocation !== undefined) {
@@ -1483,7 +1483,7 @@ function ptCheckAudioSliceRange(result, fileKey, startTime, endTime){
 
 function ptCheckEffectRange(effectname, parameter, effectStartValue, effectStartLocation, effectEndValue, effectEndLocation) {
     var res = true;
-    var effectObject = applyEffects.effectDefaults[effectname][parameter];
+    var effectObject = applyEffects.EFFECT_DEFAULTS[effectname][parameter];
 
     if (effectStartValue !== undefined) {
         if (effectEndValue === undefined) {
@@ -1605,10 +1605,10 @@ function addEffect(result, effect) {
         throw new RangeError('Cannot add effects before the first track');
     }
 
-    if (applyEffects.effectDefaults[effect.name] === undefined) {
+    if (applyEffects.EFFECT_DEFAULTS[effect.name] === undefined) {
         throw new RangeError('Effect name does not exist');
     }
-    if (applyEffects.effectDefaults[effect.name][effect.parameter] === undefined) {
+    if (applyEffects.EFFECT_DEFAULTS[effect.name][effect.parameter] === undefined) {
         throw new RangeError('Effect parameter does not exist');
     }
 
