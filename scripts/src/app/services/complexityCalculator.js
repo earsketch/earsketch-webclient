@@ -11,6 +11,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
     //variable init
     // var studentCode;
     var sampleLines = [];
+
+
     /**
       * Build the abstract syntax tree for Python. Useful for analyzing script
       * complexity or looking for specific function call e.g. onLoop().
@@ -29,9 +31,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
         }
     }
 
+
     function apiCalls() {
         return apiCalls;
     }
+
 
     var translatedIntegerValues = {
         0: { "": "Does not Use" },
@@ -207,9 +211,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
     }
 
     /*Fills allVariables list
-   * @param ast - An AST tree or node
-   * @param results - the results object.
-   */
+    * @param ast - An AST tree or node
+    * @param results - the results object.
+    */
     function gatherAllVariables(ast) {
         if (ast != null && ast.body != null) {
             angular.forEach(ast.body, function (node) {
