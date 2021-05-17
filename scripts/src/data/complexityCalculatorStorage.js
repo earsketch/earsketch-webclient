@@ -4,7 +4,6 @@ var studentCode = [];
 var originalityLines = [], makeBeatRenames = [], userFunctionRenames = [], loopLocations = [], userFunctionParameters = [], flaggedReturns = [], forLoopFuncs = [], uncalledFunctionLines = [];
 var takesArgs = false, returns = false, thisSequenceAlreadyCounted = false;
 var isJavascript = false;
-console.log('cc data loaded');
 var allVariables, functionLines, dataTypes, listFuncs, strFuncs, createListFuncs, createStrFuncs, userFunctionReturns;
 var apiCalls;
 var allCalls;

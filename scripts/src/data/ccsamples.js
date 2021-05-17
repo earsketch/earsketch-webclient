@@ -86,8 +86,31 @@ var simplifiedASTdictionary = { //conversions from AST node names to numbers for
 
 var bodyIDs = [37, 1, 3, 4];
 
+var binOps = {
+    "+": "Add",
+    "-": "Sub",
+    "*": "Mult",
+    "/": "Div",
+    "%": "Mod",
+    "**": "Pow",
+    "^": "Pow"
+};
+
+var comparatorOps = {
+    ">": "Gt",
+    "<": "Lt",
+    ">=": "GtE",
+    "<=": "LtE",
+    "==": "Eq",
+    "!=": "NotEq"
+};
+
+var boolOps = {
+    "&&": "And",
+    "||": "Or"
+}
 
 var Level3OriginalForPurpose = ["ints", "booleans", "floats", "strings", "lists", "variables", "comparisons", "listOps", "strOps", "boolOps", "mathematicalOperators"];
 
-export { STRUCTURE_SAMPLES, PY_LIST_FUNCS, PY_STR_FUNCS, PY_CREATE_LIST_FUNCS, PY_CREATE_STR_FUNCS, JS_BUILT_IN_OBJECTS, JS_LIST_FUNCS, JS_STR_FUNCS, JS_STR_LIST_OVERLAP, starterReturns, sampleCode, apiFunctions, simplifiedASTdictionary, bodyIDs, Level3OriginalForPurpose };
+export { STRUCTURE_SAMPLES, PY_LIST_FUNCS, PY_STR_FUNCS, PY_CREATE_LIST_FUNCS, PY_CREATE_STR_FUNCS, JS_BUILT_IN_OBJECTS, JS_LIST_FUNCS, JS_STR_FUNCS, JS_STR_LIST_OVERLAP, starterReturns, sampleCode, apiFunctions, simplifiedASTdictionary, bodyIDs, binOps, comparatorOps, boolOps, Level3OriginalForPurpose };
 
