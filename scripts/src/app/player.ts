@@ -33,7 +33,7 @@ export interface EffectRange {
     inputEndValue: number
 }
 
-export type Effect = EffectRange[] & {bypass?: boolean}
+export type Effect = EffectRange[] & { bypass?: boolean }
 
 export interface Track {
     clips: Clip[]
@@ -52,7 +52,7 @@ export interface DAWData {
     master: GainNode
 }
 
-export type AudioContextWithGain = AudioContext & {master: GainNode}
+export type AudioContextWithGain = AudioContext & { master: GainNode }
 
 export const Player = (context: AudioContextWithGain) => {
     let isPlaying = false
@@ -80,7 +80,7 @@ export const Player = (context: AudioContextWithGain) => {
 
     let renderingDataQueue: (DAWData | null)[] = [null, null]
     let mutedTracks: number[] = []
-    let bypassedEffects: {[key: number]: string[]} = {}
+    let bypassedEffects: { [key: number]: string[] } = {}
 
     const reset = () => {
         esconsole('resetting', ['player', 'debug'])
@@ -205,7 +205,7 @@ export const Player = (context: AudioContextWithGain) => {
 
             // construct the effect graph
             applyEffects.resetAudioNodeFlags()
-            const startNode = applyEffects.buildAudioNodeGraph(context, track, t, tempo, startTime, renderingData.master, trackBypass, 0)
+            const startNode = applyEffects.buildAudioNodeGraph(context, track, t, tempo, startTime, renderingData.master, trackBypass, false)
 
             const trackGain = context.createGain()
             trackGain.gain.setValueAtTime(1.0, context.currentTime)
