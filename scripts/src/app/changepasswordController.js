@@ -58,7 +58,7 @@ app.controller("changepasswordController", ['$scope', '$uibModalInstance', 'user
             var user = userProject.getUsername();
 
             var url = URL_DOMAIN+'/services/scripts/modifypwd?username='+user+'&password='+pwdencode+'&newpassword='+newpwdencode;
-            console.log('wsapiForgotPassword url ... '+url);
+            esconsole('modifypwd url ... ' + url, 'info');
             var request = new XMLHttpRequest();
             request.open("GET",url,true);
 

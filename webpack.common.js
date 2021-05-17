@@ -111,7 +111,6 @@ module.exports = {
             esutils: path.resolve(__dirname,`${modelDir}/esutils.js`),
             applyEffects: path.resolve(__dirname,`${modelDir}/applyeffects.js`),
             analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
-            wsapi: path.resolve(__dirname,`${modelDir}/wsapi.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API

@@ -9,7 +9,7 @@ import * as tabs from '../editor/tabState';
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'localStorage', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, WaveformCache, compiler, userProject, userConsole, userNotification, wsapi, localStorage, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'userProject', 'userConsole', 'userNotification', 'localStorage', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, WaveformCache, compiler, userProject, userConsole, userNotification, localStorage, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -713,25 +713,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     };
 
     /**
-     * Returns the workspace for the current user
-     * @name getWS
-     * @function
-     */
-    $scope.getWS = function () {
-        wsapi.getWorkspace(userProject.getUsername());
-    };
-
-    /**
-     * Saves the current workspace for the user.
-     * @name saveWS
-     * @function
-     */
-    $scope.saveWS = function () {
-        //wsapiSaveWorkspace(userProject.getUsername()  , ES_WORKSPACE);
-        wsapi.sendReport('ERROR  REPORTED');
-    };
-
-    /**
      * @name languageModeSelect
      * @function
      * @param lang {string} 'python' or 'javascript'
@@ -894,11 +875,31 @@ app.directive('fileModel', ['$parse', function ($parse) {
     };
 }]);
 
+
+function createIssue(jsreport) {
+
+    var formData = new FormData();
+
+    formData.append('jsreport', jsreport);
+
+    var request = new XMLHttpRequest();
+    request.open("POST", URL_DOMAIN + '/services/files/reportissue');
+
+    request.onload = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                esconsole('******* Send Issue Report OK*********', 'info');
+            }
+        }
+    };
+    request.send(formData);
+}
+
 /**
  * @module ReportErrorCtrl
  */
-app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance', 'wsapi',
-    function ($scope,$uibModalInstance,wsapi) {
+app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance',
+    function ($scope,$uibModalInstance) {
         /**
          * Closes the modal instance.
          * @name cancel
@@ -974,7 +975,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance', 'wsapi',
             errorinfo.labels = ["report"];
             errorinfo.body = body;
 
-            wsapi.createIssue(JSON.stringify(errorinfo));
+            createIssue(JSON.stringify(errorinfo));
             userNotification.show('Thank you for your submission! Your error has been reported', 'success');
 
             setTimeout(func, 1000);

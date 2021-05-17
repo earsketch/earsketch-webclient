@@ -113,7 +113,6 @@ require(['angular'], () => {
     require('applyEffects');
     require('userConsole');
     require('uploader');
-    require('wsapi');
     require('completer');
     require('exporter');
     require('analysis');
