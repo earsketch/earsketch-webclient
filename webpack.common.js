@@ -108,15 +108,12 @@ module.exports = {
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             modules: path.resolve(__dirname,`${modelDir}/modules.js`),
-            esutils: path.resolve(__dirname,`${modelDir}/esutils.js`),
-            applyEffects: path.resolve(__dirname,`${modelDir}/applyeffects.js`),
             analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
             wsapi: path.resolve(__dirname,`${modelDir}/wsapi.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
             ngWrappers: path.resolve(__dirname,`${apiDir}/angular-wrappers.js`),
-            passthrough: path.resolve(__dirname,`${apiDir}/passthrough.js`),
             jsAPI: path.resolve(__dirname,`${apiDir}/earsketch.js.js`),
             pyAPI: path.resolve(__dirname,`${apiDir}/earsketch.py.js`),
 
@@ -278,7 +275,6 @@ module.exports = {
             COMPLEXITY_CALCULATOR_STORAGE: 'exports-loader?type=commonjs&exports=single COMPLEXITY_CALCULATOR_STORAGE!complexityCalculatorStorage',
 
             ServiceWrapper: 'exports-loader?type=commonjs&exports=single ServiceWrapper!ngWrappers',
-            ES_PASSTHROUGH: 'exports-loader?type=commonjs&exports=single ES_PASSTHROUGH!passthrough',
             ES_JAVASCRIPT_API: 'exports-loader?type=commonjs&exports=single ES_JAVASCRIPT_API!jsAPI'
         }),
         new webpack.HotModuleReplacementPlugin(),

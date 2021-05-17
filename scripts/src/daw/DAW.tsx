@@ -6,6 +6,7 @@ import angular from 'angular'
 import ngRedux from 'ng-redux'
 
 import * as appState from '../app/appState'
+import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
 import { RootState } from '../reducers'
@@ -557,7 +558,6 @@ const Timeline = () => {
 // Pulled in via angular dependencies
 // TODO: Replace 'any' with more specific types.
 let WaveformCache: any = null
-let applyEffects: any = null
 let $rootScope: angular.IRootScopeService | null = null
 // TODO: For now this is null at declaration (as it must be initialized with Angular dependencies);
 //       when possible, let's initialize this at declaration and avoid this ugly type assertion.
@@ -1062,16 +1062,14 @@ const DAW = () => {
 const HotDAW = hot((props: {
     // TODO: better types
     WaveformCache: any,
-    applyEffects: any,
     $rootScope: angular.IRootScopeService,
     $ngRedux: any,
     // Extra dependencies for player:
     audioContext: any,
 }) => {
     WaveformCache = props.WaveformCache
-    applyEffects = props.applyEffects
     $rootScope = props.$rootScope
-    player = Player(props.audioContext, applyEffects, ESUtils)
+    player = Player(props.audioContext)
     setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
@@ -1080,5 +1078,5 @@ const HotDAW = hot((props: {
     );
 });
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'WaveformCache', 'applyEffects', '$rootScope',
-                                                  'audioContext']))  // Extra dependencies for player
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'WaveformCache', '$rootScope',
+                                                  'audioContext']))  // Extra dependency for player

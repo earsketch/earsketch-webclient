@@ -5,10 +5,11 @@
  * @module renderer
  * @author Creston Bunch
  */
+import * as applyEffects from '../../model/applyeffects'
 import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 
-app.factory('renderer', ['applyEffects', function rendererFactory(applyEffects) {
+app.factory('renderer', function () {
 
     var NUM_CHANNELS = 2;
     var SAMPLE_RATE = 44100;
@@ -421,5 +422,4 @@ app.factory('renderer', ['applyEffects', function rendererFactory(applyEffects) 
         mergeClips: mergeClips
     };
 
-}]);
-
+});

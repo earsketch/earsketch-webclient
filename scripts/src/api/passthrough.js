@@ -13,11 +13,10 @@
  * @module Passthrough
  * @author Creston Bunch
  */
+import * as applyEffects from '../model/applyeffects'
+import esconsole from '../esconsole'
 
-// TODO: This import. Currently there is some conflict between this being a CommonJS module and an ES6 module.
-// import esconsole from '../esconsole'
-
-ES_PASSTHROUGH = {
+const ES_PASSTHROUGH = {
     /**
      * Set the initial state of the result object.
      */
@@ -1203,13 +1202,13 @@ ES_PASSTHROUGH = {
         if (parameter !== undefined) {
             ptCheckType('parameter', 'string', parameter);
         } else {
-            parameter = ServiceWrapper().applyEffects.effectDefaults[effect].DEFAULT_PARAM;
+            parameter = applyEffects.effectDefaults[effect].DEFAULT_PARAM;
         }
 
         if (effectStartValue !== undefined) {
             ptCheckType('effectStartValue', 'number', effectStartValue);
         } else {
-            effectStartValue = ServiceWrapper().applyEffects.effectDefaults[effect][parameter].defaultVal;
+            effectStartValue = applyEffects.effectDefaults[effect][parameter].defaultVal;
         }
 
         if (effectStartLocation !== undefined) {
@@ -1484,7 +1483,7 @@ function ptCheckAudioSliceRange(result, fileKey, startTime, endTime){
 
 function ptCheckEffectRange(effectname, parameter, effectStartValue, effectStartLocation, effectEndValue, effectEndLocation) {
     var res = true;
-    var effectObject = ServiceWrapper().applyEffects.effectDefaults[effectname][parameter];
+    var effectObject = applyEffects.effectDefaults[effectname][parameter];
 
     if (effectStartValue !== undefined) {
         if (effectEndValue === undefined) {
@@ -1606,10 +1605,10 @@ function addEffect(result, effect) {
         throw new RangeError('Cannot add effects before the first track');
     }
 
-    if (ServiceWrapper().applyEffects.effectDefaults[effect.name] === undefined) {
+    if (applyEffects.effectDefaults[effect.name] === undefined) {
         throw new RangeError('Effect name does not exist');
     }
-    if (ServiceWrapper().applyEffects.effectDefaults[effect.name][effect.parameter] === undefined) {
+    if (applyEffects.effectDefaults[effect.name][effect.parameter] === undefined) {
         throw new RangeError('Effect parameter does not exist');
     }
 
@@ -1639,7 +1638,7 @@ function addEffect(result, effect) {
     //
     // Scale the effect ranges from user-inputted values to WebAudio
     // accepted ranges.
-    var scaledRange = ServiceWrapper().applyEffects.scaleEffect(
+    var scaledRange = applyEffects.scaleEffect(
         effect.name, effect.parameter, effect.startValue, effect.endValue
     );
     effect.inputStartValue = effect.startValue;
@@ -1657,3 +1656,5 @@ function measureToTime(measure, tempo, timeSignature) {
     //tempo beats in 60 secs
     return (measure - 1.0) * timeSignature * 60.0 / tempo;
 }
+
+export default ES_PASSTHROUGH

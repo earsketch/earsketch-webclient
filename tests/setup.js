@@ -226,7 +226,6 @@ require('waveformCache');
 require('compiler');
 require('pitchShifter');
 require('renderer');
-require('applyEffects');
 require('userConsole');
 require('uploader');
 require('wsapi');

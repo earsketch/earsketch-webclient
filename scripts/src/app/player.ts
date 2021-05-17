@@ -1,5 +1,7 @@
 // Play sounds from the JSON object output of scripts.
+import * as applyEffects from '../model/applyeffects'
 import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
 
 // Preliminary type declarations
 // TODO: Move some to compiler?
@@ -50,7 +52,9 @@ export interface DAWData {
     master: GainNode
 }
 
-export const Player = (context: AudioContext & {master: GainNode}, applyEffects: any, ESUtils: any) => {
+export type AudioContextWithGain = AudioContext & {master: GainNode}
+
+export const Player = (context: AudioContextWithGain) => {
     let isPlaying = false
 
     let waTimeStarted = 0

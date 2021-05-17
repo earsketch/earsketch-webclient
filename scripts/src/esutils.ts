@@ -1,3 +1,5 @@
+import { DAWData } from "./app/player"
+
 export const measureToTime = (measure: number, tempo: number, timeSignature=4) => {
     if (tempo === -1) tempo = 120
     //tempo beats in 60 secs
@@ -108,7 +110,7 @@ export const formatScriptForTests = (script: string) => {
 // Returns a human readable string that is convenient to copy and paste into
 // integration tests. For script outputs. It returns only the relevant parts
 // of the result object.
-export const formatResultForTests = (result: any /* TODO: import from player? */) => {
+export const formatResultForTests = (result: DAWData) => {
     let s = '\n{\n'
     s += '    tempo: ' + result.tempo + ',\n'
     s += '    length: ' + result.length + ',\n'

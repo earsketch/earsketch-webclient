@@ -32,9 +32,6 @@ function ServiceWrapper() {
     // Load the audio analyzer outside angular
     var ApiAnalyzer = injector.get('analyzer');
 
-    // Load the effect builder outside angular
-    var ApiApplyEffects = injector.get('applyEffects');
-
     // Load the reader service outside angular
     var ApiReader = injector.get('reader');
 
@@ -46,7 +43,6 @@ function ServiceWrapper() {
         autograder: ApiAutograder,
         userProject: ApiUserProject,
         analyzer: ApiAnalyzer,
-        applyEffects: ApiApplyEffects,
         reader: ApiReader,
     }
 }

@@ -30,9 +30,10 @@ ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
+import ES_PASSTHROUGH from './api/passthrough'
 
-// TODO: Remove this after resolving issue with passthrough.js.
-window.esconsole = esconsole
+// TODO: Remove this after resolving issues with earsketch.py.js, earsketch.js.js.
+window.ES_PASSTHROUGH = ES_PASSTHROUGH
 
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
@@ -110,7 +111,6 @@ require(['angular'], () => {
     require('compiler');
     require('pitchShifter');
     require('renderer');
-    require('applyEffects');
     require('userConsole');
     require('uploader');
     require('wsapi');
@@ -187,7 +187,6 @@ require(['angular'], () => {
 
     // TODO: Use a module.
     window.REPORT_LOG = [];
-    window.ES_PASSTHROUGH = ES_PASSTHROUGH;
 
     app.factory('$exceptionHandler', ['$injector', function($injector) {
         return function(exception, cause) {
