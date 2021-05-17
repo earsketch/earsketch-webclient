@@ -10367,15 +10367,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
             if (object.type === "UpdateExpression") {
                 returnObject._astname = "AugAssign";
 
-                //++ is just += 1
-                var opString = "";
-                if (object.operator === "++") {
-                    opString = "Add";
-                }
-                if (object.operator === "--") {
-                    opString = "Sub";
-                }
-
                 var valueObj = {
                     _astname: "Num",
                     n: {
@@ -10387,9 +10378,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
 
                 var targetObj = convertJavascriptASTNode(object.argument);
 
+                returnObject.op = binOps[object.operator[0]];
                 returnObject.target = targetObj;
                 returnObject.value = valueObj;
-                returnObject.op = opString;
             }
             else {
                 if (object.operator === "=") {
@@ -10400,24 +10391,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
                 }
                 else {
                     returnObject._astname = "AugAssign";
-                    var opString = "";
-                    if (object.operator === "+=") {
-                        opString = "Add";
-                    }
-                    else if (object.operator === "-=") {
-                        opString = "Sub";
-                    }
-                    else if (object.operator === "*=") {
-                        opString = "Mult";
-                    }
-                    else if (object.operator === "/=") {
-                        opString = "Div";
-                    }
-                    else if (object.operator === "%=") {
-                        opString = "Mod";
-                    }
-
-                    returnObject.op = opString;
+ 
+                    returnObject.op = binOps[object.operator[0]];
                     returnObject.target = convertJavascriptASTNode(object.left);
                     returnObject.value = convertJavascriptASTNode(object.right);
                 }
