@@ -1,7 +1,4 @@
-/**
- * @module autograder3Controller
- */
-
+import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 
 app.controller("autograder3Controller",

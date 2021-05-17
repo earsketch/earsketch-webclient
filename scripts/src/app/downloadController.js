@@ -1,3 +1,4 @@
+import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 
 app.controller("downloadController", ['$scope', '$uibModalInstance', '$uibModal', 'script', 'quality', 'exporter', 'userNotification',

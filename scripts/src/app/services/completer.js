@@ -5,6 +5,8 @@
  * @module completer
  * @author Creston Bunch
  */
+import esconsole from '../../esconsole'
+
 app.factory('completer', ['audioLibrary', '$q', function completerFactory(audioLibrary, $q) {
 
   var langTools = ace.require("ace/ext/language_tools");

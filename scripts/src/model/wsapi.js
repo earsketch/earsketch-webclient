@@ -1,9 +1,9 @@
-/*
-WS API Server Communication
-*/
-ES_WORKSPACE = '';
-ES_IMAGE_DATA = '';
-ES_FILE_DATA = '';
+// WS API Server Communication
+import esconsole from '../esconsole'
+
+let ES_WORKSPACE = '';
+let ES_IMAGE_DATA = '';
+let ES_FILE_DATA = '';
 
 app.factory('wsapi', function () {
     //TODO: many unused functions?

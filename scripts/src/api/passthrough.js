@@ -14,6 +14,9 @@
  * @author Creston Bunch
  */
 
+// TODO: This import. Currently there is some conflict between this being a CommonJS module and an ES6 module.
+// import esconsole from '../esconsole'
+
 ES_PASSTHROUGH = {
     /**
      * Set the initial state of the result object.

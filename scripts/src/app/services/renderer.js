@@ -5,7 +5,7 @@
  * @module renderer
  * @author Creston Bunch
  */
-
+import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 
 app.factory('renderer', ['applyEffects', function rendererFactory(applyEffects) {

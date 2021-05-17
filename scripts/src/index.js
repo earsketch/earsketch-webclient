@@ -28,7 +28,11 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
+import esconsole from './esconsole'
 import * as ESUtils from './esutils'
+
+// TODO: Remove this after resolving issue with passthrough.js.
+window.esconsole = esconsole
 
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));

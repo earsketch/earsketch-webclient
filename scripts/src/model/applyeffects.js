@@ -1,9 +1,6 @@
-/**
- * @fileOverview Web Audio effect chain constructors
- * @module applyEffects
- */
-
- import * as ESUtils from '../esutils'
+// @fileOverview Web Audio effect chain constructors
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
 
 app.factory('applyEffects', function () {
     /********************* EFFECT OBJECTS *******************************/

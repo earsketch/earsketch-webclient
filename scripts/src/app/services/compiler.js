@@ -4,7 +4,7 @@
  * @module compiler
  * @author Creston Bunch
  */
-
+import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 
 app.factory('compiler',

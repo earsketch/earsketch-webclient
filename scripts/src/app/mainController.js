@@ -1,4 +1,5 @@
 import * as appState from '../app/appState';
+import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as user from '../user/userState';
 import * as scripts from '../browser/scriptsState';

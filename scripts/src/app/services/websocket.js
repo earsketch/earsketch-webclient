@@ -1,3 +1,5 @@
+import esconsole from '../../esconsole'
+
 app.factory('websocket', ['userNotification', '$rootScope', function (userNotification, $rootScope) {
     var ws;
     var reconnect = 10;

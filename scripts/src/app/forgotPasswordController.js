@@ -1,6 +1,5 @@
-/**
- * @module forgotpasswordController
- */
+import esconsole from '../esconsole'
+
 app.controller("forgotpasswordController", ['$scope', '$uibModalInstance', 'userNotification',
   function($scope, $uibModalInstance, userNotification) {
 

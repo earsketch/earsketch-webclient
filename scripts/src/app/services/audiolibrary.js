@@ -11,6 +11,8 @@
  * @module audioLibrary
  * @author Creston Bunch
  */
+import esconsole from '../../esconsole'
+
 app.factory('audioLibrary', ['$http', 'audioContext', '$q',
             '$cacheFactory',
 function audioLibraryFactory($http, ctx, $q, $cacheFactory) {

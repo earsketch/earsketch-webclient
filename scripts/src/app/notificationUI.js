@@ -16,6 +16,8 @@
  * userNotification.show('Show this message for a long time', null, 10);
  * userNotification.hide(); // hide at any time.
  */
+import esconsole from '../esconsole'
+
 app.directive('notificationBar', ['userNotification', function (userNotification) {
     return {
         restrict: 'E',

@@ -1,6 +1,6 @@
 describe('EarSketch API tests', function() {
 
-    var audioLibrary, compiler, renderer, userConsole, esconsole;
+    var audioLibrary, compiler, renderer, userConsole;
     var $rootScope, $q, result;
 
     // mock module dependencies
@@ -58,8 +58,6 @@ describe('EarSketch API tests', function() {
         // mock the service wrapper that the API uses to load angular
         // dependencies
 
-        esconsole = $injector.get('esconsole');
-
         // overriding the angular-wrappers' function
         ServiceWrapper = function() {
             return {
@@ -67,7 +65,6 @@ describe('EarSketch API tests', function() {
                 compiler: compiler,
                 renderer: renderer,
                 userConsole: userConsole,
-                esconsole: esconsole
             }
         };
         $rootScope = $injector.get('$rootScope');

@@ -1,5 +1,6 @@
-import { setReady, dismissBubble } from "../bubble/bubbleState";
+import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
 import * as editor from '../editor/editorState';
 import * as tabs from '../editor/tabState';

@@ -1,11 +1,12 @@
-import * as scripts from '../../browser/scriptsState';
-
 /**
  * Manages client-side collaboration session. Single instance.
  *
  * @module collaboration
  * @author Takahiko Tsuchiya
  */
+import esconsole from '../../esconsole';
+import * as scripts from '../../browser/scriptsState';
+
 app.service('collaboration', ['userNotification', 'websocket', 'reporter', '$rootScope', '$ngRedux', function (userNotification, websocket, reporter, $rootScope, $ngRedux) {
     var self = this;
     this.script = null; // script object: only used for the off-line mode

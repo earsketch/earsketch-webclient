@@ -1,5 +1,6 @@
 import xml2js from 'xml2js';
 import * as appState from '../appState';
+import esconsole from '../../esconsole';
 import * as ESUtils from '../../esutils';
 import * as scriptsState from '../../browser/scriptsState';
 import * as tabs from '../../editor/tabState';

@@ -1,10 +1,12 @@
-import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
-import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Jason Smith
  */
+import esconsole from '../../esconsole';
+import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
+import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
+
 app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', 'audioLibrary', "caiStudent", function (complexityCalculator, recommender, audioLibrary, caiStudent) {
 
   var librarySounds = [];

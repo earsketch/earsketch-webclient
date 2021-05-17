@@ -1,8 +1,6 @@
+import esconsole from '../esconsole';
 import * as sounds from '../browser/soundsState';
 
-/**
- * @module renameController
- */
 app.controller("renameController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'reporter', 'collaboration', function ($scope, $uibModalInstance, userProject, script, reporter, collaboration) {
     $scope.scriptName = script.name.replace(/.([^.]*)$/, '');
     $scope.extension = script.name.replace(/^(.+)(\.[^.]*)$/, '$2');

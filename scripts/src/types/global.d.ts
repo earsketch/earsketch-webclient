@@ -18,7 +18,6 @@ declare var ESCurr_SearchDoc: {
 }[];
 
 declare var app: any;
-declare var esconsole: any;
 declare var userNotification: any;
 declare var hljs: any;
 declare var Hilitor: any;

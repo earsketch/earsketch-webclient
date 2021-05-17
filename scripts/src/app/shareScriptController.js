@@ -1,4 +1,5 @@
-import * as ESUtils from '../esutils'
+import esconsole from '../esconsole';
+import * as ESUtils from '../esutils';
 import * as scripts from '../browser/scriptsState';
 import * as tabs from '../editor/tabState';
 

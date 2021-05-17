@@ -1,4 +1,5 @@
 // Play sounds from the JSON object output of scripts.
+import esconsole from '../esconsole'
 
 // Preliminary type declarations
 // TODO: Move some to compiler?

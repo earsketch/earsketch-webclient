@@ -7,7 +7,7 @@
  * @todo This service is only necessary until audio workers become implemented
  * in all major browsers.
  */
-
+import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 
 app.factory('pitchshifter', ['renderer','audioContext','userConsole',

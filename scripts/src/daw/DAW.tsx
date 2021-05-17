@@ -10,7 +10,7 @@ import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
 import { RootState } from '../reducers'
 import { Player, Clip, Effect, Track, DAWData } from '../app/player'
-import esconsole from '../app/esconsole'
+import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 
 import * as daw from './dawState'
