@@ -49,7 +49,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
              "lists": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon" },
         5: { "forLoops": "Uses Original Nested Loops" }
     }
-    
+
 
     /**
     *Translate recorded integer values from the results into human-readable English
@@ -10529,8 +10529,26 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
         else if (object.type === "BinaryExpression") {
 
             //this could be a binop OR compare. Check the operator.
-            var binOps = ["+", "-", "*", "/", "%", "^", "**"];
-            if (binOps.includes(object.operator)) {
+            var binOps = {
+                "+": "Add",
+                "-": "Sub",
+                "*": "Mult",
+                "/": "Div",
+                "%": "Mod",
+                "**": "Pow",
+                "^": "Pow"
+            };
+
+            var comparatorOps = {
+                ">": "Gt",
+                "<": "Lt",
+                ">=": "GtE",
+                "<=": "LtE",
+                "==": "Eq",
+                "!=": "NotEq"
+            };
+
+            if (Object.keys(binOps).includes(object.operator)) {
 
                 //then we make a binop node
                 returnObject._astname = "BinOp";
@@ -10539,38 +10557,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
                 returnObject.left = convertJavascriptASTNode(object.left);
                 returnObject.right = convertJavascriptASTNode(object.right);
 
-                var op = "";
-                switch (object.operator) {
-                    case "+":
-                        op = "Add";
-                        break;
-                    case "-":
-                        op = "Sub";
-                        break;
-                    case "/":
-                        op = "Div";
-                        break;
-                    case "*":
-                        op = "Mult";
-                        break;
-                    case "%":
-                        op = "Mod";
-                        break;
-                    case "**":
-                        op = "Pow";
-                        break;
-                    case "^":
-                        op = "Pow";
-                        break;
-                    default:
-                        break;
-
-                }
-
-                returnObject.op = { name: op };
+                returnObject.op = { name: binOps[object.operator] };
 
             }
-            else {
+            else if (Object.keys(comparatorOps).includes(object.operator)) {
                 //we make a compare node
                 //then we make a binop node
                 returnObject._astname = "Compare";
@@ -10578,31 +10568,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
                 //binop has left, right, and operator
                 returnObject.left = convertJavascriptASTNode(object.left);
                 returnObject.comparators = [convertJavascriptASTNode(object.right)];
-                var op = "";
-                switch (object.operator) {
-                    case ">":
-                        op = "Gt";
-                        break;
-                    case "<":
-                        op = "Lt";
-                        break;
-                    case ">=":
-                        op = "GtE";
-                        break;
-                    case "<=":
-                        op = "LtE";
-                        break;
-                    case "==":
-                        op = "Eq";
-                        break;
-                    case "!=":
-                        op = "NotEq";
-                        break;
-                    default:
-                        break;
 
-                }
-                returnObject.ops = [{ name: op }];
+                returnObject.ops = [{ name: comparatorOps[object.operator] }];
             }
         }
         else if (object.type === "UnaryExpression" && object.operator === "!") {
@@ -10787,8 +10754,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
                 fillLevels(childNodes, levelList);
             }
         }
-
-
 
         lineDictionary = [];
 
