@@ -33,85 +33,37 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
         return apiCalls;
     }
 
+    var translatedIntegerValues = {
+        0: { "": "Does not Use" },
+        1: { "": "Uses" },   
+        2: { "consoleInput":"Takes Console Input Originally",
+             "": "Uses Original" },
+        3: { "forLoops": () => isJavascript? "Uses Originally with Two Arguments" : "Uses Originally With Range Min/Max",
+             "conditionals": "Uses Originally to Follow Multiple Code Paths",
+             "userFunc": "Uses and Calls Originally",
+             "consoleInput": "Takes Input Originally and Uses For Purpose",
+             "": "Uses Originally For Purpose" },
+        4: { "forLoops": () => isJavascript? "Uses Originally with Three Arguments" : "Uses Originally With Range Min/Max and Increment",
+             "variables": "Uses Originally And Transforms Value",
+             "strings": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon",
+             "lists": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon" },
+        5: { "forLoops": "Uses Original Nested Loops" }
+    }
+    
+
     /**
     *Translate recorded integer values from the results into human-readable English
     *@param resultsObj The results object.
     */
     function translateIntegerValues(resultsObj) {
         Object.keys(resultsObj).forEach(function (key) {
-
-            //0 = does not use 1 = uses 2 = uses original
-            if (resultsObj[key] === 0) {
-                resultsObj[key] = "Does Not Use";
-            }
-            else if (resultsObj[key] === 1) {
-                resultsObj[key] = "Uses";
-            }
-            else if (resultsObj[key] === 2) {
-                if (key === "consoleInput") {
-                    resultsObj[key] = "Takes Console Input Originally";
-                }
-                else {
-                    resultsObj[key] = "Uses Original";
-                }
-            }
-            else if (resultsObj[key] === 3) {
-                if (Level3OriginalForPurpose.includes(key)) {
-                    resultsObj[key] = "Uses Originally For Purpose";
-                }
-                else {
-                    if (key === "forLoops" && !isJavascript) {
-                        resultsObj[key] = "Uses Originally With Range Min/Max";
-                    }
-                    else if (key === "forLoops" && isJavascript) {
-                        resultsObj[key] = "Uses Originally With Two Arguments";
-                    }
-                    else if (key === "conditionals") {
-                        resultsObj[key] = "Uses Originally to Follow Multiple Code Paths";
-                    }
-                    else if (key === "userFunc") {
-                        resultsObj[key] = "Uses and Calls Originally";
-                    }
-                    else if (key === "consoleInput") {
-                        resultsObj[key] = "Takes Input Originally and Uses For Purpose";
-                    }
-                }
-            }
-
-            else {
-                //levels 3 and beyond are more topic-specific
-                if ((key === "lists" || key === "strings") && resultsObj[key] === 4) {
-                    resultsObj[key] = "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon";
-                }
-                if (key === "variables" && resultsObj[key] === 4) {
-                    resultsObj[key] = "Uses Originally And Transforms Value";
-                }
-                if (key === "forLoops") {
-                    if (resultsObj[key] === 4 && !isJavascript) {
-                        resultsObj[key] = "Uses Originally With Range Min/Max And Increment";
-                    }
-                    else if (resultsObj[key] === 4 && isJavascript) {
-                        resultsObj[key] = "Uses Originally With Three Arguments";
-                    }
-                    else if (resultsObj[key] === 5) {
-                        resultsObj[key] = "Uses Original Nested Loops";
-                    }
-                }
-            }
-            if (key === "userFunc") {
-                if (resultsObj[key] === "Returns") {
-                    resultsObj[key] = "Uses Originally And Returns Values";
-                }
-                else if (resultsObj[key] === "Args") {
-                    resultsObj[key] = "Uses Originally And Takes Arguments";
-                }
-                else if (resultsObj[key] === "ReturnAndArgs") {
-                    resultsObj[key] = "Uses Originally, Takes Arguments, And Returns Values";
-                }
-            }
+            var translatorDict = translatedIntegerValues[resultsObj[key]];
+            var tempKey = key;
+            if (!Object.keys(translatorDict).includes(key)) { tempKey = ""; }
+            resultsObj[key] = translatorDict[tempKey];
+            if (typeof(resultsObj[key]) === "function") { resultsObj[key] = resultsObj[key](); }
         });
     }
-
 
 
     /**
@@ -195,7 +147,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
 
         //console.log(lineDict());
 
-       // translateIntegerValues(resultsObject);   //translate the calculated values
+        // translateIntegerValues(resultsObject);   //translate the calculated values
         lineDict();
         results = resultsObject;
         caiErrorHandling.updateNames(allVariables, userFunctionParameters);
@@ -10253,7 +10205,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHe
         }
 
         //translate the calculated values
-       // translateIntegerValues(resultsObject);
+        // translateIntegerValues(resultsObject);
         //console.log(resultsObject);
         lineDict();
         results = resultsObject;
