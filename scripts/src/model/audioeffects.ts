@@ -1,3 +1,5 @@
+import { BandpassNode, ChorusNode, CompressorNode, CustomDelayNode, CustomPannerNode, DistortionNode, Eq3bandNode, FilterNode, FlangerNode, PhaserNode, PitchshiftNode, ReverbNode1, RingmodNode, TremoloNode, VolumeNode, WahNode } from "./audionodes"
+
 // Need to scale the effects
 export const dbToFloat = (dbValue: number) => {
     return (Math.pow(10, (0.05 * dbValue)))
@@ -15,6 +17,14 @@ export class VolumeEffect {
         BYPASS: {defaultVal: 0.0, min: 0.0, max: 1.0}
     }
 
+    static NODE = VolumeNode
+
+    static get(node: any, parameter: string) {
+        return {
+            GAIN: node.volume.gain,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         if (parameter === 'GAIN') {
             return dbToFloat(value)
@@ -29,6 +39,15 @@ export class DelayEffect {
         DELAY_FEEDBACK: {defaultVal: -5.0, min: -120.0, max: -1.0},
         MIX: {defaultVal: 0.5, min: 0.0, max: 1.0},
         BYPASS: {defaultVal: 0.0, min: 0.0, max: 1.0}
+    }
+
+    static NODE = CustomDelayNode
+
+    static get(node: any, parameter: string) {
+        return {
+            DELAY_TIME: node.delay.delayTime,
+            DELAY_FEEDBACK: node.feedback.gain,
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
@@ -49,6 +68,15 @@ export class FilterEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = FilterNode
+
+    static get(node: any, parameter: string) {
+        return {
+            FILTER_FREQ: node.filter.frequency,
+            FILTER_RESONANCE: node.filter.Q,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         if (parameter === 'FILTER_RESONANCE') {
             return linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, value)
@@ -64,8 +92,30 @@ export class CompressorEffect {
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
     }
 
+    static NODE = CompressorNode
+
+    static get(node: any, parameter: string) {
+        return {
+            COMPRESSOR_RATIO: node.compressor.ratio,
+            COMPRESSOR_THRESHOLD: node.compressor.threshold,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         // No scaling required for compressor (all values in dB).
+    }
+}
+
+const panParam = (leftGain: AudioParam, rightGain: AudioParam) => {
+    return {
+        setValueAtTime(value: number, time: number) {
+            leftGain.setValueAtTime((value * -0.5) + 0.5, time)
+            rightGain.setValueAtTime((value * 0.5) + 0.5, time)
+        },
+        linearRampToValueAtTime(value: number, time: number) {
+            leftGain.linearRampToValueAtTime((value * -0.5) + 0.5, time)
+            rightGain.linearRampToValueAtTime((value * 0.5) + 0.5, time)
+        },
     }
 }
 
@@ -74,6 +124,14 @@ export class PanEffect {
         DEFAULT_PARAM: "LEFT_RIGHT",
         LEFT_RIGHT: {min: -100.0, max: 100.0, defaultVal: 0.0},
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
+    }
+
+    static Node = CustomPannerNode
+
+    static get(node: any, parameter: string) {
+        return {
+            LEFT_RIGHT: panParam(node.panLeft.gain, node.panRight.gain),
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
@@ -90,6 +148,15 @@ export class BandpassEffect {
         BANDPASS_WIDTH: {min: 0.0, max: 1.0, defaultVal: 0.5},
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
+    }
+
+    static NODE = BandpassNode
+
+    static get(node: any, parameter: string) {
+        return {
+            BANDPASS_FREQ: node.bandpass.freq,
+            BANDPASS_WIDTH: node.bandpass.Q,
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
@@ -112,8 +179,36 @@ export class Eq3BandEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = Eq3bandNode
+
+    static get(node: any, parameter: string) {
+        return {
+            EQ3BAND_LOWGAIN: node.lowshelf.gain,
+            EQ3BAND_LOWFREQ: node.lowshelf.frequency,
+            EQ3BAND_MIDGAIN: node.midpeak.gain,
+            EQ3BAND_MIDFREQ: node.midpeak.frequency,
+            EQ3BAND_HIGHGAIN: node.highshelf.gain,
+            EQ3BAND_HIGHFREQ: node.highshelf.freq,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         // We're safe here. No scaling is required. All valeus are in dB or Hz which is what web audio natively accepts
+    }
+}
+
+const multiParam = (params: AudioParam[]) => {
+    return {
+        setValueAtTime(value: number, time: number) {
+            for (const param of params) {
+                param.setValueAtTime(value, time)
+            }
+        },
+        linearRampToValueAtTime(value: number, time: number) {
+            for (const param of params) {
+                param.linearRampToValueAtTime(value, time)
+            }
+        },
     }
 }
 
@@ -126,6 +221,17 @@ export class ChorusEffect {
         CHORUS_MOD: {min: 0.0, max: 1.0, defaultVal: 0.7},
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
+    }
+
+    static NODE = ChorusNode
+
+    static get(node: any, parameter: string) {
+        return {
+            CHORUS_NUMVOICES: multiParam(node.inputDelayGain.map((d: GainNode) => d.gain)),
+            CHORUS_LENGTH: multiParam(node.inputDelay.map((d: DelayNode) => d.delayTime)),
+            CHORUS_RATE: node.lfo.frequency,
+            CHORUS_MOD: node.lfoGain.gain,
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
@@ -149,6 +255,16 @@ export class FlangerEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = FlangerNode
+
+    static get(node: any, parameter: string) {
+        return {
+            FLANGER_LENGTH: node.inputDelay.delayTime,
+            FLANGER_FEEDBACK: node.feedback.gain,
+            FLANGER_RATE: node.lfo.frequency,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         if (parameter === 'FLANGER_LENGTH') {
             return value / 1000  // milliseconds to seconds
@@ -169,6 +285,17 @@ export class PhaserEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = PhaserNode
+
+    static get(node: any, parameter: string) {
+        return {
+            PHASER_RANGEMIN: multiParam([node.allpass1.frequency, node.allpass2.frequency]),
+            PHASER_RANGEMAX: multiParam([node.allpass3.frequency, node.allpass4.frequency]),
+            PHASER_FEEDBACK: node.feedback.gain,
+            PHASER_RATE: node.lfo.frequency,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         if (parameter === 'PHASER_FEEDBACK') {
             return dbToFloat(value)
@@ -185,11 +312,33 @@ export class TremoloEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = TremoloNode
+
+    static get(node: any, parameter: string) {
+        return {
+            TREMOLO_FREQ: node.lfo.frequency,
+            TREMOLO_AMOUNT: node.lfoGain.gain,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         if (parameter === 'TREMOLO_AMOUNT') {
             // db to float value
             return dbToFloat(value)
         }
+    }
+}
+
+const distortionParam = (wetGain: AudioParam, dryGain: AudioParam) => {
+    return {
+        setValueAtTime(value: number, time: number) {
+            wetGain.setValueAtTime(value, time)
+            dryGain.setValueAtTime(1 - value, time)
+        },
+        linearRampToValueAtTime(value: number, time: number) {
+            wetGain.linearRampToValueAtTime(value, time)
+            dryGain.linearRampToValueAtTime(1 - value, time)
+        },
     }
 }
 
@@ -199,6 +348,14 @@ export class DistortionEffect {
         DISTO_GAIN: {min: 0.0, max: 50.0, defaultVal: 20.0},
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
         MIX: {min: 0.0, max: 1.0, defaultVal: 0.5}
+    }
+
+    static NODE = DistortionNode
+
+    static get(node: any, parameter: string) {
+        return {
+            DISTO_GAIN: distortionParam(node.wetLeft.gain, node.dryLevel.gain),
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
@@ -218,6 +375,8 @@ export class PitchshiftEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = PitchshiftNode
+
     static scale(parameter: string, value: number) {
         if (parameter === 'PITCHSHIFT_SHIFT') {
             return value * 100  // semitones to cents
@@ -232,6 +391,15 @@ export class RingmodEffect {
         RINGMOD_FEEDBACK: {min: 0.0, max: 100.0, defaultVal: 0.0},
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
+    }
+
+    static NODE = RingmodNode
+
+    static get(node: any, parameter: string) {
+        return {
+            RINGMOD_MODFREQ: node.lfo.frequency,
+            RINGMOD_FEEDBACK: node.feedback.gain,
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
@@ -249,6 +417,14 @@ export class WahEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
+    static NODE = WahNode
+
+    static get(node: any, parameter: string) {
+        return {
+            WAH_POSITION: node.bandpass.frequency,
+        }[parameter]
+    }
+
     static scale(parameter: string, value: number) {
         if (parameter === 'WAH_POSITION') {
             // position of 0 to 1 must sweep frequencies in a certain range, say 350Hz to 10Khz
@@ -264,6 +440,15 @@ export class ReverbEffect {
         REVERB_DAMPFREQ: {min: 200, max: 18000, defaultVal: 8000},
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0},
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
+    }
+
+    static NODE = ReverbNode1
+
+    static get(node: any, parameter: string) {
+        return {
+            REVERB_TIME: multiParam(node.reverb.combFilters.map((f: any) => f.resonance)),
+            REVERB_DAMPFREQ: multiParam(node.reverb.combFilters.map((f: any) => f.dampening)),
+        }[parameter]
     }
 
     static scale(parameter: string, value: number) {
