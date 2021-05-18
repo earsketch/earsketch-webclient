@@ -15,11 +15,10 @@ export class VolumeEffect {
         BYPASS: {defaultVal: 0.0, min: 0.0, max: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'GAIN') {
-            return [dbToFloat(start), dbToFloat(end)]
+            return dbToFloat(value)
         }
-        return [start, end]
     }
 }
 
@@ -32,14 +31,12 @@ export class DelayEffect {
         BYPASS: {defaultVal: 0.0, min: 0.0, max: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'DELAY_TIME') {
-            // converting milliseconds to seconds
-            return [start / 1000, end / 1000]
+            return value / 1000  // milliseconds to seconds
         } else if (parameter === 'DELAY_FEEDBACK') {
-            return [dbToFloat(start), dbToFloat(end)]
+            return dbToFloat(value)
         }
-        return [start, end]
     }
 }
 
@@ -52,12 +49,10 @@ export class FilterEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'FILTER_RESONANCE') {
-            start = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, start)
-            end = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, end)
+            return linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, value)
         }
-        return [start, end]
     }
 }
 
@@ -69,9 +64,8 @@ export class CompressorEffect {
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         // No scaling required for compressor (all values in dB).
-        return [start, end]
     }
 }
 
@@ -82,12 +76,10 @@ export class PanEffect {
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'LEFT_RIGHT') {
-            start = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, -1, 1, start)
-            end = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, -1, 1, end)
+            return linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, -1, 1, value)
         }
-        return [start, end]
     }
 }
 
@@ -100,12 +92,10 @@ export class BandpassEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
-        if (parameter === 'BANDPASS_WIDTH') { // adjusting the Q factor
-            start = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, start)
-            end = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, end)
+    static scale(parameter: string, value: number) {
+        if (parameter === 'BANDPASS_WIDTH') {  // adjusting the Q factor
+            return linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 1, 5, value)
         }
-        return [start, end]
     }
 }
 
@@ -122,9 +112,8 @@ export class Eq3BandEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         // We're safe here. No scaling is required. All valeus are in dB or Hz which is what web audio natively accepts
-        return [start, end]
     }
 }
 
@@ -139,16 +128,14 @@ export class ChorusEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'CHORUS_LENGTH') {
-            // milliseconds to seconds
-            return [start / 1000, end / 1000]
+            return value / 1000  // milliseconds to seconds
         } else if (parameter === 'CHORUS_MOD') {  // depth of modulation
             // scale by a factor of 1000. Essentially, it scales the amplitude of the LFO. This has to be scaled down
             // to get a realistic effect as we are modulating delay values.
-            return [start / 1000, end / 1000]
+            return value / 1000
         }
-        return [start, end]
     }
 }
 
@@ -162,14 +149,12 @@ export class FlangerEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'FLANGER_LENGTH') {
-            // milliseconds to seconds
-            return [start / 1000, end / 1000]
+            return value / 1000  // milliseconds to seconds
         } else if (parameter === 'FLANGER_FEEDBACK') {
-            return [dbToFloat(start), dbToFloat(end)]
+            return dbToFloat(value)
         }
-        return [start, end]
     }
 }
 
@@ -184,11 +169,10 @@ export class PhaserEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'PHASER_FEEDBACK') {
-            return [dbToFloat(start), dbToFloat(end)]
+            return dbToFloat(value)
         }
-        return [start, end]
     }
 }
 
@@ -201,12 +185,11 @@ export class TremoloEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'TREMOLO_AMOUNT') {
             // db to float value
-            return [dbToFloat(start), dbToFloat(end)]
+            return dbToFloat(value)
         }
-        return [start, end]
     }
 }
 
@@ -218,14 +201,12 @@ export class DistortionEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 0.5}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'DISTO_GAIN') {
             // converting 0 -> 50 to 0 to 5
             // But for now mapping it to mix parameter 0-1
-            start = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 0, 1, start)
-            end = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 0, 1, end)
+            return linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 0, 1, value)
         }
-        return [start, end]
     }
 }
 
@@ -237,12 +218,10 @@ export class PitchshiftEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'PITCHSHIFT_SHIFT') {
-            // converting semitones to cents
-            return [start * 100, end * 100]
+            return value * 100  // semitones to cents
         }
-        return [start, end]
     }
 }
 
@@ -255,12 +234,10 @@ export class RingmodEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'RINGMOD_FEEDBACK') {
-            // This is a percentage. Need to convert it to float between 0 and 1 to feed the gain node.
-            return [start / 100, end / 100]
+            return value / 100  // percentage to fraction
         }
-        return [start, end]
     }
 }
 
@@ -272,13 +249,11 @@ export class WahEffect {
         MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'WAH_POSITION') {
             // position of 0 to 1 must sweep frequencies in a certain range, say 350Hz to 10Khz
-            start = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 350, 10000, start)
-            end = linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 350, 10000, end)
+            return linearScaling(this.DEFAULTS[parameter].min, this.DEFAULTS[parameter].max, 350, 10000, value)
         }
-        return [start, end]
     }
 }
 
@@ -291,11 +266,9 @@ export class ReverbEffect {
         BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
     }
 
-    static scale(parameter: string, start: number, end: number) {
+    static scale(parameter: string, value: number) {
         if (parameter === 'REVERB_TIME') {
-            start = ((0.8/4000)*(start-4000)) + 0.8
-            end = ((0.8/4000)*(end-4000)) + 0.8
+            return ((0.8/4000)*(value-4000)) + 0.8
         }
-        return [start, end]
     }
 }

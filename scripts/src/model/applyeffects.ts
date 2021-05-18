@@ -75,7 +75,10 @@ export const scaleEffect = (effectname: string, parameter: string, effectStartVa
 
     esconsole("Scaling effect values", 'debug')
     if (effectname in EFFECT_MAP) {
-        return (EFFECT_MAP as any)[effectname].scale(parameter, effectStartValue, effectEndValue)
+        return [
+            (EFFECT_MAP as any)[effectname].scale(parameter, effectStartValue) ?? effectStartValue,
+            (EFFECT_MAP as any)[effectname].scale(parameter, effectStartValue) ?? effectEndValue
+        ]
     }
 }
 
