@@ -1,5 +1,6 @@
 // Play sounds from the JSON object output of scripts.
 import * as applyEffects from '../model/applyeffects'
+import { dbToFloat } from '../model/audioeffects'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 
@@ -403,7 +404,7 @@ export const Player = (context: AudioContextWithGain) => {
     const setVolume = (gain: number) => {
         esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER'])
         if (context.master !== undefined) {
-            context.master.gain.setValueAtTime(applyEffects.dbToFloat(gain), context.currentTime)
+            context.master.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
         }
     }
 

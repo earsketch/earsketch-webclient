@@ -2,11 +2,17 @@
 import { AudioContextWithGain, Track } from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
-import { 
+import {
+    BandpassEffect, ChorusEffect, CompressorEffect, dbToFloat, DelayEffect,
+    DistortionEffect, Eq3BandEffect, FilterEffect, FlangerEffect, linearScaling, PanEffect,
+    PhaserEffect, PitchshiftEffect, ReverbEffect, RingmodEffect, TremoloEffect,
+    VolumeEffect, WahEffect
+} from './audioeffects'
+import {
     BandpassNode, ChorusNode, CompressorNode, CustomDelayNode, CustomPannerNode, 
     DistortionNode, Eq3bandNode, FilterNode, FlangerNode, PhaserNode, PitchshiftNode,
     ReverbNode1, RingmodNode, TremoloNode, VolumeNode, WahNode
-} from './audioeffects'
+} from './audionodes'
 
 // If multiple gain automations occur, only 1 node is required.
 // Hence, these flags will keep check on duplication of effect nodes
@@ -32,132 +38,26 @@ export const resetAudioNodeFlags = () => {
     buildAudioNodeGraph.reverbNodeCreatedFlag = 0
 }
 
-export const EFFECT_DEFAULTS: any = {
-    VOLUME: {
-        DEFAULT_PARAM: "GAIN",
-        GAIN: {defaultVal: 0.0, min: -60, max: 12},
-        BYPASS: {defaultVal: 0.0, min: 0.0, max: 1.0}
-    },
-    DELAY: {
-        DEFAULT_PARAM: "DELAY_TIME",
-        DELAY_TIME: {defaultVal: 300, min: 0.0, max: 4000.0},
-        DELAY_FEEDBACK: {defaultVal: -5.0, min: -120.0, max: -1.0},
-        MIX: {defaultVal: 0.5, min: 0.0, max: 1.0},
-        BYPASS: {defaultVal: 0.0, min: 0.0, max: 1.0}
-    },
-    FILTER: {
-        DEFAULT_PARAM: "FILTER_FREQ",
-        FILTER_FREQ: {min: 20.0, max: 20000.0, defaultVal: 1000.0},
-        FILTER_RESONANCE: {min: 0.0, max: 1.0, defaultVal: 0.8},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    COMPRESSOR: {
-        DEFAULT_PARAM: "COMPRESSOR_THRESHOLD",
-        COMPRESSOR_THRESHOLD: {min: -30.0, max: 0.0, defaultVal: -18.0},
-        COMPRESSOR_RATIO: {min: 1.0, max: 100.0, defaultVal: 10.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
-    },
-    PAN: {
-        DEFAULT_PARAM: "LEFT_RIGHT",
-        LEFT_RIGHT: {min: -100.0, max: 100.0, defaultVal: 0.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
-    },
-    BANDPASS: {
-        DEFAULT_PARAM: "BANDPASS_FREQ",
-        BANDPASS_FREQ: {min: 20.0, max: 20000.0, defaultVal: 800.0},
-        BANDPASS_WIDTH: {min: 0.0, max: 1.0, defaultVal: 0.5},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    EQ3BAN: {
-        DEFAULT_PARAM: "EQ3BAND_LOWGAIN",
-        EQ3BAND_LOWGAIN: {min: -24.0, max: 18.0, defaultVal: 0.0},
-        EQ3BAND_LOWFREQ: {min: 20.0, max: 20000.0, defaultVal: 200.0},
-        EQ3BAND_MIDGAIN: {min: -24.0, max: 18.0, defaultVal: 0.0},
-        EQ3BAND_MIDFREQ: {min: 20.0, max: 20000.0, defaultVal: 200.0},
-        EQ3BAND_HIGHGAIN: {min: -24.0, max: 18.0, defaultVal: 0.0},
-        EQ3BAND_HIGHFREQ: {min: 20.0, max: 20000.0, defaultVal: 200.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    CHORUS: {
-        DEFAULT_PARAM: "CHORUS_LENGTH",
-        CHORUS_LENGTH: {min: 1.0, max: 250.0, defaultVal: 15.0},
-        CHORUS_NUMVOICES: {min: 1.0, max: 8.0, defaultVal: 1.0},
-        CHORUS_RATE: {min: 0.1, max: 16.0, defaultVal: 0.5},
-        CHORUS_MOD: {min: 0.0, max: 1.0, defaultVal: 0.7},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    FLANGER: {
-        DEFAULT_PARAM: "FLANGER_LENGTH",
-        FLANGER_LENGTH: {min: 0.0, max: 200.0, defaultVal: 6.0},
-        FLANGER_FEEDBACK: {min: -80.0, max: -1.0, defaultVal: -50.0},
-        FLANGER_RATE: {min: 0.001, max: 100.0, defaultVal: 0.6},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    PHASER: {
-        DEFAULT_PARAM: "PHASER_RATE",
-        PHASER_RATE: {min: 0.0, max: 10.0, defaultVal: 0.5},
-        PHASER_FEEDBACK: {min: -120.0, max: -1.0, defaultVal: -3.0},
-        PHASER_RANGEMIN: {min: 40.0, max: 20000.0, defaultVal: 440.0},
-        PHASER_RANGEMAX: {min: 40.0, max: 20000.0, defaultVal: 1600.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    TREMOLO: {
-        DEFAULT_PARAM: "TREMOLO_FREQ",
-        TREMOLO_FREQ: {min: 0.0, max: 100.0, defaultVal: 4.0},
-        TREMOLO_AMOUNT: {min: -60.0, max: 0.0, defaultVal: -6.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    DISTORTION: {
-        DEFAULT_PARAM: "DISTO_GAIN",
-        DISTO_GAIN: {min: 0.0, max: 50.0, defaultVal: 20.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 0.5}
-    },
-    PITCHSHIFT: {
-        DEFAULT_PARAM: "PITCHSHIFT_SHIFT",
-        PITCHSHIFT_SHIFT: {min: -12.0, max: 12.0, defaultVal: 0.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    RINGMOD: {
-        DEFAULT_PARAM: "RINGMOD_MODFREQ",
-        RINGMOD_MODFREQ: {min: 0.0, max: 100.0, defaultVal: 40.0},
-        RINGMOD_FEEDBACK: {min: 0.0, max: 100.0, defaultVal: 0.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    WAH: {
-        DEFAULT_PARAM: "WAH_POSITION",
-        WAH_POSITION: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0}
-    },
-    REVERB: {
-        DEFAULT_PARAM: "REVERB_DAMPFREQ",
-        REVERB_TIME: {min: 0.0, max: 4000, defaultVal: 3500},
-        REVERB_DAMPFREQ: {min: 200, max: 18000, defaultVal: 8000},
-        MIX: {min: 0.0, max: 1.0, defaultVal: 1.0},
-        BYPASS: {min: 0.0, max: 1.0, defaultVal: 0.0}
-    }
-} as const
-
-
-// Need to scale the effects
-export const dbToFloat = (dbValue: number) => {
-    return (Math.pow(10, (0.05 * dbValue)))
+const EFFECT_MAP = {
+    VOLUME: VolumeEffect,
+    DELAY: DelayEffect,
+    FILTER: FilterEffect,
+    COMPRESSOR: CompressorEffect,
+    PAN: PanEffect,
+    BANDPASS: BandpassEffect,
+    EQ3BAN: Eq3BandEffect,  // <-- TODO: Typo in the key?
+    CHORUS: ChorusEffect,
+    FLANGER: FlangerEffect,
+    PHASER: PhaserEffect,
+    TREMOLO: TremoloEffect,
+    DISTORTION: DistortionEffect,
+    PITCHSHIFT: PitchshiftEffect,
+    RINGMOD: RingmodEffect,
+    WAH: WahEffect,
+    REVERB: ReverbEffect,
 }
 
-const linearScaling = (yMin: number, yMax: number, xMin: number, xMax: number, inputY: number) => {
-    const percent = (inputY - yMin) / (yMax - yMin)
-    return percent * (xMax - xMin) + xMin
-}
+export const EFFECT_DEFAULTS: any = Object.entries(EFFECT_MAP).reduce((obj: any, [key, value]) => (obj[key] = value.DEFAULTS, obj), {})
 
 const bypassValueComplement = (bypass_state: number) => {
     return bypass_state ? 0 : 1
@@ -172,170 +72,10 @@ export const scaleEffect = (effectname: string, parameter: string, effectStartVa
         effectStartValue = EFFECT_DEFAULTS[effectname][parameter].defaultVal
     if (effectEndValue === undefined)
         effectEndValue = effectStartValue
-    let start = effectStartValue
-    let end = effectEndValue
 
     esconsole("Scaling effect values", 'debug')
-    if (effectname === 'VOLUME') {
-        if (parameter === 'GAIN') {
-            start = dbToFloat(effectStartValue)
-            end = dbToFloat(effectEndValue)
-        }
-        return [start, end]
-    } else if (effectname === 'DELAY') {
-        if (parameter === 'DELAY_TIME') {
-            // converting milliseconds to seconds
-            start = start / 1000
-            end = end / 1000
-        } else if (parameter === 'DELAY_FEEDBACK') {
-            start = dbToFloat(effectStartValue)
-            end = dbToFloat(effectEndValue)
-        } else if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'FILTER') { //in this context, filter means low-pass. We have a separate bandpass filter
-        if (parameter === 'FILTER_FREQ') {
-            // no scaling for filter frequency. It's already input in Hertz
-        } else if (parameter === 'FILTER_RESONANCE') {
-            start = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 1, 5, effectStartValue)
-            end = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 1, 5, effectEndValue)
-        } else if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'COMPRESSOR') {
-        return [start, end]
-        // no scaling required for compressor. All values in db
-    } else if (effectname === 'PAN') {
-        if (parameter === 'LEFT_RIGHT') {
-            start = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, -1, 1, effectStartValue)
-            end = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, -1, 1, effectEndValue)
-        }
-        return [start, end]
-    } else if (effectname === 'BANDPASS') { // bandpass filter
-        if (parameter === 'BANDPASS_FREQ') {
-            // no scaling for filter frequency. Its already input in Hertz
-        } else if (parameter === 'BANDPASS_WIDTH') { // adjusting the Q factor
-            start = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 1, 5, effectStartValue)
-            end = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 1, 5, effectEndValue)
-        } else if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'EQ3BAND') { // 3 band equalizer
-        // We're safe here. No scaling is required. All valeus are in db or Hz which is what web audio natively accepts
-        return [start, end]
-    } else if (effectname === 'CHORUS') { // chorus effect
-        if (parameter === 'CHORUS_LENGTH') {
-            // milliseconds to seconds
-            start = start / 1000
-            end = end / 1000
-        } else if (parameter === 'CHORUS_NUMVOICES') {
-            // Just an integer, no scaling needed
-        } else if (parameter === 'CHORUS_RATE') {
-            // No scaling. Value in Hertz, which can be directly mapped to LFO frequency
-        } else if (parameter === 'CHORUS_MOD') { // depth of modulation
-            // scale by a factor of 1000. Essentially, it scales the amplitude of the LFO. This has to be scaled down
-            // to get a realistic effect as we are modulating delay values.
-            start = start / 1000
-            end = end / 1000
-        } else if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'FLANGER') { // flanger effect
-        if (parameter === 'FLANGER_LENGTH') {
-            // milliseconds to seconds
-            start = start / 1000
-            end = end / 1000
-        }
-        if (parameter === 'FLANGER_FEEDBACK') {
-            // db to float value
-            start = dbToFloat(effectStartValue)
-            end = dbToFloat(effectEndValue)
-        }
-        if (parameter === 'FLANGER_RATE') {
-            // No scaling. Value in Hertz, which can be directly mapped to LFO frequency
-        }
-        if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'PHASER') { // phaser effect
-        if (parameter === 'PHASER_RANGEMIN') {
-            // its in Hz so no scaling required
-        } else if (parameter === 'PHASER_RANGEMAX') {
-            // its in Hz so no scaling required
-        } else if (parameter === 'PHASER_FEEDBACK') {
-            // db to float value
-            start = dbToFloat(effectStartValue)
-            end = dbToFloat(effectEndValue)
-        } else if (parameter === 'PHASER_RATE') {
-            // No scaling. Value in Hertz, which can be directly mapped to LFO frequency
-        } else if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'TREMOLO') { // tremolo effect
-        if (parameter === 'TREMOLO_FREQ') {
-            // no scaling, already in Hz
-        } else if (parameter === 'TREMOLO_AMOUNT') {
-            // db to float value
-            start = dbToFloat(effectStartValue)
-            end = dbToFloat(effectEndValue)
-        } else if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'DISTORTION') { // distortion effect
-        if (parameter === 'DISTO_GAIN') {
-            // converting 0 -> 50 to 0 to 5
-            // But for now mapping it to mix parameter 0-1
-            start = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 0, 1, effectStartValue)
-            end = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 0, 1, effectEndValue)
-        } else if (parameter === 'MIX') {  // currently not implemented for distortion
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'PITCHSHIFT') { // pitchshift effect
-        if (parameter === 'PITCHSHIFT_SHIFT') {
-            // converting semitones to cents
-            start = effectStartValue * 100
-            end = effectEndValue * 100
-        } else if (parameter === 'MIX') {  // currently not implemented for pitchshift
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'RINGMOD') { // Ringmod effect
-        if (parameter === 'RINGMOD_MODFREQ') {
-            // no scaling, already in Hz
-        }
-        if (parameter === 'RINGMOD_FEEDBACK') {
-            // This is is percentage. Need to convert it to float between 0 and 1 to feed the gain node.
-            start = (effectStartValue) / 100
-            end = (effectEndValue) / 100
-        }
-        if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'WAH') { // Ringmod effect
-        if (parameter === 'WAH_POSITION') {
-            // position of 0 to 1 must sweep frequencies in a certain range, say 350Hz to 10Khz
-            start = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 350, 10000, effectStartValue)
-            end = linearScaling(EFFECT_DEFAULTS[effectname][parameter].min, EFFECT_DEFAULTS[effectname][parameter].max, 350, 10000, effectEndValue)
-        }
-        if (parameter === 'MIX') {
-            // no scaling required as it anyway ranges from 0 to 1 (dry - wet)
-        }
-        return [start, end]
-    } else if (effectname === 'REVERB') {
-        if (parameter === 'REVERB_TIME') {
-            start = ((0.8/4000)*(start-4000)) + 0.8
-            end = ((0.8/4000)*(end-4000)) + 0.8
-        }
-        return [start, end]
+    if (effectname in EFFECT_MAP) {
+        return (EFFECT_MAP as any)[effectname].scale(parameter, effectStartValue, effectEndValue)
     }
 }
 
@@ -1994,7 +1734,7 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
                         ReverbEffectNode1.reverb.combFilters[i].resonance.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
 
                         if (effect.endMeasure !== 0) {
-                        ReverbEffectNode1.reverb.combFilters[i].resonance.linearRampToValueAtTime(effect.endValue, getOffsetTime(effect.endMeasure))
+                            ReverbEffectNode1.reverb.combFilters[i].resonance.linearRampToValueAtTime(effect.endValue, getOffsetTime(effect.endMeasure))
                         }
                     }
 
