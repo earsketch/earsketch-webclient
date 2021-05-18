@@ -4,6 +4,7 @@ import { Provider, useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
 import { hot } from 'react-hot-loader/root';
 import { react2angular } from 'react2angular';
+import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
@@ -18,6 +19,7 @@ const darkBgColor = '#223546';
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     return (
         <div
@@ -25,7 +27,7 @@ export const TitleBar = () => {
             style={{minHeight: 'fit-content'}}  // Safari-specific issue
         >
             <div className='pl-3 pr-4 font-semibold truncate'>
-                CONTENT MANAGER
+                {t('Welcome to React')} CONTENT MANAGER
             </div>
             <div>
                 <div
@@ -52,10 +54,11 @@ const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
                 color: '#F5AE3C',
                 borderColor: '#F5AE3C'
             } : {}}
-            onClick={() => dispatch(layout.setWest({
+            onClick={() => { dispatch(layout.setWest({
                 open: true,
                 kind: name
-            }))}
+                }));
+            }}
         >
             { children }
             { name }
