@@ -14,7 +14,33 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+// import './commands'
+// import 'cypress-pipe'
+// import 'cypress-file-upload'
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+const customCommands = require('./commands.js')
+module.exports = {
+  commands: customCommands
+}
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false
+  })
+// const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/
+
+// Cypress.on('uncaught:exception', (err) => {
+//   if (resizeObserverLoopErrRe.test(err.message)) {
+//     // returning false here prevents Cypress from
+//     // failing the test
+//     return false
+//   }
+// })
+Cypress.Server.defaults({
+    delay: 500,
+    force404: false,
+    ignore: (xhr) => {
+    // handle custom logic for whitelisting
+    return true;
+    }
+    })

@@ -15,3 +15,15 @@ npx cypress open
 Configuration options set in `cypress.json`.
 
 Examples in `cypress/integration/examples/`.
+
+
+## Test cases
+
+Our custom tests are configured in `test-cases/` (see `cypress.json`)
+
+```
+src/api-browser-test.js
+src/general-client-test.js
+src/scripts-browser-test.js
+src/sound-browser-test.js
+```
