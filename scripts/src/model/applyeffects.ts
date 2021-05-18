@@ -46,7 +46,6 @@ export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track,
     // Hence, these flags will keep check on duplication of effect nodes
     // Another reason why these flags are useful - we need to apply defaults
     // only the first time the node is created.
-    let firstNodeCreatedFlag = 0
     const createdNodes: { [key: string]: number } = {}
     for (const key of Object.keys(EFFECT_MAP)) {
         createdNodes[key] = 0
@@ -55,11 +54,6 @@ export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track,
     // Returns the WebAudio context time.
     const getOffsetTime = (location: number) => {
         return Math.max(context.currentTime + ESUtils.measureToTime(location, tempo) - offsetInSeconds, context.currentTime)
-    }
-
-    const checkPastEffectEndLocation = () => {
-        // careful with the scope
-        return (effect.endMeasure !== 0) && (ESUtils.measureToTime(effect.endMeasure, tempo) <= offsetInSeconds)
     }
 
     // Shorthand function for setting the wet / dry mix parameter.
@@ -89,29 +83,12 @@ export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track,
         }
     }
 
-    // Shorthand function for setting the bypass behaviors.
-    const setBypass = (node: any) => {
-        if (checkPastEffectEndLocation()) {
-            node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), context.currentTime)
-            node.bypassDry.gain.setValueAtTime(effect.endValue, context.currentTime)
-        } else {
-            if (effect.endMeasure === 0) {
-                node.bypass.gain.setValueAtTime(bypassComplement(effect.startValue), getOffsetTime(effect.startMeasure))
-                node.bypassDry.gain.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
-            } else {
-                node.bypass.gain.setValueAtTime(bypassComplement(effect.startValue), getOffsetTime(effect.startMeasure))
-                node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), getOffsetTime(effect.endMeasure))
-                node.bypassDry.gain.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
-                node.bypassDry.gain.setValueAtTime(effect.endValue, getOffsetTime(effect.endMeasure))
-            }
-        }
-    }
-
     esconsole('Building audio node graph', 'debug')
 
     // Audio node graph can be constructed like a linked list
-    let lastNode
-    let firstNode
+    let firstNode: AudioNode | undefined = undefined
+    // Shim to avoid special flags & cases in first iteration.
+    let lastNode = { connect(target: AudioNode) { firstNode = target } }
 
     // Flatten the track effects
     const effects = []
@@ -148,12 +125,11 @@ export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track,
 
         // Setup
         const effectType = (EFFECT_MAP as any)[effect.name]
+        const pastEndLocation = (effect.endMeasure !== 0) && (ESUtils.measureToTime(effect.endMeasure, tempo) <= offsetInSeconds)
         let node
         if (!createdNodes[effect.name]) {
             node = effectType.create(context)
-            if (firstNodeCreatedFlag) {
-                lastNode.connect(node.input)
-            }
+            lastNode.connect(node.input)
 
             if (effect.name !== "PITCHSHIFT") {
                 // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
@@ -172,18 +148,26 @@ export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track,
 
         createdNodes[effect.name]++
 
-        if (!firstNodeCreatedFlag) {
-            firstNode = node
-            firstNodeCreatedFlag++
-        }
-
         // Params
         if (effect.name === "PITCHSHIFT") {
             // Nope.
         } else if (effect.parameter === "BYPASS") {
-            setBypass(node)
+            if (pastEndLocation) {
+                node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), context.currentTime)
+                node.bypassDry.gain.setValueAtTime(effect.endValue, context.currentTime)
+            } else {
+                if (effect.endMeasure === 0) {
+                    node.bypass.gain.setValueAtTime(bypassComplement(effect.startValue), getOffsetTime(effect.startMeasure))
+                    node.bypassDry.gain.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
+                } else {
+                    node.bypass.gain.setValueAtTime(bypassComplement(effect.startValue), getOffsetTime(effect.startMeasure))
+                    node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), getOffsetTime(effect.endMeasure))
+                    node.bypassDry.gain.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
+                    node.bypassDry.gain.setValueAtTime(effect.endValue, getOffsetTime(effect.endMeasure))
+                }
+            }
         } else if (effect.name !== "VOLUME" && effect.parameter === "MIX") {
-            if (checkPastEffectEndLocation()) {
+            if (pastEndLocation) {
                 setMix(node, effect.endValue, context.currentTime)
 
                 // NOTE: Weird exception for DISTO_GAIN here from before The Great Refactoring.
@@ -211,7 +195,7 @@ export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track,
                 }
             }
         } else {
-            if (checkPastEffectEndLocation()) {
+            if (pastEndLocation) {
                 // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
                 // So, for now, it does not happen here.
                 if (effect.parameter !== "REVERB_TIME") {

@@ -86,7 +86,7 @@ app.factory('renderer', function () {
                 // connect the buffer source to the effects tree
                 // if (typeof(startNode) !== "undefined")  {
                 //     source.connect(trackGain);
-                //     trackGain.connect(startNode.input)
+                //     trackGain.connect(startNode)
                 // } else {
                 //     source.connect(master);
                 //     trackGain.connect(master);
@@ -149,7 +149,7 @@ app.factory('renderer', function () {
 
                 if (typeof(startNode) !== "undefined") {
                     // TODO: the effect order (limiter) is not right
-                    trackGain.connect(startNode.input);
+                    trackGain.connect(startNode);
                 } else {
                     trackGain.connect(context.master);
                 }
@@ -158,7 +158,7 @@ app.factory('renderer', function () {
             } else {
                 if (typeof(startNode) !== "undefined") {
                     // track gain -> effect tree
-                    trackGain.connect(startNode.input)
+                    trackGain.connect(startNode)
                 } else {
                     // track gain -> (bypass effect tree) -> analyzer & master
                     trackGain.connect(track.analyser);

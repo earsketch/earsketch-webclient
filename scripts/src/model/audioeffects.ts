@@ -33,7 +33,6 @@ export class Effect {
     }
 }
 
-// Do these nodes really need bypass/bypassDry *and* wetLevel/dryLevel?
 class MixableEffect extends Effect {
     static create(context: AudioContext) {
         const node = {

@@ -226,7 +226,7 @@ export const Player = (context: AudioContextWithGain) => {
                 // if there is at least one effect set in master track
                 if (typeof(startNode) !== "undefined") {
                     // TODO: master not connected to the analyzer?
-                    trackGain.connect(startNode.input)
+                    trackGain.connect(startNode)
                     // effect tree connects to the context.master internally
                 } else {
                     // if no effect set
@@ -237,7 +237,7 @@ export const Player = (context: AudioContextWithGain) => {
             } else {
                 if (typeof(startNode) !== "undefined") {
                     // track gain -> effect tree
-                    trackGain.connect(startNode.input)
+                    trackGain.connect(startNode)
                 } else {
                     // track gain -> (bypass effect tree) -> analyzer & master
                     trackGain.connect(track.analyser)
@@ -251,7 +251,7 @@ export const Player = (context: AudioContextWithGain) => {
                 const dummyOsc = context.createOscillator()
                 const dummyGain = context.createGain()
                 dummyGain.gain.value = 0
-                dummyOsc.connect(dummyGain).connect(startNode.input)
+                dummyOsc.connect(dummyGain).connect(startNode)
                 dummyOsc.start(startTime)
                 dummyOsc.stop(startTime+0.001)
             }
