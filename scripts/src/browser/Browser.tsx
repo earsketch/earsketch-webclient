@@ -16,6 +16,7 @@ import { RootState } from '../reducers';
 
 const darkBgColor = '#223546';
 
+
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
@@ -27,7 +28,7 @@ export const TitleBar = () => {
             style={{minHeight: 'fit-content'}}  // Safari-specific issue
         >
             <div className='pl-3 pr-4 font-semibold truncate'>
-                {t('Welcome to React')} CONTENT MANAGER
+                {t('contentManager.title')}
             </div>
             <div>
                 <div
@@ -67,6 +68,7 @@ const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
 };
 
 export const BrowserTabs = () => {
+    const { t } = useTranslation();
     return (
         <div
             className='flex justify-between text-center'
@@ -77,7 +79,7 @@ export const BrowserTabs = () => {
                 minHeight: 'fit-content' // Safari-specific issue
             }}
         >
-            <BrowserTab name='SOUNDS'>
+            <BrowserTab name={t('soundBrowser.title')}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
             <BrowserTab name='SCRIPTS'>
@@ -101,13 +103,15 @@ interface SearchBarProps {
 }
 export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme);
+    const { t } = useTranslation();
+
     return (
         <form className='p-3 pb-1' onSubmit={e => e.preventDefault()}>
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === 'light' ? 'border-black' : 'border-white'}`}>
                 <input
                     className='w-full outline-none p-1 bg-transparent font-normal'
                     type='text'
-                    placeholder='Search'
+                    placeholder={t('contentManager.searchPlaceholder')}
                     value={searchText}
                     onChange={dispatchSearch}
                 />
@@ -257,7 +261,7 @@ export const Collection:React.FC<CollectionType> = ({ title, visible=true, initE
     );
 };
 
-export const Collapsed:React.FC<{ position:'west'|'east', title?:string|void }> = ({ position='west', title=null }) => {
+export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ position='west', title=null }) => {
     const theme = useSelector(appState.selectColorTheme);
     const embedMode = useSelector(appState.selectEmbedMode);
     const dispatch = useDispatch();
@@ -304,6 +308,7 @@ const BrowserComponents: { [key:string]: React.FC } = {
 const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector((state: RootState) => state.layout.west.open);
+    const { t } = useTranslation();
     let kind = useSelector(layout.selectWestKind);
     if (!Object.keys(BrowserComponents).includes(kind)) {
         kind = 'SOUNDS';
@@ -322,7 +327,7 @@ const Browser = () => {
                         <BrowserTabs />
                         <BrowserBody />
                     </>
-                ) : <Collapsed title='CONTENT MANAGER' position='west' />
+                ) : <Collapsed title={t('contentManager.title')} position='west' />
             }
         </div>
     );
