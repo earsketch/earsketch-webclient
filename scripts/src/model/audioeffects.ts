@@ -8,6 +8,11 @@ export const linearScaling = (yMin: number, yMax: number, xMin: number, xMax: nu
     return percent * (xMax - xMin) + xMin
 }
 
+interface AudioParamish {
+    setValueAtTime(value: number, time: number): void
+    linearRampToValueAtTime(value: number, time: number): void
+}
+
 export class Effect {
     static DEFAULT_PARAM = ""
     static DEFAULTS: { [key: string]: { [key: string]: number } } = {}
@@ -26,6 +31,10 @@ export class Effect {
         node.bypassDry.connect(node.output)
         node.bypass.connect(node.output)
         return node
+    }
+
+    static get(node: any, parameter: string): AudioParamish {
+        throw new Error("Abstract method; call this on a subclass.")
     }
 
     static scale(parameter: string, value: number) {
@@ -219,7 +228,7 @@ export class PanEffect extends Effect {
     static get(node: any, parameter: string) {
         return {
             LEFT_RIGHT: panParam(node.panLeft.gain, node.panRight.gain),
-        }[parameter]
+        }[parameter]!
     }
 
     static scale(parameter: string, value: number) {
@@ -597,7 +606,7 @@ export class DistortionEffect extends MixableEffect {
     static get(node: any, parameter: string) {
         return {
             DISTO_GAIN: distortionParam(node.wetLeft.gain, node.dryLevel.gain),
-        }[parameter]
+        }[parameter]!
     }
 
     static scale(parameter: string, value: number) {
@@ -748,7 +757,7 @@ export class ReverbEffect extends MixableEffect {
         return {
             REVERB_TIME: multiParam(node.reverb.combFilters.map((f: any) => f.resonance)),
             REVERB_DAMPFREQ: multiParam(node.reverb.combFilters.map((f: any) => f.dampening)),
-        }[parameter]
+        }[parameter]!
     }
 
     static scale(parameter: string, value: number) {

@@ -34,7 +34,6 @@ export interface EffectRange {
     inputEndValue: number
     startValue: number
     endValue: number
-    endLocation: number
 }
 
 export type Effect = EffectRange[] & { bypass?: boolean }

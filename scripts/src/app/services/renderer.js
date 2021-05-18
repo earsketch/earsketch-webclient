@@ -47,7 +47,7 @@ app.factory('renderer', function () {
 
             var startNode = applyEffects.buildAudioNodeGraph(
                 context, track, i, result.tempo,
-                origin, result.master, [], 0
+                origin, result.master, [], false
             );
 
             var trackGain = context.createGain();
