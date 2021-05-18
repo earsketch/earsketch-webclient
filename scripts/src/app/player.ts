@@ -32,6 +32,9 @@ export interface EffectRange {
     endMeasure: number
     inputStartValue: number
     inputEndValue: number
+    startValue: number
+    endValue: number
+    endLocation: number
 }
 
 export type Effect = EffectRange[] & { bypass?: boolean }
@@ -205,7 +208,6 @@ export const Player = (context: AudioContextWithGain) => {
             esconsole('Bypassing effects: ' + JSON.stringify(trackBypass), ['DEBUG','PLAYER'])
 
             // construct the effect graph
-            applyEffects.resetAudioNodeFlags()
             const startNode = applyEffects.buildAudioNodeGraph(context, track, t, tempo, startTime, renderingData.master, trackBypass, false)
 
             const trackGain = context.createGain()

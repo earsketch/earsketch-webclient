@@ -1,5 +1,5 @@
 // Web Audio effect chain constructors
-import { AudioContextWithGain, Track } from '../app/player'
+import { AudioContextWithGain, EffectRange, Track } from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import {
@@ -8,19 +8,8 @@ import {
     ReverbEffect, RingmodEffect, TremoloEffect, VolumeEffect, WahEffect
 } from './audioeffects'
 
-// If multiple gain automations occur, only 1 node is required.
-// Hence, these flags will keep check on duplication of effect nodes
-// Another reason why these flags are useful - we need to apply defaults
-// only the first time the node is created.
-export const resetAudioNodeFlags = () => {
-    buildAudioNodeGraph.firstNodeCreatedFlag = 0
-    buildAudioNodeGraph.createdNodes = {}
-    for (const key of Object.keys(EFFECT_MAP)) {
-        buildAudioNodeGraph.createdNodes[key] = 0
-    }
-}
 
-const EFFECT_MAP: { [key: string]: typeof Effect } = {
+export const EFFECT_MAP: { [key: string]: typeof Effect } = {
     VOLUME: VolumeEffect,
     DELAY: DelayEffect,
     FILTER: FilterEffect,
@@ -39,38 +28,30 @@ const EFFECT_MAP: { [key: string]: typeof Effect } = {
     REVERB: ReverbEffect,
 }
 
-export const EFFECT_DEFAULTS: any = Object.entries(EFFECT_MAP).reduce((obj: any, [key, value]) => (obj[key] = value.DEFAULTS, obj), {})
-
-const bypassValueComplement = (bypass_state: number) => {
+const bypassComplement = (bypass_state: number) => {
     return bypass_state ? 0 : 1
 }
 
-export const scaleEffect = (effectname: string, parameter: string, effectStartValue: number, effectEndValue: number) => {
-    esconsole('parameter is ' + parameter, 'debug')
-
-    const effect = EFFECT_MAP[effectname]
-
-    if (parameter === 'DEFAULT' || parameter === undefined)
-        parameter = effect.DEFAULTS.DEFAULT_PARAM
-    if (effectStartValue === undefined)
-        effectStartValue = effect.DEFAULTS[parameter].defaultVal
-    if (effectEndValue === undefined)
-        effectEndValue = effectStartValue
-
-    esconsole("Scaling effect values", 'debug')
-    if (effectname in EFFECT_MAP) {
-        return [effect.scale(parameter, effectStartValue), effect.scale(parameter, effectEndValue)]
-    }
-}
-
-interface BuildAudioNodeGraph {
-    (context: AudioContext, track: any, tracknumber: number, tempo: number, offsetInSeconds: number, master_collect: GainNode, bypassedEffects: any, wav_export: boolean): any
-    firstNodeCreatedFlag: number
-    createdNodes: { [key: string]: number }
+export const scaleEffect = (effectName: string, parameter: string, effectStartValue: number | undefined, effectEndValue: number | undefined) => {
+    esconsole("Scaling effect values; parameter is " + parameter, "debug")
+    const effect = EFFECT_MAP[effectName]
+    effectStartValue ??= effect.DEFAULTS[parameter].value
+    effectEndValue ??= effectStartValue
+    return [effect.scale(parameter, effectStartValue), effect.scale(parameter, effectEndValue)]
 }
 
 // Build audio node graph and schedule automation.
-export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((context: AudioContextWithGain, track: Track, tracknumber: number, tempo: number, offsetInSeconds: number, master_collect: any, bypassedEffects: string[], wav_export: any) => {
+export const buildAudioNodeGraph = (context: AudioContextWithGain, track: Track, tracknumber: number, tempo: number, offsetInSeconds: number, master_collect: any, bypassedEffects: string[], wav_export: any) => {
+    // If multiple gain automations occur, only 1 node is required.
+    // Hence, these flags will keep check on duplication of effect nodes
+    // Another reason why these flags are useful - we need to apply defaults
+    // only the first time the node is created.
+    let firstNodeCreatedFlag = 0
+    const createdNodes: { [key: string]: number } = {}
+    for (const key of Object.keys(EFFECT_MAP)) {
+        createdNodes[key] = 0
+    }
+
     // Returns the WebAudio context time.
     const getOffsetTime = (location: number) => {
         return Math.max(context.currentTime + ESUtils.measureToTime(location, tempo) - offsetInSeconds, context.currentTime)
@@ -83,8 +64,8 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
 
     // Shorthand function for setting the wet / dry mix parameter.
     const setMix = (node: any, wetValue: number | "default", time: number) => {
-        if (wetValue === 'default') {
-            wetValue = EFFECT_MAP[effect.name].DEFAULTS.MIX.defaultVal
+        if (wetValue === "default") {
+            wetValue = EFFECT_MAP[effect.name].DEFAULTS.MIX.value
         }
         node.wetLevel.gain.setValueAtTime(wetValue, time)
         node.dryLevel.gain.setValueAtTime(1 - (wetValue as number), time)
@@ -111,15 +92,15 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
     // Shorthand function for setting the bypass behaviors.
     const setBypass = (node: any) => {
         if (checkPastEffectEndLocation()) {
-            node.bypass.gain.setValueAtTime(bypassValueComplement(effect.endValue), context.currentTime)
+            node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), context.currentTime)
             node.bypassDry.gain.setValueAtTime(effect.endValue, context.currentTime)
         } else {
             if (effect.endMeasure === 0) {
-                node.bypass.gain.setValueAtTime(bypassValueComplement(effect.startvalue), getOffsetTime(effect.startMeasure))
+                node.bypass.gain.setValueAtTime(bypassComplement(effect.startValue), getOffsetTime(effect.startMeasure))
                 node.bypassDry.gain.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
             } else {
-                node.bypass.gain.setValueAtTime(bypassValueComplement(effect.startValue), getOffsetTime(effect.startMeasure))
-                node.bypass.gain.setValueAtTime(bypassValueComplement(effect.endValue), getOffsetTime(effect.endMeasure))
+                node.bypass.gain.setValueAtTime(bypassComplement(effect.startValue), getOffsetTime(effect.startMeasure))
+                node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), getOffsetTime(effect.endMeasure))
                 node.bypassDry.gain.setValueAtTime(effect.startValue, getOffsetTime(effect.startMeasure))
                 node.bypassDry.gain.setValueAtTime(effect.endValue, getOffsetTime(effect.endMeasure))
             }
@@ -128,19 +109,19 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
 
     esconsole('Building audio node graph', 'debug')
 
-    let lastNode // Audio node graph can be constructed like a linked list
+    // Audio node graph can be constructed like a linked list
+    let lastNode
     let firstNode
-    let effect: any
 
-    // flatten the track effects
+    // Flatten the track effects
     const effects = []
-    for (const k in track.effects) {
-        effect = track.effects[k]
-        for (const i in effect) {
-            effects.push(effect[i])
+    for (const effect of Object.values(track.effects)) {
+        for (const range of effect) {
+            effects.push(range)
         }
     }
 
+    let effect: EffectRange
     for (effect of effects) {
         if (!wav_export && (bypassedEffects.indexOf(effect.name + "-" + effect.parameter) > -1)) { // bypass designated effects
             esconsole('bypassed effect', 'debug')
@@ -168,17 +149,17 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
         // Setup
         const effectType = (EFFECT_MAP as any)[effect.name]
         let node
-        if (!buildAudioNodeGraph.createdNodes[effect.name]) {
+        if (!createdNodes[effect.name]) {
             node = effectType.create(context)
-            if (buildAudioNodeGraph.firstNodeCreatedFlag) {
+            if (firstNodeCreatedFlag) {
                 lastNode.connect(node.input)
             }
 
             if (effect.name !== "PITCHSHIFT") {
                 // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
                 for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                    if (["DEFAULT_PARAM", "BYPASS", "MIX", "EQ3BAND_HIGHFREQ"].indexOf(parameter) == -1) {
-                        const value = effectType.scale(parameter, (info as any).defaultVal)
+                    if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ"].indexOf(parameter) == -1) {
+                        const value = effectType.scale(parameter, (info as any).value)
                         effectType.get(node, parameter).setValueAtTime(value, context.currentTime)
                     }
                 }
@@ -189,11 +170,11 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
             }
         }
 
-        buildAudioNodeGraph.createdNodes[effect.name]++
+        createdNodes[effect.name]++
 
-        if (!buildAudioNodeGraph.firstNodeCreatedFlag) {
+        if (!firstNodeCreatedFlag) {
             firstNode = node
-            buildAudioNodeGraph.firstNodeCreatedFlag++
+            firstNodeCreatedFlag++
         }
 
         // Params
@@ -207,10 +188,10 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
 
                 // NOTE: Weird exception for DISTO_GAIN here from before The Great Refactoring.
                 // Apply defaults only the first time node is created
-                if (buildAudioNodeGraph.createdNodes[effect.name] === 1) {
+                if (createdNodes[effect.name] === 1) {
                     for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                        if (["DEFAULT_PARAM", "BYPASS", "MIX", "EQ3BAND_HIGHFREQ", "DISTO_GAIN"].indexOf(parameter) == -1) {
-                            const value = effectType.scale(parameter, (info as any).defaultVal)
+                        if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ", "DISTO_GAIN"].indexOf(parameter) == -1) {
+                            const value = effectType.scale(parameter, (info as any).value)
                             effectType.get(node, parameter).setValueAtTime(value, context.currentTime)
                         }
                     }
@@ -219,11 +200,11 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
                 setMixInTheFuture(node)
 
                 // Apply defaults only the first time delay is created
-                if (buildAudioNodeGraph.createdNodes[effect.name] === 1) {
+                if (createdNodes[effect.name] === 1) {
                     const time = getOffsetTime(effect.startMeasure)
                     for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                        if (["DEFAULT_PARAM", "BYPASS", "MIX", "EQ3BAND_HIGHFREQ", "DISTRO_GAIN", effect.parameter].indexOf(parameter) == -1) {
-                            const value = effectType.scale(parameter, (info as any).defaultVal)
+                        if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ", "DISTRO_GAIN", effect.parameter].indexOf(parameter) == -1) {
+                            const value = effectType.scale(parameter, (info as any).value)
                             effectType.get(node, parameter).setValueAtTime(value, time)
                         }
                     }
@@ -238,10 +219,10 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
                     effectType.get(node, effect.parameter).setValueAtTime(effect.endValue, context.currentTime)
                 }
                 // Apply defaults (to all the other parameters) only the first time this kind of node is created
-                if (buildAudioNodeGraph.createdNodes[effect.name] === 1) {
+                if (createdNodes[effect.name] === 1) {
                     for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                        if (["DEFAULT_PARAM", "BYPASS", "MIX", "EQ3BAND_HIGHFREQ", effect.parameter].indexOf(parameter) == -1) {
-                            const value = effectType.scale(parameter, (info as any).defaultVal)
+                        if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ", effect.parameter].indexOf(parameter) == -1) {
+                            const value = effectType.scale(parameter, (info as any).value)
                             effectType.get(node, parameter).setValueAtTime(value, context.currentTime)
                         }
                     }
@@ -253,11 +234,11 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
                 applyEffectInTheFuture(effectType.get(node, effect.parameter))
 
                 // Apply defaults (to all the other parameters) only the first time kind of node is created
-                if (buildAudioNodeGraph.createdNodes[effect.name] === 1) {
+                if (createdNodes[effect.name] === 1) {
                     const time = getOffsetTime(effect.startMeasure)
                     for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                        if (["DEFAULT_PARAM", "BYPASS", "MIX", effect.parameter].indexOf(parameter) == -1) {
-                            const value = effectType.scale(parameter, (info as any).defaultVal)
+                        if (["BYPASS", "MIX", effect.parameter].indexOf(parameter) == -1) {
+                            const value = effectType.scale(parameter, (info as any).value)
                             effectType.get(node, parameter).setValueAtTime(value, time)
                         }
                     }
@@ -292,4 +273,4 @@ export const buildAudioNodeGraph: BuildAudioNodeGraph = <BuildAudioNodeGraph>((c
     }
 
     return firstNode
-})
+}

@@ -45,8 +45,6 @@ app.factory('renderer', function () {
             // TODO: implement our custom analyzer node
             track.analyser = context.createGain();
 
-            // TODO: refactor applyeffects.js
-            applyEffects.resetAudioNodeFlags();
             var startNode = applyEffects.buildAudioNodeGraph(
                 context, track, i, result.tempo,
                 origin, result.master, [], 0
