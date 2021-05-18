@@ -3,6 +3,7 @@ import '../../css/earsketch/allstyles.less'
 import './tailwind.css';
 
 import store from './reducers';
+import './i18n';
 
 require('jquery');
 require('jqueryUI');
@@ -154,6 +155,7 @@ require(['angular'], () => {
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');
+    require('./top/LocaleSelector')
 
     // To be ported to React
     require('./layout/Layout');
