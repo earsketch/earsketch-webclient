@@ -203,6 +203,9 @@ export class CompressorEffect extends Effect {
 
     static create(context: AudioContext) {
         const node = { compressor: context.createDynamicsCompressor(), ...super.create(context) }
+        node.compressor.attack.value = 0.01
+        node.compressor.release.value = 0.150
+        node.compressor.knee.value = 3.0
         node.input.connect(node.compressor)
         node.compressor.connect(node.bypass)
         return node
@@ -396,7 +399,7 @@ export class ChorusEffect extends MixableEffect {
 
         for (let i = 0; i < this.MAX_VOICES; i++) {
             // Only the first delay node (voice) is active initially.
-            node.inputDelayGain[i].gain.value = (i ? 0 : 1)
+            node.inputDelayGain[i].gain.value = (i === 0 ? 1 : 0)
             node.input.connect(node.inputDelay[i])
             // LFO controls the delay time of each node
             node.lfoGain.connect(node.inputDelay[i].delayTime)
