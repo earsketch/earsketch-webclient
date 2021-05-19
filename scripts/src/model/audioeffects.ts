@@ -17,7 +17,7 @@ export class Effect {
     static DEFAULT_PARAM = ""
     static DEFAULTS: { [key: string]: { [key: string]: number } } = {}
 
-    static create(context: AudioContext): any {
+    static create(context: BaseAudioContext): any {
         const node = {
             input: context.createGain(),
             output: context.createGain(),

@@ -9,9 +9,10 @@
  */
 import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
+import * as render from '../renderer'
 
-app.factory('pitchshifter', ['renderer','audioContext','userConsole',
-function pitchshifterFactory(render, ctx, userConsole) {
+app.factory('pitchshifter', ['audioContext','userConsole',
+function pitchshifterFactory(ctx, userConsole) {
 
     var QFRAMES = 16;
     var FRAMESIZE = 256;

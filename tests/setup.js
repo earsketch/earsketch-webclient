@@ -225,7 +225,6 @@ require('timesync');
 require('waveformCache');
 require('compiler');
 require('pitchShifter');
-require('renderer');
 require('userConsole');
 require('uploader');
 require('completer');

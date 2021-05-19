@@ -17,9 +17,6 @@ function ServiceWrapper() {
     // Load the compiler service outside angular
     var ApiCompiler = injector.get('compiler');
 
-    // Load the renderer outside angular
-    var ApiRenderer = injector.get('renderer');
-
     // Load the user console outside angular
     var ApiUserConsole = injector.get('userConsole');
 
@@ -38,7 +35,6 @@ function ServiceWrapper() {
     return {
         audioLibrary: ApiAudioLibrary,
         compiler: ApiCompiler,
-        renderer: ApiRenderer,
         userConsole: ApiUserConsole,
         autograder: ApiAutograder,
         userProject: ApiUserProject,

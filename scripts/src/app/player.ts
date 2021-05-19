@@ -55,7 +55,7 @@ export interface DAWData {
     master: GainNode
 }
 
-export type AudioContextWithGain = AudioContext & { master: GainNode }
+export type AudioContextWithGain = BaseAudioContext & { master: GainNode }
 
 export const Player = (context: AudioContextWithGain) => {
     let isPlaying = false

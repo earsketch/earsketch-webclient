@@ -15,6 +15,7 @@
  */
 import * as applyEffects from '../model/applyeffects'
 import esconsole from '../esconsole'
+import * as renderer from '../app/renderer'
 
 const ES_PASSTHROUGH = {
     /**
@@ -625,7 +626,6 @@ const ES_PASSTHROUGH = {
 
         // load an angular service outside angular
         var compiler = ServiceWrapper().compiler;
-        var renderer = ServiceWrapper().renderer;
 
         var tempo = result.tempo;
         // the analyzeResult will contain a result object that contains only
@@ -710,7 +710,6 @@ const ES_PASSTHROUGH = {
 
         // load an angular service outside angular
         var compiler = ServiceWrapper().compiler;
-        var renderer = ServiceWrapper().renderer;
 
         var tempo = result.tempo;
         // the analyzeResult will contain a result object that contains only
