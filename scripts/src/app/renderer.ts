@@ -14,12 +14,8 @@ export const renderBuffer = (result: DAWData) => {
 
     const origin = 0
     const duration = ESUtils.measureToTime(result.length+1, result.tempo)  // need +1 to render to end of last measure
-    const offlineContext = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
-    // following the custom audioContext structure
-    const context = {
-        master: offlineContext.createGain(),
-        ...offlineContext
-    }
+    const context = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
+    const mix = context.createGain()
 
     result.master = context.createGain()
 
@@ -35,7 +31,7 @@ export const renderBuffer = (result: DAWData) => {
         track.analyser = context.createGain() as unknown as AnalyserNode
 
         const startNode = applyEffects.buildAudioNodeGraph(
-            context, track, i, result.tempo,
+            context, mix, track, i, result.tempo,
             origin, result.master, [], false
         )
 
@@ -130,10 +126,10 @@ export const renderBuffer = (result: DAWData) => {
                 // TODO: the effect order (limiter) is not right
                 trackGain.connect(startNode)
             } else {
-                trackGain.connect(context.master)
+                trackGain.connect(mix)
             }
 
-            context.master.connect(context.destination)
+            mix.connect(context.destination)
         } else {
             if (typeof(startNode) !== "undefined") {
                 // track gain -> effect tree

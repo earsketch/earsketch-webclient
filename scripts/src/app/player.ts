@@ -55,9 +55,7 @@ export interface DAWData {
     master: GainNode
 }
 
-export type AudioContextWithGain = BaseAudioContext & { master: GainNode }
-
-export const Player = (context: AudioContextWithGain) => {
+export const Player = (context: BaseAudioContext) => {
     let isPlaying = false
 
     let waTimeStarted = 0
@@ -84,6 +82,8 @@ export const Player = (context: AudioContextWithGain) => {
     let renderingDataQueue: (DAWData | null)[] = [null, null]
     let mutedTracks: number[] = []
     let bypassedEffects: { [key: number]: string[] } = {}
+
+    const mix = context.createGain()
 
     const reset = () => {
         esconsole('resetting', ['player', 'debug'])
@@ -207,7 +207,7 @@ export const Player = (context: AudioContextWithGain) => {
             esconsole('Bypassing effects: ' + JSON.stringify(trackBypass), ['DEBUG','PLAYER'])
 
             // construct the effect graph
-            const startNode = applyEffects.buildAudioNodeGraph(context, track, t, tempo, startTime, renderingData.master, trackBypass, false)
+            const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempo, startTime, renderingData.master, trackBypass, false)
 
             const trackGain = context.createGain()
             trackGain.gain.setValueAtTime(1.0, context.currentTime)
@@ -230,9 +230,9 @@ export const Player = (context: AudioContextWithGain) => {
                 } else {
                     // if no effect set
                     trackGain.connect(track.analyser)
-                    track.analyser.connect(context.master)
+                    track.analyser.connect(mix)
                 }
-                context.master.connect(context.destination)
+                mix.connect(context.destination)
             } else {
                 if (typeof(startNode) !== "undefined") {
                     // track gain -> effect tree
@@ -404,9 +404,7 @@ export const Player = (context: AudioContextWithGain) => {
     // Set playback volume in decibels.
     const setVolume = (gain: number) => {
         esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER'])
-        if (context.master !== undefined) {
-            context.master.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
-        }
+        mix.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
     }
 
     const setLoop = (loopObj: typeof loop) => {

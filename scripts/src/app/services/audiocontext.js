@@ -13,9 +13,6 @@ app.factory('audioContext', function audioContextFactory() {
         sampleRate: 44100
     });
 
-    // master node at which all effects converge
-    context.master = context.createGain();
-
     // this is a hack to keep the audio context from ever suspending
     // For some reason, Firefox will randomly suspend it and
     context.onstatechange = function() {

@@ -1,5 +1,5 @@
 // Web Audio effect chain constructors
-import { AudioContextWithGain, EffectRange, Track } from '../app/player'
+import { Track } from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import {
@@ -38,7 +38,7 @@ export const scaleEffect = (effectName: string, parameter: string, effectStartVa
 
 // Build audio node graph and schedule automation.
 export const buildAudioNodeGraph = (
-    context: AudioContextWithGain, track: Track, tracknumber: number, tempo: number,
+    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempo: number,
     offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wav_export: boolean
 ) => {
     esconsole("Building audio node graph", "debug")
@@ -163,7 +163,7 @@ export const buildAudioNodeGraph = (
         if (tracknumber === 0) {
             // if mix track, connect to the final output
             lastNode.connect(analyserNode)
-            analyserNode.connect(context.master)
+            analyserNode.connect(mix)
         } else {
             // if non-mix track, connect to result.master
             lastNode.connect(analyserNode)
