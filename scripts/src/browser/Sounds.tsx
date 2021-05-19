@@ -72,7 +72,7 @@ const Filters = () => {
 
     return (
         <div className='p-3'>
-            <div className='pb-2 text-lg'>FILTER</div>
+            <div className='pb-2 text-lg'>{t('soundBrowser.filterDropdown.title')}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
                     title={t('soundBrowser.filterDropdown.artists')}

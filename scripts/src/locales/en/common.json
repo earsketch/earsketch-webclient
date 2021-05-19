@@ -8,6 +8,7 @@
     "soundBrowser.title.recommendations": "RECOMMENDATIONS",
     "soundBrowser.button.addSound": "Add sound",
     "soundBrowser.button.showOnlyStars": "Show only",
+    "soundBrowser.filterDropdown.title": "FILTER",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
     "soundBrowser.filterDropdown.instruments": "Instruments",
@@ -20,6 +21,7 @@
     "soundBrowser.clip.tooltip.year": "Year",
     "soundBrowser.clip.tooltip.previewSound": "Preview sound",
     "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
-    "soundBrowser.clip.tooltip.paste": "Paste to editor"
+    "soundBrowser.clip.tooltip.paste": "Paste to editor",
+    "scriptBrowser.title": "SCRIPTS"
   }
 }

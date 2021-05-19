@@ -82,7 +82,7 @@ export const BrowserTabs = () => {
             <BrowserTab name={t('soundBrowser.title')}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
-            <BrowserTab name='SCRIPTS'>
+            <BrowserTab name={t('scriptBrowser.title')}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
             <BrowserTab name='API'>
