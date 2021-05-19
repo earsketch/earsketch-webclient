@@ -1,5 +1,6 @@
 // Play sounds from the JSON object output of scripts.
 import * as applyEffects from '../model/applyeffects'
+import context from './audiocontext'
 import { dbToFloat } from '../model/audioeffects'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
@@ -55,7 +56,7 @@ export interface DAWData {
     master: GainNode
 }
 
-export const Player = (context: BaseAudioContext) => {
+export const Player = () => {
     let isPlaying = false
 
     let waTimeStarted = 0

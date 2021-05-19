@@ -1064,12 +1064,10 @@ const HotDAW = hot((props: {
     WaveformCache: any,
     $rootScope: angular.IRootScopeService,
     $ngRedux: any,
-    // Extra dependencies for player:
-    audioContext: any,
 }) => {
     WaveformCache = props.WaveformCache
     $rootScope = props.$rootScope
-    player = Player(props.audioContext)
+    player = Player()
     setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
@@ -1078,5 +1076,4 @@ const HotDAW = hot((props: {
     );
 });
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'WaveformCache', '$rootScope',
-                                                  'audioContext']))  // Extra dependency for player
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'WaveformCache', '$rootScope']))

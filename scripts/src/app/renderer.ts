@@ -3,6 +3,7 @@ import * as applyEffects from '../model/applyeffects'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import { Clip, DAWData } from './player'
+import { OfflineAudioContext } from './audiocontext'
 
 
 const NUM_CHANNELS = 2
@@ -14,7 +15,7 @@ export const renderBuffer = (result: DAWData) => {
 
     const origin = 0
     const duration = ESUtils.measureToTime(result.length+1, result.tempo)  // need +1 to render to end of last measure
-    const context = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
+    const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     const mix = context.createGain()
 
     result.master = context.createGain()

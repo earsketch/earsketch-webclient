@@ -6,6 +6,7 @@ import * as helpers from '../helpers';
 import { RootState, ThunkAPI } from '../reducers';
 import { UserState } from '../user/userState';
 import { SoundEntity } from 'common';
+import context from '../app/audiocontext';
 
 interface SoundEntities {
     [fileKey: string]: SoundEntity
@@ -324,15 +325,14 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
             return null;
         }
 
-        const actx = helpers.getNgService('audioContext');
-        const bs = actx.createBufferSource();
+        const bs = context.createBufferSource();
         dispatch(setPreviewFileKey(fileKey));
         dispatch(setPreviewBSNode(bs));
 
         const audioLibrary = helpers.getNgService('audioLibrary');
         await audioLibrary.getAudioClip(fileKey,-1).then((buffer: AudioBuffer) => {
             bs.buffer = buffer;
-            bs.connect(actx.destination);
+            bs.connect(context.destination);
             bs.start(0);
             bs.onended = () => {
                 dispatch(resetPreview());

@@ -4,12 +4,13 @@
  * @module compiler
  * @author Creston Bunch
  */
+import audioContext from '../audiocontext'
 import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 
 app.factory('compiler',
-['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','$q',
-function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,$q) {
+['pitchshifter','audioLibrary','userConsole','$rootScope','$q',
+function compilerFactory(pitchshift,audioLibrary,userConsole,$rootScope,$q) {
     let testRun = false;
 
     /**

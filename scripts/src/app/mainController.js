@@ -1,4 +1,5 @@
 import * as appState from '../app/appState';
+import audioContext from './audiocontext'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as user from '../user/userState';
@@ -14,7 +15,7 @@ import * as Layout from '../layout/Layout';
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', 'userNotification', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, userNotification, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', 'userNotification', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, userNotification, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioLibrary, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });

@@ -3,9 +3,10 @@
  * @module RecorderService
  */
 
+import ctx from '../audiocontext'
 import * as ESUtils from '../../esutils'
 
-app.service('RecorderService', ['$rootScope','audioContext', 'audioLibrary', 'userProject', function ($rootScope, ctx, audioLibrary, userProject) {
+app.service('RecorderService', ['$rootScope', 'audioLibrary', 'userProject', function ($rootScope, audioLibrary, userProject) {
     var self = this;
 
     var audioRecorder, meter, micGain, zeroGain, previewBs, startTime, metroOsc, beatBuffSrc, eventBuffSrc;

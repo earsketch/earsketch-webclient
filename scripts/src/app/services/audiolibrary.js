@@ -11,11 +11,12 @@
  * @module audioLibrary
  * @author Creston Bunch
  */
+import ctx from '../audiocontext'
 import esconsole from '../../esconsole'
 
-app.factory('audioLibrary', ['$http', 'audioContext', '$q',
+app.factory('audioLibrary', ['$http', '$q',
             '$cacheFactory',
-function audioLibraryFactory($http, ctx, $q, $cacheFactory) {
+function audioLibraryFactory($http, $q, $cacheFactory) {
 
     var SOUND_CACHE = [];
     var CLIP_CACHE = {};

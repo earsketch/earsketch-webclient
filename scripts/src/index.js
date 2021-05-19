@@ -96,7 +96,6 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('audioContext');
     require('reporter');
     require('reader');
     require('userNotification');
