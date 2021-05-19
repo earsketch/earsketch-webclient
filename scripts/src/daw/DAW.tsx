@@ -10,7 +10,7 @@ import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
 import { RootState } from '../reducers'
-import { Player, Clip, Effect, Track, DAWData } from '../app/player'
+import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 
@@ -64,8 +64,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             setPlayPosition(loop.selection ? loop.start : 1)
         }
     
-        player.onStartedCallback = playbackStartedCallback
-        player.onFinishedCallback = playbackEndedCallback
+        player.callbacks.onStartedCallback = playbackStartedCallback
+        player.callbacks.onFinishedCallback = playbackEndedCallback
         player.play(playPosition, playLength)
 
         // player does not preserve volume state between plays
@@ -225,7 +225,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
                { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                 toggleBypass: (a: string) => void, track: Track, xScroll: number }) => {
+                 toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -242,7 +242,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
-                {track.clips.map((clip: Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {track.clips.map((clip: player.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
@@ -286,7 +286,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: Clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // Minimum width prevents clips from vanishing on zoom out.
@@ -310,7 +310,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }:
-                { name: string, color: daw.Color, effect: Effect, bypass: boolean, mute: boolean }) => {
+                { name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -392,7 +392,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
-                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: Track, xScroll: number }) => {
+                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -559,15 +559,12 @@ const Timeline = () => {
 // TODO: Replace 'any' with more specific types.
 let WaveformCache: any = null
 let $rootScope: angular.IRootScopeService | null = null
-// TODO: For now this is null at declaration (as it must be initialized with Angular dependencies);
-//       when possible, let's initialize this at declaration and avoid this ugly type assertion.
-let player: ReturnType<typeof Player> = null as unknown as ReturnType<typeof Player>
 
 const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: Track[], tempo: number) => {
+const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
     esconsole('preparing a waveform to draw', 'daw')
 
     // ignore the mix track (0) and metronome track (len-1)
@@ -624,7 +621,7 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
 
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', function (result: DAWData | null | undefined) {
+    $scope.$watch('compiled', (result: player.DAWData | null | undefined) => {
         const state = getState()
         if (result === null || result === undefined) return
 
@@ -636,7 +633,7 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
         const playLength = result.length + 1
         dispatch(daw.setPlayLength(playLength))
 
-        const tracks: Track[] = []
+        const tracks: player.Track[] = []
         result.tracks.forEach((track, index) => {
             // create a (shallow) copy of the track so that we can
             // add stuff to it without affecting the reference which
@@ -1067,7 +1064,6 @@ const HotDAW = hot((props: {
 }) => {
     WaveformCache = props.WaveformCache
     $rootScope = props.$rootScope
-    player = Player()
     setup(props.$ngRedux)
     return (
         <Provider store={props.$ngRedux}>
