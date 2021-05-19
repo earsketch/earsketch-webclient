@@ -33,8 +33,22 @@ export class Effect {
         return node
     }
 
-    static get(node: any, parameter: string): AudioParamish {
-        throw new Error("Abstract method; call this on a subclass.")
+    static getParameters(node: any): { [key: string]: AudioParamish } {
+        return {
+            BYPASS: {
+                // NOTE: Pre-Refactor code did not ensure bypassDry was binary (it just set it to `value`),
+                // but it seems correct to do so (bypass.gain + bypassDry.gain should sum to 1), so this does.
+                setValueAtTime(value: number, time: number) {
+                    node.bypass.gain.setValueAtTime(value ? 0 : 1, time)
+                    node.bypassDry.gain.setValueAtTime(value ? 1 : 0, time)
+                },
+                linearRampToValueAtTime(value: number, time: number) {
+                    // NOTE: Bypass is binary (an effect is either bypassed or not), so this is intentionally nonlinear (despite the name).
+                    node.bypass.gain.setValueAtTime(value ? 0 : 1, time)
+                    node.bypassDry.gain.setValueAtTime(value ? 1 : 0, time)
+                },
+            }
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -55,6 +69,22 @@ class MixableEffect extends Effect {
         node.wetLevel.connect(node.bypass)
         return node
     }
+
+    static getParameters(node: any) {
+        return {
+            MIX: {
+                setValueAtTime(value: number, time: number) {
+                    node.wetLevel.gain.setValueAtTime(value, time)
+                    node.dryLevel.gain.setValueAtTime(1 - value, time)
+                },
+                linearRampToValueAtTime(value: number, time: number) {
+                    node.wetLevel.gain.linearRampToValueAtTime(value, time)
+                    node.dryLevel.gain.linearRampToValueAtTime(1 - value, time)
+                },
+            },
+            ...super.getParameters(node)
+        }
+    }
 }
 
 export class VolumeEffect extends Effect {
@@ -71,10 +101,11 @@ export class VolumeEffect extends Effect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             GAIN: node.volume.gain,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -109,11 +140,12 @@ export class DelayEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             DELAY_TIME: node.delay.delayTime,
             DELAY_FEEDBACK: node.feedback.gain,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -144,11 +176,12 @@ export class FilterEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             FILTER_FREQ: node.filter.frequency,
             FILTER_RESONANCE: node.filter.Q,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -174,24 +207,12 @@ export class CompressorEffect extends Effect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             COMPRESSOR_RATIO: node.compressor.ratio,
             COMPRESSOR_THRESHOLD: node.compressor.threshold,
-        }[parameter]
-    }
-}
-
-const panParam = (leftGain: AudioParam, rightGain: AudioParam) => {
-    return {
-        setValueAtTime(value: number, time: number) {
-            leftGain.setValueAtTime((value * -0.5) + 0.5, time)
-            rightGain.setValueAtTime((value * 0.5) + 0.5, time)
-        },
-        linearRampToValueAtTime(value: number, time: number) {
-            leftGain.linearRampToValueAtTime((value * -0.5) + 0.5, time)
-            rightGain.linearRampToValueAtTime((value * 0.5) + 0.5, time)
-        },
+            ...super.getParameters(node)
+        }
     }
 }
 
@@ -225,10 +246,20 @@ export class PanEffect extends Effect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
-            LEFT_RIGHT: panParam(node.panLeft.gain, node.panRight.gain),
-        }[parameter]!
+            LEFT_RIGHT: {
+                setValueAtTime(value: number, time: number) {
+                    node.panLeft.gain.setValueAtTime((value * -0.5) + 0.5, time)
+                    node.panRight.gain.setValueAtTime((value * 0.5) + 0.5, time)
+                },
+                linearRampToValueAtTime(value: number, time: number) {
+                    node.panLeft.gain.linearRampToValueAtTime((value * -0.5) + 0.5, time)
+                    node.panRight.gain.linearRampToValueAtTime((value * 0.5) + 0.5, time)
+                },
+            },
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -257,11 +288,12 @@ export class BandpassEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             BANDPASS_FREQ: node.bandpass.freq,
             BANDPASS_WIDTH: node.bandpass.Q,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -308,7 +340,7 @@ export class Eq3BandEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             EQ3BAND_LOWGAIN: node.lowshelf.gain,
             EQ3BAND_LOWFREQ: node.lowshelf.frequency,
@@ -316,7 +348,8 @@ export class Eq3BandEffect extends MixableEffect {
             EQ3BAND_MIDFREQ: node.midpeak.frequency,
             EQ3BAND_HIGHGAIN: node.highshelf.gain,
             EQ3BAND_HIGHFREQ: node.highshelf.freq,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 }
 
@@ -372,13 +405,14 @@ export class ChorusEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             CHORUS_NUMVOICES: multiParam(node.inputDelayGain.map((d: GainNode) => d.gain)),
             CHORUS_LENGTH: multiParam(node.inputDelay.map((d: DelayNode) => d.delayTime)),
             CHORUS_RATE: node.lfo.frequency,
             CHORUS_MOD: node.lfoGain.gain,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -428,12 +462,13 @@ export class FlangerEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             FLANGER_LENGTH: node.inputDelay.delayTime,
             FLANGER_FEEDBACK: node.feedback.gain,
             FLANGER_RATE: node.lfo.frequency,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -487,13 +522,14 @@ export class PhaserEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             PHASER_RANGEMIN: multiParam([node.allpass[0].frequency, node.allpass[1].frequency]),
             PHASER_RANGEMAX: multiParam([node.allpass[2].frequency, node.allpass[3].frequency]),
             PHASER_FEEDBACK: node.feedback.gain,
             PHASER_RATE: node.lfo.frequency,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -536,11 +572,12 @@ export class TremoloEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             TREMOLO_FREQ: node.lfo.frequency,
             TREMOLO_AMOUNT: node.lfoGain.gain,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -548,19 +585,6 @@ export class TremoloEffect extends MixableEffect {
             return dbToFloat(value)
         }
         return value
-    }
-}
-
-const distortionParam = (wetGain: AudioParam, dryGain: AudioParam) => {
-    return {
-        setValueAtTime(value: number, time: number) {
-            wetGain.setValueAtTime(value, time)
-            dryGain.setValueAtTime(1 - value, time)
-        },
-        linearRampToValueAtTime(value: number, time: number) {
-            wetGain.linearRampToValueAtTime(value, time)
-            dryGain.linearRampToValueAtTime(1 - value, time)
-        },
     }
 }
 
@@ -603,10 +627,13 @@ export class DistortionEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
+        const parent = super.getParameters(node)
         return {
-            DISTO_GAIN: distortionParam(node.wetLeft.gain, node.dryLevel.gain),
-        }[parameter]!
+            // TODO: Apparently an alias for MIX, per the old code. Is that set in stone?
+            DISTO_GAIN: parent.MIX,
+            ...parent
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -681,11 +708,12 @@ export class RingmodEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             RINGMOD_MODFREQ: node.lfo.frequency,
             RINGMOD_FEEDBACK: node.feedback.gain,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -715,10 +743,11 @@ export class WahEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             WAH_POSITION: node.bandpass.frequency,
-        }[parameter]
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {
@@ -753,11 +782,12 @@ export class ReverbEffect extends MixableEffect {
         return node
     }
 
-    static get(node: any, parameter: string) {
+    static getParameters(node: any) {
         return {
             REVERB_TIME: multiParam(node.reverb.combFilters.map((f: any) => f.resonance)),
             REVERB_DAMPFREQ: multiParam(node.reverb.combFilters.map((f: any) => f.dampening)),
-        }[parameter]!
+            ...super.getParameters(node)
+        }
     }
 
     static scale(parameter: string, value: number) {

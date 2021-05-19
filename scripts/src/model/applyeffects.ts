@@ -28,15 +28,6 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
     REVERB: ReverbEffect,
 }
 
-const bypassComplement = (bypass_state: number) => {
-    return bypass_state ? 0 : 1
-}
-
-const setMix = (node: any, wetValue: number, time: number) => {
-    node.wetLevel.gain.setValueAtTime(wetValue, time)
-    node.dryLevel.gain.setValueAtTime(1 - wetValue, time)
-}
-
 export const scaleEffect = (effectName: string, parameter: string, effectStartValue: number | undefined, effectEndValue: number | undefined) => {
     esconsole("Scaling effect values; parameter is " + parameter, "debug")
     const effect = EFFECT_MAP[effectName]
@@ -70,9 +61,9 @@ export const buildAudioNodeGraph = (
     }
 
     for (const effect of effectRanges) {
-        if (!wav_export && (bypassedEffects.indexOf(effect.name + "-" + effect.parameter) > -1)) {
-            // Bypass designated effect.
-            esconsole("bypassed effect", "debug")
+        const fullName = effect.name + "-" + effect.parameter
+        if (!wav_export && (bypassedEffects.indexOf(fullName) > -1)) {
+            esconsole("Bypassed effect: " + fullName, "debug")
             continue
         }
 
@@ -83,16 +74,14 @@ export const buildAudioNodeGraph = (
         // However, we should rid ourselves of these as soon as we can determine that it is safe to do so.
         // These exceptions are:
         // - In the "Apply defaults" sections, Eq3Band skips EQ3BAND_HIGHFREQ.
-        //   This seems probably unintentional.
+        //   This seems probably unintentional. There's also something weird in Eq3Band creation where the high freq is set to 0.
         // - Several chunks of logic are skipped for Pitchshift, which is apparently a do-nothing node.
-        //   The old comment explaining this is:
-        //   "Do nothing, as we are using SoX for this effect. Just wrap a gain node."
-        //   I suspect this is outdated, but the status of pitchshifting is not immediately clear...
-        // - There is some confusion between distortion's one real parameter (DISTO_GAIN)
-        //   and the common parameter MIX, with the result that some logic is skipped.
+        //   The old comment explaining this is: "Do nothing, as we are using SoX for this effect. Just wrap a gain node."
+        //   We are no longer using SoX for this, but the Pitchshift here indeed does nothing.
+        // - Distortion's DISTO_GAIN is basically an alias for MIX, with the result that some logic is skipped
+        //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
         // - For reasons unknown, setting REVERB_TIME does not actually set the REVERB_TIME
         //   if the effect is not in the future. This might be unintentional.
-        // There is also an exception for Volume in mix logic, which makes sense but could probably be avoided.
 
         // Setup.
         const effectType = EFFECT_MAP[effect.name]
@@ -113,15 +102,13 @@ export const buildAudioNodeGraph = (
 
             if (effect.name !== "PITCHSHIFT") {
                 // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
+                // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
                 for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                    if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ"].indexOf(parameter) == -1) {
+                    if (!["BYPASS", "EQ3BAND_HIGHFREQ"].includes(parameter)
+                        && !(effect.name === "DISTORTION" && parameter === "MIX")) {
                         const value = effectType.scale(parameter, (info as any).value)
-                        effectType.get(node, parameter).setValueAtTime(value, context.currentTime)
+                        effectType.getParameters(node)[parameter].setValueAtTime(value, context.currentTime)
                     }
-                }
-                // NOTE: Weird exception for DISTORTION here from before The Great Refactoring.
-                if (effect.name !== "VOLUME" && effect.name !== "DISTORTION") {
-                    setMix(node, effectType.DEFAULTS.MIX.value, context.currentTime)
                 }
             }
             effectNodes[effect.name] = node
@@ -131,75 +118,37 @@ export const buildAudioNodeGraph = (
 
         // Handle parameters.
         if (effect.name === "PITCHSHIFT") {
-            // Nope.
-        } else if (effect.parameter === "BYPASS") {
-            node.bypass.gain.setValueAtTime(bypassComplement(value), time)
-            node.bypassDry.gain.setValueAtTime(value, time)
+            // Pre-Refactoring exception because Pitchshift effect does nothing. (Actual pitchshifting is handled somewhere else.)
+            continue
+        }
+
+        // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
+        // So, for now, it does not happen here.
+        if (!(pastEndLocation && effect.parameter === "REVERB_TIME")) {
+            // NOTE: endValue is not scaled here because it was scaled earlier.
+            const param = effectType.getParameters(node)[effect.parameter]
+            param.setValueAtTime(value, time)
             if (!pastEndLocation && effect.endMeasure !== 0) {
-                node.bypass.gain.setValueAtTime(bypassComplement(effect.endValue), endTime)
-                node.bypassDry.gain.setValueAtTime(effect.endValue, endTime)
+                param.linearRampToValueAtTime(effect.endValue, endTime)
             }
-        } else if (effect.parameter === "MIX" && effect.name !== "VOLUME") {
-            setMix(node, value, time)
-            if (!pastEndLocation && effect.endMeasure !== 0) {
-                node.wetLevel.gain.linearRampToValueAtTime(effect.endValue, endTime)
-                node.dryLevel.gain.linearRampToValueAtTime(1 - effect.endValue, endTime)
-            }
-            // Apply defaults only the first time this kind of node is created
-            // NOTE: Weird exception for DISTO_GAIN here from before The Great Refactoring.
-            if (createNewNode) {
-                for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                    if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ", "DISTO_GAIN"].indexOf(parameter) == -1) {
-                        const value = effectType.scale(parameter, (info as any).value)
-                        effectType.get(node, parameter).setValueAtTime(value, time)
-                    }
-                }
-            }
-        } else {
-            if (pastEndLocation) {
-                // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
-                // So, for now, it does not happen here.
-                if (effect.parameter !== "REVERB_TIME") {
-                    // NOTE: endValue is not scaled here because it was scaled earlier.
-                    effectType.get(node, effect.parameter).setValueAtTime(value, time)
-                }
-                // Apply defaults (to all the other parameters) only the first time this kind of node is created
-                if (createNewNode) {
-                    for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                        if (["BYPASS", "MIX", "EQ3BAND_HIGHFREQ", effect.parameter].indexOf(parameter) == -1) {
-                            const value = effectType.scale(parameter, (info as any).value)
-                            effectType.get(node, parameter).setValueAtTime(value, time)
-                        }
-                    }
-                    if (effect.name !== "VOLUME") {
-                        setMix(node, effectType.DEFAULTS.MIX.value, time)
-                    }
-                }
-            } else {
-                // Apply effect in the future
-                const param = effectType.get(node, effect.parameter)
-                param.setValueAtTime(value, time)
-                if (!pastEndLocation && effect.endMeasure !== 0) {
-                    param.linearRampToValueAtTime(effect.endValue, endTime)
-                }
-                // Apply defaults (to all the other parameters) only the first time this kind of node is created
-                if (createNewNode) {
-                    for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                        if (["BYPASS", "MIX", effect.parameter].indexOf(parameter) == -1) {
-                            const value = effectType.scale(parameter, (info as any).value)
-                            effectType.get(node, parameter).setValueAtTime(value, time)
-                        }
-                    }
-                    if (effect.name !== "VOLUME") {
-                        setMix(node, effectType.DEFAULTS.MIX.value, time)
-                    }
+
+        }
+        // Apply defaults (to all the other parameters) only the first time this kind of node is created
+        // NOTE: Collection of weird pre-Refactoring exceptions in the inner and outer `if` conditions.
+        if (createNewNode && effect.parameter !== "BYPASS") {
+            for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
+                if (!["BYPASS", "EQ3BAND_HIGHFREQ", effect.parameter].includes(parameter)
+                    && !(effect.name === "DISTORTION" && parameter === "MIX")
+                    && !(effect.parameter === "MIX" && parameter === "DISTO_GAIN")) {
+                    const value = effectType.scale(parameter, (info as any).value)
+                    effectType.getParameters(node)[parameter].setValueAtTime(value, time)
                 }
             }
         }
         lastNode = node
     }
 
-    if (typeof(lastNode) !== "undefined") {
+    if (typeof lastNode !== "undefined") {
         let analyserNode: AnalyserNode | GainNode = track.analyser
 
         // if analyserNode was not created successfully, replace it with a bypassing gain node
