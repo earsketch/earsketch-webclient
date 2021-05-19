@@ -65,6 +65,7 @@ class MixableEffect extends Effect {
         }
         node.wetLevel.gain.value = 0
         node.dryLevel.gain.value = 0
+        node.input.connect(node.dryLevel)
         node.dryLevel.connect(node.output)
         node.wetLevel.connect(node.bypass)
         return node
@@ -290,7 +291,7 @@ export class BandpassEffect extends MixableEffect {
 
     static getParameters(node: any) {
         return {
-            BANDPASS_FREQ: node.bandpass.freq,
+            BANDPASS_FREQ: node.bandpass.frequency,
             BANDPASS_WIDTH: node.bandpass.Q,
             ...super.getParameters(node)
         }
@@ -347,7 +348,7 @@ export class Eq3BandEffect extends MixableEffect {
             EQ3BAND_MIDGAIN: node.midpeak.gain,
             EQ3BAND_MIDFREQ: node.midpeak.frequency,
             EQ3BAND_HIGHGAIN: node.highshelf.gain,
-            EQ3BAND_HIGHFREQ: node.highshelf.freq,
+            EQ3BAND_HIGHFREQ: node.highshelf.frequency,
             ...super.getParameters(node)
         }
     }
@@ -407,7 +408,20 @@ export class ChorusEffect extends MixableEffect {
 
     static getParameters(node: any) {
         return {
-            CHORUS_NUMVOICES: multiParam(node.inputDelayGain.map((d: GainNode) => d.gain)),
+            CHORUS_NUMVOICES: {
+                // Presumably this should also set the deactivated voices' gain to 0,
+                // but the pre-Refactor code doesn't do that, so this doesn't either.
+                setValueAtTime(value: number, time: number) {
+                    for (let i = 0; i < value; i++) {
+                        node.inputDelayGain[i].gain.setValueAtTime(1, time)
+                    }
+                },
+                linearRampToValueAtTime(value: number, time: number) {
+                    for (let i = 0; i < value; i++) {
+                        node.inputDelayGain[i].gain.linearRampToValueAtTime(1, time)
+                    }
+                }
+            },
             CHORUS_LENGTH: multiParam(node.inputDelay.map((d: DelayNode) => d.delayTime)),
             CHORUS_RATE: node.lfo.frequency,
             CHORUS_MOD: node.lfoGain.gain,

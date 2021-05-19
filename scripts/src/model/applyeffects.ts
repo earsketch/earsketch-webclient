@@ -82,6 +82,7 @@ export const buildAudioNodeGraph = (
         //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
         // - For reasons unknown, setting REVERB_TIME does not actually set the REVERB_TIME
         //   if the effect is not in the future. This might be unintentional.
+        // - CHORUS_NUMVOICES always uses endValue and not startValue. Probably unintentional.
 
         // Setup.
         const effectType = EFFECT_MAP[effect.name]
@@ -89,7 +90,8 @@ export const buildAudioNodeGraph = (
         const startTime = Math.max(context.currentTime + ESUtils.measureToTime(effect.startMeasure, tempo) - offsetInSeconds, context.currentTime)
         const endTime = Math.max(context.currentTime + ESUtils.measureToTime(effect.endMeasure, tempo) - offsetInSeconds, context.currentTime)
         const time = pastEndLocation ? context.currentTime : startTime
-        const value = pastEndLocation ? effect.endValue : effect.startValue
+        // NOTE: Weird exception here for CHORUS_NUMVOICES.
+        const value = effect.parameter === "CHORUS_NUMVOICES" ? effect.endValue : (pastEndLocation ? effect.endValue : effect.startValue)
     
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
 
@@ -125,7 +127,7 @@ export const buildAudioNodeGraph = (
         // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
         // So, for now, it does not happen here.
         if (!(pastEndLocation && effect.parameter === "REVERB_TIME")) {
-            // NOTE: endValue is not scaled here because it was scaled earlier.
+            // NOTE: value is not scaled here because it was scaled earlier.
             const param = effectType.getParameters(node)[effect.parameter]
             param.setValueAtTime(value, time)
             if (!pastEndLocation && effect.endMeasure !== 0) {
