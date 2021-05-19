@@ -749,7 +749,7 @@ export class WahEffect extends MixableEffect {
     static create(context: AudioContext) {
         const node = { bandpass: context.createBiquadFilter(), ...super.create(context) }
         node.wetLevel.gain.value = 1
-        node.bandpass.frequnecy.value = 0
+        node.bandpass.frequency.value = 0
         node.bandpass.type = "bandpass"
         node.bandpass.Q.value = 1.25
         node.input.connect(node.bandpass)

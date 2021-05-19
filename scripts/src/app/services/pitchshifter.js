@@ -112,7 +112,7 @@ function pitchshifterFactory(render, ctx, userConsole) {
      * Find envelope points for a single track.
      */
     function processPitchshift(track, tempo) {
-        jsonArray = [];
+        const jsonArray = [];
         if (track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'] !== undefined) {
             //Compute envelope information
             for (var i=0; i<track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'].length; i++) {
