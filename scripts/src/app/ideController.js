@@ -66,11 +66,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     $scope.currentLanguage = localStorage.get('language', 'python');
     // $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
-    // TODO: create and handle this in userConsole directive
-    $scope.$on('updateConsole', function () {
+    userConsole.callbacks.onUpdate = function () {
         $scope.logs = userConsole.logs;
         $scope.$$phase || $scope.$digest();
-    });
+    };
 
     $scope.$on('compileembeddedTrack', function(){
         $scope.compileCode();

@@ -11,8 +11,8 @@ function($scope, compiler, caiAnalysisModule, userProject) {
     $scope.seed = Date.now();
     $scope.useSeed = true;
 
-    // overwrite userConsole javascript prompt with a hijackable one
-    var nativePrompt = userConsole.prompt;
+    // overwrite prompt with a hijackable one
+    var nativePrompt = window.esPrompt;
 
     $scope.hijackedPrompt = function() {
       var i = 0;
@@ -163,7 +163,7 @@ function($scope, compiler, caiAnalysisModule, userProject) {
               }
             }
 
-            userConsole.prompt = $scope.hijackedPrompt();
+            window.esPrompt = $scope.hijackedPrompt();
 
           }
 

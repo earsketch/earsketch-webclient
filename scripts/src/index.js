@@ -28,12 +28,29 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
+import * as helpers from './helpers'
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
 import ES_PASSTHROUGH from './api/passthrough'
 
 // TODO: Remove this after resolving issues with earsketch.py.js, earsketch.js.js.
 window.ES_PASSTHROUGH = ES_PASSTHROUGH
+
+// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// (This was previously in userConsole, but since that's now a module, the fields are read-only.)
+// (Also, it doesn't really have anything to do with the user console.)
+window.esPrompt = msg => {
+    const $uibModal = helpers.getNgService('$uibModal')
+    var modal = $uibModal.open({
+        templateUrl: 'templates/prompt.html',
+        controller: 'PromptController',
+        resolve: {
+            msg: function() { return msg }
+        },
+    })
+
+    return modal.result
+}
 
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));

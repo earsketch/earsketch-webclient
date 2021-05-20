@@ -1,35 +1,30 @@
-import * as helpers from "../helpers"
-
 interface Log {
     level: string
     text: string
 }
 
 export let logs: Log[] = []
-
-// TODO: Remove these broadcasts after porting ideController (the only controller that listens for 'updateConsole'.)
+// TODO: This can likely be eliminated via Redux after migrating ideController.
+export let callbacks = { onUpdate: () => {} }
 
 // Clears the user's error log.
 export const clear = () => {
-    const $rootScope = helpers.getNgService('$rootScope')
     logs = []
-    $rootScope.$broadcast('updateConsole')
+    callbacks.onUpdate()
 }
 
 // Use this method for messages that are caused by internal EarSketch functions and not by user scripts.
 export const status = (msg: string) => {
-    const $rootScope = helpers.getNgService('$rootScope')
     logs.push({
         level: 'status',
         text: String(msg)
     })
     scroll()
-    $rootScope.$broadcast('updateConsole')
+    callbacks.onUpdate()
 }
 
 // Adds information labeled 'info' to the user's error log.
 export const log = (msg: any) => {
-    const $rootScope = helpers.getNgService('$rootScope')
     var text = JSON.stringify(msg)
     // remove quotes from strings
     if (text[0] !== undefined && text[0] === '"' &&
@@ -41,29 +36,27 @@ export const log = (msg: any) => {
         text: text
     })
     scroll()
-    $rootScope.$broadcast('updateConsole')
+    callbacks.onUpdate()
 }
 
 // Adds information labeled 'warn' to the user's error log and notifies user on the console.
 export const warn = (msg: string) => {
-    const $rootScope = helpers.getNgService('$rootScope')
     logs.push({
         level: 'warn',
         text: 'Warning message >> ' + String(msg)
     })
     scroll()
-    $rootScope.$broadcast('updateConsole')
+    callbacks.onUpdate()
 }
 
 // Adds information labeled 'error' to the user's error log and notifies user on the console.
 export const error = (msg: string) => {
-    const $rootScope = helpers.getNgService('$rootScope')
     logs.push({
         level: 'error',
         text: 'Error message >> ' + humanize(String(msg))
     })
     scroll()
-    $rootScope.$broadcast('updateConsole')
+    callbacks.onUpdate()
 }
 
 // Humanizes user warning and error messages printed to the user console. Available cases based on Skulpt's error messages and Node.js's errors.
@@ -142,18 +135,4 @@ export const scroll = () => {
             c.scrollTop = c.scrollHeight
         }
     })
-}
-
-// Request user input from a modal dialog.
-export const prompt = (msg: string) => {
-    const $uibModal = helpers.getNgService('$uibModal')
-    var modal = $uibModal.open({
-        templateUrl: 'templates/prompt.html',
-        controller: 'PromptController',
-        resolve: {
-            msg: function() { return msg }
-        },
-    })
-
-    return modal.result
 }
