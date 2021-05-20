@@ -68,7 +68,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
     // TODO: create and handle this in userConsole directive
     $scope.$on('updateConsole', function () {
-        $scope.logs = userConsole.getLogs();
+        $scope.logs = userConsole.logs;
         $scope.$$phase || $scope.$digest();
     });
 
