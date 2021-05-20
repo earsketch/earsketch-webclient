@@ -948,7 +948,7 @@ const ES_PASSTHROUGH = {
             msg = "";
         }
 
-        return window.esPrompt()
+        return window.esPrompt(msg)
 
         /*
         var start = new Date().getTime();
