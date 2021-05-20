@@ -90,7 +90,6 @@ module.exports = {
             renderer: path.resolve(__dirname,`${servicesDir}/renderer.js`),
             pitchShifter: path.resolve(__dirname,`${servicesDir}/pitchshifter.js`),
             audioLibrary: path.resolve(__dirname,`${servicesDir}/audiolibrary.js`),
-            waveformCache: path.resolve(__dirname,`${servicesDir}/waveformcache.js`),
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),

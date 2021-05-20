@@ -13,6 +13,7 @@ import { RootState } from '../reducers'
 import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import * as WaveformCache from '../app/waveformcache'
 
 import * as daw from './dawState'
 
@@ -556,8 +557,6 @@ const Timeline = () => {
 
 
 // Pulled in via angular dependencies
-// TODO: Replace 'any' with more specific types.
-let WaveformCache: any = null
 let $rootScope: angular.IRootScopeService | null = null
 
 const rms = (array: Float32Array) => {
@@ -1057,12 +1056,9 @@ const DAW = () => {
 }
 
 const HotDAW = hot((props: {
-    // TODO: better types
-    WaveformCache: any,
     $rootScope: angular.IRootScopeService,
     $ngRedux: any,
 }) => {
-    WaveformCache = props.WaveformCache
     $rootScope = props.$rootScope
     setup(props.$ngRedux)
     return (
@@ -1072,4 +1068,4 @@ const HotDAW = hot((props: {
     );
 });
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', 'WaveformCache', '$rootScope']))
+app.component('daw', react2angular(HotDAW, null, ['$ngRedux', '$rootScope']))

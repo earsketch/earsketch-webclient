@@ -222,7 +222,6 @@ require('collaboration');
 require('colorTheme');
 require('layout');
 require('timesync');
-require('waveformCache');
 require('compiler');
 require('pitchShifter');
 require('userConsole');

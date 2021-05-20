@@ -106,7 +106,6 @@ require(['angular'], () => {
     require('collaboration');
     require('colorTheme');
     require('layout');
-    require('waveformCache');
     require('compiler');
     require('pitchShifter');
     require('userConsole');
