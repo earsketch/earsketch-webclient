@@ -5,10 +5,6 @@
 // If your API function needs to be asynchronous, make sure it returns a
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 
-// TODO: consolidate range checking and the corresponding
-// error throwing in the addClip() and addEffect() methods. Right now it is
-// duplicated in every API function.
-
 import * as applyEffects from "../model/applyeffects"
 import esconsole from "../esconsole"
 import * as renderer from "../app/renderer"
@@ -1508,20 +1504,6 @@ export const addEffect = (result: DAWData, effect: EffectRange) => {
     if (result.tracks[effect.track].effects[key] == undefined) {
         result.tracks[effect.track].effects[key] = []
     }
-
-    // TODO: this should happen when the effect is applied, not
-    // now. But until applyeffects.js gets refactored, this will have to
-    // do.
-    //
-    // Scale the effect ranges from user-inputted values to WebAudio
-    // accepted ranges.
-    const scaledRange = applyEffects.scaleEffect(
-        effect.name, effect.parameter, effect.startValue, effect.endValue
-    )
-    effect.inputStartValue = effect.startValue
-    effect.startValue = scaledRange[0]
-    effect.inputEndValue = effect.endValue
-    effect.endValue = scaledRange[1]
 
     result.tracks[effect.track].effects[key].push(effect)
 }

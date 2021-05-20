@@ -834,8 +834,6 @@ function compilerFactory(pitchshift,audioLibrary,$rootScope,$q) {
                         fillEmptyStart.endMeasure = effects[0].startMeasure;
                         fillEmptyStart.startValue = effects[0].startValue;
                         fillEmptyStart.endValue = effects[0].startValue;
-                        fillEmptyStart.inputStartValue = effects[0].inputStartValue;
-                        fillEmptyStart.inputEndValue = effects[0].inputStartValue;
                         effects.unshift(fillEmptyStart);
                     }
                 }

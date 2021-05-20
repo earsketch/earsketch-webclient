@@ -28,14 +28,6 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
     REVERB: ReverbEffect,
 }
 
-export const scaleEffect = (effectName: string, parameter: string, effectStartValue: number | undefined, effectEndValue: number | undefined) => {
-    esconsole("Scaling effect values; parameter is " + parameter, "debug")
-    const effect = EFFECT_MAP[effectName]
-    effectStartValue ??= effect.DEFAULTS[parameter].value
-    effectEndValue ??= effectStartValue
-    return [effect.scale(parameter, effectStartValue), effect.scale(parameter, effectEndValue)]
-}
-
 // Build audio node graph and schedule automation.
 export const buildAudioNodeGraph = (
     context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempo: number,
@@ -90,8 +82,11 @@ export const buildAudioNodeGraph = (
         const startTime = Math.max(context.currentTime + ESUtils.measureToTime(effect.startMeasure, tempo) - offsetInSeconds, context.currentTime)
         const endTime = Math.max(context.currentTime + ESUtils.measureToTime(effect.endMeasure, tempo) - offsetInSeconds, context.currentTime)
         const time = pastEndLocation ? context.currentTime : startTime
+        // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
+        const startValue = effectType.scale(effect.parameter, effect.startValue ?? effectType.DEFAULTS[effect.parameter].value)
+        const endValue = (effect.endValue === undefined) ? startValue : effectType.scale(effect.parameter, effect.endValue)
         // NOTE: Weird exception here for CHORUS_NUMVOICES.
-        const value = effect.parameter === "CHORUS_NUMVOICES" ? effect.endValue : (pastEndLocation ? effect.endValue : effect.startValue)
+        const value = effect.parameter === "CHORUS_NUMVOICES" ? endValue  : (pastEndLocation ? endValue  : startValue)
     
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
 
@@ -127,11 +122,10 @@ export const buildAudioNodeGraph = (
         // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
         // So, for now, it does not happen here.
         if (!(pastEndLocation && effect.parameter === "REVERB_TIME")) {
-            // NOTE: value is not scaled here because it was scaled earlier.
             const param = effectType.getParameters(node)[effect.parameter]
             param.setValueAtTime(value, time)
             if (!pastEndLocation && effect.endMeasure !== 0) {
-                param.linearRampToValueAtTime(effect.endValue, endTime)
+                param.linearRampToValueAtTime(endValue, endTime)
             }
 
         }

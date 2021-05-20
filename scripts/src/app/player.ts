@@ -33,8 +33,6 @@ export interface EffectRange {
     parameter: string
     startMeasure: number
     endMeasure: number
-    inputStartValue: number
-    inputEndValue: number
     startValue: number
     endValue: number
     track: number

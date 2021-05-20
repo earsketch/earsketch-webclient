@@ -323,8 +323,8 @@ const Effect = ({ name, color, effect, bypass, mute }:
         const points: Point[] = []
 
         effect.forEach(range => {
-            points.push({x: range.startMeasure, y: range.inputStartValue})
-            points.push({x: range.endMeasure, y: range.inputEndValue})
+            points.push({x: range.startMeasure, y: range.startValue})
+            points.push({x: range.endMeasure, y: range.endValue})
         })
 
         // draw a line to the end
