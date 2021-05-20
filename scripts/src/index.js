@@ -156,7 +156,6 @@ require(['angular'], () => {
     require('editProfileController');
     require('adminWindowController');
     require('forgotPasswordController');
-    require('shareController');
     require('submitAWSController');
 
     // React components

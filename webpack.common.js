@@ -63,7 +63,6 @@ module.exports = {
             editProfileController: path.resolve(__dirname,`${appDir}/editProfileController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             forgotPasswordController: path.resolve(__dirname,`${appDir}/forgotPasswordController.js`),
-            shareController: path.resolve(__dirname,`${appDir}/shareController.js`),
             analyzeScriptController: path.resolve(__dirname,`${appDir}/analyzeScriptController.js`),
             scriptVersionController: path.resolve(__dirname,`${appDir}/scriptVersionController.js`),
             shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
