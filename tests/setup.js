@@ -255,7 +255,6 @@ require('changePasswordController');
 require('editProfileController');
 require('adminWindowController');
 require('forgotPasswordController');
-require('shareController');
 require('submitAWSController');
 
 require('autograderController');
