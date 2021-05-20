@@ -17,12 +17,33 @@ import * as applyEffects from '../model/applyeffects'
 import esconsole from '../esconsole'
 import * as renderer from '../app/renderer'
 import * as userConsole from '../app/userconsole'
+import { Clip, DAWData, EffectRange, Track } from '../app/player'
+import { measureToTime } from '../esutils'
+import ESMessages from '../data/messages'
+import ServiceWrapper from './angular-wrappers'
+
+
+class ValueError extends Error {
+    constructor(message: string | undefined) {
+      super(message)
+      this.name = this.constructor.name
+    }
+}
+
+// NOTE: Previously we were the native InternalError, which is not standard:
+// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/InternalError
+class InternalError extends Error {
+    constructor(message: string | undefined) {
+      super(message)
+      this.name = this.constructor.name
+    }
+}
 
 const ES_PASSTHROUGH = {
     /**
      * Set the initial state of the result object.
      */
-    init: function(result, quality) {
+    init(result: DAWData, quality: any) {
         esconsole(
             'Calling pt_init from passthrough',"PT"
         );
@@ -41,7 +62,7 @@ const ES_PASSTHROUGH = {
     /**
      * Set the tempo on the result object.
      */
-    setTempo: function(result, tempo) {
+    setTempo(result: DAWData, tempo: number) {
         esconsole(
             'Calling pt_setTempo from passthrough with parameter ' +
             tempo, ['DEBUG','PT']
@@ -49,8 +70,9 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1); // remove first argument
+        var args = [...arguments].slice(1); // remove first argument
         ptCheckArgs('setTempo', args, 1, 1);
+        // TODO: Can we do some of these checks automatically via TypeScript run-time reflection?
         ptCheckType('tempo', 'number', tempo);
         ptCheckRange('setTempo', tempo, 45, 220);
 
@@ -64,7 +86,7 @@ const ES_PASSTHROUGH = {
     /**
      * Run steps to clean up the script.
      */
-    finish: function(result) {
+    finish(result: DAWData) {
         esconsole(
             'Calling pt_finish from passthrough',"PT"
         );
@@ -80,9 +102,7 @@ const ES_PASSTHROUGH = {
     /**
      * Add a clip to the given result object.
      */
-    fitMedia: function(
-        result, filekey, trackNumber, startLocation, endLocation
-    ) {
+    fitMedia(result: DAWData, filekey: string, trackNumber: number, startLocation: number, endLocation: number) {
 
         esconsole(
             'Calling pt_fitMedia from passthrough with parameters '
@@ -93,7 +113,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1); // remove first argument
+        var args = [...arguments].slice(1); // remove first argument
         ptCheckArgs('fitMedia', args, 4, 4);
         ptCheckType('filekey', 'string', filekey);
         ptCheckFilekeyType(filekey);
@@ -115,7 +135,7 @@ const ES_PASSTHROUGH = {
             end: endLocation - startLocation + 1,
             scale: false,
             loop: true
-        };
+        } as unknown as Clip;
 
         addClip(result, clip);
 
@@ -125,9 +145,7 @@ const ES_PASSTHROUGH = {
     /**
      * Insert a media clip.
      */
-    insertMedia: function(
-        result, fileName, trackNumber, trackLocation, scaleAudio
-    ) {
+    insertMedia(result: DAWData, fileName: string, trackNumber: number, trackLocation: number, scaleAudio: number | undefined) {
 
         esconsole(
             'Calling pt_insertMedia from passthrough with parameters '
@@ -138,7 +156,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1); // remove first argument
+        var args = [...arguments].slice(1); // remove first argument
         ptCheckArgs('insertMedia', args, 3, 4);
         ptCheckType('fileName', 'string', fileName);
         ptCheckFilekeyType(fileName);
@@ -173,7 +191,7 @@ const ES_PASSTHROUGH = {
             end: 0,
             scale: scaleAudio,
             loop: true
-        };
+        } as unknown as Clip;
 
         addClip(result, clip);
 
@@ -183,14 +201,14 @@ const ES_PASSTHROUGH = {
     /**
      * Insert a media clip section.
      */
-    insertMediaSection: function(
-        result,
-        fileName,
-        trackNumber,
-        trackLocation,
-        mediaStartLocation,
-        mediaEndLocation,
-        scaleAudio
+    insertMediaSection(
+        result: DAWData,
+        fileName: string,
+        trackNumber: number,
+        trackLocation: number,
+        mediaStartLocation: number,
+        mediaEndLocation: number,
+        scaleAudio: number | undefined=undefined,
     ) {
 
         esconsole(
@@ -204,7 +222,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('insertMediaSection', args, 3, 6);
         ptCheckType('fileName', 'string', fileName);
         ptCheckFilekeyType(fileName);
@@ -244,7 +262,7 @@ const ES_PASSTHROUGH = {
             end: mediaEndLocation,
             scale: scaleAudio,
             loop: true
-        };
+        } as unknown as Clip;
 
         addClip(result, clip);
 
@@ -254,7 +272,7 @@ const ES_PASSTHROUGH = {
     /**
      * Make a beat of audio clips.
      */
-    makeBeat: function(result, media, track, measure, beatString) {
+    makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string) {
         esconsole(
             'Calling pt_makeBeat from passthrough with parameters '
             + media + ' , '
@@ -265,7 +283,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('makeBeat', args, 4, 4);
 
         if (media.constructor !== Array && typeof(media) !== 'string') {
@@ -356,7 +374,7 @@ const ES_PASSTHROUGH = {
                     end: end,
                     scale: false,
                     loop: false
-                };
+                } as unknown as Clip;
 
                 addClip(result, clip, silence);
             }
@@ -368,8 +386,8 @@ const ES_PASSTHROUGH = {
     /**
      * Make a beat from media clip slices.
      */
-    makeBeatSlice: function(
-        result, media, track, measure, beatString, beatNumber
+    makeBeatSlice(
+        result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[]
     ) {
         esconsole(
             'Calling pt_makeBeatSlice from passthrough with parameters '
@@ -382,7 +400,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('makeBeatSlice', args, 5, 5);
         ptCheckType('media', 'string', media);
         ptCheckFilekeyType(media);
@@ -422,6 +440,7 @@ const ES_PASSTHROUGH = {
                 beatList.push(beatNumber[i]);
             }
         } else {
+            // TODO: This seems wrong; beatList should be type number[], but media is explicitly type string.
             beatList.push(media);
         }
 
@@ -442,8 +461,8 @@ const ES_PASSTHROUGH = {
                     throw new RangeError(ESMessages.esaudio.stringindex);
                 }
                 var start = measure + (i * SIXTEENTH);
-                var sliceStart = beatList[current];
-                var sliceEnd = beatList[current] + SIXTEENTH;
+                var sliceStart = beatList[current] as number;
+                var sliceEnd = (beatList[current] as number) + SIXTEENTH;
 
                 if (next == REST) {
                     // next char is a rest, so do nothing
@@ -473,7 +492,7 @@ const ES_PASSTHROUGH = {
      * Returns the analyzed value. Does not alter the result (it just takes it
      * as a parameter for consistency).
      */
-    analyze: function(result, audioFile, featureForAnalysis) {
+    analyze(result: DAWData, audioFile: string, featureForAnalysis: string) {
 
         esconsole(
             'Calling pt_analyze from passthrough with parameters '
@@ -483,7 +502,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('analyze', args, 2, 2);
 
         ptCheckType('audioFile', 'string', audioFile);
@@ -504,7 +523,7 @@ const ES_PASSTHROUGH = {
 
         var blockSize = 2048; // TODO: hardcoded in analysis.js as well
         var sampleRate = audioLibrary.getSampleRate ? audioLibrary.getSampleRate() : 44100;
-        if(audioFile in result.slicedClips){
+        if (audioFile in result.slicedClips) {
             var sliceLength_measure = result.slicedClips[audioFile].end - result.slicedClips[audioFile].start;
             var sliceLength_samp = sliceLength_measure * 4 * (60.0/tempo) * sampleRate;
             if(sliceLength_samp < blockSize) {
@@ -514,17 +533,17 @@ const ES_PASSTHROUGH = {
 
         return compiler.loadBuffersForSampleSlicing(result)
         .then(
-            function(newResult){ 
+            function(newResult: any){ 
                 return audioLibrary.getAudioClip(audioFile, newResult.tempo, q)
             }
-        ).catch(function(err) {
+        ).catch(function(err: Error) {
             throw err;
         })
         .then(
-            function(buffer) {
+            function(buffer: any) {
                 return ServiceWrapper().analyzer.ESAnalyze(buffer, featureForAnalysis, tempo);
             }
-        ).catch(function(err) {
+        ).catch(function(err: Error) {
             throw err;
         });
     },
@@ -534,8 +553,8 @@ const ES_PASSTHROUGH = {
      *
      * Returns the analyzed value. Does not alter the result.
      */
-    analyzeForTime: function(
-        result, audioFile, featureForAnalysis, startTime, endTime
+    analyzeForTime(
+        result: DAWData, audioFile: string, featureForAnalysis: string, startTime: number, endTime: number
     ) {
         esconsole(
             'Calling pt_analyzeForTime from passthrough with parameters '
@@ -547,7 +566,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('analyzeForTime', args, 4, 4);
 
         ptCheckType('featureForAnalysis', 'string', featureForAnalysis);
@@ -583,24 +602,24 @@ const ES_PASSTHROUGH = {
         var q = result.quality;
         return compiler.loadBuffersForSampleSlicing(result)
         .then(
-            function(newResult){ 
+            function(newResult: any){ 
                 return audioLibrary.getAudioClip(audioFile, newResult.tempo, q)
             }
-        ).catch(function(err) {
+        ).catch(function(err: Error) {
             throw err;
         })
         .then(
-            function(buffer) {
+            function(buffer: AudioBuffer) {
                 return ServiceWrapper().analyzer.ESAnalyzeForTime(
                     buffer, featureForAnalysis, startTime, endTime, tempo
                 );
             }
-        ).catch(function(err) {
+        ).catch(function(err: Error) {
             throw err;
         });
     },
 
-    analyzeTrack: function(result, trackNumber, featureForAnalysis) {
+    analyzeTrack(result: DAWData, trackNumber: number, featureForAnalysis: string) {
         esconsole('Calling pt_analyzeTrack from passthrough with parameters '
                   + trackNumber + ' , '
                   + featureForAnalysis,
@@ -608,7 +627,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('analyzeTrack', args, 2, 2);
 
         ptCheckType('trackNumber', 'number', trackNumber);
@@ -640,7 +659,7 @@ const ES_PASSTHROUGH = {
             length: result.length,
             slicedClips: result.slicedClips
         }
-        return compiler.postCompile(analyzeResult).then(function(compiled) {
+        return compiler.postCompile(analyzeResult).then(function(compiled: DAWData) {
             // TODO: analyzeTrackForTime FAILS to run a second time if the
             // track has effects using renderer.renderBuffer()
             // Until a fix is found, we use mergeClips() and ignore track
@@ -649,17 +668,17 @@ const ES_PASSTHROUGH = {
             var clips = compiled.tracks[1].clips;
             var buffer = renderer.mergeClips(clips, result.tempo);
             return buffer;
-        }).catch(function(err) {
+        }).catch(function(err: Error) {
             throw err;
-        }).then(function(buffer) {
+        }).then(function(buffer: AudioBuffer) {
             return ServiceWrapper().analyzer.ESAnalyze(buffer, featureForAnalysis, tempo);
-        }).catch(function(err) {
+        }).catch(function(err: Error) {
             throw err;
         });
     },
 
-    analyzeTrackForTime: function(
-        result, trackNumber, featureForAnalysis, startTime, endTime
+    analyzeTrackForTime(
+        result: DAWData, trackNumber: number, featureForAnalysis: string, startTime: number, endTime: number
     ) {
         esconsole(
             'Calling pt_analyzeTrackForTime from passthrough with parameters '
@@ -672,7 +691,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('analyzeTrackForTime', args, 4, 4);
 
         ptCheckType('featureForAnalysis', 'string', featureForAnalysis);
@@ -725,7 +744,7 @@ const ES_PASSTHROUGH = {
             slicedClips: result.slicedClips
         };
 
-        return compiler.postCompile(analyzeResult).then(function(compiled) {
+        return compiler.postCompile(analyzeResult).then(function(compiled: DAWData) {
             // TODO: analyzeTrackForTime FAILS to run a second time if the
             // track has effects using renderer.renderBuffer()
             // Until a fix is found, we use mergeClips() and ignore track
@@ -733,14 +752,14 @@ const ES_PASSTHROUGH = {
             var clips = compiled.tracks[1].clips;
             var buffer = renderer.mergeClips(clips, result.tempo);
             return buffer;
-        }).catch(function(err) {
+        }).catch(function(err: Error) {
             esconsole(err.toString(), ['ERROR','PT']);
             throw err;
-        }).then(function(buffer) {
+        }).then(function(buffer: AudioBuffer) {
             return ServiceWrapper().analyzer.ESAnalyzeForTime(
                 buffer, featureForAnalysis, startTime, endTime, tempo
             );
-        }).catch(function(err) {
+        }).catch(function(err: Error) {
             esconsole(err.toString(), ['ERROR','PT']);
             throw err;
         });
@@ -749,13 +768,13 @@ const ES_PASSTHROUGH = {
     /**
      * Get the duration of a clip.
      */
-    dur: function(result, fileKey) {
+    dur(result: DAWData, fileKey: string) {
         esconsole('Calling pt_dur from passthrough with parameters '
                   + fileKey, 'PT');
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('dur', args, 1, 1);
         ptCheckType('fileKey', 'string', fileKey);
 
@@ -764,10 +783,10 @@ const ES_PASSTHROUGH = {
 
         var q = result.quality;
         return audioLibrary.getAudioClip(fileKey, result.tempo, q).then(
-            function(buffer) {
+            function(buffer: AudioBuffer) {
                 return ServiceWrapper().analyzer.ESDur(buffer, result.tempo);
             }
-        ).catch(function(err) {
+        ).catch(function(err: Error) {
             throw err;
         });
     },
@@ -775,7 +794,7 @@ const ES_PASSTHROUGH = {
     /**
      * Return a Gaussian distributed random number.
      */
-    gauss: function(result, mean, stddev) {
+    gauss: function(result: DAWData, mean: number, stddev: number) {
         esconsole(
             'Calling pt_gauss from passthrough with parameters '
             + mean + ' '
@@ -784,7 +803,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('gauss', args, 0, 2);
 
         return Math.randomGaussian(mean, stddev);
@@ -793,7 +812,7 @@ const ES_PASSTHROUGH = {
     /**
      * Import an image as number data.
      */
-    importImage: function(result, imageURL, nrows, ncols, color) {
+    importImage: function(result: DAWData, imageURL: string, nrows: number, ncols: number, color: undefined | boolean) {
         esconsole(
             'Calling pt_importImage from passthrough with parameters '
             + imageURL + ' , '
@@ -804,7 +823,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('importImage', args, 3, 4);
 
         ptCheckType('imageURL', 'string', imageURL);
@@ -826,9 +845,9 @@ const ES_PASSTHROUGH = {
         var formData = new FormData();
 
         formData.append('image_url', imageURL);
-        formData.append('width', nrows);
-        formData.append('heigth', ncols);
-        formData.append('color', color ? true : false);
+        formData.append('width', "" + nrows);
+        formData.append('heigth', "" + ncols);
+        formData.append('color', "" + (color ? true : false));
 
         var request = new XMLHttpRequest();
         // TODO: synchronous requests are deprecated, come up with a better way
@@ -837,7 +856,7 @@ const ES_PASSTHROUGH = {
             'POST', URL_DOMAIN+'/services/files/stringifyimage', false
         );
 
-        var response = [];
+        var response: any = [];
         request.onload = function () {
             if (request.readyState === 4) {
                 if (request.status === 200) {
@@ -857,14 +876,14 @@ const ES_PASSTHROUGH = {
         return response;
     },
 
-    importFile: function(result, fileURL) {
+    importFile: function(result: DAWData, fileURL: string) {
         esconsole('Calling pt_importFile from passthrough with parameters '
                   + fileURL,
                   'PT');
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('importFile', args, 1, 1);
         ptCheckType('fileURL', 'string', fileURL);
 
@@ -872,8 +891,6 @@ const ES_PASSTHROUGH = {
             userConsole.warn("File url does not start with http:// - prepending string to url");
             fileURL = "http://" + fileURL;
         }
-
-        var result= ['Working'];
 
         // make the HTTP request
         var formData = new FormData();
@@ -914,7 +931,7 @@ const ES_PASSTHROUGH = {
     /**
      * Provides a way to print to the EarSketch console.
      */
-    println: function(result, msg) {
+    println: function(result: DAWData, msg: string) {
         esconsole(
             'Calling pt_println from passthrough with parameter '
             + msg,
@@ -922,7 +939,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('println', args, 1, 1);
 
         let compiler = ServiceWrapper().compiler;
@@ -934,13 +951,13 @@ const ES_PASSTHROUGH = {
     /**
      * Prompt for user input.
      */
-    prompt: function(result, msg) {
+    prompt: function(result: DAWData, msg: string) {
         esconsole('Calling pt_prompt from passthrough with parameter '
                   + msg, 'PT');
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('prompt', args, 0, 1);
         if (typeof(msg) !== 'undefined') {
             ptCheckType('prompt', 'string', msg);
@@ -948,7 +965,7 @@ const ES_PASSTHROUGH = {
             msg = "";
         }
 
-        return window.esPrompt(msg)
+        return (window as any).esPrompt(msg)
 
         /*
         var start = new Date().getTime();
@@ -970,7 +987,7 @@ const ES_PASSTHROUGH = {
      * Replace a list element.
      */
     replaceListElement: function(
-        result, inputList, elementToReplace, withElement
+        result: DAWData, inputList: any[], elementToReplace: any, withElement: any
     ) {
         esconsole(
             'Calling pt_replaceListElement from passthrough with parameters '
@@ -981,7 +998,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('replaceListElement', args, 3, 3);
         ptCheckType('inputList', 'array', inputList);
 
@@ -1003,7 +1020,7 @@ const ES_PASSTHROUGH = {
      * Replace a character in a string.
      */
     replaceString: function(
-        result, patternString, characterToReplace, withElement
+        result: DAWData, patternString: string, characterToReplace: string, withElement: string
     ) {
         esconsole(
             'Calling pt_replaceString from passthrough with parameters '
@@ -1014,7 +1031,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('replaceString', args, 3, 3);
         ptCheckType('patternString', 'string', patternString);
         ptCheckType('characterToReplace', 'string', characterToReplace);
@@ -1034,14 +1051,14 @@ const ES_PASSTHROUGH = {
     /**
      * Reverse a list.
      */
-    reverseList: function(result, inputList) {
+    reverseList: function(result: DAWData, inputList: any[]) {
         esconsole(
             'Calling pt_reverseList from passthrough with parameters '
             + inputList,"PT");
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('reverseList', args, 1, 1);
         ptCheckType('inputList', 'array', inputList);
 
@@ -1052,7 +1069,7 @@ const ES_PASSTHROUGH = {
     /**
      * Reverse a string.
      */
-    reverseString: function(result, inputString) {
+    reverseString: function(result: DAWData, inputString: string) {
         esconsole(
             'Calling pt_reverseString from passthrough with parameters '
             + inputString
@@ -1060,7 +1077,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('reverseString', args, 1, 1);
         ptCheckType('inputString', 'string', inputString);
 
@@ -1071,13 +1088,13 @@ const ES_PASSTHROUGH = {
      * Create a rhythmic effect envelope from a string.
      */
     rhythmEffects: function(
-        result,
-        track,
-        effectType,
-        effectParameter,
-        effectList,
-        measure,
-        beatString
+        result: DAWData,
+        track: number,
+        effectType: string,
+        effectParameter: string,
+        effectList: number[],
+        measure: number,
+        beatString: string
     ) {
         esconsole(
             'Calling pt_rhythmEffects from passthrough with parameters '
@@ -1091,7 +1108,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('rhythmEffects', args, 6, 6);
         ptCheckType('track', 'number', track);
         ptCheckInt('track', track);
@@ -1113,24 +1130,24 @@ const ES_PASSTHROUGH = {
         for (var i = 0; i < beatString.length; i++) {
             var current = beatString[i];
             var next = beatString[i+1];
-            var currentValue = prevValue;
+            var currentValue: number | undefined = prevValue;
             var startMeasure = measure + (i * SIXTEENTH);
 
             if (!isNaN(parseInt(current))) {
                 // parsing a number, set a new previous value
 
-                var prevValue = effectList[parseInt(current)];
+                prevValue = effectList[parseInt(current)];
             } else if (isNaN(parseInt(current)) && next !== current) {
                 // not currently parsing a number and the next char is not
                 // the same as the current char
-                var endValue = currentValue;
+                var endValue = currentValue as number;
 
                 if (current == RAMP && !isNaN(parseInt(next))) {
                     // case: ramp to number
                     endValue = effectList[parseInt(next)];
                 } else if (current == SUSTAIN && !isNaN(parseInt(next))) {
                     // case: sustain to number
-                    endValue = currentValue;
+                    endValue = currentValue as number;
                 } else if (current == RAMP && next == SUSTAIN) {
                     // case: ramp to sustain
 
@@ -1147,7 +1164,7 @@ const ES_PASSTHROUGH = {
 
                 } else if (current == SUSTAIN && next == RAMP) {
                     // case: sustain to ramp
-                    endValue = currentValue;
+                    endValue = currentValue as number;
                 }
 
                 var endMeasure = measure + (1 + i) * SIXTEENTH;
@@ -1160,7 +1177,7 @@ const ES_PASSTHROUGH = {
                     endValue: endValue,
                     startMeasure: prevMeasure,
                     endMeasure: endMeasure
-                };
+                } as unknown as EffectRange;
 
                 addEffect(result, effect);
 
@@ -1172,8 +1189,8 @@ const ES_PASSTHROUGH = {
     },
 
     setEffect: function(
-        result, trackNumber, effect, parameter, effectStartValue,
-        effectStartLocation, effectEndValue, effectEndLocation
+        result: DAWData, trackNumber: number, effect: string, parameter: string, effectStartValue: number,
+        effectStartLocation: number, effectEndValue: number, effectEndLocation: number
     ) {
         esconsole(
             'Calling pt_setEffect from passthrough with parameters '
@@ -1188,7 +1205,7 @@ const ES_PASSTHROUGH = {
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('setEffect', args, 2, 7);
         ptCheckType('trackNumber', 'number', trackNumber);
         ptCheckInt('trackNumber', trackNumber);
@@ -1228,7 +1245,7 @@ const ES_PASSTHROUGH = {
             effectEndLocation = 0;
         }
 
-        var effect = {
+        var _effect = {
             track: trackNumber,
             name: effect,
             parameter: parameter,
@@ -1236,9 +1253,9 @@ const ES_PASSTHROUGH = {
             endValue: effectEndValue,
             startMeasure: effectStartLocation,
             endMeasure: effectEndLocation
-        };
+        } as unknown as EffectRange;
 
-        addEffect(result, effect);
+        addEffect(result, _effect);
 
         return result;
     },
@@ -1246,11 +1263,11 @@ const ES_PASSTHROUGH = {
     /** 
      * Slice a part of a soundfile to create a new sound file variable
      */
-    createAudioSlice: function(result, oldSoundFile, startLocation, endLocation){
+    createAudioSlice: function(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number) {
 
         //TODO AVN: parameter validation - how to determine slice start/end is in correct range?
 
-        var args = copyArgs(arguments).slice(1); // remove first argument
+        var args = [...arguments].slice(1); // remove first argument
         ptCheckArgs('createAudioSlice', args, 3, 3);
         ptCheckType('filekey', 'string', oldSoundFile);
         ptCheckFilekeyType(oldSoundFile);
@@ -1272,14 +1289,14 @@ const ES_PASSTHROUGH = {
     /**
      * Select a random file.
      */
-    selectRandomFile: function(result, folder, extension) {
+    selectRandomFile: function(result: DAWData, folder: string, extension: undefined | string=undefined) {
 
         esconsole('Calling pt_selectRandomFile from passthrough with '
                   + 'parameters ' + folder + ' , ' + extension, 'PT');
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('selectRandomFile', args, 1, 2);
         ptCheckType('folder', 'string', folder);
 
@@ -1308,7 +1325,7 @@ const ES_PASSTHROUGH = {
                 throw new ValueError('Please use folder names available in your sound browser.');
             }
         } else {
-            throw new RuntimeError(
+            throw new InternalError(
                 'Internal server error. '
                 + 'Could not respond to the following tag: ' + folder);
         }
@@ -1317,18 +1334,18 @@ const ES_PASSTHROUGH = {
     /**
      * Shuffle a list.
      */
-    shuffleList: function(result, array) {
+    shuffleList: function(result: DAWData, array: any[]) {
         esconsole('Calling pt_shuffleList from passthrough with parameters '
                   + array, 'PT');
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('shuffleList', args, 1, 1);
         ptCheckType('inputList', 'array', array);
 
         // Fisher-Yates
-        var a = array;
+        var a = array,
             n = a.length;
 
         for(var i = n - 1; i > 0; i--) {
@@ -1344,13 +1361,13 @@ const ES_PASSTHROUGH = {
     /**
      * Shuffle a string.
      */
-    shuffleString: function(result, inputString) {
+    shuffleString: function(result: DAWData, inputString: string) {
         esconsole('Calling pt_shuffleString from passthrough with parameters '
                   + inputString, 'PT');
 
         checkInit(result);
 
-        var args = copyArgs(arguments).slice(1);
+        var args = [...arguments].slice(1);
         ptCheckArgs('shuffleString', args, 1, 1);
         ptCheckType('inputString', 'string', inputString);
 
@@ -1368,18 +1385,16 @@ const ES_PASSTHROUGH = {
     }
 };
 
-function ptCheckArgs(funcName, args, required, optional) {
-    var res = true;
+function ptCheckArgs(funcName: string, args: any[], required: number, optional: number) {
+    var res = "";
 
     if (required === optional) {
         if (args.length !== required) {
             res = funcName + '() takes exactly ' + required + ' argument(s) (' + args.length + ' given)';
-        } else {
-            res = true;
         }
     } else {
         if ((args.length >= required) && (args.length <= optional)) {
-            res = true;
+            // Pass.
         } else if (args.length < required) {
             res = funcName + '() takes at least ' + required + ' argument(s) (' + args.length + ' given)';
         } else {
@@ -1387,13 +1402,13 @@ function ptCheckArgs(funcName, args, required, optional) {
         }
     }
 
-    if (res !== true) {
+    if (res !== "") {
         throw new TypeError(res);
     }
 }
 
-function ptCheckType(name, exptype, arg) {
-    var res = true;
+function ptCheckType(name: string, exptype: string, arg: any) {
+    var res;
 
     if (exptype === 'array') {
         if (arg.constructor !== Array) {
@@ -1410,33 +1425,27 @@ function ptCheckType(name, exptype, arg) {
         }
     }
 
-    if (res !== true) {
+    if (res !== undefined) {
         throw new TypeError(res);
     }
 }
 
 // call this after the regular type check
-function ptCheckInt(name, arg) {
+function ptCheckInt(name: string, arg: number) {
     if (arg.toString().indexOf('.') > -1) {
         throw new TypeError(name + ' must be an integer');
     }
 }
 
-function ptCheckFilekeyType(filekey) {
-    var res = true;
-
+function ptCheckFilekeyType(filekey: string) {
     if ((filekey[0] === "'" && filekey[filekey.length-1] === "'") ||
         (filekey[0] === '"' && filekey[filekey.length-1] === '"')) {
-        res = 'Media constant (' + filekey + ') should not include quotation marks';
-    }
-
-    if (res !== true) {
-        throw new TypeError(res);
+        throw new TypeError('Media constant (' + filekey + ') should not include quotation marks');
     }
 }
 
-function ptCheckRange(name, arg, min, max) {
-    var res = true;
+function ptCheckRange(name: string, arg: number, min: number | {min?: number, max?: number}, max: number | undefined=undefined) {
+    var res;
 
     if (typeof(min) === 'number' && typeof(max) === 'number') {
         if (arg < min || arg > max) {
@@ -1445,40 +1454,40 @@ function ptCheckRange(name, arg, min, max) {
     } else if (typeof(min) === 'object') {
         // TODO: change the bad arg names...
         if (min.hasOwnProperty('min') && min.hasOwnProperty('max')) {
-            if (arg < min.min || arg > min.max) {
+            if (arg < min.min! || arg > min.max!) {
                 res = name + ' exceeds the allowed range of ' + min.min + ' to ' + min.max;
             }
         } else {
             if (min.hasOwnProperty('min')) {
-                if (arg < min.min) {
+                if (arg < min.min!) {
                     res = name + ' cannot be smaller than ' + min.min;
                 }
             }
 
             if (min.hasOwnProperty('max')) {
-                if (arg > min.max) {
+                if (arg > min.max!) {
                     res = name + ' cannot be bigger than ' + min.max;
                 }
             }
         }
     }
 
-    if (res !== true) {
+    if (res !== undefined) {
         throw new RangeError(res);
     }
 }
 
-function ptCheckAudioSliceRange(result, fileKey, startTime, endTime){
-    if(startTime < 1){
-        throw new RangeError(' Cannot start slice before the start of the clip');
+function ptCheckAudioSliceRange(result: DAWData, fileKey: string, startTime: number, endTime: number) {
+    if (startTime < 1) {
+        throw new RangeError('Cannot start slice before the start of the clip');
     }
     var clipDuration = ES_PASSTHROUGH.dur(result, fileKey);
-    if(endTime > clipDuration+1) {
-        throw new RangeError(' Cannot end slice after the end of the clip');
+    if (endTime > clipDuration + 1) {
+        throw new RangeError('Cannot end slice after the end of the clip');
     }
 }
 
-function ptCheckEffectRange(effectname, parameter, effectStartValue, effectStartLocation, effectEndValue, effectEndLocation) {
+function ptCheckEffectRange(effectname: string, parameter: string, effectStartValue: number, effectStartLocation: number, effectEndValue: number, effectEndLocation: number) {
     var res = true;
     var effectObject = applyEffects.EFFECT_MAP[effectname].DEFAULTS[parameter];
 
@@ -1500,7 +1509,7 @@ function ptCheckEffectRange(effectname, parameter, effectStartValue, effectStart
 
     if ((effectStartLocation !== undefined) && ((effectEndLocation !== undefined) && (effectEndLocation != 0))) {
         if (effectEndLocation < effectStartLocation) {
-            throw new RangeError(' Cannot have effect start measure greater than end measure');
+            throw new RangeError('Cannot have effect start measure greater than end measure');
 
         }
     }
@@ -1511,22 +1520,10 @@ function ptCheckEffectRange(effectname, parameter, effectStartValue, effectStart
     }
 }
 
-function checkInit(result) {
-  if (typeof(result) == typeof({})) {
-    if ('init' in result && result.init === true) {
-      // result was initialized, finish cleanly
-      return;
-    }
+function checkInit(result: DAWData) {
+  if (typeof result !== "object" || result.init !== true) {
+    throw new Error('init() is missing')
   }
-  throw new Error('init() is missing');
-}
-
-function copyArgs(args) {
-    var result = [];
-    for (var i = 0; i < args.length; i++) {
-        result.push(args[i]);
-    }
-    return result;
 }
 
 /**
@@ -1547,7 +1544,7 @@ function copyArgs(args) {
  * determining the length of the song (e.g., if makebeat has silence at the
  * end of the song).
  */
-function addClip(result, clip, silence) {
+function addClip(result: DAWData, clip: Clip, silence: number | undefined=undefined) {
 
     if (silence == undefined) {
         clip.silence = 0;
@@ -1585,7 +1582,7 @@ function addClip(result, clip, silence) {
         result.tracks.push({
             clips: [],
             effects: {}
-        })
+        } as unknown as Track)
     }
 
     result.tracks[clip.track].clips.push(clip);
@@ -1594,7 +1591,7 @@ function addClip(result, clip, silence) {
 /**
  * Helper function to add effects to the result.
  */
-function addEffect(result, effect) {
+function addEffect(result: DAWData, effect: EffectRange) {
     esconsole(effect, 'debug');
 
     // bounds checking
@@ -1619,7 +1616,7 @@ function addEffect(result, effect) {
         result.tracks.push({
             clips: [],
             effects: {}
-        })
+        } as unknown as Track)
     }
 
     var key = effect.name + '-' + effect.parameter;
@@ -1644,14 +1641,6 @@ function addEffect(result, effect) {
     effect.endValue = scaledRange[1];
 
     result.tracks[effect.track].effects[key].push(effect);
-}
-
-// copied from ESUtils
-function measureToTime(measure, tempo, timeSignature) {
-    if (typeof(timeSignature) === 'undefined') timeSignature = 4;
-    if (tempo === -1) tempo = 120;
-    //tempo beats in 60 secs
-    return (measure - 1.0) * timeSignature * 60.0 / tempo;
 }
 
 export default ES_PASSTHROUGH

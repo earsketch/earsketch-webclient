@@ -24,6 +24,8 @@ export interface Clip {
     playing?: boolean
     source?: AudioBufferSourceNode
     gain?: GainNode
+    silence: number
+    track: number
 }
 
 export interface EffectRange {
@@ -35,6 +37,7 @@ export interface EffectRange {
     inputEndValue: number
     startValue: number
     endValue: number
+    track: number
 }
 
 export type Effect = EffectRange[] & { bypass?: boolean }
@@ -49,11 +52,21 @@ export interface Track {
     mute?: boolean
 }
 
+export interface ClipSlice {
+    sourceFile: string
+    start: number
+    end: number
+}
+
 export interface DAWData {
     tempo: number
     length: number
     tracks: Track[]
     master: GainNode
+    init: boolean
+    finish: boolean
+    quality: boolean
+    slicedClips: { [key: string]: ClipSlice }
 }
 
 let isPlaying = false

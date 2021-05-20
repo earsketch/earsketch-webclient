@@ -7,7 +7,9 @@
  * a not-so-trivial task, so instead we mock these.)
  */
 
-function ServiceWrapper() {
+import angular from "angular";
+
+export default function ServiceWrapper() {
     var elem = angular.element(document.querySelector('[ng-controller]'));
     var injector = elem.injector();
 
@@ -30,11 +32,11 @@ function ServiceWrapper() {
     var ApiReader = injector.get('reader');
 
     return {
-        audioLibrary: ApiAudioLibrary,
-        compiler: ApiCompiler,
-        autograder: ApiAutograder,
-        userProject: ApiUserProject,
-        analyzer: ApiAnalyzer,
-        reader: ApiReader,
+        audioLibrary: ApiAudioLibrary as any,
+        compiler: ApiCompiler as any,
+        autograder: ApiAutograder as any,
+        userProject: ApiUserProject as any,
+        analyzer: ApiAnalyzer as any,
+        reader: ApiReader as any,
     }
 }

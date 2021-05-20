@@ -32,9 +32,12 @@ import * as helpers from './helpers'
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
 import ES_PASSTHROUGH from './api/passthrough'
+import ESMessages from './data/messages'
 
 // TODO: Remove this after resolving issues with earsketch.py.js, earsketch.js.js.
 window.ES_PASSTHROUGH = ES_PASSTHROUGH
+
+window.ESMessages = ESMessages
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 // (This was previously in userConsole, but since that's now a module, the fields are read-only.)
