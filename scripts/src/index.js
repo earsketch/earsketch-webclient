@@ -31,7 +31,7 @@ ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 import * as helpers from './helpers'
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
-import ES_PASSTHROUGH from './api/passthrough'
+import * as ES_PASSTHROUGH from './api/passthrough'
 import ESMessages from './data/messages'
 
 // TODO: Remove this after resolving issues with earsketch.py.js, earsketch.js.js.

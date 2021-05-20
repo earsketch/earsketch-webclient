@@ -56,6 +56,7 @@ describe('EarSketch API tests', function() {
         // dependencies
 
         // overriding the angular-wrappers' function
+        // TODO: may need to update this since angular-wrappers is now a module.
         ServiceWrapper = function() {
             return {
                 audioLibrary: audioLibrary,

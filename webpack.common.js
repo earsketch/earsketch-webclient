@@ -107,7 +107,6 @@ module.exports = {
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
-            ngWrappers: path.resolve(__dirname,`${apiDir}/angular-wrappers.js`),
             jsAPI: path.resolve(__dirname,`${apiDir}/earsketch.js.js`),
             pyAPI: path.resolve(__dirname,`${apiDir}/earsketch.py.js`),
 
