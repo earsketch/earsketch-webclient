@@ -7,10 +7,11 @@
 import audioContext from '../audiocontext'
 import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
+import * as userConsole from '../userconsole'
 
 app.factory('compiler',
-['pitchshifter','audioLibrary','userConsole','$rootScope','$q',
-function compilerFactory(pitchshift,audioLibrary,userConsole,$rootScope,$q) {
+['pitchshifter','audioLibrary','$rootScope','$q',
+function compilerFactory(pitchshift,audioLibrary,$rootScope,$q) {
     let testRun = false;
 
     /**

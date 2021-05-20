@@ -224,7 +224,6 @@ require('layout');
 require('timesync');
 require('compiler');
 require('pitchShifter');
-require('userConsole');
 require('uploader');
 require('completer');
 require('exporter');

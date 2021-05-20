@@ -17,9 +17,6 @@ function ServiceWrapper() {
     // Load the compiler service outside angular
     var ApiCompiler = injector.get('compiler');
 
-    // Load the user console outside angular
-    var ApiUserConsole = injector.get('userConsole');
-
     // Load the autograder service outside angular
     var ApiAutograder = injector.get('autograder');
 
@@ -35,7 +32,6 @@ function ServiceWrapper() {
     return {
         audioLibrary: ApiAudioLibrary,
         compiler: ApiCompiler,
-        userConsole: ApiUserConsole,
         autograder: ApiAutograder,
         userProject: ApiUserProject,
         analyzer: ApiAnalyzer,

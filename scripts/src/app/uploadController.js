@@ -2,8 +2,9 @@ import audioContext from './audiocontext'
 import esconsole from '../esconsole';
 import * as ESUtils from '../esutils';
 import * as sounds from '../browser/soundsState';
+import * as userConsole from './userconsole'
 
-app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService','userProject','userConsole','userNotification','audioLibrary','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, audioLibrary, $sce, $timeout, $http, $ngRedux) {
+app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService','userProject','userNotification','audioLibrary','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, RecorderService, userProject, userNotification, audioLibrary, $sce, $timeout, $http, $ngRedux) {
     $scope.file = {
         data: null,
         key: null,

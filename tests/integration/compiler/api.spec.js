@@ -27,6 +27,7 @@ describe('API function tests', function() {
         jasmine.addMatchers(customMatchers);
 
         tester = ngMidwayTester('EarSketchApp');
+        // TODO: This may be broken now that userConsole is a module rather than a service.
         userConsole = tester.injector().get('userConsole');
         // mock angular.element().injector() used in the Passthrough for
         // getting the injector outside of angular

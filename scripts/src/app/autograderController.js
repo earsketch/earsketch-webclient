@@ -1,9 +1,10 @@
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import * as userConsole from './userconsole'
 
 app.controller("autograderController",
-['$scope','compiler', 'userConsole',
-function($scope, compiler, userConsole) {
+['$scope','compiler',
+function($scope, compiler) {
 
     $scope.uploads = [];
     $scope.referenceFile = null;

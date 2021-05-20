@@ -1,9 +1,10 @@
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import * as userConsole from './userconsole'
 
 app.controller("autograder3Controller",
-['$scope','compiler', 'userConsole','caiAnalysisModule', 'userProject',
-function($scope, compiler, userConsole, caiAnalysisModule, userProject) {
+['$scope','compiler', 'caiAnalysisModule', 'userProject',
+function($scope, compiler, caiAnalysisModule, userProject) {
 
     $scope.prompts = [0];
     $scope.allowPrompts = false;

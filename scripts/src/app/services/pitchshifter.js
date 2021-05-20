@@ -11,9 +11,10 @@ import ctx from '../audiocontext'
 import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 import * as render from '../renderer'
+import * as userConsole from '../userconsole'
 
-app.factory('pitchshifter', ['userConsole',
-function pitchshifterFactory(userConsole) {
+app.factory('pitchshifter',
+function pitchshifterFactory() {
 
     var QFRAMES = 16;
     var FRAMESIZE = 256;
@@ -397,4 +398,4 @@ function pitchshifterFactory(userConsole) {
         asyncPitchshiftClips: asyncPitchshiftClips
     };
 
-}]);
+});

@@ -1,6 +1,6 @@
 describe('EarSketch API tests', function() {
 
-    var audioLibrary, compiler, renderer, userConsole;
+    var audioLibrary, compiler, renderer;
     var $rootScope, $q, result;
 
     // mock module dependencies
@@ -52,9 +52,6 @@ describe('EarSketch API tests', function() {
     });
 
     beforeEach(inject(function($injector) {
-        // spy on the user console service
-        userConsole = jasmine.createSpy('userConsole')
-            .and.callFake(function() {return $injector.get('userConsole');});
         // mock the service wrapper that the API uses to load angular
         // dependencies
 
@@ -64,7 +61,6 @@ describe('EarSketch API tests', function() {
                 audioLibrary: audioLibrary,
                 compiler: compiler,
                 renderer: renderer,
-                userConsole: userConsole,
             }
         };
         $rootScope = $injector.get('$rootScope');

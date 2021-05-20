@@ -83,17 +83,13 @@ module.exports = {
             notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
             // Models
-            audioContext: path.resolve(__dirname,`${servicesDir}/audiocontext.js`),
             compiler: path.resolve(__dirname,`${servicesDir}/compiler.js`),
             reader: path.resolve(__dirname,`${servicesDir}/reader.js`),
-            player: path.resolve(__dirname,`${servicesDir}/player.js`),
-            renderer: path.resolve(__dirname,`${servicesDir}/renderer.js`),
             pitchShifter: path.resolve(__dirname,`${servicesDir}/pitchshifter.js`),
             audioLibrary: path.resolve(__dirname,`${servicesDir}/audiolibrary.js`),
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
-            userConsole: path.resolve(__dirname,`${servicesDir}/userconsole.js`),
             userNotification: path.resolve(__dirname,`${servicesDir}/userNotification.js`),
             userProject: path.resolve(__dirname,`${servicesDir}/userProject.js`),
             localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),

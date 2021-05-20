@@ -16,6 +16,7 @@
 import * as applyEffects from '../model/applyeffects'
 import esconsole from '../esconsole'
 import * as renderer from '../app/renderer'
+import * as userConsole from '../app/userconsole'
 
 const ES_PASSTHROUGH = {
     /**
@@ -926,8 +927,6 @@ const ES_PASSTHROUGH = {
 
         let compiler = ServiceWrapper().compiler;
         if (!compiler.isTestRun()) {
-            // load an angular service outside angular
-            var userConsole = ServiceWrapper().userConsole;
             userConsole.log(msg);
         }
     },
@@ -949,7 +948,6 @@ const ES_PASSTHROUGH = {
             msg = "";
         }
 
-        var userConsole = ServiceWrapper().userConsole;
         return userConsole.prompt(msg);
 
         /*
