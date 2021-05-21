@@ -55,6 +55,34 @@ export function getAudioClip(filekey: string, tempo: number, quality: boolean=fa
     }
 }
 
+const calculateTargetBufferLength = (bufferLength: number, sampleRate: number, sourceTempo: number, targetTempo: number) => {
+    // This handles a tricky problem for user-uploaded sounds.
+    // User sounds may be in compressed formats such as MP3,
+    // which may not quite match the intended length of the sample on decoding.
+    // E.g.: A wave file of one measure at 88 bpm, 44.1kHz has 120273 samples;
+    // converting it to a mp3 and decoding yields 119808 samples,
+    // meaning it falls behind by ~0.01 seconds per loop.
+    // In this code, we round the buffer length to the nearest sixteenth note.
+    const actualLengthInSeconds = bufferLength / sampleRate
+    const actualLengthInQuarters = actualLengthInSeconds / 60 * sourceTempo
+    const actualLengthInSixteenths = actualLengthInQuarters * 4  // sixteenths per quarter
+    const targetLengthInSixteenths = Math.round(actualLengthInSixteenths)
+    if (targetLengthInSixteenths - actualLengthInSixteenths > .1) {
+        // In the unlikely event that a user has a sample which is
+        // intentionally offset by thirty-seconds (.5 of a sixteenth),
+        // sixty-fourths (.25 of a sixteenth), or one-twenty-eighths (.125 of a sixteenth),
+        // we do not want to round to the nearest sixteenth note.
+        // Instead, we leave the user's sample at its original length,
+        // and potentially leave to the mercy of the decoder.
+        return Math.round(bufferLength * (targetTempo / sourceTempo))
+    }
+
+    const targetLengthInQuarters = targetLengthInSixteenths / 4
+    const targetLengthInSeconds = targetLengthInQuarters / targetTempo * 60
+    const targetLengthInSamples = Math.round(targetLengthInSeconds * sampleRate)
+    return targetLengthInSamples
+}
+
 const timestretch = (buffer: AudioBuffer, sourceTempo: number, targetTempo: number) => {
     // JS time stretcher; Seems to introduce an unwanted sample offset when the same instance is reused.
     const kali = new Kali(1)
@@ -68,9 +96,12 @@ const timestretch = (buffer: AudioBuffer, sourceTempo: number, targetTempo: numb
     }
     kali.input(input)
     kali.process()
-
-    // This weird calculation matches the output length of SOX time stretching.
-    const targetLength = Math.round((buffer.length + 1) * sourceTempo/targetTempo)
+    // TODO: This is old stuff; we no longer use SoX and it caused issues anyway.
+    // "This weird calculation matches the output length of SOX time stretching."
+    // const targetLength = Math.round((buffer.length + 1) * sourceTempo/targetTempo)
+    esconsole(`source: ${sourceTempo} ${buffer.length} ${buffer.duration}`, ["debug", "audiolibrary"])
+    const targetLength = calculateTargetBufferLength(buffer.length, ctx.sampleRate, sourceTempo, targetTempo)
+    esconsole(`target: ${targetTempo} ${targetLength} ${targetLength / ctx.sampleRate}`, ["debug", "audiolibrary"])
     const outOffset = Math.round(offset * sourceTempo/targetTempo)
     const output = new Float32Array(targetLength + outOffset*2)
     kali.output(output)
