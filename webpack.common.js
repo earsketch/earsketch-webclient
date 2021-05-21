@@ -94,7 +94,6 @@ module.exports = {
             localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
-            layout: path.resolve(__dirname,`${servicesDir}/layout.js`),
             colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
             websocket: path.resolve(__dirname,`${servicesDir}/websocket.js`),
             collaboration: path.resolve(__dirname,`${servicesDir}/collaboration.js`),

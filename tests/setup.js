@@ -220,7 +220,6 @@ require('audioLibrary');
 require('websocket');
 require('collaboration');
 require('colorTheme');
-require('layout');
 require('timesync');
 require('compiler');
 require('pitchShifter');

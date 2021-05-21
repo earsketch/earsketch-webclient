@@ -122,7 +122,6 @@ require(['angular'], () => {
     require('websocket');
     require('collaboration');
     require('colorTheme');
-    require('layout');
     require('compiler');
     require('pitchShifter');
     require('uploader');
