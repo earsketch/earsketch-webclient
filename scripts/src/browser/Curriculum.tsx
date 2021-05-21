@@ -9,6 +9,7 @@ import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
+import * as userNotification from '../app/userNotification'
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages

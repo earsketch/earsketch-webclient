@@ -17,8 +17,9 @@
  * userNotification.hide(); // hide at any time.
  */
 import esconsole from '../esconsole'
+import * as userNotification from './userNotification'
 
-app.directive('notificationBar', ['userNotification', function (userNotification) {
+app.directive('notificationBar', function () {
     return {
         restrict: 'E',
         template: '<div>{{text}}</div>',
@@ -35,7 +36,7 @@ app.directive('notificationBar', ['userNotification', function (userNotification
 
             element.addClass('notificationBar');
 
-            userNotification.showCallback(function (text, type, duration) {
+            userNotification.callbacks.show = function (text, type, duration) {
                 /* init values */
                 if (typeof(text) === 'undefined') {
                     esconsole('cannot print empty text in userNotification', ['error', 'debug']);
@@ -62,7 +63,7 @@ app.directive('notificationBar', ['userNotification', function (userNotification
                 if (!scope.showText) {
                     queueNext();
                 }
-            });
+            };
 
             function queueNext() {
                 scope.text = userNotification.queue[0].message.text;
@@ -76,7 +77,7 @@ app.directive('notificationBar', ['userNotification', function (userNotification
                 setTimeout(userNotification.hide, userNotification.queue[0].duration * 1000);
             }
 
-            userNotification.hideCallback(function () {
+            userNotification.callbacks.hide = function () {
                 scope.showText = false;
                 userNotification.queue.shift();
 
@@ -90,12 +91,12 @@ app.directive('notificationBar', ['userNotification', function (userNotification
                 if (!scope.$$phase) {
                     scope.$apply();
                 }
-            });
+            };
         }
     }
-}]);
+});
 
-app.directive('notificationPopup', ['userNotification', 'colorTheme', function (userNotification, colorTheme) {
+app.directive('notificationPopup', ['colorTheme', function (colorTheme) {
     return {
         restrict: 'E',
         template: '<div class="arrow" style="position:absolute; top:-11px; right:21px; height:0; width:0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 14px solid;"></div><div><span style="float:left; overflow:hidden; width: 210px;  text-overflow:ellipsis;">{{popupText}}</span><span style="float:right; cursor:pointer; color:indianred" ng-click="hidePopup()">X</span></div>',
@@ -117,7 +118,7 @@ app.directive('notificationPopup', ['userNotification', 'colorTheme', function (
 
             element.addClass('notificationPopup');
 
-            userNotification.popupCallback(function (text, type, duration) {
+            userNotification.callbacks.popup = function (text, type, duration) {
                 /* init values */
                 if (typeof(text) === 'undefined') {
                     esconsole('cannot print empty text in userNotification', ['error', 'debug']);
@@ -144,7 +145,7 @@ app.directive('notificationPopup', ['userNotification', 'colorTheme', function (
                 if (!scope.showPopupText) {
                     queueNext();
                 }
-            });
+            };
 
             function queueNext() {
                 scope.popupText = userNotification.popupQueue[0].message.text;
@@ -171,7 +172,7 @@ app.directive('notificationPopup', ['userNotification', 'colorTheme', function (
                 setTimeout(userNotification.hidePopup, userNotification.popupQueue[0].duration * 1000);
             }
 
-            userNotification.hidePopupCallback(function () {
+            userNotification.callbacks.hidePopup = function () {
                 scope.showPopupText = false;
                 userNotification.popupQueue.shift();
 
@@ -185,7 +186,7 @@ app.directive('notificationPopup', ['userNotification', 'colorTheme', function (
                 if (!scope.$$phase) {
                     scope.$apply();
                 }
-            });
+            };
 
             scope.hidePopup = function () {
                 userNotification.hidePopup();

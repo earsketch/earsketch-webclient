@@ -4,8 +4,9 @@ import esconsole from '../../esconsole';
 import * as ESUtils from '../../esutils';
 import * as scriptsState from '../../browser/scriptsState';
 import * as tabs from '../../editor/tabState';
+import * as userNotification from '../userNotification';
 
-app.factory('userProject', ['$rootScope', '$http', '$window', 'userNotification', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, $window, userNotification, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
+app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, $window, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;
@@ -285,8 +286,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', 'userNotification'
 
         //=================================================
         // register callbacks / member values in the userNotification service
-        userNotification.addSharedScript = addSharedScript;
-        userNotification.setUserName(username);
+        userNotification.callbacks.addSharedScript = addSharedScript;
 
         //=================================================
 
@@ -311,7 +311,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', 'userNotification'
             collaboration.setUserName(username);
 
             // used for managing websocket notifications locally
-            userNotification.setLoginTime = new Date();
+            userNotification.user.loginTime = Date.now();
 
             esconsole(ESMessages.user.scriptsuccess, ['DEBUG', 'USER']);
 
@@ -900,7 +900,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', 'userNotification'
                     var deferred = $q.defer();
                     deferred.reject("Script was not found.");
 
-                    if (userNotification.isInLoadingScreen) {
+                    if (userNotification.state.isInLoadingScreen) {
                         self.errorLoadingSharedScript = true;
                     } else {
                         userNotification.show(ESMessages.user.badsharelink, 'failure1', 3);

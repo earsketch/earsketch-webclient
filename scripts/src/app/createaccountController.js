@@ -4,8 +4,9 @@
  */
 import esconsole from '../esconsole'
 import * as userConsole from './userconsole'
+import * as userNotification from './userNotification'
 
-app.controller("accountController", ['$scope','$uibModalInstance','userNotification', function ($scope, $uibModalInstance, userNotification) {
+app.controller("accountController", ['$scope','$uibModalInstance', function ($scope, $uibModalInstance) {
     /**
      * Closes the current modal window.
      * @name cancel

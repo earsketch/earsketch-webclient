@@ -118,7 +118,6 @@ require(['angular'], () => {
     // In-house modules
     require('reporter');
     require('reader');
-    require('userNotification');
     require('localStorage');
     require('userProject');
     require('audioLibrary');

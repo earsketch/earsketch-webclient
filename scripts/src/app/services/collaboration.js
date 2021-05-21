@@ -6,8 +6,9 @@
  */
 import esconsole from '../../esconsole';
 import * as scripts from '../../browser/scriptsState';
+import * as userNotification from '../userNotification';
 
-app.service('collaboration', ['userNotification', 'websocket', 'reporter', '$rootScope', '$ngRedux', function (userNotification, websocket, reporter, $rootScope, $ngRedux) {
+app.service('collaboration', ['websocket', 'reporter', '$rootScope', '$ngRedux', function (websocket, reporter, $rootScope, $ngRedux) {
     var self = this;
     this.script = null; // script object: only used for the off-line mode
     this.scriptID = null; // collaboration session identity (both local and remote)

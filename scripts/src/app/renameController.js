@@ -1,5 +1,5 @@
-import esconsole from '../esconsole';
 import * as sounds from '../browser/soundsState';
+import * as userNotification from './userNotification';
 
 app.controller("renameController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'reporter', 'collaboration', function ($scope, $uibModalInstance, userProject, script, reporter, collaboration) {
     $scope.scriptName = script.name.replace(/.([^.]*)$/, '');
@@ -44,7 +44,7 @@ app.controller("renameController", ['$scope', '$uibModalInstance', 'userProject'
     };
 }]);
 
-app.controller("renameSoundController", ['$scope','$uibModalInstance','sound','userProject','esconsole','userNotification','$ngRedux', function ($scope,$uibModalInstance,sound,userProject,esconsole,userNotification,$ngRedux) {
+app.controller("renameSoundController", ['$scope','$uibModalInstance','sound','userProject','esconsole','$ngRedux', function ($scope,$uibModalInstance,sound,userProject,esconsole,$ngRedux) {
     $scope.artist = sound.artist;
     $scope.username = userProject.getUsername().toUpperCase();
     // memo

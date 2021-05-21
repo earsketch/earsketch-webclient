@@ -89,7 +89,6 @@ module.exports = {
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
-            userNotification: path.resolve(__dirname,`${servicesDir}/userNotification.js`),
             userProject: path.resolve(__dirname,`${servicesDir}/userProject.js`),
             localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
