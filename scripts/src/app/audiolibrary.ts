@@ -67,13 +67,14 @@ const calculateTargetBufferLength = (bufferLength: number, sampleRate: number, s
     const actualLengthInQuarters = actualLengthInSeconds / 60 * sourceTempo
     const actualLengthInSixteenths = actualLengthInQuarters * 4  // sixteenths per quarter
     const targetLengthInSixteenths = Math.round(actualLengthInSixteenths)
-    if (targetLengthInSixteenths - actualLengthInSixteenths > .1) {
-        // In the unlikely event that a user has a sample which is
-        // intentionally offset by thirty-seconds (.5 of a sixteenth),
-        // sixty-fourths (.25 of a sixteenth), or one-twenty-eighths (.125 of a sixteenth),
-        // we do not want to round to the nearest sixteenth note.
+    if (targetLengthInSixteenths - actualLengthInSixteenths > .25) {
+        // In the unlikely event that a user has a sample which is intentionally offset
+        // by an odd number of 32nd (.5 of a sixteenth) or 64th (.25 of a sixteenth) notes,
+        // we do not round to the nearest sixteenth note.
         // Instead, we leave the user's sample at its original length,
-        // and potentially leave to the mercy of the decoder.
+        // and (if it was an MP3) leave it to the mercy of the decoder.
+        // (For reference, MP3 frame size is 1152 samples, so max offset
+        //  from codec is presumably ~.052 beats at 120 bpm, 44.1kHz)
         return Math.round(bufferLength * (targetTempo / sourceTempo))
     }
 
