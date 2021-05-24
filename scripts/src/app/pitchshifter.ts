@@ -8,62 +8,64 @@ import * as render from './renderer'
 import * as userConsole from './userconsole'
 import { Clip, EffectRange, Track } from './player'
 
-type Point = any  // TODO
+interface Point {
+    sampletime: number
+    semitone: number
+    type: 'start' | 'add' | 'end'
+}
 
-var QFRAMES = 16;
-var BUFFER_CACHE: { [key: string]: any } = {}; 
-var MAX_CACHE = 64; // increasing from 16 since we now process by clips instead of tracks
+const QFRAMES = 16;
+let BUFFER_CACHE: { [key: string]: AudioBuffer } = {}; 
+const MAX_CACHE = 64; // increasing from 16 since we now process by clips instead of tracks
 
-function computeFrameEnvelope(bendinfo: any, NumberOfFrames: number) {
-    var findex = 1;
-    var envelope =  new Float32Array(NumberOfFrames);
-    var deltaY, deltaX;
-    for(var f =0;f<NumberOfFrames ; f++) {
+const computeFrameEnvelope = (bendinfo: Point[], numFrames: number) => {
+    let findex = 1;
+    const envelope = new Float32Array(numFrames);
+    let deltaY, deltaX;
+    for(let f = 0; f < numFrames; f++) {
+        if ((findex < bendinfo.length) && (f > bendinfo[findex].sampletime)) {
+            findex++;
+        }
 
-            if ((findex < bendinfo.length) &&(f>bendinfo[ findex].sampletime)) {
-                findex++;
-            }
-
-            if (findex == bendinfo.length) {
-                envelope[f] = bendinfo[ bendinfo.length-1].semitone;
-            } else {
-                deltaY = bendinfo[ findex].semitone-bendinfo[ findex-1].semitone;
-                deltaX = bendinfo[ findex].sampletime-bendinfo[ findex-1].sampletime;
-                envelope[f] =  bendinfo[ findex-1].semitone + (deltaY* (f- bendinfo[ findex-1].sampletime)/deltaX);
-            }
+        if (findex === bendinfo.length) {
+            envelope[f] = bendinfo[bendinfo.length-1].semitone;
+        } else {
+            deltaY = bendinfo[findex].semitone - bendinfo[findex-1].semitone
+            deltaX = bendinfo[findex].sampletime - bendinfo[findex-1].sampletime
+            envelope[f] = bendinfo[findex-1].semitone + deltaY * (f - bendinfo[findex-1].sampletime)/deltaX
+        }
 
     }
     return envelope;
 }
 
 //sample time in frames
-function AddEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) {
-    var startPoint: Point = {};
-    startPoint.sampletime = Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / ESDSP_HOP_SIZE);
-    startPoint.semitone = effect.startValue;
-    startPoint.type = 'start';
+function addEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) {
+    const startPoint = {
+        sampletime: Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / ESDSP_HOP_SIZE),
+        semitone: effect.startValue,
+        type: 'start',
+    } as Point
 
-    if ((jsarray.length > 0 ) && (startPoint.sampletime == jsarray[jsarray.length - 1].sampletime)) {
+    if ((jsarray.length > 0) && (startPoint.sampletime === jsarray[jsarray.length - 1].sampletime)) {
         jsarray[jsarray.length - 1].sampletime = jsarray[jsarray.length - 1].sampletime - QFRAMES;
     }
 
-    var point: Point = null;
-
     if ((jsarray.length == 0) && (startPoint.sampletime > 0)) {
         if (startPoint.sampletime > 0) {
-            point = {};
-            point.sampletime = 0;
-            point.semitone = 0;
-            point.type = 'add';
-            jsarray.push(point);
+            jsarray.push({
+                sampletime: 0,
+                semitone: 0,
+                type: 'add',
+            })
         }
 
         if (startPoint.sampletime > QFRAMES) {
-            point = {};
-            point.sampletime = startPoint.sampletime - QFRAMES;
-            point.semitone = 0;
-            point.type = 'add';
-            jsarray.push(point);
+            jsarray.push({
+                sampletime: startPoint.sampletime - QFRAMES,
+                semitone: 0,
+                type: 'add',
+            })
         }
     }
 
@@ -71,30 +73,29 @@ function AddEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) 
         jsarray[jsarray.length - 1].sampletime = startPoint.sampletime - QFRAMES;
     }
 
-    if ((jsarray.length > 0)
-            //if   ((jsarray.length > 0) && (jsarray[jsarray.length -1].type == 'end')
-        && ((startPoint.sampletime - QFRAMES) > jsarray[jsarray.length - 1].sampletime)) {
-        point = {};
-        point.sampletime = startPoint.sampletime - QFRAMES;
-        point.semitone = jsarray[jsarray.length - 1].semitone;
-        point.type = 'add';
-
-        jsarray.push(point);
+    // Mysterious old comment: "if   ((jsarray.length > 0) && (jsarray[jsarray.length -1].type == 'end')"
+    if ((jsarray.length > 0) && ((startPoint.sampletime - QFRAMES) > jsarray[jsarray.length - 1].sampletime)) {
+        jsarray.push({
+            sampletime: startPoint.sampletime - QFRAMES,
+            semitone: jsarray[jsarray.length - 1].semitone,
+            type: 'add',
+        })
     }
 
-    jsarray.push(startPoint);
+    jsarray.push(startPoint)
 
-    var endPoint: Point = {};
-    endPoint.sampletime = Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / ESDSP_HOP_SIZE);
-    endPoint.semitone = effect.endValue;
-    endPoint.type = 'end';
+    const endPoint = {
+        sampletime: Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / ESDSP_HOP_SIZE),
+        semitone: effect.endValue,
+        type: 'end',
+    } as Point
 
     if (endPoint.sampletime == 0) {
-        endPoint.sampletime = -1;
-        endPoint.semitone = startPoint.semitone;
+        endPoint.sampletime = -1
+        endPoint.semitone = startPoint.semitone
     }
     if (endPoint.sampletime > 0) {
-        jsarray.push(endPoint);
+        jsarray.push(endPoint)
     }
 }
 
@@ -107,14 +108,14 @@ function processPitchshift(track: Track, tempo: number) {
         //Compute envelope information
         for (var i=0; i<track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'].length; i++) {
             var effect = track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'][i];
-            AddEnvelopePoint(jsonArray , effect, tempo);
+            addEnvelopePoint(jsonArray , effect, tempo);
         }
     }
     return jsonArray;
 }
 
 
-function BufferPitchShift(audiobuffer: AudioBuffer, bendinfo: any) {
+function BufferPitchShift(audiobuffer: AudioBuffer, bendinfo: Point[]) {
     esconsole('PitchBend bendinfo from ' + JSON.stringify(bendinfo), ['DEBUG','PITCHSHIFT']);
     var NFrames = computeNumberOfFrames(audiobuffer.length);
     var frameenvelope = computeFrameEnvelope(bendinfo, NFrames);
@@ -199,7 +200,7 @@ export function asyncPitchshiftTrack(track: Track, tempo: number) {
     return promise;
 }
 
-function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: number[]) {
+function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: Point[]) {
     var clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / ESDSP_HOP_SIZE);
     var clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end-clip.start), tempo) * 44100 / ESDSP_HOP_SIZE);
     var clipLenInSamps = clipEndInSamps - clipStartInSamps;
@@ -224,18 +225,18 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: number[])
         }
     }
 
-    var pointsWithinClip = env.map(function (point) {
+    var pointsOrNullWithinClip = env.map(function (point) {
         return (point.sampletime >= clipStartInSamps && point.sampletime <= clipEndInSamps) ? point : null;
     });
 
     var fixedStart = false, fixedEnd = false;
 
-    pointsWithinClip.forEach(function (point, i) {
+    pointsOrNullWithinClip.forEach(function (point, i) {
         if (!fixedStart) {
             if (point) {
                 if (point.sampletime !== clipStartInSamps) {
                     if (i % 2 === 1) {
-                        pointsWithinClip[i-1] = {
+                        pointsOrNullWithinClip[i-1] = {
                             sampletime: clipStartInSamps,
                             semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipStartInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
                             type: 'start'
@@ -248,7 +249,7 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: number[])
         } else if (!fixedEnd) {
             if (!point) {
                 if (i % 2 === 1) {
-                    pointsWithinClip[i] = {
+                    pointsOrNullWithinClip[i] = {
                         sampletime: clipEndInSamps,
                         semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipEndInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
                         type: 'end'
@@ -261,9 +262,9 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: number[])
     });
 
     // remove null values
-    pointsWithinClip = pointsWithinClip.filter(function (point) {
+    const pointsWithinClip = pointsOrNullWithinClip.filter(function (point) {
         return !!point;
-    });
+    }) as Point[];
 
     pointsWithinClip.forEach(function (point) {
         point.sampletime -= clipStartInSamps;
@@ -296,7 +297,7 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: number[])
     }
 
     if (!pointsWithinClip.length) {
-        var startSemitone, endSemitone;
+        let startSemitone: number, endSemitone: number;
 
         for (var i = 0; i < env.length; i += 2) {
             if (i === 0 && clipEndInSamps < env[i].sampletime) {
@@ -312,12 +313,12 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: number[])
 
         pointsWithinClip.push({
             sampletime: 0,
-            semitone: startSemitone,
+            semitone: startSemitone!,
             type: 'start'
         });
         pointsWithinClip.push({
             sampletime: clipLenInSamps,
-            semitone: endSemitone,
+            semitone: endSemitone!,
             type: 'end'
         });
     }
