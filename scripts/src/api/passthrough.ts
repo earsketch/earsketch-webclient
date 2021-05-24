@@ -1352,7 +1352,13 @@ const ptCheckAudioSliceRange = (result: DAWData, fileKey: string, startTime: num
     if (startTime < 1) {
         throw new RangeError("Cannot start slice before the start of the clip")
     }
-    const clipDuration = dur(result, fileKey)
+    // TODO: This is broken, and has been for an unknown length of time.
+    // `dur` returns a promise, so `dur + 1` yields "[object Promise]1".
+    // Compared against a number (endTime), this always returns false,
+    // and the error never gets thrown.
+    // Instead the error gets caught in compiler's `sliceAudioBufferByMeasure`.
+    // (The brokenness was discovered via TypeScript migration of audiolibrary.)
+    const clipDuration = dur(result, fileKey) as unknown as number
     if (endTime > clipDuration + 1) {
         throw new RangeError("Cannot end slice after the end of the clip")
     }
