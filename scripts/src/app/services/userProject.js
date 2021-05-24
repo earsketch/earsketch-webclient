@@ -1,12 +1,13 @@
 import xml2js from 'xml2js';
 import * as appState from '../appState';
+import * as audioLibrary from '../audiolibrary';
 import esconsole from '../../esconsole';
 import * as ESUtils from '../../esutils';
 import * as scriptsState from '../../browser/scriptsState';
 import * as tabs from '../../editor/tabState';
 import * as userNotification from '../userNotification';
 
-app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorage', '$uibModal', 'audioLibrary','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, $window, $q, localStorage, $uibModal, audioLibrary, reporter, websocket, collaboration, $ngRedux) {
+app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorage', '$uibModal','reporter', 'websocket', 'collaboration', '$ngRedux', function ($rootScope, $http, $window, $q, localStorage, $uibModal, reporter, websocket, collaboration, $ngRedux) {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;

@@ -215,7 +215,6 @@ require('reader');
 require('localStorage');
 require('userProject');
 require('esutils');
-require('audioLibrary');
 require('websocket');
 require('collaboration');
 require('colorTheme');

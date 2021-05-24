@@ -5,13 +5,14 @@
  * @author Creston Bunch
  */
 import audioContext from '../audiocontext'
+import * as audioLibrary from '../audiolibrary'
 import esconsole from '../../esconsole'
 import * as ESUtils from '../../esutils'
 import * as userConsole from '../userconsole'
 
 app.factory('compiler',
-['pitchshifter','audioLibrary','$rootScope','$q',
-function compilerFactory(pitchshift,audioLibrary,$rootScope,$q) {
+['pitchshifter','$rootScope','$q',
+function compilerFactory(pitchshift,$rootScope,$q) {
     let testRun = false;
 
     /**
@@ -590,7 +591,7 @@ function compilerFactory(pitchshift,audioLibrary,$rootScope,$q) {
     }
 
     function getClipTempo(result) {
-        var metadata = audioLibrary.getCache();
+        var metadata = audioLibrary.cache;
         var tempoCache = {};
 
         result.tracks.forEach(function (track) {

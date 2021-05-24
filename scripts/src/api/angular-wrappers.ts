@@ -13,9 +13,6 @@ export default function ServiceWrapper() {
     var elem = angular.element(document.querySelector('[ng-controller]'));
     var injector = elem.injector();
 
-    // Load the audio library service outside angular
-    var ApiAudioLibrary = injector.get('audioLibrary');
-
     // Load the compiler service outside angular
     var ApiCompiler = injector.get('compiler');
 
@@ -32,7 +29,6 @@ export default function ServiceWrapper() {
     var ApiReader = injector.get('reader');
 
     return {
-        audioLibrary: ApiAudioLibrary as any,
         compiler: ApiCompiler as any,
         autograder: ApiAutograder as any,
         userProject: ApiUserProject as any,

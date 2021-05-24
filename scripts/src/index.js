@@ -120,7 +120,6 @@ require(['angular'], () => {
     require('reader');
     require('localStorage');
     require('userProject');
-    require('audioLibrary');
     require('websocket');
     require('collaboration');
     require('colorTheme');

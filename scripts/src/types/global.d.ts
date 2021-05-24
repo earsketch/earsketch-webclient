@@ -5,6 +5,7 @@
  **/
 
 declare var URL_DOMAIN: string;
+declare var URL_LOADAUDIO: string;
 declare var SITE_BASE_URI: string;
 declare var BUILD_NUM: string;
 declare var FLAGS: any;
@@ -25,6 +26,7 @@ declare var lamejs: any;
 // which is a nontrivial undertaking because of significant API changes.
 // (I spent some time of this and decided against it; we might just drop the d3 dependency anyway.)
 declare var d3: any;
+declare var Kali: any;
 
 declare module 'angular' {
     var element: any

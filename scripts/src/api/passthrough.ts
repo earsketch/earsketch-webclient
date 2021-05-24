@@ -6,6 +6,7 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 
 import * as applyEffects from "../model/applyeffects"
+import * as audioLibrary from "../app/audiolibrary"
 import esconsole from "../esconsole"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../app/userconsole"
@@ -475,7 +476,6 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
     }
 
     // load an angular service outside angular
-    const audioLibrary = ServiceWrapper().audioLibrary
     const compiler = ServiceWrapper().compiler
 
     const tempo = result.tempo
@@ -542,7 +542,6 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     }
 
     // load an angular service outside angular
-    const audioLibrary = ServiceWrapper().audioLibrary
     const compiler = ServiceWrapper().compiler
 
     // Cannot do this assertion within the async promise chain
@@ -670,9 +669,6 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         )
     }
 
-    // load an angular service outside angular
-    const audioLibrary = ServiceWrapper().audioLibrary
-
     // Cannot do this assertion within the async promise chain
     const sampleRate = audioLibrary.getSampleRate ? audioLibrary.getSampleRate() : 44100
     const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
@@ -729,9 +725,6 @@ export function dur(result: DAWData, fileKey: string) {
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
     ptCheckType("fileKey", "string", fileKey)
-
-    // load an angular service outside angular
-    const audioLibrary = ServiceWrapper().audioLibrary
 
     const q = result.quality
     return audioLibrary.getAudioClip(fileKey, result.tempo, q).then(
