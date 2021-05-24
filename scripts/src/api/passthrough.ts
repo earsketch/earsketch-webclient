@@ -6,6 +6,7 @@
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 
 import * as applyEffects from "../model/applyeffects"
+import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
 import esconsole from "../esconsole"
 import * as renderer from "../app/renderer"
@@ -483,7 +484,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
 
 
     const blockSize = 2048; // TODO: hardcoded in analysis.js as well
-    const sampleRate = audioLibrary.getSampleRate ? audioLibrary.getSampleRate() : 44100
+    const sampleRate = audioContext.sampleRate
     if (audioFile in result.slicedClips) {
         const sliceLength_measure = result.slicedClips[audioFile].end - result.slicedClips[audioFile].start
         const sliceLength_samp = sliceLength_measure * 4 * (60.0/tempo) * sampleRate
@@ -545,7 +546,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     const compiler = ServiceWrapper().compiler
 
     // Cannot do this assertion within the async promise chain
-    const sampleRate = audioLibrary.getSampleRate ? audioLibrary.getSampleRate() : 44100
+    const sampleRate = audioContext.sampleRate
     const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
     const endTimeInSamples = Math.round(sampleRate * measureToTime(endTime, result.tempo))
     const blockSize = 2048; // TODO: hardcoded in analysis.js as well
@@ -670,7 +671,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
     }
 
     // Cannot do this assertion within the async promise chain
-    const sampleRate = audioLibrary.getSampleRate ? audioLibrary.getSampleRate() : 44100
+    const sampleRate = audioContext.sampleRate
     const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
     const endTimeInSamples = Math.round(sampleRate * measureToTime(endTime, result.tempo))
     const blockSize = 2048; // TODO: hardcoded in analysis.js as well

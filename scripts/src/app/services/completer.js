@@ -44,12 +44,10 @@ app.factory('completer', ['$q', function completerFactory($q) {
 
       return $q.all([
           audioLibrary.getAudioTags(),
-          audioLibrary.getEffectTags(),
-          audioLibrary.getAnalysisTags(),
           audioLibrary.getAudioFolders()
       ]).then(function(result) {
           // wait for all promises to complete and concatenate their results
-          var resultMerge = new Set(result[0].concat(result[1], result[2], result[3], result[4]));
+          var resultMerge = new Set(result[0].concat(audioLibrary.EFFECT_TAGS, audioLibrary.ANALYSIS_TAGS, result[1]));
           var resultFilter = Array.from(resultMerge).sort().reverse();
           return resultFilter;
       }, function(err) {
