@@ -110,7 +110,7 @@ function compilerFactory($rootScope,$q) {
             var track = result.tracks[i];
 
             if (track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'] !== undefined) {
-                var p = pitchshift.asyncPitchshiftClips(track, result.tempo);
+                var p = pitchshift.pitchshiftClips(track, result.tempo);
 
                 promises.push(p);
                 p.then(function (track) {

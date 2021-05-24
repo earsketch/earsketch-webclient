@@ -112,7 +112,7 @@ const getEnvelopeForTrack = (track: Track, tempo: number) => {
 }
 
 // Pitchshift an audio buffer according to the points in bendinfo.
-function pitchshift(buffer: AudioBuffer, bendinfo: Point[]) {
+const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
     esconsole("PitchBend bendinfo from " + JSON.stringify(bendinfo), ["debug", "pitchshift"])
     const bypass = (bendinfo.length == 1) && (bendinfo[0].semitone == 0)
     if (bypass) {
@@ -139,6 +139,7 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         .map((point: Point) => Object.assign({}, point))
         .filter(point => point.type !== "add")
 
+    // TODO: What is the point of this `if` and the `for` loop after?
     if (env[env.length-2].sampletime === env[env.length-1].sampletime) {
         env[env.length-2].sampletime = env[env.length-3].sampletime
         env[env.length-2].semitone = env[env.length-3].semitone
@@ -150,73 +151,74 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         }
     }
 
+    // Replace points outside the clip with `null`.
     const pointsOrNullWithinClip = env.map(point => (point.sampletime >= clipStartInSamps && point.sampletime <= clipEndInSamps) ? point : null)
 
-    let fixedStart = false, fixedEnd = false
-
-    // TODO: Can this logic be simplified or split up?
-    pointsOrNullWithinClip.forEach((point, i) => {
-        if (!fixedStart) {
-            if (point) {
-                if (point.sampletime !== clipStartInSamps) {
-                    if (i % 2 === 1) {
-                        pointsOrNullWithinClip[i-1] = {
-                            sampletime: clipStartInSamps,
-                            semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipStartInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
-                            type: "start"
-                        }
-                    }
+    // Fix the start point for the clip by interpolating between the two points on either side of `clipStartInSamps`.
+    let i = 0
+    for (; i < pointsOrNullWithinClip.length; i++) {
+        const point = pointsOrNullWithinClip[i]
+        if (!point) continue
+        if (point.sampletime !== clipStartInSamps) {
+            if (i % 2 === 1) {  // TODO: what is the point of this condition?
+                pointsOrNullWithinClip[i-1] = {
+                    sampletime: clipStartInSamps,
+                    semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipStartInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
+                    type: "start"
                 }
-                fixedStart = true
-            }
-        } else if (!fixedEnd) {
-            if (!point) {
-                if (i % 2 === 1) {
-                    pointsOrNullWithinClip[i] = {
-                        sampletime: clipEndInSamps,
-                        semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipEndInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
-                        type: "end"
-                    }
-                }
-                fixedEnd = true
             }
         }
-    })
+        break
+    }
+
+    // Fix the end point for the clip by interpolating the two points on either side of `clipEndinSamps`.
+    for (; i < pointsOrNullWithinClip.length; i++) {
+        const point = pointsOrNullWithinClip[i]
+        if (point) continue
+        if (i % 2 === 1) {
+            pointsOrNullWithinClip[i] = {  // TODO: what is the point of this condition?
+                sampletime: clipEndInSamps,
+                semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipEndInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
+                type: "end"
+            }
+        }
+        break
+    }
 
     // Remove null values.
-    const pointsWithinClip = pointsOrNullWithinClip.filter(point => point !== null) as Point[]
+    const clipPoints = pointsOrNullWithinClip.filter(point => point !== null) as Point[]
 
-    for (const point of pointsWithinClip) {
+    for (const point of clipPoints) {
         point.sampletime -= clipStartInSamps
     }
 
-    if (pointsWithinClip.length > 0 && pointsWithinClip[0].sampletime > 0) {
-        pointsWithinClip.unshift({
+    if (clipPoints.length > 0 && clipPoints[0].sampletime > 0) {
+        clipPoints.unshift({
             sampletime: 0,
-            semitone: pointsWithinClip[0].semitone,
+            semitone: clipPoints[0].semitone,
             type: "start"
         })
-        pointsWithinClip.unshift({
-            sampletime: pointsWithinClip[0].sampletime-1,
-            semitone: pointsWithinClip[0].semitone,
+        clipPoints.unshift({
+            sampletime: clipPoints[0].sampletime-1,
+            semitone: clipPoints[0].semitone,
             type: "end"
         })
     }
 
-    if (pointsWithinClip.length > 0 && pointsWithinClip[pointsWithinClip.length-1].sampletime < clipLenInSamps) {
-        pointsWithinClip.push({
-            sampletime: pointsWithinClip[pointsWithinClip.length-1].sampletime+1,
-            semitone: pointsWithinClip[pointsWithinClip.length-1].semitone,
+    if (clipPoints.length > 0 && clipPoints[clipPoints.length-1].sampletime < clipLenInSamps) {
+        clipPoints.push({
+            sampletime: clipPoints[clipPoints.length-1].sampletime+1,
+            semitone: clipPoints[clipPoints.length-1].semitone,
             type: "start"
         })
-        pointsWithinClip.push({
+        clipPoints.push({
             sampletime: clipLenInSamps,
-            semitone: pointsWithinClip[pointsWithinClip.length-1].semitone,
+            semitone: clipPoints[clipPoints.length-1].semitone,
             type: "end"
         })
     }
 
-    if (!pointsWithinClip.length) {
+    if (!clipPoints.length) {
         let startSemitone: number, endSemitone: number
 
         for (let i = 0; i < env.length; i += 2) {
@@ -230,27 +232,27 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
                 startSemitone = endSemitone = env[i+1].semitone
             }
         }
-        pointsWithinClip.push({
+        clipPoints.push({
             sampletime: 0,
             semitone: startSemitone!,
             type: "start"
         })
-        pointsWithinClip.push({
+        clipPoints.push({
             sampletime: clipLenInSamps,
             semitone: endSemitone!,
             type: "end"
         })
     }
 
-
-    if (pointsWithinClip[pointsWithinClip.length-1].sampletime === pointsWithinClip[pointsWithinClip.length-2].sampletime) {
-        pointsWithinClip.length -= 2
+    if (clipPoints[clipPoints.length-1].sampletime === clipPoints[clipPoints.length-2].sampletime) {
+        clipPoints.length -= 2
     }
 
-    return pointsWithinClip
+    return clipPoints
 }
 
-export async function asyncPitchshiftClips(track: Track, tempo: number) {
+// TODO: Is there any reason for this to be async? It doesn't actually do anything async inside, and it's CPU-bound rather than IO-bound.
+export async function pitchshiftClips(track: Track, tempo: number) {
     if (track.clips.length == 0) {
         throw new RangeError("Cannot pitchshift an empty track")
     }
