@@ -2,6 +2,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
 import * as editor from '../editor/editorState';
 import * as tabs from '../editor/tabState';
+import * as cai from '../cai/caiState';
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
@@ -207,9 +208,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
         $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
         colorTheme.load();
-
-        // Used in CAI
-        $rootScope.$broadcast("swapTabAfterIDEinit");
     };
 
     
@@ -582,8 +580,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     }
                     
                     console.log("autograder", report);
+                    $ngRedux.dispatch(cai.compileCAI([result, language, code]));
 
-                    $rootScope.$broadcast('compileCAI', [result, language, code]);
                 }, 0);
             }
 
