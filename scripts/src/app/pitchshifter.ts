@@ -1,34 +1,36 @@
 // Pitch shift tracks during compilation.
-// "TODO: This service is only necessary until audio workers become implemented in all major browsers."
-// ^ Is this accurate, or still relevant?
-import ctx from './audiocontext'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
-import * as render from './renderer'
-import * as userConsole from './userconsole'
-import { Clip, EffectRange, Track } from './player'
+// Old comment: "TODO: This service is only necessary until audio workers become implemented in all major browsers."
+// I assume this is referring to the fact that with AudioWorklets, this can be done is real-time rather than ahead-of-time.
+// That raises the question: do we want to do this in real-time? Do we want the same algorithm?
+// (For example, it looks like Tone.js has a simple PitchShift that can be implemented with just stock Web Audio nodes.)
+import ctx from "./audiocontext"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
+import * as userConsole from "./userconsole"
+import { Clip, EffectRange, Track } from "./player"
 
 interface Point {
     sampletime: number
     semitone: number
-    type: 'start' | 'add' | 'end'
+    type: "start" | "add" | "end"
 }
 
-const QFRAMES = 16;
-let BUFFER_CACHE: { [key: string]: AudioBuffer } = {}; 
-const MAX_CACHE = 64; // increasing from 16 since we now process by clips instead of tracks
+const QFRAMES = 16
+let BUFFER_CACHE: { [key: string]: AudioBuffer } = {}
+const MAX_CACHE = 64  // increased from 16 since we now process by clips instead of tracks
 
+// Interpolate a list of automation points into an audio-rate array of semitones to shift by at each sample.
 const computeFrameEnvelope = (bendinfo: Point[], numFrames: number) => {
-    let findex = 1;
-    const envelope = new Float32Array(numFrames);
-    let deltaY, deltaX;
+    let findex = 1
+    const envelope = new Float32Array(numFrames)
+    let deltaY, deltaX
     for(let f = 0; f < numFrames; f++) {
         if ((findex < bendinfo.length) && (f > bendinfo[findex].sampletime)) {
-            findex++;
+            findex++
         }
 
         if (findex === bendinfo.length) {
-            envelope[f] = bendinfo[bendinfo.length-1].semitone;
+            envelope[f] = bendinfo[bendinfo.length-1].semitone
         } else {
             deltaY = bendinfo[findex].semitone - bendinfo[findex-1].semitone
             deltaX = bendinfo[findex].sampletime - bendinfo[findex-1].sampletime
@@ -36,58 +38,57 @@ const computeFrameEnvelope = (bendinfo: Point[], numFrames: number) => {
         }
 
     }
-    return envelope;
+    return envelope
 }
 
-//sample time in frames
-function addEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) {
+const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) => {
     const startPoint = {
         sampletime: Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / ESDSP_HOP_SIZE),
         semitone: effect.startValue,
-        type: 'start',
+        type: "start",
     } as Point
 
-    if ((jsarray.length > 0) && (startPoint.sampletime === jsarray[jsarray.length - 1].sampletime)) {
-        jsarray[jsarray.length - 1].sampletime = jsarray[jsarray.length - 1].sampletime - QFRAMES;
+    if ((points.length > 0) && (startPoint.sampletime === points[points.length - 1].sampletime)) {
+        points[points.length - 1].sampletime = points[points.length - 1].sampletime - QFRAMES
     }
 
-    if ((jsarray.length == 0) && (startPoint.sampletime > 0)) {
+    if ((points.length == 0) && (startPoint.sampletime > 0)) {
         if (startPoint.sampletime > 0) {
-            jsarray.push({
+            points.push({
                 sampletime: 0,
                 semitone: 0,
-                type: 'add',
+                type: "add",
             })
         }
 
         if (startPoint.sampletime > QFRAMES) {
-            jsarray.push({
+            points.push({
                 sampletime: startPoint.sampletime - QFRAMES,
                 semitone: 0,
-                type: 'add',
+                type: "add",
             })
         }
     }
 
-    if ((jsarray.length > 0) && (jsarray[jsarray.length - 1].sampletime < 0)) {
-        jsarray[jsarray.length - 1].sampletime = startPoint.sampletime - QFRAMES;
+    if ((points.length > 0) && (points[points.length - 1].sampletime < 0)) {
+        points[points.length - 1].sampletime = startPoint.sampletime - QFRAMES
     }
 
     // Mysterious old comment: "if   ((jsarray.length > 0) && (jsarray[jsarray.length -1].type == 'end')"
-    if ((jsarray.length > 0) && ((startPoint.sampletime - QFRAMES) > jsarray[jsarray.length - 1].sampletime)) {
-        jsarray.push({
+    if ((points.length > 0) && ((startPoint.sampletime - QFRAMES) > points[points.length - 1].sampletime)) {
+        points.push({
             sampletime: startPoint.sampletime - QFRAMES,
-            semitone: jsarray[jsarray.length - 1].semitone,
-            type: 'add',
+            semitone: points[points.length - 1].semitone,
+            type: "add",
         })
     }
 
-    jsarray.push(startPoint)
+    points.push(startPoint)
 
     const endPoint = {
         sampletime: Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / ESDSP_HOP_SIZE),
         semitone: effect.endValue,
-        type: 'end',
+        type: "end",
     } as Point
 
     if (endPoint.sampletime == 0) {
@@ -95,143 +96,66 @@ function addEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) 
         endPoint.semitone = startPoint.semitone
     }
     if (endPoint.sampletime > 0) {
-        jsarray.push(endPoint)
+        points.push(endPoint)
     }
 }
 
-/**
- * Find envelope points for a single track.
- */
-function processPitchshift(track: Track, tempo: number) {
-    const jsonArray: Point[] = [];
-    if (track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'] !== undefined) {
-        //Compute envelope information
-        for (var i=0; i<track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'].length; i++) {
-            var effect = track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'][i];
-            addEnvelopePoint(jsonArray , effect, tempo);
+const getEnvelopeForTrack = (track: Track, tempo: number) => {
+    const points: Point[] = []
+    if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
+        // Compute envelope information
+        for (const effect of track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]) {
+            addEnvelopePoint(points, effect, tempo)
         }
     }
-    return jsonArray;
+    return points
 }
 
-
-function BufferPitchShift(audiobuffer: AudioBuffer, bendinfo: Point[]) {
-    esconsole('PitchBend bendinfo from ' + JSON.stringify(bendinfo), ['DEBUG','PITCHSHIFT']);
-    var NFrames = computeNumberOfFrames(audiobuffer.length);
-    var frameenvelope = computeFrameEnvelope(bendinfo, NFrames);
-    var buffer;
-    var bypass = false;
-    if ((bendinfo.length == 1) && (bendinfo[0].semitone == 0)) {
-        bypass = true;
-    }
-    //first case
+// Pitchshift an audio buffer according to the points in bendinfo.
+function pitchshift(buffer: AudioBuffer, bendinfo: Point[]) {
+    esconsole("PitchBend bendinfo from " + JSON.stringify(bendinfo), ["debug", "pitchshift"])
+    const bypass = (bendinfo.length == 1) && (bendinfo[0].semitone == 0)
     if (bypass) {
-        esconsole('First Case PITCHSHIFT - Bypass', ['DEBUG','PITCHSHIFT']);
-        buffer = ctx.createBuffer(audiobuffer.numberOfChannels, audiobuffer.length , audiobuffer.sampleRate);
-        buffer.copyToChannel(audiobuffer.getChannelData(0),0,0);
-        return buffer;
-    } else {
-        var pcmdata =  audiobuffer.getChannelData(0);
-        buffer = computePitchShift(pcmdata, frameenvelope, ctx);
-        esconsole('Pitchshift done with a buffer length of ' + buffer.length, ['DEBUG','PITCHSHIFT']);
-        return buffer;
+        esconsole("Bypassing pitchshift", ["debug", "pitchshift"])
+        // TODO: Is this copy necessary?
+        const outBuffer = ctx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate)
+        outBuffer.copyToChannel(buffer.getChannelData(0), 0, 0)
+        return outBuffer
     }
+    const numFrames = computeNumberOfFrames(buffer.length)
+    const frameEnvelope = computeFrameEnvelope(bendinfo, numFrames)
+    const outBuffer = computePitchShift(buffer.getChannelData(0), frameEnvelope, ctx)
+    esconsole("Pitchshift done with a buffer length of " + outBuffer.length, ["debug", "pitchshift"])
+    return outBuffer
 }
 
-    /**
- * Asynchronously render the pitchshifted form of a track and put the
- * pitchshifted audio buffer into each clip separately. Each clip will
- * end up with pitchshift.audio, pitchshift.start, and pitchshift.end
- * properties.
- *
- * @param {object} track The track to pitchshift.
- * @param {number} tempo The tempo of the track.
- * @returns Promise A promise that resolves to the new track where each
- * pitchshifted clip has new pitchshifted information.
- */
-export function asyncPitchshiftTrack(track: Track, tempo: number) {
-
-    var promise = new Promise(function (resolve, reject) {
-        if (track.clips.length == 0) {
-            reject(new RangeError('Cannot pitchshift an empty track'));
-        }
-        var bendinfo = processPitchshift(track, tempo);
-
-        render.mergeClips(track.clips, tempo).then(function (buffer: AudioBuffer) {
-            var shiftedBuffer;
-
-            var hashKey = JSON.stringify(track);
-
-            if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
-                BUFFER_CACHE = {};
-            }
-
-            if (BUFFER_CACHE.hasOwnProperty(hashKey)) {
-                esconsole('Using Cache ', ['DEBUG','PITCHSHIFT']);
-                shiftedBuffer = BUFFER_CACHE[hashKey];
-            } else {
-                esconsole('Computing Shift ', ['DEBUG','PITCHSHIFT']);
-                shiftedBuffer = BufferPitchShift(buffer, bendinfo);
-                BUFFER_CACHE[hashKey] = shiftedBuffer;
-            }
-            
-
-            // insert the shifted audio buffer and the times to start and
-            // end in the buffer as a new clip.pitchshift object
-            // TODO: slice a copy of the Float32Array into the old
-            // audio buffer?
-            for (var i = 0; i < track.clips.length; i++) {
-                var clip = track.clips[i];
-                var pitchshift = {
-                    audio: shiftedBuffer,
-                    start: clip.measure + clip.start - 1,
-                    end: clip.measure + clip.end - 1,
-                };
-                clip.pitchshift = pitchshift;
-            }
-
-            resolve(track);
-        }).catch(function (e) {
-            // esconsole(e, ['ERROR','PITCHSHIFT']);
-            console.error(e);
-        });
-    });
-
-    return promise;
-}
-
-function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: Point[]) {
-    var clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / ESDSP_HOP_SIZE);
-    var clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end-clip.start), tempo) * 44100 / ESDSP_HOP_SIZE);
-    var clipLenInSamps = clipEndInSamps - clipStartInSamps;
+const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) => {
+    const clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / ESDSP_HOP_SIZE)
+    const clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end-clip.start), tempo) * 44100 / ESDSP_HOP_SIZE)
+    const clipLenInSamps = clipEndInSamps - clipStartInSamps
 
     // clone the env-point-object array
-    var env = trackBendEnv.map(function (point: Point) {
-        return Object.assign({}, point);
-    });
-
-    env = env.filter(function (point) {
-        return point.type !== 'add';
-    });
+    const env = trackEnvelope
+        .map((point: Point) => Object.assign({}, point))
+        .filter(point => point.type !== "add")
 
     if (env[env.length-2].sampletime === env[env.length-1].sampletime) {
-        env[env.length-2].sampletime = env[env.length-3].sampletime;
-        env[env.length-2].semitone = env[env.length-3].semitone;
+        env[env.length-2].sampletime = env[env.length-3].sampletime
+        env[env.length-2].semitone = env[env.length-3].semitone
     }
 
-    for (var i = 1; i < env.length; i++) {
+    for (let i = 1; i < env.length; i++) {
         if (env[i].sampletime <= env[i-1].sampletime) {
-            env[i].sampletime = env[i-1].sampletime + 1;
+            env[i].sampletime = env[i-1].sampletime + 1
         }
     }
 
-    var pointsOrNullWithinClip = env.map(function (point) {
-        return (point.sampletime >= clipStartInSamps && point.sampletime <= clipEndInSamps) ? point : null;
-    });
+    const pointsOrNullWithinClip = env.map(point => (point.sampletime >= clipStartInSamps && point.sampletime <= clipEndInSamps) ? point : null)
 
-    var fixedStart = false, fixedEnd = false;
+    let fixedStart = false, fixedEnd = false
 
-    pointsOrNullWithinClip.forEach(function (point, i) {
+    // TODO: Can this logic be simplified or split up?
+    pointsOrNullWithinClip.forEach((point, i) => {
         if (!fixedStart) {
             if (point) {
                 if (point.sampletime !== clipStartInSamps) {
@@ -239,12 +163,11 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: Point[]) 
                         pointsOrNullWithinClip[i-1] = {
                             sampletime: clipStartInSamps,
                             semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipStartInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
-                            type: 'start'
-                        };
+                            type: "start"
+                        }
                     }
                 }
-
-                fixedStart = true;
+                fixedStart = true
             }
         } else if (!fixedEnd) {
             if (!point) {
@@ -252,132 +175,123 @@ function interpolateEnvPoints(clip: Clip, tempo: number, trackBendEnv: Point[]) 
                     pointsOrNullWithinClip[i] = {
                         sampletime: clipEndInSamps,
                         semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipEndInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
-                        type: 'end'
-                    };
+                        type: "end"
+                    }
                 }
-
-                fixedEnd = true;
+                fixedEnd = true
             }
         }
-    });
+    })
 
-    // remove null values
-    const pointsWithinClip = pointsOrNullWithinClip.filter(function (point) {
-        return !!point;
-    }) as Point[];
+    // Remove null values.
+    const pointsWithinClip = pointsOrNullWithinClip.filter(point => point !== null) as Point[]
 
-    pointsWithinClip.forEach(function (point) {
-        point.sampletime -= clipStartInSamps;
-    });
+    for (const point of pointsWithinClip) {
+        point.sampletime -= clipStartInSamps
+    }
 
     if (pointsWithinClip.length > 0 && pointsWithinClip[0].sampletime > 0) {
         pointsWithinClip.unshift({
             sampletime: 0,
             semitone: pointsWithinClip[0].semitone,
-            type: 'start'
-        });
+            type: "start"
+        })
         pointsWithinClip.unshift({
             sampletime: pointsWithinClip[0].sampletime-1,
             semitone: pointsWithinClip[0].semitone,
-            type: 'end'
-        });
+            type: "end"
+        })
     }
 
     if (pointsWithinClip.length > 0 && pointsWithinClip[pointsWithinClip.length-1].sampletime < clipLenInSamps) {
         pointsWithinClip.push({
             sampletime: pointsWithinClip[pointsWithinClip.length-1].sampletime+1,
             semitone: pointsWithinClip[pointsWithinClip.length-1].semitone,
-            type: 'start'
-        });
+            type: "start"
+        })
         pointsWithinClip.push({
             sampletime: clipLenInSamps,
             semitone: pointsWithinClip[pointsWithinClip.length-1].semitone,
-            type: 'end'
-        });
+            type: "end"
+        })
     }
 
     if (!pointsWithinClip.length) {
-        let startSemitone: number, endSemitone: number;
+        let startSemitone: number, endSemitone: number
 
-        for (var i = 0; i < env.length; i += 2) {
+        for (let i = 0; i < env.length; i += 2) {
             if (i === 0 && clipEndInSamps < env[i].sampletime) {
-                startSemitone = endSemitone = env[i].semitone;
+                startSemitone = endSemitone = env[i].semitone
             } else if (clipStartInSamps > env[i].sampletime && clipEndInSamps < env[i+1].sampletime) {
                 // linear interpolation
-                startSemitone = (env[i+1].semitone - env[i].semitone) * (clipStartInSamps - env[i].sampletime) / (env[i+1].sampletime - env[i].sampletime) + env[i].semitone;
-                endSemitone = (env[i+1].semitone - env[i].semitone) * (clipEndInSamps - env[i].sampletime) / (env[i+1].sampletime - env[i].sampletime) + env[i].semitone;
+                startSemitone = (env[i+1].semitone - env[i].semitone) * (clipStartInSamps - env[i].sampletime) / (env[i+1].sampletime - env[i].sampletime) + env[i].semitone
+                endSemitone = (env[i+1].semitone - env[i].semitone) * (clipEndInSamps - env[i].sampletime) / (env[i+1].sampletime - env[i].sampletime) + env[i].semitone
             } else if (i === env.length-2 && clipStartInSamps > env[i+1].sampletime) {
-                startSemitone = endSemitone = env[i+1].semitone;
+                startSemitone = endSemitone = env[i+1].semitone
             }
         }
-
         pointsWithinClip.push({
             sampletime: 0,
             semitone: startSemitone!,
-            type: 'start'
-        });
+            type: "start"
+        })
         pointsWithinClip.push({
             sampletime: clipLenInSamps,
             semitone: endSemitone!,
-            type: 'end'
-        });
+            type: "end"
+        })
     }
 
 
     if (pointsWithinClip[pointsWithinClip.length-1].sampletime === pointsWithinClip[pointsWithinClip.length-2].sampletime) {
-        pointsWithinClip.length -= 2;
+        pointsWithinClip.length -= 2
     }
 
-    return pointsWithinClip;
+    return pointsWithinClip
 }
 
-export function asyncPitchshiftClips(track: Track, tempo: number) {
-    return new Promise(function (resolve, reject) {
-        if (track.clips.length == 0) {
-            reject(new RangeError('Cannot pitchshift an empty track'));
-        }
+export async function asyncPitchshiftClips(track: Track, tempo: number) {
+    if (track.clips.length == 0) {
+        throw new RangeError("Cannot pitchshift an empty track")
+    }
 
-        // TODO: trackBendEnv looks broken with high-density automation
-        var trackBendEnv = processPitchshift(track, tempo);
+    // TODO: This looks broken with high-density automation
+    const trackEnvelope = getEnvelopeForTrack(track, tempo)
 
-        if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
-            BUFFER_CACHE = {};
-        }
+    if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
+        BUFFER_CACHE = {}
+    }
 
-        track.clips.forEach(function (clip) {
-            var shiftedBuffer;
-            var bendinfo = interpolateEnvPoints(clip, tempo, trackBendEnv);
+    for (const clip of track.clips) {
+        let shiftedBuffer
+        const bendinfo = getEnvelopeForClip(clip, tempo, trackEnvelope)
+        const hashKey = JSON.stringify({
+            clip: [clip.filekey, clip.start, clip.end],
+            bendinfo: bendinfo
+        })
 
-            var hashKey = JSON.stringify({
-                clip: [clip.filekey, clip.start, clip.end],
-                bendinfo: bendinfo
-            });
-
-            if (BUFFER_CACHE.hasOwnProperty(hashKey)) {
-                esconsole('Using Cache ', ['DEBUG','PITCHSHIFT']);
-                shiftedBuffer = BUFFER_CACHE[hashKey];
-            } else {
-                esconsole('Computing Shift ', ['DEBUG','PITCHSHIFT']);
-                try {
-                    shiftedBuffer = BufferPitchShift(clip.audio, bendinfo);
-                } catch (err) {
-                    esconsole('PitchShift Buffer not processed ', ['DEBUG','PITCHSHIFT']);
-                    esconsole(err, ['ERROR', 'PITCHSHIFT']);
-                    userConsole.error('Error processing ' + clip.filekey);
-                    throw err;
-                }
-                BUFFER_CACHE[hashKey] = shiftedBuffer;
+        if (BUFFER_CACHE.hasOwnProperty(hashKey)) {
+            esconsole("Using Cache ", ["debug", "pitchshift"])
+            shiftedBuffer = BUFFER_CACHE[hashKey]
+        } else {
+            esconsole("Computing Shift ", ["debug", "pitchshift"])
+            try {
+                shiftedBuffer = pitchshift(clip.audio, bendinfo)
+            } catch (err) {
+                esconsole("PitchShift Buffer not processed ", ["debug", "pitchshift"])
+                esconsole(err, ["ERROR", "PITCHSHIFT"])
+                userConsole.error("Error processing " + clip.filekey)
+                throw err
             }
+            BUFFER_CACHE[hashKey] = shiftedBuffer
+        }
 
-            clip.pitchshift =  {
-                audio: shiftedBuffer,
-                start: clip.start,
-                end: clip.end
-            };
-        });
+        clip.pitchshift =  {
+            audio: shiftedBuffer,
+            start: clip.start,
+            end: clip.end
+        }
+    }
 
-        resolve(track);
-    }).catch(function (err) {
-        throw err;
-    });
+    return track
 }
