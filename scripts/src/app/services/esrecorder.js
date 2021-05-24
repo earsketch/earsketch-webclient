@@ -438,7 +438,7 @@ app.service('RecorderService', ['$rootScope', 'userProject', function ($rootScop
         blob.lastModifiedDate = new Date();
 
         // get the files with default name pattern (USER_SOUND_num.wav)
-        var def = audioLibrary.cache.filter(function (item) {
+        var def = audioLibrary.cache.sounds.filter(function (item) {
             return item.file_key.match(new RegExp(userProject.getUsername().toUpperCase() + '_SOUND_\\d+'));
         });
         // get the number portion and list them in descending order

@@ -591,7 +591,7 @@ function compilerFactory(pitchshift,$rootScope,$q) {
     }
 
     function getClipTempo(result) {
-        var metadata = audioLibrary.cache;
+        var metadata = audioLibrary.cache.sounds;
         var tempoCache = {};
 
         result.tracks.forEach(function (track) {

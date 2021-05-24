@@ -1,28 +1,25 @@
-/**
- * An Angular factor service for fetching audio clips from the EarSketch
- * library.
- *
- * TODO: Angular $http uses Angular $q promises, which are not compatible with
- * native ECMAScript 6 Promises. Maybe one day they will be? I.e.
- * $q.all() and Promise.all() will not let you interchange promise types. At
- * least in unit tests. It seems to work in the browser. I have no idea why.
- * I used $q everywhere in this library so we could unit test this service.
- *
- * @module audioLibrary
- * @author Creston Bunch
- */
+
+// Fetch audio clips and metadata from the EarSketch library.
+// TODO: Fix this module's nomenclature problem, between "tags", "folders", "keys", and "tag metadata".
 import ctx from "./audiocontext"
 import esconsole from "../esconsole"
-import * as helpers from "../helpers"
 
 type AugmentedBuffer = AudioBuffer & { filekey: string }
 
-let SOUND_CACHE: any[] = []
-export { SOUND_CACHE as cache }
-// TODO: Eliminate CLIP_CACHE; PROMISE_CACHE can already do this (individual promises cache their results).
-let CLIP_CACHE: { [key: string]: any } = {}
-const PROMISE_CACHE: { [key: string]: Promise<any> } = {}
-const SLICED_CLIP_CACHE: { [key: string]: AugmentedBuffer } = {}
+export const cache = {
+    audioTags: null as string[] | null,
+    userAudioTags: null as string[] | null,
+    audioFolders: null as string[] | null,
+    defaultAudioFolders: null as string[] | null,
+    userAudioFolders: null as string[] | null,
+    defaultTags: null as string[] | null,
+    userTags: {} as { [key: string]: string[] | undefined },
+    sounds: [] as any[],
+    // Eliminate this: individual promises cache their results.
+    clips: {} as { [key: string]: any },
+    slicedClips: {} as { [key: string]: AugmentedBuffer },
+    promises: {} as { [key: string]: Promise<any> },
+}
 
 // TODO: These don't belong in this module.
 export const EFFECT_TAGS = [
@@ -46,36 +43,33 @@ export const ANALYSIS_TAGS = ["SPECTRAL_CENTROID", "RMS_AMPLITUDE"]
 export function getAudioClip(filekey: string, tempo: number, quality: boolean=false) {
     const cacheKey = [filekey, tempo, quality].toString()
 
-    if (cacheKey in PROMISE_CACHE) {
-        return PROMISE_CACHE[cacheKey]
+    if (cacheKey in cache.promises) {
+        return cache.promises[cacheKey]
     } else {
-        return PROMISE_CACHE[cacheKey] = _getAudioClip(filekey, tempo, quality)
+        return cache.promises[cacheKey] = _getAudioClip(filekey, tempo, quality)
     }
 }
 
 async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
-    const $http = helpers.getNgService("$http")
-
     const cacheKey = [filekey, tempo, quality].toString()
 
-    if (cacheKey in CLIP_CACHE) {
-        // this clip has already been downloaded
-        return CLIP_CACHE[cacheKey]
-    } else if (cacheKey in SLICED_CLIP_CACHE) {
-        const slicedBuffer = SLICED_CLIP_CACHE[cacheKey]
+    if (cacheKey in cache.clips) {
+        return cache.clips[cacheKey]
+    } else if (cacheKey in cache.slicedClips) {
+        const slicedBuffer = cache.slicedClips[cacheKey]
         slicedBuffer.filekey = filekey
         return slicedBuffer
     }
 
     esconsole("Loading audio clip with filekey: " + filekey, ["debug", "audiolibrary"])
-    const url = FLAGS.USE_CLIENT_TS ? URL_DOMAIN+"/services/audio/getunstretchedsample" : URL_LOADAUDIO
     const params = FLAGS.USE_CLIENT_TS ? {
         key: filekey
     } : {
         key: filekey,
         tempo: tempo,
         audioquality: quality ? 1 : 0
-    }
+    } as { [key: string]: any }
+    const url = (FLAGS.USE_CLIENT_TS ? URL_DOMAIN+"/services/audio/getunstretchedsample" : URL_LOADAUDIO) + "?" + new URLSearchParams(params)
     let clipOrigTempo = -1
 
     // STEP 1: check if audio key exists
@@ -94,11 +88,9 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
 
     // STEP 2: Ask the server for the audio file
     esconsole(`Getting ${filekey} buffer from server`, ["debug", "audiolibrary"])
+    let data
     try {
-        result = await $http.get(url, {
-            params: params,
-            responseType: "arraybuffer"
-        })
+        data = await (await fetch(url)).arrayBuffer()
     } catch (err) {
         esconsole("Error getting " + filekey + " from the server", ["error", "audiolibrary"])
         const status = err.status
@@ -115,7 +107,7 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
     esconsole(`Decoding ${filekey} buffer`, ["debug", "audiolibrary"])
     let buffer
     try {
-        buffer = await ctx.decodeAudioData(result.data)
+        buffer = await ctx.decodeAudioData(data)
     } catch (err) {
         esconsole("Error decoding audio clip: " + filekey, ["error", "audiolibrary"])
         throw err
@@ -169,59 +161,61 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
 
     // STEP 4: return the decoded audio buffer
     if (FLAGS.CACHE_TS_RESULTS) {
-        CLIP_CACHE[cacheKey] = buffer
+        cache.clips[cacheKey] = buffer
     }
     // add a filekey property to the buffer so we can
     // figure out where it came from later
     (buffer as AugmentedBuffer).filekey = filekey
     // remove this promise from the cache since it"s
     // been resolved
-    delete PROMISE_CACHE[cacheKey]
+    delete cache.promises[cacheKey]
 
     esconsole("Returning buffer", ["debug", "audiolibrary"])
     return buffer
 }
 
 export function cacheSlicedClip(fileKey: string, tempo: number, quality: boolean, buffer: AugmentedBuffer) {
-    SLICED_CLIP_CACHE[[fileKey, tempo, quality].toString()] = buffer
+    cache.slicedClips[[fileKey, tempo, quality].toString()] = buffer
 }
 
-// Get the list of audio tag names.
+// Get the list of audio tag names. (TODO: Doesn't this return a list of file keys?)
 export async function getAudioTags() {
+    if (cache.audioTags !== null) {
+        return cache.audioTags
+    }
     const url = URL_DOMAIN + "/services/audio/getaudiotags"
     esconsole("Fetching audio tags", ["debug", "audiolibrary"])
-    const $http = helpers.getNgService("$http")
     try {
-        const result = await $http.get(url, {cache: true})
-        // return only a list of file keys
+        const data = await (await fetch(url)).json()
         const output = []
-        for (const key in result.data.audioTags) {
-            const tag = result.data.audioTags[key]
+        for (const key in data.audioTags) {
+            const tag = data.audioTags[key]
             output.push(tag.file_key)
         }
         esconsole("Found audio tags", ["debug", "audiolibrary"])
-        return output
+        return cache.audioTags = output
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
     }
 }
 
-// Get the list of ALL user-submitted audio tags.
+// Get the list of ALL user-submitted audio tags. (TODO: Doesn't this return a list of file keys?)
 export async function getUserAudioTags() {
+    if (cache.userAudioTags !== null) {
+        return cache.userAudioTags
+    }
     const url = URL_DOMAIN + "/services/audio/getaudiokeys?tag="
-    esconsole("Fetching audio keys", ["debug","audiolibrary"])
-    const $http = helpers.getNgService("$http")
+    esconsole("Fetching audio keys", ["debug", "audiolibrary"])
     try {
-        const result = await $http.get(url, {cache: true})
-        // return only a list of file keys
+        const data = await (await fetch(url)).json()
         const output = []
-        for (const key in result.data.smallAudioFile) {
-            const tag = result.data.smallAudioFile[key]
+        for (const key in data.smallAudioFile) {
+            const tag = data.smallAudioFile[key]
             output.push(tag.file_key)
         }
         esconsole("Found audio keys", ["debug", "audiolibrary"])
-        return output
+        return cache.userAudioTags = output
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -231,36 +225,38 @@ export async function getUserAudioTags() {
 // Clears the audio tag cache.
 export function clearAudioTagCache() {
     esconsole("Clearing the audio tag cache", ["debug", "audiolibrary"])
-    // doesn't seem to be working... using removeAll() instead
-    // $cacheFactory.get("$http").remove(URL_DOMAIN + "/services/audio/getaudiotags")
-    // $cacheFactory.get("$http").remove(URL_DOMAIN + "/services/audio/getaudiokeys?tag="); // user audio tags
-    const $cacheFactory = helpers.getNgService("$cacheFactory")
-    $cacheFactory.get("$http").removeAll()
-    SOUND_CACHE = []
-    CLIP_CACHE = []; // this might be overkill, but otherwise deleted / renamed clip cache is still accessible
+    cache.audioTags = null
+    cache.userAudioTags = null
+    cache.audioFolders = null
+    cache.defaultAudioFolders = null
+    cache.userAudioFolders = null
+    cache.defaultTags = null
+    cache.userTags = {}
+    cache.sounds = []
+    cache.clips = []  // this might be overkill, but otherwise deleted / renamed clip cache is still accessible
 }
 
 // Get a list of folder keys. NOTE: This is very inefficient. Prefer using getDefaultAudioFolders and getUserAudioFolders WS.
 export async function getAudioFolders() {
-    const url = URL_DOMAIN + "/services/audio/getaudiokeys?tag="
+    if (cache.audioFolders !== null) {
+        return cache.audioFolders
+    }
     esconsole("Fetching audio folders", ["debug", "audiolibrary"])
-    const $http = helpers.getNgService("$http")
     try {
-        const result = await $http.get(url, {cache: true})
+        const data = await (await fetch(URL_DOMAIN + "/services/audio/getaudiokeys?tag=")).json()
         // return only a list of file keys
         const output = []
-        for (const key in result.data.smallAudioFile) {
-            const file = result.data.smallAudioFile[key]
-            if (file.scope === 0) { continue; }
+        for (const file of Object.values(data.smallAudioFile) as any[]) {
+            if (file.scope === 0) continue
             const str = file.tags.toUpperCase()
             const tokens = str.split("__")
             // TODO: this token business is confusing
             output.push(tokens[0])
             output.push(tokens[tokens.length-1])
-            output.push(str.substr(str.indexOf("__")+2, str.length))
+            output.push(str.substr(str.indexOf("__") + 2, str.length))
         }
         esconsole("Found audio folders", ["debug", "audiolibrary"])
-        return output
+        return cache.audioFolders = output
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -268,13 +264,14 @@ export async function getAudioFolders() {
 }
 
 async function getDefaultAudioFolders() {
-    const url = URL_DOMAIN + "/services/audio/getdefaultaudiofolders"
+    if (cache.defaultAudioFolders !== null) {
+        return cache.defaultAudioFolders
+    }
     esconsole("Fetching default audio folders", ["debug", "audiolibrary"])
-    const $http = helpers.getNgService("$http")
     try {
-        const result = await $http.get(url, {cache: true})
+        const data = await (await fetch(URL_DOMAIN + "/services/audio/getdefaultaudiofolders")).json()
         esconsole("Found default audio folders", ["debug", "audiolibrary"])
-        return result.data
+        return cache.defaultAudioFolders = data
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -282,13 +279,14 @@ async function getDefaultAudioFolders() {
 }
 
 async function getUserAudioFolders() {
-    const url = URL_DOMAIN + "/services/audio/getuseraudiofolders"
+    if (cache.userAudioFolders !== null) {
+        return cache.userAudioFolders
+    }
     esconsole("Fetching all the user audio folders", ["debug", "audiolibrary"])
-    const $http = helpers.getNgService("$http")
     try {
-        const result = await $http.get(url, {cache: true})
+        const data = await (await fetch(URL_DOMAIN + "/services/audio/getuseraudiofolders")).json()
         esconsole("Found user audio folders", ["debug", "audiolibrary"])
-        return result.data
+        return cache.userAudioFolders = data
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -312,7 +310,7 @@ export async function getDefaultTags() {
     esconsole("Fetching default tags", ["debug", "audiolibrary"])
     try {
         const result = await Promise.all([getDefaultAudioFolders(), getUserAudioFolders()])
-        // TODO: "getUserAudioFolders() cannot be cached. Separate it?"
+        // Old comment; still relevant? "TODO: getUserAudioFolders() cannot be cached. Separate it?"
         esconsole("Fetched all tags.", ["debug", "audiolibrary"])
         return EFFECT_TAGS.concat(ANALYSIS_TAGS, result[0], result[1])
     } catch (err) {
@@ -322,16 +320,14 @@ export async function getDefaultTags() {
 }
 
 export async function getDefaultTagsMetadata() {
+    if (cache.defaultTags !== null) {
+        return cache.defaultTags
+    }
     esconsole("Fetching default sounds tag metadata", ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/services/audio/getdefaultaudiotags"
-    const opts = {cache: true}
-
-    const $http = helpers.getNgService("$http")
     try {
-        const result = await $http.get(url, opts)
+        const data = await (await fetch(URL_DOMAIN + "/services/audio/getdefaultaudiotags")).json()
         esconsole("Found audio tags", ["debug", "audiolibrary"])
-        SOUND_CACHE = result.data
-        return result.data
+        return cache.defaultTags = cache.sounds = data
     } catch (err) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
         throw err
@@ -339,15 +335,15 @@ export async function getDefaultTagsMetadata() {
 }
 
 export async function getUserTagsMetadata(username: string) {
+    if (cache.userTags[username] !== undefined) {
+        return cache.userTags[username]
+    }
     esconsole("Fetching user sounds tag metadata for " + username, ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/services/audio/getuseraudiotags"
-    const opts = {cache: false, params: {"username": username}}
-    const $http = helpers.getNgService("$http")
+    const url = URL_DOMAIN + "/services/audio/getuseraudiotags?" + new URLSearchParams({ username })
     try {
-        const result = await $http.get(url, opts)
+        const data = await (await fetch(url)).json()
         esconsole("Found audio tags", ["debug", "audiolibrary"])
-        SOUND_CACHE = result.data
-        return result.data
+        return cache.userTags[username] = cache.sounds = data
     } catch (err) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
         throw err
@@ -356,14 +352,14 @@ export async function getUserTagsMetadata(username: string) {
 
 export async function verifyClip(name: string) {
     esconsole("Verifying the presence of audio clip for " + name, ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/services/audio/verifyclip"
-    const opts = {
-        cache: false,
-        params: {
-            key: name
-        }
+    const url = URL_DOMAIN + "/services/audio/verifyclip?" + new URLSearchParams({ key: name })
+    const response = await fetch(url)
+    const text = await response.text()
+    if (!text) {
+        // Server returns 200 OK + empty string for invalid keys, which breaks JSON parsing.
+        // TODO: Server should return a more reasonable response. (Either an HTTP error code or a valid JSON object such as `null`.)
+        return null
     }
-    const $http = helpers.getNgService("$http")
-    const result = await $http.get(url, opts)
-    return result.data.hasOwnProperty("file_key") ? result.data : null
+    const data = JSON.parse(text)
+    return "file_key" in data ? data : null
 }
