@@ -84,7 +84,6 @@ module.exports = {
             // Models
             compiler: path.resolve(__dirname,`${servicesDir}/compiler.js`),
             reader: path.resolve(__dirname,`${servicesDir}/reader.js`),
-            pitchShifter: path.resolve(__dirname,`${servicesDir}/pitchshifter.js`),
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),

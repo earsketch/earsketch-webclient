@@ -220,7 +220,6 @@ require('collaboration');
 require('colorTheme');
 require('timesync');
 require('compiler');
-require('pitchShifter');
 require('uploader');
 require('completer');
 require('exporter');

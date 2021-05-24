@@ -18,6 +18,11 @@ declare var ESCurr_SearchDoc: {
     text: string
 }[];
 
+// TODO: Add these types directly to earsketch-appdsp.js and make it a module.
+declare var ESDSP_HOP_SIZE: number
+declare var computeNumberOfFrames: (samples: number) => number
+declare var computePitchShift: (data: Float32Array, envelope: Float32Array, context: AudioContext) => AudioBuffer
+
 declare var app: any;
 declare var hljs: any;
 declare var Hilitor: any;

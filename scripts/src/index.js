@@ -124,7 +124,6 @@ require(['angular'], () => {
     require('collaboration');
     require('colorTheme');
     require('compiler');
-    require('pitchShifter');
     require('uploader');
     require('completer');
     require('exporter');
