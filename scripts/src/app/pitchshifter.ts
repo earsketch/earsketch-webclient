@@ -40,7 +40,7 @@ function computeFrameEnvelope(bendinfo: any, NumberOfFrames: number) {
 function AddEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) {
     var startPoint: Point = {};
     startPoint.sampletime = Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / ESDSP_HOP_SIZE);
-    startPoint.semitone = effect.startValue / 100.0;
+    startPoint.semitone = effect.startValue;
     startPoint.type = 'start';
 
     if ((jsarray.length > 0 ) && (startPoint.sampletime == jsarray[jsarray.length - 1].sampletime)) {
@@ -86,7 +86,7 @@ function AddEnvelopePoint(jsarray: Point[], effect: EffectRange, tempo: number) 
 
     var endPoint: Point = {};
     endPoint.sampletime = Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / ESDSP_HOP_SIZE);
-    endPoint.semitone = effect.endValue / 100.0;
+    endPoint.semitone = effect.endValue;
     endPoint.type = 'end';
 
     if (endPoint.sampletime == 0) {
