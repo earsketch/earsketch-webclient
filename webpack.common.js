@@ -82,7 +82,6 @@ module.exports = {
             notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
             // Models
-            reader: path.resolve(__dirname,`${servicesDir}/reader.js`),
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),

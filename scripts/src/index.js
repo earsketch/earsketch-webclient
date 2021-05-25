@@ -117,7 +117,6 @@ require(['angular'], () => {
 
     // In-house modules
     require('reporter');
-    require('reader');
     require('localStorage');
     require('userProject');
     require('websocket');

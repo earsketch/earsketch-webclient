@@ -1,10 +1,11 @@
 import * as compiler from './compiler'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import * as reader from './reader'
 
 app.controller("autograderAWSController",
-['$scope', 'reader', 'caiAnalysisModule', 'userProject',
-function($scope, reader, caiAnalysisModule, userProject) {
+['$scope', 'caiAnalysisModule', 'userProject',
+function($scope, caiAnalysisModule, userProject) {
 
     // Loading ogg by default for browsers other than Safari
     // setting default to wav for chrome 58 (May 22, 2017)

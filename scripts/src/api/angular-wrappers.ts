@@ -22,13 +22,9 @@ export default function ServiceWrapper() {
     // Load the audio analyzer outside angular
     var ApiAnalyzer = injector.get('analyzer');
 
-    // Load the reader service outside angular
-    var ApiReader = injector.get('reader');
-
     return {
         autograder: ApiAutograder as any,
         userProject: ApiUserProject as any,
         analyzer: ApiAnalyzer as any,
-        reader: ApiReader as any,
     }
 }
