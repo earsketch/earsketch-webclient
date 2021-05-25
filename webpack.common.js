@@ -95,7 +95,6 @@ module.exports = {
             reporter: path.resolve(__dirname,`${servicesDir}/reporter.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
-            modules: path.resolve(__dirname,`${modelDir}/modules.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API

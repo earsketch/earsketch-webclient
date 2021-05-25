@@ -525,8 +525,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // TODO: only should clear when compiling another script?
         WaveformCache.clear();
 
-        EarSketch.Global.ExitFlag = true;//assure the exit check variable is ON
-
         $scope.loaded = false; // show spinning icon
 
         var code = $scope.editor.getValue();
