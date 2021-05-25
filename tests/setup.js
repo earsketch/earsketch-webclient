@@ -218,7 +218,6 @@ require('colorTheme');
 require('uploader');
 require('completer');
 require('exporter');
-require('analysis');
 require('esrecorder');
 require('recorder');
 

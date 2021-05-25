@@ -96,7 +96,6 @@ module.exports = {
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             modules: path.resolve(__dirname,`${modelDir}/modules.js`),
-            analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API

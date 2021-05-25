@@ -5,6 +5,7 @@
 // If your API function needs to be asynchronous, make sure it returns a
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 
+import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
@@ -501,7 +502,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
     })
     .then(
         function(buffer: any) {
-            return ServiceWrapper().analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
+            return analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
         }
     ).catch(function(err: Error) {
         throw err
@@ -561,7 +562,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     })
     .then(
         function(buffer: AudioBuffer) {
-            return ServiceWrapper().analyzer.ESAnalyzeForTime(
+            return analyzer.ESAnalyzeForTime(
                 buffer, featureForAnalysis, startTime, endTime, tempo
             )
         }
@@ -619,7 +620,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
     }).catch(function(err: Error) {
         throw err
     }).then(function(buffer: AudioBuffer) {
-        return ServiceWrapper().analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
+        return analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
     }).catch(function(err: Error) {
         throw err
     })
@@ -696,7 +697,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         esconsole(err.toString(), ["ERROR","PT"])
         throw err
     }).then(function(buffer: AudioBuffer) {
-        return ServiceWrapper().analyzer.ESAnalyzeForTime(
+        return analyzer.ESAnalyzeForTime(
             buffer, featureForAnalysis, startTime, endTime, tempo
         )
     }).catch(function(err: Error) {
@@ -719,7 +720,7 @@ export function dur(result: DAWData, fileKey: string) {
     const q = result.quality
     return audioLibrary.getAudioClip(fileKey, result.tempo, q).then(
         function(buffer: AudioBuffer) {
-            return ServiceWrapper().analyzer.ESDur(buffer, result.tempo)
+            return analyzer.ESDur(buffer, result.tempo)
         }
     ).catch(function(err: Error) {
         throw err

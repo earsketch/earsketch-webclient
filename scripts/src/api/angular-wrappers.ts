@@ -19,12 +19,8 @@ export default function ServiceWrapper() {
     // Load the user-project service outside angular
     var ApiUserProject = injector.get('userProject');
 
-    // Load the audio analyzer outside angular
-    var ApiAnalyzer = injector.get('analyzer');
-
     return {
         autograder: ApiAutograder as any,
         userProject: ApiUserProject as any,
-        analyzer: ApiAnalyzer as any,
     }
 }

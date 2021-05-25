@@ -36,6 +36,9 @@ declare var lamejs: any;
 declare var d3: any;
 declare var Kali: any;
 declare var Sk: any;
+declare var FFT: any;
+declare var WindowFunction: any;
+declare var DSP: any;
 
 declare module 'angular' {
     var element: any
