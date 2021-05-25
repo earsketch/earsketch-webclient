@@ -98,7 +98,6 @@ module.exports = {
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
-            jsAPI: path.resolve(__dirname,`${apiDir}/earsketch.js.js`),
             pyAPI: path.resolve(__dirname,`${apiDir}/earsketch.py.js`),
 
             // Data
@@ -253,7 +252,6 @@ module.exports = {
             COMPLEXITY_CALCULATOR_STORAGE: 'exports-loader?type=commonjs&exports=single COMPLEXITY_CALCULATOR_STORAGE!complexityCalculatorStorage',
 
             ServiceWrapper: 'exports-loader?type=commonjs&exports=single ServiceWrapper!ngWrappers',
-            ES_JAVASCRIPT_API: 'exports-loader?type=commonjs&exports=single ES_JAVASCRIPT_API!jsAPI'
         }),
         new webpack.HotModuleReplacementPlugin(),
         new HappyPack({

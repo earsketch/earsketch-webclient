@@ -1,31 +1,19 @@
-/**
- * EarSketch API: Javascript
- *
- * This defines an init function for JS-Interpreter. These functions will be
- * injected into the interpreter by the compiler.
- *
- * @module JavascriptAPI
- * @author Creston Bunch
- */
+// EarSketch API: Javascript
+import * as ES_PASSTHROUGH from './passthrough'
 
-ES_JAVASCRIPT_API = function(interpreter, scope) {
-    var wrapper;
+// This defines an init function for JS-Interpreter.
+// These functions will be injected into the interpreter by the compiler.
+export default function setupAPI(interpreter: any, scope: any) {
+    let wrapper
 
     // MIX_TRACK constant
-    interpreter.setProperty(
-        scope, 'MIX_TRACK', (0)
-    );
+    interpreter.setProperty(scope, 'MIX_TRACK', (0))
 
     // Deprecated MASTER_TRACK alias for MIX_TRACK
-    interpreter.setProperty(
-        scope, 'MASTER_TRACK', (0)
-    );
+    interpreter.setProperty(scope, 'MASTER_TRACK', (0))
 
-    /**
-     * Function to initialize a new script in EarSketch.
-     *
-     * Resets the global result variable to the default value.
-     */
+    // Function to initialize a new script in EarSketch.
+    // Resets the global result variable to the default value.
     wrapper = function() {
         interpreter.setProperty(
             scope, '__ES_RESULT', callPassthrough(
@@ -103,7 +91,7 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
         // but `createAsyncFunction` demands fixed-length arguments.
         // Hack: Use placeholder arguments (x6 to be safe) and enumerate.
         // TODO: Try ES6 arg spreading once it is allowed in the codebase.
-        wrapper = function(a,b,c,d,e,f,g) {
+        wrapper = function(a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
             var args = [];
             for (var i = 0; i < arguments.length-1; i++) {
                 if (arguments[i] !== undefined) {
@@ -123,48 +111,37 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
     /**
      * Alias of prompt
      */
-    wrapper = function(msg, callback) {
+    wrapper = function(msg: string, callback: any) {
         return suspendPassthrough('prompt', callback, msg);
     };
     interpreter.setProperty(
         scope, 'readInput', interpreter.createAsyncFunction(wrapper)
     );
-    /**
-     * Helper function for easily wrapping a function around the passthrough.
-     *
-     * @private
-     */
-    function callPassthrough() {
-        // the first argument should be the passthrough function name
-        var func = arguments[0];
 
-        var args = [];
+    // Helper function for easily wrapping a function around the passthrough.
+    function callPassthrough(passthroughFunction: string, ...args: any[]) {
+
+        const passthroughArgs: any[] = []
         // put in the result as the new first argument
-        args.unshift(remapToNativeJs(
+        passthroughArgs.unshift(remapToNativeJs(
             interpreter.getProperty(scope, '__ES_RESULT')
-        ));
+        ))
 
         // convert arguments to JavaScript types
-        for (var i = 1; i < arguments.length; i++) {
-            if (arguments[i] === undefined) {
-                continue;
+        for (const arg of args) {
+            if (arg !== undefined) {
+                passthroughArgs.push(remapToNativeJs(arg))
             }
-            args.push(remapToNativeJs(arguments[i]));
         }
 
-        return wrapJsErrors(function() {
+        return wrapJsErrors(() => {
             return remapToPseudoJs(
-                ES_PASSTHROUGH[func].apply(this, args)
-            );
-        });
+                (ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs)
+            )
+        })
     }
 
-
-    /**
-     * Helper function for easily wrapping a function around the passthrough.
-     *
-     * @private
-     */
+    // Helper function for easily wrapping a function around the passthrough.
     function callModAndReturnPassthrough() {
         // the first argument should be the passthrough function name
         var func = arguments[0];
@@ -184,7 +161,7 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
         }
 
 
-        var jsResultReturn = ES_PASSTHROUGH[func].apply(this, args);
+        var jsResultReturn = (ES_PASSTHROUGH as any)[func].apply(this, args);
         var pseudoJSResultReturn = {
             result: wrapJsErrors(function() { return remapToPseudoJs(jsResultReturn.result) }),
             returnVal: wrapJsErrors(function() { return remapToPseudoJs(jsResultReturn.returnVal) })
@@ -193,67 +170,41 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
 
     }
 
-    /**
-     * Helper function for easily wrapping a function around the passthrough
-     * that returns a promise.
-     *
-     * See dur() or analyze() for examples on how to use this function.
-     *
-     * @param {string} func The function name to call in the passthrough.
-     * @param {function} callback The callback function for asynchronous
-     * execution using JS-Interpreter.
-     * @private
-     */
-    function suspendPassthrough() {
-        // the first argument should be the passthrough function name
-        var func = arguments[0];
-        var callback = arguments[1];
-
-        var args = [];
+    // Helper function for easily wrapping a function around the passthrough
+    // that returns a promise.
+    //
+    //   passthroughFunction: The function name to call in the passthrough.
+    //   callback: The callback function for asynchronous execution using JS-Interpreter.
+    //
+    // See dur() or analyze() for examples on how to use this function.
+    function suspendPassthrough(passthroughFunction: string, callback: any, ...args: any[]) {
+        const passthroughArgs: any = []
         // put in the result as the new first argument
-        args.unshift(remapToNativeJs(
+        passthroughArgs.unshift(remapToNativeJs(
             interpreter.getProperty(scope, '__ES_RESULT')
         ));
 
         // convert arguments to JavaScript types
-        for (var i = 2; i < arguments.length; i++) {
-            if (arguments[i] === undefined ||
-                typeof(arguments[i]) === 'function') {
-                continue;
+        for (const arg of args) {
+            if (arg !== undefined && typeof arg !== 'function') {
+                passthroughArgs.push(remapToNativeJs(arg))
             }
-            args.push(remapToNativeJs(arguments[i]));
         }
 
         wrapJsErrors(function() {
-            var promise = ES_PASSTHROUGH[func].apply(this, args);
-            promise.then(function(result) {
+            var promise = (ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs);
+            promise.then(function(result: any) {
                 callback(remapToPseudoJs(result));
-            }).catch(function(err) {
+            }).catch(function(err: any) {
                 throw err;
             });
         });
     }
 
-    /**
-     * Helper function that converts an arguments object into an array.
-     *
-     * @private
-     */
-    function copyArgs(args) {
-        var result = [];
-        for (var i = 0; i < args.length; i++) {
-            result.push(args[i]);
-        }
-        return result;
-    }
-
-    /**
-     * Helper function for wrapping error handling. Adds the line number of
-     * the error, etc.
-     *
-     * @private
-     */
-    function wrapJsErrors(func) {
+    // TODO: This comment is a blatant lie...
+    // Helper function for wrapping error handling. Adds the line number of
+    // the error, etc.
+    function wrapJsErrors(func: any) {
         try {
             return func();
         } catch(e) {
@@ -261,16 +212,12 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
         }
     }
 
-    /**
-     * Helper function for JS-Interpreter to map an arbitrary real Javascript
-     * variable into a pseudo Javascript variable.
-     *
-     * @param {object|string|number} v The variable to map.
-     */
-    function remapToPseudoJs(v) {
+    // Helper function for JS-Interpreter to map an arbitrary real Javascript
+    // variable into a pseudo Javascript variable.
+    function remapToPseudoJs(v: any) {
         if (!(v instanceof Object)) {
             // case v is not an object, return a mapped primitive type
-            return (v);
+            return v;
         }
         if (v instanceof Array) {
             // case v is an array
@@ -289,13 +236,9 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
         }
     }
 
-    /**
-     * Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
-     * variable into a native javascript variable.
-     *
-     * @param {object} v The pseudo variable to map.
-     */
-    function remapToNativeJs(v) {
+    // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
+    // variable into a native javascript variable.
+    function remapToNativeJs(v: any): any {
         if (typeof(v) === 'undefined') {
             return undefined;
         } else if (typeof(v) !== 'object') {
@@ -310,7 +253,7 @@ ES_JAVASCRIPT_API = function(interpreter, scope) {
                     nativeObject[i] = remapToNativeJs(v.properties[i]);
                 }
             } else {
-                nativeObject = {};
+                nativeObject = {} as { [key: string]: any }
                 for (var key in v.properties) {
                     nativeObject[key] = remapToNativeJs(v.properties[key]);
                 }

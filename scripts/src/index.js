@@ -34,7 +34,7 @@ import * as ESUtils from './esutils'
 import * as ES_PASSTHROUGH from './api/passthrough'
 import ESMessages from './data/messages'
 
-// TODO: Remove this after resolving issues with earsketch.py.js, earsketch.js.js.
+// TODO: Remove this after resolving issues with earsketch.py.js.
 window.ES_PASSTHROUGH = ES_PASSTHROUGH
 
 window.ESMessages = ESMessages

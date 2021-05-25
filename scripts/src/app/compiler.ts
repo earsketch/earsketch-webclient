@@ -1,6 +1,7 @@
 // Compile user scripts.
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
+import ES_JAVASCRIPT_API from "../api/earsketch.js"
 import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
