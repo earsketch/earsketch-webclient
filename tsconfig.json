@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "allowSyntheticDefaultImports": true,
+        "downlevelIteration": true,
+        "outDir": "./dist",
+        "sourceMap": true,
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "allowJs": false,
+        "moduleResolution": "Node",
+        "baseUrl": "./scripts",
+        "paths": {
+            "*": ["src/types/*.d.ts"],
+            "common": ["src/types/common.ts"]
+        }
+    },
+    "include": ["scripts/src/**/*"],
+    "exclude": ["node_modules"]
+}

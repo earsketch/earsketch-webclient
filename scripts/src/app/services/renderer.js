@@ -5,7 +5,7 @@
  * @module renderer
  * @author Creston Bunch
  */
-app.factory('renderer', ['applyEffects', 'ESUtils', 'esconsole', function rendererFactory(applyEffects, ESUtils, esconsole) {
+app.factory('renderer', ['applyEffects', 'ESUtils', function rendererFactory(applyEffects, ESUtils) {
 
     var NUM_CHANNELS = 2;
     var SAMPLE_RATE = 44100;

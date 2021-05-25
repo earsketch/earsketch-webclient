@@ -3,8 +3,8 @@
 @timeline-height: 15px;
 @measureline-height: 15px;
 @control-height: 30px;
-@vert-zoom-offset: 15px;
-@horz-zoom-offset: 15px;
+@vert-zoom-offset: 14px;
+@horz-zoom-offset: 14px;
 @border-width:1px;
 
 #daw-label {
@@ -12,33 +12,18 @@
 }
 
 #daw-container {
-  position: absolute;
-  right: 0;
-  left: @vert-zoom-offset;
-  bottom: 0;
-  top: @horz-zoom-offset;
-  overflow: auto;
+  position: relative;
+  width: 100%;
   border-left: @border-width solid @med-bg;
   border-top: @border-width solid @med-bg;
 }
 
 #zoom-container {
-  position: absolute;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  top: @panel-label-height;
   border-top: @border-width solid @med-bg;
-}
-
-#daw-main {
-  /*width: 1100px; */ /*width of daw window*/
 }
 
 #daw-timeline{
   height: @timeline-height;
-  position: absolute;
-  top: 0;
   z-index: 9;
   overflow: hidden;
   background: @bg;
@@ -55,17 +40,12 @@
 
 #daw-measureline{
   height: @measureline-height;
-  position: absolute;
   top: @timeline-height;
   z-index: 9;
   overflow: hidden;
   background: @bg;
   opacity: 0.8;
   box-shadow: 0px 2px 10px @dark-bg;
-}
-
-.daw-track-group-container{
-  margin-top: @control-height;  /*place just under timeline*/
 }
 
 .daw-track {
@@ -76,7 +56,7 @@
   height: 100%;
   z-index: 0;
 }
-.daw-track.muted {
+.daw-track.mute {
   background: #696969;
   opacity: 0.2;
 }
@@ -139,43 +119,28 @@
   cursor: pointer;
 }
 
-/* Firefox slider styles */
-#dawVolumeSlider::-moz-range-track {
-  width: 80px;
-  border-radius: @border-radius-small;
-  height: 14px;
-  vertical-align:middle;
-  margin-top:12px;
-  background-color: #fff;
-}
 #dawVolumeSlider::-moz-range-thumb {
   border: none;
-  background: rgb(66, 139, 202);
-  width: 12px;
-  height: 34px;
-  border-radius: @border-radius-small;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
   cursor: pointer;
 }
 /* IE slider styles */
 #dawVolumeSlider::-ms-fill-upper, #dawVolumeSlider::-ms-fill-lower {
   background:transparent;
 }
-#dawVolumeSlider::-ms-track {
-  width: 80px;
-  border-radius: @border-radius-small;
-  height: 14px;
-  vertical-align:middle;
-  margin-top:12px;
-  background-color: #fff;
-}
+
 #dawVolumeSlider::-ms-thumb {
   border: none;
-  background: rgb(66, 139, 202);
-  width: 12px;
-  height: 34px;
-  border-radius: @border-radius-small;
+  background: #AAA;
+  width: 9px;
+  height: 24px;
+  border-radius: 0;
   cursor: pointer;
 }
+
 .volumeLabel {
   color: @light-font;
   line-height: 30px;
@@ -199,12 +164,6 @@
 
 .dawTrackContainer {
   position: relative;
-  //-moz-transition: all 0.5s linear;
-  //-ms-transition: all 0.5s linear;
-  //-o-transition: all 0.5s linear;
-  //-webkit-transition: all 0.5s linear;
-  //transition: all 0.5s linear;
-  //transition: all 0.5s linear;
 }
 
 .dawTrackEffectName {
@@ -327,12 +286,14 @@
 
 svg.effectAxis{
   position: absolute;
-  left: 0px;
+  left: 0;
+  height: 100%;
 }
 
 svg.effectSvg{
   position: absolute;
-  left: 0px;
+  left: 0;
+  height: 100%;
   stroke-width: 1;
 }
 
@@ -351,11 +312,6 @@ svg.effectSvg path {
 }
 
 .daw-transport-button {
-  //-moz-transition: all 0.5s linear;
-  //-ms-transition: all 0.5s linear;
-  //-o-transition: all 0.5s linear;
-  //-webkit-transition: all 0.5s linear;
-  //transition: all 0.5s linear;
   display: flex;
   align-items: center;
 }
@@ -399,7 +355,6 @@ svg.effectSvg path {
 .dawMuteButton{
   position: absolute;
   right: 16px;
-  top: 2px;
   width: 22px;
   height: 18px;
   border-radius: 8px;
@@ -427,29 +382,16 @@ svg.effectSvg path {
   float: right;
 }
 
-.btn-play {
-  color:@gen-play !important;
-}
-
-.btn-play:hover, .play-run:active, .play-run:focus{
-  opacity: 0.7;
-}
-
 .btn-effect{
   position:absolute;
-  top:@horz-zoom-offset + @border-width;
-  left:@vert-zoom-offset + @border-width;
   height:@control-height;
   z-index: 34;
   width: 100px;
-  border-radius: 0px;
-  background: @selected-bg;
-  color: @tab-text;
+  border-radius: 0;
 }
 
 .btn-effect > span {
-  position: absolute;
-  letter-spacing : 2px;
+  letter-spacing : 1px;
 }
 
 .btn-effect span:nth-child(1) {
@@ -510,7 +452,7 @@ svg.effectSvg path {
 .daw-highlight {
   position: absolute;
   top: 0;
-  height: 1000px;
+  height: 100%;
   background-color: rgba(255, 153, 0, 0.3);
   border-left: 1px solid rgb(255, 153, 0);
   border-right: 1px solid rgb(255, 153, 0);
@@ -524,7 +466,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%;
   float: left;
-  margin-left: 98px;
+  margin-left: 100px;
   z-index: 10;
   position: absolute;
   top: 0;
@@ -534,7 +476,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%; /*smaller than daw height to avoid infinite scroll*/
   float: left;
-  margin-left: 98px;
+  margin-left: 100px;
   z-index: 20;
   position: absolute;
   background-color: #ff0000;
@@ -548,7 +490,7 @@ svg.effectSvg path {
   width: 3px;
   height: 100%; /*smaller than daw height to avoid infinite scroll*/
   float: left;
-  margin-left: 98px;
+  margin-left: 100px;
   z-index: 20;
   position: absolute;
   background-color: #6DFED4;
@@ -558,22 +500,11 @@ svg.effectSvg path {
 /* Zoom Sliders */
 
 #horz-zoom-slider-container {
-  position: absolute;
-  margin-left: 100px + @vert-zoom-offset;
-  width: calc(~"100% - 115px"); /* less.jss needs ~".." to compile calc */
-  display: flex;
-  floar: right;
   outline: none;
-  overflow: hidden;
   height: @horz-zoom-offset;
-  top: 0px;
-  opacity: 0.2;
-
-  -moz-animation: fadeout 25s linear forwards;
-  -ms-animation: fadeout 25s linear forwards;
-  -o-animation: fadeout 25s linear forwards;
-  -webkit-animation: fadeout 25s linear forwards;
-  animation: fadeout 25s linear forwards;
+  min-height: @horz-zoom-offset;
+  bottom: 0;
+  right: 0;
 }
 
 #horz-zoom-slider-container:hover {
@@ -588,21 +519,7 @@ svg.effectSvg path {
 
 #horz-zoom-slider-container > span {
   color: grey;
-  position: absolute;
 }
-
-#horz-zoom-slider-container .zoom-out {
-  font-size: 38px;
-  left: 4px;
-  bottom: -18px;
-}
-
-#horz-zoom-slider-container .zoom-in {
-  right: 3px;
-  font-size: 22px;
-  bottom: -8px;
-}
-
 
 #horz-zoom-slider-container .rzslider {
   margin: 0px;
@@ -641,27 +558,9 @@ svg.effectSvg path {
 }
 
 #vert-zoom-slider-container {
-  height: calc(~"100% - 45px"); /* less.jss needs ~".." to compile calc */
   width: @vert-zoom-offset;
-  top: @vert-zoom-offset + @control-height;
-  position: absolute;
-  opacity: 0.2;
-
-  -moz-animation: fadeout 8s linear forwards;
-  -ms-animation: fadeout 8s linear forwards;
-  -o-animation: fadeout 8s linear forwards;
-  -webkit-animation: fadeout 8s linear forwards;
-  animation: fadeout 8s linear forwards;
-}
-
-#vert-zoom-slider-container:hover {
-  opacity: 1;
-
-  -moz-animation: fadein 1s linear forwards;
-  -ms-animation: fadein 1s linear forwards;
-  -o-animation: fadein 1s linear forwards;
-  -webkit-animation: fadein 1s linear forwards;
-  animation: fadein 1s linear forwards;
+  right: 0;
+  bottom: 0;
 }
 
 @-webkit-keyframes fadein {
@@ -678,23 +577,6 @@ svg.effectSvg path {
 
 @keyframes fadeout {
   0% { opacity: 1; }
-}
-
-#vert-zoom-slider-container > span {
-  color: grey;
-  position: absolute;
-}
-
-#vert-zoom-slider-container .zoom-out {
-  font-size: 38px;
-  left: 2px;
-  top: -18px;
-}
-
-#vert-zoom-slider-container .zoom-in {
-  left: 2px;
-  font-size: 22px;
-  bottom: -6px;
 }
 
 #vert-zoom-slider-container .rzslider {

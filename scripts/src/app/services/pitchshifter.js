@@ -8,8 +8,8 @@
  * in all major browsers.
  */
 
-app.factory('pitchshifter', ['renderer','audioContext','ESUtils','esconsole','userConsole',
-function pitchshifterFactory(render, ctx, ESUtils, esconsole, userConsole) {
+app.factory('pitchshifter', ['renderer','audioContext','ESUtils','userConsole',
+function pitchshifterFactory(render, ctx, ESUtils, userConsole) {
 
     var QFRAMES = 16;
     var FRAMESIZE = 256;

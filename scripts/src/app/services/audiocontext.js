@@ -6,7 +6,7 @@
  * @module audioContext
  * @author Creston Bunch
  */
-app.factory('audioContext', [function audioContextFactory() {
+app.factory('audioContext', function audioContextFactory() {
 
     var context = new (window.AudioContext || window.webkitAudioContext)({
         latencyHint: 'interactive',
@@ -26,5 +26,5 @@ app.factory('audioContext', [function audioContextFactory() {
 
     return context;
 
-}]);
+});
 

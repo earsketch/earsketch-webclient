@@ -5,7 +5,7 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
  *
  * @author Jason Smith
  */
-app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) {
+app.factory('recommender', function () {
 
     var keyGenreDict = {};
     var keyInstrumentDict = {};
@@ -13,6 +13,22 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
     function setKeyDict(genre, instrument) {
         keyGenreDict = genre;
         keyInstrumentDict = instrument;
+
+        AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter(function(key) {
+            return Object.keys(keyGenreDict).includes(key);
+        });
+    }
+
+    function getKeyDict(type) {
+        if (type === 'genre') {
+            return keyGenreDict;
+        }
+        else if (type === 'insturment') {
+            return keyInstrumentDict;
+        }
+        else {
+            return null;
+        }
     }
 
 	// Load lists of numbers and keys
@@ -38,7 +54,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
             }
         }
         return recInput;
-    };
+    }
 
 
     function addRandomRecInput(recInput) {
@@ -51,14 +67,78 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         return recInput;
     }
 
+    function findGenreInstrumentCombinations(genreLimit = [], instrumentLimit = []) {
+        var sounds = [];
+        for (var key in keyGenreDict) {
+            var genre = keyGenreDict[key];
+            if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(genre)) {
+                if (key in keyInstrumentDict) {
+                    var instrument = keyInstrumentDict[key];
+                    if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(instrument)) {
+                        sounds.push(key);
+                    }
+                }
+            }
+        }
+        return sounds;
+    }
 
-    function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [null], instrumentLimit = [null], previousRecommendations = [], bestLimit = 3) {
-        var recs = generateRecommendations(recommendedSounds, inputSamples, coUsage, similarity);
-        return filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
-    };
+
+    function recommend(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
+        var recs = generateRecommendations(inputSamples, coUsage, similarity);
+        var filteredRecs = [];
+
+        if (Object.keys(recs).length === 0) {
+            recs = generateRecommendations([addRandomRecInput(), addRandomRecInput(), addRandomRecInput()], coUsage, similarity);
+        }
+
+        if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+            previousRecommendations = [];
+        }
+
+        filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit);
+        return filteredRecs;
+    }
 
 
-    function generateRecommendations(recommendedSounds, inputSamples, coUsage, similarity) {
+    function recommendReverse(recommendedSounds, inputSamples, coUsage, similarity, genreLimit = [], instrumentLimit = [], previousRecommendations = [], bestLimit = 3) {
+        var filteredRecs = [];
+
+        if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
+            previousRecommendations = [];
+        }
+
+        while (filteredRecs.length < bestLimit) {
+            var recs = {};
+            var outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit);
+            var filteredRecs = [];
+            for (var i in outputs) {
+                var outputRecs = generateRecommendations([outputs[i]], coUsage, similarity);
+                if (!(outputs[i] in recs)) {
+                    recs[outputs[i]] = 0;
+                }
+                for (var key in outputRecs) {
+                    if (inputSamples.length === 0 || inputSamples.includes(key)) {
+                        recs[outputs[i]] = recs[outputs[i]] + outputRecs[key];
+                    }
+                }
+            }
+            filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, [], [], previousRecommendations, bestLimit);
+            if (genreLimit.length > 0) {
+                genreLimit.pop();
+            }
+            else if (instrumentLimit.length > 0) {
+                instrumentLimit.pop();
+            }
+            else {
+                return filteredRecs;
+            }
+        }
+        return filteredRecs;
+    }
+
+
+    function generateRecommendations(inputSamples, coUsage, similarity) {
 
         // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
         coUsage = Math.sign(coUsage);
@@ -92,28 +172,41 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         }
 
         return recs;
-    };
+    }
 
 
-    function filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit) {
+    function filterRecommendations(inputRecs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, previousRecommendations, bestLimit) {
+
+        var recs = {};
+
+        for (var key in inputRecs) {
+            if (!recommendedSounds.includes(key) && !inputSamples.includes(key) && !previousRecommendations.includes(key) && key.slice(0,3) !== 'OS_') {
+                recs[key] = inputRecs[key]
+            }
+        }
 
         if (inputSamples.length > 0) {
             var i = 0;
             while (i < bestLimit) {
-                var maxRec = _.max(Object.keys(recs), function (o) { return recs[o]; });
+                var maxScore = _.max(Object.values(recs), function (o) { return recs[o]; }); 
+                var maxRecs = [];
+                for (var key in recs) {
+                    if (recs[key] === maxScore) {
+                        maxRecs.push(key);
+                    }
+                }
+                var maxRec = maxRecs[Math.floor(Math.random() * maxRecs.length)];
 
                 if (maxRec === -Infinity || maxRec === undefined) {
-                    break;
+                    return recommendedSounds;
                 }
 
-                if (!recommendedSounds.includes(maxRec) && !inputSamples.includes(maxRec) && maxRec.slice(0,3) !== 'OS_') {
-                    if (genreLimit[0] == null || keyGenreDict == null || genreLimit.includes(keyGenreDict[maxRec])) {
-                        var s = keyInstrumentDict[maxRec];
-                        if (instrumentLimit[0] == null || keyInstrumentDict == null || instrumentLimit.includes(s)) {
-                            if (!previousRecommendations.includes(maxRec)) {
-                                recommendedSounds.push(maxRec);
-                                i += 1;
-                            }
+                if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(keyGenreDict[maxRec])) {
+                    var s = keyInstrumentDict[maxRec];
+                    if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(s)) {
+                        if (!previousRecommendations.includes(maxRec)) {
+                            recommendedSounds.push(maxRec);
+                            i += 1;
                         }
                     }
                 }
@@ -121,7 +214,7 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
             }
         }
         return recommendedSounds;
-    };
+    }
 
 
     function genreRecommendations(recs) {
@@ -148,6 +241,28 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
         return instruments;
     }
 
+    function availableGenres() {
+        var genres = [];
+        for (var idx = 0; idx < AUDIOKEYS.length; idx++) {
+            var name = AUDIOKEYS[idx];
+            var genre = keyGenreDict[name];
+            if (!genres.includes(genre) && genre !== undefined && genre !== "MAKEBEAT")
+                genres.push(genre);
+        }
+        return genres;
+    }
+
+    function availableInstruments() {
+        var instruments = [];
+        for (var idx = 0; idx < AUDIOKEYS.length; idx++) {
+            var name = AUDIOKEYS[idx];
+            var instrument = keyInstrumentDict[name];
+            if (!instruments.includes(instrument) && instrument !== undefined)
+                instruments.push(instrument);
+        }
+        return instruments;
+    }
+
 
   return {
   	recommend: recommend,
@@ -156,9 +271,14 @@ app.factory('recommender', ['esconsole', 'reader', function (esconsole, reader) 
   	addRecInput: addRecInput,
     addRandomRecInput: addRandomRecInput,
     setKeyDict: setKeyDict,
+    getKeyDict: getKeyDict,
     genreRecommendations: genreRecommendations,
-    instrumentRecommendations: instrumentRecommendations
+    instrumentRecommendations: instrumentRecommendations,
+    availableGenres: availableGenres,
+    availableInstruments: availableInstruments,
+    findGenreInstrumentCombinations: findGenreInstrumentCombinations,
+    recommendReverse: recommendReverse
   };
 
-}]);
+});
 

@@ -6,6 +6,10 @@
   background-color: @dark-bg;
 }
 
+.gutter {
+  background-color: @med-bg;
+}
+
 a,
 .btn-action,
 .btn-add-sound,
@@ -246,7 +250,7 @@ a,
   color: white;
 }
 
-#empty-script-lang-message {
+.empty-script-lang-message {
   color: @med-font;
 }
 
@@ -322,6 +326,10 @@ a,
 }
 
 /* DAW */
+#devctrl, #zoom-container {
+  background-color: black;
+}
+
 #daw-container {
   border-left-color: @bg;
   border-top-color: @bg;
@@ -329,11 +337,6 @@ a,
 
 #zoom-container {
   border-top-color: @dark-font;
-}
-
-.btn-effect {
-  background: @selected-bg;
-  color: @tab-text;
 }
 
 #daw-timeline {
@@ -499,6 +502,7 @@ a,
 }
 
 #curriculum pre {
+  color: #f8f8f2;
   background-color: #23241f !important; 
   border: 1px solid @selected-bg;
 }

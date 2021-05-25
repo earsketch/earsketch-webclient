@@ -3,8 +3,8 @@
  */
 
 app.controller("autograder3Controller",
-['$scope','compiler', 'Upload','userConsole','esconsole', 'caiAnalysisModule','ESUtils', 'userProject', '$http',
-function($scope, compiler, Upload, userConsole, esconsole, caiAnalysisModule, ESUtils, userProject, $http) {
+['$scope','compiler', 'Upload','userConsole','caiAnalysisModule','ESUtils', 'userProject', '$http',
+function($scope, compiler, Upload, userConsole, caiAnalysisModule, ESUtils, userProject, $http) {
 
     $scope.prompts = [0];
     $scope.allowPrompts = false;

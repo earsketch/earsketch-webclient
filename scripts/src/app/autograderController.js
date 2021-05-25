@@ -3,8 +3,8 @@
  */
 
 app.controller("autograderController",
-['$scope','compiler', 'Upload','userConsole','ESUtils','esconsole',
-function($scope, compiler, Upload, userConsole, ESUtils, esconsole) {
+['$scope','compiler', 'userConsole','ESUtils',
+function($scope, compiler, userConsole, ESUtils) {
 
     $scope.uploads = [];
     $scope.referenceFile = null;

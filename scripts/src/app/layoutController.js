@@ -1,4 +1,4 @@
-app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout', '$window', '$location', 'ESUtils', 'userConsole', 'esconsole', 'reporter', 'collaboration', 'userNotification', function (layout, $rootScope, $scope, $timeout, $window, $location, ESUtils, userConsole, esconsole, reporter, collaboration, userNotification) {
+app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout', '$window', '$location', 'ESUtils', 'userConsole', 'reporter', 'collaboration', 'userNotification', function (layout, $rootScope, $scope, $timeout, $window, $location, ESUtils, userConsole, reporter, collaboration, userNotification) {
     // TODO: use the localStorage service
     var localStorage = $window.localStorage;
 
@@ -275,7 +275,7 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
      */
     postDigest(function () {
         var editorScope = angular.element('.code-container').scope();
-        if (editorScope) {
+        if (editorScope && editorScope.editor.droplet) {
             editorScope.editor.droplet.resize();
         }
     });
@@ -332,10 +332,6 @@ app.controller('layoutController', ['layout', '$rootScope', '$scope', '$timeout'
         } else {
             $scope.toggleSidebarTab(tab);
         }
-    };
-
-    $scope.curriculumPageView = function (title) {
-        $rootScope.$broadcast('curriculumPageView', title);
     };
 
     $scope.toggleCurriculumMaximization = function () {

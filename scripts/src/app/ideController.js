@@ -1,11 +1,13 @@
 import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
+import * as editor from '../editor/editorState';
+import * as tabs from '../editor/tabState';
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'renderer', 'uploader', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'esconsole', '$window', '$confirm','$q', 'localStorage', 'completer', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $timeout, WaveformCache, compiler, renderer, uploader, userProject, userConsole, userNotification, wsapi, ESUtils, esconsole, $window, $confirm, $q, localStorage, completer, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'localStorage', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, WaveformCache, compiler, userProject, userConsole, userNotification, wsapi, ESUtils, localStorage, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -23,20 +25,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     $scope.fontSizNum = 14;
     $scope.compiled = null;
 
-    $scope.activeTab = 0;
-    // $scope.$watch('activeTab', function(newVal, oldVal){
-    //     //AVN LOG
-    //     console.log("ACTIVE TAB IDE LOG", newVal, oldVal);
-    // });
-
+    // Tracks the selected tab data (script). Note that it might not be most up to date (modified / unsaved).
+    $scope.activeScript = null;
     /**
      * Flag to prevent successive compilation / script save request
      * @type {boolean}
      */
     $scope.isWaitingForServerResponse = false;
-    $scope.$on('scriptSaveResponseRecieved', function(){
-        $scope.isWaitingForServerResponse = false;
-    });
 
     // for report error
     $scope.userName = '';
@@ -47,9 +42,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
     //TODO AVN - quick hack, but it might also be the cleanest way to fix the shared script issue rather than
     //moving openShare() to tabController
-    $scope.sharedScripts = userProject.sharedScripts; 
+    $scope.sharedScripts = userProject.sharedScripts;
 
-    //The editor object is passed to the tabController via scope inheritance
     $scope.editor = {}; // need to pass object to the editor directive for two-way binding
 
     $scope.loaded = true; // shows spinning icon when false
@@ -66,19 +60,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
 
     $scope.currentLanguage = localStorage.get('language', 'python');
-    $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
-
-    /**
-     * Variable that remembers what language is being displayed in the curriculum,
-     * so that the ide language type can be properly changed when copying curriculum code. 
-     */
-    $scope.curriculumLanguage = localStorage.get('language', 'python'); 
-
-
-    $scope.$on('curriculumLanguage', function(event, val){
-        $scope.curriculumLanguage = val;
-    });
-
+    // $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
     // TODO: create and handle this in userConsole directive
     $scope.$on('updateConsole', function () {
@@ -132,6 +114,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      */
     $scope.initEditor = function () {
         esconsole('initEditor called', 'IDE');
+        if (!$scope.editor) return;
 
         $scope.editor.ace.setOptions({
             mode: 'ace/mode/' + $scope.currentLanguage,
@@ -155,7 +138,22 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 sender: 'editor|cli'
             },
             exec: function () {
-                $scope.$broadcast('updateTabFromEditorSave');
+                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+
+                // TODO: Potentially could use $scope.activeScript instead.
+                let script = null;
+                if (activeTabID in userProject.scripts) {
+                    script = userProject.scripts[activeTabID];
+                } else if (activeTabID in userProject.sharedScripts) {
+                    script = userProject.sharedScripts[activeTabID];
+                }
+
+                if (!script?.saved) {
+                    $ngRedux.dispatch(tabs.saveScriptIfModified(activeTabID));
+                } else if (script?.collaborative) {
+                    collaboration.saveScript();
+                }
+                activeTabID && $ngRedux.dispatch(tabs.removeModifiedScript(activeTabID));
             }
         });
 
@@ -185,28 +183,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             }
         });
 
-        // setting initial state of the editor to text mode if flag for blocks mode is null
-        if (!localStorage.checkKey('blocks')) {
-            $scope.editor.droplet.setEditorState(false);
-            localStorage.set('blocks', 'no');
-        } else if (localStorage.get('blocks') === 'yes') {
-            $scope.editor.droplet.setEditorState(true);
-        } else {
-            $scope.editor.droplet.setEditorState(false);
-        }
-        // // monitor the editor for changes, and update the tab value
-        $scope.editor.ace.on('change', function () {
-            // if ($scope.tabs[$scope.activeTab].saved) {
-            $scope.$broadcast('updateTabValueOnEditorChange');
-            
-            if ($scope.editor.ace.curOp && $scope.editor.ace.curOp.command.name) {
-                $scope.$broadcast('markCurrentTabDirty');
-            }
-        });
-
-        $scope.editor.ace.on('paste', function () {
-            $scope.$broadcast('markCurrentTabDirty');
-        });
+        $scope.editor.droplet.setEditorState(false);
 
         if (localStorage.checkKey(LS_FONT_KEY)) {
             $scope.setFontSize(parseInt(localStorage.get(LS_FONT_KEY)));
@@ -219,15 +196,20 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             userProject.shareid = shareID;
             $scope.openShare(shareID).then(() => {
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
             });
         }
 
-        $scope.editor.setReadOnly($scope.isEmbedded);
+        $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
 
-        $rootScope.$broadcast("swapTabAfterIDEinit");
-        $rootScope.$broadcast('editorLoaded');
-
+        const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
+        $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
         colorTheme.load();
+
+        // Used in CAI
+        $rootScope.$broadcast("swapTabAfterIDEinit");
     };
 
     
@@ -251,11 +233,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         esconsole('toggling blocks mode to: ' + !$scope.editor.droplet.currentlyUsingBlocks, 'ide');
+        localStorage.set('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
 
-        $scope.editor.droplet.toggleBlocks();
-        $scope.editor.clearHistory();
-
-        return localStorage.set('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
+        return $scope.editor.droplet.toggleBlocks();
     };
 
     /**
@@ -286,7 +266,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
                     // user has not opened this shared link before
                     promise = userProject.loadScript(shareid, true).then(function (result) {
-                        if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        if ($scope.isEmbedded) {
+                            $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        }
+
                         if (result.username !== $scope.username) {
                             // the shared script doesn't belong to the logged-in user
                             $scope.switchToShareMode();
@@ -302,10 +285,15 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                             // TODO: use broadcast or service
                             $scope.editor.ace.focus();
 
-                            $rootScope.$broadcast('togglePanesOnOpeningOwnSharedScript')
-                            
-                            $scope.selectScript(result);
-                            userNotification.show('This shared script link points to your own script.');
+                            if ($scope.isEmbedded) {
+                                $scope.selectScript(result);
+
+                                // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
+                                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareid));
+                            } else {
+                                userNotification.show('This shared script link points to your own script.');
+                            }
 
                             // Manually removing the user-owned shared script from the browser.
                             // TODO: Better to have refreshShareBrowser or something.
@@ -362,10 +350,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         userProject.openSharedScriptForEdit(scriptID);
     };
 
-
-    $scope.selectSharedScript = function(sharedScript){
-        $scope.$broadcast('selectSharedScript', sharedScript);
-    }
+    $scope.selectSharedScript = function (sharedScript) {
+        userProject.openSharedScript(sharedScript.shareid);
+    };
 
     /**
      * Prompts the user for a name and language, then calls the userProject
@@ -399,10 +386,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }).then(function (script) {
             // script saved and opened
             script && $rootScope.$broadcast('createScript', script.shareid);
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
         });
     };
 
-    //note - select script is used via inheritance in tabController
     /**
      * @name selectScript
      * @function
@@ -418,14 +405,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             // refresh tab state to keep $scope.tabs up-to-date before we call getTabId
             $scope.$broadcast('selectScript', script.shareid);
         }
-    };
-
-    $scope.importScript = function (script) {
-        $scope.$broadcast('importScript', script);
-    };
-
-    $scope.copyScript = function(script){
-        $scope.$broadcast('copyScript', script);
     };
 
     /**
@@ -452,9 +431,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         // TODO: questionable code: localStorage.get('blocks') === 'yes'
         // currentlyUsingBlocks would be off when we switch the language
         // maybe we need a global-state scope variable
-        if (localStorage.get('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
-            $scope.toggleBlocks();
-        }
+        // if (localStorage.get('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
+        //     $scope.toggleBlocks();
+        // }
 
         // switch global language mode and save current language to local storage.
         $scope.languageModeSelect($scope.currentLanguage);
@@ -481,16 +460,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         }
 
         esconsole("paste key" + key, 'debug');
-        var ext;
-        var ideTargetLanguage;
-
-        if ($scope.curriculumLanguage === 'python') {
-            ext = '.py';
-            ideTargetLanguage = 'python';
-        } else {
-            ext = '.js';
-            ideTargetLanguage = 'javascript';
-        }
+        const ideTargetLanguage = $ngRedux.getState().app.scriptLanguage;
+        const ext = ideTargetLanguage === 'python' ? '.py' : '.js';
 
         $rootScope.$broadcast('language', ideTargetLanguage);
 
@@ -498,14 +469,16 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         var fake_script = {
             'name': scriptName + ext,
             'source_code': key,
-            'shareid': ESUtils.randomString(22)
+            'shareid': ESUtils.randomString(22),
+            'readonly': true
         };
 
         // force a digest cycle because the click is registered by jQuery, and
         // does not trigger Angular digest.
         $scope.$apply(function () {
-            $scope.$broadcast('openCurriculumCode', fake_script);
+            $ngRedux.dispatch(scripts.addReadOnlyScript(Object.assign({}, fake_script)));
             $scope.editor.ace.focus();
+            $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
 
     };
@@ -551,9 +524,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
         $scope.loaded = false; // show spinning icon
 
-        // TODO: use the layout service instead
-        var layoutCtrlScope = angular.element('[ng-controller=layoutController]').scope();
-
         var code = $scope.editor.getValue();
 
         var startTime = Date.now();
@@ -563,6 +533,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
         userConsole.clear();
         $scope.clearErrors();
         userConsole.status('Running script...');
+
+        const scriptID = tabs.selectActiveTabID($ngRedux.getState());
+        $ngRedux.dispatch(tabs.removeModifiedScript(scriptID));
 
         promise.then(function (result) {
             var duration = Date.now() - startTime;
@@ -575,7 +548,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             userNotification.showBanner(ESMessages.interpreter.runSuccess, 'success');
 
-            $scope.$broadcast('saveCollaborativeScriptAttempt');
+            $scope.saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL);
 
             // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
             $timeout(function () {
@@ -638,7 +611,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
 
             userNotification.showBanner(ESMessages.interpreter.runFailed, 'failure1');
 
-            $scope.$broadcast('saveCollaborativeScriptFailure');
+            $scope.saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL);
 
             // auto-opens the user console if there is an error and if the console is currently closed
             $rootScope.$broadcast('openConsoleOnCodeCompileError');
@@ -647,6 +620,32 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
                 collaboration.sendCompilationRecord(errType);
             }
         });
+    };
+
+    $scope.saveActiveScriptWithRunStatus = status => {
+        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        let script = null;
+
+        if (activeTabID in userProject.scripts) {
+            script = userProject.scripts[activeTabID];
+        } else if (activeTabID in userProject.sharedScripts) {
+            script = userProject.sharedScripts[activeTabID];
+        }
+        if (script?.collaborative) {
+            script && collaboration.saveScript(script.shareid);
+            $scope.isWaitingForServerResponse = false;
+        } else if (script && !script.readonly && !script.isShared && !script.saved) {
+            // save the script on a successful run
+            userProject.saveScript(script.name, script.source_code, true, status).then(function () {
+                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                $scope.isWaitingForServerResponse = false;
+            }).catch(function (err) {
+                userNotification.show(ESMessages.idecontroller.savefailed, 'failure1');
+                $scope.isWaitingForServerResponse = false;
+            });
+        } else {
+            $scope.isWaitingForServerResponse = false;
+        }
     };
 
     /**
@@ -693,6 +692,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
     };
 
     colorTheme.subscribe($scope, function (event, theme) {
+        if (!$scope.editor.ace) return;
+
         if (theme === 'dark') {
             $scope.editor.ace.setTheme('ace/theme/monokai');
         } else {
@@ -734,40 +735,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
      * @param lang {string} 'python' or 'javascript'
      */
     $scope.languageModeSelect = function (lang) {
-        //var scriptName = $('#scriptName').html();
-        //var scriptName = $scope.scriptName;
-
         if (lang === 'python') {
-            //$scope.tabs[$scope.active()].name = scriptName.replace(/.(^.*)$/, '.py');
-            //$('#scriptName').html(scriptName.replace(/.([^.]*)$/, '.py'));
             $scope.currentLanguage = 'python';
             $scope.scriptExtension = '.py';
-            angular.element("#py i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            angular.element("#js i").removeClass("glyphicon glyphicon-ok-sign").addClass("glyphicon glyphicon-unchecked");
-
-            //Hide javascript and show python code blocks in curriculum
-            angular.element("#curriculum .curriculum-javascript").hide();
-            angular.element("#curriculum .curriculum-python").show();
-
-            //Hide /show copy buttons
-            angular.element(".copy-btn-js").hide();
-            angular.element(".copy-btn-py").show();
-
         } else {
-            //$scope.tabs[$scope.active()].name = scriptName.replace(/.(^.*)$/, '.js');
-            //$('#scriptName').html(scriptName.replace(/.([^.]*)$/, '.js'));
             $scope.currentLanguage = 'javascript';
             $scope.scriptExtension = '.js';
-            angular.element("#js i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            angular.element("#py i").removeClass("glyphicon glyphicon-ok").addClass("glyphicon glyphicon-unchecked");
-
-            //Hide javascript and show python code blocks in curriculum
-            angular.element("#curriculum .curriculum-python").hide();
-            angular.element("#curriculum .curriculum-javascript").show();
-
-            //Hide /show copy buttons
-            angular.element(".copy-btn-py").hide();
-            angular.element(".copy-btn-js").show();
         }
 
         localStorage.set('language', $scope.currentLanguage);
@@ -834,8 +807,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$http', '$uibModal', '
             $scope.editor.ace.session.getTextRange($scope.editor.ace.getSelectionRange($scope.editor.ace.insert(key)));
             $scope.editor.ace.focus();
         }
-
-        $scope.$broadcast('markCurrentTabDirty');
         return key;
     };
 
@@ -966,6 +937,26 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
                 body = body + "\r\n";
             }
 
+            var localStorageLog = "";
+            
+            Object.keys(localStorage).forEach(function (key) {
+                try {
+                    if (key === "userstate") {
+                        var localUserState = JSON.parse(localStorage.getItem(key));
+                        if (localUserState.hasOwnProperty('password')) {
+                            localUserState.password = '';
+                        }
+                        localStorageLog += key + ": " + JSON.stringify(localUserState) + "\r\n";
+                    } else {
+                        localStorageLog += key + ": " + localStorage.getItem(key) + "\r\n";
+                    }
+                } catch (e) {
+                    if (e && e.hasOwnProperty(message)) {
+                        localStorageLog += "exception for key ["+key+"]: " + e.message;
+                    }
+                }
+            });
+
             body = body + "\r\n**OS:** "+ESUtils.whichOS()+"\t **Browser:** "+ESUtils.whichBrowser()+"\r\n";
 
             if (errorDesc) {
@@ -974,6 +965,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
 
             body = body + "\r\n**SOURCE CODE:** \r\n```"+lang+"\r\n" + $scope.editor.getValue() + "\r\n```";
             body = body + "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```";
+            body = body + "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageLog + "\r\n```";
 
             var errorinfo = {};
             errorinfo.title = "User reported bug";

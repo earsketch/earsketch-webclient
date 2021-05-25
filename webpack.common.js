@@ -5,6 +5,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HappyPack = require('happypack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 const vendorDir = 'scripts/vendor';
 const libDir = 'scripts/lib';
@@ -19,7 +20,7 @@ module.exports = {
         main: './scripts/src/index.js'
     },
     resolve: {
-        extensions: ['*','.js','.jsx','.mjs','.wasm','.json','.css'],
+        extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
             tabdrop: 'bootstrap-tabdrop-ro/js/bootstrap-tabdrop.js',
@@ -56,8 +57,6 @@ module.exports = {
             editorDirective: path.resolve(__dirname,`${appDir}/editorDirective.js`),
             diffDirective: path.resolve(__dirname,`${appDir}/diffDirective.js`),
             ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
-            tabController: path.resolve(__dirname,`${appDir}/tabController.js`),
-            dawController: path.resolve(__dirname,`${appDir}/dawController.js`),
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
             recorderController: path.resolve(__dirname,`${appDir}/recorderController.js`),
             createAccountController: path.resolve(__dirname,`${appDir}/createaccountController.js`),
@@ -105,11 +104,9 @@ module.exports = {
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
             layout: path.resolve(__dirname,`${servicesDir}/layout.js`),
-            tabs: path.resolve(__dirname,`${servicesDir}/tabs.js`),
             colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
             websocket: path.resolve(__dirname,`${servicesDir}/websocket.js`),
             collaboration: path.resolve(__dirname,`${servicesDir}/collaboration.js`),
-            timesync: path.resolve(__dirname,`${servicesDir}/timesync.js`),
             reporter: path.resolve(__dirname,`${servicesDir}/reporter.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
@@ -118,7 +115,7 @@ module.exports = {
             applyEffects: path.resolve(__dirname,`${modelDir}/applyeffects.js`),
             analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
             wsapi: path.resolve(__dirname,`${modelDir}/wsapi.js`),
-            helpers: path.resolve(__dirname,`scripts/src/helpers.js`),
+            helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
             ngWrappers: path.resolve(__dirname,`${apiDir}/angular-wrappers.js`),
@@ -129,33 +126,33 @@ module.exports = {
             // Data
             messages: path.resolve(__dirname,`${dataDir}/messages.js`),
             apiDoc: path.resolve(__dirname,`${dataDir}/api_doc.js`),
-            numSlides: path.resolve(__dirname,`${dataDir}/num_slides.js`),
             
             // Curriculum Data
-            // currToC: path.resolve(__dirname,`${dataDir}/curr_toc.js`),
-            // currPages: path.resolve(__dirname,`${dataDir}/curr_pages.js`),
-            // currSearchDoc: path.resolve(__dirname,`${dataDir}/curr_searchdoc.js`),
             currQuestions: path.resolve(__dirname,`scripts/src/browser/questions.js`),
 
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
             audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
-            ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
-            caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
-            codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
-            complexityCalculatorStorage: path.resolve(__dirname,`${dataDir}/complexityCalculatorStorage.js`),
+            recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`),
 
             // CAI
             complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
+            ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
+            complexityCalculatorStorage: path.resolve(__dirname,`${dataDir}/complexityCalculatorStorage.js`),
             complexityCalculatorHelperFunctions: path.resolve(__dirname, `${servicesDir}/complexityCalculatorHelperFunctions.js`),
+            caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
+
+            caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
+            caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
+            caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
+            codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
+            codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
+
             caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
             caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
             caiStudent: path.resolve(__dirname, `${servicesDir}/caiStudent.js`),
-            caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
-            caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
-            caiErrorHandling: path.resolve(__dirname,`${servicesDir}/caiErrorHandling.js`),
-            codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
-            recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`)
+
+            caiProjectModel: path.resolve(__dirname, `${servicesDir}/caiProjectModel.js`)
 
         }
     },
@@ -179,6 +176,10 @@ module.exports = {
             use: 'react-hot-loader/webpack',
             include: /node_modules/
         }, {
+            test: /\.tsx?$/,
+            use: 'ts-loader',
+            exclude: /node_modules/
+        }, {
             test: /\.css$/,
             use: ['style-loader','css-loader','postcss-loader']
         }, {
@@ -190,6 +191,18 @@ module.exports = {
                     name: 'img/[hash]-[name].[ext]',
                 }
             }],
+        }, {
+            // TODO: Do this instead when we switch to Webpack 5
+            // test: /\.(woff|woff2|eot|ttf|otf)$/i,
+            // type: 'asset/resource',
+            test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+            use: [{
+                loader: 'file-loader',
+                options: {
+                  name: '[hash]-[name].[ext]',
+                  outputPath: 'fonts/'
+                }
+              }],
         }, {
             test: path.resolve(__dirname,'scripts/src/setup.js'),
             loader: 'exports-loader',
@@ -295,6 +308,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'autograderAWS/index.html'),
             template: 'autograderAWS/index.template.html'
+        }),
+        new TsconfigPathsPlugin({
+            configFile: "tsconfig.json"
         })
     ],
     optimization: {

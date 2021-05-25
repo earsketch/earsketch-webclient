@@ -1,4 +1,4 @@
-app.directive("diff", [function() {
+app.directive("diff", function() {
 
   /**
    * Update the diff view.
@@ -56,5 +56,5 @@ app.directive("diff", [function() {
     }
   };
 
-}]);
+});
 

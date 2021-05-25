@@ -1482,7 +1482,7 @@ var COURSERA_RESULTS = {
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.375,"endMeasure":1.4375,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.4375,"endMeasure":1.5,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.5,"endMeasure":1.5625,"inputStartValue":0,"inputEndValue":0},
-                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":-60,"inputEndValue":-60},
+                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.625,"endMeasure":1.6875,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.6875,"endMeasure":1.75,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.75,"endMeasure":1.8125,"inputStartValue":-60,"inputEndValue":-60},
@@ -1504,7 +1504,7 @@ var COURSERA_RESULTS = {
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.75,"endMeasure":2.8125,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.8125,"endMeasure":2.875,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.875,"endMeasure":2.9375,"inputStartValue":0,"inputEndValue":0},
-                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":0,"inputEndValue":0},
+                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":0,"inputEndValue":0}
                 ],
             }},
             {clips: [
@@ -1521,7 +1521,7 @@ var COURSERA_RESULTS = {
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.375,"endMeasure":1.4375,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.4375,"endMeasure":1.5,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.5,"endMeasure":1.5625,"inputStartValue":-60,"inputEndValue":-60},
-                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":0,"inputEndValue":0},
+                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.625,"endMeasure":1.6875,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.6875,"endMeasure":1.75,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.75,"endMeasure":1.8125,"inputStartValue":0,"inputEndValue":0},
@@ -1543,7 +1543,7 @@ var COURSERA_RESULTS = {
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.75,"endMeasure":2.8125,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.8125,"endMeasure":2.875,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.875,"endMeasure":2.9375,"inputStartValue":-60,"inputEndValue":-60},
-                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":-60,"inputEndValue":-60},
+                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":-60,"inputEndValue":-60}
                 ],
             }},
         ]
@@ -1569,7 +1569,7 @@ var COURSERA_RESULTS = {
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.375,"endMeasure":1.4375,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.4375,"endMeasure":1.5,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.5,"endMeasure":1.5625,"inputStartValue":-60,"inputEndValue":-60},
-                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":0,"inputEndValue":0},
+                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.625,"endMeasure":1.6875,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.6875,"endMeasure":1.75,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.75,"endMeasure":1.8125,"inputStartValue":0,"inputEndValue":0},
@@ -1591,7 +1591,7 @@ var COURSERA_RESULTS = {
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.75,"endMeasure":2.8125,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.8125,"endMeasure":2.875,"inputStartValue":0,"inputEndValue":0},
                     {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.875,"endMeasure":2.9375,"inputStartValue":-60,"inputEndValue":-60},
-                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":-60,"inputEndValue":-60},
+                    {"track":1,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":-60,"inputEndValue":-60}
                 ],
             }},
             {clips: [
@@ -1608,7 +1608,7 @@ var COURSERA_RESULTS = {
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.375,"endMeasure":1.4375,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.4375,"endMeasure":1.5,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.5,"endMeasure":1.5625,"inputStartValue":0,"inputEndValue":0},
-                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":-60,"inputEndValue":-60},
+                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.5625,"endMeasure":1.625,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.625,"endMeasure":1.6875,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":1.6875,"endMeasure":1.75,"inputStartValue":0,"inputEndValue":0},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":1.75,"endMeasure":1.8125,"inputStartValue":-60,"inputEndValue":-60},
@@ -1630,7 +1630,7 @@ var COURSERA_RESULTS = {
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.75,"endMeasure":2.8125,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":0.001,"endValue":0.001,"startMeasure":2.8125,"endMeasure":2.875,"inputStartValue":-60,"inputEndValue":-60},
                     {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.875,"endMeasure":2.9375,"inputStartValue":0,"inputEndValue":0},
-                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":0,"inputEndValue":0},
+                    {"track":2,"name":"VOLUME","parameter":"GAIN","startValue":1,"endValue":1,"startMeasure":2.9375,"endMeasure":3,"inputStartValue":0,"inputEndValue":0}
                 ],
             }},
         ]

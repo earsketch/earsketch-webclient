@@ -2,7 +2,7 @@
  * @fileOverview Angular modal-window view controller for account management. Members can be addressed with $scope.name from JS, or just with name from within the controller-bound HTML.
  * @module accountController
  */
-app.controller("accountController", ['$scope','$uibModalInstance','RecorderService','userProject','userConsole','userNotification','esconsole', function ($scope, $uibModalInstance, RecorderService, userProject, userConsole, userNotification, esconsole) {
+app.controller("accountController", ['$scope','$uibModalInstance','userConsole','userNotification', function ($scope, $uibModalInstance, userConsole, userNotification) {
     /**
      * Closes the current modal window.
      * @name cancel

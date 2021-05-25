@@ -5,8 +5,8 @@
  * @author Creston Bunch
  */
 app.factory('compiler',
-['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','ESUtils','esconsole','$q',
-function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,ESUtils,esconsole,$q) {
+['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','ESUtils','$q',
+function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,ESUtils,$q) {
     let testRun = false;
 
     /**

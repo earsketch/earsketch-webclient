@@ -6,7 +6,7 @@ import * as scripts from '../../browser/scriptsState';
  * @module collaboration
  * @author Takahiko Tsuchiya
  */
-app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esconsole', 'reporter', '$rootScope', '$ngRedux', function (userNotification, $uibModal, websocket, esconsole, reporter, $rootScope, $ngRedux) {
+app.service('collaboration', ['userNotification', 'websocket', 'reporter', '$rootScope', '$ngRedux', function (userNotification, websocket, reporter, $rootScope, $ngRedux) {
     var self = this;
     this.script = null; // script object: only used for the off-line mode
     this.scriptID = null; // collaboration session identity (both local and remote)
@@ -61,7 +61,6 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     this.refreshScriptBrowser = null;
     this.refreshSharedScriptBrowser = null;
     this.closeSharedScriptIfOpen = null;
-    this.refreshTabStateForSharedScripts = null;
 
     var editTimeout = 5000; // sync (rejoin) session if there is no server response
     var syncTimeout = 5000; // when time out, the websocket connection is likely lost
@@ -761,7 +760,7 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
     };
 
     this.onScriptSaved = function (data) {
-        if (!userIsCAI(data.sender))
+        if (!this.userIsCAI(data.sender))
             userNotification.show(data.sender + ' saved the current version of the script.', 'success');
 
         $ngRedux.dispatch(scripts.syncToNgUserProject());
@@ -1177,14 +1176,14 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         }
     };
 
-    this.leaveCollaboration = function (scriptID, userName) {
+    this.leaveCollaboration = function (scriptID, userName, refresh=true) {
         var message = new PrepareWsMessage();
         message.action = 'leaveCollaboration';
         message.scriptID = scriptID;
         message.sender = userName.toLowerCase(); // #1858
         websocket.send(message);
 
-        if (this.refreshSharedScriptBrowser) {
+        if (refresh && this.refreshSharedScriptBrowser) {
             return this.refreshSharedScriptBrowser();
         } else {
             return Promise.resolve(null);
@@ -1229,10 +1228,6 @@ app.service('collaboration', ['userNotification', '$uibModal', 'websocket', 'esc
         if (this.refreshSharedScriptBrowser) {
             await this.refreshSharedScriptBrowser();
             $ngRedux.dispatch(scripts.syncToNgUserProject());
-
-            if (self.refreshTabStateForSharedScripts) {
-                self.refreshTabStateForSharedScripts();
-            }
         }
     };
 

@@ -5,7 +5,7 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
  *
  * @author Jason Smith
  */
-app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommender', 'audioLibrary', 'ESUtils', "caiStudent", function (esconsole, complexityCalculator, recommender, audioLibrary, ESUtils, caiStudent) {
+app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', 'audioLibrary', "caiStudent", function (complexityCalculator, recommender, audioLibrary, caiStudent) {
 
   var librarySounds = [];
   var librarySoundGenres = [];
@@ -13,8 +13,8 @@ app.factory('caiAnalysisModule', ['esconsole', 'complexityCalculator', 'recommen
   var keyInstrumentDict = {};
   var genreDist = [];
   var soundsLoaded = false;
-    var savedReport = {};
-    var savedAnalysis = {};
+  var savedReport = {};
+  var savedAnalysis = {};
 
   var apiCalls = [];
 

@@ -3,7 +3,7 @@
  * @module applyEffects
  */
 
-app.factory('applyEffects', ['ESUtils', 'esconsole', function (ESUtils, esconsole) {
+app.factory('applyEffects', ['ESUtils', function (ESUtils) {
     /********************* EFFECT OBJECTS *******************************/
     // Some effects are not available as native Webaudio nodes. We use the
     // existing audioNodes to create these desired effects

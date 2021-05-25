@@ -115,7 +115,7 @@ describe('API function tests', function() {
         // TODO: figure out why this number is different in the browser
         // when not rounded
         // TODO: write tests for RMS_AMPLITUDE as well
-        var logs = ['0.292'];
+        var logs = ['0.279'];
         runTestPython(API_SCRIPTS['analyze.py'],
                       API_RESULTS['analyze'],
                       done,
@@ -123,7 +123,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyze correctly in JavaScript', function(done) {
-        var logs = [0.292];
+        var logs = [0.279];
         runTestJavascript(API_SCRIPTS['analyze.js'],
                           API_RESULTS['analyze'],
                           done,
@@ -131,7 +131,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyzeForTime correctly in Python', function(done) {
-        var logs = ['0.292'];
+        var logs = ['0.279'];
         runTestPython(API_SCRIPTS['analyzeForTime.py'],
                       API_RESULTS['analyzeForTime'],
                       done,
@@ -139,7 +139,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyzeForTime correctly in JavaScript', function(done) {
-        var logs = [0.292];
+        var logs = [0.279];
         runTestJavascript(API_SCRIPTS['analyzeForTime.js'],
                           API_RESULTS['analyzeForTime'],
                           done,
@@ -147,7 +147,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyzeTrack correctly in Python', function(done) {
-        var logs = ['0.254'];
+        var logs = ['0.241'];
         runTestPython(API_SCRIPTS['analyzeTrack.py'],
                       API_RESULTS['analyzeTrack'],
                       done,
@@ -155,7 +155,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyzeTrack correctly in JavaScript', function(done) {
-        var logs = [0.254];
+        var logs = [0.241];
         runTestJavascript(API_SCRIPTS['analyzeTrack.js'],
                           API_RESULTS['analyzeTrack'],
                           done,
@@ -163,7 +163,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyzeTrackForTime correctly in Python', function(done) {
-        var logs = ['0.281'];
+        var logs = ['0.259'];
         runTestPython(API_SCRIPTS['analyzeTrackForTime.py'],
                       API_RESULTS['analyzeTrackForTime'],
                       done,
@@ -171,7 +171,7 @@ describe('API function tests', function() {
     });
 
     it('should compile analyzeTrackForTime correctly in JavaScript', function(done) {
-        var logs = [0.281];
+        var logs = [0.259];
         runTestJavascript(API_SCRIPTS['analyzeTrackForTime.js'],
                           API_RESULTS['analyzeTrackForTime'],
                           done,

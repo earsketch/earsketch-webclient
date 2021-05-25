@@ -2,31 +2,7 @@
 import '../../css/earsketch/allstyles.less'
 import './tailwind.css';
 
-import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-
-import rootReducer from './reducers';
-
-const persistConfig = {
-    key: 'root',
-    whitelist: ['app'],
-    storage
-};
-
-const store = configureStore({
-    reducer: persistReducer(persistConfig, rootReducer),
-    middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware({
-            // Toggle these on for sanity checks.
-            // See: https://redux-toolkit.js.org/api/getDefaultMiddleware#included-default-middleware
-            immutableCheck: false,
-            serializableCheck: false
-        });
-    }
-});
-
-persistStore(store);
+import store from './reducers';
 
 require('jquery');
 require('jqueryUI');
@@ -34,6 +10,7 @@ window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
 window.Question = Question; // Used inside curriculum HTMLs.
 
 import 'angularjs-slider/dist/rzslider.css';
+import '../../fonts/icomoon_ultimate/style.css';
 
 import * as ace from 'ace-builds';
 // ace.config.set('basePath', 'dist');
@@ -115,7 +92,6 @@ require(['angular'], () => {
 
     // In-house modules
     require('audioContext');
-    require('esconsole');
     require('reporter');
     require('reader');
     require('userNotification');
@@ -125,10 +101,8 @@ require(['angular'], () => {
     require('audioLibrary');
     require('websocket');
     require('collaboration');
-    require('tabs');
     require('colorTheme');
     require('layout');
-    require('timesync');
     require('waveformCache');
     require('compiler');
     require('pitchShifter');
@@ -140,7 +114,6 @@ require(['angular'], () => {
     require('completer');
     require('exporter');
     require('analysis');
-    require('player');
     require('esrecorder');
     require('recorder');
 
@@ -150,11 +123,9 @@ require(['angular'], () => {
     require('mainController');
     require('ideController');
     require('layoutController');
-    require('tabController');
     require('notificationUI');
     require('editorDirective');
     require('promptController');
-    require('dawController');
     require('uploadController');
     require('recorderController');
     require('createScriptController');
@@ -175,11 +146,20 @@ require(['angular'], () => {
     require('submitAWSController');
 
     // React components
+    require('./browser/Browser');
     require('./bubble/Bubble');
     require('./browser/API');
     require('./browser/Sounds');
     require('./browser/Scripts');
     require('./browser/Curriculum');
+    require('./browser/ScriptsMenus');
+    require('./daw/DAW');
+    require('./app/Footer');
+    require('./editor/Tabs');
+    require('./editor/EditorHeader');
+
+    // To be ported to React
+    require('./layout/Layout');
 
     // Autograders
     require('autograderController');
@@ -201,12 +181,13 @@ require(['angular'], () => {
     require('caiErrorHandling');
     require('codeSuggestion');
     require('recommender');
+    require('caiProjectModel');
 
     // TODO: Use a module.
     window.REPORT_LOG = [];
     window.ES_PASSTHROUGH = ES_PASSTHROUGH;
 
-    app.factory('$exceptionHandler', ['esconsole', '$injector', function(esconsole, $injector) {
+    app.factory('$exceptionHandler', ['$injector', function($injector) {
         return function(exception, cause) {
             console.log(exception);
             esconsole(exception, ['ERROR','ANGULAR']);
