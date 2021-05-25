@@ -2,112 +2,50 @@
 // The reason being, the audio buffers would not have been loaded before that and the analysis would fail.
 import * as ESUtils from '../esutils'
 
-function computeFeatureForBuffer(
-    buffer: AudioBuffer, funcPointerToFeature: string, tempo: number,
-    startTime: number | undefined=undefined, endTime: number | undefined=undefined
-) {
-    var data;
-    var temp = [];
-    var spectrum;
-    var featureValue;
-    var featureVector = [];
-    data = buffer.getChannelData(0);
-    var startTimeInSamples = 0;
-    var endTimeInSamples = data.length;
-    var blockSize = 2048;
-    // If we are analyzing one part of the clip. If end time is not specified, we analyze till the end
-    if (startTime != undefined) {
-        startTimeInSamples = Math.round(buffer.sampleRate * ESUtils.measureToTime(startTime, tempo));
-        if (endTime != undefined) {
-            endTimeInSamples = Math.round(buffer.sampleRate * ESUtils.measureToTime(endTime, tempo));
-        }
-    }
-
-    // extract data according to start and end time
-    for (var k = 0; k < endTimeInSamples - startTimeInSamples; k++) {
-        temp[k] = data[k + startTimeInSamples];
-    }
-
-    // Simple playback with analyser node
-    var fft = new FFT(blockSize, buffer.sampleRate);
-    var hann = new WindowFunction(DSP.HANN);
-
-    var hop = 0;
-    while ((hop + blockSize) < temp.length) {
-        // First get the magnitude spectrum for each block
-        fft.forward(hann.process(temp.slice(hop, hop + blockSize)));
-        spectrum = fft.spectrum;
-        featureValue = FEATURE_FUNCTIONS[funcPointerToFeature](temp.slice(hop, hop + blockSize), spectrum, buffer.sampleRate, blockSize);
-        featureVector.push(featureValue);
-        hop += blockSize;
-    }
-    featureVector.sort();
-    // We take the median as the appropriate value
-    return (featureVector[Math.floor(featureVector.length / 2)]);
-};
-
-// This routine computes the feature for 1 Block only!
-function compute_spectral_centroid(time_domain_signal: never, spectrum: Float32Array, fs: never, blockSize: number) {
-    var amplitude_sum = 0;
-    var weighted_bin_sum = 0;
-    var centroid;
-    for (var index = 0; index < spectrum.length; index++) {
-        weighted_bin_sum += (index + 1) * spectrum[index];
-        amplitude_sum += spectrum[index];
-    }
-
-    if (amplitude_sum != 0) {
-        centroid = weighted_bin_sum / amplitude_sum;
-    } else {
-        centroid = 0;
-    }
-    // normalize it by fs/2 as that is the maximum frequency that can exist in the spectrum.
-    // The result is fitted to scale between 0 and 1.
-
-    centroid = centroid / (blockSize / 2);
-    return centroid;
-};
-
-// This routine computes the feature for 1 Block only!
-function compute_rms_amplitude(time_domain_signal: Float32Array, spectrum: never, fs: never, blockSize: never) {
-    var amplitudeSquare = 0;
-    var squareSum = 0;
-    var rms;
-    for (var index = 0; index < time_domain_signal.length; index++) {
-        amplitudeSquare = time_domain_signal[index] * time_domain_signal[index];
-        squareSum += amplitudeSquare
-    }
-
-    if (time_domain_signal.length != 0) {
-        rms = Math.sqrt(squareSum / time_domain_signal.length);
-    } else {
-        rms = 0;
-    }
-
-    // The result is fitted to scale between 0 and 1.
-    return rms;
-};
-
-const FEATURE_FUNCTIONS: { [key: string]: any } = {
-    rms_amplitude: compute_rms_amplitude,
-    spectral_centroid: compute_spectral_centroid,
+const FEATURE_FUNCTIONS: { [key: string]: (data: Float32Array, blockSize: number, sampleRate: number) => number[] } = {
+    rms_amplitude: computeRMSAmplitude,
+    spectral_centroid: computeSpectralCentroid,
 }
 
-export function ESAnalyze(buffer: AudioBuffer, featureForAnalysis: string, tempo: number) {
-    var featureValue;
-    featureValue = computeFeatureForBuffer(buffer, featureForAnalysis.toLowerCase(), tempo);
-    return featureValue;
-};
+export function computeFeatureForBuffer(buffer: AudioBuffer, feature: string, tempo: number, startTime?: number | undefined, endTime?: number | undefined) {
+    const startIndex = startTime === undefined ? undefined : Math.round(buffer.sampleRate * ESUtils.measureToTime(startTime, tempo))
+    const endIndex = endTime === undefined ? undefined : Math.round(buffer.sampleRate * ESUtils.measureToTime(endTime, tempo))
+    const data = buffer.getChannelData(0).slice(startIndex, endIndex)
 
-export function ESAnalyzeForTime(buffer: AudioBuffer, featureForAnalysis: string, startTime: number, endTime: number, tempo: number) {
-    var buffLengthMeasures = ESUtils.timeToMeasure(buffer.duration, tempo);
-    var featureValue;
-    featureValue = computeFeatureForBuffer(buffer, featureForAnalysis.toLowerCase(), tempo, startTime, endTime);
-    return featureValue;
-};
+    let featureVector = FEATURE_FUNCTIONS[feature.toLowerCase()](data, 2048, buffer.sampleRate)
+    // Return the median.
+    featureVector.sort()
+    return (featureVector[Math.floor(featureVector.length / 2)])
+}
 
-export function ESDur(buffer: AudioBuffer, tempo: number) {
-    // rounds off precision error in JS
-    var digits = 2;
-    return Math.round(ESUtils.timeToMeasure(buffer.duration, tempo) * Math.pow(10, digits)) / Math.pow(10, digits);
-};
+function computeRMSAmplitude(data: Float32Array, blockSize: number, sampleRate: number) {
+    const out = []
+    for (let hop = 0; (hop + blockSize) <= data.length; hop += blockSize) {
+        const block = data.slice(hop, hop + blockSize)
+        let sumOfSquares = 0
+        for (let index = 0; index < block.length; index++) {
+            sumOfSquares += block[index] * block[index]
+        }
+        out.push(Math.sqrt(sumOfSquares / block.length))
+    }
+    return out
+}
+
+function computeSpectralCentroid(data: Float32Array, blockSize: number, sampleRate: number) {
+    const out = []
+    const fft = new FFT(blockSize, sampleRate)
+    const hann = new WindowFunction(DSP.HANN)
+    for (let hop = 0; (hop + blockSize) <= data.length; hop += blockSize) {
+        fft.forward(hann.process(data.slice(hop, hop + blockSize)))
+        let amplitude_sum = 0
+        let weighted_bin_sum = 0
+        for (let index = 0; index < fft.spectrum.length; index++) {
+            weighted_bin_sum += (index + 1) * fft.spectrum[index]
+            amplitude_sum += fft.spectrum[index]
+        }
+        // Old comment: "normalize it by fs/2 as that is the maximum frequency that can exist in the spectrum."
+        // If this is done, it is done implicitly, due to the weighted bin sum using indices rather than actual frequencies.
+        out.push(amplitude_sum ? (weighted_bin_sum / amplitude_sum / (blockSize / 2)) : 0)
+    }
+    return out
+}

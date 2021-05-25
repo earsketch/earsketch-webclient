@@ -11,6 +11,7 @@ import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
 import * as compiler from "../app/compiler"
 import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../app/userconsole"
 import { Clip, DAWData, EffectRange, Track } from "../app/player"
@@ -502,7 +503,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
     })
     .then(
         function(buffer: any) {
-            return analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
+            return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo)
         }
     ).catch(function(err: Error) {
         throw err
@@ -562,8 +563,8 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     })
     .then(
         function(buffer: AudioBuffer) {
-            return analyzer.ESAnalyzeForTime(
-                buffer, featureForAnalysis, startTime, endTime, tempo
+            return analyzer.computeFeatureForBuffer(
+                buffer, featureForAnalysis, tempo, startTime, endTime
             )
         }
     ).catch(function(err: Error) {
@@ -620,7 +621,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
     }).catch(function(err: Error) {
         throw err
     }).then(function(buffer: AudioBuffer) {
-        return analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
+        return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo)
     }).catch(function(err: Error) {
         throw err
     })
@@ -697,8 +698,8 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         esconsole(err.toString(), ["ERROR","PT"])
         throw err
     }).then(function(buffer: AudioBuffer) {
-        return analyzer.ESAnalyzeForTime(
-            buffer, featureForAnalysis, startTime, endTime, tempo
+        return analyzer.computeFeatureForBuffer(
+            buffer, featureForAnalysis, tempo, startTime, endTime
         )
     }).catch(function(err: Error) {
         esconsole(err.toString(), ["ERROR","PT"])
@@ -720,7 +721,9 @@ export function dur(result: DAWData, fileKey: string) {
     const q = result.quality
     return audioLibrary.getAudioClip(fileKey, result.tempo, q).then(
         function(buffer: AudioBuffer) {
-            return analyzer.ESDur(buffer, result.tempo)
+            // rounds off precision error in JS
+            const digits = 2
+            return Math.round(ESUtils.timeToMeasure(buffer.duration, result.tempo) * Math.pow(10, 2)) / Math.pow(10, digits)
         }
     ).catch(function(err: Error) {
         throw err
