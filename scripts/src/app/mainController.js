@@ -1037,7 +1037,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         angular.element('div[caiwindow]').show();
     }
 
-    // Note: Used in api_doc.js links to the curriculum Effects chapter.
+    // Note: Used in api_doc links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
         if ($scope.showCAIWindow) {
             $scope.toggleCAIWindow();

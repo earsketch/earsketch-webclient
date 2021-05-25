@@ -233,7 +233,6 @@ module.exports = {
 
             // Data global variables
             EarSketch: 'exports-loader?type=commonjs&exports=single EarSketch!modules',
-            ESApiDoc: 'exports-loader?type=commonjs&exports=single ESApiDoc!apiDoc',
             ESNum_Slides: 'exports-loader?type=commonjs&exports=single ESNum_Slides!numSlides',
             Question: 'exports-loader?type=commonjs&exports=single Question!currQuestions',
 

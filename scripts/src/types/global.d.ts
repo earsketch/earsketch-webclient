@@ -9,7 +9,6 @@ declare var URL_LOADAUDIO: string;
 declare var SITE_BASE_URI: string;
 declare var BUILD_NUM: string;
 declare var FLAGS: any;
-declare var ESApiDoc: any;
 declare var ESCurr_TOC: any;
 declare var ESCurr_Pages: number[][];
 declare var ESCurr_SearchDoc: {
