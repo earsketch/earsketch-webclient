@@ -2,39 +2,47 @@
 import ESMessages from '../data/messages'
 import * as userNotification from './userNotification'
 
-var PY_LIST_FUNCS = [
-    'append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort'
-];
-var PY_STR_FUNCS = [
-    'join', 'split', 'strip', 'rstrip', 'lstrip', 'startswith', 'upper', 'lower'
-];
 
-/**
- * Build the abstract syntax tree for Python. Useful for analyzing script
- * complexity or looking for specific function call e.g. onLoop().
- *
- * @param source {String} The source code to analyze.
- * @private
- */
-export function pythonAst(source: string) {
+interface CodeFeatures {
+    userFunc: number
+    booleanConditionals: number
+    conditionals: number
+    loops: number
+    lists: number
+    listOps: number
+    strOps: number
+}
+
+const FEATURE_SCORES = {
+    userFunc: 30,
+    booleanConditionals: 15,
+    conditionals: 10,
+    loops: 10,
+    lists: 15,
+    listOps: 15,
+    strOps: 15,
+} as const
+
+
+const PY_LIST_FUNCS = ['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort'] as const
+const PY_STR_FUNCS = ['join', 'split', 'strip', 'rstrip', 'lstrip', 'startswith', 'upper', 'lower'] as const
+
+// Build the abstract syntax tree for Python. Useful for analyzing script
+// complexity or looking for specific function call e.g. onLoop().
+function pythonAst(source: string) {
     try {
-        var parse = Sk.parse("<analyzer>", source);
-        return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags);
+        const parse = Sk.parse("<analyzer>", source)
+        return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
     } catch (error) {
-        userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
-        throw error;
+        userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5)
+        throw error
     }
 }
 
-/**
- * Analyze the source code of a Python script.
- *
- * @param source {String} The source code to analyze.
- * @returns {Object} A summary of the analysis.
- */
+// Analyze the source code of a Python script.
 export function analyzePython(source: string) {
-    var ast = pythonAst(source);
-    var initRes = {
+    const ast = pythonAst(source)
+    const features = {
         userFunc: 0,
         booleanConditionals: 0,
         conditionals: 0,
@@ -42,109 +50,71 @@ export function analyzePython(source: string) {
         lists: 0,
         listOps: 0,
         strOps: 0
-    };
-    return recursiveAnalyzePython(ast, initRes);
+    }
+    return recursiveAnalyzePython(ast, features)
 }
 
-/**
- * Calculate the total.
- */
-export function total(scores: any) {
-    var score = 0;
-    if (scores.loops) {
-        score += scores.loops * 10;
-    }
-    if (scores.conditionals) {
-        score += scores.conditionals * 10;
-    }
-    if (scores.booleanConditionals) {
-        score += scores.booleanConditionals * 15;
-    }
-    if (scores.lists) {
-        score += scores.lists * 15;
-    }
-    if (scores.listOps) {
-        score += scores.listOps * 15;
-    }
-    if (scores.strOps) {
-        score += scores.strOps * 15;
-    }
-    if (scores.userFunc) {
-        score += scores.userFunc * 30;
-    }
-    return score;
+// Compute total score based on the features present and the score assigned to each feature.
+export function total(features: CodeFeatures) {
+    const map = FEATURE_SCORES as { [key: string]: number }
+    return Object.entries(features).reduce((score, [feature, count]) => score + count * map[feature], 0)
 }
 
-/**
- * Analyze a single node of a Python AST.
- * @private
- */
-function analyzePythonNode(node: any, results: any) {
-    console.log('node', node);
-    if (node._astname == 'FunctionDef') {
-        // user-defined function
-        results.userFunc++;
-    }
-
-    if (node._astname == 'If') {
-        // condition
-        if ('op' in node.test) {
-            // boolean
-            results.booleanConditionals++;
+// Analyze a single node of a Python AST.
+function analyzePythonNode(node: any, results: CodeFeatures) {
+    if (node._astname === 'FunctionDef') {
+        results.userFunc++
+    } else if (node._astname === 'If') {
+        if (node.test.op) {
+            results.booleanConditionals++
         } else {
-            results.conditionals++;
+            results.conditionals++
         }
-    }
-
-    if (node._astname == 'While' || node._astname == 'For') {
-        // loop
-        results.loops++;
-    }
-
-    if (node._astname == 'Assign') {
-        if ('value' in node && node.value._astname == 'List') {
-            // list
-            results.lists++;
+    } else if (node._astname === 'While' || node._astname === 'For') {
+        results.loops++
+    } else if (node._astname === 'Assign') {
+        if (node?.value?._astname === 'List') {
+            results.lists++
         }
-    }
-
-    if (node._astname == 'Expr' || node._astname == 'Assign') {
-        if ('value' in node && 'func' in node.value && 'attr' in node.value.func &&
-            PY_LIST_FUNCS.indexOf(node.value.func.attr.v) > -1) {
-            // list operation
-            results.listOps++;
+    } else if (node._astname === 'Expr' || node._astname === 'Assign') {
+        if (PY_LIST_FUNCS.includes(node?.value?.func?.attr?.v)) {
+            results.listOps++
+        } else if (PY_STR_FUNCS.includes(node?.value?.func?.attr?.v)) {
+            results.strOps++
         }
-        if ('value' in node && 'func' in node.value && 'attr' in node.value.func &&
-            PY_STR_FUNCS.indexOf(node.value.func.attr.v) > -1) {
-            // string operation
-            results.strOps++;
-        }
-
     }
 }
 
-/**
- * Recursively analyze a python abstract syntax tree.
- * @private
- */
-function recursiveAnalyzePython(ast: any, results: any) {
-    if ('body' in ast) {
-        ast.body.forEach(function (node: any) {
-            analyzePythonNode(node, results);
-            recursiveAnalyzePython(node, results);
-        });
+// Recursively analyze a python abstract syntax tree.
+function recursiveAnalyzePython(ast: any, results: CodeFeatures) {
+    if (ast.body) {
+        for (const node of ast.body) {
+            analyzePythonNode(node, results)
+            recursiveAnalyzePython(node, results)
+        }
     }
-    return results;
+    return results
 }
 
-var JS_LIST_FUNCS = ['of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values'];
 
-var JS_STR_FUNCS = ['fromCharCode', 'fromCodePoint', 'anchor', 'big', 'blink', 'bold', 'charAt', 'charCodeAt', 'codePointAt', 'concat', 'endsWith', 'fixed', 'fontcolor', 'fontsize', 'includes', 'indexOf', 'italics', 'lastIndexOf', 'link', 'localeCompare', 'match', 'normalize', 'padEnd', 'padStart', 'quote', 'repeat', 'replace', 'search', 'slice', 'small', 'split', 'startsWith', 'strike', 'sub', 'substr', 'substring', 'sup', 'toLocaleLowerCase', 'toLocaleUpperCase', 'toLowerCase', 'toSource', 'toString', 'toUpperCase', 'trim', 'trimLeft', 'trimRight', 'valueOf', 'raw'];
+const JS_LIST_FUNCS = [
+    'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf',
+    'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort',
+    'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values'
+] as const
+
+const JS_STR_FUNCS = [
+    'fromCharCode', 'fromCodePoint', 'anchor', 'big', 'blink', 'bold', 'charAt', 'charCodeAt', 'codePointAt', 'concat', 'endsWith',
+    'fixed', 'fontcolor', 'fontsize', 'includes', 'indexOf', 'italics', 'lastIndexOf', 'link', 'localeCompare', 'match', 'normalize',
+    'padEnd', 'padStart', 'quote', 'repeat', 'replace', 'search', 'slice', 'small', 'split', 'startsWith', 'strike', 'sub', 'substr',
+    'substring', 'sup', 'toLocaleLowerCase', 'toLocaleUpperCase', 'toLowerCase', 'toSource', 'toString', 'toUpperCase', 'trim',
+    'trimLeft', 'trimRight', 'valueOf', 'raw'
+] as const
 
 export function analyzeJavascript(source: string) {
     try {
-        var ast = acorn.parse(source);
-        var initRes = {
+        const ast = acorn.parse(source)
+        const features = {
             userFunc: 0,
             booleanConditionals: 0,
             conditionals: 0,
@@ -152,101 +122,100 @@ export function analyzeJavascript(source: string) {
             lists: 0,
             listOps: 0,
             strOps: 0
-        };
-        return recursiveAnalyzeJavascript(ast, initRes);
+        }
+        return recursiveAnalyzeJavascript(ast, features)
     } catch (err) {
-        userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
-        throw err;
+        userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5)
+        throw err
     }
 }
 
-function recursiveAnalyzeJavascript(tree: any, result: any) {
-    if (typeof(tree) === 'undefined' || tree === null) {
-        return result;
+function recursiveAnalyzeJavascript(tree: any, result: CodeFeatures) {
+    if (tree === undefined || tree === null) {
+        return result
     } else if (tree.constructor.name === 'Array') {
-        tree.forEach(function (branch: any) {
-            recursiveAnalyzeJavascript(branch, result);
-        });
+        for (const branch of tree) {
+            recursiveAnalyzeJavascript(branch, result)
+        }
     } else {
         switch (tree.type) {
             case 'FunctionDeclaration':
-                result.userFunc++;
-                recursiveAnalyzeJavascript(tree.body, result);
-                break;
+                result.userFunc++
+                recursiveAnalyzeJavascript(tree.body, result)
+                break
             case 'ForStatement':
             case 'ForInStatement':
             case 'WhileStatement':
             case 'DoWhileStatement':
-                result.loops++;
-                recursiveAnalyzeJavascript(tree.body, result);
-                break;
+                result.loops++
+                recursiveAnalyzeJavascript(tree.body, result)
+                break
             case 'IfStatement':
                 if (tree.test.type === 'LogicalExpression') {
-                    result.booleanConditionals++;
+                    result.booleanConditionals++
                 } else {
-                    result.conditionals++;
+                    result.conditionals++
                 }
-                recursiveAnalyzeJavascript(tree.consequent, result);
-                recursiveAnalyzeJavascript(tree.alternate, result);
-                break;
+                recursiveAnalyzeJavascript(tree.consequent, result)
+                recursiveAnalyzeJavascript(tree.alternate, result)
+                break
             case 'SwitchStatement':
-                result.conditionals++;
-                recursiveAnalyzeJavascript(tree.cases, result);
-                break;
+                result.conditionals++
+                recursiveAnalyzeJavascript(tree.cases, result)
+                break
             case 'SwitchCase':
-                recursiveAnalyzeJavascript(tree.consequent, result);
-                break;
+                recursiveAnalyzeJavascript(tree.consequent, result)
+                break
             case 'ArrayExpression':
-                result.lists++;
-                recursiveAnalyzeJavascript(tree.elements, result);
-                break;
+                result.lists++
+                recursiveAnalyzeJavascript(tree.elements, result)
+                break
 
             case 'Program':
             case 'BlockStatement':
             case 'FunctionExpression':
-                recursiveAnalyzeJavascript(tree.body, result);
-                break;
+                recursiveAnalyzeJavascript(tree.body, result)
+                break
             case 'ExpressionStatement':
-                recursiveAnalyzeJavascript(tree.expression, result);
-                break;
+                recursiveAnalyzeJavascript(tree.expression, result)
+                break
             case 'AssignmentExpression':
-                recursiveAnalyzeJavascript(tree.right, result);
-                break;
+                recursiveAnalyzeJavascript(tree.right, result)
+                break
             case 'VariableDeclaration':
-                recursiveAnalyzeJavascript(tree.declarations, result);
-                break;
+                recursiveAnalyzeJavascript(tree.declarations, result)
+                break
             case 'VariableDeclarator':
-                recursiveAnalyzeJavascript(tree.init, result);
-                break;
+                recursiveAnalyzeJavascript(tree.init, result)
+                break
 
             case 'CallExpression':
-                recursiveAnalyzeJavascript(tree.callee, result);
-                recursiveAnalyzeJavascript(tree.arguments, result);
-                break;
+                recursiveAnalyzeJavascript(tree.callee, result)
+                recursiveAnalyzeJavascript(tree.arguments, result)
+                break
             case 'MemberExpression':
-                recursiveAnalyzeJavascript(tree.object, result);
-                recursiveAnalyzeJavascript(tree.property, result);
-                break;
+                recursiveAnalyzeJavascript(tree.object, result)
+                recursiveAnalyzeJavascript(tree.property, result)
+                break
             case 'ObjectExpression':
-                recursiveAnalyzeJavascript(tree.properties, result);
-                break;
+                recursiveAnalyzeJavascript(tree.properties, result)
+                break
             case 'Identifier':
-                if (JS_LIST_FUNCS.indexOf(tree.name) !== -1) {
-                    result.listOps++;
-                } else if (JS_STR_FUNCS.indexOf(tree.name) !== -1) {
-                    result.strOps++;
+                if (JS_LIST_FUNCS.includes(tree.name)) {
+                    result.listOps++
+                } else if (JS_STR_FUNCS.includes(tree.name)) {
+                    result.strOps++
                 }
-                break;
+                break
             default:
                 if (tree.kind === 'init') {
-                    recursiveAnalyzeJavascript(tree.value, result);
+                    recursiveAnalyzeJavascript(tree.value, result)
                 }
-                if (typeof(tree.arguments) !== 'undefined') {
-                    recursiveAnalyzeJavascript(tree.arguments, result);
+                if (tree.arguments !== undefined) {
+                    recursiveAnalyzeJavascript(tree.arguments, result)
                 }
-                break;
+                break
         }
     }
-
-    return result;
+    return result
 }
