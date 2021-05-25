@@ -65,7 +65,6 @@ export interface DAWData {
     tracks: Track[]
     master: GainNode
     init: boolean
-    finish: boolean
     quality: boolean
     slicedClips: { [key: string]: ClipSlice }
 }

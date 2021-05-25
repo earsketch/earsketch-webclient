@@ -77,8 +77,8 @@ export const finish = (result: DAWData) => {
 
     checkInit(result)
 
-    // toggle finish flag
-    result["finish"] = true
+    // We used to set a flag here. But all the flag indicated was whether the user called this function,
+    // and this function didn't actually do anything *except* set that flag.
     return result
 }
 
@@ -1414,12 +1414,7 @@ function checkInit(result: DAWData) {
  * end of the song).
  */
 export const addClip = (result: DAWData, clip: Clip, silence: number | undefined=undefined) => {
-
-    if (silence == undefined) {
-        clip.silence = 0
-    } else {
-        clip.silence = silence
-    }
+    clip.silence = silence ?? 0
 
     // bounds checking
     if (clip.track === 0) {
