@@ -1,17 +1,15 @@
-﻿/**
-/**
+﻿/*
  * An angular factory service for parsing and analyzing abstract syntax trees
  * without compiling the script, e.g. to measure code complexity.
  *
  * @module complexityCalculator
- * @author Creston Bunch, Erin Truesdell
+ * @author Jason Smith, Erin Truesdell
  */
-app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorHelperFunctions', "caiErrorHandling", function complexityCalculator(userNotification, complexityCalculatorHelperFunctions, caiErrorHandling) {
+app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorState', 'complexityCalculatorHelperFunctions', 'caiErrorHandling', function complexityCalculator(userNotification, complexityCalculatorState, complexityCalculatorHelperFunctions, caiErrorHandling) {
 
     //variable init
     // var studentCode;
     var sampleLines = [];
-
 
     /**
       * Build the abstract syntax tree for Python. Useful for analyzing script

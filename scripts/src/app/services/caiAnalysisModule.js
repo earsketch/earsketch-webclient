@@ -1,6 +1,6 @@
 import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
-/**
+/*
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Jason Smith

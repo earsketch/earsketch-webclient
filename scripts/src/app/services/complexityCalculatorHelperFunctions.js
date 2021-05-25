@@ -1,9 +1,8 @@
-﻿/**
-/**
- *A library of helper functions for the CAI Code Complexity Calculator
+﻿/*
+ * A library of helper functions for the CAI Code Complexity Calculator
  *
  * @module complexityCalculator
- * @author Erin Truesdell
+ * @author Erin Truesdell, Jason Smith
  */
 app.factory('complexityCalculatorHelperFunctions', function complexityCalculatorHelperFunctions() {
 
