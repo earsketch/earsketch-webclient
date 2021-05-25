@@ -123,7 +123,6 @@ require(['angular'], () => {
     require('websocket');
     require('collaboration');
     require('colorTheme');
-    require('compiler');
     require('uploader');
     require('completer');
     require('exporter');

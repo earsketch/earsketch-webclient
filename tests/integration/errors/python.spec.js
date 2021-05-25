@@ -1,3 +1,5 @@
+import * as compiler from '../../../src/app/compiler'
+
 var SITE_DIRECTORY = '/base';
 
 describe('Testing friendly Python errors', function() {
@@ -36,7 +38,6 @@ describe('Testing friendly Python errors', function() {
         var script = 'init()\nfinish()';
 
         tester.visit('/', function() {
-            var compiler = tester.injector().get('compiler');
             compiler.compilePython(script).then(function(result) {
                 done(new Error('Script should fail.'));
             }).catch(function(err) {

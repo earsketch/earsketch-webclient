@@ -209,17 +209,13 @@ window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layou
     $ngReduxProvider.provideStore(store);
 });
 
-require('audioContext');
 require('reporter');
 require('reader');
 require('localStorage');
 require('userProject');
-require('esutils');
 require('websocket');
 require('collaboration');
 require('colorTheme');
-require('timesync');
-require('compiler');
 require('uploader');
 require('completer');
 require('exporter');

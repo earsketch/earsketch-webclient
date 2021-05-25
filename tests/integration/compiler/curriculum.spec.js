@@ -1,3 +1,5 @@
+import * as compiler from '../../../src/app/compiler'
+
 describe('Curriculum example scripts', function() {
     var tester;
     
@@ -62,7 +64,6 @@ describe('Curriculum example scripts', function() {
 
     function runTestPython(script, expected, done) {
         tester.visit('/', function() {
-            var compiler = tester.injector().get('compiler');
             compiler.compilePython(script, 0).then(function(result) {
                 expect(result).toMatchResult(expected, script);
                 done();
@@ -75,7 +76,6 @@ describe('Curriculum example scripts', function() {
 
     function runTestJavascript(script, expected, done) {
         tester.visit('/', function() {
-            var compiler = tester.injector().get('compiler');
             compiler.compileJavascript(script, 0).then(function(result) {
                 expect(result).toMatchResult(expected, script);
                 done();

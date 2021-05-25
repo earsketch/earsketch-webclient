@@ -8,6 +8,7 @@
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
+import * as compiler from "../app/compiler"
 import esconsole from "../esconsole"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../app/userconsole"
@@ -476,9 +477,6 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     const tempo = result.tempo
     const q = result.quality
 
@@ -542,9 +540,6 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
         )
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     // Cannot do this assertion within the async promise chain
     const sampleRate = audioContext.sampleRate
     const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
@@ -600,9 +595,6 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         throw new Error("Cannot analyze a track that does not exist: " + trackNumber)
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     const tempo = result.tempo
     // the analyzeResult will contain a result object that contains only
     // one track that we want to analyze
@@ -615,7 +607,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         length: result.length,
         slicedClips: result.slicedClips
     }
-    return compiler.postCompile(analyzeResult).then(function(compiled: DAWData) {
+    return compiler.postCompile(analyzeResult as any).then(function(compiled: DAWData) {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track
@@ -679,9 +671,6 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         throw new RangeError(ESMessages.esaudio.analysisTimeTooShort)
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     const tempo = result.tempo
     // the analyzeResult will contain a result object that contains only
     // one track that we want to analyze
@@ -695,7 +684,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         slicedClips: result.slicedClips
     }
 
-    return compiler.postCompile(analyzeResult).then(function(compiled: DAWData) {
+    return compiler.postCompile(analyzeResult as any).then(function(compiled: DAWData) {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track
@@ -882,8 +871,7 @@ export function println(result: DAWData, msg: string) {
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
 
-    let compiler = ServiceWrapper().compiler
-    if (!compiler.isTestRun()) {
+    if (!compiler.testRun) {
         userConsole.log(msg)
     }
 }

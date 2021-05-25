@@ -13,9 +13,6 @@ export default function ServiceWrapper() {
     var elem = angular.element(document.querySelector('[ng-controller]'));
     var injector = elem.injector();
 
-    // Load the compiler service outside angular
-    var ApiCompiler = injector.get('compiler');
-
     // Load the autograder service outside angular
     var ApiAutograder = injector.get('autograder');
 
@@ -29,7 +26,6 @@ export default function ServiceWrapper() {
     var ApiReader = injector.get('reader');
 
     return {
-        compiler: ApiCompiler as any,
         autograder: ApiAutograder as any,
         userProject: ApiUserProject as any,
         analyzer: ApiAnalyzer as any,
