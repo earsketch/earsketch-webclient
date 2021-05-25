@@ -2,7 +2,10 @@
  * @fileOverview Angular modal-window view controller for account management. Members can be addressed with $scope.name from JS, or just with name from within the controller-bound HTML.
  * @module accountController
  */
-app.controller("editProfileController", ['$scope', '$uibModalInstance', 'userProject', 'userNotification', function ($scope, $uibModalInstance, userProject, userNotification) {
+import esconsole from '../esconsole'
+import * as userNotification from './userNotification'
+
+app.controller("editProfileController", ['$scope', '$uibModalInstance', 'userProject', function ($scope, $uibModalInstance, userProject) {
     $scope.error = '';
     $scope.infoRequiredMessage = ESMessages.user.infoRequired;
     $scope.optional = true;

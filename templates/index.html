@@ -10,9 +10,6 @@
     <!-- Suppress favicon error -->
     <link rel="shortcut icon" href="favicon.ico">
 
-    <!-- Angular UI Layout -->
-    <link rel="stylesheet" type="text/css" href="scripts/lib/ui-layout.css">
-
     <!-- Google Font -->
     <link rel="stylesheet" type="text/css" href="fonts/lato/lato.css">
     <link rel="stylesheet" type="text/css" href="fonts/roboto/roboto.css">
@@ -228,7 +225,7 @@
 
     <div class="flex-grow flex flex-row h-full overflow-hidden">
         <div id="main-container" ng-controller="ideController" ng-show="showIDE || showAll" ng-style="dynamicStyle(isEmbedded)"> <!-- container -->
-            <div ng-controller="layoutController" class="h-full">
+            <div class="h-full">
                 <!-- dummy -->
                 <div class="hidden" ui-layout="" ui-layout-loaded></div>
 

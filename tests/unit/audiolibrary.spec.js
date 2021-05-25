@@ -1,6 +1,8 @@
+import * as audioLibrary from '../audiolibrary'
+
 describe('AudioLibrary tests', function() {
 
-    var mock, audioContext, audioLibrary, $httpBackend, $rootScope, $q;
+    var mock, audioContext, $httpBackend, $rootScope, $q;
 
     // mock module dependencies
     beforeEach(function() {
@@ -75,11 +77,6 @@ describe('AudioLibrary tests', function() {
         $httpBackend.when(
             'GET', URL_DOMAIN + '/services/audio/getunstretchedsample?key=TEST_KEY'
         ).respond(HELLO_BUFFER);
-    }));
-
-    // Here we load the Audio Library service for unit testing
-    beforeEach(inject(function($injector) {
-        audioLibrary = $injector.get('audioLibrary');
     }));
 
     afterEach(function() {

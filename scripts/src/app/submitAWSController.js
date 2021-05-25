@@ -2,7 +2,11 @@
  * Angular controller for the AWS submission script modal dialog.
  * @module submitAWSController
  */
-app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'exporter', 'licenses', 'ESUtils', 'clipboard', 'userNotification', 'reporter', '$http', 'colorTheme', function($scope, $uibModalInstance, userProject, script, exporter, licenses, ESUtils, clipboard, userNotification, reporter, $http, colorTheme) {
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
+import * as userNotification from './userNotification'
+
+app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'exporter', 'licenses', 'clipboard', 'reporter', '$http', 'colorTheme', function($scope, $uibModalInstance, userProject, script, exporter, licenses, clipboard, reporter, $http, colorTheme) {
 
     $scope.sharelink = location.origin + location.pathname +'#?sharing=' + script.shareid;
     $scope.lockedShareLink = "";

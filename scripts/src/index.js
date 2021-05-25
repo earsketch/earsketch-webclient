@@ -28,6 +28,33 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
+import * as helpers from './helpers'
+import esconsole from './esconsole'
+import * as ESUtils from './esutils'
+import * as ES_PASSTHROUGH from './api/passthrough'
+import ESMessages from './data/messages'
+
+// TODO: Remove this after resolving issues with earsketch.py.js, earsketch.js.js.
+window.ES_PASSTHROUGH = ES_PASSTHROUGH
+
+window.ESMessages = ESMessages
+
+// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// (This was previously in userConsole, but since that's now a module, the fields are read-only.)
+// (Also, it doesn't really have anything to do with the user console.)
+window.esPrompt = msg => {
+    const $uibModal = helpers.getNgService('$uibModal')
+    var modal = $uibModal.open({
+        templateUrl: 'templates/prompt.html',
+        controller: 'PromptController',
+        resolve: {
+            msg: function() { return msg }
+        },
+    })
+
+    return modal.result
+}
+
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
@@ -48,7 +75,6 @@ require(['angular'], () => {
     require('ng-redux');
 
     // vendor files
-    require('uiLayout');
     require('uiUtils');
     require('uiScroll');
     require('uiScrollGrid');
@@ -71,7 +97,6 @@ require(['angular'], () => {
     window.app = angular.module('EarSketchApp', [
         'ui.router',
         'ui.bootstrap',
-        'ui.layout',
         'ui.utils',
         'ngAnimate',
         'ngFileUpload',
@@ -91,26 +116,15 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('audioContext');
     require('reporter');
     require('reader');
-    require('userNotification');
     require('localStorage');
     require('userProject');
-    require('esutils');
-    require('audioLibrary');
     require('websocket');
     require('collaboration');
     require('colorTheme');
-    require('layout');
-    require('waveformCache');
     require('compiler');
-    require('pitchShifter');
-    require('renderer');
-    require('applyEffects');
-    require('userConsole');
     require('uploader');
-    require('wsapi');
     require('completer');
     require('exporter');
     require('analysis');
@@ -122,7 +136,6 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('layoutController');
     require('notificationUI');
     require('editorDirective');
     require('promptController');
@@ -142,7 +155,6 @@ require(['angular'], () => {
     require('editProfileController');
     require('adminWindowController');
     require('forgotPasswordController');
-    require('shareController');
     require('submitAWSController');
 
     // React components
@@ -185,7 +197,6 @@ require(['angular'], () => {
 
     // TODO: Use a module.
     window.REPORT_LOG = [];
-    window.ES_PASSTHROUGH = ES_PASSTHROUGH;
 
     app.factory('$exceptionHandler', ['$injector', function($injector) {
         return function(exception, cause) {
@@ -200,7 +211,7 @@ require(['angular'], () => {
         };
     }]);
 
-    app.run(['$window', 'ESUtils', function ($window, ESUtils) {
+    app.run(['$window', function ($window) {
         // Returns the version of Internet Explorer or a -1
         // (indicating the use of another browser).
         function getInternetExplorerVersion() {
