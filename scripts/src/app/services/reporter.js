@@ -4,7 +4,9 @@
  *
  * @author Creston Bunch
  */
-app.factory('reporter', ['reader', function (reader) {
+import * as reader from "../reader"
+
+app.factory('reporter', function () {
 
   var PAGE_LOADED = false;
 
@@ -387,7 +389,7 @@ app.factory('reporter', ['reader', function (reader) {
       readererror: readererror
   };
 
-}]);
+});
 
 if (true) {
 //if (window.location.hostname === 'earsketch.gatech.edu') {

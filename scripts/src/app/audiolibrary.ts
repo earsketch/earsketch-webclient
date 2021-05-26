@@ -4,7 +4,7 @@
 import ctx from "./audiocontext"
 import esconsole from "../esconsole"
 
-type AugmentedBuffer = AudioBuffer & { filekey: string }
+export type AugmentedBuffer = AudioBuffer & { filekey: string }
 
 export const cache = {
     // Metadata from server:
