@@ -2,7 +2,11 @@
  *
  * @module RecorderService
  */
-app.service('RecorderService', ['$rootScope','audioContext', 'ESUtils', 'audioLibrary', 'userProject', function ($rootScope, ctx, ESUtils, audioLibrary, userProject) {
+import * as audioLibrary from '../audiolibrary'
+import ctx from '../audiocontext'
+import * as ESUtils from '../../esutils'
+
+app.service('RecorderService', ['$rootScope', 'userProject', function ($rootScope, userProject) {
     var self = this;
 
     var audioRecorder, meter, micGain, zeroGain, previewBs, startTime, metroOsc, beatBuffSrc, eventBuffSrc;
@@ -434,7 +438,7 @@ app.service('RecorderService', ['$rootScope','audioContext', 'ESUtils', 'audioLi
         blob.lastModifiedDate = new Date();
 
         // get the files with default name pattern (USER_SOUND_num.wav)
-        var def = audioLibrary.getCache().filter(function (item) {
+        var def = audioLibrary.cache.sounds.filter(function (item) {
             return item.file_key.match(new RegExp(userProject.getUsername().toUpperCase() + '_SOUND_\\d+'));
         });
         // get the number portion and list them in descending order

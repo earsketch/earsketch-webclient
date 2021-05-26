@@ -209,31 +209,15 @@ window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layou
     $ngReduxProvider.provideStore(store);
 });
 
-require('audioContext');
-require('esconsole');
 require('reporter');
-require('reader');
-require('userNotification');
 require('localStorage');
 require('userProject');
-require('esutils');
-require('audioLibrary');
 require('websocket');
 require('collaboration');
 require('colorTheme');
-require('layout');
-require('timesync');
-require('waveformCache');
-require('compiler');
-require('pitchShifter');
-require('renderer');
-require('applyEffects');
-require('userConsole');
 require('uploader');
-require('wsapi');
 require('completer');
 require('exporter');
-require('analysis');
 require('esrecorder');
 require('recorder');
 
@@ -261,7 +245,6 @@ require('changePasswordController');
 require('editProfileController');
 require('adminWindowController');
 require('forgotPasswordController');
-require('shareController');
 require('submitAWSController');
 
 require('autograderController');

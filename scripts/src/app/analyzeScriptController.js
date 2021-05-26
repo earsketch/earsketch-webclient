@@ -1,6 +1,8 @@
+import * as reader from "./reader"
+
 app.controller("analyzeScriptController", [
-'$scope', '$uibModalInstance', 'reader', 'script',
-function($scope, $uibModalInstance, reader, script) {
+'$scope', '$uibModalInstance', 'script',
+function($scope, $uibModalInstance, script) {
 
     $scope.script = script;
 

@@ -8,14 +8,15 @@
  * @author Creston Bunch
  */
 
+import * as ESUtils from '../esutils'
+import * as reader from '../app/reader'
+import * as userConsole from '../app/userconsole'
+
 var $builtinmodule = function (name) {
 
     var mod = {};
-    var userConsole = ServiceWrapper().userConsole;
     var compiler = ServiceWrapper().compiler;
-    var analyzer = ServiceWrapper().reader;
     var autograder = ServiceWrapper().autograder;
-    var ESUtils = ServiceWrapper().ESUtils;
     var nativePrompt = userConsole.prompt;
     var prompts = [];
     var prints = [];
@@ -158,12 +159,12 @@ var $builtinmodule = function (name) {
       switch(method.v) {
         case "earsketch":
           if (language.v == 'python') {
-            results = analyzer.analyzePython(source.v);
-            results.total = analyzer.total(results);
+            results = reader.analyzePython(source.v);
+            results.total = reader.total(results);
             return Sk.ffi.remapToPy(results);
           } else {
-            results = analyzer.analyzeJavascript(source.v);
-            results.total = analyzer.total(results);
+            results = reader.analyzeJavascript(source.v);
+            results.total = reader.total(results);
             return Sk.ffi.remapToPy(results);
           }
           break;

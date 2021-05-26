@@ -1,4 +1,7 @@
-app.factory('websocket', ['userNotification', '$rootScope', function (userNotification, $rootScope) {
+import esconsole from '../../esconsole'
+import * as userNotification from '../userNotification'
+
+app.factory('websocket', ['$rootScope', function ($rootScope) {
     var ws;
     var reconnect = 10;
     var isOpen = false;

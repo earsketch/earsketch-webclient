@@ -56,7 +56,7 @@ module.exports = function (grunt) {
         'string-replace': {
             version: {
                 files: {
-                    'scripts/src/data/messages.js': 'scripts/src/data/messages.js',
+                    'scripts/src/data/messages.ts': 'scripts/src/data/messages.ts',
                     'index.html': 'index.html',
                 },
                 options: {

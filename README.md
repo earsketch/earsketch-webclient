@@ -57,9 +57,6 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
       - `esutils.js`
         Utility functions used throughout the code.
 
-      - `wsapi.js`
-        Functions to wrap server endpoints.
-
     - `setup.js`
       Connects to SoundCloud; user ID is determined by the host.
 

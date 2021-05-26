@@ -1,8 +1,10 @@
-import {createAsyncThunk, createSelector, createSlice} from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
+import lunr from 'lunr'
+
+import esconsole from '../esconsole'
 import * as layout from '../layout/layoutState'
-import {AppDispatch, RootState, ThunkAPI} from '../reducers'
-import lunr from 'lunr';
 import {BrowserTabType} from '../layout/layoutState';
+import { RootState, ThunkAPI, AppDispatch } from '../reducers'
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()

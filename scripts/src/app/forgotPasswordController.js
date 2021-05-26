@@ -1,8 +1,8 @@
-/**
- * @module forgotpasswordController
- */
-app.controller("forgotpasswordController", ['$scope', '$uibModalInstance', 'userNotification',
-  function($scope, $uibModalInstance, userNotification) {
+import esconsole from '../esconsole'
+import * as userNotification from './userNotification'
+
+app.controller("forgotpasswordController", ['$scope', '$uibModalInstance',
+  function($scope, $uibModalInstance) {
 
     /**
      * Closes the modal window

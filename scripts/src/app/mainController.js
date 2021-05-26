@@ -1,4 +1,8 @@
 import * as appState from '../app/appState';
+import audioContext from './audiocontext'
+import * as audioLibrary from './audiolibrary'
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
 import * as user from '../user/userState';
 import * as scripts from '../browser/scriptsState';
 import * as sounds from '../browser/soundsState';
@@ -8,11 +12,12 @@ import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
+import * as userNotification from './userNotification';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', 'userNotification', 'ESUtils', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, userNotification, ESUtils, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, $ngRedux, recommender, exporter) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -208,7 +213,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         $scope.loaded = true;
         $scope.updateSoundQualityGlyph($scope.audioQuality);
 
-        userNotification.isInLoadingScreen = true;
+        userNotification.state.isInLoadingScreen = true;
     };
 
     $scope.downloadSpinnerClick = function () {
@@ -355,7 +360,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                 // Always show TEACHERS link in case the teacher-user does not have the teacher role and should be directed to request one.
                 $scope.showTeachersLink = true;
 
-                userNotification.setUserRole(userInfo.role);
+                userNotification.user.role = userInfo.role;
 
                 // Retrieve the user scripts.
                 return userProject.login($scope.username, $scope.password).then(function (result) {
@@ -382,7 +387,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
                         // "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
                         // the initial login message is taken care in the sound browser controller
-                        if (userNotification.isInLoadingScreen) {
+                        if (userNotification.state.isInLoadingScreen) {
                             // showLoginMessageAfterLoading = true;
                             // $rootScope.$broadcast('showLoginMessage');
                         } else {
@@ -760,7 +765,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     try {
-        var shareID = ESUtils.getURLParameters('edit');
+        var shareID = ESUtils.getURLParameter('edit');
 
         if (shareID) {
             esconsole('opening a shared script in edit mode', ['main', 'url']);
@@ -771,7 +776,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     }
 
     try {
-        var layoutParamString = ESUtils.getURLParameters('layout');
+        var layoutParamString = ESUtils.getURLParameter('layout');
         if (layoutParamString && layoutParamString.hasOwnProperty('split')) {
             layoutParamString.split(',').forEach(function (item) {
                 var keyval = item.split(':');

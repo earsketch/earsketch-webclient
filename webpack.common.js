@@ -63,7 +63,6 @@ module.exports = {
             editProfileController: path.resolve(__dirname,`${appDir}/editProfileController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             forgotPasswordController: path.resolve(__dirname,`${appDir}/forgotPasswordController.js`),
-            shareController: path.resolve(__dirname,`${appDir}/shareController.js`),
             analyzeScriptController: path.resolve(__dirname,`${appDir}/analyzeScriptController.js`),
             scriptVersionController: path.resolve(__dirname,`${appDir}/scriptVersionController.js`),
             shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
@@ -83,25 +82,13 @@ module.exports = {
             notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
             // Models
-            audioContext: path.resolve(__dirname,`${servicesDir}/audiocontext.js`),
-            compiler: path.resolve(__dirname,`${servicesDir}/compiler.js`),
-            reader: path.resolve(__dirname,`${servicesDir}/reader.js`),
-            player: path.resolve(__dirname,`${servicesDir}/player.js`),
-            renderer: path.resolve(__dirname,`${servicesDir}/renderer.js`),
-            pitchShifter: path.resolve(__dirname,`${servicesDir}/pitchshifter.js`),
-            audioLibrary: path.resolve(__dirname,`${servicesDir}/audiolibrary.js`),
-            waveformCache: path.resolve(__dirname,`${servicesDir}/waveformcache.js`),
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
-            userConsole: path.resolve(__dirname,`${servicesDir}/userconsole.js`),
-            esconsole: path.resolve(__dirname,`${servicesDir}/esconsole.js`),
-            userNotification: path.resolve(__dirname,`${servicesDir}/userNotification.js`),
             userProject: path.resolve(__dirname,`${servicesDir}/userProject.js`),
             localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
-            layout: path.resolve(__dirname,`${servicesDir}/layout.js`),
             colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
             websocket: path.resolve(__dirname,`${servicesDir}/websocket.js`),
             collaboration: path.resolve(__dirname,`${servicesDir}/collaboration.js`),
@@ -109,20 +96,13 @@ module.exports = {
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             modules: path.resolve(__dirname,`${modelDir}/modules.js`),
-            esutils: path.resolve(__dirname,`${modelDir}/esutils.js`),
-            applyEffects: path.resolve(__dirname,`${modelDir}/applyeffects.js`),
-            analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
-            wsapi: path.resolve(__dirname,`${modelDir}/wsapi.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
-            ngWrappers: path.resolve(__dirname,`${apiDir}/angular-wrappers.js`),
-            passthrough: path.resolve(__dirname,`${apiDir}/passthrough.js`),
             jsAPI: path.resolve(__dirname,`${apiDir}/earsketch.js.js`),
             pyAPI: path.resolve(__dirname,`${apiDir}/earsketch.py.js`),
 
             // Data
-            messages: path.resolve(__dirname,`${dataDir}/messages.js`),
             apiDoc: path.resolve(__dirname,`${dataDir}/api_doc.js`),
             
             // Curriculum Data
@@ -206,7 +186,7 @@ module.exports = {
             loader: 'exports-loader',
             options: {
                 type: 'commonjs',
-                exports: ['doCopy','resizeNavigationWidth','ValueError']
+                exports: ['doCopy','resizeNavigationWidth']
             }
         }, {
             test: path.resolve(__dirname,`${libDir}/dsp.js`),
@@ -254,12 +234,8 @@ module.exports = {
 
             // Data global variables
             EarSketch: 'exports-loader?type=commonjs&exports=single EarSketch!modules',
-            ESMessages: 'exports-loader?type=commonjs&exports=single ESMessages!messages',
             ESApiDoc: 'exports-loader?type=commonjs&exports=single ESApiDoc!apiDoc',
-            // ESCurr_TOC: 'exports-loader?type=commonjs&exports=single ESCurr_TOC!currToC',
-            // ESCurr_Pages: 'exports-loader?type=commonjs&exports=single ESCurr_Pages!currPages',
             ESNum_Slides: 'exports-loader?type=commonjs&exports=single ESNum_Slides!numSlides',
-            // ESCurr_SearchDoc: 'exports-loader?type=commonjs&exports=single ESCurr_SearchDoc!currSearchDoc',
             Question: 'exports-loader?type=commonjs&exports=single Question!currQuestions',
 
             AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
@@ -279,7 +255,6 @@ module.exports = {
             COMPLEXITY_CALCULATOR_STORAGE: 'exports-loader?type=commonjs&exports=single COMPLEXITY_CALCULATOR_STORAGE!complexityCalculatorStorage',
 
             ServiceWrapper: 'exports-loader?type=commonjs&exports=single ServiceWrapper!ngWrappers',
-            ES_PASSTHROUGH: 'exports-loader?type=commonjs&exports=single ES_PASSTHROUGH!passthrough',
             ES_JAVASCRIPT_API: 'exports-loader?type=commonjs&exports=single ES_JAVASCRIPT_API!jsAPI'
         }),
         new webpack.HotModuleReplacementPlugin(),
