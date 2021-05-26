@@ -48,7 +48,7 @@ const CaiBody = () => {
                     {messageList[activeProject] &&
                     Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
                         <li key={idx}>
-                            <div className="chat-message">
+                            <div className="chat-message" style={{color:"black"}}>
                                 <div className="chat-message-bubble" style={{maxWidth:"80%", float: message.sender !== "CAI" ? 'left' : 'right', backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
                                     <div className="chat-message-sender">{message.sender}</div>
                                     <div id="text" className="chat-message-text">
