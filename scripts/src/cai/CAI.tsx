@@ -37,11 +37,14 @@ const CaiBody = () => {
     const dispatch = useDispatch()
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
+    const mainControllerScope = helpers.getNgMainController().scope()
 
     return (
         <div id="cai-body">
             <div>
+            {mainControllerScope.showCAIWindow &&
             <iframe src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" allow="fullscreen" style={{width: "100%", maxWidth: "webkit-fill-available"}}></iframe>
+            }
             </div>
             <div className="chat-message-container">
                 <ul>
@@ -49,7 +52,9 @@ const CaiBody = () => {
                     Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
                         <li key={idx}>
                             <div className="chat-message" style={{color:"black"}}>
-                                <div className="chat-message-bubble" style={{maxWidth:"80%", float: message.sender !== "CAI" ? 'left' : 'right', backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
+                                <div className="chat-message-bubble" style={{maxWidth:"80%",
+                                    float: message.sender !== "CAI" ? 'left' : 'right', 
+                                    backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
                                     <div className="chat-message-sender">{message.sender}</div>
                                     <div id="text" className="chat-message-text">
                                         {message.text[0]}
