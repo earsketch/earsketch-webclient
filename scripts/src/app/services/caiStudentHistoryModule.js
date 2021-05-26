@@ -98,17 +98,17 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
                 }
                 if (output != null) {
                     if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
-                        output["userFunc"] = 3;
+                        output["userFunc"] = 4;
                     }
                     else if (output["userFunc"] === "ReturnAndArgs") {
-                        output["userFunc"] = 4;
+                        output["userFunc"] = 5;
                     }
 
                     if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
-                        output["userFunc"] = 3;
+                        output["userFunc"] = 4;
                     }
                     else if (output["userFunc"] === "ReturnAndArgs") {
-                        output["userFunc"] = 4;
+                        output["userFunc"] = 5;
                     }
 
                     for (var j in aggregateScore) {
