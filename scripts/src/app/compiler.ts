@@ -1,7 +1,7 @@
 // Compile user scripts.
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
-import ES_JAVASCRIPT_API from "../api/earsketch.js"
+import ES_JAVASCRIPT_API, { remapToNativeJs } from "../api/earsketch.js"
 import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
@@ -358,12 +358,12 @@ async function runJsInterpreter(interpreter: any) {
     while (interpreter.run()) {
         await sleep(200)
     }
-    if (interpreter.__ES_FINISHED !== undefined) {
-        esconsole("Compiling finished. Extracting result.", ["debug", "compiler"])
-        return interpreter.__ES_FINISHED
-    } else {
-        throw new EvalError("Missing call to finish() or something went wrong.")
+    const result = interpreter.getProperty(interpreter.scope, '__ES_RESULT')
+    if (result === undefined) {
+        throw new EvalError("Missing call to init() or something went wrong.")
     }
+    esconsole("Compiling finished. Extracting result.", ["debug", "compiler"])
+    return remapToNativeJs(result)
 }
 
 // Gets the current line number from the top of the JS-interpreter

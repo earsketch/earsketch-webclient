@@ -1,131 +1,116 @@
 // EarSketch API: Javascript
 import * as ES_PASSTHROUGH from './passthrough'
 
+// Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
+// variable into a native javascript variable.
+export function remapToNativeJs(v: any): any {
+    if (v === undefined) {
+        return undefined
+    } else if (typeof v !== 'object') {
+        return v
+    }
+
+    let nativeObject
+    if (v instanceof Interpreter.Object) {
+        if (v.proto && v.proto.class && v.proto.class === 'Array') {
+            nativeObject = []
+            for (let i = 0; i < v.properties.length; i++) {
+                nativeObject[i] = remapToNativeJs(v.properties[i])
+            }
+        } else {
+            nativeObject = {} as { [key: string]: any }
+            for (const key in v.properties) {
+                nativeObject[key] = remapToNativeJs(v.properties[key])
+            }
+
+        }
+    }
+
+    return nativeObject
+}
+
 // This defines an init function for JS-Interpreter.
 // These functions will be injected into the interpreter by the compiler.
 export default function setupAPI(interpreter: any, scope: any) {
-    let wrapper
-
     // MIX_TRACK constant
     interpreter.setProperty(scope, 'MIX_TRACK', (0))
-
     // Deprecated MASTER_TRACK alias for MIX_TRACK
     interpreter.setProperty(scope, 'MASTER_TRACK', (0))
 
+    const register = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createNativeFunction(fn))
+    const registerAsync = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createAsyncFunction(fn))
+
     // Function to initialize a new script in EarSketch.
     // Resets the global result variable to the default value.
-    wrapper = function() {
-        interpreter.setProperty(
-            scope, '__ES_RESULT', callPassthrough(
-                'init', interpreter.getProperty(scope, '__AUDIO_QUALITY')
-            )
-        );
-        interpreter.scope = scope;
-    };
-    interpreter.setProperty(
-        scope, 'init', interpreter.createNativeFunction(wrapper)
-    );
+    register("init", () => {
+        const result = callPassthrough('init', interpreter.getProperty(scope, '__AUDIO_QUALITY'))
+        interpreter.setProperty(scope, '__ES_RESULT', result)
+        interpreter.scope = scope
+    })
 
-    /**
-     * Finish the script.
-     *
-     * Sets an __ES_FINISHED property on the interpreter object used to run
-     * the script. This property contains the native JS compiled result.
-     */
-    wrapper = function() {
-        interpreter.setProperty(
-            scope, '__ES_RESULT', callPassthrough('finish')
-        );
-        interpreter.__ES_FINISHED = remapToNativeJs(
-            interpreter.getProperty(scope, '__ES_RESULT')
-        );
-    };
-    interpreter.setProperty(
-        scope, 'finish', interpreter.createNativeFunction(wrapper)
-    );
+    // Finish the script.
+    // Formerly set __ES_FINISHED = _ES_RESULT property on the interpreter object.
+    // Now we just use _ES_RESULT directly, and finish is not required.
+    register("finish", () => {})
 
-    var passThroughList = ['setTempo', 'fitMedia', 'insertMedia', 'insertMediaSection', 'makeBeat', 'makeBeatSlice', 'rhythmEffects', 'setEffect'];
+    const passthroughList = ['setTempo', 'fitMedia', 'insertMedia', 'insertMediaSection', 'makeBeat', 'makeBeatSlice', 'rhythmEffects', 'setEffect']
 
-    passThroughList.forEach(function (name) {
-        wrapper = function() {
-            var args = [].slice.call(arguments);
-            args.unshift(name);
-            interpreter.setProperty(scope, '__ES_RESULT', callPassthrough.apply(this, args));
-        };
-        interpreter.setProperty(scope, name, interpreter.createNativeFunction(wrapper));
-    });
+    for (const name of passthroughList) {
+        register(name, (...args: any[]) => {
+            interpreter.setProperty(scope, '__ES_RESULT', callPassthrough.apply(this, [name, ...args]))
+        })
+    }
 
-    var returnablePassThroughList = ['gauss', 'importImage', 'importFile', 'println', 'replaceListElement', 'replaceString', 'reverseList', 'reverseString', 'selectRandomFile', 'shuffleList', 'shuffleString'];
+    const returnablePassThroughList = ['gauss', 'importImage', 'importFile', 'println', 'replaceListElement', 'replaceString', 'reverseList', 'reverseString', 'selectRandomFile', 'shuffleList', 'shuffleString']
 
-    returnablePassThroughList.forEach(function (name) {
-        wrapper = function() {
-            var args = [].slice.call(arguments);
-            args.unshift(name);
-            var retVal = callPassthrough.apply(this, args);
+    for (const name of returnablePassThroughList) {
+        register(name, (...args: any[]) => callPassthrough.apply(this, [name, ...args]))
+    }
 
-            return retVal;
-        };
-        interpreter.setProperty(scope, name, interpreter.createNativeFunction(wrapper));
-    });
+    const modAndReturnPassThroughList = ['createAudioSlice']
 
-    var modAndReturnPassThroughList = ['createAudioSlice'];
+    for (const name of modAndReturnPassThroughList) {
+        register(name, (...args: any[]) => {
+            const resultAndReturnVal = callModAndReturnPassthrough.apply(this, [name, ...args])
+            interpreter.setProperty(scope, '__ES_RESULT', resultAndReturnVal.result)
+            return resultAndReturnVal.returnVal
+        })
+    }
 
-    modAndReturnPassThroughList.forEach(function (name) {
-        wrapper = function() {
-            var args = [].slice.call(arguments);
-            args.unshift(name);
-            var resultAndReturnVal = callModAndReturnPassthrough.apply(this, args);
+    const suspendedPassThroughList = ['analyze', 'analyzeForTime', 'analyzeTrack', 'analyzeTrackForTime', 'dur', 'prompt']
 
-            interpreter.setProperty(scope, '__ES_RESULT', resultAndReturnVal.result);
-            return resultAndReturnVal.returnVal;
-        };
-        interpreter.setProperty(scope, name, interpreter.createNativeFunction(wrapper));
-    });
-
-    var suspendedPassThroughList = ['analyze', 'analyzeForTime', 'analyzeTrack', 'analyzeTrackForTime', 'dur', 'prompt'];
-
-    suspendedPassThroughList.forEach(function (name) {
+    for (const name of suspendedPassThroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
         // https://github.com/NeilFraser/JS-Interpreter/issues/180
         // These ES APIs take the max of 4 variable-length arguments,
         // but `createAsyncFunction` demands fixed-length arguments.
         // Hack: Use placeholder arguments (x6 to be safe) and enumerate.
         // TODO: Try ES6 arg spreading once it is allowed in the codebase.
-        wrapper = function(a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
-            var args = [];
-            for (var i = 0; i < arguments.length-1; i++) {
+        registerAsync(name, function(a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
+            const args = []
+            for (let i = 0; i < arguments.length-1; i++) {
                 if (arguments[i] !== undefined) {
                     // Ignore unused placeholders (undefined)
-                    args.push(arguments[i]);
+                    args.push(arguments[i])
                 }
             }
             // Last item (g) is always the callback function.
-            var callback = arguments[arguments.length-1];
-            args.unshift(callback);
-            args.unshift(name);
-            suspendPassthrough.apply(this, args);
-        };
-        interpreter.setProperty(scope, name, interpreter.createAsyncFunction(wrapper));
-    });
+            const callback = arguments[arguments.length-1]
+            args.unshift(callback)
+            args.unshift(name)
+            suspendPassthrough.apply(this, args)
+        })
+    }
 
-    /**
-     * Alias of prompt
-     */
-    wrapper = function(msg: string, callback: any) {
-        return suspendPassthrough('prompt', callback, msg);
-    };
-    interpreter.setProperty(
-        scope, 'readInput', interpreter.createAsyncFunction(wrapper)
-    );
+    // Alias of prompt
+    registerAsync("readInput", (msg: string, callback: any) => suspendPassthrough('prompt', callback, msg))
 
     // Helper function for easily wrapping a function around the passthrough.
     function callPassthrough(passthroughFunction: string, ...args: any[]) {
 
         const passthroughArgs: any[] = []
         // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(
-            interpreter.getProperty(scope, '__ES_RESULT')
-        ))
+        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, '__ES_RESULT')))
 
         // convert arguments to JavaScript types
         for (const arg of args) {
@@ -134,39 +119,29 @@ export default function setupAPI(interpreter: any, scope: any) {
             }
         }
 
-        return wrapJsErrors(() => {
-            return remapToPseudoJs(
-                (ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs)
-            )
-        })
+        return remapToPseudoJs((ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs))
     }
 
     // Helper function for easily wrapping a function around the passthrough.
-    function callModAndReturnPassthrough() {
-        // the first argument should be the passthrough function name
-        var func = arguments[0];
-
-        var args = [];
+    function callModAndReturnPassthrough(func: string, ...args: any) {
+        const passthroughArgs = []
         // put in the result as the new first argument
-        args.unshift(remapToNativeJs(
-            interpreter.getProperty(scope, '__ES_RESULT')
-        ));
+        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, '__ES_RESULT')))
 
         // convert arguments to JavaScript types
-        for (var i = 1; i < arguments.length; i++) {
-            if (arguments[i] === undefined) {
-                continue;
+        for (const arg of args) {
+            if (arg !== undefined) {
+                passthroughArgs.push(remapToNativeJs(arg))
             }
-            args.push(remapToNativeJs(arguments[i]));
         }
 
 
-        var jsResultReturn = (ES_PASSTHROUGH as any)[func].apply(this, args);
-        var pseudoJSResultReturn = {
-            result: wrapJsErrors(function() { return remapToPseudoJs(jsResultReturn.result) }),
-            returnVal: wrapJsErrors(function() { return remapToPseudoJs(jsResultReturn.returnVal) })
-        };
-        return pseudoJSResultReturn;
+        const jsResultReturn = (ES_PASSTHROUGH as any)[func].apply(this, passthroughArgs)
+        const pseudoJSResultReturn = {
+            result: remapToPseudoJs(jsResultReturn.result),
+            returnVal: remapToPseudoJs(jsResultReturn.returnVal)
+        }
+        return pseudoJSResultReturn
 
     }
 
@@ -177,12 +152,10 @@ export default function setupAPI(interpreter: any, scope: any) {
     //   callback: The callback function for asynchronous execution using JS-Interpreter.
     //
     // See dur() or analyze() for examples on how to use this function.
-    function suspendPassthrough(passthroughFunction: string, callback: any, ...args: any[]) {
+    async function suspendPassthrough(passthroughFunction: string, callback: any, ...args: any[]) {
         const passthroughArgs: any = []
         // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(
-            interpreter.getProperty(scope, '__ES_RESULT')
-        ));
+        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, '__ES_RESULT')))
 
         // convert arguments to JavaScript types
         for (const arg of args) {
@@ -191,25 +164,8 @@ export default function setupAPI(interpreter: any, scope: any) {
             }
         }
 
-        wrapJsErrors(function() {
-            var promise = (ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs);
-            promise.then(function(result: any) {
-                callback(remapToPseudoJs(result));
-            }).catch(function(err: any) {
-                throw err;
-            });
-        });
-    }
-
-    // TODO: This comment is a blatant lie...
-    // Helper function for wrapping error handling. Adds the line number of
-    // the error, etc.
-    function wrapJsErrors(func: any) {
-        try {
-            return func();
-        } catch(e) {
-            throw e;
-        }
+        const result = await (ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs)
+        callback(remapToPseudoJs(result))
     }
 
     // Helper function for JS-Interpreter to map an arbitrary real Javascript
@@ -217,50 +173,22 @@ export default function setupAPI(interpreter: any, scope: any) {
     function remapToPseudoJs(v: any) {
         if (!(v instanceof Object)) {
             // case v is not an object, return a mapped primitive type
-            return v;
+            return v
         }
         if (v instanceof Array) {
             // case v is an array
-            var pseudoList = interpreter.createObject(interpreter.ARRAY);
+            const pseudoList = interpreter.createObject(interpreter.ARRAY)
 
-            for (var i=0; i < v.length; i++) {
+            for (let i = 0; i < v.length; i++) {
                 // recursively remap nested values
-                var remappedVal = remapToPseudoJs(v[i]);
-                interpreter.setProperty(pseudoList, i, remappedVal);
+                const remappedVal = remapToPseudoJs(v[i])
+                interpreter.setProperty(pseudoList, i, remappedVal)
             }
             // pseudoList appears to be an Object rather than Array instance with length getter. (May 6, 2020)
-            interpreter.setProperty(pseudoList, 'length', v.length);
-            return pseudoList;
+            interpreter.setProperty(pseudoList, 'length', v.length)
+            return pseudoList
         } else {
-            return interpreter.nativeToPseudo(v);
+            return interpreter.nativeToPseudo(v)
         }
     }
-
-    // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
-    // variable into a native javascript variable.
-    function remapToNativeJs(v: any): any {
-        if (typeof(v) === 'undefined') {
-            return undefined;
-        } else if (typeof(v) !== 'object') {
-            return v;
-        }
-
-        var nativeObject;
-        if (v instanceof Interpreter.Object) {
-            if (v.proto && v.proto.class && v.proto.class === 'Array') {
-                nativeObject = [];
-                for (var i = 0; i < v.properties.length; i++) {
-                    nativeObject[i] = remapToNativeJs(v.properties[i]);
-                }
-            } else {
-                nativeObject = {} as { [key: string]: any }
-                for (var key in v.properties) {
-                    nativeObject[key] = remapToNativeJs(v.properties[key]);
-                }
-
-            }
-        }
-
-        return nativeObject;
-    }
-};
+}
