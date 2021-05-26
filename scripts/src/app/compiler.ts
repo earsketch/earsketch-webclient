@@ -1,7 +1,8 @@
 // Compile user scripts.
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
-import ES_JAVASCRIPT_API, { remapToNativeJs } from "../api/earsketch.js"
+import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
+import setupPythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
@@ -87,12 +88,18 @@ export function compilePython(code: string, quality: number) {
     return importPython(code, quality)
 }
 
+function runPythonCode(code: string) {
+    Sk.resetCompiler()
+    setupPythonAPI()
+    return Sk.importModuleInternal_("<stdin>", false, "__main__", code, undefined, false, true)
+}
+
 // Attempts evaluating and replacing undefined names with a placeholder until the actual evaluation later.
 // TODO: This probably does not need to be recursive.
 function recursiveNameCheckPY(code: string, undefinedNames: string[]): string[] {
     try {
         testRun = true
-        Sk.importMainWithBody("<stdin>", false, code, true)
+        runPythonCode(code)
     } catch (e) {
         if (e.tp$name && e.tp$name === "NameError") {
             const undefinedName = e.toString().split("'")[1]
@@ -136,15 +143,6 @@ async function handleUndefinedNamesPY(code: string) {
 // Python script (i.e., in the autograder.) For most use cases you should use
 // compilePython() instead and ignore this function.
 export async function importPython(code: string, quality: number) {
-    esconsole(`Loading EarSketch library from: ${SITE_BASE_URI}/scripts/src/api/earsketch.py.js`)
-
-    Sk.externalLibraries = {
-        // import EarSketch library into skulpt
-        earsketch : {
-            path: `${SITE_BASE_URI}/scripts/src/api/earsketch.py.js?v=${BUILD_NUM}&ext=.py.js`
-        }
-    }
-
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
     Sk.builtins["init"] = new Sk.builtin.func(() => {
@@ -196,7 +194,7 @@ export async function importPython(code: string, quality: number) {
     esconsole("Compiling script using Skulpt.", ["debug", "compiler"])
     const mod = await Sk.misceval.asyncToPromise(() => {
         try {
-            return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true)
+            return runPythonCode(code)
         } catch (err) {
             esconsole(err, ["error", "compiler"])
             throw err
@@ -263,7 +261,7 @@ async function handleUndefinedNamesJS(code: string, interpreter: any, tags: stri
 function createJsInterpreter(code: string, tags: string[], quality: number) {
     let interpreter
     try {
-        interpreter = new Interpreter(code, ES_JAVASCRIPT_API)
+        interpreter = new Interpreter(code, setupJavascriptAPI)
     } catch (e) {
         if (e.loc !== undefined) {
             // acorn provides line numbers for syntax errors
@@ -305,7 +303,7 @@ export async function compileJavascript(code: string, quality: number) {
     if (bypassOptimization) {
         let interpreter
         try {
-            interpreter = new Interpreter(code, ES_JAVASCRIPT_API)
+            interpreter = new Interpreter(code, setupJavascriptAPI)
         } catch (err) {
             if (err.loc !== undefined) {
                 // acorn provides line numbers for syntax errors

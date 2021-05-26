@@ -11,9 +11,7 @@ const vendorDir = 'scripts/vendor';
 const libDir = 'scripts/lib';
 const appDir = 'scripts/src/app';
 const servicesDir = 'scripts/src/app/services';
-const apiDir = 'scripts/src/api';
 const dataDir = 'scripts/src/data';
-const modelDir = 'scripts/src/model';
 
 module.exports = {
     entry: {
@@ -96,12 +94,6 @@ module.exports = {
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
-
-            // ES API
-            pyAPI: path.resolve(__dirname,`${apiDir}/earsketch.py.js`),
-
-            // Data
-            apiDoc: path.resolve(__dirname,`${dataDir}/api_doc.js`),
             
             // Curriculum Data
             currQuestions: path.resolve(__dirname,`scripts/src/browser/questions.js`),

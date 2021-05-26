@@ -25,14 +25,12 @@ export function remapToNativeJs(v: any): any {
 
         }
     }
-
     return nativeObject
 }
 
 // This defines an init function for JS-Interpreter.
 // These functions will be injected into the interpreter by the compiler.
 export default function setupAPI(interpreter: any, scope: any) {
-    // MIX_TRACK constant
     interpreter.setProperty(scope, "MIX_TRACK", (0))
     // Deprecated MASTER_TRACK alias for MIX_TRACK
     interpreter.setProperty(scope, "MASTER_TRACK", (0))
@@ -57,29 +55,29 @@ export default function setupAPI(interpreter: any, scope: any) {
 
     for (const name of passthroughList) {
         register(name, (...args: any[]) => {
-            interpreter.setProperty(scope, "__ES_RESULT", callPassthrough.apply(this, [name, ...args]))
+            interpreter.setProperty(scope, "__ES_RESULT", callPassthrough(name, ...args))
         })
     }
 
-    const returnablePassThroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
+    const returnablePassthroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
 
-    for (const name of returnablePassThroughList) {
-        register(name, (...args: any[]) => callPassthrough.apply(this, [name, ...args]))
+    for (const name of returnablePassthroughList) {
+        register(name, (...args: any[]) => callPassthrough(name, ...args))
     }
 
-    const modAndReturnPassThroughList = ["createAudioSlice"]
+    const modAndReturnPassthroughList = ["createAudioSlice"]
 
-    for (const name of modAndReturnPassThroughList) {
+    for (const name of modAndReturnPassthroughList) {
         register(name, (...args: any[]) => {
-            const resultAndReturnVal = callModAndReturnPassthrough.apply(this, [name, ...args])
+            const resultAndReturnVal = callModAndReturnPassthrough(name, ...args)
             interpreter.setProperty(scope, "__ES_RESULT", resultAndReturnVal.result)
             return resultAndReturnVal.returnVal
         })
     }
 
-    const suspendedPassThroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
+    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
 
-    for (const name of suspendedPassThroughList) {
+    for (const name of suspendedPassthroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
         // https://github.com/NeilFraser/JS-Interpreter/issues/180
         // These ES APIs take the max of 4 variable-length arguments,
@@ -96,75 +94,39 @@ export default function setupAPI(interpreter: any, scope: any) {
             }
             // Last item (g) is always the callback function.
             const callback = arguments[arguments.length-1]
-            args.unshift(callback)
-            args.unshift(name)
-            suspendPassthrough.apply(this, args)
+            suspendPassthrough(name, callback, ...args)
         })
     }
 
     // Alias of readInput. TODO: Can we get rid of this? It's not in the API documentation, curriculum, or Python API.
     registerAsync("prompt", (msg: string, callback: any) => suspendPassthrough("readInput", callback, msg))
 
+    // Convert arguments to JavaScript types.
+    const convertArgs = (args: any[]) => (
+        [interpreter.getProperty(scope, "__ES_RESULT"), ...args]
+        .map(arg => arg === undefined ? arg : remapToNativeJs(arg))
+    )
+
     // Helper function for easily wrapping a function around the passthrough.
-    function callPassthrough(passthroughFunction: string, ...args: any[]) {
-
-        const passthroughArgs: any[] = []
-        // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, "__ES_RESULT")))
-
-        // convert arguments to JavaScript types
-        for (const arg of args) {
-            if (arg !== undefined) {
-                passthroughArgs.push(remapToNativeJs(arg))
-            }
-        }
-
-        return remapToPseudoJs((ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs))
+    function callPassthrough(name: string, ...args: any[]) {
+        return remapToPseudoJs((ES_PASSTHROUGH as any)[name](...convertArgs(args)))
     }
 
     // Helper function for easily wrapping a function around the passthrough.
-    function callModAndReturnPassthrough(func: string, ...args: any) {
-        const passthroughArgs = []
-        // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, "__ES_RESULT")))
-
-        // convert arguments to JavaScript types
-        for (const arg of args) {
-            if (arg !== undefined) {
-                passthroughArgs.push(remapToNativeJs(arg))
-            }
-        }
-
-
-        const jsResultReturn = (ES_PASSTHROUGH as any)[func].apply(this, passthroughArgs)
-        const pseudoJSResultReturn = {
+    function callModAndReturnPassthrough(name: string, ...args: any) {
+        const jsResultReturn = (ES_PASSTHROUGH as any)[name](...convertArgs(args))
+        return {
             result: remapToPseudoJs(jsResultReturn.result),
             returnVal: remapToPseudoJs(jsResultReturn.returnVal)
         }
-        return pseudoJSResultReturn
-
     }
 
-    // Helper function for easily wrapping a function around the passthrough
-    // that returns a promise.
-    //
+    // Helper function for easily wrapping a function around the passthrough that returns a promise.
     //   passthroughFunction: The function name to call in the passthrough.
     //   callback: The callback function for asynchronous execution using JS-Interpreter.
-    //
     // See dur() or analyze() for examples on how to use this function.
-    async function suspendPassthrough(passthroughFunction: string, callback: any, ...args: any[]) {
-        const passthroughArgs: any = []
-        // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, "__ES_RESULT")))
-
-        // convert arguments to JavaScript types
-        for (const arg of args) {
-            if (arg !== undefined && typeof arg !== "function") {
-                passthroughArgs.push(remapToNativeJs(arg))
-            }
-        }
-
-        const result = await (ES_PASSTHROUGH as any)[passthroughFunction].apply(this, passthroughArgs)
+    async function suspendPassthrough(name: string, callback: any, ...args: any[]) {
+        const result = await (ES_PASSTHROUGH as any)[name](...convertArgs(args))
         callback(remapToPseudoJs(result))
     }
 
