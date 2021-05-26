@@ -51,6 +51,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     // TEMPORARY FOR GM TESTING
     $scope.showGM = FLAGS.SHOW_GM;
 
+    // TEMPORARY FOR I18N DEVELOPMENT
+    $scope.showLocaleSwitcher = FLAGS.SHOW_LOCALE_SWITCHER;
+
     if ($scope.showAmazon) {
         $rootScope.$broadcast('showAmazon');
     }
