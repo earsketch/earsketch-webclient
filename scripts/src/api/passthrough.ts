@@ -881,16 +881,15 @@ export function println(result: DAWData, msg: string) {
 }
 
 // Prompt for user input.
-export function prompt(result: DAWData, msg: string) {
-    esconsole("Calling pt_prompt from passthrough with parameter "
-                + msg, "PT")
+export function readInput(result: DAWData, msg: string) {
+    esconsole("Calling pt_readInput from passthrough with parameter " + msg, "PT")
 
     checkInit(result)
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("prompt", args, 0, 1)
-    if (typeof(msg) !== "undefined") {
-        ptCheckType("prompt", "string", msg)
+    ptCheckArgs("readInput", args, 0, 1)
+    if (typeof msg !== "undefined") {
+        ptCheckType("readInput", "string", msg)
     } else {
         msg = ""
     }

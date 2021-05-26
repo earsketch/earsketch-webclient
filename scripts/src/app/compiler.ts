@@ -290,7 +290,8 @@ export async function compileJavascript(code: string, quality: number) {
     esconsole(ESUtils.formatScriptForTests(code), ["nolog", "compiler"])
 
     // A temporary switch for disabling the lazy evaluation of undefined names.
-    const escapeWords = /Math\.random|readInput|analyzeTrackForTime|analyzeTrack|analyzeForTime|analyze|dur/
+    // TODO: Update this if we remove `prompt`, which is currently an alias for `readInput` in the JS API.
+    const escapeWords = /Math\.random|readInput|prompt|analyzeTrackForTime|analyzeTrack|analyzeForTime|analyze|dur/
     const bypassOptimization = !FLAGS.LAZY_SCRIPT_COMPILER || escapeWords.test(code)
     esconsole("Using lazy name loading: " + !bypassOptimization, ["compiler", "debug"])
     const getTagsFn = bypassOptimization ? audioLibrary.getAllTags : audioLibrary.getDefaultTags

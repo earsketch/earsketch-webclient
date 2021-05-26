@@ -77,7 +77,7 @@ export default function setupAPI(interpreter: any, scope: any) {
         })
     }
 
-    const suspendedPassThroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "prompt"]
+    const suspendedPassThroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
 
     for (const name of suspendedPassThroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
@@ -102,8 +102,8 @@ export default function setupAPI(interpreter: any, scope: any) {
         })
     }
 
-    // Alias of prompt
-    registerAsync("readInput", (msg: string, callback: any) => suspendPassthrough("prompt", callback, msg))
+    // Alias of readInput. TODO: Can we get rid of this? It's not in the API documentation, curriculum, or Python API.
+    registerAsync("prompt", (msg: string, callback: any) => suspendPassthrough("readInput", callback, msg))
 
     // Helper function for easily wrapping a function around the passthrough.
     function callPassthrough(passthroughFunction: string, ...args: any[]) {

@@ -78,7 +78,7 @@ var $builtinmodule = function (name) {
         });
     });
 
-    var suspendedPassThroughList = ['analyze', 'analyzeForTime', 'analyzeTrack', 'analyzeTrackForTime', 'dur'];
+    var suspendedPassThroughList = ['analyze', 'analyzeForTime', 'analyzeTrack', 'analyzeTrackForTime', 'dur', 'readInput'];
 
     suspendedPassThroughList.forEach(function (name) {
         mod[name] = new Sk.builtin.func(function () {
@@ -88,25 +88,16 @@ var $builtinmodule = function (name) {
         });
     });
 
-    // these are with unique names
-    /**
-     * Alias of raw_input
-     */
-    mod.readInput = new Sk.builtin.func(function (msg) {
-        //return callPassthrough('prompt', msg);
-        return suspendPassthrough('prompt', msg);
-    });
-
     /**
      * Overwrite of raw_input. Issue #1087, something must be wrong in
      * Skulpt's implementation -- works fine this way.
      */
     mod.raw_input = new Sk.builtin.func(function (msg) {
-        return suspendPassthrough('prompt', msg);
+        return suspendPassthrough('readInput', msg);
     });
 
     mod.input = new Sk.builtin.func(function (msg) {
-        return suspendPassthrough('prompt', msg);
+        return suspendPassthrough('readInput', msg);
     });
 
     /**
