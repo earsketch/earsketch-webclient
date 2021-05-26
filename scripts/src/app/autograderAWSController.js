@@ -87,7 +87,7 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
       var shareID = $scope.entries.split(',');
       var contestID = $scope.entrants.split(',');
 
-      for (i = 0; i < shareID.length; i++) {
+      for (var i = 0; i < shareID.length; i++) {
         if (shareID[i][0] == ','){
           shareID[i] = shareID[i].substring(1);
         }
@@ -273,7 +273,7 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
         }
       }
       angular.forEach($scope.results, function(result) {
-        row = [];
+        var row = [];
         for (var i = 0; i < headers.length; i++) {
           row[i] = '';
         }
