@@ -1,18 +1,18 @@
 // EarSketch API: Javascript
-import * as ES_PASSTHROUGH from './passthrough'
+import * as ES_PASSTHROUGH from "./passthrough"
 
 // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
 // variable into a native javascript variable.
 export function remapToNativeJs(v: any): any {
     if (v === undefined) {
         return undefined
-    } else if (typeof v !== 'object') {
+    } else if (typeof v !== "object") {
         return v
     }
 
     let nativeObject
     if (v instanceof Interpreter.Object) {
-        if (v.proto && v.proto.class && v.proto.class === 'Array') {
+        if (v.proto && v.proto.class && v.proto.class === "Array") {
             nativeObject = []
             for (let i = 0; i < v.properties.length; i++) {
                 nativeObject[i] = remapToNativeJs(v.properties[i])
@@ -33,9 +33,9 @@ export function remapToNativeJs(v: any): any {
 // These functions will be injected into the interpreter by the compiler.
 export default function setupAPI(interpreter: any, scope: any) {
     // MIX_TRACK constant
-    interpreter.setProperty(scope, 'MIX_TRACK', (0))
+    interpreter.setProperty(scope, "MIX_TRACK", (0))
     // Deprecated MASTER_TRACK alias for MIX_TRACK
-    interpreter.setProperty(scope, 'MASTER_TRACK', (0))
+    interpreter.setProperty(scope, "MASTER_TRACK", (0))
 
     const register = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createNativeFunction(fn))
     const registerAsync = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createAsyncFunction(fn))
@@ -43,8 +43,8 @@ export default function setupAPI(interpreter: any, scope: any) {
     // Function to initialize a new script in EarSketch.
     // Resets the global result variable to the default value.
     register("init", () => {
-        const result = callPassthrough('init', interpreter.getProperty(scope, '__AUDIO_QUALITY'))
-        interpreter.setProperty(scope, '__ES_RESULT', result)
+        const result = callPassthrough("init", interpreter.getProperty(scope, "__AUDIO_QUALITY"))
+        interpreter.setProperty(scope, "__ES_RESULT", result)
         interpreter.scope = scope
     })
 
@@ -53,31 +53,31 @@ export default function setupAPI(interpreter: any, scope: any) {
     // Now we just use _ES_RESULT directly, and finish is not required.
     register("finish", () => {})
 
-    const passthroughList = ['setTempo', 'fitMedia', 'insertMedia', 'insertMediaSection', 'makeBeat', 'makeBeatSlice', 'rhythmEffects', 'setEffect']
+    const passthroughList = ["setTempo", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
 
     for (const name of passthroughList) {
         register(name, (...args: any[]) => {
-            interpreter.setProperty(scope, '__ES_RESULT', callPassthrough.apply(this, [name, ...args]))
+            interpreter.setProperty(scope, "__ES_RESULT", callPassthrough.apply(this, [name, ...args]))
         })
     }
 
-    const returnablePassThroughList = ['gauss', 'importImage', 'importFile', 'println', 'replaceListElement', 'replaceString', 'reverseList', 'reverseString', 'selectRandomFile', 'shuffleList', 'shuffleString']
+    const returnablePassThroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
 
     for (const name of returnablePassThroughList) {
         register(name, (...args: any[]) => callPassthrough.apply(this, [name, ...args]))
     }
 
-    const modAndReturnPassThroughList = ['createAudioSlice']
+    const modAndReturnPassThroughList = ["createAudioSlice"]
 
     for (const name of modAndReturnPassThroughList) {
         register(name, (...args: any[]) => {
             const resultAndReturnVal = callModAndReturnPassthrough.apply(this, [name, ...args])
-            interpreter.setProperty(scope, '__ES_RESULT', resultAndReturnVal.result)
+            interpreter.setProperty(scope, "__ES_RESULT", resultAndReturnVal.result)
             return resultAndReturnVal.returnVal
         })
     }
 
-    const suspendedPassThroughList = ['analyze', 'analyzeForTime', 'analyzeTrack', 'analyzeTrackForTime', 'dur', 'prompt']
+    const suspendedPassThroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "prompt"]
 
     for (const name of suspendedPassThroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
@@ -103,14 +103,14 @@ export default function setupAPI(interpreter: any, scope: any) {
     }
 
     // Alias of prompt
-    registerAsync("readInput", (msg: string, callback: any) => suspendPassthrough('prompt', callback, msg))
+    registerAsync("readInput", (msg: string, callback: any) => suspendPassthrough("prompt", callback, msg))
 
     // Helper function for easily wrapping a function around the passthrough.
     function callPassthrough(passthroughFunction: string, ...args: any[]) {
 
         const passthroughArgs: any[] = []
         // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, '__ES_RESULT')))
+        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, "__ES_RESULT")))
 
         // convert arguments to JavaScript types
         for (const arg of args) {
@@ -126,7 +126,7 @@ export default function setupAPI(interpreter: any, scope: any) {
     function callModAndReturnPassthrough(func: string, ...args: any) {
         const passthroughArgs = []
         // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, '__ES_RESULT')))
+        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, "__ES_RESULT")))
 
         // convert arguments to JavaScript types
         for (const arg of args) {
@@ -155,11 +155,11 @@ export default function setupAPI(interpreter: any, scope: any) {
     async function suspendPassthrough(passthroughFunction: string, callback: any, ...args: any[]) {
         const passthroughArgs: any = []
         // put in the result as the new first argument
-        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, '__ES_RESULT')))
+        passthroughArgs.unshift(remapToNativeJs(interpreter.getProperty(scope, "__ES_RESULT")))
 
         // convert arguments to JavaScript types
         for (const arg of args) {
-            if (arg !== undefined && typeof arg !== 'function') {
+            if (arg !== undefined && typeof arg !== "function") {
                 passthroughArgs.push(remapToNativeJs(arg))
             }
         }
@@ -185,7 +185,7 @@ export default function setupAPI(interpreter: any, scope: any) {
                 interpreter.setProperty(pseudoList, i, remappedVal)
             }
             // pseudoList appears to be an Object rather than Array instance with length getter. (May 6, 2020)
-            interpreter.setProperty(pseudoList, 'length', v.length)
+            interpreter.setProperty(pseudoList, "length", v.length)
             return pseudoList
         } else {
             return interpreter.nativeToPseudo(v)
