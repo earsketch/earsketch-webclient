@@ -315,8 +315,10 @@ export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
     (_, { getState, dispatch }) => {
         // Auto scroll to the bottom.
         setTimeout(function () {
-            let caiBody = angular.element('#cai-body')[0]
+            const caiBody = angular.element('#cai-body')[0]
+            if (caiBody) {
                 caiBody.scrollTop = caiBody.scrollHeight
+            }
         })
     }
 )
