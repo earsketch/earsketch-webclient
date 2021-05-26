@@ -106,7 +106,7 @@ const CaiFooter = () => {
                         <button className="dropbtn-cai" style={{marginLeft: "auto", display: "block", marginRight: "auto"}}>
                             {dropupLabel}
                         </button>
-                        <div className="dropup-cai-content" style={{left:"100px", height:"fit-content"}}>
+                        <div className="dropup-cai-content" style={{left:"50%", height:"fit-content"}}>
                             <ul>
                                 {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
