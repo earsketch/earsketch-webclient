@@ -2,14 +2,18 @@ import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers';
 import Split from 'split.js';
 
-type WestKinds = 'SOUNDS' | 'SCRIPTS' | 'API';
+export enum BrowserTabType {
+    Sound = 1,
+    Script,
+    API
+}
 
 const layoutSlice = createSlice({
     name: 'layout',
     initialState: {
         west: {
             open: true,
-            kind: 'SOUNDS',
+            kind: BrowserTabType.Sound,
             size: 280
         },
         east: {
@@ -128,7 +132,7 @@ export const setVerticalSizesFromRatio = createAsyncThunk<void, number[], ThunkA
     }
 );
 
-export const openWest = createAsyncThunk<void, WestKinds|void, ThunkAPI>(
+export const openWest = createAsyncThunk<void, BrowserTabType|void, ThunkAPI>(
     'layout/openWest',
     (kind, { getState, dispatch }) => {
         if (layoutMutableState.horizontalSplits) {

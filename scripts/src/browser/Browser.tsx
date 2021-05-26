@@ -1,21 +1,20 @@
-import React, { useState, useEffect, LegacyRef, ChangeEventHandler, MouseEventHandler } from 'react';
-import { Store } from 'redux';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { usePopper } from "react-popper";
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
-import { useTranslation } from 'react-i18next';
+import React, {ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState} from 'react';
+import {Store} from 'redux';
+import {Provider, useDispatch, useSelector} from 'react-redux';
+import {usePopper} from "react-popper";
+import {hot} from 'react-hot-loader/root';
+import {react2angular} from 'react2angular';
+import {useTranslation} from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
-
-import { SoundBrowser } from './Sounds';
-import { ScriptBrowser } from './Scripts';
-import { APIBrowser } from './API';
-import { RootState } from '../reducers';
+import {BrowserTabType} from '../layout/layoutState';
+import {SoundBrowser} from './Sounds';
+import {ScriptBrowser} from './Scripts';
+import {APIBrowser} from './API';
+import {RootState} from '../reducers';
 
 const darkBgColor = '#223546';
-
 
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme);
@@ -44,9 +43,9 @@ export const TitleBar = () => {
     );
 };
 
-const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
+const BrowserTab: React.FC<{ name: string, type: BrowserTabType }> = ({ name, type, children }) => {
     const dispatch = useDispatch();
-    const isSelected = useSelector(layout.selectWestKind)===name;
+    const isSelected = useSelector(layout.selectWestKind)===type;
 
     return (
         <div
@@ -57,7 +56,7 @@ const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
             } : {}}
             onClick={() => { dispatch(layout.setWest({
                 open: true,
-                kind: name
+                kind: type
                 }));
             }}
         >
@@ -79,13 +78,13 @@ export const BrowserTabs = () => {
                 minHeight: 'fit-content' // Safari-specific issue
             }}
         >
-            <BrowserTab name={t('soundBrowser.title')}>
+            <BrowserTab name={t('soundBrowser.title')} type={BrowserTabType.Sound}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
-            <BrowserTab name={t('scriptBrowser.title')}>
+            <BrowserTab name={t('scriptBrowser.title')} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
-            <BrowserTab name='API'>
+            <BrowserTab name='API' type={BrowserTabType.API}>
                 <i className='icon-book pr-2' />
             </BrowserTab>
         </div>
@@ -299,10 +298,10 @@ export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ p
 };
 
 // Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
-const BrowserComponents: { [key:string]: React.FC } = {
-    SOUNDS: SoundBrowser,
-    SCRIPTS: ScriptBrowser,
-    API: APIBrowser
+const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
+    [BrowserTabType.Sound]: SoundBrowser,
+    [BrowserTabType.Script]: ScriptBrowser,
+    [BrowserTabType.API]: APIBrowser
 };
 
 const Browser = () => {
@@ -310,8 +309,8 @@ const Browser = () => {
     const open = useSelector((state: RootState) => state.layout.west.open);
     const { t } = useTranslation();
     let kind = useSelector(layout.selectWestKind);
-    if (!Object.keys(BrowserComponents).includes(kind)) {
-        kind = 'SOUNDS';
+    if(!(kind in BrowserTabType)) {
+        kind = BrowserTabType.Sound;
     }
     const BrowserBody = BrowserComponents[kind];
 
