@@ -42,9 +42,7 @@ const CaiBody = () => {
     return (
         <div id="cai-body">
             <div>
-            {mainControllerScope.showCAIWindow &&
             <video src="https://earsketch.gatech.edu/videoMedia/cai_denoise.mp4" controls style={{width: "100%", maxWidth: "webkit-fill-available"}}></video>
-            }
             </div>
             <div className="chat-message-container">
                 <ul>
