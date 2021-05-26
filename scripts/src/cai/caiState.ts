@@ -235,6 +235,10 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         const caiStudentPreferenceModule = helpers.getNgService('caiStudentHistoryModule')
         const rootScope = helpers.getNgRootScope()
 
+        if (caiDialogue.isDone()) {
+            return
+        }
+
         //call cai analysis here
         const result = data[0]
         const language = data[1]
@@ -278,6 +282,11 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
     (data, { getState, dispatch }) => {
         const caiDialogue = helpers.getNgService('caiDialogue')
         const errorReturn = caiDialogue.handleError(data)
+
+        if (caiDialogue.isDone()) {
+            return
+        }
+
         if (errorReturn != "") {
             setTimeout(() => {
                 dispatch(setInputOptions(caiDialogue.createButtons()))
