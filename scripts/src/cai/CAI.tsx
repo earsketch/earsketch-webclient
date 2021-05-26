@@ -143,14 +143,15 @@ const CaiPane = () => {
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
 
-    dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
-
-    dispatch(cai.curriculumPage(curriculumLocation))
+    useEffect (() => {
+        dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(cai.curriculumPage(curriculumLocation))
+    })
 
     return paneIsOpen ? (
         <div className={`font-sans h-full flex flex-col ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}>
             <CaiHeader />
-            {<CaiBody />}
+            <CaiBody />
             <CaiFooter />
         </div>
     ) : <Collapsed title='CAI' position='east' />
