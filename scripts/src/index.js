@@ -117,17 +117,14 @@ require(['angular'], () => {
 
     // In-house modules
     require('reporter');
-    require('reader');
     require('localStorage');
     require('userProject');
     require('websocket');
     require('collaboration');
     require('colorTheme');
-    require('compiler');
     require('uploader');
     require('completer');
     require('exporter');
-    require('analysis');
     require('esrecorder');
     require('recorder');
 

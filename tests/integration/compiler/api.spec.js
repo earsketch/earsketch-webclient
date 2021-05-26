@@ -1,3 +1,5 @@
+import * as compiler from '../../../src/app/compiler'
+
 describe('API function tests', function() {
     var tester;
     var skulptConfig;
@@ -79,7 +81,6 @@ describe('API function tests', function() {
             logs = [];
         }
         tester.visit('/', function() {
-            var compiler = tester.injector().get('compiler');
             compiler.compilePython(script, 0).then(function(result) {
                 expect(result).toMatchResult(expected, script);
                 for (var i = 0; i < logs.length; i++) {
@@ -98,7 +99,6 @@ describe('API function tests', function() {
             logs = [];
         }
         tester.visit('/', function() {
-            var compiler = tester.injector().get('compiler');
             compiler.compileJavascript(script, 0).then(function(result) {
                 expect(result).toMatchResult(expected, script);
                 for (var i = 0; i < logs.length; i++) {

@@ -82,8 +82,6 @@ module.exports = {
             notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
             // Models
-            compiler: path.resolve(__dirname,`${servicesDir}/compiler.js`),
-            reader: path.resolve(__dirname,`${servicesDir}/reader.js`),
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
@@ -98,7 +96,6 @@ module.exports = {
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             modules: path.resolve(__dirname,`${modelDir}/modules.js`),
-            analysis: path.resolve(__dirname,`${modelDir}/analysis.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
 
             // ES API
