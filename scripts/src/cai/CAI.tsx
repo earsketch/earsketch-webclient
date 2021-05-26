@@ -7,6 +7,7 @@ import { SearchBar, Collapsed } from '../browser/Browser'
 import * as cai from './caiState'
 import * as tabs from '../editor/tabState'
 import * as appState from '../app/appState'
+import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 import * as curriculum from '../browser/curriculumState'
 import * as helpers from '../helpers'
@@ -160,14 +161,11 @@ const CaiPane = () => {
 
 let initialized = false
 let $rootScope: angular.IRootScopeService | null = null
-let ESUtils: any = null
 
 const HotCAI = hot((props: {
-    ESUtils: any,
     $ngRedux: any, // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
     $rootScope: angular.IRootScopeService
 }) => {
-    ESUtils = props.ESUtils
     return (
         <Provider store={props.$ngRedux}>
             <CaiPane />
@@ -175,4 +173,4 @@ const HotCAI = hot((props: {
     )
 })
 
-app.component('cai', react2angular(HotCAI, null, ['$ngRedux', 'clipboard', 'ESUtils', '$rootScope']))
+app.component('cai', react2angular(HotCAI, null, ['$ngRedux', 'clipboard', '$rootScope']))
