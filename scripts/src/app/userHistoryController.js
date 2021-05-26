@@ -1,7 +1,4 @@
-/**
- * @module userHistoryController
- */
-
+import esconsole from '../esconsole'
 
 app.controller("userHistoryController", ['$scope', 'userProject', '$http', 'localStorage', function($scope, userProject, $http, localStorage) {
 

@@ -5,7 +5,9 @@
  * @module reader
  * @author Creston Bunch
  */
-app.factory('reader', ['userNotification', function reader(userNotification) {
+import * as userNotification from '../userNotification'
+
+app.factory('reader', function reader() {
     var PY_LIST_FUNCS = [
         'append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort'
     ];
@@ -261,4 +263,4 @@ app.factory('reader', ['userNotification', function reader(userNotification) {
         analyzePython: analyzePython,
         analyzeJavascript: analyzeJavascript
     };
-}]);
+});

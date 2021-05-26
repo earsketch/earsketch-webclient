@@ -1,4 +1,4 @@
-var ESMessages ={
+const ESMessages = {
     "exitunsaved": "You have unsaved changes to your scripts. Are you sure you want to exit now?",
     "interpreter": {
         "version": "EarSketch Client V 2.626", //"grunt update-version" to update minor version
@@ -171,3 +171,5 @@ var ESMessages ={
         "preemptiveSave": 'After putting a user name, you need to press Enter, Tab, Space, or click outside before hitting SAVE. This step checks if the user name exists.'
     }
 };
+
+export default ESMessages

@@ -8,14 +8,15 @@
  * @author Creston Bunch
  */
 
+import * as ESUtils from '../esutils'
+import * as userConsole from '../app/userconsole'
+
 var $builtinmodule = function (name) {
 
     var mod = {};
-    var userConsole = ServiceWrapper().userConsole;
     var compiler = ServiceWrapper().compiler;
     var analyzer = ServiceWrapper().reader;
     var autograder = ServiceWrapper().autograder;
-    var ESUtils = ServiceWrapper().ESUtils;
     var nativePrompt = userConsole.prompt;
     var prompts = [];
     var prints = [];

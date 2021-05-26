@@ -1,10 +1,10 @@
-/**
- * @module autograderController
- */
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
+import * as userConsole from './userconsole'
 
 app.controller("autograderController",
-['$scope','compiler', 'userConsole','ESUtils',
-function($scope, compiler, userConsole, ESUtils) {
+['$scope','compiler',
+function($scope, compiler) {
 
     $scope.uploads = [];
     $scope.referenceFile = null;
@@ -20,7 +20,7 @@ function($scope, compiler, userConsole, ESUtils) {
     $scope.useSeed = true;
 
     // overwrite userConsole javascript prompt with a hijackable one
-    var nativePrompt = userConsole.prompt;
+    var nativePrompt = window.esPrompt;
     $scope.listenerPrompt = function(text) {
       return nativePrompt(text).then(function(response) {
         $scope.prompts.push(response);
@@ -108,7 +108,7 @@ function($scope, compiler, userConsole, ESUtils) {
         $scope.referenceResult = null;
         $scope.referenceResultCopy = null;
         // restore prompt function to record inputs
-        userConsole.prompt = $scope.listenerPrompt;
+        window.esPrompt = $scope.listenerPrompt;
         if (file !== null) {
             $scope.referenceLanguage = ESUtils.parseLanguage(file.name);
             $scope.readFile(file)
@@ -144,7 +144,7 @@ function($scope, compiler, userConsole, ESUtils) {
         // clear current uploads
         $scope.uploads = [];
         // use the hijacked prompt function to input user input
-        userConsole.prompt = $scope.hijackedPrompt();
+        window.esPrompt = $scope.hijackedPrompt();
 
         // start with a promise that resolves immediately
         var p = new Promise(function(resolve) { resolve(); });

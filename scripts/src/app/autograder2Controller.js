@@ -1,10 +1,10 @@
-/**
- * @module autograderController
- */
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
+import * as userConsole from './userconsole'
 
 app.controller("autograder2Controller",
-['$scope','compiler', 'reader', 'Upload','userConsole','ESUtils', 'userProject', '$http',
-function($scope, compiler, reader, Upload, userConsole, ESUtils, userProject, $http) {
+['$scope','compiler', 'reader', 'userProject',
+function($scope, compiler, reader, userProject) {
 
     // Loading ogg by default for browsers other than Safari
     // setting default to wav for chrome 58 (May 22, 2017)

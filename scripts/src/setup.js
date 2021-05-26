@@ -81,10 +81,3 @@ function toggleSlidePane(lessonUrl){
 //        'click focus': 'mouseleave blur'
 //    });
 //});
-
-// TODO: create custom error model / service
-function ValueError(message) {
-    this.name = "ValueError";
-    this.message = (message || "");
-}
-ValueError.prototype = Error.prototype;

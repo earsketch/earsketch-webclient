@@ -4,9 +4,16 @@
  * @module compiler
  * @author Creston Bunch
  */
+import audioContext from '../audiocontext'
+import * as audioLibrary from '../audiolibrary'
+import esconsole from '../../esconsole'
+import * as ESUtils from '../../esutils'
+import * as pitchshift from '../pitchshifter'
+import * as userConsole from '../userconsole'
+
 app.factory('compiler',
-['pitchshifter','audioLibrary','audioContext','userConsole','$rootScope','ESUtils','$q',
-function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootScope,ESUtils,$q) {
+['$rootScope','$q',
+function compilerFactory($rootScope,$q) {
     let testRun = false;
 
     /**
@@ -103,7 +110,7 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
             var track = result.tracks[i];
 
             if (track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT'] !== undefined) {
-                var p = pitchshift.asyncPitchshiftClips(track, result.tempo);
+                var p = pitchshift.pitchshiftClips(track, result.tempo);
 
                 promises.push(p);
                 p.then(function (track) {
@@ -181,8 +188,7 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
                 var undefinedName = e.toString().split("'")[1];
 
                 // Create a dummy constant and repeat.
-                undefinedNamePy = Sk.ffi.remapToPy(undefinedName);
-                Sk.builtins[undefinedName] = undefinedNamePy;
+                Sk.builtins[undefinedName] = Sk.ffi.remapToPy(undefinedName);
 
                 if (undefinedNames.indexOf(undefinedName) === -1)
                 {
@@ -586,7 +592,7 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
     }
 
     function getClipTempo(result) {
-        var metadata = audioLibrary.getCache();
+        var metadata = audioLibrary.cache.sounds;
         var tempoCache = {};
 
         result.tracks.forEach(function (track) {
@@ -830,8 +836,6 @@ function compilerFactory(pitchshift,audioLibrary,audioContext,userConsole,$rootS
                         fillEmptyStart.endMeasure = effects[0].startMeasure;
                         fillEmptyStart.startValue = effects[0].startValue;
                         fillEmptyStart.endValue = effects[0].startValue;
-                        fillEmptyStart.inputStartValue = effects[0].inputStartValue;
-                        fillEmptyStart.inputEndValue = effects[0].inputStartValue;
                         effects.unshift(fillEmptyStart);
                     }
                 }

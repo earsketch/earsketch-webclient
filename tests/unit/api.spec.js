@@ -1,6 +1,6 @@
 describe('EarSketch API tests', function() {
 
-    var audioLibrary, compiler, renderer, userConsole, esconsole;
+    var audioLibrary, compiler, renderer;
     var $rootScope, $q, result;
 
     // mock module dependencies
@@ -52,22 +52,16 @@ describe('EarSketch API tests', function() {
     });
 
     beforeEach(inject(function($injector) {
-        // spy on the user console service
-        userConsole = jasmine.createSpy('userConsole')
-            .and.callFake(function() {return $injector.get('userConsole');});
         // mock the service wrapper that the API uses to load angular
         // dependencies
 
-        esconsole = $injector.get('esconsole');
-
         // overriding the angular-wrappers' function
+        // TODO: may need to update this since angular-wrappers is now a module.
         ServiceWrapper = function() {
             return {
                 audioLibrary: audioLibrary,
                 compiler: compiler,
                 renderer: renderer,
-                userConsole: userConsole,
-                esconsole: esconsole
             }
         };
         $rootScope = $injector.get('$rootScope');

@@ -4,6 +4,8 @@
  * @module colorTheme
  * @author Takahiko Tsuchiya
  */
+import esconsole from '../../esconsole'
+
 app.factory('colorTheme', ['localStorage', '$rootScope', function (localStorage, $rootScope) {
     var currentTheme = 'light';
 

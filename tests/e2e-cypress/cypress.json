@@ -1,0 +1,5 @@
+{
+  "defaultCommandTimeout": 10000,
+  "supportFile": "src/support/index.js",
+  "integrationFolder": "src/"
+}

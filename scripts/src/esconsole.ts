@@ -1,4 +1,3 @@
-/*==================== new logger / print functions ====================*/
 let ESConsoleTraceLevel = 2
 const ESConsoleExcludedTags = ['DEBUG']
 const ESConsoleIncludedTags = ['WARNING', 'ERROR', 'FATAL']
@@ -418,9 +417,5 @@ esconsole.addESTagToNotPrint = addESTagToNotPrint
 esconsole.ESLog = ESLog
 esconsole.addESTagToLog = addESTagToLog
 esconsole.addESTagToNotLog = addESTagToNotLog
-
-// TODO: For now, we make this global by sticking it on `window`.
-// Eventually, all modules that use it should instead import as an ES6 module.
-window.esconsole = esconsole
 
 export default esconsole
