@@ -220,6 +220,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
                 dispatch(setDefaultInputOptions())
             }
         }
+        dispatch(autoScrollCAI())
     }
 );
 
