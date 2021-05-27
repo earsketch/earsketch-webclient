@@ -12,11 +12,9 @@ app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', 'userProject', fu
             scope.editor.droplet = null;
 
             scope.editor.visible = true;
-            collaboration.editorVisible = true;
 
             scope.$on('visible', function(event, val){
                 scope.editor.visible = !val;
-                collaboration.editorVisible = !val;
             });
 
             if (scope.currentLanguage === 'python') {

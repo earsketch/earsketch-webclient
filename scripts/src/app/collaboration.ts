@@ -28,13 +28,10 @@ export let isSynching = false; // TODO: redundant? for storing cursors
 
 export let sessionActive = false;
 export let active = false;
-// syncPromise = null;
 
 export let selection: any = null;
 export let cursorPos: any = null;
 
-// redundant?
-// userStatus = null;
 export let role = 'viewer';
 
 // parent state version number on server & client, which the current operation is based on
@@ -45,7 +42,6 @@ export let history: any = {};
 
 export let collaborators = {};
 export let otherMembers: any = {};
-// otherActiveMembers = [];
 export let markers: any = {};
 export let colors = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]];
 
@@ -73,10 +69,6 @@ function triggerByNotification(data: any) {
                 helpers.getNgRootScope().$emit('joinedCollabSession', data);
                 break;
             }
-            // case 'invited': { // not used
-            //     onInvitation(data);
-            //     break;
-            // }
             case 'sessionStatus': {
                 onSessionStatus(data);
                 break;
@@ -130,10 +122,6 @@ function triggerByNotification(data: any) {
                 }
                 case 'scriptSaved': {
                     onScriptSaved(data);
-                    break;
-                }
-                case 'alreadySaved': {
-                    onAlreadySaved(data);
                     break;
                 }
                 case 'cursorPosition': {
@@ -354,7 +342,6 @@ export let onJoinedSession = function (data: any) {
     // open script in editor
     scriptText = data.scriptText;
     setEditorTextWithoutOutput(scriptText);
-    // highlightEditorFrame(true);
 
     // sync the server state number
     state = data.state;
@@ -484,38 +471,6 @@ export let removeCollaborators = function (shareID: string, userName: string, re
     }
 };
 
-// legacy stuff for turn-taking collaboration
-// requestWriteAccess = function () {
-//     websocket.send({
-//         'notification_type': 'collaboration',
-//         'action': 'miscMessage',
-//         'scriptID': scriptID,
-//         'sender': userName,
-//         'text': userName + ' has requested the write access!'
-//     });
-// };
-//
-// giveUpWriteAccess = function () {
-//     websocket.send({
-//         'notification_type': 'collaboration',
-//         'action': 'miscMessage',
-//         'scriptID': scriptID,
-//         'sender': userName,
-//         'text': userName + ' is done with editing.'
-//     });
-// };
-//
-// toggleWriteAccess = function (user) {
-//     websocket.send({
-//         'notification_type': 'collaboration',
-//         'action': 'changeWriteAccess',
-//         'scriptID': scriptID,
-//         'sender': userName,
-//         'targetUser': user,
-//         'canEdit': collaborators[user].canEdit
-//     })
-// };
-
 function setEditorTextWithoutOutput(scriptText: string) {
     lockEditor = true;
 
@@ -559,7 +514,6 @@ export let editScript = function (data: any) {
 
         if (!sessionActive) {
             rejoinSession();
-            // rejoinAndEdit(message);
         } else {
             websocket.send(message);
             timeoutSync(message.ID);
@@ -731,16 +685,6 @@ export let rejoinSession = function () {
     });
 };
 
-// rejoinAndEdit = function (editMessage) {
-//     if (active) {
-//         esconsole('rejoining session and editing', 'collab');
-//         userNotification.showBanner('Synchronization error: Rejoining the session', 'failure1');
-//
-//         editMessage.action = 'rejoinAndEdit';
-//         websocket.send(editMessage);
-//     }
-// };
-
 export let saveScript = function (scriptID: string) {
     var message;
 
@@ -763,10 +707,6 @@ export let onScriptSaved = function (data: any) {
         userNotification.show(data.sender + ' saved the current version of the script.', 'success');
 
     store.dispatch(scripts.syncToNgUserProject());
-};
-
-export let onAlreadySaved = function (nothing: any) {
-    // userNotification.show('Not saved: The current version of the collaborative script is already up to date');
 };
 
 export let storeCursor = function (position: any) {
@@ -847,11 +787,6 @@ function removeOtherCursors() {
     }
 }
 
-// currently, "invited" user is automatically joined to the collaboration group
-// onInvitation = function (data) {
-//     userNotification.handleCollabInvitation(data);
-// };
-
 export let onMiscMessage = function (data: any) {
     userNotification.show(data.text);
 };
@@ -876,7 +811,6 @@ export let onChangeWriteAccess = function (data: any) {
 export let onSessionClosed = function (data: any) {
     esconsole('remote session closed', 'collab');
 
-    // active = false;
     sessionActive = false;
 
     for (var member in otherMembers) {
@@ -889,17 +823,6 @@ export let onSessionClosed = function (data: any) {
 export let onSessionClosedForInactivity = function (data: any) {
     userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.");
 };
-
-// a legacy code that signifies the editor tab is in collaboration mode
-// function highlightEditorFrame(bool) {
-//     if (bool) {
-//         // angular.element(document.querySelector('#code-toolbar > div.tab-container > div > ul > li.uib-tab.nav-item.ng-isolate-scope.active > a')).css('background-color', '#3371ab7');
-//         angular.element(document.querySelectorAll('.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover')).css('background-color', '#3371ab7');
-//         angular.element(document.getElementsByClassName('code-container')).css('border', '2px solid #337ab7');
-//     } else {
-//
-//     }
-// }
 
 function beforeTransf(operation: any) {
     if (operation.action === 'insert') {
@@ -1139,8 +1062,6 @@ function adjustCursor(op: any) {
 }
 
 export let onUserAddedToCollaboration = async function (data: any) {
-    // userNotification.show(data.sender + ' added you as a collaborator on ' + data.scriptName, 'collaboration');
-
     if (active && scriptID === data.scriptID) {
         data.addedMembers.forEach(function (member: string) {
             otherMembers[member] = {
@@ -1157,8 +1078,6 @@ export let onUserAddedToCollaboration = async function (data: any) {
 };
 
 export let onUserRemovedFromCollaboration = async function (data: any) {
-    // userNotification.show(data.sender + ' removed you from collaboration on ' + data.scriptName, 'collaboration');
-
     if (data.removedMembers.indexOf(userName) !== -1) {
         if (closeSharedScriptIfOpen) {
             closeSharedScriptIfOpen(data.scriptID);
@@ -1190,8 +1109,6 @@ export let leaveCollaboration = function (scriptID: string, userName: string, re
 };
 
 export let onUserLeftCollaboration = async function (data: any) {
-    // userNotification.show(data.sender + ' left the collaboration on ' + data.scriptName, 'collaboration');
-
     if (active && scriptID === data.scriptID) {
         delete otherMembers[data.sender.toLowerCase()]; // #1858
 
@@ -1222,7 +1139,6 @@ export let renameScript = function (scriptID: string, scriptName: string, userNa
 
 export let onScriptRenamed = async function (data: any) {
     esconsole(data.sender + ' renamed a collaborative script ' + data.scriptID, 'collab');
-    // userNotification.show('Collaborative script "' + data.oldName + '" was renamed to "' + data.newName + '"', 'collaboration');
 
     if (refreshSharedScriptBrowser) {
         await refreshSharedScriptBrowser();
