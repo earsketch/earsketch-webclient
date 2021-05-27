@@ -284,12 +284,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     }
 
                                     else if (listVal._astname === "Num") {
-                                        if (!complexityCalculatorHelperFunctions.isNodeFloat(listVal)) {
-                                            newVariable.value = "Int";
-                                        }
-                                        else {
-                                            newVariable.value = "Float";
-                                        }
+                                        newVariable.value = complexityCalculatorHelperFunctions.isNodeFloat(listVal) ? "Float" : "Int";
                                     }
 
                                     else if (listVal._astname === "Str") {
@@ -632,7 +627,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                             if (foundIter) { forFuncObj.functionNames.push(iterListItem.id.v); }
                                                         }
                                                     }
-
                                                     forLoopFuncs.push(forFuncObj);
                                                     newVariable.value = "userFunction";
                                                 }
@@ -707,12 +701,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
 
                                 else if (firstValue._astname === "Num") {
-                                    if (!complexityCalculatorHelperFunctions.isNodeFloat(firstValue)) {
-                                        newVariable.value = "Int";
-                                    }
-                                    else {
-                                        newVariable.value = "Float";
-                                    }
+                                    newVariable.value = complexityCalculatorHelperFunctions.isNodeFloat(firstValue) ? "Float" : "Int";
                                 }
 
                                 else if (firstValue._astname === "Subscript") {
@@ -826,12 +815,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         }
 
                                         if (subValue._astname === "Num") {
-                                            if (!complexityCalculatorHelperFunctions.isNodeFloat(subValue)) {
-                                                newVariable.value = "Int";
-                                            }
-                                            else {
-                                                newVariable.value = "Float";
-                                            }
+                                            newVariable.value = complexityCalculatorHelperFunctions.isNodeFloat(firstValue) ? "Float" : "Int";
                                         }
                                     }
                                 }
@@ -1649,13 +1633,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     containedVal = complexityCalculatorHelperFunctions.listTypesWithin(nodeVal, [], inputIndexing, containsOps);
                 }
 
-                if (nodeVal._astname === 'Num') { //test if it's an int or float
-                    if (!complexityCalculatorHelperFunctions.isNodeFloat(nodeVal)) {
-                        varVal = 'Int';
-                    }
-                    else {
-                        varVal = 'Float';
-                    }
+                if (nodeVal._astname === "Num") { //test if it's an int or float
+                    varVal = complexityCalculatorHelperFunctions.isNodeFloat(nodeVal) ? "Float" : "Int";
                 }
                 if (nodeVal._astname === "Str") {
                     varVal = "Str";
@@ -2229,12 +2208,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     }
                     //ints, floats
                     else if (indexValue._astname === "Num") {
-                        if (!complexityCalculatorHelperFunctions.isNodeFloat(indexValue)) {
-                            userFunctionReturns[r].returns = "Int";
-                        }
-                        else {
-                            userFunctionReturns[r].returns = "Float";
-                        }
+                        userFunctionReturns[r].returns = complexityCalculatorHelperFunctions.isNodeFloat(indexValue) ? "Float" : "Int";
                     }
                     //comparisons and boolops both become booleans and stored in containedValue
                     else if (indexValue._astname === "Compare" || indexValue._astname === "BoolOp") {
@@ -2501,12 +2475,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                     }
                     else if (indexValue._astname === "Num") {
-                        if (!complexityCalculatorHelperFunctions.isNodeFloat(indexValue)) {
-                            allVariables[r].value = "Int";
-                        }
-                        else {
-                            allVariables[r].value = "Float";
-                        }
+                        allVariables[r].value = complexityCalculatorHelperFunctions.isNodeFloat(indexValue) ? "Float" : "Int";
                     }
                     else if (indexValue._astname === "Compare" || indexValue._astname === "BoolOp") {
                         allVariables[r].value = "Bool";
@@ -2829,12 +2798,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         functionObject.indexAndInput.strIndexed = complexityCalculatorHelperFunctions.getStringIndexingInNode(retVal)[0];
                     }
                     if (retVal._astname === "Num") {
-                        if (!complexityCalculatorHelperFunctions.isNodeFloat(retVal)) {
-                            valueType = "Int";
-                        }
-                        else {
-                            valueType = "Float";
-                        }
+                        valueType = omplexityCalculatorHelperFunctions.isNodeFloat(retVal) ? "Float" : "Int";
                     }
                     else if (retVal._astname === "Call") {
                         //if it returns another function's return, we look up what THAT function returns. if we know.
@@ -3500,12 +3464,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
 
                             if (argType === "Num") {
-                                if (!complexityCalculatorHelperFunctions.isNodeFloat(arg)) {
-                                    argType = "Int";
-                                }
-                                else {
-                                    argType = "Float";
-                                }
+                                argType = complexityCalculatorHelperFunctions.isNodeFloat(arg) ? "Float" : "Int";
 
                                 userFunctionReturns[index].flagVal = "";
                                 userFunctionReturns[index].funcVar = "";
@@ -4012,12 +3971,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
 
                             else if (type === "Num") {
-                                if (!complexityCalculatorHelperFunctions.isNodeFloat(node.args[a])) {
-                                    paramArgVar.value = "Int";
-                                }
-                                else {
-                                    paramArgVar.value = "Float";
-                                }
+                                paramArgVar.value = complexityCalculatorHelperFunctions.isNodeFloat(node.args[a]) ? "Float" : "Int";
                             }
                             else if (type === "Name" && (argsIn[a].id.v === "True" || argsIn[a].id.v === "False")) {
                                 paramArgVar.value = "Bool";
@@ -4291,12 +4245,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 userFunctionReturns[index].opsDone = [];
                             }
                             if (argType === "Num") {
-                                if (!complexityCalculatorHelperFunctions.isNodeFloat(arg)) {
-                                    argType = "Int";
-                                }
-                                else {
-                                    argType = "Float";
-                                }
+                                argType = complexityCalculatorHelperFunctions.isNodeFloat(arg) ? "Float" : "Int";
                                 userFunctionReturns[index].flagVal = "";
                                 userFunctionReturns[index].funcVar = "";
                                 userFunctionReturns[index].returns = argType;
@@ -5123,12 +5072,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     bools = true;
                 }
                 else if (singleArg._astname === 'Num') {
-                    if (!complexityCalculatorHelperFunctions.isNodeFloat(singleArg)) {
-                        ints = true;
-                    }
-                    else {
-                        floats = true;
-                    }
+                    complexityCalculatorHelperFunctions.isNodeFloat(singleArg) ? floats = true : ints = true;
                 }
 
                 //if it's a list, we also look at and note all the types in the list as being used for a purpose.
@@ -5828,12 +5772,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     uses["strings"] = true;
                 }
                 if (node._astname === 'Num') {
-                    if (!complexityCalculatorHelperFunctions.isNodeFloat(node)) {
-                        uses["ints"] = true;
-                    }
-                    else {
-                        uses["floats"] = true;
-                    }
+                    complexityCalculatorHelperFunctions.isNodeFloat(node) ? uses["floats"] = true : uses["ints"] = true;
                 }
                 if ((node._astname === "Name" && (node.id.v === "True" || node.id.v === "False"))) {
                     uses["booleans"] = true;
@@ -8296,12 +8235,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 bools = true;
                             }
                             else if (nodeToCheck._astname === 'Num') {
-                                if (!complexityCalculatorHelperFunctions.isNodeFloat(nodeToCheck)) {
-                                    ints = true;
-                                }
-                                else {
-                                    floats = true;
-                                }
+                                complexityCalculatorHelperFunctions.isNodeFloat(nodeToCheck) ? floats = true : ints = true;
                             }
                             else if (nodeToCheck._astname === 'List') {
                                 //if it's a list, we also look at and note all the types in the list as being used for a purpose.
