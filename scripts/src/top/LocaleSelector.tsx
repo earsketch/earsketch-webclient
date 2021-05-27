@@ -1,5 +1,5 @@
 import React from "react";
-import {Store} from "redux";
+import { Store } from "redux";
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { hot } from 'react-hot-loader/root';
 import { react2angular } from 'react2angular';
