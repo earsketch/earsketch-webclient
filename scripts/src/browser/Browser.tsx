@@ -8,7 +8,7 @@ import {useTranslation} from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
-import {BrowserTabType} from '../layout/layoutState';
+import { BrowserTabType } from '../types/enums';
 import {SoundBrowser} from './Sounds';
 import {ScriptBrowser} from './Scripts';
 import {APIBrowser} from './API';
