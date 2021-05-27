@@ -11,46 +11,41 @@ export let script: any = null; // script object: only used for the off-line mode
 export let scriptID: string | null = null; // collaboration session identity (both local and remote)
 
 export let userName = '';
-export let owner = false;
-export let canEdit = true;
+let owner = false;
 
-export let editor: any = null;
+let editor: any = null;
 var editSession: any = null;
 var aceRange: any = null;
 
-export let buffer: any[] = [];
-export let synchronized = true; // user's own messages against server
-export let awaiting = null; // unique edit ID from self
+let buffer: any[] = [];
+let synchronized = true; // user's own messages against server
+let awaiting: any = null; // unique edit ID from self
 
-export let scriptText = '';
+let scriptText = '';
 export let lockEditor = true;
 export let isSynching = false; // TODO: redundant? for storing cursors
 
-export let sessionActive = false;
+let sessionActive = false;
 export let active = false;
 
-export let selection: any = null;
-export let cursorPos: any = null;
-
-export let role = 'viewer';
+let selection: any = null;
+let cursorPos: any = null;
 
 // parent state version number on server & client, which the current operation is based on
-export let state = 0;
+let state = 0;
 
 // keeps track of the SERVER operations. only add the received messages.
-export let history: any = {};
+let history: any = {};
 
-export let collaborators = {};
 export let otherMembers: any = {};
-export let markers: any = {};
-export let colors = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]];
+let markers: any = {};
 
 export let chat: any = {};
 export let tutoring = false;
 
-export let promises: any = {};
-export let timeouts: any = {};
-export let scriptCheckTimerID: any = null;
+let promises: any = {};
+let timeouts: any = {};
+let scriptCheckTimerID: any = null;
 
 // callbacks for environmental changes
 export let refreshScriptBrowser: any = null;
@@ -175,7 +170,7 @@ function PrepareWsMessage() {
     this['sender'] = userName; // #1858
 }
 
-export let initialize = function () {
+let initialize = function () {
     editSession = editor.ace.getSession();
     otherMembers = {};
     buffer = [];
@@ -273,7 +268,7 @@ export let closeScript = function (shareID: string, userName: string) {
     }
 };
 
-export let setOwner = function (boolean: boolean) {
+let setOwner = function (boolean: boolean) {
     owner = boolean;
 };
 
@@ -289,7 +284,7 @@ export let checkSessionStatus = function () {
     timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout);
 };
 
-export let onSessionStatus = function (data: any) {
+let onSessionStatus = function (data: any) {
     esconsole('session status received', 'collab');
     clearTimeout(timeouts[userName]);
     delete timeouts[userName];
@@ -307,17 +302,7 @@ function onFailedToSynchronize() {
     userNotification.show('Failed to synchronize with the central server. You might already have another EarSketch window or tab open somewhere. To fix  please refresh page.', 'failure2', 999);
 }
 
-// TODO: may not be directly called by UI
-export let closeSession = function (shareID: string) {
-    websocket.send({
-        'notification_type': 'collaboration',
-        'action': 'closeSession',
-        'scriptID': shareID,
-        'sender': userName
-    });
-};
-
-export let joinSession = function (shareID: string, userName: string) {
+let joinSession = function (shareID: string, userName: string) {
     esconsole('joining collaboration session: ' + shareID, 'collab');
 
     scriptID = shareID;
@@ -332,7 +317,7 @@ export let joinSession = function (shareID: string, userName: string) {
     timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout);
 };
 
-export let onJoinedSession = function (data: any) {
+let onJoinedSession = function (data: any) {
     esconsole('joined collaboration session: ' + data.scriptID, 'collab');
 
     // clear the websocket connection check
@@ -366,7 +351,7 @@ export let onJoinedSession = function (data: any) {
     }
 };
 
-export let onSessionsFull = function (data: any) {
+let onSessionsFull = function (data: any) {
     // clear the websocket connection check sent from joinSession
     clearTimeout(timeouts[userName]);
     delete timeouts[userName];
@@ -377,7 +362,7 @@ export let onSessionsFull = function (data: any) {
     openScriptOffline(script);
 };
 
-export let openScriptOffline = function (script: any) {
+let openScriptOffline = function (script: any) {
     esconsole('opening a collaborative script in the off-line mode', 'collab');
     script.username = script.username.toLocaleString(); // #1858
     script.collaborative = false;
@@ -404,7 +389,7 @@ export let leaveSession = function (shareID: string, username?: string) {
     helpers.getNgRootScope().$emit('leftCollabSession', null);
 };
 
-export let onMemberJoinedSession = function (data: any) {
+let onMemberJoinedSession = function (data: any) {
     userNotification.show(data.sender + ' has joined the collaboration session.');
 
     if (otherMembers.hasOwnProperty(data.sender)) {
@@ -419,7 +404,7 @@ export let onMemberJoinedSession = function (data: any) {
     helpers.getNgRootScope().$apply(); // update GUI
 };
 
-export let onMemberLeftSession = function (data: any) {
+let onMemberLeftSession = function (data: any) {
     userNotification.show(data.sender + ' has left the collaboration session.');
 
     if (markers.hasOwnProperty(data.sender)) {
@@ -525,7 +510,7 @@ export let editScript = function (data: any) {
     }
 };
 
-export let onEditMessage = function (data: any) {
+let onEditMessage = function (data: any) {
     editor.setReadOnly(true);
     history[data.state] = data.editData;
 
@@ -635,23 +620,23 @@ function syncToSession(data: any) {
     history = {};
 }
 
-export let onSyncError = function (data: any) {
+let onSyncError = function (data: any) {
     userNotification.showBanner("There was a sync error. Adjusting the local edit...");
     syncToSession(data);
 };
 
-export let requestSync = function () {
+let requestSync = function () {
     esconsole('requesting synchronization to the server', 'collab');
     var message = new (PrepareWsMessage as any)();
     message.action = 'requestSync';
     websocket.send(message);
 };
 
-export let onSyncToSession = function (data: any) {
+let onSyncToSession = function (data: any) {
     syncToSession(data);
 };
 
-export let rejoinSession = function () {
+let rejoinSession = function () {
     if (active) {
         userNotification.showBanner('Synchronization error: Rejoining the session', 'failure1');
 
@@ -702,7 +687,7 @@ export let saveScript = function (scriptID: string) {
     reporter.saveSharedScript();
 };
 
-export let onScriptSaved = function (data: any) {
+let onScriptSaved = function (data: any) {
     if (!userIsCAI(data.sender))
         userNotification.show(data.sender + ' saved the current version of the script.', 'success');
 
@@ -740,7 +725,7 @@ export let storeSelection = function (selection: any) {
     }
 };
 
-export let onCursorPosMessage = function (data: any) {
+let onCursorPosMessage = function (data: any) {
     data.sender = data.sender.toLowerCase(); // #1858
     var document = editSession.getDocument();
     var cursorPos = document.indexToPosition(data.position, 0);
@@ -755,7 +740,7 @@ export let onCursorPosMessage = function (data: any) {
     markers[data.sender] = editSession.addMarker(range, 'generic-cursor-'+num, 'text', true);
 };
 
-export let onSelectMessage = function (data: any) {
+let onSelectMessage = function (data: any) {
     data.sender = data.sender.toLowerCase(); // #1858
 
     var document = editSession.getDocument();
@@ -787,19 +772,15 @@ function removeOtherCursors() {
     }
 }
 
-export let onMiscMessage = function (data: any) {
+let onMiscMessage = function (data: any) {
     userNotification.show(data.text);
 };
 
-export let onChangeWriteAccess = function (data: any) {
-    canEdit = data.canEdit;
-
+let onChangeWriteAccess = function (data: any) {
     if (data.canEdit) {
-        role = 'editor';
         editor.setReadOnly(false);
         userNotification.show(data.sender + ' gave you the write access!', 'collaboration');
     } else {
-        role = 'viewer';
         editor.setReadOnly(true);
         userNotification.show('You no longer have the write access.', 'collaboration');
     }
@@ -808,7 +789,7 @@ export let onChangeWriteAccess = function (data: any) {
 /**
  * After certain period of inactivity, the session closes automatically, sending message. It should flag for startSession to be sent before the next action.
  */
-export let onSessionClosed = function (data: any) {
+let onSessionClosed = function (data: any) {
     esconsole('remote session closed', 'collab');
 
     sessionActive = false;
@@ -820,7 +801,7 @@ export let onSessionClosed = function (data: any) {
     helpers.getNgRootScope().$apply(); // update GUI
 };
 
-export let onSessionClosedForInactivity = function (data: any) {
+let onSessionClosedForInactivity = function (data: any) {
     userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.");
 };
 
@@ -1061,7 +1042,7 @@ function adjustCursor(op: any) {
     }
 }
 
-export let onUserAddedToCollaboration = async function (data: any) {
+let onUserAddedToCollaboration = async function (data: any) {
     if (active && scriptID === data.scriptID) {
         data.addedMembers.forEach(function (member: string) {
             otherMembers[member] = {
@@ -1077,7 +1058,7 @@ export let onUserAddedToCollaboration = async function (data: any) {
     }
 };
 
-export let onUserRemovedFromCollaboration = async function (data: any) {
+let onUserRemovedFromCollaboration = async function (data: any) {
     if (data.removedMembers.indexOf(userName) !== -1) {
         if (closeSharedScriptIfOpen) {
             closeSharedScriptIfOpen(data.scriptID);
@@ -1108,7 +1089,7 @@ export let leaveCollaboration = function (scriptID: string, userName: string, re
     }
 };
 
-export let onUserLeftCollaboration = async function (data: any) {
+let onUserLeftCollaboration = async function (data: any) {
     if (active && scriptID === data.scriptID) {
         delete otherMembers[data.sender.toLowerCase()]; // #1858
 
@@ -1137,7 +1118,7 @@ export let renameScript = function (scriptID: string, scriptName: string, userNa
     websocket.send(message);
 };
 
-export let onScriptRenamed = async function (data: any) {
+let onScriptRenamed = async function (data: any) {
     esconsole(data.sender + ' renamed a collaborative script ' + data.scriptID, 'collab');
 
     if (refreshSharedScriptBrowser) {
@@ -1159,7 +1140,7 @@ export let getScriptText = function (scriptID: string) {
     });
 };
 
-export let onScriptText = function (data: any) {
+let onScriptText = function (data: any) {
     if (promises['getScriptText']) {
         promises['getScriptText'](data.scriptText);
         delete promises['getScriptText'];
@@ -1241,23 +1222,8 @@ export let sendCompilationRecord = function (type: string) {
     websocket.send(message);
 };
 
-export let sendTabSwitchRecord = function (tab: any) {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'switchScript';
-    message.text = tab.name;
-    websocket.send(message);
-};
-
-export let sendCurriculumOpenRecord = function (pageTitle: string) {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'openCurriculum';
-    message.text = pageTitle;
-    websocket.send(message);
-};
-
-
 // TEMPORARY for Wizard of Oz CAI testing, Spring 2020.
-export let userIsCAI = function (user: string) {
+let userIsCAI = function (user: string) {
     user = user.toUpperCase();
     return (user.indexOf("AI_PARTNER") !== -1 || user.indexOf("CAI") !== -1);
 };
