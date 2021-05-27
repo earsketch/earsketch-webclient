@@ -12,14 +12,9 @@ import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
 import { RootState } from '../reducers';
+import { BrowserTabType } from "../layout/layoutState";
 
 const darkBgColor = '#223546';
-
-export enum BrowserTabType {
-    Sound = 1,
-    Script,
-    Api
-}
 
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme);

@@ -5,7 +5,7 @@ import * as helpers from '../helpers';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity } from 'common';
-import { BrowserTabType } from '../browser/Browser';
+import { BrowserTabType } from "../layout/layoutState";
 
 interface BubbleState {
     active: boolean
