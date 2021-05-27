@@ -5,11 +5,12 @@
  * @author Takahiko Tsuchiya
  */
 import esconsole from '../../esconsole';
+import * as reporter from '../reporter';
 import * as scripts from '../../browser/scriptsState';
 import * as userNotification from '../userNotification';
 import * as websocket from '../websocket';
 
-app.service('collaboration', ['reporter', '$rootScope', '$ngRedux', function (reporter, $rootScope, $ngRedux) {
+app.service('collaboration', ['$rootScope', '$ngRedux', function ($rootScope, $ngRedux) {
     var self = this;
     this.script = null; // script object: only used for the off-line mode
     this.scriptID = null; // collaboration session identity (both local and remote)

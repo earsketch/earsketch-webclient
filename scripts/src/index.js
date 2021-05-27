@@ -113,7 +113,6 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('reporter');
     require('localStorage');
     require('userProject');
     require('collaboration');
