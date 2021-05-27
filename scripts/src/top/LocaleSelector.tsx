@@ -10,8 +10,8 @@ import { useTranslation } from "react-i18next";
 import * as appState from '../app/appState';
 
 interface locale {
-    displayText: string,
-    localeCode: string
+    displayText: string;
+    localeCode: string;
 }
 
 const AVAILABLE_LOCALES: locale[] = [
