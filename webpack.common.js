@@ -137,6 +137,8 @@ module.exports = {
 
             // CAI
             complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
+            complexityCalculatorPY: path.resolve(__dirname,`${servicesDir}/complexityCalculatorPY.js`),
+            complexityCalculatorJS: path.resolve(__dirname,`${servicesDir}/complexityCalculatorJS.js`),
             complexityCalculatorState: path.resolve(__dirname,`${servicesDir}/complexityCalculatorState.js`),
             ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
             complexityCalculatorStorage: path.resolve(__dirname,`${dataDir}/complexityCalculatorStorage.js`),

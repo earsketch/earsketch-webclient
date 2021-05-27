@@ -5,7 +5,7 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
  *
  * @author Jason Smith
  */
-app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', 'audioLibrary', "caiStudent", function (complexityCalculator, recommender, audioLibrary, caiStudent) {
+app.factory('caiAnalysisModule', ['complexityCalculator', 'complexityCalculatorPY', 'complexityCalculatorJS', 'recommender', 'audioLibrary', "caiStudent", function (complexityCalculator, complexityCalculatorPY, complexityCalculatorJS, recommender, audioLibrary, caiStudent) {
 
   var librarySounds = [];
   var librarySoundGenres = [];
@@ -107,13 +107,13 @@ app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', 'audioL
    * @param script {string} The script source code
    */
   function analyzeCode(language, script) {
-    if (language == "python") {
-      return complexityCalculator.analyzePython(script);
-    } else if (language == "javascript") {
-      return complexityCalculator.analyzeJavascript(script);
-    } else {
-      return;
-    }
+      if (language == "python") {
+          return complexityCalculatorPY.analyzePython(script);
+      } else if (language == "javascript") {
+          return complexityCalculatorJS.analyzeJavascript(script);
+      } else {
+          return;
+      }
   }
 
   /**
@@ -127,22 +127,22 @@ app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', 'audioL
   }
 
   /**
-   * Report the code complexity and music analysis of a script.
-   *
-   * @param language {string} The language python or javascript
-   * @param script {string} The script source code
-   * @param trackListing {dict} Compiler output
-   */
-   function analyzeCodeAndMusic(language, script, trackListing) {
+  * Report the code complexity and music analysis of a script.
+  *
+  * @param language {string} The language python or javascript
+  * @param script {string} The script source code
+  * @param trackListing {dict} Compiler output
+  */
+  function analyzeCodeAndMusic(language, script, trackListing) {
     var codeComplexity = analyzeCode(language, script);
-       var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.apiCalls());
-       savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis });
-       if (caiStudent != null && FLAGS.SHOW_CAI) {
-           //caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity });
-           caiStudent.updateModel("musicAttributes", musicAnalysis);
-       }
+    var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.getApiCalls());
+    savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis });
+    if (caiStudent != null && FLAGS.SHOW_CAI) {
+      //caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity });
+      caiStudent.updateModel("musicAttributes", musicAnalysis);
+    }
     return Object.assign({}, {'Code':codeComplexity}, {'Music':musicAnalysis});
-   }
+  }
 
 
   /*
@@ -156,7 +156,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', 'audioL
       report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length)};
       report["EFFECTS"] = {};
 
-      apiCalls = complexityCalculator.apiCalls();
+      apiCalls = complexityCalculator.getApiCalls();
 
       if(apiCalls.length > 0) {
         report["APICALLS"] = apiCalls;

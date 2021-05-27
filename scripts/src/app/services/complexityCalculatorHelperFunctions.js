@@ -4044,6 +4044,146 @@ app.factory('complexityCalculatorHelperFunctions', function complexityCalculator
         return nameList;
     }
 
+    /* Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
+    * @param ast - the Python or Javascript AST object
+    */
+    function replaceNumericUnaryOps(ast) {
+        for (var i in ast) {
+            if (ast[i] != null && ast[i]._astname != null) {
+                if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) { ast[i] = ast[i].operand; }
+                else if (ast[i] != null && 'body' in ast[i]) {
+                    for (var p in ast[i].body) {
+                        replaceNumericUnaryOps(ast[i].body[p]);
+                    }
+                }
+                replaceNumericUnaryOps(ast[i]);
+            }
+        }
+    }
+
+    //Finds Variable object given the variable name. If not found, returns null.
+    function getVariableObject(variableName) {
+        for (var r = 0; r < allVariables.length; r++) {
+            if (allVariables[r].name === variableName) { return allVariables[r]; }
+        }
+        return null;
+    }
+
+
+    //Find the User Function Return object by the function name. If not found, returns null.
+    function getFunctionObject(funcName) {
+        for (var u = 0; u < userFunctionReturns.length; u++) {
+            if (userFunctionReturns[u].name === funcName) { return userFunctionReturns[u]; }
+        }
+        return null;
+    }
+
+    function lineDict() {
+
+        function fillLevels(nodeList, levelList) {
+            var childNodes = [];
+            var thisLevel = [];
+            for (var i in nodeList) {
+                if (nodeList[i].children.length > 0) {
+                    for (var j in nodeList[i].children) {
+                        childNodes.push(nodeList[i].children[j]);
+                    }
+                }
+                thisLevel.push([nodeList[i].start, nodeList[i].end]);
+
+            }
+            levelList.push(thisLevel);
+            if (childNodes.length > 0) {
+                fillLevels(childNodes, levelList);
+            }
+        }
+
+        lineDictionary = [];
+
+        //initialize array values
+        for (var i in studentCode) {
+            lineDictionary.push({ line: Number(i) + 1, variables: [], loop: 0, calls: [], ifElse: [] });
+        }
+
+        //note every time the user defines a function
+        for (var u in userFunctionReturns) {
+            if (userFunctionReturns[u].startLine != null) {
+                var index = userFunctionReturns[u].startLine - 1;
+                lineDictionary[index].userFunction = userFunctionReturns[u];
+                var i = index + 1;
+                while (i < userFunctionReturns[u].endLine) {
+                    lineDictionary[i].userFunction = userFunctionReturns[u];
+                    i++;
+                }
+            }
+        }
+
+        //note every time a variable is assigned or modified
+        for (var v in variableAssignments) {
+            var index = variableAssignments[v].line - 1;
+            var variableVal = getVariableObject(variableAssignments[v].name);
+            if (lineDictionary[index] != null) {
+                lineDictionary[index].variables.push(variableVal);
+            }
+        }
+
+        for (var loop in loopLocations) {
+            //track the begin points of each loop
+            var index = loopLocations[loop][0] - 1;
+            lineDictionary[index].loopStart = loopLocations[loop];
+
+            //note which lines are in one or more loops
+            for (var loopLine = loopLocations[loop][0] - 1; loopLine <= loopLocations[loop][1] - 1; loopLine++) {
+                if (lineDictionary[loopLine] != null) {
+                    lineDictionary[loopLine].loop += 1;
+                }
+            }
+        }
+
+        for (var call in allCalls) {
+            var index = allCalls[call].line - 1;
+            if (lineDictionary[index] != null) {
+                lineDictionary[index].calls.push(allCalls[call]);
+            }
+        }
+
+        //nested if else statements
+        var levels = [];
+        fillLevels(allConditionals, levels);
+
+        //remove overlap in levels
+        for (var i in levels) {
+            for (var j = 0; j < levels[i].length; j++) {
+                //if (j != 0) {
+                //    //if it's not the first one, subtract 1 from the start value
+                //   // levels[i][j][0] -= 1;
+                //}
+                if (j != levels[i].length - 1) {
+                    //if it's not the last one, subtract 1 from the end value
+                    levels[i][j][1] = levels[i][j][1] - 1;
+                }
+                else {
+                }
+            }
+        }
+
+        for (var i in levels) {
+            for (var j = 0; j < levels[i].length; j++) {
+                var string = "else";
+                if (j === 0) {
+                    string = "if";
+                }
+                var start = levels[i][j][0];
+                var end = levels[i][j][1];
+                for (var p = start; p <= end; p++) {
+                    lineDictionary[p - 1].ifElse.push(string);
+                }
+            }
+        }
+
+        return lineDictionary;
+    }
+
 
     return {
         appendArray: appendArray, 
@@ -4077,6 +4217,10 @@ app.factory('complexityCalculatorHelperFunctions', function complexityCalculator
         mostRecentElements: mostRecentElements,
         getLastLine: getLastLine,
         allReturnsFilled: allReturnsFilled,
-        getNestedVariables: getNestedVariables
+        getNestedVariables: getNestedVariables,
+        replaceNumericUnaryOps: replaceNumericUnaryOps,
+        getVariableObject: getVariableObject,
+        getFunctionObject: getFunctionObject,
+        lineDict: lineDict
     };
 });
