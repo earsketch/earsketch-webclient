@@ -1,10 +1,10 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
 import * as tabs from '../editor/tabState';
 import * as helpers from '../helpers';
-import {sampleScript} from "./bubbleData";
-import {RootState, ThunkAPI} from '../reducers';
-import {ScriptEntity} from 'common';
+import { sampleScript } from "./bubbleData";
+import { RootState, ThunkAPI } from '../reducers';
+import { ScriptEntity } from 'common';
 import { BrowserTabType } from '../types/enums';
 
 interface BubbleState {

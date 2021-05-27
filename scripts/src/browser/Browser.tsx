@@ -1,18 +1,18 @@
-import React, {ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState} from 'react';
-import {Store} from 'redux';
-import {Provider, useDispatch, useSelector} from 'react-redux';
-import {usePopper} from "react-popper";
-import {hot} from 'react-hot-loader/root';
-import {react2angular} from 'react2angular';
-import {useTranslation} from 'react-i18next';
+import React, { ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState } from 'react';
+import { Store } from 'redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import { usePopper } from "react-popper";
+import { hot } from 'react-hot-loader/root';
+import { react2angular } from 'react2angular';
+import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
-import {BrowserTabType} from '../types/enums';
-import {SoundBrowser} from './Sounds';
-import {ScriptBrowser} from './Scripts';
-import {APIBrowser} from './API';
-import {RootState} from '../reducers';
+import { BrowserTabType } from '../types/enums';
+import { SoundBrowser } from './Sounds';
+import { ScriptBrowser } from './Scripts';
+import { APIBrowser } from './API';
+import { RootState } from '../reducers';
 
 const darkBgColor = '#223546';
 
