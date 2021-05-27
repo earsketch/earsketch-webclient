@@ -521,31 +521,38 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
         // NOTE: This loop pushes onto the array. We don't want to iterate over the new elements, so we slice() here.
         for (const clip of track.clips.slice()) {
             const buffer = buffers[clip.filekey]
-            // add the buffer property
             clip.audio = buffer
-
-            // calculate the measure length of the clip
-            const duration = ESUtils.timeToMeasure(buffer.duration, result.tempo)
-
-            // by default, increment the repeating clip position by the clip duration
-            let posIncr = duration
+            let duration, posIncr
 
             // if the clip does not have the original tempo, override the incremental size to be a quarter note, half note, a measure, etc.
             if (clip.tempo === -1) {
+                // by default, increment the repeating clip position by the clip duration
+                posIncr = duration = ESUtils.timeToMeasure(buffer.duration, result.tempo)
                 let exp = -2
 
-                while (duration > Math.pow(2, exp)) {
-                    // stop adjusting at exp=4 -> 16 measures
-                    if (exp >= 4) {
-                        break
-                    } else {
-                        exp++
-                    }
+                // stop adjusting at exp=4 -> 16 measures
+                while (duration > Math.pow(2, exp) && exp < 4) {
+                    exp++
                 }
 
                 if (duration <= Math.pow(2, exp)) {
                     posIncr = Math.pow(2, exp)
                 }
+            } else {
+                // Tempo specified: round to the nearest sixteenth note.
+                // This corrects for imprecision in dealing with integer numbers of samples,
+                // and helps with user-uploaded MP3, which deviate from the intended length after encoding & decoding.
+                // E.g.: A wave file of one measure at 88 bpm, 44.1kHz has 120273 samples;
+                // converting it to a mp3 and decoding yields 119808 samples,
+                // meaning it falls behind by ~0.01 seconds per loop.
+                const actualLengthInQuarters = buffer.duration / 60 * result.tempo
+                const actualLengthInSixteenths = actualLengthInQuarters * 4
+                // NOTE: This prevents users from using samples which have intentionally weird lenghts,
+                // like 33 32nd notes, as they will be rounded to the nearest 16th.
+                // This has been deemed an acceptable tradeoff for fixing unintentional loop drift.
+                const targetLengthInSixteenths = Math.round(actualLengthInSixteenths)
+                const targetLengthInQuarters = targetLengthInSixteenths / 4
+                duration = posIncr = targetLengthInQuarters / 4
             }
 
             // if the clip end value is 0, set it to the duration
@@ -565,7 +572,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             )
 
             // update the source clip to reflect the new length
-            clip.end = Math.min(1+duration, clip.end)
+            clip.end = Math.min(duration + 1, clip.end)
             clip.loopChild = false
 
             // add clips to fill in empty space
