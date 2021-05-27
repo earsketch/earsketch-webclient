@@ -1,4 +1,4 @@
-import React, {useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from 'react';
+import React, { useState, useEffect, LegacyRef, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { FixedSizeList as List } from 'react-window';
