@@ -54,11 +54,10 @@ const BrowserTab: React.FC<{ name: string, type: BrowserTabType }> = ({ name, ty
                 color: '#F5AE3C',
                 borderColor: '#F5AE3C'
             } : {}}
-            onClick={() => { dispatch(layout.setWest({
+            onClick={() => dispatch(layout.setWest({
                 open: true,
                 kind: type
-                }));
-            }}
+            }))}
         >
             { children }
             { name }
