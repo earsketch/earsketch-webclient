@@ -25,7 +25,7 @@ export interface APIItem {
     caveats?: string
 }
 
-const ESApiDoc: { [key: string]: APIItem | APIItem[] } = {
+const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } = {
     "analyze": {
         "description": "This function analyzes an audio file for the specified feature.",
         "parameters": {
@@ -724,6 +724,6 @@ const ESApiDoc: { [key: string]: APIItem | APIItem[] } = {
         },
         "autocomplete": "shuffleString(inputString)"
     }
-}
+} as const
 
 export default ESApiDoc
