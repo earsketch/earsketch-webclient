@@ -8,7 +8,7 @@ import {useTranslation} from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
-import { BrowserTabType } from '../types/enums';
+import {BrowserTabType} from '../types/enums';
 import {SoundBrowser} from './Sounds';
 import {ScriptBrowser} from './Scripts';
 import {APIBrowser} from './API';
@@ -84,7 +84,7 @@ export const BrowserTabs = () => {
             <BrowserTab name={t('scriptBrowser.title')} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
-            <BrowserTab name='API' type={BrowserTabType.API}>
+            <BrowserTab name='API' type={BrowserTabType.Api}>
                 <i className='icon-book pr-2' />
             </BrowserTab>
         </div>
@@ -301,7 +301,7 @@ export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ p
 const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
     [BrowserTabType.Sound]: SoundBrowser,
     [BrowserTabType.Script]: ScriptBrowser,
-    [BrowserTabType.API]: APIBrowser
+    [BrowserTabType.Api]: APIBrowser
 };
 
 const Browser = () => {
@@ -312,6 +312,7 @@ const Browser = () => {
     if(!(kind in BrowserTabType)) {
         kind = BrowserTabType.Sound;
     }
+
     const BrowserBody = BrowserComponents[kind];
 
     return (

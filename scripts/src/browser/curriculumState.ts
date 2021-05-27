@@ -54,7 +54,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(layout.openWest(BrowserTabType.API))
+            dispatch(layout.openWest(BrowserTabType.Api))
         }
     })
 
