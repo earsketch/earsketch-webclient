@@ -2,11 +2,13 @@ import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers';
 import Split from 'split.js';
 
-export enum BrowserTabType {
-    Sound = 1,
-    Script,
-    Api
-}
+export const BrowserTabType = {
+    Sound: 0,
+    Script: 1,
+    API: 2
+} as const
+
+export type BrowserTabType = typeof BrowserTabType[keyof typeof BrowserTabType];
 
 const layoutSlice = createSlice({
     name: 'layout',
