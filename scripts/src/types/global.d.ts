@@ -6,9 +6,11 @@
 
 declare var URL_DOMAIN: string;
 declare var URL_LOADAUDIO: string;
+declare var URL_WEBSOCKET: string
 declare var SITE_BASE_URI: string;
 declare var BUILD_NUM: string;
 declare var FLAGS: any;
+
 declare var ESCurr_TOC: any;
 declare var ESCurr_Pages: number[][];
 declare var ESCurr_SearchDoc: {

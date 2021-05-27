@@ -69,7 +69,7 @@ app.service('collaboration', ['reporter', '$rootScope', '$ngRedux', function (re
     var syncTimeout = 5000; // when time out, the websocket connection is likely lost
 
     // websocket callbacks
-    function triggerByNotification(event, data) {
+    function triggerByNotification(data) {
         if (data.notification_type === 'collaboration') {
             switch (data.action) {
                 case 'joinedSession': {

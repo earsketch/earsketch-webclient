@@ -810,7 +810,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         // Close CAI
         $rootScope.$broadcast('caiClose');
 
-        websocket.close();
+        websocket.disconnect();
     }
 
     /**
@@ -875,7 +875,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         data.scriptid = shareid;
         data.users = users;
 
-        if (!websocket.isOpen()) {
+        if (!websocket.isOpen) {
             websocket.connect(getUsername(), function () {
                 websocket.send(data);
             });
