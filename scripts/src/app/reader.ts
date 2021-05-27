@@ -24,6 +24,11 @@ const FEATURE_SCORES = {
 } as const
 
 
+export function analyze(language: "python" | "javascript", source: string) {
+    return language === "python" ? analyzePython(source): analyzeJavascript(source)
+}
+
+
 const PY_LIST_FUNCS = ['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort'] as const
 const PY_STR_FUNCS = ['join', 'split', 'strip', 'rstrip', 'lstrip', 'startswith', 'upper', 'lower'] as const
 

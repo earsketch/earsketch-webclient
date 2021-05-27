@@ -1,4 +1,4 @@
-import * as reporter from './reporter';
+import reporter from './reporter';
 import * as sounds from '../browser/soundsState';
 import * as userNotification from './userNotification';
 

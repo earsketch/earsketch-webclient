@@ -3,7 +3,7 @@ import * as appState from '../appState';
 import * as audioLibrary from '../audiolibrary';
 import esconsole from '../../esconsole';
 import * as ESUtils from '../../esutils';
-import * as reporter from '../reporter';
+import reporter from '../reporter';
 import * as scriptsState from '../../browser/scriptsState';
 import * as tabs from '../../editor/tabState';
 import * as userNotification from '../userNotification';

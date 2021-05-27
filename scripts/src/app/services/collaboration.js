@@ -5,7 +5,7 @@
  * @author Takahiko Tsuchiya
  */
 import esconsole from '../../esconsole';
-import * as reporter from '../reporter';
+import reporter from '../reporter';
 import * as scripts from '../../browser/scriptsState';
 import * as userNotification from '../userNotification';
 import * as websocket from '../websocket';

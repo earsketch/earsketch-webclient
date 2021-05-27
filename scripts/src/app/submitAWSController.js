@@ -4,7 +4,7 @@
  */
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
-import * as reporter from './reporter'
+import reporter from './reporter'
 import * as userNotification from './userNotification'
 
 app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'exporter', 'licenses', 'clipboard', '$http', 'colorTheme', function($scope, $uibModalInstance, userProject, script, exporter, licenses, clipboard, $http, colorTheme) {

@@ -4,7 +4,7 @@ import * as audioLibrary from './audiolibrary'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as user from '../user/userState';
-import * as reporter from './reporter';
+import reporter from './reporter';
 import * as scripts from '../browser/scriptsState';
 import * as sounds from '../browser/soundsState';
 import * as recommenderState from '../browser/recommenderState';

@@ -1,6 +1,6 @@
 import * as compiler from './compiler'
 import * as ESUtils from '../esutils'
-import * as reporter from './reporter'
+import reporter from './reporter'
 import * as tabs from '../editor/tabState';
 import * as scripts from '../browser/scriptsState';
 
