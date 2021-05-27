@@ -1,3 +1,4 @@
+import * as collaboration from './collaboration'
 import * as compiler from './compiler'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
@@ -14,7 +15,7 @@ import * as WaveformCache from './waveformcache';
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'localStorage', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, localStorage, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'localStorage', 'caiAnalysisModule', 'colorTheme', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, localStorage, caiAnalysisModule, colorTheme, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };

@@ -1,7 +1,9 @@
+import "./collaboration"
+
 app.directive('chatwindow', function () {
     return {
         templateUrl: 'templates/chat-window.html',
-        controller: ['$scope', 'collaboration', 'userProject', function ($scope, collaboration, userProject) {
+        controller: ['$scope', 'userProject', function ($scope, userProject) {
             $scope.chatroomName = '';
             $scope.collaborators = [];
 

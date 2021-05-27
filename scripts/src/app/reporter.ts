@@ -100,7 +100,7 @@ function share(method: "link" | "people" | "soundcloud", license: string) {
     })
 }
 
-export default { exception, readererror, compile, complexity, share, ...module };
+export default { exception, readererror, compile, complexity, share, ...module } as { [key: string]: Function };
 
 // TODO: Disable in dev builds?
 (function(i:any,s,o,g,r:any,a?:any,m?:any){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){

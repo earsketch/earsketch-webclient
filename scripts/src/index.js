@@ -116,7 +116,6 @@ require(['angular'], () => {
     // In-house modules
     require('localStorage');
     require('userProject');
-    require('collaboration');
     require('colorTheme');
     require('uploader');
     require('completer');
