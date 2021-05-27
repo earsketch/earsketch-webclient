@@ -5,7 +5,7 @@ import esconsole from '../esconsole'
 import * as layout from '../layout/layoutState'
 
 import { RootState, ThunkAPI, AppDispatch } from '../reducers'
-import { BrowserTabType } from '../types/enums';
+import { BrowserTabType } from '../browser/Browser';
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()

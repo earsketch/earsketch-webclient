@@ -8,13 +8,18 @@ import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
-import { BrowserTabType } from '../types/enums';
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
 import { RootState } from '../reducers';
 
 const darkBgColor = '#223546';
+
+export enum BrowserTabType {
+    Sound = 1,
+    Script,
+    Api
+}
 
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme);
