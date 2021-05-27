@@ -212,7 +212,6 @@ window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layou
 require('reporter');
 require('localStorage');
 require('userProject');
-require('websocket');
 require('collaboration');
 require('colorTheme');
 require('uploader');

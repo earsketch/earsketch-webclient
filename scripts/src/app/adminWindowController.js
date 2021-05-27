@@ -5,8 +5,9 @@
  */
 
 import esconsole from '../esconsole'
+import * as websocket from './websocket'
 
-app.controller("adminwindowController", ['$scope', '$confirm', '$uibModalInstance', 'userProject', '$http', 'websocket', function ($scope, $confirm, $uibModalInstance, userProject, $http, websocket) {
+app.controller("adminwindowController", ['$scope', '$confirm', '$uibModalInstance', 'userProject', '$http', function ($scope, $confirm, $uibModalInstance, userProject, $http) {
 
     userProject.getAllUserRoles().then(function(users) {
         $scope.users = users;

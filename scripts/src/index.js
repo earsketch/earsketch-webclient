@@ -116,7 +116,6 @@ require(['angular'], () => {
     require('reporter');
     require('localStorage');
     require('userProject');
-    require('websocket');
     require('collaboration');
     require('colorTheme');
     require('uploader');
