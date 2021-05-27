@@ -8,7 +8,7 @@ i18n
     .init({
         fallbackLng: 'en',
         defaultNS: 'common',
-        debug: true,
+        debug: false,
 
         keySeparator: false, // we do not use keys in form messages.welcome
 
