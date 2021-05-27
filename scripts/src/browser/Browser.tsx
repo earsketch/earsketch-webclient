@@ -84,7 +84,7 @@ export const BrowserTabs = () => {
             <BrowserTab name={t('scriptBrowser.title')} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
-            <BrowserTab name='API' type={BrowserTabType.Api}>
+            <BrowserTab name='API' type={BrowserTabType.API}>
                 <i className='icon-book pr-2' />
             </BrowserTab>
         </div>
@@ -301,7 +301,7 @@ export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ p
 const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
     [BrowserTabType.Sound]: SoundBrowser,
     [BrowserTabType.Script]: ScriptBrowser,
-    [BrowserTabType.Api]: APIBrowser
+    [BrowserTabType.API]: APIBrowser
 };
 
 const Browser = () => {
@@ -309,7 +309,8 @@ const Browser = () => {
     const open = useSelector((state: RootState) => state.layout.west.open);
     const { t } = useTranslation();
     let kind = useSelector(layout.selectWestKind);
-    if(!(kind in BrowserTabType)) {
+
+    if (!Object.values(BrowserTabType).includes(kind)) {
         kind = BrowserTabType.Sound;
     }
 

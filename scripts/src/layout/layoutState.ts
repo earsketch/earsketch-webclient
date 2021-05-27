@@ -136,7 +136,7 @@ export const openWest = createAsyncThunk<void, BrowserTabType|void, ThunkAPI>(
     'layout/openWest',
     (kind, { getState, dispatch }) => {
         if (layoutMutableState.horizontalSplits) {
-            dispatch(setWest(kind ? { open: true, kind } : { open: true }));
+            dispatch(setWest(kind !== undefined ? { open: true, kind } : { open: true }));
             layoutMutableState.horizontalSplits.setSizes(selectHorizontalRatio(getState()));
             const gutter = document.getElementById(`gutter-horizontal-0`);
             if (gutter) gutter.style['pointerEvents'] = 'auto';
