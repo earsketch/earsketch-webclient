@@ -20,7 +20,7 @@ const caiSlice = createSlice({
     name: 'cai',
     initialState: {
         activeProject: "",
-        messageList: {"":[]},
+        messageList: {"": []},
         inputOptions: [],
         errorOptions: [],
         dropupLabel: "",
@@ -39,7 +39,7 @@ const caiSlice = createSlice({
                     { label: "what do you think we should do next?", value: "suggest" }, 
                     { label: "do you want to come up with some sound ideas?", value: "sound_select" }, 
                     { label: "i think we're close to done", value: 'wrapup' }, 
-                    { label: "i have some ideas about our project", value:"properties"}
+                    { label: "i have some ideas about our project", value: "properties"}
                 ]
             }
         },
@@ -66,7 +66,7 @@ const caiSlice = createSlice({
         resetState(state) {
             state = {
                 activeProject: "",
-                messageList: {"":[]},
+                messageList: {"": []},
                 inputOptions: [],
                 errorOptions: [],
                 dropupLabel: "",
@@ -102,10 +102,10 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
             const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
             for (let msg in messages) {
                 const outputMessage = {
-                    text:messages[msg][0],
-                    keyword:messages[msg][1],
-                    date:Date.now(),
-                    sender:"CAI"
+                    text: messages[msg][0],
+                    keyword: messages[msg][1],
+                    date: Date.now(),
+                    sender: "CAI"
                 } as CAIMessage
 
                 dispatch(addToMessageList(outputMessage))
@@ -126,70 +126,54 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         const rootScope = helpers.getNgRootScope()
 
         caiDialogue.studentInteract()
-
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, '') === '') {
             return
         }
-
         const message = {
-            text:[input.label,"","","",""], 
-            keyword:["","","","",""], 
-            date:Date.now(), 
-            sender:userProject.getUsername()
+            text: [input.label,"","","",""], 
+            keyword: ["","","","",""], 
+            date: Date.now(), 
+            sender: userProject.getUsername()
         } as CAIMessage
 
         const text = ideScope.editor.ace.getValue();
         const lang = ideScope.currentLanguage;
         codeSuggestion.generateResults(text, lang)
-
         caiDialogue.setCodeObj(ideScope.editor.ace.session.doc.$lines.join("\n"))
-
         dispatch(addToMessageList(message))
-
         let msgText = caiDialogue.generateOutput(input.value)
 
         if (input.value === 'error') {
             dispatch(setErrorOptions([]))
         }
-
         if (msgText.includes("[ERRORFIX")) {
             const errorS = msgText.substring(msgText.indexOf("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
             const errorF = msgText.substring(msgText.lastIndexOf("|") + 1, msgText.length - 1)
             msgText = msgText.substring(0, msgText.indexOf("[ERRORFIX"))
             caiDialogue.setSuccessFail(parseInt(errorS), parseInt(errorF))
-
             const actionOutput = caiDialogue.attemptErrorFix()
-
             msgText += "|" + actionOutput ? caiDialogue.errorFixSuccess() : caiDialogue.errorFixFail()
         }
-
         dispatch(caiDialogue.isDone() ? setInputOptions([]) : setInputOptions(caiDialogue.createButtons()))
-
-        setTimeout(() => {
-            if (msgText !== "") {
-                const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
-                for (let msg in messages) {
-                    if (messages[msg] !== "") {
-                        const outputMessage = {
-                            text:messages[msg][0], 
-                            keyword:messages[msg][1], 
-                            date:Date.now(), 
-                            sender:"CAI"
-                        } as CAIMessage
-
-                        dispatch(addToMessageList(outputMessage))
-                        dispatch(autoScrollCAI())
-                        rootScope.$broadcast('newCAIMessage')
-                    }
+        if (msgText !== "") {
+            const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
+            for (let msg in messages) {
+                if (messages[msg] !== "") {
+                    const outputMessage = {
+                        text: messages[msg][0], 
+                        keyword: messages[msg][1], 
+                        date: Date.now(), 
+                        sender: "CAI"
+                    } as CAIMessage
+                    dispatch(addToMessageList(outputMessage))
+                    dispatch(autoScrollCAI())
+                    rootScope.$broadcast('newCAIMessage')
                 }
-            }            
-            
-            // With no options available to user, default to tree selection.
-            dispatch(setDefaultInputOptions())
-
-            dispatch(setDropupLabel(caiDialogue.getDropup()))
-        }, 0);
-
+            }
+        }            
+        // With no options available to user, default to tree selection.
+        dispatch(setDefaultInputOptions())
+        dispatch(setDropupLabel(caiDialogue.getDropup()))
     }
 );
 
@@ -249,27 +233,25 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         codeSuggestion.generateResults(code, language)
         caiStudentHistoryModule.addScoreToAggregate(code, language)
 
-        setTimeout(() => {
-            const output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results)
-            if (output !== null && output !== "" && output[0][0] !== "") {
-                const message = {
-                    text:output[0], 
-                    keyword:output[1], 
-                    date:Date.now(), 
-                    sender:"CAI"
-                } as CAIMessage
-                dispatch(addToMessageList(message))
-                dispatch(setInputOptions(caiDialogue.createButtons()))
-                dispatch(setErrorOptions([]))
-                dispatch(setDefaultInputOptions())
-            }
-            if (output !== null && output === "" && !caiDialogue.activeWaits() && caiDialogue.studentInteractedValue()) {
-                dispatch(setDefaultInputOptions())
-            }
-            dispatch(setDropupLabel(caiDialogue.getDropup()))
-            dispatch(autoScrollCAI())
-            rootScope.$broadcast('newCAIMessage')
-        }, 0)
+        const output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results)
+        if (output !== null && output !== "" && output[0][0] !== "") {
+            const message = {
+                text: output[0], 
+                keyword: output[1], 
+                date: Date.now(), 
+                sender: "CAI"
+            } as CAIMessage
+            dispatch(addToMessageList(message))
+            dispatch(setInputOptions(caiDialogue.createButtons()))
+            dispatch(setErrorOptions([]))
+            dispatch(setDefaultInputOptions())
+        }
+        if (output !== null && output === "" && !caiDialogue.activeWaits() && caiDialogue.studentInteractedValue()) {
+            dispatch(setDefaultInputOptions())
+        }
+        dispatch(setDropupLabel(caiDialogue.getDropup()))
+        dispatch(autoScrollCAI())
+        rootScope.$broadcast('newCAIMessage')
 
         var t = Date.now()
         caiStudentPreferenceModule.addCompileTS(t)
@@ -288,12 +270,10 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
         }
 
         if (errorReturn !== "") {
-            setTimeout(() => {
-                dispatch(setInputOptions(caiDialogue.createButtons()))
-                dispatch(setDefaultInputOptions())
-                dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
-                autoScrollCAI()
-            }, 0)
+            dispatch(setInputOptions(caiDialogue.createButtons()))
+            dispatch(setDefaultInputOptions())
+            dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
+            dispatch(autoScrollCAI())
         }
         else {
             dispatch(setErrorOptions([]))
@@ -313,9 +293,9 @@ export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], Thunk
 export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
     'cai/autoScrollCAI',
     (_, { getState, dispatch }) => {
-        // Auto scroll to the bottom.
-        setTimeout(function () {
-            const caiBody = angular.element('#cai-body')[0]
+        // Auto scroll to the bottom (set on a timer to happen after message updates).
+        const caiBody = angular.element('#cai-body')[0]
+        setTimeout(function(){
             if (caiBody) {
                 caiBody.scrollTop = caiBody.scrollHeight
             }
@@ -344,9 +324,7 @@ export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
     'cai/userOnPage',
     (time: number, {getState, dispatch}) => {
         const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
-        // const caiDialogue = helpers.getNgService('caiDialogue')
         caiStudentPreferenceModule.addOnPageStatus(1,time)
-        // caiDialogue.addToNodeHistory(["pageStatus", 1])
     }
 );
 
@@ -354,9 +332,7 @@ export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
     'cai/userOffPage',
     (time: number, {getState, dispatch}) => {
         const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
-        // const caiDialogue = helpers.getNgService('caiDialogue')
         caiStudentPreferenceModule.addOnPageStatus(0,time)
-        // caiDialogue.addToNodeHistory(["pageStatus", 1])
     }
 );
 
@@ -364,9 +340,7 @@ export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
     'cai/keyStroke',
     ([action, content, time], {getState, dispatch}) => {
         const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
-        // const caiDialogue = helpers.getNgService('caiDialogue')
         caiStudentPreferenceModule.addKeystroke(action, content, time)
-        // caiDialogue.addToNodeHistory(["keyStroke", {action, content}])
     }
 );
 
@@ -374,9 +348,7 @@ export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
     'cai/mousePosition',
     ([x,y], {getState, dispatch}) => {
         const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
-        // const caiDialogue = helpers.getNgService('caiDialogue')
         caiStudentPreferenceModule.addMousePos({x,y})
-        // caiDialogue.addToNodeHistory(["mousePosition", {x,y}])
     }
 );
 
