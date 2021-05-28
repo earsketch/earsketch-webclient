@@ -1,399 +1,290 @@
 // Manage client-side collaboration sessions.
-import esconsole from '../esconsole';
-import * as helpers from '../helpers';
-import store from '../reducers';
-import reporter from './reporter';
-import * as scripts from '../browser/scriptsState';
-import * as userNotification from './userNotification';
-import * as websocket from './websocket';
+import esconsole from '../esconsole'
+import * as helpers from '../helpers'
+import store from '../reducers'
+import reporter from './reporter'
+import * as scripts from '../browser/scriptsState'
+import * as userNotification from './userNotification'
+import * as websocket from './websocket'
 
-export let script: any = null; // script object: only used for the off-line mode
-export let scriptID: string | null = null; // collaboration session identity (both local and remote)
+export let script: any = null// script object: only used for the off-line mode
+export let scriptID: string | null = null// collaboration session identity (both local and remote)
 
-export let userName = '';
-let owner = false;
+export let userName = ''
+let owner = false
 
-let editor: any = null;
-var editSession: any = null;
-var aceRange: any = null;
+let editor: any = null
+let editSession: any = null
+let aceRange: any = null
 
-let buffer: any[] = [];
-let synchronized = true; // user's own messages against server
-let awaiting: any = null; // unique edit ID from self
+let buffer: any[] = []
+let synchronized = true// user's own messages against server
+let awaiting: any = null// unique edit ID from self
 
-let scriptText = '';
-export let lockEditor = true;
-export let isSynching = false; // TODO: redundant? for storing cursors
+let scriptText = ''
+export let lockEditor = true
+export let isSynching = false// TODO: redundant? for storing cursors
 
-let sessionActive = false;
-export let active = false;
+let sessionActive = false
+export let active = false
 
-let selection: any = null;
-let cursorPos: any = null;
+let selection: any = null
+let cursorPos: any = null
 
 // parent state version number on server & client, which the current operation is based on
-let state = 0;
+let state = 0
 
 // keeps track of the SERVER operations. only add the received messages.
-let history: any = {};
+let history: any = {}
 
-export let otherMembers: any = {};
-let markers: any = {};
+export let otherMembers: any = {}
+let markers: any = {}
 
-export let chat: any = {};
-export let tutoring = false;
+export let chat: any = {}
+export let tutoring = false
 
-let promises: any = {};
-let timeouts: any = {};
-let scriptCheckTimerID: any = null;
+let promises: any = {}
+let timeouts: any = {}
+let scriptCheckTimerID: any = null
 
 // callbacks for environmental changes
-export let refreshScriptBrowser: any = null;
-export let refreshSharedScriptBrowser: any = null;
-export let closeSharedScriptIfOpen: any = null;
+export let refreshScriptBrowser: any = null
+export let refreshSharedScriptBrowser: any = null
+export let closeSharedScriptIfOpen: any = null
 
-var editTimeout = 5000; // sync (rejoin) session if there is no server response
-var syncTimeout = 5000; // when time out, the websocket connection is likely lost
-
-// websocket callbacks
-function triggerByNotification(data: any) {
-    if (data.notification_type === 'collaboration') {
-        switch (data.action) {
-            case 'joinedSession': {
-                onJoinedSession(data);
-                helpers.getNgRootScope().$emit('joinedCollabSession', data);
-                break;
-            }
-            case 'sessionStatus': {
-                onSessionStatus(data);
-                break;
-            }
-            case 'sessionClosed': {
-                onSessionClosed(data);
-                break;
-            }
-            case 'sessionsFull': {
-                onSessionsFull(data);
-                break;
-            }
-            case 'userAddedToCollaboration': {
-                onUserAddedToCollaboration(data);
-                break;
-            }
-            case 'userRemovedFromCollaboration': {
-                onUserRemovedFromCollaboration(data);
-                break;
-            }
-            case 'userLeftCollaboration': {
-                onUserLeftCollaboration(data);
-                break;
-            }
-            case 'scriptRenamed': {
-                onScriptRenamed(data);
-                break;
-            }
-            case 'scriptText': {
-                onScriptText(data);
-                break;
-            }
-            case 'joinedTutoring': {
-                helpers.getNgRootScope().$emit('joinedTutoring', data);
-            }
-        }
-
-        if (active && scriptID === data.scriptID) {
-            switch (data.action) {
-                case 'edit': {
-                    onEditMessage(data);
-                    break;
-                }
-                case 'syncToSession': {
-                    onSyncToSession(data);
-                    break;
-                }
-                case 'syncError': {
-                    onSyncError(data);
-                    break;
-                }
-                case 'scriptSaved': {
-                    onScriptSaved(data);
-                    break;
-                }
-                case 'cursorPosition': {
-                    onCursorPosMessage(data);
-                    break;
-                }
-                case 'select': {
-                    onSelectMessage(data);
-                    break;
-                }
-                case 'memberJoinedSession': {
-                    onMemberJoinedSession(data);
-                    break;
-                }
-                case 'memberLeftSession': {
-                    onMemberLeftSession(data);
-                    break;
-                }
-                case 'miscMessage': {
-                    onMiscMessage(data);
-                    break;
-                }
-                case 'writeAccess': {
-                    onChangeWriteAccess(data);
-                    break;
-                }
-                case 'chat': {
-                    helpers.getNgRootScope().$emit('chatMessageReceived', data);
-                    break;
-                }
-                case 'compile': {
-                    helpers.getNgRootScope().$emit('compileTrialReceived', data);
-                    break;
-                }
-                case 'sessionClosedForInactivity': {
-                    onSessionClosedForInactivity(data);
-                    break;
-                }
-            }
-        }
-    }
-}
-
-websocket.subscribe(triggerByNotification);
+const editTimeout = 5000// sync (rejoin) session if there is no server response
+const syncTimeout = 5000// when time out, the websocket connection is likely lost
 
 function PrepareWsMessage() {
     // Note: For the historic mishandling of username letter cases, we treat them as case insensitive (always convert to lowercase) in collaboration and websocket messaging for the time being... Tagging the relevant changes as GH issue #1858.
 
-    this['notification_type'] = 'collaboration';
-    this['scriptID'] = scriptID;
-    this['sender'] = userName; // #1858
+    this['notification_type'] = 'collaboration'
+    this['scriptID'] = scriptID
+    this['sender'] = userName  // #1858
 }
 
-let initialize = function () {
-    editSession = editor.ace.getSession();
-    otherMembers = {};
-    buffer = [];
-    timeouts = {};
-};
+function initialize() {
+    editSession = editor.ace.getSession()
+    otherMembers = {}
+    buffer = []
+    timeouts = {}
+}
 
-export let setUserName = function (userName: string) {
-    userName = userName.toLowerCase(); // #1858
-};
+export function setUserName(userName: string) {
+    userName = userName.toLowerCase()  // #1858
+}
 
-export let setEditor = function (editor: any) {
-    editor = editor;
-    editSession = editor.ace.getSession();
-    aceRange = ace.require('ace/range').Range;
-};
+export function setEditor(editor: any) {
+    editor = editor
+    editSession = editor.ace.getSession()
+    aceRange = ace.require('ace/range').Range
+}
 
-/**
- * Opening a script with collaborators starts a real-time collaboration session.
- */
-export let openScript = function (script: any, userName: string) {
-    script.username = script.username.toLowerCase(); // #1858
-    script = script;
+// Opening a script with collaborators starts a real-time collaboration session.
+export function openScript(script: any, userName: string) {
+    script.username = script.username.toLowerCase()// #1858
+    script = script
 
-    userName = userName.toLowerCase(); // #1858
+    userName = userName.toLowerCase()// #1858
 
-    var shareID = script.shareid;
+    const shareID = script.shareid
 
     if (scriptID !== shareID) {
-        esconsole('opening a collaborative script: ' + shareID, 'collab');
+        esconsole('opening a collaborative script: ' + shareID, 'collab')
 
         // initialize the local model
-        initialize();
+        initialize()
 
-        joinSession(shareID, userName);
-        editor.setReadOnly(true);
-        setOwner(script.username === userName);
+        joinSession(shareID, userName)
+        editor.setReadOnly(true)
+        setOwner(script.username === userName)
 
         if (!owner) {
             otherMembers[script.username] = {
                 active: false,
                 canEdit: true
-            };
+            }
 
             // TODO: combine with other-members state object?
             chat[script.username] = {
                 text: '',
                 popover: false
-            };
+            }
         }
 
         script.collaborators.forEach(function (member: string) {
-            member = member.toLowerCase(); // #1858
+            member = member.toLowerCase()// #1858
             if (member !== userName) {
                 otherMembers[member] = {
                     active: false,
                     canEdit: true
-                };
+                }
 
                 chat[member] = {
                     text: '',
                     popover: false
-                };
+                }
             }
-        });
+        })
 
         chat[userName] = {
             text: '',
             popover: false
-        };
+        }
     }
-    reporter.openSharedScript();
-};
+    reporter.openSharedScript()
+}
 
-export let closeScript = function (shareID: string, userName: string) {
-    userName = userName.toLowerCase(); // #1858
+export function closeScript(shareID: string, userName: string) {
+    userName = userName.toLowerCase()// #1858
 
     if (scriptID === shareID) {
-        esconsole('closing a collaborative script: ' + shareID, 'collab');
+        esconsole('closing a collaborative script: ' + shareID, 'collab')
 
-        leaveSession(shareID, userName);
-        lockEditor = false;
+        leaveSession(shareID, userName)
+        lockEditor = false
 
-        removeOtherCursors();
+        removeOtherCursors()
 
-        active = false;
-        scriptID = null;
+        active = false
+        scriptID = null
 
-        for (var timeout in timeouts) {
-            clearTimeout(timeouts[timeout]);
+        for (const timeout in timeouts) {
+            clearTimeout(timeouts[timeout])
         }
 
-        timeouts = {};
+        timeouts = {}
     } else {
-        esconsole('cannot close the active tab with different script ID');
+        esconsole('cannot close the active tab with different script ID')
     }
-};
+}
 
-let setOwner = function (boolean: boolean) {
-    owner = boolean;
-};
+function setOwner(boolean: boolean) {
+    owner = boolean
+}
 
-export let checkSessionStatus = function () {
-    esconsole('checking collaboration session status', 'collab');
+export function checkSessionStatus() {
+    esconsole('checking collaboration session status', 'collab')
 
-    var message = new (PrepareWsMessage() as any);
-    message.action = 'checkSessionStatus';
-    message.state = state;
-    websocket.send(message);
+    const message = new (PrepareWsMessage() as any)
+    message.action = 'checkSessionStatus'
+    message.state = state
+    websocket.send(message)
 
     // check the websocket connection
-    timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout);
-};
+    timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout)
+}
 
-let onSessionStatus = function (data: any) {
-    esconsole('session status received', 'collab');
-    clearTimeout(timeouts[userName]);
-    delete timeouts[userName];
+function onSessionStatus(data: any) {
+    esconsole('session status received', 'collab')
+    clearTimeout(timeouts[userName])
+    delete timeouts[userName]
 
     if (data.active) {
         if (data.state !== state) {
-            rejoinSession();
+            rejoinSession()
         }
     } else {
-        rejoinSession();
+        rejoinSession()
     }
-};
-
-function onFailedToSynchronize() {
-    userNotification.show('Failed to synchronize with the central server. You might already have another EarSketch window or tab open somewhere. To fix  please refresh page.', 'failure2', 999);
 }
 
-let joinSession = function (shareID: string, userName: string) {
-    esconsole('joining collaboration session: ' + shareID, 'collab');
+function onFailedToSynchronize() {
+    userNotification.show('Failed to synchronize with the central server. You might already have another EarSketch window or tab open somewhere. To fix  please refresh page.', 'failure2', 999)
+}
 
-    scriptID = shareID;
-    userName = userName.toLowerCase(); // #1858
+function joinSession(shareID: string, userName: string) {
+    esconsole('joining collaboration session: ' + shareID, 'collab')
 
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'joinSession';
-    message.state = state;
-    websocket.send(message);
+    scriptID = shareID
+    userName = userName.toLowerCase()// #1858
+
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'joinSession'
+    message.state = state
+    websocket.send(message)
 
     // check the websocket connection
-    timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout);
-};
+    timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout)
+}
 
-let onJoinedSession = function (data: any) {
-    esconsole('joined collaboration session: ' + data.scriptID, 'collab');
+function onJoinedSession(data: any) {
+    esconsole('joined collaboration session: ' + data.scriptID, 'collab')
 
     // clear the websocket connection check
-    clearTimeout(timeouts[userName]);
-    delete timeouts[userName];
+    clearTimeout(timeouts[userName])
+    delete timeouts[userName]
     
     // open script in editor
-    scriptText = data.scriptText;
-    setEditorTextWithoutOutput(scriptText);
+    scriptText = data.scriptText
+    setEditorTextWithoutOutput(scriptText)
 
     // sync the server state number
-    state = data.state;
-    history = {}; // TODO: pull all the history? maybe not
+    state = data.state
+    history = {}// TODO: pull all the history? maybe not
 
-    editor.setReadOnly(false);
-    active = true;
-    sessionActive = true;
+    editor.setReadOnly(false)
+    active = true
+    sessionActive = true
 
     // the state of the initiated messages and messageBuffer
-    synchronized = true;
+    synchronized = true
 
     data.activeMembers.forEach(function (member: string) {
         if (member !== userName) {
-            otherMembers[member].active = true;
+            otherMembers[member].active = true
         }
-    });
+    })
 
     if (promises['joinSession']) {
-        promises['joinSession'](data);
-        delete promises['joinSession'];
+        promises['joinSession'](data)
+        delete promises['joinSession']
     }
-};
+}
 
-let onSessionsFull = function (data: any) {
+function onSessionsFull(data: any) {
     // clear the websocket connection check sent from joinSession
-    clearTimeout(timeouts[userName]);
-    delete timeouts[userName];
+    clearTimeout(timeouts[userName])
+    delete timeouts[userName]
 
-    esconsole('could not create a session. max number reached: ' + data.scriptID, 'collab');
-    userNotification.show('Server has reached the maximum number of real-time collaboration sessions. Please try again later.', 'failure1');
+    esconsole('could not create a session. max number reached: ' + data.scriptID, 'collab')
+    userNotification.show('Server has reached the maximum number of real-time collaboration sessions. Please try again later.', 'failure1')
 
-    openScriptOffline(script);
-};
+    openScriptOffline(script)
+}
 
-let openScriptOffline = function (script: any) {
-    esconsole('opening a collaborative script in the off-line mode', 'collab');
-    script.username = script.username.toLocaleString(); // #1858
-    script.collaborative = false;
-    script.readonly = script.username !== userName;
+function openScriptOffline(script: any) {
+    esconsole('opening a collaborative script in the off-line mode', 'collab')
+    script.username = script.username.toLocaleString()// #1858
+    script.collaborative = false
+    script.readonly = script.username !== userName
 
     if (editor.droplet.currentlyUsingBlocks) {
-        editor.droplet.setValue(script.source_code, -1);
+        editor.droplet.setValue(script.source_code, -1)
     } else {
-        editor.ace.setValue(script.source_code, -1);
+        editor.ace.setValue(script.source_code, -1)
     }
-    editor.setReadOnly(script.readonly);
+    editor.setReadOnly(script.readonly)
 
-    reporter.openSharedScript();
-};
+    reporter.openSharedScript()
+}
 
-export let leaveSession = function (shareID: string, username?: string) {
-    esconsole('leaving collaboration session: ' + shareID, 'collab');
-    lockEditor = true;
+export function leaveSession(shareID: string, username?: string) {
+    esconsole('leaving collaboration session: ' + shareID, 'collab')
+    lockEditor = true
 
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'leaveSession';
-    websocket.send(message);
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'leaveSession'
+    websocket.send(message)
 
-    helpers.getNgRootScope().$emit('leftCollabSession', null);
-};
+    helpers.getNgRootScope().$emit('leftCollabSession', null)
+}
 
-let onMemberJoinedSession = function (data: any) {
-    userNotification.show(data.sender + ' has joined the collaboration session.');
+function onMemberJoinedSession(data: any) {
+    userNotification.show(data.sender + ' has joined the collaboration session.')
 
     if (otherMembers.hasOwnProperty(data.sender)) {
-        otherMembers[data.sender].active = true;
+        otherMembers[data.sender].active = true
     } else {
         otherMembers[data.sender] = {
             active: true,
@@ -401,252 +292,252 @@ let onMemberJoinedSession = function (data: any) {
         }
     }
 
-    helpers.getNgRootScope().$apply(); // update GUI
-};
+    helpers.getNgRootScope().$apply()// update GUI
+}
 
-let onMemberLeftSession = function (data: any) {
-    userNotification.show(data.sender + ' has left the collaboration session.');
+function onMemberLeftSession(data: any) {
+    userNotification.show(data.sender + ' has left the collaboration session.')
 
     if (markers.hasOwnProperty(data.sender)) {
-        editSession.removeMarker(markers[data.sender]);
+        editSession.removeMarker(markers[data.sender])
     }
 
-    otherMembers[data.sender].active = false;
+    otherMembers[data.sender].active = false
 
-    helpers.getNgRootScope().$apply(); // update GUI
-};
+    helpers.getNgRootScope().$apply()// update GUI
+}
 
-export let addCollaborators = function (shareID: string, userName: string, addedCollaborators: string[]) {
+export function addCollaborators(shareID: string, userName: string, addedCollaborators: string[]) {
     // #1858 Note: addedCollaborators are already converted to lower case in shareScriptController.js:328.
     if (addedCollaborators.length !== 0) {
-        var message = new (PrepareWsMessage as any)();
-        message.action = 'addCollaborators';
-        message.scriptID = shareID;
-        message.sender = userName.toLowerCase(); // #1858
-        message.collaborators = addedCollaborators;
+        const message = new (PrepareWsMessage as any)()
+        message.action = 'addCollaborators'
+        message.scriptID = shareID
+        message.sender = userName.toLowerCase()// #1858
+        message.collaborators = addedCollaborators
         // add script name info (done in the server side now)
-        websocket.send(message);
+        websocket.send(message)
 
         if (scriptID === shareID && active) {
             addedCollaborators.forEach(function (member) {
                 otherMembers[member] = {
                     active: false,
                     canEdit: true
-                };
-            });
+                }
+            })
         }
     }
-};
+}
 
-export let removeCollaborators = function (shareID: string, userName: string, removedCollaborators: string[]) {
+export function removeCollaborators(shareID: string, userName: string, removedCollaborators: string[]) {
     // #1858 Note: removedCollaborators are already converted to lower case in shareScriptController.js:328.
     if (removedCollaborators.length !== 0) {
-        var message = new (PrepareWsMessage as any)();
-        message.action = 'removeCollaborators';
-        message.scriptID = shareID;
-        message.sender = userName.toLowerCase(); // #1858
-        message.collaborators = removedCollaborators;
-        websocket.send(message);
+        const message = new (PrepareWsMessage as any)()
+        message.action = 'removeCollaborators'
+        message.scriptID = shareID
+        message.sender = userName.toLowerCase()// #1858
+        message.collaborators = removedCollaborators
+        websocket.send(message)
 
         if (scriptID === shareID && active) {
             removedCollaborators.forEach(function (member) {
-                delete otherMembers[member];
-            });
+                delete otherMembers[member]
+            })
         }
     }
-};
+}
 
 function setEditorTextWithoutOutput(scriptText: string) {
-    lockEditor = true;
+    lockEditor = true
 
-    var session = editor.ace.getSession();
-    var cursor = session.selection.getCursor();
+    const session = editor.ace.getSession()
+    const cursor = session.selection.getCursor()
 
-    editor.ace.setValue(scriptText, -1);
-    session.selection.moveCursorToPosition(cursor);
+    editor.ace.setValue(scriptText, -1)
+    session.selection.moveCursorToPosition(cursor)
 
-    lockEditor = false;
+    lockEditor = false
 }
 
 function generateRandomID() {
-    return Math.random().toString(36).substr(2, 10);
+    return Math.random().toString(36).substr(2, 10)
 }
 
 function timeoutSync(messageID: string) {
     timeouts[messageID] = setTimeout(function () {
-        esconsole('edit synchronization timed out', 'collab');
+        esconsole('edit synchronization timed out', 'collab')
 
-        rejoinSession();
-    }, editTimeout);
+        rejoinSession()
+    }, editTimeout)
 }
 
-export let editScript = function (data: any) {
-    storeCursor(editSession.selection.getCursor());
+export function editScript(data: any) {
+    storeCursor(editSession.selection.getCursor())
     if (scriptCheckTimerID) {
-        clearTimeout(scriptCheckTimerID);
+        clearTimeout(scriptCheckTimerID)
     }
 
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'edit';
-    message.ID = generateRandomID();
-    message.state = state;
-    message.editData = data;
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'edit'
+    message.ID = generateRandomID()
+    message.state = state
+    message.editData = data
 
     if (synchronized) {
-        buffer.push(message);
-        synchronized = false;
-        awaiting = message.ID;
+        buffer.push(message)
+        synchronized = false
+        awaiting = message.ID
 
         if (!sessionActive) {
-            rejoinSession();
+            rejoinSession()
         } else {
-            websocket.send(message);
-            timeoutSync(message.ID);
+            websocket.send(message)
+            timeoutSync(message.ID)
         }
     } else {
         // buffered messages get temporary incremental state nums
-        message.state += buffer.length;
-        buffer.push(message);
+        message.state += buffer.length
+        buffer.push(message)
     }
-};
+}
 
-let onEditMessage = function (data: any) {
-    editor.setReadOnly(true);
-    history[data.state] = data.editData;
+function onEditMessage(data: any) {
+    editor.setReadOnly(true)
+    history[data.state] = data.editData
 
     // filter out own edit
     if (data.ID === awaiting) {
-        clearTimeout(timeouts[data.ID]);
-        delete timeouts[data.ID];
+        clearTimeout(timeouts[data.ID])
+        delete timeouts[data.ID]
 
-        state++;
+        state++
 
         if (buffer.length > 1) {
-            var nextMessage = buffer[1];
-            awaiting = nextMessage.ID;
+            const nextMessage = buffer[1]
+            awaiting = nextMessage.ID
 
             if (state !== nextMessage.state) {
-                esconsole('client -> server out of sync: ' + nextMessage.state + ' ' + state + ' ' + nextMessage.editData.text, ['collab', 'nolog']);
+                esconsole('client -> server out of sync: ' + nextMessage.state + ' ' + state + ' ' + nextMessage.editData.text, ['collab', 'nolog'])
                 // adjust buffer here???
-                rejoinSession();
-                return;
+                rejoinSession()
+                return
 
             } else {
-                esconsole('client -> server in sync: ' + state + ' ' + nextMessage.editData.text, ['collab', 'nolog']);
+                esconsole('client -> server in sync: ' + state + ' ' + nextMessage.editData.text, ['collab', 'nolog'])
             }
 
-            websocket.send(nextMessage);
-            timeoutSync(nextMessage.ID);
+            websocket.send(nextMessage)
+            timeoutSync(nextMessage.ID)
         } else {
-            esconsole('synced with own edit', ['collab', 'nolog']);
-            synchronized = true;
+            esconsole('synced with own edit', ['collab', 'nolog'])
+            synchronized = true
 
             // hard sync the script text after 5 seconds of inactivity
             // for potential permanent sync errors
-            scriptCheckTimerID = compareScriptText(5000);
+            scriptCheckTimerID = compareScriptText(5000)
         }
 
-        buffer.shift();
+        buffer.shift()
     } else {
-        var serverOp = data.editData;
+        let serverOp = data.editData
 
         if (data.state === state) {
-            esconsole('server -> client in sync: ' + data.state + ' ' + data.editData.text, ['collab', 'nolog']);
+            esconsole('server -> client in sync: ' + data.state + ' ' + data.editData.text, ['collab', 'nolog'])
 
         } else  {
-            esconsole('server -> client out of sync: ' + data.state + ' ' + state + ' ' + data.editData.text, ['collab', 'nolog']);
+            esconsole('server -> client out of sync: ' + data.state + ' ' + state + ' ' + data.editData.text, ['collab', 'nolog'])
 
-            requestSync();
+            requestSync()
         }
 
         if (buffer.length > 0) {
-            esconsole('adjusting buffered edits...', ['collab', 'nolog']);
+            esconsole('adjusting buffered edits...', ['collab', 'nolog'])
 
             buffer = buffer.map(function (op: any) {
-                esconsole("input : " + JSON.stringify(op.editData), ['collab', 'nolog']);
-                var tops = transform(serverOp, op.editData);
-                serverOp = tops[0];
-                op.editData = tops[1];
-                op.state = op.state + 1;
-                esconsole("output: " + JSON.stringify(op.editData), ['collab', 'nolog']);
-                return op;
-            });
+                esconsole("input : " + JSON.stringify(op.editData), ['collab', 'nolog'])
+                const tops = transform(serverOp, op.editData)
+                serverOp = tops[0]
+                op.editData = tops[1]
+                op.state = op.state + 1
+                esconsole("output: " + JSON.stringify(op.editData), ['collab', 'nolog'])
+                return op
+            })
 
         }
 
-        esconsole('applying the transformed edit', ['collab', 'nolog']);
-        apply(serverOp);
-        adjustCursor(serverOp);
+        esconsole('applying the transformed edit', ['collab', 'nolog'])
+        apply(serverOp)
+        adjustCursor(serverOp)
 
-        state++;
+        state++
     }
-    editor.setReadOnly(false);
-};
+    editor.setReadOnly(false)
+}
 
 /**
  * Used with the version-control revertScript
  */
-export let reloadScriptText = function (text: string) {
-    editor.ace.setValue(text, -1);
-};
-
-function syncToSession(data: any) {
-    state = data.state;
-
-    if (scriptText === data.scriptText) {
-        return null;
-    }
-
-    isSynching = true;
-    scriptText = data.scriptText;
-
-    setEditorTextWithoutOutput(scriptText);
-
-    // try to reset the cursor position
-    editSession.selection.moveCursorToPosition(cursorPos);
-
-    if (JSON.stringify(selection.start) !==  JSON.stringify(selection.end)) {
-        var start = selection.start;
-        var end = selection.end;
-        var reverse = JSON.stringify(cursorPos) !== JSON.stringify(selection.end);
-
-        var range = new aceRange(start.row, start.column, end.row, end.column);
-        editSession.selection.setSelectionRange(range, reverse);
-    }
-
-    isSynching = false;
-    synchronized = true;
-    buffer = [];
-    history = {};
+export function reloadScriptText(text: string) {
+    editor.ace.setValue(text, -1)
 }
 
-let onSyncError = function (data: any) {
-    userNotification.showBanner("There was a sync error. Adjusting the local edit...");
-    syncToSession(data);
-};
+function syncToSession(data: any) {
+    state = data.state
 
-let requestSync = function () {
-    esconsole('requesting synchronization to the server', 'collab');
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'requestSync';
-    websocket.send(message);
-};
+    if (scriptText === data.scriptText) {
+        return null
+    }
 
-let onSyncToSession = function (data: any) {
-    syncToSession(data);
-};
+    isSynching = true
+    scriptText = data.scriptText
 
-let rejoinSession = function () {
+    setEditorTextWithoutOutput(scriptText)
+
+    // try to reset the cursor position
+    editSession.selection.moveCursorToPosition(cursorPos)
+
+    if (JSON.stringify(selection.start) !==  JSON.stringify(selection.end)) {
+        const start = selection.start
+        const end = selection.end
+        const reverse = JSON.stringify(cursorPos) !== JSON.stringify(selection.end)
+
+        const range = new aceRange(start.row, start.column, end.row, end.column)
+        editSession.selection.setSelectionRange(range, reverse)
+    }
+
+    isSynching = false
+    synchronized = true
+    buffer = []
+    history = {}
+}
+
+function onSyncError(data: any) {
+    userNotification.showBanner("There was a sync error. Adjusting the local edit...")
+    syncToSession(data)
+}
+
+function requestSync() {
+    esconsole('requesting synchronization to the server', 'collab')
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'requestSync'
+    websocket.send(message)
+}
+
+function onSyncToSession(data: any) {
+    syncToSession(data)
+}
+
+function rejoinSession() {
     if (active) {
-        userNotification.showBanner('Synchronization error: Rejoining the session', 'failure1');
+        userNotification.showBanner('Synchronization error: Rejoining the session', 'failure1')
 
-        initialize();
+        initialize()
 
         if (!owner) {
             otherMembers[script.username] = {
                 active: false,
                 canEdit: true
-            };
+            }
         }
 
         script.collaborators.forEach(function (member: string) {
@@ -654,215 +545,205 @@ let rejoinSession = function () {
                 otherMembers[member] = {
                     active: false,
                     canEdit: true
-                };
+                }
             }
-        });
+        })
 
-        var message = new (PrepareWsMessage as any)();
-        message.action = 'rejoinSession';
-        message.state = state;
-        message.tutoring = tutoring;
-        websocket.send(message);
+        const message = new (PrepareWsMessage as any)()
+        message.action = 'rejoinSession'
+        message.state = state
+        message.tutoring = tutoring
+        websocket.send(message)
     }
 
     return new Promise(function (resolve) {
-        promises['joinSession'] = resolve;
-    });
-};
+        promises['joinSession'] = resolve
+    })
+}
 
-export let saveScript = function (scriptID: string) {
-    var message;
-
+export function saveScript(scriptID: string) {
     if (scriptID) {
         if (scriptID === scriptID) {
-            message = new (PrepareWsMessage as any)();
-            message.action = 'saveScript';
-            websocket.send(message);
+            const message = new (PrepareWsMessage as any)()
+            message.action = 'saveScript'
+            websocket.send(message)
         }
     } else {
-        message = new (PrepareWsMessage as any)();
-        message.action = 'saveScript';
-        websocket.send(message);
+        const message = new (PrepareWsMessage as any)()
+        message.action = 'saveScript'
+        websocket.send(message)
     }
-    reporter.saveSharedScript();
-};
+    reporter.saveSharedScript()
+}
 
-let onScriptSaved = function (data: any) {
+function onScriptSaved(data: any) {
     if (!userIsCAI(data.sender))
-        userNotification.show(data.sender + ' saved the current version of the script.', 'success');
+        userNotification.show(data.sender + ' saved the current version of the script.', 'success')
 
-    store.dispatch(scripts.syncToNgUserProject());
-};
+    store.dispatch(scripts.syncToNgUserProject())
+}
 
-export let storeCursor = function (position: any) {
+export function storeCursor(position: any) {
     if (position !== cursorPos) {
-        cursorPos = position;
+        cursorPos = position
 
-        var idx = editSession.getDocument().positionToIndex(position, 0);
+        const idx = editSession.getDocument().positionToIndex(position, 0)
 
-        var message = new (PrepareWsMessage as any)();
-        message.action = 'cursorPosition';
-        message.position = idx;
-        message.state = state;
-        websocket.send(message);
-    }
-};
-
-export let storeSelection = function (selection: any) {
-    if (selection !== selection) {
-        selection = selection;
-
-        var document = editSession.getDocument();
-        var start = document.positionToIndex(selection.start, 0);
-        var end = document.positionToIndex(selection.end, 0);
-
-        var message = new (PrepareWsMessage as any)();
-        message.action = 'select';
-        message.start = start;
-        message.end = end;
-        message.state = state;
-        websocket.send(message);
-    }
-};
-
-let onCursorPosMessage = function (data: any) {
-    data.sender = data.sender.toLowerCase(); // #1858
-    var document = editSession.getDocument();
-    var cursorPos = document.indexToPosition(data.position, 0);
-    var range = new aceRange(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column+1);
-
-    if (markers.hasOwnProperty(data.sender)) {
-        editSession.removeMarker(markers[data.sender]);
-    }
-
-    var num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1;
-
-    markers[data.sender] = editSession.addMarker(range, 'generic-cursor-'+num, 'text', true);
-};
-
-let onSelectMessage = function (data: any) {
-    data.sender = data.sender.toLowerCase(); // #1858
-
-    var document = editSession.getDocument();
-    var start = document.indexToPosition(data.start, 0);
-    var end = document.indexToPosition(data.end, 0);
-    var range;
-
-    if (markers.hasOwnProperty(data.sender)) {
-        editSession.removeMarker(markers[data.sender]);
-    }
-
-    var num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1;
-
-    if (data.start === data.end) {
-        range = new aceRange(start.row, start.column, start.row, start.column+1);
-        markers[data.sender] = editSession.addMarker(range, 'generic-cursor-'+num, 'text', true);
-    } else {
-        range = new aceRange(start.row, start.column, end.row, end.column);
-        markers[data.sender] = editSession.addMarker(range, 'generic-selection-'+num, 'line', true);
-    }
-};
-
-function removeOtherCursors() {
-    for (var m in otherMembers) {
-        if (markers.hasOwnProperty(m)) {
-            editSession.removeMarker(markers[m]);
-        }
-        delete markers[m];
+        const message = new (PrepareWsMessage as any)()
+        message.action = 'cursorPosition'
+        message.position = idx
+        message.state = state
+        websocket.send(message)
     }
 }
 
-let onMiscMessage = function (data: any) {
-    userNotification.show(data.text);
-};
+export function storeSelection(selection: any) {
+    if (selection !== selection) {
+        selection = selection
 
-let onChangeWriteAccess = function (data: any) {
-    if (data.canEdit) {
-        editor.setReadOnly(false);
-        userNotification.show(data.sender + ' gave you the write access!', 'collaboration');
+        const document = editSession.getDocument()
+        const start = document.positionToIndex(selection.start, 0)
+        const end = document.positionToIndex(selection.end, 0)
+
+        const message = new (PrepareWsMessage as any)()
+        message.action = 'select'
+        message.start = start
+        message.end = end
+        message.state = state
+        websocket.send(message)
+    }
+}
+
+function onCursorPosMessage(data: any) {
+    data.sender = data.sender.toLowerCase()// #1858
+    const document = editSession.getDocument()
+    const cursorPos = document.indexToPosition(data.position, 0)
+    const range = new aceRange(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column+1)
+
+    if (markers.hasOwnProperty(data.sender)) {
+        editSession.removeMarker(markers[data.sender])
+    }
+
+    const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
+
+    markers[data.sender] = editSession.addMarker(range, 'generic-cursor-'+num, 'text', true)
+}
+
+function onSelectMessage(data: any) {
+    data.sender = data.sender.toLowerCase()// #1858
+
+    const document = editSession.getDocument()
+    const start = document.indexToPosition(data.start, 0)
+    const end = document.indexToPosition(data.end, 0)
+
+    if (markers.hasOwnProperty(data.sender)) {
+        editSession.removeMarker(markers[data.sender])
+    }
+
+    const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
+
+    if (data.start === data.end) {
+        const range = new aceRange(start.row, start.column, start.row, start.column+1)
+        markers[data.sender] = editSession.addMarker(range, 'generic-cursor-'+num, 'text', true)
     } else {
-        editor.setReadOnly(true);
-        userNotification.show('You no longer have the write access.', 'collaboration');
+        const range = new aceRange(start.row, start.column, end.row, end.column)
+        markers[data.sender] = editSession.addMarker(range, 'generic-selection-'+num, 'line', true)
     }
-};
+}
 
-/**
- * After certain period of inactivity, the session closes automatically, sending message. It should flag for startSession to be sent before the next action.
- */
-let onSessionClosed = function (data: any) {
-    esconsole('remote session closed', 'collab');
+function removeOtherCursors() {
+    for (const m in otherMembers) {
+        if (markers.hasOwnProperty(m)) {
+            editSession.removeMarker(markers[m])
+        }
+        delete markers[m]
+    }
+}
 
-    sessionActive = false;
+function onMiscMessage(data: any) {
+    userNotification.show(data.text)
+}
 
-    for (var member in otherMembers) {
-        otherMembers[member].active = false;
+function onChangeWriteAccess(data: any) {
+    if (data.canEdit) {
+        editor.setReadOnly(false)
+        userNotification.show(data.sender + ' gave you the write access!', 'collaboration')
+    } else {
+        editor.setReadOnly(true)
+        userNotification.show('You no longer have the write access.', 'collaboration')
+    }
+}
+
+// After certain period of inactivity, the session closes automatically, sending message. It should flag for startSession to be sent before the next action.
+function onSessionClosed(data: any) {
+    esconsole('remote session closed', 'collab')
+
+    sessionActive = false
+
+    for (const member in otherMembers) {
+        otherMembers[member].active = false
     }
 
-    helpers.getNgRootScope().$apply(); // update GUI
-};
+    helpers.getNgRootScope().$apply()  // update GUI
+}
 
-let onSessionClosedForInactivity = function (data: any) {
-    userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.");
-};
+function onSessionClosedForInactivity(data: any) {
+    userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.")
+}
 
 function beforeTransf(operation: any) {
     if (operation.action === 'insert') {
-        operation.len = operation.text.length;
-        operation.end = operation.start + operation.len;
+        operation.len = operation.text.length
+        operation.end = operation.start + operation.len
     } else if (operation.action === 'remove') {
-        operation.end = operation.start + operation.len;
+        operation.end = operation.start + operation.len
     }
-    return JSON.parse(JSON.stringify(operation));
+    return JSON.parse(JSON.stringify(operation))
 }
 
 function afterTransf(operation: any) {
     if (operation.action === 'insert') {
-        operation.end = operation.start + operation.len;
+        operation.end = operation.start + operation.len
     } else if (operation.action === 'remove') {
-        operation.end = operation.start + operation.len;
+        operation.end = operation.start + operation.len
     } else if (operation.action === 'mult') {
         operation.operations = operation.operations.map(function (op: any) {
-            return afterTransf(op);
-        });
+            return afterTransf(op)
+        })
     }
-    return operation;
+    return operation
 }
 
-/**
- * Operational transform (with no composition)
- * @param op1
- * @param op2
- * @returns {Array}
- */
+// Operational transform (with no composition)
 function transform(op1: any, op2: any) {
-    op1 = beforeTransf(op1);
-    op2 = beforeTransf(op2);
+    op1 = beforeTransf(op1)
+    op2 = beforeTransf(op2)
 
     if (op1.action === 'mult') {
         op1.operations = op1.operations.map(function (op: any) {
-            var tops = transform(op, op2);
-            op2 = tops[1];
-            return tops[0];
-        });
+            const tops = transform(op, op2)
+            op2 = tops[1]
+            return tops[0]
+        })
     } else if (op2.action === 'mult') {
         op2.operations = op2.operations.map(function (op: any) {
-            var tops = transform(op1, op);
-            op1 = tops[0];
-            return tops[1];
-        });
+            const tops = transform(op1, op)
+            op1 = tops[0]
+            return tops[1]
+        })
     } else {
         if (op1.action === 'insert' && op2.action === 'insert') {
             if (op1.start <= op2.start) {
-                op2.start += op1.len;
+                op2.start += op1.len
             } else {
-                op1.start += op2.len;
+                op1.start += op2.len
             }
         } else if (op1.action === 'insert' && op2.action === 'remove') {
             if (op1.start <= op2.start){
-                op2.start += op1.len;
+                op2.start += op1.len
             } else if (op2.start < op1.start && op1.start <= op2.end) {
-                var overlap = op2.end - op1.start;
-                op1.start = op2.start;
+                const overlap = op2.end - op1.start
+                op1.start = op2.start
 
                 op2 = {
                     action: 'mult',
@@ -877,17 +758,17 @@ function transform(op1: any, op2: any) {
                     }]
                 }
             } else if (op2.end < op1.start) {
-                op1.start -= op2.len;
+                op1.start -= op2.len
             } else {
-                esconsole('case uncovered: ' + JSON.stringify(op1) + ' ' + JSON.stringify(op2), 'collab');
+                esconsole('case uncovered: ' + JSON.stringify(op1) + ' ' + JSON.stringify(op2), 'collab')
             }
         } else if (op1.action === 'remove' && op2.action === 'insert') {
             if (op1.end <= op2.start) {
-                op2.start -= op1.len;
+                op2.start -= op1.len
             } else if (op1.start <= op2.start && op2.start < op1.end && op1.end <= op2.end) {
-                var overlap = op1.end - op2.start;
+                const overlap = op1.end - op2.start
 
-                var top1 = {
+                const top1 = {
                     action: 'mult',
                     operations: [{
                         action: 'remove',
@@ -898,12 +779,12 @@ function transform(op1: any, op2: any) {
                         start: op2.end - (op1.len - overlap),
                         len: overlap
                     }]
-                };
+                }
 
-                op2.start = op1.start;
-                op1 = top1;
+                op2.start = op1.start
+                op1 = top1
             } else if (op1.start <= op2.start && op2.end <= op1.end) {
-                var top1 = {
+                const top1 = {
                     action: 'mult',
                     operations: [{
                         action: 'remove',
@@ -914,29 +795,29 @@ function transform(op1: any, op2: any) {
                         start: op1.start + op2.len,
                         len: op1.len - (op2.start - op1.start)
                     }]
-                };
-                op2.start = op1.start;
-                op1 = top1;
+                }
+                op2.start = op1.start
+                op1 = top1
             } else if (op2.start <= op1.start) {
-                op1.start += op2.len;
+                op1.start += op2.len
             } else {
-                esconsole('case uncovered: ' + JSON.stringify(op1) + ' ' + JSON.stringify(op2), 'collab');
+                esconsole('case uncovered: ' + JSON.stringify(op1) + ' ' + JSON.stringify(op2), 'collab')
             }
         } else if (op1.action === 'remove' && op2.action === 'remove') {
             if (op1.end <= op2.start) {
-                op2.start -= op1.len;
+                op2.start -= op1.len
             } else if (op1.start <= op2.start && op2.start < op1.end && op1.end <= op2.end) {
-                var overlap = op1.end - op2.start;
-                op1.len -= overlap;
-                op2.start = op1.start;
-                op2.len -= overlap;
+                const overlap = op1.end - op2.start
+                op1.len -= overlap
+                op2.start = op1.start
+                op2.len -= overlap
             } else if (op2.start < op1.start && op1.start <= op2.end && op2.end <= op1.end) {
-                var overlap = op2.end - op1.start;
-                op1.start = op2.start;
-                op1.len -= overlap;
-                op2.len -= overlap;
+                const overlap = op2.end - op1.start
+                op1.start = op2.start
+                op1.len -= overlap
+                op2.len -= overlap
             } else if (op2.end <= op1.start) {
-                op1.start -= op2.len;
+                op1.start -= op2.len
             } else if (op1.start < op2.start && op2.end < op1.end) {
                 op1 = {
                     action: 'mult',
@@ -949,11 +830,11 @@ function transform(op1: any, op2: any) {
                         start: op2.start - 1,
                         len: op1.end - op2.end
                     }]
-                };
+                }
 
-                op2.len = 0;
+                op2.len = 0
             } else if (op2.start < op1.start && op1.end < op2.end) {
-                op1.len = 0;
+                op1.len = 0
 
                 op2 = {
                     action: 'mult',
@@ -966,264 +847,307 @@ function transform(op1: any, op2: any) {
                         start: op1.start - 1,
                         len: op2.end - op1.end
                     }]
-                };
+                }
             } else if (op1.start === op2.start && op1.end === op2.end) {
                 // already covered
             } else {
-                esconsole('case uncovered: ' + JSON.stringify(op1) + ' ' + JSON.stringify(op2), 'collab');
+                esconsole('case uncovered: ' + JSON.stringify(op1) + ' ' + JSON.stringify(op2), 'collab')
             }
         }
     }
 
-    var results = [];
-    results[0] = afterTransf(op1);
-    results[1] = afterTransf(op2);
+    const results = []
+    results[0] = afterTransf(op1)
+    results[1] = afterTransf(op2)
 
-    return results;
+    return results
 }
 
-var operations: any = {
-    insert: function (op: any) {
-        var document = editSession.getDocument();
-        var start = document.indexToPosition(op.start, 0);
-        var text = op.text;
-        editSession.insert(start, text);
+const operations: any = {
+    insert(op: any) {
+        const document = editSession.getDocument()
+        const start = document.indexToPosition(op.start, 0)
+        const text = op.text
+        editSession.insert(start, text)
     },
 
-    remove: function (op: any) {
-        var document = editSession.getDocument();
-        var start = document.indexToPosition(op.start, 0);
-        var end = document.indexToPosition(op.end, 0);
+    remove(op: any) {
+        const document = editSession.getDocument()
+        const start = document.indexToPosition(op.start, 0)
+        const end = document.indexToPosition(op.end, 0)
 
         editSession.remove({
             start: start,
             end: end
-        });
+        })
     }
-};
+}
 
 operations.mult = function (op: any) {
     op.operations.forEach(function (o: any) {
-        apply(o);
-    });
-};
-
-/**
- * Applies edit operations on the editor content.
- * @param op
- */
-function apply(op: any) {
-    lockEditor = true;
-    operations[op.action](op);
-    lockEditor = false;
+        apply(o)
+    })
 }
 
-/**
- * Other people's operations may affect where the user's cursor should be.
- * @param op
- */
+// Applies edit operations on the editor content.
+function apply(op: any) {
+    lockEditor = true
+    operations[op.action](op)
+    lockEditor = false
+}
+
+// Other people's operations may affect where the user's cursor should be.
 function adjustCursor(op: any) {
     if (op.action === 'mult') {
         op.operations.forEach(function (o: any) {
-            adjustCursor(o);
-        });
+            adjustCursor(o)
+        })
     } else if (op.action === 'insert') {
         if (op.start <= cursorPos) {
-            cursorPos += op.text.length;
+            cursorPos += op.text.length
         }
     } else if (op.action === 'remove') {
         if (op.start < cursorPos) {
             if (op.end <= cursorPos) {
-                cursorPos -= op.len;
+                cursorPos -= op.len
             } else {
-                cursorPos = op.start;
+                cursorPos = op.start
             }
         }
     }
 }
 
-let onUserAddedToCollaboration = async function (data: any) {
+async function onUserAddedToCollaboration(data: any) {
     if (active && scriptID === data.scriptID) {
         data.addedMembers.forEach(function (member: string) {
             otherMembers[member] = {
                 active: false,
                 canEdit: true
             }
-        });
+        })
     }
 
     if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser();
-        store.dispatch(scripts.syncToNgUserProject());
+        await refreshSharedScriptBrowser()
+        store.dispatch(scripts.syncToNgUserProject())
     }
-};
+}
 
-let onUserRemovedFromCollaboration = async function (data: any) {
+async function onUserRemovedFromCollaboration(data: any) {
     if (data.removedMembers.indexOf(userName) !== -1) {
         if (closeSharedScriptIfOpen) {
-            closeSharedScriptIfOpen(data.scriptID);
+            closeSharedScriptIfOpen(data.scriptID)
         }
     } else if (active && scriptID === data.scriptID) {
         data.removedMembers.forEach(function (member: string) {
-            delete otherMembers[member];
-        });
+            delete otherMembers[member]
+        })
     }
 
     if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser();
-        store.dispatch(scripts.syncToNgUserProject());
+        await refreshSharedScriptBrowser()
+        store.dispatch(scripts.syncToNgUserProject())
     }
-};
+}
 
-export let leaveCollaboration = function (scriptID: string, userName: string, refresh=true) {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'leaveCollaboration';
-    message.scriptID = scriptID;
-    message.sender = userName.toLowerCase(); // #1858
-    websocket.send(message);
+export function leaveCollaboration(scriptID: string, userName: string, refresh=true) {
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'leaveCollaboration'
+    message.scriptID = scriptID
+    message.sender = userName.toLowerCase()// #1858
+    websocket.send(message)
 
     if (refresh && refreshSharedScriptBrowser) {
-        return refreshSharedScriptBrowser();
+        return refreshSharedScriptBrowser()
     } else {
-        return Promise.resolve(null);
+        return Promise.resolve(null)
     }
-};
+}
 
-let onUserLeftCollaboration = async function (data: any) {
+async function onUserLeftCollaboration(data: any) {
     if (active && scriptID === data.scriptID) {
-        delete otherMembers[data.sender.toLowerCase()]; // #1858
+        delete otherMembers[data.sender.toLowerCase()]  // #1858
 
         // close collab session tab if it's active and no more collaborators left
         if (Object.keys(otherMembers).length === 0) {
-            closeScript(data.scriptID, userName);
+            closeScript(data.scriptID, userName)
         }
     }
 
     if (refreshScriptBrowser) {
-        await refreshScriptBrowser();
+        await refreshScriptBrowser()
     }
     if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser();
+        await refreshSharedScriptBrowser()
     }
-    store.dispatch(scripts.syncToNgUserProject());
-};
+    store.dispatch(scripts.syncToNgUserProject())
+}
 
-export let renameScript = function (scriptID: string, scriptName: string, userName: string) {
-    esconsole('renaming the script for ' + scriptID, 'collab');
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'renameScript';
-    message.scriptID = scriptID;
-    message.scriptName = scriptName;
-    message.sender = userName.toLowerCase(); // #1858
-    websocket.send(message);
-};
+export function renameScript(scriptID: string, scriptName: string, userName: string) {
+    esconsole('renaming the script for ' + scriptID, 'collab')
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'renameScript'
+    message.scriptID = scriptID
+    message.scriptName = scriptName
+    message.sender = userName.toLowerCase()// #1858
+    websocket.send(message)
+}
 
-let onScriptRenamed = async function (data: any) {
-    esconsole(data.sender + ' renamed a collaborative script ' + data.scriptID, 'collab');
+async function onScriptRenamed(data: any) {
+    esconsole(data.sender + ' renamed a collaborative script ' + data.scriptID, 'collab')
 
     if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser();
-        store.dispatch(scripts.syncToNgUserProject());
+        await refreshSharedScriptBrowser()
+        store.dispatch(scripts.syncToNgUserProject())
     }
-};
+}
 
-export let getScriptText = function (scriptID: string) {
-    esconsole('requesting the script text for ' + scriptID, 'collab');
+export function getScriptText(scriptID: string) {
+    esconsole('requesting the script text for ' + scriptID, 'collab')
 
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'getScriptText';
-    message.scriptID = scriptID;
-    websocket.send(message);
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'getScriptText'
+    message.scriptID = scriptID
+    websocket.send(message)
 
     return new Promise(function (resolve) {
-        promises['getScriptText'] = resolve;
-    });
-};
+        promises['getScriptText'] = resolve
+    })
+}
 
-let onScriptText = function (data: any) {
+function onScriptText(data: any) {
     if (promises['getScriptText']) {
-        promises['getScriptText'](data.scriptText);
-        delete promises['getScriptText'];
+        promises['getScriptText'](data.scriptText)
+        delete promises['getScriptText']
     }
-};
+}
 
 function compareScriptText(delay: number) {
     return setTimeout(function () {
         getScriptText(scriptID!).then(function (serverText: string) {
             if (serverText !== editor.getValue()) {
                 // possible sync error
-                rejoinSession();
+                rejoinSession()
             }
-        });
-    }, delay);
+        })
+    }, delay)
 }
 
-export let joinTutoring = function () {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'joinTutoring';
-    websocket.send(message);
+export function joinTutoring() {
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'joinTutoring'
+    websocket.send(message)
 
-    tutoring = true;
-};
+    tutoring = true
+}
 
-export let leaveTutoring = function () {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'leaveTutoring';
-    websocket.send(message);
+export function leaveTutoring() {
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'leaveTutoring'
+    websocket.send(message)
 
-    tutoring = false;
-};
+    tutoring = false
+}
 
-export let sendChatMessage = function (text: string) {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'chat';
-    message.text = text;
-    message.date = Date.now();
-    websocket.send(message);
+export function sendChatMessage(text: string) {
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'chat'
+    message.text = text
+    message.date = Date.now()
+    websocket.send(message)
 
-    return message;
-};
+    return message
+}
 
-export let chatSubscribe = function (scope: any, callback: Function) {
-    var chatMessageHandler = helpers.getNgRootScope().$on('chatMessageReceived', callback);
-    var compileTrialHandler = helpers.getNgRootScope().$on('compileTrialReceived', callback);
+export function chatSubscribe(scope: any, callback: Function) {
+    const chatMessageHandler = helpers.getNgRootScope().$on('chatMessageReceived', callback)
+    const compileTrialHandler = helpers.getNgRootScope().$on('compileTrialReceived', callback)
 
     if (scope) {
-        scope.$on('$destroy', chatMessageHandler);
-        scope.$on('$destroy', compileTrialHandler);
+        scope.$on('$destroy', chatMessageHandler)
+        scope.$on('$destroy', compileTrialHandler)
     }
-};
+}
 
-export let onJoinSubscribe = function (scope: any, callback: Function) {
-    var handler = helpers.getNgRootScope().$on('joinedCollabSession', callback);
+export function onJoinSubscribe(scope: any, callback: Function) {
+    const handler = helpers.getNgRootScope().$on('joinedCollabSession', callback)
     if (scope) {
-        scope.$on('$destroy', handler);
+        scope.$on('$destroy', handler)
     }
-};
+}
 
-export let onLeaveSubscribe = function (scope: any, callback: Function) {
-    var handler = helpers.getNgRootScope().$on('leftCollabSession', callback);
+export function onLeaveSubscribe(scope: any, callback: Function) {
+    const handler = helpers.getNgRootScope().$on('leftCollabSession', callback)
     if (scope) {
-        scope.$on('$destroy', handler);
+        scope.$on('$destroy', handler)
     }
-};
+}
 
-export let onJoinTutoringSubscribe = function (scope: any, callback: Function) {
-    var handler = helpers.getNgRootScope().$on('joinedTutoring', callback);
+export function onJoinTutoringSubscribe(scope: any, callback: Function) {
+    const handler = helpers.getNgRootScope().$on('joinedTutoring', callback)
     if (scope) {
-        scope.$on('$destroy', handler);
+        scope.$on('$destroy', handler)
     }
-};
+}
 
-export let sendCompilationRecord = function (type: string) {
-    var message = new (PrepareWsMessage as any)();
-    message.action = 'compile';
-    message.text = type;
-    websocket.send(message);
-};
+export function sendCompilationRecord(type: string) {
+    const message = new (PrepareWsMessage as any)()
+    message.action = 'compile'
+    message.text = type
+    websocket.send(message)
+}
+
+
+const GENERAL_HANDLERS: { [key: string]: (data: any) => void } = {
+    onJoinedSession(data: any) {
+        onJoinedSession(data)
+        helpers.getNgRootScope().$emit('joinedCollabSession', data)
+    },
+    onSessionStatus,
+    onSessionClosed,
+    onSessionsFull,
+    onUserAddedToCollaboration,
+    onUserRemovedFromCollaboration,
+    onUserLeftCollaboration,
+    onScriptRenamed,
+    onScriptText,
+    onJoinedTutoring: (data: any) => helpers.getNgRootScope().$emit('joinedTutoring', data),
+}
+
+const SCRIPT_HANDLERS: { [key: string]: (data: any) => void } = {
+    onEdit: onEditMessage,
+    onSyncToSession,
+    onSyncError,
+    onScriptSaved,
+    onCursorPosition: onCursorPosMessage,
+    onSelect: onSelectMessage,
+    onMemberJoinedSession,
+    onMemberLeftSession,
+    onMiscMessage,
+    onWriteAccess: onChangeWriteAccess,
+    onChat: (data: any) => helpers.getNgRootScope().$emit('chatMessageReceived', data),
+    onCompile: (data: any) => helpers.getNgRootScope().$emit('compileTrialReceived', data),
+    onSessionClosedForInactivity,
+}
+
+// websocket callbacks
+function triggerByNotification(data: any) {
+    if (data.notification_type === 'collaboration') {
+        // Convert e.g. "joinedSession" to "onJoinedSession"
+        const action = "on" + data.action.charAt(0).toUpperCase() + data.action.slice(1)
+        GENERAL_HANDLERS[action]?.(data)
+
+        if (active && scriptID === data.scriptID) {
+            SCRIPT_HANDLERS[action]?.(data)
+        }
+    }
+}
+
+websocket.subscribe(triggerByNotification)
+
 
 // TEMPORARY for Wizard of Oz CAI testing, Spring 2020.
-let userIsCAI = function (user: string) {
-    user = user.toUpperCase();
-    return (user.indexOf("AI_PARTNER") !== -1 || user.indexOf("CAI") !== -1);
-};
+function userIsCAI(user: string) {
+    user = user.toUpperCase()
+    return (user.indexOf("AI_PARTNER") !== -1 || user.indexOf("CAI") !== -1)
+}
