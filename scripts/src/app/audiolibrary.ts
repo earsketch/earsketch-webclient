@@ -4,7 +4,7 @@
 import ctx from "./audiocontext"
 import esconsole from "../esconsole"
 
-type AugmentedBuffer = AudioBuffer & { filekey: string }
+export type AugmentedBuffer = AudioBuffer & { filekey: string }
 
 export const cache = {
     // Metadata from server:
@@ -68,7 +68,6 @@ const timestretch = (buffer: AudioBuffer, sourceTempo: number, targetTempo: numb
     }
     kali.input(input)
     kali.process()
-
     // This weird calculation matches the output length of SOX time stretching.
     const targetLength = Math.round((buffer.length + 1) * sourceTempo/targetTempo)
     const outOffset = Math.round(offset * sourceTempo/targetTempo)
@@ -136,29 +135,42 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
         }
     }
 
+    // Need to do this before decodeAudioData() call, as that 'detaches' the ArrayBuffer.
+    const bytes = new Uint8Array(data)
+    // Check for MP3 file signatures.
+    const isMP3 = (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] == 0x33) || (bytes[0] === 0xff || bytes[1] === 0xfb)
+
     // STEP 3: decode the audio data.
     esconsole(`Decoding ${filekey} buffer`, ["debug", "audiolibrary"])
     let buffer
     try {
-        buffer = await ctx.decodeAudioData(data)
+        buffer = await ctx.decodeAudioData(data) as AugmentedBuffer
     } catch (err) {
         esconsole("Error decoding audio clip: " + filekey, ["error", "audiolibrary"])
         throw err
     }
     esconsole(filekey + " buffer decoded", ["debug", "audiolibrary"])
 
+    if (isMP3) {
+        // MP3-specific offset fix
+        const fixed = new Float32Array(buffer.length)
+        // Offset chosen based on https://lame.sourceforge.io/tech-FAQ.txt
+        buffer.copyFromChannel(fixed, 0, 1057)
+        buffer.copyToChannel(fixed, 0)        
+    }
+
     if (!FLAGS.USE_CLIENT_TS || originalTempo === -1 || tempo === -1) {
         esconsole("Using the server (sox) time stretcher.", ["debug", "audiolibrary"])
     } else {
         esconsole("Using client-side time stretcher for " + filekey, ["debug", "audiolibrary"])
-        buffer = timestretch(buffer, originalTempo, tempo)
+        buffer = timestretch(buffer, originalTempo, tempo) as AugmentedBuffer
     }
 
     // STEP 4: Return the decoded audio buffer.
     // Add a filekey property to the buffer so we can figure out where it came from later.
-    (buffer as AugmentedBuffer).filekey = filekey
+    buffer.filekey = filekey
     if (FLAGS.CACHE_TS_RESULTS) {
-        cache.clips[cacheKey] = buffer as AugmentedBuffer
+        cache.clips[cacheKey] = buffer
     }
     // Remove this promise from the cache since it's been resolved.
     delete cache.promises[cacheKey]

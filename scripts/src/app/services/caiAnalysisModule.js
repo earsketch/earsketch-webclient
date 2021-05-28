@@ -156,7 +156,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', "caiStu
       var report = {};
 
       // basic music information
-      report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length)};
+      report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length * 4.0)};
       report["EFFECTS"] = {};
 
       apiCalls = complexityCalculator.apiCalls();
@@ -409,24 +409,15 @@ app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', "caiStu
     report["SOUNDPROFILE"] = output["SOUNDPROFILE"];
     report["GENRE"] = output["GENRE"];
 
-    // Audio Recommendations per measure
-    report["RECOMMENDATIONS"] = [];
-
     // Volume Mixing - simultaneous varying gain adjustments in separate tracks.
     report["MIXING"] = {grade: 0};
 
     for (var i in Object.keys(report["MEASUREVIEW"]))
     {
-      var recInput = [];
-      var recommendedSounds = [];
-
       var volumeMixing = {};
 
       report["MEASUREVIEW"][i].forEach(function(item) {
-        if (item.type === "sound") {
-          recInput.push(item.name);
-        }
-        else if (item.type === "effect") {
+         if (item.type === "effect") {
           if (item.param === "GAIN" && !volumeMixing.hasOwnProperty(item.track)) {
             if (!Object.values(volumeMixing).includes(item.value)) {
               volumeMixing[item.track] = item.value;
@@ -434,9 +425,6 @@ app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', "caiStu
           }
         }
       });
-
-      recommendedSounds = recommender.recommend(recommendedSounds,recInput,1,1);
-      report["RECOMMENDATIONS"].push(recommendedSounds);
 
       report["MIXING"][i] = Object.keys(volumeMixing).length;
 

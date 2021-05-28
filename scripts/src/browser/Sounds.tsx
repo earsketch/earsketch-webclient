@@ -1,5 +1,6 @@
 import React, {useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -56,6 +57,7 @@ const FilterItem = ({ category, value }: { category: keyof sounds.Filters, value
 };
 
 const Filters = () => {
+    const { t } = useTranslation();
     const includeFeaturedArtists = useSelector(sounds.selectFeaturedSoundVisibility);
     const artistsSelector = includeFeaturedArtists ? sounds.selectAllArtists : sounds.selectAllRegularArtists;
     const genresSelector = includeFeaturedArtists ? sounds.selectAllGenres : sounds.selectAllRegularGenres;
@@ -70,10 +72,10 @@ const Filters = () => {
 
     return (
         <div className='p-3'>
-            <div className='pb-2 text-lg'>FILTER</div>
+            <div className='pb-2 text-lg'>{t('soundBrowser.filterDropdown.title')}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
-                    title='Artists'
+                    title={t('soundBrowser.filterDropdown.artists')}
                     category='artists'
                     items={artists}
                     position='left'
@@ -81,7 +83,7 @@ const Filters = () => {
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title='Genres'
+                    title={t('soundBrowser.filterDropdown.genres')}
                     category='genres'
                     items={genres}
                     position='center'
@@ -89,7 +91,7 @@ const Filters = () => {
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title='Instruments'
+                    title={t('soundBrowser.filterDropdown.instruments')}
                     category='instruments'
                     items={instruments}
                     position='right'
@@ -103,6 +105,8 @@ const Filters = () => {
 
 const ShowOnlyFavorites = () => {
     const dispatch = useDispatch();
+    const { t } = useTranslation();
+
     return (
         <div className='flex items-center'>
             <div className='pr-2'>
@@ -116,7 +120,7 @@ const ShowOnlyFavorites = () => {
                 />
             </div>
             <div className='pr-1'>
-                Show only
+                {t('soundBrowser.button.showOnlyStars')}
             </div>
             <i className='icon icon-star-full2 fav-icon' />
         </div>
@@ -125,6 +129,8 @@ const ShowOnlyFavorites = () => {
 
 const AddSound = () => {
     const ngRootScope = helpers.getNgRootScope();
+    const { t } = useTranslation();
+
     return (
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
@@ -134,7 +140,7 @@ const AddSound = () => {
                 <i className='icon icon-plus2' />
             </div>
             <div className='mr-3'>
-                Add sound
+                {t('soundBrowser.button.addSound')}
             </div>
         </div>
     );
@@ -145,14 +151,15 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
     const previewFileKey = useSelector(sounds.selectPreviewFileKey);
     const fileKey = clip.file_key;
     const theme = useSelector(appState.selectColorTheme);
+    const { t } = useTranslation();
 
-    const tooltip = `File: ${fileKey}
-        Folder: ${clip.folder}
-        Artist: ${clip.artist}
-        Genre: ${clip.genre}
-        Instrument: ${clip.instrument}
-        Original Tempo: ${clip.tempo}
-        Year: ${clip.year}`.replace(/\n\s+/g,'\n');
+    const tooltip = `${t('soundBrowser.clip.tooltip.file')}: ${fileKey}
+        ${t('soundBrowser.clip.tooltip.folder')}: ${clip.folder}
+        ${t('soundBrowser.clip.tooltip.artist')}: ${clip.artist}
+        ${t('soundBrowser.clip.tooltip.genre')}: ${clip.genre}
+        ${t('soundBrowser.clip.tooltip.instrument')}: ${clip.instrument}
+        ${t('soundBrowser.clip.tooltip.originalTempo')}: ${clip.tempo}
+        ${t('soundBrowser.clip.tooltip.year')}: ${clip.year}`.replace(/\n\s+/g,'\n');
 
     const loggedIn = useSelector(user.selectLoggedIn);
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(fileKey);
@@ -172,7 +179,7 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                     <button
                         className='btn btn-xs btn-action'
                         onClick={() => dispatch(sounds.previewSound(fileKey))}
-                        title='Preview sound'
+                        title={t('soundBrowser.clip.tooltip.previewSound')}
                     >
                         { previewFileKey===fileKey
                             ? <i className='icon icon-stop2' />
@@ -185,7 +192,7 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                             <button
                                 className='btn btn-xs btn-action'
                                 onClick={() => dispatch(sounds.markFavorite({ fileKey, isFavorite }))}
-                                title='Mark as favorite'
+                                title={t('soundBrowser.clip.tooltip.markFavorite')}
                             >
                                 { isFavorite
                                     ? <i className='icon icon-star-full2 fav-icon' />
@@ -200,7 +207,7 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                             <button
                                 className='btn btn-xs btn-action'
                                 onClick={() => ideScope.pasteCode(fileKey)}
-                                title='Paste to editor'
+                                title={t('soundBrowser.clip.tooltip.paste')}
                             >
                                 <i className='icon icon-paste2' />
                             </button>
@@ -323,10 +330,11 @@ const WindowedRecommendations = () => {
     const loggedIn = useSelector(user.selectLoggedIn);
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
     const recommendations = useSelector((state: RootState) => state.recommender.recommendations);
+    const { t } = useTranslation();
 
     return (
         <Collection
-            title='RECOMMENDATIONS'
+            title={t('soundBrowser.title.recommendations')}
             visible={loggedIn&&tabsOpen}
             initExpanded={false}
         >
@@ -418,18 +426,20 @@ const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, fol
 };
 
 const DefaultSoundCollection = () => {
+    const { t } = useTranslation();
     const folders = useSelector(sounds.selectFilteredRegularFolders);
     const fileKeysByFolders = useSelector(sounds.selectFilteredRegularFileKeysByFolders);
     const filteredListChanged = useSelector(sounds.selectFilteredListChanged);
     const numFileKeys = useSelector(sounds.selectAllRegularFileKeys).length;
     const numFilteredFileKeys = useSelector(sounds.selectFilteredRegularFileKeys).length;
     const filtered = numFilteredFileKeys !== numFileKeys;
-    const title = `SOUND COLLECTION (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
+    const title = `${t('soundBrowser.title.collection')} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
     const props = { title, folders, fileKeysByFolders, filteredListChanged };
     return <WindowedSoundCollection { ...props } />;
 };
 
 const FeaturedArtistCollection = () => {
+    const { t } = useTranslation();
     const folders = useSelector(sounds.selectFilteredFeaturedFolders);
     const fileKeysByFolders = useSelector(sounds.selectFilteredFeaturedFileKeysByFolders);
     const filteredListChanged = useSelector(sounds.selectFilteredListChanged);
@@ -439,7 +449,7 @@ const FeaturedArtistCollection = () => {
     const numFilteredFileKeys = useSelector(sounds.selectFilteredFeaturedFileKeys).length;
     const filtered = numFilteredFileKeys !== numFileKeys;
     const artists = useSelector(sounds.selectFeaturedArtists);
-    const title = `FEATURED ARTIST${artists.length>1 ? 'S' : ''} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
+    const title = `${t('soundBrowser.title.featuredArtist')}${artists.length>1 ? 'S' : ''} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
     const props = { title, folders, fileKeysByFolders, filteredListChanged, visible, initExpanded };
     return <WindowedSoundCollection { ...props } />;
 };

@@ -1,0 +1,16 @@
+{
+  "common": {
+    "contentManager.title": "SPANISH HERE",
+    "contentManager.searchPlaceholder": "Spanish",
+    "soundBrowser.title": "SPANISH SO",
+    "scriptBrowser.title": "SPANISH SCR",
+    "soundBrowser.title.collection": "Spanish",
+    "soundBrowser.title.featuredArtist": "Spanish Here",
+    "soundBrowser.title.recommendations": "Spanish",
+    "soundBrowser.button.addSound": "Spanish Here",
+    "soundBrowser.button.showOnlyStars": "Spanish Here",
+    "soundBrowser.filterDropdown.artists": "Spanish Here",
+    "soundBrowser.filterDropdown.genres": "Spanish Here",
+    "soundBrowser.filterDropdown.instruments": "Spanish Here"
+  }
+}

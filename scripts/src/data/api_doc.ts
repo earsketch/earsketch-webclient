@@ -1,6 +1,31 @@
 // TODO: There are some links to the curriculum that relies on Angular main controller for accessing the Redux store. We should import the store and curriculumState here to dispatch the action directly. (#2232)
 
-var ESApiDoc = {
+export interface APIParameter {
+    type: string
+    description: string
+    default?: string
+}
+
+export interface APIItem {
+    description: string
+    example: {
+        python: string
+        javascript: string
+    }
+    autocomplete?: string
+    parameters?: {
+        [name: string]: APIParameter
+    }
+    returns?: {
+        type: string
+        description: string
+    }
+    meta?: any
+    expert?: string
+    caveats?: string
+}
+
+const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } = {
     "analyze": {
         "description": "This function analyzes an audio file for the specified feature.",
         "parameters": {
@@ -699,4 +724,6 @@ var ESApiDoc = {
         },
         "autocomplete": "shuffleString(inputString)"
     }
-};
+} as const
+
+export default ESApiDoc

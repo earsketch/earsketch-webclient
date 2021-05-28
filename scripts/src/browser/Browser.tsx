@@ -1,23 +1,25 @@
-import React, { useState, useEffect, LegacyRef, ChangeEventHandler, MouseEventHandler } from 'react';
+import React, { ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState } from 'react';
 import { Store } from 'redux';
-import { Provider, useSelector, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { usePopper } from "react-popper";
 import { hot } from 'react-hot-loader/root';
 import { react2angular } from 'react2angular';
+import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
 import * as layout from '../layout/layoutState';
-
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
 import { RootState } from '../reducers';
+import { BrowserTabType } from "../layout/layoutState";
 
 const darkBgColor = '#223546';
 
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
+    const { t } = useTranslation();
 
     return (
         <div
@@ -25,7 +27,7 @@ export const TitleBar = () => {
             style={{minHeight: 'fit-content'}}  // Safari-specific issue
         >
             <div className='pl-3 pr-4 font-semibold truncate'>
-                CONTENT MANAGER
+                {t('contentManager.title')}
             </div>
             <div>
                 <div
@@ -41,9 +43,9 @@ export const TitleBar = () => {
     );
 };
 
-const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
+const BrowserTab: React.FC<{ name: string, type: BrowserTabType }> = ({ name, type, children }) => {
     const dispatch = useDispatch();
-    const isSelected = useSelector(layout.selectWestKind)===name;
+    const isSelected = useSelector(layout.selectWestKind)===type;
 
     return (
         <div
@@ -54,7 +56,7 @@ const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
             } : {}}
             onClick={() => dispatch(layout.setWest({
                 open: true,
-                kind: name
+                kind: type
             }))}
         >
             { children }
@@ -64,6 +66,7 @@ const BrowserTab: React.FC<{ name: string }> = ({ name, children }) => {
 };
 
 export const BrowserTabs = () => {
+    const { t } = useTranslation();
     return (
         <div
             className='flex justify-between text-center'
@@ -74,13 +77,13 @@ export const BrowserTabs = () => {
                 minHeight: 'fit-content' // Safari-specific issue
             }}
         >
-            <BrowserTab name='SOUNDS'>
+            <BrowserTab name={t('soundBrowser.title')} type={BrowserTabType.Sound}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
-            <BrowserTab name='SCRIPTS'>
+            <BrowserTab name={t('scriptBrowser.title')} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
-            <BrowserTab name='API'>
+            <BrowserTab name='API' type={BrowserTabType.API}>
                 <i className='icon-book pr-2' />
             </BrowserTab>
         </div>
@@ -98,13 +101,15 @@ interface SearchBarProps {
 }
 export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme);
+    const { t } = useTranslation();
+
     return (
         <form className='p-3 pb-1' onSubmit={e => e.preventDefault()}>
             <label className={`w-full border-b-2 flex justify-between  items-center ${theme === 'light' ? 'border-black' : 'border-white'}`}>
                 <input
                     className='w-full outline-none p-1 bg-transparent font-normal'
                     type='text'
-                    placeholder='Search'
+                    placeholder={t('contentManager.searchPlaceholder')}
                     value={searchText}
                     onChange={dispatchSearch}
                 />
@@ -254,7 +259,7 @@ export const Collection:React.FC<CollectionType> = ({ title, visible=true, initE
     );
 };
 
-export const Collapsed:React.FC<{ position:'west'|'east', title?:string|void }> = ({ position='west', title=null }) => {
+export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ position='west', title=null }) => {
     const theme = useSelector(appState.selectColorTheme);
     const embedMode = useSelector(appState.selectEmbedMode);
     const dispatch = useDispatch();
@@ -292,19 +297,22 @@ export const Collapsed:React.FC<{ position:'west'|'east', title?:string|void }> 
 };
 
 // Keys are weirdly all caps because of the shared usage in the layout reducer as well as component's title-bar prop.
-const BrowserComponents: { [key:string]: React.FC } = {
-    SOUNDS: SoundBrowser,
-    SCRIPTS: ScriptBrowser,
-    API: APIBrowser
+const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
+    [BrowserTabType.Sound]: SoundBrowser,
+    [BrowserTabType.Script]: ScriptBrowser,
+    [BrowserTabType.API]: APIBrowser
 };
 
 const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector((state: RootState) => state.layout.west.open);
+    const { t } = useTranslation();
     let kind = useSelector(layout.selectWestKind);
-    if (!Object.keys(BrowserComponents).includes(kind)) {
-        kind = 'SOUNDS';
+
+    if (!Object.values(BrowserTabType).includes(kind)) {
+        kind = BrowserTabType.Sound;
     }
+
     const BrowserBody = BrowserComponents[kind];
 
     return (
@@ -319,7 +327,7 @@ const Browser = () => {
                         <BrowserTabs />
                         <BrowserBody />
                     </>
-                ) : <Collapsed title='CONTENT MANAGER' position='west' />
+                ) : <Collapsed title={t('contentManager.title')} position='west' />
             }
         </div>
     );

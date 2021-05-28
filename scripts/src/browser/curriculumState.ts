@@ -3,7 +3,9 @@ import lunr from 'lunr'
 
 import esconsole from '../esconsole'
 import * as layout from '../layout/layoutState'
+
 import { RootState, ThunkAPI, AppDispatch } from '../reducers'
+import { BrowserTabType } from "../layout/layoutState";
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
@@ -52,7 +54,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(layout.openWest("API"))
+            dispatch(layout.openWest(BrowserTabType.API))
         }
     })
 

@@ -6,7 +6,7 @@ import { RootState } from '../reducers';
 const appSlice = createSlice({
     name: 'app',
     initialState: {
-        locale: 'us-en',
+        locale: 'en',
         scriptLanguage: 'python',
         colorTheme: 'light',
         fontSize: 14,
@@ -48,6 +48,9 @@ const appSlice = createSlice({
         },
         setEmbeddedShareID(state, { payload }) {
             state.embeddedShareID = payload;
+        },
+        setLocale(state, { payload }) {
+            state.locale = payload;
         }
     }
 });
@@ -70,6 +73,7 @@ export const {
     setEmbeddedScriptUsername,
     setEmbeddedScriptName,
     setEmbeddedShareID,
+    setLocale,
 } = appSlice.actions;
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage;
@@ -82,3 +86,4 @@ export const selectHideEditor = (state: RootState) => state.app.hideEditor;
 export const selectEmbeddedScriptUsername = (state: RootState) => state.app.embeddedScriptUsername;
 export const selectEmbeddedScriptName = (state: RootState) => state.app.embeddedScriptName;
 export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedShareID;
+export const selectLocale = (state: RootState) => state.app.locale;

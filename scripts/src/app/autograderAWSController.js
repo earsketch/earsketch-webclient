@@ -1,9 +1,11 @@
+import * as compiler from './compiler'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import * as reader from './reader'
 
 app.controller("autograderAWSController",
-['$scope','compiler', 'reader', 'caiAnalysisModule', 'userProject',
-function($scope, compiler, reader, caiAnalysisModule, userProject) {
+['$scope', 'caiAnalysisModule', 'userProject',
+function($scope, caiAnalysisModule, userProject) {
 
     // Loading ogg by default for browsers other than Safari
     // setting default to wav for chrome 58 (May 22, 2017)
@@ -17,6 +19,7 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
     $scope.complexityThreshold = 0;
     $scope.uniqueStems = 0;
     $scope.lengthRequirement = 0;
+    $scope.showIndividualGrades = false;
 
     $scope.contestDict = {};
 
@@ -77,58 +80,79 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
       $scope.code_passed = [];
       $scope.music_code_passed = [];
 
+      $scope.showIndividualGrades = document.getElementById('showIndividualGrades').checked;
+
       esconsole("Running autograder.", ['DEBUG']);
       $scope.entries = document.querySelector('.output').innerText;
       $scope.entrants = document.querySelector('.hiddenOutput').innerText;
-      // var shareUrls = $scope.urls.split('\n');
-      // shareUrls.pop();
+
       var shareID = $scope.entries.split(',');
       var contestID = $scope.entrants.split(',');
-      // console.log(shareUrls);
 
-      for (i = 0; i < shareID.length; i++) {
+      for (var i = 0; i < shareID.length; i++) {
         if (shareID[i][0] == ','){
           shareID[i] = shareID[i].substring(1);
         }
+        shareID[i] = shareID[i].replace(/\n|\r/g, "");
         $scope.contestDict[shareID[i]] = contestID[i];
       }
-
-      // var re = /\?sharing=([^\s.,;])+/g
-      // var matches = $scope.urls.match(re);
 
       // start with a promise that resolves immediately
       var p = new Promise(function(resolve) { resolve(); });
 
-      //for (var i = 0; i < shareUrls.length; i++) {
-      // angular.forEach(matches, function(match) {
       angular.forEach(shareID, function(id) {
         esconsole("ShareId: " + id, ['DEBUG']);
         p = p.then(function() {
           $scope.processing = id;
           var ret = userProject.loadScript(id).then($scope.compileScript);
+
+          $scope.$applyAsync();
+
           if (ret != 0)
             return ret;
         });
       });
+
+      $scope.processing = null;
     };
 
     $scope.compileScript = function(script) {
-      console.log("compile script", script.name);
+      
+      if(!script) {
+        return 0;
+      }
+      else {
+        console.log("compile script", script.name);
+      }
 
       if (script.name == undefined) {
         console.log("Script is incorrectly named.");
         return 0;
       }
-      if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
-        console.log("Script contains readInput, cannot autograde.");
-        return 0;
-      }
+
+      // Temporary: removal of readInput.
+      // if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
+      //   console.log("Script contains readInput, cannot autograde.");
+      //   return 0;
+      // }
 
       var complexity = $scope.read(script.source_code, script.name);
       var complexityScore = reader.total(complexity);
       var complexityPass = complexityScore >= $scope.complexityThreshold;
 
-      return $scope.compile(script.source_code, script.name).then(function(compiler_output) {
+      // TODO: process print statements through Skulpt. Temporary removal of print statements.
+      var sourceCodeLines = script.source_code.split('\n');
+      var sourceCode = [];
+
+      for (var i = 0; i < sourceCodeLines.length; i++) {
+        if (sourceCodeLines[i].indexOf('print') === -1) {
+          sourceCode.push(sourceCodeLines[i]);
+        }
+      }
+
+      sourceCode = sourceCode.join('\n');
+
+      return $scope.compile(sourceCode, script.name).then(function(compiler_output) {
         esconsole(compiler_output, ['DEBUG']);
 
         var analysis = caiAnalysisModule.analyzeMusic(compiler_output);
@@ -169,6 +193,10 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
         }
         $scope.processing = null;
       }).catch(function(err) {
+        $scope.results.push({
+          script:script,
+          error:err
+        });
         esconsole(err, ['ERROR']);
         $scope.processing = null;
     });
@@ -218,7 +246,7 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
 
     $scope.generateCSVAWS = function() {
       var headers = ['#', 'username', 'script_name', 'shareid', 'error'];
-      var includeReports = ["GRADE", "OVERVIEW"];
+      var includeReports = ["OVERVIEW", "COMPLEXITY", "GRADE"];
       var rows = [];
       var col_map = {};
 
@@ -247,17 +275,17 @@ function($scope, compiler, reader, caiAnalysisModule, userProject) {
         }
       }
       angular.forEach($scope.results, function(result) {
-        row = [];
+        var row = [];
         for (var i = 0; i < headers.length; i++) {
           row[i] = '';
         }
         if (result.script) {
           row[1] = result.script.username;
           row[2] = result.script.name;
-          row[3] = result.script.shareid;
+          row[3] = result.script.shareid.replace(/\n|\r/g, "");
           // var frontString = "https://earsketch.gatech.edu/earsketch2/#?sharing=";
-          var frontString = SITE_BASE_URI + "/earsketch2/?sharing=";
-          row[0] = $scope.contestDict[frontString+row[3]];
+          // var frontString = SITE_BASE_URI + "/earsketch2/?sharing=";
+          row[0] = $scope.contestDict[row[3]];
         }
         if (result.error) {
           console.log(result.error)

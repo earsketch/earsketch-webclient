@@ -6,6 +6,7 @@
  * @author Creston Bunch
  */
 import * as audioLibrary from '../audiolibrary'
+import ESApiDoc from '../../data/api_doc'
 import esconsole from '../../esconsole'
 
 app.factory('completer', ['$q', function completerFactory($q) {

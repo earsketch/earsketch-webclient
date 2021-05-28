@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { isArray } from 'lodash'
 
 import * as api from './apiState'
+import { APIItem, APIParameter } from '../data/api_doc'
 import { selectScriptLanguage } from '../app/appState'
 
 import { SearchBar } from './Browser'
@@ -62,7 +63,7 @@ function useForceUpdate() {
 }
 
 
-const paste = (name: string, obj: api.APIItem) => {
+const paste = (name: string, obj: APIItem) => {
     let args: string[] = []
     for (var param in obj.parameters) {
         args.push(param)
@@ -76,7 +77,7 @@ const paste = (name: string, obj: api.APIItem) => {
 }
 
 // Main point of this module.
-const Entry = ({ name, obj }: { name: string, obj: api.APIItem & { details?: boolean } }) => {
+const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean } }) => {
     // TODO don't mutate obj.details
     const forceUpdate = useForceUpdate()
     const [highlight, setHighlight] = useState(false)
@@ -113,7 +114,7 @@ const Entry = ({ name, obj }: { name: string, obj: api.APIItem & { details?: boo
             {obj.parameters
             ? (<div className="text-lg font-light break-word">
                 <span className="px-1">(</span>
-                {Object.entries(obj.parameters).map(([param, paramVal]: [string, api.APIParameter]) => (
+                {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter ]) => (
                     <span key={param}>
                         <span title={`${param} (${paramVal.type}) - ${paramVal.description}`}>{param}</span>
                         {paramVal.hasOwnProperty('default') &&
@@ -132,7 +133,7 @@ const Entry = ({ name, obj }: { name: string, obj: api.APIItem & { details?: boo
 }
 
 
-const Details = ({ obj }: { obj: api.APIItem }) => {
+const Details = ({ obj }: { obj: APIItem  }) => {
     const language = useSelector(selectScriptLanguage)
     const theme = useSelector(appState.selectColorTheme)
 
@@ -194,9 +195,9 @@ const Details = ({ obj }: { obj: api.APIItem }) => {
 const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
-        {entries.map(([name, obj]: [string, api.APIItem]) => {
+        {entries.map(([name, obj]: [string, APIItem ]) => {
             const arr = isArray(obj) ? obj : [obj]
-            return arr.map((o: api.APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
+            return arr.map((o: APIItem , index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}
     </>)
 }

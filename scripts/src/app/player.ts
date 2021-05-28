@@ -26,6 +26,9 @@ export interface Clip {
     gain?: GainNode
     silence: number
     track: number
+    tempo: number
+    loop: boolean
+    scale: number
 }
 
 export interface EffectRange {
@@ -62,7 +65,6 @@ export interface DAWData {
     tracks: Track[]
     master: GainNode
     init: boolean
-    finish: boolean
     quality: boolean
     slicedClips: { [key: string]: ClipSlice }
 }

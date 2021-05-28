@@ -5,10 +5,13 @@
 // If your API function needs to be asynchronous, make sure it returns a
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
 
+import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
+import * as compiler from "../app/compiler"
 import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../app/userconsole"
 import { Clip, DAWData, EffectRange, Track } from "../app/player"
@@ -76,8 +79,8 @@ export const finish = (result: DAWData) => {
 
     checkInit(result)
 
-    // toggle finish flag
-    result["finish"] = true
+    // We used to set a flag here. But all the flag indicated was whether the user called this function,
+    // and this function didn't actually do anything *except* set that flag.
     return result
 }
 
@@ -476,9 +479,6 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     const tempo = result.tempo
     const q = result.quality
 
@@ -503,7 +503,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
     })
     .then(
         function(buffer: any) {
-            return ServiceWrapper().analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
+            return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo)
         }
     ).catch(function(err: Error) {
         throw err
@@ -542,9 +542,6 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
         )
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     // Cannot do this assertion within the async promise chain
     const sampleRate = audioContext.sampleRate
     const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
@@ -566,8 +563,8 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     })
     .then(
         function(buffer: AudioBuffer) {
-            return ServiceWrapper().analyzer.ESAnalyzeForTime(
-                buffer, featureForAnalysis, startTime, endTime, tempo
+            return analyzer.computeFeatureForBuffer(
+                buffer, featureForAnalysis, tempo, startTime, endTime
             )
         }
     ).catch(function(err: Error) {
@@ -600,9 +597,6 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         throw new Error("Cannot analyze a track that does not exist: " + trackNumber)
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     const tempo = result.tempo
     // the analyzeResult will contain a result object that contains only
     // one track that we want to analyze
@@ -615,7 +609,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         length: result.length,
         slicedClips: result.slicedClips
     }
-    return compiler.postCompile(analyzeResult).then(function(compiled: DAWData) {
+    return compiler.postCompile(analyzeResult as any).then(function(compiled: DAWData) {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track
@@ -627,7 +621,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
     }).catch(function(err: Error) {
         throw err
     }).then(function(buffer: AudioBuffer) {
-        return ServiceWrapper().analyzer.ESAnalyze(buffer, featureForAnalysis, tempo)
+        return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo)
     }).catch(function(err: Error) {
         throw err
     })
@@ -679,9 +673,6 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         throw new RangeError(ESMessages.esaudio.analysisTimeTooShort)
     }
 
-    // load an angular service outside angular
-    const compiler = ServiceWrapper().compiler
-
     const tempo = result.tempo
     // the analyzeResult will contain a result object that contains only
     // one track that we want to analyze
@@ -695,7 +686,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         slicedClips: result.slicedClips
     }
 
-    return compiler.postCompile(analyzeResult).then(function(compiled: DAWData) {
+    return compiler.postCompile(analyzeResult as any).then(function(compiled: DAWData) {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track
@@ -707,8 +698,8 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         esconsole(err.toString(), ["ERROR","PT"])
         throw err
     }).then(function(buffer: AudioBuffer) {
-        return ServiceWrapper().analyzer.ESAnalyzeForTime(
-            buffer, featureForAnalysis, startTime, endTime, tempo
+        return analyzer.computeFeatureForBuffer(
+            buffer, featureForAnalysis, tempo, startTime, endTime
         )
     }).catch(function(err: Error) {
         esconsole(err.toString(), ["ERROR","PT"])
@@ -730,7 +721,9 @@ export function dur(result: DAWData, fileKey: string) {
     const q = result.quality
     return audioLibrary.getAudioClip(fileKey, result.tempo, q).then(
         function(buffer: AudioBuffer) {
-            return ServiceWrapper().analyzer.ESDur(buffer, result.tempo)
+            // rounds off precision error in JS
+            const digits = 2
+            return Math.round(ESUtils.timeToMeasure(buffer.duration, result.tempo) * Math.pow(10, 2)) / Math.pow(10, digits)
         }
     ).catch(function(err: Error) {
         throw err
@@ -882,23 +875,21 @@ export function println(result: DAWData, msg: string) {
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
 
-    let compiler = ServiceWrapper().compiler
-    if (!compiler.isTestRun()) {
+    if (!compiler.testRun) {
         userConsole.log(msg)
     }
 }
 
 // Prompt for user input.
-export function prompt(result: DAWData, msg: string) {
-    esconsole("Calling pt_prompt from passthrough with parameter "
-                + msg, "PT")
+export function readInput(result: DAWData, msg: string) {
+    esconsole("Calling pt_readInput from passthrough with parameter " + msg, "PT")
 
     checkInit(result)
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("prompt", args, 0, 1)
-    if (typeof(msg) !== "undefined") {
-        ptCheckType("prompt", "string", msg)
+    ptCheckArgs("readInput", args, 0, 1)
+    if (typeof msg !== "undefined") {
+        ptCheckType("readInput", "string", msg)
     } else {
         msg = ""
     }
@@ -1426,12 +1417,7 @@ function checkInit(result: DAWData) {
  * end of the song).
  */
 export const addClip = (result: DAWData, clip: Clip, silence: number | undefined=undefined) => {
-
-    if (silence == undefined) {
-        clip.silence = 0
-    } else {
-        clip.silence = silence
-    }
+    clip.silence = silence ?? 0
 
     // bounds checking
     if (clip.track === 0) {

@@ -57,6 +57,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     // TEMPORARY FOR GM TESTING
     $scope.showGM = FLAGS.SHOW_GM;
 
+    // TEMPORARY FOR I18N DEVELOPMENT
+    $scope.showLocaleSwitcher = FLAGS.SHOW_LOCALE_SWITCHER;
+
     if ($scope.showAmazon) {
         $rootScope.$broadcast('showAmazon');
     }
@@ -1035,7 +1038,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         angular.element('div[caiwindow]').show();
     }
 
-    // Note: Used in api_doc.js links to the curriculum Effects chapter.
+    // Note: Used in api_doc links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
         if ($scope.showCAIWindow) {
             $scope.toggleCAIWindow();
