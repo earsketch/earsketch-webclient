@@ -86,6 +86,10 @@ export const callbacks = {
     refreshScriptBrowser: null as Function | null,
     refreshSharedScriptBrowser: null as Function | null,
     closeSharedScriptIfOpen: null as Function | null,
+    chat: null as Function | null,
+    onJoin: null as Function | null,
+    onLeave: null as Function | null,
+    onJoinTutoring: null as Function | null,
 }
 
 const editTimeout = 5000  // sync (rejoin) session if there is no server response
@@ -264,6 +268,8 @@ function onJoinedSession(data: any) {
         continuations.joinSession(data)
         delete continuations.joinSession
     }
+
+    callbacks.onJoin?.(data)
 }
 
 function onSessionsFull(data: any) {
@@ -299,7 +305,7 @@ export function leaveSession(shareID: string, username?: string) {
 
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
 
-    helpers.getNgRootScope().$emit('leftCollabSession', null)
+    callbacks.onLeave?.()
 }
 
 function onMemberJoinedSession(data: any) {
@@ -1043,47 +1049,13 @@ export function sendChatMessage(text: string) {
     return message
 }
 
-export function chatSubscribe(scope: any, callback: Function) {
-    const chatMessageHandler = helpers.getNgRootScope().$on('chatMessageReceived', callback)
-    const compileTrialHandler = helpers.getNgRootScope().$on('compileTrialReceived', callback)
-
-    if (scope) {
-        scope.$on('$destroy', chatMessageHandler)
-        scope.$on('$destroy', compileTrialHandler)
-    }
-}
-
-export function onJoinSubscribe(scope: any, callback: Function) {
-    const handler = helpers.getNgRootScope().$on('joinedCollabSession', callback)
-    if (scope) {
-        scope.$on('$destroy', handler)
-    }
-}
-
-export function onLeaveSubscribe(scope: any, callback: Function) {
-    const handler = helpers.getNgRootScope().$on('leftCollabSession', callback)
-    if (scope) {
-        scope.$on('$destroy', handler)
-    }
-}
-
-export function onJoinTutoringSubscribe(scope: any, callback: Function) {
-    const handler = helpers.getNgRootScope().$on('joinedTutoring', callback)
-    if (scope) {
-        scope.$on('$destroy', handler)
-    }
-}
-
 export function sendCompilationRecord(type: string) {
     websocket.send({ action: "compile", text: type, ...makeWebsocketMessage() })
 }
 
 
 const GENERAL_HANDLERS: { [key: string]: (data: any) => void } = {
-    onJoinedSession(data: any) {
-        onJoinedSession(data)
-        helpers.getNgRootScope().$emit('joinedCollabSession', data)
-    },
+    onJoinedSession,
     onSessionStatus,
     onSessionClosed,
     onSessionsFull,
@@ -1092,7 +1064,7 @@ const GENERAL_HANDLERS: { [key: string]: (data: any) => void } = {
     onUserLeftCollaboration,
     onScriptRenamed,
     onScriptText,
-    onJoinedTutoring: (data: any) => helpers.getNgRootScope().$emit('joinedTutoring', data),
+    onJoinedTutoring: (data: any) => callbacks.onJoinTutoring?.(data),
 }
 
 const SCRIPT_HANDLERS: { [key: string]: (data: any) => void } = {
@@ -1106,8 +1078,8 @@ const SCRIPT_HANDLERS: { [key: string]: (data: any) => void } = {
     onMemberLeftSession,
     onMiscMessage,
     onWriteAccess: onChangeWriteAccess,
-    onChat: (data: any) => helpers.getNgRootScope().$emit('chatMessageReceived', data),
-    onCompile: (data: any) => helpers.getNgRootScope().$emit('compileTrialReceived', data),
+    onChat: (data: any) => callbacks.chat?.(data),
+    onCompile: (data: any) => callbacks.chat?.(data),
     onSessionClosedForInactivity,
 }
 
