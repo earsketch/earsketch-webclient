@@ -214,59 +214,42 @@ export const checkIllegalCharacters = (input: string) => {
 }
 
 // Calculates last modified time unit (previously in scriptBrowserController & mainController).
-export const formatTimer = (input: number) => {
-    var seconds = Math.floor(input / 1000)
+export const formatTimer = (duration_ms: number) => {
+    const one_minute  = 1000*60
+    const two_minutes = 1000*60*2
+    const one_hour    = 1000*60*60
+    const two_hours   = 1000*60*60*2
+    const one_day     = 1000*60*60*24
+    const two_days    = 1000*60*60*24*2
+    const one_week    = 1000*60*60*24*7
+    const two_weeks   = 1000*60*60*24*7*2
+    const one_month   = 1000*60*60*24*30
+    const two_months  = 1000*60*60*24*30*2
+    const one_year    = 1000*60*60*24*365
+    const two_years   = 1000*60*60*24*365*2
+
+    var seconds = Math.floor(duration_ms / 1000)
     var minutes = Math.floor(seconds / 60)
     var hours = Math.floor(minutes / 60)
     var days = Math.floor(hours / 24)
+    var weeks = Math.floor(days / 7)
+    var months = Math.floor(weeks / 4.3)  // approximate, based on 30.5/7
+    var years = Math.floor(weeks / 52)
 
-    if (days <= 1) {
-        if (seconds <= 0) {
-            return 'just now'
-        } else if (minutes === 0) {
-            return 'recently'
-        } else if (hours === 0) {
-            if (minutes === 1) {
-                return '1 minute ago'
-            } else {
-                return minutes + ' minutes ago'
-            }
-        } else if (hours < 24) {
-            if (hours === 1) {
-                return '1 hour ago'
-            } else {
-                return hours + ' hours ago'
-            }
-        }
-    } else {
-        if (days > 1 && days <= 2) {
-            return "yesterday"
-        } else if (days > 2 && days <= 7) {
-            return days + " days ago"
-        } else if (days > 7) {
-            var weeks = Math.floor(days/7)
-            if (weeks === 1) {
-                return "last week"
-            } else if (weeks > 1 && weeks <= 4) {
-                return weeks + " weeks ago"
-            } else if (weeks > 4) {
-                var months = Math.floor(weeks/4)
-
-                if (months === 1) {
-                    return "last month"
-                } else if (months > 1 && months < 12) {
-                    return months + " months ago"
-                } else if (months >= 12) {
-                    var years = Math.floor(months/12)
-                    if (years <= 1) {
-                        return "last year"
-                    } else if (years > 1) {
-                        return years + " years ago"
-                    }
-                }
-            }
-        }
-    }
+    if (duration_ms <= 0) {return 'just now';}
+    if (duration_ms <= one_minute)  {return 'recently'}
+    if (duration_ms <= two_minutes) {return '1 minute ago'}
+    if (duration_ms <= one_hour)    {return minutes + ' minutes ago'}
+    if (duration_ms <= two_hours)   {return '1 hour ago'}
+    if (duration_ms <= one_day)     {return hours + ' hours ago'}
+    if (duration_ms <= two_days)    {return 'yesterday'}
+    if (duration_ms <= one_week)    {return days + ' days ago'}
+    if (duration_ms <= two_weeks)   {return 'last week'}
+    if (duration_ms <= one_month)   {return weeks + ' weeks ago'}
+    if (duration_ms <= two_months)  {return 'last month'}
+    if (duration_ms <= one_year)    {return months + ' months ago'}
+    if (duration_ms <= two_years)   {return 'last year'}
+    if (duration_ms >  two_years)   {return years + ' years ago'}
 }
 
 
