@@ -7,8 +7,26 @@ import * as scripts from '../browser/scriptsState'
 import * as userNotification from './userNotification'
 import * as websocket from './websocket'
 
-export let script: any = null// script object: only used for the off-line mode
-export let scriptID: string | null = null// collaboration session identity (both local and remote)
+interface Message {
+    notification_type: string
+    scriptID: string
+    sender: string
+    action?: string
+    state?: number
+    collaborators?: string[]
+    ID?: string
+    editData?: any
+    tutoring?: boolean
+    position?: number
+    start?: number
+    end?: number
+    scriptName?: string
+    text?: string
+    date?: number
+}
+
+export let script: any = null  // script object: only used for the off-line mode
+export let scriptID: string | null = null  // collaboration session identity (both local and remote)
 
 export let userName = ''
 let owner = false
@@ -17,13 +35,13 @@ let editor: any = null
 let editSession: any = null
 let aceRange: any = null
 
-let buffer: any[] = []
-let synchronized = true// user's own messages against server
-let awaiting: any = null// unique edit ID from self
+let buffer: Message[] = []
+let synchronized = true  // user's own messages against server
+let awaiting: any = null  // unique edit ID from self
 
 let scriptText = ''
 export let lockEditor = true
-export let isSynching = false// TODO: redundant? for storing cursors
+export let isSynching = false  // TODO: redundant? for storing cursors
 
 let sessionActive = false
 export let active = false
@@ -52,15 +70,16 @@ export let refreshScriptBrowser: any = null
 export let refreshSharedScriptBrowser: any = null
 export let closeSharedScriptIfOpen: any = null
 
-const editTimeout = 5000// sync (rejoin) session if there is no server response
-const syncTimeout = 5000// when time out, the websocket connection is likely lost
+const editTimeout = 5000  // sync (rejoin) session if there is no server response
+const syncTimeout = 5000  // when time out, the websocket connection is likely lost
 
-function PrepareWsMessage() {
+function makeWebsocketMessage() {
     // Note: For the historic mishandling of username letter cases, we treat them as case insensitive (always convert to lowercase) in collaboration and websocket messaging for the time being... Tagging the relevant changes as GH issue #1858.
-
-    this['notification_type'] = 'collaboration'
-    this['scriptID'] = scriptID
-    this['sender'] = userName  // #1858
+    return {
+        notification_type: "collaboration",
+        scriptID: scriptID,
+        sender: userName,
+    } as Message
 }
 
 function initialize() {
@@ -85,7 +104,7 @@ export function openScript(script: any, userName: string) {
     script.username = script.username.toLowerCase()// #1858
     script = script
 
-    userName = userName.toLowerCase()// #1858
+    userName = userName.toLowerCase()  // #1858
 
     const shareID = script.shareid
 
@@ -112,8 +131,8 @@ export function openScript(script: any, userName: string) {
             }
         }
 
-        script.collaborators.forEach(function (member: string) {
-            member = member.toLowerCase()// #1858
+        for (let member of script.collaborators) {
+            member = member.toLowerCase()  // #1858
             if (member !== userName) {
                 otherMembers[member] = {
                     active: false,
@@ -125,7 +144,7 @@ export function openScript(script: any, userName: string) {
                     popover: false
                 }
             }
-        })
+        }
 
         chat[userName] = {
             text: '',
@@ -136,7 +155,7 @@ export function openScript(script: any, userName: string) {
 }
 
 export function closeScript(shareID: string, userName: string) {
-    userName = userName.toLowerCase()// #1858
+    userName = userName.toLowerCase()  // #1858
 
     if (scriptID === shareID) {
         esconsole('closing a collaborative script: ' + shareID, 'collab')
@@ -165,12 +184,7 @@ function setOwner(boolean: boolean) {
 
 export function checkSessionStatus() {
     esconsole('checking collaboration session status', 'collab')
-
-    const message = new (PrepareWsMessage() as any)
-    message.action = 'checkSessionStatus'
-    message.state = state
-    websocket.send(message)
-
+    websocket.send({ action: "checkSessionStatus", state, ...makeWebsocketMessage() })
     // check the websocket connection
     timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout)
 }
@@ -197,12 +211,9 @@ function joinSession(shareID: string, userName: string) {
     esconsole('joining collaboration session: ' + shareID, 'collab')
 
     scriptID = shareID
-    userName = userName.toLowerCase()// #1858
+    userName = userName.toLowerCase()  // #1858
 
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'joinSession'
-    message.state = state
-    websocket.send(message)
+    websocket.send({ action: "joinSession", state, ...makeWebsocketMessage() })
 
     // check the websocket connection
     timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout)
@@ -221,7 +232,7 @@ function onJoinedSession(data: any) {
 
     // sync the server state number
     state = data.state
-    history = {}// TODO: pull all the history? maybe not
+    history = {}  // TODO: pull all the history? maybe not
 
     editor.setReadOnly(false)
     active = true
@@ -230,15 +241,15 @@ function onJoinedSession(data: any) {
     // the state of the initiated messages and messageBuffer
     synchronized = true
 
-    data.activeMembers.forEach(function (member: string) {
+    for (const member of data.activeMembers) {
         if (member !== userName) {
             otherMembers[member].active = true
         }
-    })
+    }
 
-    if (promises['joinSession']) {
-        promises['joinSession'](data)
-        delete promises['joinSession']
+    if (promises.joinSession) {
+        promises.joinSession(data)
+        delete promises.joinSession
     }
 }
 
@@ -255,7 +266,7 @@ function onSessionsFull(data: any) {
 
 function openScriptOffline(script: any) {
     esconsole('opening a collaborative script in the off-line mode', 'collab')
-    script.username = script.username.toLocaleString()// #1858
+    script.username = script.username.toLocaleString()  // #1858
     script.collaborative = false
     script.readonly = script.username !== userName
 
@@ -273,9 +284,7 @@ export function leaveSession(shareID: string, username?: string) {
     esconsole('leaving collaboration session: ' + shareID, 'collab')
     lockEditor = true
 
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'leaveSession'
-    websocket.send(message)
+    websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
 
     helpers.getNgRootScope().$emit('leftCollabSession', null)
 }
@@ -292,7 +301,7 @@ function onMemberJoinedSession(data: any) {
         }
     }
 
-    helpers.getNgRootScope().$apply()// update GUI
+    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 function onMemberLeftSession(data: any) {
@@ -304,27 +313,28 @@ function onMemberLeftSession(data: any) {
 
     otherMembers[data.sender].active = false
 
-    helpers.getNgRootScope().$apply()// update GUI
+    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 export function addCollaborators(shareID: string, userName: string, addedCollaborators: string[]) {
     // #1858 Note: addedCollaborators are already converted to lower case in shareScriptController.js:328.
     if (addedCollaborators.length !== 0) {
-        const message = new (PrepareWsMessage as any)()
-        message.action = 'addCollaborators'
-        message.scriptID = shareID
-        message.sender = userName.toLowerCase()// #1858
-        message.collaborators = addedCollaborators
         // add script name info (done in the server side now)
-        websocket.send(message)
+        websocket.send({
+            ...makeWebsocketMessage(),
+            action: "addCollaborators",
+            scriptID: shareID,
+            sender: userName.toLowerCase(),  // #1858
+            collaborators: addedCollaborators,
+        })
 
         if (scriptID === shareID && active) {
-            addedCollaborators.forEach(function (member) {
+            for (const member of addedCollaborators) {
                 otherMembers[member] = {
                     active: false,
                     canEdit: true
                 }
-            })
+            }
         }
     }
 }
@@ -332,12 +342,13 @@ export function addCollaborators(shareID: string, userName: string, addedCollabo
 export function removeCollaborators(shareID: string, userName: string, removedCollaborators: string[]) {
     // #1858 Note: removedCollaborators are already converted to lower case in shareScriptController.js:328.
     if (removedCollaborators.length !== 0) {
-        const message = new (PrepareWsMessage as any)()
-        message.action = 'removeCollaborators'
-        message.scriptID = shareID
-        message.sender = userName.toLowerCase()// #1858
-        message.collaborators = removedCollaborators
-        websocket.send(message)
+        websocket.send({
+            ...makeWebsocketMessage(),
+            action: "removeCollaborators",
+            scriptID: shareID,
+            sender: userName.toLowerCase(),  // #1858
+            collaborators: removeCollaborators,
+        })
 
         if (scriptID === shareID && active) {
             removedCollaborators.forEach(function (member) {
@@ -377,11 +388,13 @@ export function editScript(data: any) {
         clearTimeout(scriptCheckTimerID)
     }
 
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'edit'
-    message.ID = generateRandomID()
-    message.state = state
-    message.editData = data
+    const message = {
+        action: "edit",
+        ID: generateRandomID(),
+        state,
+        editData: data,
+        ...makeWebsocketMessage()
+    }
 
     if (synchronized) {
         buffer.push(message)
@@ -427,7 +440,7 @@ function onEditMessage(data: any) {
             }
 
             websocket.send(nextMessage)
-            timeoutSync(nextMessage.ID)
+            timeoutSync(nextMessage.ID!)
         } else {
             esconsole('synced with own edit', ['collab', 'nolog'])
             synchronized = true
@@ -474,9 +487,7 @@ function onEditMessage(data: any) {
     editor.setReadOnly(false)
 }
 
-/**
- * Used with the version-control revertScript
- */
+// Used with the version-control revertScript
 export function reloadScriptText(text: string) {
     editor.ace.setValue(text, -1)
 }
@@ -518,9 +529,7 @@ function onSyncError(data: any) {
 
 function requestSync() {
     esconsole('requesting synchronization to the server', 'collab')
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'requestSync'
-    websocket.send(message)
+    websocket.send({ action: "requestSync", ...makeWebsocketMessage() })
 }
 
 function onSyncToSession(data: any) {
@@ -549,29 +558,19 @@ function rejoinSession() {
             }
         })
 
-        const message = new (PrepareWsMessage as any)()
-        message.action = 'rejoinSession'
-        message.state = state
-        message.tutoring = tutoring
-        websocket.send(message)
+        websocket.send({ action: "rejoinSession", state, tutoring, ...makeWebsocketMessage() })
     }
 
-    return new Promise(function (resolve) {
-        promises['joinSession'] = resolve
-    })
+    return new Promise(resolve => promises['joinSession'] = resolve)
 }
 
 export function saveScript(scriptID: string) {
     if (scriptID) {
         if (scriptID === scriptID) {
-            const message = new (PrepareWsMessage as any)()
-            message.action = 'saveScript'
-            websocket.send(message)
+            websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
         }
     } else {
-        const message = new (PrepareWsMessage as any)()
-        message.action = 'saveScript'
-        websocket.send(message)
+        websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
     }
     reporter.saveSharedScript()
 }
@@ -586,14 +585,8 @@ function onScriptSaved(data: any) {
 export function storeCursor(position: any) {
     if (position !== cursorPos) {
         cursorPos = position
-
-        const idx = editSession.getDocument().positionToIndex(position, 0)
-
-        const message = new (PrepareWsMessage as any)()
-        message.action = 'cursorPosition'
-        message.position = idx
-        message.state = state
-        websocket.send(message)
+        position = editSession.getDocument().positionToIndex(position, 0)
+        websocket.send({ action: "cursorPosition", position, state, ...makeWebsocketMessage() })
     }
 }
 
@@ -605,17 +598,12 @@ export function storeSelection(selection: any) {
         const start = document.positionToIndex(selection.start, 0)
         const end = document.positionToIndex(selection.end, 0)
 
-        const message = new (PrepareWsMessage as any)()
-        message.action = 'select'
-        message.start = start
-        message.end = end
-        message.state = state
-        websocket.send(message)
+        websocket.send({ action: "select", start, end, state, ...makeWebsocketMessage() })
     }
 }
 
 function onCursorPosMessage(data: any) {
-    data.sender = data.sender.toLowerCase()// #1858
+    data.sender = data.sender.toLowerCase()  // #1858
     const document = editSession.getDocument()
     const cursorPos = document.indexToPosition(data.position, 0)
     const range = new aceRange(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column+1)
@@ -630,7 +618,7 @@ function onCursorPosMessage(data: any) {
 }
 
 function onSelectMessage(data: any) {
-    data.sender = data.sender.toLowerCase()// #1858
+    data.sender = data.sender.toLowerCase()  // #1858
 
     const document = editSession.getDocument()
     const start = document.indexToPosition(data.start, 0)
@@ -951,12 +939,12 @@ async function onUserRemovedFromCollaboration(data: any) {
 }
 
 export function leaveCollaboration(scriptID: string, userName: string, refresh=true) {
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'leaveCollaboration'
-    message.scriptID = scriptID
-    message.sender = userName.toLowerCase()// #1858
-    websocket.send(message)
-
+    websocket.send({ 
+        ...makeWebsocketMessage(),
+        action: "leaveCollaboration",
+        scriptID,
+        sender: userName.toLowerCase()  // #1858
+    })
     if (refresh && refreshSharedScriptBrowser) {
         return refreshSharedScriptBrowser()
     } else {
@@ -985,12 +973,13 @@ async function onUserLeftCollaboration(data: any) {
 
 export function renameScript(scriptID: string, scriptName: string, userName: string) {
     esconsole('renaming the script for ' + scriptID, 'collab')
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'renameScript'
-    message.scriptID = scriptID
-    message.scriptName = scriptName
-    message.sender = userName.toLowerCase()// #1858
-    websocket.send(message)
+    websocket.send({
+        ...makeWebsocketMessage(),
+        action: "renameScript",
+        scriptID,
+        scriptName,
+        sender: userName.toLowerCase()
+    })
 }
 
 async function onScriptRenamed(data: any) {
@@ -1004,15 +993,8 @@ async function onScriptRenamed(data: any) {
 
 export function getScriptText(scriptID: string) {
     esconsole('requesting the script text for ' + scriptID, 'collab')
-
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'getScriptText'
-    message.scriptID = scriptID
-    websocket.send(message)
-
-    return new Promise(function (resolve) {
-        promises['getScriptText'] = resolve
-    })
+    websocket.send({ ...makeWebsocketMessage(), action: "getScriptText", scriptID })
+    return new Promise(resolve => promises['getScriptText'] = resolve)
 }
 
 function onScriptText(data: any) {
@@ -1034,28 +1016,18 @@ function compareScriptText(delay: number) {
 }
 
 export function joinTutoring() {
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'joinTutoring'
-    websocket.send(message)
-
+    websocket.send({ action: "joinTutoring", ...makeWebsocketMessage() })
     tutoring = true
 }
 
 export function leaveTutoring() {
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'leaveTutoring'
-    websocket.send(message)
-
+    websocket.send({ action: "leaveTutoring", ...makeWebsocketMessage() })
     tutoring = false
 }
 
 export function sendChatMessage(text: string) {
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'chat'
-    message.text = text
-    message.date = Date.now()
+    const message = { action: "chat", text, date: Date.now(), ...makeWebsocketMessage() }
     websocket.send(message)
-
     return message
 }
 
@@ -1091,10 +1063,7 @@ export function onJoinTutoringSubscribe(scope: any, callback: Function) {
 }
 
 export function sendCompilationRecord(type: string) {
-    const message = new (PrepareWsMessage as any)()
-    message.action = 'compile'
-    message.text = type
-    websocket.send(message)
+    websocket.send({ action: "compile", text: type, ...makeWebsocketMessage() })
 }
 
 
