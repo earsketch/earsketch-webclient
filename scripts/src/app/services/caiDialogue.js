@@ -1097,9 +1097,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function getLinks(utterance) {
-        // utterance = "like: \n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, 1, startMeasure, endMeasure)\n\n    [LINK|fitMedia](FILENAME, 2, startMeasure, endMeasure)";
         var utteranceFirstHalf = utterance;
-        // var utteranceFirstHalf = utterance;
         var utteranceSecondHalf = "";
         var keyword = ""
         var link = ""
@@ -1108,17 +1106,13 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         //does one iterations/ assumes one appearance
         if (utterance.includes("[LINK")) {
             while (utterance.includes("[LINK")) {
-
                 keyword = utterance.substring(utterance.indexOf("[LINK") + 6, utterance.indexOf("]"));
-                // keyword = keyword.link("google.com")
                 link = LINKS[keyword];
                 utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
                 utteranceSecondHalf = utterance.substring(utterance.indexOf("]") + 1, utterance.length);
                 utterance = utteranceSecondHalf;
                 textPieces.push(utteranceFirstHalf);
                 keywordLinks.push([keyword, link]);
-
-                // console.log(utterance);
             }
         }
         else {
