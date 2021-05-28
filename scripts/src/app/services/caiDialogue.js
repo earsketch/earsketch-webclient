@@ -605,11 +605,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function addToNodeHistory(nodeObj) {
-        if (nodeHistory[activeProject]) {
+        if (FLAGS.SHOW_CAI && nodeHistory[activeProject]) {
             nodeHistory[activeProject].push(nodeObj);
             codeSuggestion.storeHistory(nodeHistory[activeProject]);
-            if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0)
+            if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0) {
                 userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
+            }
+            console.log("node history", nodeHistory);
+
         }
     }
 
@@ -1057,7 +1060,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             else {
                 addToNodeHistory([0, utterance, parameters]);
             }
-            console.log("node history", nodeHistory);
             // reconstituteNodeHistory();
         }
 

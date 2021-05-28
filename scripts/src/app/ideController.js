@@ -584,8 +584,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     }
                     
                     console.log("autograder", report);
-                    $ngRedux.dispatch(cai.compileCAI([result, language, code]));
-
+                    if (FLAGS.SHOW_CAI) {
+                        $ngRedux.dispatch(cai.compileCAI([result, language, code]));
+                    }
                 }, 0);
             }
 

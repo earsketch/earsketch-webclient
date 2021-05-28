@@ -139,7 +139,9 @@ app.directive('editor', ['$rootScope', 'collaboration', '$timeout', '$ngRedux', 
 
                 // console.log("event in editor", event,event['action'],event['lines']);
                 var t = Date.now();
-                $ngRedux.dispatch(cai.keyStroke([event['action'],event['lines'],t]));
+                if (FLAGS.SHOW_CAI) {
+                    $ngRedux.dispatch(cai.keyStroke([event['action'],event['lines'],t]));
+                }
                 
                 if (collaboration.active && !collaboration.lockEditor) {
                     // convert from positionObjects & lines to index & text
@@ -167,7 +169,9 @@ app.directive('editor', ['$rootScope', 'collaboration', '$timeout', '$ngRedux', 
 
                 recommendationTimer = $timeout(function() {
                     $rootScope.$broadcast('reloadRecommendations');
-                    $ngRedux.dispatch(cai.checkForCodeUpdates());
+                    if (FLAGS.SHOW_CAI) {
+                        $ngRedux.dispatch(cai.checkForCodeUpdates());
+                    }
                 }, 1000);
 
                 const activeTabID = tabs.selectActiveTabID($ngRedux.getState());

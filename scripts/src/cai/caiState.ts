@@ -166,10 +166,10 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dispatch(caiDialogue.isDone() ? setInputOptions([]) : setInputOptions(caiDialogue.createButtons()))
 
         setTimeout(() => {
-            if (msgText != "") {
+            if (msgText !== "") {
                 const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
                 for (let msg in messages) {
-                    if (messages[msg] != "") {
+                    if (messages[msg] !== "") {
                         const outputMessage = {
                             text:messages[msg][0], 
                             keyword:messages[msg][1], 
@@ -251,7 +251,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
         setTimeout(() => {
             const output = caiDialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results)
-            if (output != null && output[0][0] != "") {
+            if (output !== null && output !== "" && output[0][0] !== "") {
                 const message = {
                     text:output[0], 
                     keyword:output[1], 
@@ -263,7 +263,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
                 dispatch(setErrorOptions([]))
                 dispatch(setDefaultInputOptions())
             }
-            if (output != null && output == "" && !caiDialogue.activeWaits() && caiDialogue.studentInteractedValue()) {
+            if (output !== null && output === "" && !caiDialogue.activeWaits() && caiDialogue.studentInteractedValue()) {
                 dispatch(setDefaultInputOptions())
             }
             dispatch(setDropupLabel(caiDialogue.getDropup()))
@@ -287,7 +287,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
             return
         }
 
-        if (errorReturn != "") {
+        if (errorReturn !== "") {
             setTimeout(() => {
                 dispatch(setInputOptions(caiDialogue.createButtons()))
                 dispatch(setDefaultInputOptions())
