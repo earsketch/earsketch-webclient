@@ -42,7 +42,7 @@ app.factory('caiStudent', function () {
             }
         }
 
-        console.log("STUDENT MODEL", studentModel);
+        // console.log("STUDENT MODEL", studentModel);
 
     }
 
