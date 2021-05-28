@@ -4,13 +4,36 @@
  * @module complexityCalculator
  * @author Jason Smith, Erin Truesdell
  */
-app.factory('complexityCalculatorState', ['userNotification', 'complexityCalculatorHelperFunctions', function (userNotification, complexityCalculatorHelperFunctions) {
+app.factory('complexityCalculatorState', ['userNotification', function (userNotification) {
+
+    var state = {
+        allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], originalityLines: [], loopLocations: [], functionLines: [], uncalledFunctionLines: [], userFunctionParameters: [], makeBeatRenames: [], userFunctionRenames: [], forLoopFuncs: []
+    };
+
+    function resetState() {
+        state = {
+            allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], originalityLines: [], loopLocations: [], functionLines: [], uncalledFunctionLines: [], userFunctionParameters: [], makeBeatRenames: [], userFunctionRenames: [], forLoopFuncs: []
+        };
+    }
 
     function getState() {
         return {};
     }
 
+    function getStateProperty(propertyName) {
+        if (propertyName in state) {
+            return state[propertyName];
+        }
+        else return [];
+    }
+
+
+
+
+
     return {
-        getState: getState
+        getState: getState,
+        getStateProperty: getStateProperty,
+        resetState: resetState
     };
 }]);
