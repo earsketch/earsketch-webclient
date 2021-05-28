@@ -1,4 +1,3 @@
-import esconsole from '../esconsole';
 import * as tabs from '../editor/tabState';
 import * as config from '../editor/editorConfig';
 
