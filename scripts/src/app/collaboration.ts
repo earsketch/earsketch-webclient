@@ -16,7 +16,7 @@ interface Message {
     state?: number
     collaborators?: string[]
     ID?: string
-    editData?: any
+    editData?: Edit
     tutoring?: boolean
     position?: number
     start?: number
@@ -24,6 +24,14 @@ interface Message {
     scriptName?: string
     text?: string
     date?: number
+}
+
+interface Edit {
+    action: string
+    start: number
+    end: number
+    text: number
+    len: number  // TODO: redunant with start and end?
 }
 
 export let script: ScriptEntity | null = null  // script object: only used for the off-line mode
@@ -38,7 +46,7 @@ let aceRange: any = null
 
 let buffer: Message[] = []
 let synchronized = true  // user's own messages against server
-let awaiting: any = null  // unique edit ID from self
+let awaiting: string = ""  // unique edit ID from self
 
 let scriptText = ''
 export let lockEditor = true
@@ -54,7 +62,7 @@ let cursorPos: any = null
 let state = 0
 
 // keeps track of the SERVER operations. only add the received messages.
-let history: any = {}
+let history: { [key: number]: Edit } = {}
 
 export let otherMembers: {
     [key: string]: { canEdit: boolean; active: boolean }
@@ -66,14 +74,19 @@ export let chat: {
 } = {}
 export let tutoring = false
 
-let promises: any = {}
+// This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
+// We call the continuations (fulfilling the promise) when we receive the corresponding server message.
+// This allows other modules to do things like `await collaboration.getScriptText(scriptID)`.
+let continuations: { [key: string]: (value: unknown) => void } = {}
 let timeouts: { [key: string]: number } = {}
 let scriptCheckTimerID: number = 0
 
 // callbacks for environmental changes
-export let refreshScriptBrowser: any = null
-export let refreshSharedScriptBrowser: any = null
-export let closeSharedScriptIfOpen: any = null
+export const callbacks = {
+    refreshScriptBrowser: null as Function | null,
+    refreshSharedScriptBrowser: null as Function | null,
+    closeSharedScriptIfOpen: null as Function | null,
+}
 
 const editTimeout = 5000  // sync (rejoin) session if there is no server response
 const syncTimeout = 5000  // when time out, the websocket connection is likely lost
@@ -107,7 +120,7 @@ export function setEditor(editor_: any) {
 // Opening a script with collaborators starts a real-time collaboration session.
 export function openScript(script_: ScriptEntity, userName: string) {
     script = script_
-    script.username = script.username.toLowerCase()// #1858
+    script.username = script.username.toLowerCase()  // #1858
     userName = userName.toLowerCase()  // #1858
 
     const shareID = script.shareid
@@ -120,7 +133,7 @@ export function openScript(script_: ScriptEntity, userName: string) {
 
         joinSession(shareID, userName)
         editor.setReadOnly(true)
-        setOwner(script.username === userName)
+        owner = script.username === userName
 
         if (!owner) {
             otherMembers[script.username] = {
@@ -180,10 +193,6 @@ export function closeScript(shareID: string, userName: string) {
     } else {
         esconsole('cannot close the active tab with different script ID')
     }
-}
-
-function setOwner(boolean: boolean) {
-    owner = boolean
 }
 
 export function checkSessionStatus() {
@@ -251,9 +260,9 @@ function onJoinedSession(data: any) {
         }
     }
 
-    if (promises.joinSession) {
-        promises.joinSession(data)
-        delete promises.joinSession
+    if (continuations.joinSession) {
+        continuations.joinSession(data)
+        delete continuations.joinSession
     }
 }
 
@@ -385,7 +394,7 @@ function timeoutSync(messageID: string) {
     }, editTimeout)
 }
 
-export function editScript(data: any) {
+export function editScript(data: Edit) {
     storeCursor(editSession.selection.getCursor())
     if (scriptCheckTimerID) {
         clearTimeout(scriptCheckTimerID)
@@ -430,16 +439,16 @@ function onEditMessage(data: any) {
 
         if (buffer.length > 1) {
             const nextMessage = buffer[1]
-            awaiting = nextMessage.ID
+            awaiting = nextMessage.ID!
 
             if (state !== nextMessage.state) {
-                esconsole('client -> server out of sync: ' + nextMessage.state + ' ' + state + ' ' + nextMessage.editData.text, ['collab', 'nolog'])
+                esconsole('client -> server out of sync: ' + nextMessage.state + ' ' + state + ' ' + nextMessage.editData!.text, ['collab', 'nolog'])
                 // adjust buffer here???
                 rejoinSession()
                 return
 
             } else {
-                esconsole('client -> server in sync: ' + state + ' ' + nextMessage.editData.text, ['collab', 'nolog'])
+                esconsole('client -> server in sync: ' + state + ' ' + nextMessage.editData!.text, ['collab', 'nolog'])
             }
 
             websocket.send(nextMessage)
@@ -564,7 +573,7 @@ function rejoinSession() {
         websocket.send({ action: "rejoinSession", state, tutoring, ...makeWebsocketMessage() })
     }
 
-    return new Promise(resolve => promises['joinSession'] = resolve)
+    return new Promise(resolve => continuations.joinSession = resolve)
 }
 
 export function saveScript(scriptID: string) {
@@ -918,16 +927,16 @@ async function onUserAddedToCollaboration(data: any) {
         })
     }
 
-    if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser()
+    if (callbacks.refreshSharedScriptBrowser) {
+        await callbacks.refreshSharedScriptBrowser()
         store.dispatch(scripts.syncToNgUserProject())
     }
 }
 
 async function onUserRemovedFromCollaboration(data: any) {
     if (data.removedMembers.indexOf(userName) !== -1) {
-        if (closeSharedScriptIfOpen) {
-            closeSharedScriptIfOpen(data.scriptID)
+        if (callbacks.closeSharedScriptIfOpen) {
+            callbacks.closeSharedScriptIfOpen(data.scriptID)
         }
     } else if (active && scriptID === data.scriptID) {
         data.removedMembers.forEach((member: string) => {
@@ -935,8 +944,8 @@ async function onUserRemovedFromCollaboration(data: any) {
         })
     }
 
-    if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser()
+    if (callbacks.refreshSharedScriptBrowser) {
+        await callbacks.refreshSharedScriptBrowser()
         store.dispatch(scripts.syncToNgUserProject())
     }
 }
@@ -948,8 +957,8 @@ export function leaveCollaboration(scriptID: string, userName: string, refresh=t
         scriptID,
         sender: userName.toLowerCase()  // #1858
     })
-    if (refresh && refreshSharedScriptBrowser) {
-        return refreshSharedScriptBrowser()
+    if (refresh && callbacks.refreshSharedScriptBrowser) {
+        return callbacks.refreshSharedScriptBrowser()
     } else {
         return Promise.resolve(null)
     }
@@ -965,11 +974,11 @@ async function onUserLeftCollaboration(data: any) {
         }
     }
 
-    if (refreshScriptBrowser) {
-        await refreshScriptBrowser()
+    if (callbacks.refreshScriptBrowser) {
+        await callbacks.refreshScriptBrowser()
     }
-    if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser()
+    if (callbacks.refreshSharedScriptBrowser) {
+        await callbacks.refreshSharedScriptBrowser()
     }
     store.dispatch(scripts.syncToNgUserProject())
 }
@@ -988,8 +997,8 @@ export function renameScript(scriptID: string, scriptName: string, userName: str
 async function onScriptRenamed(data: any) {
     esconsole(data.sender + ' renamed a collaborative script ' + data.scriptID, 'collab')
 
-    if (refreshSharedScriptBrowser) {
-        await refreshSharedScriptBrowser()
+    if (callbacks.refreshSharedScriptBrowser) {
+        await callbacks.refreshSharedScriptBrowser()
         store.dispatch(scripts.syncToNgUserProject())
     }
 }
@@ -997,13 +1006,13 @@ async function onScriptRenamed(data: any) {
 export function getScriptText(scriptID: string) {
     esconsole('requesting the script text for ' + scriptID, 'collab')
     websocket.send({ ...makeWebsocketMessage(), action: "getScriptText", scriptID })
-    return new Promise(resolve => promises['getScriptText'] = resolve)
+    return new Promise(resolve => continuations.getScriptText = resolve)
 }
 
 function onScriptText(data: any) {
-    if (promises['getScriptText']) {
-        promises['getScriptText'](data.scriptText)
-        delete promises['getScriptText']
+    if (continuations.getScriptText) {
+        continuations.getScriptText(data.scriptText)
+        delete continuations.getScriptText
     }
 }
 

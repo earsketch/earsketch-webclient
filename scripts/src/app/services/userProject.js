@@ -279,14 +279,14 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
 
         //=================================================
         // register callbacks to the collaboration service
-        collaboration.refreshScriptBrowser = refreshCodeBrowser;
+        collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser;
         
-        collaboration.refreshSharedScriptBrowser = function () {
+        collaboration.callbacks.refreshSharedScriptBrowser = function () {
             // TODO: potential race condition with server-side script renaming operation?
             return getSharedScripts(username, password);
         };
 
-        collaboration.closeSharedScriptIfOpen = closeSharedScript;
+        collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript;
 
         //=================================================
         // register callbacks / member values in the userNotification service
