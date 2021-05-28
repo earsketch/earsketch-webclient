@@ -6,6 +6,7 @@ import reporter from './reporter'
 import * as scripts from '../browser/scriptsState'
 import * as userNotification from './userNotification'
 import * as websocket from './websocket'
+import { ScriptEntity } from 'common'
 
 interface Message {
     notification_type: string
@@ -25,7 +26,7 @@ interface Message {
     date?: number
 }
 
-export let script: any = null  // script object: only used for the off-line mode
+export let script: ScriptEntity | null = null  // script object: only used for the off-line mode
 export let scriptID: string | null = null  // collaboration session identity (both local and remote)
 
 export let userName = ''
@@ -55,15 +56,19 @@ let state = 0
 // keeps track of the SERVER operations. only add the received messages.
 let history: any = {}
 
-export let otherMembers: any = {}
-let markers: any = {}
+export let otherMembers: {
+    [key: string]: { canEdit: boolean; active: boolean }
+} = {}
+let markers: { [key: string]: any } = {}
 
-export let chat: any = {}
+export let chat: {
+    [key: string]: { text: string; popover: boolean }
+} = {}
 export let tutoring = false
 
 let promises: any = {}
-let timeouts: any = {}
-let scriptCheckTimerID: any = null
+let timeouts: { [key: string]: number } = {}
+let scriptCheckTimerID: number = 0
 
 // callbacks for environmental changes
 export let refreshScriptBrowser: any = null
@@ -89,21 +94,20 @@ function initialize() {
     timeouts = {}
 }
 
-export function setUserName(userName: string) {
-    userName = userName.toLowerCase()  // #1858
+export function setUserName(username_: string) {
+    userName = username_.toLowerCase()  // #1858
 }
 
-export function setEditor(editor: any) {
-    editor = editor
+export function setEditor(editor_: any) {
+    editor = editor_
     editSession = editor.ace.getSession()
     aceRange = ace.require('ace/range').Range
 }
 
 // Opening a script with collaborators starts a real-time collaboration session.
-export function openScript(script: any, userName: string) {
+export function openScript(script_: ScriptEntity, userName: string) {
+    script = script_
     script.username = script.username.toLowerCase()// #1858
-    script = script
-
     userName = userName.toLowerCase()  // #1858
 
     const shareID = script.shareid
@@ -186,7 +190,7 @@ export function checkSessionStatus() {
     esconsole('checking collaboration session status', 'collab')
     websocket.send({ action: "checkSessionStatus", state, ...makeWebsocketMessage() })
     // check the websocket connection
-    timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout)
+    timeouts[userName] = window.setTimeout(onFailedToSynchronize, syncTimeout)
 }
 
 function onSessionStatus(data: any) {
@@ -207,16 +211,16 @@ function onFailedToSynchronize() {
     userNotification.show('Failed to synchronize with the central server. You might already have another EarSketch window or tab open somewhere. To fix  please refresh page.', 'failure2', 999)
 }
 
-function joinSession(shareID: string, userName: string) {
+function joinSession(shareID: string, username_: string) {
     esconsole('joining collaboration session: ' + shareID, 'collab')
 
     scriptID = shareID
-    userName = userName.toLowerCase()  // #1858
+    userName = username_.toLowerCase()  // #1858
 
     websocket.send({ action: "joinSession", state, ...makeWebsocketMessage() })
 
     // check the websocket connection
-    timeouts[userName] = setTimeout(onFailedToSynchronize, syncTimeout)
+    timeouts[userName] = window.setTimeout(onFailedToSynchronize, syncTimeout)
 }
 
 function onJoinedSession(data: any) {
@@ -261,10 +265,10 @@ function onSessionsFull(data: any) {
     esconsole('could not create a session. max number reached: ' + data.scriptID, 'collab')
     userNotification.show('Server has reached the maximum number of real-time collaboration sessions. Please try again later.', 'failure1')
 
-    openScriptOffline(script)
+    openScriptOffline(script!)
 }
 
-function openScriptOffline(script: any) {
+function openScriptOffline(script: ScriptEntity) {
     esconsole('opening a collaborative script in the off-line mode', 'collab')
     script.username = script.username.toLocaleString()  // #1858
     script.collaborative = false
@@ -351,7 +355,7 @@ export function removeCollaborators(shareID: string, userName: string, removedCo
         })
 
         if (scriptID === shareID && active) {
-            removedCollaborators.forEach(function (member) {
+            removedCollaborators.forEach((member) => {
                 delete otherMembers[member]
             })
         }
@@ -375,9 +379,8 @@ function generateRandomID() {
 }
 
 function timeoutSync(messageID: string) {
-    timeouts[messageID] = setTimeout(function () {
+    timeouts[messageID] = window.setTimeout(() => {
         esconsole('edit synchronization timed out', 'collab')
-
         rejoinSession()
     }, editTimeout)
 }
@@ -466,7 +469,7 @@ function onEditMessage(data: any) {
         if (buffer.length > 0) {
             esconsole('adjusting buffered edits...', ['collab', 'nolog'])
 
-            buffer = buffer.map(function (op: any) {
+            buffer = buffer.map((op: any) => {
                 esconsole("input : " + JSON.stringify(op.editData), ['collab', 'nolog'])
                 const tops = transform(serverOp, op.editData)
                 serverOp = tops[0]
@@ -543,13 +546,13 @@ function rejoinSession() {
         initialize()
 
         if (!owner) {
-            otherMembers[script.username] = {
+            otherMembers[script!.username] = {
                 active: false,
                 canEdit: true
             }
         }
 
-        script.collaborators.forEach(function (member: string) {
+        script!.collaborators.forEach((member: string) => {
             if (member !== userName) {
                 otherMembers[member] = {
                     active: false,
@@ -590,9 +593,9 @@ export function storeCursor(position: any) {
     }
 }
 
-export function storeSelection(selection: any) {
-    if (selection !== selection) {
-        selection = selection
+export function storeSelection(selection_: any) {
+    if (selection !== selection_) {
+        selection = selection_
 
         const document = editSession.getDocument()
         const start = document.positionToIndex(selection.start, 0)
@@ -695,7 +698,7 @@ function afterTransf(operation: any) {
     } else if (operation.action === 'remove') {
         operation.end = operation.start + operation.len
     } else if (operation.action === 'mult') {
-        operation.operations = operation.operations.map(function (op: any) {
+        operation.operations = operation.operations.map((op: any) => {
             return afterTransf(op)
         })
     }
@@ -708,13 +711,13 @@ function transform(op1: any, op2: any) {
     op2 = beforeTransf(op2)
 
     if (op1.action === 'mult') {
-        op1.operations = op1.operations.map(function (op: any) {
+        op1.operations = op1.operations.map((op: any) => {
             const tops = transform(op, op2)
             op2 = tops[1]
             return tops[0]
         })
     } else if (op2.action === 'mult') {
-        op2.operations = op2.operations.map(function (op: any) {
+        op2.operations = op2.operations.map((op: any) => {
             const tops = transform(op1, op)
             op1 = tops[0]
             return tops[1]
@@ -871,8 +874,8 @@ const operations: any = {
     }
 }
 
-operations.mult = function (op: any) {
-    op.operations.forEach(function (o: any) {
+operations.mult = (op: any) => {
+    op.operations.forEach((o: any) => {
         apply(o)
     })
 }
@@ -887,7 +890,7 @@ function apply(op: any) {
 // Other people's operations may affect where the user's cursor should be.
 function adjustCursor(op: any) {
     if (op.action === 'mult') {
-        op.operations.forEach(function (o: any) {
+        op.operations.forEach((o: any) => {
             adjustCursor(o)
         })
     } else if (op.action === 'insert') {
@@ -907,7 +910,7 @@ function adjustCursor(op: any) {
 
 async function onUserAddedToCollaboration(data: any) {
     if (active && scriptID === data.scriptID) {
-        data.addedMembers.forEach(function (member: string) {
+        data.addedMembers.forEach((member: string) => {
             otherMembers[member] = {
                 active: false,
                 canEdit: true
@@ -927,7 +930,7 @@ async function onUserRemovedFromCollaboration(data: any) {
             closeSharedScriptIfOpen(data.scriptID)
         }
     } else if (active && scriptID === data.scriptID) {
-        data.removedMembers.forEach(function (member: string) {
+        data.removedMembers.forEach((member: string) => {
             delete otherMembers[member]
         })
     }
@@ -1005,8 +1008,8 @@ function onScriptText(data: any) {
 }
 
 function compareScriptText(delay: number) {
-    return setTimeout(function () {
-        getScriptText(scriptID!).then(function (serverText: string) {
+    return window.setTimeout(() => {
+        getScriptText(scriptID!).then((serverText: string) => {
             if (serverText !== editor.getValue()) {
                 // possible sync error
                 rejoinSession()
