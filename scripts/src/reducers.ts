@@ -30,7 +30,7 @@ const rootReducer = combineReducers({
     daw,
     curriculum,
     recommender,
-    cai
+    cai,
 });
 
 // Note: Configuring store in rootReducer so it can be imported and accessed in non-React files.

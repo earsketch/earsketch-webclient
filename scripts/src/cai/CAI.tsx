@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, MutableRefObject, ChangeEvent } fro
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
-import { SearchBar, Collapsed } from '../browser/Browser'
+import { Collapsed } from '../browser/Browser'
 
 import * as cai from './caiState'
 import * as tabs from '../editor/tabState'
@@ -14,7 +14,6 @@ import * as helpers from '../helpers'
 
 
 const CaiHeader = () => {
-    const dispatch = useDispatch()
     const activeProject = useSelector(cai.selectActiveProject)
 
     return (
@@ -34,11 +33,40 @@ const CaiHeader = () => {
 }
 
 
-const CaiBody = () => {
+const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
+
+    return (
+        <div className="chat-message" style={{color:"black"}}>
+            <div className="chat-message-bubble" style={{maxWidth:"80%",
+                float: message.sender !== "CAI" ? 'left' : 'right', 
+                backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
+                <div className="chat-message-sender">{message.sender}</div>
+                <div id="text" className="chat-message-text">
+                    {message.text[0]}
+                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,0]))} style={{color:"blue"}}>{message.keyword[0][0]}</a>
+                    {message.text[1]}
+                    <a href="#" onClick={() =>dispatch(cai.openCurriculum([message,1]))} style={{color:"blue"}}>{message.keyword[1][0]}</a>
+                    {message.text[2]}
+                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,2]))} style={{color:"blue"}}>{message.keyword[2][0]}</a>
+                    {message.text[3]}
+                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,3]))} style={{color:"blue"}}>{message.keyword[3][0]}</a>
+                    {message.text[4]}
+                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,4]))} style={{color:"blue"}}>{message.keyword[4][0]}</a>
+                    {message.text[5]}
+                </div>
+            </div>
+            <div className="chat-message-date" style={{float: message.sender !== "CAI" ? 'left' : 'right'}}>
+                {ESUtils.formatTimer(Date.now() - message.date)}
+            </div>
+        </div>
+    )
+}
+
+
+const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
-    const mainControllerScope = helpers.getNgMainController().scope()
 
     return (
         <div id="cai-body">
@@ -50,29 +78,7 @@ const CaiBody = () => {
                     {messageList[activeProject] &&
                     Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
                         <li key={idx}>
-                            <div className="chat-message" style={{color:"black"}}>
-                                <div className="chat-message-bubble" style={{maxWidth:"80%",
-                                    float: message.sender !== "CAI" ? 'left' : 'right', 
-                                    backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
-                                    <div className="chat-message-sender">{message.sender}</div>
-                                    <div id="text" className="chat-message-text">
-                                        {message.text[0]}
-                                        <a href="#" onClick={() => dispatch(cai.openCurriculum([message,0]))} style={{color:"blue"}}>{message.keyword[0][0]}</a>
-                                        {message.text[1]}
-                                        <a href="#" onClick={() =>dispatch(cai.openCurriculum([message,1]))} style={{color:"blue"}}>{message.keyword[1][0]}</a>
-                                        {message.text[2]}
-                                        <a href="#" onClick={() => dispatch(cai.openCurriculum([message,2]))} style={{color:"blue"}}>{message.keyword[2][0]}</a>
-                                        {message.text[3]}
-                                        <a href="#" onClick={() => dispatch(cai.openCurriculum([message,3]))} style={{color:"blue"}}>{message.keyword[3][0]}</a>
-                                        {message.text[4]}
-                                        <a href="#" onClick={() => dispatch(cai.openCurriculum([message,4]))} style={{color:"blue"}}>{message.keyword[4][0]}</a>
-                                        {message.text[5]}
-                                    </div>
-                                </div>
-                                <div className="chat-message-date" style={{float: message.sender !== "CAI" ? 'left' : 'right'}}>
-                                    {ESUtils.formatTimer(Date.now() - Number(message.date))}
-                                </div>
-                            </div>
+                            <CAIMessageView {...message}/>
                         </li>
                     )}
                 </ul>
@@ -138,7 +144,6 @@ const CaiFooter = () => {
 
 const CaiPane = () => {
     const dispatch = useDispatch()
-    const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const activeScript = useSelector(tabs.selectActiveTabScript)
@@ -159,12 +164,8 @@ const CaiPane = () => {
 }
 
 
-let initialized = false
-let $rootScope: angular.IRootScopeService | null = null
-
 const HotCAI = hot((props: {
-    $ngRedux: any, // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
-    $rootScope: angular.IRootScopeService
+    $ngRedux: any // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
 }) => {
     return (
         <Provider store={props.$ngRedux}>
@@ -173,4 +174,4 @@ const HotCAI = hot((props: {
     )
 })
 
-app.component('cai', react2angular(HotCAI, null, ['$ngRedux', 'clipboard', '$rootScope']))
+app.component('cai', react2angular(HotCAI, null, ['$ngRedux']))

@@ -213,9 +213,7 @@ export const checkIllegalCharacters = (input: string) => {
     return input.match(matchPattern)
 }
 
-/**
- * Calculates last modified time unit (previously in scriptBrowserController & mainController).
- */
+// Calculates last modified time unit (previously in scriptBrowserController & mainController).
 export const formatTimer = (input: number) => {
     var seconds = Math.floor(input / 1000)
     var minutes = Math.floor(seconds / 60)

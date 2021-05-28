@@ -1131,8 +1131,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 /**
  * Filter for calculating last modified time unit (previously in scriptBrowserController)
  */
-app.filter('formatTimer', ['ESUtils', function (ESUtils) {
+app.filter('formatTimer', function () {
     return function (input) {
         return ESUtils.formatTimer(input)
     }
-}]);
+});
