@@ -204,16 +204,13 @@ export function closeScript(shareID: string, userName: string) {
 
         leaveSession(shareID, userName)
         lockEditor = false
-
         removeOtherCursors()
-
         active = false
         scriptID = null
 
         for (const timeout in timeouts) {
             clearTimeout(timeouts[timeout])
         }
-
         timeouts = {}
     } else {
         esconsole("cannot close the active tab with different script ID")
@@ -268,10 +265,8 @@ function onJoinedSession(data: Message) {
     scriptText = data.scriptText!
     setEditorTextWithoutOutput(scriptText)
 
-    // sync the server state number
     state = data.state!
     history = {}  // TODO: pull all the history? maybe not
-
     editor.setReadOnly(false)
     active = true
     sessionActive = true
@@ -297,10 +292,8 @@ function onSessionsFull(data: Message) {
     // clear the websocket connection check sent from joinSession
     clearTimeout(timeouts[userName])
     delete timeouts[userName]
-
     esconsole("could not create a session. max number reached: " + data.scriptID, "collab")
     userNotification.show("Server has reached the maximum number of real-time collaboration sessions. Please try again later.", "failure1")
-
     openScriptOffline(script!)
 }
 
@@ -316,16 +309,13 @@ function openScriptOffline(script: ScriptEntity) {
         editor.ace.setValue(script.source_code, -1)
     }
     editor.setReadOnly(script.readonly)
-
     reporter.openSharedScript()
 }
 
 export function leaveSession(shareID: string, username?: string) {
     esconsole("leaving collaboration session: " + shareID, "collab")
     lockEditor = true
-
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
-
     callbacks.onLeave?.()
 }
 
@@ -340,7 +330,6 @@ function onMemberJoinedSession(data: Message) {
             canEdit: true
         }
     }
-
     helpers.getNgRootScope().$apply()  // update GUI
 }
 
@@ -352,7 +341,6 @@ function onMemberLeftSession(data: Message) {
     }
 
     otherMembers[data.sender].active = false
-
     helpers.getNgRootScope().$apply()  // update GUI
 }
 
@@ -400,13 +388,10 @@ export function removeCollaborators(shareID: string, userName: string, removedCo
 
 function setEditorTextWithoutOutput(scriptText: string) {
     lockEditor = true
-
     const session = editor.ace.getSession()
     const cursor = session.selection.getCursor()
-
     editor.ace.setValue(scriptText, -1)
     session.selection.moveCursorToPosition(cursor)
-
     lockEditor = false
 }
 
@@ -461,7 +446,6 @@ function onEditMessage(data: Message) {
     if (data.ID === awaiting) {
         clearTimeout(timeouts[data.ID])
         delete timeouts[data.ID]
-
         state++
 
         if (buffer.length > 1) {
@@ -473,7 +457,6 @@ function onEditMessage(data: Message) {
                 // adjust buffer here???
                 rejoinSession()
                 return
-
             } else {
                 esconsole("client -> server in sync: " + state, ["collab", "nolog"])
             }
@@ -488,24 +471,19 @@ function onEditMessage(data: Message) {
             // for potential permanent sync errors
             scriptCheckTimerID = compareScriptText(5000)
         }
-
         buffer.shift()
     } else {
         let serverOp = data.editData!
-        console.log("serverOp = ", serverOp)
 
         if (data.state === state) {
             esconsole("server -> client in sync: " + data.state, ["collab", "nolog"])
-
         } else  {
             esconsole("server -> client out of sync: " + data.state, ["collab", "nolog"])
-
             requestSync()
         }
 
         if (buffer.length > 0) {
             esconsole("adjusting buffered edits...", ["collab", "nolog"])
-
             buffer = buffer.map(op => {
                 esconsole("input: " + JSON.stringify(op.editData), ["collab", "nolog"])
                 const tops = transform(serverOp, op.editData!)
@@ -517,7 +495,6 @@ function onEditMessage(data: Message) {
             })
 
         }
-
         esconsole("applying the transformed edit", ["collab", "nolog"])
         apply(serverOp)
         const doc = editSession!.getDocument()
@@ -525,7 +502,6 @@ function onEditMessage(data: Message) {
             cursorPos = doc.indexToPosition(adjustCursor(doc.positionToIndex(cursorPos), serverOp), 0)
             editSession!.selection.moveCursorToPosition(cursorPos)
         }
-
         state++
     }
     editor.setReadOnly(false)
@@ -622,7 +598,6 @@ export function saveScript(scriptID: string) {
 function onScriptSaved(data: Message) {
     if (!userIsCAI(data.sender))
         userNotification.show(data.sender + " saved the current version of the script.", "success")
-
     store.dispatch(scripts.syncToNgUserProject())
 }
 
@@ -886,12 +861,7 @@ function transform(op1: EditOperation, op2: EditOperation) {
             }
         }
     }
-
-    const results = []
-    results[0] = afterTransf(op1)
-    results[1] = afterTransf(op2)
-
-    return results
+    return [afterTransf(op1), afterTransf(op2)]
 }
 
 const operations = {
