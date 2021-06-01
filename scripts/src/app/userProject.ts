@@ -57,6 +57,19 @@ export var sharedScripts: any = {};
 export var openScripts: any[] = [];
 var openSharedScripts: any[] = [];
 
+function form(obj: { [key: string]: string | Blob }={}) {
+    const data = new FormData()
+    for (const [key, value] of Object.entries(obj)) {
+        data.append(key, value)
+    }
+    return data
+}
+
+function authForm(obj: { [key: string]: string | Blob }={}) {
+    const { username, password } = loadUser()
+    return form({ username, password: btoa(password), ...obj})
+}
+
 // websocket gets closed before onunload in FF
 window.onbeforeunload = function () {
     if (isLogged()) {
@@ -115,10 +128,7 @@ window.onbeforeunload = function () {
 
             notificationsMarkedAsRead.forEach(function (notificationID) {
                 esconsole('marking notification ' + notificationID + ' as read', 'user');
-                var body = new FormData();
-                body.append('username', username);
-                body.append('password', getEncodedPassword());
-                body.append('notification_id', notificationID);
+                const body = authForm({ notification_id: notificationID });
                 helpers.getNgService("$http").post(url, body, opts);
             });
         }
@@ -132,31 +142,6 @@ window.onbeforeunload = function () {
         }
     }
 };
-
-if (FLAGS.SHOW_CAI) {
-    window.onfocus = function() {
-        store.dispatch(cai.userOnPage(Date.now()));
-    };
-
-    window.onblur = function() {
-        store.dispatch(cai.userOnPage(Date.now()));
-    };
-
-    var mouse_x: any;
-    var mouse_y: any;
-
-    window.addEventListener('mousemove', function (e) {
-        mouse_x = e.x;
-        mouse_y = e.y;
-    });   
-
-    window.setInterval(function() {
-        if (mouse_x && mouse_y) {
-            store.dispatch(cai.mousePosition([mouse_x, mouse_y]));
-            clearInterval();
-        }
-    }, 5000);
-}
 
 export function loadLocalScripts() {
     // Load scripts from local storage if they are available. When a user logs
@@ -258,35 +243,28 @@ function postProcessCollaborators(script: ScriptEntity, userName?: string) {
 export function login(username: string, password: string) {
     esconsole('Using username: ' + username, ['DEBUG', 'USER']);
 
-    // register callbacks to the collaboration service
-    collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser;
-    
-    collaboration.callbacks.refreshSharedScriptBrowser = function () {
-        // TODO: potential race condition with server-side script renaming operation?
-        return getSharedScripts(username, password);
-    };
-
-    collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript;
-
-    // register callbacks / member values in the userNotification service
-    userNotification.callbacks.addSharedScript = addSharedScript;
-
     var url = WSURLDOMAIN + '/services/scripts/findall';
     // TODO: base64 encoding is not a secure way to send password
-    var payload = new FormData();
-    payload.append('username', username);
-    payload.append('password', btoa(password));
+    const payload = form({ username, password: btoa(password) })
     var opts = {
         transformRequest: identity,
         headers: {'Content-Type': undefined}
     };
 
     return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-        // esconsole(result, ['debug', 'user']);
         reporter.login(username);
 
         // persist the user session
         storeUser(username, password);
+
+        // register callbacks to the collaboration service
+        collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
+        // TODO: potential race condition with server-side script renaming operation?
+        collaboration.callbacks.refreshSharedScriptBrowser = getSharedScripts
+        collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript
+
+        // register callbacks / member values in the userNotification service
+        userNotification.callbacks.addSharedScript = addSharedScript
 
         websocket.connect(username);
         collaboration.setUserName(username);
@@ -406,10 +384,10 @@ export function login(username: string, password: string) {
                         }
                     });
                 });
-            }).then(() => getSharedScripts(username, password));
+            }).then(() => getSharedScripts());
         } else {
             // load scripts in shared browser
-            return getSharedScripts(username, password);
+            return getSharedScripts();
         }
     }, function(err: Error) {
         esconsole('Login failure', ['DEBUG','ERROR']);
@@ -420,12 +398,8 @@ export function login(username: string, password: string) {
 
 export function refreshCodeBrowser() {
     if (isLogged()) {
-        var username = getUsername();
-        var password = getPassword();
         var url = WSURLDOMAIN + '/services/scripts/findall';
-        var payload = new FormData();
-        payload.append('username', username);
-        payload.append('password', btoa(password));
+        var payload = authForm()
         var opts = {
             transformRequest: identity,
             headers: {'Content-Type': undefined}
@@ -504,16 +478,9 @@ function formatDateToISO(date: string){
 // Fetch a script's history, authenticating via username and password.
 // Resolves to a list of historical scripts.
 export function getScriptHistory(scriptid: string) {
-    var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY)!);
-    var username = userState.username;
-    var password = userState.password;
-
     esconsole('Getting script history: ' + scriptid, ['DEBUG', 'USER']);
     var url = WSURLDOMAIN + '/services/scripts/scripthistory';
-    var payload = new FormData();
-    payload.append('scriptid', scriptid);
-    payload.append('username', username);
-    payload.append('password', btoa(password));
+    const payload = authForm({ scriptid })
     var opts = {
         transformRequest: identity,
         headers: {'Content-Type': undefined}
@@ -549,18 +516,9 @@ export function getScriptHistory(scriptid: string) {
 
 // Fetch a specific version of a script.
 export function getScriptVersion(scriptid: string, versionid: string) {
-    var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY)!);
-    var username = userState.username;
-    var password = userState.password;
-
     esconsole('Getting script history: ' + scriptid + '  version: ' + versionid, ['DEBUG', 'USER']);
     var url = WSURLDOMAIN + '/services/scripts/scriptversion';
-    var payload = new FormData();
-    payload.append('scriptid', scriptid);
-    // payload.append('scriptname', undefined);
-    payload.append('username', username);
-    payload.append('password', btoa(password));
-    payload.append('versionid', versionid);
+    const payload = authForm({ scriptid, versionid })
     var opts = {
         transformRequest: identity,
         headers: {'Content-Type': undefined}
@@ -585,13 +543,11 @@ export function getScriptVersion(scriptid: string, versionid: string) {
 }
 
 // Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
-export function getSharedScripts(username: string, password: string) {
+export function getSharedScripts() {
     resetSharedScripts();
 
     var url = WSURLDOMAIN + '/services/scripts/getsharedscripts';
-    var payload = new FormData();
-    payload.append('username', username);
-    payload.append('password', btoa(password));
+    var payload = authForm()
     var opts = {
         transformRequest: identity,
         headers: {'Content-Type': undefined}
@@ -677,25 +633,20 @@ export function isLogged() {
 }
 
 // Get a username from local storage.
-export function getUsername() {
+export function getUsername(): string {
     return loadUser()?.username
 }
 
 // Set a users new password.
 export function setPassword(pass: string) {
     if (isLogged()) {
-        storeUser(getUsername(), pass);
+        storeUser(getUsername()!, pass);
     }
 }
 
 // Get the password from local storage.
-function getPassword() {
+function getPassword(): string {
     return loadUser()?.password
-}
-
-// Get the base-64 encoded ASCII string password of the user.
-export function getEncodedPassword() {
-    return btoa(getPassword());
 }
 
 export function shareWithPeople(shareid: string, users: string[]) {
@@ -706,9 +657,7 @@ export function shareWithPeople(shareid: string, users: string[]) {
     data.users = users;
 
     if (!websocket.isOpen) {
-        websocket.connect(getUsername(), function () {
-            websocket.send(data);
-        });
+        websocket.connect(getUsername(), () => websocket.send(data))
     } else {
         websocket.send(data);
     }
@@ -800,15 +749,13 @@ export function getLicenses(){
 }
 
 
-export function getUserInfo(username: string, password: string){
-    if (!username) username = getUsername();
-    if (!password) password = getPassword();
+export function getUserInfo(username?: string, password?: string){
+    username ??= getUsername()
+    password ??= getPassword()
     var url = WSURLDOMAIN + '/services/scripts/getuserinfo';
     var payload, opts
     if (password !== null) {
-        payload = new FormData();
-        payload.append('username', username);
-        payload.append('password', btoa(password));
+        payload = form({ username, password: btoa(password) })
         opts = {
             transformRequest: identity,
             headers: {'Content-Type': undefined}
@@ -1184,15 +1131,8 @@ export function setScriptDesc(scriptname: string, scriptId: string, desc: string
 // Import a shared script to the user's owned script list.
 function importSharedScript(scriptid: string) {
     if (isLogged()) {
-        var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY)!);
-        var username = userState.username;
-        var password = userState.password;
-
         var url = WSURLDOMAIN + '/services/scripts/import';
-        var payload = new FormData();
-        payload.append('username', username);
-        payload.append('password', btoa(password));
-        payload.append('scriptid', scriptid);
+        const payload = authForm({ scriptid })
         var opts = {
             transformRequest: identity,
             headers: {'Content-Type': undefined}
@@ -1204,10 +1144,10 @@ function importSharedScript(scriptid: string) {
             }
             closeSharedScript(scriptid);
 
-            esconsole('Import script ' + scriptid + ' to ' + username, 'debug');
+            esconsole('Import script ' + scriptid, 'debug');
             return result.data;
         }).catch(function (err: Error) {
-            esconsole('Could not import script ' + scriptid + ' to ' + username, 'debug');
+            esconsole('Could not import script ' + scriptid, 'debug');
             esconsole(err, ['ERROR']);
         });
     }
@@ -1240,13 +1180,13 @@ export function openSharedScriptForEdit(shareID: string) {
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
 function addSharedScript(shareID: string, notificationID: string) {
     if (isLogged()) {
-        getSharedScripts(getUsername(), getPassword()).then(function (scriptList: ScriptEntity[]) {
+        getSharedScripts().then(function (scriptList: ScriptEntity[]) {
             if (!scriptList.some(function (script) {
                     return script.shareid === shareID;
                 })) {
                 loadScript(shareID, true).then(function (script: ScriptEntity) {
                     saveSharedScript(shareID, script.name, script.source_code, script.username).then(function () {
-                        getSharedScripts(getUsername(), getPassword());
+                        getSharedScripts();
                     });
                 });
             }
@@ -1305,11 +1245,7 @@ export function getAllUserRoles() {
         var password = getPassword();
         var url = WSURLDOMAIN + '/services/scripts/getalluserroles';
         if (password !== null) {
-
-            var payload = new FormData();
-            payload.append('adminusername', username);
-            payload.append('password', btoa(password));
-
+            const payload = form({ adminusername: username, password: btoa(password) })
             var opts = {
                 transformRequest: identity,
                 headers: {'Content-Type': undefined}
@@ -1337,13 +1273,7 @@ export function addRole(user: string, role: string) {
         var password = getPassword();
         var url = WSURLDOMAIN + '/services/scripts/adduserrole';
         if (password !== null) {
-
-            var payload = new FormData();
-            payload.append('adminusername', username);
-            payload.append('password', btoa(password));
-            payload.append('username', user);
-            payload.append('role', role);
-
+            const payload = form({ adminusername: username, password: btoa(password), username: user, role })
             var opts = {
                 transformRequest: identity,
                 headers: {'Content-Type': undefined}
@@ -1371,13 +1301,7 @@ export function removeRole(user: string, role: string) {
         var password = getPassword();
         var url = WSURLDOMAIN + '/services/scripts/removeuserrole';
         if (password !== null) {
-
-            var payload = new FormData();
-            payload.append('adminusername', username);
-            payload.append('password', btoa(password));
-            payload.append('username', user);
-            payload.append('role', role);
-
+            const payload = form({ adminusername: username, password: btoa(password), username: user, role })
             var opts = {
                 transformRequest: identity,
                 headers: {'Content-Type': undefined}
@@ -1400,17 +1324,17 @@ export function removeRole(user: string, role: string) {
 export function setPasswordForUser(userID: string, password: string, adminPassphrase: string) {
     return new Promise<void>(function (resolve, reject) {
         if (isLogged()) {
-            var adminID = getUsername();
             var adminPwd = getPassword();
 
             if (adminPwd !== null) {
                 esconsole('Admin setting a new password for user');
-                var payload = new FormData();
-                payload.append('adminid', adminID);
-                payload.append('adminpwd', btoa(adminPwd));
-                payload.append('adminpp', btoa(adminPassphrase));
-                payload.append('username', userID);
-                payload.append('newpassword', encodeURIComponent(btoa(password)));
+                const payload = form({
+                    adminid: getUsername(),
+                    adminpwd: btoa(adminPwd),
+                    adminpp: btoa(adminPassphrase),
+                    username: userID,
+                    newpassword: encodeURIComponent(btoa(password)),
+                })
 
                 var opts = {
                     transformRequest: identity,
@@ -1637,33 +1561,25 @@ export function getTutoringRecord(scriptID: string) {
         transformRequest: identity,
         headers: {'Content-Type': undefined}
     };
-    var body = new FormData();
-    body.append('username', getUsername());
-    body.append('password', getEncodedPassword());
-    body.append('scriptid', scriptID);
+    const body = authForm({ scriptid: scriptID })
 
     return helpers.getNgService("$http").post(url, body, opts).then(function (result: any) {
         return result.data;
     });
 }
 
-export function uploadCAIHistory(projectName: string, node: any) {
+export function uploadCAIHistory(project: string, node: any) {
     var url = URL_DOMAIN + '/services/scripts/uploadcaihistory';
-
     var opts = {
         transformRequest: identity,
         headers: {'Content-Type': undefined}
     };
-
-    var body = new FormData();
-    body.append('username', getUsername());
-    body.append('project', projectName)
-    body.append('node', JSON.stringify(node));
+    const body = form({ username: getUsername(), project, node: JSON.stringify(node) })
 
     helpers.getNgService("$http").post(url, body, opts).then(function() {
-        console.log('saved to CAI history:', projectName, node);
+        console.log('saved to CAI history:', project, node);
     }).catch(function(err: Error) {
-        console.log('could not save to cai', projectName, node);
+        console.log('could not save to cai', project, node);
         throw err;
     });
 }
