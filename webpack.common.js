@@ -86,7 +86,6 @@ module.exports = {
             localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
-            colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),

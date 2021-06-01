@@ -21,7 +21,7 @@ import * as userNotification from './userNotification';
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', 'localStorage', 'colorTheme', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, localStorage, colorTheme, $document, $ngRedux, recommender) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', 'localStorage', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, localStorage, $document, $ngRedux, recommender) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -42,7 +42,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.loggedIn = false;
     $scope.showIDE = true;
     $scope.showAll = false;
-    $scope.colorTheme = localStorage.get('colorTheme', 'light');
+    $scope.colorTheme = $ngRedux.getState().app.colorTheme;
     $scope.hljsTheme = 'monokai-sublime';
     $scope.selectedFont = 14;
     $scope.enableChat = false; // Chat window toggle button. Hidden by default.
@@ -95,7 +95,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
-        colorTheme.set('light');
+        $ngRedux.dispatch(appState.setColorTheme("light"))
         $ngRedux.dispatch(appState.setEmbedMode(true));
         Layout.destroy();
         layout.setMinSize(0);
@@ -407,9 +407,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                         const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
                         activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
                     }
-
-                    const theme = colorTheme.load();
-                    $ngRedux.dispatch(appState.setColorTheme(theme));
                 });
             } else {
 
@@ -543,8 +540,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             }
         });
     } else {
-        const theme = colorTheme.load();
-        $ngRedux.dispatch(appState.setColorTheme(theme));
         $ngRedux.dispatch(scripts.syncToNgUserProject());
                                   
 
@@ -743,12 +738,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.toggleColorTheme = function () {
-        const theme = colorTheme.toggle();
-        $ngRedux.dispatch(appState.setColorTheme(theme));
+        $ngRedux.dispatch(appState.toggleColorTheme());
         reporter.toggleColorTheme();
     };
 
-    colorTheme.subscribe($scope, function (event, theme) {
+    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
         $scope.colorTheme = theme;
 
         if (theme === 'dark') {

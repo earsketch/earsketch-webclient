@@ -12,11 +12,16 @@ import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as WaveformCache from './waveformcache';
 
+const ACE_THEMES = {
+    light: "ace/theme/chrome",
+    dark: "ace/theme/monokai",
+}
+
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'localStorage', 'caiAnalysisModule', 'colorTheme', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, localStorage, caiAnalysisModule, colorTheme, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'localStorage', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, localStorage, caiAnalysisModule, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -126,7 +131,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         $scope.editor.ace.setOptions({
             mode: 'ace/mode/' + $scope.currentLanguage,
-            theme: 'ace/theme/monokai',
+            theme: ACE_THEMES[$ngRedux.getState().app.colorTheme],
             fontSize: $scope.fontSizNum,
             enableBasicAutocompletion: true,
             enableSnippets: false,
@@ -214,7 +219,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
         $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
-        colorTheme.load();
     };
 
     
@@ -695,14 +699,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.editor.ace.getSession().removeMarker($scope.marker);
     };
 
-    colorTheme.subscribe($scope, function (event, theme) {
+    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
         if (!$scope.editor.ace) return;
-
-        if (theme === 'dark') {
-            $scope.editor.ace.setTheme('ace/theme/monokai');
-        } else {
-            $scope.editor.ace.setTheme('ace/theme/chrome');
-        }
+        $scope.editor.ace.setTheme(ACE_THEMES[theme]);
     });
 
     /**

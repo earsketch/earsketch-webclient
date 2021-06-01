@@ -11,7 +11,7 @@ import * as userNotification from './userNotification';
  * Angular controller for the share script modal dialog.
  * @module shareScriptCtroller
  */
-app.controller("shareScriptController", ['$scope', '$uibModalInstance', '$window', 'userProject', 'script', 'quality', 'licenses', 'clipboard', '$http', 'colorTheme', '$ngRedux', function($scope, $uibModalInstance, $window, userProject, script, quality, licenses, clipboard, $http, colorTheme, $ngRedux) {
+app.controller("shareScriptController", ['$scope', '$uibModalInstance', '$window', 'userProject', 'script', 'quality', 'licenses', 'clipboard', '$http', '$ngRedux', function($scope, $uibModalInstance, $window, userProject, script, quality, licenses, clipboard, $http, $ngRedux) {
 
     $scope.sharelink = location.origin + location.pathname +'?sharing=' + script.shareid;
     $scope.lockedShareLink = "";
@@ -55,7 +55,7 @@ app.controller("shareScriptController", ['$scope', '$uibModalInstance', '$window
     };
 
     $scope.setPillFontColor = function () {
-        if (colorTheme.get() === 'dark') {
+        if ($ngRedux.getState().app.colorTheme === 'dark') {
             return 'white';
         } else {
             return 'black';

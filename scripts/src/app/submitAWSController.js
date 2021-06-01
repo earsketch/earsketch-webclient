@@ -8,7 +8,7 @@ import * as exporter from './exporter'
 import reporter from './reporter'
 import * as userNotification from './userNotification'
 
-app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'licenses', 'clipboard', '$http', 'colorTheme', function($scope, $uibModalInstance, userProject, script, licenses, clipboard, $http, colorTheme) {
+app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'licenses', 'clipboard', '$http', '$ngRedux', function($scope, $uibModalInstance, userProject, script, licenses, clipboard, $http, $ngRedux) {
 
     $scope.sharelink = location.origin + location.pathname +'#?sharing=' + script.shareid;
     $scope.lockedShareLink = "";
@@ -37,7 +37,7 @@ app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProje
     window.shareScriptScope = $scope;
 
     $scope.setPillFontColor = function () {
-        if (colorTheme.get() === 'dark') {
+        if ($ngRedux.getState().app.colorTheme === 'dark') {
             return 'white';
         } else {
             return 'black';
