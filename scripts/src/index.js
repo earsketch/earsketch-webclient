@@ -34,6 +34,7 @@ import esconsole from './esconsole'
 import * as ESUtils from './esutils'
 // TODO: Remove this after dealing lib/earsketch-appdsp.js.
 import ESMessages from './data/messages'
+import reporter from './app/reporter'
 window.ESMessages = ESMessages
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
@@ -113,11 +114,8 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('reporter');
     require('localStorage');
     require('userProject');
-    require('websocket');
-    require('collaboration');
     require('colorTheme');
     require('uploader');
     require('completer');
@@ -193,18 +191,16 @@ require(['angular'], () => {
     // TODO: Use a module.
     window.REPORT_LOG = [];
 
-    app.factory('$exceptionHandler', ['$injector', function($injector) {
+    app.factory('$exceptionHandler', function() {
         return function(exception, cause) {
             console.log(exception);
             esconsole(exception, ['ERROR','ANGULAR']);
-            var reporter = $injector.get('reporter');
-
             // ensures we don't report Skulpt errors to GA
             if (exception.args === undefined) {
                 reporter.exception(exception.toString());
             }
         };
-    }]);
+    });
 
     app.run(['$window', function ($window) {
         // Returns the version of Internet Explorer or a -1

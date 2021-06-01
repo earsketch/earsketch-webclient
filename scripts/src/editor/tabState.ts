@@ -4,6 +4,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import * as ace from 'ace-builds';
 
+import * as collaboration from '../app/collaboration';
 import * as helpers from '../helpers';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
@@ -172,8 +173,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         editor.setReadOnly(script.readonly);
 
         if (script.collaborative) {
-            const collaboration = helpers.getNgService('collaboration');
-            collaboration.openScript(Object.assign({},script), user.selectUserName(getState()));
+            collaboration.openScript(Object.assign({},script), user.selectUserName(getState())!);
         }
 
         prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID));
@@ -271,9 +271,8 @@ const ensureCollabScriptIsClosed = createAsyncThunk<void, string, ThunkAPI>(
         const activeTabID = selectActiveTabID(getState());
         const script = scripts.selectAllScriptEntities(getState())[scriptID];
         if (scriptID === activeTabID && script?.collaborative) {
-            const collabService = helpers.getNgService('collaboration');
-            const userName = user.selectUserName(getState());
-            collabService.closeScript(scriptID, userName);
+            const userName = user.selectUserName(getState())!;
+            collaboration.closeScript(scriptID, userName);
         }
     }
 );

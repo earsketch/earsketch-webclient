@@ -89,7 +89,6 @@ module.exports = {
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
             colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
             websocket: path.resolve(__dirname,`${servicesDir}/websocket.js`),
-            collaboration: path.resolve(__dirname,`${servicesDir}/collaboration.js`),
             reporter: path.resolve(__dirname,`${servicesDir}/reporter.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),

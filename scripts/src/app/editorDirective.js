@@ -1,9 +1,9 @@
-import esconsole from '../esconsole';
+import * as collaboration from './collaboration';
 import * as tabs from '../editor/tabState';
 import * as config from '../editor/editorConfig';
 import * as cai from '../cai/caiState';
 
-app.directive('editor', ['$rootScope', 'collaboration', '$timeout', '$ngRedux', 'userProject', function ($rootScope, collaboration, $timeout, $ngRedux, userProject) {
+app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', 'userProject', function ($rootScope, $timeout, $ngRedux, userProject) {
     return {
         transclude: false,
         restrict: 'EA',
@@ -13,11 +13,9 @@ app.directive('editor', ['$rootScope', 'collaboration', '$timeout', '$ngRedux', 
             scope.editor.droplet = null;
 
             scope.editor.visible = true;
-            collaboration.editorVisible = true;
 
             scope.$on('visible', function(event, val){
                 scope.editor.visible = !val;
-                collaboration.editorVisible = !val;
             });
 
             if (scope.currentLanguage === 'python') {
