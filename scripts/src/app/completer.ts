@@ -1,81 +1,52 @@
-/**
- * An angular factory service for providing an ace completer for the EarSketch
- * API and audio constants.
- *
- * @module completer
- * @author Creston Bunch
- */
-import { require } from "ace-builds"
+// Register Ace completer for EarSketch API and audio constants.
+import { Ace, require as aceRequire } from "ace-builds"
 
-import * as audioLibrary from './audiolibrary'
-import ESApiDoc, { APIItem } from '../data/api_doc'
-import esconsole from '../esconsole'
+import ESApiDoc from "../data/api_doc"
+import * as audioLibrary from "./audiolibrary"
 
-var langTools = require("ace/ext/language_tools");
+const langTools = aceRequire("ace/ext/language_tools")
 
 // Get the list of autocompletions
-var completions: string[] = []
-Object.values(ESApiDoc).forEach(function(func) {
-  if(Array.isArray(func)) {
-    func.forEach(function(func) {
-      if(func.autocomplete) {
-        completions.push(func.autocomplete);
-      }
-    });
-  } else {
-    if((func as APIItem).autocomplete) {
-      completions.push((func as APIItem).autocomplete!);
-    }
-  }
-})
+const apiCompletions: string[] = []
+for (const data of Object.values(ESApiDoc)) {
+    const entries = Array.isArray(data) ? data : [data]
+    apiCompletions.push(...entries.map(entry => entry.autocomplete).filter(a => a !== undefined))
+}
 
-var earsketchCompleter = {
-
-  getCompletions: function(editor: any, session: any, pos: any, prefix: string, callback: Function) {
-    if (prefix.length < 2) { callback(null, []); return; }
-
-    var output: any[] = [];
-
-    // Add api functions to the output
-    output = output.concat(completions.filter(function(f) {
-      return f.indexOf(prefix) > -1;
-    }).map(function(f, i) {
-      return {name: f, value: f, score: -i, meta: "EarSketch function"};
-    }));
-
-    return Promise.all([
-        audioLibrary.getAudioTags(),
-        audioLibrary.getAudioFolders()
-    ]).then(function(result: any) {
-        // wait for all promises to complete and concatenate their results
-        var resultMerge = new Set(result[0].concat(audioLibrary.EFFECT_TAGS, audioLibrary.ANALYSIS_TAGS, result[1]));
-        var resultFilter = Array.from(resultMerge).sort().reverse();
-        return resultFilter;
-    }, function(err: Error) {
-        esconsole(err, ['ERROR','AUDIOLIBRARY']);
-        throw err;
-    }).catch(function(err: Error) {
-        esconsole(err, ['ERROR','AUDIOLIBRARY']);
-        throw err;
-    }).then(function(result: any) {
-      result = result.filter(function(tag: any) {
-        if (tag !== undefined) {
-          return tag.indexOf(prefix) > -1;
+const earsketchCompleter: Ace.Completer = {
+    async getCompletions(editor, session, pos, prefix, callback) {
+        if (prefix.length < 2) {
+            callback(null, [])
+            return
         }
-      }).map(function(tag: string, i: number) {
-        return {name: tag, value: tag, score: i, meta: "EarSketch constant"};
-      });
 
-      output = output.concat(result);
+        // Include API function completions.
+        const completions = apiCompletions.filter(f => f.includes(prefix)).map((f, i) => ({
+            name: f, value: f, score: -i, meta: "EarSketch function",
+        }))
 
-      callback(null, output);
-    });
+        // Include audio constants. If they haven't been fetched yet, go ahead and provide whatever completions we can.
+        if (audioLibrary.cache.audioTags === null) {
+            audioLibrary.getAudioTags()
+        }
 
-  }
-};
+        if (audioLibrary.cache.audioFolders === null) {
+            audioLibrary.getAudioFolders()
+        }
 
-// reset completers ()emoves the keyword completer that includes Python
-// keywords we don't want to show students)
-langTools.setCompleters(null);
-langTools.addCompleter(langTools.snippetCompleter);
-langTools.addCompleter(earsketchCompleter);
+        // Combine constants.
+        const merged = new Set((audioLibrary.cache.audioTags ?? []).concat(audioLibrary.EFFECT_TAGS, audioLibrary.ANALYSIS_TAGS, audioLibrary.cache.audioFolders ?? []))
+        const sorted = Array.from(merged).sort().reverse()
+        const constants = sorted
+            .filter(tag => tag !== undefined && tag.includes(prefix))
+            .map((tag, i) => ({ name: tag, value: tag, score: i, meta: "EarSketch constant" }))
+
+        completions.push(...constants)
+        callback(null, completions)
+    }
+}
+
+// Reset completers to remove Python keyword completer that we don't want to show students.
+langTools.setCompleters(null)
+langTools.addCompleter(langTools.snippetCompleter)
+langTools.addCompleter(earsketchCompleter)
