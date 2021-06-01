@@ -19,7 +19,6 @@ import ESMessages from '../data/messages';
 
 const identity = (angular as any).identity;
 
-var WSURLDOMAIN = URL_DOMAIN;
 var USER_STATE_KEY = 'userstate';
 
 var LS_TABS_KEY = 'tabs_v2';
@@ -57,6 +56,7 @@ export var sharedScripts: any = {};
 export var openScripts: any[] = [];
 var openSharedScripts: any[] = [];
 
+// Helper functions for making API requests.
 function form(obj: { [key: string]: string | Blob }={}) {
     const data = new FormData()
     for (const [key, value] of Object.entries(obj)) {
@@ -65,9 +65,47 @@ function form(obj: { [key: string]: string | Blob }={}) {
     return data
 }
 
-function authForm(obj: { [key: string]: string | Blob }={}) {
-    const { username, password } = loadUser()
-    return form({ username, password: btoa(password), ...obj})
+async function get(endpoint: string, params?: { [key: string]: string }) {
+    const url = URL_DOMAIN + endpoint
+    const response = await helpers.getNgService("$http").get(url, { params })
+    return response.data
+}
+
+async function postForm(endpoint: string, data?: { [key: string]: string }) {
+    const url = URL_DOMAIN + endpoint
+    const payload = form(data)
+    const opts = {
+        transformRequest: identity,
+        headers: {'Content-Type': undefined}
+    }
+    const response = await helpers.getNgService("$http").post(url, payload, opts)
+    return response.data
+}
+
+async function postAuthForm(endpoint: string, data: { [key: string]: string }={}) {
+    return postForm(endpoint, { username: getUsername(), password: getEncodedPassword(), ...data })
+}
+
+async function postAdminForm(endpoint: string, data: { [key: string]: string }={}) {
+    return postForm(endpoint, { adminusername: getUsername(), password: getEncodedPassword(), ...data })
+}
+
+async function post(endpoint: string, params: { [key: string]: string }) {
+    const url = URL_DOMAIN + endpoint
+    const opts = { params }
+    const response = await helpers.getNgService("$http").post(url, {}, opts)
+    return response.data
+}
+
+async function postAuth(endpoint: string, params: { [key: string]: string }) {
+    return post(endpoint, { username: getUsername(), password: getEncodedPassword(), ...params })
+}
+
+async function postXMLAuth(endpoint: string, xml: string) {
+    const url = URL_DOMAIN + endpoint
+    const opts = { headers: {'Content-Type': 'application/xml;charset=UTF-8'} }
+    const response = await helpers.getNgService("$http").post(url, xml, opts)
+    return response.data
 }
 
 // websocket gets closed before onunload in FF
@@ -120,16 +158,9 @@ window.onbeforeunload = function () {
 
         // TODO: may not be properly working... check!
         if (notificationsMarkedAsRead.length !== 0) {
-            var url = URL_DOMAIN + '/services/scripts/markread';
-            var opts = {
-                transformRequest: identity,
-                headers: {'Content-Type': undefined}
-            };
-
-            notificationsMarkedAsRead.forEach(function (notificationID) {
-                esconsole('marking notification ' + notificationID + ' as read', 'user');
-                const body = authForm({ notification_id: notificationID });
-                helpers.getNgService("$http").post(url, body, opts);
+            notificationsMarkedAsRead.forEach(function (notification_id) {
+                esconsole('marking notification ' + notification_id + ' as read', 'user');
+                postAuthForm("/services/scripts/markread", { notification_id })
             });
         }
 
@@ -242,16 +273,7 @@ function postProcessCollaborators(script: ScriptEntity, userName?: string) {
 // Login, setup, restore scripts, return shared scripts.
 export function login(username: string, password: string) {
     esconsole('Using username: ' + username, ['DEBUG', 'USER']);
-
-    var url = WSURLDOMAIN + '/services/scripts/findall';
-    // TODO: base64 encoding is not a secure way to send password
-    const payload = form({ username, password: btoa(password) })
-    var opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    };
-
-    return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
+    return postForm("/services/scripts/findall", { username, password: btoa(password) }).then((data: any) => {
         reporter.login(username);
 
         // persist the user session
@@ -276,12 +298,12 @@ export function login(username: string, password: string) {
 
         var storedScripts;
 
-        if (result.data) {
-            if (result.data.scripts instanceof Array) {
-                storedScripts = result.data.scripts;
+        if (data) {
+            if (data.scripts instanceof Array) {
+                storedScripts = data.scripts;
             } else {
                 // one script -- somehow this gets parsed to one object
-                storedScripts = [result.data.scripts];
+                storedScripts = [data.scripts];
             }
         }
 
@@ -398,24 +420,15 @@ export function login(username: string, password: string) {
 
 export function refreshCodeBrowser() {
     if (isLogged()) {
-        var url = WSURLDOMAIN + '/services/scripts/findall';
-        var payload = authForm()
-        var opts = {
-            transformRequest: identity,
-            headers: {'Content-Type': undefined}
-        };
-
-        // TODO: base64 encoding is not a secure way to send password
-
-        return helpers.getNgService("$http").post(url, payload, opts).then((result: any) => {
+        return postAuthForm("/services/scripts/findall").then((data: any) => {
             let res;
 
-            if (result.data) {
-                if (result.data.scripts instanceof Array) {
-                    res = result.data.scripts;
+            if (data) {
+                if (data.scripts instanceof Array) {
+                    res = data.scripts;
                 } else {
                     // one script -- somehow this gets parsed to one object
-                    res = [result.data.scripts];
+                    res = [data.scripts];
                 }
             }
 
@@ -463,14 +476,10 @@ export function refreshCodeBrowser() {
     }
 }
 
-/**
- * Format a date to ISO 8601
- *
- * @param {string} date the date to format
- */
+// Format a date to ISO 8601
 function formatDateToISO(date: string){
-    //Format created date to ISO 8601
-        var isoFormat = date.slice(0,-2).replace(' ','T');
+    // Format created date to ISO 8601
+    var isoFormat = date.slice(0,-2).replace(' ','T');
     // javascript Date.parse() requires ISO 8601
     return Date.parse(isoFormat);
 }
@@ -479,29 +488,22 @@ function formatDateToISO(date: string){
 // Resolves to a list of historical scripts.
 export function getScriptHistory(scriptid: string) {
     esconsole('Getting script history: ' + scriptid, ['DEBUG', 'USER']);
-    var url = WSURLDOMAIN + '/services/scripts/scripthistory';
-    const payload = authForm({ scriptid })
-    var opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    };
-
-    return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
+    return postAuthForm("/services/scripts/scripthistory", { scriptid }).then(function(data: any) {
         var r;
 
-        if (result.data === null) {
+        if (data === null) {
             // no scripts
             return [];
-        } else if (result.data.scripts instanceof Array) {
+        } else if (data.scripts instanceof Array) {
             //Format created date to ISO 8601
-            for(var i = 0; i< result.data.scripts.length; i++){
-                result.data.scripts[i].created = formatDateToISO(result.data.scripts[i].created);
+            for(var i = 0; i< data.scripts.length; i++){
+                data.scripts[i].created = formatDateToISO(data.scripts[i].created);
             }
-            r = result.data.scripts;
+            r = data.scripts;
         } else {
             // one script -- somehow this gets parsed to one object
-            result.data.scripts.created = formatDateToISO(result.data.scripts.created);
-            r = [result.data.scripts];
+            data.scripts.created = formatDateToISO(data.scripts.created);
+            r = [data.scripts];
         }
 
         return r
@@ -517,20 +519,13 @@ export function getScriptHistory(scriptid: string) {
 // Fetch a specific version of a script.
 export function getScriptVersion(scriptid: string, versionid: string) {
     esconsole('Getting script history: ' + scriptid + '  version: ' + versionid, ['DEBUG', 'USER']);
-    var url = WSURLDOMAIN + '/services/scripts/scriptversion';
-    const payload = authForm({ scriptid, versionid })
-    var opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    };
-
-    return helpers.getNgService("$http").post(url, payload, opts).then(function (result: any) {
-        if (result.data === null) {
+    return postAuthForm("/services/scripts/scriptversion", { scriptid, versionid }).then(function (data: any) {
+        if (data === null) {
             // no scripts
             return [];
         } else {
             // one script -- somehow this gets parsed to one object
-            var r = [result.data];
+            var r = [data];
         }
 
         return r;
@@ -545,23 +540,15 @@ export function getScriptVersion(scriptid: string, versionid: string) {
 // Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
 export function getSharedScripts() {
     resetSharedScripts();
-
-    var url = WSURLDOMAIN + '/services/scripts/getsharedscripts';
-    var payload = authForm()
-    var opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    };
-
-    return helpers.getNgService("$http").post(url, payload, opts).then(function (result: any) {
+    return postAuthForm("/services/scripts/getsharedscripts").then(function (data: any) {
         let res;
 
-        if (result.data) {
-            if (result.data.scripts instanceof Array) {
-                res = result.data.scripts;
+        if (data) {
+            if (data.scripts instanceof Array) {
+                res = data.scripts;
             } else {
                 // one script -- somehow this gets parsed to one object
-                res = [result.data.scripts];
+                res = [data.scripts];
             }
         }
 
@@ -577,15 +564,8 @@ export function getSharedScripts() {
 }
 
 // Get shared id for locked version of latest script.
-export function getLockedSharedScriptId(shareid: string){
-    var url = WSURLDOMAIN + '/services/scripts/getlockedshareid';
-    return helpers.getNgService("$http").get(url, {
-        params: {'shareid': shareid }
-    }).then(function(result: any) {
-        return result.data.shareid;
-    }, function(err: Error) {
-        console.log(err);
-    });
+export async function getLockedSharedScriptId(shareid: string){
+    return (await get("/services/scripts/getlockedshareid", { shareid })).shareid
 }
 
 // Save a username and password to local storage to persist between sessions.
@@ -628,8 +608,7 @@ export function clearUser() {
 
 // Check if a user is stored in local storage.
 export function isLogged() {
-    var jsstate = localStorage.getItem(USER_STATE_KEY);
-    return jsstate !== null;
+    return localStorage.getItem(USER_STATE_KEY) !== null;
 }
 
 // Get a username from local storage.
@@ -649,6 +628,10 @@ function getPassword(): string {
     return loadUser()?.password
 }
 
+export function getEncodedPassword() {
+    return btoa(getPassword())
+}
+
 export function shareWithPeople(shareid: string, users: string[]) {
     var data: any = {};
     data.notification_type = "sharewithpeople";
@@ -664,247 +647,118 @@ export function shareWithPeople(shareid: string, users: string[]) {
 }
 
 // Fetch a script by ID.
-export function loadScript(id: string, sharing: boolean) {
-    //sharing is not used but the function doesn't work if it is not there. Why?
-    var url = URL_DOMAIN + '/services/scripts/scriptbyid';
-    var opts = { params: {'scriptid': id} };
-    return helpers.getNgService("$http").get(url, opts)
-        .then(function(result: any) {
-            if (sharing && result.data === '') {
-                if (userNotification.state.isInLoadingScreen) {
-                } else {
-                    userNotification.show(ESMessages.user.badsharelink, 'failure1', 3);
-                }
-
-                throw "Script was not found.";
+export async function loadScript(id: string, sharing: boolean) {
+    try {
+        const data = await get("/services/scripts/scriptbyid", { scriptid: id })
+        if (sharing && data === '') {
+            if (userNotification.state.isInLoadingScreen) {
+            } else {
+                userNotification.show(ESMessages.user.badsharelink, 'failure1', 3)
             }
-            return result.data;
-        }, function(err: Error) {
-            esconsole('Failure getting script id: '+id, ['DEBUG','ERROR']);
-        });
+            throw "Script was not found."
+        }
+        return data
+    } catch {
+        esconsole('Failure getting script id: '+id, ['DEBUG','ERROR']);
+    }
 }
 
 // Deletes an audio key if owned by the user.
-export function deleteAudio(audiokey: string) {
-    esconsole('Calling Deleted audiokey: ' + audiokey, 'debug');
-    var username = getUsername();
-    var password = getPassword();
-    var url = WSURLDOMAIN + '/services/audio/delete';
-    if (password !== null) {
-        var opts = {
-            params: {
-                'username': username,
-                'password': btoa(password),
-                'audiokey': audiokey
-            },
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        };
-        var payload = {};
-        return helpers.getNgService("$http").post(url, payload, opts).then(function() {
-            esconsole('Deleted audiokey: ' + audiokey, 'debug');
-            audioLibrary.clearAudioTagCache(); // otherwise the deleted audio key is still usable by the user
-        }).catch(function(err: Error) {
-            esconsole('Could not delete audiokey: ' + audiokey, 'debug');
-            esconsole(err, ['ERROR']);
-        });
+export async function deleteAudio(audiokey: string) {
+    try {
+        await postAuth("/services/audio/delete", { audiokey })
+        esconsole('Deleted audiokey: ' + audiokey, 'debug')
+        audioLibrary.clearAudioTagCache()  // otherwise the deleted audio key is still usable by the user
+    } catch (err) {
+        esconsole(err, ["error", "userProject"])
     }
 }
 
 // Rename an audio key if owned by the user.
-export function renameAudio(audiokey: string, newaudiokey: string) {
-    esconsole('Calling Deleted audiokey: ' + audiokey, 'debug');
-
-    var username = getUsername();
-    var password = getPassword();
-    var url = WSURLDOMAIN + '/services/audio/rename';
-    if (password !== null) {
-        var opts = {
-            params: {
-                'username': username,
-                'password': btoa(password),
-                'audiokey': audiokey,
-                'newaudiokey': newaudiokey
-            },
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        };
-        var payload = {};
-        return helpers.getNgService("$http").post(url, payload, opts).then(function() {
-            esconsole('Successfully renamed audiokey: ' + audiokey + ' to ' + newaudiokey, 'debug');
-            userNotification.show(ESMessages.general.soundrenamed, 'normal', 2);
-            audioLibrary.clearAudioTagCache(); // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
-        }).catch(function(err: Error) {
-            esconsole('Could not rename audiokey: ' + audiokey + ' to ' + newaudiokey, 'debug');
-            userNotification.show('Error renaming custom sound', 'failure1', 2);
-            esconsole(err, ['ERROR']);
-        });
+export async function renameAudio(audiokey: string, newaudiokey: string) {
+    try {
+        await postAuth("/services/audio/rename", { audiokey, newaudiokey })
+        esconsole('Successfully renamed audiokey: ' + audiokey + ' to ' + newaudiokey, 'debug');
+        userNotification.show(ESMessages.general.soundrenamed, 'normal', 2);
+        audioLibrary.clearAudioTagCache(); // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
+    } catch (err) {
+        userNotification.show('Error renaming custom sound', 'failure1', 2);
+        esconsole(err, ["error", "userProject"])
     }
 }
 
 // Get a script license information from the back-end.
-export function getLicenses(){
-    var url = WSURLDOMAIN + '/services/scripts/getlicenses';
-    return helpers.getNgService("$http").get(url).then(function(response: any){
-        return response.data.licenses;
-    })
+export async function getLicenses() {
+    return (await get("/services/scripts/getlicenses")).licenses
 }
 
-
-export function getUserInfo(username?: string, password?: string){
-    username ??= getUsername()
-    password ??= getPassword()
-    var url = WSURLDOMAIN + '/services/scripts/getuserinfo';
-    var payload, opts
-    if (password !== null) {
-        payload = form({ username, password: btoa(password) })
-        opts = {
-            transformRequest: identity,
-            headers: {'Content-Type': undefined}
-        }
-    }
-
-    return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-        esconsole('Get user info ' + ' for ' + username, 'debug');
-
-        var user: any = {};
-        user.username = result.data.username;
-        user.email = result.data.email;
-        if (result.data.first_name !== undefined)
-            user.firstname = result.data.first_name;
-        else
-            user.firstname = "";
-
-        if (result.data.last_name !== undefined)
-            user.lastname = result.data.last_name;
-        else
-            user.lastname = "";
-
-        if (result.data.role !== undefined)
-            user.role = result.data.role;
-        
-
-        return user;
-    });
+export async function getUserInfo(username_?: string, password?: string) {
+    esconsole('Get user info ' + ' for ' + username_, 'debug');
+    const data: { [key: string]: string } = (username_ && password) ? { username: username_, password: btoa(password) } : {}
+    const { username, email, first_name, last_name, role } = await postAuthForm("/services/scripts/getuserinfo", data)
+    return { username, email, firstname: first_name ?? "", lastname: last_name ?? "", role }
 }
 
 // Set a script license id if owned by the user.
-export function setLicense(scriptName: string, scriptId: string, licenseID: string){
+export async function setLicense(scriptName: string, scriptId: string, licenseID: string){
     if (isLogged()) {
-        // user is logged in, make a request to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/setscriptlicense';
-        if (password !== null) {
-            var opts = {
-                params: {
-                    'scriptname': scriptName,
-                    'username': username,
-                    'license_id': licenseID
-                },
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-            };
-            return helpers.getNgService("$http").get(url, opts).then(function () {
-                esconsole('Set License Id ' + licenseID + ' to ' + scriptName, 'debug');
-                scripts[scriptId].license_id = licenseID;
-            }).catch(function (err: Error) {
-                esconsole('Could not set license id: ' + licenseID + ' to ' + scriptName, 'debug');
-                esconsole(err, ['ERROR']);
-            });
+        try {
+            // TODO: Why doesn't this endpoint require authentication?
+            await get("/services/scripts/setscriptlicense", { scriptname: scriptName, username: getUsername(), license_id: licenseID })
+        } catch (err) {
+            esconsole('Could not set license id: ' + licenseID + ' to ' + scriptName, 'debug');
+            esconsole(err, ['ERROR']);
         }
+        esconsole('Set License Id ' + licenseID + ' to ' + scriptName, 'debug');
+        scripts[scriptId].license_id = licenseID;
     }
 }
 
 // save a sharedscript into user's account.
-export function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string){
+export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string){
     if (isLogged()) {
-        username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/savesharedscript';
-        var opts;
-        if (password !== null) {
-            opts = {
-                params: {
-                    'scriptid': scriptid,
-                    'username': username,
-                    'password': btoa(password)
-                },
-                headers: {'Content-Type': 'application/xml'}
-            }
-        }
-        var payload={};
-        return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-            var shareid = result.data.shareid;
-
-            esconsole('Save shared script ' + result.data.name + ' to ' + username, 'debug');
-
-            sharedScripts[shareid] = result.data;
-
-            sharedScripts[shareid].isShared = true;
-            sharedScripts[shareid].readonly = true;
-            sharedScripts[shareid].modified = Date.now();
-
-            return sharedScripts[shareid];
-        })
+        const data = await postAuth("/services/scripts/savesharedscript", { scriptid })
+        var shareid = data.shareid;
+        esconsole('Save shared script ' + data.name + ' to ' + username, 'debug');
+        return sharedScripts[shareid] = { ...data, isShared: true, readonly: true, modified: Date.now() }
     } else {
-        return new Promise(function(resolve, reject) {
-            sharedScripts[scriptid] = {
-                'name': scriptname,
-                'shareid': scriptid,
-                'modified': Date.now(),
-                'source_code': sourcecode,
-                'isShared': true,
-                'readonly': true,
-                'username': username
-            };
-            //not storing shared scripts in local storage yet
-            // localStorage[LS_SCRIPTS_KEY] = JSON.stringify(scripts);
-            resolve(sharedScripts[scriptid]);
-        });
+        return sharedScripts[scriptid] = {
+            name: scriptname,
+            shareid: scriptid,
+            modified: Date.now(),
+            source_code: sourcecode,
+            isShared: true,
+            readonly: true,
+            username,
+        };
     }
 }
 
 // Delete a script if owned by the user.
-export function deleteScript(scriptid: string) {
+export async function deleteScript(scriptid: string) {
     if (isLogged()) {
         // User is logged in so make a call to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/delete';
-        if (password !== null) {
-            var opts = {
-                params: {
-                    'username': username,
-                    'password': btoa(password),
-                    'scriptid': scriptid
-                },
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-            };
-            var payload = {};
-            return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                esconsole('Deleted script: ' + scriptid, 'debug');
+        try {
+            const data = await postAuth("/services/scripts/delete", { scriptid })
+            esconsole('Deleted script: ' + scriptid, 'debug');
 
-                if (scripts[scriptid]) {
-                    scripts[scriptid] = result.data;
-                    scripts[scriptid].modified = Date.now();
-                    scripts[scriptid] = postProcessCollaborators(scripts[scriptid]);
-                    closeScript(scriptid);
-                    // delete scripts[scriptid];
-                } else {
-                    //script doesn't exist
-                }
-            }).catch(function(err: Error) {
-                esconsole('Could not delete script: ' + scriptid, 'debug');
-                esconsole(err, ['USER', 'ERROR']);
-            });
+            if (scripts[scriptid]) {
+                scripts[scriptid] = data;
+                scripts[scriptid].modified = Date.now();
+                scripts[scriptid] = postProcessCollaborators(scripts[scriptid]);
+                closeScript(scriptid);
+            } else {
+                // script doesn't exist
+            }
+        } catch (err) {
+            esconsole('Could not delete script: ' + scriptid, 'debug');
+            esconsole(err, ['USER', 'ERROR']);
         }
     } else {
         // User is not logged in so alter local storage
-        return new Promise<void>(function(resolve, reject) {
-            closeScript(scriptid);
-            scripts[scriptid].soft_delete = true;
-            // delete scripts[scriptid];
-            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
-            resolve();
-        });
+        closeScript(scriptid);
+        scripts[scriptid].soft_delete = true;
+        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
     }
 }
 
@@ -944,31 +798,17 @@ export function restoreScript(script: ScriptEntity) {
     return p.then(function(restoredScript: ScriptEntity) {
         if (isLogged()) {
             // User is logged in so make a call to the web service
-            var username = getUsername();
-            var password = getPassword();
-            var url = WSURLDOMAIN + '/services/scripts/restore';
-            if (password !== null) {
-                var opts = {
-                    params: {
-                        'username': username,
-                        'password': btoa(password),
-                        'scriptid': script.shareid
-                    },
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-                };
-                var payload = {};
-                return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                    esconsole('Restored script: ' + script.shareid, 'debug');
-                    restoredScript = result.data;
-                    restoredScript.saved = true;
-                    restoredScript.modified = Date.now();
-                    scripts[restoredScript.shareid] = restoredScript;
-                    return restoredScript;
-                }).catch(function(err: Error) {
-                    esconsole('Could not restore script: ' + script.shareid, 'debug');
-                    esconsole(err, ['ERROR']);
-                });
-            }
+            return postAuth("/services/scripts/restore", { scriptid: script.shareid }).then(function(data: any) {
+                esconsole('Restored script: ' + script.shareid, 'debug');
+                restoredScript = data;
+                restoredScript.saved = true;
+                restoredScript.modified = Date.now();
+                scripts[restoredScript.shareid] = restoredScript;
+                return restoredScript;
+            }).catch(function(err: Error) {
+                esconsole('Could not restore script: ' + script.shareid, 'debug');
+                esconsole(err, ['ERROR']);
+            });
         } else {
             // User is not logged in so alter local storage
             return new Promise<void>(function(resolve, reject) {
@@ -1068,30 +908,14 @@ export function importCollaborativeScript(script: ScriptEntity) {
 export function deleteSharedScript(scriptid: string) {
     if (isLogged()) {
         // User is logged in so make a call to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/deletesharedscript';
-        if (password !== null) {
-            var opts = {
-                params: {
-                    'username': username,
-                    'password': btoa(password),
-                    'scriptid': scriptid
-                },
-                headers: {'Content-Type': 'application/xml'}
-            };
-            var payload = {};
-            return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                esconsole('Deleted shared script: ' + scriptid, 'debug');
-
-                closeSharedScript(scriptid);
-                delete sharedScripts[scriptid];
-
-            }).catch(function(err: Error) {
-                esconsole('Could not delete shared script: ' + scriptid, 'debug');
-                esconsole(err, ['ERROR']);
-            });
-        }
+        return postAuth("/services/scripts/deletesharedscript", { scriptid }).then(function() {
+            esconsole('Deleted shared script: ' + scriptid, 'debug');
+            closeSharedScript(scriptid);
+            delete sharedScripts[scriptid];
+        }).catch(function(err: Error) {
+            esconsole('Could not delete shared script: ' + scriptid, 'debug');
+            esconsole(err, ['ERROR']);
+        });
     } else {
         // User is not logged in
         return new Promise<void>(function(resolve, reject) {
@@ -1109,7 +933,7 @@ export function setScriptDesc(scriptname: string, scriptId: string, desc: string
     if (isLogged()) {
         var username = getUsername();
         var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/setscriptdesc';
+        var url = URL_DOMAIN + '/services/scripts/setscriptdesc';
         if (password !== null) {
             var content = '<scripts><username>' + username + '</username>'
                     + '<name>' + scriptname + '</name>'
@@ -1129,27 +953,20 @@ export function setScriptDesc(scriptname: string, scriptId: string, desc: string
 }
 
 // Import a shared script to the user's owned script list.
-function importSharedScript(scriptid: string) {
+async function importSharedScript(scriptid: string) {
     if (isLogged()) {
-        var url = WSURLDOMAIN + '/services/scripts/import';
-        const payload = authForm({ scriptid })
-        var opts = {
-            transformRequest: identity,
-            headers: {'Content-Type': undefined}
-        };
-
-        return helpers.getNgService("$http").post(url, payload, opts).then(function (result: any) {
+        try {
+            const data = await postAuth("/services/scripts/import", { scriptid })
             if (scriptid) {
                 delete sharedScripts[scriptid];
             }
             closeSharedScript(scriptid);
-
             esconsole('Import script ' + scriptid, 'debug');
-            return result.data;
-        }).catch(function (err: Error) {
+            return data;
+        } catch (err) {
             esconsole('Could not import script ' + scriptid, 'debug');
             esconsole(err, ['ERROR']);
-        });
+        }
     }
 }
 
@@ -1204,31 +1021,16 @@ function addSharedScript(shareID: string, notificationID: string) {
 export function renameScript(scriptid: string, newName: string) {
     if (isLogged()) {
         // user is logged in, make a request to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/rename';
-        if (password !== null) {
-            var opts = {
-                params: {
-                    'username': username,
-                    'password': btoa(password),
-                    'scriptid': scriptid,
-                    'scriptname': newName
-                },
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-            };
-            var payload = {};
-            return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                esconsole('Renamed script: ' + scriptid + ' to ' + newName, 'debug');
+        return postAuth("/services/scripts/rename", { scriptid, scriptname: newName }).then(function() {
+            esconsole('Renamed script: ' + scriptid + ' to ' + newName, 'debug');
 
-                if (scriptid) {
-                    scripts[scriptid].name = newName;
-                }
-            }).catch(function(err: Error) {
-                esconsole('Could not rename script: ' + scriptid, 'debug');
-                esconsole(err, ['ERROR']);
-            });
-        }
+            if (scriptid) {
+                scripts[scriptid].name = newName;
+            }
+        }).catch(function(err: Error) {
+            esconsole('Could not rename script: ' + scriptid, 'debug');
+            esconsole(err, ['ERROR']);
+        });
     } else {
         // User is not logged in, update local storage
         scripts[scriptid].name = newName;
@@ -1241,24 +1043,12 @@ export function renameScript(scriptid: string, newName: string) {
 export function getAllUserRoles() {
     if (isLogged()) {
         // user is logged in, make a request to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/getalluserroles';
-        if (password !== null) {
-            const payload = form({ adminusername: username, password: btoa(password) })
-            var opts = {
-                transformRequest: identity,
-                headers: {'Content-Type': undefined}
-            };
-        
-            return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                esconsole('Users roles requested by ' + username, 'debug');
-                return result.data.users;
-            }).catch(function(err: Error) {
-                esconsole('Could not retreive users and their roles', 'debug');
-                esconsole(err, ['ERROR']);
-            });
-        }
+        return postAdminForm("/services/scripts/getalluserroles").then(function(data: any) {
+            return data.users;
+        }).catch(function(err: Error) {
+            esconsole('Could not retreive users and their roles', 'debug');
+            esconsole(err, ['ERROR']);
+        });
     } else {
         // User is not logged in
         esconsole('Login failure', ['DEBUG','ERROR']);      
@@ -1266,27 +1056,14 @@ export function getAllUserRoles() {
 }
 
 // Add role to user
-export function addRole(user: string, role: string) {
+export function addRole(username: string, role: string) {
     if (isLogged()) {
-        // user is logged in, make a request to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/adduserrole';
-        if (password !== null) {
-            const payload = form({ adminusername: username, password: btoa(password), username: user, role })
-            var opts = {
-                transformRequest: identity,
-                headers: {'Content-Type': undefined}
-            };
-        
-            return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                esconsole('Add role ' + role + ' to ' + username, 'debug');
-                return result.data;
-            }).catch(function(err: Error) {
-                esconsole('Could not add new role', 'debug');
-                esconsole(err, ['ERROR']);
-            });
-        }
+        return postAdminForm("/services/scripts/adduserrole", { username, role }).then(function(result: any) {
+            return result.data;
+        }).catch(function(err: Error) {
+            esconsole('Could not add new role', 'debug');
+            esconsole(err, ['ERROR']);
+        });
     } else {
         // User is not logged in
         esconsole('Login failure', ['DEBUG','ERROR']);
@@ -1294,27 +1071,14 @@ export function addRole(user: string, role: string) {
 }
 
 // Remove role from user
-export function removeRole(user: string, role: string) {
+export function removeRole(username: string, role: string) {
     if (isLogged()) {
-        // user is logged in, make a request to the web service
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/removeuserrole';
-        if (password !== null) {
-            const payload = form({ adminusername: username, password: btoa(password), username: user, role })
-            var opts = {
-                transformRequest: identity,
-                headers: {'Content-Type': undefined}
-            };
-        
-            return helpers.getNgService("$http").post(url, payload, opts).then(function(result: any) {
-                esconsole('Remove role ' + role + ' from '+ username, 'debug');
-                return result.data;
-            }).catch(function(err: Error) {
-                esconsole('Could not remove role', 'debug');
-                esconsole(err, ['ERROR']);
-            });
-        }
+        return postAdminForm("/services/scripts/adduserrole", { username, role }).then(function(result: any) {
+            return result.data;
+        }).catch(function(err: Error) {
+            esconsole('Could not remove role', 'debug');
+            esconsole(err, ['ERROR']);
+        });
     } else {
         // User is not logged in
         esconsole('Login failure', ['DEBUG','ERROR']);
@@ -1328,21 +1092,14 @@ export function setPasswordForUser(userID: string, password: string, adminPassph
 
             if (adminPwd !== null) {
                 esconsole('Admin setting a new password for user');
-                const payload = form({
+                const data = {
                     adminid: getUsername(),
                     adminpwd: btoa(adminPwd),
                     adminpp: btoa(adminPassphrase),
                     username: userID,
                     newpassword: encodeURIComponent(btoa(password)),
-                })
-
-                var opts = {
-                    transformRequest: identity,
-                    headers: {'Content-Type': undefined}
-                };
-
-                var url = WSURLDOMAIN + '/services/scripts/modifypwdadmin';
-                helpers.getNgService("$http").post(url, payload, opts).then(function () {
+                }
+                postForm("/services/scripts/modifypwdadmin", data).then(function () {
                     userNotification.show('Successfully set a new password for user: ' + userID + ' with password: ' + password, 'history', 3);
                     resolve();
                 }, function () {
@@ -1406,45 +1163,31 @@ export function saveScript(scriptname: string, sourcecode: string, overwrite?: b
     }
 
     if (isLogged()) {
-        var username = getUsername();
-        var password = getPassword();
-        var url = WSURLDOMAIN + '/services/scripts/save';
+        reporter.saveScript();
+        var content = '<scripts><username>' + getUsername() + '</username>'
+            + '<name>' + n + '</name>'
+            + '<run_status>' + status + '</run_status>'
+            + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
+        return postXMLAuth("/services/scripts/save", content).then(function(result: any) {
+            var shareid = result.data.shareid;
+            var script = result.data;
 
-        if (password !== null) {
-            var content = '<scripts><username>' + getUsername() + '</username>'
-                + '<name>' + n + '</name>'
-                + '<run_status>' + status + '</run_status>'
-                + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
+            esconsole('Saved script: ' + n);
+            esconsole('Saved script shareid: ' + shareid);
 
-            var opts = {
-                headers: {'Content-Type': 'application/xml;charset=UTF-8'},
-                params: {
-                    'username': username,
-                    'password': btoa(password)
-                }
-            };
+            script.modified = Date.now();
+            script.saved = true;
+            script.tooltipText = '';
 
-            return helpers.getNgService("$http").post(url, content, opts).then(function(result: any) {
-                var shareid = result.data.shareid;
-                var script = result.data;
+            script = postProcessCollaborators(script);
 
-                esconsole('Saved script: ' + n);
-                esconsole('Saved script shareid: ' + shareid);
-
-                script.modified = Date.now();
-                script.saved = true;
-                script.tooltipText = '';
-
-                script = postProcessCollaborators(script);
-
-                scripts[shareid] = script;
-                return scripts[shareid];
-            }).catch(function(err: Error) {
-                esconsole('Could not save script: ' + scriptname, 'debug');
-                esconsole(err, ['ERROR']);
-                throw err;
-            });
-        }
+            scripts[shareid] = script;
+            return scripts[shareid];
+        }).catch(function(err: Error) {
+            esconsole('Could not save script: ' + scriptname, 'debug');
+            esconsole(err, ['ERROR']);
+            throw err;
+        });
     } else {
         return new Promise(function(resolve, reject) {
             var shareid = "";
@@ -1471,7 +1214,6 @@ export function saveScript(scriptname: string, sourcecode: string, overwrite?: b
             resolve(scripts[shareid]);
         });
     }
-    reporter.saveScript();
 }
 
 // Creates a new empty script and adds it to the list of open scripts, and saves it to a user's library.
@@ -1555,28 +1297,15 @@ export function saveAll() {
     return promises;
 }
 
-export function getTutoringRecord(scriptID: string) {
-    var url = URL_DOMAIN + '/services/scripts/gettutoringrecord';
-    var opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    };
-    const body = authForm({ scriptid: scriptID })
-
-    return helpers.getNgService("$http").post(url, body, opts).then(function (result: any) {
+export function getTutoringRecord(scriptid: string) {
+    return postAuthForm("/services/scripts/gettutoringrecord", { scriptid }).then(function (result: any) {
         return result.data;
     });
 }
 
 export function uploadCAIHistory(project: string, node: any) {
-    var url = URL_DOMAIN + '/services/scripts/uploadcaihistory';
-    var opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    };
-    const body = form({ username: getUsername(), project, node: JSON.stringify(node) })
-
-    helpers.getNgService("$http").post(url, body, opts).then(function() {
+    const data = { username: getUsername(), project, node: JSON.stringify(node) }
+    postForm("/services/scripts/uploadcaihistory", data).then(function() {
         console.log('saved to CAI history:', project, node);
     }).catch(function(err: Error) {
         console.log('could not save to cai', project, node);
