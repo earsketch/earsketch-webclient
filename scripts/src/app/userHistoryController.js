@@ -1,6 +1,6 @@
 import esconsole from '../esconsole'
 
-app.controller("userHistoryController", ['$scope', 'userProject', '$http', 'localStorage', function($scope, userProject, $http, localStorage) {
+app.controller("userHistoryController", ['$scope', 'userProject', '$http', function($scope, userProject, $http) {
 
     /**
      * Parse shareids and return a history of versions of all scripts modified by the unique shared script authors
@@ -10,7 +10,7 @@ app.controller("userHistoryController", ['$scope', 'userProject', '$http', 'loca
         $scope.processing = null;
         var USER_STATE_KEY = 'userstate';
         var username = userProject.getUsername();
-        var password = JSON.parse(localStorage.get(USER_STATE_KEY)).password;
+        var password = JSON.parse(localStorage.getItem(USER_STATE_KEY)).password;
 
         var shareUrls = $scope.urls.split('\n');
         var re = /\?sharing=([^\s.,;$])+/g

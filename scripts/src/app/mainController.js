@@ -21,7 +21,7 @@ import * as userNotification from './userNotification';
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', 'localStorage', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, localStorage, $document, $ngRedux, recommender) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, $document, $ngRedux, recommender) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -296,7 +296,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.fontSizes = [{'size': 10}, {'size': 12}, {'size': 14}, {'size': 18}, {'size': 24}, {'size': 36}];
 
     // mainly for alternate display in curriculum / API browser
-    $scope.dispLang = localStorage.get('language', 'python');
+    $scope.dispLang = localStorage.getItem('language') ?? 'python';
     // this may be overridden by URL parameter later
 
     $scope.$on('language', function (event, value) {

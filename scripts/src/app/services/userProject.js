@@ -11,7 +11,7 @@ import * as cai from '../../cai/caiState';
 import * as userNotification from '../userNotification';
 import * as websocket from '../websocket';
 
-app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorage', '$uibModal', '$ngRedux', function ($rootScope, $http, $window, $q, localStorage, $uibModal, $ngRedux) {
+app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal', '$ngRedux', function ($rootScope, $http, $window, $q, $uibModal, $ngRedux) {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;
@@ -129,8 +129,8 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                 return true; // Show warning popover.
             }
         } else {
-            if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-                localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+            if (localStorage.getItem(LS_SCRIPTS_KEY) !== null) {
+                localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
             }
         }
     };
@@ -164,12 +164,14 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         // Load scripts from local storage if they are available. When a user logs
         // in these scripts will be saved to the web service and deleted from local
         // storage.
-        if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-            scripts = Object.assign(scripts, JSON.parse(localStorage.get(LS_SCRIPTS_KEY)));
+        const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
+        if (scriptData !== null) {
+            scripts = Object.assign(scripts, JSON.parse(scriptData));
             $ngRedux.dispatch(scriptsState.syncToNgUserProject());
 
-            if (localStorage.checkKey(LS_TABS_KEY)) {
-                const storedTabs = JSON.parse(localStorage.get(LS_TABS_KEY));
+            const tabData = localStorage.getItem(LS_TABS_KEY)
+            if (tabData !== null) {
+                const storedTabs = JSON.parse(tabData);
                 if (storedTabs) {
                     storedTabs.forEach(tab => {
                         openScripts.push(tab);
@@ -178,8 +180,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                 }
             }
 
-            if (localStorage.checkKey(LS_SHARED_TABS_KEY)) {
-                const storedTabs = JSON.parse(localStorage.get(LS_SHARED_TABS_KEY));
+            const sharedTabData = localStorage.getItem(LS_SHARED_TABS_KEY)
+            if (sharedTabData !== null) {
+                const storedTabs = JSON.parse(sharedTabData);
                 if (storedTabs) {
                     storedTabs.forEach(tab => {
                         openSharedScripts.push(tab);
@@ -357,8 +360,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
             // their previous tab session stored in the browser's local storage
             const embedMode = appState.selectEmbedMode($ngRedux.getState());
             if (!embedMode) {
-                if (localStorage.checkKey(LS_TABS_KEY)) {
-                    const opened = JSON.parse(localStorage.get(LS_TABS_KEY));
+                const tabData = localStorage.getItem(LS_TABS_KEY)
+                if (tabData !== null) {
+                    const opened = JSON.parse(tabData);
 
                     for (let i in opened) {
                         if (opened.hasOwnProperty(i)) {
@@ -366,8 +370,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                         }
                     }
                 }
-                if (localStorage.checkKey(LS_SHARED_TABS_KEY)) {
-                    const opened = JSON.parse(localStorage.get(LS_SHARED_TABS_KEY));
+                const sharedTabData = localStorage.getItem(LS_SHARED_TABS_KEY)
+                if (sharedTabData !== null) {
+                    const opened = JSON.parse(sharedTabData);
 
                     for (let i in opened) {
                         if (opened.hasOwnProperty(i)) {
@@ -390,8 +395,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
             }
 
             // Copy scripts local storage to the web service.
-            if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-                var saved = JSON.parse(localStorage.get(LS_SCRIPTS_KEY));
+            const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
+            if (scriptData !== null) {
+                var saved = JSON.parse(scriptData);
 
                 var promises = [];
                 for (var i in saved) {
@@ -414,9 +420,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                 $ngRedux.dispatch(tabs.resetTabs());
 
                 return $q.all(promises).then(function (savedScripts) {
-                    localStorage.remove(LS_SCRIPTS_KEY);
-                    localStorage.remove(LS_TABS_KEY);
-                    localStorage.remove(LS_SHARED_TABS_KEY);
+                    localStorage.removeItem(LS_SCRIPTS_KEY);
+                    localStorage.removeItem(LS_TABS_KEY);
+                    localStorage.removeItem(LS_SHARED_TABS_KEY);
 
                     return refreshCodeBrowser().then(function () {
                         // once all scripts have been saved open them
@@ -494,8 +500,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                 throw err;
             });
         } else {
-            if (localStorage.checkKey(LS_SCRIPTS_KEY)) {
-                var r = JSON.parse(localStorage.get(LS_SCRIPTS_KEY));
+            const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
+            if (scriptData !== null) {
+                var r = JSON.parse(scriptData);
                 resetScripts();
                 for (var i in r) {
                     var script = r[i];
@@ -530,7 +537,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * objects.
      */
      function getScriptHistory(scriptid) {
-        var userState = JSON.parse(localStorage.get(USER_STATE_KEY));
+        var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
         var username = userState.username;
         var password = userState.password;
 
@@ -582,7 +589,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * objects.
      */
      function getScriptVersion(scriptid, versionid) {
-         var userState = JSON.parse(localStorage.get(USER_STATE_KEY));
+         var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
          var username = userState.username;
          var password = userState.password;
 
@@ -689,7 +696,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * @param {string} tags to check if the sound is owned by the user
      */
      function markFavoriteClip(sound_key, tags) {
-        var userState = JSON.parse(localStorage.get(USER_STATE_KEY));
+        var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
         var username = userState.username;
         var password = userState.password;
 
@@ -723,7 +730,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * @param {string} tags to check if the sound is owned by the user
      */
      function unmarkFavoriteClip(sound_key, tags) {
-        var userState = JSON.parse(localStorage.get(USER_STATE_KEY));
+        var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
         var username = userState.username;
         var password = userState.password;
 
@@ -783,7 +790,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         userState.username = username;
         userState.password = password;
 
-        localStorage.set(USER_STATE_KEY, JSON.stringify(userState));
+        localStorage.setItem(USER_STATE_KEY, JSON.stringify(userState));
     }
 
     /**
@@ -792,8 +799,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * @returns {object} The user state object with the username and password.
      */
     function loadUser() {
-        if (localStorage.checkKey(USER_STATE_KEY)){
-            return JSON.parse(localStorage.get(USER_STATE_KEY));
+        const userState = localStorage.getItem(USER_STATE_KEY)
+        if (userState !== null) {
+            return JSON.parse(userState);
         }
         return null;
     }
@@ -824,7 +832,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * Check if a user is stored in local storage.
      */
     function isLogged() {
-        var jsstate = localStorage.get(USER_STATE_KEY);
+        var jsstate = localStorage.getItem(USER_STATE_KEY);
         return jsstate !== null;
     }
 
@@ -834,7 +842,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * @returns {string} The username stored in local storage.
      */
     function getUsername() {
-        var jsstate = localStorage.get(USER_STATE_KEY);
+        var jsstate = localStorage.getItem(USER_STATE_KEY);
         if (jsstate !== null){
             var userState = JSON.parse(jsstate);
             return userState.username;
@@ -859,7 +867,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      * @returns {string} The password stored in local storage.
      */
     function getPassword() {
-        var jsstate = localStorage.get(USER_STATE_KEY);
+        var jsstate = localStorage.getItem(USER_STATE_KEY);
         if (jsstate !== null) {
             var userState = JSON.parse(jsstate);
             return userState.password;
@@ -1177,7 +1185,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                 closeScript(scriptid);
                 scripts[scriptid].soft_delete = true;
                 // delete scripts[scriptid];
-                localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+                localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
                 resolve();
             });
         }
@@ -1254,7 +1262,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                 return new Promise(function(resolve, reject) {
                     scripts[restoredScript.shareid].modified = Date.now();
                     scripts[restoredScript.shareid].soft_delete = false;
-                    localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+                    localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
                     resolve();
                 });
             }
@@ -1429,7 +1437,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
      */
     function importSharedScript(scriptid) {
         if (isLogged()) {
-            var userState = JSON.parse(localStorage.get(USER_STATE_KEY));
+            var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
             var username = userState.username;
             var password = userState.password;
 
@@ -1476,7 +1484,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                     openScript(savedScript.shareid);
 
                     // re-save to local with above updated info
-                    localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+                    localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
                 });
             });
         }
@@ -1547,7 +1555,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         } else {
             // User is not logged in, update local storage
             scripts[scriptid].name = newName;
-            localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
             return Promise.resolve(null);
         }
     }
@@ -1833,7 +1841,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
                     'tooltipText': '',
                     'collaborators': []
                 };
-                localStorage.set(LS_SCRIPTS_KEY, JSON.stringify(scripts));
+                localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts));
                 resolve(scripts[shareid]);
             });
         }
@@ -1868,7 +1876,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         if (openScripts.indexOf(shareid) === -1) {
             openScripts.push(shareid);
             // save tabs state
-            localStorage.set(LS_TABS_KEY, JSON.stringify(openScripts));
+            localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts));
         }
         reporter.openScript();
         return openScripts.indexOf(shareid);
@@ -1886,7 +1894,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
         if (openSharedScripts.indexOf(shareid) === -1) {
             openSharedScripts.push(shareid);
 
-            localStorage.set(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
+            localStorage.setItem(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
         }
     }
 
@@ -1901,13 +1909,13 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', 'localStorag
             if (openScripts.includes(shareid)) {
                 openScripts.splice(openScripts.indexOf(shareid), 1);
                 // save tabs state
-                localStorage.set(LS_TABS_KEY, JSON.stringify(openScripts));
+                localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts));
             }
         } else if (isSharedScriptOpen(shareid)) {
             if (openSharedScripts.includes(shareid)) {
                 openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1);
                 // save tabs state
-                localStorage.set(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
+                localStorage.setItem(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
             }
         }
         return tabs.selectOpenTabs($ngRedux.getState()).slice();

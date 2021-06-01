@@ -83,7 +83,6 @@ module.exports = {
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
             userProject: path.resolve(__dirname,`${servicesDir}/userProject.js`),
-            localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
 
