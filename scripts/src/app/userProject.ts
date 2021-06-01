@@ -79,10 +79,6 @@ window.onbeforeunload = function () {
                     + '<name>' + name + '</name>'
                     + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
 
-                // const headers = { type: 'application/xml;charset=UTF-8' };
-                // const blob = new Blob([JSON.stringify(body)], headers);
-                // const res = navigator.sendBeacon(saveScriptURL, blob);
-
                 fetch(saveScriptURL, {
                     method: 'POST',
                     headers: new Headers({ 'Content-Type': 'application/xml' }),
@@ -194,13 +190,12 @@ export function loadLocalScripts() {
         }
     }
 }
-/**
- * Because scripts and openScripts are objects and we can't reset them
- * simply by re-instantiating empty objects, we use resetScripts() to
- * clear them manually. This is necessary due to controllers watching these
- * variables passed by reference. If we orphan those references, the
- * controllers won't update properly anymore.
- */
+
+// Because scripts and openScripts are objects and we can't reset them
+// simply by re-instantiating empty objects, we use resetScripts() to
+// clear them manually. This is necessary due to controllers watching these
+// variables passed by reference. If we orphan those references, the
+// controllers won't update properly anymore.
 function resetScripts() {
     for (var key in scripts) {
         delete scripts[key];
@@ -230,23 +225,13 @@ function resetSharedOpenScripts() {
     }
 }
 
-/**
- * The script content from server may need adjustment in the collaborators parameter.
- * @param script
- * @param userName
- * @returns {*}
- */
+// The script content from server may need adjustment in the collaborators parameter.
 function postProcessCollaborators(script: ScriptEntity, userName?: string) {
     if (typeof(script.collaborators) === 'undefined') {
         script.collaborators = [];
     } else if (typeof(script.collaborators) === 'string') {
         script.collaborators = [script.collaborators];
     }
-
-    // #1858: Disabling this will now load all the collaborators for each script in whatever the letter cases recorded in DB. (Often all in lower cases, but should be in correct cases after 2019/12.)
-    // script.collaborators = script.collaborators.map(function (username) {
-    //     return username.toLowerCase();
-    // });
 
     if (userName) {
         // for shared-script browser: treat script as collaborative only when the user is listed among collaborators
@@ -269,19 +254,10 @@ function postProcessCollaborators(script: ScriptEntity, userName?: string) {
     return script;
 }
 
-/**
- * Get a user scripts, authenticating via username and password. Returns
- * a promise that resolves to a list of user script objects.
- *
- * @param {string} username The username to fetch scripts for
- * @param {string} password The user's password used for authentication.
- * @returns {Promise} A promise that resolves to the list of user scripts
- * objects.
- */
+// Login, setup, restore scripts, return shared scripts.
 export function login(username: string, password: string) {
     esconsole('Using username: ' + username, ['DEBUG', 'USER']);
 
-    //=================================================
     // register callbacks to the collaboration service
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser;
     
@@ -292,11 +268,8 @@ export function login(username: string, password: string) {
 
     collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript;
 
-    //=================================================
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = addSharedScript;
-
-    //=================================================
 
     var url = WSURLDOMAIN + '/services/scripts/findall';
     // TODO: base64 encoding is not a secure way to send password
@@ -528,14 +501,8 @@ function formatDateToISO(date: string){
     return Date.parse(isoFormat);
 }
 
-/**
- * Get a script's history, authenticating via username and password. Returns
- * a promise that resolves to a list of user script's history objects.
- *
- * @param {string} scriptid the Script's id
- * @returns {Promise} A promise that resolves to the list of user scripts
- * objects.
- */
+// Fetch a script's history, authenticating via username and password.
+// Resolves to a list of historical scripts.
 export function getScriptHistory(scriptid: string) {
     var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY)!);
     var username = userState.username;
@@ -580,15 +547,7 @@ export function getScriptHistory(scriptid: string) {
     });
 }
 
-    /**
- * Get a script's exact version, authenticating via username and password. Returns
- * a promise that resolves to a list of user script's history objects.
- *
- * @param {string} scriptid the Script's id
- * @param {string} versionid the Script's version id
- * @returns {Promise} A promise that resolves to the list of user scripts
- * objects.
- */
+// Fetch a specific version of a script.
 export function getScriptVersion(scriptid: string, versionid: string) {
     var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY)!);
     var username = userState.username;
@@ -625,15 +584,7 @@ export function getScriptVersion(scriptid: string, versionid: string) {
     });
 }
 
-    /**
- * Get shared scripts in the user account, authenticating via username and password. Returns
- * a promise that resolves to a list of user's shared script objects.
- *
- * @param {string} username The username to fetch scripts for
- * @param {string} password The user's password used for authentication.
- * @returns {Promise} A promise that resolves to the list of user's shared scripts
- * objects.
- */
+// Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
 export function getSharedScripts(username: string, password: string) {
     resetSharedScripts();
 
@@ -669,15 +620,7 @@ export function getSharedScripts(username: string, password: string) {
     });
 }
 
-    /**
- * Get shared id for locked version of latest script.
- *
- *
- * @param {string} username The username to fetch scripts for
- * @param {string} password The user's password used for authentication.
- * @returns {Promise} A promise that resolves to the list of user's shared scripts
- * objects.
- */
+// Get shared id for locked version of latest script.
 export function getLockedSharedScriptId(shareid: string){
     var url = WSURLDOMAIN + '/services/scripts/getlockedshareid';
     return helpers.getNgService("$http").get(url, {
@@ -689,13 +632,7 @@ export function getLockedSharedScriptId(shareid: string){
     });
 }
 
-/**
- * Save a username and password to local storage to persist between
- * sessions.
- *
- * @param {string} username The username to store.
- * @param {string} password The password to store with the username.
- */
+// Save a username and password to local storage to persist between sessions.
 function storeUser(username: string, password: string) {
     var userState: any = {};
     userState.username = username;
@@ -704,11 +641,7 @@ function storeUser(username: string, password: string) {
     localStorage.setItem(USER_STATE_KEY, JSON.stringify(userState));
 }
 
-/**
- * Get a username and password from local storage, if it exists.
- *
- * @returns {object} The user state object with the username and password.
- */
+// Get a username and password from local storage, if it exists.
 export function loadUser() {
     const userState = localStorage.getItem(USER_STATE_KEY)
     if (userState !== null) {
@@ -717,9 +650,7 @@ export function loadUser() {
     return null;
 }
 
-/**
- * Delete a user saved to local storage. I.e., logout.
- */
+// Delete a user saved to local storage. I.e., logout.
 export function clearUser() {
     // TODO: use tunnelled
     resetOpenScripts();
@@ -739,57 +670,30 @@ export function clearUser() {
     websocket.disconnect();
 }
 
-/**
- * Check if a user is stored in local storage.
- */
+// Check if a user is stored in local storage.
 export function isLogged() {
     var jsstate = localStorage.getItem(USER_STATE_KEY);
     return jsstate !== null;
 }
 
-/**
- * Get a username from local storage.
- *
- * @returns {string} The username stored in local storage.
- */
+// Get a username from local storage.
 export function getUsername() {
-    var jsstate = localStorage.getItem(USER_STATE_KEY);
-    if (jsstate !== null){
-        var userState = JSON.parse(jsstate);
-        return userState.username;
-    }
-    return null;
+    return loadUser()?.username
 }
 
-/**
- * Set a users new password.
- *
- * @param {string} pass The new password to set.
- */
+// Set a users new password.
 export function setPassword(pass: string) {
     if (isLogged()) {
         storeUser(getUsername(), pass);
     }
 }
 
-/**
- * Get the password from local storage.
- *
- * @returns {string} The password stored in local storage.
- */
+// Get the password from local storage.
 function getPassword() {
-    var jsstate = localStorage.getItem(USER_STATE_KEY);
-    if (jsstate !== null) {
-        var userState = JSON.parse(jsstate);
-        return userState.password;
-    }
-    return null;
+    return loadUser()?.password
 }
 
-/**
- * Get the base-64 encoded ASCII string password of the user.
- * @returns {string}
- */
+// Get the base-64 encoded ASCII string password of the user.
 export function getEncodedPassword() {
     return btoa(getPassword());
 }
@@ -810,15 +714,8 @@ export function shareWithPeople(shareid: string, users: string[]) {
     }
 }
 
-
-/**
- * Get a script.
- *
- * @param {integer} id The script id to load.
- * @returns {Promise} The script
- */
+// Fetch a script by ID.
 export function loadScript(id: string, sharing: boolean) {
-
     //sharing is not used but the function doesn't work if it is not there. Why?
     var url = URL_DOMAIN + '/services/scripts/scriptbyid';
     var opts = { params: {'scriptid': id} };
@@ -838,12 +735,7 @@ export function loadScript(id: string, sharing: boolean) {
         });
 }
 
-/**
- * Deletes an audio key if owned by the user.
- *
- * @param {String} audiokey The key to delete.
- * @returns {Promise} A promise that resolves when the request completes.
- */
+// Deletes an audio key if owned by the user.
 export function deleteAudio(audiokey: string) {
     esconsole('Calling Deleted audiokey: ' + audiokey, 'debug');
     var username = getUsername();
@@ -869,13 +761,7 @@ export function deleteAudio(audiokey: string) {
     }
 }
 
-/**
- * Rename an audio key if owned by the user.
- *
- * @param {string} audiokey The audio key to rename
- * @param {string} newaudiokey The new name for the audio key.
- * @returns {Promise} A promise that resolves when the request completes.
- */
+// Rename an audio key if owned by the user.
 export function renameAudio(audiokey: string, newaudiokey: string) {
     esconsole('Calling Deleted audiokey: ' + audiokey, 'debug');
 
@@ -905,10 +791,7 @@ export function renameAudio(audiokey: string, newaudiokey: string) {
     }
 }
 
-/**
- * Get a script license information from the back-end.
- */
-
+// Get a script license information from the back-end.
 export function getLicenses(){
     var url = WSURLDOMAIN + '/services/scripts/getlicenses';
     return helpers.getNgService("$http").get(url).then(function(response: any){
@@ -916,10 +799,6 @@ export function getLicenses(){
     })
 }
 
-
-/**
- * Get user info
- */
 
 export function getUserInfo(username: string, password: string){
     if (!username) username = getUsername();
@@ -960,12 +839,7 @@ export function getUserInfo(username: string, password: string){
     });
 }
 
-/**
- * Set a script license id if owned by the user.
- *
- * @param {integer} scriptName Name of the shared script
- * @param {integer} licenseID The license id to give the script.
- */
+// Set a script license id if owned by the user.
 export function setLicense(scriptName: string, scriptId: string, licenseID: string){
     if (isLogged()) {
         // user is logged in, make a request to the web service
@@ -992,15 +866,7 @@ export function setLicense(scriptName: string, scriptId: string, licenseID: stri
     }
 }
 
-/**
- * save a sharedscript into user's account.
- *
- * @param {integer} scriptid scriptid of the shared script
- * @param scriptname {string} The name of the script.
- * @param sourcecode {string} The script sourcecode.
- * @returns {Promise} A promise that resolves to the saved script.
- */
-
+// save a sharedscript into user's account.
 export function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string){
     if (isLogged()) {
         username = getUsername();
@@ -1049,12 +915,7 @@ export function saveSharedScript(scriptid: string, scriptname: string, sourcecod
     }
 }
 
-/**
- * Delete a script if owned by the user.
- *
- * @param {integer} scriptid The script id to use.
- * @returns {Promise} A promise that resolves when the request is completed.
- */
+// Delete a script if owned by the user.
 export function deleteScript(scriptid: string) {
     if (isLogged()) {
         // User is logged in so make a call to the web service
@@ -1100,12 +961,7 @@ export function deleteScript(scriptid: string) {
     }
 }
 
-/**
- * Restore a script deleted by the user.
- *
- * @param {integer} scriptid The script id to use.
- * @returns {Promise} A promise that resolves when the request is completed.
- */
+// Restore a script deleted by the user.
 export function restoreScript(script: ScriptEntity) {
 
     var p;
@@ -1261,11 +1117,7 @@ export function importCollaborativeScript(script: ScriptEntity) {
     }));
 }
 
-/**
- * Delete a shared script if owned by the user.
- *
- * @param {integer} scriptid The script id to use.
- */
+// Delete a shared script if owned by the user.
 export function deleteSharedScript(scriptid: string) {
     if (isLogged()) {
         // User is logged in so make a call to the web service
@@ -1305,20 +1157,9 @@ export function deleteSharedScript(scriptid: string) {
     }
 }
 
-/**
- * Set a shared script description if owned by the user.
- *
- * @param scriptname {integer} Name of the script to use.
- * @param scriptId {string} Share ID
- * @param desc The script description that the user inputs.
- */
-
-export function setScriptDesc(scriptname: string, scriptId: string, desc: string) {
+// Set a shared script description if owned by the user.
+export function setScriptDesc(scriptname: string, scriptId: string, desc: string="") {
     if (isLogged()) {
-        if (typeof(desc) === 'undefined') {
-            desc = '';
-        }
-
         var username = getUsername();
         var password = getPassword();
         var url = WSURLDOMAIN + '/services/scripts/setscriptdesc';
@@ -1340,10 +1181,7 @@ export function setScriptDesc(scriptname: string, scriptId: string, desc: string
     }
 }
 
-/**
- * Import a shared script to the user's owned script list.
- * @param {integer} scriptid The script id to use.
- */
+// Import a shared script to the user's owned script list.
 function importSharedScript(scriptid: string) {
     if (isLogged()) {
         var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY)!);
@@ -1399,11 +1237,7 @@ export function openSharedScriptForEdit(shareID: string) {
     }
 }
 
-/**
- * Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
- * @param shareID
- * @param notificationID
- */
+// Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
 function addSharedScript(shareID: string, notificationID: string) {
     if (isLogged()) {
         getSharedScripts(getUsername(), getPassword()).then(function (scriptList: ScriptEntity[]) {
@@ -1426,13 +1260,7 @@ function addSharedScript(shareID: string, notificationID: string) {
     }
 }
 
-/**
- * Rename a script if owned by the user.
- *
- * @param {integer} scriptid The script id to use.
- * @param {integer} newName The new name to give the script.
- * @returns {Promise} A promise that resolves when the request is completed.
- */
+// Rename a script if owned by the user.
 export function renameScript(scriptid: string, newName: string) {
     if (isLogged()) {
         // user is logged in, make a request to the web service
@@ -1469,11 +1297,7 @@ export function renameScript(scriptid: string, newName: string) {
     }
 }
 
-/**
- * Get all users and their roles
- *
- * @returns {Promise} A promise that resolves when the request is completed.
- */
+// Get all users and their roles
 export function getAllUserRoles() {
     if (isLogged()) {
         // user is logged in, make a request to the web service
@@ -1505,11 +1329,7 @@ export function getAllUserRoles() {
     }
 }
 
-/**
- * Add role to user
- *
- * @returns {Promise} A promise that resolves when the request is completed.
- */
+// Add role to user
 export function addRole(user: string, role: string) {
     if (isLogged()) {
         // user is logged in, make a request to the web service
@@ -1543,11 +1363,7 @@ export function addRole(user: string, role: string) {
     }
 }
 
-/**
- * Remove role from user
- *
- * @returns {Promise} A promise that resolves when the request is completed.
- */
+// Remove role from user
 export function removeRole(user: string, role: string) {
     if (isLogged()) {
         // user is logged in, make a request to the web service
@@ -1618,13 +1434,7 @@ export function setPasswordForUser(userID: string, password: string, adminPassph
     });
 }
 
-/**
- * If a scriptname already is taken, find the next possible name by
- * appending a number (1), (2), etc...
- *
- * @param scriptname {string} The name of the script.
- * @returns {string} A name that has not been taken yet.
- */
+// If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
 function nextName(scriptname: string) {
     var name = ESUtils.parseName(scriptname);
     var ext = ESUtils.parseExt(scriptname);
@@ -1650,17 +1460,9 @@ function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean)
         .some(id => !(!!scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname);
 }
 
-/**
- * Save a user's script if they have permission to do so.
- *
- * @param scriptname {string} The name of the script.
- * @param sourcecode {string} The script sourcecode.
- * @param overwrite {boolean} (default: true) If true, will overwrite
- * existing scripts. Otherwise a number will be appended to the script name.
- * @param status {integer} (default: 0) The run status of the script when
- * saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
- * @returns {Promise} A promise that resolves to the saved script.
- */
+// Save a user's script if they have permission to do so.
+//   overwrite: If true, overwrite existing scripts. Otherwise, save with a new name.
+//   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
 export function saveScript(scriptname: string, sourcecode: string, overwrite?: boolean, status?: number) {
     if (overwrite === undefined) {
         overwrite = true;
@@ -1748,14 +1550,7 @@ export function saveScript(scriptname: string, sourcecode: string, overwrite?: b
     reporter.saveScript();
 }
 
-/**
- * Creates a new empty script and adds it to the list of open scripts, and
- * saves it to a user's library.
- *
- * @param scriptname {string} The script name to use.
- * @returns {Promise} A promise that resolves to the index of the newly
- * created script.
- */
+// Creates a new empty script and adds it to the list of open scripts, and saves it to a user's library.
 export function createScript(scriptname: string) {
     var language = ESUtils.parseLanguage(scriptname);
     return saveScript(scriptname, TEMPLATES[language as "python" | "javascript"])
@@ -1765,13 +1560,7 @@ export function createScript(scriptname: string) {
     });
 }
 
-/**
- * Adds a script name to the list of open scripts. If a script is already
- * open, it does nothing.
- *
- * @param shareid {string} The id of the script to open.
- * @returns {integer} The list index of the opened script.
- */
+// Adds a script to the list of open scripts. No effect if the script is already open.
 export function openScript(shareid: string) {
     if (openScripts.indexOf(shareid) === -1) {
         openScripts.push(shareid);
@@ -1781,16 +1570,9 @@ export function openScript(shareid: string) {
     reporter.openScript();
     return openScripts.indexOf(shareid);
 }
-/**
- * Adds a shared script to the list of open shared scripts. If the script is already
- * open, it does nothing.
- *
- * @param shareid {string} The id of the script to open.
- * @returns {integer} The list index of the opened script.
- */
+
+// Adds a shared script to the list of open shared scripts. If the script is already open, it does nothing.
 export function openSharedScript(shareid: string) {
-    /*use sharedid instead of scriptname since shared scripts origniating
-    from different sources can have same names */
     if (openSharedScripts.indexOf(shareid) === -1) {
         openSharedScripts.push(shareid);
 
@@ -1798,12 +1580,7 @@ export function openSharedScript(shareid: string) {
     }
 }
 
-/**
- * Removes a script name from the list of open scripts.
- *
- * @param shareid {string} The id of the script to close.
- * @returns {array}
- */
+// Removes a script name from the list of open scripts.
 export function closeScript(shareid: string) {
     if (isOpen(shareid)) {
         if (openScripts.includes(shareid)) {
@@ -1821,12 +1598,7 @@ export function closeScript(shareid: string) {
     return tabs.selectOpenTabs(store.getState()).slice();
 }
 
-/**
- * Removes a script name from the list of open shared scripts.
- *
- * @param shareid {string} The id of the script to close.
- * @returns {array}
- */
+// Removes a script name from the list of open shared scripts.
 export function closeSharedScript(shareid: string) {
     if (isSharedScriptOpen(shareid)) {
         openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1);
@@ -1835,30 +1607,17 @@ export function closeSharedScript(shareid: string) {
     return openSharedScripts;
 }
 
-/**
- * Check if a script is open.
- *
- * @param shareid {string} The id of the script to check.
- * @returns {boolean} Whether the script is open or not.
- */
+// Check if a script is open.
 function isOpen(shareid: string) {
     return openScripts.indexOf(shareid) !== -1;
 }
 
-/**
- * Check if a shared script is open.
- *
- * @param scriptname {string} The name of the script to check.
- * @returns {boolean} Whether the script is open or not.
- */
+// Check if a shared script is open.
 function isSharedScriptOpen(shareid: string) {
     return openSharedScripts.indexOf(shareid) !== -1;
 }
 
-/**
- * Sends a request to save all the currently open scripts.
-* @returns {Promises}
-    */
+// Save all open scripts.
 export function saveAll() {
     var promises: any[] = [];
 
