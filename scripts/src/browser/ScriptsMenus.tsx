@@ -5,6 +5,7 @@ import { react2angular } from 'react2angular';
 import { usePopper } from 'react-popper';
 import PopperJS from '@popperjs/core';
 import * as appState from "../app/appState";
+import * as exporter from "../app/exporter";
 import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
 import * as tabs from "../editor/tabState";
@@ -184,7 +185,6 @@ const SingletonDropdownMenu = () => {
             <MenuItem
                 name='Print' icon='icon-printer'
                 onClick={() => {
-                    const exporter = helpers.getNgService('exporter');
                     exporter.print(unsavedScript);
                 }}
             />

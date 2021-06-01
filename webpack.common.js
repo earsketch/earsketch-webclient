@@ -81,15 +81,12 @@ module.exports = {
 
             // Models
             uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
-            exporter: path.resolve(__dirname,`${servicesDir}/exporter.js`),
             esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
             userProject: path.resolve(__dirname,`${servicesDir}/userProject.js`),
             localStorage: path.resolve(__dirname,`${servicesDir}/localStorage.js`),
             completer: path.resolve(__dirname,`${servicesDir}/completer.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
             colorTheme: path.resolve(__dirname,`${servicesDir}/colorTheme.js`),
-            websocket: path.resolve(__dirname,`${servicesDir}/websocket.js`),
-            reporter: path.resolve(__dirname,`${servicesDir}/reporter.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),

@@ -119,7 +119,6 @@ require(['angular'], () => {
     require('colorTheme');
     require('uploader');
     require('completer');
-    require('exporter');
     require('esrecorder');
     require('recorder');
 
