@@ -78,8 +78,8 @@ export interface CAIButton {
 
 export interface CAIMessage {
     sender: string
-    keyword: any
-    text: any
+    keyword: string[]
+    text: string[]
     date: number
 }
 
