@@ -214,42 +214,31 @@ export const checkIllegalCharacters = (input: string) => {
 }
 
 // Calculates last modified time unit (previously in scriptBrowserController & mainController).
-export const formatTimer = (duration_ms: number) => {
-    const one_minute  = 1000*60
-    const two_minutes = 1000*60*2
-    const one_hour    = 1000*60*60
-    const two_hours   = 1000*60*60*2
-    const one_day     = 1000*60*60*24
-    const two_days    = 1000*60*60*24*2
-    const one_week    = 1000*60*60*24*7
-    const two_weeks   = 1000*60*60*24*7*2
-    const one_month   = 1000*60*60*24*30
-    const two_months  = 1000*60*60*24*30*2
-    const one_year    = 1000*60*60*24*365
-    const two_years   = 1000*60*60*24*365*2
+export const formatTimer = (milliseconds: number) => {
+    const seconds = Math.floor(milliseconds / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(minutes / 60)
+    const days = Math.floor(hours / 24)
+    const weeks = Math.floor(days / 7)
+    const months = Math.floor(days / 30.5)
+    const years = Math.floor(days / 365)
 
-    var seconds = Math.floor(duration_ms / 1000)
-    var minutes = Math.floor(seconds / 60)
-    var hours = Math.floor(minutes / 60)
-    var days = Math.floor(hours / 24)
-    var weeks = Math.floor(days / 7)
-    var months = Math.floor(weeks / 4.3)  // approximate, based on 30.5/7
-    var years = Math.floor(weeks / 52)
-
-    if (duration_ms <= 0) {return 'just now';}
-    if (duration_ms <= one_minute)  {return 'recently'}
-    if (duration_ms <= two_minutes) {return '1 minute ago'}
-    if (duration_ms <= one_hour)    {return minutes + ' minutes ago'}
-    if (duration_ms <= two_hours)   {return '1 hour ago'}
-    if (duration_ms <= one_day)     {return hours + ' hours ago'}
-    if (duration_ms <= two_days)    {return 'yesterday'}
-    if (duration_ms <= one_week)    {return days + ' days ago'}
-    if (duration_ms <= two_weeks)   {return 'last week'}
-    if (duration_ms <= one_month)   {return weeks + ' weeks ago'}
-    if (duration_ms <= two_months)  {return 'last month'}
-    if (duration_ms <= one_year)    {return months + ' months ago'}
-    if (duration_ms <= two_years)   {return 'last year'}
-    if (duration_ms >  two_years)   {return years + ' years ago'}
+    switch (true) {
+        case seconds < 1: return 'just now'
+        case minutes < 1: return 'recently'
+        case minutes < 2: return '1 minute ago'
+        case hours < 1: return minutes + ' minutes ago'
+        case hours < 2: return '1 hour ago'
+        case days < 1: return hours + ' hours ago'
+        case days < 2: return 'yesterday'
+        case weeks < 1: return days + ' days ago'
+        case weeks < 2: return 'last week'
+        case months < 1: return weeks + ' weeks ago'
+        case months < 2: return 'last month'
+        case years < 1: return months + ' months ago'
+        case years < 2: return 'last year'
+        default: return years + ' years ago'
+    }
 }
 
 
