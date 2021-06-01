@@ -1,10 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
-import * as layout from '../layout/layoutState'
-import { RootState, ThunkAPI, AppDispatch } from '../reducers'
-import lunr from 'lunr';
-
+import { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
-
 import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
 

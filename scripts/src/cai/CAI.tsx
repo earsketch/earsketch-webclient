@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, MutableRefObject, ChangeEvent } from 'react'
+import React, { useEffect } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
@@ -10,8 +10,6 @@ import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 import * as curriculum from '../browser/curriculumState'
-import * as helpers from '../helpers'
-
 
 const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
