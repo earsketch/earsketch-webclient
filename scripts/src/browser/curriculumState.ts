@@ -301,6 +301,10 @@ export const adjustLocation = (location: number[], delta: number) => {
     return tocPages[pageIdx]
 }
 
+export const getURLForLocation = (location: number[]) => {
+    return locationToUrl[location.join(',')];
+}
+
 const urlToLocation: { [key:string]: number[] } = {}
 const locationToUrl: { [key:string]: string } = {}
 toc.forEach((unit: TOCItem, unitIdx: number) => {

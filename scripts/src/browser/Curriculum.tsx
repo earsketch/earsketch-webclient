@@ -10,6 +10,7 @@ import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../app/userNotification'
+import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
@@ -17,7 +18,8 @@ const tocPages = ESCurr_Pages
 let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
-    const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
+    const page = curriculum.getURLForLocation(currentLocation);
+    const url = SITE_BASE_URI + '#?page=' + page + '&language=' + language
     clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
@@ -318,16 +320,23 @@ const HotCurriculum = hot((props: {
         clipboard = props.clipboard
 
         // Handle URL parameters.
-        const locstr = ESUtils.getURLParameter('curriculum')
-        if (locstr === null) {
-            // Load welcome page initially.
-            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
-        } else {
-            // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
-            const loc = locstr.split('-').map((x: string) => parseInt(x))
-            if (loc.every((idx: number) => !isNaN(idx))) {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ location: loc }))
+        const oldLocStr = ESUtils.getURLParameter('curriculum'); // legacy curriculum permalink parameter (indices)
+        const pageStr = ESUtils.getURLParameter('page'); // new curriculum permalink parameter (filename)
+
+        if (oldLocStr !== null) {
+            const url = ESCurr_OLD_LOCATIONS[oldLocStr];
+            if(url !== undefined) {
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url: url }));
             }
+        }
+
+        if(pageStr !== null) {
+            props.$ngRedux.dispatch(curriculum.fetchContent({ url: pageStr }));
+        }
+
+        if(oldLocStr === null && pageStr === null) {
+            // Load welcome page initially.
+            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }));
         }
 
         const languageParam = ESUtils.getURLParameter('language')
