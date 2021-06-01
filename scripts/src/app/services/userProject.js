@@ -23,11 +23,9 @@ app.factory('userProject', function () {
     var LS_SHARED_TABS_KEY = 'shared_tabs_v1';
     var LS_SCRIPTS_KEY = 'scripts_v1';
 
-    var STATUS_UNKNOWN = 0;
     var STATUS_SUCCESSFUL = 1;
     var STATUS_UNSUCCESSFUL = 2;
     var shareid = "";
-    var errorLoadingSharedScript = false;
 
     // notification IDs
     var notificationsMarkedAsRead = [];
@@ -51,7 +49,6 @@ app.factory('userProject', function () {
     // keep a mapping of script names: script objects
     var scripts = {};
     var sharedScripts = {};
-    var sharedScriptsReady = false;
 
     // keep a list of script names that are currently open
     var openScripts = [];
@@ -208,8 +205,6 @@ app.factory('userProject', function () {
     }
 
     function resetSharedScripts() {
-        sharedScriptsReady = false;
-
         for (var key in sharedScripts) {
             delete sharedScripts[key];
         }
@@ -666,7 +661,6 @@ app.factory('userProject', function () {
                  sharedScripts[script.shareid] = script;
              }
 
-             sharedScriptsReady = true;
              return res;
          });
      }
@@ -690,95 +684,6 @@ app.factory('userProject', function () {
             console.log(err);
         });
     }
-
-    /**
-     * send post request to server to mark a sound_file as a favorite
-     *
-     * @param {string} sound_key id of the sound file
-     * @param {string} tags to check if the sound is owned by the user
-     */
-     function markFavoriteClip(sound_key, tags) {
-        var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
-        var username = userState.username;
-        var password = userState.password;
-
-        esconsole('Adding sound to favourites: ' + sound_key, ['DEBUG', 'USER']);
-        var url = WSURLDOMAIN + '/services/audio/addfavorite';
-
-        var payload = new FormData();
-        payload.append('username', username);
-        payload.append('password', btoa(password));
-        payload.append('audio_file_key', sound_key);
-        payload.append('userowned', tags === username);
-        var opts = {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        };
-
-        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
-
-        }, function(err) {
-            console.log(err);
-            esconsole('Add favorite sound failed', ['DEBUG','ERROR']);
-            esconsole(err.toString(), ['DEBUG','ERROR']);
-            throw err;
-        });
-     }
-
-     /**
-     * send post request to server to remove a sound_file from his favorites
-     *
-     * @param {string} sound_key id of the sound file
-     * @param {string} tags to check if the sound is owned by the user
-     */
-     function unmarkFavoriteClip(sound_key, tags) {
-        var userState = JSON.parse(localStorage.getItem(USER_STATE_KEY));
-        var username = userState.username;
-        var password = userState.password;
-
-        esconsole('Removing sound from favourites: ' + sound_key, ['DEBUG', 'USER']);
-        var url = WSURLDOMAIN + '/services/audio/removefavorite';
-
-        var payload = new FormData();
-        payload.append('username', username);
-        payload.append('password', btoa(password));
-        payload.append('audio_file_key', sound_key);
-        payload.append('userowned', tags === username);
-        var opts = {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        };
-
-        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
-
-        }, function(err) {
-            console.log(err);
-            esconsole('Remove favorite sound failed', ['DEBUG','ERROR']);
-            esconsole(err.toString(), ['DEBUG','ERROR']);
-            throw err;
-        });
-     }
-     
-     function getFavorites() {
-        esconsole('Loading favorites', ['DEBUG', 'USER']);
-        var url = WSURLDOMAIN + '/services/audio/getfavorites';
-
-        var payload = new FormData();
-        payload.append('username', getUsername());
-        payload.append('password', getEncodedPassword());
-        var opts = {
-            transformRequest: angular.identity,
-            headers: {'Content-Type': undefined}
-        };
-
-        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
-            return result.data;
-        }, function(err) {
-            esconsole('Loading favorite sounds failed', ['DEBUG','ERROR']);
-            esconsole(err.toString(), ['DEBUG','ERROR']);
-            throw err;
-        });
-     }
 
     /**
      * Save a username and password to local storage to persist between
@@ -1955,20 +1860,6 @@ app.factory('userProject', function () {
     }
 
     /**
-     * Check if there are any unsaved scripts still open.
-     *
-     * @returns {boolean} Whether there are any unsaved
-     */
-    function isAllSaved() {
-        for (var id in openScripts) {
-            if (id in scripts && !scripts[id].saved) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Sends a request to save all the currently open scripts.
     * @returns {Promises}
      */
@@ -2023,69 +1914,55 @@ function uploadCAIHistory(projectName, node) {
 }
 
     self = {
-        login: login,
-        loadLocalScripts: loadLocalScripts,
-        storeUser: storeUser,
-        loadUser: loadUser,
+        addRole: addRole,
         clearUser: clearUser,
-        isLogged: isLogged,
-        getUsername: getUsername,
-        setPassword: setPassword,
-        getEncodedPassword: getEncodedPassword,
-        loadScript: loadScript,
-        getScriptHistory : getScriptHistory,
-        getScriptVersion : getScriptVersion,
-        deleteAudio: deleteAudio,
-        renameAudio: renameAudio,
-        deleteScript: deleteScript,
-        restoreScript: restoreScript,
-        nextName: nextName,
-        renameScript: renameScript,
-        saveScript: saveScript,
-        createScript: createScript,
-        openScript: openScript, // almost duplicate name
-        openSharedScript: openSharedScript, // almost duplicate name
         closeScript: closeScript,
         closeSharedScript: closeSharedScript,
-        isOpen: isOpen,
-        isAllSaved: isAllSaved,
-        saveAll: saveAll,
-        scripts: scripts,
-        sharedScripts:sharedScripts,
-        openScripts: openScripts, // almost duplicate name
-        openSharedScripts: openSharedScripts, // almost duplicate name
-        setLicense: setLicense,
-        getLicenses: getLicenses,
-        getUserInfo: getUserInfo,
-        markFavoriteClip: markFavoriteClip,
-        unmarkFavoriteClip: unmarkFavoriteClip,
-        getFavorites: getFavorites,
-        saveSharedScript: saveSharedScript,
-        getSharedScripts: getSharedScripts,
-        sharedScriptsReady: sharedScriptsReady,
-        getLockedSharedScriptId: getLockedSharedScriptId,
+        createScript: createScript,
+        deleteAudio: deleteAudio,
+        deleteScript: deleteScript,
         deleteSharedScript: deleteSharedScript,
-        setScriptDesc: setScriptDesc,
-        importSharedScript: importSharedScript,
-        importScript: importScript,
-        importCollaborativeScript: importCollaborativeScript,
-        openSharedScriptForEdit: openSharedScriptForEdit,
-        addSharedScript: addSharedScript,
-        refreshCodeBrowser: refreshCodeBrowser,
-        shareid: shareid,
-        lookForScriptByName: lookForScriptByName,
         getAllUserRoles: getAllUserRoles,
-        addRole: addRole,
-        removeRole: removeRole,
-        setPasswordForUser: setPasswordForUser,
-        shareWithPeople: shareWithPeople,
+        getEncodedPassword: getEncodedPassword,
+        getLicenses: getLicenses,
+        getLockedSharedScriptId: getLockedSharedScriptId,
+        getScriptHistory : getScriptHistory,
+        getScriptVersion : getScriptVersion,
+        getSharedScripts: getSharedScripts,
         getTutoringRecord: getTutoringRecord,
+        getUserInfo: getUserInfo,
+        getUsername: getUsername,
+        importCollaborativeScript: importCollaborativeScript,
+        importScript: importScript,
+        isLogged: isLogged,
+        loadLocalScripts: loadLocalScripts,
+        loadScript: loadScript,
+        loadUser: loadUser,
+        login: login,
+        openScript: openScript, // almost duplicate name
+        openScripts: openScripts, // almost duplicate name
+        openSharedScript: openSharedScript, // almost duplicate name
+        openSharedScriptForEdit: openSharedScriptForEdit,
+        refreshCodeBrowser: refreshCodeBrowser,
+        removeRole: removeRole,
+        renameAudio: renameAudio,
+        renameScript: renameScript,
+        restoreScript: restoreScript,
+        saveAll: saveAll,
+        saveScript: saveScript,
+        saveSharedScript: saveSharedScript,
+        scripts: scripts,
+        setLicense: setLicense,
+        setPassword: setPassword,
+        setPasswordForUser: setPasswordForUser,
+        setScriptDesc: setScriptDesc,
+        sharedScripts:sharedScripts,
+        shareid: shareid,
+        shareWithPeople: shareWithPeople,
         uploadCAIHistory: uploadCAIHistory,
         // export constants
-        STATUS_UNKNOWN: STATUS_UNKNOWN,
         STATUS_SUCCESSFUL: STATUS_SUCCESSFUL,
         STATUS_UNSUCCESSFUL: STATUS_UNSUCCESSFUL,
-        errorLoadingSharedScript: errorLoadingSharedScript
     };
 
     window.userProjScope = self;
