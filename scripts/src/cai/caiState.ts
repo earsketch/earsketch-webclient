@@ -6,9 +6,9 @@ import * as curriculum from '../browser/curriculumState'
 
 interface caiState {
     activeProject: string
-    messageList: any
-    inputOptions: any
-    errorOptions: any
+    messageList: { [key:string]: CAIMessage[] }
+    inputOptions: {label: string; value: string}[]
+    errorOptions: {label: string; value: string}[]
     dropupLabel: string
 }
 
