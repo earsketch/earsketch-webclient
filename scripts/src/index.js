@@ -115,7 +115,6 @@ require(['angular'], () => {
 
     // In-house modules
     require('userProject');
-    require('uploader');
     require('completer');
     require('esrecorder');
     require('recorder');
