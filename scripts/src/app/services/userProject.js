@@ -4,6 +4,8 @@ import * as audioLibrary from '../audiolibrary';
 import * as collaboration from '../collaboration';
 import esconsole from '../../esconsole';
 import * as ESUtils from '../../esutils';
+import * as helpers from '../../helpers';
+import store from '../../reducers';
 import reporter from '../reporter';
 import * as scriptsState from '../../browser/scriptsState';
 import * as tabs from '../../editor/tabState';
@@ -11,7 +13,7 @@ import * as cai from '../../cai/caiState';
 import * as userNotification from '../userNotification';
 import * as websocket from '../websocket';
 
-app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal', '$ngRedux', function ($rootScope, $http, $window, $q, $uibModal, $ngRedux) {
+app.factory('userProject', function () {
     var self = {};
 
     var WSURLDOMAIN = URL_DOMAIN;
@@ -56,7 +58,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
     var openSharedScripts = [];
 
     // websocket gets closed before onunload in FF
-    $window.onbeforeunload = function (e) {
+    window.onbeforeunload = function (e) {
         if (isLogged()) {
             let saving = false;
             const username = getUsername();
@@ -95,7 +97,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                             script.tooltipText = '';
                             postProcessCollaborators(script);
                             scripts[script.shareid] = script;
-                            $ngRedux.dispatch(scriptsState.syncToNgUserProject());
+                            store.dispatch(scriptsState.syncToNgUserProject());
                             userNotification.show(ESMessages.user.scriptcloud, 'success');
                         });
                 }
@@ -121,7 +123,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     body.append('username', username);
                     body.append('password', getEncodedPassword());
                     body.append('notification_id', notificationID);
-                    $http.post(url, body, opts);
+                    helpers.getNgService("$http").post(url, body, opts);
                 });
             }
 
@@ -136,25 +138,25 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
     };
 
     if (FLAGS.SHOW_CAI) {
-        $window.onfocus = function() {
-            $ngRedux.dispatch(cai.userOnPage(Date.now()));
+        window.onfocus = function() {
+            store.dispatch(cai.userOnPage(Date.now()));
         };
 
-        $window.onblur = function() {
-            $ngRedux.dispatch(cai.userOnPage(Date.now()));
+        window.onblur = function() {
+            store.dispatch(cai.userOnPage(Date.now()));
         };
 
         var mouse_x;
         var mouse_y;
 
-        $window.addEventListener('mousemove', function (e) {
+        window.addEventListener('mousemove', function (e) {
             mouse_x = e.x;
             mouse_y = e.y;
         });   
 
-        $window.setInterval(function() {
+        window.setInterval(function() {
             if (mouse_x && mouse_y) {
-                $ngRedux.dispatch(cai.mousePosition([mouse_x, mouse_y]));
+                store.dispatch(cai.mousePosition([mouse_x, mouse_y]));
                 clearInterval();
             }
         }, 5000);
@@ -167,7 +169,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
         const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
         if (scriptData !== null) {
             scripts = Object.assign(scripts, JSON.parse(scriptData));
-            $ngRedux.dispatch(scriptsState.syncToNgUserProject());
+            store.dispatch(scriptsState.syncToNgUserProject());
 
             const tabData = localStorage.getItem(LS_TABS_KEY)
             if (tabData !== null) {
@@ -175,7 +177,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 if (storedTabs) {
                     storedTabs.forEach(tab => {
                         openScripts.push(tab);
-                        $ngRedux.dispatch(tabs.setActiveTabAndEditor(tab));
+                        store.dispatch(tabs.setActiveTabAndEditor(tab));
                     });
                 }
             }
@@ -186,7 +188,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 if (storedTabs) {
                     storedTabs.forEach(tab => {
                         openSharedScripts.push(tab);
-                        $ngRedux.dispatch(tabs.setActiveTabAndEditor(tab));
+                        store.dispatch(tabs.setActiveTabAndEditor(tab));
                     });
                 }
             }
@@ -308,7 +310,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
             headers: {'Content-Type': undefined}
         };
 
-        return $http.post(url, payload, opts).then(function(result) {
+        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
             // esconsole(result, ['debug', 'user']);
             reporter.login(username);
 
@@ -358,7 +360,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
 
             // when the user logs in and his/her scripts are loaded, we can restore
             // their previous tab session stored in the browser's local storage
-            const embedMode = appState.selectEmbedMode($ngRedux.getState());
+            const embedMode = appState.selectEmbedMode(store.getState());
             if (!embedMode) {
                 const tabData = localStorage.getItem(LS_TABS_KEY)
                 if (tabData !== null) {
@@ -380,18 +382,18 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                         }
                     }
                 }
-                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+                const activeTabID = tabs.selectActiveTabID(store.getState());
                 if (activeTabID) {
-                    $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+                    store.dispatch(tabs.setActiveTabAndEditor(activeTabID));
                 }
             }
 
             // Clear Recommendations in Sound Browser
-            $rootScope.$broadcast('clearRecommender');
+            helpers.getNgRootScope().$broadcast('clearRecommender');
 
             // Close CAI
             if (FLAGS.SHOW_CAI) {
-                $ngRedux.dispatch(cai.resetState());
+                store.dispatch(cai.resetState());
             }
 
             // Copy scripts local storage to the web service.
@@ -417,9 +419,9 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 }
 
                 resetOpenScripts();
-                $ngRedux.dispatch(tabs.resetTabs());
+                store.dispatch(tabs.resetTabs());
 
-                return $q.all(promises).then(function (savedScripts) {
+                return Promise.all(promises).then(function (savedScripts) {
                     localStorage.removeItem(LS_SCRIPTS_KEY);
                     localStorage.removeItem(LS_TABS_KEY);
                     localStorage.removeItem(LS_SHARED_TABS_KEY);
@@ -429,7 +431,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                         angular.forEach(savedScripts, function(savedScript) {
                             if(savedScript) {
                                 openScript(savedScript.shareid);
-                                $ngRedux.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid));
+                                store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid));
                             }
                         });
                     });
@@ -460,7 +462,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
 
             // TODO: base64 encoding is not a secure way to send password
 
-            return $http.post(url, payload, opts).then(result => {
+            return helpers.getNgService("$http").post(url, payload, opts).then(result => {
                 let res;
 
                 if (result.data) {
@@ -552,7 +554,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
             headers: {'Content-Type': undefined}
         };
 
-        return $http.post(url, payload, opts).then(function(result) {
+        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
 
             if (result.data === null) {
                 // no scripts
@@ -606,7 +608,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
              headers: {'Content-Type': undefined}
          };
 
-         return $http.post(url, payload, opts).then(function (result) {
+         return helpers.getNgService("$http").post(url, payload, opts).then(function (result) {
              if (result.data === null) {
                  // no scripts
                  return [];
@@ -645,7 +647,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
              headers: {'Content-Type': undefined}
          };
 
-         return $http.post(url, payload, opts).then(function (result) {
+         return helpers.getNgService("$http").post(url, payload, opts).then(function (result) {
              let res;
 
              if (result.data) {
@@ -680,7 +682,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
      */
     function getLockedSharedScriptId(shareid){
         var url = WSURLDOMAIN + '/services/scripts/getlockedshareid';
-        return $http.get(url, {
+        return helpers.getNgService("$http").get(url, {
             params: {'shareid': shareid }
         }).then(function(result) {
             return result.data.shareid;
@@ -713,7 +715,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
             headers: {'Content-Type': undefined}
         };
 
-        return $http.post(url, payload, opts).then(function(result) {
+        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
 
         }, function(err) {
             console.log(err);
@@ -747,7 +749,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
             headers: {'Content-Type': undefined}
         };
 
-        return $http.post(url, payload, opts).then(function(result) {
+        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
 
         }, function(err) {
             console.log(err);
@@ -769,7 +771,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
             headers: {'Content-Type': undefined}
         };
 
-        return $http.post(url, payload, opts).then(function(result) {
+        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
             return result.data;
         }, function(err) {
             esconsole('Loading favorite sounds failed', ['DEBUG','ERROR']);
@@ -818,11 +820,11 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
         localStorage.clear();
 
         // Clear Recommendations in Sound Browser
-        $rootScope.$broadcast('clearRecommender');
+        helpers.getNgRootScope().$broadcast('clearRecommender');
 
         // Close CAI
         if (FLAGS.SHOW_CAI) {
-            $ngRedux.dispatch(cai.resetState());
+            store.dispatch(cai.resetState());
         }
 
         websocket.disconnect();
@@ -911,19 +913,16 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
         //sharing is not used but the function doesn't work if it is not there. Why?
         var url = URL_DOMAIN + '/services/scripts/scriptbyid';
         var opts = { params: {'scriptid': id} };
-        return $http.get(url, opts)
+        return helpers.getNgService("$http").get(url, opts)
             .then(function(result) {
                 if (sharing && result.data === '') {
-                    var deferred = $q.defer();
-                    deferred.reject("Script was not found.");
-
                     if (userNotification.state.isInLoadingScreen) {
                         self.errorLoadingSharedScript = true;
                     } else {
                         userNotification.show(ESMessages.user.badsharelink, 'failure1', 3);
                     }
 
-                    return deferred.promise;
+                    throw "Script was not found.";
                 }
                 return result.data;
             }, function(err) {
@@ -952,7 +951,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             };
             var payload = {};
-            return $http.post(url, payload, opts).then(function() {
+            return helpers.getNgService("$http").post(url, payload, opts).then(function() {
                 esconsole('Deleted audiokey: ' + audiokey, 'debug');
                 audioLibrary.clearAudioTagCache(); // otherwise the deleted audio key is still usable by the user
             }).catch(function(err) {
@@ -986,7 +985,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}
             };
             var payload = {};
-            return $http.post(url, payload, opts).then(function() {
+            return helpers.getNgService("$http").post(url, payload, opts).then(function() {
                 esconsole('Successfully renamed audiokey: ' + audiokey + ' to ' + newaudiokey, 'debug');
                 userNotification.show(ESMessages.general.soundrenamed, 'normal', 2);
                 audioLibrary.clearAudioTagCache(); // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
@@ -1004,7 +1003,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
 
     function getLicenses(){
         var url = WSURLDOMAIN + '/services/scripts/getlicenses';
-        return $http.get(url).then(function(response){
+        return helpers.getNgService("$http").get(url).then(function(response){
             return response.data.licenses;
         })
     }
@@ -1028,7 +1027,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
             }
         }
 
-        return $http.post(url, payload, opts).then(function(result) {
+        return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
             esconsole('Get user info ' + ' for ' + username, 'debug');
 
             var user = {};
@@ -1073,7 +1072,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     },
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 };
-                return $http.get(url, opts).then(function () {
+                return helpers.getNgService("$http").get(url, opts).then(function () {
                     esconsole('Set License Id ' + licenseID + ' to ' + scriptName, 'debug');
                     scripts[scriptId].license_id = licenseID;
                 }).catch(function (err) {
@@ -1109,7 +1108,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 }
             }
             var payload={};
-            return $http.post(url, payload, opts).then(function(result) {
+            return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                 var shareid = result.data.shareid;
 
                 esconsole('Save shared script ' + result.data.name + ' to ' + username, 'debug');
@@ -1162,7 +1161,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 };
                 var payload = {};
-                return $http.post(url, payload, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                     esconsole('Deleted script: ' + scriptid, 'debug');
 
                     if (scripts[scriptid]) {
@@ -1202,7 +1201,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
         var p;
         if (lookForScriptByName(script.name, true)) {
         // Prompt the user to rename the script
-            p = $uibModal.open({
+            p = helpers.getNgService("$uibModal").open({
                 templateUrl: 'templates/rename-import-script.html',
                 controller: 'renameController',
                 size: 100,
@@ -1245,7 +1244,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                     };
                     var payload = {};
-                    return $http.post(url, payload, opts).then(function(result) {
+                    return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                         esconsole('Restored script: ' + script.shareid, 'debug');
                         restoredScript = result.data;
                         restoredScript.saved = true;
@@ -1275,7 +1274,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
         var p;
         if (lookForScriptByName(script.name)) {
         // Prompt the user to rename the script
-            p = $uibModal.open({
+            p = helpers.getNgService("$uibModal").open({
                 templateUrl: 'templates/rename-import-script.html',
                 controller: 'renameController',
                 size: 100,
@@ -1323,7 +1322,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
     function importCollaborativeScript(script) {
         let p, originalScriptName = script.name;
         if (lookForScriptByName(script.name)) {
-            p = $uibModal.open({
+            p = helpers.getNgService("$uibModal").open({
                 templateUrl: 'templates/rename-import-script.html',
                 controller: 'renameController',
                 size: 100,
@@ -1373,7 +1372,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     headers: {'Content-Type': 'application/xml'}
                 };
                 var payload = {};
-                return $http.post(url, payload, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                     esconsole('Deleted shared script: ' + scriptid, 'debug');
 
                     closeSharedScript(scriptid);
@@ -1451,7 +1450,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 headers: {'Content-Type': undefined}
             };
 
-            return $http.post(url, payload, opts).then(function (result) {
+            return helpers.getNgService("$http").post(url, payload, opts).then(function (result) {
                 if (scriptid) {
                     delete sharedScripts[scriptid];
                 }
@@ -1541,7 +1540,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}
                 };
                 var payload = {};
-                return $http.post(url, payload, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                     esconsole('Renamed script: ' + scriptid + ' to ' + newName, 'debug');
 
                     if (scriptid) {
@@ -1582,7 +1581,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     headers: {'Content-Type': undefined}
                 };
            
-                return $http.post(url, payload, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                     esconsole('Users roles requested by ' + username, 'debug');
                     return result.data.users;
                 }).catch(function(err) {
@@ -1623,7 +1622,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     headers: {'Content-Type': undefined}
                 };
            
-                return $http.post(url, payload, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                     esconsole('Add role ' + role + ' to ' + username, 'debug');
                     return result.data;
                 }).catch(function(err) {
@@ -1664,7 +1663,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     headers: {'Content-Type': undefined}
                 };
            
-                return $http.post(url, payload, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, payload, opts).then(function(result) {
                     esconsole('Remove role ' + role + ' from '+ username, 'debug');
                     return result.data;
                 }).catch(function(err) {
@@ -1702,7 +1701,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     };
 
                     var url = WSURLDOMAIN + '/services/scripts/modifypwdadmin';
-                    $http.post(url, payload, opts).then(function () {
+                    helpers.getNgService("$http").post(url, payload, opts).then(function () {
                         userNotification.show('Successfully set a new password for user: ' + userID + ' with password: ' + password, 'history', 3);
                         resolve();
                     }, function () {
@@ -1798,7 +1797,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                     }
                 };
 
-                return $http.post(url, content, opts).then(function(result) {
+                return helpers.getNgService("$http").post(url, content, opts).then(function(result) {
                     var shareid = result.data.shareid;
                     var script = result.data;
 
@@ -1918,7 +1917,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
                 localStorage.setItem(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts));
             }
         }
-        return tabs.selectOpenTabs($ngRedux.getState()).slice();
+        return tabs.selectOpenTabs(store.getState()).slice();
     }
 
     /**
@@ -1997,7 +1996,7 @@ app.factory('userProject', ['$rootScope', '$http', '$window', '$q', '$uibModal',
         body.append('password', getEncodedPassword());
         body.append('scriptid', scriptID);
 
-        return $http.post(url, body, opts).then(function (result) {
+        return helpers.getNgService("$http").post(url, body, opts).then(function (result) {
             return result.data;
         });
     }
@@ -2015,7 +2014,7 @@ function uploadCAIHistory(projectName, node) {
     body.append('project', projectName)
     body.append('node', JSON.stringify(node));
 
-    $http.post(url, body, opts).then(function(result) {
+    helpers.getNgService("$http").post(url, body, opts).then(function(result) {
         console.log('saved to CAI history:', projectName, node);
     }).catch(function(err) {
         console.log('could not save to cai', projectName, node);
@@ -2092,4 +2091,4 @@ function uploadCAIHistory(projectName, node) {
     window.userProjScope = self;
 
     return self;
-}]);
+});
