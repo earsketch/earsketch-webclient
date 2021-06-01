@@ -210,7 +210,6 @@ window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layou
 });
 
 require('userProject');
-require('completer');
 require('esrecorder');
 require('recorder');
 
