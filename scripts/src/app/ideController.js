@@ -10,6 +10,7 @@ import * as tabs from '../editor/tabState';
 import * as cai from '../cai/caiState';
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
+import * as userProject from './userProject';
 import * as WaveformCache from './waveformcache';
 
 const ACE_THEMES = {
@@ -21,7 +22,7 @@ const ACE_THEMES = {
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, caiAnalysisModule, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, caiAnalysisModule, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };

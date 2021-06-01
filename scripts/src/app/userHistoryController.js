@@ -1,6 +1,7 @@
 import esconsole from '../esconsole'
+import * as userProject from './userProject'
 
-app.controller("userHistoryController", ['$scope', 'userProject', '$http', function($scope, userProject, $http) {
+app.controller("userHistoryController", ['$scope', '$http', function($scope, $http) {
 
     /**
      * Parse shareids and return a history of versions of all scripts modified by the unique shared script authors

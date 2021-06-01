@@ -7,6 +7,7 @@ import { selectUserName } from '../user/userState';
 import * as helpers from '../helpers';
 import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity, ScriptType } from 'common';
+import * as userProject from '../app/userProject';
 
 export interface ScriptEntities {
     [scriptID: string]: ScriptEntity
@@ -232,7 +233,6 @@ export const {
 export const syncToNgUserProject = createAsyncThunk(
     'scripts/syncToNgUserProject',
     (_, { dispatch }) => {
-        const userProject = helpers.getNgService('userProject');
         const scripts = cloneDeep(userProject.scripts);
         const sharedScripts = cloneDeep(userProject.sharedScripts);
         each(scripts, script => {
@@ -506,8 +506,6 @@ export const selectUnsavedDropdownMenuScript = createSelector(
         if (!script) {
             return null;
         }
-
-        const userProject = helpers.getNgService('userProject');
         return type==='regular' && userProject.scripts[script.shareid]
             || type==='shared' && userProject.sharedScripts[script.shareid]
             || type==='readonly' && readOnlyScripts[script.shareid] || null;

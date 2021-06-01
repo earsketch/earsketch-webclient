@@ -4,7 +4,9 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', 'caiStudent', 'caiStudentPreferenceModule', function (userProject, complexityCalculator, caiStudent, caiStudentPreferenceModule) {
+import * as userProject from '../userProject'
+
+app.factory('caiStudentHistoryModule', ['complexityCalculator', 'caiStudent', 'caiStudentPreferenceModule', function (complexityCalculator, caiStudent, caiStudentPreferenceModule) {
 
     var aggregateScore;
     var curriculumPagesViewed;

@@ -17,11 +17,12 @@ import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
 import * as cai from '../cai/caiState';
 import * as userNotification from './userNotification';
+import * as userProject from './userProject';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, $document, $ngRedux, recommender) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$q', '$confirm', '$sce', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, $q, $confirm, $sce, $document, $ngRedux, recommender) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });

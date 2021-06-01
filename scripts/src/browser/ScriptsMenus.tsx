@@ -11,16 +11,15 @@ import * as scripts from "./scriptsState";
 import * as tabs from "../editor/tabState";
 import * as helpers from "../helpers";
 import { ScriptEntity, ScriptType } from 'common';
+import * as userProject from '../app/userProject';
 
 export const openScript = (script: ScriptEntity) => {
-    const userProject = helpers.getNgService('userProject');
     const rootScope = helpers.getNgRootScope();
     userProject.openScript(script.shareid);
     rootScope.$broadcast('selectScript', script.shareid);
 };
 
 export const openSharedScript = (script: ScriptEntity) => {
-    const userProject = helpers.getNgService('userProject');
     userProject.openSharedScript(script.shareid);
 };
 
@@ -224,7 +223,6 @@ const SingletonDropdownMenu = () => {
                 name='Import' icon='icon-import'
                 visible={['shared','readonly'].includes(type as string)}
                 onClick={async () => {
-                    const userProject = helpers.getNgService('userProject');
                     let imported;
 
                     if (script?.collaborative) {
@@ -248,7 +246,6 @@ const SingletonDropdownMenu = () => {
                 visible={type!=='readonly'}
                 onClick={async () => {
                     const scope = helpers.getNgMainController().scope();
-                    const userProject = helpers.getNgService('userProject');
                     if (type==='regular') {
                         await scope.deleteScript(unsavedScript);
                     } else if (type==='shared') {

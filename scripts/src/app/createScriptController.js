@@ -2,9 +2,11 @@
  * Angular controller for the create script modal dialog.
  * @module createScriptCtrl
  */
+import * as userProject from './userProject'
+
 app.controller("CreateScriptCtrl", [
-'$scope', '$uibModalInstance', 'userProject', 'language',
-function($scope, $uibModalInstance, userProject, language) {
+'$scope', '$uibModalInstance', 'language',
+function($scope, $uibModalInstance, language) {
 
     $scope.name = '';
     $scope.error = '';

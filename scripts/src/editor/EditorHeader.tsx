@@ -10,6 +10,7 @@ import * as editor from './editorState';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
 import * as helpers from '../helpers';
+import * as userProject from '../app/userProject';
 
 const UndoRedoButtons = () => {
     const editorScope = helpers.getNgDirective('editor').scope();
@@ -114,7 +115,6 @@ const EditorHeader = () => {
                                 ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
                             `}
                             onClick={() => {
-                                const userProject = helpers.getNgService('userProject');
                                 // This temporary hack assumes any types of not-owned script are not sharable from the editor header.
                                 const unsavedScript = userProject.scripts[activeTab];
                                 mainScope.shareScript(Object.assign({}, unsavedScript));

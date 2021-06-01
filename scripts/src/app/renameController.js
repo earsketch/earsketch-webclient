@@ -2,8 +2,9 @@ import * as collaboration from './collaboration';
 import reporter from './reporter';
 import * as sounds from '../browser/soundsState';
 import * as userNotification from './userNotification';
+import * as userProject from './userProject';
 
-app.controller("renameController", ['$scope', '$uibModalInstance', 'userProject', 'script', function ($scope, $uibModalInstance, userProject, script) {
+app.controller("renameController", ['$scope', '$uibModalInstance', 'script', function ($scope, $uibModalInstance, script) {
     $scope.scriptName = script.name.replace(/.([^.]*)$/, '');
     $scope.extension = script.name.replace(/^(.+)(\.[^.]*)$/, '$2');
     $scope.oldScriptName = script.name.replace(/.([^.]*)$/, '');

@@ -4,8 +4,9 @@ import * as ESUtils from '../esutils'
 import reporter from './reporter'
 import * as tabs from '../editor/tabState';
 import * as scripts from '../browser/scriptsState';
+import * as userProject from './userProject';
 
-app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'script', 'userProject', 'allowRevert', '$ngRedux', function ($scope, $uibModalInstance, script, userProject, allowRevert, $ngRedux) {
+app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'script', 'allowRevert', '$ngRedux', function ($scope, $uibModalInstance, script, allowRevert, $ngRedux) {
     $scope.script = script;
     $scope.allowRevert = allowRevert;
 
