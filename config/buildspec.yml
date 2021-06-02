@@ -35,8 +35,8 @@ phases:
       - export LOCAL_STAGING_CACHED_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}-NOCACHE"
       - export LOCAL_STAGING_CACHED_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_CACHED_DIR_NAME"
       - export ES_VERSION="$ES_VERSION_MAJOR.$ES_VERSION_MINOR.$CODEBUILD_BUILD_NUMBER"
-      - [ -z "$ES_BASE_URI" ] && echo "ES_BASE_URI Empty"
-      - [ -z "$ES_BASE_URL" ] && echo "ES_BASE_URL Empty"
+      - if [ -z "$ES_BASE_URI" ] then echo "ES_BASE_URI Empty" fi
+      - if [ -z "$ES_BASE_URL" ] then echo "ES_BASE_URL Empty" fi
   build:
     commands:
       - start_time="$(date -u +%s)"
