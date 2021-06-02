@@ -101,11 +101,20 @@ async function postAuth(endpoint: string, params: { [key: string]: string }) {
     return post(endpoint, { username: getUsername(), password: getEncodedPassword(), ...params })
 }
 
-async function postXMLAuth(endpoint: string, xml: string) {
+async function postXML(endpoint: string, xml: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
-    const opts = { headers: {'Content-Type': 'application/xml;charset=UTF-8'} }
-    const response = await helpers.getNgService("$http").post(url, xml, opts)
-    return response.data
+    const response = await fetch(url + (params ? "?" + new URLSearchParams(params) : ""), {
+        method: "POST",
+        headers: new Headers({ "Content-Type": "application/xml" }),
+        body: xml,
+    })
+    const text = await response.text()
+    const data = await xml2js.parseStringPromise(text, { explicitArray: false })
+    return data
+}
+
+async function postXMLAuth(endpoint: string, xml: string) {
+    return postXML(endpoint, xml, { username: getUsername(), password: getEncodedPassword() })
 }
 
 // websocket gets closed before onunload in FF
@@ -113,9 +122,6 @@ window.onbeforeunload = function () {
     if (isLogged()) {
         let saving = false;
         const username = getUsername();
-        const password = getPassword();
-        const saveScriptURL = URL_DOMAIN + '/services/scripts/save'
-            +'?username='+username+'&password='+encodeURIComponent(btoa(password));
 
         openScripts.forEach(function (shareID) {
             if (scripts[shareID] && scripts[shareID].collaborative) {
@@ -126,17 +132,10 @@ window.onbeforeunload = function () {
                 saving = true;
                 const sourcecode = scripts[shareID].source_code;
                 const name = scripts[shareID].name;
-                const body = '<scripts><username>' + getUsername() + '</username>'
-                    + '<name>' + name + '</name>'
-                    + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
+                const xml = `<scripts><username>${username}</username><name>${name}</name>` +
+                            `<source_code><![CDATA[${sourcecode}]]></source_code></scripts>`
 
-                fetch(saveScriptURL, {
-                    method: 'POST',
-                    headers: new Headers({ 'Content-Type': 'application/xml' }),
-                    body
-                })
-                    .then(response => response.text())
-                    .then(xml => xml2js.parseStringPromise(xml, { explicitArray: false }))
+                postXMLAuth("/services/scripts/save", xml)
                     .then(data => {
                         const script = data.scripts;
                         script.modified = Date.now();
@@ -313,13 +312,8 @@ export function login(username: string, password: string) {
         for (var i in storedScripts) {
             var script = storedScripts[i];
             // reformat saved date to ISO 8601 format
-            // TODO: moment.js would allow us to format arbitrary date strings
-            // alternatively, dates should be stored in the database
-            // formatted in ISO 8601
-            var isoFormat = script.modified.slice(0,-2).replace(' ','T');
             var offset = new Date().getTimezoneOffset();
-            // javascript Date.parse() requires ISO 8601
-            script.modified = Date.parse(isoFormat) + offset * 60000;
+            script.modified = formatDateToISO(script.modified) + offset * 60000;
             scripts[script.shareid] = script;
             // set this flag to false when the script gets modified
             // then set it to true when the script gets saved
@@ -437,12 +431,7 @@ export function refreshCodeBrowser() {
             for (var i in res) {
                 let script = res[i];
                 // reformat saved date to ISO 8601 format
-                // TODO: moment.js would allow us to format arbitrary date strings
-                // alternatively, dates should be stored in the database
-                // formatted in ISO 8601
-                var isoFormat = script.modified.slice(0,-2).replace(' ','T');
-                // javascript Date.parse() requires ISO 8601
-                script.modified = Date.parse(isoFormat);
+                script.modified = formatDateToISO(script.modified);
                 // set this flag to false when the script gets modified
                 // then set it to true when the script gets saved
                 script.saved = true;
@@ -454,7 +443,6 @@ export function refreshCodeBrowser() {
             }
 
         }, function(err: Error) {
-            console.log(err);
             esconsole('refreshCodeBrowser failure', ['DEBUG','ERROR']);
             esconsole(err.toString(), ['DEBUG','ERROR']);
             throw err;
@@ -477,6 +465,7 @@ export function refreshCodeBrowser() {
 }
 
 // Format a date to ISO 8601
+// TODO: dates should be stored in the database so as to make this unnecessary
 function formatDateToISO(date: string){
     // Format created date to ISO 8601
     var isoFormat = date.slice(0,-2).replace(' ','T');
@@ -509,7 +498,6 @@ export function getScriptHistory(scriptid: string) {
         return r
 
     }, function(err: Error) {
-        console.log(err);
         esconsole('Login failure', ['DEBUG','ERROR']);
         esconsole(err.toString(), ['DEBUG','ERROR']);
         throw err;
@@ -530,7 +518,6 @@ export function getScriptVersion(scriptid: string, versionid: string) {
 
         return r;
     }, function (err: Error) {
-        console.log(err);
         esconsole('Login failure', ['DEBUG','ERROR']);
         esconsole(err.toString(), ['DEBUG','ERROR']);
         throw err;
@@ -929,26 +916,12 @@ export function deleteSharedScript(scriptid: string) {
 }
 
 // Set a shared script description if owned by the user.
-export function setScriptDesc(scriptname: string, scriptId: string, desc: string="") {
+export async function setScriptDesc(scriptname: string, scriptId: string, desc: string="") {
     if (isLogged()) {
-        var username = getUsername();
-        var password = getPassword();
-        var url = URL_DOMAIN + '/services/scripts/setscriptdesc';
-        if (password !== null) {
-            var content = '<scripts><username>' + username + '</username>'
-                    + '<name>' + scriptname + '</name>'
-                    + '<description><![CDATA[' + desc + ']]></description></scripts>';
-            //TODO: find JSON alternative for CDATA and use angular $http post
-            $.ajax(url, {
-                method: 'POST',
-                async: true,
-                contentType: 'application/xml;charset=UTF-8',
-                data: content,
-                success: function(response: any) {
-                    scripts[scriptId].description = desc;
-                }
-            });
-        }
+        // TODO: These values (particularly the description) should probably be escaped...
+        const xml = `<scripts><username>${getUsername()}</username><name>${scriptname}</name><description><![CDATA[${desc}]]></description></scripts>`
+        await postXML("/services/scripts/setscriptdesc", xml)
+        scripts[scriptId].description = desc
     }
 }
 
@@ -1164,13 +1137,12 @@ export function saveScript(scriptname: string, sourcecode: string, overwrite?: b
 
     if (isLogged()) {
         reporter.saveScript();
-        var content = '<scripts><username>' + getUsername() + '</username>'
-            + '<name>' + n + '</name>'
-            + '<run_status>' + status + '</run_status>'
-            + '<source_code><![CDATA[' + sourcecode + ']]></source_code></scripts>';
-        return postXMLAuth("/services/scripts/save", content).then(function(result: any) {
-            var shareid = result.data.shareid;
-            var script = result.data;
+        const xml = `<scripts><username>${getUsername()}</username>` + 
+                    `<name>${n}</name><run_status>${status}</run_status>` +
+                    `<source_code><![CDATA[${sourcecode}]]></source_code></scripts>`
+        return postXMLAuth("/services/scripts/save", xml).then(function(data: any) {
+            let script = data.scripts;
+            const shareid = script.shareid;
 
             esconsole('Saved script: ' + n);
             esconsole('Saved script shareid: ' + shareid);
