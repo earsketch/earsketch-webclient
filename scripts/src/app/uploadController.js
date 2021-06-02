@@ -286,7 +286,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService
       if ($scope.isSafari) return null;
 
       var username = userProject.getUsername();
-      var encodedPassword = userProject.getEncodedPassword();
+      var encodedPassword = userProject.getPassword();
       var url = URL_DOMAIN + '/services/scripts/getembeddedtunepadid';
 
       var payload = new FormData();

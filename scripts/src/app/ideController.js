@@ -208,7 +208,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // open shared script from URL
         var shareID = $location.search()['sharing'];
         if (typeof(shareID) !== 'undefined') {
-            userProject.shareid = shareID;
             $scope.openShare(shareID).then(() => {
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
                 $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
@@ -258,7 +257,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         var alreadySaved = false;
         var promise;
 
-        if (userProject.isLogged()) {
+        if (userProject.isLoggedIn()) {
             // User is logged in
             promise = userProject.getSharedScripts($scope.username, $scope.password).then(function (result) {
                 // Check if the shared script has been saved
@@ -315,7 +314,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     });
                 } else {
                     // user has already opened this shared link before
-                    if (userProject.isLogged()) {
+                    if (userProject.isLoggedIn()) {
                         promise = userProject.getSharedScripts($scope.username, $scope.password).then(function () {
                             if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
                             $scope.selectSharedScript(result);
@@ -352,7 +351,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
     // listens to the broadcast message sent by mainController on clicking login button
     $rootScope.$on('openShareAfterLogin', function() {
-        $scope.openShare(userProject.shareid).then(() => {
+        $scope.openShare($location.search()['sharing']).then(() => {
             $ngRedux.dispatch(scripts.syncToNgUserProject());
         });
     });
@@ -750,7 +749,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      */
     $scope.reportError = function () {
 
-        if (userProject.isLogged()) {
+        if (userProject.isLoggedIn()) {
             userProject.getUserInfo().then(function (user) {
 
                 $scope.userName = user.firstname + " " + user.lastname;
@@ -828,7 +827,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      * @function
      */
     $scope.openUploadWindow = function () {
-        if (userProject.isLogged()) {
+        if (userProject.isLoggedIn()) {
             $uibModal.open({
                 templateUrl: 'templates/upload-sound.html',
                 controller: 'UploadSoundCtrl'

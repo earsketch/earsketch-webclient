@@ -399,7 +399,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                             userNotification.show(ESMessages.general.loginsuccess, 'normal', 0.5);
                         }
 
-                        if (userProject.shareid && $scope.isManualLogin) {
+                        if ($location.search()['sharing'] && $scope.isManualLogin) {
                             $rootScope.$broadcast('openShareAfterLogin');
                         }
 
@@ -428,9 +428,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         // $ngRedux.dispatch(scripts.resetSharedScripts());
 
         // save all unsaved open scripts
-        var promises = userProject.saveAll();
-
-        $q.all(promises).then(function () {
+        userProject.saveAll().then(function () {
             if (userProject.openScripts.length > 0) {
                 userNotification.show(ESMessages.user.allscriptscloud);
             }
@@ -487,7 +485,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                     var url = URL_DOMAIN + '/services/scripts/getlmsloginurl';
                     var payload = new FormData();
                     payload.append('username', userProject.getUsername());
-                    payload.append('password', userProject.getEncodedPassword());
+                    payload.append('password', userProject.getPassword());
                     var opts = {
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}
@@ -527,7 +525,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     // attempt to load userdata from a previous session
-    if (userProject.isLogged()) {
+    if (userProject.isLoggedIn()) {
         var userStore = userProject.loadUser();
         $scope.username = userStore.username;
         $scope.password = userStore.password;
@@ -658,7 +656,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         var url = URL_DOMAIN + '/services/scripts/markread';
         var body = new FormData();
         body.append('username', userProject.getUsername());
-        body.append('password', userProject.getEncodedPassword());
+        body.append('password', userProject.getPassword());
         body.append('notification_id', userNotification.history[index].id);
         var opts = {
             transformRequest: angular.identity,
@@ -1053,8 +1051,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.closeAllTabs = () => {
         $confirm({text: ESMessages.idecontroller.closealltabs, ok: "Close All"}).then(() => {
-            const promises = userProject.saveAll();
-            $q.all(promises).then(() => {
+            userProject.saveAll().then(() => {
                 userNotification.show(ESMessages.user.allscriptscloud);
                 $ngRedux.dispatch(tabs.closeAllTabs());
             }).catch(() => userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1'));

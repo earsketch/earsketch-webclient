@@ -1195,7 +1195,7 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
 
     let url = URL_DOMAIN + "/services/audio/getrandomaudiokey?tag=" + folder
 
-    if (userProject.isLogged()) {
+    if (userProject.isLoggedIn()) {
         url += "&username=" + userProject.getUsername()
     }
 
