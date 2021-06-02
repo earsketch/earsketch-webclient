@@ -246,7 +246,7 @@ const interleave = (inputL: Float32Array, inputR: Float32Array) => {
 }
 
 // Encode an array of interleaved 2-channel samples to a WAV file.
-const encodeWAV = (samples: Float32Array) => {
+export const encodeWAV = (samples: Float32Array) => {
     const buffer = new ArrayBuffer(44 + samples.length * 2)
     const view = new DataView(buffer)
 
