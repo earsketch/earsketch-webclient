@@ -8,7 +8,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
 
 
     function analyzeJavascript(source) {
-        //  try {
         apiCalls = [];
         allCalls = [];
         allConditionals = [];
@@ -26,7 +25,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         studentCode = source.split("\n");
 
         //handle this like you'd handle python.
-        var newAST = convertJavascriptASTTree(ast);
+        var newAST = convertASTTree(ast);
 
         //initialize all of the lists we'll use in each code reading
         originalityLines = [];
@@ -99,10 +98,10 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
 
 
     //fun javascript conversion times
-    function convertJavascriptASTTree(AstTree) {
+    function convertASTTree(AstTree) {
         var bodyItems = [];
         for (var i in AstTree.body) {
-            var toAdd = convertJavascriptASTNode(AstTree.body[i]);
+            var toAdd = convertASTNode(AstTree.body[i]);
             bodyItems.push(toAdd);
         }
         var parentItem = { body: bodyItems };
@@ -119,7 +118,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
     *@param JsAst The Javascript AST to convert.
     * does this by hierarchically going through JS AST nodes, and constructing a new AST with matching nodes structured like Skulpt Python nodes
     */
-    function convertJavascriptASTNode(JsAst) {
+    function convertASTNode(JsAst) {
         var returnObject = {};
         var object = JsAst;
 
@@ -131,7 +130,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             hasBody = true;
             var nodeBody = [];
             for (var i in object.body.body) {
-                var bodyItem = convertJavascriptASTNode(object.body.body[i]);
+                var bodyItem = convertASTNode(object.body.body[i]);
                 nodeBody.push(bodyItem);
             }
             if (object.body.body[0] != null && "loc" in object.body.body[0]) {
@@ -141,7 +140,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
                 nodeBody.lineno = jsParentLine;
             }
         }
-
         //line number
         if (object.loc != null) {
             returnObject.lineno = object.loc.start.line;
@@ -154,44 +152,39 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             returnObject.lineno = jsParentLine;
             returnObject.col_offset = jsParentCol;
         }
-
         //now for the hard part - covering everything we might possibly need.
-
         if (object.type === "ForStatement") { //for loops are a special case, because they function VERY differently in js than in python. We have to build in csome extra stuff in our analysis function, but that's doable, methinks.
             returnObject._astname = "JSFor";
             if (object.init != null) {
-                returnObject.init = convertJavascriptASTNode(object.init);
+                returnObject.init = convertASTNode(object.init);
             }
             if (object.test != null) {
-                returnObject.test = convertJavascriptASTNode(object.test);
+                returnObject.test = convertASTNode(object.test);
             }
             if (object.update != null) {
-                returnObject.update = convertJavascriptASTNode(object.update);
+                returnObject.update = convertASTNode(object.update);
             }
             if (hasBody) {
                 returnObject.body = nodeBody;
             }
         }
-
         else if (object.type === "ForInStatement") { //for loops are a special case, because they function VERY differently in js than in python. We have to build in csome extra stuff in our analysis function, but that's doable, methinks.
             returnObject._astname = "For";
-
             //has an iter and a target
-            returnObject.iter = convertJavascriptASTNode(object.right);
+            returnObject.iter = convertASTNode(object.right);
             if (object.left.type = "VariableDeclaration") {
-                returnObject.target = convertJavascriptASTNode(object.left.declarations[0].id)
+                returnObject.target = convertASTNode(object.left.declarations[0].id)
             }
             else {
-                returnObject.iter = convertJavascriptASTNode(object.left);
+                returnObject.iter = convertASTNode(object.left);
             }
-
             if (hasBody) {
                 returnObject.body = nodeBody;
             }
         }
         else if (object.type === "WhileStatement") {
             if (object.test != null) {
-                returnObject.test = convertJavascriptASTNode(object.test);
+                returnObject.test = convertASTNode(object.test);
             }
             if (hasBody) {
                 returnObject.body = nodeBody;
@@ -199,24 +192,21 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         }
         else if (object.type === "FunctionDeclaration") {
             returnObject._astname = "FunctionDef";
-
             //has id.v with "name" ast
             if (object.id != null) {
                 var funcName = object.id.name;
                 returnObject.name = { v: funcName, lineno: object.loc.start.line };
             }
-
             //and a params property.
             var paramsObject = [];
             for (var i in object.params) {
-                var paramObject = convertJavascriptASTNode(object.params[i]);
+                var paramObject = convertASTNode(object.params[i]);
                 paramsObject.push(paramObject);
             }
             returnObject.args = {
                 args: paramsObject,
                 lineno: object.loc.start.line
             };
-
             //and a body.
             if (hasBody) {
                 returnObject.body = nodeBody;
@@ -224,78 +214,64 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         }
         else if (object.type === "FunctionExpression") {
             returnObject._astname = "FunctionExp";
-
             //name the function after its location so its return gets properly tallied by function evaluate.
             returnObject.functionName = "" + object.loc.start.line + "|" + object.loc.start.column;
-
             //make a child object the serves as a function definition
             var funcDefObj = {
                 _astname: "FunctionDef",
                 lineno: object.loc.start.line,
                 name: { v: returnObject.functionName }
             };
-
             //body in funcdefobj
             if (hasBody) {
                 funcDefObj.body = nodeBody
             }
-
             //params
             var paramsObject = [];
             for (var i in object.params) {
-                var paramObject = convertJavascriptASTNode(object.params[i]);
+                var paramObject = convertASTNode(object.params[i]);
                 paramsObject.push(paramObject);
             }
-
             funcDefObj.args = {
                 args: paramsObject,
                 lineno: object.loc.start.line
             };
-
             returnObject.functionDef = funcDefObj;
         }
 
         else if (object.type === "IfStatement") {
             returnObject._astname = "If";
-
             if (object.test != null) {
-                returnObject.test = convertJavascriptASTNode(object.test);
+                returnObject.test = convertASTNode(object.test);
             }
-
             returnObject.body = [];
             if (object.consequent != null && 'body' in object.consequent) {
                 for (var i in object.consequent.body) {
-                    var addObj = convertJavascriptASTNode(object.consequent.body[i]);
+                    var addObj = convertASTNode(object.consequent.body[i]);
                     if (addObj != null) { returnObject.body.push(addObj); }
                 }
             }
-
             //alternate is the "else" component
             if (object.alternate != null && object.alternate.type !== "EmptyStatement") {
                 if (object.alternate.type === "BlockStatement") {
-
                     var bodyList = [];
                     for (var i in object.alternate.body) {
-                        bodyList.push(convertJavascriptASTNode(object.alternate.body[i]));
+                        bodyList.push(convertASTNode(object.alternate.body[i]));
                     }
-
                     returnObject.orelse = bodyList;
                 }
-
                 else {
-                    returnObject.orelse = [convertJavascriptASTNode(object.alternate)]; //could be a single line, could be a body node
+                    returnObject.orelse = [convertASTNode(object.alternate)]; //could be a single line, could be a body node
                 }
             }
         }
         else if (object.type === "VariableDeclaration") {
             //we're actually looking in the declarator node
             var declaratorNode = object.declarations[0];
-
             returnObject._astname = "Assign";
-
-            returnObject.targets = [convertJavascriptASTNode(declaratorNode.id)];
+            returnObject.targets = [convertASTNode(declaratorNode.id)];
             if (declaratorNode.init != null) {
-                returnObject.value = convertJavascriptASTNode(declaratorNode.init);
+                returnObject.value = convertASTNode(declaratorNode.init);
             }
             else { //fake null node
                 returnObject.value = { lineno: object.loc.start.line };
@@ -307,11 +283,8 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             }
         }
         else if (object.type === "MemberExpression") {
-
             if ('name' in object.property && (JS_LIST_FUNCS.includes(object.property.name) || JS_STR_FUNCS.includes(object.property.name))) {
-
                 returnObject._astname = "Call";
-
                 //initialize function object
                 returnObject.func = {
                     _astname: "Attribute",
@@ -321,33 +294,27 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
                     },
                     lineno: object.loc.start.line
                 };
-
-                returnObject.func.value = convertJavascriptASTNode(object.object);
+                returnObject.func.value = convertASTNode(object.object);
             }
             else {
                 returnObject._astname = "Subscript";
-
                 //subscript nodes have a slice, which has a value. here, the slice _astname will ALWAYS be "Index"
                 returnObject.slice = { _astname: "Index" };
-                returnObject.slice.value = convertJavascriptASTNode(object.property);
-
+                returnObject.slice.value = convertASTNode(object.property);
                 //and a value which is the thing we are slicing.
-                returnObject.value = convertJavascriptASTNode(object.object);
+                returnObject.value = convertASTNode(object.object);
             }
-
         }
         else if (object.type === "CallExpression") {
 
             returnObject._astname = "Call";
             returnObject.func = {}; //initialize function object
-
             var attrFuncs = ["pop", "reverse", "length", "sort", "concat", "indexOf", "splice", "push"];
 
             //first, we HAVE to get the function name
             //if it's a listop or strop . we need all the extra stuff bc memberexpression can also be a subscript which doesn't get saved as an attr
             if (object.callee.type === "MemberExpression" && 'property' in object.callee && 'name' in object.callee.property &&
                 (JS_LIST_FUNCS.includes(object.callee.property.name) || JS_STR_FUNCS.includes(object.callee.property.name))) {
-
                 //get the funcname and store as an attr. attr.v is func name - in JS, this is an identifier in objec.tproperty. we just need the name prop tbqh   //func.value is arg - in JS, this is stored inobject.object.
                 returnObject.func._astname = "Attribute";
                 returnObject.func.attr = {
@@ -355,12 +322,12 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
                     lineno: object.loc.start.line
                 };
 
-                returnObject.func.value = convertJavascriptASTNode(object.callee.object);
+                returnObject.func.value = convertASTNode(object.callee.object);
 
                 if (object.arguments.length > 0) {
                     var argsObj = [];
                     for (var i in object.arguments) {
-                        argsObj.push(convertJavascriptASTNode(object.arguments[i]));
+                        argsObj.push(convertASTNode(object.arguments[i]));
                     }
                     returnObject.args = argsObj;
                 }
@@ -370,17 +337,15 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
                     v: object.callee.property.name,
                     lineno: object.loc.start.line
                 };
-
                 returnObject.args = [];
             }
 
             else {
-                var funcVal = convertJavascriptASTNode(object.callee);
-
+                var funcVal = convertASTNode(object.callee);
                 returnObject.func = funcVal;
                 var argsObj = [];
                 for (var i in object.arguments) {
-                    argsObj.push(convertJavascriptASTNode(object.arguments[i]));
+                    argsObj.push(convertASTNode(object.arguments[i]));
                 }
                 returnObject.args = argsObj;
             }
@@ -388,9 +353,8 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         }
         else if (object.type === "ReturnStatement") {
             returnObject._astname = "Return";
-
             if (object.argument != null) {
-                returnObject.value = convertJavascriptASTNode(object.argument);
+                returnObject.value = convertASTNode(object.argument);
             }
         }
         else if (object.type === "BinaryExpression") {
@@ -399,24 +363,23 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
                 //then we make a binop node
                 returnObject._astname = "BinOp";
                 //binop has left, right, and operator
-                returnObject.left = convertJavascriptASTNode(object.left);
-                returnObject.right = convertJavascriptASTNode(object.right);
+                returnObject.left = convertASTNode(object.left);
+                returnObject.right = convertASTNode(object.right);
                 returnObject.op = { name: binOps[object.operator] };
             }
             else if (Object.keys(comparatorOps).includes(object.operator)) {
-                //we make a compare node
-                //then we make a binop node
+                //we make a compare node, then we make a binop node
                 returnObject._astname = "Compare";
                 //binop has left, right, and operator
-                returnObject.left = convertJavascriptASTNode(object.left);
-                returnObject.comparators = [convertJavascriptASTNode(object.right)];
+                returnObject.left = convertASTNode(object.left);
+                returnObject.comparators = [convertASTNode(object.right)];
                 returnObject.ops = [{ name: comparatorOps[object.operator] }];
             }
         }
         else if (object.type === "UnaryExpression" && object.operator === "!") {
             returnObject._astname = "UnaryOp";
             returnObject.op = { name: "Not" };
-            returnObject.operand = convertJavascriptASTNode(object.argument);
+            returnObject.operand = convertASTNode(object.argument);
         }
         else if (object.type === "UnaryExpression" && object.operator === "-") {
             returnObject._astname = "Num";
@@ -429,7 +392,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         }
         else if (object.type === "LogicalExpression") {
             returnObject._astname = "BoolOp";
-            returnObject.values = [convertJavascriptASTNode(object.left), convertJavascriptASTNode(object.right)];
+            returnObject.values = [convertASTNode(object.left), convertASTNode(object.right)];
             //operator should be or or and. bitwise ops don't count.
             if (Object.keys(boolOps).includes(object.operator)) {
                 returnObject.op = { name: boolOps[object.operator] };
@@ -437,7 +400,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         }
         else if (object.type === "Literal") {
             //this is all of our basic datatypes - int, float, bool, str, and null
-
             if (object.value == null) {
                 returnObject._astname = "Name";
                 returnObject.id = {
@@ -484,11 +446,9 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         else if (object.type === "ArrayExpression") {
             returnObject._astname = "List";
             var eltsObj = [];
-
             for (var i in object.elements) {
-                eltsObj.push(convertJavascriptASTNode(object.elements[i]))
+                eltsObj.push(convertASTNode(object.elements[i]))
             }
-
             returnObject.elts = eltsObj;
         }
         else if (object.type === "UpdateExpression" || object.type === "AssignmentExpression") {
@@ -496,7 +456,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             //augassign has target, op, value
             if (object.type === "UpdateExpression") {
                 returnObject._astname = "AugAssign";
-
                 var valueObj = {
                     _astname: "Num",
                     n: {
@@ -505,9 +464,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
                     },
                     lineno: object.loc.start.line
                 };
-
-                var targetObj = convertJavascriptASTNode(object.argument);
-
+                var targetObj = convertASTNode(object.argument);
                 returnObject.op = binOps[object.operator[0]];
                 returnObject.target = targetObj;
                 returnObject.value = valueObj;
@@ -515,16 +472,14 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             else {
                 if (object.operator === "=") {
                     returnObject._astname = "Assign";
-
-                    returnObject.targets = [convertJavascriptASTNode(object.left)];
-                    returnObject.value = convertJavascriptASTNode(object.right);
+                    returnObject.targets = [convertASTNode(object.left)];
+                    returnObject.value = convertASTNode(object.right);
                 }
                 else {
                     returnObject._astname = "AugAssign";
- 
                     returnObject.op = binOps[object.operator[0]];
-                    returnObject.target = convertJavascriptASTNode(object.left);
-                    returnObject.value = convertJavascriptASTNode(object.right);
+                    returnObject.target = convertASTNode(object.left);
+                    returnObject.value = convertASTNode(object.right);
                 }
             }
         }

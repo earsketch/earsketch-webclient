@@ -13,7 +13,7 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
     * @param source {String} The source code to analyze.
     * @private
     */
-    function pythonAst(source) {
+    function generateAst(source) {
         try {
             var parse = Sk.parse("<analyzer>", source);
             studentCode = source.split("\n");
@@ -56,7 +56,7 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
         //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
         userFunctionReturns = starterReturns.slice(0);
 
-        var ast = pythonAst(source);
+        var ast = generateAst(source);
         complexityCalculatorHelperFunctions.replaceNumericUnaryOps(ast.body);
         //initialize the results object
         var resultsObject = {
@@ -110,7 +110,6 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
     }
 
     return {
-        pythonAst: pythonAst,
         analyzePython: analyzePython
     };
 }]);
