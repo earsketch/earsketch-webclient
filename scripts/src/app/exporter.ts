@@ -48,7 +48,7 @@ async function exportAudio(script: ScriptEntity, quality: number, type: string, 
 
     let blob
     try {
-        blob = render(result)
+        blob = await render(result)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
         throw ESMessages.download.rendererror
