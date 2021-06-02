@@ -11,14 +11,13 @@ import * as userProject from './userProject'
 
 var audioRecorder: any, meter: any, micGain: any, zeroGain: any, previewBs: any, startTime: any, metroOsc: any, beatBuffSrc: any, eventBuffSrc: any;
 
-export let upload: any = {
-    prepareForUpload: null,
-    showUploadButton: null
-};
-
-export let callbacks: any = {
-    openRecordMenu: null,
-    micAccessBlocked: null,
+export let callbacks = {
+    prepareForUpload: (blob: Blob, useMetro: boolean, bpm: number) => {},
+    openRecordMenu: () => {},
+    micAccessBlocked: (type: string) => {},
+    showSpectrogram: () => {},
+    showRecordedWaveform: () => {},
+    clickOnMetronome: (beat: number) => {},
 }
 
 export let analyserNode: AnalyserNode | null = null;
@@ -61,7 +60,7 @@ export let clear = function (softClear?: boolean) {
     properties.isPreviewing = false;
     properties.meterVal = 0;
 
-    helpers.getNgRootScope().$broadcast('showRecordedWaveform');
+    callbacks.showRecordedWaveform();
 };
 
 export let init = function () {
@@ -134,7 +133,7 @@ function gotAudio(stream: any) {
     zeroGain.connect(ctx.destination);
 
     updateMeter();
-    helpers.getNgRootScope().$broadcast('showSpectrogram');
+    callbacks.showSpectrogram();
 }
 
 function scheduleRecord() {
@@ -213,7 +212,7 @@ function onRecordStart() {
         beatBuffSrc[i].start(ctx.currentTime + 60.0 / properties.bpm * i);
         beatBuffSrc[i].onended = function () {
             properties.curBeat = (properties.curBeat + 1) % 4;
-            helpers.getNgRootScope().$broadcast('clickOnMetronome',properties.curBeat);
+            callbacks.clickOnMetronome(properties.curBeat);
 
             if (properties.curBeat === 0) {
                 properties.curMeasure++;
@@ -277,7 +276,7 @@ function startRecording() {
     }
 
     properties.isRecording = true;
-    helpers.getNgRootScope().$broadcast('showSpectrogram');
+    callbacks.showSpectrogram();
 }
 
 function stopRecording() {
@@ -373,7 +372,7 @@ function gotBuffer(buf: any) {
         }
     }
 
-    helpers.getNgRootScope().$broadcast('showRecordedWaveform');
+    callbacks.showRecordedWaveform();
     properties.hasBuffer = true;
 
     //properties.save();
@@ -407,7 +406,7 @@ function doneEncoding(blob: any) {
     //blob.name = 'SOUND_' + numPadded + '.wav';
     blob.name='QUICK_RECORD';
 
-    upload.prepareForUpload!(blob, properties.useMetro, properties.bpm);
+    callbacks.prepareForUpload!(blob, properties.useMetro, properties.bpm);
 }
 
 export let togglePreview = function () {

@@ -64,7 +64,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
     };
 
     $scope.recorder = RecorderService;
-    RecorderService.upload.prepareForUpload = $scope.prepareForUpload;
+    RecorderService.callbacks.prepareForUpload = $scope.prepareForUpload;
 
     $scope.close = function () {
         $uibModalInstance.close();

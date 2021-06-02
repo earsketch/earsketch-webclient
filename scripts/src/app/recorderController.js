@@ -114,7 +114,7 @@ app.directive('visualMetronome', function () {
                 }
             });
 
-            scope.$on('clickOnMetronome', function (event,val) {
+            RecorderService.callbacks.clickOnMetronome = function (val) {
                 if (showMetronome) {
                     switch (val) {
                         case 0:
@@ -131,7 +131,7 @@ app.directive('visualMetronome', function () {
                             break;
                     }
                 }
-            });
+            };
         }
     }
 });
@@ -159,13 +159,13 @@ app.directive('drawWaveform', function () {
 
             ctx.clearRect(0, 0, w, h);
 
-            scope.$on('showSpectrogram', function () {
+            RecorderService.callbacks.showSpectrogram = function () {
                 if (!rafId) {
                     drawSpectrogram();
                 }
-            });
+            };
 
-            scope.$on('showRecordedWaveform', function () {
+            RecorderService.callbacks.showRecordedWaveform = function () {
                 if (rafId) {
                     window.cancelAnimationFrame(rafId);
                     rafId = undefined;
@@ -176,7 +176,7 @@ app.directive('drawWaveform', function () {
                 } else {
                     drawWaveform(new Float32Array(0));
                 }
-            });
+            };
 
             function drawWaveform(buf) {
                 var step = Math.ceil(buf.length / w);
