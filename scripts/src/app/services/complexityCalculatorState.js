@@ -28,9 +28,6 @@ app.factory('complexityCalculatorState', ['userNotification', function (userNoti
     }
 
 
-
-
-
     return {
         getState: getState,
         getStateProperty: getStateProperty,

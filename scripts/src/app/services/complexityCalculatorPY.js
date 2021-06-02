@@ -4,7 +4,7 @@
  * @module complexityCalculator
  * @author Jason Smith, Erin Truesdell
  */
-app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions) {
+app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', 'complexityCalculatorState', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions, complexityCalculatorState) {
 
     /**
     * Build the abstract syntax tree for Python. Useful for analyzing script
@@ -31,27 +31,7 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
      */
     function analyzePython(source) {
 
-        apiCalls = [];
-        allCalls = [];
-        allConditionals = [];
-        variableAssignments = [];
-
-        listFuncs = PY_LIST_FUNCS;
-        strFuncs = PY_STR_FUNCS;
-        createListFuncs = PY_CREATE_LIST_FUNCS;
-        createStrFuncs = PY_CREATE_STR_FUNCS;
-
-        //initialize all of the lists we'll use in each code reading
-        originalityLines = [];
-        loopLocations = [];
-        dataTypes = [];
-        functionLines = [];
-        uncalledFunctionLines = [];
-        userFunctionParameters = [];
-        makeBeatRenames = [];
-        userFunctionRenames = [];
-        forLoopFuncs = [];
-        allVariables = [];
+        complexityCalculatorState.resetState();
 
         //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
         userFunctionReturns = starterReturns.slice(0);
@@ -64,10 +44,6 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
             conditionals: 0,
             forLoops: 0,
             List: 0,
-            Str: 0,
-            Int: 0,
-            Float: 0,
-            Bool: 0,
             variables: 0,
             listOps: 0,
             strOps: 0,

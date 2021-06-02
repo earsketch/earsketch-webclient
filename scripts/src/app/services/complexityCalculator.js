@@ -13,24 +13,30 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
 
     function getApiCalls() {
-        return apiCalls;
+        return complexityCalculatorState.getStateProperty("apiCalls")();
     }
 
 
     var translatedIntegerValues = {
         0: { "": "Does not Use" },
-        1: { "": "Uses" },   
-        2: { "consoleInput":"Takes Console Input Originally",
-             "": "Uses Original" },
-        3: { "forLoops": () => isJavascript? "Uses Originally with Two Arguments" : "Uses Originally With Range Min/Max",
-             "conditionals": "Uses Originally to Follow Multiple Code Paths",
-             "userFunc": "Uses and Calls Originally",
-             "consoleInput": "Takes Input Originally and Uses For Purpose",
-             "": "Uses Originally For Purpose" },
-        4: { "forLoops": () => isJavascript? "Uses Originally with Three Arguments" : "Uses Originally With Range Min/Max and Increment",
-             "variables": "Uses Originally And Transforms Value",
-             "strings": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon",
-             "lists": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon" },
+        1: { "": "Uses" },
+        2: {
+            "consoleInput": "Takes Console Input Originally",
+            "": "Uses Original"
+        },
+        3: {
+            "forLoops": () => isJavascript ? "Uses Originally with Two Arguments" : "Uses Originally With Range Min/Max",
+            "conditionals": "Uses Originally to Follow Multiple Code Paths",
+            "userFunc": "Uses and Calls Originally",
+            "consoleInput": "Takes Input Originally and Uses For Purpose",
+            "": "Uses Originally For Purpose"
+        },
+        4: {
+            "forLoops": () => isJavascript ? "Uses Originally with Three Arguments" : "Uses Originally With Range Min/Max and Increment",
+            "variables": "Uses Originally And Transforms Value",
+            "strings": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon",
+            "lists": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon"
+        },
         5: { "forLoops": "Uses Original Nested Loops" }
     }
 
@@ -45,27 +51,32 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             var tempKey = key;
             if (!Object.keys(translatorDict).includes(key)) { tempKey = ""; }
             resultsObj[key] = translatorDict[tempKey];
-            if (typeof(resultsObj[key]) === "function") { resultsObj[key] = resultsObj[key](); }
+            if (typeof (resultsObj[key]) === "function") { resultsObj[key] = resultsObj[key](); }
         });
     }
 
 
-    /*Fills userFunctionParameters list
+    /*Fills  complexityCalculatorState.getStateProperty("userFunctionParameters") list
     * @param ast - An AST tree or node
     * @param results - the results object.
     */
     function evaluateUserFunctionParameters(ast, results) {
+
         if (ast != null && ast.body != null) {
-            angular.forEach(ast.body, function (node) {
+            var astKeys = Object.keys(ast.body);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast.body[astKeys[r]];
                 checkForFunctions(node, results);
                 evaluateUserFunctionParameters(node, results);
-            });
+            }
         }
-        else if (ast != null && (ast._astname != null || (ast[0] != null && typeof ast[0] === 'object'))) {
-            angular.forEach(ast, function (node) {
+        else if (ast != null && (ast._astname != null || (ast[0] != null && Object.keys(ast[0]) != null))) {
+            var astKeys = Object.keys(ast);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast[astKeys[r]];
                 checkForFunctions(node, results);
                 evaluateUserFunctionParameters(node, results);
-            });
+            }
         }
     }
 
@@ -75,16 +86,20 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
     */
     function gatherAllVariables(ast) {
         if (ast != null && ast.body != null) {
-            angular.forEach(ast.body, function (node) {
+            var astKeys = Object.keys(ast.body);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast.body[astKeys[r]];
                 markVariable(node);
                 gatherAllVariables(node);
-            });
+            }
         }
-        else if (ast != null && (ast._astname != null || (ast[0] != null && typeof ast[0] === 'object'))) {
-            angular.forEach(ast, function (node) {
+        else if (ast != null && (ast._astname != null || (ast[0] != null && Object.keys(ast[0]) != null))) {
+            var astKeys = Object.keys(ast);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast[astKeys[r]];
                 markVariable(node);
                 gatherAllVariables(node);
-            });
+            }
         }
     }
 
@@ -100,7 +115,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             //mark the loop bounds for later labeling of variable value changes.
             var startLine = node.lineno;
             var endLine = complexityCalculatorHelperFunctions.getLastLine(node);
-            loopLocations.push([startLine, endLine]);
+            complexityCalculatorState.getStateProperty("loopLocations").push([startLine, endLine]);
 
             //check the "init" component, and mark variable there if found
             if (node.init != null) {
@@ -115,7 +130,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
         //While loops just need to have their bounds marked
         if (node != null && node._astname != null && node._astname === "While") {
-            loopLocations.push([node.lineno, complexityCalculatorHelperFunctions.getLastLine(node)]);
+            complexityCalculatorState.getStateProperty("loopLocations").push([node.lineno, complexityCalculatorHelperFunctions.getLastLine(node)]);
         }
 
         //Python for loops. Also, JS foreach loops get sent here.
@@ -123,7 +138,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             //mark the loop bounds for later labeling of variable value changes.
             var startLine = node.lineno;
             var endLine = complexityCalculatorHelperFunctions.getLastLine(node);
-            loopLocations.push([startLine, endLine]);
+            complexityCalculatorState.getStateProperty("loopLocations").push([startLine, endLine]);
 
             var nodeIter = node.iter;
             if (nodeIter != null) {
@@ -210,8 +225,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                                         if (listItem != null && listItem._astname === "Name") {
                                                             var itemIsFunction = false;
-                                                            for (var u in userFunctionParameters) {
-                                                                if (userFunctionParameters[u].name === listItem.id.v) {
+                                                            for (var u in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                                                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[u].name === listItem.id.v) {
                                                                     itemIsFunction = true;
                                                                     break;
                                                                 }
@@ -222,7 +237,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                         }
                                                     }
 
-                                                    forLoopFuncs.push(forFuncObj);
+                                                    complexityCalculatorState.getStateProperty("forLoopFuncs").push(forFuncObj);
                                                     newVariable.value = "userFunction";
                                                 }
                                             }
@@ -312,8 +327,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                                     if (listItem != null && listItem._astname === "Name") {
                                                         var itemIsFunction = false;
-                                                        for (var u in userFunctionParameters) {
-                                                            if (userFunctionParameters[u].name === listItem.id.v) {
+                                                        for (var u in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                                                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[u].name === listItem.id.v) {
                                                                 itemIsFunction = true;
                                                                 break;
                                                             }
@@ -324,7 +339,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                     }
                                                 }
 
-                                                forLoopFuncs.push(forFuncObj);
+                                                complexityCalculatorState.getStateProperty("forLoopFuncs").push(forFuncObj);
                                                 newVariable.value = "userFunction";
 
                                             }
@@ -542,8 +557,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                                     if (listItem._astname === "Name") {
                                                         var listItemIsFunction = false;
-                                                        for (var u in userFunctionParameters) {
-                                                            if (userFunctionParameters[u].name === listItem.id.v) {
+                                                        for (var u in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                                                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[u].name === listItem.id.v) {
                                                                 listItemIsFunction = true;
                                                                 break;
                                                             }
@@ -554,7 +569,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                     }
                                                 }
                                                 newVariable.value = "userFunction";
-                                                forLoopFuncs.push(forFuncObj);
+                                                complexityCalculatorState.getStateProperty("forLoopFuncs").push(forFuncObj);
                                             }
                                         }
                                         if (newVariable.value !== "userFunction" && varElements != null && varElements.length > 0) {
@@ -618,8 +633,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                         iterListItem = complexityCalculatorHelperFunctions.retrieveFromList(iterListItem);
                                                         if (iterListItem._astname === "Name") {
                                                             var foundIter = false;
-                                                            for (var u in userFunctionParameters) {
-                                                                if (userFunctionParameters[u].name === iterListItem.id.v) {
+                                                            for (var u in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                                                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[u].name === iterListItem.id.v) {
                                                                     foundIter = true;
                                                                     break;
                                                                 }
@@ -627,7 +642,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                             if (foundIter) { forFuncObj.functionNames.push(iterListItem.id.v); }
                                                         }
                                                     }
-                                                    forLoopFuncs.push(forFuncObj);
+
+                                                    complexityCalculatorState.getStateProperty("forLoopFuncs").push(forFuncObj);
                                                     newVariable.value = "userFunction";
                                                 }
                                             }
@@ -751,8 +767,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                                 if (iterListItem._astname === "Name") {
                                                                     var foundIter = false;
 
-                                                                    for (var u in userFunctionParameters) {
-                                                                        if (userFunctionParameters[u].name === iterListItem.id.v) {
+                                                                    for (var u in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                                                                        if (complexityCalculatorState.getStateProperty("userFunctionParameters")[u].name === iterListItem.id.v) {
                                                                             foundIter = true;
                                                                             break;
                                                                         }
@@ -764,7 +780,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                                 }
                                                             }
 
-                                                            forLoopFuncs.push(forFuncObj);
+                                                            complexityCalculatorState.getStateProperty("forLoopFuncs").push(forFuncObj);
                                                             newVariable.value = "userFunction";
                                                         }
                                                     }
@@ -870,16 +886,16 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                             functionNames: []
                                         };
 
-                                        //series of renames in forLoopFuncs
+                                        //series of renames in  complexityCalculatorState.getStateProperty("forLoopFuncs")
                                         for (var i in allLists) {
                                             var iterListItem = allLists[i];
                                             iterListItem = complexityCalculatorHelperFunctions.retrieveFromList(iterListItem);
                                             if (iterListItem != null && iterListItem._astname === "Name") {
                                                 var foundIter = false;
 
-                                                for (var u in userFunctionParameters) {
+                                                for (var u in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
 
-                                                    if (userFunctionParameters[u].name === iterListItem.id.v) {
+                                                    if (complexityCalculatorState.getStateProperty("userFunctionParameters")[u].name === iterListItem.id.v) {
                                                         foundIter = true;
                                                         break;
                                                     }
@@ -890,7 +906,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                 }
                                             }
                                         }
-                                        forLoopFuncs.push(forFuncObj);
+                                        complexityCalculatorState.getStateProperty("forLoopFuncs").push(forFuncObj);
                                         newVariable.value = "userFunction";
                                     }
                                 }
@@ -913,7 +929,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             lineNumber = parentLineNumber;
                         }
 
-                        if (originalityLines.includes(lineNumber)) {
+                        if (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber)) {
 
                             newVariable.original = true;
                             for (var u = 0; u < userFunctionReturns.length; u++) {
@@ -923,11 +939,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (node.lineno >= userFunctionReturns[u].startLine && node.lineno <= userFunctionReturns[u].endLine) {
                                     var paramIndex = -1;
 
-                                    for (var a = 0; a < userFunctionParameters.length; a++) {
+                                    for (var a = 0; a < complexityCalculatorState.getStateProperty("userFunctionParameters").length; a++) {
 
-                                        if (userFunctionParameters[a].name === userFunctionReturns[u].name) {
-                                            for (var p = 0; p < userFunctionParameters[a].params.length; p++) {
-                                                if (userFunctionParameters[a].params[p] === varName) {
+                                        if (complexityCalculatorState.getStateProperty("userFunctionParameters")[a].name === userFunctionReturns[u].name) {
+                                            for (var p = 0; p < complexityCalculatorState.getStateProperty("userFunctionParameters")[a].params.length; p++) {
+                                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[a].params[p] === varName) {
                                                     paramIndex = p;
                                                     break;
                                                 }
@@ -946,9 +962,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                             //Mark the assignment at the first line of the loop
                             var lineNo = node.lineno;
-                            for (var h = 0; h < loopLocations.length; h++) {
-                                if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                    lineNo = loopLocations[h][0];
+                            for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                                if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                    lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                     break;
                                 }
                             }
@@ -962,7 +978,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             newVariable.assignedModified.push({ line: lineNo, value: studentCode[lineNumber].trim(), original: true, nodeValue: fakeValue });
 
                             allVariables.push(newVariable);
-                            variableAssignments.push({ line: node.lineno, name: newVariable.name });
+                            complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: newVariable.name });
                         }
 
                     }
@@ -989,13 +1005,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 }
 
                 var isInForLoop = false;
-                for (var n in loopLocations) {
-                    if (loopLocations[n][0] < lineNumber && loopLocations[n][1] > lineNumber) {
+                for (var n in complexityCalculatorState.getStateProperty("loopLocations")) {
+                    if (complexityCalculatorState.getStateProperty("loopLocations")[n][0] < lineNumber && complexityCalculatorState.getStateProperty("loopLocations")[n][1] > lineNumber) {
                         isInForLoop = true;
                     }
                 }
 
-                var modOriginality = (originalityLines.includes(lineNumber));
+                var modOriginality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
                 var funcName = functionNode.attr.v;
 
                 if (listFuncs.includes(funcName)) {
@@ -1027,9 +1043,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (!assignmentAlreadyExists) {
                             var lineNo = node.lineno;
 
-                            for (var h = 0; h < loopLocations.length; h++) {
-                                if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                    lineNo = loopLocations[h][0];
+                            for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                                if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                    lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                     break;
                                 }
                             }
@@ -1040,7 +1056,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 original: modOriginality,
                                 nodeValue: valueItem
                             });
-                            variableAssignments.push({ line: node.lineno, name: variableObject.name });
+                            complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: variableObject.name });
 
                             if (isInForLoop) { //push a second time if we're in a loop.
                                 variableObject.assignedModified.push({
@@ -1078,14 +1094,14 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             }
 
             var isInForLoop = false;
-            for (var n in loopLocations) {
-                if (loopLocations[n][0] < lineNumber && loopLocations[n][1] > lineNumber) {
+            for (var n in complexityCalculatorState.getStateProperty("loopLocations")) {
+                if (complexityCalculatorState.getStateProperty("loopLocations")[n][0] < lineNumber && complexityCalculatorState.getStateProperty("loopLocations")[n][1] > lineNumber) {
                     isInForLoop = true;
                     break;
                 }
             }
 
-            var modOriginality = (originalityLines.includes(lineNumber));;
+            var modOriginality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));;
             var assignLine = node.value.lineno - 1;
             var offset = node.value.col_offset;
             var valueString = node.op.name + " " + studentCode[assignLine].substring(offset);
@@ -1158,9 +1174,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
             if (!modificationAlreadyExists) {
                 var lineNo = node.lineno;
-                for (var h = 0; h < loopLocations.length; h++) {
-                    if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                        lineNo = loopLocations[h][0];
+                for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                    if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                        lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                         break;
                     }
                 }
@@ -1171,7 +1187,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     nodeValue: node,
                     binop: binVal
                 });
-                variableAssignments.push({ line: node.lineno, name: variableObject.name });
+                complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: variableObject.name });
                 if (isInForLoop) { //push twice for loops
                     variableObject.assignedModified.push({
                         line: lineNo,
@@ -1249,17 +1265,17 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                             var varName = varTarget.id.v;
 
-                            if (assignedName === "makeBeat" || makeBeatRenames.includes(assignedName)) {
+                            if (assignedName === "makeBeat" || complexityCalculatorState.getStateProperty("makeBeatRenames").includes(assignedName)) {
                                 //special case if user renames makeBeat
-                                makeBeatRenames.push(varName);
+                                complexityCalculatorState.getStateProperty("makeBeatRenames").push(varName);
                             }
 
-                            for (var n = 0; n < userFunctionParameters.length; n++) {
-                                if (userFunctionParameters[n].name === assignedName) { //double check and make sure its not already in here
+                            for (var n = 0; n < complexityCalculatorState.getStateProperty("userFunctionParameters").length; n++) {
+                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[n].name === assignedName) { //double check and make sure its not already in here
                                     var alreadyMarked = false;
 
-                                    for (var j = 0; j < userFunctionParameters.length; j++) {
-                                        if (userFunctionParameters[j].name === varName) {
+                                    for (var j = 0; j < complexityCalculatorState.getStateProperty("userFunctionParameters").length; j++) {
+                                        if (complexityCalculatorState.getStateProperty("userFunctionParameters")[j].name === varName) {
                                             alreadyMarked = true;
                                             break;
                                         }
@@ -1267,10 +1283,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                     if (!alreadyMarked) {
                                         newFunctionObject = {};
-                                        Object.assign(newFunctionObject, userFunctionParameters[n]);
+                                        Object.assign(newFunctionObject, complexityCalculatorState.getStateProperty("userFunctionParameters")[n]);
                                         newFunctionObject.name = varName;
 
-                                        userFunctionParameters.push(newFunctionObject);
+                                        complexityCalculatorState.getStateProperty("userFunctionParameters").push(newFunctionObject);
                                     }
                                 }
                             }
@@ -1295,12 +1311,12 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                     //if the function we're reassigning is a reassign of something else
                                     var reassignedFuncName = assignedName;
-                                    for (var n = 0; n < userFunctionRenames; n++) {
-                                        if (userFunctionRenames[n][0] === reassignedFuncName) {
-                                            reassignedFuncName = userFunctionRenames[n][1];
+                                    for (var n = 0; n < complexityCalculatorState.getStateProperty("userFunctionRenames"); n++) {
+                                        if (complexityCalculatorState.getStateProperty("userFunctionRenames")[n][0] === reassignedFuncName) {
+                                            reassignedFuncName = complexityCalculatorState.getStateProperty("userFunctionRenames")[n][1];
                                         }
                                     }
-                                    userFunctionRenames.push([varName, reassignedFuncName]);
+                                    complexityCalculatorState.getStateProperty("userFunctionRenames").push([varName, reassignedFuncName]);
                                     return;
                                 }
                             }
@@ -1673,16 +1689,16 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         lineNumber = parentLineNumber;
                     }
 
-                    var modOriginality = (originalityLines.includes(lineNumber));
+                    var modOriginality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
 
                     if (!invalidTransformation) {  //if this is within a function and part of the function's params, we need to note that here.
                         for (var u = 0; u < userFunctionReturns.length; u++) {
                             if (node.lineno >= userFunctionReturns[u].startLine && node.lineno <= userFunctionReturns[u].endLine) {
                                 var paramIndex = -1;  //ok, it's in the function, is it a param?
-                                for (var a = 0; a < userFunctionParameters.length; a++) {
-                                    if (userFunctionParameters[a].name === userFunctionReturns[u].name) {
-                                        for (var p = 0; p < userFunctionParameters[a].params.length; p++) {
-                                            if (userFunctionParameters[a].params[p] === varName) {
+                                for (var a = 0; a < complexityCalculatorState.getStateProperty("userFunctionParameters").length; a++) {
+                                    if (complexityCalculatorState.getStateProperty("userFunctionParameters")[a].name === userFunctionReturns[u].name) {
+                                        for (var p = 0; p < complexityCalculatorState.getStateProperty("userFunctionParameters")[a].params.length; p++) {
+                                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[a].params[p] === varName) {
                                                 paramIndex = p;
                                                 break;
                                             }
@@ -1741,9 +1757,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     if (!invalidTransformation) {
                         var lineNo = node.lineno;
                         var insideForLoop = false;
-                        for (var h = 0; h < loopLocations.length; h++) {
-                            if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                lineNo = loopLocations[h][0];
+                        for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                            if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                 insideForLoop = true;
                                 break;
                             }
@@ -1769,7 +1785,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                     }
                     allVariables.push(userVariable);
-                    variableAssignments.push({ line: node.lineno, name: userVariable.name });
+                    complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: userVariable.name });
                 }
 
                 else {
@@ -1837,11 +1853,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             lineNumber = parentLineNumber;
                         }
 
-                        var modOriginality = (originalityLines.includes(lineNumber));
+                        var modOriginality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
                         var lineNo = node.lineno;
-                        for (var h = 0; h < loopLocations.length; h++) {
-                            if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                lineNo = loopLocations[h][0];
+                        for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                            if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                 break;
                             }
                         }
@@ -1853,12 +1869,12 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             nodeValue: node.value,
                             binop: binVal
                         });
-                        variableAssignments.push({ line: node.lineno, name: allVariables[indexOfExistingVariableObj].name });
+                        complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: allVariables[indexOfExistingVariableObj].name });
 
-                        for (var uf = 0; uf < userFunctionParameters.length; uf++) { //is this variable a parameter in this function? if so, what's its parameter index?
+                        for (var uf = 0; uf < complexityCalculatorState.getStateProperty("userFunctionParameters").length; uf++) { //is this variable a parameter in this function? if so, what's its parameter index?
                             var paramIndex = -1;
-                            for (var pa = 0; pa < userFunctionParameters[uf].params.length; pa++) {
-                                if (userFunctionParameters[uf].params[pa] === varName) {
+                            for (var pa = 0; pa < complexityCalculatorState.getStateProperty("userFunctionParameters")[uf].params.length; pa++) {
+                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[uf].params[pa] === varName) {
                                     paramIndex = pa;
                                     break;
                                 }
@@ -1866,7 +1882,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (paramIndex > -1) { //ok it's a param in this func. NOW we see if it's within the lines of the function
                                 var ufReturnIndex = -1;
                                 for (var u = 0; u < userFunctionReturns.length; u++) {
-                                    if (userFunctionReturns[u].name === userFunctionParameters[uf].name) {
+                                    if (userFunctionReturns[u].name === complexityCalculatorState.getStateProperty("userFunctionParameters")[uf].name) {
                                         ufReturnIndex = u;
                                         break;
                                     }
@@ -2083,12 +2099,12 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         else if (indexVar == null && complexityCalculatorHelperFunctions.getFunctionObject(indexValue.id.v) != null) {
 
-                            for (var n = 0; n < userFunctionParameters.length; n++) {
-                                if (userFunctionParameters[n].name === userFunctionReturns[r].name) { //double check and make sure its not already in here
+                            for (var n = 0; n < complexityCalculatorState.getStateProperty("userFunctionParameters").length; n++) {
+                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[n].name === userFunctionReturns[r].name) { //double check and make sure its not already in here
                                     var alreadyMarked = false;
 
-                                    for (var j = 0; j < userFunctionParameters.length; j++) {
-                                        if (userFunctionParameters[j].name === indexValue.id.v) {
+                                    for (var j = 0; j < complexityCalculatorState.getStateProperty("userFunctionParameters").length; j++) {
+                                        if (complexityCalculatorState.getStateProperty("userFunctionParameters")[j].name === indexValue.id.v) {
                                             alreadyMarked = true;
                                             break;
                                         }
@@ -2096,10 +2112,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                     if (!alreadyMarked) {
                                         newFunctionObject = {};
-                                        Object.assign(newFunctionObject, userFunctionParameters[n]);
+                                        Object.assign(newFunctionObject, complexityCalculatorState.getStateProperty("userFunctionParameters")[n]);
                                         newFunctionObject.name = indexValue.id.v;
 
-                                        userFunctionParameters.push(newFunctionObject);
+                                        complexityCalculatorState.getStateProperty("userFunctionParameters").push(newFunctionObject);
 
                                     }
                                     break;
@@ -2130,12 +2146,12 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                     //if the function we're reassigning is a reassign of something else
                                     var reassignedFuncName = userFunctionReturns[r].name;
-                                    for (var n = 0; n < userFunctionRenames; n++) {
-                                        if (userFunctionRenames[n][0] === reassignedFuncName) {
-                                            reassignedFuncName = userFunctionRenames[n][1];
+                                    for (var n = 0; n < complexityCalculatorState.getStateProperty("userFunctionRenames"); n++) {
+                                        if (complexityCalculatorState.getStateProperty("userFunctionRenames")[n][0] === reassignedFuncName) {
+                                            reassignedFuncName = complexityCalculatorState.getStateProperty("userFunctionRenames")[n][1];
                                         }
                                     }
-                                    userFunctionRenames.push([indexValue.id.v, reassignedFuncName]);
+                                    complexityCalculatorState.getStateProperty("userFunctionRenames").push([indexValue.id.v, reassignedFuncName]);
                                     break;
                                 }
                             }
@@ -2640,8 +2656,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             var userFuncsIndex = -1;
             if (functionObject.name != null) {
                 //should never be null but putting this in here for error protection
-                for (var i in userFunctionParameters) {
-                    if (userFunctionParameters[i].name === functionObject.name) {
+                for (var i in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                    if (complexityCalculatorState.getStateProperty("userFunctionParameters")[i].name === functionObject.name) {
                         userFuncsIndex = i;
                         break;
                     }
@@ -2692,10 +2708,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         functionObject.indexAndInput.input = true;
                     }
 
-                    if (userFuncsIndex != -1 && userFunctionParameters[userFuncsIndex].params.includes(funcName)) {
+                    if (userFuncsIndex != -1 && complexityCalculatorState.getStateProperty("userFunctionParameters")[userFuncsIndex].params.includes(funcName)) {
                         //later on, this will be used to simulate a call to this function that was passed as a parameter
-                        userFunctionParameters[userFuncsIndex].paramFuncsCalled.push({
-                            index: userFunctionParameters[userFuncsIndex].params.indexOf(funcName),
+                        complexityCalculatorState.getStateProperty("userFunctionParameters")[userFuncsIndex].paramFuncsCalled.push({
+                            index: complexityCalculatorState.getStateProperty("userFunctionParameters")[userFuncsIndex].params.indexOf(funcName),
                             node: Object.assign({}, node)
                         });
                     }
@@ -2909,8 +2925,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     else if (retVal._astname === "Name") {
                         var isFunctionName = false;
 
-                        for (var i in userFunctionParameters) {
-                            if (userFunctionParameters[i].name === retVal.id.v) {
+                        for (var i in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[i].name === retVal.id.v) {
                                 isFunctionName = true;
                             }
                         }
@@ -3138,7 +3154,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             lineNumber = node.lineno - 1;
             lastLine = complexityCalculatorHelperFunctions.getLastLine(node);
             wholeLoop = studentCode.slice(lineNumber, lastLine);
-            userFunctionParameters.push({
+            complexityCalculatorState.getStateProperty("userFunctionParameters").push({
                 name: node.name.v,
                 params: paramList,
                 paramFuncsCalled: []
@@ -3164,7 +3180,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             //set originality measure
             var originality = false;
             for (var p = lineNumber + 1; p < lastLine + 1; p++) {
-                if (originalityLines.includes(p)) {
+                if (complexityCalculatorState.getStateProperty("originalityLines").includes(p)) {
                     originality = true;
                     break;
                 }
@@ -3185,11 +3201,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             };
 
             for (var k = node.lineno; k <= lastLine; k++) {
-                uncalledFunctionLines.push(k);
+                complexityCalculatorState.getStateProperty("uncalledFunctionLines").push(k);
                 functionLineMarker.lines.push(k);
             }
 
-            functionLines.push(functionLineMarker);
+            complexityCalculatorState.getStateProperty("functionLines").push(functionLineMarker);
 
             //create a new object and add its return value. push to list.
             if (functionObj != null) {
@@ -3228,7 +3244,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
             if (isOriginal) {
                 //store if it's original
-                originalityLines.push(studentLine + 1);
+                complexityCalculatorState.getStateProperty("originalityLines").push(studentLine + 1);
             }
         }
     }
@@ -3239,22 +3255,26 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
     function evaluateFunctionReturnParams(ast) {
         if (ast != null && ast.body != null) {
             lookForParamReturns(ast);
-            angular.forEach(ast.body, function (node) {
+            var astKeys = Object.keys(ast.body);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast[astKeys[r]];
                 lookForParamReturns(node);
                 evaluateFunctionReturnParams(node);
-            });
+            }
         }
         else if (ast != null && (ast._astname != null || (ast[0] != null && typeof ast[0] === 'object'))) {
             lookForParamReturns(ast);
-            angular.forEach(ast, function (node) {
+            var astKeys = Object.keys(ast.body);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast[astKeys[r]];
                 lookForParamReturns(node);
                 evaluateFunctionReturnParams(node);
-            });
+            }
         }
     }
 
 
-    /* Labels functions that return their own parameters. Also handles function removal from the uncalledFunctionLines if said function is called (we only evaluate in-function code if the function is called)
+    /* Labels functions that return their own parameters. Also handles function removal from the  complexityCalculatorState.getStateProperty("uncalledFunctionLines") if said function is called (we only evaluate in-function code if the function is called)
     * @param node - the node to be checked
     *
     *
@@ -3318,9 +3338,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         //adjustments so things get read accurately
                         var lineNo = nodeItem.lineno;
-                        for (var h = 0; h < loopLocations.length; h++) {
-                            if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                lineNo = loopLocations[h][0];
+                        for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                            if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                 break;
                             }
                         }
@@ -3331,14 +3351,14 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 value: studentCode[nodeItem.lineno - 1].trim(),
                                 nodeValue: nodeItem
                             });
-                            variableAssignments.push({ line: node.lineno, name: paramArgVar.name });
+                            complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                         }
 
                         //fill in param variable values, add to allVariables
                         var alreadyExists = -1;
                         var funcInd = -1;
-                        for (var f = 0; f < userFunctionParameters.length; f++) {
-                            if (userFunctionParameters[f].name === funcName) {
+                        for (var f = 0; f < complexityCalculatorState.getStateProperty("userFunctionParameters").length; f++) {
+                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[f].name === funcName) {
                                 funcInd = f;
                                 break;
                             }
@@ -3346,13 +3366,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (funcInd != -1) {
                             for (var e = 0; e < allVariables.length; e++) {
-                                if (allVariables[e].name === userFunctionParameters[funcInd].params[a]) {
+                                if (allVariables[e].name === complexityCalculatorState.getStateProperty("userFunctionParameters")[funcInd].params[a]) {
                                     alreadyExists = e;
                                     break;
                                 }
                             }
 
-                            paramArgVar.name = userFunctionParameters[funcInd].params[a];
+                            paramArgVar.name = complexityCalculatorState.getStateProperty("userFunctionParameters")[funcInd].params[a];
                         }
 
                         var attrName = node.func.attr.v;
@@ -3415,7 +3435,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         else if (alreadyExists === -1) {
                             allVariables.push(paramArgVar);
-                            variableAssignments.push({ line: node.lineno, name: paramArgVar.name });
+                            complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                         }
                     }
 
@@ -3686,7 +3706,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         lineNumber = parentLineNumber;
                     }
 
-                    var originality = (originalityLines.includes(lineNumber));
+                    var originality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
                     var startLine = 0;
                     var endLine = 0;
 
@@ -3707,9 +3727,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             for (var v = 0; v < allVariables.length; v++) {
                                 if (allVariables[v].name === argsIn[a].id.v) {
                                     var lineNo = nodeItem.lineno;
-                                    for (var h = 0; h < loopLocations.length; h++) {
-                                        if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                            lineNo = loopLocations[h][0];
+                                    for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                                        if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                            lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                             break;
                                         }
                                     }
@@ -3720,7 +3740,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         original: originality,
                                         nodeValue: nodeItem
                                     });
-                                    variableAssignments.push({ line: nodeItem.lineno, name: allVariables[v].name });
+                                    complexityCalculatorState.getStateProperty("variableAssignments").push({ line: nodeItem.lineno, name: allVariables[v].name });
 
                                     allVariables[v].modifyingFunctions.push([startLine, endLine]);
                                     break;
@@ -3729,13 +3749,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                     }
 
-                    //Handle uncalledFunctionLines. a functionExp is generally ALWAYS called.
-                    for (var p = 0; p < functionLines.length; p++) {
-                        if (functionLines[p].name === funcName) {
-                            //remove lines from uncalledFunctionLines
-                            for (var l = 0; l < functionLines[p].lines.length; l++) {
-                                var lineIndex = uncalledFunctionLines.indexOf(functionLines[p].lines[l]);
-                                uncalledFunctionLines.splice(lineIndex, 1);
+                    //Handle  complexityCalculatorState.getStateProperty("uncalledFunctionLines"). a functionExp is generally ALWAYS called.
+                    for (var p = 0; p < complexityCalculatorState.getStateProperty("functionLines").length; p++) {
+                        if (complexityCalculatorState.getStateProperty("functionLines")[p].name === funcName) {
+                            //remove lines from  complexityCalculatorState.getStateProperty("uncalledFunctionLines")
+                            for (var l = 0; l < complexityCalculatorState.getStateProperty("functionLines")[p].lines.length; l++) {
+                                var lineIndex = complexityCalculatorState.getStateProperty("uncalledFunctionLines").indexOf(complexityCalculatorState.getStateProperty("functionLines")[p].lines[l]);
+                                complexityCalculatorState.getStateProperty("uncalledFunctionLines").splice(lineIndex, 1);
                             }
                             break;
                         }
@@ -3771,8 +3791,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             }
 
             //if we haven't stored the name yet, check the function renames in for loops
-            for (var f = 0; f < userFunctionParameters.length; f++) {
-                if (userFunctionParameters[f].name === funcName) {
+            for (var f = 0; f < complexityCalculatorState.getStateProperty("userFunctionParameters").length; f++) {
+                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[f].name === funcName) {
                     alreadyExists = true;
                     funcInd = f;
                     break;
@@ -3781,10 +3801,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
             if (!alreadyExists) {
                 var alias = null;
-                for (var h in forLoopFuncs) {
-                    if (forLoopFuncs[h].callName === funcName) {
+                for (var h in complexityCalculatorState.getStateProperty("forLoopFuncs")) {
+                    if (complexityCalculatorState.getStateProperty("forLoopFuncs")[h].callName === funcName) {
                         alreadyExists = true;
-                        funcNames = forLoopFuncs[h].functionNames;
+                        funcNames = complexityCalculatorState.getStateProperty("forLoopFuncs")[h].functionNames;
                         break;
                     }
                 }
@@ -3798,25 +3818,25 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 var foundName = false;
                 var calledName = funcNames[r];
 
-                for (var f = 0; f < userFunctionParameters.length; f++) {
-                    if (userFunctionParameters[f].name === calledName) {
+                for (var f = 0; f < complexityCalculatorState.getStateProperty("userFunctionParameters").length; f++) {
+                    if (complexityCalculatorState.getStateProperty("userFunctionParameters")[f].name === calledName) {
                         foundName = true;
                         funcInd = f;
                         break;
                     }
                 }
-                for (var p = 0; p < functionLines.length; p++) {
-                    for (var n = 0; n < userFunctionRenames.length; n++) {
-                        if (userFunctionRenames[n][0] === calledName) {
-                            calledName = userFunctionRenames[n][1];
+                for (var p = 0; p < complexityCalculatorState.getStateProperty("functionLines").length; p++) {
+                    for (var n = 0; n < complexityCalculatorState.getStateProperty("userFunctionRenames").length; n++) {
+                        if (complexityCalculatorState.getStateProperty("userFunctionRenames")[n][0] === calledName) {
+                            calledName = complexityCalculatorState.getStateProperty("userFunctionRenames")[n][1];
                         }
                     }
 
-                    if (functionLines[p].name === calledName) {
-                        //remove lines from uncalledFunctionLines
-                        for (var l = 0; l < functionLines[p].lines.length; l++) {
-                            var lineIndex = uncalledFunctionLines.indexOf(functionLines[p].lines[l]);
-                            uncalledFunctionLines.splice(lineIndex, 1);
+                    if (complexityCalculatorState.getStateProperty("functionLines")[p].name === calledName) {
+                        //remove lines from  complexityCalculatorState.getStateProperty("uncalledFunctionLines")
+                        for (var l = 0; l < complexityCalculatorState.getStateProperty("functionLines")[p].lines.length; l++) {
+                            var lineIndex = complexityCalculatorState.getStateProperty("uncalledFunctionLines").indexOf(complexityCalculatorState.getStateProperty("functionLines")[p].lines[l]);
+                            complexityCalculatorState.getStateProperty("uncalledFunctionLines").splice(lineIndex, 1);
                         }
                         break;
                     }
@@ -3865,9 +3885,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         //get lineno, etc.
                         var lineNo = node.lineno;
-                        for (var h = 0; h < loopLocations.length; h++) {
-                            if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                lineNo = loopLocations[h][0];
+                        for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                            if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                 break;
                             }
                         }
@@ -3878,19 +3898,19 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 value: studentCode[node.lineno - 1].trim(),
                                 nodeValue: node
                             });
-                            variableAssignments.push({ line: node.lineno, name: paramArgVar.name });
+                            complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                         }
 
                         var alreadyExists = -1;
                         for (var e = 0; e < allVariables.length; e++) {
-                            if (allVariables[e].name === userFunctionParameters[funcInd].params[a]) {
+                            if (allVariables[e].name === complexityCalculatorState.getStateProperty("userFunctionParameters")[funcInd].params[a]) {
                                 alreadyExists = e;
                                 break;
                             }
                         }
 
                         if (funcInd != -1) {
-                            paramArgVar.name = userFunctionParameters[funcInd].params[a];
+                            paramArgVar.name = complexityCalculatorState.getStateProperty("userFunctionParameters")[funcInd].params[a];
                         }
 
                         //now we get the actual value
@@ -4196,7 +4216,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             else if (alreadyExists === -1) {
                                 allVariables.push(paramArgVar);
 
-                                variableAssignments.push({ line: node.lineno, name: paramArgVar.name });
+                                complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                             }
                         }
                     }
@@ -4473,7 +4493,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         else {
                             lineNumber = parentLineNumber;
                         }
-                        var originality = (originalityLines.includes(lineNumber));
+                        var originality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
 
                         funcName = node.func.id.v;
                         nodeArgs = node.args;
@@ -4499,9 +4519,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (allVariables[v].name === nodeArgs[a].id.v) {
                                         var lineNo = node.lineno;
 
-                                        for (var h = 0; h < loopLocations.length; h++) {
-                                            if (lineNo >= loopLocations[h][0] && lineNo <= loopLocations[h][1]) {
-                                                lineNo = loopLocations[h][0];
+                                        for (var h = 0; h < complexityCalculatorState.getStateProperty("loopLocations").length; h++) {
+                                            if (lineNo >= complexityCalculatorState.getStateProperty("loopLocations")[h][0] && lineNo <= complexityCalculatorState.getStateProperty("loopLocations")[h][1]) {
+                                                lineNo = complexityCalculatorState.getStateProperty("loopLocations")[h][0];
                                                 break;
                                             }
                                         }
@@ -4512,14 +4532,14 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                             original: originality,
                                             nodeValue: node
                                         });
-                                        variableAssignments.push({ line: node.lineno, name: allVariables[v].name });
+                                        complexityCalculatorState.getStateProperty("variableAssignments").push({ line: node.lineno, name: allVariables[v].name });
                                         allVariables[v].modifyingFunctions.push([startLine, endLine]);
 
                                         break;
                                     }
                                 }
                             }
-                        }
+                        } piCalls
                     }
                 }
             }
@@ -4534,7 +4554,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         }
 
         var originality = false;
-        originality = (originalityLines.includes(lineNumber));
+        originality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
 
         //add to apiFunctionCalls
         var functionNameNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
@@ -4549,10 +4569,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 callObject.args = complexityCalculatorHelperFunctions.getArgValuesFromArray(node.args, node.lineno);
             }
 
-            allCalls.push(callObject);
+            complexityCalculatorState.getStateProperty("allCalls")().push(callObject);
 
             if (apiFunctions.includes(functionNameNode.id.v)) {
-                apiCalls.push(callObject);
+                complexityCalculatorState.getStateProperty("apiCalls")().push(callObject);
             }
         }
         else if (functionNameNode != null && 'attr' in functionNameNode) {
@@ -4565,15 +4585,15 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 callObject.args = complexityCalculatorHelperFunctions.getArgValuesFromArray([functionNameNode.value], node.lineno);
             }
 
-            allCalls.push(callObject);
+            complexityCalculatorState.getStateProperty("allCalls")().push(callObject);
         }
 
         //if it's a function that's been renamed, we count this as variables being 3
         if (originality) {
             //go through function renames
             //the varname is the first one
-            for (var i in userFunctionRenames) {
-                if (userFunctionRenames[i][0] === functionNameNode.id.v && results.variables < 3) {
+            for (var i in complexityCalculatorState.getStateProperty("userFunctionRenames")) {
+                if (complexityCalculatorState.getStateProperty("userFunctionRenames")[i][0] === functionNameNode.id.v && results.variables < 3) {
                     results.variables = 3;
                 }
             }
@@ -4611,8 +4631,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 }
             }
         }
-        for (var f = 0; f < userFunctionParameters.length; f++) {
-            if (userFunctionParameters[f].name === funcName) {
+        for (var f = 0; f < complexityCalculatorState.getStateProperty("userFunctionParameters").length; f++) {
+            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[f].name === funcName) {
                 foundFunc = true;
                 functionParametersIndex = f;
                 break;
@@ -4620,7 +4640,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         }
 
         //using a list as a makeBeat() parameter counts as indexing it for a purpose.
-        if ((funcName === "makeBeat" || makeBeatRenames.includes(funcName)) && results["List"] < 4 && node.args.length > 0) {
+        if ((funcName === "makeBeat" || complexityCalculatorState.getStateProperty("makeBeatRenames").includes(funcName)) && results.lists < 4 && node.args.length > 0) {
 
             //see if the arg is a list
             //get the first argument
@@ -4681,11 +4701,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         //let's check the args
         //using something as an argument counts as using "for a purpose," so this gets updated in the results.
         var argResults = {
-            Float : false,
-            Int : false,
-            Str : false,
-            Bool : false,
-            List : false
+            Float: false,
+            Int: false,
+            Str: false,
+            Bool: false,
+            List: false
         };
 
         var nodeArgs = [];
@@ -4740,7 +4760,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         //if anything reaches a new level, update the results.
         if (originality || functionOriginality) {
             for (let arg in argResults) {
-                if(argResults[arg] && results[arg] < 3) {
+                if (argResults[arg] && results[arg] < 3) {
                     results[arg] = 3;
                 }
             }
@@ -4750,33 +4770,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         for (var a = 0; a < nodeArgs.length; a++) {
 
             var argResults = {
-                Float : false,
-                Int : false,
-                Str : false,
-                Bool : false,
-                List : false
+                List: false
             };
 
             var singleArg = nodeArgs[a];
 
             //extract values from UnaryOp and Subscript nodes
             if (singleArg._astname === "UnaryOp") {
-                var anyOr = originality;
-                if (!originality) {
-                    var unaryNames = [];
-                    complexityCalculatorHelperFunctions.getNestedVariables(singleArg, unaryNames);
-
-                    for (var p in unaryNames) {
-                        var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
-                        if (isVar != null && isVar.original) {
-                            anyOr = true;
-                            break;
-                        }
-                    }
-                }
-                if (anyOr) {
-                    results["Bool"] = 3;
-                }
                 singleArg = singleArg.operand;
             }
             if (complexityCalculatorHelperFunctions.retrieveFromList(singleArg) != singleArg) {
@@ -4801,9 +4801,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             if (singleArg != null && singleArg._astname === "Subscript") {
 
                 if (originality) {
-                    if (complexityCalculatorHelperFunctions.getStringIndexingInNode(singleArg)[0]) {
-                        results["Str"] = 4;
-                    }
                     if (complexityCalculatorHelperFunctions.getIndexingInNode(singleArg)[0]) {
                         results["List"] = 4;
                     }
@@ -4834,22 +4831,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             if (singleArg != null) {
                 if (singleArg._astname === "UnaryOp") {
 
-                    var anyOr = originality;
-                    if (!originality) {
-                        var unaryNames = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(singleArg, unaryNames);
-                        for (var p in unaryNames) {
-                            var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
-                            if (isVar != null && isVar.original) {
-                                anyOr = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (anyOr) {
-                        results["Bool"] = 3;
-                    }
                     singleArg = singleArg.operand;
                 }
 
@@ -4859,9 +4840,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     var funcExpOriginality = false;
                     nameString += singleArg.lineno + "|" + singleArg.col_offset;
 
-                    for (var i in userFunctionParameters) {
-                        if (userFunctionParameters[i].name === nameString) {
-                            if (userFunctionParameters[i].params.length > 0) {
+                    for (var i in complexityCalculatorState.getStateProperty("userFunctionParameters")) {
+                        if (complexityCalculatorState.getStateProperty("userFunctionParameters")[i].name === nameString) {
+                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[i].params.length > 0) {
                                 takesArgs = true;
                             }
                             break;
@@ -4893,10 +4874,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     if (functionParametersIndex > -1) {
                         //if a matches an index, make a fake node and recursively analyze
 
-                        for (var paramFunc in userFunctionParameters[functionParametersIndex].paramFuncsCalled) {
-                            if (userFunctionParameters[functionParametersIndex].paramFuncsCalled[paramFunc].index === a) {
+                        for (var paramFunc in complexityCalculatorState.getStateProperty("userFunctionParameters")[functionParametersIndex].paramFuncsCalled) {
+                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[functionParametersIndex].paramFuncsCalled[paramFunc].index === a) {
                                 //make a fake node
-                                var fakeNode = Object.assign({}, userFunctionParameters[functionParametersIndex].paramFuncsCalled[paramFunc].node);
+                                var fakeNode = Object.assign({}, complexityCalculatorState.getStateProperty("userFunctionParameters")[functionParametersIndex].paramFuncsCalled[paramFunc].node);
 
                                 if (singleArg._astname === "Name") {
                                     fakeNode.func = Object.assign({}, singleArg);
@@ -4962,20 +4943,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (funcItem.indexAndInput != null && funcItem.indexAndInput.indexed) {
                             results["List"] = 4;
                         }
-                        if (funcItem.indexAndInput != null && funcItem.indexAndInput.strIndexed) {
-                            results["Str"] = 4;
-                        }
                         if (funcItem.opsDone != null) {
                             var opsUsedList = complexityCalculatorHelperFunctions.opsBeforeLine(funcItem.opsDone, lineNumberToUse, "func", funcItem);
                             complexityCalculatorHelperFunctions.appendArray(opsUsedList, opsUsed);
                         }
                     }
 
-                    //update results object accordingly
-                    if (funcReturn === "Str" && results["Str"] < 3) {
-                        results["Str"] = 3;
-                    }
-                    else if (results[funcReturn] < 3) {
+                    else if (results[funcReturn] < 3 && funcReturn == "List") {
                         argResults[funcReturn] = true;
                     }
 
@@ -4988,17 +4962,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                     }
                 }
-                //basic datatypes: str, bool, int, float
-                else if (singleArg._astname === 'Str') {
-                    argResults["Str"] = true;
-                }
-                else if (singleArg._astname === 'Name' && singleArg.id.v != null && (singleArg.id.v === 'True' || singleArg.id.v === 'False')) {
-                    argResults["Bool"] = true;
-                }
-                else if (singleArg._astname === 'Num') {
-                    complexityCalculatorHelperFunctions.isNodeFloat(singleArg) ? argResults["Float"] = true : argResults["Int"] = true;
-                }
-
                 //if it's a list, we also look at and note all the types in the list as being used for a purpose.
                 else if (singleArg._astname === 'List') {
 
@@ -5019,15 +4982,12 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (listInputIndexing.indexed) {
                             results["List"] = 4;
                         }
-                        if (listInputIndexing.strIndexed) {
-                            results["Str"] = 4;
-                        }
                     }
                     else {
                         listValues = complexityCalculatorHelperFunctions.listTypesWithin(singleArg.elts, listValues, { input: false, indexed: false, strIndexed: false }, []);
                     }
 
-                    listValues.forEach(function(arg) {
+                    listValues.forEach(function (arg) {
                         argResults[arg] = true;
                     });
 
@@ -5068,21 +5028,15 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if ((originalAssignment || originality) && otherVar.indexAndInput.indexed) {
                             results["List"] = 4;
                         }
-                        if ((originalAssignment || originality) && otherVar.indexAndInput.strIndexed) {
-                            results["Str"] = 4;
-                        }
                         if ((originalAssignment || originality) && otherVar.opsDone != null) {
                             var opsUsedInVar = complexityCalculatorHelperFunctions.opsBeforeLine(otherVar.opsDone, lineNumberToUse, "var", otherVar);
                             complexityCalculatorHelperFunctions.appendArray(opsUsedInVar, opsUsed);
                         }
 
-                        if (otherVar.containedValue != null) {
-                            otherVar.containedValue.forEach(function(arg) {
-                                argResults[arg] = true;
-                            });
+                        if ((otherVar.containedValue != null && otherVar.containedValue.includes("List")) || otherVar.value == "List") {
+                            argResults["List"] = true;
                         }
 
-                        argResults[otherVar.value] = true;
                     }
 
                     //check to see if this is a variable whose value has been changed at least once before this call
@@ -5159,10 +5113,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (results.variables < 3) {
                                 results.variables = 3;
                             }
-                            if (varType === "Bool" && (results.bools === "Does Not Use" || results.bools === 1 || results.bools === 2)) {
-                                results.bools = 3;
-                            }
-                            else if(results[varType] < 3) {
+                            else if (results[varType] < 3 && varType == "List") {
                                 results[varType] = 3;
                             }
                         }
@@ -5174,7 +5125,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             results.variables = 3;
                         }
                         for (let arg in argResults) {
-                            if (argResults[arg] && results[arg] < 3) {
+                            if (argResults[arg] && results[arg] < 3 && arg == "List") {
                                 results[arg] = 3;
                             }
                         }
@@ -5184,9 +5135,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 else if ((singleArg._astname === "BinOp" || singleArg._astname === "BoolOp" || singleArg._astname === "Compare" || singleArg._astname === "List")) {
                     if (complexityCalculatorHelperFunctions.getIndexingInNode(singleArg)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(singleArg)[1])) {
                         results["List"] = 4;
-                    }
-                    if (complexityCalculatorHelperFunctions.getStringIndexingInNode(singleArg)[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(singleArg)[1])) {
-                        results["Str"] = 4;
                     }
                 }
 
@@ -5236,9 +5184,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (inputIndexPurpose.indexed) {
                             results["List"] = 4;
                         }
-                        if (inputIndexPurpose.strIndexed) {
-                            results["Str"] = 4;
-                        }
                     }
 
                     if (originality && !opsUsed.includes("BinOp")) {
@@ -5247,13 +5192,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     for (var p = 0; p < withinBinOp.length; p++) {
                         if (Array.isArray(withinBinOp[p])) { //if the binop includes a list, go through THAT.
                             argResults["List"] = true;
-                            withinBinOp[p].forEach(function(arg) {
-                                argResults[arg] = true;
-                            });
-
-                        }
-                        else {
-                            argResults[withinBinOp[p]] = true;
                         }
                     }
                 }
@@ -5288,9 +5226,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         if (inputForPurposeInArg.indexed) {
                             results["List"] = 4;
-                        }
-                        if (inputForPurposeInArg.strIndexed) {
-                            results["Str"] = 4;
                         }
                     }
                     for (var b = 0; b < boolOpValues.length; b++) {
@@ -5327,9 +5262,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (indexInputItem.indexed) {
                             results["List"] = 4;
                         }
-                        if (indexInputItem.strIndexed) {
-                            results["Str"] = 4;
-                        }
                     }
 
                     if (indexInputItem.input) {
@@ -5337,9 +5269,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     }
 
                     //update datatype usage bools
-                    for (var b = 0; b < compareValues.length; b++) {
-                        argResults[compareValues[b]] = true;
-                    }
+                    if (compareValues.includes("List")) { argResults["List"] = true; }
                 }
 
                 //is it something else that can CONTAIN a variable value? We need to check this for setting results.variables to 3
@@ -5393,7 +5323,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (otherVariable.indexAndInput.input) {
                                     results.consoleInput = 3;
                                 }
-                                if (results[containedVal] < 3) {
+                                if (results[containedVal] < 3 && containedVal == "List") {
                                     results[containedVal] = 3;
                                 }
                             }
@@ -5411,7 +5341,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         results.variables = 3;
                     }
                     for (let arg in argResults) {
-                        if (argResults[arg] && results[arg] < 3) {
+                        if (argResults[arg] && results[arg] < 3 && arg == "List") {
                             results[arg] = 3;
                         }
                     }
@@ -5426,16 +5356,16 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
             if (funcFound == null) {
                 //is it in ForLoopFuncs instead???
                 var fLF = null;
-                for (var f in forLoopFuncs) {
-                    if (forLoopFuncs[f].callName === funcName) {
-                        fLF = forLoopFuncs[f];
+                for (var f in complexityCalculatorState.getStateProperty("forLoopFuncs")) {
+                    if (complexityCalculatorState.getStateProperty("forLoopFuncs")[f].callName === funcName) {
+                        fLF = complexityCalculatorState.getStateProperty("forLoopFuncs")[f];
                         break;
                     }
                 }
                 if (fLF != null) {
                     //handle variable originality too
                     var forLoopOrig = false;
-                    if (!originality && originalityLines.includes(fLF.startLine)) {
+                    if (!originality && complexityCalculatorState.getStateProperty("originalityLines").includes(fLF.startLine)) {
                         //this is done only if the call isn't original, for efficiency's sake
                         forLoopOrig = true;
                     }
@@ -5452,8 +5382,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (Number.isInteger(results.userFunc) && results.userFunc < 3) {
                                 results.userFunc = 3;
                             }
-                            for (var f = 0; f < userFunctionParameters.length; f++) {
-                                if (userFunctionParameters[f].name === fLF.functionNames[otherName]) {
+                            for (var f = 0; f < complexityCalculatorState.getStateProperty("userFunctionParameters").length; f++) {
+                                if (complexityCalculatorState.getStateProperty("userFunctionParameters")[f].name === fLF.functionNames[otherName]) {
                                     paramFuncIndex = f;
                                     break;
                                 }
@@ -5465,14 +5395,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (otherFunc.indexAndInput.indexed) {
                                     results["List"] = 4;
                                 }
-                                if (otherFunc.indexAndInput.strIndexed) {
-                                    results["Str"] = 4;
-                                }
                                 if (otherFunc.indexAndInput.input) {
                                     results.consoleInput = 3;
                                 }
                             }
-                            if (userFunctionParameters[paramFuncIndex].params.length > 0) {
+                            if (complexityCalculatorState.getStateProperty("userFunctionParameters")[paramFuncIndex].params.length > 0) {
                                 takesArgs = true;
                             }
                         }
@@ -5489,14 +5416,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     if (funcFound.indexAndInput.indexed) {
                         results["List"] = 4;
                     }
-                    if (funcFound.indexAndInput.strIndexed) {
-                        results["Str"] = 4;
-                    }
                     if (funcFound.indexAndInput.input) {
                         results.consoleInput = 3;
                     }
                 }
-                if (functionParametersIndex != -1 && userFunctionParameters[functionParametersIndex].params.length > 0) {
+                if (functionParametersIndex != -1 && complexityCalculatorState.getStateProperty("userFunctionParameters")[functionParametersIndex].params.length > 0) {
                     takesArgs = true;
                 }
             }
@@ -5534,19 +5458,15 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 lineNumber = parentLineNumber;
             }
 
-            if (!uncalledFunctionLines.includes(lineNumber + 1)) {
+            if (!complexityCalculatorState.getStateProperty("uncalledFunctionLines").includes(lineNumber + 1)) {
                 //initilize usage booleans
                 var uses = {
                     variables: false,
-                    strings: false,
-                    booleans: false,
                     conditionals: false,
-                    ints: false,
                     lists: false,
                     consoleInput: false,
                     mathematicalOperators: false,
                     comparisons: false,
-                    floats: false,
                     userFunc: false,
                     forLoops: false,
                     whileLoops: false,
@@ -5565,21 +5485,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 if (node._astname === 'Assign' || node[0] === 'Assign') {
                     uses["variables"] = true;
                 }
-                if (node._astname === 'Str') {
-                    uses["strings"] = true;
-                }
-                if (node._astname === 'Num') {
-                    complexityCalculatorHelperFunctions.isNodeFloat(node) ? uses["floats"] = true : uses["ints"] = true;
-                }
-                if ((node._astname === "Name" && (node.id.v === "True" || node.id.v === "False"))) {
-                    uses["booleans"] = true;
-                }
-                if (node._astname === "UnaryOp") {
-                    uses["booleans"] = true;
-                }
                 if (node._astname === "Name" && node.id.v !== "True" && node.id.v !== "False" && complexityCalculatorHelperFunctions.getVariableObject(node.id.v) != null) {
                     uses["variables"] = true;
-                    if (originalityLines.includes(lineNumber) && results.variables < 2) {
+                    if (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber) && results.variables < 2) {
                         results.variables = 2;
                     }
                 }
@@ -5596,26 +5504,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     recursiveAnalyzeAST(node.operand, results, loopParent);
                 }
 
-                //CASTING - this marks existence of relevant datatype.
-                if (node._astname === "Call" && 'func' in node) {
-                    var nodeFunc = node.func;
-                    nodeFunc = complexityCalculatorHelperFunctions.retrieveFromList(nodeFunc);
-                    if (nodeFunc._astname === 'Name') {
 
-                        if (nodeFunc.id.v === "int") {
-                            uses["int"] = true;
-                        }
-                        if (nodeFunc.id.v === "float") {
-                            uses["floats"] = true;
-                        }
-                        if (nodeFunc.id.v === "bool") {
-                            uses["booleans"] = true;
-                        }
-                        if (nodeFunc.id.v === "str") {
-                            uses["strings"] = true;
-                        }
-                    }
-                }
                 //look for user-defined functions
                 if (node._astname === 'FunctionDef') {
                     uses["userFunc"] = true;
@@ -5649,7 +5538,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         if (originality || anyOriginalNested) {
                             if (nameItem.indexAndInput.input) { results.consoleInput = 3; }
-                            if (nameItem.indexAndInput.strIndexed) { results["Str"] = 4; }
                             if (nameItem.indexAndInput.indexed) { results["List"] = 4; }
                             var opsList = complexityCalculatorHelperFunctions.opsBeforeLine(nameItem.opsDone, node.lineno, "var", nameItem);
                             for (var p = 0; p < opsList; p++) {
@@ -5729,7 +5617,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (listFuncs.includes(funcName) && !isStrFunc) {
                             if (results.listOps[funcName] === 0) { results.listOps = 1; }
-                            if (originalityLines.includes(node.lineno) && results.listOps < 2) { results.listOps = 2; }
+                            if (complexityCalculatorState.getStateProperty("originalityLines").includes(node.lineno) && results.listOps < 2) { results.listOps = 2; }
                             listOpUsed = "" + funcName;
                             if (attrVar != null) { attrVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", attrVar.opsDone, node.lineno); }
                             //are we in a function?
@@ -5742,7 +5630,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         if (strFuncs.includes(funcName) && !isListFunc) {
                             if (results.strOps === 0) { results.strOps = 1; }
-                            if (originalityLines.includes(node.lineno) && results.strOps < 2) { results.strOps = 2; }
+                            if (complexityCalculatorState.getStateProperty("originalityLines").includes(node.lineno) && results.strOps < 2) { results.strOps = 2; }
                             strOpUsed = "" + funcName;
                             if (attrVar != null) { attrVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("StrOp", attrVar.opsDone, node.lineno); }
                             //are we in a function?
@@ -5757,23 +5645,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                 }
                 //look for console input
                 if ((node.value != null && node.value._astname === 'Call') && ('id' in node.value.func && 'v' in node.value.func.id && node.value.func.id.v === 'readInput')) { uses["consoleInput"] = true; }
-                var newDataType = "";
                 //mark usage of the things we are looknig for
                 Object.keys(uses).forEach(function (key) {
                     if (uses[key] && results[key] === 0) { results[key] = 1; }
                 });
-                if (uses["booleans"]) {
-                    newDataType = "Bool";
-                }
-                if (uses["floats"]) {
-                    newDataType = "Float";
-                }
-                if (uses["ints"]) {
-                    newDataType = "Int";
-                }
-                if (uses["strings"]) {
-                    newDataType = "Str";
-                }
+
 
                 //Level 2 is originality, so we check that next.
 
@@ -5787,10 +5663,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     //lastLine = node.body[node.body.length - 1].lineno + 1;
                     var lastLine = complexityCalculatorHelperFunctions.getLastLine(node);
                     for (var chunkLine = node.lineno; chunkLine <= lastLine; chunkLine++) {
-                        if (originalityLines.includes(chunkLine)) {
+                        if (complexityCalculatorState.getStateProperty("originalityLines").includes(chunkLine)) {
                             originality = true;
                             break;
                         }
+
                     }
                     //tree originaity, if we ever want to switch to this measure
                     // originality = complexityCalculatorHelperFunctions.TreeOriginality(node, 1, STRUCTURE_SAMPLES);
@@ -5806,7 +5683,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         lineNumber = parentLineNumber;
                     }
 
-                    originality = (originalityLines.includes(lineNumber));
+                    originality = (complexityCalculatorState.getStateProperty("originalityLines").includes(lineNumber));
                 }
 
                 //originality value updates for functions, variables, etc.
@@ -5825,7 +5702,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     }
 
                     //whatever is in here, mark that it's used uniquely.
-                    var markAsOriginal = ["variables", "strings", "booleans", "ints", "consoleInput", "mathematicalOperators", "floats", "lists", "listOps", "strOps", "boolOps"];
+                    var markAsOriginal = ["variables", "consoleInput", "mathematicalOperators", "lists", "listOps", "strOps", "boolOps"];
 
                     for (var attribute = 0; attribute < markAsOriginal.length; attribute++) {
                         if (uses[markAsOriginal[attribute]] && results[markAsOriginal[attribute]] < 2) {
@@ -5865,9 +5742,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (iterName.value === "List") {
                                     results["List"] = 4;
                                 }
-                                if (iterName.value === "Str") {
-                                    results["Str"] = 4;
-                                }
 
                                 var listedOps = complexityCalculatorHelperFunctions.opsBeforeLine(iterName.opsDone, node.lineno, "var", iterName);
 
@@ -5890,9 +5764,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                             }
                         }
-                        if (node.iter._astname === "Str") {
-                            results["Str"] = 4;
-                        }
 
                         if ('func' in node.iter) {
                             if (complexityCalculatorHelperFunctions.doesCallCreateList(node.iter)) {
@@ -5906,9 +5777,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                 if (iterator.returns === "List") {
                                     results["List"] = 4;
-                                }
-                                else if (iterator.returns === "Str") {
-                                    results["Str"] = 4;
                                 }
                                 var listedOps = complexityCalculatorHelperFunctions.opsBeforeLine(iterator.opsDone, node.lineno, "func", iterator);
 
@@ -6015,7 +5883,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         var isStrIndexedItem = complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[0];
 
                         if (isIndexedItem) { results["List"] = 4; }
-                        if (isStrIndexedItem) { results["Str"] = 4; }
 
                         testNode = complexityCalculatorHelperFunctions.retrieveFromList(testNode);
                     }
@@ -6035,9 +5902,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                             }
                         }
-                        if (anyOr) {
-                            results["Bool"] = 3;
-                        }
                         testNode = testNode.operand;
                     }
 
@@ -6052,9 +5916,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         //update indexing variables
                         if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
                             results["List"] = 4;
-                        }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[1])) {
-                            results["Str"] = 4;
                         }
 
                         if (!originality) {
@@ -6080,9 +5941,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (inputIndexItem.indexed) {
                                 results["List"] = 4;
                             }
-                            if (inputIndexItem.strIndexed) {
-                                results["Str"] = 4;
-                            }
                             if (inputIndexItem.input) {
                                 inputUsed = true;
                             }
@@ -6099,9 +5957,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
                             results["List"] = 4;
-                        }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[1])) {
-                            results["Str"] = 4;
                         }
 
                         if (!originality) {
@@ -6121,9 +5976,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (inputIndexItem.indexed) {
                             results["List"] = 4;
                         }
-                        if (inputIndexItem.strIndexed) {
-                            results["Str"] = 4;
-                        }
                         if (inputIndexItem.input) {
                             inputUsed = true;
                         }
@@ -6139,9 +5991,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
                             results["List"] = 4;
-                        }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[1])) {
-                            results["Str"] = 4;
                         }
 
                         if (!originality) {
@@ -6161,9 +6010,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (inputIndexPurp.indexed) {
                             results["List"] = 4;
                         }
-                        if (inputIndexPurp.strIndexed) {
-                            results["Str"] = 4;
-                        }
                         if (inputIndexPurp.input) {
                             inputUsed = true;
                         }
@@ -6178,9 +6024,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
                             results["List"] = 4;
-                        }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[1])) {
-                            results["Str"] = 4;
                         }
                         if (!originality) {
                             containedTypes = complexityCalculatorHelperFunctions.listTypesWithin(testNode.elts, containedTypes, {
@@ -6198,9 +6041,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (inputIndexPurp.indexed) {
                             results["List"] = 4;
-                        }
-                        if (inputIndexPurp.strIndexed) {
-                            results["Str"] = 4;
                         }
                         if (inputIndexPurp.input) {
                             inputUsed = true;
@@ -6227,9 +6067,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (testVar.indexAndInput.indexed && (originality || testVar.original)) {
                                     results["List"] = 4
                                 }
-                                if (testVar.indexAndInput.strIndexed && (originality || testVar.original)) {
-                                    results["Str"] = 4;
-                                }
                                 if (testVar.opsDone != null && (originality || testVar.original)) {
                                     var opsInVar = complexityCalculatorHelperFunctions.opsBeforeLine(testVar.opsDone, node.lineno, "var", testVar);
                                     complexityCalculatorHelperFunctions.appendArray(opsInVar, opsUsed);
@@ -6248,7 +6085,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         else {
                             //otherwise it's just "if true" or "if false"
-                            argResults["Bool"] = true;
                         }
                     }
                     else if (testNode != null && testNode._astname === "Call") {
@@ -6300,9 +6136,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (returnFrom.indexAndInput.indexed && (originality || returnFrom.original)) {
                                 results["List"] = 4;
                             }
-                            if (returnFrom.indexAndInput.strIndexed && (originality || returnFrom.original)) {
-                                results["Str"] = 4;
-                            }
                             if (returnFrom.indexAndInput.input) {
                                 inputUsed = true;
                             }
@@ -6335,7 +6168,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         if (purposeVars && (results.variables < 3)) { results.variables = 3; }
                     }
-
                     var modOriginality = false;
                     if (testNode != null && testNode._astname === "Name" && testNode.id.v !== "True" && testNode.id.v !== "False") {
                         var originalAssign = false;
@@ -6390,7 +6222,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 results.variables = 3;
                             }
                             if ((assignOriginality || originality)) {
-                                if (results[varType] < 3) {
+                                if (results[varType] != null && results[varType] < 3) {
                                     results[varType] = 3;
                                 }
                             }
@@ -6488,9 +6320,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                             }
                         }
-                        if (anyOr) {
-                            results["Bool"] = 3;
-                        }
                         nodeIter = nodeIter.operand;
                     }
                     nodeIter = complexityCalculatorHelperFunctions.retrieveFromList(nodeIter);
@@ -6563,9 +6392,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter)[0]) {
                                 results["List"] = 4;
                             }
-                            if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeIter)[0]) {
-                                results["Str"] = 4;
-                            }
                             datatypesUsed.push("List");
 
                             var inputIndexItem = {
@@ -6591,29 +6417,19 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 inputTaken = true;
                             }
                         }
-
-                        else if (nodeIter._astname === "Str") {
-                            results["Str"] = 4;
-                        }
                         //itarator is a variable
                         else if (nodeIter._astname === "Name") {
 
                             var iteratorVar = complexityCalculatorHelperFunctions.getVariableObject(nodeIter.id.v);
 
                             if (iteratorVar != null) {
-                                if (iteratorVar.value === "Str" || iteratorVar.value === "List") {
+                                if (iteratorVar.value === "List") {
                                     results[iteratorVar.value] = 4;
-                                }
-                                else {
-                                    results[iteratorVar.value] = 3;
                                 }
 
                                 //update results
                                 if ((iteratorVar.original || originality) && iteratorVar.indexAndInput.indexed) {
                                     results["List"] = 4;
-                                }
-                                if ((iteratorVar.original || originality) && iteratorVar.indexAndInput.strIndexed) {
-                                    results["Str"] = 4;
                                 }
 
                                 if (iteratorVar.containedValue != null) {
@@ -6661,9 +6477,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter)[0]) {
                                 results["List"] = 4;
                             }
-                            if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeIter)[0]) {
-                                results["Str"] = 4;
-                            }
 
                             var iterableBinOpTypes = [];
                             var inputBinOp = false;
@@ -6672,21 +6485,18 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (isList) {
                                 results["List"] = 4;
                             }
-                            if (complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeIter) === "Str") {
-                                results["Str"] = 4;
-                            }
                             if (!opsUsed.includes("BinOp")) {
                                 opsUsed.push("BinOp");
                             }
 
                             for (var p = 0; p < iterableBinOpTypes.length; p++) {
                                 var typeName = iterableBinOpTypes[p];
-                                if (typeName === "Str" || typeName === "List") {
+                                if (typeName === "List") {
                                     results[typeName] = 4;
                                 }
                                 else {
-                                    results[typeName] = 3;
-                                }                               
+                                    // results[typeName] = 3;
+                                }
                             }
                             if (inputBinOp) {
                                 results.consoleInput = 3;
@@ -6717,7 +6527,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
                             if (strFuncs.includes(funcName)) {
                                 results.strOps = 3;
-                                if (complexityCalculatorHelperFunctions.doesCallCreateString) { results["Str"] = 4; }
                             }
 
                             for (var u = 0; u < userFunctionReturns.length; u++) {
@@ -6727,16 +6536,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (originality && userFunctionReturns[u].indexAndInput.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if (originality && userFunctionReturns[u].indexAndInput.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
                                 }
 
                                 if (userFunctionReturns[u].containedValue != null) {
-                                    for (var cv = 0; cv < userFunctionReturns[u].containedValue.length; cv++) {                                        
+                                    for (var cv = 0; cv < userFunctionReturns[u].containedValue.length; cv++) {
                                         if (userFunctionReturns[u].containedValue[cv] === "List") {
                                             results["List"] = 4;
-                                        } 
+                                        }
                                         else {
                                             results[userFunctionReturns[u].containedValue[cv]] = 3;
                                         }
@@ -6806,9 +6612,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (argVar.indexAndInput.indexed && (argVar.original || originality)) {
                                         results["List"] = 4;
                                     }
-                                    if (argVar.indexAndInput.strIndexed && (argVar.original || originality)) {
-                                        results["Str"] = 4;
-                                    }
 
                                     //update results
 
@@ -6845,9 +6648,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter.args[t])[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter.args[t])[1])) {
                                     results["List"] = 4;
                                 }
-                                if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeIter.args[t])[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeIter.args[t])[1])) {
-                                    results["Str"] = 4;
-                                }
 
                                 var allNamesWithin = [];
                                 complexityCalculatorHelperFunctions.getNestedVariables(nodeIter.args[t], allNamesWithin);
@@ -6866,9 +6666,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         if (nestedVar.original || originality) {
                                             if (varInput && results.consoleInput < 3) {
                                                 results.consoleInput = 3;
-                                            }
-                                            if (results[containedVal] < 3) {
-                                                results[containedVal] = 3;
                                             }
                                             if (nestedVar.opsDone != null) {
                                                 complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.opsBeforeLine(nestedVar.opsDone, node.lineno, "var", nestedVar), opsUsed);
@@ -6906,31 +6703,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         results["List"] = 4;
                                     }
 
-                                    //is it a string?
-                                    if (nodeIter.args[t].value._astname === "Str") {
-                                        results["Str"] = 4;
-                                    }
-                                    if (nodeIter.args[t].value._astname === "Subscript" && getstringIndexing(nodeIter.args[t].value)) {
-                                        results["Str"] = 4;
-                                    }
-                                    if (nodeIter.args[t].value._astname === "BinOp" && complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeIter.args[t].value) === "Str") {
-                                        results["Str"] = 4;
-                                    }
-                                    if (nodeIter.args[t].value._astname === "Call") {
-                                        if (complexityCalculatorHelperFunctions.doesCallCreateString(nodeIter.args[t].value)) {
-                                            results["Str"] = 4;
-                                        }
-                                        if (complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.args[t].value.id.v) != null && complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.args[t].value.id.v).returns === "Str") {
-                                            results["Str"] = 4;
-                                        }
-                                    }
-                                    if (nodeIter.args[t].value._astname === "Name") {
-                                        var iterArgVar = complexityCalculatorHelperFunctions.getVariableObject(nodeIter.args[t].value.id.v);
-
-                                        if (iterArgVar != null && iterArgVar.value === "Str") {
-                                            results["Str"] = 4;
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -6943,9 +6715,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter)[0] && originality) {
                             results["List"] = 4;
-                        }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeIter)[0] && originality) {
-                            results["Str"] = 4;
                         }
 
                         for (var m = 0; m < listVars.length; m++) {
@@ -7004,16 +6773,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (nodeIter.value._astname === "List") {
                                 results["List"] = 4;
                             }
-                            if (nodeIter.value._astname === "Str") {
-                                results["Str"] = 4;
-                            }
 
                             if (nodeIter.value._astname === "Subscript") {
                                 if (getNestedIndexing(nodeIter.value)[0]) {
                                     results["List"] = 4;
-                                }
-                                if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeIter.value)[0]) {
-                                    results["Str"] = 4;
                                 }
                             }
 
@@ -7037,9 +6800,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                                 break;
                                             }
                                         }
-                                    }
-                                    if (anyOriginality) {
-                                        results["Str"] = 4;
                                     }
                                 }
                             }
@@ -7070,9 +6830,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         if (isUserFunc.returns === "List" && (originality || isUserFunc.original)) {
                                             results["List"] = 4;
                                         }
-                                        else if (isUserFunc.returns === "Str" && (originality || isUserFunc.original)) {
-                                            results["Str"] = 4;
-                                        }
                                     }
                                 }
                             }
@@ -7080,9 +6837,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 //is it indexing a variable that contains a list?
                                 if (complexityCalculatorHelperFunctions.getVariableObject(nodeIter.value.id.v).value === "List" && (originality || complexityCalculatorHelperFunctions.getVariableObject(nodeIter.value.id.v).original)) {
                                     results["List"] = 4;
-                                }
-                                if (complexityCalculatorHelperFunctions.getVariableObject(nodeIter.value.id.v).value === "Str" && (originality || complexityCalculatorHelperFunctions.getVariableObject(nodeIter.value.id.v).original)) {
-                                    results["Str"] = 4;
                                 }
                             }
                         }
@@ -7093,19 +6847,16 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     var testItem = node.test;
 
                     if (testItem._astname === "UnaryOp") {
-                        var anyOr = originality;
                         if (!originality) {
                             var unaryNames = [];
                             complexityCalculatorHelperFunctions.getNestedVariables(testItem, unaryNames);
                             for (var p in unaryNames) {
                                 var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
                                 if (isVar != null && isVar.original) {
-                                    anyOr = true;
                                     break;
                                 }
                             }
                         }
-                        if (anyOr) { results["Bool"] = 3; }
                         testItem = testItem.operand;
                     }
 
@@ -7141,20 +6892,15 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     testItem = complexityCalculatorHelperFunctions.retrieveFromList(testItem);
 
                     if (testItem._astname === "UnaryOp") {
-                        var anyOr = originality;
                         if (!originality) {
                             var unaryNames = [];
                             complexityCalculatorHelperFunctions.getNestedVariables(testItem, unaryNames);
                             for (var p in unaryNames) {
                                 var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
                                 if (isVar != null && isVar.original) {
-                                    anyOr = true;
                                     break;
                                 }
                             }
-                        }
-                        if (anyOr) {
-                            results["Bool"] = 3;
                         }
                         testItem = testItem.operand;
                     }
@@ -7186,7 +6932,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
                         }
                         else if (strFuncs.indexOf(funcName) > -1 && originality) {
-                            argResults["Str"] = true;
                             if (!opsUsed.includes("StrOp")) {
                                 opsUsed.push("StrOp");
                             }
@@ -7215,9 +6960,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (originality && calledFunc.indexAndInput.indexed) {
                                 results["List"] = 4;
                             }
-                            if (originality && calledFunc.indexAndInput.strIndexed) {
-                                results["Str"] = 4;
-                            }
                             if (calledFunc.nested) {
                                 purposeVars = true;
                             }
@@ -7225,8 +6967,9 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.opsBeforeLine(calledFunc.opsDone, node.lineno, "func", calledFunc), opsUsed);
                             }
                         }
-
-                        argResults[callReturnVal] = true;
+                        if (callReturnVal == "List") {
+                            argResults[callReturnVal] = true;
+                        }
                     }
 
                     //now, if it's something that has values within it, we chack through that
@@ -7270,9 +7013,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         if (anyOriginality || anyOriginality) {
                             if (useInput.input) {
                                 results["List"] = 4;
-                            }
-                            if (useInput.strIndexed) {
-                                results["Str"] = 4;
                             }
                             if (useInput.indexed) {
                                 results["List"] = 4;
@@ -7320,15 +7060,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         results["List"] = 4;
                                     }
 
-                                    //contained values
-                                    if (testFunc.containedValue != null) {
-                                        for (var c = 0; c < testFunc.containedValue.length; c++) {
-                                            var varType = testFunc.containedValue[c];
-                                            if (results[varType] < 3) {
-                                                results[varType] = 3;
-                                            }
-                                        }
-                                    }
+
                                 }
                             }
                         }
@@ -7348,9 +7080,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (argVar.indexAndInput.indexed) {
                                     results["List"] = 4;
                                 }
-                                if (argVar.indexAndInput.strIndexed) {
-                                    results["Str"] = 4;
-                                }
                                 var varType = argVar.value;
 
                                 var contained = argVar.containedValue;
@@ -7366,7 +7095,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.opsBeforeLine(argVar.opsDone, node.lineno, "var", argVar), opsUsed);
                                 }
 
-                                if (results[varType] < 3) {
+                                if (varType == "List" && results["List"] < 3) {
                                     results[varType] = 3;
                                 }
 
@@ -7408,8 +7137,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 if (testVariable.original || originality) {
                                     if (varInput && results.consoleInput < 3) {
                                         results.consoleInput = 3;
-                                    }                            
-                                    if (results[containedVal] < 3) {
+                                    }
+                                    if (results[containedVal] < 3 && containedVal == "List") {
                                         results[containedVal] = 3;
                                     }
                                     if (containedValList.length > 0) {
@@ -7618,9 +7347,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (nodeToCheck._astname === "Subscript") {
                                 if (originality) {
                                     var isIndexedItem = false;
-                                    if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeToCheck)[0]) {
-                                        results["Str"] = 4;
-                                    }
 
                                     if (nodeToCheck.slice._astname === "Index") {
 
@@ -7727,16 +7453,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (funcItem.indexAndInput != null && funcItem.indexAndInput.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if (funcItem.indexAndInput != null && funcItem.indexAndInput.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
                                     if (funcItem.opsDone != null) {
                                         var opsUsedList = complexityCalculatorHelperFunctions.opsBeforeLine(funcItem.opsDone, lineNumberToUse, "func", funcItem);
                                         complexityCalculatorHelperFunctions.appendArray(opsUsedList, opsUsed);
                                     }
                                 }
 
-                                if (results[funcReturn] < 3) {
+                                if (results[funcReturn] < 3 && funcReturn == "List") {
                                     results[funcReturn] = 3;
                                 }
 
@@ -7751,73 +7474,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
 
                             //basic datatypes
-                            else if (nodeToCheck._astname === 'Str') {
-                                argResults["Str"] = true;
-                            }
-                            else if (nodeToCheck._astname === 'Name' && nodeToCheck.id.v != null && (nodeToCheck.id.v === 'True' || nodeToCheck.id.v === 'False')) {
-                                argResults["Bool"] = true;
-                            }
-                            else if (nodeToCheck._astname === 'Num') {
-                                complexityCalculatorHelperFunctions.isNodeFloat(nodeToCheck) ? floats = true : ints = true;
-                            }
-                            else if (nodeToCheck._astname === 'List') {
-                                //if it's a list, we also look at and note all the types in the list as being used for a purpose.
-                                lists = true;
-                                var listInputIndexing = {
-                                    input: false,
-                                    indexed: false,
-                                    strIndexed: false
-                                };
-                                var listValues = [];
-                                if (originality) {
 
-                                    //check ops and list and string indexing
-                                    var operations = [];
-                                    listValues = complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck.elts, listValues, listInputIndexing, operations);
-                                    complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.opsBeforeLine(operations, node.lineno, "", null), opsUsed);
-
-                                    if (listInputIndexing.indexed) {
-                                        results["List"] = 4;
-                                    }
-                                    if (listInputIndexing.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
-                                }
-                                else {
-                                    listValues = complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck.elts, listValues, {
-                                        input: false,
-                                        indexed: false,
-                                        strIndexed: false
-                                    }, []);
-                                }
-
-                                //basic datatypes - purpose
-                                for (var k = 0; k < listValues.length; k++) {
-                                    argResults[listValues[k]] = true;
-                                }
-
-                                if (listInputIndexing.input && originality) {
-                                    results.consoleInput = 3;
-                                }
-
-                                var varsIn = [];
-                                complexityCalculatorHelperFunctions.getNestedVariables(nodeToCheck, varsIn);
-
-                                var varsIn = [];
-                                complexityCalculatorHelperFunctions.getNestedVariables(nodeToCheck, varsIn);
-                                var anyOriginality = originality;
-                                if (!anyOriginality) {
-                                    for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                                        if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
-                                            anyOriginality = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (varsIn.length > 0 && anyOriginality) {
-                                    purposeVars = true;
-                                }
-                            }
                             else if (nodeToCheck._astname === 'Name' && nodeToCheck.id.v !== "True" && nodeToCheck.id.v !== "False") {
                                 //then it's a variable. look up what's in there.
                                 purposeVars = true;
@@ -7834,9 +7491,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if ((originalAssignment || originality) && otherVar.indexAndInput.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if ((originalAssignment || originality) && otherVar.indexAndInput.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
                                     if ((originalAssignment || originality) && otherVar.opsDone != null) {
                                         var opsUsedInVar = complexityCalculatorHelperFunctions.opsBeforeLine(otherVar.opsDone, lineNumberToUse, "var", otherVar);
                                         complexityCalculatorHelperFunctions.appendArray(opsUsedInVar, opsUsed);
@@ -7849,23 +7503,16 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         }
                                     }
                                     argResults[otherVar.value] = true;
-                                    if (otherVar.value === "List" && otherVar.containedValue != null) {
-                                        //go through values in list and note those too!
-                                        for (var k = 0; k < otherVar.containedValue.length; k++) {
-                                            argResults[otherVar.containedValue[k]] = true;
-                                        }
-                                    }
+
                                 }
-                                    
+
                             }
                             else if ((nodeToCheck._astname === "BinOp" || nodeToCheck._astname === "BoolOp" || nodeToCheck._astname === "Compare" || nodeToCheck._astname === "List")) {
                                 if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeToCheck)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(nodeToCheck)[1])) {
                                     results["List"] = 4;
                                 }
-                                if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeToCheck)[0] && (originality || complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeToCheck)[1])) {
-                                    results["Str"] = 4;
-                                }
                             }
+
 
                             if (nodeToCheck._astname === "BinOp") {
                                 // ditto with the BinOp
@@ -7914,21 +7561,12 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (inputIndexPurpose.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if (inputIndexPurpose.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
                                 }
                                 if (originality && !opsUsed.includes("BinOp")) { opsUsed.push("BinOp"); }
                                 for (var p = 0; p < withinBinOp.length; p++) {
                                     if (Array.isArray(withinBinOp[p])) {
                                         //if the binop includes a list, go through THAT.
                                         lists = true;
-                                        for (var s = 0; s < withinBinOp.length; s++) {
-                                            argResults[withinBinOp[p][s]] = true;
-                                        }
-                                    }
-                                    else {
-                                        argResults[withinBinOp[p]] = true;
                                     }
                                 }
                             }
@@ -7965,13 +7603,11 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (inputForPurposeInArg.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if (inputForPurposeInArg.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
                                 }
 
-                                boolOpValues[b].forEach(function(arg) {
-                                    argResults[arg] = true;
+                                boolOpValues[b].forEach(function (arg) {
+                                    if (arg == "List") { argResults[arg] = true; }
+
                                 });
 
                             }
@@ -8006,16 +7642,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (indexInputItem.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if (indexInputItem.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
                                 }
                                 if (indexInputItem.input) {
                                     results.consoleInput = 3;
                                 }
 
-                                compareValues[b].forEach(function(arg) {
-                                    argResults[arg] = true;
+                                compareValues[b].forEach(function (arg) {
+                                    if (arg == "List") { argResults[arg] = true; }
                                 });
 
                             }
@@ -8091,18 +7724,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                         if (varType === "List" && results["List"] < 3) {
                                             results["List"] = 3;
                                         }
-                                        if (varType === "Bool" && results.bools < 3) {
-                                            results.bools = 3;
-                                        }
-                                        if (varType === "Str" && results["Str"] < 3) {
-                                            results["Str"] = 3;
-                                        }
-                                        if (varType === "Int") {
-                                            results["Int"] = 3;
-                                        }
-                                        if (varType === "Float") {
-                                            results["Float"] = 3;
-                                        }
                                     }
                                 }
                             }
@@ -8167,11 +7788,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                             results.variables = 4;
                                         }
                                         if (otherVariable.original || originality) {
-                                            if (results[otherVariable.value] < 3) {
-                                                results[otherVariable.value] = 3;
-                                            }
-                                            if (otherVariable.indexAndInput.input) {
-                                                results.consoleInput = 3;
+                                            if (otherVariable.value === "List" && results["List"] < 3) {
+                                                results["List"] = 3;
                                             }
                                         }
                                     }
@@ -8237,21 +7855,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 typesWithinAssign = complexityCalculatorHelperFunctions.listTypesWithin(node.init.targets[0], typesWithinAssign, assignIn, opsUsed);
                                 complexityCalculatorHelperFunctions.listTypesWithin(node.init.value, typesWithinAssign, assignIn, opsUsed);
 
-                                //datatypes
-                                if ('int' in typesWithinAssign) {
-                                    results["Int"] = 3;
-                                }
-                                if ('str' in typesWithinAssign && results["Str"] < 3) {
-                                    results["Str"] = 3;
-                                }
-                                if ('bool' in typesWithinAssign) {
-                                    results["Bool"] = 3;
-                                }
                                 if ('list' in typesWithinAssign && results["List"] < 3) {
                                     results["List"] = 3;
-                                }
-                                if ('float' in typesWithinAssign) {
-                                    results["Float"] = 3;
                                 }
 
                                 if (assignIn.input) {
@@ -8259,9 +7864,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                                 if (assignIn.indexed) {
                                     results["List"] = 4;
-                                }
-                                if (assignIn.strIndexed) {
-                                    results["Str"] = 4;
                                 }
                             }
                         }
@@ -8305,20 +7907,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 typesWithinAssign = complexityCalculatorHelperFunctions.listTypesWithin(node.init.target, typesWithinAssign, assignIn, opsUsed);
                                 complexityCalculatorHelperFunctions.listTypesWithin(node.init.value, typesWithinAssign, assignIn, opsUsed);
 
-                                //datatypes
-                                if ('int' in typesWithinAssign) {
-                                    results["Int"] = 3;
-                                }
-                                if ('str' in typesWithinAssign &&
-                                    results["Str"] < 3) { results["Str"] = 3; }
-                                if ('bool' in typesWithinAssign) {
-                                    results["Bool"] = 3;
-                                }
                                 if ('list' in typesWithinAssign && results["List"] < 3) {
                                     results["List"] = 3;
-                                }
-                                if ('float' in typesWithinAssign) {
-                                    results["Float"] = 3;
                                 }
 
                                 if (assignIn.input) {
@@ -8326,9 +7916,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                                 if (assignIn.indexed) {
                                     results["List"] = 4;
-                                }
-                                if (assignIn.strIndexed) {
-                                    results["Str"] = 4;
                                 }
                             }
                         }
@@ -8339,23 +7926,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     //We'll need typeswithin here as well as any other ops
                     var nodeTest = node.test;
                     if (nodeTest._astname === "UnaryOp") {
-                        var anyOr = originality;
-
-                        if (!originality) {
-                            var unaryNames = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeTest, unaryNames);
-                            for (var p in unaryNames) {
-                                var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
-
-                                if (isVar != null && isVar.original) {
-                                    anyOr = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (anyOr) {
-                            results["Bool"] = 3;
-                        }
                         nodeTest = nodeTest.operand;
                     }
 
@@ -8391,23 +7961,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                     nodeTest = complexityCalculatorHelperFunctions.retrieveFromList(nodeTest);
 
                     if (nodeTest._astname === "UnaryOp") {
-                        var anyOr = originality;
-                        if (!originality) {
-                            var unaryNames = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeTest, unaryNames);
-
-                            for (var p in unaryNames) {
-                                var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
-                                if (isVar != null && isVar.original) {
-                                    anyOr = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (anyOr) {
-                            results["Bool"] = 3;
-                        }
                         nodeTest = nodeTest.operand;
                     }
 
@@ -8444,24 +7997,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                         //unary and subscript values
                         if (testItem._astname === "UnaryOp") {
-                            var anyOr = originality;
-                            if (!originality) {
-                                var unaryNames = [];
-                                complexityCalculatorHelperFunctions.getNestedVariables(testItem, unaryNames);
-
-                                for (var p in unaryNames) {
-                                    var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
-
-                                    if (isVar != null && isVar.original) {
-                                        anyOr = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (anyOr) {
-                                results["Bool"] = 3;
-                            }
                             testItem = testItem.operand;
                         }
 
@@ -8496,22 +8031,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         testItem = complexityCalculatorHelperFunctions.retrieveFromList(testItem);
 
                         if (testItem._astname === "UnaryOp") {
-                            var anyOr = originality;
-                            if (!originality) {
-                                var unaryNames = [];
-                                complexityCalculatorHelperFunctions.getNestedVariables(testItem, unaryNames);
-                                for (var p in unaryNames) {
-                                    var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
-
-                                    if (isVar != null && isVar.original) {
-                                        anyOr = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (anyOr) {
-                                results["Bool"] = 3;
-                            }
 
                             testItem = testItem.operand;
                         }
@@ -8560,8 +8079,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             if (calledFunc != null) {
                                 callReturnVal = calledFunc.returns;
                                 if (calledFunc.containedValue != null) {
-                                    calledFunc.containedValue.forEach(function(arg) {
-                                        argResults[arg] = true;
+                                    calledFunc.containedValue.forEach(function (arg) {
+                                        if (argResults[arg]) { argResults[arg] = true; }
                                     });
                                 }
 
@@ -8570,9 +8089,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                                 if (originality && calledFunc.indexAndInput.indexed) {
                                     results["List"] = 4;
-                                }
-                                if (originality && calledFunc.indexAndInput.strIndexed) {
-                                    results["Str"] = 4;
                                 }
                                 if (calledFunc.nested) {
                                     purposeVars = true;
@@ -8626,11 +8142,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                                         //contained values
                                         if (testFunc.containedValue != null) {
-                                            testFunc.containedValue.forEach(function(arg) {
-                                                if(results[arg] < 3) {
-                                                    results[arg] = 3;
-                                                }
-                                            });
+                                            if (testFunc.containedValue.includes("List") && (results["List"] < 3)) {
+                                                results["List"] = 3;
+                                            }
+
                                         }
                                     }
                                 }
@@ -8655,16 +8170,10 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
 
                             //update results from types within?
-                            if (originality) {
-                                if (useInput.input && results.consoleInput < 3) {
-                                    results.consoleInput = 3;
-                                }
-                                allTypes.forEach(function(arg) {
-                                    if(results[arg] < 3) {
-                                        results[arg] = 3;
-                                    }
-                                });
+                            if (originality && allTypes.includes("List") && (results["List"] < 3)) {
+                                results["List"] = 3;
                             }
+
 
                             var nestedVars = complexityCalculatorHelperFunctions.getNestedVariables(testItem, []);
                             var anyOriginality = false;
@@ -8679,13 +8188,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
 
                             //input, indexing
                             if (anyOriginality || anyOriginality) {
-                                if (useInput.input) {
-                                    results["List"] = 4;
-                                }
-                                if (useInput.strIndexed) {
-                                    results["Str"] = 4;
-                                }
-                                if (useInput.indexed) {
+                                if (useInput.input || useInput.indexed) {
                                     results["List"] = 4;
                                 }
                             }
@@ -8706,9 +8209,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (argVar.indexAndInput.indexed) {
                                         results["List"] = 4;
                                     }
-                                    if (argVar.indexAndInput.strIndexed) {
-                                        results["Str"] = 4;
-                                    }
 
                                     var varType = argVar.value;
                                     var contained = argVar.containedValue;
@@ -8723,16 +8223,13 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                     if (argVar.opsDone != null) {
                                         complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.opsBeforeLine(argVar.opsDone, node.lineno, "var", argVar), opsUsed);
                                     }
-                                    if (results[varType] < 3) {
-                                        results[varType] = 3;
+
+                                    if ((contained.length > 0 && contained.includes("List") && (results["List"] < 3)) || (results[varType] < 3 && varType == "List")) {
+                                        results["List"] = 3;
                                     }
-                                    if (contained.length > 0) {
-                                        contained.forEach(function(arg) {
-                                            if(results[arg] < 3) {
-                                                results[arg] = 3;
-                                            }
-                                        });
-                                    }
+
+
+
                                 }
                             }
                         }
@@ -8785,21 +8282,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                             }
                         }
 
-                        //datatypes
-                        if ('int' in dataTypesIn) {
-                            results["Int"] = 3;
-                        }
-                        if ('str' in dataTypesIn && results["Str"] < 3) {
-                            results["Str"] = 3;
-                        }
-                        if ('bool' in dataTypesIn) {
-                            results["Bool"] = 3;
-                        }
                         if ('list' in dataTypesIn && results["List"] < 3) {
                             results["List"] = 3;
-                        }
-                        if ('float' in dataTypesIn) {
-                            results["Float"] = 3;
                         }
 
                         if (indexingIn.input) {
@@ -8807,9 +8291,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                         }
                         if (indexingIn.indexed) {
                             results["List"] = 4;
-                        }
-                        if (indexingIn.strIndexed) {
-                            results["Str"] = 4;
                         }
 
                     }
@@ -8859,21 +8340,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 typesWithinAssign = complexityCalculatorHelperFunctions.listTypesWithin(node.update.target, typesWithinAssign, assignIn, opsUsed);
                                 complexityCalculatorHelperFunctions.listTypesWithin(node.update.value, typesWithinAssign, assignIn, opsUsed);
 
-                                //datatypes
-                                if ('int' in typesWithinAssign) {
-                                    results["Int"] = 3;
-                                }
-                                if ('str' in typesWithinAssign && results["Str"] < 3) {
-                                    results["Str"] = 3;
-                                }
-                                if ('bool' in typesWithinAssign) {
-                                    results["Bool"] = 3;
-                                }
                                 if ('list' in typesWithinAssign && results["List"] < 3) {
                                     results["List"] = 3;
-                                }
-                                if ('float' in typesWithinAssign) {
-                                    results["Float"] = 3;
                                 }
 
                                 if (assignIn.input) {
@@ -8881,9 +8349,6 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
                                 }
                                 if (assignIn.indexed) {
                                     results["List"] = 4;
-                                }
-                                if (assignIn.strIndexed) {
-                                    results["Str"] = 4;
                                 }
                             }
                         }
@@ -8963,16 +8428,20 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
      */
     function recursiveAnalyzeAST(ast, results, loopParent) {
         if (ast != null && ast.body != null) {
-            angular.forEach(ast.body, function (node) {
+            var astKeys = Object.keys(ast.body);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast.body[astKeys[r]];
                 var loopPar = analyzeASTNode(node, results, loopParent);
                 recursiveAnalyzeAST(node, results, loopPar);
-            });
+            }
         }
-        else if (ast != null && (ast._astname != null || (ast[0] != null && typeof ast[0] === 'object'))) {
-            angular.forEach(ast, function (node) {
+        else if (ast != null && (ast._astname != null || (ast[0] != null && Object.keys(ast.body) != null))) {
+            var astKeys = Object.keys(ast.body);
+            for (var r = 0; r < astKeys.length; r++) {
+                var node = ast.body[astKeys[r]];
                 var loopPar = analyzeASTNode(node, results, loopParent);
                 recursiveAnalyzeAST(node, results, loopPar);
-            });
+            }
         }
         return results;
     }

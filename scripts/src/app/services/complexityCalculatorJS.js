@@ -4,15 +4,13 @@
  * @module complexityCalculator
  * @author Jason Smith, Erin Truesdell
  */
-app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions) {
+app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', 'complexityCalculatorState', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions, complexityCalculatorState) {
 
 
     function analyzeJavascript(source) {
         //  try {
-        apiCalls = [];
-        allCalls = [];
-        allConditionals = [];
-        variableAssignments = [];
+
+        complexityCalculatorState.resetState();
 
         var ast = acorn.parse(source, {
             locations: true
@@ -28,17 +26,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         //handle this like you'd handle python.
         var newAST = convertJavascriptASTTree(ast);
 
-        //initialize all of the lists we'll use in each code reading
-        originalityLines = [];
-        loopLocations = [];
-        dataTypes = [];
-        functionLines = [];
-        uncalledFunctionLines = [];
-        userFunctionParameters = [];
-        makeBeatRenames = [];
-        userFunctionRenames = [];
-        forLoopFuncs = [];
-
         //initialize list of function return objects with all functions from the API that return something (includes casting)
         userFunctionReturns = starterReturns.slice(0);
         allVariables = [];
@@ -49,10 +36,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             conditionals: 0,
             forLoops: 0,
             List: 0,
-            Str: 0,
-            Int: 0,
-            Float: 0,
-            Bool: 0,
             variables: 0,
             listOps: 0,
             strOps: 0,
