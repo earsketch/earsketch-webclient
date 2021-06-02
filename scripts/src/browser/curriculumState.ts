@@ -300,7 +300,7 @@ export const adjustLocation = (location: number[], delta: number) => {
 
     return tocPages[pageIdx]
 }
-// token change
+
 const urlToLocation: { [key:string]: number[] } = {}
 const locationToUrl: { [key:string]: string } = {}
 toc.forEach((unit: TOCItem, unitIdx: number) => {
