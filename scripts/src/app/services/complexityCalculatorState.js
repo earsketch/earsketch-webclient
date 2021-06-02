@@ -21,10 +21,7 @@ app.factory('complexityCalculatorState', ['userNotification', function (userNoti
     }
 
     function getStateProperty(propertyName) {
-        if (propertyName in state) {
-            return state[propertyName];
-        }
-        else return [];
+        return (propertyName in state) ? state[propertyName] : [];
     }
 
 
