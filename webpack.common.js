@@ -80,8 +80,6 @@ module.exports = {
             notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
             // Models
-            uploader: path.resolve(__dirname,`${servicesDir}/uploader.js`),
-            esrecorder: path.resolve(__dirname,`${servicesDir}/esrecorder.js`),
             autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),

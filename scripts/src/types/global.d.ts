@@ -47,6 +47,9 @@ declare var FFT: any;
 declare var WindowFunction: any;
 declare var DSP: any;
 
+declare var createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode;
+declare var Recorder: any
+
 declare module 'angular' {
     var element: any
     interface IScope {

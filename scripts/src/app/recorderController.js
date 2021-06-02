@@ -1,4 +1,6 @@
-app.directive('levelMeter', ['RecorderService', function (RecorderService) {
+import * as RecorderService from "./esrecorder"
+
+app.directive('levelMeter', function () {
     return {
         restrict: 'E',
         link: function (scope, elem) {
@@ -89,7 +91,7 @@ app.directive('levelMeter', ['RecorderService', function (RecorderService) {
             }
         }
     };
-}]);
+});
 
 app.directive('visualMetronome', function () {
     return {
@@ -134,7 +136,7 @@ app.directive('visualMetronome', function () {
     }
 });
 
-app.directive('drawWaveform', ['RecorderService', function (RecorderService) {
+app.directive('drawWaveform', function () {
     return {
         restrict: 'E',
         link: function (scope, elem) {
@@ -226,4 +228,4 @@ app.directive('drawWaveform', ['RecorderService', function (RecorderService) {
             }
         }
     };
-}]);
+});

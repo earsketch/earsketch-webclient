@@ -209,7 +209,6 @@ window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layou
     $ngReduxProvider.provideStore(store);
 });
 
-require('esrecorder');
 require('recorder');
 
 Object.assign(window,require('esAppDSP'));

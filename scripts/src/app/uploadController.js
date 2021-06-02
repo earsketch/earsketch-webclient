@@ -2,12 +2,13 @@ import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
 import esconsole from '../esconsole';
 import * as ESUtils from '../esutils';
+import * as RecorderService from './esrecorder';
 import * as sounds from '../browser/soundsState';
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 
-app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, RecorderService, $sce, $timeout, $http, $ngRedux) {
+app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, $sce, $timeout, $http, $ngRedux) {
     $scope.file = {
         data: null,
         key: null,
@@ -88,7 +89,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService
         
     }
 
-    RecorderService.micAccessBlocked = function (error) {
+    RecorderService.callbacks.micAccessBlocked = function (error) {
         $scope.$apply(function () {
             $scope.micAccessError = true;
             if (error == "chrome_mic_noaccess") {
@@ -103,7 +104,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService
         });
     };
 
-    RecorderService.openRecordMenu = function () {
+    RecorderService.callbacks.openRecordMenu = function () {
         $scope.$apply(function () {
             $scope.micAccessError = false;
             $scope.micAccessMessage = '';

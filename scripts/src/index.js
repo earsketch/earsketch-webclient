@@ -117,7 +117,6 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('esrecorder');
     require('recorder');
 
     Object.assign(window,require('esAppDSP'));
