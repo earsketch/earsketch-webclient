@@ -27,7 +27,7 @@ export const STATUS_UNSUCCESSFUL = 2
 export const shareid = ""
 
 // notification IDs
-const notificationsMarkedAsRead: any[] = []
+const notificationsMarkedAsRead: string[] = []
 
 const TEMPLATES = {
     python: "#\t\tpython code\n#\t\tscript_name:\n#\n" +
@@ -46,12 +46,12 @@ const TEMPLATES = {
 }
 
 // keep a mapping of script names: script objects
-export let scripts: any = {}
-export const sharedScripts: any = {}
+export let scripts: { [key: string]: ScriptEntity } = {}
+export const sharedScripts: { [key: string]: ScriptEntity } = {}
 
 // keep a list of script names that are currently open
-export const openScripts: any[] = []
-const openSharedScripts: any[] = []
+export const openScripts: string[] = []
+const openSharedScripts: string[] = []
 
 // Helper functions for making API requests.
 function form(obj: { [key: string]: string | Blob }={}) {
@@ -69,13 +69,25 @@ function form(obj: { [key: string]: string | Blob }={}) {
 // Expects query parameters, returns JSON.
 async function get(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
-    return (await fetch(url)).json()
+    try {
+        return (await fetch(url)).json()
+    } catch (err) {
+        esconsole(`get failed: ${url}`, ["error", "user"])
+        esconsole(err, ["error", "user"])
+        throw err
+    }
 }
 
 // Expects form data, returns JSON.
 async function postForm(endpoint: string, data?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
-    return (await fetch(url, { method: "post", body: form(data) })).json()
+    try {
+        return (await fetch(url, { method: "post", body: form(data) })).json()
+    } catch (err) {
+        esconsole(`postForm failed: ${url}`, ["error", "user"])
+        esconsole(err, ["error", "user"])
+        throw err
+    }
 }
 
 async function postAuthForm(endpoint: string, data: { [key: string]: string }={}) {
@@ -90,7 +102,13 @@ async function postAdminForm(endpoint: string, data: { [key: string]: string }={
 async function post(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     const text = (await fetch(url, { method: "post" })).text()
-    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+    try {
+        return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+    } catch (err) {
+        esconsole(`post failed: ${url}`, ["error", "user"])
+        esconsole(err, ["error", "user"])
+        throw err
+    }
 }
 
 async function postAuth(endpoint: string, params: { [key: string]: string }) {
@@ -114,7 +132,7 @@ async function postXMLAuth(endpoint: string, xml: string) {
 }
 
 // websocket gets closed before onunload in FF
-window.onbeforeunload = function () {
+window.onbeforeunload = () => {
     if (isLogged()) {
         let saving = false
         const username = getUsername()
@@ -126,21 +144,10 @@ window.onbeforeunload = function () {
 
             if (scripts[shareID] && !scripts[shareID].saved) {
                 saving = true
-                const sourcecode = scripts[shareID].source_code
-                const name = scripts[shareID].name
-                const xml = `<scripts><username>${username}</username><name>${name}</name>` +
-                            `<source_code><![CDATA[${sourcecode}]]></source_code></scripts>`
-
-                postXMLAuth("/services/scripts/save", xml)
-                    .then(script => {
-                        script.modified = Date.now()
-                        script.saved = true
-                        script.tooltipText = ''
-                        postProcessCollaborators(script)
-                        scripts[script.shareid] = script
-                        store.dispatch(scriptsState.syncToNgUserProject())
-                        userNotification.show(ESMessages.user.scriptcloud, "success")
-                    })
+                saveScript(scripts[shareID].name, scripts[shareID].source_code).then(() => {
+                    store.dispatch(scriptsState.syncToNgUserProject())
+                    userNotification.show(ESMessages.user.scriptcloud, "success")
+                })
             }
         }
 
@@ -151,16 +158,13 @@ window.onbeforeunload = function () {
         }
 
         // TODO: may not be properly working... check!
-        if (notificationsMarkedAsRead.length !== 0) {
+        if (notificationsMarkedAsRead.length) {
             for (const notification_id of notificationsMarkedAsRead) {
-                esconsole("marking notification " + notification_id + " as read", "user")
+                esconsole(`marking notification ${notification_id} as read`, "user")
                 postAuthForm("/services/scripts/markread", { notification_id })
             }
         }
-
-        if (saving) {
-            return true  // Show warning popover.
-        }
+        return saving  // Show warning popover if true.
     } else {
         if (localStorage.getItem(LS_SCRIPTS_KEY) !== null) {
             localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
@@ -220,7 +224,7 @@ function resetSharedScripts() {
 
 function resetOpenScripts() {
     while (openScripts.length > 0) {
-        const popped = openScripts.pop()
+        const popped = openScripts.pop()!
 
         // special case for collaborative script. TODO: manage this in the tabs service.
         if (scripts.hasOwnProperty(popped) && scripts[popped].collaborative) {
@@ -262,184 +266,146 @@ function postProcessCollaborators(script: ScriptEntity, userName?: string) {
     return script
 }
 
+// Get an array of scripts, regardless of data (which might be null, or data.scripts might be a single object).
+function extractScripts(data: any): ScriptEntity[] {
+    if (data === null) {
+        return []
+    } else if (Array.isArray(data.scripts)) {
+        return data.scripts
+    } else {
+        return [data.scripts]
+    }
+}
+
 // Login, setup, restore scripts, return shared scripts.
-export function login(username: string, password: string) {
+export async function login(username: string, password: string) {
     esconsole("Using username: " + username, ["debug", "user"])
-    return postForm("/services/scripts/findall", { username, password: btoa(password) }).then((data: any) => {
-        reporter.login(username)
+    const data = await postForm("/services/scripts/findall", { username, password: btoa(password) })
+    reporter.login(username)
+    // persist the user session
+    // TODO: Don't store the password!
+    storeUser(username, password)
 
-        // persist the user session
-        storeUser(username, password)
+    // register callbacks to the collaboration service
+    collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
+    // TODO: potential race condition with server-side script renaming operation?
+    collaboration.callbacks.refreshSharedScriptBrowser = getSharedScripts
+    collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript
 
-        // register callbacks to the collaboration service
-        collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
-        // TODO: potential race condition with server-side script renaming operation?
-        collaboration.callbacks.refreshSharedScriptBrowser = getSharedScripts
-        collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript
+    // register callbacks / member values in the userNotification service
+    userNotification.callbacks.addSharedScript = addSharedScript
 
-        // register callbacks / member values in the userNotification service
-        userNotification.callbacks.addSharedScript = addSharedScript
+    websocket.connect(username)
+    collaboration.setUserName(username)
 
-        websocket.connect(username)
-        collaboration.setUserName(username)
+    // used for managing websocket notifications locally
+    userNotification.user.loginTime = Date.now()
 
-        // used for managing websocket notifications locally
-        userNotification.user.loginTime = Date.now()
+    esconsole(ESMessages.user.scriptsuccess, ["debug", "user"])
 
-        esconsole(ESMessages.user.scriptsuccess, ["debug", "user"])
+    const storedScripts = extractScripts(data)
 
-        let storedScripts
+    resetScripts()
 
-        if (data) {
-            if (data.scripts instanceof Array) {
-                storedScripts = data.scripts
-            } else {
-                // one script -- somehow this gets parsed to one object
-                storedScripts = [data.scripts]
+    // update user project scripts
+    for (const script of storedScripts) {
+        // reformat saved date to ISO 8601 format
+        const offset = new Date().getTimezoneOffset()
+        script.modified = formatDateToISO(script.modified as string) + offset * 60000
+        scripts[script.shareid] = script
+        // set this flag to false when the script gets modified
+        // then set it to true when the script gets saved
+        script.saved = true
+        script.tooltipText = ""
+        postProcessCollaborators(script)
+    }
+
+    // when the user logs in and his/her scripts are loaded, we can restore
+    // their previous tab session stored in the browser's local storage
+    const embedMode = appState.selectEmbedMode(store.getState())
+    if (!embedMode) {
+        const tabData = localStorage.getItem(LS_TABS_KEY)
+        if (tabData !== null) {
+            openScripts.push(...Object.values(JSON.parse(tabData)) as string[])
+        }
+        const sharedTabData = localStorage.getItem(LS_SHARED_TABS_KEY)
+        if (sharedTabData !== null) {
+            openSharedScripts.push(...Object.values(JSON.parse(sharedTabData)) as string[])
+        }
+        const activeTabID = tabs.selectActiveTabID(store.getState())
+        if (activeTabID) {
+            store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
+        }
+    }
+
+    // Clear Recommendations in Sound Browser
+    helpers.getNgRootScope().$broadcast("clearrecommender")
+
+    // Close CAI
+    if (FLAGS.SHOW_CAI) {
+        store.dispatch(cai.resetState())
+    }
+
+    // Copy scripts local storage to the web service.
+    // TODO: Break out into separate function?
+    const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
+    if (scriptData !== null) {
+        const saved = JSON.parse(scriptData)
+
+        const promises = []
+        for (const i in saved) {
+            if (saved.hasOwnProperty(i) && !saved[i].soft_delete) {
+                if (saved[i].hasOwnProperty("creator") && (saved[i].creator !== username)) {
+                    if(saved[i].hasOwnProperty("original_id")) {
+                        promises.push(importSharedScript(saved[i].original_id))
+                    }
+                } else {
+                    const tabEditorSession = tabs.getEditorSession(saved[i].shareid)
+                    if (tabEditorSession) {
+                        promises.push(saveScript(saved[i].name, tabs.getEditorSession(saved[i].shareid).getValue(), false))
+                    }
+                }
             }
         }
 
+        resetOpenScripts()
+        store.dispatch(tabs.resetTabs())
+
+        const savedScripts = await Promise.all(promises)
+        localStorage.removeItem(LS_SCRIPTS_KEY)
+        localStorage.removeItem(LS_TABS_KEY)
+        localStorage.removeItem(LS_SHARED_TABS_KEY)
+
+        await refreshCodeBrowser()
+        // once all scripts have been saved open them
+        for (const savedScript of savedScripts) {
+            if (savedScript) {
+                openScript(savedScript.shareid)
+                store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid))
+            }
+        }
+    }
+    // load scripts in shared browser
+    return getSharedScripts()
+}
+
+export async function refreshCodeBrowser() {
+    if (isLogged()) {
+        const data = await postAuthForm("/services/scripts/findall")
+        const fetchedScripts = extractScripts(data)
+
         resetScripts()
 
-        // update user project scripts
-        for (const i in storedScripts) {
-            const script = storedScripts[i]
+        for (const script of fetchedScripts) {
             // reformat saved date to ISO 8601 format
-            const offset = new Date().getTimezoneOffset()
-            script.modified = formatDateToISO(script.modified) + offset * 60000
-            scripts[script.shareid] = script
+            script.modified = formatDateToISO(script.modified as string)
             // set this flag to false when the script gets modified
             // then set it to true when the script gets saved
             script.saved = true
             script.tooltipText = ""
-
+            scripts[script.shareid] = script
             postProcessCollaborators(script)
         }
-
-        // when the user logs in and his/her scripts are loaded, we can restore
-        // their previous tab session stored in the browser's local storage
-        const embedMode = appState.selectEmbedMode(store.getState())
-        if (!embedMode) {
-            const tabData = localStorage.getItem(LS_TABS_KEY)
-            if (tabData !== null) {
-                const opened = JSON.parse(tabData)
-
-                for (let i in opened) {
-                    if (opened.hasOwnProperty(i)) {
-                        openScripts.push(opened[i])
-                    }
-                }
-            }
-            const sharedTabData = localStorage.getItem(LS_SHARED_TABS_KEY)
-            if (sharedTabData !== null) {
-                const opened = JSON.parse(sharedTabData)
-
-                for (let i in opened) {
-                    if (opened.hasOwnProperty(i)) {
-                        openSharedScripts.push(opened[i])
-                    }
-                }
-            }
-            const activeTabID = tabs.selectActiveTabID(store.getState())
-            if (activeTabID) {
-                store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
-            }
-        }
-
-        // Clear Recommendations in Sound Browser
-        helpers.getNgRootScope().$broadcast("clearrecommender")
-
-        // Close CAI
-        if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.resetState())
-        }
-
-        // Copy scripts local storage to the web service.
-        const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
-        if (scriptData !== null) {
-            const saved = JSON.parse(scriptData)
-
-            const promises = []
-            for (const i in saved) {
-                if (saved.hasOwnProperty(i) && !saved[i].soft_delete) {
-                    if (saved[i].hasOwnProperty("creator") && (saved[i].creator !== username)) {
-                        if(saved[i].hasOwnProperty("original_id")) {
-                            promises.push(importSharedScript(saved[i].original_id))
-                        }
-                    } else {
-                        // promises.push(saveScript(saved[i].name, saved[i].source_code, false))
-                        const tabEditorSession = tabs.getEditorSession(saved[i].shareid)
-                        if(tabEditorSession) {
-                            promises.push(saveScript(saved[i].name, tabs.getEditorSession(saved[i].shareid).getValue(), false))
-                        }
-                    }
-                }
-            }
-
-            resetOpenScripts()
-            store.dispatch(tabs.resetTabs())
-
-            return Promise.all(promises).then(function (savedScripts) {
-                localStorage.removeItem(LS_SCRIPTS_KEY)
-                localStorage.removeItem(LS_TABS_KEY)
-                localStorage.removeItem(LS_SHARED_TABS_KEY)
-
-                return refreshCodeBrowser().then(function () {
-                    // once all scripts have been saved open them
-                    for (const savedScript of savedScripts) {
-                        if(savedScript) {
-                            openScript(savedScript.shareid)
-                            store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid))
-                        }
-                    }
-                })
-            }).then(() => getSharedScripts())
-        } else {
-            // load scripts in shared browser
-            return getSharedScripts()
-        }
-    }, function(err: Error) {
-        esconsole("Login failure", ["error", "user"])
-        esconsole(err.toString(), ["error", "user"])  // TODO: this shows as [object object]?
-        throw err
-    })
-}
-
-export function refreshCodeBrowser() {
-    if (isLogged()) {
-        return postAuthForm("/services/scripts/findall").then((data: any) => {
-            let res
-
-            if (data) {
-                if (data.scripts instanceof Array) {
-                    res = data.scripts
-                } else {
-                    // one script -- somehow this gets parsed to one object
-                    res = [data.scripts]
-                }
-            }
-
-            resetScripts()
-
-            for (const i in res) {
-                let script = res[i]
-                // reformat saved date to ISO 8601 format
-                script.modified = formatDateToISO(script.modified)
-                // set this flag to false when the script gets modified
-                // then set it to true when the script gets saved
-                script.saved = true
-                script.tooltipText = ""
-
-                scripts[script.shareid] = script
-
-                script = postProcessCollaborators(script)
-            }
-
-        }, function(err: Error) {
-            esconsole("refreshCodeBrowser failure", ["error", "user"])
-            esconsole(err.toString(), ["error", "user"])
-            throw err
-        })
     } else {
         const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
         if (scriptData !== null) {
@@ -453,7 +419,6 @@ export function refreshCodeBrowser() {
                 scripts[script.shareid] = script
             }
         }
-        return Promise.resolve()
     }
 }
 
@@ -468,66 +433,34 @@ function formatDateToISO(date: string){
 
 // Fetch a script's history, authenticating via username and password.
 // Resolves to a list of historical scripts.
-export function getScriptHistory(scriptid: string) {
+export async function getScriptHistory(scriptid: string) {
     esconsole("Getting script history: " + scriptid, ["debug", "user"])
-    return postAuthForm("/services/scripts/scripthistory", { scriptid }).then(function(data: any) {
-        if (data === null) {
-            // no scripts
-            return []
-        } else if (data.scripts instanceof Array) {
-            // Format created date to ISO 8601.
-            for (const script of data.scripts) {
-                script.created = formatDateToISO(script.created)
-            }
-            return data.scripts
-        } else {
-            // one script -- somehow this gets parsed to one object
-            data.scripts.created = formatDateToISO(data.scripts.created)
-            return [data.scripts]
-        }
-    }, function(err: Error) {
-        esconsole("Login failure", ["error", "user"])
-        esconsole(err.toString(), ["error", "user"])
-        throw err
-    })
+    const data = await postAuthForm("/services/scripts/scripthistory", { scriptid })
+    const scripts = extractScripts(data)
+    for (const script of scripts) {
+        script.created = formatDateToISO(script.created as string)
+    }
+    return scripts
 }
 
 // Fetch a specific version of a script.
-export function getScriptVersion(scriptid: string, versionid: string) {
+export async function getScriptVersion(scriptid: string, versionid: string) {
     esconsole("Getting script history: " + scriptid + "  version: " + versionid, ["debug", "user"])
-    return postAuthForm("/services/scripts/scriptversion", { scriptid, versionid }).then(function (data: any) {
-        return data === null ? [] : [data]
-    }, function (err: Error) {
-        esconsole("Login failure", ["error", "user"])
-        esconsole(err.toString(), ["error", "user"])
-        throw err
-    })
+    const data = await postAuthForm("/services/scripts/scriptversion", { scriptid, versionid })
+    return data === null ? [] : [data]
 }
 
 // Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
-export function getSharedScripts() {
+export async function getSharedScripts() {
     resetSharedScripts()
-    return postAuthForm("/services/scripts/getsharedscripts").then(function (data: any) {
-        let res
-
-        if (data) {
-            if (data.scripts instanceof Array) {
-                res = data.scripts
-            } else {
-                // one script -- somehow this gets parsed to one object
-                res = [data.scripts]
-            }
-        }
-
-        for (const i in res) {
-            const script = res[i]
-            script.isShared = true
-            postProcessCollaborators(script, getUsername())
-            sharedScripts[script.shareid] = script
-        }
-
-        return res
-    })
+    const data = await postAuthForm("/services/scripts/getsharedscripts")
+    const scripts = extractScripts(data)
+    for (const script of scripts) {
+        script.isShared = true
+        postProcessCollaborators(script, getUsername())
+        sharedScripts[script.shareid] = script
+    }
+    return scripts
 }
 
 // Get shared id for locked version of latest script.
@@ -537,11 +470,7 @@ export async function getLockedSharedScriptId(shareid: string){
 
 // Save a username and password to local storage to persist between sessions.
 function storeUser(username: string, password: string) {
-    const userState: any = {}
-    userState.username = username
-    userState.password = password
-
-    localStorage.setItem(USER_STATE_KEY, JSON.stringify(userState))
+    localStorage.setItem(USER_STATE_KEY, JSON.stringify({ username, password }))
 }
 
 // Get a username and password from local storage, if it exists.
@@ -600,11 +529,12 @@ export function getEncodedPassword() {
 }
 
 export function shareWithPeople(shareid: string, users: string[]) {
-    const data: any = {}
-    data.notification_type = "sharewithpeople"
-    data.username = getUsername()
-    data.scriptid = shareid
-    data.users = users
+    const data = {
+        notification_type: "sharewithpeople",
+        username: getUsername(),
+        scriptid: shareid,
+        users,
+    }
 
     if (!websocket.isOpen) {
         websocket.connect(getUsername(), () => websocket.send(data))
@@ -696,7 +626,7 @@ export async function saveSharedScript(scriptid: string, scriptname: string, sou
             isShared: true,
             readonly: true,
             username,
-        }
+        } as ScriptEntity
     }
 }
 
@@ -729,158 +659,104 @@ export async function deleteScript(scriptid: string) {
 }
 
 // Restore a script deleted by the user.
-export function restoreScript(script: ScriptEntity) {
+export async function restoreScript(script: ScriptEntity) {
     let p
     if (lookForScriptByName(script.name, true)) {
         // Prompt the user to rename the script
-        p = helpers.getNgService("$uibModal").open({
+        const renamedScript = await helpers.getNgService("$uibModal").open({
             templateUrl: "templates/rename-import-script.html",
             controller: "renamecontroller",
             size: 100,
             resolve: { script: () => script },
         }).result
 
-        p.then(function(renamedScript: ScriptEntity) {
-            if (renamedScript.name === script.name) {
-                script.name = nextName(script.name)
-            } else {
-                script.name = renamedScript.name
-            }
-            renameScript(script.shareid, script.name)
-            return script
-        }, function () {
-            //dismissed
-        }).catch(function(err: Error) {
-
-        })
-    } else {
-        // Script name is valid, so just return it
-        p = new Promise(function(resolve) { resolve(script) })
+        if (renamedScript.name === script.name) {
+            script.name = nextName(script.name)
+        } else {
+            script.name = renamedScript.name
+        }
+        renameScript(script.shareid, script.name)
     }
 
-    return p.then(function(restoredScript: ScriptEntity) {
-        if (isLogged()) {
-            // User is logged in so make a call to the web service
-            return postAuth("/services/scripts/restore", { scriptid: script.shareid }).then(function(restored: any) {
-                esconsole("Restored script: " + restored.shareid, "debug")
-                scripts[restored.shareid] = { ...restored, saved: true, modified: Date.now() }
-                return restored
-            }).catch(function(err: Error) {
-                esconsole("Could not restore script: " + script.shareid, "debug")
-                esconsole(err, ["error"])
-            })
-        } else {
-            // User is not logged in so alter local storage
-            return new Promise<void>(function(resolve, reject) {
-                scripts[restoredScript.shareid].modified = Date.now()
-                scripts[restoredScript.shareid].soft_delete = false
-                localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-                resolve()
-            })
-        }
-    })
+    if (isLogged()) {
+        const restored = await postAuth("/services/scripts/restore", { scriptid: script.shareid })
+        esconsole("Restored script: " + restored.shareid, "debug")
+        scripts[restored.shareid] = { ...restored, saved: true, modified: Date.now() }
+        return restored
+    } else {
+        scripts[script.shareid].modified = Date.now()
+        scripts[script.shareid].soft_delete = false
+        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
+    }
 }
 
 // Import a script by checking if it is shared or not, and saving it to
 // the user workspace. Returns a promise which resolves to the saved script.
-export function importScript(script: ScriptEntity) {
-    let p
+export async function importScript(script: ScriptEntity) {
     if (lookForScriptByName(script.name)) {
-    // Prompt the user to rename the script
-        p = helpers.getNgService("$uibModal").open({
+        // Prompt the user to rename the script
+        const newScript = await helpers.getNgService("$uibModal").open({
             templateUrl: "templates/rename-import-script.html",
             controller: "renamecontroller",
             size: 100,
             resolve: { script: () => script }
         }).result
 
-        p.then(function(newScript: ScriptEntity) {
-            if (newScript.name === script.name) {
-                script.name = nextName(script.name)
-            } else {
-                script.name = newScript.name
-            }
-            return script
-        }, function () {
-            //dismissed
-        }).catch(function(err: Error) {
-
-        })
-    } else {
-        // Script name is valid, so just return it
-        p = new Promise(resolve => resolve(script))
+        if (newScript.name === script.name) {
+            script.name = nextName(script.name)
+        } else {
+            script.name = newScript.name
+        }
     }
 
-    return p.then(function(script: ScriptEntity) {
-        if (script.isShared) {
-        // The user is importing a shared script -- need to call the webservice
-            if (isLogged()) {
-                return importSharedScript(script.shareid).then(function(imported: ScriptEntity) {
-                    renameScript(imported.shareid, script.name)
-                    imported.name = script.name
-                    return Promise.resolve(imported)
-                })
-            } else {
-                throw ESMessages.general.unauthenticated
-            }
+    if (script.isShared) {
+    // The user is importing a shared script -- need to call the webservice
+        if (isLogged()) {
+            const imported = await importSharedScript(script.shareid)
+            renameScript(imported.shareid, script.name)
+            imported.name = script.name
+            return Promise.resolve(imported)
         } else {
-            // The user is importing a read-only script (e.g. from the curriculum)
-            return saveScript(script.name, script.source_code)
+            throw ESMessages.general.unauthenticated
         }
-    })
+    } else {
+        // The user is importing a read-only script (e.g. from the curriculum)
+        return saveScript(script.name, script.source_code)
+    }
 }
 
-export function importCollaborativeScript(script: ScriptEntity) {
-    let p, originalScriptName = script.name
+export async function importCollaborativeScript(script: ScriptEntity) {
+    let originalScriptName = script.name
     if (lookForScriptByName(script.name)) {
-        p = helpers.getNgService("$uibModal").open({
+        const newScript = await helpers.getNgService("$uibModal").open({
             templateUrl: "templates/rename-import-script.html",
             controller: "renamecontroller",
             size: 100,
             resolve: { script: () => script }
         }).result
 
-        p.then((newScript: ScriptEntity) => {
-            if (newScript.name === script.name) {
-                script.name = nextName(script.name)
-            } else {
-                script.name = newScript.name
-            }
-            return script
-        })
-    } else {
-        // Script name is valid, so just return it
-        p = Promise.resolve(script)
+        if (newScript.name === script.name) {
+            script.name = nextName(script.name)
+        } else {
+            script.name = newScript.name
+        }
     }
-
-    return p.then(() => collaboration.getScriptText(script.shareid).then((text: string) => {
-        userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
-        collaboration.closeScript(script.shareid, getUsername())
-        return saveScript(script.name, text)
-    }))
+    const text = await collaboration.getScriptText(script.shareid)
+    userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
+    collaboration.closeScript(script.shareid, getUsername())
+    return saveScript(script.name, text)
 }
 
 // Delete a shared script if owned by the user.
-export function deleteSharedScript(scriptid: string) {
+export async function deleteSharedScript(scriptid: string) {
     if (isLogged()) {
-        // User is logged in so make a call to the web service
-        return postAuth("/services/scripts/deletesharedscript", { scriptid }).then(function() {
-            esconsole("Deleted shared script: " + scriptid, "debug")
-            closeSharedScript(scriptid)
-            delete sharedScripts[scriptid]
-        }).catch(function(err: Error) {
-            esconsole("Could not delete shared script: " + scriptid, "debug")
-            esconsole(err, ["error"])
-        })
+        await postAuth("/services/scripts/deletesharedscript", { scriptid })
+        esconsole("Deleted shared script: " + scriptid, "debug")
+        closeSharedScript(scriptid)
+        delete sharedScripts[scriptid]
     } else {
-        // User is not logged in
-        return new Promise<void>(function(resolve, reject) {
-            closeSharedScript(scriptid)
-            delete sharedScripts[scriptid]
-            // shared scripts are not maintained in local storage yet
-            // localStorage[LS_SCRIPTS_KEY] = JSON.stringify(scripts)
-            resolve()
-        })
+        closeSharedScript(scriptid)
+        delete sharedScripts[scriptid]
     }
 }
 
@@ -912,44 +788,33 @@ async function importSharedScript(scriptid: string) {
     }
 }
 
-export function openSharedScriptForEdit(shareID: string) {
+export async function openSharedScriptForEdit(shareID: string) {
     if (isLogged()) {
-        importSharedScript(shareID).then(function (importedScript: ScriptEntity) {
-            refreshCodeBrowser().then(function () {
-                openScript(importedScript.shareid)
-            })
-        })
+        const importedScript = await importSharedScript(shareID)
+        await refreshCodeBrowser()
+        openScript(importedScript.shareid)
     } else {
-        loadScript(shareID, true).then(function (script: ScriptEntity) {
-            // save with duplicate check
-            importScript(script).then(function (savedScript: any) {
-                // add sharer's info
-                savedScript.creator = script.username
-                savedScript.original_id = shareID
-
-                openScript(savedScript.shareid)
-
-                // re-save to local with above updated info
-                localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-            })
-        })
+        const script = await loadScript(shareID, true)
+        // save with duplicate check
+        const savedScript = await importScript(script)
+        // add sharer's info
+        savedScript.creator = script.username
+        savedScript.original_id = shareID
+        openScript(savedScript.shareid)
+        // re-save to local with above updated info
+        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
     }
 }
 
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
-function addSharedScript(shareID: string, notificationID: string) {
+async function addSharedScript(shareID: string, notificationID: string) {
     if (isLogged()) {
-        getSharedScripts().then(function (scriptList: ScriptEntity[]) {
-            if (!scriptList.some(function (script) {
-                    return script.shareid === shareID
-                })) {
-                loadScript(shareID, true).then(function (script: ScriptEntity) {
-                    saveSharedScript(shareID, script.name, script.source_code, script.username).then(function () {
-                        getSharedScripts()
-                    })
-                })
-            }
-        })
+        const scriptList = await getSharedScripts()
+        if (!scriptList.some(script => script.shareid === shareID)) {
+            const script = await loadScript(shareID, true)
+            await saveSharedScript(shareID, script.name, script.source_code, script.username)
+            getSharedScripts()
+        }
     }
 
     // prevent repeated import upon page refresh by marking the notification message "read." The message may still appear as unread for the current session.
@@ -960,19 +825,11 @@ function addSharedScript(shareID: string, notificationID: string) {
 }
 
 // Rename a script if owned by the user.
-export function renameScript(scriptid: string, newName: string) {
+export async function renameScript(scriptid: string, newName: string) {
     if (isLogged()) {
-        // user is logged in, make a request to the web service
-        return postAuth("/services/scripts/rename", { scriptid, scriptname: newName }).then(function() {
-            esconsole("Renamed script: " + scriptid + " to " + newName, "debug")
-
-            if (scriptid) {
-                scripts[scriptid].name = newName
-            }
-        }).catch(function(err: Error) {
-            esconsole("Could not rename script: " + scriptid, "debug")
-            esconsole(err, ["error"])
-        })
+        await postAuth("/services/scripts/rename", { scriptid, scriptname: newName })
+        esconsole("Renamed script: " + scriptid + " to " + newName, "debug")
+        scripts[scriptid].name = newName
     } else {
         // User is not logged in, update local storage
         scripts[scriptid].name = newName
@@ -982,79 +839,53 @@ export function renameScript(scriptid: string, newName: string) {
 }
 
 // Get all users and their roles
-export function getAllUserRoles() {
+export async function getAllUserRoles() {
     if (isLogged()) {
-        // user is logged in, make a request to the web service
-        return postAdminForm("/services/scripts/getalluserroles").then(function(data: any) {
-            return data.users
-        }).catch(function(err: Error) {
-            esconsole("Could not retreive users and their roles", "debug")
-            esconsole(err, ["error"])
-        })
+        return (await postAdminForm("/services/scripts/getalluserroles")).users
     } else {
-        // User is not logged in
         esconsole("Login failure", ["error", "user"])
     }
 }
 
 // Add role to user
-export function addRole(username: string, role: string) {
+export async function addRole(username: string, role: string) {
     if (isLogged()) {
-        return postAdminForm("/services/scripts/adduserrole", { username, role }).then(function(result: any) {
-            return result.data
-        }).catch(function(err: Error) {
-            esconsole("Could not add new role", "debug")
-            esconsole(err, ["error"])
-        })
+        return postAdminForm("/services/scripts/adduserrole", { username, role })
     } else {
-        // User is not logged in
         esconsole("Login failure", ["error", "user"])
     }
 }
 
 // Remove role from user
-export function removeRole(username: string, role: string) {
+export async function removeRole(username: string, role: string) {
     if (isLogged()) {
-        return postAdminForm("/services/scripts/adduserrole", { username, role }).then(function(result: any) {
-            return result.data
-        }).catch(function(err: Error) {
-            esconsole("Could not remove role", "debug")
-            esconsole(err, ["error"])
-        })
+        return postAdminForm("/services/scripts/adduserrole", { username, role })
     } else {
-        // User is not logged in
         esconsole("Login failure", ["error", "user"])
     }
 }
 
-export function setPasswordForUser(userID: string, password: string, adminPassphrase: string) {
-    return new Promise<void>(function (resolve, reject) {
-        if (isLogged()) {
-            const adminPwd = getPassword()
+export async function setPasswordForUser(userID: string, password: string, adminPassphrase: string) {
+    if (isLogged()) {
+        const adminPwd = getPassword()
 
-            if (adminPwd !== null) {
-                esconsole("Admin setting a new password for user")
-                const data = {
-                    adminid: getUsername(),
-                    adminpwd: btoa(adminPwd),
-                    adminpp: btoa(adminPassphrase),
-                    username: userID,
-                    newpassword: encodeURIComponent(btoa(password)),
-                }
-                postForm("/services/scripts/modifypwdadmin", data).then(function () {
-                    userNotification.show("Successfully set a new password for user: " + userID + " with password: " + password, "history", 3)
-                    resolve()
-                }, function () {
-                    userNotification.show("Error setting a new password for user: " + userID, "failure1")
-                    reject()
-                })
-            } else {
-                reject()
+        if (adminPwd !== null) {
+            esconsole("Admin setting a new password for user")
+            const data = {
+                adminid: getUsername(),
+                adminpwd: btoa(adminPwd),
+                adminpp: btoa(adminPassphrase),
+                username: userID,
+                newpassword: encodeURIComponent(btoa(password)),
             }
+            await postForm("/services/scripts/modifypwdadmin", data)
+            userNotification.show("Successfully set a new password for user: " + userID + " with password: " + password, "history", 3)
         } else {
-            reject()
+            throw "Missing admin password"
         }
-    })
+    } else {
+        throw "Login failure"
+    }
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
@@ -1062,14 +893,14 @@ function nextName(scriptname: string) {
     const name = ESUtils.parseName(scriptname)
     const ext = ESUtils.parseExt(scriptname)
 
-    const matchedNames: any = {}
-    for (const id in scripts) {
-        if (scripts[id].name.includes(name)) {
-            matchedNames[scripts[id].name] = scripts[id].name
+    const matchedNames = new Set()
+    for (const script of Object.values(scripts)) {
+        if (script.name.startsWith(name)) {
+            matchedNames.add(script.name)
         }
     }
 
-    for (let counter = 1; scriptname in matchedNames; counter++) {
+    for (let counter = 1; matchedNames.has(scriptname); counter++) {
         scriptname = name + "_" + counter + ext
     }
 
@@ -1077,14 +908,13 @@ function nextName(scriptname: string) {
 }
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
-    return Object.keys(scripts)
-        .some(id => !(!!scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
+    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
 }
 
 // Save a user's script if they have permission to do so.
 //   overwrite: If true, overwrite existing scripts. Otherwise, save with a new name.
 //   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
-export function saveScript(scriptname: string, source_code: string, overwrite: boolean=true, status: number=0) {
+export async function saveScript(scriptname: string, source_code: string, overwrite: boolean=true, status: number=0) {
     const name = overwrite ? scriptname : nextName(scriptname)
 
     if (isLogged()) {
@@ -1092,66 +922,49 @@ export function saveScript(scriptname: string, source_code: string, overwrite: b
         const xml = `<scripts><username>${getUsername()}</username>` + 
                     `<name>${name}</name><run_status>${status}</run_status>` +
                     `<source_code><![CDATA[${source_code}]]></source_code></scripts>`
-        return postXMLAuth("/services/scripts/save", xml).then(function(script: any) {
-            const shareid = script.shareid
-
-            esconsole("Saved script: " + name)
-            esconsole("Saved script shareid: " + shareid)
-
-            script.modified = Date.now()
-            script.saved = true
-            script.tooltipText = ''
-
-            script = postProcessCollaborators(script)
-
-            scripts[shareid] = script
-            return scripts[shareid]
-        }).catch(function(err: Error) {
-            esconsole("Could not save script: " + scriptname, "debug")
-            esconsole(err, ["error"])
-            throw err
-        })
+        const script = await postXMLAuth("/services/scripts/save", xml)
+        esconsole("Saved script: " + name)
+        esconsole("Saved script shareid: " + script.shareid)
+        script.modified = Date.now()
+        script.saved = true
+        script.tooltipText = ''
+        postProcessCollaborators(script)
+        scripts[script.shareid] = script
+        return scripts[script.shareid]
     } else {
-        return new Promise(function(resolve, reject) {
-            let shareid = ""
-            if (overwrite) {
-                const match: any = Object.values(scripts).find((v: any) => v.name===name)
-                if (match) {
-                    shareid = match.shareid
-                }
-            }
-            if (shareid === "") {
-                shareid = ESUtils.randomString(22)
-            }
+        let shareid
+        if (overwrite) {
+            const match = Object.values(scripts).find(v => v.name === name)
+            shareid = match?.shareid
+        }
+        if (shareid === undefined) {
+            shareid = ESUtils.randomString(22)
+        }
 
-            scripts[shareid] = { 
-                name, shareid, source_code,
-                modified: Date.now(),
-                saved: true,
-                tooltipText: '',
-                collaborators: [],
-            }
-            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-            resolve(scripts[shareid])
-        })
+        scripts[shareid] = { 
+            name, shareid, source_code,
+            modified: Date.now(),
+            saved: true,
+            tooltipText: '',
+            collaborators: [],
+        } as ScriptEntity
+        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
+        return scripts[shareid]
     }
 }
 
 // Creates a new empty script and adds it to the list of open scripts, and saves it to a user's library.
-export function createScript(scriptname: string) {
+export async function createScript(scriptname: string) {
     const language = ESUtils.parseLanguage(scriptname)
-    return saveScript(scriptname, TEMPLATES[language as "python" | "javascript"])
-    .then(function(result: any) {
-        openScript(result.shareid)
-        return result
-    })
+    const script = await saveScript(scriptname, TEMPLATES[language as "python" | "javascript"])
+    openScript(script.shareid)
+    return script
 }
 
 // Adds a script to the list of open scripts. No effect if the script is already open.
 export function openScript(shareid: string) {
-    if (openScripts.indexOf(shareid) === -1) {
+    if (openScripts.includes(shareid)) {
         openScripts.push(shareid)
-        // save tabs state
         localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts))
     }
     reporter.openScript()
@@ -1160,22 +973,21 @@ export function openScript(shareid: string) {
 
 // Adds a shared script to the list of open shared scripts. If the script is already open, it does nothing.
 export function openSharedScript(shareid: string) {
-    if (openSharedScripts.indexOf(shareid) === -1) {
+    if (openSharedScripts.includes(shareid)) {
         openSharedScripts.push(shareid)
-
         localStorage.setItem(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts))
     }
 }
 
 // Removes a script name from the list of open scripts.
 export function closeScript(shareid: string) {
-    if (isOpen(shareid)) {
+    if (openScripts.includes(shareid)) {
         if (openScripts.includes(shareid)) {
             openScripts.splice(openScripts.indexOf(shareid), 1)
             // save tabs state
             localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts))
         }
-    } else if (isSharedScriptOpen(shareid)) {
+    } else if (openSharedScripts.includes(shareid)) {
         if (openSharedScripts.includes(shareid)) {
             openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1)
             // save tabs state
@@ -1187,26 +999,16 @@ export function closeScript(shareid: string) {
 
 // Removes a script name from the list of open shared scripts.
 export function closeSharedScript(shareid: string) {
-    if (isSharedScriptOpen(shareid)) {
+    if (openSharedScripts.includes(shareid)) {
         openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1)
         localStorage[LS_SHARED_TABS_KEY] = JSON.stringify(openSharedScripts)
     }
     return openSharedScripts
 }
 
-// Check if a script is open.
-function isOpen(shareid: string) {
-    return openScripts.indexOf(shareid) !== -1
-}
-
-// Check if a shared script is open.
-function isSharedScriptOpen(shareid: string) {
-    return openSharedScripts.indexOf(shareid) !== -1
-}
-
 // Save all open scripts.
 export function saveAll() {
-    const promises: Promise<any>[] = []
+    const promises = []
     for (const openScript of openScripts) {
         // do not auto-save collaborative scripts
         if (openScript in scripts && !scripts[openScript].saved && !scripts[openScript].collaborative) {
@@ -1216,18 +1018,12 @@ export function saveAll() {
     return promises
 }
 
-export function getTutoringRecord(scriptid: string) {
-    return postAuthForm("/services/scripts/gettutoringrecord", { scriptid }).then(function (result: any) {
-        return result.data
-    })
+export async function getTutoringRecord(scriptid: string) {
+    return postAuthForm("/services/scripts/gettutoringrecord", { scriptid })
 }
 
-export function uploadCAIHistory(project: string, node: any) {
+export async function uploadCAIHistory(project: string, node: any) {
     const data = { username: getUsername(), project, node: JSON.stringify(node) }
-    postForm("/services/scripts/uploadcaihistory", data).then(function() {
-        console.log("saved to CAI history:", project, node)
-    }).catch(function(err: Error) {
-        console.log("could not save to cai", project, node)
-        throw err
-    })
+    await postForm("/services/scripts/uploadcaihistory", data)
+    console.log("saved to CAI history:", project, node)
 }

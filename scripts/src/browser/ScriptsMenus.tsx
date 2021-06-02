@@ -184,7 +184,7 @@ const SingletonDropdownMenu = () => {
             <MenuItem
                 name='Print' icon='icon-printer'
                 onClick={() => {
-                    exporter.print(unsavedScript);
+                    exporter.print(unsavedScript!);
                 }}
             />
             <MenuItem
@@ -192,7 +192,7 @@ const SingletonDropdownMenu = () => {
                 visible={type==='regular'}
                 disabled={!loggedIn}
                 onClick={() => {
-                    shareScript(unsavedScript);
+                    shareScript(unsavedScript!);
                 }}
             />
             <MenuItem
