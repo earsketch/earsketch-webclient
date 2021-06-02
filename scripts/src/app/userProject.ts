@@ -65,21 +65,20 @@ function form(obj: { [key: string]: string | Blob }={}) {
     return data
 }
 
+// Our API is pretty inconsistent in terms of what endpoints consume/produce.
+// Each helper deals with a different type of endpoint.
+// (The helpers with "Auth" and "Admin" prepopulate some parameters for convenience.)
+
+// Expects query parameters, returns JSON.
 async function get(endpoint: string, params?: { [key: string]: string }) {
-    const url = URL_DOMAIN + endpoint
-    const response = await helpers.getNgService("$http").get(url, { params })
-    return response.data
+    const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
+    return (await fetch(url)).json()
 }
 
+// Expects form data, returns JSON.
 async function postForm(endpoint: string, data?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
-    const payload = form(data)
-    const opts = {
-        transformRequest: identity,
-        headers: {'Content-Type': undefined}
-    }
-    const response = await helpers.getNgService("$http").post(url, payload, opts)
-    return response.data
+    return (await fetch(url, { method: "POST", body: form(data) })).json()
 }
 
 async function postAuthForm(endpoint: string, data: { [key: string]: string }={}) {
@@ -90,17 +89,18 @@ async function postAdminForm(endpoint: string, data: { [key: string]: string }={
     return postForm(endpoint, { adminusername: getUsername(), password: getEncodedPassword(), ...data })
 }
 
-async function post(endpoint: string, params: { [key: string]: string }) {
-    const url = URL_DOMAIN + endpoint
-    const opts = { params }
-    const response = await helpers.getNgService("$http").post(url, {}, opts)
-    return response.data
+// Expects query parameters, returns XML.
+async function post(endpoint: string, params?: { [key: string]: string }) {
+    const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
+    const text = (await fetch(url, { method: "POST" })).text()
+    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
 }
 
 async function postAuth(endpoint: string, params: { [key: string]: string }) {
     return post(endpoint, { username: getUsername(), password: getEncodedPassword(), ...params })
 }
 
+// Expects XML, returns XML.
 async function postXML(endpoint: string, xml: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
     const response = await fetch(url + (params ? "?" + new URLSearchParams(params) : ""), {
@@ -109,8 +109,7 @@ async function postXML(endpoint: string, xml: string, params?: { [key: string]: 
         body: xml,
     })
     const text = await response.text()
-    const data = await xml2js.parseStringPromise(text, { explicitArray: false })
-    return data
+    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
 }
 
 async function postXMLAuth(endpoint: string, xml: string) {
@@ -136,8 +135,7 @@ window.onbeforeunload = function () {
                             `<source_code><![CDATA[${sourcecode}]]></source_code></scripts>`
 
                 postXMLAuth("/services/scripts/save", xml)
-                    .then(data => {
-                        const script = data.scripts;
+                    .then(script => {
                         script.modified = Date.now();
                         script.saved = true;
                         script.tooltipText = '';
@@ -704,10 +702,9 @@ export async function setLicense(scriptName: string, scriptId: string, licenseID
 // save a sharedscript into user's account.
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string){
     if (isLogged()) {
-        const data = await postAuth("/services/scripts/savesharedscript", { scriptid })
-        var shareid = data.shareid;
-        esconsole('Save shared script ' + data.name + ' to ' + username, 'debug');
-        return sharedScripts[shareid] = { ...data, isShared: true, readonly: true, modified: Date.now() }
+        const script = await postAuth("/services/scripts/savesharedscript", { scriptid })
+        esconsole('Save shared script ' + script.name + ' to ' + username, 'debug');
+        return sharedScripts[script.shareid] = { ...script, isShared: true, readonly: true, modified: Date.now() }
     } else {
         return sharedScripts[scriptid] = {
             name: scriptname,
@@ -726,11 +723,11 @@ export async function deleteScript(scriptid: string) {
     if (isLogged()) {
         // User is logged in so make a call to the web service
         try {
-            const data = await postAuth("/services/scripts/delete", { scriptid })
+            const script = await postAuth("/services/scripts/delete", { scriptid })
             esconsole('Deleted script: ' + scriptid, 'debug');
 
             if (scripts[scriptid]) {
-                scripts[scriptid] = data;
+                scripts[scriptid] = script;
                 scripts[scriptid].modified = Date.now();
                 scripts[scriptid] = postProcessCollaborators(scripts[scriptid]);
                 closeScript(scriptid);
@@ -785,13 +782,10 @@ export function restoreScript(script: ScriptEntity) {
     return p.then(function(restoredScript: ScriptEntity) {
         if (isLogged()) {
             // User is logged in so make a call to the web service
-            return postAuth("/services/scripts/restore", { scriptid: script.shareid }).then(function(data: any) {
-                esconsole('Restored script: ' + script.shareid, 'debug');
-                restoredScript = data;
-                restoredScript.saved = true;
-                restoredScript.modified = Date.now();
-                scripts[restoredScript.shareid] = restoredScript;
-                return restoredScript;
+            return postAuth("/services/scripts/restore", { scriptid: script.shareid }).then(function(restored: any) {
+                esconsole('Restored script: ' + restored.shareid, 'debug')
+                scripts[restored.shareid] = { ...restored, saved: true, modified: Date.now() }
+                return restored
             }).catch(function(err: Error) {
                 esconsole('Could not restore script: ' + script.shareid, 'debug');
                 esconsole(err, ['ERROR']);
@@ -1140,8 +1134,7 @@ export function saveScript(scriptname: string, sourcecode: string, overwrite?: b
         const xml = `<scripts><username>${getUsername()}</username>` + 
                     `<name>${n}</name><run_status>${status}</run_status>` +
                     `<source_code><![CDATA[${sourcecode}]]></source_code></scripts>`
-        return postXMLAuth("/services/scripts/save", xml).then(function(data: any) {
-            let script = data.scripts;
+        return postXMLAuth("/services/scripts/save", xml).then(function(script: any) {
             const shareid = script.shareid;
 
             esconsole('Saved script: ' + n);
