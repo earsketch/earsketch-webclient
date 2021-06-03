@@ -3,10 +3,10 @@ import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
 import {ScriptEntity} from 'common';
 
-let keyGenreDict: any = {}
-let keyInstrumentDict: any = {}
+let keyGenreDict: { [key: string]: string } = {}
+let keyInstrumentDict: { [key: string]: string } = {}
 
-export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:string]: string }) {
+export function setKeyDict(genre: { [key: string]: string }, instrument: { [key: string]: string }) {
     keyGenreDict = genre
     keyInstrumentDict = instrument
 
