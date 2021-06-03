@@ -571,6 +571,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                         var report = caiAnalysisModule.analyzeCodeAndMusic(language, code, result);
                     }
                     catch (e) {
+                        // TODO: Make this work across browsers. (See esconsole for reference.)
                         var traceDepth = 5;
                         var stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1];
                         var startIndex = stackString.indexOf("reader.js");
