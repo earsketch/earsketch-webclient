@@ -5,8 +5,9 @@
 import esconsole from '../esconsole'
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification'
+import * as userProject from './userProject'
 
-app.controller("changepasswordController", ['$scope', '$uibModalInstance', 'userProject', function ($scope, $uibModalInstance, userProject) {
+app.controller("changepasswordController", ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
     $scope.pwError = "";
 
     /**

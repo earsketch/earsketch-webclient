@@ -18,6 +18,7 @@ import { Clip, DAWData, EffectRange, Track } from "../app/player"
 import { measureToTime } from "../esutils"
 import ESMessages from "../data/messages"
 import ServiceWrapper from "./angular-wrappers"
+import * as userProject from "../app/userProject"
 
 
 class ValueError extends Error {
@@ -1193,9 +1194,8 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
     }
 
     let url = URL_DOMAIN + "/services/audio/getrandomaudiokey?tag=" + folder
-    const userProject = ServiceWrapper().userProject
 
-    if (userProject.isLogged()) {
+    if (userProject.isLoggedIn()) {
         url += "&username=" + userProject.getUsername()
     }
 

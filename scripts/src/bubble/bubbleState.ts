@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
 import * as tabs from '../editor/tabState';
 import * as helpers from '../helpers';
+import * as userProject from '../app/userProject';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity } from 'common';
@@ -46,7 +47,6 @@ const createSampleScript = createAsyncThunk(
         const { bubble: { language } } = getState() as { bubble: BubbleState };
         const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
-        const userProject = helpers.getNgService('userProject');
         const rootScope = helpers.getNgService('$rootScope');
         return userProject.saveScript(fileName, code, true)
             .then((script: ScriptEntity) => {

@@ -40,6 +40,9 @@ declare var Kali: any;
 declare var SC: any;  // Soundcloud
 declare var Sk: any;
 
+declare module 'xml2js';
+declare var $: any;
+
 declare var FFT: any;
 declare var WindowFunction: any;
 declare var DSP: any;

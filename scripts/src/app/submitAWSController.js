@@ -7,8 +7,9 @@ import * as ESUtils from '../esutils'
 import * as exporter from './exporter'
 import reporter from './reporter'
 import * as userNotification from './userNotification'
+import * as userProject from './userProject'
 
-app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'userProject', 'script', 'licenses', 'clipboard', '$http', '$ngRedux', function($scope, $uibModalInstance, userProject, script, licenses, clipboard, $http, $ngRedux) {
+app.controller("submitAWSController", ['$scope', '$uibModalInstance', 'script', 'licenses', 'clipboard', '$http', '$ngRedux', function($scope, $uibModalInstance, script, licenses, clipboard, $http, $ngRedux) {
 
     $scope.sharelink = location.origin + location.pathname +'#?sharing=' + script.shareid;
     $scope.lockedShareLink = "";

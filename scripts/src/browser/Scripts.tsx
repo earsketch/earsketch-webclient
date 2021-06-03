@@ -10,6 +10,7 @@ import * as scripts from './scriptsState';
 import * as tabs from '../editor/tabState';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
+import * as userProject from '../app/userProject';
 import { RootState } from '../reducers';
 import { ScriptEntity, ScriptType } from 'common';
 
@@ -207,7 +208,6 @@ const RestoreButton = ({ script }: { script: ScriptEntity }) => {
     const dispatch = useDispatch();
     return (
         <PillButton onClick={async () => {
-            const userProject = helpers.getNgService('userProject');
             await userProject.restoreScript(Object.assign({}, script));
             dispatch(scripts.syncToNgUserProject());
         }}>
@@ -339,7 +339,6 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
     const loggedIn = useSelector(user.selectLoggedIn);
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
-    const userProject = helpers.getNgService('userProject');
 
     let bgColor;
     if (highlight) {

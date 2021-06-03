@@ -4,8 +4,9 @@
  */
 import esconsole from '../esconsole'
 import * as userNotification from './userNotification'
+import * as userProject from './userProject'
 
-app.controller("editProfileController", ['$scope', '$uibModalInstance', 'userProject', function ($scope, $uibModalInstance, userProject) {
+app.controller("editProfileController", ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
     $scope.error = '';
     $scope.infoRequiredMessage = ESMessages.user.infoRequired;
     $scope.optional = true;

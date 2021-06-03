@@ -16,11 +16,7 @@ export default function ServiceWrapper() {
     // Load the autograder service outside angular
     var ApiAutograder = injector.get('autograder');
 
-    // Load the user-project service outside angular
-    var ApiUserProject = injector.get('userProject');
-
     return {
         autograder: ApiAutograder as any,
-        userProject: ApiUserProject as any,
     }
 }

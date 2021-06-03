@@ -10,6 +10,7 @@ import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 import * as curriculum from '../browser/curriculumState'
+import store from '../reducers'
 
 const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -171,5 +172,24 @@ const HotCAI = hot((props: {
         </Provider>
     )
 })
+
+if (FLAGS.SHOW_CAI) {
+    // TODO: Moved out of userProject, should probably go in a useEffect.
+    window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
+    window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
+
+    let mouse_x: number | undefined, mouse_y: number | undefined
+
+    window.addEventListener('mousemove', e => {
+        mouse_x = e.x
+        mouse_y = e.y
+    })
+
+    window.setInterval(() => {
+        if (mouse_x && mouse_y) {
+            store.dispatch(cai.mousePosition([mouse_x, mouse_y]))
+        }
+    }, 5000)
+}
 
 app.component('cai', react2angular(HotCAI, null, ['$ngRedux']))

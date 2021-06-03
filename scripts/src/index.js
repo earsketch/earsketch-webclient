@@ -117,7 +117,6 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('userProject');
     require('esrecorder');
     require('recorder');
 

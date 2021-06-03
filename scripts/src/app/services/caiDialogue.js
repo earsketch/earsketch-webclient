@@ -5,7 +5,9 @@ import { current } from 'immer';
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule, caiStudentHistoryModule, caiProjectModel) {
+import * as userProject from '../userProject'
+
+app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiErrorHandling, recommender, caiStudentPreferenceModule, caiStudentHistoryModule, caiProjectModel) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};

@@ -5,8 +5,9 @@ import * as ESUtils from '../esutils';
 import * as sounds from '../browser/soundsState';
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
+import * as userProject from './userProject';
 
-app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService','userProject','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, RecorderService, userProject, $sce, $timeout, $http, $ngRedux) {
+app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, RecorderService, $sce, $timeout, $http, $ngRedux) {
     $scope.file = {
         data: null,
         key: null,
@@ -285,7 +286,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','RecorderService
       if ($scope.isSafari) return null;
 
       var username = userProject.getUsername();
-      var encodedPassword = userProject.getEncodedPassword();
+      var encodedPassword = userProject.getPassword();
       var url = URL_DOMAIN + '/services/scripts/getembeddedtunepadid';
 
       var payload = new FormData();

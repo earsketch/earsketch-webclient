@@ -9,6 +9,7 @@ import * as helpers from '../helpers';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
 import * as editor from "./editorState";
+import * as userProject from '../app/userProject';
 
 interface TabState {
     openTabs: string[],
@@ -248,7 +249,6 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
             const restoredSession = getEditorSession(scriptID);
 
             if (restoredSession) {
-                const userProject = helpers.getNgService('userProject');
                 const script = scripts.selectAllScriptEntities(getState())[scriptID];
                 userProject.saveScript(script.name, restoredSession.getValue()).then(() => {
                     userProject.closeScript(scriptID);

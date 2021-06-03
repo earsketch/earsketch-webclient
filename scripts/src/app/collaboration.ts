@@ -1003,7 +1003,7 @@ async function onScriptRenamed(data: Message) {
     }
 }
 
-export function getScriptText(scriptID: string) {
+export function getScriptText(scriptID: string): Promise<string> {
     esconsole("requesting the script text for " + scriptID, "collab")
     websocket.send({ ...makeWebsocketMessage(), action: "getScriptText", scriptID })
     return new Promise(resolve => continuations.getScriptText = resolve)

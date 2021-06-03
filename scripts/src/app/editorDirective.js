@@ -2,8 +2,9 @@ import * as collaboration from './collaboration';
 import * as tabs from '../editor/tabState';
 import * as config from '../editor/editorConfig';
 import * as cai from '../cai/caiState';
+import * as userProject from './userProject';
 
-app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', 'userProject', function ($rootScope, $timeout, $ngRedux, userProject) {
+app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', function ($rootScope, $timeout, $ngRedux) {
     return {
         transclude: false,
         restrict: 'EA',
