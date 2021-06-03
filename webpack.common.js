@@ -107,7 +107,6 @@ module.exports = {
             codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
 
             caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
-            caiStudentPreferenceModule: path.resolve(__dirname, `${servicesDir}/caiStudentPreferenceModule.js`),
 
             caiProjectModel: path.resolve(__dirname, `${servicesDir}/caiProjectModel.js`)
 

@@ -1,13 +1,13 @@
-﻿import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree';
-import { current } from 'immer';
-/**
+﻿/**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
+import * as caiStudentPreferenceModule from "../../cai/caiStudentPreferences"
+import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree';
 import * as userProject from '../userProject'
 
-app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiErrorHandling, recommender, caiStudentPreferenceModule, caiStudentHistoryModule, caiProjectModel) {
+app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiErrorHandling, recommender, caiStudentHistoryModule, caiProjectModel) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};

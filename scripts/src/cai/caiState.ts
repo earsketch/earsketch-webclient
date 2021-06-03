@@ -1,6 +1,7 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
+import * as caiStudentPreferenceModule from './caiStudentPreferences'
 import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
 
@@ -212,7 +213,6 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         const caiDialogue = helpers.getNgService('caiDialogue')
         const codeSuggestion = helpers.getNgService('codeSuggestion')
         const caiStudentHistoryModule = helpers.getNgService('caiStudentHistoryModule')
-        const caiStudentPreferenceModule = helpers.getNgService('caiStudentHistoryModule')
         const rootScope = helpers.getNgRootScope()
 
         if (caiDialogue.isDone()) {
@@ -319,7 +319,6 @@ export const checkForCodeUpdates = createAsyncThunk<void, ThunkAPI>(
 export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
     'cai/userOnPage',
     (time: number, {getState, dispatch}) => {
-        const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
         caiStudentPreferenceModule.addOnPageStatus(1,time)
     }
 );
@@ -327,7 +326,6 @@ export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
 export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
     'cai/userOffPage',
     (time: number, {getState, dispatch}) => {
-        const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
         caiStudentPreferenceModule.addOnPageStatus(0,time)
     }
 );
@@ -335,7 +333,6 @@ export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
 export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
     'cai/keyStroke',
     ([action, content, time], {getState, dispatch}) => {
-        const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
         caiStudentPreferenceModule.addKeystroke(action, content, time)
     }
 );
@@ -343,7 +340,6 @@ export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
 export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
     'cai/mousePosition',
     ([x,y], {getState, dispatch}) => {
-        const caiStudentPreferenceModule = helpers.getNgService('caiStudentPreferenceModule')
         caiStudentPreferenceModule.addMousePos({x,y})
     }
 );
