@@ -3,8 +3,8 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-import * as caiStudent from "../../cai/caiStudent"
-import * as caiStudentPreferenceModule from "../../cai/caiStudentPreferences"
+import * as caiStudent from "../../cai/student"
+import * as caiStudentPreferenceModule from "../../cai/studentPreferences"
 import * as userProject from '../userProject'
 
 app.factory('caiStudentHistoryModule', ['complexityCalculator', function (complexityCalculator) {

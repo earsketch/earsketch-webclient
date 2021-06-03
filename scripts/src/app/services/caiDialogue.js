@@ -3,14 +3,14 @@
  *
  * @author Erin Truesdell, Jason Smith
  */
-import * as caiErrorHandling from "../../cai/caiErrorHandling"
-import * as caiStudentPreferenceModule from "../../cai/caiStudentPreferences"
-import * as caiProjectModel from "../../cai/caiProjectModel"
-import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree';
-import * as recommender from '../recommender';
+import * as caiErrorHandling from "../../cai/errorHandling"
+import * as caiStudentPreferenceModule from "../../cai/studentPreferences"
+import * as caiProjectModel from "../../cai/projectModel"
+import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree'
+import * as recommender from '../recommender'
 import * as userProject from '../userProject'
 
-app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', function (codeSuggestion, caiErrorHandling, caiStudentHistoryModule) {
+app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', function (codeSuggestion, caiStudentHistoryModule) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};

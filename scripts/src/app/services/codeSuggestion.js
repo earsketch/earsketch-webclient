@@ -1,5 +1,5 @@
 import {CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI} from 'codeRecommendations';
-import * as caiProjectModel from "../../cai/caiProjectModel"
+import * as caiProjectModel from "../../cai/projectModel"
 
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.

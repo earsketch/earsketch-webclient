@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
-import * as caiStudentPreferenceModule from './caiStudentPreferences'
+import * as caiStudentPreferenceModule from './studentPreferences'
 import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
 

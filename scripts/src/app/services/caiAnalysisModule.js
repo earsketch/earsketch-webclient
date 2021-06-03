@@ -4,7 +4,7 @@
  * @author Jason Smith
  */
 import * as audioLibrary from '../audiolibrary';
-import * as caiStudent from '../../cai/caiStudent';
+import * as caiStudent from '../../cai/student';
 import esconsole from '../../esconsole';
 import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';

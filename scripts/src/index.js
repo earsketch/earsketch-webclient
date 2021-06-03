@@ -37,7 +37,7 @@ import ESMessages from './data/messages'
 import reporter from './app/reporter'
 window.ESMessages = ESMessages
 // TODO: Remove this after making complexityCalculator a module instead of a service.
-import * as caiErrorHandling from './cai/caiErrorHandling'
+import * as caiErrorHandling from './cai/errorHandling'
 window.caiErrorHandling = caiErrorHandling
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
