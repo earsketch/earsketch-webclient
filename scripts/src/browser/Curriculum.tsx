@@ -14,12 +14,13 @@ import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
+const SECTION_URL_CHARACTER = '!'
 
 let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
-    const page = curriculum.getURLForLocation(currentLocation);
-    const url = SITE_BASE_URI + '#?curriculum=' + page + '&language=' + language
+    const page = curriculum.getURLForLocation(currentLocation).replace("#", SECTION_URL_CHARACTER)
+    const url = SITE_BASE_URI + '?' + new URLSearchParams({ curriculum: page, language })
     clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
@@ -320,26 +321,26 @@ const HotCurriculum = hot((props: {
         clipboard = props.clipboard
 
         // Handle URL parameters.
-        const curriculumParam = ESUtils.getURLParameter('curriculum');
+        const curriculumParam = ESUtils.getURLParameter('curriculum')
 
         if (curriculumParam !== null) {
             // check if this value exists in our old locations file first
-            const url = ESCurr_OLD_LOCATIONS[curriculumParam];
-            if(url !== undefined) {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ url: url }));
+            const url = ESCurr_OLD_LOCATIONS[curriculumParam]
+            if (url !== undefined) {
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url }))
             } else {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ url: curriculumParam }));
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url: curriculumParam.replace(SECTION_URL_CHARACTER, "#") }))
             }
         }
 
-        if(curriculumParam === null) {
+        if (curriculumParam === null) {
             // Load welcome page initially.
-            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }));
+            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
         }
 
         const languageParam = ESUtils.getURLParameter('language')
         if (languageParam && ['python', 'javascript'].indexOf(languageParam) > -1) {
-            // If the user has a script open, that language overwrites this one due to ideController;
+            // If the user has a script open, that language overwrites this one due to ideController
             // this is probably a bug, but the old curriculumPaneController has the same behavior.
             props.$ngRedux.dispatch(appState.setScriptLanguage(languageParam))
         }

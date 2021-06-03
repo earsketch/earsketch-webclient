@@ -330,7 +330,7 @@ const fixLocation = (href: string, loc: number[]) => {
         // if loc is still undefined then this is a request for an un-indexed page, default them to the welcome page
         loc = [0];
         href = undefined as any;
-        userNotification.show('Failed to load curriculum link. Redirecting to welcome page.',"failure2", 0.5);
+        userNotification.show('Failed to load curriculum link. Redirecting to welcome page.',"failure2", 2);
     }
 
     if (href === undefined) {

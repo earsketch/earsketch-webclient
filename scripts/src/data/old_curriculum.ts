@@ -1,4 +1,4 @@
-export const ESCurr_OLD_LOCATIONS: {[index: string]:string} = {
+export const ESCurr_OLD_LOCATIONS: { [index: string]: string } = {
     "0": "welcome.html",
     "1": "ch_u1_intro.html",
     "2": "ch_u2_intro.html",
@@ -281,4 +281,4 @@ export const ESCurr_OLD_LOCATIONS: {[index: string]:string} = {
     "9-3-8": "ch_YVIPModule4.html#_bonus_functions_with_staggered_start_and_end_measures",
     "9-4": "ch_YVIP_FinalSubmission.html",
     "9-4-0": "ch_YVIP_FinalSubmission.html#SubmitYourRemix"
-};
+} as const;
