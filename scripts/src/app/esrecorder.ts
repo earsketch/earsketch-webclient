@@ -1,17 +1,19 @@
-/**
- *
- * @module RecorderService
- */
-import * as audioLibrary from './audiolibrary'
 import ctx from './audiocontext'
 import * as ESUtils from '../esutils'
 import * as helpers from '../helpers'
 import { encodeWAV } from './renderer'
-import * as userProject from './userProject'
 
-var audioRecorder: any, meter: any, micGain: any, zeroGain: any, previewBs: any, startTime: any, metroOsc: any, beatBuffSrc: any, eventBuffSrc: any;
+let audioRecorder: any
+let meter: any
+let micGain: any
+let zeroGain: any
+let previewBs: any
+let startTime: any
+let metroOsc: any
+let beatBuffSrc: any
+let eventBuffSrc: any
 
-export let callbacks = {
+export const callbacks = {
     prepareForUpload: (blob: Blob, useMetro: boolean, bpm: number) => {},
     openRecordMenu: () => {},
     micAccessBlocked: (type: string) => {},
@@ -22,7 +24,7 @@ export let callbacks = {
 
 export let analyserNode: AnalyserNode | null = null;
 
-export let properties: any = {
+export const properties: any = {
     micIsOn: false,
     isRecording: false,
     useMetro: true,
@@ -39,12 +41,12 @@ export let properties: any = {
     meterVal: 0
 };
 
-var recorderOptions = {
+const recorderOptions = {
     bufferLen: 2048,
     numChannels: 1
 };
 
-export let clear = function (softClear?: boolean) {
+export function clear(softClear?: boolean) {
     audioRecorder = null;
     previewBs = null;
 
@@ -63,8 +65,7 @@ export let clear = function (softClear?: boolean) {
     callbacks.showRecordedWaveform();
 };
 
-export let init = function () {
-    
+export function init() {
     clear();
 
     meter = createAudioMeter(ctx, 1, 0.95, 500);
@@ -75,7 +76,7 @@ export let init = function () {
     beatBuffSrc = [];
     eventBuffSrc = [];  
 
-    var audioOptions = {
+    const audioOptions = {
         "audio": {
             "mandatory": {
                 "googEchoCancellation": "false",
@@ -118,7 +119,7 @@ function gotAudio(stream: any) {
     // FF bug: a fake audio node needs to be exposed to the global scope
     (window as any).horrible_hack_for_mozilla = ctx.createMediaStreamSource(stream);
 
-    var mic = ctx.createMediaStreamSource(stream);
+    const mic = ctx.createMediaStreamSource(stream);
     mic.connect(meter);
     mic.connect(micGain);
 
@@ -177,19 +178,18 @@ function scheduleRecord() {
 }
 
 function onRecordStart() {
-    var sr = ctx.sampleRate;
-    var beats = 4;
+    const sr = ctx.sampleRate;
+    const beats = 4;
     metroOsc = [];
     beatBuffSrc = [];
 
-    for (var i = 0; i < (properties.numMeasures + properties.countoff) * beats; i++) {
-
+    for (let i = 0; i < (properties.numMeasures + properties.countoff) * beats; i++) {
         // scheduled metronome sounds
         if (i < properties.countoff * beats || properties.clicks) {
             metroOsc[i] = ctx.createOscillator();
-            var metroGain = ctx.createGain();
-            var del = 60.0 / properties.bpm * i + ctx.currentTime;
-            var dur = 0.1;
+            const metroGain = ctx.createGain();
+            const del = 60.0 / properties.bpm * i + ctx.currentTime;
+            const dur = 0.1;
             if (i % beats === 0) {
                 metroOsc[i].frequency.value = 2000;
                 metroGain.gain.setValueAtTime(0.25, del);
@@ -205,7 +205,7 @@ function onRecordStart() {
         }
 
         // buffer-based scheduler mainly for visual dots
-        var beatBuff = ctx.createBuffer(1, sr * 60.0 / properties.bpm, sr);
+        const beatBuff = ctx.createBuffer(1, sr * 60.0 / properties.bpm, sr);
         beatBuffSrc[i] = ctx.createBufferSource();
         beatBuffSrc[i].buffer = beatBuff;
         beatBuffSrc[i].connect(ctx.destination);
@@ -225,20 +225,13 @@ function onRecordStart() {
 
                 helpers.getNgRootScope().$apply();
             }
-
-            // ugly hack for firefox
-            // if (properties.isRecording) {
-            //     // updateCurMeasureShow();
-            // } else {
-            //     properties.curBeat = -1;
-            // }
         };
     }
 }
 
-function buffEventCall (lenInSec: number, onEnded: (this: AudioScheduledSourceNode, ev: Event) => any) {
-    var sr = ctx.sampleRate;
-    var buffSrc = ctx.createBufferSource();
+function buffEventCall(lenInSec: number, onEnded: (this: AudioScheduledSourceNode, ev: Event) => any) {
+    const sr = ctx.sampleRate;
+    const buffSrc = ctx.createBufferSource();
     buffSrc.buffer = ctx.createBuffer(1, sr * lenInSec, sr);
     buffSrc.connect(ctx.destination);
     buffSrc.start(ctx.currentTime);
@@ -246,7 +239,7 @@ function buffEventCall (lenInSec: number, onEnded: (this: AudioScheduledSourceNo
     eventBuffSrc.push(buffSrc);
 }
 
-export let toggleRecord = function () {
+export function toggleRecord() {
     if (properties.micIsOn) {
         if (!properties.isRecording) {
             startRecording();
@@ -349,25 +342,22 @@ function updateMeter() {
 
 function gotBuffer(buf: any) {
     if (properties.useMetro) {
-        var targetLen = Math.round(240.0 / properties.bpm * properties.numMeasures * ctx.sampleRate);
-        var startTimeDiff = Math.round((audioRecorder.getStartTime() - startTime) * ctx.sampleRate);
-        if (properties.countoff > 0) {
-            startTimeDiff = 0;
-        }
+        const targetLen = Math.round(240.0 / properties.bpm * properties.numMeasures * ctx.sampleRate);
+        const startTimeDiff = properties.countoff > 0 ? 0 : Math.round((audioRecorder.getStartTime() - startTime) * ctx.sampleRate);
 
         properties.buffer = ctx.createBuffer(buf.length, targetLen, ctx.sampleRate);
 
-        for (var ch = 0; ch < buf.length; ch++) {
-            var chdata = properties.buffer.getChannelData(ch);
+        for (let ch = 0; ch < buf.length; ch++) {
+            const chdata = properties.buffer.getChannelData(ch);
 
-            for (var i = 0; i < targetLen; i++) {
+            for (let i = 0; i < targetLen; i++) {
                 chdata[i] = buf[ch][i+startTimeDiff];
             }
         }
     } else {
         properties.buffer = ctx.createBuffer(buf.length, buf[0].length, ctx.sampleRate);
 
-        for (var ch = 0; ch < buf.length; ch++) {
+        for (let ch = 0; ch < buf.length; ch++) {
             properties.buffer.getChannelData(ch).set(buf[ch]);
         }
     }
@@ -375,41 +365,18 @@ function gotBuffer(buf: any) {
     callbacks.showRecordedWaveform();
     properties.hasBuffer = true;
 
-    //properties.save();
-    var view = encodeWAV(properties.buffer.getChannelData(0));
-    var blob = new Blob([view], {type: 'audio/wav'});
+    const view = encodeWAV(properties.buffer.getChannelData(0));
+    const blob = new Blob([view], {type: 'audio/wav'});
     doneEncoding(blob);
 }
 
 function doneEncoding(blob: any) {
     blob.lastModifiedDate = new Date();
-
-    // get the files with default name pattern (USER_SOUND_num.wav)
-    var def = audioLibrary.cache.sounds.filter(function (item) {
-        return item.file_key.match(new RegExp(userProject.getUsername().toUpperCase() + '_SOUND_\\d+'));
-    });
-    // get the number portion and list them in descending order
-    var nums = def.map(function (item) {
-        return parseInt(item.file_key.replace(new RegExp(userProject.getUsername().toUpperCase() + '_SOUND_'), ''));
-    }).sort(function (a, b) {
-        return b-a;
-    });
-    // increment by 1
-    var nextNum;
-    if (nums.length === 0) {
-        nextNum = (1).toString();
-    } else {
-        nextNum = (nums[0]+1).toString();
-    }
-    // pad with leading 0s. the basic digit length is 3
-    var numPadded = Array(4 - nextNum.length).join('0') + nextNum;
-    //blob.name = 'SOUND_' + numPadded + '.wav';
     blob.name='QUICK_RECORD';
-
     callbacks.prepareForUpload!(blob, properties.useMetro, properties.bpm);
 }
 
-export let togglePreview = function () {
+export function togglePreview() {
     if (!properties.isPreviewing) {
         startPreview();
     } else {
@@ -424,7 +391,7 @@ function startPreview() {
         previewBs = ctx.createBufferSource();
         previewBs.buffer = properties.buffer;
 
-        var amp = ctx.createGain();
+        const amp = ctx.createGain();
         amp.gain.value = 1;
         previewBs.connect(amp);
         amp.connect(ctx.destination);
