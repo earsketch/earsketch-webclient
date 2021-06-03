@@ -15,31 +15,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
     function getApiCalls() {
         return complexityCalculatorState.getStateProperty("apiCalls")();
     }
-
-
-    var translatedIntegerValues = {
-        0: { "": "Does not Use" },
-        1: { "": "Uses" },
-        2: {
-            "consoleInput": "Takes Console Input Originally",
-            "": "Uses Original"
-        },
-        3: {
-            "forLoops": () => isJavascript ? "Uses Originally with Two Arguments" : "Uses Originally With Range Min/Max",
-            "conditionals": "Uses Originally to Follow Multiple Code Paths",
-            "userFunc": "Uses and Calls Originally",
-            "consoleInput": "Takes Input Originally and Uses For Purpose",
-            "": "Uses Originally For Purpose"
-        },
-        4: {
-            "forLoops": () => isJavascript ? "Uses Originally with Three Arguments" : "Uses Originally With Range Min/Max and Increment",
-            "variables": "Uses Originally And Transforms Value",
-            "strings": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon",
-            "lists": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon"
-        },
-        5: { "forLoops": "Uses Original Nested Loops" }
-    }
-
+    
 
     /**
     *Translate recorded integer values from the results into human-readable English
