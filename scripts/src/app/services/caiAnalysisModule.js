@@ -8,8 +8,9 @@ import * as caiStudent from '../../cai/caiStudent';
 import esconsole from '../../esconsole';
 import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
+import * as recommender from '../recommender';
 
-app.factory('caiAnalysisModule', ['complexityCalculator', 'recommender', function (complexityCalculator, recommender) {
+app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCalculator) {
 
   var librarySounds = [];
   var librarySoundGenres = [];

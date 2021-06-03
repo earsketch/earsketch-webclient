@@ -16,13 +16,14 @@ import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
 import * as cai from '../cai/caiState';
+import * as recommender from './recommender';
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$q', '$confirm', '$sce', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, $q, $confirm, $sce, $document, $ngRedux, recommender) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$q', '$confirm', '$sce', '$document', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $q, $confirm, $sce, $document, $ngRedux) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });

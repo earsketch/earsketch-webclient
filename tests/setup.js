@@ -245,4 +245,3 @@ require('inputsController');
 require('autograder');
 require('caiAnalysisModule');
 require('complexityCalculator');
-require('recommender');

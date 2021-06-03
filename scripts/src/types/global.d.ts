@@ -50,6 +50,20 @@ declare var DSP: any;
 declare var createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode;
 declare var Recorder: any
 
+declare module 'audiokeysRecommendations' {
+    var AUDIOKEYS_RECOMMENDATIONS: {
+        [key: string]: {
+            [key: string]: number[]
+        }
+    }
+}
+
+declare module 'numbersAudiokeys' {
+    var NUMBERS_AUDIOKEYS: {
+        [key: string]: string
+    }
+}
+
 declare module 'angular' {
     var element: any
     interface IScope {

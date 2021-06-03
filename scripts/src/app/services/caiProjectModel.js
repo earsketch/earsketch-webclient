@@ -1,10 +1,7 @@
-﻿
-/**
- * Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
- *
- * @author Jason Smith
- */
-app.factory('caiProjectModel', ['recommender', function (recommender) {
+﻿//Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
+import * as recommender from '../recommender';
+
+app.factory('caiProjectModel', [_, function () {
 
     var activeProject = "";
 

@@ -179,7 +179,6 @@ require(['angular'], () => {
     require('caiDialogue');
     require('caiErrorHandling');
     require('codeSuggestion');
-    require('recommender');
     require('caiProjectModel');
 
     // TODO: Use a module.
