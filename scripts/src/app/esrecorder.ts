@@ -1,17 +1,32 @@
-import ctx from './audiocontext'
-import * as ESUtils from '../esutils'
-import * as helpers from '../helpers'
-import { encodeWAV } from './renderer'
+import audioContext from "./audiocontext"
+import * as ESUtils from "../esutils"
+import * as helpers from "../helpers"
+import { encodeWAV } from "./renderer"
 
-let audioRecorder: any
-let meter: any
-let micGain: any
-let zeroGain: any
-let previewBs: any
-let startTime: any
-let metroOsc: any
-let beatBuffSrc: any
-let eventBuffSrc: any
+const RECORDER_OPTIONS = {
+    bufferLen: 2048,
+    numChannels: 1
+} as const
+
+let audioRecorder: any  // Recorder from lib/recorderjs/recorder.js
+let meter: any  // AudioMeter from lib/volume-meter.js
+let micGain: GainNode | null
+let previewSource: AudioBufferSourceNode | null
+let startTime = 0
+let metroOsc: OscillatorNode[] = []
+let beatBuffSrc: AudioBufferSourceNode[] = []
+let eventBuffSrc: AudioBufferSourceNode[] = []
+let curBeat = -1
+
+export let analyserNode: AnalyserNode | null
+export let micIsOn = false
+export let isRecording = false
+export let curMeasure = 0
+export let curMeasureShow = 0
+export let buffer: AudioBuffer | null
+export let hasBuffer = false
+export let isPreviewing = false
+export let meterVal = 0
 
 export const callbacks = {
     prepareForUpload: (blob: Blob, useMetro: boolean, bpm: number) => {},
@@ -22,59 +37,42 @@ export const callbacks = {
     clickOnMetronome: (beat: number) => {},
 }
 
-export let analyserNode: AnalyserNode | null = null;
-
-export const properties: any = {
-    micIsOn: false,
-    isRecording: false,
+export const properties = {
     useMetro: true,
     clicks: false,
     bpm: 120,
     countoff: 1,
     numMeasures: 2,
-    curMeasure: 0,
-    curMeasureShow: 0,
-    curBeat: -1,
-    buffer: null,
-    hasBuffer: false,
-    isPreviewing: false,
-    meterVal: 0
-};
-
-const recorderOptions = {
-    bufferLen: 2048,
-    numChannels: 1
-};
+}
 
 export function clear(softClear?: boolean) {
-    audioRecorder = null;
-    previewBs = null;
+    audioRecorder = null
+    previewSource = null
 
     if (!softClear) {
-        properties.micIsOn = false;
+        micIsOn = false
     }
-    properties.isRecording = false;
-    properties.curMeasure = 0;
-    properties.curMeasureShow = 0;
-    properties.curBeat = -1;
-    properties.buffer = null;
-    properties.hasBuffer = false;
-    properties.isPreviewing = false;
-    properties.meterVal = 0;
+    isRecording = false
+    curMeasure = 0
+    curMeasureShow = 0
+    curBeat = -1
+    buffer = null
+    hasBuffer = false
+    isPreviewing = false
+    meterVal = 0
 
-    callbacks.showRecordedWaveform();
-};
+    callbacks.showRecordedWaveform()
+}
 
 export function init() {
-    clear();
+    clear()
 
-    meter = createAudioMeter(ctx, 1, 0.95, 500);
-    micGain = ctx.createGain(); // to feed to the recorder
-    zeroGain = ctx.createGain(); // disable monitoring
-    startTime = 0;
-    metroOsc = [];
-    beatBuffSrc = [];
-    eventBuffSrc = [];  
+    meter = createAudioMeter(audioContext, 1, 0.95, 500)
+    micGain = audioContext.createGain()  // to feed to the recorder
+    startTime = 0
+    metroOsc = []
+    beatBuffSrc = []
+    eventBuffSrc = []
 
     const audioOptions = {
         "audio": {
@@ -86,329 +84,304 @@ export function init() {
             },
             "optional": []
         }
-    };
+    }
 
-    micGain.gain.value = 1;
-    zeroGain.gain.value = 0;
+    micGain.gain.value = 1
 
     const nav = navigator as any
     if (!nav.getUserMedia)
-        nav.getUserMedia = nav.webkitGetUserMedia || nav.mozGetUserMedia;
+        nav.getUserMedia = nav.webkitGetUserMedia || nav.mozGetUserMedia
     if (!nav.cancelAnimationFrame)
-        nav.cancelAnimationFrame = nav.webkitCancelAnimationFrame || nav.mozCancelAnimationFrame;
+        nav.cancelAnimationFrame = nav.webkitCancelAnimationFrame || nav.mozCancelAnimationFrame
     if (!nav.requestAnimationFrame)
-        nav.requestAnimationFrame = nav.webkitRequestAnimationFrame || nav.mozRequestAnimationFrame;
+        nav.requestAnimationFrame = nav.webkitRequestAnimationFrame || nav.mozRequestAnimationFrame
 
-    if (!properties.micIsOn) {
-        navigator.getUserMedia(audioOptions as MediaStreamConstraints, gotAudio, mediaNotAccessible);
+    if (!micIsOn) {
+        navigator.getUserMedia(audioOptions as MediaStreamConstraints, gotAudio, mediaNotAccessible)
     } 
-};
+}
 
-function mediaNotAccessible(error: any) {
-    if ((ESUtils.whichBrowser().indexOf('Chrome') > -1)) {
-        callbacks.micAccessBlocked("chrome_mic_noaccess");
-    } else if ((ESUtils.whichBrowser().indexOf('Firefox') > -1)) {
-        callbacks.micAccessBlocked("ff_mic_noaccess");
+function mediaNotAccessible() {
+    if ((ESUtils.whichBrowser().indexOf("Chrome") > -1)) {
+        callbacks.micAccessBlocked("chrome_mic_noaccess")
+    } else if ((ESUtils.whichBrowser().indexOf("Firefox") > -1)) {
+        callbacks.micAccessBlocked("ff_mic_noaccess")
     }
 }
 
 function gotAudio(stream: any) {
-    properties.micIsOn = true;
-    callbacks.openRecordMenu(); // proceed to open the record menu UI
+    micIsOn = true
+    callbacks.openRecordMenu();  // proceed to open the record menu UI
 
-    // FF bug: a fake audio node needs to be exposed to the global scope
-    (window as any).horrible_hack_for_mozilla = ctx.createMediaStreamSource(stream);
-
-    const mic = ctx.createMediaStreamSource(stream);
-    mic.connect(meter);
-    mic.connect(micGain);
+    const mic = audioContext.createMediaStreamSource(stream)
+    mic.connect(meter)
+    mic.connect(micGain!)
 
     //For drawing spectrogram
-    analyserNode = ctx.createAnalyser();
-    analyserNode.fftSize = recorderOptions.bufferLen/2;
-    mic.connect(analyserNode);
+    analyserNode = audioContext.createAnalyser()
+    analyserNode.fftSize = RECORDER_OPTIONS.bufferLen/2
+    mic.connect(analyserNode)
 
-    audioRecorder = new Recorder(micGain, recorderOptions);
+    audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
 
-    micGain.connect(zeroGain);
-    zeroGain.connect(ctx.destination);
+    const zeroGain = audioContext.createGain()  // disable monitoring
+    zeroGain.gain.value = 0
+    micGain!.connect(zeroGain)
+    zeroGain.connect(audioContext.destination)
 
-    updateMeter();
-    callbacks.showSpectrogram();
+    updateMeter()
+    callbacks.showSpectrogram()
 }
 
 function scheduleRecord() {
-    eventBuffSrc = [];
+    eventBuffSrc = []
 
     // start recording immediately
     if (properties.countoff === 0) {
         // reset the recorder audio process timing
-        audioRecorder = new Recorder(micGain, recorderOptions);
+        audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
 
-        audioRecorder.clear();
-        audioRecorder.record();
-        properties.hasBuffer = false;
+        audioRecorder.clear()
+        audioRecorder.record()
+        hasBuffer = false
 
-        startTime = ctx.currentTime;
+        startTime = audioContext.currentTime
     } else {
         // start after count off
-        buffEventCall(240.0 / properties.bpm * properties.countoff, function () {
-            if (properties.isRecording) {
+        buffEventCall(240.0 / properties.bpm * properties.countoff, () => {
+            if (isRecording) {
                 // reset the recorder instance
-                audioRecorder = new Recorder(micGain, recorderOptions);
+                audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
 
-                audioRecorder.clear();
-                audioRecorder.record();
-                properties.hasBuffer = false;
+                audioRecorder.clear()
+                audioRecorder.record()
+                hasBuffer = false
 
-                startTime = ctx.currentTime;
+                startTime = audioContext.currentTime
             }
-        });
+        })
     }
 
     // stop recording
-    buffEventCall(240.0 / properties.bpm * (properties.countoff + properties.numMeasures + 0.3), function () {
-        if (properties.isRecording) {
-            toggleRecord();
+    buffEventCall(240.0 / properties.bpm * (properties.countoff + properties.numMeasures + 0.3), () => {
+        if (isRecording) {
+            toggleRecord()
         }
-    });
+    })
 
     // might need to be called as a callback from the audioRecorder
-    onRecordStart();
+    onRecordStart()
 }
 
 function onRecordStart() {
-    const sr = ctx.sampleRate;
-    const beats = 4;
-    metroOsc = [];
-    beatBuffSrc = [];
+    const sr = audioContext.sampleRate
+    const beats = 4
+    metroOsc = []
+    beatBuffSrc = []
 
     for (let i = 0; i < (properties.numMeasures + properties.countoff) * beats; i++) {
         // scheduled metronome sounds
         if (i < properties.countoff * beats || properties.clicks) {
-            metroOsc[i] = ctx.createOscillator();
-            const metroGain = ctx.createGain();
-            const del = 60.0 / properties.bpm * i + ctx.currentTime;
-            const dur = 0.1;
+            metroOsc[i] = audioContext.createOscillator()
+            const metroGain = audioContext.createGain()
+            const del = 60.0 / properties.bpm * i + audioContext.currentTime
+            const dur = 0.1
             if (i % beats === 0) {
-                metroOsc[i].frequency.value = 2000;
-                metroGain.gain.setValueAtTime(0.25, del);
+                metroOsc[i].frequency.value = 2000
+                metroGain.gain.setValueAtTime(0.25, del)
             } else {
-                metroOsc[i].frequency.value = 1000;
-                metroGain.gain.setValueAtTime(0.5, del);
+                metroOsc[i].frequency.value = 1000
+                metroGain.gain.setValueAtTime(0.5, del)
             }
-            metroOsc[i].connect(metroGain);
-            metroOsc[i].start(del);
-            metroOsc[i].stop(del + dur);
-            metroGain.gain.linearRampToValueAtTime(0, del + dur);
-            metroGain.connect(ctx.destination);
+            metroOsc[i].connect(metroGain)
+            metroOsc[i].start(del)
+            metroOsc[i].stop(del + dur)
+            metroGain.gain.linearRampToValueAtTime(0, del + dur)
+            metroGain.connect(audioContext.destination)
         }
 
         // buffer-based scheduler mainly for visual dots
-        const beatBuff = ctx.createBuffer(1, sr * 60.0 / properties.bpm, sr);
-        beatBuffSrc[i] = ctx.createBufferSource();
-        beatBuffSrc[i].buffer = beatBuff;
-        beatBuffSrc[i].connect(ctx.destination);
-        beatBuffSrc[i].start(ctx.currentTime + 60.0 / properties.bpm * i);
-        beatBuffSrc[i].onended = function () {
-            properties.curBeat = (properties.curBeat + 1) % 4;
-            callbacks.clickOnMetronome(properties.curBeat);
+        // TODO: Creating a blank AudioBuffer and AudioBufferSourceNode just for scheduling
+        //       via onended seems like overkill. Wouldn't `setTimeout` suffice here?
+        const beatBuff = audioContext.createBuffer(1, sr * 60.0 / properties.bpm, sr)
+        const source = audioContext.createBufferSource()
+        beatBuffSrc.push(source)
+        source.buffer = beatBuff
+        source.connect(audioContext.destination)
+        source.start(audioContext.currentTime + 60.0 / properties.bpm * i)
+        source.onended = () => {
+            curBeat = (curBeat + 1) % 4
+            callbacks.clickOnMetronome(curBeat)
 
-            if (properties.curBeat === 0) {
-                properties.curMeasure++;
+            if (curBeat === 0) {
+                curMeasure++
 
-                if (properties.curMeasure < 0) {
-                    properties.curMeasureShow = properties.curMeasure;
+                if (curMeasure < 0) {
+                    curMeasureShow = curMeasure
                 } else {
-                    properties.curMeasureShow = properties.curMeasure + 1;
+                    curMeasureShow = curMeasure + 1
                 }
 
-                helpers.getNgRootScope().$apply();
+                helpers.getNgRootScope().$apply()
             }
-        };
+        }
     }
 }
 
 function buffEventCall(lenInSec: number, onEnded: (this: AudioScheduledSourceNode, ev: Event) => any) {
-    const sr = ctx.sampleRate;
-    const buffSrc = ctx.createBufferSource();
-    buffSrc.buffer = ctx.createBuffer(1, sr * lenInSec, sr);
-    buffSrc.connect(ctx.destination);
-    buffSrc.start(ctx.currentTime);
-    buffSrc.onended = onEnded;
-    eventBuffSrc.push(buffSrc);
+    const sr = audioContext.sampleRate
+    const buffSrc = audioContext.createBufferSource()
+    buffSrc.buffer = audioContext.createBuffer(1, sr * lenInSec, sr)
+    buffSrc.connect(audioContext.destination)
+    buffSrc.start(audioContext.currentTime)
+    buffSrc.onended = onEnded
+    eventBuffSrc.push(buffSrc)
 }
 
 export function toggleRecord() {
-    if (properties.micIsOn) {
-        if (!properties.isRecording) {
-            startRecording();
+    if (micIsOn) {
+        if (isRecording) {
+            stopRecording()
         } else {
-            stopRecording();
+            startRecording()
         }
     } else {
-        alert('Please make sure that microphone input is turned on.')
+        alert("Please make sure that microphone input is turned on.")
     }
-};
+}
 
 function startRecording() {
     if (properties.useMetro) {
-        checkInputFields();
-        properties.curMeasure = -properties.countoff;
-        properties.curMeasureShow = properties.curMeasure;
-
-        properties.curBeat = 0;
-
-        scheduleRecord();
+        checkInputFields()
+        curMeasure = -properties.countoff
+        curMeasureShow = curMeasure
+        curBeat = 0
+        scheduleRecord()
     } else {
-        properties.hasBuffer = false;
-        properties.curMeasure = 0;
-        audioRecorder = new Recorder(micGain, recorderOptions);
-        audioRecorder.clear();
-        audioRecorder.record();
+        hasBuffer = false
+        curMeasure = 0
+        audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
+        audioRecorder.clear()
+        audioRecorder.record()
     }
 
-    properties.isRecording = true;
-    callbacks.showSpectrogram();
+    isRecording = true
+    callbacks.showSpectrogram()
 }
 
 function stopRecording() {
-    audioRecorder.stop();
-    properties.curMeasureShow = 0;
+    audioRecorder.stop()
+    curMeasureShow = 0
 
     // should have at least > 0 recorded frame
-    if (properties.curMeasure > -1) {
-        audioRecorder.getBuffer(gotBuffer);
+    if (curMeasure > -1) {
+        audioRecorder.getBuffer(gotBuffer)
     }
 
     if (properties.useMetro) {
-        stopWebAudioEvents();
-
-        properties.isRecording = false;
-        properties.curBeat = -1;
-        properties.curMeasure = 0;
-        properties.curMeasureShow = 0;
+        stopWebAudioEvents()
+        isRecording = false
+        curBeat = -1
+        curMeasure = 0
+        curMeasureShow = 0
     } else {
-        properties.isRecording = false;
+        isRecording = false
     }
 }
 
 function stopWebAudioEvents() {
-    metroOsc.forEach(function (node: OscillatorNode) {
-        node.stop(0);
-    });
-
-    beatBuffSrc.forEach(function (node: AudioBufferSourceNode) {
-        node.stop(0);
-        node.disconnect();
-    });
-
-    eventBuffSrc.forEach(function (node: AudioBufferSourceNode) {
-        node.stop(0);
-        node.disconnect();
-    });
+    for (const node of metroOsc) {
+        node.stop(0)
+    }
+    for (const node of beatBuffSrc.concat(eventBuffSrc)) {
+        node.stop(0)
+        node.disconnect()
+    }
 }
 
 function checkInputFields() {
-    properties.bpm = Number.parseInt(properties.bpm);
-    properties.countoff = Number.parseInt(properties.countoff);
-    properties.numMeasures = Number.parseInt(properties.numMeasures);
-
-    if (Number.isNaN(properties.bpm)) {
-        properties.bpm = 120;
-    } else if (properties.bpm < 30) {
-        properties.bpm = 30;
-    } else if (properties.bpm > 480) {
-        properties.bpm = 480;
-    }
-
-    if (Number.isNaN(properties.countoff) || properties.countoff < 0) {
-        properties.countoff = 1;
-    } else if (properties.countoff > 4) {
-        properties.countoff = 4;
-    }
-
-    if (Number.isNaN(properties.numMeasures) || properties.numMeasures <= 0) {
-        properties.numMeasures = 1;
-    } else if (properties.numMeasures > 8) {
-        properties.numMeasures = 8;
-    }
+    properties.bpm = Number.parseInt(properties.bpm + "")
+    properties.countoff = Number.parseInt(properties.countoff + "")
+    properties.numMeasures = Number.parseInt(properties.numMeasures + "")
+    // Clamp to valid ranges, replace NaNs with default values.
+    properties.bpm = Math.max(30, Math.min(properties.bpm, 480)) || 120
+    properties.countoff = Math.max(1, Math.min(properties.countoff, 4)) || 1
+    properties.numMeasures = Math.max(1, Math.min(properties.numMeasures, 8)) || 1
 }
 
 function updateMeter() {
-    properties.meterVal = meter.volume;
-    requestAnimationFrame(updateMeter);
+    meterVal = meter.volume
+    requestAnimationFrame(updateMeter)
 }
 
-function gotBuffer(buf: any) {
+function gotBuffer(buf: Float32Array[]) {
     if (properties.useMetro) {
-        const targetLen = Math.round(240.0 / properties.bpm * properties.numMeasures * ctx.sampleRate);
-        const startTimeDiff = properties.countoff > 0 ? 0 : Math.round((audioRecorder.getStartTime() - startTime) * ctx.sampleRate);
+        const targetLen = Math.round(240.0 / properties.bpm * properties.numMeasures * audioContext.sampleRate)
+        const startTimeDiff = properties.countoff > 0 ? 0 : Math.round((audioRecorder.getStartTime() - startTime) * audioContext.sampleRate)
 
-        properties.buffer = ctx.createBuffer(buf.length, targetLen, ctx.sampleRate);
+        buffer = audioContext.createBuffer(buf.length, targetLen, audioContext.sampleRate)
 
         for (let ch = 0; ch < buf.length; ch++) {
-            const chdata = properties.buffer.getChannelData(ch);
-
+            const chdata = buffer.getChannelData(ch)
             for (let i = 0; i < targetLen; i++) {
-                chdata[i] = buf[ch][i+startTimeDiff];
+                chdata[i] = buf[ch][i+startTimeDiff]
             }
         }
     } else {
-        properties.buffer = ctx.createBuffer(buf.length, buf[0].length, ctx.sampleRate);
+        buffer = audioContext.createBuffer(buf.length, buf[0].length, audioContext.sampleRate)
 
         for (let ch = 0; ch < buf.length; ch++) {
-            properties.buffer.getChannelData(ch).set(buf[ch]);
+            buffer.getChannelData(ch).set(buf[ch])
         }
     }
 
-    callbacks.showRecordedWaveform();
-    properties.hasBuffer = true;
+    callbacks.showRecordedWaveform()
+    hasBuffer = true
 
-    const view = encodeWAV(properties.buffer.getChannelData(0));
-    const blob = new Blob([view], {type: 'audio/wav'});
-    doneEncoding(blob);
+    const view = encodeWAV(buffer.getChannelData(0))
+    const blob = new Blob([view], { type: "audio/wav" })
+    doneEncoding(blob)
 }
 
 function doneEncoding(blob: any) {
-    blob.lastModifiedDate = new Date();
-    blob.name='QUICK_RECORD';
-    callbacks.prepareForUpload!(blob, properties.useMetro, properties.bpm);
+    blob.lastModifiedDate = new Date()
+    blob.name = "QUICK_RECORD"
+    callbacks.prepareForUpload(blob, properties.useMetro, properties.bpm)
 }
 
 export function togglePreview() {
-    if (!properties.isPreviewing) {
-        startPreview();
+    if (!isPreviewing) {
+        startPreview()
     } else {
-        stopPreview();
+        stopPreview()
     }
-};
+}
 
 function startPreview() {
-    if (properties.buffer !== null) {
-        properties.isPreviewing = true;
+    if (buffer !== null) {
+        isPreviewing = true
 
-        previewBs = ctx.createBufferSource();
-        previewBs.buffer = properties.buffer;
+        previewSource = audioContext.createBufferSource()
+        previewSource.buffer = buffer
 
-        const amp = ctx.createGain();
-        amp.gain.value = 1;
-        previewBs.connect(amp);
-        amp.connect(ctx.destination);
-        previewBs.start(ctx.currentTime);
-        previewBs.onended = function () {
-            properties.isPreviewing = false;
-            helpers.getNgRootScope().$apply();
+        const amp = audioContext.createGain()
+        amp.gain.value = 1
+        previewSource.connect(amp)
+        amp.connect(audioContext.destination)
+        previewSource.start(audioContext.currentTime)
+        previewSource.onended = () => {
+            isPreviewing = false
+            helpers.getNgRootScope().$apply()
         }
     } else {
-        console.log('buffer is empty');
+        console.log("buffer is empty")
     }
 }
 
 function stopPreview() {
-    if (previewBs) {
-        previewBs.stop(ctx.currentTime);
-        previewBs = null;
+    if (previewSource) {
+        previewSource.stop(audioContext.currentTime)
+        previewSource = null
     }
-    properties.isPreviewing = false;
+    isPreviewing = false
 }

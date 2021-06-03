@@ -171,8 +171,8 @@ app.directive('drawWaveform', function () {
                     rafId = undefined;
                 }
 
-                if (RecorderService.properties.buffer) {
-                    drawWaveform(RecorderService.properties.buffer.getChannelData(0));
+                if (RecorderService.buffer) {
+                    drawWaveform(RecorderService.buffer.getChannelData(0));
                 } else {
                     drawWaveform(new Float32Array(0));
                 }
