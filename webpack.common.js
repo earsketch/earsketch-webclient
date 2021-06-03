@@ -91,7 +91,6 @@ module.exports = {
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
             audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
-            recommender: path.resolve(__dirname,`${servicesDir}/recommender.js`),
 
             // CAI
             complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
@@ -106,9 +105,6 @@ module.exports = {
             codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
 
             caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
-
-            caiProjectModel: path.resolve(__dirname, `${servicesDir}/caiProjectModel.js`)
-
         }
     },
     module: {

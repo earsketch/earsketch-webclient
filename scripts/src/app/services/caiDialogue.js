@@ -5,11 +5,12 @@
  */
 import * as caiErrorHandling from "../../cai/caiErrorHandling"
 import * as caiStudentPreferenceModule from "../../cai/caiStudentPreferences"
+import * as caiProjectModel from "../../cai/caiProjectModel"
 import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree';
 import * as recommender from '../recommender';
 import * as userProject from '../userProject'
 
-app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiStudentHistoryModule, caiProjectModel) {
+app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', function (codeSuggestion, caiErrorHandling, caiStudentHistoryModule) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};
@@ -480,7 +481,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', 'caiPro
                 if (model[keys[j]].length < options.length) {
                     var newNode = Object.assign({}, templateNode);
                     newNode["id"] = tempID;
-                    newNode["title"] = caiProjectModel.propertyButtons[keys[j]];
+                    newNode["title"] = caiProjectModel.getPropertyButtons()[keys[j]];
                     newNode["parameters"] = { property: keys[j] };
                     caiTree.push(newNode);
                     buttons.push({ label: newNode.title, value: newNode.id });

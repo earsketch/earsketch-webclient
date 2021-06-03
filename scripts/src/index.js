@@ -178,7 +178,6 @@ require(['angular'], () => {
     require('complexityCalculatorHelperFunctions');
     require('caiDialogue');
     require('codeSuggestion');
-    require('caiProjectModel');
 
     // TODO: Use a module.
     window.REPORT_LOG = [];

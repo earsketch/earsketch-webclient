@@ -6,7 +6,6 @@ import {ScriptEntity} from 'common';
 let keyGenreDict: any = {}
 let keyInstrumentDict: any = {}
 
-
 export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:string]: string }) {
     keyGenreDict = genre
     keyInstrumentDict = instrument
@@ -15,7 +14,6 @@ export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:
         return Object.keys(keyGenreDict).includes(key)
     });
 }
-
 
 export function getKeyDict(type: string) {
     if (type === 'genre') { 
@@ -26,7 +24,6 @@ export function getKeyDict(type: string) {
         return null
     }
 }
-
 
 // Load lists of numbers and keys
 var AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
@@ -48,7 +45,6 @@ export function addRecInput(recInput: string[], script: ScriptEntity) {
     }
     return recInput;
 }
-
 
 export function addRandomRecInput(recInput: string[] = []) {
     let name = "";
@@ -77,7 +73,6 @@ export function findGenreInstrumentCombinations(genreLimit: string[] = [], instr
     return sounds;
 }
 
-
 export function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1, 
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3) {
     let recs = generateRecommendations(inputSamples, coUsage, similarity)
@@ -92,7 +87,6 @@ export function recommend(recommendedSounds: string[], inputSamples: string[], c
         previousRecommendations, bestLimit)
     return filteredRecs;
 }
-
 
 export function recommendReverse(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1, 
     genreLimit: string[] = [], instrumentLimit: string[] = [], previousRecommendations: string[] = [], bestLimit: number = 3) {
@@ -131,7 +125,6 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
     return filteredRecs
 }
 
-
 function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
@@ -160,7 +153,6 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     }
     return recs
 }
-
 
 function filterRecommendations(inputRecs: { [key: string]: number }, recommendedSounds: string[], inputSamples: string[], 
     genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number) {
@@ -201,7 +193,6 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
     return recommendedSounds;
 }
 
-
 export function availableGenres() {
     let genres : string[] = []
     for (let idx = 0; idx < AUDIOKEYS.length; idx++) {
@@ -213,7 +204,6 @@ export function availableGenres() {
     }
     return genres
 }
-
 
 export function availableInstruments() {
     let instruments : string[] = []
