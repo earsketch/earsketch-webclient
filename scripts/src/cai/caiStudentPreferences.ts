@@ -1,304 +1,294 @@
-﻿/**
- * Student preference module for CAI (Co-creative Artificial Intelligence) Project.
- *
- * @author Erin Truesdell, Jason Smith
- */
+﻿// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import * as caiStudent from "./caiStudent"
 
-//var init
-var suggestionsAccepted: any = {};
-var suggestionsRejected: any = {};
+// TODO: All of these objects have one entry per project, so project state is spread across all of them.
+// Instead, refactor to group all the state into one object per project, so the functions can just deal with one object
+// (and avoid having to index with `[projectName]` everywhere).
+const suggestionsAccepted: { [key: string]: number } = {}
+const suggestionsRejected: { [key: string]: number } = {}
 
-var allSoundsSuggested: any = {};
-var allSoundsUsed: any = {};
-var soundsSuggestedAndUsed: any = {};
-var currentSoundSuggestionsPresent: any = {};
-var soundsContributedByStudent: any = {};
+const allSoundsSuggested: { [key: string]: string[] } = {}
+const allSoundsUsed: { [key: string]: string[] } = {}
+const soundsSuggestedAndUsed: { [key: string]: string[] } = {}
+const currentSoundSuggestionsPresent: { [key: string]: string[] } = {}
+const soundsContributedByStudent: { [key: string]: string[] } = {}
 
-var codeSuggestionsUsed: any = {};
+type CodeSuggestion = [number, any, string]
+const codeSuggestionsUsed: { [key: string]: CodeSuggestion[] } = {}
+const codeSuggestionsMade: { [key: string]: CodeSuggestion[] } = {}
 
-var codeSuggestionsMade: any = {};
-var sampleSuggestionsMade: any = {};
+type SoundSuggestion = [number, string[]]
+const sampleSuggestionsMade: { [key: string]: SoundSuggestion[] } = {}
+const soundSuggestionTracker: { [key: string]: SoundSuggestion[] } = {}
 
-var soundSuggestionTracker: any = {};
-
-var numberOfRuns = 3;
-
-var acceptanceRatio: any = {};
-var activeProject = "";
+const acceptanceRatio: { [key: string]: number } = {}
+let activeProject = ""
 
 function setActiveProject(projectName: string) {
-    activeProject = projectName;
+    activeProject = projectName
 
     if (!allSoundsSuggested[projectName]) {
-        allSoundsSuggested[projectName] = [];
+        allSoundsSuggested[projectName] = []
     }
     if (!allSoundsUsed[projectName]) {
-        allSoundsUsed[projectName] = [];
+        allSoundsUsed[projectName] = []
     }
     if (!soundsSuggestedAndUsed[projectName]) {
-        soundsSuggestedAndUsed[projectName] = [];
+        soundsSuggestedAndUsed[projectName] = []
     }
     if (!currentSoundSuggestionsPresent[projectName]) {
-        currentSoundSuggestionsPresent[projectName] = [];
+        currentSoundSuggestionsPresent[projectName] = []
     }
     if (!soundsContributedByStudent[projectName]) {
-        soundsContributedByStudent[projectName] = [];
+        soundsContributedByStudent[projectName] = []
     }
 
     if (!codeSuggestionsUsed[projectName]) {
-        codeSuggestionsUsed[projectName] = [];
+        codeSuggestionsUsed[projectName] = []
     }
 
     if (!codeSuggestionsMade[projectName]) {
-        codeSuggestionsMade[projectName] = [];
+        codeSuggestionsMade[projectName] = []
     }
     if (!sampleSuggestionsMade[projectName]) {
-        sampleSuggestionsMade[projectName] = [];
+        sampleSuggestionsMade[projectName] = []
     }
 
     if (!acceptanceRatio[projectName]) {
-        acceptanceRatio[projectName] = 0;
+        acceptanceRatio[projectName] = 0
     }
 
     if (!suggestionsAccepted[projectName]) {
-        suggestionsAccepted[projectName] = 0;
+        suggestionsAccepted[projectName] = 0
     }
     if (!suggestionsRejected[projectName]) {
-        suggestionsRejected[projectName] = 0;
+        suggestionsRejected[projectName] = 0
     }
 
     if (!soundSuggestionTracker[activeProject]) {
-        soundSuggestionTracker[activeProject] = [];
+        soundSuggestionTracker[activeProject] = []
     }
-    activeProject = projectName;
+    activeProject = projectName
 }
 
 function getSoundSuggestionsUsed() {
-    return soundSuggestionTracker[activeProject].slice(0);
+    return soundSuggestionTracker[activeProject].slice(0)
 }
 
 function getCodeSuggestionsUsed() {
-    return codeSuggestionsUsed[activeProject].slice(0);
+    return codeSuggestionsUsed[activeProject].slice(0)
 }
 
-function updateHistoricalArrays(currentSounds?: any[]) {
-
-
+function updateHistoricalArrays(currentSounds?: string[]) {
     //update historical list of all sound suggestions
-    for (var i = 0; i < sampleSuggestionsMade[activeProject].length; i++) {
-        for (var j = 0; j < sampleSuggestionsMade[activeProject][i][1].length; j++) {
-            if (!allSoundsSuggested[activeProject].includes(sampleSuggestionsMade[activeProject][i][1][j])) {
-                allSoundsSuggested[activeProject].push(sampleSuggestionsMade[activeProject][i][1][j]);
+    for (const suggestion of sampleSuggestionsMade[activeProject]) {
+        for (const sound of suggestion[1]) {
+            if (!allSoundsSuggested[activeProject].includes(sound)) {
+                allSoundsSuggested[activeProject].push(sound)
             }
         }
     }
 
     //update historical list of all sounds used
     if (currentSounds != null) {
-        for (var i = 0; i < currentSounds.length; i++) {
-            if (!allSoundsUsed[activeProject].includes(currentSounds[i])) {
-                allSoundsUsed[activeProject].push(currentSounds[i]);
+        for (const sound of currentSounds) {
+            if (!allSoundsUsed[activeProject].includes(sound)) {
+                allSoundsUsed[activeProject].push(sound)
             }
         }
     }
 
     //update historical list of sound suggestions used
-    for (var i = 0; i < allSoundsUsed[activeProject].length; i++) {
-        if (allSoundsSuggested[activeProject].includes(allSoundsUsed[activeProject][i]) && !soundsSuggestedAndUsed[activeProject].includes(allSoundsUsed[i]) && !soundsContributedByStudent[activeProject].includes(allSoundsUsed[activeProject][i])) {
-            soundsSuggestedAndUsed[activeProject].push(allSoundsUsed[activeProject][i]);
+    for (const sound of allSoundsUsed[activeProject]) {
+        if (allSoundsSuggested[activeProject].includes(sound) && !soundsSuggestedAndUsed[activeProject].includes(sound) && !soundsContributedByStudent[activeProject].includes(sound)) {
+            soundsSuggestedAndUsed[activeProject].push(sound)
         }
     }
 
 
     //if current sounds passed, update "currently used suggestions" list
     if (currentSounds != null) {
-        var newCurrentSuggs = [];
-        for (var i = 0; i < currentSoundSuggestionsPresent[activeProject].length; i++) {
-            if (currentSounds.includes(currentSoundSuggestionsPresent[activeProject][i])) {
-                newCurrentSuggs.push(currentSoundSuggestionsPresent[activeProject][i])
+        const newCurrentSuggs = []
+        for (const sound of currentSoundSuggestionsPresent[activeProject]) {
+            if (currentSounds.includes(sound)) {
+                newCurrentSuggs.push(sound)
             }
         }
 
-        for (var i = 0; i < currentSounds.length; i++) {
-            if (allSoundsSuggested[activeProject].includes(currentSounds[i]) && !newCurrentSuggs.includes(currentSounds[i])) {
-                newCurrentSuggs.push(currentSounds[i]);
+        for (const sound of currentSounds) {
+            if (allSoundsSuggested[activeProject].includes(sound) && !newCurrentSuggs.includes(sound)) {
+                newCurrentSuggs.push(sound)
             }
         }
 
-        currentSoundSuggestionsPresent[activeProject] = newCurrentSuggs.slice(0);
+        currentSoundSuggestionsPresent[activeProject] = newCurrentSuggs.slice(0)
     }
 
     if (currentSounds != null) {
-        for (var i = 0; i < currentSounds.length; i++) {
-            if (!allSoundsSuggested[activeProject].includes(currentSounds[i]) && !soundsContributedByStudent[activeProject].includes(currentSounds[i])) {
-                soundsContributedByStudent[activeProject].push(currentSounds[i]);
+        for (const sound of currentSounds) {
+            if (!allSoundsSuggested[activeProject].includes(sound) && !soundsContributedByStudent[activeProject].includes(sound)) {
+                soundsContributedByStudent[activeProject].push(sound)
             }
         }
     }
 
     //push this set of lists to the student model
 
-    var suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent, soundsContributedByStudent: soundsContributedByStudent };
+    const suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent, soundsContributedByStudent: soundsContributedByStudent }
 
-    caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker });
+    caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker })
 
 }
 
-function addSoundSuggestion(suggestionArray: any) {
-    sampleSuggestionsMade[activeProject].push([0, suggestionArray]);
-    updateHistoricalArrays();
+function addSoundSuggestion(suggestionArray: string[]) {
+    sampleSuggestionsMade[activeProject].push([0, suggestionArray])
+    updateHistoricalArrays()
 }
 
-function runSound(soundsUsedArray: any) {
+function runSound(soundsUsedArray: string[]) {
+    updateHistoricalArrays(soundsUsedArray)
 
-    updateHistoricalArrays(soundsUsedArray);
-
-    var newArray = [];
-    for (var i = 0; i < sampleSuggestionsMade[activeProject].length; i++) {
-
-        var wasUsed = false;
+    const newArray: SoundSuggestion[] = []
+    for (const suggestion of sampleSuggestionsMade[activeProject]) {
+        let wasUsed = false
 
         //were any of the sounds used?
-        for (var j = 0; j < soundsUsedArray.length; j++) {
-            if (sampleSuggestionsMade[activeProject][i][1].includes(soundsUsedArray[j])) {
-                wasUsed = true;
-                break;
+        for (const sound of soundsUsedArray) {
+            if (suggestion[1].includes(sound)) {
+                wasUsed = true
+                break
             }
         }
 
         //decrement
 
 
-        sampleSuggestionsMade[activeProject][i][0] += 1;
+        suggestion[0] += 1
         //if 0, add to the rejection category and delete the item
         if (wasUsed) {
-            suggestionsAccepted[activeProject] += 1;
-            soundSuggestionTracker[activeProject].push(sampleSuggestionsMade[activeProject][i]);
-            updateAcceptanceRatio();
+            suggestionsAccepted[activeProject] += 1
+            soundSuggestionTracker[activeProject].push(suggestion)
+            updateAcceptanceRatio()
         }
         else {
-            if (sampleSuggestionsMade[activeProject][i][0] == 0) {
-            //    suggestionsRejected[activeProject] += 1;
-            //    updateAcceptanceRatio();
+            if (suggestion[0] == 0) {
+            //    suggestionsRejected[activeProject] += 1
+            //    updateAcceptanceRatio()
             }
             else {
-                newArray.push(sampleSuggestionsMade[activeProject][i].slice(0));
+                newArray.push([...suggestion])
             }
         }
 
     }
 
-    sampleSuggestionsMade[activeProject] = newArray.slice(0);
+    sampleSuggestionsMade[activeProject] = [...newArray]
 
 }
 
-function addCodeSuggestion(complexityObj: any, utterance: any) {
-    codeSuggestionsMade[activeProject].push([0, complexityObj, utterance]);
+function addCodeSuggestion(complexityObj: any, utterance: string) {
+    codeSuggestionsMade[activeProject].push([0, complexityObj, utterance])
 }
 
 function runCode(complexityOutput: any) {
-    var newArray = [];
-    for (var i = 0; i < codeSuggestionsMade[activeProject].length; i++) {
-
-        var wasUsed = true;
+    const newArray: CodeSuggestion[] = []
+    for (const suggestion of codeSuggestionsMade[activeProject]) {
+        let wasUsed = true
 
         //were any reqs readched?
-        var keys = Object.keys(codeSuggestionsMade[activeProject][i][1]);
-
-        for (var j = 0; j < keys.length; j++) {
-            if (complexityOutput[keys[j]] < codeSuggestionsMade[activeProject][i][1][keys[j]]) {
-                wasUsed = false;
+        for (const key of Object.keys(suggestion[1])) {
+            if (complexityOutput[key] < suggestion[1][key]) {
+                wasUsed = false
             }
         }
 
         //decrement
 
-        codeSuggestionsMade[activeProject][i][0] += 1;
+        suggestion[0] += 1
 
         //if 0, add to the rejection category and delete the item
         if (wasUsed) {
-            suggestionsAccepted[activeProject] += 1;
-            updateAcceptanceRatio();
-            codeSuggestionsUsed[activeProject].push(codeSuggestionsMade[activeProject][i]);
+            suggestionsAccepted[activeProject] += 1
+            updateAcceptanceRatio()
+            codeSuggestionsUsed[activeProject].push(suggestion)
         }
         else {
-            if (codeSuggestionsMade[activeProject][i][0] == 0) {
-                // suggestionsRejected[activeProject] += 1;
-                // updateAcceptanceRatio();
+            if (suggestion[0] == 0) {
+                // suggestionsRejected[activeProject] += 1
+                // updateAcceptanceRatio()
             }
             else {
-                newArray.push(codeSuggestionsMade[activeProject][i].slice(0));
+                newArray.push([...suggestion])
             }
         }
 
 
     }
 
-    codeSuggestionsMade[activeProject] = newArray.slice(0);
+    codeSuggestionsMade[activeProject] = [...newArray]
 }
 
 function updateAcceptanceRatio() {
-    acceptanceRatio[activeProject] = suggestionsAccepted[activeProject] / (suggestionsAccepted[activeProject] + suggestionsRejected[activeProject]);
+    acceptanceRatio[activeProject] = suggestionsAccepted[activeProject] / (suggestionsAccepted[activeProject] + suggestionsRejected[activeProject])
     caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
 }
 
-var bucketSize = 30; // options range from 10s - 120s
+const bucketSize = 30  // options range from 10s - 120s
 // for experimenting
-// var bucketOptions = [10,20,30,40,50,60,90,120];
+// const bucketOptions = [10,20,30,40,50,60,90,120]
 
-var onPageHistory: any[] = [];
-var lastEditTS = 0;
-var deleteKeyTS = [];
-var recentCompiles = 3;
-var compileTS: any[] = [];
-var compileErrors: any[] = [];
-var mousePos: any[] = [];
+const onPageHistory: any[] = []
+let lastEditTS = 0
+const deleteKeyTS = []
+const recentCompiles = 3
+const compileTS: any[] = []
+const compileErrors: any[] = []
+const mousePos: any[] = []
 
 
 function addOnPageStatus(status: any, time: any) {
-    onPageHistory.push({status,time});
-    caiStudent.updateModel("preferences", { onPageHistory: onPageHistory});
-    // console.log("history", onPageHistory);
+    onPageHistory.push({status,time})
+    caiStudent.updateModel("preferences", { onPageHistory: onPageHistory})
+    // console.log("history", onPageHistory)
 }
 
 function returnPageStatus() {
-    return onPageHistory[-1];
+    return onPageHistory[-1]
 }
 
 function addCompileTS(time: any) {
-    compileTS.push(time);
-    lastEditTS = time;
-    caiStudent.updateModel("preferences", { compileTS: compileTS});
+    compileTS.push(time)
+    lastEditTS = time
+    caiStudent.updateModel("preferences", { compileTS: compileTS})
 }
 
 function addKeystroke(action: string, content: any, time: any) {
     if (action=='remove') {
-        deleteKeyTS.push(time);
+        deleteKeyTS.push(time)
     }
 }
 
 function addCompileError(error: any, time: any) {
-    compileErrors.push({error, time});
-    caiStudent.updateModel("preferences", { compileErrors: compileErrors});
+    compileErrors.push({error, time})
+    caiStudent.updateModel("preferences", { compileErrors: compileErrors})
 }
 
 function stuckOnError() {
-    var recentHistory = compileErrors.slice(compileErrors.length-recentCompiles, compileErrors.length);
-    var errors = recentHistory.map(function(a) {return a.error[0].args.v[0].v;});
+    const recentHistory = compileErrors.slice(compileErrors.length-recentCompiles, compileErrors.length)
+    const errors = recentHistory.map(a => a.error[0].args.v[0].v)
     if (compileErrors.length >= recentCompiles && allEqual(errors)) {
-        return true;
+        return true
     }
-    return false;
+    return false
 }
 
 function allEqual(arr: any[]) {
-    return new Set(arr).size == 1;
+    return new Set(arr).size == 1
     }
 
 function addMousePos(pos: any) {
-    mousePos.push(pos);
-    caiStudent.updateModel("preferences", { mousePos: mousePos});
+    mousePos.push(pos)
+    caiStudent.updateModel("preferences", { mousePos: mousePos})
 }
 
 // what are the measures to understand how off or on task one is?
@@ -308,20 +298,20 @@ function addMousePos(pos: any) {
 // start/end of key presses [bursts]
 // mouse clicks
 
-
+// TODO: Export functions directly.
 export {
-    addSoundSuggestion,
-    runSound,
     addCodeSuggestion,
-    runCode,
-    addOnPageStatus,
     addCompileError,
     addCompileTS,
     addKeystroke,
     addMousePos,
-    returnPageStatus,
-    stuckOnError,
-    getSoundSuggestionsUsed,
+    addOnPageStatus,
+    addSoundSuggestion,
     getCodeSuggestionsUsed,
-    setActiveProject
-};
+    getSoundSuggestionsUsed,
+    returnPageStatus,  // Currently unused
+    runCode,
+    runSound,
+    setActiveProject,
+    stuckOnError,  // Currently unused
+}
