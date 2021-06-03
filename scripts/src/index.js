@@ -177,7 +177,6 @@ require(['angular'], () => {
     require('complexityCalculator');
     require('complexityCalculatorHelperFunctions');
     require('caiDialogue');
-    require('caiErrorHandling');
     require('codeSuggestion');
     require('caiProjectModel');
 
