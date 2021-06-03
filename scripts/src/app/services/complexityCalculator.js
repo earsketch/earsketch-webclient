@@ -6,7 +6,6 @@
  * @module complexityCalculator
  * @author Creston Bunch, Erin Truesdell
  */
-import * as caiErrorHandling from "../../cai/caiErrorHandling"
 
 app.factory('complexityCalculator', ['complexityCalculatorHelperFunctions', function complexityCalculator(complexityCalculatorHelperFunctions) {
 
