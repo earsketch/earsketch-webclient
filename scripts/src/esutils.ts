@@ -213,6 +213,34 @@ export const checkIllegalCharacters = (input: string) => {
     return input.match(matchPattern)
 }
 
+// Calculates last modified time unit (previously in scriptBrowserController & mainController).
+export const formatTimer = (milliseconds: number) => {
+    const seconds = Math.floor(milliseconds / 1000)
+    const minutes = Math.floor(seconds / 60)
+    const hours = Math.floor(minutes / 60)
+    const days = Math.floor(hours / 24)
+    const weeks = Math.floor(days / 7)
+    const months = Math.floor(days / 30.5)
+    const years = Math.floor(days / 365)
+
+    switch (true) {
+        case seconds < 1: return 'just now'
+        case minutes < 1: return 'recently'
+        case minutes < 2: return '1 minute ago'
+        case hours < 1: return minutes + ' minutes ago'
+        case hours < 2: return '1 hour ago'
+        case days < 1: return hours + ' hours ago'
+        case days < 2: return 'yesterday'
+        case weeks < 1: return days + ' days ago'
+        case weeks < 2: return 'last week'
+        case months < 1: return weeks + ' weeks ago'
+        case months < 2: return 'last month'
+        case years < 1: return months + ' months ago'
+        case years < 2: return 'last year'
+        default: return years + ' years ago'
+    }
+}
+
 
 const defaultTo = (value: number, defaultValue: number) => {
     return isNaN(value) ? defaultValue : value

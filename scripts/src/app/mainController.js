@@ -4,6 +4,7 @@ import * as audioLibrary from './audiolibrary'
 import * as collaboration from './collaboration'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import * as exporter from './exporter'
 import * as user from '../user/userState';
 import reporter from './reporter';
 import * as scripts from '../browser/scriptsState';
@@ -14,12 +15,13 @@ import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
+import * as cai from '../cai/caiState';
 import * as userNotification from './userNotification';
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', 'localStorage', 'colorTheme', '$document', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, localStorage, colorTheme, $document, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', '$q', '$confirm', '$sce', '$document', '$ngRedux', 'recommender', function ($rootScope, $scope, $http, $uibModal, $location, userProject, $q, $confirm, $sce, $document, $ngRedux, recommender) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -40,7 +42,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.loggedIn = false;
     $scope.showIDE = true;
     $scope.showAll = false;
-    $scope.colorTheme = localStorage.get('colorTheme', 'light');
+    $scope.colorTheme = $ngRedux.getState().app.colorTheme;
     $scope.hljsTheme = 'monokai-sublime';
     $scope.selectedFont = 14;
     $scope.enableChat = false; // Chat window toggle button. Hidden by default.
@@ -93,7 +95,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
-        colorTheme.set('light');
+        $ngRedux.dispatch(appState.setColorTheme("light"))
         $ngRedux.dispatch(appState.setEmbedMode(true));
         Layout.destroy();
         layout.setMinSize(0);
@@ -294,7 +296,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.fontSizes = [{'size': 10}, {'size': 12}, {'size': 14}, {'size': 18}, {'size': 24}, {'size': 36}];
 
     // mainly for alternate display in curriculum / API browser
-    $scope.dispLang = localStorage.get('language', 'python');
+    $scope.dispLang = localStorage.getItem('language') ?? 'python';
     // this may be overridden by URL parameter later
 
     $scope.$on('language', function (event, value) {
@@ -404,13 +406,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
                         const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
                         activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
-
-                        // Used in CAI
-                        $rootScope.$broadcast('swapTabAfterIDEinit');
                     }
-
-                    const theme = colorTheme.load();
-                    $ngRedux.dispatch(appState.setColorTheme(theme));
                 });
             } else {
 
@@ -544,8 +540,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             }
         });
     } else {
-        const theme = colorTheme.load();
-        $ngRedux.dispatch(appState.setColorTheme(theme));
         $ngRedux.dispatch(scripts.syncToNgUserProject());
                                   
 
@@ -744,12 +738,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.toggleColorTheme = function () {
-        const theme = colorTheme.toggle();
-        $ngRedux.dispatch(appState.setColorTheme(theme));
+        $ngRedux.dispatch(appState.toggleColorTheme());
         reporter.toggleColorTheme();
     };
 
-    colorTheme.subscribe($scope, function (event, theme) {
+    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
         $scope.colorTheme = theme;
 
         if (theme === 'dark') {
@@ -1027,7 +1020,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             angular.element('curriculum').hide();
             angular.element('div[caiwindow]').show();
             document.getElementById('caiButton').classList.remove('flashNavButton');
-            $rootScope.$broadcast('switchToCAI');
+            $ngRedux.dispatch(cai.autoScrollCAI());
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
@@ -1137,64 +1130,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
  */
 app.filter('formatTimer', function () {
     return function (input) {
-        var seconds = Math.floor(input / 1000);
-        var minutes = Math.floor(seconds / 60);
-        var hours = Math.floor(minutes / 60);
-        var days = Math.floor(hours / 24);
-
-        if (days <= 1) {
-            if (seconds <= 0) {
-                return 'just now';
-            } else if (minutes === 0) {
-                // if (seconds === 1) {
-                //     return '1 second ago';
-                // } else {
-                //     return seconds + ' seconds ago';
-                // }
-                return 'recently';
-            } else if (hours === 0) {
-                if (minutes === 1) {
-                    return '1 minute ago';
-                } else {
-                    return minutes + ' minutes ago';
-                }
-            } else if (hours < 24) {
-                if (hours === 1) {
-                    return '1 hour ago';
-                } else {
-                    return hours + ' hours ago';
-                }
-            }
-        } else {
-            // if (days <= 1) return "today";
-            if (days > 1 && days <= 2) {
-                return "yesterday";
-            } else if (days > 2 && days <= 7) {
-                return days + " days ago";
-            } else if (days > 7) {
-                var weeks = Math.floor(days/7);
-
-                if (weeks === 1) {
-                    return "last week";
-                } else if (weeks > 1 && weeks <= 4) {
-                    return weeks + " weeks ago";
-                } else if (weeks > 4) {
-                    var months = Math.floor(weeks/4);
-
-                    if (months === 1) {
-                        return "last month";
-                    } else if (months > 1 && months < 12) {
-                        return months + " months ago";
-                    } else if (months >= 12) {
-                        var years = Math.floor(months/12);
-                        if (years <= 1) {
-                            return "last year";
-                        } else if (years > 1) {
-                            return years + " years ago";
-                        }
-                    }
-                }
-            }
-        }
+        return ESUtils.formatTimer(input)
     }
 });

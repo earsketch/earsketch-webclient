@@ -1,6 +1,7 @@
 import * as collaboration from './collaboration';
 import * as tabs from '../editor/tabState';
 import * as config from '../editor/editorConfig';
+import * as cai from '../cai/caiState';
 
 app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', 'userProject', function ($rootScope, $timeout, $ngRedux, userProject) {
     return {
@@ -136,7 +137,9 @@ app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', 'userProject', fu
 
                 // console.log("event in editor", event,event['action'],event['lines']);
                 var t = Date.now();
-                $rootScope.$broadcast('keyStroke',event['action'],event['lines'],t);
+                if (FLAGS.SHOW_CAI) {
+                    $ngRedux.dispatch(cai.keyStroke([event['action'],event['lines'],t]));
+                }
                 
                 if (collaboration.active && !collaboration.lockEditor) {
                     // convert from positionObjects & lines to index & text
@@ -164,6 +167,9 @@ app.directive('editor', ['$rootScope', '$timeout', '$ngRedux', 'userProject', fu
 
                 recommendationTimer = $timeout(function() {
                     $rootScope.$broadcast('reloadRecommendations');
+                    if (FLAGS.SHOW_CAI) {
+                        $ngRedux.dispatch(cai.checkForCodeUpdates());
+                    }
                 }, 1000);
 
                 const activeTabID = tabs.selectActiveTabID($ngRedux.getState());

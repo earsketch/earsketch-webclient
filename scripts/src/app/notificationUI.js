@@ -96,7 +96,7 @@ app.directive('notificationBar', function () {
     }
 });
 
-app.directive('notificationPopup', ['colorTheme', function (colorTheme) {
+app.directive('notificationPopup', ['$ngRedux', function ($ngRedux) {
     return {
         restrict: 'E',
         template: '<div class="arrow" style="position:absolute; top:-11px; right:21px; height:0; width:0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 14px solid;"></div><div><span style="float:left; overflow:hidden; width: 210px;  text-overflow:ellipsis;">{{popupText}}</span><span style="float:right; cursor:pointer; color:indianred" ng-click="hidePopup()">X</span></div>',
@@ -151,14 +151,15 @@ app.directive('notificationPopup', ['colorTheme', function (colorTheme) {
                 scope.popupText = userNotification.popupQueue[0].message.text;
                 scope.showPopupText = true;
 
+                const theme = $ngRedux.getState().app.colorTheme;
                 if (colors[0].hasOwnProperty(userNotification.popupQueue[0].type)) {
-                    if (colorTheme.get() === 'dark') {
+                    if (theme === 'dark') {
                         attrs.$set('style', colors[0][userNotification.popupQueue[0].type]);
                     } else {
                         attrs.$set('style', colors[1][userNotification.popupQueue[0].type]);
                     }
                 } else {
-                    if (colorTheme.get() === 'dark') {
+                    if (theme === 'dark') {
                         attrs.$set('style', 'white');
                     } else {
                         attrs.$set('style', 'black');

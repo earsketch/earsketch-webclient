@@ -7,15 +7,21 @@ import * as scripts from '../browser/scriptsState';
 import * as editor from '../editor/editorState';
 import reporter from './reporter';
 import * as tabs from '../editor/tabState';
+import * as cai from '../cai/caiState';
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as WaveformCache from './waveformcache';
+
+const ACE_THEMES = {
+    light: "ace/theme/chrome",
+    dark: "ace/theme/monokai",
+}
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'localStorage', 'caiAnalysisModule', 'colorTheme', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, localStorage, caiAnalysisModule, colorTheme, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'userProject', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, userProject, caiAnalysisModule, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -67,7 +73,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     }
 
 
-    $scope.currentLanguage = localStorage.get('language', 'python');
+    $scope.currentLanguage = localStorage.getItem('language') ?? 'python';
     // $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
     userConsole.callbacks.onUpdate = function () {
@@ -125,7 +131,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         $scope.editor.ace.setOptions({
             mode: 'ace/mode/' + $scope.currentLanguage,
-            theme: 'ace/theme/monokai',
+            theme: ACE_THEMES[$ngRedux.getState().app.colorTheme],
             fontSize: $scope.fontSizNum,
             enableBasicAutocompletion: true,
             enableSnippets: false,
@@ -192,9 +198,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         $scope.editor.droplet.setEditorState(false);
 
-        if (localStorage.checkKey(LS_FONT_KEY)) {
-            $scope.setFontSize(parseInt(localStorage.get(LS_FONT_KEY)));
-            $rootScope.$broadcast('initFontSize', parseInt(localStorage.get(LS_FONT_KEY)));
+        const fontSize = localStorage.getItem(LS_FONT_KEY);
+        if (fontSize !== null) {
+            $scope.setFontSize(parseInt(fontSize));
+            $rootScope.$broadcast('initFontSize', parseInt(fontSize));
         }
 
         // open shared script from URL
@@ -213,10 +220,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
         $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
-        colorTheme.load();
-
-        // Used in CAI
-        $rootScope.$broadcast("swapTabAfterIDEinit");
     };
 
     
@@ -240,7 +243,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
 
         esconsole('toggling blocks mode to: ' + !$scope.editor.droplet.currentlyUsingBlocks, 'ide');
-        localStorage.set('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
+        localStorage.setItem('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
 
         return $scope.editor.droplet.toggleBlocks();
     };
@@ -435,10 +438,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.editor.setLanguage(language);
 
         // re-enable blocks mode if language changes
-        // TODO: questionable code: localStorage.get('blocks') === 'yes'
+        // TODO: questionable code: localStorage.getItem('blocks') === 'yes'
         // currentlyUsingBlocks would be off when we switch the language
         // maybe we need a global-state scope variable
-        // if (localStorage.get('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
+        // if (localStorage.getItem('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
         //     $scope.toggleBlocks();
         // }
 
@@ -587,8 +590,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     }
                     
                     console.log("autograder", report);
-
-                    $rootScope.$broadcast('compileCAI', [result, language, code]);
+                    if (FLAGS.SHOW_CAI) {
+                        $ngRedux.dispatch(cai.compileCAI([result, language, code]));
+                    }
                 }, 0);
             }
 
@@ -696,14 +700,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.editor.ace.getSession().removeMarker($scope.marker);
     };
 
-    colorTheme.subscribe($scope, function (event, theme) {
+    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
         if (!$scope.editor.ace) return;
-
-        if (theme === 'dark') {
-            $scope.editor.ace.setTheme('ace/theme/monokai');
-        } else {
-            $scope.editor.ace.setTheme('ace/theme/chrome');
-        }
+        $scope.editor.ace.setTheme(ACE_THEMES[theme]);
     });
 
     /**
@@ -729,7 +728,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             $scope.scriptExtension = '.js';
         }
 
-        localStorage.set('language', $scope.currentLanguage);
+        localStorage.setItem('language', $scope.currentLanguage);
         $rootScope.$broadcast('language', $scope.currentLanguage);
     };
 
@@ -810,7 +809,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // need to refresh the droplet palette section -- otherwise the block layout becomes weird
         $scope.editor.setLanguage($scope.currentLanguage);
 
-        localStorage.set(LS_FONT_KEY, $scope.fontSizNum);
+        localStorage.setItem(LS_FONT_KEY, $scope.fontSizNum);
         $scope.editor.ace.focus();
     };
 

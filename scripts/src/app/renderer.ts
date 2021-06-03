@@ -1,17 +1,17 @@
 // Render scripts using an offline audio context.
-import * as applyEffects from '../model/applyeffects'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
-import { Clip, DAWData } from './player'
-import { OfflineAudioContext } from './audiocontext'
+import * as applyEffects from "../model/applyeffects"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
+import { Clip, DAWData } from "./player"
+import { OfflineAudioContext } from "./audiocontext"
 
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
  
 // Render a result for offline playback.
-export const renderBuffer = (result: DAWData) => {
-    esconsole('Begin rendering result to buffer.', ['DEBUG','RENDERER'])
+export async function renderBuffer(result: DAWData) {
+    esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const origin = 0
     const duration = ESUtils.measureToTime(result.length+1, result.tempo)  // need +1 to render to end of last measure
@@ -48,11 +48,9 @@ export const renderBuffer = (result: DAWData) => {
             // audio buffer is different than the clip audio buffer, and
             // has different start and end times
             let start, end
-            const pitchshiftEffect = track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT']
+            const pitchshiftEffect = track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]
             if (pitchshiftEffect !== undefined) {
-                esconsole('Using pitchshifted audio for ' + clip.filekey +
-                            ' on track ' + i,
-                            ['DEBUG','RENDERER'])
+                esconsole(`Using pitchshifted audio for ${clip.filekey} on track ${i}`, ["debug", "renderer"])
                 source.buffer = clip.pitchshift!.audio
                 start = ESUtils.measureToTime(
                     clip.pitchshift!.start, result.tempo
@@ -123,7 +121,7 @@ export const renderBuffer = (result: DAWData) => {
             result.master.connect(limiter)
             limiter.connect(trackGain)
 
-            if (typeof(startNode) !== "undefined") {
+            if (startNode !== undefined) {
                 // TODO: the effect order (limiter) is not right
                 trackGain.connect(startNode)
             } else {
@@ -132,7 +130,7 @@ export const renderBuffer = (result: DAWData) => {
 
             mix.connect(context.destination)
         } else {
-            if (typeof(startNode) !== "undefined") {
+            if (startNode !== undefined) {
                 // track gain -> effect tree
                 trackGain.connect(startNode)
             } else {
@@ -143,62 +141,56 @@ export const renderBuffer = (result: DAWData) => {
         }
     }
 
-    return new Promise((resolve, reject) => {
-        context.startRendering()
-        context.oncomplete = result => {
-            resolve(result.renderedBuffer)
-            esconsole('Render to buffer completed.', ['DEBUG','RENDERER'])
-        }
-    })
+    const buffer = await context.startRendering()
+    esconsole("Render to buffer completed.", ["debug", "renderer"])
+    return buffer
 }
  
-// Render a result for offline playback. Returns a promise that resolves to a Blob.
-export const renderWav = (result: DAWData) => {
-    return new Promise((resolve, reject) => {
-        renderBuffer(result)
-        .then((buffer: AudioBuffer) => resolve(bufferToWav(buffer)))
-        .catch(err => reject(err))
-    })
+// Render a result for offline playback. Returns a Blob.
+export async function renderWav(result: DAWData) {
+    const buffer = await renderBuffer(result)
+    const pcmarrayL = buffer.getChannelData(0)
+    const pcmarrayR = buffer.getChannelData(1)
+
+    const interleaved = interleave(pcmarrayL, pcmarrayR)
+    const dataview = encodeWAV(interleaved)
+    return new Blob([dataview], { type: "audio/wav" })
 }
 
-// Render a result to mp3 for offline playback. Returns a Promise that resolves to a Blob.
-export const renderMp3 = (result: DAWData) => {
-    return new Promise((resolve, reject) => {
-        renderBuffer(result).then((buffer: AudioBuffer) => {
-            const mp3encoder = new lamejs.Mp3Encoder(2, 44100, 160)
-            const mp3Data = []
+// Render a result to mp3 for offline playback. Returns a Blob.
+export async function renderMp3(result: DAWData) {
+    const buffer = await renderBuffer(result)
+    const mp3encoder = new lamejs.Mp3Encoder(2, 44100, 160)
+    const mp3Data = []
 
-            const left = float32ToInt16(buffer.getChannelData(0))
-            const right = float32ToInt16(buffer.getChannelData(1))
-            const sampleBlockSize = 1152
-            let mp3buf
+    const left = float32ToInt16(buffer.getChannelData(0))
+    const right = float32ToInt16(buffer.getChannelData(1))
+    const sampleBlockSize = 1152
+    let mp3buf
 
-            const len = left.length
+    const len = left.length
 
-            for (let i = 0; i < len; i += sampleBlockSize) {
-                const leftChunk = left.subarray(i, i + sampleBlockSize)
-                const rightChunk = right.subarray(i, i + sampleBlockSize)
-                mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk)
-                if (mp3buf.length > 0) {
-                    mp3Data.push(mp3buf)
-                }
-            }
-            mp3buf = mp3encoder.flush()
+    for (let i = 0; i < len; i += sampleBlockSize) {
+        const leftChunk = left.subarray(i, i + sampleBlockSize)
+        const rightChunk = right.subarray(i, i + sampleBlockSize)
+        mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk)
+        if (mp3buf.length > 0) {
+            mp3Data.push(mp3buf)
+        }
+    }
+    mp3buf = mp3encoder.flush()
 
-            if (mp3buf.length > 0) {
-                mp3Data.push(mp3buf)
-            }
+    if (mp3buf.length > 0) {
+        mp3Data.push(mp3buf)
+    }
 
-            const blob = new Blob(mp3Data, {type: 'audio/mp3'})
-            resolve(blob)
-        }).catch(err => reject(err))
-    })
+    return new Blob(mp3Data, { type: "audio/mp3" })
 }
 
 // Merge all the given clip buffers into one large buffer.
 // Returns a promise that resolves to an AudioBuffer.
-export const mergeClips = (clips: Clip[], tempo: number) => {
-    esconsole('Merging clips', ['DEBUG', 'RENDERER'])
+export async function mergeClips(clips: Clip[], tempo: number) {
+    esconsole("Merging clips", ["debug", "renderer"])
     // calculate the length of the merged clips
     let length = 0
     for (const clip of clips) {
@@ -209,51 +201,33 @@ export const mergeClips = (clips: Clip[], tempo: number) => {
     }
     const duration = ESUtils.measureToTime(length, tempo)
 
-    const promise = new Promise((resolve, reject) => {
-        // create an offline context for rendering
-        const context = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
+    // create an offline context for rendering
+    const context = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
 
-        const master = context.createGain()
-        master.connect(context.destination)
+    const master = context.createGain()
+    master.connect(context.destination)
 
-        for (const clip of clips) {
-            const source = context.createBufferSource()
-            source.buffer = clip.audio
+    for (const clip of clips) {
+        const source = context.createBufferSource()
+        source.buffer = clip.audio
 
-            source.connect(master)
+        source.connect(master)
 
-            const startTime = ESUtils.measureToTime(clip.measure, tempo)
-            const startOffset = ESUtils.measureToTime(clip.start, tempo)
-            const endOffset = ESUtils.measureToTime(clip.end, tempo)
+        const startTime = ESUtils.measureToTime(clip.measure, tempo)
+        const startOffset = ESUtils.measureToTime(clip.start, tempo)
+        const endOffset = ESUtils.measureToTime(clip.end, tempo)
 
-            if (endOffset < startOffset) {
-                continue
-            }
-
-            source.start(startTime + startOffset)
-            source.stop(startTime + (endOffset - startOffset))
+        if (endOffset < startOffset) {
+            continue
         }
 
-        context.startRendering()
+        source.start(startTime + startOffset)
+        source.stop(startTime + (endOffset - startOffset))
+    }
 
-        context.oncomplete = result => {
-            esconsole('Merged clips', ['DEBUG','RENDERER'])
-            resolve(result.renderedBuffer)
-        }
-    })
-
-    return promise
-}
-
-// Take a rendered offline audio context buffer and turn it into a WAV file Blob.
-const bufferToWav = (buffer: AudioBuffer) => {
-    const pcmarrayL = buffer.getChannelData(0)
-    const pcmarrayR = buffer.getChannelData(1)
-
-    const interleaved = interleave(pcmarrayL, pcmarrayR)
-    const dataview = encodeWAV(interleaved)
-    const audioBlob = new Blob([dataview], { type: 'audio/wav' })
-    return audioBlob
+    const buffer = await context.startRendering()
+    esconsole("Merged clips", ["debug", "renderer"])
+    return buffer
 }
 
 // Create an interleaved two-channel array for WAV file output.
@@ -277,13 +251,13 @@ const encodeWAV = (samples: Float32Array) => {
     const view = new DataView(buffer)
 
     // RIFF identifier
-    writeString(view, 0, 'RIFF')
+    writeString(view, 0, "RIFF")
     // file length
     view.setUint32(4, 32 + samples.length * 2, true)
     // RIFF type
-    writeString(view, 8, 'WAVE')
+    writeString(view, 8, "WAVE")
     // format chunk identifier
-    writeString(view, 12, 'fmt ')
+    writeString(view, 12, "fmt ")
     // format chunk length
     view.setUint32(16, 16, true)
     // sample format (raw)
@@ -299,7 +273,7 @@ const encodeWAV = (samples: Float32Array) => {
     // bits per sample
     view.setUint16(34, 16, true)
     // data chunk identifier
-    writeString(view, 36, 'data')
+    writeString(view, 36, "data")
     // data chunk length
     view.setUint32(40, samples.length * 2, true)
 

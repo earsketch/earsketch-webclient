@@ -192,7 +192,7 @@ export async function getAudioTags() {
     esconsole("Fetching audio tags", ["debug", "audiolibrary"])
     try {
         const data = await (await fetch(url)).json()
-        const output = []
+        const output: string[] = []
         for (const key in data.audioTags) {
             const tag = data.audioTags[key]
             output.push(tag.file_key)
@@ -214,7 +214,7 @@ export async function getUserAudioTags() {
     esconsole("Fetching audio keys", ["debug", "audiolibrary"])
     try {
         const data = await (await fetch(url)).json()
-        const output = []
+        const output: string[] = []
         for (const key in data.smallAudioFile) {
             const tag = data.smallAudioFile[key]
             output.push(tag.file_key)

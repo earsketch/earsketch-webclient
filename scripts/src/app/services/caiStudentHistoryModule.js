@@ -40,7 +40,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
 
     function calculateAggregateCodeScore() {
         if (aggregateScore == null) {
-            console.log("Script List Received: ");
             var savedScripts = [];
             var scriptTypes = [];
             var savedNames = [];
@@ -171,7 +170,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
         }
         if (!curriculumPagesViewed.includes(page)) {
             curriculumPagesViewed.push(page);
-            console.log(curriculumPagesViewed);
             caiStudent.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed})
         }
     }

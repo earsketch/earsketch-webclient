@@ -14,13 +14,10 @@ app.factory('caiStudent', function () {
             if (studentModel.codeKnowledge == null) {
                 studentModel.codeKnowledge = {};
             }
-
             var keys = Object.keys(value);
-
             for (var i = 0; i < keys.length; i++) {
                 studentModel.codeKnowledge[keys[i]] = value[keys[i]];
             }
-
         }
 
         if (property == "musicAttributes") {
@@ -30,23 +27,16 @@ app.factory('caiStudent', function () {
             studentModel.musicAttributes["soundProfile"] = value;
         }
 
-
         if (property == "preferences") {
             if (studentModel.preferences == null) {
                 studentModel["preferences"] = {};
             }
-
             var keys = Object.keys(value);
             for (var i = 0; i < keys.length; i++) {
                 studentModel.preferences[keys[i]] = value[keys[i]];
             }
         }
-
-        console.log("STUDENT MODEL", studentModel);
-
     }
-
-
 
     return {
         studentModel: studentModel,

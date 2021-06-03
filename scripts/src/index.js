@@ -37,6 +37,9 @@ import ESMessages from './data/messages'
 import reporter from './app/reporter'
 window.ESMessages = ESMessages
 
+// NOTE: We import this purely for its side-effects (registering a completer with Ace).
+import './app/completer'
+
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 // (This was previously in userConsole, but since that's now a module, the fields are read-only.)
 // (Also, it doesn't really have anything to do with the user console.)
@@ -114,12 +117,7 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('localStorage');
     require('userProject');
-    require('colorTheme');
-    require('uploader');
-    require('completer');
-    require('exporter');
     require('esrecorder');
     require('recorder');
 
@@ -174,7 +172,7 @@ require(['angular'], () => {
     require('inputsController');
 
     // CAI
-    require('caiWindowDirective');
+    require('./cai/CAI');
     require('caiStudent');
     require('autograder');
     require('caiAnalysisModule');

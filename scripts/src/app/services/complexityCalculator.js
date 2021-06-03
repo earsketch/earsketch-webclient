@@ -10908,7 +10908,6 @@ app.factory('complexityCalculator', ['complexityCalculatorHelperFunctions', "cai
                 }
             }
         }
-        console.log(levels);
 
         for (var i in levels) {
             for (var j = 0; j < levels[i].length; j++) {

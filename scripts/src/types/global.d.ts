@@ -30,13 +30,16 @@ declare var app: any;
 declare var hljs: any;
 declare var Hilitor: any;
 declare var Interpreter: any;  // JS-Interpreter
+declare var JSZip: any;
 declare var lamejs: any;
 // NOTE: It looks like bringing in d3 types would require upgrading past d3 v3,
 // which is a nontrivial undertaking because of significant API changes.
 // (I spent some time of this and decided against it; we might just drop the d3 dependency anyway.)
 declare var d3: any;
 declare var Kali: any;
+declare var SC: any;  // Soundcloud
 declare var Sk: any;
+
 declare var FFT: any;
 declare var WindowFunction: any;
 declare var DSP: any;

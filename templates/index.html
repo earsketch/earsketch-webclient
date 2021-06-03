@@ -321,7 +321,9 @@
                             <curriculum style="height:inherit"></curriculum>
                         </div>
                         <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
-                        <div caiwindow style="display:flex;" ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
+                        <div class="h-full" ng-show="showCAIWindow">
+                            <cai style="height:inherit"></cai>
+                        </div>
                     </div>
                 </div>
             </div>
