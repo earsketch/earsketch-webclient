@@ -1,14 +1,11 @@
-﻿//import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS} from 'caiTree';
-
-import { computeStyles } from "@popperjs/core";
-import { parseString } from "xml2js";
-
-/**
+﻿/**
  * Student preference module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
+import * as caiStudent from "../../cai/caiStudent"
+
+app.factory('caiStudentPreferenceModule', function () {
 
     //var init
     var suggestionsAccepted = {};
@@ -331,4 +328,4 @@ app.factory('caiStudentPreferenceModule', ['caiStudent', function (caiStudent) {
         setActiveProject: setActiveProject
     };
 
-}]);
+});

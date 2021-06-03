@@ -171,7 +171,6 @@ require(['angular'], () => {
 
     // CAI
     require('./cai/CAI');
-    require('caiStudent');
     require('autograder');
     require('caiAnalysisModule');
     require('caiStudentPreferenceModule');
