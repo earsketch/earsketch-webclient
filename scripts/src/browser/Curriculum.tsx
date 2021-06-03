@@ -19,7 +19,7 @@ let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
     const page = curriculum.getURLForLocation(currentLocation);
-    const url = SITE_BASE_URI + '#?page=' + page + '&language=' + language
+    const url = SITE_BASE_URI + '#?curriculum=' + page + '&language=' + language
     clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
@@ -320,21 +320,19 @@ const HotCurriculum = hot((props: {
         clipboard = props.clipboard
 
         // Handle URL parameters.
-        const oldLocStr = ESUtils.getURLParameter('curriculum'); // legacy curriculum permalink parameter (indices)
-        const pageStr = ESUtils.getURLParameter('page'); // new curriculum permalink parameter (filename)
+        const curriculumParam = ESUtils.getURLParameter('curriculum');
 
-        if (oldLocStr !== null) {
-            const url = ESCurr_OLD_LOCATIONS[oldLocStr];
+        if (curriculumParam !== null) {
+            // check if this value exists in our old locations file first
+            const url = ESCurr_OLD_LOCATIONS[curriculumParam];
             if(url !== undefined) {
                 props.$ngRedux.dispatch(curriculum.fetchContent({ url: url }));
+            } else {
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url: curriculumParam }));
             }
         }
 
-        if(pageStr !== null) {
-            props.$ngRedux.dispatch(curriculum.fetchContent({ url: pageStr }));
-        }
-
-        if(oldLocStr === null && pageStr === null) {
+        if(curriculumParam === null) {
             // Load welcome page initially.
             props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }));
         }
