@@ -107,7 +107,7 @@ app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'scrip
                     $scope.modified = result[0];
                 }
                 $scope.loadingScript = false;
-
+                $scope.$apply();
                 return $scope.original;
             });
     };

@@ -414,7 +414,7 @@ export async function refreshCodeBrowser() {
 // TODO: dates should be stored in the database so as to make this unnecessary
 function formatDateToISO(date: string){
     // Format created date to ISO 8601
-    const isoFormat = date.slice(0,-2).replace(" ", "t")
+    const isoFormat = date.slice(0,-2).replace(" ", "T")
     // javascript Date.parse() requires ISO 8601
     return Date.parse(isoFormat)
 }
