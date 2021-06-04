@@ -20,7 +20,7 @@ let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
-    const url = `${SITE_BASE_URI}?curriculum=${page}&language=${language}`
+    const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
