@@ -321,8 +321,8 @@ toc.forEach((unit: TOCItem, unitIdx: number) => {
     })
 })
 
-const fixLocation = (href: string, loc: number[]) => {
-    if (loc === undefined) {
+const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
+    if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href];
     }
 
