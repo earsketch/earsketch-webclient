@@ -6,6 +6,7 @@ import * as layout from '../layout/layoutState'
 
 import { RootState, ThunkAPI, AppDispatch } from '../reducers'
 import { BrowserTabType } from "../layout/layoutState";
+import * as userNotification from "../app/userNotification";
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
@@ -301,6 +302,10 @@ export const adjustLocation = (location: number[], delta: number) => {
     return tocPages[pageIdx]
 }
 
+export const getURLForLocation = (location: number[]) => {
+    return locationToUrl[location.join(',')];
+}
+
 const urlToLocation: { [key:string]: number[] } = {}
 const locationToUrl: { [key:string]: string } = {}
 toc.forEach((unit: TOCItem, unitIdx: number) => {
@@ -316,12 +321,19 @@ toc.forEach((unit: TOCItem, unitIdx: number) => {
     })
 })
 
-const fixLocation = (href: string, loc: number[]) => {
-    if (loc === undefined) {
-        loc = urlToLocation[href]
-    } else if (href === undefined) {
-        href = locationToUrl[loc.join(',')]
+const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
+    if (loc === undefined && href !== undefined) {
+        loc = urlToLocation[href];
     }
+
+    if (loc === undefined) {
+        // if loc is still undefined then this is a request for an un-indexed page, default them to the welcome page
+        loc = [0];
+        href = undefined as any;
+        userNotification.show('Failed to load curriculum link. Redirecting to welcome page.',"failure2", 2);
+    }
+
+   href ??= locationToUrl[loc.join(',')]
 
     if (loc.length === 1 && toc[loc[0]].chapters) {
         // @ts-ignore
