@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from "react"
+import { Ace } from "ace-builds"
 import { hot } from "react-hot-loader/root"
 import { Provider, useSelector } from "react-redux"
 import { react2angular } from "react2angular"
+import React, { useEffect, useRef } from "react"
 
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
@@ -15,32 +16,104 @@ import store from "../reducers"
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0
 
-const collabColors = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
+const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 
-function setupAceHandlers(editor: any, ideScope: any) {
-    editor.ace.on("changeSession", (event: any) => ideScope.onChangeTasks.forEach((fn: Function) => fn(event)))
+// Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
+let ace: Ace.Editor = null as unknown as Ace.Editor
+let mydroplet: any = null
+
+function getValue() {
+    return ace.getValue()
+}
+
+function setReadOnly(value: boolean) {
+    ace.setReadOnly(value)
+    mydroplet.setReadOnly(value)
+}
+
+function setFontSize(value: string) {
+    ace.setFontSize(value)
+    mydroplet.setFontSize(value)
+}
+
+function undo() {
+    if (mydroplet.currentlyUsingBlocks) {
+        mydroplet.undo()
+    } else {
+        ace.undo()
+    }
+}
+
+function redo() {
+    if (mydroplet.currentlyUsingBlocks) {
+        mydroplet.redo()
+    } else {
+        ace.redo()
+    }
+}
+
+function checkUndo() {
+    if (mydroplet.currentlyUsingBlocks) {
+        return mydroplet.undoStack.length > 0
+    } else {
+        const undoManager = ace.getSession().getUndoManager()
+        return undoManager.canUndo()
+    }
+}
+
+function checkRedo() {
+    if (mydroplet.currentlyUsingBlocks) {
+        return mydroplet.redoStack.length > 0
+    } else {
+        const undoManager = ace.getSession().getUndoManager()
+        return undoManager.canRedo()
+    }
+}
+
+function clearHistory() {
+    if (mydroplet.currentlyUsingBlocks) {
+        mydroplet.clearUndoStack()
+    } else {
+        const undoManager = ace.getSession().getUndoManager()
+        undoManager.reset()
+        ace.getSession().setUndoManager(undoManager)
+    }
+}
+
+function setLanguage(currentLanguage: string) {
+    if (currentLanguage === "python") {
+        mydroplet.setMode("python", config.blockPalettePython.modeOptions)
+        mydroplet.setPalette(config.blockPalettePython.palette)
+    } else if (currentLanguage === "javascript") {
+        mydroplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+        mydroplet.setPalette(config.blockPaletteJavascript.palette)
+    }
+    ace.getSession().setMode("ace/mode/" + currentLanguage)
+}
+
+function setupAceHandlers(ace: Ace.Editor, ideScope: any) {
+    ace.on("changeSession", (event: any) => ideScope.onChangeTasks.forEach((fn: Function) => fn(event)))
 
     // TODO: add listener if collaboration userStatus is owner, remove otherwise
     // TODO: also make sure switching / closing tab is handled
-    editor.ace.on("change", (event: any) => {
+    ace.on("change", (event: any) => {
         ideScope.onChangeTasks.forEach((fn: Function) => fn(event))
 
-        // console.log("event in editor", event,event["action"],event["lines"])
-        var t = Date.now()
+        const t = Date.now()
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.keyStroke([event["action"],event["lines"],t]))
+            store.dispatch(cai.keyStroke([event["action"], event["lines"], t]))
         }
         
         if (collaboration.active && !collaboration.lockEditor) {
             // convert from positionObjects & lines to index & text
-            var session = editor.ace.getSession()
-            var document = session.getDocument()
-            var start = document.positionToIndex(event.start, 0)
-            var text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
+            const session = ace.getSession()
+            const document = session.getDocument()
+            const start = document.positionToIndex(event.start, 0)
+            const text = event.lines.length > 1 ? event.lines.join("\n") : event.lines[0]
 
             // buggy!
-            // var end = document.positionToIndex(event.end, 0)
-            var end = start + text.length
+            // const end = document.positionToIndex(event.end, 0)
+            const end = start + text.length
 
             collaboration.editScript({
                 action: event.action,
@@ -55,7 +128,7 @@ function setupAceHandlers(editor: any, ideScope: any) {
             clearTimeout(recommendationTimer)
         }
 
-        recommendationTimer = window.setTimeout(function() {
+        recommendationTimer = window.setTimeout(() => {
             helpers.getNgRootScope().$broadcast("reloadRecommendations")
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
@@ -63,7 +136,7 @@ function setupAceHandlers(editor: any, ideScope: any) {
         }, 1000)
 
         const activeTabID = tabs.selectActiveTabID(store.getState())
-        const editSession = editor.ace.getSession()
+        const editSession = ace.getSession()
         tabs.setEditorSession(activeTabID, editSession)
 
         let script = null
@@ -82,22 +155,22 @@ function setupAceHandlers(editor: any, ideScope: any) {
         }
     })
 
-    editor.ace.getSession().selection.on("changeSelection", function () {
+    ace.getSession().selection.on("changeSelection", () => {
         if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(() => collaboration.storeSelection(editor.ace.getSession().selection.getRange()))
+            setTimeout(() => collaboration.storeSelection(ace.getSession().selection.getRange()))
         }
     })
 
-    editor.ace.getSession().selection.on("changeCursor", function () {
+    ace.getSession().selection.on("changeCursor", () => {
         if (collaboration.active && !collaboration.isSynching) {
-            setTimeout(function () {
-                var session = editor.ace.getSession()
+            setTimeout(() => {
+                const session = ace.getSession()
                 collaboration.storeCursor(session.selection.getCursor())
             })
         }
     })
 
-    editor.ace.on("focus", () => {
+    ace.on("focus", () => {
         if (collaboration.active) {
             collaboration.checkSessionStatus()
         }
@@ -109,13 +182,15 @@ let setupDone = false
 function setup(editor: any, element: HTMLDivElement, language: string, ideScope: any) {
     if (setupDone) return
     if (language === "python") {
-        editor.droplet = new droplet.Editor(element, config.blockPalettePython)
+        mydroplet = new droplet.Editor(element, config.blockPalettePython)
     } else {
-        editor.droplet = new droplet.Editor(element, config.blockPaletteJavascript)
+        mydroplet = new droplet.Editor(element, config.blockPaletteJavascript)
     }
+    editor.droplet = mydroplet
 
-    editor.ace = editor.droplet.aceEditor
-    setupAceHandlers(editor, ideScope)
+    ace = mydroplet.aceEditor
+    editor.ace = ace
+    setupAceHandlers(editor.ace, ideScope)
 
     ideScope.initEditor()
 
@@ -133,12 +208,10 @@ const Editor = () => {
     const editorElement = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        editor.ace = null
-        editor.droplet = null
-        editor.visible = true
-
-        ideScope.$on("visible", (event: any, val: boolean) => editor.visible = !val)
-    
+        Object.assign(editor, {
+            getValue, setReadOnly, setFontSize, undo,
+            redo, checkUndo, checkRedo, clearHistory, setLanguage,
+        })
         ideScope.onChangeTasks = new Set()
     }, [])
 
@@ -146,86 +219,6 @@ const Editor = () => {
         if (!editorElement.current) return
         setup(editor, editorElement.current, language, ideScope)
     }, [editorElement.current])
-
-    editor.getValue = () => editor.ace.getValue()
-
-    // TODO: not working with ace editor
-    editor.setValue = (...args: any[]) => {
-        try {
-            if (editor.droplet.currentlyUsingBlocks) {
-                editor.droplet.setValue.apply(this, args)
-            } else {
-                editor.ace.setValue.apply(this, args)
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    editor.setReadOnly = (value: boolean) => {
-        editor.ace.setReadOnly(value)
-        editor.droplet.setReadOnly(value)
-    }
-
-    editor.setFontSize = function (value: number) {
-        editor.ace.setFontSize(value)
-        editor.droplet.setFontSize(value)
-    }
-
-    editor.undo = function () {
-        if (editor.droplet.currentlyUsingBlocks) {
-            editor.droplet.undo()
-        } else {
-            editor.ace.undo(true)
-        }
-    }
-
-    editor.redo = function () {
-        if (editor.droplet.currentlyUsingBlocks) {
-            editor.droplet.redo()
-        } else {
-            editor.ace.redo(true)
-        }
-    }
-
-    editor.checkUndo = function () {
-        if (editor.droplet.currentlyUsingBlocks) {
-            return editor.droplet.undoStack.length > 0
-        } else {
-            var undoManager = editor.ace.getSession().getUndoManager()
-            return undoManager.hasUndo()
-        }
-    }
-
-    editor.checkRedo = function () {
-        if (editor.droplet.currentlyUsingBlocks) {
-            return editor.droplet.redoStack.length > 0
-        } else {
-            var undoManager = editor.ace.getSession().getUndoManager()
-            return undoManager.hasRedo()
-        }
-    }
-
-    editor.clearHistory = function () {
-        if (editor.droplet.currentlyUsingBlocks) {
-            editor.droplet.clearUndoStack()
-        } else {
-            var undoManager = editor.ace.getSession().getUndoManager()
-            undoManager.reset()
-            editor.ace.getSession().setUndoManager(undoManager)
-        }
-    }
-
-    editor.setLanguage = function (currentLanguage: string) {
-        if (currentLanguage === "python") {
-            editor.droplet.setMode("python", config.blockPalettePython.modeOptions)
-            editor.droplet.setPalette(config.blockPalettePython.palette)
-        } else if (currentLanguage === "javascript") {
-            editor.droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-            editor.droplet.setPalette(config.blockPaletteJavascript.palette)
-        }
-        editor.ace.getSession().setMode("ace/mode/" + currentLanguage)
-    }
 
     return <>
         {/* TODO: using parent (ideController) scope... cannot isolate them well */}
@@ -244,8 +237,8 @@ const Editor = () => {
         {activeScript?.collaborative && <div id="collab-badges-container">
             {Object.entries(collaboration.otherMembers).map(([name, state], index) => 
             <div className="collaborator-badge prevent-selection" style={{
-                    borderColor: state.active ? `rgba(${collabColors[index % 6].join()},0.75)` : "#666",
-                    backgroundColor: state.active ? `rgba(${collabColors[index % 6].join()},0.5)`: "#666",
+                    borderColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
+                    backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)`: "#666",
                  }}
                  uib-tooltip="{{name}}" tooltip-placement="left" uib-popover={collaboration.chat[name].text}
                  popover-placement="left" popover-is-open="collaboration.chat[name].popover" popover-trigger="none">

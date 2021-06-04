@@ -635,9 +635,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.toggleNotificationHistory = function (bool) {
         $scope.showNotificationHistory = bool;
-
-        $rootScope.$broadcast('visible', bool);
-
         if (bool) {
             $scope.showNotification = false;
         }
