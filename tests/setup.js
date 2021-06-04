@@ -216,7 +216,6 @@ Object.assign(window,require('esAppDSP'));
 // Controllers
 require('mainController');
 require('ideController');
-require('editorDirective');
 require('promptController');
 require('uploadController');
 require('recorderController');

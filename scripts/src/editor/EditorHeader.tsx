@@ -13,7 +13,7 @@ import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 
 const UndoRedoButtons = () => {
-    const editorScope = helpers.getNgDirective('editor').scope();
+    const editorScope = helpers.getNgController("ideController").scope();
     const theme = useSelector(appState.selectColorTheme);
 
     const enabled = `cursor-pointer ${theme==='light' ? 'text-black' : 'text-white'}`;

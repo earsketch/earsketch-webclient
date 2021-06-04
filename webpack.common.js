@@ -51,7 +51,6 @@ module.exports = {
 
             // Controllers
             mainController: path.resolve(__dirname,`${appDir}/mainController.js`),
-            editorDirective: path.resolve(__dirname,`${appDir}/editorDirective.js`),
             diffDirective: path.resolve(__dirname,`${appDir}/diffDirective.js`),
             ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),

@@ -307,7 +307,7 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
     }
 );
 
-export const checkForCodeUpdates = createAsyncThunk<void, ThunkAPI>(
+export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     'cai/checkForCodeUpdates',
     (_, { getState, dispatch }) => {
         const ideScope = helpers.getNgController('ideController').scope()

@@ -127,7 +127,6 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('editorDirective');
     require('promptController');
     require('uploadController');
     require('recorderController');
@@ -159,6 +158,7 @@ require(['angular'], () => {
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');
+    require('./editor/Editor')
     require('./top/LocaleSelector')
     require('./app/Notification')
 
