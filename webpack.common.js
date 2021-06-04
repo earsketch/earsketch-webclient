@@ -78,9 +78,6 @@ module.exports = {
             userHistoryController: path.resolve(__dirname,`${appDir}/userHistoryController.js`),
             notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
-            // Models
-            autograder: path.resolve(__dirname,`${servicesDir}/autograder.js`),
-
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
             
@@ -224,8 +221,6 @@ module.exports = {
             CAI_NUCLEI: 'exports-loader?type=commonjs&exports=single CAI_NUCLEI!codeRecommendations',
 
             COMPLEXITY_CALCULATOR_STORAGE: 'exports-loader?type=commonjs&exports=single COMPLEXITY_CALCULATOR_STORAGE!complexityCalculatorStorage',
-
-            ServiceWrapper: 'exports-loader?type=commonjs&exports=single ServiceWrapper!ngWrappers',
         }),
         new webpack.HotModuleReplacementPlugin(),
         new HappyPack({

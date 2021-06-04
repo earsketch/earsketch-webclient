@@ -1,6 +1,5 @@
 import angular from 'angular';
 
-// TODO: Should replace the global ServiceWrapper in api/angular-wrappers.js
 export const getNgService = (name: string): angular.IRootScopeService => angular.element(document).injector().get(name);
 
 export const getNgController = (controllerName: string) => {

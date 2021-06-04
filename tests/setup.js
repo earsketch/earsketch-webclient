@@ -242,6 +242,5 @@ require('autograder2Controller');
 require('autograderAWSController');
 require('autograder3Controller');
 require('inputsController');
-require('autograder');
 require('caiAnalysisModule');
 require('complexityCalculator');

@@ -17,7 +17,6 @@ import * as userConsole from "../app/userconsole"
 import { Clip, DAWData, EffectRange, Track } from "../app/player"
 import { measureToTime } from "../esutils"
 import ESMessages from "../data/messages"
-import ServiceWrapper from "./angular-wrappers"
 import * as userProject from "../app/userProject"
 
 

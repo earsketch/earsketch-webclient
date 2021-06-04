@@ -25,6 +25,8 @@ describe('EarSketch API tests', function() {
     // load the earsketch app
     beforeEach(module('EarSketchApp'));
 
+    // TODO: probably need to update this to mock these differently,
+    //       since the services are now modules and angular-wrappers is gone.
     beforeEach(function() {
         // create a mock audioLibrary service
         audioLibrary = {
@@ -52,18 +54,6 @@ describe('EarSketch API tests', function() {
     });
 
     beforeEach(inject(function($injector) {
-        // mock the service wrapper that the API uses to load angular
-        // dependencies
-
-        // overriding the angular-wrappers' function
-        // TODO: may need to update this since angular-wrappers is now a module.
-        ServiceWrapper = function() {
-            return {
-                audioLibrary: audioLibrary,
-                compiler: compiler,
-                renderer: renderer,
-            }
-        };
         $rootScope = $injector.get('$rootScope');
         $q = $injector.get('$q');
     }));
