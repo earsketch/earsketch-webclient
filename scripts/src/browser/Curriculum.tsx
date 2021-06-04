@@ -14,15 +14,30 @@ import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
-const SECTION_URL_CHARACTER = '!'
+const SECTION_URL_CHARACTER = ':'
 
 let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
-    const page = curriculum.getURLForLocation(currentLocation).replace("#", SECTION_URL_CHARACTER)
-    const url = SITE_BASE_URI + '?' + new URLSearchParams({ curriculum: page, language })
+    const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
+    const url = `${SITE_BASE_URI}?curriculum=${page}&language=${language}`
     clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
+}
+
+const urlToPermalink = (url: string) => {
+    return url
+        .replace(".html", "")
+        .replace("#", SECTION_URL_CHARACTER)
+}
+
+const permalinkToURL = (permalink: string) => {
+    const linkParts = permalink.split(SECTION_URL_CHARACTER)
+    linkParts[0] += ".html"
+    if (linkParts.length === 2) {
+        linkParts[0] += "#"
+    }
+    return linkParts.join('')
 }
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
@@ -329,7 +344,7 @@ const HotCurriculum = hot((props: {
             if (url !== undefined) {
                 props.$ngRedux.dispatch(curriculum.fetchContent({ url }))
             } else {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ url: curriculumParam.replace(SECTION_URL_CHARACTER, "#") }))
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url: permalinkToURL(curriculumParam) }))
             }
         }
 

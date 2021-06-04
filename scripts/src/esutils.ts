@@ -204,7 +204,7 @@ export const randomString = (length: number) => {
 
 // Returns the matching value or a null value if the parameter does not exist.
 export const getURLParameter = (key: string) => {
-    const params = new URLSearchParams(window.location.search)
+    const params = new URLSearchParams(window.location.search + window.location.hash)
     return params.get(key)
 }
 
