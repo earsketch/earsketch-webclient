@@ -13,7 +13,7 @@ interface Notification {
     script_name?: string
     shareid?: string
     id?: string
-    created?: number
+    created?: string
 }
 
 // TODO: separate the temporary and permanent notification services?
@@ -140,7 +140,7 @@ export const loadHistory = (notificationList: Notification[]) => {
             v.message.text = '[Teacher] ' + v.message.text
         }
 
-        v.time = v.created!
+        v.time = Date.parse(v.created!)
 
         // hack around only receiving notification history (collection) but not individual messages
         // TODO: always send individual notification from server
