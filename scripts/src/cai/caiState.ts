@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
 import * as caiStudentPreferenceModule from './studentPreferences'
+import * as editor from '../editor/Editor'
 import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
 
@@ -133,10 +134,11 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             sender: userProject.getUsername()
         } as CAIMessage
 
-        const text = ideScope.editor.ace.getValue();
+        const text = editor.ace.getValue();
+        // TODO: use the script language selector from appState
         const lang = ideScope.currentLanguage;
         codeSuggestion.generateResults(text, lang)
-        caiDialogue.setCodeObj(ideScope.editor.ace.session.doc.$lines.join("\n"))
+        caiDialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList(message))
         let msgText = caiDialogue.generateOutput(input.value)
 
@@ -310,9 +312,8 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
 export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     'cai/checkForCodeUpdates',
     (_, { getState, dispatch }) => {
-        const ideScope = helpers.getNgController('ideController').scope()
         const caiDialogue = helpers.getNgService('caiDialogue')
-        caiDialogue.checkForCodeUpdates(ideScope.editor.ace.getValue())
+        caiDialogue.checkForCodeUpdates(editor.ace.getValue())
     }
 );
 

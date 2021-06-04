@@ -6,14 +6,14 @@ import { react2angular } from 'react2angular';
 
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
-import * as editor from './editorState';
+import * as editor from './Editor';
+import * as editorState from './editorState';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
 import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 
 const UndoRedoButtons = () => {
-    const editorScope = helpers.getNgController("ideController").scope();
     const theme = useSelector(appState.selectColorTheme);
 
     const enabled = `cursor-pointer ${theme==='light' ? 'text-black' : 'text-white'}`;
@@ -22,31 +22,28 @@ const UndoRedoButtons = () => {
     const [hasUndo, setHasUndo] = useState(false);
     const [hasRedo, setHasRedo] = useState(false);
 
-    const onChangeTask = () => {
+    const onChange = () => {
         // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
         setTimeout(() => {
-            if (editorScope?.editor) {
-                setHasUndo(editorScope.editor.checkUndo());
-                setHasRedo(editorScope.editor.checkRedo());
-            }
+            setHasUndo(editor.checkUndo());
+            setHasRedo(editor.checkRedo());
         });
     };
 
     useEffect(() => {
-        if (!editorScope || !editorScope.onChangeTasks) return;
-        editorScope.onChangeTasks.add(onChangeTask)
-        return () => editorScope.onChangeTasks.delete(onChangeTask);
+        editor.callbacks.onChange = onChange
+        return () => { editor.callbacks.onChange = null };
     });
 
     return (<>
         <i
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: 'scaleX(-1)' }}
-            onClick={() => editorScope?.editor.undo()}
+            onClick={() => editor.undo()}
         />
         <i
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
-            onClick={() => editorScope?.editor.redo()}
+            onClick={() => editor.redo()}
         />
     </>);
 };
@@ -58,7 +55,7 @@ const EditorHeader = () => {
     const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID) as string;
     const allScripts = useSelector(scripts.selectAllScriptEntities);
-    const blocksMode = useSelector(editor.selectBlocksMode);
+    const blocksMode = useSelector(editorState.selectBlocksMode);
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
     const loggedIn = useSelector(user.selectLoggedIn);
@@ -87,7 +84,7 @@ const EditorHeader = () => {
                             onClick={() => {
                                 if (ideScope) {
                                     ideScope.toggleBlocks();
-                                    dispatch(editor.setBlocksMode(ideScope.editor.droplet.currentlyUsingBlocks));
+                                    dispatch(editorState.setBlocksMode(editor.droplet.currentlyUsingBlocks));
                                 }
                             }}
                         >

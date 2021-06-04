@@ -29,16 +29,20 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
+import { react2angular } from 'react2angular'
+
 import * as helpers from './helpers'
+import { Editor } from './editor/Editor'
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
+import reporter from './app/reporter'
 // TODO: Remove this after dealing lib/earsketch-appdsp.js.
 import ESMessages from './data/messages'
-import reporter from './app/reporter'
 window.ESMessages = ESMessages
 // TODO: Remove this after making complexityCalculator a module instead of a service.
 import * as caiErrorHandling from './cai/errorHandling'
 window.caiErrorHandling = caiErrorHandling
+window.droplet = droplet
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
 import './app/completer'
@@ -158,7 +162,7 @@ require(['angular'], () => {
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');
-    require('./editor/Editor')
+    app.component("editor", react2angular(Editor))
     require('./top/LocaleSelector')
     require('./app/Notification')
 

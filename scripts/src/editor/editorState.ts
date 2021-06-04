@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import * as config from './editorConfig';
-import * as app from '../app/appState';
 import { Ace } from 'ace-builds';
 import { RootState } from '../reducers';
 

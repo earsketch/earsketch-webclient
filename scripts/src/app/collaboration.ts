@@ -2,6 +2,7 @@
 import { Ace, Range } from "ace-builds"
 
 import { ScriptEntity } from "common"
+import * as editor from "../editor/Editor"
 import esconsole from "../esconsole"
 import * as helpers from "../helpers"
 import store from "../reducers"
@@ -63,7 +64,6 @@ export let scriptID: string | null = null  // collaboration session identity (bo
 export let userName = ""
 let owner = false
 
-let editor: any = null
 let editSession: Ace.EditSession | null = null
 
 let buffer: Message[] = []
@@ -135,11 +135,6 @@ function initialize() {
 
 export function setUserName(username_: string) {
     userName = username_.toLowerCase()  // #1858
-}
-
-export function setEditor(editor_: any) {
-    editor = editor_
-    editSession = editor.ace.getSession()
 }
 
 // Opening a script with collaborators starts a real-time collaboration session.

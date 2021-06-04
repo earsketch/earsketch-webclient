@@ -1,7 +1,6 @@
 import { Ace } from "ace-builds"
 import { hot } from "react-hot-loader/root"
 import { Provider, useSelector } from "react-redux"
-import { react2angular } from "react2angular"
 import React, { useEffect, useRef } from "react"
 
 import * as appState from "../app/appState"
@@ -13,66 +12,69 @@ import * as tabs from "./tabState"
 import * as userProject from "../app/userProject"
 import store from "../reducers"
 
+const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
+
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0
 
-const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
+// TODO: Consolidate with editorState.
 
 // Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
-let ace: Ace.Editor = null as unknown as Ace.Editor
-let mydroplet: any = null
+export let ace: Ace.Editor = null as unknown as Ace.Editor
+export let droplet: any = null
+export let callbacks = { onChange: null as (() => void) | null }
 
-function getValue() {
+export function getValue() {
     return ace.getValue()
 }
 
-function setReadOnly(value: boolean) {
+export function setReadOnly(value: boolean) {
     ace.setReadOnly(value)
-    mydroplet.setReadOnly(value)
+    droplet.setReadOnly(value)
 }
 
-function setFontSize(value: string) {
+export function setFontSize(value: string) {
     ace.setFontSize(value)
-    mydroplet.setFontSize(value)
+    droplet.setFontSize(value)
 }
 
-function undo() {
-    if (mydroplet.currentlyUsingBlocks) {
-        mydroplet.undo()
+export function undo() {
+    if (droplet.currentlyUsingBlocks) {
+        droplet.undo()
     } else {
         ace.undo()
     }
 }
 
-function redo() {
-    if (mydroplet.currentlyUsingBlocks) {
-        mydroplet.redo()
+export function redo() {
+    if (droplet.currentlyUsingBlocks) {
+        droplet.redo()
     } else {
         ace.redo()
     }
 }
 
-function checkUndo() {
-    if (mydroplet.currentlyUsingBlocks) {
-        return mydroplet.undoStack.length > 0
+export function checkUndo() {
+    if (droplet.currentlyUsingBlocks) {
+        return droplet.undoStack.length > 0
     } else {
         const undoManager = ace.getSession().getUndoManager()
         return undoManager.canUndo()
     }
 }
 
-function checkRedo() {
-    if (mydroplet.currentlyUsingBlocks) {
-        return mydroplet.redoStack.length > 0
+export function checkRedo() {
+    if (droplet.currentlyUsingBlocks) {
+        return droplet.redoStack.length > 0
     } else {
         const undoManager = ace.getSession().getUndoManager()
         return undoManager.canRedo()
     }
 }
 
-function clearHistory() {
-    if (mydroplet.currentlyUsingBlocks) {
-        mydroplet.clearUndoStack()
+export function clearHistory() {
+    if (droplet.currentlyUsingBlocks) {
+        droplet.clearUndoStack()
     } else {
         const undoManager = ace.getSession().getUndoManager()
         undoManager.reset()
@@ -80,24 +82,24 @@ function clearHistory() {
     }
 }
 
-function setLanguage(currentLanguage: string) {
+export function setLanguage(currentLanguage: string) {
     if (currentLanguage === "python") {
-        mydroplet.setMode("python", config.blockPalettePython.modeOptions)
-        mydroplet.setPalette(config.blockPalettePython.palette)
+        droplet.setMode("python", config.blockPalettePython.modeOptions)
+        droplet.setPalette(config.blockPalettePython.palette)
     } else if (currentLanguage === "javascript") {
-        mydroplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-        mydroplet.setPalette(config.blockPaletteJavascript.palette)
+        droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+        droplet.setPalette(config.blockPaletteJavascript.palette)
     }
     ace.getSession().setMode("ace/mode/" + currentLanguage)
 }
 
-function setupAceHandlers(ace: Ace.Editor, ideScope: any) {
-    ace.on("changeSession", (event: any) => ideScope.onChangeTasks.forEach((fn: Function) => fn(event)))
+function setupAceHandlers(ace: Ace.Editor) {
+    ace.on("changeSession", () => callbacks.onChange?.())
 
     // TODO: add listener if collaboration userStatus is owner, remove otherwise
     // TODO: also make sure switching / closing tab is handled
-    ace.on("change", (event: any) => {
-        ideScope.onChangeTasks.forEach((fn: Function) => fn(event))
+    ace.on("change", (event) => {
+        callbacks.onChange?.()
 
         const t = Date.now()
         if (FLAGS.SHOW_CAI) {
@@ -179,23 +181,19 @@ function setupAceHandlers(ace: Ace.Editor, ideScope: any) {
 
 let setupDone = false
 
-function setup(editor: any, element: HTMLDivElement, language: string, ideScope: any) {
+function setup(element: HTMLDivElement, language: string, ideScope: any) {
     if (setupDone) return
+
     if (language === "python") {
-        mydroplet = new droplet.Editor(element, config.blockPalettePython)
+        droplet = new window.droplet.Editor(element, config.blockPalettePython)
     } else {
-        mydroplet = new droplet.Editor(element, config.blockPaletteJavascript)
+        droplet = new window.droplet.Editor(element, config.blockPaletteJavascript)
     }
-    editor.droplet = mydroplet
 
-    ace = mydroplet.aceEditor
-    editor.ace = ace
-    setupAceHandlers(editor.ace, ideScope)
-
+    ace = droplet.aceEditor
+    setupAceHandlers(ace)
     ideScope.initEditor()
-
     ideScope.collaboration = collaboration
-    collaboration.setEditor(editor)
     setupDone = true
 }
 
@@ -204,20 +202,11 @@ const Editor = () => {
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
     const ideScope = helpers.getNgController("ideController").scope()
-    const editor = ideScope.editor
     const editorElement = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        Object.assign(editor, {
-            getValue, setReadOnly, setFontSize, undo,
-            redo, checkUndo, checkRedo, clearHistory, setLanguage,
-        })
-        ideScope.onChangeTasks = new Set()
-    }, [])
-
-    useEffect(() => {
         if (!editorElement.current) return
-        setup(editor, editorElement.current, language, ideScope)
+        setup(editorElement.current, language, ideScope)
     }, [editorElement.current])
 
     return <>
@@ -250,4 +239,4 @@ const Editor = () => {
 
 const HotEditor = hot(() => <Provider store={store}><Editor /></Provider>)
 
-app.component("editor", react2angular(HotEditor))
+export { HotEditor as Editor }
