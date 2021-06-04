@@ -37,11 +37,6 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
             forLoops: 0,
             List: 0,
             variables: 0,
-            listOps: 0,
-            strOps: 0,
-            boolOps: 0,
-            comparisons: 0,
-            mathematicalOperators: 0,
             consoleInput: 0
         };
 
