@@ -145,7 +145,7 @@
         </div>
 
         <!-- temporary place for the app-generated notifications -->
-        <notification-bar ng-show="showText"></notification-bar>
+        <notification-bar></notification-bar>
 
         <!-- top-right icons -->
         <div id="top-header-nav-form">
@@ -195,7 +195,7 @@
                     <i class="icon icon-bell" id="user-notification-icon"></i>
                     <div id="badge" ng-show="getNumUnread() > 0">{{getNumUnread()}}</div>
                 </div>
-                <notification-popup ng-show="showPopupText"></notification-popup>
+                <notification-popup></notification-popup>
             </div>
 
             <!-- user login menu -->

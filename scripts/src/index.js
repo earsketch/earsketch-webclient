@@ -127,7 +127,6 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('notificationUI');
     require('editorDirective');
     require('promptController');
     require('uploadController');
@@ -161,6 +160,7 @@ require(['angular'], () => {
     require('./editor/Tabs');
     require('./editor/EditorHeader');
     require('./top/LocaleSelector')
+    require('./app/Notification')
 
     // To be ported to React
     require('./layout/Layout');

@@ -76,7 +76,6 @@ module.exports = {
             autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
             inputsController: path.resolve(__dirname,`${appDir}/inputsController.js`),
             userHistoryController: path.resolve(__dirname,`${appDir}/userHistoryController.js`),
-            notificationUI: path.resolve(__dirname,`${appDir}/notificationUI.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
