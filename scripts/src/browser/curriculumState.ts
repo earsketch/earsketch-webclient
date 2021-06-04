@@ -333,9 +333,7 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         userNotification.show('Failed to load curriculum link. Redirecting to welcome page.',"failure2", 2);
     }
 
-    if (href === undefined) {
-        href = locationToUrl[loc.join(',')]
-    }
+   href ??= locationToUrl[loc.join(',')]
 
     if (loc.length === 1 && toc[loc[0]].chapters) {
         // @ts-ignore
