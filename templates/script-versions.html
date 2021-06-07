@@ -51,8 +51,8 @@
       </table>
     </div>
     <div ng-hide="compiling || compiledResult !== undefined">
-      <div class="col-md-8 scroll-50" ng-hide="loadingScript">
-        <pre><code diff class="diff" original="original.source_code" modified="modified.source_code"></code></pre>
+      <div class="col-md-8 scroll-50" ng-if="!loadingScript">
+        <pre><diff original="original.source_code" modified="modified.source_code" /></pre>
         <div ng-if="original.activeUsers">Active Collaborators: {{parseActiveUsers(original.activeUsers)}}</div>
       </div>
       <div class="col-md-8 scroll-50" ng-show="loadingScript">

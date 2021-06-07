@@ -27,6 +27,8 @@ declare var computePitchShift: (data: Float32Array, envelope: Float32Array, cont
 
 declare var acorn: any;
 declare var app: any;
+declare var difflib: any;
+declare var diffview: any;
 declare var droplet: any;
 declare var hljs: any;
 declare var Hilitor: any;

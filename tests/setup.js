@@ -225,7 +225,6 @@ require('shareScriptController');
 require('scriptVersionController');
 require('analyzeScriptController');
 require('userHistoryController');
-require('diffDirective');
 
 require('createAccountController');
 require('changePasswordController');

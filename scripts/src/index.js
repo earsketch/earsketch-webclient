@@ -140,7 +140,6 @@ require(['angular'], () => {
     require('scriptVersionController');
     require('analyzeScriptController');
     require('userHistoryController');
-    require('diffDirective');
 
     require('createAccountController');
     require('changePasswordController');
@@ -165,6 +164,7 @@ require(['angular'], () => {
     require('./top/LocaleSelector')
     require('./app/Notification')
     require('./app/Recorder')
+    require('./app/Diff')
 
     // To be ported to React
     require('./layout/Layout');
