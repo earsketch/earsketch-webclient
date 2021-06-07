@@ -223,7 +223,6 @@ require('renameController');
 require('downloadController');
 require('shareScriptController');
 require('scriptVersionController');
-require('analyzeScriptController');
 require('userHistoryController');
 
 require('createAccountController');

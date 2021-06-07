@@ -13,7 +13,7 @@ interface CodeFeatures {
     strOps: number
 }
 
-const FEATURE_SCORES = {
+export const FEATURE_SCORES = {
     userFunc: 30,
     booleanConditionals: 15,
     conditionals: 10,

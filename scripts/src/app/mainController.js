@@ -18,6 +18,7 @@ import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
 import * as cai from '../cai/caiState';
 import * as recommender from './recommender';
+import { ScriptAnalysis } from './ScriptAnalysis';
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 
@@ -25,10 +26,11 @@ import * as userProject from './userProject';
 import { react2angular } from "react2angular"
 
 function wrapModal(component) {
-    return ({ modalInstance, ...props }) => component({ close: modalInstance.close, ...props })
+    return ({ modalInstance, resolve, ...props }) => component({ close: modalInstance.close, ...resolve, ...props })
 }
 
 app.component("forgotpasswordController", react2angular(wrapModal(ForgotPassword), ["modalInstance"]))
+app.component("analyzeScriptController", react2angular(wrapModal(ScriptAnalysis), ["modalInstance", "resolve"]))
 
 /**
  * @module mainController
@@ -929,8 +931,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.openCodeIndicator = script => {
         $uibModal.open({
-            templateUrl: 'templates/script-analysis.html',
-            controller: 'analyzeScriptController',
+            component: 'analyzeScriptController',
             size: 100,
             resolve: {
                 script() { return script; }
