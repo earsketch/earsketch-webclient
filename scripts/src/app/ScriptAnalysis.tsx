@@ -25,21 +25,25 @@ export const ScriptAnalysis = ({ script, close }: { script: ScriptEntity, close:
         </div>
         <div className="modal-body">
             <table className="table">
-                <tr>
-                    <th>Category</th>
-                    <th>Count</th>
-                </tr>
-                {categories.map(({ name, count, value }) => 
-                <tr>
-                    <td>{name}</td>
-                    <td>{count} &times; {value}</td>
-                </tr>)}
-                <tr>
-                    <th>Total</th>
-                    <th id="totalScriptScore">
-                        {score}
-                    </th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {categories.map(({ name, count, value }) => 
+                    <tr key={name}>
+                        <th>{name}</th>
+                        <td>{count} &times; {value}</td>
+                    </tr>)}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>Total</th>
+                        <td>{score}</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         <div className="modal-footer">
