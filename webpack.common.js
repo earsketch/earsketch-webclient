@@ -54,7 +54,6 @@ module.exports = {
             diffDirective: path.resolve(__dirname,`${appDir}/diffDirective.js`),
             ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
-            recorderController: path.resolve(__dirname,`${appDir}/recorderController.js`),
             createAccountController: path.resolve(__dirname,`${appDir}/createaccountController.js`),
             changePasswordController: path.resolve(__dirname,`${appDir}/changepasswordController.js`),
             editProfileController: path.resolve(__dirname,`${appDir}/editProfileController.js`),

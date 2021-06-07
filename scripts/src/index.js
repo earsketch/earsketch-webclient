@@ -133,7 +133,6 @@ require(['angular'], () => {
     require('ideController');
     require('promptController');
     require('uploadController');
-    require('recorderController');
     require('createScriptController');
     require('renameController');
     require('downloadController');
@@ -165,6 +164,7 @@ require(['angular'], () => {
     app.component("editor", react2angular(Editor))
     require('./top/LocaleSelector')
     require('./app/Notification')
+    require('./app/Recorder')
 
     // To be ported to React
     require('./layout/Layout');

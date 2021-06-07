@@ -1,8 +1,0 @@
-<div class="counter-meter">
-	<span id="record-button" ng-show="recorder.micIsOn" ng-hide="(recorder.properties.useMetro && recorder.isRecording) || recorder.hasBuffer" ng-click="recorder.toggleRecord()"><i class="icon icon-recording" ng-class="{'blink recording':recorder.isRecording, '':!recorder.isRecording}"></i></span>
-	<span ng-show="recorder.isRecording && recorder.properties.useMetro">{{recorder.curMeasureShow}}</span>
-	<div id="preview-button" ng-show="recorder.hasBuffer && !recorder.isRecording" ng-click="recorder.togglePreview()" >
-		<span id="play-icon" ng-show="!recorder.isPreviewing && recorder.curMeasure >= 0"><i class="icon icon-play4"></i></span>
-    	<span id="stop-icon" ng-hide="!recorder.isPreviewing && recorder.curMeasure >= 0"><i class="icon icon-stop2"></i></span> 
-	</div>
-<div>

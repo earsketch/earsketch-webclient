@@ -369,6 +369,7 @@ function startPreview() {
         previewSource.connect(amp)
         amp.connect(audioContext.destination)
         previewSource.start(audioContext.currentTime)
+        helpers.getNgRootScope().$apply()
         previewSource.onended = () => {
             isPreviewing = false
             helpers.getNgRootScope().$apply()
