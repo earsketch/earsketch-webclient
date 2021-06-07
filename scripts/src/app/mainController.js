@@ -5,6 +5,7 @@ import * as collaboration from './collaboration'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as exporter from './exporter'
+import { ForgotPassword } from './ForgotPassword'
 import * as user from '../user/userState';
 import reporter from './reporter';
 import * as scripts from '../browser/scriptsState';
@@ -19,6 +20,15 @@ import * as cai from '../cai/caiState';
 import * as recommender from './recommender';
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
+
+// Temporary glue from $uibModal to React components.
+import { react2angular } from "react2angular"
+
+function wrapModal(component) {
+    return ({ modalInstance, ...props }) => component({ close: modalInstance.close, ...props })
+}
+
+app.component("forgotpasswordController", react2angular(wrapModal(ForgotPassword), ["modalInstance"]))
 
 /**
  * @module mainController
@@ -567,10 +577,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.forgotPass = function () {
-        $uibModal.open({
-            templateUrl: 'templates/forgot-password.html',
-            controller: 'forgotpasswordController'
-        });
+        $uibModal.open({ component: 'forgotpasswordController' });
     };
 
     $scope.changePassword = function () {
