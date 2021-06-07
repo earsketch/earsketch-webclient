@@ -63,7 +63,6 @@ module.exports = {
             downloadController: path.resolve(__dirname,`${appDir}/downloadController.js`),
             renameController: path.resolve(__dirname,`${appDir}/renameController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-            createScriptController: path.resolve(__dirname,`${appDir}/createScriptController.js`),
             promptController: path.resolve(__dirname,`${appDir}/promptController.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
             autograder2Controller: path.resolve(__dirname,`${appDir}/autograder2Controller.js`),

@@ -9,10 +9,15 @@ import * as editorState from '../editor/editorState';
 import reporter from './reporter';
 import * as tabs from '../editor/tabState';
 import * as cai from '../cai/caiState';
+import { wrapModal } from '../helpers';
+import { ScriptCreator } from './ScriptCreator';
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 import * as WaveformCache from './waveformcache';
+
+// Temporary glue from $uibModal to React components.
+app.component("createScriptController", wrapModal(ScriptCreator))
 
 const ACE_THEMES = {
     light: "ace/theme/chrome",
@@ -374,8 +379,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
 
         var modalInstance = $uibModal.open({
-            templateUrl: 'templates/create-script.html',
-            controller: 'CreateScriptCtrl',
+            component: 'createScriptController',
             // pass the current language to use as the default selected lang.
             resolve: {
                 language: function () {
@@ -387,14 +391,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         reporter.createScript();
 
         return modalInstance.result.then(function (filename) {
-            userProject.closeScript(filename);
-            return userProject.createScript(filename);
-        }, () => {
-            esconsole('Modal dismissed.', ['IDE','debug']);
-        }).then(function (script) {
-            // script saved and opened
-            script && $rootScope.$broadcast('createScript', script.shareid);
-            $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
+            if (filename) {
+                userProject.closeScript(filename);
+                return userProject.createScript(filename).then(function (script) {
+                    // script saved and opened
+                    script && $rootScope.$broadcast('createScript', script.shareid);
+                    $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
+                });
+            }
         });
     };
 
