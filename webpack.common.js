@@ -55,7 +55,6 @@ module.exports = {
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
             createAccountController: path.resolve(__dirname,`${appDir}/createaccountController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
-            scriptVersionController: path.resolve(__dirname,`${appDir}/scriptVersionController.js`),
             shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
             submitAWSController: path.resolve(__dirname,`${appDir}/submitAWSController.js`),
             renameController: path.resolve(__dirname,`${appDir}/renameController.js`),

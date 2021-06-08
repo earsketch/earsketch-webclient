@@ -412,7 +412,7 @@ export async function refreshCodeBrowser() {
 
 // Format a date to ISO 8601
 // TODO: dates should be stored in the database so as to make this unnecessary
-function formatDateToISO(date: string){
+function formatDateToISO(date: string) {
     // Format created date to ISO 8601
     const isoFormat = date.slice(0,-2).replace(" ", "T")
     // javascript Date.parse() requires ISO 8601
@@ -432,9 +432,9 @@ export async function getScriptHistory(scriptid: string) {
 }
 
 // Fetch a specific version of a script.
-export async function getScriptVersion(scriptid: string, versionid: string) {
+export async function getScriptVersion(scriptid: string, versionid: number) {
     esconsole("Getting script history: " + scriptid + "  version: " + versionid, ["debug", "user"])
-    const data = await postAuthForm("/services/scripts/scriptversion", { scriptid, versionid })
+    const data = await postAuthForm("/services/scripts/scriptversion", { scriptid, versionid: versionid + "" })
     return data === null ? [] : [data]
 }
 

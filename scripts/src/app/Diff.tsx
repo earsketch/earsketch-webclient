@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react"
-import { react2angular } from "react2angular"
 
-const Diff = ({ original, modified }: { original: string, modified: string }) => {
+export const Diff = ({ original, modified }: { original: string, modified: string }) => {
     const element = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -34,5 +33,3 @@ const Diff = ({ original, modified }: { original: string, modified: string }) =>
 
     return <code ref={element} className="diff"></code>
 }
-
-app.component("diff", react2angular(Diff, ["original", "modified"]))
