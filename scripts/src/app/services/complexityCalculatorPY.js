@@ -32,6 +32,8 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
     function analyzePython(source) {
 
         complexityCalculatorState.resetState();
+        complexityCalculatorState.setProperty("listFuncs",['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
+        complexityCalculatorState.setProperty('studentCode',source.split("\n"));
 
         //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
         userFunctionReturns = starterReturns.slice(0);
@@ -49,6 +51,7 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
         };
         isJavascript = false;
 
+        
         //PASS 0: efficient originality
         complexityCalculator.checkOriginality();
         //PASS 1: Do the same thing for function returns from user-defined functions
@@ -76,7 +79,7 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
         // translateIntegerValues(resultsObject);   //translate the calculated values
         complexityCalculatorHelperFunctions.lineDict();
         results = resultsObject;
-        caiErrorHandling.updateNames(allVariables, userFunctionParameters);
+        caiErrorHandling.updateNames(complexityCalculatorState.getProperty('allVariables'), complexityCalculatorState.getProperty('userFunctionParameters'));
         return resultsObject;
     }
 

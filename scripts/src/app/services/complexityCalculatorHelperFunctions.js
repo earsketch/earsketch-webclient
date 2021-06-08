@@ -619,7 +619,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
 
 
     /* Get the most recent assigned value of a variable
-    * @param variableObj - the complexityCalculatorState.getStateProperty("allVariables")() item representing the variable
+    * @param variableObj - the complexityCalculatorState.getProperty("allVariables") item representing the variable
     * @lineno - the line number from which we are inquiring - needed because variable values change over time
     * @returns AST node representing the most likely most recent value assigned to this variable
     */
@@ -1983,7 +1983,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
         if (node._astname === "Subscript") {
             if (node.slice._astname === "Index" || node.slice._astname === "Slice") {
                 if (node.value._astname === "Str") {
-                    return [true,  complexityCalculatorState.getStateProperty("originalityLines").includes(node.lineno)];
+                    return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)];
                 }
                 if (node.value._astname === "Subscript") {
                     return (getStringIndexing(node.value));
@@ -2034,7 +2034,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
 
             if (node._astname === "Subscript" && node.slice._astname === "Index") {//if the thing we're indexing is a list, return true
                 if (node.value._astname === "List") {
-                    return [true,  complexityCalculatorState.getStateProperty("originalityLines").includes(node.lineno)];
+                    return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)];
                 }
                 //is it a binop that resolves to a list?
                 if (node.value._astname === "BinOp" && Array.isArray(recursivelyAnalyzeBinOp(node.value))) {
@@ -2162,11 +2162,11 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
         //special cases: min, max, and choice count as indexing for our purposes
         if (node._astname === "Call" && 'id' in node.func && (node.func.id.v === "min" || node.func.id.v === "max")) {
 
-            return [true,  complexityCalculatorState.getStateProperty("originalityLines").includes(node.lineno)];
+            return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)];
         }
         if (node._astname === "Call" && 'attr' in node.func && node.func.attr.v === "choice") {
 
-            return [true,  complexityCalculatorState.getStateProperty("originalityLines").includes(node.lineno)];
+            return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)];
         }
 
         if (node._astname === "Subscript") {
@@ -2217,9 +2217,9 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
 
         //adjustment if we're in a loop
         //basically, if the op happens in a loop, we consider it to start at the loop's first line
-        for (var p in  complexityCalculatorState.getStateProperty("loopLocations")) {
-            if (lineno >=  complexityCalculatorState.getStateProperty("loopLocations")[p][0] && lineno <=  complexityCalculatorState.getStateProperty("loopLocations")[p][1]) {
-                lineno =  complexityCalculatorState.getStateProperty("loopLocations")[p][0];
+        for (var p in  complexityCalculatorState.getProperty("loopLocations")) {
+            if (lineno >=  complexityCalculatorState.getProperty("loopLocations")[p][0] && lineno <=  complexityCalculatorState.getProperty("loopLocations")[p][1]) {
+                lineno =  complexityCalculatorState.getProperty("loopLocations")[p][0];
                 break;
             }
         }
@@ -2391,7 +2391,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
             else {
                 //otherwise, we check for a decimal point in the actual line of code.
                 var strVal = String(node.n.v);
-                var lineString = studentCode[sourceIndex];
+                var lineString = complexityCalculatorState.getProperty('studentCode')[sourceIndex];
                 var valueIndex = node.col_offset;
                 var valToTrim = lineString.substring(valueIndex);
                 var valueString = "";
@@ -2415,7 +2415,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
     }
 
 
-    /* Handles the addition of information about conditional lines to  complexityCalculatorState.getStateProperty("allConditionals")()
+    /* Handles the addition of information about conditional lines to  complexityCalculatorState.getProperty("allConditionals")()
     * @param node - the conditional AST node
     */
     function notateConditional(node) {
@@ -2502,19 +2502,19 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
         }
 
         //is this a child node?
-        var isChild = findParent(node.lineno, lastLine,  complexityCalculatorState.getStateProperty("allConditionals")());
+        var isChild = findParent(node.lineno, lastLine,  complexityCalculatorState.getProperty("allConditionals"));
         //go through, replacing isChild with the object its a child of if found
         if (isChild != null) {
             for (var i in newObjects) {
-                if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end,  complexityCalculatorState.getStateProperty("allConditionals")())) {
-                    pushParent(newObjects[i], isChild.start, isChild.end,  complexityCalculatorState.getStateProperty("allConditionals")());
+                if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end,  complexityCalculatorState.getProperty("allConditionals"))) {
+                    pushParent(newObjects[i], isChild.start, isChild.end,  complexityCalculatorState.getProperty("allConditionals"));
                 }
             }
         }
         else {
             for (var i in newObjects) {
-                if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end,  complexityCalculatorState.getStateProperty("allConditionals")())) {
-                     complexityCalculatorState.getStateProperty("allConditionals")().push(newObjects[i]);
+                if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end,  complexityCalculatorState.getProperty("allConditionals"))) {
+                     complexityCalculatorState.getProperty("allConditionals").push(newObjects[i]);
                 }
             }
         }
@@ -2805,7 +2805,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
 
     /**
      * Recursively analyze a python abstract syntax tree and build a simplified, partially canonicalized AST for equivalence use and MAYBE edit distance, depending on how much time Erin has.
-     *DO NOT CALL THIS FUNCTION until AFTER complexityCalculatorState.getStateProperty("allVariables")() and userDefinedFunctions have been filled (i.e., only call from AnalyzePythonNode)! These are used to get variable datatypes.
+     *DO NOT CALL THIS FUNCTION until AFTER complexityCalculatorState.getProperty("allVariables") and userDefinedFunctions have been filled (i.e., only call from AnalyzePythonNode)! These are used to get variable datatypes.
      * @param node {AST Node} The node to canonicalize
      */
     function buildSimplifiedAST(node) {
@@ -3258,7 +3258,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
                         varName = binOp.left.split(':')[1];
                         var leftVar = getVariableObject(varName);
                         if (leftVar != null) {
-                            // if ( complexityCalculatorState.getStateProperty("allVariables")()[i].containedValue != null && complexityCalculatorState.getStateProperty("allVariables")()[i].containedValue !== "") {
+                            // if ( complexityCalculatorState.getProperty("allVariables")[i].containedValue != null && complexityCalculatorState.getProperty("allVariables")[i].containedValue !== "") {
                             if (leftVar.value == "List") {
                                 binOp.left = leftVar.containedValue;
                             }
@@ -3928,23 +3928,23 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
             }
         }
 
-        //do the same thing with complexityCalculatorState.getStateProperty("allVariables")()
-        for (j = 0; j < complexityCalculatorState.getStateProperty("allVariables")().length; j++) {
+        //do the same thing with complexityCalculatorState.getProperty("allVariables")
+        for (j = 0; j < complexityCalculatorState.getProperty("allVariables").length; j++) {
 
-            if (typeof complexityCalculatorState.getStateProperty("allVariables")()[j].value != 'string' || complexityCalculatorState.getStateProperty("allVariables")()[j].value === "" || complexityCalculatorState.getStateProperty("allVariables")()[j].value === "BinOp" || complexityCalculatorState.getStateProperty("allVariables")()[j].value === "Subscript") {
+            if (typeof complexityCalculatorState.getProperty("allVariables")[j].value != 'string' || complexityCalculatorState.getProperty("allVariables")[j].value === "" || complexityCalculatorState.getProperty("allVariables")[j].value === "BinOp" || complexityCalculatorState.getProperty("allVariables")[j].value === "Subscript") {
                 allFilled = false;
             }
 
-            if ( complexityCalculatorState.getStateProperty("allVariables")()[j].value === "List" && complexityCalculatorState.getStateProperty("allVariables")()[j].containedValue != null) {
-                for (var k = 0; k < complexityCalculatorState.getStateProperty("allVariables")()[j].containedValue.length; k++) {
-                    if ( complexityCalculatorState.getStateProperty("allVariables")()[j].containedValue[k].includes(':')) {
+            if ( complexityCalculatorState.getProperty("allVariables")[j].value === "List" && complexityCalculatorState.getProperty("allVariables")[j].containedValue != null) {
+                for (var k = 0; k < complexityCalculatorState.getProperty("allVariables")[j].containedValue.length; k++) {
+                    if ( complexityCalculatorState.getProperty("allVariables")[j].containedValue[k].includes(':')) {
                         allFilled = false;
                         break;
                     }
                 }
 
-                for (var p in complexityCalculatorState.getStateProperty("allVariables")()[j].assignedModified) {
-                    if (!Array.isArray( complexityCalculatorState.getStateProperty("allVariables")()[j].assignedModified[p].binop) && (typeof complexityCalculatorState.getStateProperty("allVariables")()[j].assignedModified[p].binop !== "string")) {
+                for (var p in complexityCalculatorState.getProperty("allVariables")[j].assignedModified) {
+                    if (!Array.isArray( complexityCalculatorState.getProperty("allVariables")[j].assignedModified[p].binop) && (typeof complexityCalculatorState.getProperty("allVariables")[j].assignedModified[p].binop !== "string")) {
                         allFilled = false;
                     }
                 }
@@ -3960,8 +3960,8 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
 
     //Finds Variable object given the variable name. If not found, returns null.
     function getVariableObject(variableName) {
-        for (var r = 0; r < complexityCalculatorState.getStateProperty("allVariables")().length; r++) {
-            if ( complexityCalculatorState.getStateProperty("allVariables")()[r].name === variableName) { return complexityCalculatorState.getStateProperty("allVariables")()[r]; }
+        for (var r = 0; r < complexityCalculatorState.getProperty("allVariables").length; r++) {
+            if ( complexityCalculatorState.getProperty("allVariables")[r].name === variableName) { return complexityCalculatorState.getProperty("allVariables")[r]; }
         }
         return null;
     }
@@ -4063,8 +4063,8 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
 
     //Finds Variable object given the variable name. If not found, returns null.
     function getVariableObject(variableName) {
-        for (var r = 0; r < complexityCalculatorState.getStateProperty("allVariables").length; r++) {
-            if (omplexityCalculatorState.getStateProperty("allVariables")[r].name === variableName) { return omplexityCalculatorState.getStateProperty("allVariables")[r]; }
+        for (var r = 0; r < complexityCalculatorState.getProperty("allVariables").length; r++) {
+            if (complexityCalculatorState.getProperty("allVariables")[r].name === variableName) { return complexityCalculatorState.getProperty("allVariables")[r]; }
         }
         return null;
     }
@@ -4101,7 +4101,7 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
         lineDictionary = [];
 
         //initialize array values
-        for (var i in studentCode) {
+        for (var i in complexityCalculatorState.getProperty('studentCode')) {
             lineDictionary.push({ line: Number(i) + 1, variables: [], loop: 0, calls: [], ifElse: [] });
         }
 
@@ -4119,37 +4119,37 @@ app.factory('complexityCalculatorHelperFunctions', ['complexityCalculatorState',
         }
 
         //note every time a variable is assigned or modified
-        for (var v in variableAssignments) {
-            var index = variableAssignments[v].line - 1;
-            var variableVal = getVariableObject(variableAssignments[v].name);
+        for (var v in complexityCalculatorState.getProperty('variableAssignments')) {
+            var index = complexityCalculatorState.getProperty('variableAssignments')[v].line - 1;
+            var variableVal = getVariableObject(complexityCalculatorState.getProperty('variableAssignments')[v].name);
             if (lineDictionary[index] != null) {
                 lineDictionary[index].variables.push(variableVal);
             }
         }
 
-        for (var loop in  complexityCalculatorState.getStateProperty("loopLocations")) {
+        for (var loop in  complexityCalculatorState.getProperty("loopLocations")) {
             //track the begin points of each loop
-            var index =  complexityCalculatorState.getStateProperty("loopLocations")[loop][0] - 1;
-            lineDictionary[index].loopStart =  complexityCalculatorState.getStateProperty("loopLocations")[loop];
+            var index =  complexityCalculatorState.getProperty("loopLocations")[loop][0] - 1;
+            lineDictionary[index].loopStart =  complexityCalculatorState.getProperty("loopLocations")[loop];
 
             //note which lines are in one or more loops
-            for (var loopLine =  complexityCalculatorState.getStateProperty("loopLocations")[loop][0] - 1; loopLine <=  complexityCalculatorState.getStateProperty("loopLocations")[loop][1] - 1; loopLine++) {
+            for (var loopLine =  complexityCalculatorState.getProperty("loopLocations")[loop][0] - 1; loopLine <=  complexityCalculatorState.getProperty("loopLocations")[loop][1] - 1; loopLine++) {
                 if (lineDictionary[loopLine] != null) {
                     lineDictionary[loopLine].loop += 1;
                 }
             }
         }
 
-        for (var call in allCalls) {
-            var index = allCalls[call].line - 1;
+        for (var call in complexityCalculatorState.getProperty('allCalls')) {
+            var index = complexityCalculatorState.getProperty('allCalls')[call].line - 1;
             if (lineDictionary[index] != null) {
-                lineDictionary[index].calls.push(allCalls[call]);
+                lineDictionary[index].calls.push(complexityCalculatorState.getProperty('allCalls')[call]);
             }
         }
 
         //nested if else statements
         var levels = [];
-        fillLevels( complexityCalculatorState.getStateProperty("allConditionals")(), levels);
+        fillLevels( complexityCalculatorState.getProperty("allConditionals"), levels);
 
         //remove overlap in levels
         for (var i in levels) {

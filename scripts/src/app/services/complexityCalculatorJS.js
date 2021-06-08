@@ -11,6 +11,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         //  try {
 
         complexityCalculatorState.resetState();
+        complexityCalculatorState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
 
         var ast = acorn.parse(source, {
             locations: true
@@ -21,7 +22,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         createListFuncs = JS_LIST_FUNCS;
         createStrFuncs = JS_STR_FUNCS;
 
-        studentCode = source.split("\n");
+        complexityCalculatorState.setProperty('studentCode', source.split("\n"));
 
         //handle this like you'd handle python.
         var newAST = convertASTTree(ast);
@@ -71,7 +72,7 @@ app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator
         // translateIntegerValues(resultsObject);
         complexityCalculatorHelperFunctions.lineDict();
         results = resultsObject;
-        caiErrorHandling.updateNames(allVariables, userFunctionParameters);
+        caiErrorHandling.updateNames(complexityCalculatorState.getProperty('allVariables'), complexityCalculatorState.getProperty('userFunctionParameters'));
         return resultsObject;
     }
 
