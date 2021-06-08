@@ -58,7 +58,6 @@ module.exports = {
             scriptVersionController: path.resolve(__dirname,`${appDir}/scriptVersionController.js`),
             shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
             submitAWSController: path.resolve(__dirname,`${appDir}/submitAWSController.js`),
-            downloadController: path.resolve(__dirname,`${appDir}/downloadController.js`),
             renameController: path.resolve(__dirname,`${appDir}/renameController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             promptController: path.resolve(__dirname,`${appDir}/promptController.js`),

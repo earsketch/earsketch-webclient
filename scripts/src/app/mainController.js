@@ -3,6 +3,7 @@ import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
 import { ChangePassword } from './ChangePassword'
 import * as collaboration from './collaboration'
+import { Download } from './Download'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as exporter from './exporter'
@@ -30,6 +31,7 @@ app.component("forgotpasswordController", wrapModal(ForgotPassword))
 app.component("analyzeScriptController", wrapModal(ScriptAnalysis))
 app.component("editProfileController", wrapModal(ProfileEditor))
 app.component("changepasswordController", wrapModal(ChangePassword))
+app.component("downloadController", wrapModal(Download))
 
 /**
  * @module mainController
@@ -909,8 +911,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.downloadScript = script => {
         $uibModal.open({
-            templateUrl: 'templates/download.html',
-            controller: 'downloadController',
+            component: 'downloadController',
             resolve: {
                 script() { return script; },
                 quality() { return $scope.audioQuality; }

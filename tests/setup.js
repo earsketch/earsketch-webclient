@@ -219,7 +219,6 @@ require('ideController');
 require('promptController');
 require('uploadController');
 require('renameController');
-require('downloadController');
 require('shareScriptController');
 require('scriptVersionController');
 require('userHistoryController');
