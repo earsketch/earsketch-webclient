@@ -235,11 +235,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         userNotification.state.isInLoadingScreen = true;
     };
 
-    $scope.downloadSpinnerClick = function () {
-        esconsole('***** downloadSpinnerClick *****');
-        document.getElementById('download-loader').style.display = 'none';
-    };
-
     /**
      *
      * @param compress
