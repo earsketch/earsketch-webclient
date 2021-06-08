@@ -13,7 +13,7 @@ export interface ScriptEntity {
     collaborators: any // Should be string[] but server can give other data types such as undefined and string
     imported: boolean
     isShared: boolean
-    run_status: string
+    run_status: number
     readonly: boolean
     creator: string
     file_location?: string
@@ -21,6 +21,7 @@ export interface ScriptEntity {
     original_id?: string
     description?: string
     soft_delete?: boolean | string
+    activeUsers?: string | string[]
 }
 
 // Note: How about collaborative?

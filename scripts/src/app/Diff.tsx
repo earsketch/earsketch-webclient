@@ -7,8 +7,8 @@ export const Diff = ({ original, modified }: { original: string, modified: strin
         if (!element.current) return
 
         // Perform diff.
-        const newLines = difflib.stringAsLines(original)
-        const baseLines = difflib.stringAsLines(modified)
+        const newLines = difflib.stringAsLines(modified)
+        const baseLines = difflib.stringAsLines(original)
         // This is a list of 3-tuples describing what changes should be made to the base text in order to yield the new text.
         const opcodes = (new difflib.SequenceMatcher(baseLines, newLines)).get_opcodes()
 
