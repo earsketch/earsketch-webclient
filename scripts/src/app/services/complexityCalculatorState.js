@@ -1,9 +1,5 @@
-﻿/*
- * An angular factory for managing the state of the complexity calculator service.
- *
- * @module complexityCalculator
- * @author Jason Smith, Erin Truesdell
- */
+﻿
+// An angular factory for managing the state of the complexity calculator service.
 app.factory('complexityCalculatorState', ['userNotification', function (userNotification) {
 
 

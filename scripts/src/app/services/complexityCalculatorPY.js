@@ -1,44 +1,24 @@
-﻿/*
- * An angular factory for processing Python code through the complexity calculator service.
- *
- * @module complexityCalculator
- * @author Jason Smith, Erin Truesdell
- */
+﻿// An angular factory for processing Python code through the complexity calculator service.
 app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', 'complexityCalculatorState', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions, complexityCalculatorState) {
-
-    /**
-    * Build the abstract syntax tree for Python. Useful for analyzing script
-    * complexity or looking for specific function call e.g. onLoop().
-    *
-    * @param source {String} The source code to analyze.
-    * @private
-    */
-    function generateAst(source) {
+   	// Build the abstract syntax tree for Python.
+    function generateAst(source_code) {
         try {
-            var parse = Sk.parse("<analyzer>", source);
-            studentCode = source.split("\n");
+            var parse = Sk.parse("<analyzer>", source_code);
+            studentCode = source_code.split("\n");
             return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags);
         } catch (error) {
-            //userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5);
             throw error;
         }
     }
 
-    /**
-     * Analyze the source code of a Python script.
-     * @param source {String} The source code to analyze.
-     * @returns {Object} A summary of the analysis.
-     */
-    function analyzePython(source) {
-
+    // Analyze the source code of a Python script.
+    function analyzePython(source_code) {
         complexityCalculatorState.resetState();
         complexityCalculatorState.setProperty("listFuncs",['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
-        complexityCalculatorState.setProperty('studentCode',source.split("\n"));
-
+        complexityCalculatorState.setProperty('studentCode',source_code.split("\n"));
         //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
         userFunctionReturns = starterReturns.slice(0);
-
-        var ast = generateAst(source);
+        var ast = generateAst(source_code);
         complexityCalculatorHelperFunctions.replaceNumericUnaryOps(ast.body);
         //initialize the results object
         var resultsObject = {
@@ -49,9 +29,7 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
             variables: 0,
             consoleInput: 0
         };
-        isJavascript = false;
-
-        
+        isJavascript = false;        
         //PASS 0: efficient originality
         complexityCalculator.checkOriginality();
         //PASS 1: Do the same thing for function returns from user-defined functions
@@ -75,7 +53,6 @@ app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator
         if (resultsObject.comparisons > resultsObject.booleans) {
             resultsObject.booleans = resultsObject.comparisons;
         }
-
         // translateIntegerValues(resultsObject);   //translate the calculated values
         complexityCalculatorHelperFunctions.lineDict();
         results = resultsObject;
