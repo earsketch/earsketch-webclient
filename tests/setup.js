@@ -225,7 +225,6 @@ require('scriptVersionController');
 require('userHistoryController');
 
 require('createAccountController');
-require('changePasswordController');
 require('adminWindowController');
 require('submitAWSController');
 

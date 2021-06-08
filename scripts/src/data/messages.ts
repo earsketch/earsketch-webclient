@@ -133,7 +133,7 @@ const ESMessages = {
     },
     "changepassword" : {
         "pwdauth": "Old password wrong. Password could not be changed.",
-        "pwdfail": "Your password confirmation was not the same as your password. Password could not be changed.",
+        "pwdfail": "Your password confirmation is not the same as your password.",
         "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
         "timeout": "Timeout communication error ...",
         "passwordsuccess": "Password changed succesfully ...",

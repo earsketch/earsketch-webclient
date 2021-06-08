@@ -1,6 +1,7 @@
 import * as appState from '../app/appState';
 import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
+import { ChangePassword } from './ChangePassword'
 import * as collaboration from './collaboration'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
@@ -28,6 +29,7 @@ import * as userProject from './userProject';
 app.component("forgotpasswordController", wrapModal(ForgotPassword))
 app.component("analyzeScriptController", wrapModal(ScriptAnalysis))
 app.component("editProfileController", wrapModal(ProfileEditor))
+app.component("changepasswordController", wrapModal(ChangePassword))
 
 /**
  * @module mainController
@@ -580,11 +582,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.changePassword = function () {
-        $uibModal.open({
-            templateUrl: 'templates/change-password.html',
-            controller: 'changepasswordController',
-            scope: $scope
-        });
+        $uibModal.open({ component: 'changepasswordController' });
     };
 
     $scope.editProfile = function () {

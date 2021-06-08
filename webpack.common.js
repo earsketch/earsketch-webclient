@@ -54,7 +54,6 @@ module.exports = {
             ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
             createAccountController: path.resolve(__dirname,`${appDir}/createaccountController.js`),
-            changePasswordController: path.resolve(__dirname,`${appDir}/changepasswordController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             scriptVersionController: path.resolve(__dirname,`${appDir}/scriptVersionController.js`),
             shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
