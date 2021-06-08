@@ -11,6 +11,7 @@ import * as pitchshift from "./pitchshifter"
 import * as userConsole from "./userconsole"
 import { Clip, DAWData, Track } from "./player"
 import { AugmentedBuffer } from "./audiolibrary"
+import i18n from "i18next";
 
 export let testRun = false
 
@@ -146,10 +147,10 @@ export async function importPython(code: string, quality: number) {
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
     Sk.builtins["init"] = new Sk.builtin.func(() => {
-        throw new Error("init()" + ESMessages.interpreter.noimport)
+        throw new Error("init()" + i18n.t('messages:interpreter.noimport'))
     })
     Sk.builtins["finish"] = new Sk.builtin.func(() => {
-        throw new Error("finish()" + ESMessages.interpreter.noimport)
+        throw new Error("finish()" + i18n.t('messages:interpreter.noimport'))
     })
     Sk.builtins["__AUDIO_QUALITY"] = false
 

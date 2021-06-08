@@ -13,6 +13,7 @@ import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 import * as WaveformCache from './waveformcache';
+import i18n from "i18next";
 
 const ACE_THEMES = {
     light: "ace/theme/chrome",
@@ -552,7 +553,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
             reporter.compile(language, true, undefined, duration);
 
-            userNotification.showBanner(ESMessages.interpreter.runSuccess, 'success');
+            userNotification.showBanner(i18n.t('messages:interpreter.runSuccess'), 'success');
 
             $scope.saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL);
 
@@ -617,7 +618,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             var errType = String(err).split(":")[0];
             reporter.compile(language, false, errType, duration);
 
-            userNotification.showBanner(ESMessages.interpreter.runFailed, 'failure1');
+            userNotification.showBanner(i18n.t('messages:interpreter.runFailed'), 'failure1');
 
             $scope.saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL);
 

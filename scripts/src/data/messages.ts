@@ -1,10 +1,5 @@
 const ESMessages = {
-
-    "interpreter": {
-        "runSuccess": 'Script ran successfully! Click the play button to hear your music.',
-        "runFailed": 'There are one or more errors in your script. Look at the console for details.',
-        "noimport": ' is undefined. Perhaps "from earsketch import *" is missing.'
-    },
+    
     "dawservice": {
         "effecttrackwarning": "Adding an effect track before the audio track is created"
     },
