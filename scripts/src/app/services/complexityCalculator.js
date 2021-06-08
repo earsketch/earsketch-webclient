@@ -749,9 +749,8 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         }
     }
 
-    /* Handles re-visiting all of the variables, functions, and subscript values where we didn't know the datatype at the time
-    * Traverses through lists of function and variable objects, and finds values for those that don't have them
-    */
+    // Handles re-visiting all of the variables, functions, and subscript values where we didn't know the datatype at the time
+    // Traverses through lists of function and variable objects, and finds values for those that don't have them
     function evaluateAllEmpties() {
         //function objects
         for (var r = 0; r < complexityCalculatorState.getProperty('userFunctionReturns').length; r++) {
@@ -1173,10 +1172,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         }
     }
 
-    /* If a BinOp node contains a number of lists, consolidates these into a single array for use in analysis
-    * @param node - the BinOp node
-    * @returns - An array of AST nodes representing the output of the BinOp
-    */
+    // If a BinOp node contains a number of lists, consolidates these into a single array for use in analysis
     function getAllBinOpLists(node) {
         function recursivelyGetListValues(node, combinedList) {
             var leftNode = node.left;
@@ -1249,11 +1245,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         return combined;
     }
 
-
-    /*Finds out if a node in a user-defined functioncomplexityCalculatorState.getProperty('returns')a value, andcomplexityCalculatorState.getProperty('returns')that
-    * @param node - the AST node
-    * @returns function object populated with necessary values.
-    */
+    // Finds out if a node in a user-defined functioncomplexityCalculatorState.getProperty('returns')a value, andcomplexityCalculatorState.getProperty('returns')that
     function findReturnInBody(node, functionObject) {
         if (node != null && node._astname != null) {
             //variable init
@@ -1625,10 +1617,7 @@ app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorSt
         return functionObject;
     }
 
-    /*Checks a single node for a function definition and adds name to the list if it finds one
-    * @param node - The AST node to check
-    * @param results - the results object
-    */
+    // Checks a single node for a function definition and adds name to the list if it finds one
     function checkForFunctions(node, results) {
         //again, some things don't get recursively checked automatically, so we manually call that here
         if (node != null && node._astname != null && 'test' in node) {
