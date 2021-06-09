@@ -139,7 +139,6 @@ require(['angular'], () => {
 
     require('createAccountController');
     require('changePasswordController');
-    require('editProfileController');
     require('adminWindowController');
     require('submitAWSController');
 

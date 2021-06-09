@@ -53,7 +53,7 @@ export const openScripts: string[] = []
 const openSharedScripts: string[] = []
 
 // Helper functions for making API requests.
-function form(obj: { [key: string]: string | Blob }={}) {
+export function form(obj: { [key: string]: string | Blob }={}) {
     const data = new FormData()
     for (const [key, value] of Object.entries(obj)) {
         data.append(key, value)
@@ -567,7 +567,7 @@ export async function getLicenses() {
 
 export async function getUserInfo(username_?: string, password?: string) {
     esconsole("Get user info " + " for " + username_, "debug")
-    const data: { [key: string]: string } = (username_ && password) ? { username: username_, password: btoa(password) } : {}
+    const data: { [key: string]: string } = { username: username_ ?? getUsername(), password: password ? btoa(password) : getPassword() }
     const { username, email, first_name, last_name, role } = await postForm("/services/scripts/getuserinfo", data)
     return { username, email, firstname: first_name ?? "", lastname: last_name ?? "", role }
 }
