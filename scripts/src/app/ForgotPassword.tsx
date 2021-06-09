@@ -3,19 +3,21 @@ import React, { useState } from "react"
 import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as userNotification from "./userNotification"
+import { useTranslation } from "react-i18next";
 
 export const ForgotPassword = ({ close }: { close: () => void }) => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState("")
 
     const resetPassword = () => {
         const url = URL_DOMAIN + '/services/scripts/resetpwd?email=' + encodeURIComponent(email)
         fetch(url).then(response => {
             if (response.ok) {
-                esconsole(ESMessages.forgotpassword.success, "info")
-                userNotification.show("Please check your e-mail for a message from EarSketch to reset your password.", "success", 3.5)
+                esconsole(t('messages:forgotpassword.success'), "info")
+                userNotification.show(t('messages:forgotpassword.success'), "success", 3.5)
             } else {
-                esconsole(ESMessages.forgotpassword.fail, "info")
-                userNotification.show("The email address you entered is not valid or is not associated with an EarSketch account.", "failure1", 3.5)
+                esconsole(t('messages:forgotpassword.fail'), "info")
+                userNotification.show(t('messages:forgotpassword.fail'), "failure1", 3.5)
             }
         })
         close()

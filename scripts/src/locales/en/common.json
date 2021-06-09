@@ -72,6 +72,10 @@
       "nopassword": "Please enter the password.",
       "servertimeout": "The was some problem at our end. Please try again.",
       "unexpectederror": "Unexpected error. Please try again or report error from the options menu."
+    },
+    "forgotpassword" : {
+      "fail": "The email address you entered is not valid or is not associated with an EarSketch account.",
+      "success": "Please check your e-mail for a message from EarSketch to reset your password."
     }
   }
 }

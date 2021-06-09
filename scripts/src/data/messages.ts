@@ -55,10 +55,6 @@ const ESMessages = {
         "commerror": "Communication error ...",
         "commerror2": "Communication error ..."
     },
-    "forgotpassword" : {
-        "fail": "Forgot Password failed...",
-        "success": "Password Reset instructions was successfully sent to your email ..."
-    },
     "shareScript": {
         "menuDescriptions": {
             "viewOnly": "I want someone to see my script. (They cannot edit.)",
