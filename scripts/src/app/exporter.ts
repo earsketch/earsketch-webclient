@@ -9,29 +9,32 @@ import ESMessages from "../data/messages"
 import { DAWData } from "./player"
 import * as renderer from "./renderer"
 
-// Make a dummy anchor for downloading the script as text.
+// Make a dummy anchor for downloading blobs.
 let dummyAnchor = document.createElement("a")
 document.body.appendChild(dummyAnchor)
 dummyAnchor.style.display = "none"
 
-// Export the script as a text file.
-export function text(script: ScriptEntity) {
-    esconsole("Downloading script locally.", ["debug", "exporter"])
-    const blob = new Blob([script.source_code], { type: "text/plain" })
+function download(name: string, blob: Blob) {
     const url = window.URL.createObjectURL(blob)
-    // Download the script.
     dummyAnchor.href = url
-    dummyAnchor.download = script.name
+    dummyAnchor.download = name
     dummyAnchor.target = "_blank"
     esconsole("File location: " + url, ["debug", "exporter"])
     dummyAnchor.click()
 }
 
-async function compile(script: ScriptEntity, quality: number) {
+// Export the script as a text file.
+export function text(script: ScriptEntity) {
+    esconsole("Downloading script locally.", ["debug", "exporter"])
+    const blob = new Blob([script.source_code], { type: "text/plain" })
+    download(script.name, blob)
+}
+
+async function compile(script: ScriptEntity, quality: boolean) {
     const lang = ESUtils.parseLanguage(script.name)
     let result
     try {
-        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code, quality)
+        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code, +quality)
     } catch {
         throw ESMessages.download.compileerror
     }
@@ -42,35 +45,28 @@ async function compile(script: ScriptEntity, quality: number) {
 }
 
 // Exports the script as an audio file.
-async function exportAudio(script: ScriptEntity, quality: number, type: string, render: (result: DAWData) => Promise<Blob>) {
+async function exportAudio(script: ScriptEntity, quality: boolean, type: string, render: (result: DAWData) => Promise<Blob>) {
     const name = ESUtils.parseName(script.name)
     const result = await compile(script, quality)
-
-    let blob
     try {
-        blob = await render(result)
+        const blob = await render(result)
+        esconsole(`Ready to download ${type} file.`, ["debug", "exporter"])
+        download(`${name}.${type}`, blob)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
         throw ESMessages.download.rendererror
     }
-
-    esconsole(`Ready to download ${type} file.`, ["debug", "exporter"])
-    // save the file locally without sending to the server.
-    return {
-        path: (window.URL || window.webkitURL).createObjectURL(blob),
-        name: `${name}.${type}`,
-    }
 }
 
-export function wav(script: ScriptEntity, quality: number) {
+export function wav(script: ScriptEntity, quality: boolean) {
     return exportAudio(script, quality, "wav", renderer.renderWav)
 }
 
-export function mp3(script: ScriptEntity, quality: number) {
+export function mp3(script: ScriptEntity, quality: boolean) {
     return exportAudio(script, quality, "mp3", renderer.renderMp3)
 }
 
-export async function multiTrack(script: ScriptEntity, quality: number) {
+export async function multiTrack(script: ScriptEntity, quality: boolean) {
     const result = await compile(script, quality)
     const name = ESUtils.parseName(script.name)
 
@@ -106,20 +102,12 @@ export async function multiTrack(script: ScriptEntity, quality: number) {
     }
     await Promise.all(promises)
 
-    if (ESUtils.whichBrowser().includes("Safari")) {
-        // TODO: Why is this exception here? Does it work? Is it still necessary?
-        return zip.generateAsync({ type: "base64" })
-    } else {
-        const blob = await zip.generateAsync({ type: "blob" })
-        return {
-            path: (window.URL || window.webkitURL).createObjectURL(blob),
-            name: name + ".zip",
-        }
-    }
+    const blob = await zip.generateAsync({ type: "blob" })
+    download(`${name}.zip`, blob)
 }
 
 // Export the script to SoundCloud using the SoundCloud SDK.
-export async function soundcloud(script: ScriptEntity, quality: number, scData: any) {
+export async function soundcloud(script: ScriptEntity, quality: boolean, scData: any) {
     esconsole("Requesting SoundCloud Access...", ["debug", "exporter"])
     await SC.connect()
 
