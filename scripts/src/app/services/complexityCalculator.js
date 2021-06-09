@@ -1,5 +1,8 @@
-﻿// An angular factory service for parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
-app.factory('complexityCalculator', ['userNotification', 'complexityCalculatorState', 'complexityCalculatorHelperFunctions', function complexityCalculator(userNotification, complexityCalculatorState, complexityCalculatorHelperFunctions) {
+import * as complexityCalculatorState from '../../cai/complexityCalculatorState';
+import * as complexityCalculatorHelperFunctions from '../../cai/complexityCalculatorHelperFunctions';
+
+// An angular factory service for parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
+app.factory('complexityCalculator', [function complexityCalculator() {
     //variable init
     var sampleLines = complexityCalculatorState.sampleCode.slice(0);
 

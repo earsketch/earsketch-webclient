@@ -1,10 +1,12 @@
 import {CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI} from 'codeRecommendations';
+import * as caiProjectModel from "../../cai/projectModel"
+
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', 'caiProjectModel', function (caiAnalysisModule, complexityCalculator, caiProjectModel) {
+app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', function (caiAnalysisModule, complexityCalculator) {
 
     var currentDelta = { soundsAdded: [], sections: 0 };
     var currentDeltaSum = 0;

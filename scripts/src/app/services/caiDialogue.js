@@ -1,11 +1,16 @@
-﻿import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree';
-import { current } from 'immer';
-/**
+﻿/**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender', 'userProject', 'caiStudentPreferenceModule', 'caiStudentHistoryModule', 'caiProjectModel', function (codeSuggestion, caiErrorHandling, recommender, userProject, caiStudentPreferenceModule, caiStudentHistoryModule, caiProjectModel) {
+import * as caiErrorHandling from "../../cai/errorHandling"
+import * as caiStudentPreferenceModule from "../../cai/studentPreferences"
+import * as caiProjectModel from "../../cai/projectModel"
+import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree'
+import * as recommender from '../recommender'
+import * as userProject from '../userProject'
+
+app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', function (codeSuggestion, caiStudentHistoryModule) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};
@@ -476,7 +481,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
                 if (model[keys[j]].length < options.length) {
                     var newNode = Object.assign({}, templateNode);
                     newNode["id"] = tempID;
-                    newNode["title"] = caiProjectModel.propertyButtons[keys[j]];
+                    newNode["title"] = caiProjectModel.getPropertyButtons()[keys[j]];
                     newNode["parameters"] = { property: keys[j] };
                     caiTree.push(newNode);
                     buttons.push({ label: newNode.title, value: newNode.id });
@@ -605,11 +610,14 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function addToNodeHistory(nodeObj) {
-        if (nodeHistory[activeProject]) {
+        if (FLAGS.SHOW_CAI && nodeHistory[activeProject]) {
             nodeHistory[activeProject].push(nodeObj);
             codeSuggestion.storeHistory(nodeHistory[activeProject]);
-            if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0)
+            if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0) {
                 userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1]);
+            }
+            console.log("node history", nodeHistory);
+
         }
     }
 
@@ -1057,7 +1065,6 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
             else {
                 addToNodeHistory([0, utterance, parameters]);
             }
-            console.log("node history", nodeHistory);
             // reconstituteNodeHistory();
         }
 
@@ -1095,9 +1102,7 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
     }
 
     function getLinks(utterance) {
-        // utterance = "like: \n\ndef myFunction(startMeasure, endMeasure):\n    [LINK|fitMedia](FILENAME, 1, startMeasure, endMeasure)\n\n    [LINK|fitMedia](FILENAME, 2, startMeasure, endMeasure)";
         var utteranceFirstHalf = utterance;
-        // var utteranceFirstHalf = utterance;
         var utteranceSecondHalf = "";
         var keyword = ""
         var link = ""
@@ -1106,17 +1111,13 @@ app.factory('caiDialogue', ['codeSuggestion', 'caiErrorHandling', 'recommender',
         //does one iterations/ assumes one appearance
         if (utterance.includes("[LINK")) {
             while (utterance.includes("[LINK")) {
-
                 keyword = utterance.substring(utterance.indexOf("[LINK") + 6, utterance.indexOf("]"));
-                // keyword = keyword.link("google.com")
                 link = LINKS[keyword];
                 utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"));
                 utteranceSecondHalf = utterance.substring(utterance.indexOf("]") + 1, utterance.length);
                 utterance = utteranceSecondHalf;
                 textPieces.push(utteranceFirstHalf);
                 keywordLinks.push([keyword, link]);
-
-                // console.log(utterance);
             }
         }
         else {

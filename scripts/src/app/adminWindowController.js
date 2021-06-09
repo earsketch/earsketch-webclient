@@ -3,7 +3,12 @@
  * Angular controller for admin services. Members can be addressed with $scope.name from JS, or just with name from within the controller-bound HTML.
  * @module adminWindowController
  */
-app.controller("adminwindowController", ['$scope', '$confirm', '$uibModalInstance', 'userProject', '$http', 'websocket', function ($scope, $confirm, $uibModalInstance, userProject, $http, websocket) {
+
+import esconsole from '../esconsole'
+import * as websocket from './websocket'
+import * as userProject from './userProject'
+
+app.controller("adminwindowController", ['$scope', '$confirm', '$uibModalInstance', '$http', function ($scope, $confirm, $uibModalInstance, $http) {
 
     userProject.getAllUserRoles().then(function(users) {
         $scope.users = users;

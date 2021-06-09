@@ -10,9 +10,6 @@
     <!-- Suppress favicon error -->
     <link rel="shortcut icon" href="favicon.ico">
 
-    <!-- Angular UI Layout -->
-    <link rel="stylesheet" type="text/css" href="scripts/lib/ui-layout.css">
-
     <!-- Google Font -->
     <link rel="stylesheet" type="text/css" href="fonts/lato/lato.css">
     <link rel="stylesheet" type="text/css" href="fonts/roboto/roboto.css">
@@ -148,7 +145,7 @@
         </div>
 
         <!-- temporary place for the app-generated notifications -->
-        <notification-bar ng-show="showText"></notification-bar>
+        <notification-bar></notification-bar>
 
         <!-- top-right icons -->
         <div id="top-header-nav-form">
@@ -164,7 +161,7 @@
 <!--                    <span class="sr-only">Keyboard Shortcuts</span>-->
 <!--                </button>-->
 <!--            </div>-->
-
+            <locale-selector ng-if="showLocaleSwitcher"></locale-selector>
             <!-- Font Size -->
             <div uib-dropdown dropdown-append-to-body>
                 <button uib-dropdown-toggle type="button" id="font-size-button" class="top-header-nav-button btn btn-xs btn-clear dropdown-toggle">
@@ -198,7 +195,7 @@
                     <i class="icon icon-bell" id="user-notification-icon"></i>
                     <div id="badge" ng-show="getNumUnread() > 0">{{getNumUnread()}}</div>
                 </div>
-                <notification-popup ng-show="showPopupText"></notification-popup>
+                <notification-popup></notification-popup>
             </div>
 
             <!-- user login menu -->
@@ -228,7 +225,7 @@
 
     <div class="flex-grow flex flex-row h-full overflow-hidden">
         <div id="main-container" ng-controller="ideController" ng-show="showIDE || showAll" ng-style="dynamicStyle(isEmbedded)"> <!-- container -->
-            <div ng-controller="layoutController" class="h-full">
+            <div class="h-full">
                 <!-- dummy -->
                 <div class="hidden" ui-layout="" ui-layout-loaded></div>
 
@@ -263,7 +260,7 @@
                                         <p>By: {{embeddedScriptUsername}}</p>
                                     </div>
 
-                                    <div editor class="flex flex-grow h-full max-h-full overflow-y-hidden"></div>
+                                    <editor class="flex flex-grow h-full max-h-full overflow-y-hidden"></editor>
                                 </div>
 
 <!--                                <span ng-show="isEmbedded" class="embedded-script-info" style="padding-top: 5px;"> Script: {{embeddedScriptName}}</span>-->
@@ -324,7 +321,9 @@
                             <curriculum style="height:inherit"></curriculum>
                         </div>
                         <div chatwindow id="chat-window" ng-show="showChatWindow"></div>
-                        <div caiwindow style="display:flex;" ng-if="enableCAI" id="chat-window" ng-show="showCAIWindow"></div>
+                        <div class="h-full" ng-show="showCAIWindow">
+                            <cai style="height:inherit"></cai>
+                        </div>
                     </div>
                 </div>
             </div>

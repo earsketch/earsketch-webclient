@@ -1,5 +1,13 @@
 import * as appState from '../app/appState';
+import audioContext from './audiocontext'
+import * as audioLibrary from './audiolibrary'
+import * as collaboration from './collaboration'
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
+import * as exporter from './exporter'
+import { ForgotPassword } from './ForgotPassword'
 import * as user from '../user/userState';
+import reporter from './reporter';
 import * as scripts from '../browser/scriptsState';
 import * as sounds from '../browser/soundsState';
 import * as recommenderState from '../browser/recommenderState';
@@ -8,11 +16,23 @@ import * as tabs from '../editor/tabState';
 import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
+import * as cai from '../cai/caiState';
+import { wrapModal } from '../helpers';
+import { ProfileEditor } from './ProfileEditor';
+import * as recommender from './recommender';
+import { ScriptAnalysis } from './ScriptAnalysis';
+import * as userNotification from './userNotification';
+import * as userProject from './userProject';
+
+// Temporary glue from $uibModal to React components.
+app.component("forgotpasswordController", wrapModal(ForgotPassword))
+app.component("analyzeScriptController", wrapModal(ScriptAnalysis))
+app.component("editProfileController", wrapModal(ProfileEditor))
 
 /**
  * @module mainController
  */
-app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', 'userProject', 'userNotification', 'ESUtils', '$q', '$confirm', '$sce', 'localStorage', 'reporter', 'colorTheme', 'collaboration', '$document', 'audioContext', 'audioLibrary', '$ngRedux', 'recommender', 'exporter', function ($rootScope, $scope, $http, $uibModal, $location, userProject, userNotification, ESUtils, $q, $confirm, $sce, localStorage, reporter, colorTheme, collaboration, $document, audioContext, audioLibrary, $ngRedux, recommender, exporter) {
+app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$q', '$confirm', '$sce', '$document', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $q, $confirm, $sce, $document, $ngRedux) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
     });
@@ -33,7 +53,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.loggedIn = false;
     $scope.showIDE = true;
     $scope.showAll = false;
-    $scope.colorTheme = localStorage.get('colorTheme', 'light');
+    $scope.colorTheme = $ngRedux.getState().app.colorTheme;
     $scope.hljsTheme = 'monokai-sublime';
     $scope.selectedFont = 14;
     $scope.enableChat = false; // Chat window toggle button. Hidden by default.
@@ -50,6 +70,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     // TEMPORARY FOR GM TESTING
     $scope.showGM = FLAGS.SHOW_GM;
+
+    // TEMPORARY FOR I18N DEVELOPMENT
+    $scope.showLocaleSwitcher = FLAGS.SHOW_LOCALE_SWITCHER;
 
     if ($scope.showAmazon) {
         $rootScope.$broadcast('showAmazon');
@@ -83,7 +106,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
-        colorTheme.set('light');
+        $ngRedux.dispatch(appState.setColorTheme("light"))
         $ngRedux.dispatch(appState.setEmbedMode(true));
         Layout.destroy();
         layout.setMinSize(0);
@@ -205,7 +228,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         $scope.loaded = true;
         $scope.updateSoundQualityGlyph($scope.audioQuality);
 
-        userNotification.isInLoadingScreen = true;
+        userNotification.state.isInLoadingScreen = true;
     };
 
     $scope.downloadSpinnerClick = function () {
@@ -284,7 +307,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.fontSizes = [{'size': 10}, {'size': 12}, {'size': 14}, {'size': 18}, {'size': 24}, {'size': 36}];
 
     // mainly for alternate display in curriculum / API browser
-    $scope.dispLang = localStorage.get('language', 'python');
+    $scope.dispLang = localStorage.getItem('language') ?? 'python';
     // this may be overridden by URL parameter later
 
     $scope.$on('language', function (event, value) {
@@ -352,7 +375,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                 // Always show TEACHERS link in case the teacher-user does not have the teacher role and should be directed to request one.
                 $scope.showTeachersLink = true;
 
-                userNotification.setUserRole(userInfo.role);
+                userNotification.user.role = userInfo.role;
 
                 // Retrieve the user scripts.
                 return userProject.login($scope.username, $scope.password).then(function (result) {
@@ -379,14 +402,14 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
                         // "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
                         // the initial login message is taken care in the sound browser controller
-                        if (userNotification.isInLoadingScreen) {
+                        if (userNotification.state.isInLoadingScreen) {
                             // showLoginMessageAfterLoading = true;
                             // $rootScope.$broadcast('showLoginMessage');
                         } else {
                             userNotification.show(ESMessages.general.loginsuccess, 'normal', 0.5);
                         }
 
-                        if (userProject.shareid && $scope.isManualLogin) {
+                        if ($location.search()['sharing'] && $scope.isManualLogin) {
                             $rootScope.$broadcast('openShareAfterLogin');
                         }
 
@@ -394,13 +417,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
                         const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
                         activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
-
-                        // Used in CAI
-                        $rootScope.$broadcast('swapTabAfterIDEinit');
                     }
-
-                    const theme = colorTheme.load();
-                    $ngRedux.dispatch(appState.setColorTheme(theme));
                 });
             } else {
 
@@ -421,9 +438,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         // $ngRedux.dispatch(scripts.resetSharedScripts());
 
         // save all unsaved open scripts
-        var promises = userProject.saveAll();
-
-        $q.all(promises).then(function () {
+        userProject.saveAll().then(function () {
             if (userProject.openScripts.length > 0) {
                 userNotification.show(ESMessages.user.allscriptscloud);
             }
@@ -480,7 +495,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                     var url = URL_DOMAIN + '/services/scripts/getlmsloginurl';
                     var payload = new FormData();
                     payload.append('username', userProject.getUsername());
-                    payload.append('password', userProject.getEncodedPassword());
+                    payload.append('password', userProject.getPassword());
                     var opts = {
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}
@@ -520,7 +535,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     // attempt to load userdata from a previous session
-    if (userProject.isLogged()) {
+    if (userProject.isLoggedIn()) {
         var userStore = userProject.loadUser();
         $scope.username = userStore.username;
         $scope.password = userStore.password;
@@ -534,8 +549,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             }
         });
     } else {
-        const theme = colorTheme.load();
-        $ngRedux.dispatch(appState.setColorTheme(theme));
         $ngRedux.dispatch(scripts.syncToNgUserProject());
                                   
 
@@ -563,10 +576,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.forgotPass = function () {
-        $uibModal.open({
-            templateUrl: 'templates/forgot-password.html',
-            controller: 'forgotpasswordController'
-        });
+        $uibModal.open({ component: 'forgotpasswordController' });
     };
 
     $scope.changePassword = function () {
@@ -580,9 +590,22 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.editProfile = function () {
         $scope.showNotification = false;
         $uibModal.open({
-            templateUrl: 'templates/edit-profile.html',
-            controller: 'editProfileController',
-            scope: $scope
+            component: 'editProfileController',
+            resolve: {
+                username() { return $scope.username },
+                password() { return $scope.password },
+                email() { return $scope.email },
+                role() { return $scope.userrole },
+                firstName() { return $scope.firstname },
+                lastName() { return $scope.lastname },
+                changePassword() { return $scope.changePassword },
+            }
+        }).result.then(result => {
+            if (result !== undefined) {
+                $scope.firstname = result.firstName;
+                $scope.lastname = result.lastName;
+                $scope.email = result.email;
+            }
         });
     };
 
@@ -631,9 +654,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.toggleNotificationHistory = function (bool) {
         $scope.showNotificationHistory = bool;
-
-        $rootScope.$broadcast('visible', bool);
-
         if (bool) {
             $scope.showNotification = false;
         }
@@ -653,7 +673,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         var url = URL_DOMAIN + '/services/scripts/markread';
         var body = new FormData();
         body.append('username', userProject.getUsername());
-        body.append('password', userProject.getEncodedPassword());
+        body.append('password', userProject.getPassword());
         body.append('notification_id', userNotification.history[index].id);
         var opts = {
             transformRequest: angular.identity,
@@ -734,12 +754,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.toggleColorTheme = function () {
-        const theme = colorTheme.toggle();
-        $ngRedux.dispatch(appState.setColorTheme(theme));
+        $ngRedux.dispatch(appState.toggleColorTheme());
         reporter.toggleColorTheme();
     };
 
-    colorTheme.subscribe($scope, function (event, theme) {
+    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
         $scope.colorTheme = theme;
 
         if (theme === 'dark') {
@@ -757,7 +776,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     try {
-        var shareID = ESUtils.getURLParameters('edit');
+        var shareID = ESUtils.getURLParameter('edit');
 
         if (shareID) {
             esconsole('opening a shared script in edit mode', ['main', 'url']);
@@ -768,7 +787,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     }
 
     try {
-        var layoutParamString = ESUtils.getURLParameters('layout');
+        var layoutParamString = ESUtils.getURLParameter('layout');
         if (layoutParamString && layoutParamString.hasOwnProperty('split')) {
             layoutParamString.split(',').forEach(function (item) {
                 var keyval = item.split(':');
@@ -922,8 +941,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.openCodeIndicator = script => {
         $uibModal.open({
-            templateUrl: 'templates/script-analysis.html',
-            controller: 'analyzeScriptController',
+            component: 'analyzeScriptController',
             size: 100,
             resolve: {
                 script() { return script; }
@@ -1017,7 +1035,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             angular.element('curriculum').hide();
             angular.element('div[caiwindow]').show();
             document.getElementById('caiButton').classList.remove('flashNavButton');
-            $rootScope.$broadcast('switchToCAI');
+            $ngRedux.dispatch(cai.autoScrollCAI());
         } else {
             angular.element('div[caiwindow]').hide();
             angular.element('curriculum').show();
@@ -1032,7 +1050,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         angular.element('div[caiwindow]').show();
     }
 
-    // Note: Used in api_doc.js links to the curriculum Effects chapter.
+    // Note: Used in api_doc links to the curriculum Effects chapter.
     $scope.loadCurriculumChapter = location => {
         if ($scope.showCAIWindow) {
             $scope.toggleCAIWindow();
@@ -1049,8 +1067,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.closeAllTabs = () => {
         $confirm({text: ESMessages.idecontroller.closealltabs, ok: "Close All"}).then(() => {
-            const promises = userProject.saveAll();
-            $q.all(promises).then(() => {
+            userProject.saveAll().then(() => {
                 userNotification.show(ESMessages.user.allscriptscloud);
                 $ngRedux.dispatch(tabs.closeAllTabs());
             }).catch(() => userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1'));
@@ -1127,64 +1144,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
  */
 app.filter('formatTimer', function () {
     return function (input) {
-        var seconds = Math.floor(input / 1000);
-        var minutes = Math.floor(seconds / 60);
-        var hours = Math.floor(minutes / 60);
-        var days = Math.floor(hours / 24);
-
-        if (days <= 1) {
-            if (seconds <= 0) {
-                return 'just now';
-            } else if (minutes === 0) {
-                // if (seconds === 1) {
-                //     return '1 second ago';
-                // } else {
-                //     return seconds + ' seconds ago';
-                // }
-                return 'recently';
-            } else if (hours === 0) {
-                if (minutes === 1) {
-                    return '1 minute ago';
-                } else {
-                    return minutes + ' minutes ago';
-                }
-            } else if (hours < 24) {
-                if (hours === 1) {
-                    return '1 hour ago';
-                } else {
-                    return hours + ' hours ago';
-                }
-            }
-        } else {
-            // if (days <= 1) return "today";
-            if (days > 1 && days <= 2) {
-                return "yesterday";
-            } else if (days > 2 && days <= 7) {
-                return days + " days ago";
-            } else if (days > 7) {
-                var weeks = Math.floor(days/7);
-
-                if (weeks === 1) {
-                    return "last week";
-                } else if (weeks > 1 && weeks <= 4) {
-                    return weeks + " weeks ago";
-                } else if (weeks > 4) {
-                    var months = Math.floor(weeks/4);
-
-                    if (months === 1) {
-                        return "last month";
-                    } else if (months > 1 && months < 12) {
-                        return months + " months ago";
-                    } else if (months >= 12) {
-                        var years = Math.floor(months/12);
-                        if (years <= 1) {
-                            return "last year";
-                        } else if (years > 1) {
-                            return years + " years ago";
-                        }
-                    }
-                }
-            }
-        }
+        return ESUtils.formatTimer(input)
     }
 });

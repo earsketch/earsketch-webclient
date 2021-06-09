@@ -1,18 +1,20 @@
-/**
- * @module autograder3Controller
- */
+import * as compiler from './compiler'
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
+import * as userConsole from './userconsole'
+import * as userProject from './userProject'
 
 app.controller("autograder3Controller",
-['$scope','compiler', 'Upload','userConsole','caiAnalysisModule','ESUtils', 'userProject', '$http',
-function($scope, compiler, Upload, userConsole, caiAnalysisModule, ESUtils, userProject, $http) {
+['$scope', 'caiAnalysisModule',
+function($scope, caiAnalysisModule) {
 
     $scope.prompts = [0];
     $scope.allowPrompts = false;
     $scope.seed = Date.now();
     $scope.useSeed = true;
 
-    // overwrite userConsole javascript prompt with a hijackable one
-    var nativePrompt = userConsole.prompt;
+    // overwrite prompt with a hijackable one
+    var nativePrompt = window.esPrompt;
 
     $scope.hijackedPrompt = function() {
       var i = 0;
@@ -159,7 +161,7 @@ function($scope, compiler, Upload, userConsole, caiAnalysisModule, ESUtils, user
                 console.log("read input", sourceCodeLines[i]);
               }
             }
-            userConsole.prompt = $scope.hijackedPrompt();
+            window.esPrompt = $scope.hijackedPrompt();
           }
 
           return $scope.compile(sourceCode, script.name).then(function(compiler_output) {

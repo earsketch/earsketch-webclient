@@ -1,5 +1,9 @@
-﻿// An angular factory for processing JavaScript code through the complexity calculator service.
-app.factory('complexityCalculatorJS', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', 'complexityCalculatorState', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions, complexityCalculatorState) {
+﻿import * as complexityCalculatorState from '../../cai/complexityCalculatorState';
+import * as caiErrorHandling from '../../cai/errorHandling';
+import * as complexityCalculatorHelperFunctions from '../../cai/complexityCalculatorHelperFunctions';
+
+// An angular factory for processing JavaScript code through the complexity calculator service.
+app.factory('complexityCalculatorJS', ['complexityCalculator', function (complexityCalculator) {
 
     function analyzeJavascript(source) {
         complexityCalculatorState.resetState();

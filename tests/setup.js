@@ -209,32 +209,6 @@ window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layou
     $ngReduxProvider.provideStore(store);
 });
 
-require('audioContext');
-require('esconsole');
-require('reporter');
-require('reader');
-require('userNotification');
-require('localStorage');
-require('userProject');
-require('esutils');
-require('audioLibrary');
-require('websocket');
-require('collaboration');
-require('colorTheme');
-require('layout');
-require('timesync');
-require('waveformCache');
-require('compiler');
-require('pitchShifter');
-require('renderer');
-require('applyEffects');
-require('userConsole');
-require('uploader');
-require('wsapi');
-require('completer');
-require('exporter');
-require('analysis');
-require('esrecorder');
 require('recorder');
 
 Object.assign(window,require('esAppDSP'));
@@ -242,27 +216,17 @@ Object.assign(window,require('esAppDSP'));
 // Controllers
 require('mainController');
 require('ideController');
-require('layoutController');
-require('notificationUI');
-require('editorDirective');
 require('promptController');
 require('uploadController');
-require('recorderController');
-require('createScriptController');
 require('renameController');
 require('downloadController');
 require('shareScriptController');
 require('scriptVersionController');
-require('analyzeScriptController');
 require('userHistoryController');
-require('diffDirective');
 
 require('createAccountController');
 require('changePasswordController');
-require('editProfileController');
 require('adminWindowController');
-require('forgotPasswordController');
-require('shareController');
 require('submitAWSController');
 
 require('autograderController');
@@ -270,7 +234,5 @@ require('autograder2Controller');
 require('autograderAWSController');
 require('autograder3Controller');
 require('inputsController');
-require('autograder');
 require('caiAnalysisModule');
 require('complexityCalculator');
-require('recommender');

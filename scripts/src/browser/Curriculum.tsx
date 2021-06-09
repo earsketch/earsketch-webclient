@@ -7,17 +7,37 @@ import { ClipboardService } from 'angular-clipboard'
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
+import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
+import * as userNotification from '../app/userNotification'
+import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
+const SECTION_URL_CHARACTER = ':'
 
 let clipboard: ClipboardService|null = null
 
 const copyURL = (language: string, currentLocation: number[]) => {
-    const url = SITE_BASE_URI + '#?curriculum=' + currentLocation.join('-') + '&language=' + language
+    const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
+    const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
     clipboard?.copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
+}
+
+const urlToPermalink = (url: string) => {
+    return url
+        .replace(".html", "")
+        .replace("#", SECTION_URL_CHARACTER)
+}
+
+const permalinkToURL = (permalink: string) => {
+    const linkParts = permalink.split(SECTION_URL_CHARACTER)
+    linkParts[0] += ".html"
+    if (linkParts.length === 2) {
+        linkParts[0] += "#"
+    }
+    return linkParts.join('')
 }
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
@@ -309,7 +329,6 @@ let $rootScope: RootScope = null
 
 const HotCurriculum = hot((props: {
     clipboard: ClipboardService,
-    ESUtils: any,
     $ngRedux: any, // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
     $rootScope: RootScope
 }) => {
@@ -317,23 +336,28 @@ const HotCurriculum = hot((props: {
         clipboard = props.clipboard
 
         // Handle URL parameters.
-        const ESUtils = props.ESUtils
-        const locstr = ESUtils.getURLParameters('curriculum')
-        if (locstr === null) {
-            // Load welcome page initially.
-            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
-        } else {
-            // The anonymous function is necessary here because .map(parseInt) passes the index as parseInt's second argument (radix).
-            const loc = locstr.split('-').map((x: string) => parseInt(x))
-            if (loc.every((idx: number) => !isNaN(idx))) {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ location: loc }))
+        const curriculumParam = ESUtils.getURLParameter('curriculum')
+
+        if (curriculumParam !== null) {
+            // check if this value exists in our old locations file first
+            const url = ESCurr_OLD_LOCATIONS[curriculumParam]
+            if (url !== undefined) {
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url }))
+            } else {
+                props.$ngRedux.dispatch(curriculum.fetchContent({ url: permalinkToURL(curriculumParam) }))
             }
         }
 
-        if (['python', 'javascript'].indexOf(ESUtils.getURLParameters('language')) > -1) {
-            // If the user has a script open, that language overwrites this one due to ideController;
+        if (curriculumParam === null) {
+            // Load welcome page initially.
+            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
+        }
+
+        const languageParam = ESUtils.getURLParameter('language')
+        if (languageParam && ['python', 'javascript'].indexOf(languageParam) > -1) {
+            // If the user has a script open, that language overwrites this one due to ideController
             // this is probably a bug, but the old curriculumPaneController has the same behavior.
-            props.$ngRedux.dispatch(appState.setScriptLanguage(ESUtils.getURLParameters('language')))
+            props.$ngRedux.dispatch(appState.setScriptLanguage(languageParam))
         }
 
         $rootScope = props.$rootScope
@@ -365,4 +389,4 @@ const HotCurriculum = hot((props: {
     )
 })
 
-app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', 'ESUtils', '$rootScope']))
+app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', '$rootScope']))

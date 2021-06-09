@@ -11,6 +11,7 @@ import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
 import * as editor from './editorState';
 import * as helpers from '../helpers';
+import * as userProject from '../app/userProject';
 
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 
@@ -99,7 +100,6 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
                     onClick={(event) => {
                         dispatch(tabs.closeAndSwitchTab(scriptID));
 
-                        const userProject = helpers.getNgService('userProject');
                         userProject.closeScript(scriptID);
 
                         // The tab is reselected otherwise.

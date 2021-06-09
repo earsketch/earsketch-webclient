@@ -1,4 +1,6 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
+
+import ESApiDoc, { APIItem } from '../data/api_doc';
 import { selectScriptLanguage } from '../app/appState';
 import { RootState } from '../reducers';
 
@@ -21,42 +23,18 @@ export const {
 
 export const selectSearchText = (state: RootState) => state.api.searchText
 
-export const selectAllEntries = (state: RootState) => Object.entries(ESApiDoc)
-
-export interface APIParameter {
-    type: string
-    description: string
-    default?: string
-}
-
-export interface APIItem {
-    description: string
-    example: {
-        python: string
-        javascript: string
-    }
-    autocomplete: string
-    parameters?: {
-        [name: string]: APIParameter
-    }
-    returns?: {
-        type: string
-        description: string
-    }
-    meta?: any
-    expert?: string
-    caveats?: string
-}
-
 export const selectFilteredEntries = createSelector(
-    [selectAllEntries, selectSearchText, selectScriptLanguage],
-    (entries, searchText, language) => {
+    [selectSearchText, selectScriptLanguage],
+    (searchText, language) => {
         searchText = searchText.toLowerCase()
-        return entries.filter(([name, obj]: [name:string, obj:APIItem]) => {
-            const description = obj.description?.toLowerCase();
-            const params = obj.parameters && Object.keys(obj.parameters)
-            const field = `${name.toLowerCase()}${description}${params}`
-            return field.includes(searchText) && (!obj.meta || (obj.meta.language === language))
+        return Object.entries(ESApiDoc).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
+            const entries = Array.isArray(data) ? data : [data]
+            return entries.some(obj => {
+                const description = obj.description?.toLowerCase();
+                const params = obj.parameters && Object.keys(obj.parameters)
+                const field = `${name.toLowerCase()}${description}${params}`
+                return field.includes(searchText) && (!obj.meta || (obj.meta.language === language))
+            })
         })
     }
 )

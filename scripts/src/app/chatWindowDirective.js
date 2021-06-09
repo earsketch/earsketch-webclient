@@ -1,7 +1,10 @@
+import "./collaboration"
+import * as userProject from "./userProject"
+
 app.directive('chatwindow', function () {
     return {
         templateUrl: 'templates/chat-window.html',
-        controller: ['$scope', 'collaboration', 'userProject', function ($scope, collaboration, userProject) {
+        controller: ['$scope', function ($scope) {
             $scope.chatroomName = '';
             $scope.collaborators = [];
 
@@ -136,7 +139,7 @@ app.directive('chatwindow', function () {
                 return data;
             }
 
-            collaboration.chatSubscribe($scope, function (event, data) {
+            collaboration.callbacks.chat = function (data) {
                 if (!$scope.senderIsUser(data)) {
                     if (data.action === 'chat') {
 
@@ -155,9 +158,9 @@ app.directive('chatwindow', function () {
                         }
                     }
                 }
-            });
+            };
 
-            collaboration.onJoinSubscribe($scope, function (event, data) {
+            collaboration.callbacks.onJoin = function (data) {
                 $scope.chatroomName = collaboration.script.name;
                 $scope.collaborators = [collaboration.script.username].concat(collaboration.script.collaborators);
 
@@ -171,17 +174,17 @@ app.directive('chatwindow', function () {
                 if ($scope.showChatWindow) {
                     collaboration.joinTutoring();
                 }
-            });
+            };
 
-            collaboration.onLeaveSubscribe($scope, function () {
+            collaboration.callbacks.onLeave = function () {
                 $scope.messageList = [];
 
                 if ($scope.showChatWindow) {
                     collaboration.leaveTutoring();
                 }
-            });
+            };
 
-            collaboration.onJoinTutoringSubscribe($scope, function (event, data) {
+            collaboration.callbacks.onJoinTutoring = function (data) {
                 $scope.messageList = data.data.map(function (entry) {
                     var res = {
                         action: entry.action,
@@ -201,7 +204,14 @@ app.directive('chatwindow', function () {
                 }).filter(function (entry) { return !!entry });
                 $scope.$applyAsync();
                 autoScroll();
-            });
+            };
+
+            $scope.on('$destroy', function () {
+                collaboration.callbacks.chat = null;
+                collaboration.callbacks.onJoin = null;
+                collaboration.callbacks.onLeave = null;
+                collaboration.callbacks.onJoinTutoring = null;
+            })
 
             $scope.getTutoringRecord = function () {
                 userProject.getTutoringRecord(collaboration.scriptID).then(function (record) {

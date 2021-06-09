@@ -16,7 +16,6 @@ module.exports = function(config) {
 
         files: [
             {pattern: 'scripts/lib/earsketch-dsp.js', included: true},
-            {pattern: 'scripts/src/api/earsketch.js.js', included: true},
             {pattern: 'scripts/src/api/earsketch.py.js', served: true},
             {pattern: 'tests/setup.js', included: true},
             {pattern: 'tests/unit/hello.js', included:true},

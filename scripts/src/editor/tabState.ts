@@ -4,10 +4,12 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import * as ace from 'ace-builds';
 
+import * as collaboration from '../app/collaboration';
 import * as helpers from '../helpers';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
 import * as editor from "./editorState";
+import * as userProject from '../app/userProject';
 
 interface TabState {
     openTabs: string[],
@@ -172,8 +174,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         editor.setReadOnly(script.readonly);
 
         if (script.collaborative) {
-            const collaboration = helpers.getNgService('collaboration');
-            collaboration.openScript(Object.assign({},script), user.selectUserName(getState()));
+            collaboration.openScript(Object.assign({},script), user.selectUserName(getState())!);
         }
 
         prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID));
@@ -248,7 +249,6 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
             const restoredSession = getEditorSession(scriptID);
 
             if (restoredSession) {
-                const userProject = helpers.getNgService('userProject');
                 const script = scripts.selectAllScriptEntities(getState())[scriptID];
                 userProject.saveScript(script.name, restoredSession.getValue()).then(() => {
                     userProject.closeScript(scriptID);
@@ -271,9 +271,8 @@ const ensureCollabScriptIsClosed = createAsyncThunk<void, string, ThunkAPI>(
         const activeTabID = selectActiveTabID(getState());
         const script = scripts.selectAllScriptEntities(getState())[scriptID];
         if (scriptID === activeTabID && script?.collaborative) {
-            const collabService = helpers.getNgService('collaboration');
-            const userName = user.selectUserName(getState());
-            collabService.closeScript(scriptID, userName);
+            const userName = user.selectUserName(getState())!;
+            collaboration.closeScript(scriptID, userName);
         }
     }
 );

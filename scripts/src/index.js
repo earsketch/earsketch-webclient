@@ -3,6 +3,7 @@ import '../../css/earsketch/allstyles.less'
 import './tailwind.css';
 
 import store from './reducers';
+import './i18n';
 
 require('jquery');
 require('jqueryUI');
@@ -28,6 +29,37 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
+import { react2angular } from 'react2angular'
+
+import * as helpers from './helpers'
+import { Editor } from './editor/Editor'
+import esconsole from './esconsole'
+import * as ESUtils from './esutils'
+import reporter from './app/reporter'
+// TODO: Remove this after dealing lib/earsketch-appdsp.js.
+import ESMessages from './data/messages'
+window.ESMessages = ESMessages
+window.droplet = droplet
+
+// NOTE: We import this purely for its side-effects (registering a completer with Ace).
+import './app/completer'
+
+// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+// (This was previously in userConsole, but since that's now a module, the fields are read-only.)
+// (Also, it doesn't really have anything to do with the user console.)
+window.esPrompt = msg => {
+    const $uibModal = helpers.getNgService('$uibModal')
+    var modal = $uibModal.open({
+        templateUrl: 'templates/prompt.html',
+        controller: 'PromptController',
+        resolve: {
+            msg: function() { return msg }
+        },
+    })
+
+    return modal.result
+}
+
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
@@ -48,7 +80,6 @@ require(['angular'], () => {
     require('ng-redux');
 
     // vendor files
-    require('uiLayout');
     require('uiUtils');
     require('uiScroll');
     require('uiScrollGrid');
@@ -71,7 +102,6 @@ require(['angular'], () => {
     window.app = angular.module('EarSketchApp', [
         'ui.router',
         'ui.bootstrap',
-        'ui.layout',
         'ui.utils',
         'ngAnimate',
         'ngFileUpload',
@@ -91,30 +121,6 @@ require(['angular'], () => {
     // app.component('rootComponent', react2angular(RootComponent));
 
     // In-house modules
-    require('audioContext');
-    require('reporter');
-    require('reader');
-    require('userNotification');
-    require('localStorage');
-    require('userProject');
-    require('esutils');
-    require('audioLibrary');
-    require('websocket');
-    require('collaboration');
-    require('colorTheme');
-    require('layout');
-    require('waveformCache');
-    require('compiler');
-    require('pitchShifter');
-    require('renderer');
-    require('applyEffects');
-    require('userConsole');
-    require('uploader');
-    require('wsapi');
-    require('completer');
-    require('exporter');
-    require('analysis');
-    require('esrecorder');
     require('recorder');
 
     Object.assign(window,require('esAppDSP'));
@@ -122,27 +128,17 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('layoutController');
-    require('notificationUI');
-    require('editorDirective');
     require('promptController');
     require('uploadController');
-    require('recorderController');
-    require('createScriptController');
     require('renameController');
     require('downloadController');
     require('shareScriptController');
     require('scriptVersionController');
-    require('analyzeScriptController');
     require('userHistoryController');
-    require('diffDirective');
 
     require('createAccountController');
     require('changePasswordController');
-    require('editProfileController');
     require('adminWindowController');
-    require('forgotPasswordController');
-    require('shareController');
     require('submitAWSController');
 
     // React components
@@ -157,6 +153,11 @@ require(['angular'], () => {
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');
+    app.component("editor", react2angular(Editor))
+    require('./top/LocaleSelector')
+    require('./app/Notification')
+    require('./app/Recorder')
+    require('./app/Diff')
 
     // To be ported to React
     require('./layout/Layout');
@@ -169,41 +170,30 @@ require(['angular'], () => {
     require('inputsController');
 
     // CAI
-    require('caiWindowDirective');
-    require('caiStudent');
-    require('autograder');
+    require('./cai/CAI');
     require('caiAnalysisModule');
-    require('caiStudentPreferenceModule');
     require('caiStudentHistoryModule');
     require('complexityCalculator');
     require('complexityCalculatorPY');
     require('complexityCalculatorJS');
-    require('complexityCalculatorState');
-    require('complexityCalculatorHelperFunctions');
     require('caiDialogue');
-    require('caiErrorHandling');
     require('codeSuggestion');
-    require('recommender');
-    require('caiProjectModel');
 
     // TODO: Use a module.
     window.REPORT_LOG = [];
-    window.ES_PASSTHROUGH = ES_PASSTHROUGH;
 
-    app.factory('$exceptionHandler', ['$injector', function($injector) {
+    app.factory('$exceptionHandler', function() {
         return function(exception, cause) {
             console.log(exception);
             esconsole(exception, ['ERROR','ANGULAR']);
-            var reporter = $injector.get('reporter');
-
             // ensures we don't report Skulpt errors to GA
             if (exception.args === undefined) {
                 reporter.exception(exception.toString());
             }
         };
-    }]);
+    });
 
-    app.run(['$window', 'ESUtils', function ($window, ESUtils) {
+    app.run(['$window', function ($window) {
         // Returns the version of Internet Explorer or a -1
         // (indicating the use of another browser).
         function getInternetExplorerVersion() {

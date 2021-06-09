@@ -1,7 +1,12 @@
+import * as collaboration from './collaboration'
+import * as compiler from './compiler'
+import * as ESUtils from '../esutils'
+import reporter from './reporter'
 import * as tabs from '../editor/tabState';
 import * as scripts from '../browser/scriptsState';
+import * as userProject from './userProject';
 
-app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'script', 'userProject', 'compiler', 'ESUtils', 'reporter', 'collaboration', 'allowRevert', '$ngRedux', function ($scope, $uibModalInstance, script, userProject, compiler, ESUtils, reporter, collaboration, allowRevert, $ngRedux) {
+app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'script', 'allowRevert', '$ngRedux', function ($scope, $uibModalInstance, script, allowRevert, $ngRedux) {
     $scope.script = script;
     $scope.allowRevert = allowRevert;
 
@@ -102,7 +107,7 @@ app.controller("scriptVersionController", ['$scope', '$uibModalInstance', 'scrip
                     $scope.modified = result[0];
                 }
                 $scope.loadingScript = false;
-
+                $scope.$apply();
                 return $scope.original;
             });
     };

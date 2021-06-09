@@ -1,0 +1,27 @@
+{
+  "common": {
+    "contentManager.title": "CONTENT MANAGER",
+    "contentManager.searchPlaceholder": "Search",
+    "soundBrowser.title": "SOUNDS",
+    "soundBrowser.title.collection": "SOUND COLLECTION",
+    "soundBrowser.title.featuredArtist": "FEATURED ARTIST",
+    "soundBrowser.title.recommendations": "RECOMMENDATIONS",
+    "soundBrowser.button.addSound": "Add sound",
+    "soundBrowser.button.showOnlyStars": "Show only",
+    "soundBrowser.filterDropdown.title": "FILTER",
+    "soundBrowser.filterDropdown.artists": "Artists",
+    "soundBrowser.filterDropdown.genres": "Genres",
+    "soundBrowser.filterDropdown.instruments": "Instruments",
+    "soundBrowser.clip.tooltip.file": "File",
+    "soundBrowser.clip.tooltip.folder": "Folder",
+    "soundBrowser.clip.tooltip.artist": "Artist",
+    "soundBrowser.clip.tooltip.genre": "Genre",
+    "soundBrowser.clip.tooltip.instrument": "Instrument",
+    "soundBrowser.clip.tooltip.originalTempo": "Original Tempo",
+    "soundBrowser.clip.tooltip.year": "Year",
+    "soundBrowser.clip.tooltip.previewSound": "Preview sound",
+    "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
+    "soundBrowser.clip.tooltip.paste": "Paste to editor",
+    "scriptBrowser.title": "SCRIPTS"
+  }
+}

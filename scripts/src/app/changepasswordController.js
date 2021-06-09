@@ -2,7 +2,12 @@
  * Angular controller for change-password services. Members can be addressed with $scope.name from JS, or just with name from within the controller-bound HTML.
  * @module changepasswordController
  */
-app.controller("changepasswordController", ['$scope', '$uibModalInstance', 'userProject', 'userConsole', 'userNotification', 'esconsole', function ($scope, $uibModalInstance, userProject, userConsole, userNotification, esconsole) {
+import esconsole from '../esconsole'
+import * as userConsole from './userconsole'
+import * as userNotification from './userNotification'
+import * as userProject from './userProject'
+
+app.controller("changepasswordController", ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
     $scope.pwError = "";
 
     /**
@@ -56,7 +61,7 @@ app.controller("changepasswordController", ['$scope', '$uibModalInstance', 'user
             var user = userProject.getUsername();
 
             var url = URL_DOMAIN+'/services/scripts/modifypwd?username='+user+'&password='+pwdencode+'&newpassword='+newpwdencode;
-            console.log('wsapiForgotPassword url ... '+url);
+            esconsole('modifypwd url ... ' + url, 'info');
             var request = new XMLHttpRequest();
             request.open("GET",url,true);
 

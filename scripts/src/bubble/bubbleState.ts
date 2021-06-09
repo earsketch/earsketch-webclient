@@ -1,10 +1,12 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
 import * as tabs from '../editor/tabState';
 import * as helpers from '../helpers';
+import * as userProject from '../app/userProject';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity } from 'common';
+import { BrowserTabType } from "../layout/layoutState";
 
 interface BubbleState {
     active: boolean
@@ -45,7 +47,6 @@ const createSampleScript = createAsyncThunk(
         const { bubble: { language } } = getState() as { bubble: BubbleState };
         const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
-        const userProject = helpers.getNgService('userProject');
         const rootScope = helpers.getNgService('$rootScope');
         return userProject.saveScript(fileName, code, true)
             .then((script: ScriptEntity) => {
@@ -103,10 +104,10 @@ export const proceed = createAsyncThunk(
             case 4:
                 break;
             case 5:
-                await dispatch(layout.openWest('SOUNDS'));
+                await dispatch(layout.openWest(BrowserTabType.Sound));
                 break;
             case 6:
-                await dispatch(layout.openWest('SCRIPTS'));
+                await dispatch(layout.openWest(BrowserTabType.Script));
                 break;
             case 7:
                 await dispatch(layout.openEast());

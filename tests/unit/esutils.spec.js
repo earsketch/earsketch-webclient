@@ -1,22 +1,11 @@
+import * as ESUtils from '../../src/esutils'
+
 describe('ESUtils unit tests', function () {
-    var ESUtils;
-
     beforeEach(module('EarSketchApp'));
-
-    beforeEach(inject(function ($injector) {
-        ESUtils = $injector.get('ESUtils');
-    }));
 
     describe('toPrecision', function () {
         it('should work', function () {
             expect(ESUtils.toPrecision(0.123456789)).toBe(0.12346);
-        });
-    });
-
-    describe('roundOff', function () {
-        it('should work', function () {
-            expect(ESUtils.roundOff(100.37, 1)).toBe(100.4);
-            expect(ESUtils.roundOff(2.401, 2)).toBe(2.40);
         });
     });
 
@@ -50,15 +39,6 @@ describe('ESUtils unit tests', function () {
             expect(ESUtils.parseExt('test.abc')).toBe('.abc');
         });
     });
-
-    // not in ESUtil service
-    // describe('decimalAdjust', function () {
-    //     it('should work', function () {
-    //         expect(ESUtils.decimalAdjust('round', 14.2312, 3)).toBe(14.231);
-    //         expect(ESUtils.decimalAdjust('floor', 14.2312, 3)).toBe(14.000);
-    //         expect(ESUtils.decimalAdjust('ceil', 14.2312, 3)).toBe(15.000);
-    //     });
-    // });
 
     describe('compareObjectStructure', function () {
         var func;

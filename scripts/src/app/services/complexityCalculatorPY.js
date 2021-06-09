@@ -1,5 +1,9 @@
-﻿// An angular factory for processing Python code through the complexity calculator service.
-app.factory('complexityCalculatorPY', ['userNotification', 'complexityCalculator', 'caiErrorHandling', 'complexityCalculatorHelperFunctions', 'complexityCalculatorState', function (userNotification, complexityCalculator, caiErrorHandling, complexityCalculatorHelperFunctions, complexityCalculatorState) {
+﻿import * as complexityCalculatorState from '../../cai/complexityCalculatorState';
+import * as caiErrorHandling from '../../cai/errorHandling';
+import * as complexityCalculatorHelperFunctions from '../../cai/complexityCalculatorHelperFunctions';
+
+// An angular factory for processing Python code through the complexity calculator service.
+app.factory('complexityCalculatorPY', ['complexityCalculator', function (complexityCalculator) {
    	// Build the abstract syntax tree for Python.
     function generateAst(source_code) {
         try {

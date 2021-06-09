@@ -8,14 +8,37 @@
  * @author Creston Bunch
  */
 
+import * as compiler from '../app/compiler'
+import * as ESUtils from '../esutils'
+import * as helpers from '../helpers'
+import * as reader from '../app/reader'
+import * as userConsole from '../app/userconsole'
+
+/**
+ * Presents a modal dialog with the script's source and multiple input
+ * prompts. Returns the values from the input prompts.
+ */
+function prompt(inputs, script, language) {
+    var modal = helpers.getNgService("$uibModal").open({
+        templateUrl: 'templates/inputs.html',
+        controller: 'InputsController',
+        resolve: {
+            inputs: function() { return inputs; },
+            script: function() { return script; },
+            language: function() { return language; }
+        },
+    });
+
+    return modal.result.then(function(inputs) {
+        return inputs;
+    }).catch(function(err) {
+        throw err;
+    });
+}
+
 var $builtinmodule = function (name) {
 
     var mod = {};
-    var userConsole = ServiceWrapper().userConsole;
-    var compiler = ServiceWrapper().compiler;
-    var analyzer = ServiceWrapper().reader;
-    var autograder = ServiceWrapper().autograder;
-    var ESUtils = ServiceWrapper().ESUtils;
     var nativePrompt = userConsole.prompt;
     var prompts = [];
     var prints = [];
@@ -119,7 +142,7 @@ var $builtinmodule = function (name) {
       script = Sk.ffi.remapToJs(script);
       language = Sk.ffi.remapToJs(language);
 
-      var promise = autograder.prompt(inputs, script, language);
+      var promise = prompt(inputs, script, language);
       var susp = new Sk.misceval.Suspension();
       susp.resume = function() {
           if (susp.data.error) {
@@ -158,12 +181,12 @@ var $builtinmodule = function (name) {
       switch(method.v) {
         case "earsketch":
           if (language.v == 'python') {
-            results = analyzer.analyzePython(source.v);
-            results.total = analyzer.total(results);
+            results = reader.analyzePython(source.v);
+            results.total = reader.total(results);
             return Sk.ffi.remapToPy(results);
           } else {
-            results = analyzer.analyzeJavascript(source.v);
-            results.total = analyzer.total(results);
+            results = reader.analyzeJavascript(source.v);
+            results.total = reader.total(results);
             return Sk.ffi.remapToPy(results);
           }
           break;

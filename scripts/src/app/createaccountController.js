@@ -2,7 +2,11 @@
  * @fileOverview Angular modal-window view controller for account management. Members can be addressed with $scope.name from JS, or just with name from within the controller-bound HTML.
  * @module accountController
  */
-app.controller("accountController", ['$scope','$uibModalInstance','userConsole','userNotification', function ($scope, $uibModalInstance, userConsole, userNotification) {
+import esconsole from '../esconsole'
+import * as userConsole from './userconsole'
+import * as userNotification from './userNotification'
+
+app.controller("accountController", ['$scope','$uibModalInstance', function ($scope, $uibModalInstance) {
     /**
      * Closes the current modal window.
      * @name cancel
@@ -120,7 +124,8 @@ app.controller("accountController", ['$scope','$uibModalInstance','userConsole',
             request.timeout = 10000;
             request.ontimeout = function () {
                 userConsole.error(ESMessages.createaccount.timeout);
-                userConsole.displayStatus('.timeoutFailure');
+                // TODO: Commented this out while migrating userConsole, because there is no function called 'displayStatus' in userConsole:
+                // userConsole.displayStatus('.timeoutFailure');
                 $uibModalInstance.close();
             };
 

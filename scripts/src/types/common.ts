@@ -18,6 +18,7 @@ export interface ScriptEntity {
     creator: string
     file_location?: string
     id?: string
+    original_id?: string
     description?: string
     soft_delete?: boolean | string
 }

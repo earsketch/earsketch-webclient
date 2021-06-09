@@ -1,13 +1,34 @@
+import * as collaboration from './collaboration'
+import * as compiler from './compiler'
+import esconsole from '../esconsole'
+import * as ESUtils from '../esutils'
 import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
-import * as editor from '../editor/editorState';
+import * as editor from '../editor/Editor';
+import * as editorState from '../editor/editorState';
+import reporter from './reporter';
 import * as tabs from '../editor/tabState';
+import * as cai from '../cai/caiState';
+import { wrapModal } from '../helpers';
+import { ScriptCreator } from './ScriptCreator';
+import * as userConsole from './userconsole'
+import * as userNotification from './userNotification';
+import * as userProject from './userProject';
+import * as WaveformCache from './waveformcache';
+
+// Temporary glue from $uibModal to React components.
+app.component("createScriptController", wrapModal(ScriptCreator))
+
+const ACE_THEMES = {
+    light: "ace/theme/chrome",
+    dark: "ace/theme/monokai",
+}
 
 /**
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'WaveformCache', 'compiler', 'userProject', 'userConsole', 'userNotification', 'wsapi', 'ESUtils', 'localStorage', 'reporter', 'caiAnalysisModule', 'colorTheme', 'collaboration', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, WaveformCache, compiler, userProject, userConsole, userNotification, wsapi, ESUtils, localStorage, reporter, caiAnalysisModule, colorTheme, collaboration, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, caiAnalysisModule, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };
@@ -44,8 +65,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     //moving openShare() to tabController
     $scope.sharedScripts = userProject.sharedScripts;
 
-    $scope.editor = {}; // need to pass object to the editor directive for two-way binding
-
     $scope.loaded = true; // shows spinning icon when false
 
     //embedableTrack - changeCss and
@@ -59,14 +78,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     }
 
 
-    $scope.currentLanguage = localStorage.get('language', 'python');
+    $scope.currentLanguage = localStorage.getItem('language') ?? 'python';
     // $scope.useBlocks = false; // global option that persists even droplet cannot open because of code errors
 
-    // TODO: create and handle this in userConsole directive
-    $scope.$on('updateConsole', function () {
-        $scope.logs = userConsole.getLogs();
+    userConsole.callbacks.onUpdate = function () {
+        $scope.logs = userConsole.logs;
         $scope.$$phase || $scope.$digest();
-    });
+    };
 
     $scope.$on('compileembeddedTrack', function(){
         $scope.compileCode();
@@ -114,11 +132,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      */
     $scope.initEditor = function () {
         esconsole('initEditor called', 'IDE');
-        if (!$scope.editor) return;
 
-        $scope.editor.ace.setOptions({
+        editor.ace.setOptions({
             mode: 'ace/mode/' + $scope.currentLanguage,
-            theme: 'ace/theme/monokai',
+            theme: ACE_THEMES[$ngRedux.getState().app.colorTheme],
             fontSize: $scope.fontSizNum,
             enableBasicAutocompletion: true,
             enableSnippets: false,
@@ -128,9 +145,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         });
 
         // suppressing a minor error message in FF
-        $scope.editor.ace.$blockScrolling = Infinity;
+        editor.ace.$blockScrolling = Infinity;
 
-        $scope.editor.ace.commands.addCommand({
+        editor.ace.commands.addCommand({
             name: 'saveScript',
             bindKey: {
                 win: 'Ctrl-S',
@@ -157,7 +174,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             }
         });
 
-        // $scope.editor.commands.addCommand({
+        // editor.commands.addCommand({
         //     name: 'goToLine',
         //     bindKey: {
         //         win: 'Ctrl-L',
@@ -171,7 +188,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         //     }
         // });
 
-        $scope.editor.ace.commands.addCommand({
+        editor.ace.commands.addCommand({
             name: 'runCode',
             bindKey: {
                 win: 'Ctrl-Enter',
@@ -183,33 +200,29 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             }
         });
 
-        $scope.editor.droplet.setEditorState(false);
+        editor.droplet.setEditorState(false);
 
-        if (localStorage.checkKey(LS_FONT_KEY)) {
-            $scope.setFontSize(parseInt(localStorage.get(LS_FONT_KEY)));
-            $rootScope.$broadcast('initFontSize', parseInt(localStorage.get(LS_FONT_KEY)));
+        const fontSize = localStorage.getItem(LS_FONT_KEY);
+        if (fontSize !== null) {
+            $scope.setFontSize(parseInt(fontSize));
+            $rootScope.$broadcast('initFontSize', parseInt(fontSize));
         }
 
         // open shared script from URL
         var shareID = $location.search()['sharing'];
         if (typeof(shareID) !== 'undefined') {
-            userProject.shareid = shareID;
             $scope.openShare(shareID).then(() => {
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
                 $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
             });
         }
 
-        $ngRedux.dispatch(editor.setEditorInstance($scope.editor));
+        $ngRedux.dispatch(editorState.setEditorInstance(editor));
         const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
         activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
 
         const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
-        $scope.editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
-        colorTheme.load();
-
-        // Used in CAI
-        $rootScope.$broadcast("swapTabAfterIDEinit");
+        editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
     };
 
     
@@ -220,9 +233,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      * @function
      */
     $scope.toggleBlocks = function () {
-        if (!$scope.editor.droplet.currentlyUsingBlocks) {
+        if (!editor.droplet.currentlyUsingBlocks) {
             // ask Ace editor if there are any syntax errors
-            var annotations = $scope.editor.ace.getSession().getAnnotations();
+            var annotations = editor.ace.getSession().getAnnotations();
             if (annotations.some(function (note) {
                     return note.type === 'error'
                 })) {
@@ -232,10 +245,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             }
         }
 
-        esconsole('toggling blocks mode to: ' + !$scope.editor.droplet.currentlyUsingBlocks, 'ide');
-        localStorage.set('blocks', ($scope.editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
+        esconsole('toggling blocks mode to: ' + !editor.droplet.currentlyUsingBlocks, 'ide');
+        localStorage.setItem('blocks', (editor.droplet.currentlyUsingBlocks ? 'yes' : 'no'));
 
-        return $scope.editor.droplet.toggleBlocks();
+        return editor.droplet.toggleBlocks();
     };
 
     /**
@@ -247,7 +260,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         var alreadySaved = false;
         var promise;
 
-        if (userProject.isLogged()) {
+        if (userProject.isLoggedIn()) {
             // User is logged in
             promise = userProject.getSharedScripts($scope.username, $scope.password).then(function (result) {
                 // Check if the shared script has been saved
@@ -283,7 +296,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                         } else {
                             // the shared script belongs to the logged-in user
                             // TODO: use broadcast or service
-                            $scope.editor.ace.focus();
+                            editor.ace.focus();
 
                             if ($scope.isEmbedded) {
                                 $scope.selectScript(result);
@@ -304,7 +317,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     });
                 } else {
                     // user has already opened this shared link before
-                    if (userProject.isLogged()) {
+                    if (userProject.isLoggedIn()) {
                         promise = userProject.getSharedScripts($scope.username, $scope.password).then(function () {
                             if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
                             $scope.selectSharedScript(result);
@@ -335,13 +348,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     };
 
     $scope.switchToShareMode = function() {
-        $scope.editor.ace.focus();
+        editor.ace.focus();
         $ngRedux.dispatch(scripts.setFeatureSharedScript(true));
     };
 
     // listens to the broadcast message sent by mainController on clicking login button
     $rootScope.$on('openShareAfterLogin', function() {
-        $scope.openShare(userProject.shareid).then(() => {
+        $scope.openShare($location.search()['sharing']).then(() => {
             $ngRedux.dispatch(scripts.syncToNgUserProject());
         });
     });
@@ -366,8 +379,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
 
         var modalInstance = $uibModal.open({
-            templateUrl: 'templates/create-script.html',
-            controller: 'CreateScriptCtrl',
+            component: 'createScriptController',
             // pass the current language to use as the default selected lang.
             resolve: {
                 language: function () {
@@ -379,14 +391,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         reporter.createScript();
 
         return modalInstance.result.then(function (filename) {
-            userProject.closeScript(filename);
-            return userProject.createScript(filename);
-        }, () => {
-            esconsole('Modal dismissed.', ['IDE','debug']);
-        }).then(function (script) {
-            // script saved and opened
-            script && $rootScope.$broadcast('createScript', script.shareid);
-            $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
+            if (filename) {
+                userProject.closeScript(filename);
+                return userProject.createScript(filename).then(function (script) {
+                    // script saved and opened
+                    script && $rootScope.$broadcast('createScript', script.shareid);
+                    $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
+                });
+            }
         });
     };
 
@@ -425,13 +437,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             throw new Error('bad language value');
         }
 
-        $scope.editor.setLanguage(language);
+        editor.setLanguage(language);
 
         // re-enable blocks mode if language changes
-        // TODO: questionable code: localStorage.get('blocks') === 'yes'
+        // TODO: questionable code: localStorage.getItem('blocks') === 'yes'
         // currentlyUsingBlocks would be off when we switch the language
         // maybe we need a global-state scope variable
-        // if (localStorage.get('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
+        // if (localStorage.getItem('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
         //     $scope.toggleBlocks();
         // }
 
@@ -477,7 +489,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // does not trigger Angular digest.
         $scope.$apply(function () {
             $ngRedux.dispatch(scripts.addReadOnlyScript(Object.assign({}, fake_script)));
-            $scope.editor.ace.focus();
+            editor.ace.focus();
             $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
 
@@ -492,12 +504,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     $scope.getResult = function () {
         if ($scope.currentLanguage === 'python') {
             return compiler.compilePython(
-                $scope.editor.getValue(),
+                editor.getValue(),
                 $scope.audioQuality
             );
         } else if ($scope.currentLanguage === 'javascript') {
             return compiler.compileJavascript(
-                $scope.editor.getValue(),
+                editor.getValue(),
                 $scope.audioQuality
             );
         }
@@ -520,11 +532,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // TODO: only should clear when compiling another script?
         WaveformCache.clear();
 
-        EarSketch.Global.ExitFlag = true;//assure the exit check variable is ON
-
         $scope.loaded = false; // show spinning icon
 
-        var code = $scope.editor.getValue();
+        var code = editor.getValue();
 
         var startTime = Date.now();
         var language = $scope.currentLanguage;
@@ -563,6 +573,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                         var report = caiAnalysisModule.analyzeCodeAndMusic(language, code, result);
                     }
                     catch (e) {
+                        // TODO: Make this work across browsers. (See esconsole for reference.)
                         var traceDepth = 5;
                         var stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1];
                         var startIndex = stackString.indexOf("reader.js");
@@ -582,8 +593,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     }
                     
                     console.log("autograder", report);
-
-                    $rootScope.$broadcast('compileCAI', [result, language, code]);
+                    if (FLAGS.SHOW_CAI) {
+                        $ngRedux.dispatch(cai.compileCAI([result, language, code]));
+                    }
                 }, 0);
             }
 
@@ -659,20 +671,20 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         if ($scope.currentLanguage === 'javascript') {
             if (err.lineNumber !== undefined) {
                 $scope.lineNumber = err.lineNumber - 1;
-                if ($scope.editor.droplet.currentlyUsingBlocks) {
-                    $scope.editor.droplet.markLine(err.lineNumber - 1, {color: "red"});
+                if (editor.droplet.currentlyUsingBlocks) {
+                    editor.droplet.markLine(err.lineNumber - 1, {color: "red"});
                 }
                 line = err.lineNumber - 1;
                 aceRange = ace.require('ace/range').Range;
                 range = new aceRange(line, 0, line, 2000);
-                $scope.marker = $scope.editor.ace.getSession().addMarker(range, 'error-highlight', "fullLine");
+                $scope.marker = editor.ace.getSession().addMarker(range, 'error-highlight', "fullLine");
             }
         } else if ($scope.currentLanguage === 'python') {
             if (err.traceback !== undefined && err.traceback.length > 0) {
                 line = err.traceback[0].lineno - 1;
                 aceRange = ace.require('ace/range').Range;
                 range = new aceRange(line, 0, line, 2000);
-                $scope.marker = $scope.editor.ace.getSession().addMarker(range, 'error-highlight', "fullLine");
+                $scope.marker = editor.ace.getSession().addMarker(range, 'error-highlight', "fullLine");
             }
         }
     };
@@ -683,22 +695,17 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      * @function
      */
     $scope.clearErrors = function () {
-        if ($scope.editor.droplet.currentlyUsingBlocks) {
+        if (editor.droplet.currentlyUsingBlocks) {
             if ($scope.lineNumber !== undefined) {
-                $scope.editor.droplet.unmarkLine($scope.lineNumber);
+                editor.droplet.unmarkLine($scope.lineNumber);
             }
         }
-        $scope.editor.ace.getSession().removeMarker($scope.marker);
+        editor.ace.getSession().removeMarker($scope.marker);
     };
 
-    colorTheme.subscribe($scope, function (event, theme) {
-        if (!$scope.editor.ace) return;
-
-        if (theme === 'dark') {
-            $scope.editor.ace.setTheme('ace/theme/monokai');
-        } else {
-            $scope.editor.ace.setTheme('ace/theme/chrome');
-        }
+    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
+        if (!editor.ace) return;
+        editor.ace.setTheme(ACE_THEMES[theme]);
     });
 
     /**
@@ -708,25 +715,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      */
     $scope.setPage = function (page) {
         $state.transitionTo(page);
-    };
-
-    /**
-     * Returns the workspace for the current user
-     * @name getWS
-     * @function
-     */
-    $scope.getWS = function () {
-        wsapi.getWorkspace(userProject.getUsername());
-    };
-
-    /**
-     * Saves the current workspace for the user.
-     * @name saveWS
-     * @function
-     */
-    $scope.saveWS = function () {
-        //wsapiSaveWorkspace(userProject.getUsername()  , ES_WORKSPACE);
-        wsapi.sendReport('ERROR  REPORTED');
     };
 
     /**
@@ -743,7 +731,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             $scope.scriptExtension = '.js';
         }
 
-        localStorage.set('language', $scope.currentLanguage);
+        localStorage.setItem('language', $scope.currentLanguage);
         $rootScope.$broadcast('language', $scope.currentLanguage);
     };
 
@@ -764,7 +752,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      */
     $scope.reportError = function () {
 
-        if (userProject.isLogged()) {
+        if (userProject.isLoggedIn()) {
             userProject.getUserInfo().then(function (user) {
 
                 $scope.userName = user.firstname + " " + user.lastname;
@@ -801,11 +789,11 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      */
     $scope.pasteCode = function (key) {
         esconsole('paste key ' + key, 'debug');
-        if ($scope.editor.droplet.currentlyUsingBlocks) {
-            $scope.editor.droplet.setFocusedText(key);
+        if (editor.droplet.currentlyUsingBlocks) {
+            editor.droplet.setFocusedText(key);
         } else {
-            $scope.editor.ace.session.getTextRange($scope.editor.ace.getSelectionRange($scope.editor.ace.insert(key)));
-            $scope.editor.ace.focus();
+            editor.ace.session.getTextRange(editor.ace.getSelectionRange(editor.ace.insert(key)));
+            editor.ace.focus();
         }
         return key;
     };
@@ -820,12 +808,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
     $scope.setFontSize = function (val) {
         $scope.fontSizNum = val;
-        $scope.editor.setFontSize(val);
+        editor.setFontSize(val);
         // need to refresh the droplet palette section -- otherwise the block layout becomes weird
-        $scope.editor.setLanguage($scope.currentLanguage);
+        editor.setLanguage($scope.currentLanguage);
 
-        localStorage.set(LS_FONT_KEY, $scope.fontSizNum);
-        $scope.editor.ace.focus();
+        localStorage.setItem(LS_FONT_KEY, $scope.fontSizNum);
+        editor.ace.focus();
     };
 
     $scope.$on('fontSizeChanged', function (event, val) {
@@ -842,7 +830,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      * @function
      */
     $scope.openUploadWindow = function () {
-        if (userProject.isLogged()) {
+        if (userProject.isLoggedIn()) {
             $uibModal.open({
                 templateUrl: 'templates/upload-sound.html',
                 controller: 'UploadSoundCtrl'
@@ -892,11 +880,31 @@ app.directive('fileModel', ['$parse', function ($parse) {
     };
 }]);
 
+
+function createIssue(jsreport) {
+
+    var formData = new FormData();
+
+    formData.append('jsreport', jsreport);
+
+    var request = new XMLHttpRequest();
+    request.open("POST", URL_DOMAIN + '/services/files/reportissue');
+
+    request.onload = function () {
+        if (request.readyState === 4) {
+            if (request.status === 200) {
+                esconsole('******* Send Issue Report OK*********', 'info');
+            }
+        }
+    };
+    request.send(formData);
+}
+
 /**
  * @module ReportErrorCtrl
  */
-app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsapi','esconsole','ESUtils',
-    function ($scope,$http,$uibModalInstance,wsapi,esconsole, ESUtils) {
+app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance',
+    function ($scope,$uibModalInstance) {
         /**
          * Closes the modal instance.
          * @name cancel
@@ -963,7 +971,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
                 body = body + "\r\n**Error Description:** "+errorDesc+"\r\n";
             }
 
-            body = body + "\r\n**SOURCE CODE:** \r\n```"+lang+"\r\n" + $scope.editor.getValue() + "\r\n```";
+            body = body + "\r\n**SOURCE CODE:** \r\n```"+lang+"\r\n" + editor.getValue() + "\r\n```";
             body = body + "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```";
             body = body + "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageLog + "\r\n```";
 
@@ -972,7 +980,7 @@ app.controller('ReportErrorCtrl', ['$scope', '$http', '$uibModalInstance', 'wsap
             errorinfo.labels = ["report"];
             errorinfo.body = body;
 
-            wsapi.createIssue(JSON.stringify(errorinfo));
+            createIssue(JSON.stringify(errorinfo));
             userNotification.show('Thank you for your submission! Your error has been reported', 'success');
 
             setTimeout(func, 1000);

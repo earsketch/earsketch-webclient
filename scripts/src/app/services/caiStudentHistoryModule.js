@@ -1,11 +1,13 @@
-﻿//import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS} from 'caiTree';
-/**
+﻿/**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', 'caiStudent', 'caiStudentPreferenceModule', function (userProject, complexityCalculator, caiStudent, caiStudentPreferenceModule) {
+import * as caiStudent from "../../cai/student"
+import * as caiStudentPreferenceModule from "../../cai/studentPreferences"
+import * as userProject from '../userProject'
 
+app.factory('caiStudentHistoryModule', ['complexityCalculator', function (complexityCalculator) {
     var aggregateScore;
     var curriculumPagesViewed;
     var codeRequests = 0;
@@ -40,7 +42,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
 
     function calculateAggregateCodeScore() {
         if (aggregateScore == null) {
-            console.log("Script List Received: ");
             var savedScripts = [];
             var scriptTypes = [];
             var savedNames = [];
@@ -98,17 +99,17 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
                 }
                 if (output != null) {
                     if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
-                        output["userFunc"] = 3;
+                        output["userFunc"] = 4;
                     }
                     else if (output["userFunc"] === "ReturnAndArgs") {
-                        output["userFunc"] = 4;
+                        output["userFunc"] = 5;
                     }
 
                     if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
-                        output["userFunc"] = 3;
+                        output["userFunc"] = 4;
                     }
                     else if (output["userFunc"] === "ReturnAndArgs") {
-                        output["userFunc"] = 4;
+                        output["userFunc"] = 5;
                     }
 
                     for (var j in aggregateScore) {
@@ -171,7 +172,6 @@ app.factory('caiStudentHistoryModule', ['userProject', 'complexityCalculator', '
         }
         if (!curriculumPagesViewed.includes(page)) {
             curriculumPagesViewed.push(page);
-            console.log(curriculumPagesViewed);
             caiStudent.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed})
         }
     }
