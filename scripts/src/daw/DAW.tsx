@@ -2,17 +2,15 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 import { react2angular } from 'react2angular'
-import angular from 'angular'
-import ngRedux from 'ng-redux'
 
 import * as appState from '../app/appState'
 import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
-import { RootState } from '../reducers'
 import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import store, { RootState } from '../reducers'
 import * as WaveformCache from '../app/waveformcache'
 
 import * as daw from './dawState'
@@ -54,7 +52,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         // TODO: Update after relevant components get ported.
         if (needCompile) {
-            $rootScope?.$broadcast('compileembeddedTrack', true)
+            helpers.getNgRootScope().$broadcast('compileembeddedTrack', true)
             setNeedCompile(false)
             return
         }
@@ -555,10 +553,6 @@ const Timeline = () => {
     </div>
 }
 
-
-// Pulled in via angular dependencies
-let $rootScope: angular.IRootScopeService | null = null
-
 const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
 }
@@ -609,10 +603,84 @@ let lastTab: string | null = null
 // TODO: Temporary hack:
 let _setPlayPosition: ((a: number) => void) | null = null
 
-let setupDone = false
-const setup = ($ngRedux: ngRedux.INgRedux) => {
-    const { dispatch, getState } = $ngRedux
+export function setDAWData(result: player.DAWData) {
+    const { dispatch, getState } = store
+    const state = getState()
 
+    prepareWaveforms(result.tracks, result.tempo)
+
+    dispatch(daw.setTempo(result.tempo))
+
+    const playLength = result.length + 1
+    dispatch(daw.setPlayLength(playLength))
+
+    const tracks: player.Track[] = []
+    result.tracks.forEach((track, index) => {
+        // create a (shallow) copy of the track so that we can
+        // add stuff to it without affecting the reference which
+        // we want to preserve (e.g., for the autograder)
+        track = Object.assign({}, track)
+        tracks.push(track)
+
+        // Copy clips, too... because somehow dispatch(daw.setTracks(tracks)) is doing a deep freeze, preventing clip.source from being set by player.
+        track.clips = track.clips.map(c => Object.assign({}, c))
+
+        track.visible = true
+        track.label = index
+        track.buttons = true // show solo/mute buttons
+    })
+
+    const mix = tracks[0]
+    const metronome = tracks[tracks.length-1]
+
+    if (mix !== undefined) {
+        mix.visible = Object.keys(mix.effects).length > 0
+        mix.mute = false
+        // the mix track is special
+        mix.label = 'MIX'
+        mix.buttons = false
+    }
+    if (metronome !== undefined) {
+        metronome.visible = false
+        metronome.mute = !state.daw.metronome
+        metronome.effects = {}
+    }
+
+    // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
+    dispatch(daw.setTracks(tracks))
+
+    if (lastTab !== state.tabs.activeTabID) {
+        // User switched tabs since the last run.
+        dispatch(daw.setMetronome(false))
+        dispatch(daw.setShowEffects(true))
+        dispatch(daw.setPlaying(false))
+        _setPlayPosition!(1)
+        dispatch(daw.shuffleTrackColors())
+        dispatch(daw.setSoloMute({}))
+        dispatch(daw.setBypass({}))
+        // Set zoom based on play length.
+        dispatch(daw.setTrackWidth(64000 / playLength))
+        dispatch(daw.setTrackHeight(45))
+        lastTab = state.tabs.activeTabID
+    }
+
+    player.setRenderingData(result)
+    player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
+    player.setBypassedEffects(daw.selectBypass(state))
+
+    // sanity checks
+    const newLoop = Object.assign({}, state.daw.loop)
+    if (state.daw.loop.start > playLength) {
+        newLoop.start = 1
+    }
+    if (state.daw.loop.end > playLength) {
+        newLoop.end = playLength
+    }
+    dispatch(daw.setLoop(newLoop))
+}
+
+let setupDone = false
+const setup = () => {
     if (setupDone) return
     setupDone = true
 
@@ -621,84 +689,14 @@ const setup = ($ngRedux: ngRedux.INgRedux) => {
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
     $scope.$watch('compiled', (result: player.DAWData | null | undefined) => {
-        const state = getState()
-        if (result === null || result === undefined) return
-
-        esconsole('code compiled', 'daw')
-        prepareWaveforms(result.tracks, result.tempo)
-
-        dispatch(daw.setTempo(result.tempo))
-
-        const playLength = result.length + 1
-        dispatch(daw.setPlayLength(playLength))
-
-        const tracks: player.Track[] = []
-        result.tracks.forEach((track, index) => {
-            // create a (shallow) copy of the track so that we can
-            // add stuff to it without affecting the reference which
-            // we want to preserve (e.g., for the autograder)
-            track = Object.assign({}, track)
-            tracks.push(track)
-
-            // Copy clips, too... because somehow dispatch(daw.setTracks(tracks)) is doing a deep freeze, preventing clip.source from being set by player.
-            track.clips = track.clips.map(c => Object.assign({}, c))
-
-            track.visible = true
-            track.label = index
-            track.buttons = true // show solo/mute buttons
-        })
-
-        const mix = tracks[0]
-        const metronome = tracks[tracks.length-1]
-
-        if (mix !== undefined) {
-            mix.visible = Object.keys(mix.effects).length > 0
-            mix.mute = false
-            // the mix track is special
-            mix.label = 'MIX'
-            mix.buttons = false
+        if (result) {
+            esconsole("code compiled", "daw")
+            setDAWData(result)
         }
-        if (metronome !== undefined) {
-            metronome.visible = false
-            metronome.mute = !state.daw.metronome
-            metronome.effects = {}
-        }
-
-        // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
-        dispatch(daw.setTracks(tracks))
-
-        if (lastTab !== state.tabs.activeTabID) {
-            // User switched tabs since the last run.
-            dispatch(daw.setMetronome(false))
-            dispatch(daw.setShowEffects(true))
-            dispatch(daw.setPlaying(false))
-            _setPlayPosition!(1)
-            dispatch(daw.shuffleTrackColors())
-            dispatch(daw.setSoloMute({}))
-            dispatch(daw.setBypass({}))
-            // Set zoom based on play length.
-            dispatch(daw.setTrackWidth(64000 / playLength))
-            dispatch(daw.setTrackHeight(45))
-            lastTab = state.tabs.activeTabID
-        }
-
-        player.setRenderingData(result)
-        player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
-        player.setBypassedEffects(daw.selectBypass(state))
-
-        // sanity checks
-        const newLoop = Object.assign({}, state.daw.loop)
-        if (state.daw.loop.start > playLength) {
-            newLoop.start = 1
-        }
-        if (state.daw.loop.end > playLength) {
-            newLoop.end = playLength
-        }
-        dispatch(daw.setLoop(newLoop))
     })
 }
 
-const DAW = () => {
+export const DAW = () => {
     const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const trackColors = useSelector(daw.selectTrackColors)
@@ -1055,17 +1053,13 @@ const DAW = () => {
     </div>
 }
 
-const HotDAW = hot((props: {
-    $rootScope: angular.IRootScopeService,
-    $ngRedux: any,
-}) => {
-    $rootScope = props.$rootScope
-    setup(props.$ngRedux)
+const HotDAW = hot(() => {
+    setup()
     return (
-        <Provider store={props.$ngRedux}>
+        <Provider store={store}>
             <DAW />
         </Provider>
-    );
-});
+    )
+})
 
-app.component('daw', react2angular(HotDAW, null, ['$ngRedux', '$rootScope']))
+app.component('daw', react2angular(HotDAW))

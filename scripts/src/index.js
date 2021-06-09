@@ -133,7 +133,6 @@ require(['angular'], () => {
     require('uploadController');
     require('renameController');
     require('shareScriptController');
-    require('scriptVersionController');
     require('userHistoryController');
 
     require('createAccountController');

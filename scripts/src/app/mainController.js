@@ -23,6 +23,7 @@ import { wrapModal } from '../helpers';
 import { ProfileEditor } from './ProfileEditor';
 import * as recommender from './recommender';
 import { ScriptAnalysis } from './ScriptAnalysis';
+import { ScriptHistory } from './ScriptHistory';
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 import i18n from "i18next";
@@ -33,6 +34,7 @@ app.component("analyzeScriptController", wrapModal(ScriptAnalysis))
 app.component("editProfileController", wrapModal(ProfileEditor))
 app.component("changepasswordController", wrapModal(ChangePassword))
 app.component("downloadController", wrapModal(Download))
+app.component("scriptVersionController", wrapModal(ScriptHistory))
 
 /**
  * @module mainController
@@ -923,8 +925,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         await userProject.saveScript(script.name, script.source_code);
         $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
-            templateUrl: 'templates/script-versions.html',
-            controller: 'scriptVersionController',
+            component: 'scriptVersionController',
             size: 'lg',
             resolve: {
                 script() { return script; },

@@ -225,7 +225,7 @@ const Editor = () => {
         {/* Note: activeScript managed in ideController and tabState */}
         {activeScript?.collaborative && <div id="collab-badges-container">
             {Object.entries(collaboration.otherMembers).map(([name, state], index) => 
-            <div className="collaborator-badge prevent-selection" style={{
+            <div key={name} className="collaborator-badge prevent-selection" style={{
                     borderColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
                     backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)`: "#666",
                  }}

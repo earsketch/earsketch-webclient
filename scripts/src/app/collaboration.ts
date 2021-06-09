@@ -579,12 +579,8 @@ function rejoinSession() {
     return new Promise(resolve => continuations.joinSession = resolve)
 }
 
-export function saveScript(scriptID: string) {
-    if (scriptID) {
-        if (scriptID === scriptID) {
-            websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
-        }
-    } else {
+export function saveScript(_scriptID?: string) {
+    if (!_scriptID || (_scriptID === scriptID)) {
         websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
     }
     reporter.saveSharedScript()

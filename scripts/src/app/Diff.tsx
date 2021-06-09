@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from "react"
-import { react2angular } from "react2angular"
 
-const Diff = ({ original, modified }: { original: string, modified: string }) => {
+export const Diff = ({ original, modified }: { original: string, modified: string }) => {
     const element = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!element.current) return
 
         // Perform diff.
-        const newLines = difflib.stringAsLines(original)
-        const baseLines = difflib.stringAsLines(modified)
+        const newLines = difflib.stringAsLines(modified)
+        const baseLines = difflib.stringAsLines(original)
         // This is a list of 3-tuples describing what changes should be made to the base text in order to yield the new text.
         const opcodes = (new difflib.SequenceMatcher(baseLines, newLines)).get_opcodes()
 
@@ -34,5 +33,3 @@ const Diff = ({ original, modified }: { original: string, modified: string }) =>
 
     return <code ref={element} className="diff"></code>
 }
-
-app.component("diff", react2angular(Diff, ["original", "modified"]))
