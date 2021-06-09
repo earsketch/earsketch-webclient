@@ -16,6 +16,7 @@ import * as userNotification from "./userNotification"
 import * as websocket from "./websocket"
 import { ScriptEntity } from "common"
 import ESMessages from "../data/messages"
+import i18n from "i18next";
 
 const USER_STATE_KEY = "userstate"
 
@@ -145,7 +146,7 @@ window.onbeforeunload = () => {
                 saving = true
                 saveScript(scripts[shareID].name, scripts[shareID].source_code).then(() => {
                     store.dispatch(scriptsState.syncToNgUserProject())
-                    userNotification.show(ESMessages.user.scriptcloud, "success")
+                    userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
                 })
             }
         }
@@ -296,7 +297,7 @@ export async function login(username: string, password: string) {
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
 
-    esconsole(ESMessages.user.scriptsuccess, ["debug", "user"])
+    esconsole(i18n.t('messages:user.scriptsuccess'), ["debug", "user"])
     const storedScripts = extractScripts(data)
     resetScripts()
 
@@ -526,7 +527,7 @@ export async function loadScript(id: string, sharing: boolean) {
         const data = await get("/services/scripts/scriptbyid", { scriptid: id })
         if (sharing && data === "") {
             if (!userNotification.state.isInLoadingScreen) {
-                userNotification.show(ESMessages.user.badsharelink, "failure1", 3)
+                userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
             }
             throw "Script was not found."
         }

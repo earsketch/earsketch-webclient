@@ -14,13 +14,6 @@ const ESMessages = {
         "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
         "blocksyntaxerror": "Failed to switch to the block mode. Please make sure that there is no syntax error in the code."
     },
-    "esaudio": {
-        "stringindex": "Beat string index is out of bounds",
-        "nonlistRangeError": "beat strings can only contain 0, +, or -",
-        "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
-        "pitchshiftTooLong": "The clip is too long for the PITCHSHIFT effect. The max length is 5 minutes. Please use a shorter clip.",
-        "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
-    },
     "general": {
         "unauthenticated": "Please login before using this feature...",
         "shortname": "Please provide a name that is at least 3 characters long.",
@@ -31,19 +24,6 @@ const ESMessages = {
         "renameSoundSpecialChar": "Removing special characters in the renaming process...",
         'illegalCharacterInUserID': 'Please use only regular characters, numbers, or _ in the user ID.',
         'complexitySyntaxError': 'Failed to run the code indicator. There might be a syntax error in your code.'
-    },
-    "user": {
-        "scriptsuccess": "List of scripts in Load script list successfully updated.",
-        "scriptcloud": "Script successfully saved to the cloud.",
-        "allscriptscloud": "All unsaved scripts successfully saved to the cloud.",
-        "badsharelink": "Error opening a script. The share link in the URL may be wrong.",
-        "scriptcopied": "Script successfully copied.",
-        "teachersLink": "Teacher account requires your full name and a unique email address for logging in to the TEACHERS website. Please provide them in the Edit Profile menu in the account options.",
-        "infoRequired": "First Name, Last Name, and E-mail Address are required for a teacher account.",
-        "emailConflict": "Failed to update the user profile. Please check that this E-mail address is not used in other EarSketch accounts. (Hint: If you cannot remember such user account, try logging out and choose Reset Account -> Forgot Your Password? option. This lets you retrieve the account tied to the E-mail address.",
-        "teacherSiteLoginError": "Error logging in to the TEACHERS website! ",
-        "promptFixAtTeacherSite": ". Please try changing the user information in Edit Profile.",
-        "teachersPageNoAccess": "You must have a teacher account to access this page. You can request one at the CONTACT page."
     },
     "uploadcontroller" : {
         "freesoundSelection": "Please select a sound from the Freesound search results...",

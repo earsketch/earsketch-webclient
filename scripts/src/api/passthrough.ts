@@ -18,6 +18,7 @@ import { Clip, DAWData, EffectRange, Track } from "../app/player"
 import { measureToTime } from "../esutils"
 import ESMessages from "../data/messages"
 import * as userProject from "../app/userProject"
+import i18n from "i18next";
 
 
 class ValueError extends Error {
@@ -299,9 +300,9 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
         if (!isNaN(current)) {
             if (current > mediaList.length - 1) {
                 if (mediaList.length === 1) {
-                    throw new RangeError(ESMessages.esaudio.nonlistRangeError)
+                    throw new RangeError(i18n.t('messages:esaudio.nonlistRangeError'))
                 } else {
-                    throw new RangeError(ESMessages.esaudio.stringindex)
+                    throw new RangeError(i18n.t('messages:esaudio.stringindex'))
                 }
             }
             const filekey = mediaList[current]
@@ -430,7 +431,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
         // current beat is a valid number
         if (!isNaN(current)) {
             if (current > beatList.length - 1) {
-                throw new RangeError(ESMessages.esaudio.stringindex)
+                throw new RangeError(i18n.t('messages:esaudio.stringindex'))
             }
             const start = measure + (i * SIXTEENTH)
             const sliceStart = beatList[current] as number
@@ -548,7 +549,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     const endTimeInSamples = Math.round(sampleRate * measureToTime(endTime, result.tempo))
     const blockSize = 2048; // TODO: hardcoded in analysis.js as well
     if ((endTimeInSamples - startTimeInSamples) < blockSize) {
-        throw new RangeError(ESMessages.esaudio.analysisTimeTooShort)
+        throw new RangeError(i18n.t('messages:esaudio.analysisTimeTooShort'))
     }
 
     const tempo = result.tempo
@@ -670,7 +671,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
     const endTimeInSamples = Math.round(sampleRate * measureToTime(endTime, result.tempo))
     const blockSize = 2048; // TODO: hardcoded in analysis.js as well
     if ((endTimeInSamples - startTimeInSamples) < blockSize) {
-        throw new RangeError(ESMessages.esaudio.analysisTimeTooShort)
+        throw new RangeError(i18n.t('messages:esaudio.analysisTimeTooShort'))
     }
 
     const tempo = result.tempo

@@ -7,6 +7,7 @@ import * as sounds from '../browser/soundsState';
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
+import i18n from "i18next";
 
 app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeout', '$http', '$ngRedux' , function($scope, $uibModalInstance, $sce, $timeout, $http, $ngRedux) {
     $scope.file = {
@@ -250,8 +251,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
             if(tempo > 200 || (tempo > -1 && tempo < 45)){
                 flagerr = true;
                 esconsole('Tempo is out of range 45-200', 'warning');
-                userConsole.warn(ESMessages.esaudio.tempoRange);
-                $scope.uploadError = ESMessages.esaudio.tempoRange;
+                userConsole.warn(i18n.t('messages:esaudio.tempoRange'));
+                $scope.uploadError = i18n.t('messages:esaudio.tempoRange');
             }
         }
 
@@ -550,8 +551,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
                     if(tempo > 200 || (tempo > -1 && tempo < 45)){
                         flagerr = true;
                         esconsole('Tempo is out of range 45-200', 'warning');
-                        userConsole.warn(ESMessages.esaudio.tempoRange);
-                        $scope.uploadError = ESMessages.esaudio.tempoRange;
+                        userConsole.warn(i18n.t('messages:esaudio.tempoRange'));
+                        $scope.uploadError = i18n.t('messages:esaudio.tempoRange');
                     }
                 }
 
