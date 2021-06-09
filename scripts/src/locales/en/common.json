@@ -32,6 +32,13 @@
     },
     "dawservice": {
       "effecttrackwarning": "Adding an effect track before the audio track is created"
+    },
+    "esaudio": {
+      "stringindex": "Beat string index is out of bounds",
+      "nonlistRangeError": "beat strings can only contain 0, +, or -",
+      "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
+      "pitchshiftTooLong": "The clip is too long for the PITCHSHIFT effect. The max length is 5 minutes. Please use a shorter clip.",
+      "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
     }
   }
 }

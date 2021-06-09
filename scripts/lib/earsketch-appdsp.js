@@ -10,6 +10,10 @@
 //var ESDSP_MAX_BUFFERSIZE = 5*44100*60;
 
 
+// import i18n from "i18next"; use this once this is a module
+
+const i18next = require("i18next");
+
 var ESDSP_NumberOfSamples=0;
 var ESDSP_WINDOW_SIZE = 1024;
 var ESDSP_HOP_SIZE = 256;
@@ -194,9 +198,10 @@ function computePitchShift(AudioData , envelope, context) {
 
 	console.log('WINDOW_SIZE '+ ESDSP_WINDOW_SIZE + ' HOP SIZE '+ESDSP_HOP_SIZE);
 	console.log('Buffer Samples '+ AudioData.length );
-
+	console.log('es dsp i18next output: ' + i18next.default.t('messages:esaudio.pitchshiftTooLong'));
 	if(AudioData.length > ESDSP_MAX_BUFFERSIZE){
-		throw ESMessages.esaudio.pitchshiftTooLong;
+		throw i18next.t('messages:esaudio.pitchshiftTooLong');
+
 	}
 
 	ESDSP_NumberOfSamples = AudioData.length ;
