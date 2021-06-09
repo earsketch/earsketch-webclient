@@ -135,7 +135,6 @@ require(['angular'], () => {
     require('userHistoryController');
 
     require('adminWindowController');
-    require('submitAWSController');
 
     // React components
     require('./browser/Browser');

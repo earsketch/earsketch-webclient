@@ -3,6 +3,7 @@ import * as appState from '../app/appState';
 import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
 import { ChangePassword } from './ChangePassword'
+import { CompetitionSubmission } from './CompetitionSubmission'
 import * as collaboration from './collaboration'
 import { Download } from './Download'
 import esconsole from '../esconsole'
@@ -40,6 +41,7 @@ app.component("scriptVersionController", wrapModal(ScriptHistory))
 app.component("renameController", wrapModal(RenameScript))
 app.component("renameSoundController", wrapModal(RenameSound))
 app.component("accountController", wrapModal(AccountCreator))
+app.component("submitCompetitionController", wrapModal(CompetitionSubmission))
 
 /**
  * @module mainController
@@ -998,14 +1000,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.submitToCompetition = async script => {
         await userProject.saveScript(script.name, script.source_code);
         $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
+        const shareID = await userProject.getLockedSharedScriptId(script.shareid);
         $uibModal.open({
-            templateUrl: 'templates/submit-script-aws.html',
-            controller: 'submitAWSController',
+            component: 'submitCompetitionController',
             size: 'lg',
             resolve: {
-                script() { return script; },
-                quality() { return $scope.audioQuality; },
-                licenses() { return $scope.licenses; }
+                name() { return script.name; },
+                shareID() { return shareID; },
             }
         });
     };

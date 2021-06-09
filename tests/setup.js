@@ -222,7 +222,6 @@ require('shareScriptController');
 require('userHistoryController');
 
 require('adminWindowController');
-require('submitAWSController');
 
 require('autograderController');
 require('autograder2Controller');
