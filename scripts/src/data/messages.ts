@@ -59,11 +59,6 @@ const ESMessages = {
         "fail": "Forgot Password failed...",
         "success": "Password Reset instructions was successfully sent to your email ..."
     },
-    "downloadprotecteddata": {
-        "nopassword": "Please enter the password.",
-        "servertimeout": "The was some problem at our end. Please try again.",
-        "unexpectederror": "Unexpected error. Please try again or report error from the options menu."
-    },
     "shareScript": {
         "menuDescriptions": {
             "viewOnly": "I want someone to see my script. (They cannot edit.)",

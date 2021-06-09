@@ -1004,7 +1004,7 @@ app.controller('DownloadTeacherMaterialsCtrl', ['$scope', '$http', '$uibModalIns
      */
     $scope.download = function () {
         if ($scope.keypass === "") {
-            $scope.error = ESMessages.downloadprotecteddata.nopassword;
+            $scope.error = i18n.t('messages:downloadprotecteddata.nopassword');
             return;
         }
 
@@ -1016,7 +1016,7 @@ app.controller('DownloadTeacherMaterialsCtrl', ['$scope', '$http', '$uibModalIns
         request.timeout = 10000;
 
         request.ontimeout = function () {
-            $scope.error = ESMessages.downloadprotecteddata.servertimeout;
+            $scope.error = i18n.t('messages:downloadprotecteddata.servertimeout');
             esconsole('Timeout while requesting teacher materials from server.', 'error');
         };
 
@@ -1034,7 +1034,7 @@ app.controller('DownloadTeacherMaterialsCtrl', ['$scope', '$http', '$uibModalIns
                         $uibModalInstance.close();
                         return;
                     } else {
-                        $scope.error = ESMessages.downloadprotecteddata.servertimeout;
+                        $scope.error = i18n.t('messages:downloadprotecteddata.servertimeout');
                     }
                 } else if (request.status === 403){
                     $scope.error = "Incorrect password.";
@@ -1043,7 +1043,7 @@ app.controller('DownloadTeacherMaterialsCtrl', ['$scope', '$http', '$uibModalIns
                 }
             }
             esconsole('Error in download teacher materials: STATUS '+ request.status, 'error');
-            $scope.error = ESMessages.downloadprotecteddata.unexpectederror;
+            $scope.error = i18n.t('messages:downloadprotecteddata.unexpectederror');
             $scope.$apply();
         };
 

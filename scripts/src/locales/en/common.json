@@ -67,6 +67,11 @@
       "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
       "commerror": "Communication error ...",
       "commerror2": "Communication error ..."
+    },
+    "downloadprotecteddata": {
+      "nopassword": "Please enter the password.",
+      "servertimeout": "The was some problem at our end. Please try again.",
+      "unexpectederror": "Unexpected error. Please try again or report error from the options menu."
     }
   }
 }
