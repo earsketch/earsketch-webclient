@@ -22,6 +22,7 @@ import * as cai from '../cai/caiState';
 import { wrapModal } from '../helpers';
 import { ProfileEditor } from './ProfileEditor';
 import * as recommender from './recommender';
+import { RenameScript, RenameSound } from './Rename';
 import { ScriptAnalysis } from './ScriptAnalysis';
 import { ScriptHistory } from './ScriptHistory';
 import * as userNotification from './userNotification';
@@ -34,6 +35,8 @@ app.component("editProfileController", wrapModal(ProfileEditor))
 app.component("changepasswordController", wrapModal(ChangePassword))
 app.component("downloadController", wrapModal(Download))
 app.component("scriptVersionController", wrapModal(ScriptHistory))
+app.component("renameController", wrapModal(RenameScript))
+app.component("renameSoundController", wrapModal(RenameSound))
 
 /**
  * @module mainController
@@ -837,8 +840,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.renameSound = sound => {
         $uibModal.open({
-            templateUrl: 'templates/rename-sound.html',
-            controller: 'renameSoundController',
+            component: 'renameSoundController',
             size: 'sm',
             resolve: {
                 sound() { return sound; }
@@ -891,8 +893,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         const scriptCopy = Object.assign({}, script);
 
         const modal = $uibModal.open({
-            templateUrl: 'templates/rename-script.html',
-            controller: 'renameController',
+            component: 'renameController',
             size: 100,
             resolve: {
                 script() { return scriptCopy; }
@@ -900,6 +901,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         });
 
         modal.result.then(async newScript => {
+            if (!newScript) return;
             await userProject.renameScript(scriptCopy.shareid, newScript.name);
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             reporter.renameScript();
