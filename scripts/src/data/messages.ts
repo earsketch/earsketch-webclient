@@ -1,8 +1,6 @@
 const ESMessages = {
-    
-    "dawservice": {
-        "effecttrackwarning": "Adding an effect track before the audio track is created"
-    },
+
+
     "idecontroller": {
         "soundcloud": {
             "description": "EarSketch helps you learn core topics in computer science, music, and music technology in a fun, engaging environment. You learn to code in Python or JavaScript, two of the most popular programming languages in the world, while manipulating loops, composing beats, and applying effects to a multi-track digital audio workstation. To learn more about EarSketch, visit http://earsketch.gatech.edu.",

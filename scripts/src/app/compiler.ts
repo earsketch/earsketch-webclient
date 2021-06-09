@@ -681,7 +681,7 @@ function checkEffects(result: DAWData) {
         const effectCount  = Object.keys(track.effects).length
 
         if (effectCount > 0 && clipCount == 0) {
-            userConsole.warn(ESMessages.dawservice.effecttrackwarning + ` (Track ${i})`)
+            userConsole.warn(i18n.t('messages:dawservice.effecttrackwarning') + ` (Track ${i})`)
         }
     }
 }
