@@ -218,17 +218,14 @@ require('mainController');
 require('ideController');
 require('promptController');
 require('uploadController');
-require('createScriptController');
 require('renameController');
 require('downloadController');
 require('shareScriptController');
 require('scriptVersionController');
-require('analyzeScriptController');
 require('userHistoryController');
 
 require('createAccountController');
 require('changePasswordController');
-require('editProfileController');
 require('adminWindowController');
 require('submitAWSController');
 

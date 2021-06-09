@@ -1,4 +1,5 @@
 import angular from 'angular';
+import { react2angular } from 'react2angular';
 
 export const getNgService = (name: string): angular.IRootScopeService => angular.element(document).injector().get(name);
 
@@ -19,3 +20,8 @@ export const getNgDirective = (directiveName: string) => {
 export const getNgRootScope = () => angular.element(document).injector().get('$rootScope');
 
 export const getNgMainController = () => angular.element(document.body);
+
+export function wrapModal(component: Function) {
+    const wrapped = ({ modalInstance, resolve, ...props}: any) => component({ close: modalInstance.close, ...resolve, ...props })
+    return react2angular(wrapped, ["modalInstance", "resolve"])
+}
