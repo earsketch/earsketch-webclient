@@ -5,18 +5,32 @@
  *
  */
 
+import ESMessages from "../src/data/messages";
+
 //EARSKETCH DSP ESSENTIAL VARIABLES
 
 //var ESDSP_MAX_BUFFERSIZE = 5*44100*60;
 
+declare var Module: any
+
+let initDSP: any
+let fillHann: any
+let windowSignal: any
+let windowSignalQ: any
+let rfft: any
+let convert: any
+let unconvert: any
+let overlapadd: any
+let interpolateFit: any
+let interpolateFitVar: any
 
 var ESDSP_NumberOfSamples=0;
 var ESDSP_WINDOW_SIZE = 1024;
-var ESDSP_HOP_SIZE = 256;
+export const HOP_SIZE = 256;
 
 var ESDSP_MAX_BUFFERSIZE = 8388608;
 var ESDSP_MAX_OUTSAMPLES = 2*ESDSP_MAX_BUFFERSIZE;
-var ESDSP_MAX_FRAMES =  ESDSP_MAX_BUFFERSIZE/ESDSP_HOP_SIZE;
+var ESDSP_MAX_FRAMES =  ESDSP_MAX_BUFFERSIZE/HOP_SIZE;
 
 var ESDSP_FRAMES=0;
 var ESDSP_OUTSAMPLES=0;
@@ -24,16 +38,16 @@ var ESDSP_INTERSAMPLES=0;
 
 
 //HEAP VARIABLES
-var WW_HEAP;
-var HH_HEAP;
-var LASTPH_HEAP;
-var ACCUMPH_HEAP;
-var MAGFREQ_HEAP;
-var YOVERLAP_HEAP;
-var YINTERP_HEAP;
-var YHOPOUT_HEAP;
+var WW_HEAP: any
+var HH_HEAP: any
+var LASTPH_HEAP: any
+var ACCUMPH_HEAP: any
+var MAGFREQ_HEAP: any
+var YOVERLAP_HEAP: any
+var YINTERP_HEAP: any
+var YHOPOUT_HEAP: any
 
-var ZERO_FOUTSAMPLES;
+var ZERO_FOUTSAMPLES: any
 
 //Create the Heap
 setupHeap();
@@ -135,13 +149,13 @@ function freeHeap(){
 
 
 
-function setOutSample(envelope){
-	var step,alpha , hopOut;
+function setOutSample(envelope: Float32Array){
+	var step,alpha , hopOut: any;
     ESDSP_OUTSAMPLES = 0;               
-    for (f=0; f<ESDSP_FRAMES; ++f) {        
+    for (let f=0; f<ESDSP_FRAMES; ++f) {        
 		step = envelope[f];
         alpha =  Math.pow (2.0, step/12.0);
-        hopOut = Math.round(alpha*ESDSP_HOP_SIZE);
+        hopOut = Math.round(alpha*HOP_SIZE);
         ESDSP_OUTSAMPLES = ESDSP_OUTSAMPLES + hopOut;
         
     }
@@ -154,45 +168,32 @@ function setOutSample(envelope){
 
 }
 
-function setVariableShift(envelope){
+function setVariableShift(envelope: Float32Array){
 	var step,alpha , hopOut;
 
                     
-    for (f=0; f<ESDSP_FRAMES; ++f) {
+    for (let f=0; f<ESDSP_FRAMES; ++f) {
         step = envelope[f];
         alpha =  Math.pow (2.0, step/12.0);
-        hopOut = Math.round(alpha*ESDSP_HOP_SIZE);
+        hopOut = Math.round(alpha*HOP_SIZE);
         YHOPOUT_HEAP[f] = hopOut;
     }
 }
 
 
 
-function computeNumberOfFrames(totalsamples){
+export function computeNumberOfFrames(totalsamples: number){
 
-	return  1+ Math.floor(  (totalsamples-ESDSP_WINDOW_SIZE) / ESDSP_HOP_SIZE );
+	return  1+ Math.floor(  (totalsamples-ESDSP_WINDOW_SIZE) / HOP_SIZE );
 }
 
 //return an audio buffer
 
-function computePitchShift(AudioData , envelope, context) { 
-	/*
-	//encapsulate function methods to avoid goes to the global scope
-	var initDSP;
-	var fillHann;
-	var windowSignal;
-	var windowSignalQ;
-	var rfft;
-	var convert;
-	var unconvert;
-	var overlapadd;
-	var interpolateFit;
-	var interpolateFitVar;
-	*/
+export function computePitchShift(AudioData: Float32Array, envelope: Float32Array, context: AudioContext) { 
 	console.log ('Start computePitchShift ...');
 
 
-	console.log('WINDOW_SIZE '+ ESDSP_WINDOW_SIZE + ' HOP SIZE '+ESDSP_HOP_SIZE);
+	console.log('WINDOW_SIZE '+ ESDSP_WINDOW_SIZE + ' HOP SIZE '+HOP_SIZE);
 	console.log('Buffer Samples '+ AudioData.length );
 
 	if(AudioData.length > ESDSP_MAX_BUFFERSIZE){
@@ -200,7 +201,7 @@ function computePitchShift(AudioData , envelope, context) {
 	}
 
 	ESDSP_NumberOfSamples = AudioData.length ;
-	ESDSP_FRAMES = 1+ Math.floor(  (ESDSP_NumberOfSamples-ESDSP_WINDOW_SIZE) / ESDSP_HOP_SIZE );
+	ESDSP_FRAMES = 1+ Math.floor(  (ESDSP_NumberOfSamples-ESDSP_WINDOW_SIZE) / HOP_SIZE );
 
 
 	//Compute Frame Envelope
@@ -226,7 +227,7 @@ function computePitchShift(AudioData , envelope, context) {
 
 	var index = 0;
 	var offset = 0;
-    for (f=0; f<ESDSP_FRAMES; ++f) {
+    for (let f=0; f<ESDSP_FRAMES; ++f) {
     	//Nota that subarray is a pointer to the AudioData not a new array
     	//WW.set(AudioData.subarray(index,index+WINDOW_SIZE));
     	QWindow = 1.0 / Math.sqrt(((ESDSP_WINDOW_SIZE/YHOPOUT_HEAP[f])/2.0));
@@ -237,7 +238,7 @@ function computePitchShift(AudioData , envelope, context) {
     	//FORWARD REAL FFT
     	rfft(WW_HEAP.byteOffset, ESDSP_WINDOW_SIZE/2, 1);
     	//COMPUTING INSTANTANEOS FREQUENCY
-    	convert( WW_HEAP.byteOffset, MAGFREQ_HEAP.byteOffset, ESDSP_WINDOW_SIZE/2, ESDSP_HOP_SIZE,LASTPH_HEAP.byteOffset);
+    	convert( WW_HEAP.byteOffset, MAGFREQ_HEAP.byteOffset, ESDSP_WINDOW_SIZE/2, HOP_SIZE,LASTPH_HEAP.byteOffset);
     	//COMPUTE COMPLEX FFT FROM INSTANTANEOUS FREQUENCY
     	unconvert(  MAGFREQ_HEAP.byteOffset,  WW_HEAP.byteOffset, ESDSP_WINDOW_SIZE/2, YHOPOUT_HEAP[f], ACCUMPH_HEAP.byteOffset);
     	//INVERSE FFT
@@ -245,14 +246,14 @@ function computePitchShift(AudioData , envelope, context) {
 		//WEIGTHED HANNING WINDOW
     	windowSignalQ(HH_HEAP.byteOffset,WW_HEAP.byteOffset, ESDSP_WINDOW_SIZE, QWindow);
 
-    	index = index +ESDSP_HOP_SIZE;
+    	index = index +HOP_SIZE;
 		overlapadd(WW_HEAP.byteOffset,YOVERLAP_HEAP.byteOffset,  offset, ESDSP_WINDOW_SIZE);
 
     	offset = offset + YHOPOUT_HEAP[f];
     }
 	console.log('Interpolation ...');
 
-	interpolateFitVar(YOVERLAP_HEAP.byteOffset,YINTERP_HEAP.byteOffset, YHOPOUT_HEAP.byteOffset,  ESDSP_OUTSAMPLES,ESDSP_INTERSAMPLES,  ESDSP_FRAMES ,ESDSP_HOP_SIZE);
+	interpolateFitVar(YOVERLAP_HEAP.byteOffset,YINTERP_HEAP.byteOffset, YHOPOUT_HEAP.byteOffset,  ESDSP_OUTSAMPLES,ESDSP_INTERSAMPLES,  ESDSP_FRAMES ,HOP_SIZE);
 
     console.log('after DSP Interpolation');
 
