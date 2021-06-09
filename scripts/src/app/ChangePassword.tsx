@@ -4,12 +4,14 @@ import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
+import { useTranslation } from "react-i18next";
 
 export const ChangePassword = ({ close }: { close: () => void }) => {
     const [error, setError] = useState("")
     const [oldPassword, setOldPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const { t } = useTranslation();
 
     const submitPassword = () => {
         // TODO: This should not be a GET request, and these should not be URL parameters...
@@ -20,14 +22,14 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                 userNotification.show("Password changed successfully!", "success")
                 close()
             } else if (response.status === 401) {
-                setError(ESMessages.changepassword.pwdauth)
+                setError(t('messages:changepassword.pwdauth'))
             } else {
                 esconsole(`Error changing password: ${response.status} ${response.statusText}`, "error")
-                setError(ESMessages.changepassword.commerror)
+                setError(t('messages:changepassword.commerror'))
             }
         }).catch(error => {
             esconsole(error, "error")
-            setError(ESMessages.changepassword.commerror2)
+            setError(t('messages:changepassword.commerror2'))
         })
     }
 
@@ -50,7 +52,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                         <div className="form-group">
                             <input type="password" className="form-control" name="newpassword1" placeholder="New password"
                                    value={newPassword} onChange={e => {
-                                       e.target.setCustomValidity(e.target.validity.valid ? "" : ESMessages.changepassword.pwdlength)
+                                       e.target.setCustomValidity(e.target.validity.valid ? "" : t('messages:changepassword.pwdlength'))
                                        setNewPassword(e.target.value)
                                    }} required minLength={5} />
                         </div>
@@ -61,7 +63,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                     <div className="col-md-6">
                         <div className="form-group">
                             <input type="password" className="form-control" name="newpassword2" placeholder="Confirm new password" onChange={e => {
-                                    e.target.setCustomValidity(e.target.value === newPassword ? "" : ESMessages.changepassword.pwdfail)
+                                    e.target.setCustomValidity(e.target.value === newPassword ? "" : t('messages:changepassword.pwdfail'))
                                     setConfirmPassword(e.target.value)
                                 }} value={confirmPassword} required />
                         </div>

@@ -59,14 +59,6 @@ const ESMessages = {
         "fail": "Forgot Password failed...",
         "success": "Password Reset instructions was successfully sent to your email ..."
     },
-    "changepassword" : {
-        "pwdauth": "Old password wrong. Password could not be changed.",
-        "pwdfail": "Your password confirmation is not the same as your password.",
-        "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
-        "timeout": "Timeout communication error ...",
-        "commerror": "Communication error ...",
-        "commerror2": "Communication error ..."
-    },
     "downloadprotecteddata": {
         "nopassword": "Please enter the password.",
         "servertimeout": "The was some problem at our end. Please try again.",

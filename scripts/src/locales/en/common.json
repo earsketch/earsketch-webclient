@@ -60,6 +60,13 @@
       "compileerror": "Script could not compile successfully.",
       "emptyerror": "Song is empty!",
       "rendererror": "There was a problem rendering the script."
+    },
+    "changepassword" : {
+      "pwdauth": "Old password wrong. Password could not be changed.",
+      "pwdfail": "Your password confirmation is not the same as your password.",
+      "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
+      "commerror": "Communication error ...",
+      "commerror2": "Communication error ..."
     }
   }
 }
