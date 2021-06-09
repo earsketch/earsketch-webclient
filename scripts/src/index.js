@@ -126,8 +126,6 @@ require(['angular'], () => {
     // In-house modules
     require('recorder');
 
-    Object.assign(window,require('esAppDSP'));
-
     // Controllers
     require('mainController');
     require('ideController');

@@ -163,13 +163,6 @@ module.exports = {
                 type: 'commonjs',
                 exports: ['Module']
             }
-        }, {
-            test: path.resolve(__dirname,`${libDir}/earsketch-appdsp.js`),
-            loader: 'exports-loader',
-            options: {
-                type: 'commonjs',
-                exports: ['ESDSP_NumberOfSamples','ESDSP_WINDOW_SIZE','ESDSP_HOP_SIZE','ESDSP_MAX_BUFFERSIZE','ESDSP_MAX_OUTSAMPLES','ESDSP_MAX_FRAMES','ESDSP_FRAMES','ESDSP_OUTSAMPLES','ESDSP_INTERSAMPLES','esdsploadtest','setupCWrappers','initHeap','setupHeap','initDSPLibrary','freeHeap','setOutSample','setVariableShift','computeNumberOfFrames','computePitchShift']
-            }
         }]
     },
     plugins: [
