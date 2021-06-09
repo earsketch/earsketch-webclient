@@ -134,7 +134,6 @@ require(['angular'], () => {
     require('shareScriptController');
     require('userHistoryController');
 
-    require('createAccountController');
     require('adminWindowController');
     require('submitAWSController');
 

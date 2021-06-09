@@ -79,7 +79,7 @@ async function get(endpoint: string, params?: { [key: string]: string }) {
 }
 
 // Expects form data, returns JSON.
-async function postForm(endpoint: string, data?: { [key: string]: string }) {
+export async function postForm(endpoint: string, data?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
     try {
         return (await fetch(url, { method: "POST", body: form(data) })).json()

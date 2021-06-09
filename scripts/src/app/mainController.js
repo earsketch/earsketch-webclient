@@ -1,3 +1,4 @@
+import { AccountCreator } from './AccountCreator';
 import * as appState from '../app/appState';
 import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
@@ -38,6 +39,7 @@ app.component("downloadController", wrapModal(Download))
 app.component("scriptVersionController", wrapModal(ScriptHistory))
 app.component("renameController", wrapModal(RenameScript))
 app.component("renameSoundController", wrapModal(RenameSound))
+app.component("accountController", wrapModal(AccountCreator))
 
 /**
  * @module mainController
@@ -573,11 +575,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
 
     $scope.createAccount = function () {
-        $uibModal.open({
-            templateUrl: 'templates/create-account.html',
-            controller: 'accountController',
-            scope: $scope
-        });
+        $uibModal.open({ component: 'accountController' }).result.then(result => {
+            if (!result) return
+            $scope.username = result.username
+            $scope.password = result.password
+            $scope.openShareAfterLogin()
+            $scope.login()
+        })
     };
 
     $scope.forgotPass = function () {

@@ -27,7 +27,7 @@ const ESMessages = {
         'complexitySyntaxError': 'Failed to run the code indicator. There might be a syntax error in your code.',
     },
     "createaccount" : {
-        "usernameinvalid": "The username you entered is not valid. Usernames must not start with a number and cannot include spaces or special characters.",
+        "usernameconstraint": "Usernames must not start with a number and cannot include spaces or special characters.",
         "pwdfail": "Your password confirmation is not the same as your password.",
         "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
         "timeout": "Timeout communication error.",
