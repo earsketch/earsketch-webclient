@@ -4,6 +4,7 @@ import ESMessages from "../data/messages"
 import * as exporter from "./exporter"
 import { ScriptEntity } from "common"
 import * as userNotification from "./userNotification"
+import { useTranslation } from "react-i18next";
 
 const EXPORT_TYPES = {
     // Thin wrapper for `exporter.text()` since it breaks the pattern (not async, doesn't take quality).
@@ -14,6 +15,7 @@ const EXPORT_TYPES = {
 }
 
 export const Download = ({ script, quality, close }: { script: ScriptEntity, quality: boolean, close: () => void }) => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState({
         script: false,
         wav: false,
@@ -22,6 +24,7 @@ export const Download = ({ script, quality, close }: { script: ScriptEntity, qua
     })
 
     const save = async (type: keyof typeof EXPORT_TYPES) => {
+
         setLoading({ ...loading, [type]: true })
         const exportFunction = EXPORT_TYPES[type].function
         try {
@@ -57,7 +60,7 @@ export const Download = ({ script, quality, close }: { script: ScriptEntity, qua
                     </h3>
                 </div>
                 <div className="col-md-9">
-                    <div>{ESMessages.download[type as keyof typeof EXPORT_TYPES]}</div>
+                    <div>{t('messages:download.' + type as keyof typeof EXPORT_TYPES)}</div>
                 </div>
             </div>)}
         </div>

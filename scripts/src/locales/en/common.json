@@ -51,6 +51,15 @@
       "teacherSiteLoginError": "Error logging in to the TEACHERS website! ",
       "promptFixAtTeacherSite": ". Please try changing the user information in Edit Profile.",
       "teachersPageNoAccess": "You must have a teacher account to access this page. You can request one at the CONTACT page."
+    },
+    "download": {
+      "script": "Save your code as a text file on your computer.",
+      "wav": "Save your song as WAV audio file (uses more disk space, higher audio quality).",
+      "mp3": "Save your song as an MP3 file (uses less disk space, lower audio quality).",
+      "multitrack": "Save each track of your song as a separate WAV file (for importing into a digital audio workstation program like GarageBand, Logic, Pro Tools, Reaper, FruityLoops, Cubase, Audition, or Live).",
+      "compileerror": "Script could not compile successfully.",
+      "emptyerror": "Song is empty!",
+      "rendererror": "There was a problem rendering the script."
     }
   }
 }

@@ -72,12 +72,6 @@ const ESMessages = {
         "servertimeout": "The was some problem at our end. Please try again.",
         "unexpectederror": "Unexpected error. Please try again or report error from the options menu."
     },
-    "download":{
-        "safari_zip": 'In Safari, the downloaded file will be named "Unknown", "Unknown-2", etc. and you will need to rename it to "your_script_name.zip" (Don\'t forget the .zip at the end!) It may also take some time before the download begins depending on the file size. We generally recommend using Chrome or Firefox for downloading multi-track project.',
-        "compileerror": "Script could not compile successfully.",
-        "emptyerror": "Song is empty!",
-        "rendererror": "There was a problem rendering the script.",
-    },
     "shareScript": {
         "menuDescriptions": {
             "viewOnly": "I want someone to see my script. (They cannot edit.)",

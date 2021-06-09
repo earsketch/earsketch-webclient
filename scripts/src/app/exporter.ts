@@ -8,6 +8,7 @@ import * as helpers from "../helpers"
 import ESMessages from "../data/messages"
 import { DAWData } from "./player"
 import * as renderer from "./renderer"
+import i18n from "i18next";
 
 // Make a dummy anchor for downloading blobs.
 let dummyAnchor = document.createElement("a")
@@ -36,10 +37,10 @@ async function compile(script: ScriptEntity, quality: boolean) {
     try {
         result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code, +quality)
     } catch {
-        throw ESMessages.download.compileerror
+        throw i18n.t('messages:download.compileerror')
     }
     if (result.length === 0) {
-        throw ESMessages.download.emptyerror
+        throw i18n.t('messages:download.emptyerror')
     }
     return result
 }
@@ -54,7 +55,7 @@ async function exportAudio(script: ScriptEntity, quality: boolean, type: string,
         download(`${name}.${type}`, blob)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
-        throw ESMessages.download.rendererror
+        throw i18n.t('messages:download.rendererror')
     }
 }
 
@@ -91,7 +92,7 @@ export async function multiTrack(script: ScriptEntity, quality: boolean) {
             blob = await renderer.renderWav(copy)
         } catch (err) {
             esconsole(err, ["error", "exporter"])
-            throw ESMessages.download.rendererror
+            throw i18n.t('messages:download.rendererror')
         }
         zip.file(name + "/" + "track_" + trackNum.toString() + ".wav", blob)
     }
@@ -117,7 +118,7 @@ export async function soundcloud(script: ScriptEntity, quality: boolean, scData:
         blob = renderer.renderWav(result)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
-        throw ESMessages.download.rendererror
+        throw i18n.t('messages:download.rendererror')
     }
 
     esconsole("Uploading to SoundCloud.", "exporter")
