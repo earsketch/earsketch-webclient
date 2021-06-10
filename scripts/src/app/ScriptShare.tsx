@@ -545,6 +545,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, save, description, shareli
 }
 
 const MoreDetails = ({ script, licenses, licenseID }: any) => {
+    const [collapsed, setCollapsed] = useState(true)
     const [description, setDescription] = useState(script.description)
 
     const getLicenseLink = function (id: string) {
@@ -572,37 +573,45 @@ const MoreDetails = ({ script, licenses, licenseID }: any) => {
         userProject.setLicense(script.name, script.shareid, licenseID)
     }
 
-    return <div className="panel-default"> {/* TODO: Expand/collabse, heading. ("More Details (Description, License)...") */}
-        <div className="form-group text-left">
-            <div className="modal-section-header">
-                <span>Description (optional)</span>
-            </div>
-            <form role="form">
-                <textarea className="form-control border-0" rows={2} placeholder="Click here to start typing..." value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
-            </form>
+    return <div className="panel panel-default"> {/* TODO: Expand/collabse, heading. ("More Details (Description, License)...") */}
+        <div  className="panel-heading">
+            <h4 className="panel-title">
+                <a role="button" className="accordion-toggle" onClick={() => setCollapsed(!collapsed)}><span>More Details (Description, License)...</span></a>
+            </h4>
         </div>
-
-        <div className="text-left">
-            <div className="modal-section-header">
-                <span>License Type</span>
+        {!collapsed
+        && <div className="panel-body">
+            <div className="form-group text-left">
+                <div className="modal-section-header">
+                    <span>Description (optional)</span>
+                </div>
+                <form role="form">
+                    <textarea className="form-control border-0" rows={2} placeholder="Click here to start typing..." value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
+                </form>
             </div>
 
-            <div className="container" id="share-licenses-container">
-                <div className="row mt-3 justify-between flex">
-                    {Object.values(licenses).map((license: any, index: number) =>
-                    <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline mt-3">
-                        <label>
-                            <input type="radio" name="optradio" ng-model="data.selectedLicenseId" ng-value="license.id"/>
-                            <span></span>{license.license}
-                        </label>
-                    </div>)}
+            <div className="text-left">
+                <div className="modal-section-header">
+                    <span>License Type</span>
+                </div>
+
+                <div className="container" id="share-licenses-container">
+                    <div className="row mt-6 flex">
+                        {Object.values(licenses).map((license: any, index: number) =>
+                        <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
+                            <label>
+                                <input type="radio" name="optradio" ng-model="data.selectedLicenseId" ng-value="license.id"/>
+                                <span></span>{license.license}
+                            </label>
+                        </div>)}
+                    </div>
+                </div>
+
+                <div className="description my-3 p-3">
+                    {licenses[licenseID].licenseDesc} Click <a href={getLicenseLink(licenseID)} target="_blank">here</a> to see more.
                 </div>
             </div>
-
-            <div className="description my-3 p-10">
-                {licenses[licenseID].licenseDesc} Click <a href={getLicenseLink(licenseID)} target="_blank">here</a> to see more.
-            </div>
-        </div>
+        </div>}
     </div>
 }
 
