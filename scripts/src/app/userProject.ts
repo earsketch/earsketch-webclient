@@ -67,10 +67,12 @@ export function form(obj: { [key: string]: string | Blob }={}) {
 // (The helpers with "auth" and "admin" prepopulate some parameters for convenience.)
 
 // Expects query parameters, returns JSON.
-async function get(endpoint: string, params?: { [key: string]: string }) {
+export async function get(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     try {
-        return (await fetch(url)).json()
+        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
+        const text = await (await fetch(url)).text()
+        return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`get failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])
@@ -891,7 +893,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
             saved: true,
             tooltipText: "",
             collaborators: [],
-        } as ScriptEntity
+        } as any as ScriptEntity
         localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
         return scripts[shareid]
     }

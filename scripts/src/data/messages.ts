@@ -45,7 +45,6 @@ const ESMessages = {
             "embedded": "I want to be able to embed my song on a website.",
             "soundCloud": "I want to publish my song on SoundCloud."
         },
-        "preemptiveSave": 'After putting a user name, you need to press Enter, Tab, Space, or click outside before hitting SAVE. This step checks if the user name exists.'
     }
 };
 

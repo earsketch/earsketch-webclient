@@ -10,7 +10,7 @@ export interface ScriptEntity {
     saved: boolean
     tooltipText: string
     collaborative: boolean
-    collaborators: any // Should be string[] but server can give other data types such as undefined and string
+    collaborators: string[]
     imported: boolean
     isShared: boolean
     run_status: number

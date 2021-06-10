@@ -284,7 +284,7 @@ const SingletonSharedScriptInfo = () => {
                     />
                     <SharedScriptInfoItem
                         title='Collaborators'
-                        body={script.collaborative ? script.collaborators.join(', ') : null}
+                        body={script.collaborative ? script.collaborators.join(', ') : ""}
                     />
                     <SharedScriptInfoItem
                         title='License Information'

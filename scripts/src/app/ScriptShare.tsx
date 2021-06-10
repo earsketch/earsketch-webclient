@@ -2,11 +2,9 @@ import React, { useState } from "react"
 import { Provider, useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
-import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
-import * as helpers from "../helpers"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "../editor/tabState"
@@ -15,120 +13,24 @@ import * as userProject from "./userProject"
 import { ScriptEntity } from "common"
 import * as app from "./appState"
 import store from "../reducers"
+import { get } from "./userProject"
 
 // stuff for view-only and collaborative share
-// param "which" is either "viewers" or "collaborators"
-function processQueryInput($event: any, which: any) {
-    if ($event.keyCode === 13) {
-        queryId(which); // asynchronous
-    } else if ($event.keyCode === 8) {
-        // delete key removes list item
-        if (which.query === "") {
-            which.list.pop()
-            checkAllForErrors(which)
-            checkIfReady(which)
-        }
-    } else if ($event.keyCode === 32) {
-        queryId(which)
-    }
-}
-
-interface User {
-    id: string
-    exists: boolean
-}
-
-function queryId(which: any) {
-        which.query = which.query.toLowerCase()
-
-    if (which.query === "") {
+async function queryID(query: any) {
+    query = query.toLowerCase().trim()
+    if (query === "") {
         return null
-    } else if (which.query.replace(/\s+/, "").length === 0) {
-        return null
+    } else if (ESUtils.checkIllegalCharacters(query)) {
+        throw ESMessages.general.illegalCharacterInUserID
+    } else if (query === userProject.getUsername().toLowerCase()) {
+        throw "You cannot share scripts with yourself!"
     }
 
-    if (ESUtils.checkIllegalCharacters(which.query)) {
-        showErrorMessage(ESMessages.general.illegalCharacterInUserID, which)
-        return null
+    const data = await get("/services/scripts/searchuser", { query })
+    if (data) {
+        return data.username
     }
-
-    // #1858
-    if (which.query === userProject.getUsername().toLowerCase()) {
-        showErrorMessage("You cannot share scripts with yourself!", which)
-        return null
-    }
-
-    var url = URL_DOMAIN + "/services/scripts/searchuser"
-    var opts = { params: {"query": which.query} }
-    helpers.getNgService("$http").get(url, opts)
-        .then(function(result: any) {
-            if (result.data.hasOwnProperty("created")) {
-                clearErrors(which)
-
-                // Fix letter cases if they are not all-lower-cases.
-                which.query = result.data.username
-
-                which.list.push({
-                    id: which.query,
-                    exists: true
-                })
-
-                checkQueryDuplicates(which)
-                which.query = ""
-
-                checkIfReady(which)
-            } else {
-                showErrorMessage("That user ID does not exist.", which)
-
-                which.list.push({
-                    id: which.query,
-                    exists: false
-                })
-                which.query = ""
-            }
-            return result.data
-        }, function(err: any) {
-            esconsole(err, ["DEBUG","ERROR"])
-        })
-}
-
-function checkAllForErrors(which: any) {
-    clearErrors(which)
-
-    if (!which.list.every((p: any) => p.exists)) {
-        showErrorMessage("There might be invalid IDs in the list.", which)
-        return null
-    }
-    checkQueryDuplicates(which)
-}
-
-function checkQueryDuplicates(which: any) {
-    // #1858
-    const unique = new Set(which.list.map((p: User) => p.id.toLowerCase()))
-    if (unique.size !== which.list.length) {
-        showErrorMessage("There might be duplicate IDs in the list.", which)
-    }
-}
-
-function showErrorMessage(message: string, which: any) {
-    which.hasError = true
-    which.errorMessage = message
-    which.ready = false
-}
-
-function clearErrors(which: any) {
-    which.hasError = false
-    which.errorMessage = ""
-    which.ready = false
-}
-
-function checkIfReady(which: any) {
-    which.ready = which.list.length > 0 && !which.hasError
-}
-
-function removeId(index: number, which: any) {
-    which.list.splice(index, 1)
-    checkAllForErrors(which)
+    throw "That user ID does not exist."
 }
 
 export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
@@ -239,7 +141,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                             {viewers.list.map((p: any, index) =>
                             <div key={index} className="share-people-chip" ng-repeat="p in viewers.list track by $index">
                                 <span className="mr-1" style={{ color: p.exists ? pillFontColor : "red" }}>{p.id}</span>
-                                <span className="cursor-pointer" onClick={() => removeId(index, viewers)} style={{ color: "#c25452" }}>X</span>
+                                <span className="cursor-pointer" onClick={() => viewers.list.splice(index, 1)} style={{ color: "#c25452" }}>X</span>
                             </div>)}
                             <input className="bg-transparent border-none outline-none flex-grow" ng-model="viewers.query" style={{ width: "24em" }} placeholder="Type user ID, then hit enter." ng-keydown="processQueryInput($event, "viewers")" ng-blur="queryId("viewers")" autoFocus />
                         </form>
@@ -259,115 +161,120 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     </>
 }
 
-const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription }: any) => {
+const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }:
+    { script: ScriptEntity, licenses: any, licenseID: string, setLicenseID: (id: string) => void, description: string, setDescription: (d: string) => void, save: () => void, close: () => void }) => {
     const dispatch = useDispatch()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const theme = useSelector(app.selectColorTheme)
     const pillFontColor = theme === "dark" ? "white" : "black"
 
-    const [collaborators, setCollaborators] = useState({
-        list: [] as User[],
-        query: "", // current input value
-        hasError: false, // for all list items
-        errorMessage: "",
-        ready: false // ready to share
-    })
+    const [error, setError] = useState("")
+    const [query, setQuery] = useState("")
+    const [collaborators, setCollaborators] = useState(script.collaborators as string[])
 
-    const manageCollaborators = function () {
-        if (collaborators.hasError) return
-        var userName = userProject.getUsername()
-        var existingUsersList = script.collaborators
+    const submit = async () => {
+        if (error !== "") return
 
-        var newUsersList = collaborators.list.map(user => user.id)
+        let newCollaborators = collaborators
+        if (query !== "") {
+            // User has entered but not yet added another name; add it now.
+            let result = await addCollaborator(query)
+            if (!result) {
+                return
+            }
+            newCollaborators = result
+        }
+        const oldCollaborators = script.collaborators
 
-        var added = newUsersList.filter(function (m) {
-            return existingUsersList.indexOf(m) === -1
-        })
-        var removed = existingUsersList.filter((m: string) => !newUsersList.includes(m))
+        // Update the remote script state.
+        const added = newCollaborators.filter(m => !oldCollaborators.includes(m))
+        const removed = oldCollaborators.filter(m => !newCollaborators.includes(m))
+        const username = userProject.getUsername()
+        collaboration.addCollaborators(script.shareid, username, added)
+        collaboration.removeCollaborators(script.shareid, username, removed)
 
-        // update the remote script state
-        collaboration.addCollaborators(script.shareid, userName, added)
-        collaboration.removeCollaborators(script.shareid, userName, removed)
-
-        // update the local script state
-        script.collaborators = newUsersList
+        // Update the local script state.
+        script.collaborators = newCollaborators
         userProject.scripts[script.shareid] = script
+        save()
 
-        // save license info for the collaboration mode as well
-        userProject.setLicense(script.name, script.shareid, licenseID)
-
-        script.collaborators = newUsersList
-        script.collaborative = newUsersList.length !== 0
-
-        // manage the state of tab if already open
+        script.collaborators = newCollaborators
+        script.collaborative = newCollaborators.length > 0
+        // Update the state of tab, if open.
         if (activeTabID === script.shareid) {
-            if (existingUsersList.length === 0 && newUsersList.length > 0) {
+            if (oldCollaborators.length === 0 && newCollaborators.length > 0) {
                 if (!script.saved) {
-                    userProject.saveScript(script.name, script.source_code)
-                        .then(function () {
-                            collaboration.openScript(script, userName)
-                        })
-                } else {
-                    collaboration.openScript(script, userName)
+                    await userProject.saveScript(script.name, script.source_code)
                 }
-            } else if (existingUsersList.length > 0 && newUsersList.length === 0) {
-                collaboration.closeScript(script.shareid, userName)
+                collaboration.openScript(script, username)
+            } else if (oldCollaborators.length > 0 && newCollaborators.length === 0) {
+                collaboration.closeScript(script.shareid, username)
             }
         }
+        dispatch(scripts.syncToNgUserProject())
+        close()
+    }
 
-        if (collaborators.ready) {
-            dispatch(scripts.syncToNgUserProject())
-            close()
-        } else {
-            if (collaborators.query.length) {
-                alert(ESMessages.shareScript.preemptiveSave)
-            } else {
-                dispatch(scripts.syncToNgUserProject())
-                close()
-            }
+    const handleInput = (event: React.KeyboardEvent) => {
+        if (event.key === " ") {
+            event.preventDefault()
+            addCollaborator(query)
+        } else if (event.key === "Backspace" && query === "") {
+            setCollaborators(collaborators.slice(0, -1))
         }
     }
 
-    // auto-filling the existing collaborators
-    // TODO: Watch for mixed-case bugs #1858
-    if (script.hasOwnProperty("collaborators")) {
-        collaborators.list = script.collaborators.map((userID: string) => ({
-            id: userID,
-            exists: true
-        }))
+    const addCollaborator = async (query: string) => {
+        try {
+            const username = await queryID(query)
+            if (!username) {
+                return collaborators
+            }
+            let newCollaborators = collaborators
+            if (!collaborators.map((s: string) => s.toLowerCase()).includes(username.toLowerCase())) {
+                // Avoid duplicates.
+                newCollaborators = [ ...collaborators, username ]
+                setCollaborators(newCollaborators)
+            }
+            setQuery("")
+            return newCollaborators
+        } catch (error) {
+            setError(error)
+            return null
+        }
+    }
+
+    const removeCollaborator = (index: number) => {
+        setCollaborators(collaborators.slice(0, index).concat(collaborators.slice(index+1)))
     }
 
     return <>
-        <div className="modal-body">
-            <div>
+        <form onSubmit={e => { e.preventDefault(); submit() }}>
+            <div className="modal-body">
                 <div className="modal-section-header">
-                    <span>
-                        <i className="icon icon-users" style={{ color: "#6dfed4" }}></i>
-                        Add or Remove Collaborators
-                    </span>
+                    <i className="icon icon-users" style={{ color: "#6dfed4" }}></i>
+                    Add or Remove Collaborators
                 </div>
                 <div className="mt-5">
-                    <form>
-                        {collaborators.list.map((p: any, index: number) =>
+                        {collaborators.map((name: string, index: number) =>
                         <div key={index} className="share-people-chip">
-                            <span className="mr-1" style={{ color: p.exists ? pillFontColor : "red" }}>{p.id}</span>
-                            <span className="cursor-pointer" onClick={() => removeId(index, collaborators)} style={{ color: "#c25452" }}>X</span>
+                            <span className="mr-1" style={{ color: pillFontColor }}>{name}</span>
+                            <span className="cursor-pointer" onClick={() => removeCollaborator(index)} style={{ color: "#c25452" }}>X</span>
                         </div>)}
-                        {/* #1858: TODO -- Existing collaborators are listed in all lowercase! */}
-                        <input className="bg-transparent border-none outline-none flex-grow" ng-model="viewers.query" style={{ width: "24em" }} placeholder="Type user ID, then hit enter." onKeyDown={e => processQueryInput(e, collaborators)} onBlur={() => queryId(collaborators)} autoFocus />
-                    </form>
+                        <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder="Type user IDs, separated by space." autoFocus
+                            value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={() => addCollaborator(query)} />
                 </div>
                 <hr className="mt-3" />
-                <div ng-show="collaborators.hasError" className="share-people-error">{collaborators.errorMessage}</div>
+                {error && <div className="share-people-error">{error}</div>}
             </div>
-        </div>
-        <div className="modal-footer border-t-0">
-            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
-            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
-                <span onClick={manageCollaborators}><a href="#" style={!collaborators.hasError ? { color: "#76aaff" } : { color: "#777", cursor: "pointer" }}><i className="icon icon-checkmark"></i>SAVE</a></span>
+            <div className="modal-footer border-t-0">
+                <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
+                <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
+                    <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                    <input type="submit" value="SAVE" className="btn btn-primary" style={error !== "" ? { color: "#76aaff" } : { color: "white", cursor: "pointer" }} />
+                </div>
             </div>
-        </div>
+        </form>
     </>
 }
 
@@ -556,20 +463,9 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
 
 const MoreDetails = ({ script, licenses, licenseID, setLicenseID, description, setDescription }: any) => {
     const [collapsed, setCollapsed] = useState(true)
+    const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
 
-    const getLicenseLink = function (id: string) {
-        var name = licenses[id].license
-        var link = "https://creativecommons.org/licenses/"
-        var type = name.split(" ")[1]
-
-        if (type !== undefined) {
-            link = link + type.toLowerCase() + "/4.0"
-        }
-
-        return link
-    }
-
-    return <div className="panel panel-default"> {/* TODO: Expand/collabse, heading. ("More Details (Description, License)...") */}
+    return <div className="panel panel-default">
         <div  className="panel-heading">
             <h4 className="panel-title">
                 <a role="button" className="accordion-toggle" onClick={() => setCollapsed(!collapsed)}><span>More Details (Description, License)...</span></a>
@@ -604,7 +500,7 @@ const MoreDetails = ({ script, licenses, licenseID, setLicenseID, description, s
                 </div>
 
                 <div className="description my-3 p-3">
-                    {licenses[licenseID].licenseDesc} Click <a href={getLicenseLink(licenseID)} target="_blank">here</a> to see more.
+                    {licenses[licenseID].licenseDesc} Click <a href={licenseLink} target="_blank">here</a> to see more.
                 </div>
             </div>
         </div>}
