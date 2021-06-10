@@ -54,7 +54,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="form-group">
-                            <input type="text" className="form-control" name="username" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_$][0-9a-zA-Z_$]*" title={ESMessages.createaccount.usernameconstraint} />
+                            <input type="text" className="form-control" name="username" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={ESMessages.createaccount.usernameconstraint} />
                         </div>
                     </div>
                 </div>
