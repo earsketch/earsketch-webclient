@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { Provider, useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
 import esconsole from "../esconsole"
@@ -14,13 +14,7 @@ import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
 import { ScriptEntity } from "common"
 import * as app from "./appState"
-
-const menuDescriptions = {
-    link: ESMessages.shareScript.menuDescriptions.viewOnly,
-    collaboration: ESMessages.shareScript.menuDescriptions.collaboration,
-    embedded: ESMessages.shareScript.menuDescriptions.embedded,
-    soundcloud: ESMessages.shareScript.menuDescriptions.soundCloud,
-}
+import store from "../reducers"
 
 // stuff for view-only and collaborative share
 // param "which" is either "viewers" or "collaborators"
@@ -181,8 +175,6 @@ export const LinkTab = ({ script, licenses, licenseID, sharelink, lockedShareID,
 
     return <>
         <div className="modal-body">
-            <div uib-tab-heading>LET OTHERS VIEW</div>
-            <div className="share-script-menu-descriptions">{menuDescriptions.link}</div>
             <div>
                 <div className="modal-section-header">
                     <span>
@@ -340,10 +332,6 @@ const CollaborationTab = ({ script, licenses, licenseID }: any) => {
 
     return <>
         <div className="modal-body">
-            <div uib-tab-heading>LET OTHERS EDIT</div>
-            <div className="share-script-menu-descriptions">
-                {menuDescriptions.collaboration}
-            </div>
             <div>
                 <div className="modal-section-header">
                     <span>
@@ -385,10 +373,6 @@ const EmbedTab = ({ script, licenses, licenseID, sharelink }: any) => {
 
     return <>
         <div className="modal-body">
-            <div uib-tab-heading>SHARE AN EMBEDDED SCRIPT</div>
-            <div className="share-script-menu-descriptions">
-                {menuDescriptions.embedded}
-            </div> 
             <div>
                 <div className="modal-section-header">
                     <span>
@@ -519,10 +503,6 @@ const SoundCloudTab = ({ script, licenses, licenseID, save, description, shareli
 
     return <>
         <div className="modal-body">
-            <div uib-tab-heading>SHARE ON SOUNDCLOUD</div>
-            <div className="share-script-menu-descriptions">
-                {menuDescriptions.soundcloud}
-            </div>
             <div className="modal-section-header">
                 <span>
                     <i className="icon icon-soundcloud" style={{ color: "#6dfed4" }}></i>
@@ -626,33 +606,41 @@ const MoreDetails = ({ script, licenses, licenseID }: any) => {
     </div>
 }
 
-export const ScriptShare = ({ script, quality, licenses, clipboard }: any) => {
+const Tabs = [
+    { component: LinkTab, title: "LET OTHERS VIEW", description: ESMessages.shareScript.menuDescriptions.viewOnly },
+    { component: CollaborationTab, title: "LET OTHERS EDIT", description: ESMessages.shareScript.menuDescriptions.collaboration },
+    { component: EmbedTab, title: "SHARE AN EMBEDDED SCRIPT", description: ESMessages.shareScript.menuDescriptions.embedded },
+    { component: SoundCloudTab, title: "SHARE ON SOUNDCLOUD", description: ESMessages.shareScript.menuDescriptions.soundCloud },
+]
+
+export const ScriptShare = ({ script, licenses }: any) => {
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const [lockedShareID, setLockedShareID] = useState("")
     const lockedShareLink = location.origin + location.pathname +"?sharing=" + lockedShareID
 
-    console.log("licenses is", licenses)
-
-    const Tabs = {
-        LINK: 0,
-        COLLABORATION: 1,
-        EMBEDDED: 2,
-        SOUNDCLOUD: 3
-    } as const
-
     userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
 
-    const ShareComponents = [LinkTab, CollaborationTab, EmbedTab, SoundCloudTab]
     const [activeTab, setActiveTab] = useState(0)
     const [licenseID, setLicenseID] = useState(script.license_id || 1)
 
-    const ShareBody = ShareComponents[activeTab]
+    const ShareBody = Tabs[activeTab].component
     return <div className="share-script">
         <div className="modal-header">
             <h4 className="modal-title">
                 <i className="icon icon-share2 mr-3"></i>Share "{script.name}"
             </h4>
+            <hr className="my-4 border-gray-200" />
+            <div className="es-modal-tabcontainer">
+                <ul className="nav-pills flex flex-row">
+                    {Tabs.map(({ title }, index) =>
+                    <li key={index} className={"uib-tab nav-item ng-scope ng-isolate-scope flex-grow" + (activeTab === index ? " active" : "")}>
+                        <a onClick={() => setActiveTab(index)} className="nav-link ng-binding h-full flex justify-center items-center">{title}</a>
+                    </li>)}
+                </ul>
+            </div>
+            <div className="text-center mt-4">{Tabs[activeTab].description}</div>
         </div>
-        <ShareBody script={script} licenses={licenses} licenseID={licenseID} />
+        {/* TODO: Move to wrapModal */}
+        <Provider store={store}><ShareBody script={script} licenses={licenses} licenseID={licenseID} /></Provider>
     </div>
 }
