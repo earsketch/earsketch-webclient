@@ -23,8 +23,6 @@ const ERROR_FUNCTIONS = {
 
 const AUDIOKEYS: string[] = Object.keys(AUDIOKEYS_RECOMMENDATIONS)
 
-const LEVENSHTEIN_THRESHOLD = 5
-
 let studentCode: string[] = []
 let allNames: string[] = []
 let allVars = []
@@ -56,13 +54,13 @@ function handleNameError(error: any) {
 	for (const part of parts) {
 		let lowestScore = -1
 		let replacement = ""
-		for (const name of allNames) {
-			const score = levenshtein(name, part)
-			if (score > 0 && score <= LEVENSHTEIN_THRESHOLD && (lowestScore === -1 || score < lowestScore)) {
-				lowestScore = score
-				replacement = name
-			}
-		}
+		// for (const name of allNames) {
+		// 	const score = levenshtein(name, part)
+		// 	if (score > 0 && score <= LEVENSHTEIN_THRESHOLD && (lowestScore === -1 || score < lowestScore)) {
+		// 		lowestScore = score
+		// 		replacement = name
+		// 	}
+		// }
 
 		if (lowestScore !== -1) {
 			nameScores.push([lowestScore, part, replacement])
@@ -134,12 +132,12 @@ function handleParseError(error: any) {
 	const codeLine = studentCode[error[0].traceback[0].lineno - 1]
 	let newLineValue = ""
 
-	for (const statement of importStatements) {
-		if (levenshtein(codeLine, statement) <= LEVENSHTEIN_THRESHOLD) {
-			newLineValue = statement
-			break
-		}
-	}
+	// for (const statement of importStatements) {
+	// 	if (levenshtein(codeLine, statement) <= LEVENSHTEIN_THRESHOLD) {
+	// 		newLineValue = statement
+	// 		break
+	// 	}
+	// }
 
 	if (newLineValue !== "") {
 		return [error[0].traceback[0].lineno - 1, 0, error[0].traceback[0].lineno - 1, studentCode[error[0].traceback[0].lineno - 1].length, newLineValue]
@@ -153,7 +151,7 @@ function handleImportError(error: any) {
 	let newLineValue = ""
 
 	for (const statement of importStatements) {
-		if (levenshtein(codeLine, statement) <= LEVENSHTEIN_THRESHOLD) {
+		if (codeLine === statement) {
 			newLineValue = statement
 			break
 		}
@@ -209,35 +207,4 @@ export function updateNames(variables: any[], functions: any[]) {
 		allVars = [...variables]
 		userFunctions = [...functions]
 	}
-}
-
-function levenshtein(a: string, b: string) {
-	if (a === "") return b.length
-	if (b === "") return a.length
-
-	const matrix = []
-
-	// increment along the first column of each row
-	for (let i = 0; i <= b.length; i++) {
-		matrix[i] = [i]
-	}
-
-	// increment each column in the first row
-	for (let j = 0; j <= a.length; j++) {
-		matrix[0][j] = j
-	}
-
-	// Fill in the rest of the matrix
-	for (let i = 1; i <= b.length; i++) {
-		for (let j = 1; j <= a.length; j++) {
-			if (b.charAt(i - 1) === a.charAt(j - 1)) {
-				matrix[i][j] = matrix[i - 1][j - 1]
-			} else {
-				matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, // substitution
-					Math.min(matrix[i][j - 1] + 1, // insertion
-						matrix[i - 1][j] + 1)) // deletion
-			}
-		}
-	}
-	return matrix[b.length][a.length]
 }

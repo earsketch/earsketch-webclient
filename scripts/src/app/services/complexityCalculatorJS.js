@@ -11,16 +11,11 @@ app.factory('complexityCalculatorJS', ['complexityCalculator', function (complex
         var ast = acorn.parse(source, {
             locations: true
         });
-        listFuncs = JS_LIST_FUNCS;
-        strFuncs = JS_STR_FUNCS;
-        createListFuncs = JS_LIST_FUNCS;
-        createStrFuncs = JS_STR_FUNCS;
         complexityCalculatorState.setProperty('studentCode', source.split("\n"));
         //handle this like you'd handle python.
         var newAST = convertASTTree(ast);
         //initialize list of function return objects with all functions from the API that return something (includes casting)
-        userFunctionReturns = starterReturns.slice(0);
-        allVariables = [];
+        var allVariables = [];
         //initialize the results object
         var resultsObject = {
             userFunc: 0,
@@ -30,9 +25,7 @@ app.factory('complexityCalculatorJS', ['complexityCalculator', function (complex
             variables: 0,
             consoleInput: 0
         };
-        isJavascript = true;
-        //PASS 0: efficient originality. we need. JS sample code
-        complexityCalculator.checkOriginality();
+        complexityCalculatorState.setProperty('isJavascript', true);
         //PASS 1: Do the same thing for function returns from user-defined functions
         complexityCalculator.evaluateUserFunctionParameters(newAST, resultsObject);
         //PASS 2: Gather and label all user-defined variables. If the value is a function call or a BinOp
@@ -40,7 +33,7 @@ app.factory('complexityCalculatorJS', ['complexityCalculator', function (complex
         //PASS 3: Account for the variables that only exist as function params. This pass also does a couple other things in the way of functions/removes called function lines from the uncalledFunctionLines so they get checked
         complexityCalculator.evaluateFunctionReturnParams(newAST);
         //Now, use information gained from labeling user functions to fill in missing variable info, and vice-versa. 10 is the max number of times this will happen before we give up. we can change this if it proves problematic
-        iterations = 0;
+        var iterations = 0;
         while (!complexityCalculatorHelperFunctions.allReturnsFilled() && iterations < 10) {
             complexityCalculator.evaluateAllEmpties();
             iterations++;
@@ -57,7 +50,6 @@ app.factory('complexityCalculatorJS', ['complexityCalculator', function (complex
         //translate the calculated values
         // translateIntegerValues(resultsObject);
         complexityCalculatorHelperFunctions.lineDict();
-        results = resultsObject;
         caiErrorHandling.updateNames(complexityCalculatorState.getProperty('allVariables'), complexityCalculatorState.getProperty('userFunctionParameters'));
         return resultsObject;
     }

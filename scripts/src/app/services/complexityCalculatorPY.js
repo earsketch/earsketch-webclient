@@ -8,7 +8,7 @@ app.factory('complexityCalculatorPY', ['complexityCalculator', function (complex
     function generateAst(source_code) {
         try {
             var parse = Sk.parse("<analyzer>", source_code);
-            studentCode = source_code.split("\n");
+        	complexityCalculatorState.setProperty('studentCode',source_code.split("\n"));
             return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags);
         } catch (error) {
             throw error;
@@ -18,10 +18,9 @@ app.factory('complexityCalculatorPY', ['complexityCalculator', function (complex
     // Analyze the source code of a Python script.
     function analyzePython(source_code) {
         complexityCalculatorState.resetState();
-        complexityCalculatorState.setProperty("listFuncs",['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
-        complexityCalculatorState.setProperty('studentCode',source_code.split("\n"));
+        complexityCalculatorState.setProperty("listFuncs", ['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
+        complexityCalculatorState.setProperty('studentCode', source_code.split("\n"));
         //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
-        userFunctionReturns = starterReturns.slice(0);
         var ast = generateAst(source_code);
         complexityCalculatorHelperFunctions.replaceNumericUnaryOps(ast.body);
         //initialize the results object
@@ -33,9 +32,7 @@ app.factory('complexityCalculatorPY', ['complexityCalculator', function (complex
             variables: 0,
             consoleInput: 0
         };
-        isJavascript = false;        
-        //PASS 0: efficient originality
-        complexityCalculator.checkOriginality();
+        complexityCalculatorState.setProperty('isJavascript', false);     
         //PASS 1: Do the same thing for function returns from user-defined functions
         complexityCalculator.evaluateUserFunctionParameters(ast, resultsObject);
         //PASS 2: Gather and label all user-defined variables. If the value is a function call or a BinOp
@@ -43,7 +40,7 @@ app.factory('complexityCalculatorPY', ['complexityCalculator', function (complex
         //PASS 3: Account for the variables that only exist as function params.
         complexityCalculator.evaluateFunctionReturnParams(ast);
         //use information gained from labeling user functions to fill in missing variable info, and vice-versa.
-        iterations = 0;
+        var iterations = 0;
         while (!complexityCalculatorHelperFunctions.allReturnsFilled() && iterations < 10) {
             complexityCalculator.evaluateAllEmpties();
             iterations++;
@@ -59,7 +56,6 @@ app.factory('complexityCalculatorPY', ['complexityCalculator', function (complex
         }
         // translateIntegerValues(resultsObject);   //translate the calculated values
         complexityCalculatorHelperFunctions.lineDict();
-        results = resultsObject;
         caiErrorHandling.updateNames(complexityCalculatorState.getProperty('allVariables'), complexityCalculatorState.getProperty('userFunctionParameters'));
         return resultsObject;
     }
