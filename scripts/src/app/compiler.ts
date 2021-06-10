@@ -4,14 +4,13 @@ import * as audioLibrary from "./audiolibrary"
 import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
 import setupPythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
-import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "./userconsole"
 import { Clip, DAWData, Track } from "./player"
 import { AugmentedBuffer } from "./audiolibrary"
-import i18n from "i18next";
+import i18n from "i18next"
 
 export let testRun = false
 

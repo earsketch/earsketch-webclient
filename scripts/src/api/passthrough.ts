@@ -16,9 +16,8 @@ import * as renderer from "../app/renderer"
 import * as userConsole from "../app/userconsole"
 import { Clip, DAWData, EffectRange, Track } from "../app/player"
 import { measureToTime } from "../esutils"
-import ESMessages from "../data/messages"
 import * as userProject from "../app/userProject"
-import i18n from "i18next";
+import i18n from "i18next"
 
 
 class ValueError extends Error {

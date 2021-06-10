@@ -1,9 +1,8 @@
 import React, { useState } from "react"
 
 import esconsole from "../esconsole"
-import ESMessages from "../data/messages"
 import * as userNotification from "./userNotification"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 export const ForgotPassword = ({ close }: { close: () => void }) => {
     const { t } = useTranslation();

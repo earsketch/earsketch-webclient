@@ -9,9 +9,7 @@ i18n
         fallbackLng: 'en',
         ns: ['common', 'messages'],
         defaultNS: 'common',
-        debug: true,
-
-        // keySeparator: false, // we do not use keys in form messages.welcome
+        debug: false,
 
         interpolation: {
             escapeValue: false // react already safes from xss

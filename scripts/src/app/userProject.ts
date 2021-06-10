@@ -16,7 +16,7 @@ import * as userNotification from "./userNotification"
 import * as websocket from "./websocket"
 import { ScriptEntity } from "common"
 import ESMessages from "../data/messages"
-import i18n from "i18next";
+import i18n from "i18next"
 
 const USER_STATE_KEY = "userstate"
 

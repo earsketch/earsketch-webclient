@@ -5,10 +5,9 @@ import * as compiler from "./compiler"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
-import ESMessages from "../data/messages"
 import { DAWData } from "./player"
 import * as renderer from "./renderer"
-import i18n from "i18next";
+import i18n from "i18next"
 
 // Make a dummy anchor for downloading blobs.
 let dummyAnchor = document.createElement("a")

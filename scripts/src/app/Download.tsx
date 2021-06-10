@@ -1,10 +1,9 @@
 import React, { useState } from "react"
 
-import ESMessages from "../data/messages"
 import * as exporter from "./exporter"
 import { ScriptEntity } from "common"
 import * as userNotification from "./userNotification"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 const EXPORT_TYPES = {
     // Thin wrapper for `exporter.text()` since it breaks the pattern (not async, doesn't take quality).
@@ -60,7 +59,7 @@ export const Download = ({ script, quality, close }: { script: ScriptEntity, qua
                     </h3>
                 </div>
                 <div className="col-md-9">
-                    <div>{t('messages:download.' + type as keyof typeof EXPORT_TYPES)}</div>
+                    <div>{t('messages:download.' + type)}</div>
                 </div>
             </div>)}
         </div>
