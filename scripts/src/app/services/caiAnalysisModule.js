@@ -4,8 +4,11 @@ import esconsole from '../../esconsole';
 import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
 import * as recommender from '../recommender';
+import * as complexityCalculator from '../../cai/complexityCalculator';
+import * as complexityCalculatorPY from '../../cai/complexityCalculatorPY';
+import * as complexityCalculatorJS from '../../cai/complexityCalculatorJS';
 
-app.factory('caiAnalysisModule', ['complexityCalculator', 'complexityCalculatorPY', 'complexityCalculatorJS', function (complexityCalculator, complexityCalculatorPY, complexityCalculatorJS) {
+app.factory('caiAnalysisModule', [function () {
   var librarySounds = [];
   var librarySoundGenres = [];
   var keyGenreDict = {};

@@ -6,8 +6,10 @@
 import * as caiStudent from "../../cai/student"
 import * as caiStudentPreferenceModule from "../../cai/studentPreferences"
 import * as userProject from '../userProject'
+import * as complexityCalculatorPY from '../../cai/complexityCalculatorPY'
+import * as complexityCalculatorJS from '../../cai/complexityCalculatorJS'
 
-app.factory('caiStudentHistoryModule', ['complexityCalculator', function (complexityCalculator) {
+app.factory('caiStudentHistoryModule', [function () {
     var aggregateScore;
     var curriculumPagesViewed;
     var codeRequests = 0;
@@ -88,10 +90,10 @@ app.factory('caiStudentHistoryModule', ['complexityCalculator', function (comple
 
                 try {
                     if (ty == "py") {
-                        output = Object.assign({}, complexityCalculator.analyzePython(sc));
+                        output = Object.assign({}, complexityCalculatorPY.analyzePython(sc));
                     }
                     else {
-                        output = Object.assign({}, complexityCalculator.analyzeJavascript(sc));
+                        output = Object.assign({}, complexityCalculatorJS.analyzeJavascript(sc));
                     }
                 }
                 catch (error) {
@@ -133,10 +135,10 @@ app.factory('caiStudentHistoryModule', ['complexityCalculator', function (comple
 
         //analyze new code
         if (scriptType == "python") {
-            newOutput = Object.assign({}, complexityCalculator.analyzePython(script));
+            newOutput = Object.assign({}, complexityCalculatorPY.analyzePython(script));
         }
         else {
-            newOutput = Object.assign({}, complexityCalculator.analyzeJavascript(script));
+            newOutput = Object.assign({}, complexityCalculatorJS.analyzeJavascript(script));
         }
         //numeric replacement
         if (newOutput["userFunc"] === "Args" || newOutput["userFunc"] === "Returns") {

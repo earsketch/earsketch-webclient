@@ -81,9 +81,6 @@ module.exports = {
             audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
 
             // CAI
-            complexityCalculator: path.resolve(__dirname,`${servicesDir}/complexityCalculator.js`),
-            complexityCalculatorPY: path.resolve(__dirname,`${servicesDir}/complexityCalculatorPY.js`),
-            complexityCalculatorJS: path.resolve(__dirname,`${servicesDir}/complexityCalculatorJS.js`),
             ccSamples: path.resolve(__dirname,`${dataDir}/ccsamples.js`),
             caiAnalysisModule: path.resolve(__dirname,`${servicesDir}/caiAnalysisModule.js`),
 
