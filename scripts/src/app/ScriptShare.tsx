@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Provider, useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
@@ -33,21 +33,82 @@ async function queryID(query: any) {
     throw "That user ID does not exist."
 }
 
+const UserListInput = ({ users, setUsers, setFinalize }:
+    { users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void }
+) => {
+    const theme = useSelector(app.selectColorTheme)
+    const [query, setQuery] = useState("")
+    const [error, setError] = useState("")
+
+    setFinalize(async () => {
+        if (error !== "") {
+            return null
+        } else if (query !== "") {
+            // User has entered but not yet added another name; add it now.
+            return addUser()
+        } else {
+            return users
+        }
+    })
+
+    const handleInput = (event: React.KeyboardEvent) => {
+        if (event.key === " ") {
+            event.preventDefault()
+            addUser()
+        } else if (event.key === "Backspace" && query === "") {
+            setUsers(users.slice(0, -1))
+        }
+    }
+
+    const addUser = async () => {
+        try {
+            const username = await queryID(query)
+            if (!username) {
+                return users
+            }
+            let newUsers = users
+            if (!users.map((s: string) => s.toLowerCase()).includes(username.toLowerCase())) {
+                // Avoid duplicates.
+                newUsers = [ ...users, username ]
+                setUsers(newUsers)
+            }
+            setQuery("")
+            return newUsers
+        } catch (error) {
+            setError(error)
+            return null
+        }
+    }
+
+    const removeUser = (index: number) => {
+        setUsers(users.slice(0, index).concat(users.slice(index+1)))
+    }
+
+    return <>
+        <div className="mt-5">
+            {users.map((name: string, index: number) =>
+            <div key={index} className="share-people-chip">
+                <span className="mr-1" style={{ color: theme === "dark" ? "white" : "black" }}>{name}</span>
+                <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
+            </div>)}
+            <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder="Type user IDs, separated by space." autoFocus
+                value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
+        </div>
+        <hr className="mt-3" />
+        {error && <div className="share-people-error">{error}</div>}
+    </>
+}
+
 export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
     const [lockedShareID, setLockedShareID] = useState("")
     const [showLockedShareLink, setShowLockedShareLink] = useState(false)
+    const [viewers, setViewers] = useState([] as string[])
+    const finalize = useRef<undefined | (() => Promise<string[] | null>)>()
 
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const lockedShareLink = location.origin + location.pathname +"?sharing=" + lockedShareID
 
     userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
-    // const [viewers, setViewers] = useState({
-    //     list: [] as User[],
-    //     query: "", // current input value
-    //     hasError: false, // for all list items
-    //     errorMessage: "",
-    //     ready: false // ready to share
-    // })
 
     const downloadShareUrl = () => {
         const url = showLockedShareLink ? lockedShareLink : sharelink
@@ -59,29 +120,17 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         } as ScriptEntity)
     }
 
-    // const sendViewOnlyScript = function () {
-    //     if (viewers.hasError) return
-    //     save()
+    const submit = async () => {
+        const users = await finalize.current?.()
+        if (!users) return
+        save()
+        reporter.share("link", licenses[licenseID].license)
+        userProject.shareWithPeople(showLockedShareLink ? lockedShareID : script.shareid, users)
+        userNotification.show("Shared " + script.name + " as view-only with " + users.join(", "))
+        close()
+    }
 
-    //     if (viewers.ready) {
-    //         // reporter.share("link", $scope.licenses[$scope.selectedLicenseId].license)
-    //         if (showLockedShareLink) {
-    //             userProject.shareWithPeople(lockedShareID, viewers.list)
-    //         } else {
-    //             userProject.shareWithPeople(script.shareid, viewers.list)
-    //         }
-    //         userNotification.show("Shared " + script.name + " as view-only with " + viewers.list.map(user => user.id).join(", "))
-    //         close()
-    //     } else {
-    //         if (viewers.query.length) {
-    //             alert(ESMessages.shareScript.preemptiveSave)
-    //         } else {
-    //             close()
-    //         }
-    //     }
-    // }
-
-    return <>
+    return <form onSubmit={e => { e.preventDefault(); submit() }}>
         <div className="modal-body">
             <div>
                 <div className="modal-section-header">
@@ -129,61 +178,37 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 </div>
                 <hr className="mt-3" />
 
-                {/* <div>
+                <div>
                     <div className="modal-section-header">
                         <span>
                             <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
                             Send View-only Script to Other Users
                         </span>
                     </div>
-                    <div className="mt-5 flex justify-between">
-                        <form>
-                            {viewers.list.map((p: any, index) =>
-                            <div key={index} className="share-people-chip" ng-repeat="p in viewers.list track by $index">
-                                <span className="mr-1" style={{ color: p.exists ? pillFontColor : "red" }}>{p.id}</span>
-                                <span className="cursor-pointer" onClick={() => viewers.list.splice(index, 1)} style={{ color: "#c25452" }}>X</span>
-                            </div>)}
-                            <input className="bg-transparent border-none outline-none flex-grow" ng-model="viewers.query" style={{ width: "24em" }} placeholder="Type user ID, then hit enter." ng-keydown="processQueryInput($event, "viewers")" ng-blur="queryId("viewers")" autoFocus />
-                        </form>
-                    </div>
-                    <hr className="mt-3" />
-                    <div ng-show="viewers.hasError" className="share-people-error">{viewers.errorMessage}</div>
-                </div> */}
+                    <UserListInput users={viewers} setUsers={setViewers} setFinalize={f => finalize.current = f} />
+                </div>
             </div>
         </div>
         <div className="modal-footer border-t-0">
             <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
-                {/* <span onClick={sendViewOnlyScript}><a href="#" style={!viewers.hasError ? { color: "#76aaff" } : { color: "#777", cursor: "pointer" }}><i className="icon icon-checkmark"></i>SAVE{viewers.ready ? " and SEND" : ""}</a></span> */}
+                <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value="SAVE" className="btn btn-primary" style={/*error !== ""*/ false ? { color: "#76aaff" } : { color: "white", cursor: "pointer" }} />
             </div>
         </div>
-    </>
+    </form>
 }
 
 const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }:
     { script: ScriptEntity, licenses: any, licenseID: string, setLicenseID: (id: string) => void, description: string, setDescription: (d: string) => void, save: () => void, close: () => void }) => {
     const dispatch = useDispatch()
     const activeTabID = useSelector(tabs.selectActiveTabID)
-    const theme = useSelector(app.selectColorTheme)
-    const pillFontColor = theme === "dark" ? "white" : "black"
-
-    const [error, setError] = useState("")
-    const [query, setQuery] = useState("")
-    const [collaborators, setCollaborators] = useState(script.collaborators as string[])
+    const [collaborators, setCollaborators] = useState(script.collaborators)
+    const finalize = useRef<undefined | (() => Promise<string[] | null>)>()
 
     const submit = async () => {
-        if (error !== "") return
-
-        let newCollaborators = collaborators
-        if (query !== "") {
-            // User has entered but not yet added another name; add it now.
-            let result = await addCollaborator(query)
-            if (!result) {
-                return
-            }
-            newCollaborators = result
-        }
+        const newCollaborators = await finalize.current?.()
+        if (!newCollaborators) return
         const oldCollaborators = script.collaborators
 
         // Update the remote script state.
@@ -215,67 +240,22 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         close()
     }
 
-    const handleInput = (event: React.KeyboardEvent) => {
-        if (event.key === " ") {
-            event.preventDefault()
-            addCollaborator(query)
-        } else if (event.key === "Backspace" && query === "") {
-            setCollaborators(collaborators.slice(0, -1))
-        }
-    }
-
-    const addCollaborator = async (query: string) => {
-        try {
-            const username = await queryID(query)
-            if (!username) {
-                return collaborators
-            }
-            let newCollaborators = collaborators
-            if (!collaborators.map((s: string) => s.toLowerCase()).includes(username.toLowerCase())) {
-                // Avoid duplicates.
-                newCollaborators = [ ...collaborators, username ]
-                setCollaborators(newCollaborators)
-            }
-            setQuery("")
-            return newCollaborators
-        } catch (error) {
-            setError(error)
-            return null
-        }
-    }
-
-    const removeCollaborator = (index: number) => {
-        setCollaborators(collaborators.slice(0, index).concat(collaborators.slice(index+1)))
-    }
-
-    return <>
-        <form onSubmit={e => { e.preventDefault(); submit() }}>
-            <div className="modal-body">
-                <div className="modal-section-header">
-                    <i className="icon icon-users" style={{ color: "#6dfed4" }}></i>
-                    Add or Remove Collaborators
-                </div>
-                <div className="mt-5">
-                        {collaborators.map((name: string, index: number) =>
-                        <div key={index} className="share-people-chip">
-                            <span className="mr-1" style={{ color: pillFontColor }}>{name}</span>
-                            <span className="cursor-pointer" onClick={() => removeCollaborator(index)} style={{ color: "#c25452" }}>X</span>
-                        </div>)}
-                        <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder="Type user IDs, separated by space." autoFocus
-                            value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={() => addCollaborator(query)} />
-                </div>
-                <hr className="mt-3" />
-                {error && <div className="share-people-error">{error}</div>}
+    return <form onSubmit={e => { e.preventDefault(); submit() }}>
+        <div className="modal-body">
+            <div className="modal-section-header">
+                <i className="icon icon-users" style={{ color: "#6dfed4" }}></i>
+                Add or Remove Collaborators
             </div>
-            <div className="modal-footer border-t-0">
-                <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
-                <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                    <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                    <input type="submit" value="SAVE" className="btn btn-primary" style={error !== "" ? { color: "#76aaff" } : { color: "white", cursor: "pointer" }} />
-                </div>
+            <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => finalize.current = f} />
+        </div>
+        <div className="modal-footer border-t-0">
+            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
+            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
+                <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value="SAVE" className="btn btn-primary" style={/*error !== ""*/ false ? { color: "#76aaff" } : { color: "white", cursor: "pointer" }} />
             </div>
-        </form>
-    </>
+        </div>
+    </form>
 }
 
 const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
