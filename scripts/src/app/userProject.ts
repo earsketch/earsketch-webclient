@@ -101,7 +101,7 @@ async function postAdminForm(endpoint: string, data: { [key: string]: string }={
 // Expects query parameters, returns XML.
 async function post(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
-    const text = (await fetch(url, { method: "POST" })).text()
+    const text = await (await fetch(url, { method: "POST" })).text()
     try {
         return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
     } catch (err) {
@@ -553,7 +553,6 @@ export async function renameAudio(audiokey: string, newaudiokey: string) {
     try {
         await postAuth("/services/audio/rename", { audiokey, newaudiokey })
         esconsole(`Successfully renamed audiokey: ${audiokey} to ${newaudiokey}`, ["debug", "user"])
-        userNotification.show(ESMessages.general.soundrenamed, "normal", 2)
         audioLibrary.clearAudioTagCache()  // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)
@@ -636,14 +635,16 @@ export async function deleteScript(scriptid: string) {
 }
 
 async function promptForRename(script: ScriptEntity) {
-    const name = (await helpers.getNgService("$uibModal").open({
-        templateUrl: "templates/rename-import-script.html",
-        controller: "renamecontroller",
+    const oldName = script.name
+    await helpers.getNgService("$uibModal").open({
+        component: "renameController",
         size: 100,
-        resolve: { script: () => script },
-    }).result).name
+        resolve: { script: () => script, conflict: () => true },
+    }).result
 
-    script.name = name === script.name ? nextName(name) : name
+    if (script.name === oldName) {
+        script.name = nextName(oldName)
+    }
 }
 
 // Restore a script deleted by the user.
