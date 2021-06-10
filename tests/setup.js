@@ -218,7 +218,6 @@ require('mainController');
 require('ideController');
 require('promptController');
 require('uploadController');
-require('shareScriptController');
 require('userHistoryController');
 
 require('adminWindowController');

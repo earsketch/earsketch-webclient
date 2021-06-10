@@ -54,7 +54,6 @@ module.exports = {
             ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
-            shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             promptController: path.resolve(__dirname,`${appDir}/promptController.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
