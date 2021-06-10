@@ -131,8 +131,14 @@ function removeId(index: number, which: any) {
     checkAllForErrors(which)
 }
 
-export const LinkTab = ({ script, licenses, licenseID, sharelink, lockedShareID, lockedShareLink, save, close }: any) => {
+export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
+    const [lockedShareID, setLockedShareID] = useState("")
     const [showLockedShareLink, setShowLockedShareLink] = useState(false)
+
+    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
+    const lockedShareLink = location.origin + location.pathname +"?sharing=" + lockedShareID
+
+    userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
     // const [viewers, setViewers] = useState({
     //     list: [] as User[],
     //     query: "", // current input value
@@ -181,8 +187,9 @@ export const LinkTab = ({ script, licenses, licenseID, sharelink, lockedShareID,
                         <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
                         Sharable View-only Link
                     </span>
-                    <div className="btn-group" uib-dropdown auto-close="outsideClick">
-                        <button type="button" className="btn btn-filter dropdown-toggle" uib-dropdown-toggle ng-disabled="disabled">
+                    {/* TODO: Deal with this dropdown */}
+                    <div className="btn-group" auto-close="outsideClick">
+                        <button type="button" className="btn btn-filter dropdown-toggle">
                             <span>
                             {showLockedShareLink
                             ? "SHARE ONLY CURRENT VERSION"
@@ -243,7 +250,7 @@ export const LinkTab = ({ script, licenses, licenseID, sharelink, lockedShareID,
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{script, licenses, licenseID}} />
+            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
                 {/* <span onClick={sendViewOnlyScript}><a href="#" style={!viewers.hasError ? { color: "#76aaff" } : { color: "#777", cursor: "pointer" }}><i className="icon icon-checkmark"></i>SAVE{viewers.ready ? " and SEND" : ""}</a></span> */}
@@ -252,7 +259,7 @@ export const LinkTab = ({ script, licenses, licenseID, sharelink, lockedShareID,
     </>
 }
 
-const CollaborationTab = ({ script, licenses, licenseID }: any) => {
+const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription }: any) => {
     const dispatch = useDispatch()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const theme = useSelector(app.selectColorTheme)
@@ -355,7 +362,7 @@ const CollaborationTab = ({ script, licenses, licenseID }: any) => {
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{script, licenses, licenseID}} />
+            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
                 <span onClick={manageCollaborators}><a href="#" style={!collaborators.hasError ? { color: "#76aaff" } : { color: "#777", cursor: "pointer" }}><i className="icon icon-checkmark"></i>SAVE</a></span>
@@ -364,7 +371,8 @@ const CollaborationTab = ({ script, licenses, licenseID }: any) => {
     </>
 }
 
-const EmbedTab = ({ script, licenses, licenseID, sharelink }: any) => {
+const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
+    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
     const embeddingOption = "" + (showCode ? "&hideCode" : "") + (showDAW ? "&hideDaw" : "")
@@ -397,15 +405,17 @@ const EmbedTab = ({ script, licenses, licenseID, sharelink }: any) => {
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{script, licenses, licenseID}} />
+            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
+                <span onClick={() => { save(); close() }}><a href="#" style={{ color: "#76aaff" }}><i className="icon icon-checkmark"></i>SAVE</a></span>
             </div>
         </div>
     </>
 }
 
-const SoundCloudTab = ({ script, licenses, licenseID, save, description, sharelink, close }: any) => {
+const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
+    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const license = licenses[licenseID]
     
     const shareSoundCloud = () => {
@@ -530,7 +540,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, save, description, shareli
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{script, licenses, licenseID}} />
+            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
 
             <div ng-show="sc.message.show" className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: sc.message.color }}>
                 <span ng-show="sc.message.spinner"><i className="spinner icon icon-spinner"></i></span> {sc.message.text}
@@ -544,9 +554,8 @@ const SoundCloudTab = ({ script, licenses, licenseID, save, description, shareli
     </>
 }
 
-const MoreDetails = ({ script, licenses, licenseID }: any) => {
+const MoreDetails = ({ script, licenses, licenseID, setLicenseID, description, setDescription }: any) => {
     const [collapsed, setCollapsed] = useState(true)
-    const [description, setDescription] = useState(script.description)
 
     const getLicenseLink = function (id: string) {
         var name = licenses[id].license
@@ -558,19 +567,6 @@ const MoreDetails = ({ script, licenses, licenseID }: any) => {
         }
 
         return link
-    }
-
-    const saveScriptDesc = () => {
-        userProject.setScriptDesc(script.name, script.shareid, description)
-    }
-
-    const save = () => {
-        saveScriptDesc()
-        updateLicense()
-    }
-
-    const updateLicense = () => {
-        userProject.setLicense(script.name, script.shareid, licenseID)
     }
 
     return <div className="panel panel-default"> {/* TODO: Expand/collabse, heading. ("More Details (Description, License)...") */}
@@ -597,10 +593,10 @@ const MoreDetails = ({ script, licenses, licenseID }: any) => {
 
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
-                        {Object.values(licenses).map((license: any, index: number) =>
-                        <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
+                        {Object.entries(licenses).map(([id, license]: any) =>
+                        <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
                             <label>
-                                <input type="radio" name="optradio" ng-model="data.selectedLicenseId" ng-value="license.id"/>
+                                <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
                                 <span></span>{license.license}
                             </label>
                         </div>)}
@@ -622,15 +618,15 @@ const Tabs = [
     { component: SoundCloudTab, title: "SHARE ON SOUNDCLOUD", description: ESMessages.shareScript.menuDescriptions.soundCloud },
 ]
 
-export const ScriptShare = ({ script, licenses }: any) => {
-    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
-    const [lockedShareID, setLockedShareID] = useState("")
-    const lockedShareLink = location.origin + location.pathname +"?sharing=" + lockedShareID
-
-    userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
-
+export const ScriptShare = ({ script, licenses, close }: any) => {
     const [activeTab, setActiveTab] = useState(0)
-    const [licenseID, setLicenseID] = useState(script.license_id || 1)
+    const [description, setDescription] = useState(script.description)
+    const [licenseID, setLicenseID] = useState(script.license_id || "1")
+
+    const save = () => {
+        userProject.setScriptDesc(script.name, script.shareid, description)
+        userProject.setLicense(script.name, script.shareid, licenseID)
+    }
 
     const ShareBody = Tabs[activeTab].component
     return <div className="share-script">
@@ -642,14 +638,14 @@ export const ScriptShare = ({ script, licenses }: any) => {
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ title }, index) =>
-                    <li key={index} className={"uib-tab nav-item ng-scope ng-isolate-scope flex-grow" + (activeTab === index ? " active" : "")}>
-                        <a onClick={() => setActiveTab(index)} className="nav-link ng-binding h-full flex justify-center items-center">{title}</a>
+                    <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
+                        <a onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">{title}</a>
                     </li>)}
                 </ul>
             </div>
             <div className="text-center mt-4">{Tabs[activeTab].description}</div>
         </div>
         {/* TODO: Move to wrapModal */}
-        <Provider store={store}><ShareBody script={script} licenses={licenses} licenseID={licenseID} /></Provider>
+        <Provider store={store}><ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} /></Provider>
     </div>
 }
