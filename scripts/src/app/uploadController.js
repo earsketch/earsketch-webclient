@@ -77,7 +77,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
 
     $scope.openRecordMenu = function () {
         if (ESUtils.whichBrowser().match('Chrome|Firefox') == null) {
-            $scope.recError = ESMessages.uploadcontroller.nosupport;
+            $scope.recError = i18n.t('messages:uploadcontroller.nosupport');
         } else {
             RecorderService.init();
         };
@@ -94,9 +94,9 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
         $scope.$apply(function () {
             $scope.micAccessError = true;
             if (error == "chrome_mic_noaccess") {
-                $scope.micAccessMessage = ESMessages.uploadcontroller.chrome_mic_noaccess;
+                $scope.micAccessMessage = i18n.t('messages:uploadcontroller.chrome_mic_noaccess');
             } else if (error == "ff_mic_noaccess") {
-                $scope.micAccessMessage = ESMessages.uploadcontroller.ff_mic_noaccess;
+                $scope.micAccessMessage = i18n.t('messages:uploadcontroller.ff_mic_noaccess');
             }
             $scope.notAllowedToRecord = true;
             $timeout(function () {
@@ -200,22 +200,22 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
         // TODO: show these userConsole warnings as notification messages instead
         if (userProject.getUsername() == null) {
             esconsole('User not authenticated', 'warning');
-            userConsole.warn(ESMessages.uploadcontroller.userAuth);
-            $scope.uploadError = ESMessages.uploadcontroller.userAuth;
+            userConsole.warn(i18n.t('messages:uploadcontroller.userAuth'));
+            $scope.uploadError = i18n.t('messages:uploadcontroller.userAuth');
             flagerr = true;
         }
 
         if($scope.freesoundChoice === -1){
             esconsole('No selection made for Freesound upload', 'warning');
-            userConsole.warn(ESMessages.uploadcontroller.freesoundSelection);
+            userConsole.warn(i18n.t('messages:uploadcontroller.freesoundSelection'));
             flagerr = true;
         }
 
         try {
             if (typeof(key) === 'undefined') {
                 esconsole('Key Undefined ...', 'warning');
-                userConsole.warn(ESMessages.uploadcontroller.undefinedconstant);
-                $scope.uploadError = ESMessages.uploadcontroller.undefinedconstant;
+                userConsole.warn(i18n.t('messages:uploadcontroller.undefinedconstant'));
+                $scope.uploadError = i18n.t('messages:uploadcontroller.undefinedconstant');
                 flagerr = true;
             } else {
                 var jsstr = 'let ' + key + '=5';
@@ -224,8 +224,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
                 const fileKeys = sounds.selectAllFileKeys($ngRedux.getState());
                 if (fileKeys.some(fileKey => fileKey === (userProject.getUsername() + '_' + key).toUpperCase())) {
                     esconsole('Key Already Exists ...', 'info');
-                    userConsole.warn(key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused);
-                    $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused;
+                    userConsole.warn(key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  i18n.t('messages:uploadcontroller.alreadyused'));
+                    $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  i18n.t('messages:uploadcontroller.alreadyused');
                     flagerr = true;
                 }
             }
@@ -234,8 +234,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
 
             flagerr = true;
             esconsole('Key value not allowed', 'warning');
-            userConsole.warn(key + ' ' + ESMessages.uploadcontroller.invalidconstant);
-            $scope.uploadError = key + ' ' + ESMessages.uploadcontroller.invalidconstant
+            userConsole.warn(key + ' ' + i18n.t('messages:uploadcontroller.invalidconstant'));
+            $scope.uploadError = key + ' ' + i18n.t('messages:uploadcontroller.invalidconstant')
         }
 
         if (tempo == null || tempo == "") {
@@ -245,8 +245,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
             if ( isNaN(parseInt(tempo)) || tempo < -1) {
                 flagerr = true;
                 esconsole('Tempo is NaN', 'warning');
-                userConsole.warn(ESMessages.uploadcontroller.tempointeger);
-                $scope.uploadError = ESMessages.uploadcontroller.tempointeger;
+                userConsole.warn(i18n.t('messages:uploadcontroller.tempointeger'));
+                $scope.uploadError = i18n.t('messages:uploadcontroller.tempointeger');
             }
             if(tempo > 200 || (tempo > -1 && tempo < 45)){
                 flagerr = true;
@@ -269,7 +269,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
             };
 
             $http.post(url, undefined, {params:data}).then(function(result) {
-                userNotification.show(ESMessages.uploadcontroller.uploadsuccess, 'success');
+                userNotification.show(i18n.t('messages:uploadcontroller.uploadsuccess'), 'success');
 
                 // clear the cache so it gets reloaded
                 audioLibrary.clearAudioTagCache();
@@ -477,15 +477,15 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
         // TODO: show these userConsole warnings as notification messages instead
         if (userProject.getUsername() == null) {
             esconsole('User not authenticated', ['upload', 'error']);
-            userConsole.warn(ESMessages.uploadcontroller.userAuth);
-            $scope.uploadError = ESMessages.uploadcontroller.userAuth;
+            userConsole.warn(i18n.t('messages:uploadcontroller.userAuth'));
+            $scope.uploadError = i18n.t('messages:uploadcontroller.userAuth');
             flagerr = true;
         }
 
         if (typeof(file) == 'undefined') {
             esconsole('File Undefined ...', ['upload', 'error']);
-            userConsole.warn(ESMessages.uploadcontroller.wavsel);
-            $scope.uploadError = ESMessages.uploadcontroller.wavsel;
+            userConsole.warn(i18n.t('messages:uploadcontroller.wavsel'));
+            $scope.uploadError = i18n.t('messages:uploadcontroller.wavsel');
             flagerr = true;
         } else {
             //check if file is from esrecording
@@ -496,8 +496,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
             var ext = filename.split('.').pop();
 
             if (!['wav','aiff','aif','mp3'].includes(ext)) {
-                userConsole.warn(filename + ESMessages.uploadcontroller.invalidfile);
-                $scope.uploadError = filename + ESMessages.uploadcontroller.invalidfile;
+                userConsole.warn(filename + i18n.t('messages:uploadcontroller.invalidfile'));
+                $scope.uploadError = filename + i18n.t('messages:uploadcontroller.invalidfile');
                 flagerr = true;
             }
         }
@@ -506,16 +506,16 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
             if (buffer.duration > 30) {
                 esconsole('Rejecting the upload of audio file with duration: ' + buffer.duration, ['upload', 'error']);
 
-                userConsole.warn(ESMessages.uploadcontroller.bigsize);
-                $scope.uploadError = ESMessages.uploadcontroller.bigsize;
+                userConsole.warn(i18n.t('messages:uploadcontroller.bigsize'));
+                $scope.uploadError = i18n.t('messages:uploadcontroller.bigsize');
                 flagerr = true;
                 return null;
             } else {
                 try {
                     if (typeof(key) == 'undefined') {
                         esconsole('Key Undefined ...', 'warning');
-                        userConsole.warn(ESMessages.uploadcontroller.undefinedconstant);
-                        $scope.uploadError = ESMessages.uploadcontroller.undefinedconstant;
+                        userConsole.warn(i18n.t('messages:uploadcontroller.undefinedconstant'));
+                        $scope.uploadError = i18n.t('messages:uploadcontroller.undefinedconstant');
                         flagerr = true;
                     } else {
                         var jsstr = 'let ' + key + '=5';
@@ -524,8 +524,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
                         const fileKeys = sounds.selectAllFileKeys($ngRedux.getState());
                         if (fileKeys.some(fileKey => fileKey === (userProject.getUsername() + '_' + key).toUpperCase())) {
                             esconsole('Key Already Exists ...', 'info');
-                            // userConsole.warn(key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused);
-                            $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  ESMessages.uploadcontroller.alreadyused;
+                            $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  i18n.t('messages:uploadcontroller.alreadyused');
                             flagerr = true;
                         }
                     }
@@ -534,8 +533,7 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
 
                     flagerr = true;
                     esconsole('Key value not allowed', 'warning');
-                    // userConsole.warn(key + ' ' + ESMessages.uploadcontroller.invalidconstant);
-                    $scope.uploadError = key + ' ' + ESMessages.uploadcontroller.invalidconstant
+                    $scope.uploadError = key + ' ' + i18n.t('messages:uploadcontroller.invalidconstant')
                 }
 
                 if (tempo == null || tempo === '') {
@@ -545,8 +543,8 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
                     if ( isNaN(parseInt(tempo)) || tempo < -1) {
                         flagerr = true;
                         esconsole('Tempo is NaN', 'warning');
-                        userConsole.warn(ESMessages.uploadcontroller.tempointeger);
-                        $scope.uploadError = ESMessages.uploadcontroller.tempointeger;
+                        userConsole.warn(i18n.t('messages:uploadcontroller.tempointeger'));
+                        $scope.uploadError = i18n.t('messages:uploadcontroller.tempointeger');
                     }
                     if(tempo > 200 || (tempo > -1 && tempo < 45)){
                         flagerr = true;
@@ -596,13 +594,13 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
 
                     request.timeout = 60000;
                     request.ontimeout = function () {
-                        userConsole.error(ESMessages.uploadcontroller.timeout);
+                        userConsole.error(i18n.t('messages:uploadcontroller.timeout'));
                     };
 
                     request.onload = function () {
                         if (request.readyState === 4) {
                             if (request.status === 200) {
-                                userNotification.show(ESMessages.uploadcontroller.uploadsuccess, 'success');
+                                userNotification.show(i18n.t('messages:uploadcontroller.uploadsuccess'), 'success');
 
                                 // clear the cache so it gets reloaded
                                 audioLibrary.clearAudioTagCache();
@@ -612,13 +610,13 @@ app.controller("UploadSoundCtrl", ['$scope','$uibModalInstance','$sce', '$timeou
                             } else {
                                 esconsole('Error Sending Custom Sound...', 'error');
                                 esconsole(request.statusText, 'error');
-                                userConsole.error(ESMessages.uploadcontroller.commerror);
-                                $scope.error = ESMessages.uploadcontroller.commerror;
+                                userConsole.error(i18n.t('messages:uploadcontroller.commerror'));
+                                $scope.error = i18n.t('messages:uploadcontroller.commerror');
                             }
                         } else {
                             esconsole('Error Sending Custom Sound....', 'error');
-                            userConsole.error(ESMessages.uploadcontroller.commerror2);
-                            $scope.error = ESMessages.uploadcontroller.commerror2;
+                            userConsole.error(i18n.t('messages:uploadcontroller.commerror2'));
+                            $scope.error = i18n.t('messages:uploadcontroller.commerror2');
                         }
                     };
 
