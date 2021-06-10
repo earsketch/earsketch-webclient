@@ -89,9 +89,9 @@ const soundsSlice = createSlice({
             const fileKeys = state.userSounds.fileKeys;
             fileKeys[fileKeys.indexOf(oldName)] = newName;
             const entity = state.userSounds.entities[oldName];
+            delete state.userSounds.entities[oldName];
             entity.file_key = newName;
             state.userSounds.entities[newName] = entity;
-            delete state.userSounds.entities[oldName];
         },
         deleteUserSound(state, { payload }) {
             const fileKeys = state.userSounds.fileKeys;

@@ -72,8 +72,9 @@ const ESMessages = {
         "sounddeleted": "Successfully deleted sound",
         "renameSoundEmpty": "Sound name cannot be empty (or only contain \"_\")!",
         "renameSoundSpecialChar": "Removing special characters in the renaming process...",
+        "renameSoundConflict": "Sound name already in use",
         'illegalCharacterInUserID': 'Please use only regular characters, numbers, or _ in the user ID.',
-        'complexitySyntaxError': 'Failed to run the code indicator. There might be a syntax error in your code.'
+        'complexitySyntaxError': 'Failed to run the code indicator. There might be a syntax error in your code.',
     },
     "modulevalue": {
         "keyvalue": "message to display"

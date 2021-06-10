@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Provider, useDispatch } from "react-redux"
+import { Provider, useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
 import { ScriptEntity, SoundEntity } from "common"
@@ -55,10 +55,11 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
 
 const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
     const dispatch = useDispatch()
+    const soundNames = useSelector(sounds.selectAllFileKeys)
     const username = userProject.getUsername().toUpperCase()
-    // Remove <username>_ prefix if present.
+    // Remove <username>_ prefix, which is present in all user sounds.
     const prefix = username + "_"
-    const [name, setName] = useState(sound.file_key.startsWith(prefix) ? sound.file_key.slice(prefix.length) : sound.file_key)
+    const [name, setName] = useState(sound.file_key.slice(prefix.length))
 
     const confirm = () => {
         const specialCharReplaced = /[^\w\s]/g.test(name)
@@ -72,19 +73,18 @@ const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }
         if (cleanName === "") {
             userNotification.show(ESMessages.general.renameSoundEmpty, "failure1")
             close()
-            return
-        } else if (specialCharReplaced) {
-            userNotification.show(ESMessages.general.renameSoundSpecialChar, "failure1")
-        }
-        
-        if (sound.file_key.startsWith(prefix)) {
-            // if username existed in the original file name, add it back with an _
+        } else if (soundNames.includes(prefix + cleanName)) {
+            userNotification.show(ESMessages.general.renameSoundConflict, "failure1")
+            close()
+        } else {
+            if (specialCharReplaced) {
+                userNotification.show(ESMessages.general.renameSoundSpecialChar, "normal")
+            }
             userProject.renameAudio(sound.file_key, prefix + cleanName).then(() => {
                 dispatch(sounds.renameLocalUserSound({ oldName: sound.file_key, newName: prefix + cleanName }))
+                userNotification.show(ESMessages.general.soundrenamed, "normal")
                 close()
             })
-        } else {
-            userProject.renameAudio(sound.file_key, cleanName).then(() => close())
         }
     }
 

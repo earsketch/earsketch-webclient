@@ -552,7 +552,6 @@ export async function renameAudio(audiokey: string, newaudiokey: string) {
     try {
         await postAuth("/services/audio/rename", { audiokey, newaudiokey })
         esconsole(`Successfully renamed audiokey: ${audiokey} to ${newaudiokey}`, ["debug", "user"])
-        userNotification.show(ESMessages.general.soundrenamed, "normal", 2)
         audioLibrary.clearAudioTagCache()  // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)
