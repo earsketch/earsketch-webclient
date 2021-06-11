@@ -11,7 +11,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [email, setEmail] = useState("")
-    const { t } = useTranslation();
+    const { t } = useTranslation()
 
     const submit = async () => {
         setError("Please wait...")

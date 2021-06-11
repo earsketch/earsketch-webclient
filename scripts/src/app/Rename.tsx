@@ -60,7 +60,7 @@ const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }
     // Remove <username>_ prefix, which is present in all user sounds.
     const prefix = username + "_"
     const [name, setName] = useState(sound.file_key.slice(prefix.length))
-    const { t } = useTranslation();
+    const { t } = useTranslation()
 
     const confirm = () => {
         const specialCharReplaced = /[^\w\s]/g.test(name)
