@@ -99,20 +99,32 @@ const UserListInput = ({ users, setUsers, setFinalize }:
     </>
 }
 
-export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
+interface TabParameters {
+    script: ScriptEntity
+    licenses: { [key: string]: any }
+    licenseID: string
+    setLicenseID: (id: string) => void
+    description: string
+    setDescription: (description: string) => void
+    save: () => void
+    close: () => void
+}
+
+export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const [lockedShareID, setLockedShareID] = useState("")
-    const [showLockedShareLink, setShowLockedShareLink] = useState(false)
+    const [lock, setLock] = useState(false)
     const [viewers, setViewers] = useState([] as string[])
     const finalize = useRef<undefined | (() => Promise<string[] | null>)>()
+    const linkElement = useRef<HTMLInputElement>(null)
 
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const lockedShareLink = location.origin + location.pathname +"?sharing=" + lockedShareID
+    const link = lock ? lockedShareLink : sharelink
 
     userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
 
     const downloadShareUrl = () => {
-        const url = showLockedShareLink ? lockedShareLink : sharelink
-        const textContent = "[InternetShortcut]\n" + "URL=" + url + "\n" + "IconIndex=0"
+        const textContent = "[InternetShortcut]\n" + "URL=" + link + "\n" + "IconIndex=0"
         // This is an "interesting" use of exporter.text().
         exporter.text({
             name: script.name + ".url",
@@ -125,7 +137,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         if (!users) return
         save()
         reporter.share("link", licenses[licenseID].license)
-        userProject.shareWithPeople(showLockedShareLink ? lockedShareID : script.shareid, users)
+        userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
         userNotification.show("Shared " + script.name + " as view-only with " + users.join(", "))
         close()
     }
@@ -138,42 +150,26 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                         <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
                         Sharable View-only Link
                     </span>
-                    {/* TODO: Deal with this dropdown */}
-                    <div className="btn-group" auto-close="outsideClick">
-                        <button type="button" className="btn btn-filter dropdown-toggle">
-                            <span>
-                            {showLockedShareLink
-                            ? "SHARE ONLY CURRENT VERSION"
-                            : "SHARE FUTURE CHANGES"}
-                            </span>
-                            <span className="caret"></span>
+                    <div className="btn-group">
+                        <button type="button" onClick={() => setLock(true)}
+                                className={"btn " + (lock ? "btn-primary" : "btn-default")}
+                                style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}>
+                            SHARE CURRENT VERSION
                         </button>
-                        <ul className="dropdown-menu" role="menu">
-                            <li>
-                                <a href="#" onClick={() => setShowLockedShareLink(!showLockedShareLink)}>
-                                    <div>
-                                        <div>
-                                            <span>
-                                                {showLockedShareLink
-                                                ? "SHARE FUTURE CHANGES"
-                                                : "SHARE ONLY CURRENT VERSION"}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
+                        <button type="button" onClick={() => setLock(false)}
+                                className={"btn " + (lock ? "btn-default" : "btn-primary")}
+                                style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}>
+                            SHARE FUTURE CHANGES
+                        </button>
                     </div>
                 </div>
-                <div id="share-link-container" style={{ marginTop: "15px" }}>
-                    <div className="share-link">
-                        <span ng-show="!showLockedShareLink">{sharelink}</span>
-                        <span ng-hide="!showLockedShareLink">{lockedShareLink}</span>
-                    </div>
+                <div id="share-link-container mt-5">
+                    <input ref={linkElement} className="share-link outline-none" type="text" value={link} size={link.length} readOnly />
                     <div>
                         <span className="download-share-url" onClick={downloadShareUrl}><i className="glyphicon glyphicon-download-alt" uib-tooltip="Download URL shortcut file" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
-                        {/* TODO: Clipboard directive: sharelink or lockedShareLink */}
-                        <span className="copy-share-link" uib-popover="Copied!" popover-placement="top-right" popover-animation="true" popover-trigger="outsideClick"><i className="icon icon-paste4" uib-tooltip="Copy To Clipboard" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
+                        <span onClick={() => { linkElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title="Copy to clipboard">
+                            <i className="icon icon-paste4"></i>
+                        </span>
                     </div>
                 </div>
                 <hr className="mt-3" />
@@ -193,14 +189,13 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
             <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value="SAVE" className="btn btn-primary" style={/*error !== ""*/ false ? { color: "#76aaff" } : { color: "white", cursor: "pointer" }} />
+                <input type="submit" value={"SAVE" + (viewers.length ? " AND SEND" : "")} className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
 }
 
-const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }:
-    { script: ScriptEntity, licenses: any, licenseID: string, setLicenseID: (id: string) => void, description: string, setDescription: (d: string) => void, save: () => void, close: () => void }) => {
+const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const dispatch = useDispatch()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const [collaborators, setCollaborators] = useState(script.collaborators)
@@ -252,21 +247,22 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
             <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value="SAVE" className="btn btn-primary" style={/*error !== ""*/ false ? { color: "#76aaff" } : { color: "white", cursor: "pointer" }} />
+                <input type="submit" value="SAVE" className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
 }
 
-const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
+const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
-    const embeddingOption = "" + (showCode ? "&hideCode" : "") + (showDAW ? "&hideDaw" : "")
-    const embedHeight = (showCode || showDAW) ? 400 : 54
-    const embeddedIFrameCode = `<iframe width="600" height="${embedHeight}" src="${sharelink}&embedded=true${embeddingOption}"></iframe>`
+    const options = "" + (showCode ? "&hideCode" : "") + (showDAW ? "&hideDaw" : "")
+    const height = (showCode || showDAW) ? 400 : 54
+    const code = `<iframe width="600" height="${height}" src="${sharelink}&embedded=true${options}"></iframe>`
+    const codeElement = useRef<HTMLTextAreaElement>(null)
 
-    return <>
+    return <form onSubmit={e => { e.preventDefault(); save(); close() }}>
         <div className="modal-body">
             <div>
                 <div className="modal-section-header">
@@ -274,19 +270,14 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                         <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
                         Embeddable IFrame code
                     </span>
-                    <form name="myForm" >
-                        <label>Show Code: <input type="checkbox" checked={showCode} onChange={e => setShowCode(e.target.checked)} /></label>
-                        <label>Show Daw: <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
-                        </form>
-                </div>
+                    <label className="mr-3">Show Code: <input type="checkbox" checked={showCode} onChange={e => setShowCode(e.target.checked)} /></label>
+                    <label className="mr-3">Show DAW: <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
+                 </div>
                 <div id="share-link-container" className="mt-5">
-                    <div className="share-link">
-                        <span>{embeddedIFrameCode}</span>
-                    </div>
-                    <div>
-                        {/* Replace clipboard directive */}
-                        <span className="copy-share-link" uib-popover="Copied!" popover-placement="top-right" popover-animation="true" popover-trigger="outsideClick"><i className="icon icon-paste4" uib-tooltip="Copy To Clipboard" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
-                    </div>
+                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full" value={code} readOnly />
+                    <span onClick={() => { codeElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title="Copy to clipboard">
+                        <i className="icon icon-paste4"></i>
+                    </span>
                 </div>
                 <hr className="mt-3" />
             </div>
@@ -294,14 +285,14 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
         <div className="modal-footer border-t-0">
             <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
-                <span onClick={() => { save(); close() }}><a href="#" style={{ color: "#76aaff" }}><i className="icon icon-checkmark"></i>SAVE</a></span>
+                <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value="SAVE" className="btn btn-primary text-white" />
             </div>
         </div>
-    </>
+    </form>
 }
 
-const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: any) => {
+const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const license = licenses[licenseID]
     
@@ -398,7 +389,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
         })
     }
 
-    return <>
+    return <form>
         <div className="modal-body">
             <div className="modal-section-header">
                 <span>
@@ -406,9 +397,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
                     Song Name
                 </span>
             </div>
-            <form role="form">
-                <textarea className="form-control border-0" rows={1} placeholder="Click here to start typing..." ng-model="sc.options.name"></textarea>
-            </form>
+            <textarea className="form-control border-0" rows={1} placeholder="Click here to start typing..." ng-model="sc.options.name"></textarea>
             <hr className="mt-0" />
 
             <div className="modal-section-header">
@@ -434,11 +423,11 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             </div>
 
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
-                <span onClick={shareSoundCloud}><a href="#"><i className="icon icon-checkmark"></i>UPLOAD</a></span>
+                <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value="UPLOAD" className="btn btn-primary text-white" />
             </div>
         </div>
-    </>
+    </form>
 }
 
 const MoreDetails = ({ script, licenses, licenseID, setLicenseID, description, setDescription }: any) => {
@@ -457,9 +446,7 @@ const MoreDetails = ({ script, licenses, licenseID, setLicenseID, description, s
                 <div className="modal-section-header">
                     <span>Description (optional)</span>
                 </div>
-                <form role="form">
-                    <textarea className="form-control border-0" rows={2} placeholder="Click here to start typing..." value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
-                </form>
+                <textarea className="form-control border-0" rows={2} placeholder="Click here to start typing..." value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
             </div>
 
             <div className="text-left">
@@ -521,7 +508,8 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
             </div>
             <div className="text-center mt-4">{Tabs[activeTab].description}</div>
         </div>
-        {/* TODO: Move to wrapModal */}
-        <Provider store={store}><ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} /></Provider>
+        <Provider store={store}>
+            <ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} />
+        </Provider>
     </div>
 }
