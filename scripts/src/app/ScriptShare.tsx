@@ -56,6 +56,8 @@ const UserListInput = ({ users, setUsers, setFinalize }:
             addUser()
         } else if (event.key === "Backspace" && query === "") {
             setUsers(users.slice(0, -1))
+        } else if (error !== "") {
+            setError("")
         }
     }
 
