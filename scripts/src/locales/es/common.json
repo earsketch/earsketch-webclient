@@ -28,6 +28,17 @@
       "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
       "pitchshiftTooLong": "SPANISH The clip is too long for the PITCHSHIFT effect. The max length is 5 minutes. Please use a shorter clip.",
       "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
+    },
+    "general": {
+      "illegalCharacterInUserID": "spanish Please use only regular characters, numbers, or _ in the user ID."
+    },
+    "shareScript": {
+      "menuDescriptions": {
+        "viewOnly": "es I want someone to see my script. (They cannot edit.)",
+        "collaboration": "es I want someone to be able to edit my script.",
+        "embedded": "es I want to be able to embed my song on a website.",
+        "soundCloud": "es I want to publish my song on SoundCloud."
+      }
     }
   }
 }

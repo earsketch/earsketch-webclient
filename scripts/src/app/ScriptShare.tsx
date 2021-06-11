@@ -13,6 +13,8 @@ import store from "../reducers"
 import * as tabs from "../editor/tabState"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
+import { useTranslation } from "react-i18next"
+import i18n from "i18next"
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -20,7 +22,7 @@ async function queryID(query: any) {
     if (query === "") {
         return null
     } else if (ESUtils.checkIllegalCharacters(query)) {
-        throw ESMessages.general.illegalCharacterInUserID
+        throw i18n.t('messages:general.illegalCharacterInUserID')
     } else if (query === userProject.getUsername().toLowerCase()) {
         throw "You cannot share scripts with yourself!"
     }
@@ -448,16 +450,17 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
 }
 
 const Tabs = [
-    { component: LinkTab, title: "LET OTHERS VIEW", description: ESMessages.shareScript.menuDescriptions.viewOnly },
-    { component: CollaborationTab, title: "LET OTHERS EDIT", description: ESMessages.shareScript.menuDescriptions.collaboration },
-    { component: EmbedTab, title: "SHARE AN EMBEDDED SCRIPT", description: ESMessages.shareScript.menuDescriptions.embedded },
-    { component: SoundCloudTab, title: "SHARE ON SOUNDCLOUD", description: ESMessages.shareScript.menuDescriptions.soundCloud },
+    { component: LinkTab, title: "LET OTHERS VIEW", descriptionKey: 'messages:shareScript.menuDescriptions.viewOnly' },
+    { component: CollaborationTab, title: "LET OTHERS EDIT", descriptionKey: 'messages:shareScript.menuDescriptions.collaboration' },
+    { component: EmbedTab, title: "SHARE AN EMBEDDED SCRIPT", descriptionKey: 'messages:shareScript.menuDescriptions.embedded' },
+    { component: SoundCloudTab, title: "SHARE ON SOUNDCLOUD", descriptionKey: 'messages:shareScript.menuDescriptions.soundCloud' },
 ]
 
 export const ScriptShare = ({ script, licenses, close }: any) => {
     const [activeTab, setActiveTab] = useState(0)
     const [description, setDescription] = useState(script.description)
     const [licenseID, setLicenseID] = useState(script.license_id || "1")
+    const { t } = useTranslation()
 
     const save = () => {
         userProject.setScriptDesc(script.name, script.shareid, description)
@@ -479,7 +482,7 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
                     </li>)}
                 </ul>
             </div>
-            <div className="text-center mt-4">{Tabs[activeTab].description}</div>
+            <div className="text-center mt-4">{t(Tabs[activeTab].descriptionKey)}</div>
         </div>
         <Provider store={store}>
             <ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} />

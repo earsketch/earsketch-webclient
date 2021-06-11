@@ -109,7 +109,8 @@
       "renameSoundEmpty": "Sound name cannot be empty (or only contain \"_\")!",
       "renameSoundSpecialChar": "Removing special characters in the renaming process...",
       "renameSoundConflict": "Sound name already in use",
-      "shortname": "Please provide a name that is at least 3 characters long."
+      "shortname": "Please provide a name that is at least 3 characters long.",
+      "illegalCharacterInUserID": "Please use only regular characters, numbers, or _ in the user ID."
     },
     "idecontroller": {
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
@@ -118,6 +119,14 @@
       "blocksyntaxerror": "Failed to switch to the block mode. Please make sure that there is no syntax error in the code.",
       "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
       "closealltabs":"This will close all open tabs. Are you sure you want to proceed?"
+    },
+    "shareScript": {
+      "menuDescriptions": {
+        "viewOnly": "I want someone to see my script. (They cannot edit.)",
+        "collaboration": "I want someone to be able to edit my script.",
+        "embedded": "I want to be able to embed my song on a website.",
+        "soundCloud": "I want to publish my song on SoundCloud."
+      }
     }
   }
 }
