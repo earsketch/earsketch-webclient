@@ -1,8 +1,5 @@
 ﻿// A library of helper functions for the CAI Code Complexity Calculator
-import * as complexityCalculatorState from './complexityCalculatorState';
-
-import { PY_LIST_FUNCS, PY_STR_FUNCS, PY_CREATE_LIST_FUNCS, PY_CREATE_STR_FUNCS, 
-            JS_BUILT_IN_OBJECTS, JS_LIST_FUNCS, JS_STR_FUNCS, JS_STR_LIST_OVERLAP } from './complexityCalculatorState';
+import * as ccState from './complexityCalculatorState';
 
 // Appends the values in the source array to the target list.
 export function appendArray(source: any[], target: any[]) {
@@ -442,11 +439,11 @@ export function getCallReturn(callingNode: any) {
 export function getMostRecentValue(variableObject: any, lineno: number) : any {
     let inFunction = null   //step 1. are we in a function?
     let returnVal = null
-    for (let u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-        if (lineno >= complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine && 
-            lineno <= complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine) {
-            inFunction = [complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine, 
-                complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine]
+    for (let u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+        if (lineno >= ccState.getProperty('userFunctionReturns')[u].startLine && 
+            lineno <= ccState.getProperty('userFunctionReturns')[u].endLine) {
+            inFunction = [ccState.getProperty('userFunctionReturns')[u].startLine, 
+                ccState.getProperty('userFunctionReturns')[u].endLine]
             break
         }
     }
@@ -472,9 +469,9 @@ export function getMostRecentValue(variableObject: any, lineno: number) : any {
         if (variableObject.assignedModified[amItem].line <= lineno) {
             // is it in a function? this only counts if it's NOT in a function
             let isInFunction = false
-            for (let udfNumber = 0; udfNumber < complexityCalculatorState.getProperty('userFunctionReturns').length; udfNumber++) {
-                if (variableObject.assignedModified[amItem].line >= complexityCalculatorState.getProperty('userFunctionReturns')[udfNumber].startLine && 
-                    variableObject.assignedModified[amItem].line <= complexityCalculatorState.getProperty('userFunctionReturns')[udfNumber].endLine) {
+            for (let udfNumber = 0; udfNumber < ccState.getProperty('userFunctionReturns').length; udfNumber++) {
+                if (variableObject.assignedModified[amItem].line >= ccState.getProperty('userFunctionReturns')[udfNumber].startLine && 
+                    variableObject.assignedModified[amItem].line <= ccState.getProperty('userFunctionReturns')[udfNumber].endLine) {
                     isInFunction = true
                     break
                 }
@@ -601,7 +598,7 @@ export function performListOp(callingNode: any): any {
     //check the language, and call the appropriate listop function
     //python and javascript handle str/listops a little differently,
     //so we must differentiate as well
-    return complexityCalculatorState.getProperty('isJavascript') ? jsOp(callingNode) : pythonOp(callingNode)
+    return ccState.getProperty('isJavascript') ? jsOp(callingNode) : pythonOp(callingNode)
     
     //helper comparison function
     function compare(a: any, b: any) { // Use toUpperCase() to ignore character casing
@@ -1384,7 +1381,7 @@ export function doesCallCreateList(node: any) {
             if ('id' in funcNode && funcNode.id.v === "shuffleList") {
                 return true
             };
-            if (PY_CREATE_LIST_FUNCS.includes(funcName)) {
+            if (ccState.PY_CREATE_LIST_FUNCS.includes(funcName)) {
                 return true
             }
         }
@@ -1410,7 +1407,7 @@ export function doesCallCreateString(node: any) {
                 return true
             }
         }
-        if (PY_CREATE_STR_FUNCS.includes(funcName)) {
+        if (ccState.PY_CREATE_STR_FUNCS.includes(funcName)) {
             return true
         }
     }
@@ -1425,7 +1422,7 @@ export function isCallAStrOp(node: any) {
             return false
         } else if ('attr' in thisNode.func) {
             let funcName = thisNode.func.attr.v
-            if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+            if (ccState.getProperty('listFuncs').includes(funcName)) {
                 return true
             }
         }
@@ -1563,7 +1560,7 @@ export function getStringIndexingInNode(node: any) : any {
     if (node._astname === "Subscript") {
         if (node.slice._astname === "Index" || node.slice._astname === "Slice") {
             if (node.value._astname === "Str") {
-                return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)]
+                return [true,  ccState.getProperty("originalityLines").includes(node.lineno)]
             }
             if (node.value._astname === "Subscript") {
                 return (getStringIndexing(node.value))
@@ -1592,7 +1589,7 @@ export function getStringIndexingInNode(node: any) : any {
 // Is this "Call" AST node a call to a list operation?
 export function isCallAListOp(node: any) {
     const thisNode =  retrieveFromList(node)
-    if (thisNode != null && thisNode._astname === "Call" && 'attr' in thisNode.func && complexityCalculatorState.getProperty('listFuncs').includes(thisNode.func.attr.v)) {
+    if (thisNode != null && thisNode._astname === "Call" && 'attr' in thisNode.func && ccState.getProperty('listFuncs').includes(thisNode.func.attr.v)) {
         return true
     }
     return false
@@ -1603,7 +1600,7 @@ export function getIndexingInNode(node: any) : any {
     function getNestedIndexing(node: any) : any {
         if (node._astname === "Subscript" && node.slice._astname === "Index") {//if the thing we're indexing is a list, return true
             if (node.value._astname === "List") {
-                return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)]
+                return [true,  ccState.getProperty("originalityLines").includes(node.lineno)]
             }
             //is it a binop that resolves to a list?
             if (node.value._astname === "BinOp" && Array.isArray(recursivelyAnalyzeBinOp(node.value))) {
@@ -1714,10 +1711,10 @@ export function getIndexingInNode(node: any) : any {
     }
     //special cases: min, max, and choice count as indexing for our purposes
     if (node._astname === "Call" && 'id' in node.func && (node.func.id.v === "min" || node.func.id.v === "max")) {
-        return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)]
+        return [true,  ccState.getProperty("originalityLines").includes(node.lineno)]
     }
     if (node._astname === "Call" && 'attr' in node.func && node.func.attr.v === "choice") {
-        return [true,  complexityCalculatorState.getProperty("originalityLines").includes(node.lineno)]
+        return [true,  ccState.getProperty("originalityLines").includes(node.lineno)]
     }
     if (node._astname === "Subscript") {
         if (node.slice._astname === "Index" || node.slice._astname === "Slice") {
@@ -1759,10 +1756,10 @@ export function addOpToList(opToAdd: any, opList: any[], lineno: number) {
     }
     //adjustment if we're in a loop
     //basically, if the op happens in a loop, we consider it to start at the loop's first line
-    for (let p in  complexityCalculatorState.getProperty("loopLocations")) {
-        if (lineno >=  complexityCalculatorState.getProperty("loopLocations")[p][0] && 
-            lineno <=  complexityCalculatorState.getProperty("loopLocations")[p][1]) {
-            lineno =  complexityCalculatorState.getProperty("loopLocations")[p][0]
+    for (let p in  ccState.getProperty("loopLocations")) {
+        if (lineno >=  ccState.getProperty("loopLocations")[p][0] && 
+            lineno <=  ccState.getProperty("loopLocations")[p][1]) {
+            lineno =  ccState.getProperty("loopLocations")[p][0]
             break
         }
     }
@@ -1790,8 +1787,8 @@ export function opsBeforeLine(opList: any[], lineNumber: number, funcOrVar: stri
     let opsBefore = [] //initialize return value
     //are we in a function?
     let inFunction = false
-    for (let u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-        if (lineNumber >= complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine && lineNumber <= complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine) {
+    for (let u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+        if (lineNumber >= ccState.getProperty('userFunctionReturns')[u].startLine && lineNumber <= ccState.getProperty('userFunctionReturns')[u].endLine) {
             inFunction = true
         }
     }
@@ -1807,9 +1804,9 @@ export function opsBeforeLine(opList: any[], lineNumber: number, funcOrVar: stri
             while (!lineOutsideFunction && line < opList[a].lines.length) {
                 const lineno = opList[a].lines[line]
                 let isInside = false
-                for (let u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-                    if (lineno >= complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine && 
-                        lineno <= complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine) {
+                for (let u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+                    if (lineno >= ccState.getProperty('userFunctionReturns')[u].startLine && 
+                        lineno <= ccState.getProperty('userFunctionReturns')[u].endLine) {
                         isInside = true
                         break
                     }
@@ -1832,11 +1829,11 @@ export function opsBeforeLine(opList: any[], lineNumber: number, funcOrVar: stri
         for (let i in funcOrVarObject.modifyingFunctions) {
             //find the function object in userFunctions
             let funcObj = null
-            for (let p in complexityCalculatorState.getProperty('userFunctionReturns')) {
-                if (complexityCalculatorState.getProperty('userFunctionReturns')[p].startLine != null && 
-                    complexityCalculatorState.getProperty('userFunctionReturns')[p].startLine === funcOrVarObject.modifyingFunctions[i][0] && 
-                    complexityCalculatorState.getProperty('userFunctionReturns')[p].endLine === funcOrVarObject.modifyingFunctions[i][1]) {
-                    funcObj = Object.assign({}, complexityCalculatorState.getProperty('userFunctionReturns')[p])
+            for (let p in ccState.getProperty('userFunctionReturns')) {
+                if (ccState.getProperty('userFunctionReturns')[p].startLine != null && 
+                    ccState.getProperty('userFunctionReturns')[p].startLine === funcOrVarObject.modifyingFunctions[i][0] && 
+                    ccState.getProperty('userFunctionReturns')[p].endLine === funcOrVarObject.modifyingFunctions[i][1]) {
+                    funcObj = Object.assign({}, ccState.getProperty('userFunctionReturns')[p])
                     break
                 }
             }
@@ -1868,12 +1865,12 @@ export function opsBeforeLine(opList: any[], lineNumber: number, funcOrVar: stri
     } else if (funcOrVar === "func") {
         //if any other functions are called within the bounds of this function
         let containedFuncs = []
-        for (let i in complexityCalculatorState.getProperty('userFunctionReturns')) {
-            if (complexityCalculatorState.getProperty('userFunctionReturns')[i].callsTo != null) {
-                for (let p in complexityCalculatorState.getProperty('userFunctionReturns')[i].callsTo) {
-                    if (complexityCalculatorState.getProperty('userFunctionReturns')[i].callsTo[p] >= funcOrVarObject.startLine && 
-                        complexityCalculatorState.getProperty('userFunctionReturns')[i].callsTo[p] <= funcOrVarObject.endLine) {
-                        containedFuncs.push(complexityCalculatorState.getProperty('userFunctionReturns')[i])
+        for (let i in ccState.getProperty('userFunctionReturns')) {
+            if (ccState.getProperty('userFunctionReturns')[i].callsTo != null) {
+                for (let p in ccState.getProperty('userFunctionReturns')[i].callsTo) {
+                    if (ccState.getProperty('userFunctionReturns')[i].callsTo[p] >= funcOrVarObject.startLine && 
+                        ccState.getProperty('userFunctionReturns')[i].callsTo[p] <= funcOrVarObject.endLine) {
+                        containedFuncs.push(ccState.getProperty('userFunctionReturns')[i])
                     }
                 }
             }
@@ -1899,7 +1896,7 @@ export function isNodeFloat(node: any) {
             return true
         } else {
             //otherwise, we check for a decimal point in the actual line of code.
-            const lineString = complexityCalculatorState.getProperty('studentCode')[sourceIndex]
+            const lineString = ccState.getProperty('studentCode')[sourceIndex]
             const valueIndex = node.col_offset
             const valToTrim = lineString.substring(valueIndex)
             let valueString = ""
@@ -1916,7 +1913,7 @@ export function isNodeFloat(node: any) {
     }
 }
 
-// Handles the addition of information about conditional lines to  complexityCalculatorState.getProperty("allConditionals")()
+// Handles the addition of information about conditional lines to  ccState.getProperty("allConditionals")()
 export function notateConditional(node: any) {
     let lastLine = getLastLine(node)
     //fills in a list of lines where else statements for this conditional occur
@@ -1976,18 +1973,18 @@ export function notateConditional(node: any) {
         newObjects.push({ start: elseLines[i], end: elseLines[i + 1], children: [] })
     }
     //is this a child node?
-    const isChild = findParent(node.lineno, lastLine, complexityCalculatorState.getProperty("allConditionals"))
+    const isChild = findParent(node.lineno, lastLine, ccState.getProperty("allConditionals"))
     //go through, replacing isChild with the object its a child of if found
     if (isChild != null) {
         for (let i in newObjects) {
-            if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, complexityCalculatorState.getProperty("allConditionals"))) {
-                pushParent(newObjects[i], isChild.start, isChild.end, complexityCalculatorState.getProperty("allConditionals"))
+            if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, ccState.getProperty("allConditionals"))) {
+                pushParent(newObjects[i], isChild.start, isChild.end, ccState.getProperty("allConditionals"))
             }
         }
     } else {
         for (let i in newObjects) {
-            if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, complexityCalculatorState.getProperty("allConditionals"))) {
-                complexityCalculatorState.getProperty("allConditionals").push(newObjects[i])
+            if (!doesAlreadyExist(newObjects[i].start, newObjects[i].end, ccState.getProperty("allConditionals"))) {
+                ccState.getProperty("allConditionals").push(newObjects[i])
             }
         }
     }
@@ -2017,7 +2014,7 @@ export function recursivelyEvaluateBinOp(binOp: any) {
                     const varName = binOp.left.split(':')[1]
                     let leftVar = getVariableObject(varName)
                     if (leftVar != null) {
-                        // if ( complexityCalculatorState.getProperty("allVariables")[i].containedValue != null && complexityCalculatorState.getProperty("allVariables")[i].containedValue !== "") {
+                        // if ( ccState.getProperty("allVariables")[i].containedValue != null && ccState.getProperty("allVariables")[i].containedValue !== "") {
                         if (leftVar.value == "List") {
                             binOp.left = leftVar.containedValue
                         } else {
@@ -2188,7 +2185,7 @@ export function listTypesWithin(node: Node, typesWithin: string[], inputIndexing
             //if it's a listop or strop we have to get types in args
             let isListFunc, isStrFunc = false
             //disambiguation for functions that can go for strings or arrays
-            if (JS_STR_LIST_OVERLAP.includes(funcName) && complexityCalculatorState.getProperty('isJavascript')) {
+            if (ccState.JS_STR_LIST_OVERLAP.includes(funcName) && ccState.getProperty('isJavascript')) {
                 const opValType = getTypeFromNode(functionNode.value)
                 if (opValType === "List") {
                     isListFunc = true
@@ -2200,11 +2197,11 @@ export function listTypesWithin(node: Node, typesWithin: string[], inputIndexing
                 }
             }
             //check value
-            if (complexityCalculatorState.getProperty('listFuncs').includes(funcName) && !isStrFunc) {
+            if (ccState.getProperty('listFuncs').includes(funcName) && !isStrFunc) {
                 opList = addOpToList("ListOp", opList, thisNode.lineno)
                 listTypesWithin(functionNode.value, typesWithin, inputIndexingObj, opList)
             }
-            if (complexityCalculatorState.getProperty('strFuncs').includes(funcName) && !isListFunc) {
+            if (ccState.getProperty('strFuncs').includes(funcName) && !isListFunc) {
                 opList = addOpToList("StrOp", opList, thisNode.lineno)
                 listTypesWithin(functionNode.value, typesWithin, inputIndexingObj, opList)
             }
@@ -2470,7 +2467,7 @@ export function trimCommentsAndWhitespace(stringToTrim: string) {
     let returnString = stringToTrim
     //strip out any trailing comments
     //python uses #
-    if (!complexityCalculatorState.getProperty('isJavascript') && returnString.includes('#')) {
+    if (!ccState.getProperty('isJavascript') && returnString.includes('#')) {
         let singleQuotes = 0
         let doubleQuotes = 0
         let commentIndex = -1
@@ -2495,7 +2492,7 @@ export function trimCommentsAndWhitespace(stringToTrim: string) {
         }
     }
     //Javascript uses //
-    if (complexityCalculatorState.getProperty('isJavascript') && returnString.includes('//')) {
+    if (ccState.getProperty('isJavascript') && returnString.includes('//')) {
         let singleQuotes = 0
         let doubleQuotes = 0
         let commentIndex = -1
@@ -2527,9 +2524,9 @@ export function mostRecentElements(variableObj: any, callingLine: number) {
     let inFunction = null
     let correctElts = null
     //check whether the current line is inside or outside of a function declaration
-    for (let u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-        if (callingLine >= complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine && callingLine <= complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine) {
-            inFunction = [complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine, complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine]
+    for (let u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+        if (callingLine >= ccState.getProperty('userFunctionReturns')[u].startLine && callingLine <= ccState.getProperty('userFunctionReturns')[u].endLine) {
+            inFunction = [ccState.getProperty('userFunctionReturns')[u].startLine, ccState.getProperty('userFunctionReturns')[u].endLine]
             break
         }
     }
@@ -2557,8 +2554,8 @@ export function mostRecentElements(variableObj: any, callingLine: number) {
         if (variableObj.nodeElements[eltsItem].line <= callingLine) {
             // is it in a function? this only counts if it's NOT in a function
             let isInFunction = false
-            for (let udfNumber = 0; udfNumber < complexityCalculatorState.getProperty('userFunctionReturns').length; udfNumber++) {
-                if (variableObj.nodeElements[eltsItem].line >= complexityCalculatorState.getProperty('userFunctionReturns')[udfNumber].startLine && variableObj.nodeElements[eltsItem].line <= complexityCalculatorState.getProperty('userFunctionReturns')[udfNumber].endLine) {
+            for (let udfNumber = 0; udfNumber < ccState.getProperty('userFunctionReturns').length; udfNumber++) {
+                if (variableObj.nodeElements[eltsItem].line >= ccState.getProperty('userFunctionReturns')[udfNumber].startLine && variableObj.nodeElements[eltsItem].line <= ccState.getProperty('userFunctionReturns')[udfNumber].endLine) {
                     isInFunction = true
                     break
                 }
@@ -2594,16 +2591,16 @@ export function getLastLine(functionNode: any) {
 export function allReturnsFilled() {
     let allFilled = true // gets flagged as false if a function return or variable value is not yet known.
     //go through the list of uer-defined functions. if the return value is unknown, flag allFilled to false.
-    for (let j = 0; j < complexityCalculatorState.getProperty('userFunctionReturns').length; j++) {
-        if (typeof complexityCalculatorState.getProperty('userFunctionReturns')[j].returns != 'string' ||
-            complexityCalculatorState.getProperty('userFunctionReturns')[j].returns === "" ||
-            complexityCalculatorState.getProperty('userFunctionReturns')[j].returns === "BinOp" ||
-            complexityCalculatorState.getProperty('userFunctionReturns')[j].returns === "Subscript") {
+    for (let j = 0; j < ccState.getProperty('userFunctionReturns').length; j++) {
+        if (typeof ccState.getProperty('userFunctionReturns')[j].returns != 'string' ||
+            ccState.getProperty('userFunctionReturns')[j].returns === "" ||
+            ccState.getProperty('userFunctionReturns')[j].returns === "BinOp" ||
+            ccState.getProperty('userFunctionReturns')[j].returns === "Subscript") {
             allFilled = false
         }
-        if (complexityCalculatorState.getProperty('userFunctionReturns')[j].returns === "List" && complexityCalculatorState.getProperty('userFunctionReturns')[j].containedValue != null) {
-            for (let k = 0; k < complexityCalculatorState.getProperty('userFunctionReturns')[j].containedValue.length; k++) {
-                if (complexityCalculatorState.getProperty('userFunctionReturns')[j].containedValue[k].includes(':')) {
+        if (ccState.getProperty('userFunctionReturns')[j].returns === "List" && ccState.getProperty('userFunctionReturns')[j].containedValue != null) {
+            for (let k = 0; k < ccState.getProperty('userFunctionReturns')[j].containedValue.length; k++) {
+                if (ccState.getProperty('userFunctionReturns')[j].containedValue[k].includes(':')) {
                     allFilled = false
                     break
                 }
@@ -2613,20 +2610,20 @@ export function allReturnsFilled() {
             break
         }
     }
-    //do the same thing with complexityCalculatorState.getProperty("allVariables")
-    for (let j = 0; j < complexityCalculatorState.getProperty("allVariables").length; j++) {
-        if (typeof complexityCalculatorState.getProperty("allVariables")[j].value != 'string' || complexityCalculatorState.getProperty("allVariables")[j].value === "" || complexityCalculatorState.getProperty("allVariables")[j].value === "BinOp" || complexityCalculatorState.getProperty("allVariables")[j].value === "Subscript") {
+    //do the same thing with ccState.getProperty("allVariables")
+    for (let j = 0; j < ccState.getProperty("allVariables").length; j++) {
+        if (typeof ccState.getProperty("allVariables")[j].value != 'string' || ccState.getProperty("allVariables")[j].value === "" || ccState.getProperty("allVariables")[j].value === "BinOp" || ccState.getProperty("allVariables")[j].value === "Subscript") {
             allFilled = false
         }
-        if (complexityCalculatorState.getProperty("allVariables")[j].value === "List" && complexityCalculatorState.getProperty("allVariables")[j].containedValue != null) {
-            for (let k = 0; k < complexityCalculatorState.getProperty("allVariables")[j].containedValue.length; k++) {
-                if ( complexityCalculatorState.getProperty("allVariables")[j].containedValue[k].includes(':')) {
+        if (ccState.getProperty("allVariables")[j].value === "List" && ccState.getProperty("allVariables")[j].containedValue != null) {
+            for (let k = 0; k < ccState.getProperty("allVariables")[j].containedValue.length; k++) {
+                if ( ccState.getProperty("allVariables")[j].containedValue[k].includes(':')) {
                     allFilled = false
                     break
                 }
             }
-            for (let p in complexityCalculatorState.getProperty("allVariables")[j].assignedModified) {
-                if (!Array.isArray( complexityCalculatorState.getProperty("allVariables")[j].assignedModified[p].binop) && (typeof complexityCalculatorState.getProperty("allVariables")[j].assignedModified[p].binop !== "string")) {
+            for (let p in ccState.getProperty("allVariables")[j].assignedModified) {
+                if (!Array.isArray( ccState.getProperty("allVariables")[j].assignedModified[p].binop) && (typeof ccState.getProperty("allVariables")[j].assignedModified[p].binop !== "string")) {
                     allFilled = false
                 }
             }
@@ -2640,16 +2637,16 @@ export function allReturnsFilled() {
 
 // Finds Variable object given the variable name. If not found, returns null.
 export function getVariableObject(variableName: string) {
-    for (let r = 0; r < complexityCalculatorState.getProperty("allVariables").length; r++) {
-        if (complexityCalculatorState.getProperty("allVariables")[r].name === variableName) { return complexityCalculatorState.getProperty("allVariables")[r] }
+    for (let r = 0; r < ccState.getProperty("allVariables").length; r++) {
+        if (ccState.getProperty("allVariables")[r].name === variableName) { return ccState.getProperty("allVariables")[r] }
     }
     return null
 }
 
 // Find the User Function Return object by the function name. If not found, returns null.
 export function getFunctionObject(funcName: string) {
-    for (let u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-        if (complexityCalculatorState.getProperty('userFunctionReturns')[u].name === funcName) { return complexityCalculatorState.getProperty('userFunctionReturns')[u] }
+    for (let u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+        if (ccState.getProperty('userFunctionReturns')[u].name === funcName) { return ccState.getProperty('userFunctionReturns')[u] }
     }
     return null
 }
@@ -2741,7 +2738,7 @@ export function lineDict() {
     }
     let lineDictionary = [];
     //initialize array values
-    for (let i in complexityCalculatorState.getProperty('studentCode')) {
+    for (let i in ccState.getProperty('studentCode')) {
         let variables : any[] = []
         let calls : any[] = []
         let ifElse : any[] = []
@@ -2757,45 +2754,45 @@ export function lineDict() {
         })
     }
     //note every time the user defines a function
-    for (let u in complexityCalculatorState.getProperty('userFunctionReturns')) {
-        if (complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine != null) {
-            const index = complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine - 1
-            lineDictionary[index].userFunction = complexityCalculatorState.getProperty('userFunctionReturns')[u]
+    for (let u in ccState.getProperty('userFunctionReturns')) {
+        if (ccState.getProperty('userFunctionReturns')[u].startLine != null) {
+            const index = ccState.getProperty('userFunctionReturns')[u].startLine - 1
+            lineDictionary[index].userFunction = ccState.getProperty('userFunctionReturns')[u]
             let i = index + 1
-            while (i < complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine) {
-                lineDictionary[i].userFunction = complexityCalculatorState.getProperty('userFunctionReturns')[u]
+            while (i < ccState.getProperty('userFunctionReturns')[u].endLine) {
+                lineDictionary[i].userFunction = ccState.getProperty('userFunctionReturns')[u]
                 i++;
             }
         }
     }
     //note every time a variable is assigned or modified
-    for (let v in complexityCalculatorState.getProperty('variableAssignments')) {
-        const index = complexityCalculatorState.getProperty('variableAssignments')[v].line - 1
-        const variableVal = getVariableObject(complexityCalculatorState.getProperty('variableAssignments')[v].name)
+    for (let v in ccState.getProperty('variableAssignments')) {
+        const index = ccState.getProperty('variableAssignments')[v].line - 1
+        const variableVal = getVariableObject(ccState.getProperty('variableAssignments')[v].name)
         if (lineDictionary[index] != null) {
             lineDictionary[index].variables.push(variableVal)
         }
     }
-    for (let loop in complexityCalculatorState.getProperty("loopLocations")) {
+    for (let loop in ccState.getProperty("loopLocations")) {
         //track the begin points of each loop
-        const index =  complexityCalculatorState.getProperty("loopLocations")[loop][0] - 1;
-        lineDictionary[index].loopStart =  complexityCalculatorState.getProperty("loopLocations")[loop]
+        const index =  ccState.getProperty("loopLocations")[loop][0] - 1;
+        lineDictionary[index].loopStart =  ccState.getProperty("loopLocations")[loop]
         //note which lines are in one or more loops
-        for (let loopLine = complexityCalculatorState.getProperty("loopLocations")[loop][0] - 1; loopLine <=  complexityCalculatorState.getProperty("loopLocations")[loop][1] - 1; loopLine++) {
+        for (let loopLine = ccState.getProperty("loopLocations")[loop][0] - 1; loopLine <=  ccState.getProperty("loopLocations")[loop][1] - 1; loopLine++) {
             if (lineDictionary[loopLine] != null) {
                 lineDictionary[loopLine].loop += 1
             }
         }
     }
-    for (let call in complexityCalculatorState.getProperty('allCalls')) {
-        const index = complexityCalculatorState.getProperty('allCalls')[call].line - 1
+    for (let call in ccState.getProperty('allCalls')) {
+        const index = ccState.getProperty('allCalls')[call].line - 1
         if (lineDictionary[index] != null) {
-            lineDictionary[index].calls.push(complexityCalculatorState.getProperty('allCalls')[call])
+            lineDictionary[index].calls.push(ccState.getProperty('allCalls')[call])
         }
     }
     //nested if else statements
     let levels: any[] = []
-    fillLevels(complexityCalculatorState.getProperty("allConditionals"), levels)
+    fillLevels(ccState.getProperty("allConditionals"), levels)
     //remove overlap in levels
     for (let i in levels) {
         for (let j = 0; j < levels[i].length; j++) {

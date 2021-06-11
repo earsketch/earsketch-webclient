@@ -1,17 +1,16 @@
-﻿import * as complexityCalculatorState from './complexityCalculatorState';
+﻿import * as ccState from './complexityCalculatorState';
 import * as caiErrorHandling from './errorHandling';
-import * as complexityCalculatorHelperFunctions from './complexityCalculatorHelperFunctions';
-import * as complexityCalculator from './complexityCalculator';
-import { JS_BUILT_IN_OBJECTS, JS_LIST_FUNCS, JS_STR_FUNCS, JS_STR_LIST_OVERLAP } from './complexityCalculatorState';
+import * as ccHelpers from './complexityCalculatorHelperFunctions';
+import * as cc from './complexityCalculator';
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source) {
-    complexityCalculatorState.resetState();
-    complexityCalculatorState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
+    ccState.resetState();
+    ccState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
     var ast = acorn.parse(source, {
         locations: true
     });
-    complexityCalculatorState.setProperty('studentCode', source.split("\n"));
+    ccState.setProperty('studentCode', source.split("\n"));
     //handle this like you'd handle python.
     var newAST = convertASTTree(ast);
     //initialize list of function return objects with all functions from the API that return something (includes casting)
@@ -25,21 +24,21 @@ export function analyzeJavascript(source) {
         variables: 0,
         consoleInput: 0
     };
-    complexityCalculatorState.setProperty('isJavascript', true);
+    ccState.setProperty('isJavascript', true);
     //PASS 1: Do the same thing for function returns from user-defined functions
-    complexityCalculator.evaluateUserFunctionParameters(newAST, resultsObject);
+    cc.evaluateUserFunctionParameters(newAST, resultsObject);
     //PASS 2: Gather and label all user-defined variables. If the value is a function call or a BinOp
-    complexityCalculator.gatherAllVariables(newAST);
+    cc.gatherAllVariables(newAST);
     //PASS 3: Account for the variables that only exist as function params. This pass also does a couple other things in the way of functions/removes called function lines from the uncalledFunctionLines so they get checked
-    complexityCalculator.evaluateFunctionReturnParams(newAST);
+    cc.evaluateFunctionReturnParams(newAST);
     //Now, use information gained from labeling user functions to fill in missing variable info, and vice-versa. 10 is the max number of times this will happen before we give up. we can change this if it proves problematic
     var iterations = 0;
-    while (!complexityCalculatorHelperFunctions.allReturnsFilled() && iterations < 10) {
-        complexityCalculator.evaluateAllEmpties();
+    while (!ccHelpers.allReturnsFilled() && iterations < 10) {
+        cc.evaluateAllEmpties();
         iterations++;
     }
     //PASS 4: Actually analyze the Python.
-    complexityCalculator.recursiveAnalyzeAST(newAST, resultsObject, [false, false]);
+    cc.recursiveAnalyzeAST(newAST, resultsObject, [false, false]);
     //boolops and comparisons count as boolean values, so if they're used at a certain level, booleans should be AT LEAST the value of these
     if (resultsObject.boolOps > resultsObject.booleans) {
         resultsObject.booleans = resultsObject.boolOps;
@@ -49,8 +48,8 @@ export function analyzeJavascript(source) {
     }
     //translate the calculated values
     // translateIntegerValues(resultsObject);
-    complexityCalculatorHelperFunctions.lineDict();
-    caiErrorHandling.updateNames(complexityCalculatorState.getProperty('allVariables'), complexityCalculatorState.getProperty('userFunctionParameters'));
+    ccHelpers.lineDict();
+    caiErrorHandling.updateNames(ccState.getProperty('allVariables'), ccState.getProperty('userFunctionParameters'));
     return resultsObject;
 }
 
@@ -221,7 +220,7 @@ function convertASTNode(JsAst) {
             };
         }
     } else if (object.type === "MemberExpression") {
-        if ('name' in object.property && (JS_LIST_FUNCS.includes(object.property.name) || JS_STR_FUNCS.includes(object.property.name))) {
+        if ('name' in object.property && (ccState.JS_LIST_FUNCS.includes(object.property.name) || ccState.JS_STR_FUNCS.includes(object.property.name))) {
             returnObject._astname = "Call";
             //initialize function object
             returnObject.func = {
@@ -248,7 +247,7 @@ function convertASTNode(JsAst) {
         //first, we HAVE to get the function name
         //if it's a listop or strop . we need all the extra stuff bc memberexpression can also be a subscript which doesn't get saved as an attr
         if (object.callee.type === "MemberExpression" && 'property' in object.callee && 'name' in object.callee.property &&
-            (JS_LIST_FUNCS.includes(object.callee.property.name) || JS_STR_FUNCS.includes(object.callee.property.name))) {
+            (ccState.JS_LIST_FUNCS.includes(object.callee.property.name) || ccState.JS_STR_FUNCS.includes(object.callee.property.name))) {
             //get the funcname and store as an attr. attr.v is func name - in JS, this is an identifier in objec.tproperty. we just need the name prop tbqh   //func.value is arg - in JS, this is stored inobject.object.
             returnObject.func._astname = "Attribute";
             returnObject.func.attr = {
@@ -264,7 +263,7 @@ function convertASTNode(JsAst) {
                 returnObject.args = argsObj;
             }
         } else if (object.callee.type === "MemberExpression" && 'object' in object.callee 
-        	&& 'name' in object.callee.object && (JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
+        	&& 'name' in object.callee.object && (ccState.JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
             returnObject.func.id = {
                 v: object.callee.property.name,
                 lineno: object.loc.start.line
@@ -286,20 +285,20 @@ function convertASTNode(JsAst) {
         }
     } else if (object.type === "BinaryExpression") {
         //this could be a binop OR compare. Check the operator.
-        if (Object.keys(binOps).includes(object.operator)) {
+        if (Object.keys(ccState.binOps).includes(object.operator)) {
             //then we make a binop node
             returnObject._astname = "BinOp";
             //binop has left, right, and operator
             returnObject.left = convertASTNode(object.left);
             returnObject.right = convertASTNode(object.right);
-            returnObject.op = { name: binOps[object.operator] };
-        } else if (Object.keys(comparatorOps).includes(object.operator)) {
+            returnObject.op = { name: ccState.binOps[object.operator] };
+        } else if (Object.keys(ccState.comparatorOps).includes(object.operator)) {
             //we make a compare node, then we make a binop node
             returnObject._astname = "Compare";
             //binop has left, right, and operator
             returnObject.left = convertASTNode(object.left);
             returnObject.comparators = [convertASTNode(object.right)];
-            returnObject.ops = [{ name: comparatorOps[object.operator] }];
+            returnObject.ops = [{ name: ccState.comparatorOps[object.operator] }];
         }
     } else if (object.type === "UnaryExpression" && object.operator === "!") {
         returnObject._astname = "UnaryOp";
@@ -317,8 +316,8 @@ function convertASTNode(JsAst) {
         returnObject._astname = "BoolOp";
         returnObject.values = [convertASTNode(object.left), convertASTNode(object.right)];
         //operator should be or or and. bitwise ops don't count.
-        if (Object.keys(boolOps).includes(object.operator)) {
-            returnObject.op = { name: boolOps[object.operator] };
+        if (Object.keys(ccState.boolOps).includes(object.operator)) {
+            returnObject.op = { name: ccState.boolOps[object.operator] };
         }
     } else if (object.type === "Literal") {
         //this is all of our basic datatypes - int, float, bool, str, and null
@@ -379,7 +378,7 @@ function convertASTNode(JsAst) {
                 lineno: object.loc.start.line
             };
             var targetObj = convertASTNode(object.argument);
-            returnObject.op = binOps[object.operator[0]];
+            returnObject.op = ccState.binOps[object.operator[0]];
             returnObject.target = targetObj;
             returnObject.value = valueObj;
         } else {
@@ -389,7 +388,7 @@ function convertASTNode(JsAst) {
                 returnObject.value = convertASTNode(object.right);
             } else {
                 returnObject._astname = "AugAssign";
-                returnObject.op = binOps[object.operator[0]];
+                returnObject.op = ccState.binOps[object.operator[0]];
                 returnObject.target = convertASTNode(object.left);
                 returnObject.value = convertASTNode(object.right);
             }

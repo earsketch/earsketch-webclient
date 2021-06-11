@@ -1,16 +1,10 @@
-import * as complexityCalculatorState from './complexityCalculatorState';
-import * as complexityCalculatorHelperFunctions from './complexityCalculatorHelperFunctions';
-
-import { PY_LIST_FUNCS, PY_STR_FUNCS, PY_CREATE_LIST_FUNCS, PY_CREATE_STR_FUNCS, 
-            JS_BUILT_IN_OBJECTS, JS_LIST_FUNCS, JS_STR_FUNCS, JS_STR_LIST_OVERLAP } from './complexityCalculatorState';
+import * as ccState from './complexityCalculatorState';
+import * as ccHelpers from './complexityCalculatorHelperFunctions';
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
-//variable init
-var sampleLines = complexityCalculatorState.sampleCode.slice(0);
-
 export function getApiCalls() {
-    return complexityCalculatorState.getProperty("apiCalls");
+    return ccState.getProperty("apiCalls");
 }
 
 // Translate recorded integer values from the results into human-readable English
@@ -23,14 +17,14 @@ function translateIntegerValues(resultsObj) {
             "": "Uses Original"
         },
         3: {
-            "forLoops": () => complexityCalculatorState.getProperty('isJavascript') ? "Uses Originally with Two Arguments" : "Uses Originally With Range Min/Max",
+            "forLoops": () => ccState.getProperty('isJavascript') ? "Uses Originally with Two Arguments" : "Uses Originally With Range Min/Max",
             "conditionals": "Uses Originally to Follow Multiple Code Paths",
             "userFunc": "Uses and Calls Originally",
             "consoleInput": "Takes Input Originally and Uses For Purpose",
             "": "Uses Originally For Purpose"
         },
         4: {
-            "forLoops": () => complexityCalculatorState.getProperty('isJavascript') ? "Uses Originally with Three Arguments" : "Uses Originally With Range Min/Max and Increment",
+            "forLoops": () => ccState.getProperty('isJavascript') ? "Uses Originally with Three Arguments" : "Uses Originally With Range Min/Max and Increment",
             "variables": "Uses Originally And Transforms Value",
             "strings": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon",
             "lists": "Uses And Indexes Originally For Purpose OR Uses Originally And Iterates Upon"
@@ -46,7 +40,7 @@ function translateIntegerValues(resultsObj) {
     });
 }
 
-// Fills complexityCalculatorState.getProperty("complexityCalculatorState.getProperty('userFunctionParameters')") list
+// Fills ccState.getProperty("ccState.getProperty('userFunctionParameters')") list
 export function evaluateUserFunctionParameters(ast, results) {
     if (ast != null && ast.body != null) {
         var astKeys = Object.keys(ast.body);
@@ -66,7 +60,7 @@ export function evaluateUserFunctionParameters(ast, results) {
     }
 }
 
-// Fills complexityCalculatorState.getProperty('allVariables') list
+// Fills ccState.getProperty('allVariables') list
 export function gatherAllVariables(ast) {
     if (ast != null && ast.body != null) {
         var astKeys = Object.keys(ast.body);
@@ -85,7 +79,7 @@ export function gatherAllVariables(ast) {
     }
 }
 
-// Adds a variable to complexityCalculatorState.getProperty('allVariables') along with its contents if a node includes a variable assignment.
+// Adds a variable to ccState.getProperty('allVariables') along with its contents if a node includes a variable assignment.
 // Also marks bourdaries of for and while loops for use later
 function markVariable(node) {
     var fakeBinOp = null;
@@ -94,8 +88,8 @@ function markVariable(node) {
     if (node != null && node._astname != null && node._astname === "JSFor") {
         //mark the loop bounds for later labeling of variable value changes.
         var startLine = node.lineno;
-        var endLine = complexityCalculatorHelperFunctions.getLastLine(node);
-        complexityCalculatorState.getProperty('loopLocations').push([startLine, endLine]);
+        var endLine = ccHelpers.getLastLine(node);
+        ccState.getProperty('loopLocations').push([startLine, endLine]);
         //check the "init" component, and mark variable there if found
         if (node.init != null) {
             markVariable(node.init);
@@ -107,21 +101,21 @@ function markVariable(node) {
     }
     //While loops just need to have their bounds marked
     if (node != null && node._astname != null && node._astname === "While") {
-        complexityCalculatorState.getProperty('loopLocations').push([node.lineno, complexityCalculatorHelperFunctions.getLastLine(node)]);
+        ccState.getProperty('loopLocations').push([node.lineno, ccHelpers.getLastLine(node)]);
     }
     //Python for loops. Also, JS foreach loops get sent here.
     if (node != null && node._astname != null && node._astname === "For") {
         //mark the loop bounds for later labeling of variable value changes.
         var startLine = node.lineno;
-        var endLine = complexityCalculatorHelperFunctions.getLastLine(node);
-        complexityCalculatorState.getProperty('loopLocations').push([startLine, endLine]);
+        var endLine = ccHelpers.getLastLine(node);
+        ccState.getProperty('loopLocations').push([startLine, endLine]);
         var nodeIter = node.iter;
         if (nodeIter != null) {
             if (node.target._astname === "Name") {
-                if (complexityCalculatorHelperFunctions.getVariableObject(node.target.id.v) == null) {
+                if (ccHelpers.getVariableObject(node.target.id.v) == null) {
                     //if it's not already stored in a var, we create a new variable object
                     //get the variable's name
-                    var varTarget = complexityCalculatorHelperFunctions.retrieveFromList(node.target);
+                    var varTarget = ccHelpers.retrieveFromList(node.target);
                     if (varTarget == null || (varTarget != null && varTarget._astname !== "Name" && varTarget._astname !== "Subscript")) {
                         return;
                     }
@@ -130,12 +124,12 @@ function markVariable(node) {
                     var modFunc = [];
                     if (node.lineno != null) {
                         lineNumber = node.lineno;
-                        complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                        ccState.setProperty('parentLineNumber', lineNumber);
                     }
                     else {
-                        lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                        lineNumber = ccState.getProperty('parentLineNumber');
                     }
-                    complexityCalculatorState.getProperty("variableAssignments").push({ line: lineNumber, name: targetName });
+                    ccState.getProperty("variableAssignments").push({ line: lineNumber, name: targetName });
                 }
             }
         }
@@ -144,19 +138,19 @@ function markVariable(node) {
         gatherAllVariables(node.orelse);
     }
     if (node != null && node._astname != null && node._astname === "Call") {
-        var functionNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
+        var functionNode = ccHelpers.retrieveFromList(node.func);
         if (functionNode != null && "attr" in functionNode) {
             lineNumber = 0;
             if (node.lineno != null) {
                 lineNumber = node.lineno;
-                complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                ccState.setProperty('parentLineNumber', lineNumber);
             } else {
-                lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                lineNumber = ccState.getProperty('parentLineNumber');
             }
-            var modOriginality = (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber));
+            var modOriginality = (ccState.getProperty('originalityLines').includes(lineNumber));
             var funcName = functionNode.attr.v;
-            if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
-                complexityCalculatorState.getProperty("variableAssignments").push({ line: lineNumber, name: functionNode.value.id.v });
+            if (ccState.getProperty('listFuncs').includes(funcName)) {
+                ccState.getProperty("variableAssignments").push({ line: lineNumber, name: functionNode.value.id.v });
             }
         }
     }
@@ -164,13 +158,13 @@ function markVariable(node) {
         lineNumber = 0;
         if (node.lineno != null) {
             lineNumber = node.lineno;
-            complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+            ccState.setProperty('parentLineNumber', lineNumber);
         } else {
-            lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+            lineNumber = ccState.getProperty('parentLineNumber');
         }
         var assignLine = node.value.lineno - 1;
         var offset = node.value.col_offset;
-        var valueString = node.op.name + " " + complexityCalculatorState.getProperty('studentCode')[assignLine].substring(offset);
+        var valueString = node.op.name + " " + ccState.getProperty('studentCode')[assignLine].substring(offset);
         var indexOfExistingVariableObj = -1;
         varTarget = node.target;
         if (varTarget._astname = "Subscript") {
@@ -178,11 +172,11 @@ function markVariable(node) {
         }
         if (varTarget != null) {
             var varName = varTarget.id.v;
-            var variableObject = complexityCalculatorHelperFunctions.getVariableObject(varName);
+            var variableObject = ccHelpers.getVariableObject(varName);
             if (variableObject == null) {
                 return;
             }
-            variableObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("AugAssign", variableObject.opsDone, node.lineno);
+            variableObject.opsDone = ccHelpers.addOpToList("AugAssign", variableObject.opsDone, node.lineno);
             var modificationAlreadyExists = false;
             for (var p = 0; p < variableObject.assignedModified.length; p++) {
                 if (variableObject.assignedModified[p].value === valueString) {
@@ -198,51 +192,51 @@ function markVariable(node) {
                 lineno: lineNumber
             };
             var nestedBinOp = [];
-            complexityCalculatorHelperFunctions.getNestedVariables(fakeBinOp, nestedBinOp);
+            ccHelpers.getNestedVariables(fakeBinOp, nestedBinOp);
             if (nestedBinOp.length > 0) {
                 variableObject.nested = true;
             }
-            binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(fakeBinOp);
+            binVal = ccHelpers.recursivelyAnalyzeBinOp(fakeBinOp);
             if (Array.isArray(binVal)) {
                 varVal = "List";
                 variableObject.nodeElements.push({
                     line: node.lineno,
-                    elts: complexityCalculatorHelperFunctions.getAllBinOpLists(fakeBinOp)
+                    elts: ccHelpers.getAllBinOpLists(fakeBinOp)
                 });
                 variableObject.stringElements.push({
                     line: node.lineno,
-                    elts: complexityCalculatorHelperFunctions.nodesToStrings(complexityCalculatorHelperFunctions.getAllBinOpLists(fakeBinOp), node.lineno)
+                    elts: ccHelpers.nodesToStrings(ccHelpers.getAllBinOpLists(fakeBinOp), node.lineno)
                 });
-                complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.nodesToStrings(binVal, node.lineno), variableObject.containedValue);
+                ccHelpers.appendArray(ccHelpers.nodesToStrings(binVal, node.lineno), variableObject.containedValue);
                 variableObject.containedValue.push("List");
-                variableObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", variableObject.opsDone, node.lineno);
+                variableObject.opsDone = ccHelpers.addOpToList("ListOp", variableObject.opsDone, node.lineno);
             }
             if (typeof binVal !== "string" && !Array.isArray(binVal)) {
                 varVal = "BinOp";
             }
-            variableObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", variableObject.opsDone, node.lineno);
-            var binOpTypes = complexityCalculatorHelperFunctions.listTypesWithin(fakeBinOp, [], variableObject.indexAndInput, variableObject.opsDone);
-            complexityCalculatorHelperFunctions.appendArray(binOpTypes, variableObject.containedValue);
+            variableObject.opsDone = ccHelpers.addOpToList("BinOp", variableObject.opsDone, node.lineno);
+            var binOpTypes = ccHelpers.listTypesWithin(fakeBinOp, [], variableObject.indexAndInput, variableObject.opsDone);
+            ccHelpers.appendArray(binOpTypes, variableObject.containedValue);
             if (!modificationAlreadyExists) {
                 var lineNo = node.lineno;
-                for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                    if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                        lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                    if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                        lineNo = ccState.getProperty('loopLocations')[h][0];
                         break;
                     }
                 }
                 variableObject.assignedModified.push({
                     line: lineNo,
-                    value: complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(valueString),
+                    value: ccHelpers.trimCommentsAndWhitespace(valueString),
                     original: modOriginality,
                     nodeValue: node,
                     binop: binVal
                 });
-                complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: variableObject.name });
+                ccState.getProperty("variableAssignments").push({ line: node.lineno, name: variableObject.name });
                 if (isInForLoop) { //push twice for loops
                     variableObject.assignedModified.push({
                         line: lineNo,
-                        value: complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(valueString),
+                        value: ccHelpers.trimCommentsAndWhitespace(valueString),
                         original: modOriginality,
                         nodeValue: node,
                         binop: binVal
@@ -262,9 +256,9 @@ function markVariable(node) {
                 assignedVal = node.value;
                 isFunction = true;
             } else {
-                var funcNode = complexityCalculatorHelperFunctions.retrieveFromList(node.value.func);
-                if (funcNode._astname === "Name" && complexityCalculatorHelperFunctions.getFunctionObject(funcNode.id.v) != null && complexityCalculatorHelperFunctions.getFunctionObject(funcNode.id.v).returns === "Function") {
-                    assignedName = complexityCalculatorHelperFunctions.getFunctionObject(funcNode.id.v).flagVal;
+                var funcNode = ccHelpers.retrieveFromList(node.value.func);
+                if (funcNode._astname === "Name" && ccHelpers.getFunctionObject(funcNode.id.v) != null && ccHelpers.getFunctionObject(funcNode.id.v).returns === "Function") {
+                    assignedName = ccHelpers.getFunctionObject(funcNode.id.v).flagVal;
                     isFunction = true;
                 }
             }
@@ -277,10 +271,10 @@ function markVariable(node) {
                     }
                     if (assignedVal != null && typeof assignedVal === 'object' &&
                         assignedVal._astname != null && assignedVal._astname === "Subscript" &&
-                        complexityCalculatorHelperFunctions.getIndexingInNode(assignedVal)[0]) {
+                        ccHelpers.getIndexingInNode(assignedVal)[0]) {
                         subscripted = true;
                     }
-                    assignedVal = complexityCalculatorHelperFunctions.retrieveFromList(assignedVal);
+                    assignedVal = ccHelpers.retrieveFromList(assignedVal);
                     if (assignedVal != null && typeof assignedVal === 'object' && assignedVal._astname != null && assignedVal._astname === "UnaryOp") {
                         containedVal.push("Bool");
                         assignedVal = assignedVal.operand;
@@ -294,60 +288,60 @@ function markVariable(node) {
                     }
                 }
                 if (assignedName !== "") {
-                    var varTarget = complexityCalculatorHelperFunctions.retrieveFromList(node.targets[0]);
+                    var varTarget = ccHelpers.retrieveFromList(node.targets[0]);
                     if (varTarget == null || (varTarget != null && varTarget._astname !== "Name" && varTarget._astname !== "Subscript")) {
                         return;
                     } else {
                         var varName = varTarget.id.v;
-                        if (assignedName === "makeBeat" || complexityCalculatorState.getProperty('makeBeatRenames').includes(assignedName)) {
+                        if (assignedName === "makeBeat" || ccState.getProperty('makeBeatRenames').includes(assignedName)) {
                             //special case if user renames makeBeat
-                            complexityCalculatorState.getProperty('makeBeatRenames').push(varName);
+                            ccState.getProperty('makeBeatRenames').push(varName);
                         }
-                        for (var n = 0; n < complexityCalculatorState.getProperty('userFunctionParameters').length; n++) {
-                            if (complexityCalculatorState.getProperty('userFunctionParameters')[n].name === assignedName) { //double check and make sure its not already in here
+                        for (var n = 0; n < ccState.getProperty('userFunctionParameters').length; n++) {
+                            if (ccState.getProperty('userFunctionParameters')[n].name === assignedName) { //double check and make sure its not already in here
                                 var alreadyMarked = false;
-                                for (var j = 0; j < complexityCalculatorState.getProperty('userFunctionParameters').length; j++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionParameters')[j].name === varName) {
+                                for (var j = 0; j < ccState.getProperty('userFunctionParameters').length; j++) {
+                                    if (ccState.getProperty('userFunctionParameters')[j].name === varName) {
                                         alreadyMarked = true;
                                         break;
                                     }
                                 }
                                 if (!alreadyMarked) {
                                     newFunctionObject = {};
-                                    Object.assign(newFunctionObject, complexityCalculatorState.getProperty('userFunctionParameters')[n]);
+                                    Object.assign(newFunctionObject, ccState.getProperty('userFunctionParameters')[n]);
                                     newFunctionObject.name = varName;
-                                    complexityCalculatorState.getProperty('userFunctionParameters').push(newFunctionObject);
+                                    ccState.getProperty('userFunctionParameters').push(newFunctionObject);
                                 }
                             }
                         }
-                        for (var p = 0; p < complexityCalculatorState.getProperty('userFunctionReturns').length; p++) {
-                            if (assignedName === complexityCalculatorState.getProperty('userFunctionReturns')[p].name) {
-                                for (var i = 0; i < complexityCalculatorState.getProperty('userFunctionReturns').length; i++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionReturns')[i].name === varName) {
+                        for (var p = 0; p < ccState.getProperty('userFunctionReturns').length; p++) {
+                            if (assignedName === ccState.getProperty('userFunctionReturns')[p].name) {
+                                for (var i = 0; i < ccState.getProperty('userFunctionReturns').length; i++) {
+                                    if (ccState.getProperty('userFunctionReturns')[i].name === varName) {
                                         return;
                                     } //if it's already been marked we don't need to do anything else.
                                 }
                                 var newReturn = {};
-                                Object.assign(newReturn, complexityCalculatorState.getProperty('userFunctionReturns')[p]);
+                                Object.assign(newReturn, ccState.getProperty('userFunctionReturns')[p]);
                                 newReturn.name = varName;
                                 if (subscripted) {
                                     newReturn.indexAndInput.indexed = true;
                                 }
-                                complexityCalculatorState.getProperty('userFunctionReturns').push(newReturn);
+                                ccState.getProperty('userFunctionReturns').push(newReturn);
                                 //if the function we're reassigning is a reassign of something else
                                 var reassignedFuncName = assignedName;
-                                for (var n = 0; n < complexityCalculatorState.getProperty('userFunctionRenames'); n++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionRenames')[n][0] === reassignedFuncName) {
-                                        reassignedFuncName = complexityCalculatorState.getProperty('userFunctionRenames')[n][1];
+                                for (var n = 0; n < ccState.getProperty('userFunctionRenames'); n++) {
+                                    if (ccState.getProperty('userFunctionRenames')[n][0] === reassignedFuncName) {
+                                        reassignedFuncName = ccState.getProperty('userFunctionRenames')[n][1];
                                     }
                                 }
-                                complexityCalculatorState.getProperty('userFunctionRenames').push([varName, reassignedFuncName]);
+                                ccState.getProperty('userFunctionRenames').push([varName, reassignedFuncName]);
                                 return;
                             }
                         }
                     }
                     //ELSE if rename of api function, ignore it completely.
-                    if (assignedVal != null && apiFunctions.includes(assignedName)) {
+                    if (assignedVal != null && ccState.apiFunctions.includes(assignedName)) {
                         return;
                     }
                 }
@@ -358,7 +352,7 @@ function markVariable(node) {
         funcOrVar = "";
         flag = "";
         var indexOfExistingVariableObj = -1;
-        var varTarget = complexityCalculatorHelperFunctions.retrieveFromList(node.targets[0]);
+        var varTarget = ccHelpers.retrieveFromList(node.targets[0]);
         if ((varTarget != null && varTarget._astname !== "Name" && varTarget._astname !== "Subscript") || varTarget == null) {
             return;
         }
@@ -371,32 +365,32 @@ function markVariable(node) {
         var containsOps = [];
         var assignLine = node.value.lineno - 1;
         var offset = node.value.col_offset;
-        var valueString = complexityCalculatorState.getProperty('studentCode')[assignLine].substring(offset);
+        var valueString = ccState.getProperty('studentCode')[assignLine].substring(offset);
         var subscriptString = false;
         var nodeVal = node.value;
         var carryOriginality = false;
         var copiedElts = null;
         //mark subscripting and listops, if applicable
         if (nodeVal._astname === "Subscript") {
-            inputIndexing.strIndexed = complexityCalculatorHelperFunctions.getStringIndexingInNode(node.value)[0];
+            inputIndexing.strIndexed = ccHelpers.getStringIndexingInNode(node.value)[0];
         }
-        nodeVal = complexityCalculatorHelperFunctions.retrieveFromList(nodeVal);
+        nodeVal = ccHelpers.retrieveFromList(nodeVal);
         if (nodeVal != null && nodeVal._astname != null) {
             if (nodeVal._astname === "UnaryOp" || nodeVal._astname === 'Compare' || (nodeVal._astname === 'Name' && nodeVal.id.v != null && ((nodeVal.id.v === "True" || nodeVal.id.v === "False")))) {
                 if (nodeVal._astname === "Compare") {
-                    containsOps = complexityCalculatorHelperFunctions.addOpToList("Compare", containsOps, node.lineno);
+                    containsOps = ccHelpers.addOpToList("Compare", containsOps, node.lineno);
                     var compareTypes = [];
-                    complexityCalculatorHelperFunctions.listTypesWithin(nodeVal, compareTypes, inputIndexing, containsOps);
+                    ccHelpers.listTypesWithin(nodeVal, compareTypes, inputIndexing, containsOps);
                     containedVal = compareTypes;
                 }
             } else if (nodeVal._astname === 'Name') { //this means it contains the value of another variable or function
                 containsNested = true;
-                otherVar = complexityCalculatorHelperFunctions.getVariableObject(nodeVal.id.v);
+                otherVar = ccHelpers.getVariableObject(nodeVal.id.v);
                 if (otherVar != null && otherVar.value !== "" && otherVar.value !== "BinOp") {
                     if (otherVar.indexAndInput.input) {
                         inputIndexing.input = true;
                     }
-                    containsOps = complexityCalculatorHelperFunctions.appendOpList(otherVar.opsDone, containsOps);
+                    containsOps = ccHelpers.appendOpList(otherVar.opsDone, containsOps);
                     if (otherVar.indexAndInput.indexed) {
                         inputIndexing.indexed = true;
                     }
@@ -405,19 +399,19 @@ function markVariable(node) {
                     }
                     if (otherVar.nodeElements != null) {
                         copiedElts = [];
-                        complexityCalculatorHelperFunctions.appendArray(otherVar.nodeElements, copiedElts);
+                        ccHelpers.appendArray(otherVar.nodeElements, copiedElts);
                     }
-                    complexityCalculatorHelperFunctions.appendArray(otherVar.containedValue, containedVal);
+                    ccHelpers.appendArray(otherVar.containedValue, containedVal);
                 }
-                if (otherVar == null && complexityCalculatorHelperFunctions.getFunctionObject(nodeVal.id.v) != null) {
+                if (otherVar == null && ccHelpers.getFunctionObject(nodeVal.id.v) != null) {
                     flag = nodeVal.id.v;
                 }
             }
             if (nodeVal._astname === 'List') {
                 listElts = nodeVal.elts;
-                containedVal = complexityCalculatorHelperFunctions.listTypesWithin(nodeVal, containedVal, inputIndexing, containsOps);
+                containedVal = ccHelpers.listTypesWithin(nodeVal, containedVal, inputIndexing, containsOps);
                 var hasNames = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(nodeVal, hasNames);
+                ccHelpers.getNestedVariables(nodeVal, hasNames);
                 if (hasNames.length > 0) {
                     containsNested = true;
                 }
@@ -436,8 +430,8 @@ function markVariable(node) {
                 }
                 var isListFunc = false, isStrFunc = false;
                 //disambiguation between operations that can be done to strings and lists in JS
-                if (JS_STR_LIST_OVERLAP.includes(funcName) && complexityCalculatorState.getProperty('isJavascript')) {
-                    var operationType = complexityCalculatorHelperFunctions.getTypeFromNode(nodeVal.func.value);
+                if (ccState.JS_STR_LIST_OVERLAP.includes(funcName) && ccState.getProperty('isJavascript')) {
+                    var operationType = ccHelpers.getTypeFromNode(nodeVal.func.value);
                     if (operationType === "List") {
                         isListFunc = true;
                     } else if (operationType === "Str") {
@@ -446,9 +440,9 @@ function markVariable(node) {
                         isListFunc, isStrFunc = true;
                     }
                 }
-                if ('attr' in nodeVal.func && complexityCalculatorState.getProperty('listFuncs').includes(funcName) && !isStrFunc && funcName !== "shuffleList") {
+                if ('attr' in nodeVal.func && ccState.getProperty('listFuncs').includes(funcName) && !isStrFunc && funcName !== "shuffleList") {
                     if (nodeVal.func.value._astname === "List") {
-                        var valuesInList = complexityCalculatorHelperFunctions.listTypesWithin(nodeVal.func.value, [], inputIndexing, containsOps);
+                        var valuesInList = ccHelpers.listTypesWithin(nodeVal.func.value, [], inputIndexing, containsOps);
                         for (var vil = 0; vil < valuesInList; vil++) {
                             containedVal.push(valuesInList[vil]);
                         }
@@ -456,43 +450,43 @@ function markVariable(node) {
                     //binop
                     if (nodeVal.func.value._astname === "BinOp") {
                         var valsInOp = [];
-                        containsOps = complexityCalculatorHelperFunctions.addOpToList("BinOp", containsOps, node.lineno);
-                        complexityCalculatorHelperFunctions.listTypesWithin(nodeVal.func.value, valsInOp, inputIndexing, containsOps);
+                        containsOps = ccHelpers.addOpToList("BinOp", containsOps, node.lineno);
+                        ccHelpers.listTypesWithin(nodeVal.func.value, valsInOp, inputIndexing, containsOps);
                         for (var vio = 0; vio < valsInOp.length; vio++) {
                             containedVal.push(valsInOp[vio]);
                         }
                     }
                     //func call
                     if (nodeVal.func.value._astname === "Call") {
-                        var calledFunction = complexityCalculatorHelperFunctions.getFunctionObject(nodeVal.func.value.id.v);
+                        var calledFunction = ccHelpers.getFunctionObject(nodeVal.func.value.id.v);
                         if (calledFunction != null) {
                             if (calledFunction.containedValue != null) {
-                                complexityCalculatorHelperFunctions.appendArray(calledFunction.containedValue, containedVal);
+                                ccHelpers.appendArray(calledFunction.containedValue, containedVal);
                             }
                             if (calledFunction.opsDone != null) {
-                                complexityCalculatorHelperFunctions.appendOpList(calledFunction.opsDone, containsOps);
+                                ccHelpers.appendOpList(calledFunction.opsDone, containsOps);
                             }
                         }
                     }
                     //var
                     if (nodeVal.func.value._astname === "Name") {//we have to find the other variable
-                        var foundVariable = complexityCalculatorHelperFunctions.getVariableObject(nodeVal.func.value.id.v);
+                        var foundVariable = ccHelpers.getVariableObject(nodeVal.func.value.id.v);
                         if (foundVariable != null) {
-                            complexityCalculatorHelperFunctions.appendArray(foundVariable.containedValue, containedVal);
-                            containsOps = complexityCalculatorHelperFunctions.appendOpList(foundVariable.opsDone, containsOps);
+                            ccHelpers.appendArray(foundVariable.containedValue, containedVal);
+                            containsOps = ccHelpers.appendOpList(foundVariable.opsDone, containsOps);
                         }
                     }
                 }
-                var assignedFunctionReturn = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                var assignedFunctionReturn = ccHelpers.getFunctionObject(funcName);
                 if (assignedFunctionReturn != null && assignedFunctionReturn.returns !== "" && assignedFunctionReturn.returns !== "BinOp") {
                     if (assignedFunctionReturn.indexAndInput != null) {
                         inputIndexing = assignedFunctionReturn.indexAndInput;
                     }
                     if (assignedFunctionReturn.opsDone != null) {
-                        containsOps = complexityCalculatorHelperFunctions.appendOpList(assignedFunctionReturn.opsDone, containsOps);
+                        containsOps = ccHelpers.appendOpList(assignedFunctionReturn.opsDone, containsOps);
                     }
                     if (assignedFunctionReturn.containedValue != null) {
-                        containedVal = complexityCalculatorHelperFunctions.appendArray(assignedFunctionReturn.containedValue, containedVal);
+                        containedVal = ccHelpers.appendArray(assignedFunctionReturn.containedValue, containedVal);
                     }
                     if (assignedFunctionReturn.nodeElements != null && assignedFunctionReturn.nodeElements.length > 0) {
                         copiedElts = [];
@@ -507,22 +501,22 @@ function markVariable(node) {
                 }
             }
             if (nodeVal._astname === "BoolOp" || nodeVal._astname === "BinOp" || nodeVal._astname === "Compare" || nodeVal._astname === "List") {
-                if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeVal)[0]) {
+                if (ccHelpers.getIndexingInNode(nodeVal)[0]) {
                     inputIndexing.indexed = true;
                 }
-                if (complexityCalculatorHelperFunctions.getStringIndexingInNode(nodeVal)[0]) {
+                if (ccHelpers.getStringIndexingInNode(nodeVal)[0]) {
                     inputIndexing.strIndexed = true;
                 }
             }
             if (nodeVal._astname === "BoolOp") {//see what's inside in case there are other variables in the boolop
                 var nestedVariables = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(nodeVal, nestedVariables);
-                containsOps = complexityCalculatorHelperFunctions.addOpToList("BoolOp", containsOps, node.lineno);
+                ccHelpers.getNestedVariables(nodeVal, nestedVariables);
+                containsOps = ccHelpers.addOpToList("BoolOp", containsOps, node.lineno);
                 if (nestedVariables.length > 0) {
                     containsNested = true;
                 }
                 var boolOpVals = [];
-                complexityCalculatorHelperFunctions.listTypesWithin(nodeVal, boolOpVals, inputIndexing, containsOps);
+                ccHelpers.listTypesWithin(nodeVal, boolOpVals, inputIndexing, containsOps);
                 if (boolOpVals.length > 0) {
                     containedVal = boolOpVals;
                 }
@@ -531,26 +525,26 @@ function markVariable(node) {
                 //If it's a BinOp, recursively analyze and include in containedValue.
                 //also, see if other variables are in the BinOp (which actually happens first)
                 var nestedBinOp = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(nodeVal, nestedBinOp);
+                ccHelpers.getNestedVariables(nodeVal, nestedBinOp);
                 if (nestedBinOp.length > 0) {
                     containsNested = true;
                 }
-                if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeVal))) {
-                    listElts = complexityCalculatorHelperFunctions.getAllBinOpLists(nodeVal);
+                if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeVal))) {
+                    listElts = ccHelpers.getAllBinOpLists(nodeVal);
                 }
-                binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeVal);
+                binVal = ccHelpers.recursivelyAnalyzeBinOp(nodeVal);
                 if (Array.isArray(binVal)) {
-                    listElts = complexityCalculatorHelperFunctions.getAllBinOpLists(nodeVal);
+                    listElts = ccHelpers.getAllBinOpLists(nodeVal);
                     containedVal = binVal;
-                    containsOps = complexityCalculatorHelperFunctions.addOpToList("ListOp", containsOps, node.lineno);
+                    containsOps = ccHelpers.addOpToList("ListOp", containsOps, node.lineno);
                 }
-                containsOps = complexityCalculatorHelperFunctions.addOpToList("BinOp", containsOps, node.lineno);
-                containedVal = complexityCalculatorHelperFunctions.listTypesWithin(nodeVal, [], inputIndexing, containsOps);
+                containsOps = ccHelpers.addOpToList("BinOp", containsOps, node.lineno);
+                containedVal = ccHelpers.listTypesWithin(nodeVal, [], inputIndexing, containsOps);
             }
         }
         //if we have ANY kind of information, add the variable to the list; or, if the variable is already in the list, update the value.
-        for (var i = 0; i < complexityCalculatorState.getProperty('allVariables').length; i++) {
-            if (complexityCalculatorState.getProperty('allVariables')[i].name === varName) {
+        for (var i = 0; i < ccState.getProperty('allVariables').length; i++) {
+            if (ccState.getProperty('allVariables')[i].name === varName) {
                 indexOfExistingVariableObj = i;
                 break;
             }
@@ -564,19 +558,19 @@ function markVariable(node) {
             var modFunc = [];
             if (node.lineno != null) {
                 lineNumber = node.lineno;
-                complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                ccState.setProperty('parentLineNumber', lineNumber);
             } else {
-                lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                lineNumber = ccState.getProperty('parentLineNumber');
             }
-            var modOriginality = (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber));
+            var modOriginality = (ccState.getProperty('originalityLines').includes(lineNumber));
             if (!invalidTransformation) {  //if this is within a function and part of the function's params, we need to note that here.
-                for (var u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-                    if (node.lineno >= complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine && node.lineno <= complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine) {
+                for (var u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+                    if (node.lineno >= ccState.getProperty('userFunctionReturns')[u].startLine && node.lineno <= ccState.getProperty('userFunctionReturns')[u].endLine) {
                         var paramIndex = -1;  //ok, it's in the function, is it a param?
-                        for (var a = 0; a < complexityCalculatorState.getProperty('userFunctionParameters').length; a++) {
-                            if (complexityCalculatorState.getProperty('userFunctionParameters')[a].name === complexityCalculatorState.getProperty('userFunctionReturns')[u].name) {
-                                for (var p = 0; p < complexityCalculatorState.getProperty('userFunctionParameters')[a].params.length; p++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionParameters')[a].params[p] === varName) {
+                        for (var a = 0; a < ccState.getProperty('userFunctionParameters').length; a++) {
+                            if (ccState.getProperty('userFunctionParameters')[a].name === ccState.getProperty('userFunctionReturns')[u].name) {
+                                for (var p = 0; p < ccState.getProperty('userFunctionParameters')[a].params.length; p++) {
+                                    if (ccState.getProperty('userFunctionParameters')[a].params[p] === varName) {
                                         paramIndex = p;
                                         break;
                                     }
@@ -585,8 +579,8 @@ function markVariable(node) {
                             }
                         }
                         if (paramIndex > -1) {
-                            complexityCalculatorState.getProperty('userFunctionReturns')[u].paramsChanged.push(paramIndex);
-                            modFunc.push([complexityCalculatorState.getProperty('userFunctionReturns')[u].startLine, complexityCalculatorState.getProperty('userFunctionReturns')[u].endLine]);
+                            ccState.getProperty('userFunctionReturns')[u].paramsChanged.push(paramIndex);
+                            modFunc.push([ccState.getProperty('userFunctionReturns')[u].startLine, ccState.getProperty('userFunctionReturns')[u].endLine]);
                         }
                         break;
                     }
@@ -605,7 +599,7 @@ function markVariable(node) {
             for (var o = 0; o < copiedElts.length; o++) {
                 eltsToList.push({
                     line: copiedElts[o].line,
-                    elts: complexityCalculatorHelperFunctions.nodesToStrings(copiedElts[o].elts, node.lineno)
+                    elts: ccHelpers.nodesToStrings(copiedElts[o].elts, node.lineno)
                 });
             }
             var userVariable = {
@@ -630,16 +624,16 @@ function markVariable(node) {
             if (!invalidTransformation) {
                 var lineNo = node.lineno;
                 var insideForLoop = false;
-                for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                    if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                        lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                    if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                        lineNo = ccState.getProperty('loopLocations')[h][0];
                         insideForLoop = true;
                         break;
                     }
                 }
                 userVariable.assignedModified.push({
                     line: lineNo,
-                    value: complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(valueString),
+                    value: ccHelpers.trimCommentsAndWhitespace(valueString),
                     original: modOriginality,
                     nodeValue: node.value,
                     binop: binVal
@@ -648,15 +642,15 @@ function markVariable(node) {
                 if (insideForLoop) {
                     userVariable.assignedModified.push({
                         line: lineNo,
-                        value: complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(valueString),
+                        value: ccHelpers.trimCommentsAndWhitespace(valueString),
                         original: modOriginality,
                         nodeValue: node.value,
                         binop: binVal
                     });
                 }
             }
-            complexityCalculatorState.getProperty('allVariables').push(userVariable);
-            complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: userVariable.name });
+            ccState.getProperty('allVariables').push(userVariable);
+            ccState.getProperty("variableAssignments").push({ line: node.lineno, name: userVariable.name });
         } else {
             var invalidTransformation = false; //This gets set to true if the variable's value is being set to itself, ex. potato = potato.
             if (node.value._astname === "Name" && 'id' in node.targets[0] && node.targets[0].id.v === node.value.id.v) {
@@ -675,26 +669,26 @@ function markVariable(node) {
             for (var o = 0; o < copiedElts.length; o++) {
                 eltsToList.push({
                     line: copiedElts[0].line,
-                    elts: complexityCalculatorHelperFunctions.nodesToStrings(copiedElts[o].elts)
+                    elts: ccHelpers.nodesToStrings(copiedElts[o].elts)
                 });
             }
-            complexityCalculatorHelperFunctions.appendArray(copiedElts, complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].nodeElements);
-            complexityCalculatorHelperFunctions.appendArray(eltsToList, complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].stringElements);
+            ccHelpers.appendArray(copiedElts, ccState.getProperty('allVariables')[indexOfExistingVariableObj].nodeElements);
+            ccHelpers.appendArray(eltsToList, ccState.getProperty('allVariables')[indexOfExistingVariableObj].stringElements);
             if (inputIndexing.input) {
-                complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.input = true;
+                ccState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.input = true;
             }
             if (inputIndexing.indexed) {
-                complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.indexed = true;
+                ccState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.indexed = true;
             }
             if (inputIndexing.strIndexed) {
-                complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.strIndexed = true;
+                ccState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.strIndexed = true;
             }
             if (binVal != null) {
-                complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].binOp = binVal;
+                ccState.getProperty('allVariables')[indexOfExistingVariableObj].binOp = binVal;
             }
             var assignmentExists = false;
-            for (var p = 0; p < complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified.length; p++) {
-                if (complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified[p].value === valueString) {
+            for (var p = 0; p < ccState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified.length; p++) {
+                if (ccState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified[p].value === valueString) {
                     assignmentExists = true;
                     break;
                 }
@@ -706,51 +700,51 @@ function markVariable(node) {
                 lineNumber = 0;
                 if (node.lineno != null) {
                     lineNumber = node.lineno;
-                    complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                    ccState.setProperty('parentLineNumber', lineNumber);
                 } else {
-                    lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                    lineNumber = ccState.getProperty('parentLineNumber');
                 }
-                var modOriginality = (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber));
+                var modOriginality = (ccState.getProperty('originalityLines').includes(lineNumber));
                 var lineNo = node.lineno;
-                for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                    if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                        lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                    if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                        lineNo = ccState.getProperty('loopLocations')[h][0];
                         break;
                     }
                 }
-                complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified.push({
+                ccState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified.push({
                     line: lineNo,
-                    value: complexityCalculatorHelperFunctions.trimCommentsAndWhitespace(valueString),
+                    value: ccHelpers.trimCommentsAndWhitespace(valueString),
                     original: modOriginality,
                     nodeValue: node.value,
                     binop: binVal
                 });
-                complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].name });
-                for (var uf = 0; uf < complexityCalculatorState.getProperty('userFunctionParameters').length; uf++) { //is this variable a parameter in this function? if so, what's its parameter index?
+                ccState.getProperty("variableAssignments").push({ line: node.lineno, name: ccState.getProperty('allVariables')[indexOfExistingVariableObj].name });
+                for (var uf = 0; uf < ccState.getProperty('userFunctionParameters').length; uf++) { //is this variable a parameter in this function? if so, what's its parameter index?
                     var paramIndex = -1;
-                    for (var pa = 0; pa < complexityCalculatorState.getProperty('userFunctionParameters')[uf].params.length; pa++) {
-                        if (complexityCalculatorState.getProperty('userFunctionParameters')[uf].params[pa] === varName) {
+                    for (var pa = 0; pa < ccState.getProperty('userFunctionParameters')[uf].params.length; pa++) {
+                        if (ccState.getProperty('userFunctionParameters')[uf].params[pa] === varName) {
                             paramIndex = pa;
                             break;
                         }
                     }
                     if (paramIndex > -1) { //ok it's a param in this func. NOW we see if it's within the lines of the function
                         var ufReturnIndex = -1;
-                        for (var u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-                            if (userFunctionReturns[u].name === complexityCalculatorState.getProperty('userFunctionParameters')[uf].name) {
+                        for (var u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+                            if (userFunctionReturns[u].name === ccState.getProperty('userFunctionParameters')[uf].name) {
                                 ufReturnIndex = u;
                                 break;
                             }
                         }
                         if (ufReturnIndex > -1) {//this should NEVER be false. but, ya know. safety. or because we needed another if statement. your choice.
-                            if (node.lineno > complexityCalculatorState.getProperty('userFunctionReturns')[ufReturnIndex].startLine && node.lineno <= complexityCalculatorState.getProperty('userFunctionReturns')[ufReturnIndex].endLine) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[ufReturnIndex].paramsChanged.push(paramIndex);
+                            if (node.lineno > ccState.getProperty('userFunctionReturns')[ufReturnIndex].startLine && node.lineno <= ccState.getProperty('userFunctionReturns')[ufReturnIndex].endLine) {
+                                ccState.getProperty('userFunctionReturns')[ufReturnIndex].paramsChanged.push(paramIndex);
                             } //then THIS is a change TO THE FUNCTION'S PARAMETER, WITHIN THAT FUNCTION. AKA this function modifies the value of this parameter.
                         }
                     }
                 }
             }
-            complexityCalculatorHelperFunctions.appendOpList(containsOps, complexityCalculatorState.getProperty('allVariables')[indexOfExistingVariableObj].opsDone);
+            ccHelpers.appendOpList(containsOps, ccState.getProperty('allVariables')[indexOfExistingVariableObj].opsDone);
         }
     }
 }
@@ -759,64 +753,64 @@ function markVariable(node) {
 // Traverses through lists of function and variable objects, and finds values for those that don't have them
 export function evaluateAllEmpties() {
     //function objects
-    for (var r = 0; r < complexityCalculatorState.getProperty('userFunctionReturns').length; r++) {
-        if (complexityCalculatorState.getProperty('userFunctionReturns')[r].returns === "") {
-            if (complexityCalculatorState.getProperty('userFunctionReturns')[r].funcVar === "var") {
-                //if itcomplexityCalculatorState.getProperty('returns')a variable  we look it up in the variable dictionary
-                var returnedVariable = complexityCalculatorHelperFunctions.getVariableObject(complexityCalculatorState.getProperty('userFunctionReturns')[r].flagVal);
+    for (var r = 0; r < ccState.getProperty('userFunctionReturns').length; r++) {
+        if (ccState.getProperty('userFunctionReturns')[r].returns === "") {
+            if (ccState.getProperty('userFunctionReturns')[r].funcVar === "var") {
+                //if itccState.getProperty('returns')a variable  we look it up in the variable dictionary
+                var returnedVariable = ccHelpers.getVariableObject(ccState.getProperty('userFunctionReturns')[r].flagVal);
                 if (returnedVariable != null && returnedVariable.value !== "" && returnedVariable.value !== "BinOp") {
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].flagVal = "";
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].funcVar = "";
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = returnedVariable.value;
-                    complexityCalculatorHelperFunctions.copyAttributes(returnedVariable, complexityCalculatorState.getProperty('userFunctionReturns')[r], ["indexAndInput"]);
+                    ccState.getProperty('userFunctionReturns')[r].flagVal = "";
+                    ccState.getProperty('userFunctionReturns')[r].funcVar = "";
+                    ccState.getProperty('userFunctionReturns')[r].returns = returnedVariable.value;
+                    ccHelpers.copyAttributes(returnedVariable, ccState.getProperty('userFunctionReturns')[r], ["indexAndInput"]);
                     //get the latest version of the variable's node elements before the function is declared, and assign that to the function object's node elements.
                     if (returnedVariable.nodeElements != null && returnedVariable.nodeElements.length > 0) {
                         var nodeElementsIndex = -1;
                         for (var t = 0; t < returnedVariable.nodeElements.length - 1; t++) {
-                            if (returnedVariable.nodeElements[t].line > complexityCalculatorState.getProperty('userFunctionReturns')[r].endLine) {
+                            if (returnedVariable.nodeElements[t].line > ccState.getProperty('userFunctionReturns')[r].endLine) {
                                 break;
                             }
-                            if (returnedVariable.nodeElements[t].line > complexityCalculatorState.getProperty('userFunctionReturns')[r].startLine && returnedVariable.nodeElements[t + 1].line > complexityCalculatorState.getProperty('userFunctionReturns')[r].endLine) {
+                            if (returnedVariable.nodeElements[t].line > ccState.getProperty('userFunctionReturns')[r].startLine && returnedVariable.nodeElements[t + 1].line > ccState.getProperty('userFunctionReturns')[r].endLine) {
                                 nodeElementsIndex = t;
                             }
                         }
                         if (nodeElementsIndex === -1 &&
-                            returnedVariable.nodeElements[returnedVariable.nodeElements.length - 1].line >= complexityCalculatorState.getProperty('userFunctionReturns')[r].startLine &&
-                            returnedVariable.nodeElements[returnedVariable.nodeElements.length - 1].line <= complexityCalculatorState.getProperty('userFunctionReturns')[r].endLine) {
+                            returnedVariable.nodeElements[returnedVariable.nodeElements.length - 1].line >= ccState.getProperty('userFunctionReturns')[r].startLine &&
+                            returnedVariable.nodeElements[returnedVariable.nodeElements.length - 1].line <= ccState.getProperty('userFunctionReturns')[r].endLine) {
                             nodeElementsIndex = returnedVariable.nodeElements.length - 1;
                         }
                         if (nodeElementsIndex === -1) {
                             nodeElementsIndex = 0;
                         }
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements = [returnedVariable.nodeElements[nodeElementsIndex]];
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].stringElements = [returnedVariable.stringElements[nodeElementsIndex]];
+                        ccState.getProperty('userFunctionReturns')[r].nodeElements = [returnedVariable.nodeElements[nodeElementsIndex]];
+                        ccState.getProperty('userFunctionReturns')[r].stringElements = [returnedVariable.stringElements[nodeElementsIndex]];
                     }
                     //append any opsDone and containedValue items from the variable to the corresponding items in the function objec.t
-                    complexityCalculatorHelperFunctions.appendArray(returnedVariable.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue);
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(returnedVariable.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone);
+                    ccHelpers.appendArray(returnedVariable.containedValue, ccState.getProperty('userFunctionReturns')[r].containedValue);
+                    ccState.getProperty('userFunctionReturns')[r].opsDone = ccHelpers.appendOpList(returnedVariable.opsDone, ccState.getProperty('userFunctionReturns')[r].opsDone);
                 }
-            } else if (complexityCalculatorState.getProperty('userFunctionReturns')[r].funcVar === "func" && complexityCalculatorState.getProperty('userFunctionReturns')[r].name != complexityCalculatorState.getProperty('userFunctionReturns')[r].flag) {
+            } else if (ccState.getProperty('userFunctionReturns')[r].funcVar === "func" && ccState.getProperty('userFunctionReturns')[r].name != ccState.getProperty('userFunctionReturns')[r].flag) {
                 //if it returns a call to another function, copy the information from that function.
                 //This prevents us from getting stuck recursing forever
-                var returnedFunc = complexityCalculatorHelperFunctions.getFunctionObject(complexityCalculatorState.getProperty('userFunctionReturns')[r].flagVal)
+                var returnedFunc = ccHelpers.getFunctionObject(ccState.getProperty('userFunctionReturns')[r].flagVal)
                 if (returnedFunc != null && returnedFunc.returns !== "" && returnedFunc.returns !== "BinOp") {
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].funcVar = "";
+                    ccState.getProperty('userFunctionReturns')[r].funcVar = "";
                     //copy relevant information
-                    complexityCalculatorHelperFunctions.copyAttributes(returnedFunc, complexityCalculatorState.getProperty('userFunctionReturns')[r], ["returns", "indexAndInput", "nested", "nodeElements", "stringElements"]);
+                    ccHelpers.copyAttributes(returnedFunc, ccState.getProperty('userFunctionReturns')[r], ["returns", "indexAndInput", "nested", "nodeElements", "stringElements"]);
                     if (returnedFunc.containedValue != null) {
-                        complexityCalculatorHelperFunctions.appendArray(returnedFunc.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r]);
+                        ccHelpers.appendArray(returnedFunc.containedValue, ccState.getProperty('userFunctionReturns')[r]);
                     }
                 }
             }
         }
         //go through all of the objects in the function's nodeElements and evaluate them, creating fake nodes
-        if (complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements != null && complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements.length > 0 && complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0] != null) {
-            for (var i in complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts) {
-                if (complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i]._astname == null &&
-                    typeofcomplexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i] === "object" &&
-                    'left' in complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i]) {
-                    var eltsValue = { lineno: complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i].lineno };
-                    eltsValue._astname = complexityCalculatorHelperFunctions.recursivelyEvaluateBinOp(complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i]);
+        if (ccState.getProperty('userFunctionReturns')[r].nodeElements != null && ccState.getProperty('userFunctionReturns')[r].nodeElements.length > 0 && ccState.getProperty('userFunctionReturns')[r].nodeElements[0] != null) {
+            for (var i in ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts) {
+                if (ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i]._astname == null &&
+                    typeofccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i] === "object" &&
+                    'left' in ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i]) {
+                    var eltsValue = { lineno: ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i].lineno };
+                    eltsValue._astname = ccHelpers.recursivelyEvaluateBinOp(ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i]);
                     if (eltsValue._astname === "Int") {
                         eltsValue._astname = "Num";
                         eltsValue.n = { v: 1 };
@@ -832,65 +826,65 @@ export function evaluateAllEmpties() {
                         eltsValue._astname = "Name";
                         eltsValue.id = { v: "True" };
                     }
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i] = eltsValue;
+                    ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts[i] = eltsValue;
                 }
             }
-            complexityCalculatorState.getProperty('userFunctionReturns')[r].stringElements[0] = complexityCalculatorHelperFunctions.nodesToStrings(complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].elts, complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements[0].line);
+            ccState.getProperty('userFunctionReturns')[r].stringElements[0] = ccHelpers.nodesToStrings(ccState.getProperty('userFunctionReturns')[r].nodeElements[0].elts, ccState.getProperty('userFunctionReturns')[r].nodeElements[0].line);
         }
         //If we have an un-evaluated subscript, do that now
-        if (complexityCalculatorState.getProperty('userFunctionReturns')[r].returns === "Subscript") {
+        if (ccState.getProperty('userFunctionReturns')[r].returns === "Subscript") {
             //its an index or a slice
-            var indexValue = complexityCalculatorHelperFunctions.retrieveFromList(complexityCalculatorState.getProperty('userFunctionReturns')[r].flagVal);
-            if (complexityCalculatorHelperFunctions.getIndexingInNode(complexityCalculatorState.getProperty('userFunctionReturns')[r].returns)[0]) {
-                complexityCalculatorState.getProperty('userFunctionReturns')[r].indexAndInput.indexed = true;
+            var indexValue = ccHelpers.retrieveFromList(ccState.getProperty('userFunctionReturns')[r].flagVal);
+            if (ccHelpers.getIndexingInNode(ccState.getProperty('userFunctionReturns')[r].returns)[0]) {
+                ccState.getProperty('userFunctionReturns')[r].indexAndInput.indexed = true;
             }
-            if (complexityCalculatorHelperFunctions.getStringIndexingInNode(complexityCalculatorState.getProperty('userFunctionReturns')[r].returns)[0]) {
-                complexityCalculatorState.getProperty('userFunctionReturns')[r].indexAndInput.strIndexed = true;
+            if (ccHelpers.getStringIndexingInNode(ccState.getProperty('userFunctionReturns')[r].returns)[0]) {
+                ccState.getProperty('userFunctionReturns')[r].indexAndInput.strIndexed = true;
             }
             if (indexValue != null) {
                 //We know what it is.
-                complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone, indexValue.lineno);
-                complexityCalculatorState.getProperty('allVariables').flagVal = ""; //this may get reset to something down below, which is fine and 100% intentional.
-                indexValue = complexityCalculatorHelperFunctions.retrieveFromList(indexValue);
+                ccState.getProperty('userFunctionReturns')[r].opsDone = ccHelpers.addOpToList("ListOp", ccState.getProperty('userFunctionReturns')[r].opsDone, indexValue.lineno);
+                ccState.getProperty('allVariables').flagVal = ""; //this may get reset to something down below, which is fine and 100% intentional.
+                indexValue = ccHelpers.retrieveFromList(indexValue);
                 if (indexValue._astname === "Name") {
                     //it's a bool OR it's another variable. EVEN IF WE DON'T KNOW WHAT THAT VAR IS, WE CAN UPDATE THIS and set the flagVal to var:varName
                     if (indexValue.id.v === "True" || indexValue.id.v === "False") {
                         //boolean
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "Bool";
+                        ccState.getProperty('userFunctionReturns')[r].returns = "Bool";
                     }
                     //otherwise, it's a variable object
-                    var indexVar = complexityCalculatorHelperFunctions.getVariableObject(indexValue.id.v);
+                    var indexVar = ccHelpers.getVariableObject(indexValue.id.v);
                     if (indexVar != null && indexVar.value !== "" && indexVar.value !== "BinOp") {
-                        complexityCalculatorHelperFunctions.copyAttributes(indexVar, complexityCalculatorState.getProperty('userFunctionReturns')[r], ["value", "binOp", "nested", "original", "input", "nodeElements", "stringElements", "strIndexed"]);
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(indexVar.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone);
-                        complexityCalculatorHelperFunctions.appendArray(indexVar.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue);
+                        ccHelpers.copyAttributes(indexVar, ccState.getProperty('userFunctionReturns')[r], ["value", "binOp", "nested", "original", "input", "nodeElements", "stringElements", "strIndexed"]);
+                        ccState.getProperty('userFunctionReturns')[r].opsDone = ccHelpers.appendOpList(indexVar.opsDone, ccState.getProperty('userFunctionReturns')[r].opsDone);
+                        ccHelpers.appendArray(indexVar.containedValue, ccState.getProperty('userFunctionReturns')[r].containedValue);
                     } else if (indexVar != null && indexVar.value === "") {
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "";
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].flagVal = "var:" + indexVar.name;
-                    } else if (indexVar == null && complexityCalculatorHelperFunctions.getFunctionObject(indexValue.id.v) != null) {
-                        for (var n = 0; n < complexityCalculatorState.getProperty('userFunctionParameters').length; n++) {
-                            if (complexityCalculatorState.getProperty('userFunctionParameters')[n].name === complexityCalculatorState.getProperty('userFunctionReturns')[r].name) { //double check and make sure its not already in here
+                        ccState.getProperty('userFunctionReturns')[r].returns = "";
+                        ccState.getProperty('userFunctionReturns')[r].flagVal = "var:" + indexVar.name;
+                    } else if (indexVar == null && ccHelpers.getFunctionObject(indexValue.id.v) != null) {
+                        for (var n = 0; n < ccState.getProperty('userFunctionParameters').length; n++) {
+                            if (ccState.getProperty('userFunctionParameters')[n].name === ccState.getProperty('userFunctionReturns')[r].name) { //double check and make sure its not already in here
                                 var alreadyMarked = false;
-                                for (var j = 0; j < complexityCalculatorState.getProperty('userFunctionParameters').length; j++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionParameters')[j].name === indexValue.id.v) {
+                                for (var j = 0; j < ccState.getProperty('userFunctionParameters').length; j++) {
+                                    if (ccState.getProperty('userFunctionParameters')[j].name === indexValue.id.v) {
                                         alreadyMarked = true;
                                         break;
                                     }
                                 }
                                 if (!alreadyMarked) {
                                     newFunctionObject = {};
-                                    Object.assign(newFunctionObject, complexityCalculatorState.getProperty('userFunctionParameters')[n]);
+                                    Object.assign(newFunctionObject, ccState.getProperty('userFunctionParameters')[n]);
                                     newFunctionObject.name = indexValue.id.v;
-                                    complexityCalculatorState.getProperty('userFunctionParameters').push(newFunctionObject);
+                                    ccState.getProperty('userFunctionParameters').push(newFunctionObject);
                                 }
                                 break;
                             }
                         }
-                        for (var p = 0; p < complexityCalculatorState.getProperty('userFunctionReturns').length; p++) {
-                            if (complexityCalculatorState.getProperty('userFunctionReturns')[r].name === complexityCalculatorState.getProperty('userFunctionReturns')[p].name) {
+                        for (var p = 0; p < ccState.getProperty('userFunctionReturns').length; p++) {
+                            if (ccState.getProperty('userFunctionReturns')[r].name === ccState.getProperty('userFunctionReturns')[p].name) {
                                 var alreadyMarked = false;
-                                for (var i = 0; i < complexityCalculatorState.getProperty('userFunctionReturns').length; i++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionReturns')[i].name === indexValue.id.v) {
+                                for (var i = 0; i < ccState.getProperty('userFunctionReturns').length; i++) {
+                                    if (ccState.getProperty('userFunctionReturns')[i].name === indexValue.id.v) {
                                         alreadyMarked = true;
                                         break;
                                     } //if it's already been marked we don't need to do anything else.
@@ -899,18 +893,18 @@ export function evaluateAllEmpties() {
                                     break;
                                 }
                                 var newReturn = {};
-                                Object.assign(newReturn, complexityCalculatorState.getProperty('userFunctionReturns')[p]);
+                                Object.assign(newReturn, ccState.getProperty('userFunctionReturns')[p]);
                                 newReturn.name = indexValue.id.v;
                                 newReturn.indexAndInput.indexed = true;
-                                complexityCalculatorState.getProperty('userFunctionReturns').push(newReturn);
+                                ccState.getProperty('userFunctionReturns').push(newReturn);
                                 //if the function we're reassigning is a reassign of something else
-                                var reassignedFuncName = complexityCalculatorState.getProperty('userFunctionReturns')[r].name;
-                                for (var n = 0; n < complexityCalculatorState.getProperty('userFunctionRenames'); n++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionRenames')[n][0] === reassignedFuncName) {
-                                        reassignedFuncName = complexityCalculatorState.getProperty('userFunctionRenames')[n][1];
+                                var reassignedFuncName = ccState.getProperty('userFunctionReturns')[r].name;
+                                for (var n = 0; n < ccState.getProperty('userFunctionRenames'); n++) {
+                                    if (ccState.getProperty('userFunctionRenames')[n][0] === reassignedFuncName) {
+                                        reassignedFuncName = ccState.getProperty('userFunctionRenames')[n][1];
                                     }
                                 }
-                                complexityCalculatorState.getProperty('userFunctionRenames').push([indexValue.id.v, reassignedFuncName]);
+                                ccState.getProperty('userFunctionRenames').push([indexValue.id.v, reassignedFuncName]);
                                 break;
                             }
                         }
@@ -918,114 +912,114 @@ export function evaluateAllEmpties() {
                 } else if (indexValue._astname === "Call") {
                     //it's a function call
                     var alreadyTallied = false;
-                    if ('id' in indexValue.func || indexValue.func._astname === "Subscript" || complexityCalculatorHelperFunctions.retrieveFromList(indexValue.func) != indexValue.func) {
+                    if ('id' in indexValue.func || indexValue.func._astname === "Subscript" || ccHelpers.retrieveFromList(indexValue.func) != indexValue.func) {
                         var funcName = "";
                         //get the function name
                         if ('id' in indexValue.func) {
                             funcName = indexValue.func.id.v;
                         } else {
                             var functionNameNode = null;
-                            functionNameNode = complexityCalculatorHelperFunctions.retrieveFromList(indexValue.func);
+                            functionNameNode = ccHelpers.retrieveFromList(indexValue.func);
                             if (functionNameNode != null && functionNameNode._astname === "Name") {
                                 funcName = functionNameNode.id.v;
                             }
                         }
                         //get the function object and copy values from it
-                        var userFunctionCalled = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                        var userFunctionCalled = ccHelpers.getFunctionObject(funcName);
                         if (userFunctionCalled != null && userFunctionCalled.returns !== "") {
-                            complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = userFunctionCalled.returns;
-                            complexityCalculatorHelperFunctions.copyAttributes(userFunctionCalled, complexityCalculatorState.getProperty('userFunctionReturns')[r], ["binOp", "nested", "original", "indexAndInput", "nodeElements", "stringElements"]);
-                            complexityCalculatorHelperFunctions.appendArray(userFunctionCalled.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue);
+                            ccState.getProperty('userFunctionReturns')[r].returns = userFunctionCalled.returns;
+                            ccHelpers.copyAttributes(userFunctionCalled, ccState.getProperty('userFunctionReturns')[r], ["binOp", "nested", "original", "indexAndInput", "nodeElements", "stringElements"]);
+                            ccHelpers.appendArray(userFunctionCalled.containedValue, ccState.getProperty('userFunctionReturns')[r].containedValue);
                             if (userFunctionCalled.opsDone != null) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(userFunctionCalled.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone);
+                                ccState.getProperty('userFunctionReturns')[r].opsDone = ccHelpers.appendOpList(userFunctionCalled.opsDone, ccState.getProperty('userFunctionReturns')[r].opsDone);
                             }
                         }
                         alreadyTallied = true;
                     }
                 } else if (indexValue._astname === "Num") {
                     //ints, floats
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = complexityCalculatorHelperFunctions.isNodeFloat(indexValue) ? "Float" : "Int";
+                    ccState.getProperty('userFunctionReturns')[r].returns = ccHelpers.isNodeFloat(indexValue) ? "Float" : "Int";
                 } else if (indexValue._astname === "Compare" || indexValue._astname === "BoolOp") {
                     //comparisons and boolops both become booleans and stored in containedValue
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "Bool";
-                    complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone);
+                    ccState.getProperty('userFunctionReturns')[r].returns = "Bool";
+                    ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone);
                 } else if (indexValue._astname === "BinOp") {
                     //if binop, evaluate and push contained values
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone, indexValue.lineno);
-                    var binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(indexValue);
+                    ccState.getProperty('userFunctionReturns')[r].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('userFunctionReturns')[r].opsDone, indexValue.lineno);
+                    var binVal = ccHelpers.recursivelyAnalyzeBinOp(indexValue);
                     if (typeof binVal === "string") {
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = binVal;
-                        complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone);
+                        ccState.getProperty('userFunctionReturns')[r].returns = binVal;
+                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone);
                     } else if (Array.isArray(binVal)) {
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "List";
-                        complexityCalculatorState.getProperty('allVariables').nodeElements.push({
+                        ccState.getProperty('userFunctionReturns')[r].returns = "List";
+                        ccState.getProperty('allVariables').nodeElements.push({
                             line: indexValue.lineno,
                             elts: binVal
                         });
-                        complexityCalculatorState.getProperty('allVariables').stringElements.push({
+                        ccState.getProperty('allVariables').stringElements.push({
                             line: indexValue.lineno,
-                            elts: complexityCalculatorHelperFunctions.nodesToStrings(binVal)
+                            elts: ccHelpers.nodesToStrings(binVal)
                         });
                     } else {//we re-frame as a binop object!
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "BinOp";
-                        complexityCalculatorState.getProperty('userFunctionReturns')[r].binOp = binVal;
+                        ccState.getProperty('userFunctionReturns')[r].returns = "BinOp";
+                        ccState.getProperty('userFunctionReturns')[r].binOp = binVal;
                     }
                 } else if (indexValue._astname === "List") {
                     //list
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "List";
-                    complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[r].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[r].opsDone), complexityCalculatorState.getProperty('userFunctionReturns')[r].containedValue);
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements.push({
+                    ccState.getProperty('userFunctionReturns')[r].returns = "List";
+                    ccHelpers.appendArray(ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone), ccState.getProperty('userFunctionReturns')[r].containedValue);
+                    ccState.getProperty('userFunctionReturns')[r].nodeElements.push({
                         line: indexValue.lineno,
                         elts: indexValue.elts
                     });
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].nodeElements.push({
+                    ccState.getProperty('userFunctionReturns')[r].nodeElements.push({
                         line: indexValue.lineno,
-                        elts: complexityCalculatorHelperFunctions.nodesToStrings(indexValue.elts)
+                        elts: ccHelpers.nodesToStrings(indexValue.elts)
                     });
                 } else if (indexValue._astname === "Str") {
-                    complexityCalculatorState.getProperty('userFunctionReturns')[r].returns = "Str";
+                    ccState.getProperty('userFunctionReturns')[r].returns = "Str";
                 }
             }
         }
     }
     //Now, go through the list of all variables and do the same thing
-    for (var r = 0; r < complexityCalculatorState.getProperty('allVariables').length; r++) {
-        if (complexityCalculatorState.getProperty('allVariables')[r].value === "") {
-            if (complexityCalculatorState.getProperty('allVariables')[r].funcVar === "var") {
+    for (var r = 0; r < ccState.getProperty('allVariables').length; r++) {
+        if (ccState.getProperty('allVariables')[r].value === "") {
+            if (ccState.getProperty('allVariables')[r].funcVar === "var") {
                 //if it's the value of another variable, we look it up in the var directory and copy the values
-                var copiedVar = complexityCalculatorHelperFunctions.getVariableObject(complexityCalculatorState.getProperty('allVariables')[r].flagVal);
+                var copiedVar = ccHelpers.getVariableObject(ccState.getProperty('allVariables')[r].flagVal);
                 if (copiedVar != null && copiedVar.value !== "" && copiedVar.value !== "BinOp") {
-                    complexityCalculatorState.getProperty('allVariables')[r].flagVal = "";
-                    complexityCalculatorState.getProperty('allVariables')[r].funcVar = "";
-                    complexityCalculatorHelperFunctions.copyAttributes(copiedVar, complexityCalculatorState.getProperty('allVariables')[r], ["value", "binOp", "original", "indexAndInput", "nodeElements", "stringElements", "nested",]);
-                    complexityCalculatorHelperFunctions.appendArray(copiedVar.containedValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue);
-                    complexityCalculatorState.getProperty('allVariables')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(copiedVar.opsDone, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
+                    ccState.getProperty('allVariables')[r].flagVal = "";
+                    ccState.getProperty('allVariables')[r].funcVar = "";
+                    ccHelpers.copyAttributes(copiedVar, ccState.getProperty('allVariables')[r], ["value", "binOp", "original", "indexAndInput", "nodeElements", "stringElements", "nested",]);
+                    ccHelpers.appendArray(copiedVar.containedValue, ccState.getProperty('allVariables')[r].containedValue);
+                    ccState.getProperty('allVariables')[r].opsDone = ccHelpers.appendOpList(copiedVar.opsDone, ccState.getProperty('allVariables')[r].opsDone);
                 }
-            } else if (complexityCalculatorState.getProperty('allVariables')[r].funcVar === "func" && complexityCalculatorState.getProperty('allVariables')[r].name != complexityCalculatorState.getProperty('allVariables')[r].flagVal) {
+            } else if (ccState.getProperty('allVariables')[r].funcVar === "func" && ccState.getProperty('allVariables')[r].name != ccState.getProperty('allVariables')[r].flagVal) {
                 //otherwise, it contains the value returned by a function, so go look that up and copy its values
                 //prevents us from getting stuck recursing forever
-                var funcValue = complexityCalculatorHelperFunctions.getFunctionObject(complexityCalculatorState.getProperty('allVariables')[r].flagVal);
+                var funcValue = ccHelpers.getFunctionObject(ccState.getProperty('allVariables')[r].flagVal);
                 if (funcValue != null && funcValue.returns !== "") {
-                    complexityCalculatorState.getProperty('allVariables')[r].flagVal = "";
-                    complexityCalculatorState.getProperty('allVariables')[r].funcVar = "";
-                    complexityCalculatorState.getProperty('allVariables')[r].value = funcValue.returns;
-                    complexityCalculatorHelperFunctions.copyAttributes(funcValue, complexityCalculatorState.getProperty('allVariables')[r], ["input", "binOp", "nested", "nodeElements", "stringElements"]);
+                    ccState.getProperty('allVariables')[r].flagVal = "";
+                    ccState.getProperty('allVariables')[r].funcVar = "";
+                    ccState.getProperty('allVariables')[r].value = funcValue.returns;
+                    ccHelpers.copyAttributes(funcValue, ccState.getProperty('allVariables')[r], ["input", "binOp", "nested", "nodeElements", "stringElements"]);
                     if (funcValue.containedValue != null) {
-                        complexityCalculatorHelperFunctions.appendArray(funcValue.containedValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue);
+                        ccHelpers.appendArray(funcValue.containedValue, ccState.getProperty('allVariables')[r].containedValue);
                     }
                     if (funcValue.opsDone != null) {
-                        complexityCalculatorState.getProperty('allVariables')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(funcValue.opsDone, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
+                        ccState.getProperty('allVariables')[r].opsDone = ccHelpers.appendOpList(funcValue.opsDone, ccState.getProperty('allVariables')[r].opsDone);
                     }
                 }
             }
         }
         //now go through and check all of the things in nodeElements, because we need to evaluate them if we can
-        if (complexityCalculatorState.getProperty('allVariables')[r].nodeElements != null) {
-            for (var p in complexityCalculatorState.getProperty('allVariables')[r].nodeElements) {
-                for (var i in complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts) {
-                    if (complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts[i]._astname == null && typeof complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts[i] === "object" && 'left' in complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts[i]) {
-                        var eltsValue = { lineno: complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts[i].lineno };
-                        eltsValue._astname = complexityCalculatorHelperFunctions.recursivelyEvaluateBinOp(complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts[i]);
+        if (ccState.getProperty('allVariables')[r].nodeElements != null) {
+            for (var p in ccState.getProperty('allVariables')[r].nodeElements) {
+                for (var i in ccState.getProperty('allVariables')[r].nodeElements[p].elts) {
+                    if (ccState.getProperty('allVariables')[r].nodeElements[p].elts[i]._astname == null && typeof ccState.getProperty('allVariables')[r].nodeElements[p].elts[i] === "object" && 'left' in ccState.getProperty('allVariables')[r].nodeElements[p].elts[i]) {
+                        var eltsValue = { lineno: ccState.getProperty('allVariables')[r].nodeElements[p].elts[i].lineno };
+                        eltsValue._astname = ccHelpers.recursivelyEvaluateBinOp(ccState.getProperty('allVariables')[r].nodeElements[p].elts[i]);
                         if (eltsValue._astname === "Int") {
                             eltsValue._astname = "Num";
                             eltsValue.n = { v: 1 };
@@ -1041,144 +1035,144 @@ export function evaluateAllEmpties() {
                             eltsValue._astname = "Name";
                             eltsValue.id = { v: "True" };
                         }
-                        complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts[i] = eltsValue;
+                        ccState.getProperty('allVariables')[r].nodeElements[p].elts[i] = eltsValue;
                     }
                 }
-                complexityCalculatorState.getProperty('allVariables')[r].stringElements[p] = complexityCalculatorHelperFunctions.nodesToStrings(complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].elts, complexityCalculatorState.getProperty('allVariables')[r].nodeElements[p].line);
+                ccState.getProperty('allVariables')[r].stringElements[p] = ccHelpers.nodesToStrings(ccState.getProperty('allVariables')[r].nodeElements[p].elts, ccState.getProperty('allVariables')[r].nodeElements[p].line);
             }
         }
-        if (complexityCalculatorState.getProperty('allVariables')[r].value === "List") {
-            for (var j = 0; j < complexityCalculatorState.getProperty('allVariables')[r].containedValue.length; j++) {
-                if (complexityCalculatorState.getProperty('allVariables')[r].containedValue[j] != null && typeof complexityCalculatorState.getProperty('allVariables')[r].containedValue[j] === 'string' && complexityCalculatorState.getProperty('allVariables')[r].containedValue[j].includes('var:')) {
-                    var varName = complexityCalculatorState.getProperty('allVariables')[r].containedValue[j].split(':')[1];
-                    var otherVariable = complexityCalculatorHelperFunctions.getVariableObject(varName);
+        if (ccState.getProperty('allVariables')[r].value === "List") {
+            for (var j = 0; j < ccState.getProperty('allVariables')[r].containedValue.length; j++) {
+                if (ccState.getProperty('allVariables')[r].containedValue[j] != null && typeof ccState.getProperty('allVariables')[r].containedValue[j] === 'string' && ccState.getProperty('allVariables')[r].containedValue[j].includes('var:')) {
+                    var varName = ccState.getProperty('allVariables')[r].containedValue[j].split(':')[1];
+                    var otherVariable = ccHelpers.getVariableObject(varName);
                     if (otherVariable != null && otherVariable.value !== "" && otherVariable.value !== "BinOp") {
                         if (otherVariable.value === "List") {
-                            complexityCalculatorState.getProperty('allVariables')[r].containedValue[j] = otherVariable.containedValue.slice(0);
+                            ccState.getProperty('allVariables')[r].containedValue[j] = otherVariable.containedValue.slice(0);
                         }
                         if (otherVariable.nested) {
-                            complexityCalculatorState.getProperty('allVariables')[r].nested = true;
+                            ccState.getProperty('allVariables')[r].nested = true;
                         }
                     }
-                } else if (complexityCalculatorState.getProperty('allVariables')[r].containedValue[j] != null && typeof complexityCalculatorState.getProperty('allVariables')[r].containedValue[j] === 'string' && complexityCalculatorState.getProperty('allVariables')[r].containedValue[j].includes('func:')) {
-                    var funcName = complexityCalculatorState.getProperty('allVariables')[r].containedValue[j].split(':')[1];
-                    var otherFunc = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                } else if (ccState.getProperty('allVariables')[r].containedValue[j] != null && typeof ccState.getProperty('allVariables')[r].containedValue[j] === 'string' && ccState.getProperty('allVariables')[r].containedValue[j].includes('func:')) {
+                    var funcName = ccState.getProperty('allVariables')[r].containedValue[j].split(':')[1];
+                    var otherFunc = ccHelpers.getFunctionObject(funcName);
                     if (otherFunc != null && otherFunc.returns !== "" && otherFunc.returns !== "BinOp") {
-                        complexityCalculatorState.getProperty('allVariables')[r].containedValue[j] = otherFunc.returns;
+                        ccState.getProperty('allVariables')[r].containedValue[j] = otherFunc.returns;
                     }
                 }
             }
         }
-        if (complexityCalculatorState.getProperty('allVariables')[r].value === "Subscript") {
-            var indexValue = complexityCalculatorHelperFunctions.retrieveFromList(complexityCalculatorState.getProperty('allVariables')[r].flagVal);
+        if (ccState.getProperty('allVariables')[r].value === "Subscript") {
+            var indexValue = ccHelpers.retrieveFromList(ccState.getProperty('allVariables')[r].flagVal);
             if (indexValue != null) {//then we know what it is.
-                complexityCalculatorState.getProperty('allVariables')[r].indexAndInput.indexed = true;
-                complexityCalculatorState.getProperty('allVariables')[r].opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", complexityCalculatorState.getProperty('allVariables')[r].opsDone, indexValue.lineno);
-                complexityCalculatorState.getProperty('allVariables').flagVal = ""; //this may get reset to something down below, which is fine and 100% intentional.
-                indexValue = complexityCalculatorHelperFunctions.retrieveFromList(indexValue);
+                ccState.getProperty('allVariables')[r].indexAndInput.indexed = true;
+                ccState.getProperty('allVariables')[r].opsDone = ccHelpers.addOpToList("ListOp", ccState.getProperty('allVariables')[r].opsDone, indexValue.lineno);
+                ccState.getProperty('allVariables').flagVal = ""; //this may get reset to something down below, which is fine and 100% intentional.
+                indexValue = ccHelpers.retrieveFromList(indexValue);
                 if (indexValue != null && indexValue._astname === "Name") {
                     //it's a bool OR it's another variable. EVEN IF WE DON'T KNOW WHAT THAT VAR IS, WE CAN UPDATE THIS and set the flagVal to var:varName
                     if (indexValue.id.v === "True" || indexValue.id.v === "False") {
-                        complexityCalculatorState.getProperty('allVariables')[r].value = "Bool";
+                        ccState.getProperty('allVariables')[r].value = "Bool";
                     }
-                    var indexVar = complexityCalculatorHelperFunctions.getVariableObject(indexValue.id.v);
+                    var indexVar = ccHelpers.getVariableObject(indexValue.id.v);
                     if (indexVar != null && indexVar.value !== "" && indexVar.value !== "BinOp") {
-                        complexityCalculatorHelperFunctions.copyAttributes(indexVar, complexityCalculatorState.getProperty('allVariables')[r], ["value", "nested", "original", "input", "nodeElements", "stringElements", "strIndexed"]);
-                        complexityCalculatorState.getProperty('allVariables')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(indexVar.opsDone, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
-                        complexityCalculatorHelperFunctions.appendArray(indexVar.containedValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue);
+                        ccHelpers.copyAttributes(indexVar, ccState.getProperty('allVariables')[r], ["value", "nested", "original", "input", "nodeElements", "stringElements", "strIndexed"]);
+                        ccState.getProperty('allVariables')[r].opsDone = ccHelpers.appendOpList(indexVar.opsDone, ccState.getProperty('allVariables')[r].opsDone);
+                        ccHelpers.appendArray(indexVar.containedValue, ccState.getProperty('allVariables')[r].containedValue);
                     } else if (indexVar != null && indexVar.value === "") {
-                        complexityCalculatorState.getProperty('allVariables')[r].value = "";
-                        complexityCalculatorState.getProperty('allVariables')[r].flagVal = "var:" + indexVar.name;
+                        ccState.getProperty('allVariables')[r].value = "";
+                        ccState.getProperty('allVariables')[r].flagVal = "var:" + indexVar.name;
                     }
                 } else if (indexValue != null && indexValue._astname === "Call") {
                     var alreadyTallied = false;
-                    if ('id' in indexValue.func || indexValue.func._astname === "Subscript" || complexityCalculatorHelperFunctions.retrieveFromList(indexValue.func) != indexValue.func) {
+                    if ('id' in indexValue.func || indexValue.func._astname === "Subscript" || ccHelpers.retrieveFromList(indexValue.func) != indexValue.func) {
                         var funcName = "";
                         if ('id' in indexValue.func) {
                             funcName = indexValue.func.id.v;
                         } else {
                             var functionNameNode = null;
-                            functionNameNode = complexityCalculatorHelperFunctions.retrieveFromList(indexValue.func);
+                            functionNameNode = ccHelpers.retrieveFromList(indexValue.func);
                             if (functionNameNode != null) {
                                 funcName = functionNameNode.id.v;
                             }
                         }
-                        var userFunctionCalled = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                        var userFunctionCalled = ccHelpers.getFunctionObject(funcName);
                         if (userFunctionCalled != null && userFunctionCalled.returns !== "") {
-                            complexityCalculatorState.getProperty('allVariables')[r].value = userFunctionCalled.returns;
-                            complexityCalculatorHelperFunctions.copyAttributes(userFunctionCalled, complexityCalculatorState.getProperty('allVariables')[r], ["nested", "binOp", "original", "indexAndInput", "nodeElements", "stringElements"]);
-                            complexityCalculatorHelperFunctions.appendArray(userFunctionCalled.containedValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue);
+                            ccState.getProperty('allVariables')[r].value = userFunctionCalled.returns;
+                            ccHelpers.copyAttributes(userFunctionCalled, ccState.getProperty('allVariables')[r], ["nested", "binOp", "original", "indexAndInput", "nodeElements", "stringElements"]);
+                            ccHelpers.appendArray(userFunctionCalled.containedValue, ccState.getProperty('allVariables')[r].containedValue);
                             if (userFunctionCalled.opsDone != null) {
-                                complexityCalculatorState.getProperty('allVariables')[r].opsDone = complexityCalculatorHelperFunctions.appendOpList(userFunctionCalled.opsDone, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
+                                ccState.getProperty('allVariables')[r].opsDone = ccHelpers.appendOpList(userFunctionCalled.opsDone, ccState.getProperty('allVariables')[r].opsDone);
                             }
                         }
                         alreadyTallied = true;
                     }
                     if (!alreadyTallied) {
-                        complexityCalculatorState.getProperty('allVariables')[r].value = complexityCalculatorHelperFunctions.getCallReturn(indexValue);
-                        if (Array.isArray(complexityCalculatorState.getProperty('allVariables')[r].value)) {
-                            complexityCalculatorState.getProperty('allVariables').nodeElements.push({
+                        ccState.getProperty('allVariables')[r].value = ccHelpers.getCallReturn(indexValue);
+                        if (Array.isArray(ccState.getProperty('allVariables')[r].value)) {
+                            ccState.getProperty('allVariables').nodeElements.push({
                                 line: indexValue.lineno,
-                                elts: complexityCalculatorState.getProperty('allVariables')[r].value
+                                elts: ccState.getProperty('allVariables')[r].value
                             });
-                            complexityCalculatorState.getProperty('allVariables').stringElements.push({
+                            ccState.getProperty('allVariables').stringElements.push({
                                 line: indexValue.lineno,
-                                elts: complexityCalculatorHelperFunctions.nodesToStrings(complexityCalculatorState.getProperty('allVariables')[r].value)
+                                elts: ccHelpers.nodesToStrings(ccState.getProperty('allVariables')[r].value)
                             });
-                            complexityCalculatorState.getProperty('allVariables')[r].value = "List";
+                            ccState.getProperty('allVariables')[r].value = "List";
                         }
                     }
                 } else if (indexValue._astname === "Num") {
-                    complexityCalculatorState.getProperty('allVariables')[r].value = complexityCalculatorHelperFunctions.isNodeFloat(indexValue) ? "Float" : "Int";
+                    ccState.getProperty('allVariables')[r].value = ccHelpers.isNodeFloat(indexValue) ? "Float" : "Int";
                 } else if (indexValue._astname === "Compare" || indexValue._astname === "BoolOp") {
-                    complexityCalculatorState.getProperty('allVariables')[r].value = "Bool";
+                    ccState.getProperty('allVariables')[r].value = "Bool";
                     if (indexValue._astname === "Compare") {
-                        complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue, complexityCalculatorState.getProperty('allVariables')[r].indexAndInput, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
+                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone);
                     }
                     if (indexValue._astname === "BoolOp") {
-                        complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue, complexityCalculatorState.getProperty('allVariables')[r].indexAndInput, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
+                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone);
                     }
                 } else if (indexValue._astname === "BinOp") {
-                    complexityCalculatorState.getProperty('allVariables')[r].opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", complexityCalculatorState.getProperty('allVariables')[r].opsDone, indexValue.lineno);
-                    var binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(indexValue);
+                    ccState.getProperty('allVariables')[r].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('allVariables')[r].opsDone, indexValue.lineno);
+                    var binVal = ccHelpers.recursivelyAnalyzeBinOp(indexValue);
                     if (typeof binVal === "string") {
-                        complexityCalculatorState.getProperty('allVariables')[r].value = binVal;
-                        complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue, complexityCalculatorState.getProperty('allVariables')[r].indexAndInput, complexityCalculatorState.getProperty('allVariables')[r].opsDone);
+                        ccState.getProperty('allVariables')[r].value = binVal;
+                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone);
                     } else if (Array.isArray(binVal)) {
-                        complexityCalculatorState.getProperty('allVariables')[r].value = "List";
-                        complexityCalculatorState.getProperty('allVariables').nodeElements.push({
+                        ccState.getProperty('allVariables')[r].value = "List";
+                        ccState.getProperty('allVariables').nodeElements.push({
                             line: indexValue.lineno,
                             elts: binVal
                         });
-                        complexityCalculatorState.getProperty('allVariables').stringElements.push({
+                        ccState.getProperty('allVariables').stringElements.push({
                             line: indexValue.lineno,
-                            elts: complexityCalculatorHelperFunctions.nodesToStrings(binVal)
+                            elts: ccHelpers.nodesToStrings(binVal)
                         });
                     } else {
                         //we re-frame as a binop object
-                        complexityCalculatorState.getProperty('allVariables')[r].value = "BinOp";
-                        complexityCalculatorState.getProperty('allVariables')[r].binOp = binVal;
+                        ccState.getProperty('allVariables')[r].value = "BinOp";
+                        ccState.getProperty('allVariables')[r].binOp = binVal;
                     }
                 } else if (indexValue._astname === "List") {
-                    complexityCalculatorState.getProperty('allVariables')[r].value = "List";
-                    complexityCalculatorHelperFunctions.appendArray(complexityCalculatorState.getProperty('allVariables')[r].containedValue, complexityCalculatorHelperFunctions.listTypesWithin(indexValue, complexityCalculatorState.getProperty('allVariables')[r].containedValue, complexityCalculatorState.getProperty('allVariables')[r].indexAndInput, complexityCalculatorState.getProperty('allVariables')[r].opsDone));
-                    complexityCalculatorState.getProperty('allVariables')[r].nodeElements.push({
+                    ccState.getProperty('allVariables')[r].value = "List";
+                    ccHelpers.appendArray(ccState.getProperty('allVariables')[r].containedValue, ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone));
+                    ccState.getProperty('allVariables')[r].nodeElements.push({
                         line: indexValue.lineno,
                         elts: indexValue.elts
                     });
-                    complexityCalculatorState.getProperty('allVariables')[r].nodeElements.push({
+                    ccState.getProperty('allVariables')[r].nodeElements.push({
                         line: indexValue.lineno,
-                        elts: complexityCalculatorHelperFunctions.nodesToStrings(indexValue.elts)
+                        elts: ccHelpers.nodesToStrings(indexValue.elts)
                     });
                 } else if (indexValue._astname === "Str") {
-                    complexityCalculatorState.getProperty('allVariables')[r].value = "Str";
+                    ccState.getProperty('allVariables')[r].value = "Str";
                 }
             }
         }
     }
 }
 
-// Finds out if a node in a user-defined functioncomplexityCalculatorState.getProperty('returns')a value, andcomplexityCalculatorState.getProperty('returns')that
+// Finds out if a node in a user-defined functionccState.getProperty('returns')a value, andccState.getProperty('returns')that
 function findReturnInBody(node, functionObject) {
     if (node != null && node._astname != null) {
         //variable init
@@ -1186,13 +1180,13 @@ function findReturnInBody(node, functionObject) {
         var varList = [];
         var isIndexed = false;
         var tempObj = {};
-        complexityCalculatorHelperFunctions.copyAttributes(functionObject, tempObj, ["stringElements", "indexAndInput", "name", "returns", "funcVar", "flagVal", "binOp", "containedValue", "opsDone", "nested", "original", "paramsChanged", "nodeElements", "paramFuncsCalled"]);
+        ccHelpers.copyAttributes(functionObject, tempObj, ["stringElements", "indexAndInput", "name", "returns", "funcVar", "flagVal", "binOp", "containedValue", "opsDone", "nested", "original", "paramsChanged", "nodeElements", "paramFuncsCalled"]);
         functionObject = tempObj;
         var userFuncsIndex = -1;
         if (functionObject.name != null) {
             //should never be null but putting this in here for error protection
-            for (var i in complexityCalculatorState.getProperty('userFunctionParameters')) {
-                if (complexityCalculatorState.getProperty('userFunctionParameters')[i].name === functionObject.name) {
+            for (var i in ccState.getProperty('userFunctionParameters')) {
+                if (ccState.getProperty('userFunctionParameters')[i].name === functionObject.name) {
                     userFuncsIndex = i;
                     break;
                 }
@@ -1214,21 +1208,21 @@ function findReturnInBody(node, functionObject) {
         }
         //add any ops to opsDone
         if (node._astname === "BinOp") {
-            functionObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", functionObject.opsDone, node.lineno);
+            functionObject.opsDone = ccHelpers.addOpToList("BinOp", functionObject.opsDone, node.lineno);
         }
         if (node._astname === "AugAssign") {
-            functionObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("AugAssign", functionObject.opsDone, node.lineno);
+            functionObject.opsDone = ccHelpers.addOpToList("AugAssign", functionObject.opsDone, node.lineno);
         }
         if (node._astname === "BoolOp" || node._astname === "UnaryOp") {
-            functionObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("BoolOp", functionObject.opsDone, node.lineno);
+            functionObject.opsDone = ccHelpers.addOpToList("BoolOp", functionObject.opsDone, node.lineno);
         }
         if (node._astname === "Compare") {
-            functionObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("Compare", functionObject.opsDone, node.lineno);
+            functionObject.opsDone = ccHelpers.addOpToList("Compare", functionObject.opsDone, node.lineno);
         }
         //is there a call to another function or to a list or string op? Handle that here.
         if (node._astname === "Call") {
             var funcName = "";
-            var funcNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
+            var funcNode = ccHelpers.retrieveFromList(node.func);
             if (funcNode != null) {
                 if ('id' in funcNode) {
                     funcName = funcNode.id.v;
@@ -1238,16 +1232,16 @@ function findReturnInBody(node, functionObject) {
                 if (funcName === 'readInput') {
                     functionObject.indexAndInput.input = true;
                 }
-                if (userFuncsIndex != -1 && complexityCalculatorState.getProperty('userFunctionParameters')[userFuncsIndex].params.includes(funcName)) {
+                if (userFuncsIndex != -1 && ccState.getProperty('userFunctionParameters')[userFuncsIndex].params.includes(funcName)) {
                     //later on, this will be used to simulate a call to this function that was passed as a parameter
-                    complexityCalculatorState.getProperty('userFunctionParameters')[userFuncsIndex].paramFuncsCalled.push({
-                        index: complexityCalculatorState.getProperty('userFunctionParameters')[userFuncsIndex].params.indexOf(funcName),
+                    ccState.getProperty('userFunctionParameters')[userFuncsIndex].paramFuncsCalled.push({
+                        index: ccState.getProperty('userFunctionParameters')[userFuncsIndex].params.indexOf(funcName),
                         node: Object.assign({}, node)
                     });
                 }
                 var isListFunc = false, isStrFunc = false;
-                if (JS_STR_LIST_OVERLAP.includes(funcName) && complexityCalculatorState.getProperty('isJavascript')) {
-                    var opValType = complexityCalculatorHelperFunctions.getTypeFromNode(funcNode.value);
+                if (ccState.JS_STR_LIST_OVERLAP.includes(funcName) && ccState.getProperty('isJavascript')) {
+                    var opValType = ccHelpers.getTypeFromNode(funcNode.value);
                     if (opValType === "List") {
                         isListFunc = true;
                     } else if (opValType === "Str") {
@@ -1256,8 +1250,8 @@ function findReturnInBody(node, functionObject) {
                         isListFunc, isStrFunc = true;
                     }
                 }
-                if (complexityCalculatorState.getProperty('listFuncs').includes(funcName) && !isStrFunc) {
-                    functionObject.opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", functionObject.opsDone, node.lineno);
+                if (ccState.getProperty('listFuncs').includes(funcName) && !isStrFunc) {
+                    functionObject.opsDone = ccHelpers.addOpToList("ListOp", functionObject.opsDone, node.lineno);
                 }
             }
         }
@@ -1272,22 +1266,22 @@ function findReturnInBody(node, functionObject) {
             if (retVal._astname === "UnaryOp") {
                 functionObject.returns = "Bool";
                 retVal = retVal.operand;
-                opsPerformed = complexityCalculatorHelperFunctions.addOpToList("BoolOp", opsPerformed, node.lineno);
+                opsPerformed = ccHelpers.addOpToList("BoolOp", opsPerformed, node.lineno);
             }
             if (node.value._astname === "Subscript") {
-                retVal = complexityCalculatorHelperFunctions.retrieveFromList(node.value);
+                retVal = ccHelpers.retrieveFromList(node.value);
                 if (retVal == null) {
                     valueType = "Subscript";
                     flag = node.value;
                 }
-                if (complexityCalculatorHelperFunctions.getIndexingInNode(node.value)[0]) {
+                if (ccHelpers.getIndexingInNode(node.value)[0]) {
                     functionObject.indexAndInput.isIndexed = true;
                 }
-                if (complexityCalculatorHelperFunctions.getStringIndexingInNode(node.value)[0]) {
+                if (ccHelpers.getStringIndexingInNode(node.value)[0]) {
                     functionObject.indexAndInput.strIndexed = true;
                 }
             }
-            retVal = complexityCalculatorHelperFunctions.retrieveFromList(node.value);
+            retVal = ccHelpers.retrieveFromList(node.value);
             if (typeof retVal === "string") {
                 valueType = "";
                 flag = retVal;
@@ -1295,13 +1289,13 @@ function findReturnInBody(node, functionObject) {
                 //store the type of returned value
                 if (retVal._astname === "BinOp" || retVal._astname === "BoolOp" || retVal._astname === "Compare" || retVal._astname === "List") {
                     //get list/array/string indexing
-                    isIndexed = complexityCalculatorHelperFunctions.getIndexingInNode(retVal)[0];
-                    functionObject.indexAndInput.strIndexed = complexityCalculatorHelperFunctions.getStringIndexingInNode(retVal)[0];
+                    isIndexed = ccHelpers.getIndexingInNode(retVal)[0];
+                    functionObject.indexAndInput.strIndexed = ccHelpers.getStringIndexingInNode(retVal)[0];
                 }
                 if (retVal._astname === "Num") {
                     valueType = omplexityCalculatorHelperFunctions.isNodeFloat(retVal) ? "Float" : "Int";
                 } else if (retVal._astname === "Call") {
-                    //if itcomplexityCalculatorState.getProperty('returns')another function's return, we look up what THAT function returns. if we know.
+                    //if itccState.getProperty('returns')another function's return, we look up what THAT function returns. if we know.
                     funcOrVar = "func";
                     var funcName = "";
                     if ('id' in retVal.func) {
@@ -1312,46 +1306,46 @@ function findReturnInBody(node, functionObject) {
                     if (funcName === 'readInput') {
                         functionObject.indexAndInput.input = true;
                     }
-                    //special case -complexityCalculatorState.getProperty('returns')the returned value of a listOp
-                    if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+                    //special case -ccState.getProperty('returns')the returned value of a listOp
+                    if (ccState.getProperty('listFuncs').includes(funcName)) {
                         valueType = "List";
-                        opsPerformed = complexityCalculatorHelperFunctions.addOpToList("ListOp", opsPerformed, node.lineno);
+                        opsPerformed = ccHelpers.addOpToList("ListOp", opsPerformed, node.lineno);
                         if (retVal.func.value._astname === "List") {
-                            var valuesInList = complexityCalculatorHelperFunctions.listTypesWithin(retVal.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
+                            var valuesInList = ccHelpers.listTypesWithin(retVal.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
                             for (var vil = 0; vil < valuesInList; vil++) {
                                 contVal.push(valuesInList[vil]);
                             }
                         }
                         if (retVal.func.value._astname === "BinOp") {
                             var valsInOp = [];
-                            complexityCalculatorHelperFunctions.listTypesWithin(retVal.func.value, valsInOp, functionObject.indexAndInput, opsPerformed);
+                            ccHelpers.listTypesWithin(retVal.func.value, valsInOp, functionObject.indexAndInput, opsPerformed);
                             for (var vio = 0; vio < valsInOp.length; vio++) {
                                 contVal.push(valsInOp[vio]);
                             }
                         }
                         if (retVal.func.value._astname === "Call") {
-                            var retFunc = complexityCalculatorHelperFunctions.getFunctionObject(retVal.func.value.func.id.v);
+                            var retFunc = ccHelpers.getFunctionObject(retVal.func.value.func.id.v);
                             if (retFunc != null) {
                                 if (retFunc.containedValue != null) {
-                                    complexityCalculatorHelperFunctions.appendArray(retFunc.containedValue, contVal);
+                                    ccHelpers.appendArray(retFunc.containedValue, contVal);
                                 }
                                 if (retFunc.opsDone != null) {
-                                    opsPerformed = complexityCalculatorHelperFunctions.appendOpList(retFunc.opsDone, opsPerformed);
+                                    opsPerformed = ccHelpers.appendOpList(retFunc.opsDone, opsPerformed);
                                 }
                             }
                         }
                         if (retVal.func.value._astname === "Name") {  //we have to find the other variable
-                            var retVar = complexityCalculatorHelperFunctions.getVariableObject(retVal.func.value.id.v);
+                            var retVar = ccHelpers.getVariableObject(retVal.func.value.id.v);
                             if (retVar != null) {
-                                complexityCalculatorHelperFunctions.appendArray(retVar.containedValue, contVal);
-                                opsPerformed = complexityCalculatorHelperFunctions.appendOpList(retVar.opsDone, opsPerformed);
+                                ccHelpers.appendArray(retVar.containedValue, contVal);
+                                opsPerformed = ccHelpers.appendOpList(retVar.opsDone, opsPerformed);
                             }
                         }
                     }
                     flag = funcName;
                     foundMatch = false;
-                    var matchedFunc = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
-                    //or itcomplexityCalculatorState.getProperty('returns')the return of another function
+                    var matchedFunc = ccHelpers.getFunctionObject(funcName);
+                    //or itccState.getProperty('returns')the return of another function
                     if (matchedFunc != null) {
                         valueType = matchedFunc.returns;
                         if (matchedFunc.containedValue != null) {
@@ -1359,7 +1353,7 @@ function findReturnInBody(node, functionObject) {
                                 contVal = matchedFunc.containedValue;
                             }
                             if (matchedFunc.opsDone != null) {
-                                opsPerformed = complexityCalculatorHelperFunctions.appendOpList(matchedFunc.opsDone, opsPerformed);
+                                opsPerformed = ccHelpers.appendOpList(matchedFunc.opsDone, opsPerformed);
                             }
                             if (matchedFunc.nested) {
                                 variablesIncluded = true;
@@ -1379,8 +1373,8 @@ function findReturnInBody(node, functionObject) {
                 } else if (retVal._astname === "Name") {
                     //returns a variable value
                     var isFunctionName = false;
-                    for (var i in complexityCalculatorState.getProperty('userFunctionParameters')) {
-                        if (complexityCalculatorState.getProperty('userFunctionParameters')[i].name === retVal.id.v) {
+                    for (var i in ccState.getProperty('userFunctionParameters')) {
+                        if (ccState.getProperty('userFunctionParameters')[i].name === retVal.id.v) {
                             isFunctionName = true;
                         }
                     }
@@ -1398,23 +1392,23 @@ function findReturnInBody(node, functionObject) {
                             flag = variableName;
                             valueType = "";
                             variablesIncluded = true;
-                            var varToCopy = complexityCalculatorHelperFunctions.getVariableObject(variableName);
+                            var varToCopy = ccHelpers.getVariableObject(variableName);
                             //copy values from the variable object
                             if (varToCopy != null && varToCopy.value !== "BinOp" && varToCopy.value !== "") {
                                 valueType = varToCopy.value;
                                 contVal = varToCopy.containedValue;
-                                opsPerformed = complexityCalculatorHelperFunctions.appendOpList(varToCopy.opsDone, opsPerformed);
+                                opsPerformed = ccHelpers.appendOpList(varToCopy.opsDone, opsPerformed);
                                 if (varToCopy.nodeElements != null) {
                                     var nodeElementsIndex = -1;
-                                    for (var t = 0; t < complexityCalculatorState.getProperty('allVariables')[v].nodeElements.length - 1; t++) {
-                                        if (complexityCalculatorState.getProperty('allVariables')[v].nodeElements[t].line > functionObject.startLine && complexityCalculatorState.getProperty('allVariables')[v].nodeElements[t + 1].line > functionObject.endLine) {
+                                    for (var t = 0; t < ccState.getProperty('allVariables')[v].nodeElements.length - 1; t++) {
+                                        if (ccState.getProperty('allVariables')[v].nodeElements[t].line > functionObject.startLine && ccState.getProperty('allVariables')[v].nodeElements[t + 1].line > functionObject.endLine) {
                                             nodeElementsIndex = t;
                                             break;
                                         }
                                     }
-                                    if (nodeElementsIndex = -1 && complexityCalculatorState.getProperty('allVariables')[v].nodeElements[allVariables[v].nodeElements.length - 1].line >= functionObject.startLine &&
-                                        complexityCalculatorState.getProperty('allVariables')[v].nodeElements[allVariables[v].nodeElements.length - 1].line <= functionObject.endLine) {
-                                        nodeElementsIndex = complexityCalculatorState.getProperty('allVariables')[v].nodeElements.length - 1;
+                                    if (nodeElementsIndex = -1 && ccState.getProperty('allVariables')[v].nodeElements[allVariables[v].nodeElements.length - 1].line >= functionObject.startLine &&
+                                        ccState.getProperty('allVariables')[v].nodeElements[allVariables[v].nodeElements.length - 1].line <= functionObject.endLine) {
+                                        nodeElementsIndex = ccState.getProperty('allVariables')[v].nodeElements.length - 1;
                                     }
                                     if (nodeElementsIndex = -1) {
                                         nodeElementsIndex = 0;
@@ -1432,55 +1426,55 @@ function findReturnInBody(node, functionObject) {
                         }
                     }
                 } else if (retVal._astname === "BinOp") {
-                    //if itcomplexityCalculatorState.getProperty('returns')a binOp, we have to evaluate what kind of datatype it is.
-                    opsPerformed = complexityCalculatorHelperFunctions.addOpToList("BinOp", opsPerformed, node.lineno);
-                    if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(retVal))) {
-                        var binOpElts = complexityCalculatorHelperFunctions.getAllBinOpLists(retVal);
+                    //if itccState.getProperty('returns')a binOp, we have to evaluate what kind of datatype it is.
+                    opsPerformed = ccHelpers.addOpToList("BinOp", opsPerformed, node.lineno);
+                    if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(retVal))) {
+                        var binOpElts = ccHelpers.getAllBinOpLists(retVal);
                         functionObject.nodeElements = [{
                             line: retVal.lineno,
                             elts: binOpElts
                         }];
                         functionObject.stringElements = [{
                             line: retVal.lineno,
-                            elts: complexityCalculatorHelperFunctions.nodesToStrings(binOpElts, retVal.lineno)
+                            elts: ccHelpers.nodesToStrings(binOpElts, retVal.lineno)
                         }];
                     }
-                    complexityCalculatorHelperFunctions.getNestedVariables(retVal, varList);
-                    binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(retVal);
+                    ccHelpers.getNestedVariables(retVal, varList);
+                    binVal = ccHelpers.recursivelyAnalyzeBinOp(retVal);
                     if (binVal != null) {
                         valueType = "BinOp";
                         contVal = [];
-                        complexityCalculatorHelperFunctions.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
+                        ccHelpers.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
                     } else {
                         valueType = "";
                     }
                 } else if (retVal._astname === "BoolOp") {
                     //boolop becomes bool
                     valueType = "Bool";
-                    complexityCalculatorHelperFunctions.getNestedVariables(retVal, varList);
+                    ccHelpers.getNestedVariables(retVal, varList);
                     contVal = [];
-                    opsPerformed = complexityCalculatorHelperFunctions.addOpToList("BoolOp", opsPerformed, node.lineno);
-                    complexityCalculatorHelperFunctions.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
+                    opsPerformed = ccHelpers.addOpToList("BoolOp", opsPerformed, node.lineno);
+                    ccHelpers.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
                 } else if (retVal._astname === "List") {
                     //store "List" and also all values within that list in nodeElements, stringElements, and containedValue
                     valueType = "List";
-                    complexityCalculatorHelperFunctions.getNestedVariables(retVal, varList);
-                    contVal = complexityCalculatorHelperFunctions.listTypesWithin(retVal.elts, contVal, functionObject.indexAndInput, opsPerformed);
+                    ccHelpers.getNestedVariables(retVal, varList);
+                    contVal = ccHelpers.listTypesWithin(retVal.elts, contVal, functionObject.indexAndInput, opsPerformed);
                     functionObject.nodeElements = [{
                         line: node.lineno,
                         elts: retVal.elts
                     }];
                     functionObject.stringElements = [{
                         line: node.lineno,
-                        elts: complexityCalculatorHelperFunctions.nodesToStrings(retVal.elts, node.lineno)
+                        elts: ccHelpers.nodesToStrings(retVal.elts, node.lineno)
                     }];
                 } else if (retVal._astname === "Compare") {
                     //comparison also becomes a bool
-                    complexityCalculatorHelperFunctions.getNestedVariables(retVal, varList);
+                    ccHelpers.getNestedVariables(retVal, varList);
                     valueType = "Bool";
                     contVal = [];
-                    opsPerformed = complexityCalculatorHelperFunctions.addOpToList("Compare", opsPerformed, node.lineno);
-                    complexityCalculatorHelperFunctions.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
+                    opsPerformed = ccHelpers.addOpToList("Compare", opsPerformed, node.lineno);
+                    ccHelpers.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
                 }
             }
             //if we know what it is, we don't have to bother flagging it
@@ -1489,7 +1483,7 @@ function findReturnInBody(node, functionObject) {
                 funcOrVar = "";
             }
             if (functionObject != null && functionObject.opsDone != null) {
-                opsPerformed = complexityCalculatorHelperFunctions.appendOpList(functionObject.opsDone, opsPerformed);
+                opsPerformed = ccHelpers.appendOpList(functionObject.opsDone, opsPerformed);
             }
             if (varList.length > 0) {
                 variablesIncluded = true;
@@ -1571,9 +1565,9 @@ function checkForFunctions(node, results) {
             paramList.push(paramName);
         }
         var lineNumber = node.lineno - 1;
-        var lastLine = complexityCalculatorHelperFunctions.getLastLine(node);
-        var wholeLoop = complexityCalculatorState.getProperty('studentCode').slice(lineNumber, lastLine);
-        complexityCalculatorState.getProperty('userFunctionParameters').push({
+        var lastLine = ccHelpers.getLastLine(node);
+        var wholeLoop = ccState.getProperty('studentCode').slice(lineNumber, lastLine);
+        ccState.getProperty('userFunctionParameters').push({
             name: node.name.v,
             params: paramList,
             paramFuncsCalled: []
@@ -1595,7 +1589,7 @@ function checkForFunctions(node, results) {
         //set originality measure
         var originality = false;
         for (var p = lineNumber + 1; p < lastLine + 1; p++) {
-            if (complexityCalculatorState.getProperty('originalityLines').includes(p)) {
+            if (ccState.getProperty('originalityLines').includes(p)) {
                 originality = true;
                 break;
             }
@@ -1605,23 +1599,23 @@ function checkForFunctions(node, results) {
             results.userFunc = 2;
         }
         functionObj.original = originality;
-        var lastLine = complexityCalculatorHelperFunctions.getLastLine(node);
+        var lastLine = ccHelpers.getLastLine(node);
         //store these lines as places where functions are defined
         var functionLineMarker = {
             name: functionName,
             lines: []
         };
         for (var k = node.lineno; k <= lastLine; k++) {
-            complexityCalculatorState.getProperty('uncalledFunctionLines').push(k);
+            ccState.getProperty('uncalledFunctionLines').push(k);
             functionLineMarker.lines.push(k);
         }
-        complexityCalculatorState.getProperty("functionLines").push(functionLineMarker);
+        ccState.getProperty("functionLines").push(functionLineMarker);
         //create a new object and add its return value. push to list.
         if (functionObj != null) {
             functionObj.name = functionName;
             functionObj.startLine = node.lineno;
             functionObj.endLine = lastLine;
-            complexityCalculatorState.getProperty('userFunctionReturns').push(functionObj);
+            ccState.getProperty('userFunctionReturns').push(functionObj);
         }
     }
 }
@@ -1648,7 +1642,7 @@ export function evaluateFunctionReturnParams(ast) {
 }
 
 // Labels functions that return their own parameters. 
-// Also handles function removal from the complexityCalculatorState.getProperty("complexityCalculatorState.getProperty('uncalledFunctionLines')") if said function is called (we only evaluate in-function code if the function is called)
+// Also handles function removal from the ccState.getProperty("ccState.getProperty('uncalledFunctionLines')") if said function is called (we only evaluate in-function code if the function is called)
 function lookForParamReturns(node) {
     //again, we need to manually recurse through certian types of nodes
     if (node != null && node._astname != null && 'test' in node) {
@@ -1663,19 +1657,19 @@ function lookForParamReturns(node) {
     if (node != null && node._astname === "Call" && "attr" in node.func) {
         //this is solely for JS array ops such as map() that take function expressions as arguments
         for (var i in node.args) {
-            var nodeItem = complexityCalculatorHelperFunctions.retrieveFromList(node.args[i]);
+            var nodeItem = ccHelpers.retrieveFromList(node.args[i]);
             if (nodeItem != null && nodeItem._astname === "FunctionExp") {
                 //handle params
                 var funcName = nodeItem.functionName;
                 var isRecursiveCall = false;
                 var argsIn = nodeItem.functionDef.args.args;
-                var calledReturnObj = complexityCalculatorHelperFunctions.getFunctionObject(calledName);
+                var calledReturnObj = ccHelpers.getFunctionObject(calledName);
                 if (calledReturnObj != null && calledReturnObj.startLine != null && (nodeItem.lineno > calledReturnObj.startLine && nodeItem.lineno <= calledReturnObj.endLine)) {
                     isRecursiveCall = true;
                 }
                 var index = -1;
-                for (var userFuncRet = 0; userFuncRet < complexityCalculatorState.getProperty('userFunctionReturns').length; userFuncRet++) {
-                    if (complexityCalculatorState.getProperty('userFunctionReturns')[userFuncRet].name === funcName) {
+                for (var userFuncRet = 0; userFuncRet < ccState.getProperty('userFunctionReturns').length; userFuncRet++) {
+                    if (ccState.getProperty('userFunctionReturns')[userFuncRet].name === funcName) {
                         index = userFuncRet;
                         break;
                     }
@@ -1704,37 +1698,37 @@ function lookForParamReturns(node) {
                     };
                     //adjustments so things get read accurately
                     var lineNo = nodeItem.lineno;
-                    for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                        if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                            lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                    for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                        if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                            lineNo = ccState.getProperty('loopLocations')[h][0];
                             break;
                         }
                     }
                     if (!isRecursiveCall) {
                         paramArgVar.assignedModified.push({
                             line: lineNo,
-                            value: complexityCalculatorState.getProperty('studentCode')[nodeItem.lineno - 1].trim(),
+                            value: ccState.getProperty('studentCode')[nodeItem.lineno - 1].trim(),
                             nodeValue: nodeItem
                         });
-                        complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
+                        ccState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                     }
-                    //fill in param variable values, add to complexityCalculatorState.getProperty('allVariables')
+                    //fill in param variable values, add to ccState.getProperty('allVariables')
                     var alreadyExists = -1;
                     var funcInd = -1;
-                    for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionParameters').length; f++) {
-                        if (complexityCalculatorState.getProperty('userFunctionParameters')[f].name === funcName) {
+                    for (var f = 0; f < ccState.getProperty('userFunctionParameters').length; f++) {
+                        if (ccState.getProperty('userFunctionParameters')[f].name === funcName) {
                             funcInd = f;
                             break;
                         }
                     }
                     if (funcInd != -1) {
-                        for (var e = 0; e < complexityCalculatorState.getProperty('allVariables').length; e++) {
-                            if (complexityCalculatorState.getProperty('allVariables')[e].name === complexityCalculatorState.getProperty('userFunctionParameters')[funcInd].params[a]) {
+                        for (var e = 0; e < ccState.getProperty('allVariables').length; e++) {
+                            if (ccState.getProperty('allVariables')[e].name === ccState.getProperty('userFunctionParameters')[funcInd].params[a]) {
                                 alreadyExists = e;
                                 break;
                             }
                         }
-                        paramArgVar.name = complexityCalculatorState.getProperty('userFunctionParameters')[funcInd].params[a];
+                        paramArgVar.name = ccState.getProperty('userFunctionParameters')[funcInd].params[a];
                     }
                     var attrName = node.func.attr.v;
                     //this information is needed so we can get a value for the param variable
@@ -1744,23 +1738,23 @@ function lookForParamReturns(node) {
                             opToPerform = node.func.attr.v;
                         }
                         if (node.func.value._astname === "Name") {
-                            var variable = complexityCalculatorHelperFunctions.getVariableObject(node.func.value.id.v);
+                            var variable = ccHelpers.getVariableObject(node.func.value.id.v);
                             if (variable != null) {
-                                var correctElts = complexityCalculatorHelperFunctions.mostRecentElements(variable, node.lineno - 1);
+                                var correctElts = ccHelpers.mostRecentElements(variable, node.lineno - 1);
                                 if (correctElts != null) {
                                     listToUse = correctElts.slice(0);
                                 }
                             }
                         } else if (node.func.value._astname === "Call") {
-                            if (complexityCalculatorHelperFunctions.retrieveFromList(node.func.value) != node.func.value) {
-                                listToUse = complexityCalculatorHelperFunctions.retrieveFromList(node.func.value).elts;
+                            if (ccHelpers.retrieveFromList(node.func.value) != node.func.value) {
+                                listToUse = ccHelpers.retrieveFromList(node.func.value).elts;
                             } else if ('id' in node.func.value.func) {
                                 var funcName = node.func.value.func.id.v;
                                 var thisLine = node.lineno;
-                                if (complexityCalculatorHelperFunctions.getFunctionObject(funcName) != null) {
-                                    var variable = complexityCalculatorHelperFunctions.getVariableObject(node.func.value.id.v);
+                                if (ccHelpers.getFunctionObject(funcName) != null) {
+                                    var variable = ccHelpers.getVariableObject(node.func.value.id.v);
                                     if (variable != null) {
-                                        var correctElts = complexityCalculatorHelperFunctions.mostRecentElements(variable, node.lineno);
+                                        var correctElts = ccHelpers.mostRecentElements(variable, node.lineno);
                                         if (correctElts != null) {
                                             listToUse = correctElts.slice(0);
                                         }
@@ -1770,87 +1764,87 @@ function lookForParamReturns(node) {
                         } else if (node.func.value._astname === "List") {
                             listToUse = node.func.value.elts;
                         } else if (node.func.value._astname === "BinOp") {
-                            listToUse = complexityCalculatorHelperFunctions.getAllBinOpLists(node.func.value);
+                            listToUse = ccHelpers.getAllBinOpLists(node.func.value);
                         }
                         if (listToUse != null) {
-                            paramArgVar.value = complexityCalculatorHelperFunctions.getTypeFromNode(complexityCalculatorHelperFunctions.retrieveFromList(listToUse[0]));
+                            paramArgVar.value = ccHelpers.getTypeFromNode(ccHelpers.retrieveFromList(listToUse[0]));
                         }
                     }
                     //add to relevant lists
-                    if (paramArgVar.opsDone.length > 0 && index != -1 && complexityCalculatorState.getProperty('userFunctionReturns')[index].startLine != null) {
-                        paramArgVar.modifyingFunctions.push([complexityCalculatorState.getProperty('userFunctionReturns')[index].startLine, complexityCalculatorState.getProperty('userFunctionReturns')[index].endLine]);
+                    if (paramArgVar.opsDone.length > 0 && index != -1 && ccState.getProperty('userFunctionReturns')[index].startLine != null) {
+                        paramArgVar.modifyingFunctions.push([ccState.getProperty('userFunctionReturns')[index].startLine, ccState.getProperty('userFunctionReturns')[index].endLine]);
                     }
-                    if (alreadyExists > -1 && (complexityCalculatorState.getProperty('allVariables')[alreadyExists].value === "" && paramArgVar.value !== "")) {
-                        complexityCalculatorState.getProperty('allVariables')[alreadyExists] = paramArgVar;
+                    if (alreadyExists > -1 && (ccState.getProperty('allVariables')[alreadyExists].value === "" && paramArgVar.value !== "")) {
+                        ccState.getProperty('allVariables')[alreadyExists] = paramArgVar;
                     } else if (alreadyExists === -1) {
-                        complexityCalculatorState.getProperty('allVariables').push(paramArgVar);
-                        complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
+                        ccState.getProperty('allVariables').push(paramArgVar);
+                        ccState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                     }
                 }
                 if (index > -1) {
-                    //if the functioncomplexityCalculatorState.getProperty('returns')one of its own parameters, we now know what datatype that is.
-                    if (complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar === "param") {
-                        var arg = nodeItem.args[complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal];
+                    //if the functionccState.getProperty('returns')one of its own parameters, we now know what datatype that is.
+                    if (ccState.getProperty('userFunctionReturns')[index].funcVar === "param") {
+                        var arg = nodeItem.args[ccState.getProperty('userFunctionReturns')[index].flagVal];
                         var argType = arg._astname;
                         var returnType = argType;
                         var containedWithin = [];
-                        if (complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone == null) {
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = [];
+                        if (ccState.getProperty('userFunctionReturns')[index].opsDone == null) {
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = [];
                         }
                         if (argType === "Num") {
-                            argType = complexityCalculatorHelperFunctions.isNodeFloat(arg) ? "Float" : "Int";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                            argType = ccHelpers.isNodeFloat(arg) ? "Float" : "Int";
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
                         }
                         if (argType === "Name" && (arg.id.v === "True" || arg.id.v === "False")) {
                             argType = "Bool";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
                         } else if (argType === "Name") {
                             var foundVar = false;
-                            for (var v = 0; v < complexityCalculatorState.getProperty('allVariables').length; v++) {
-                                if (complexityCalculatorState.getProperty('allVariables')[v].name === arg.id.v && complexityCalculatorState.getProperty('allVariables')[v].value !== "" && complexityCalculatorState.getProperty('allVariables')[v].value !== "BinOp") {
+                            for (var v = 0; v < ccState.getProperty('allVariables').length; v++) {
+                                if (ccState.getProperty('allVariables')[v].name === arg.id.v && ccState.getProperty('allVariables')[v].value !== "" && ccState.getProperty('allVariables')[v].value !== "BinOp") {
                                     foundVar = true;
-                                    argType = complexityCalculatorState.getProperty('allVariables')[v].value;
-                                    containedWithin = complexityCalculatorState.getProperty('allVariables')[v].containedValue;
-                                    complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.appendOpList(complexityCalculatorState.getProperty('allVariables')[v].opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    argType = ccState.getProperty('allVariables')[v].value;
+                                    containedWithin = ccState.getProperty('allVariables')[v].containedValue;
+                                    ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.appendOpList(ccState.getProperty('allVariables')[v].opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     break;
                                 }
                             }
                             if (foundVar) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].returns = argType;
                                 if (containedWithin.length > 0) {
-                                    complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
+                                    ccState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
                                 }
                             } else {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "var";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = arg.id.v;
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "var";
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = arg.id.v;
                             }
                         }
                         if (argType === "Compare") {
                             argType = "Bool";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("Compare", complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
-                            complexityCalculatorHelperFunctions.listTypesWithin(arg, containedWithin, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("Compare", ccState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
+                            ccHelpers.listTypesWithin(arg, containedWithin, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
                             if (containedWithin.length > 0) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
+                                ccState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
                             }
                         }
                         if (argType === "BoolOp") {
                             argType = "Bool";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("BoolOp", complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
-                            complexityCalculatorHelperFunctions.listTypesWithin(arg, containedWithin, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("BoolOp", ccState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
+                            ccHelpers.listTypesWithin(arg, containedWithin, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                             if (containedWithin.length > 0) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
+                                ccState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
                             }
                         }
                         if (argType === "Call") {
@@ -1863,114 +1857,114 @@ function lookForParamReturns(node) {
                                 funcName = nodeItem.value.func.attr.v;
                             }
                             if (funcName === 'readInput') {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput.input = true;
+                                ccState.getProperty('userFunctionReturns')[index].indexAndInput.input = true;
                             }
-                            if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+                            if (ccState.getProperty('listFuncs').includes(funcName)) {
                                 valueType = "List";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
+                                ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("ListOp", ccState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
                                 if (nodeItem.value.func.value._astname === "List") {
-                                    var valuesInList = complexityCalculatorHelperFunctions.listTypesWithin(nodeItem.value.func.value.elts, [], complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    var valuesInList = ccHelpers.listTypesWithin(nodeItem.value.func.value.elts, [], ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     for (var vil = 0; vil < valuesInList; vil++) {
-                                        complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue.push(valuesInList[vil]);
+                                        ccState.getProperty('userFunctionReturns')[index].containedValue.push(valuesInList[vil]);
                                     }
                                 }
                                 //binop
                                 if (nodeItem.value.func.value._astname === "BinOp") {
                                     var valsInOp = [];
-                                    complexityCalculatorHelperFunctions.listTypesWithin(nodeItem.value.func.value, valsInOp, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    ccHelpers.listTypesWithin(nodeItem.value.func.value, valsInOp, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     for (var vio = 0; vio < valsInOp.length; vio++) {
-                                        complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue.push(valsInOp[vio]);
+                                        ccState.getProperty('userFunctionReturns')[index].containedValue.push(valsInOp[vio]);
                                     }
                                 }
                                 //func call
                                 if (nodeItem.value.func.value._astname === "Call" && 'id' in nodeItem.value.func.value) {
-                                    var calledFunction = complexityCalculatorHelperFunctions.getFunctionObject(nodeItem.value.func.value.id.v);
+                                    var calledFunction = ccHelpers.getFunctionObject(nodeItem.value.func.value.id.v);
                                     if (calledFunction != null) {
-                                        complexityCalculatorHelperFunctions.copyAttributes(calledFunction, complexityCalculatorState.getProperty('userFunctionReturns')[index], ["original", "binOp", "indexAndInput", "nodeElements", "stringElements", "nested"]);
+                                        ccHelpers.copyAttributes(calledFunction, ccState.getProperty('userFunctionReturns')[index], ["original", "binOp", "indexAndInput", "nodeElements", "stringElements", "nested"]);
                                         if (calledFunction.containedValue != null) {
-                                            complexityCalculatorHelperFunctions.appendArray(calledFunction.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue);
+                                            ccHelpers.appendArray(calledFunction.containedValue, ccState.getProperty('userFunctionReturns')[index].containedValue);
                                         }
                                         if (calledFunction.opsDone != null) {
-                                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.appendOpList(calledFunction.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.appendOpList(calledFunction.opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                         }
                                     }
                                 }
                                 //var
                                 if (nodeItem.value.func.value._astname === "Name") {
-                                    var valueVariable = complexityCalculatorHelperFunctions.getVariableObject(nodeItem.value.func.value.id.v);
+                                    var valueVariable = ccHelpers.getVariableObject(nodeItem.value.func.value.id.v);
                                     if (valueVariable != null) {
-                                        complexityCalculatorHelperFunctions.copyAttributes(valueVariable, complexityCalculatorState.getProperty('userFunctionReturns')[index], ["indexAndInput", "nested"]);
+                                        ccHelpers.copyAttributes(valueVariable, ccState.getProperty('userFunctionReturns')[index], ["indexAndInput", "nested"]);
                                         if (valueVariable.nodeElements.length > 0) {
-                                            complexityCalculatorState.getProperty('userFunctionReturns').nodeElements = [valueVariable.nodeElements[0]];
-                                            complexityCalculatorState.getProperty('userFunctionReturns').stringElements = [valueVariable.stringElements[0]];
+                                            ccState.getProperty('userFunctionReturns').nodeElements = [valueVariable.nodeElements[0]];
+                                            ccState.getProperty('userFunctionReturns').stringElements = [valueVariable.stringElements[0]];
                                         }
-                                        complexityCalculatorHelperFunctions.appendArray(valueVariable.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue);
-                                        complexityCalculatorHelperFunctions.appendOpList(valueVariable.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                        ccHelpers.appendArray(valueVariable.containedValue, ccState.getProperty('userFunctionReturns')[index].containedValue);
+                                        ccHelpers.appendOpList(valueVariable.opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     }
                                 }
                             }
-                            var funcRet = complexityCalculatorHelperFunctions.getFunctionObject(arg.id.v);
+                            var funcRet = ccHelpers.getFunctionObject(arg.id.v);
                             if (funcRet != null && funcRet.returns !== "" && funcRet.returns !== "BinOp") {
                                 foundFunc = true;
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = funcRet.returns;
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].returns = funcRet.returns;
                                 if (funcRet.containedValue != null) {
-                                    complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = funcRet.containedValue;
+                                    ccState.getProperty('userFunctionReturns')[index].containedValue = funcRet.containedValue;
                                 }
                                 if (funcRet.opsDone != null) {
-                                    complexityCalculatorHelperFunctions.appendOpList(funcRet.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    ccHelpers.appendOpList(funcRet.opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                 }
                             }
                             if (!foundFunc) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "func";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "func";
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
                             }
                         }
                         if (argType === "BinOp") {
                             var contVal = [];
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", complexityCalculatorState.getProperty('userFunctionReturns')[index], nodeItem.lineno);
-                            var binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(arg);
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('userFunctionReturns')[index], nodeItem.lineno);
+                            var binVal = ccHelpers.recursivelyAnalyzeBinOp(arg);
                             if (typeof binVal === "string") {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = binVal;
-                                complexityCalculatorHelperFunctions.listTypesWithin(arg, contVal, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].returns = binVal;
+                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
                             } else if (Array.isArray(binVal)) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = "List";
-                                complexityCalculatorHelperFunctions.listTypesWithin(arg, contVal, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].nodeElements = [{
+                                ccState.getProperty('userFunctionReturns')[index].returns = "List";
+                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].nodeElements = [{
                                     line: arg.lineno,
                                     elts: binVal
                                 }];
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].stringElements = [{
+                                ccState.getProperty('userFunctionReturns')[index].stringElements = [{
                                     line: arg.lineno,
-                                    elts: complexityCalculatorHelperFunctions.nodesToStrings(binVal)
+                                    elts: ccHelpers.nodesToStrings(binVal)
                                 }];
                             } else {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = "BinOp";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].binOp = binVal;
-                                complexityCalculatorHelperFunctions.listTypesWithin(arg, contVal, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                ccState.getProperty('userFunctionReturns')[index].returns = "BinOp";
+                                ccState.getProperty('userFunctionReturns')[index].binOp = binVal;
+                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                             }
                             if (contVal.length > 0) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = contVal;
+                                ccState.getProperty('userFunctionReturns')[index].containedValue = contVal;
                             }
                         }
                         if (argType === "List") {
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = "List";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = complexityCalculatorHelperFunctions.listTypesWithin(arg.elts, complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue,
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].nodeElements = [{
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = "List";
+                            ccState.getProperty('userFunctionReturns')[index].containedValue = ccHelpers.listTypesWithin(arg.elts, ccState.getProperty('userFunctionReturns')[index].containedValue,
+                                ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                            ccState.getProperty('userFunctionReturns')[index].nodeElements = [{
                                 line: arg.lineno,
                                 elts: arg.elts
                             }];
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].stringElements = [{
+                            ccState.getProperty('userFunctionReturns')[index].stringElements = [{
                                 line: arg.lineno,
-                                elts: complexityCalculatorHelperFunctions.nodesToStrings(arg.elts)
+                                elts: ccHelpers.nodesToStrings(arg.elts)
                             }];
                         }
                     }
@@ -1980,54 +1974,54 @@ function lookForParamReturns(node) {
                 var lineNumber = 0;
                 if (nodeItem.lineno != null) {
                     lineNumber = nodeItem.lineno;
-                    complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                    ccState.setProperty('parentLineNumber', lineNumber);
                 } else {
-                    lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                    lineNumber = ccState.getProperty('parentLineNumber');
                 }
-                var originality = (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber));
+                var originality = (ccState.getProperty('originalityLines').includes(lineNumber));
                 var startLine = 0;
                 var endLine = 0;
-                for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionReturns').length; f++) {
-                    if (complexityCalculatorState.getProperty('userFunctionReturns')[f].name === funcName && complexityCalculatorState.getProperty('userFunctionReturns')[f].paramsChanged != null) {
-                        modifiesParams = complexityCalculatorState.getProperty('userFunctionReturns')[f].paramsChanged;
-                        startLine = complexityCalculatorState.getProperty('userFunctionReturns')[f].startLine;
-                        endLine = complexityCalculatorState.getProperty('userFunctionReturns')[f].endLine;
+                for (var f = 0; f < ccState.getProperty('userFunctionReturns').length; f++) {
+                    if (ccState.getProperty('userFunctionReturns')[f].name === funcName && ccState.getProperty('userFunctionReturns')[f].paramsChanged != null) {
+                        modifiesParams = ccState.getProperty('userFunctionReturns')[f].paramsChanged;
+                        startLine = ccState.getProperty('userFunctionReturns')[f].startLine;
+                        endLine = ccState.getProperty('userFunctionReturns')[f].endLine;
                         break;
                     }
                 }
                 //update assignedModified for any params that the function modifies
                 for (var a = 0; a < argsIn.length; a++) {
                     if (modifiesParams.includes(a) && (argsIn[a]._astname === "Name" && argsIn[a].id.v !== "True" && argsIn[a].id.v !== "False")) {
-                        modString = complexityCalculatorState.getProperty('studentCode')[nodeItem.lineno - 1];
-                        for (var v = 0; v < complexityCalculatorState.getProperty('allVariables').length; v++) {
-                            if (complexityCalculatorState.getProperty('allVariables')[v].name === argsIn[a].id.v) {
+                        modString = ccState.getProperty('studentCode')[nodeItem.lineno - 1];
+                        for (var v = 0; v < ccState.getProperty('allVariables').length; v++) {
+                            if (ccState.getProperty('allVariables')[v].name === argsIn[a].id.v) {
                                 var lineNo = nodeItem.lineno;
-                                for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                                    if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                                        lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                                for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                                    if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                                        lineNo = ccState.getProperty('loopLocations')[h][0];
                                         break;
                                     }
                                 }
-                                complexityCalculatorState.getProperty('allVariables')[v].assignedModified.push({
+                                ccState.getProperty('allVariables')[v].assignedModified.push({
                                     line: lineNo,
-                                    value: complexityCalculatorState.getProperty('studentCode')[lineNumber].trim(),
+                                    value: ccState.getProperty('studentCode')[lineNumber].trim(),
                                     original: originality,
                                     nodeValue: nodeItem
                                 });
-                                complexityCalculatorState.getProperty("variableAssignments").push({ line: nodeItem.lineno, name: complexityCalculatorState.getProperty('allVariables')[v].name });
-                                complexityCalculatorState.getProperty('allVariables')[v].modifyingFunctions.push([startLine, endLine]);
+                                ccState.getProperty("variableAssignments").push({ line: nodeItem.lineno, name: ccState.getProperty('allVariables')[v].name });
+                                ccState.getProperty('allVariables')[v].modifyingFunctions.push([startLine, endLine]);
                                 break;
                             }
                         }
                     }
                 }
-                //Handle  complexityCalculatorState.getProperty("complexityCalculatorState.getProperty('uncalledFunctionLines')"). a functionExp is generally ALWAYS called.
-                for (var p = 0; p < complexityCalculatorState.getProperty("functionLines").length; p++) {
-                    if (complexityCalculatorState.getProperty("functionLines")[p].name === funcName) {
-                        //remove lines from  complexityCalculatorState.getProperty("complexityCalculatorState.getProperty('uncalledFunctionLines')")
-                        for (var l = 0; l < complexityCalculatorState.getProperty("functionLines")[p].lines.length; l++) {
-                            var lineIndex = complexityCalculatorState.getProperty('uncalledFunctionLines').indexOf(complexityCalculatorState.getProperty("functionLines")[p].lines[l]);
-                            complexityCalculatorState.getProperty('uncalledFunctionLines').splice(lineIndex, 1);
+                //Handle  ccState.getProperty("ccState.getProperty('uncalledFunctionLines')"). a functionExp is generally ALWAYS called.
+                for (var p = 0; p < ccState.getProperty("functionLines").length; p++) {
+                    if (ccState.getProperty("functionLines")[p].name === funcName) {
+                        //remove lines from  ccState.getProperty("ccState.getProperty('uncalledFunctionLines')")
+                        for (var l = 0; l < ccState.getProperty("functionLines")[p].lines.length; l++) {
+                            var lineIndex = ccState.getProperty('uncalledFunctionLines').indexOf(ccState.getProperty("functionLines")[p].lines[l]);
+                            ccState.getProperty('uncalledFunctionLines').splice(lineIndex, 1);
                         }
                         break;
                     }
@@ -2051,15 +2045,15 @@ function lookForParamReturns(node) {
             funcName = node.func.attr.v;
             nodeArgs = [node.func.value];
         } else if (node.func._astname === "Subscript") {
-            var nameNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
+            var nameNode = ccHelpers.retrieveFromList(node.func);
             if (nameNode._astname === "Name") {
                 funcName = nameNode.id.v;
             }
             argsIn = node.args;
         }
         //if we haven't stored the name yet, check the function renames in for loops
-        for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionParameters').length; f++) {
-            if (complexityCalculatorState.getProperty('userFunctionParameters')[f].name === funcName) {
+        for (var f = 0; f < ccState.getProperty('userFunctionParameters').length; f++) {
+            if (ccState.getProperty('userFunctionParameters')[f].name === funcName) {
                 alreadyExists = true;
                 funcInd = f;
                 break;
@@ -2067,10 +2061,10 @@ function lookForParamReturns(node) {
         }
         if (!alreadyExists) {
             var alias = null;
-            for (var h in complexityCalculatorState.getProperty('forLoopFuncs')) {
-                if (complexityCalculatorState.getProperty('forLoopFuncs')[h].callName === funcName) {
+            for (var h in ccState.getProperty('forLoopFuncs')) {
+                if (ccState.getProperty('forLoopFuncs')[h].callName === funcName) {
                     alreadyExists = true;
-                    funcNames = complexityCalculatorState.getProperty('forLoopFuncs')[h].functionNames;
+                    funcNames = ccState.getProperty('forLoopFuncs')[h].functionNames;
                     break;
                 }
             }
@@ -2081,31 +2075,31 @@ function lookForParamReturns(node) {
         for (var r in funcNames) {
             var foundName = false;
             var calledName = funcNames[r];
-            for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionParameters').length; f++) {
-                if (complexityCalculatorState.getProperty('userFunctionParameters')[f].name === calledName) {
+            for (var f = 0; f < ccState.getProperty('userFunctionParameters').length; f++) {
+                if (ccState.getProperty('userFunctionParameters')[f].name === calledName) {
                     foundName = true;
                     funcInd = f;
                     break;
                 }
             }
-            for (var p = 0; p < complexityCalculatorState.getProperty("functionLines").length; p++) {
-                for (var n = 0; n < complexityCalculatorState.getProperty('userFunctionRenames').length; n++) {
-                    if (complexityCalculatorState.getProperty('userFunctionRenames')[n][0] === calledName) {
-                        calledName = complexityCalculatorState.getProperty('userFunctionRenames')[n][1];
+            for (var p = 0; p < ccState.getProperty("functionLines").length; p++) {
+                for (var n = 0; n < ccState.getProperty('userFunctionRenames').length; n++) {
+                    if (ccState.getProperty('userFunctionRenames')[n][0] === calledName) {
+                        calledName = ccState.getProperty('userFunctionRenames')[n][1];
                     }
                 }
-                if (complexityCalculatorState.getProperty("functionLines")[p].name === calledName) {
-                    //remove lines from  complexityCalculatorState.getProperty("complexityCalculatorState.getProperty('uncalledFunctionLines')")
-                    for (var l = 0; l < complexityCalculatorState.getProperty("functionLines")[p].lines.length; l++) {
-                        var lineIndex = complexityCalculatorState.getProperty('uncalledFunctionLines').indexOf(complexityCalculatorState.getProperty("functionLines")[p].lines[l]);
-                        complexityCalculatorState.getProperty('uncalledFunctionLines').splice(lineIndex, 1);
+                if (ccState.getProperty("functionLines")[p].name === calledName) {
+                    //remove lines from  ccState.getProperty("ccState.getProperty('uncalledFunctionLines')")
+                    for (var l = 0; l < ccState.getProperty("functionLines")[p].lines.length; l++) {
+                        var lineIndex = ccState.getProperty('uncalledFunctionLines').indexOf(ccState.getProperty("functionLines")[p].lines[l]);
+                        ccState.getProperty('uncalledFunctionLines').splice(lineIndex, 1);
                     }
                     break;
                 }
             }
             var ops = [];
             var isRecursiveCall = false;
-            var calledReturnObj = complexityCalculatorHelperFunctions.getFunctionObject(calledName);
+            var calledReturnObj = ccHelpers.getFunctionObject(calledName);
             if (calledReturnObj != null) {
                 if (!('callsTo' in calledReturnObj)) {
                     calledReturnObj.callsTo = [];
@@ -2116,7 +2110,7 @@ function lookForParamReturns(node) {
                 isRecursiveCall = true;
             }
             if (foundName) {
-                //create a variable object for each parameter, adding to complexityCalculatorState.getProperty('allVariables')
+                //create a variable object for each parameter, adding to ccState.getProperty('allVariables')
                 for (var a = 0; a < argsIn.length; a++) {
                     var paramArgVar = {
                         name: "",
@@ -2140,58 +2134,58 @@ function lookForParamReturns(node) {
                     };
                     //get lineno, etc.
                     var lineNo = node.lineno;
-                    for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                        if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                            lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                    for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                        if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                            lineNo = ccState.getProperty('loopLocations')[h][0];
                             break;
                         }
                     }
                     if (!isRecursiveCall) {
                         paramArgVar.assignedModified.push({
                             line: lineNo,
-                            value: complexityCalculatorState.getProperty('studentCode')[node.lineno - 1].trim(),
+                            value: ccState.getProperty('studentCode')[node.lineno - 1].trim(),
                             nodeValue: node
                         });
-                        complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
+                        ccState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                     }
                     var alreadyExists = -1;
-                    for (var e = 0; e < complexityCalculatorState.getProperty('allVariables').length; e++) {
-                        if (complexityCalculatorState.getProperty('allVariables')[e].name === complexityCalculatorState.getProperty('userFunctionParameters')[funcInd].params[a]) {
+                    for (var e = 0; e < ccState.getProperty('allVariables').length; e++) {
+                        if (ccState.getProperty('allVariables')[e].name === ccState.getProperty('userFunctionParameters')[funcInd].params[a]) {
                             alreadyExists = e;
                             break;
                         }
                     }
                     if (funcInd != -1) {
-                        paramArgVar.name = complexityCalculatorState.getProperty('userFunctionParameters')[funcInd].params[a];
+                        paramArgVar.name = ccState.getProperty('userFunctionParameters')[funcInd].params[a];
                     }
                     //now we get the actual value
                     var argItem = argsIn[a];
                     if (argItem._astname === "UnaryOp") {
                         paramArgVar.value = "Bool";
-                        complexityCalculatorHelperFunctions.listTypesWithin(argsIn[a].operand, paramArgVar.containedValue, paramArgVar.indexAndInput, paramArgVar.opsDone);
+                        ccHelpers.listTypesWithin(argsIn[a].operand, paramArgVar.containedValue, paramArgVar.indexAndInput, paramArgVar.opsDone);
                         argItem = argItem.operand;
                     }
-                    if (complexityCalculatorHelperFunctions.retrieveFromList(argItem) != argItem) {
-                        if (complexityCalculatorHelperFunctions.getIndexingInNode(argItem)[0]) {
+                    if (ccHelpers.retrieveFromList(argItem) != argItem) {
+                        if (ccHelpers.getIndexingInNode(argItem)[0]) {
                             paramArgVar.indexAndInput.indexed = true;
                         }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(argItem)[0]) {
+                        if (ccHelpers.getStringIndexingInNode(argItem)[0]) {
                             paramArgVar.indexAndInput.strIndexed = true;
                         }
-                        argItem = complexityCalculatorHelperFunctions.retrieveFromList(argItem);
+                        argItem = ccHelpers.retrieveFromList(argItem);
                     }
                     if (argItem != null && argItem._astname === "Subscript") {
-                        if (complexityCalculatorHelperFunctions.getIndexingInNode(argItem)[0]) {
+                        if (ccHelpers.getIndexingInNode(argItem)[0]) {
                             paramArgVar.indexAndInput.indexed = true;
                         }
-                        if (complexityCalculatorHelperFunctions.getStringIndexingInNode(argItem)[0]) {
+                        if (ccHelpers.getStringIndexingInNode(argItem)[0]) {
                             paramArgVar.indexAndInput.strIndexed = true;
                         }
-                        argItem = complexityCalculatorHelperFunctions.retrieveFromList(argItem);
+                        argItem = ccHelpers.retrieveFromList(argItem);
                     }
                     if (argItem != null && argItem._astname === "UnaryOp") {
                         paramArgVar.value = "Bool";
-                        complexityCalculatorHelperFunctions.listTypesWithin(argsIn[a].operand, paramArgVar.containedValue, paramArgVar.indexAndInput, paramArgVar.opsDone);
+                        ccHelpers.listTypesWithin(argsIn[a].operand, paramArgVar.containedValue, paramArgVar.indexAndInput, paramArgVar.opsDone);
                         argItem = argItem.operand;
                     }
                     if (argItem != null) {
@@ -2199,20 +2193,20 @@ function lookForParamReturns(node) {
                         if (type === "Str") {
                             paramArgVar.value = "Str";
                         } else if (type === "AugAssign") {
-                            paramArgVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("AugAssign", paramArgVar.opsDone, node.lineno);
+                            paramArgVar.opsDone = ccHelpers.addOpToList("AugAssign", paramArgVar.opsDone, node.lineno);
                         } else if (type === "Num") {
-                            paramArgVar.value = complexityCalculatorHelperFunctions.isNodeFloat(node.args[a]) ? "Float" : "Int";
+                            paramArgVar.value = ccHelpers.isNodeFloat(node.args[a]) ? "Float" : "Int";
                         } else if (type === "Name" && (argsIn[a].id.v === "True" || argsIn[a].id.v === "False")) {
                             paramArgVar.value = "Bool";
                         } else if (type === "Name") {
                             var otherVar = node.args[a].id.v;
                             var foundOtherVar = false;
-                            var otherVariableLocated = complexityCalculatorHelperFunctions.getVariableObject(otherVar);
+                            var otherVariableLocated = ccHelpers.getVariableObject(otherVar);
                             if (otherVariableLocated != null && otherVariableLocated.value !== "" && otherVariableLocated.value !== "BinOp") {
                                 foundOtherVar = true;
-                                complexityCalculatorHelperFunctions.copyAttributes(otherVariableLocated, paramArgVar, ["value", "flagVal", "binOp", "nested", "indexAndInput", "original", "nodeElements", "stringElements"]);
-                                complexityCalculatorHelperFunctions.appendArray(otherVariableLocated.containedValue, paramArgVar.containedValue);
-                                paramArgVar.opsDone = complexityCalculatorHelperFunctions.appendOpList(otherVariableLocated.opsDone, paramArgVar.opsDone);
+                                ccHelpers.copyAttributes(otherVariableLocated, paramArgVar, ["value", "flagVal", "binOp", "nested", "indexAndInput", "original", "nodeElements", "stringElements"]);
+                                ccHelpers.appendArray(otherVariableLocated.containedValue, paramArgVar.containedValue);
+                                paramArgVar.opsDone = ccHelpers.appendOpList(otherVariableLocated.opsDone, paramArgVar.opsDone);
                             }
                             if (!foundOtherVar) {
                                 paramArgVar.funcVar = "var";
@@ -2220,12 +2214,12 @@ function lookForParamReturns(node) {
                             }
                         } else if (type === "BinOp") {
                             var nestedBinOp = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(node.args[a], nestedBinOp);
-                            paramArgVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", paramArgVar.opsDone, node.lineno);
+                            ccHelpers.getNestedVariables(node.args[a], nestedBinOp);
+                            paramArgVar.opsDone = ccHelpers.addOpToList("BinOp", paramArgVar.opsDone, node.lineno);
                             if (nestedBinOp.length > 0) {
                                 paramArgVar.nested = true;
                             }
-                            var binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(node.args[a]);
+                            var binVal = ccHelpers.recursivelyAnalyzeBinOp(node.args[a]);
                             if (binVal != null && typeof binVal === 'string' && !binVal.includes(':')) {
                                 paramArgVar.value = binVal;
                             } else if (binVal != null && Array.isArray(binVal)) {
@@ -2237,20 +2231,20 @@ function lookForParamReturns(node) {
                                 });
                                 paramArgVar.stringElements.push({
                                     line: node.lineno,
-                                    elts: complexityCalculatorHelperFunctions.nodesToStrings(binVal)
+                                    elts: ccHelpers.nodesToStrings(binVal)
                                 });
                             } else {
                                 //if we don't have an answer yet, store the binop object for later evaluation
                                 paramArgVar.value = "BinOp";
                                 paramArgVar.binOp = binVal;
                             }
-                            var binOpTypes = complexityCalculatorHelperFunctions.listTypesWithin(node.args[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
+                            var binOpTypes = ccHelpers.listTypesWithin(node.args[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
                             paramArgVar.containedVal = binOpTypes;
                         } else if (type === "Call") {
                             //then it's whatever that call returns
                             var funcName = "";
                             var item = argsIn[a].func;
-                            item = complexityCalculatorHelperFunctions.retrieveFromList(argsIn[a].func);
+                            item = ccHelpers.retrieveFromList(argsIn[a].func);
                             if ('id' in item) {
                                 funcName = item.id.v;
                             } else if ('attr' in item) {
@@ -2259,15 +2253,15 @@ function lookForParamReturns(node) {
                             if (funcName === 'readInput') {
                                 functionObject.indexAndInput.input = true;
                             }
-                            if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+                            if (ccState.getProperty('listFuncs').includes(funcName)) {
                                 valueType = "List";
-                                paramArgVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", paramArgVar.opsDone, node.lineno);
+                                paramArgVar.opsDone = ccHelpers.addOpToList("ListOp", paramArgVar.opsDone, node.lineno);
                                 if (node.value.func.value._astname === "List" || node.value.func.value._astname === "BinOp") {
-                                    var valuesInList = complexityCalculatorHelperFunctions.listTypesWithin(node.value.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
-                                    complexityCalculatorHelperFunctions.appendArray(valuesInList, paramArgVar.containedValue);
+                                    var valuesInList = ccHelpers.listTypesWithin(node.value.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
+                                    ccHelpers.appendArray(valuesInList, paramArgVar.containedValue);
                                 }
                                 //elts
-                                var eltsObj = complexityCalculatorHelperFunctions.performListOp(item);
+                                var eltsObj = ccHelpers.performListOp(item);
                                 paramArgVar.nodeElements.push({
                                     line: node.lineno,
                                     elts: eltsObj[0]
@@ -2278,13 +2272,13 @@ function lookForParamReturns(node) {
                                 });
                                 //func call
                                 if (node.value.func.value._astname === "Call") {
-                                    var paramCall = complexityCalculatorHelperFunctions.getFunctionObject(node.value.func.value.id.v);
+                                    var paramCall = ccHelpers.getFunctionObject(node.value.func.value.id.v);
                                     if (paramCall != null) {
                                         if (paramCall.containedValue != null) {
-                                            complexityCalculatorHelperFunctions.appendArray(paramCall.containedValue, paramArgVar.containedValue);
+                                            ccHelpers.appendArray(paramCall.containedValue, paramArgVar.containedValue);
                                         }
                                         if (paramCall.opsDone != null) {
-                                            paramArgVar.opsDone = complexityCalculatorHelperFunctions.appendOpList(paramCall.opsDone, paramArgVar.opsDone);
+                                            paramArgVar.opsDone = ccHelpers.appendOpList(paramCall.opsDone, paramArgVar.opsDone);
                                         }
                                         if (paramCall.nodeElements != null) {
                                             paramArgVar.nodeElements = paramCall.nodeElements;
@@ -2294,25 +2288,25 @@ function lookForParamReturns(node) {
                                 }
                                 //var
                                 if (node.value.func.value._astname === "Name") {
-                                    var calledVar = complexityCalculatorHelperFunctions.getVariableObject(node.value.func.value.id.v);
+                                    var calledVar = ccHelpers.getVariableObject(node.value.func.value.id.v);
                                     if (calledVar != null) {
-                                        complexityCalculatorHelperFunctions.appendArray(calledVar.containedValue, paramArgVar.containedValue);
-                                        paramArgVar.opsDone = complexityCalculatorHelperFunctions.appendOpList(calledVar.opsDone, paramArgVar.opsDone);
-                                        complexityCalculatorHelperFunctions.appendArray(paramCall.stringElements, paramArgVar.stringElements);
-                                        complexityCalculatorHelperFunctions.appendArray(paramCall.nodeElements, paramArgVar.nodeElements);
+                                        ccHelpers.appendArray(calledVar.containedValue, paramArgVar.containedValue);
+                                        paramArgVar.opsDone = ccHelpers.appendOpList(calledVar.opsDone, paramArgVar.opsDone);
+                                        ccHelpers.appendArray(paramCall.stringElements, paramArgVar.stringElements);
+                                        ccHelpers.appendArray(paramCall.nodeElements, paramArgVar.nodeElements);
                                     }
                                 }
                             }
                         } else if (type === "BoolOp") {
                             paramArgVar.value = "Bool";
-                            paramArgVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("BoolOp", paramArgVar.opsDone, node.lineno);
-                            var boolOpVals = complexityCalculatorHelperFunctions.listTypesWithin(argsIn[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
+                            paramArgVar.opsDone = ccHelpers.addOpToList("BoolOp", paramArgVar.opsDone, node.lineno);
+                            var boolOpVals = ccHelpers.listTypesWithin(argsIn[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
                             if (boolOpVals.length > 0) {
                                 paramArgVar.containedValue = boolOpVals;
                             }
                         } else if (type === "List") {
                             paramArgVar.value = "List";
-                            var containedVal = complexityCalculatorHelperFunctions.listTypesWithin(argsIn[a].elts, [], paramArgVar.indexAndInput, paramArgVar.opsDone);
+                            var containedVal = ccHelpers.listTypesWithin(argsIn[a].elts, [], paramArgVar.indexAndInput, paramArgVar.opsDone);
                             if (containedVal.length > 0) {
                                 paramArgVar.containedValue = containedVal;
                             }
@@ -2322,98 +2316,98 @@ function lookForParamReturns(node) {
                             });
                             paramArgVar.stringElements.push({
                                 line: node.lineno,
-                                elts: complexityCalculatorHelperFunctions.nodesToStrings(argsIn[a].elts, node.lineno)
+                                elts: ccHelpers.nodesToStrings(argsIn[a].elts, node.lineno)
                             });
                         } else if (type === "Compare") {
                             paramArgVar.value = "Bool";
-                            paramArgVar.opsDone = complexityCalculatorHelperFunctions.addOpToList("Compare", paramArgVar.opsDone, node.lineno);
-                            var compareTypes = complexityCalculatorHelperFunctions.listTypesWithin(argsIn[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
+                            paramArgVar.opsDone = ccHelpers.addOpToList("Compare", paramArgVar.opsDone, node.lineno);
+                            var compareTypes = ccHelpers.listTypesWithin(argsIn[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
                             if (compareTypes.length > 0) {
                                 paramArgVar.containedValue = compareTypes;
                             }
                         }
                         var index = -1;
-                        for (var userFuncRet = 0; userFuncRet < complexityCalculatorState.getProperty('userFunctionReturns').length; userFuncRet++) {
-                            if (complexityCalculatorState.getProperty('userFunctionReturns')[userFuncRet].name === funcName) {
+                        for (var userFuncRet = 0; userFuncRet < ccState.getProperty('userFunctionReturns').length; userFuncRet++) {
+                            if (ccState.getProperty('userFunctionReturns')[userFuncRet].name === funcName) {
                                 index = userFuncRet;
                                 break;
                             }
                         }
-                        if (paramArgVar.opsDone.length > 0 && index != -1 && complexityCalculatorState.getProperty('userFunctionReturns')[index].startLine != null) {
-                            paramArgVar.modifyingFunctions.push([complexityCalculatorState.getProperty('userFunctionReturns')[index].startLine, complexityCalculatorState.getProperty('userFunctionReturns')[index].endLine]);
+                        if (paramArgVar.opsDone.length > 0 && index != -1 && ccState.getProperty('userFunctionReturns')[index].startLine != null) {
+                            paramArgVar.modifyingFunctions.push([ccState.getProperty('userFunctionReturns')[index].startLine, ccState.getProperty('userFunctionReturns')[index].endLine]);
                         }
-                        if (alreadyExists > -1 && (complexityCalculatorState.getProperty('allVariables')[alreadyExists].value === "" && paramArgVar.value !== "")) {
-                            complexityCalculatorState.getProperty('allVariables')[alreadyExists] = paramArgVar;
+                        if (alreadyExists > -1 && (ccState.getProperty('allVariables')[alreadyExists].value === "" && paramArgVar.value !== "")) {
+                            ccState.getProperty('allVariables')[alreadyExists] = paramArgVar;
                         } else if (alreadyExists === -1) {
-                            complexityCalculatorState.getProperty('allVariables').push(paramArgVar);
-                            complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
+                            ccState.getProperty('allVariables').push(paramArgVar);
+                            ccState.getProperty("variableAssignments").push({ line: node.lineno, name: paramArgVar.name });
                         }
                     }
                 }
                 if (index > -1) {
-                    //if the functioncomplexityCalculatorState.getProperty('returns')this parameter, we tell it what that is
-                    if (complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar === "param") {
-                        var arg = node.args[complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal];
+                    //if the functionccState.getProperty('returns')this parameter, we tell it what that is
+                    if (ccState.getProperty('userFunctionReturns')[index].funcVar === "param") {
+                        var arg = node.args[ccState.getProperty('userFunctionReturns')[index].flagVal];
                         var argType = arg._astname;
                         var returnType = argType;
                         var containedWithin = [];
-                        if (complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone == null) {
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = [];
+                        if (ccState.getProperty('userFunctionReturns')[index].opsDone == null) {
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = [];
                         }
                         if (argType === "Num") {
-                            argType = complexityCalculatorHelperFunctions.isNodeFloat(arg) ? "Float" : "Int";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                            argType = ccHelpers.isNodeFloat(arg) ? "Float" : "Int";
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
                         }
                         if (argType === "Name" && (arg.id.v === "True" || arg.id.v === "False")) {
                             argType = "Bool";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
                         } else if (argType === "Name") {
                             var foundVar = false;
-                            for (var v = 0; v < complexityCalculatorState.getProperty('allVariables').length; v++) {
-                                if (complexityCalculatorState.getProperty('allVariables')[v].name === arg.id.v && complexityCalculatorState.getProperty('allVariables')[v].value !== "" && complexityCalculatorState.getProperty('allVariables')[v].value !== "BinOp") {
+                            for (var v = 0; v < ccState.getProperty('allVariables').length; v++) {
+                                if (ccState.getProperty('allVariables')[v].name === arg.id.v && ccState.getProperty('allVariables')[v].value !== "" && ccState.getProperty('allVariables')[v].value !== "BinOp") {
                                     foundVar = true;
-                                    argType = complexityCalculatorState.getProperty('allVariables')[v].value;
-                                    containedWithin = complexityCalculatorState.getProperty('allVariables')[v].containedValue;
-                                    complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.appendOpList(complexityCalculatorState.getProperty('allVariables')[v].opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    argType = ccState.getProperty('allVariables')[v].value;
+                                    containedWithin = ccState.getProperty('allVariables')[v].containedValue;
+                                    ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.appendOpList(ccState.getProperty('allVariables')[v].opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     break;
                                 }
                             }
                             if (foundVar) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].returns = argType;
                                 if (containedWithin.length > 0) {
-                                    complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
+                                    ccState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
                                 }
                             } else {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "var";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = arg.id.v;
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "var";
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = arg.id.v;
                             }
                         }
                         if (argType === "Compare") {
                             argType = "Bool";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("Compare", complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
-                            complexityCalculatorHelperFunctions.listTypesWithin(arg, containedWithin, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("Compare", ccState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
+                            ccHelpers.listTypesWithin(arg, containedWithin, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
                             if (containedWithin.length > 0) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
+                                ccState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
                             }
                         }
                         if (argType === "BoolOp") {
                             argType = "Bool";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("BoolOp", complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = argType;
-                            complexityCalculatorHelperFunctions.listTypesWithin(arg, containedWithin, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("BoolOp", ccState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = argType;
+                            ccHelpers.listTypesWithin(arg, containedWithin, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                             if (containedWithin.length > 0) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
+                                ccState.getProperty('userFunctionReturns')[index].containedValue = containedWithin;
                             }
                         }
                         if (argType === "Call") {
@@ -2425,116 +2419,116 @@ function lookForParamReturns(node) {
                                 funcName = node.value.func.attr.v;
                             }
                             if (funcName === 'readInput') {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput.input = true;
+                                ccState.getProperty('userFunctionReturns')[index].indexAndInput.input = true;
                             }
-                            if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+                            if (ccState.getProperty('listFuncs').includes(funcName)) {
                                 valueType = "List";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("ListOp", complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
+                                ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("ListOp", ccState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
                                 if (node.value.func.value._astname === "List") {
-                                    var valuesInList = complexityCalculatorHelperFunctions.listTypesWithin(node.value.func.value.elts, [], complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    var valuesInList = ccHelpers.listTypesWithin(node.value.func.value.elts, [], ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     for (var vil = 0; vil < valuesInList; vil++) {
-                                        complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue.push(valuesInList[vil]);
+                                        ccState.getProperty('userFunctionReturns')[index].containedValue.push(valuesInList[vil]);
                                     }
                                 }
                                 //binop
                                 if (node.value.func.value._astname === "BinOp") {
                                     var valsInOp = [];
-                                    complexityCalculatorHelperFunctions.listTypesWithin(node.value.func.value, valsInOp, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    ccHelpers.listTypesWithin(node.value.func.value, valsInOp, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     for (var vio = 0; vio < valsInOp.length; vio++) {
-                                        complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue.push(valsInOp[vio]);
+                                        ccState.getProperty('userFunctionReturns')[index].containedValue.push(valsInOp[vio]);
                                     }
                                 }
                                 //func call
                                 if (node.value.func.value._astname === "Call" && 'id' in node.value.func.value) {
-                                    var calledFunction = complexityCalculatorHelperFunctions.getFunctionObject(node.value.func.value.id.v);
+                                    var calledFunction = ccHelpers.getFunctionObject(node.value.func.value.id.v);
                                     if (calledFunction != null) {
-                                        complexityCalculatorHelperFunctions.copyAttributes(calledFunction, complexityCalculatorState.getProperty('userFunctionReturns')[index], ["original", "binOp", "indexAndInput", "nodeElements", "stringElements", "nested"]);
+                                        ccHelpers.copyAttributes(calledFunction, ccState.getProperty('userFunctionReturns')[index], ["original", "binOp", "indexAndInput", "nodeElements", "stringElements", "nested"]);
                                         if (calledFunction.containedValue != null) {
-                                            complexityCalculatorHelperFunctions.appendArray(calledFunction.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue);
+                                            ccHelpers.appendArray(calledFunction.containedValue, ccState.getProperty('userFunctionReturns')[index].containedValue);
                                         }
                                         if (calledFunction.opsDone != null) {
-                                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.appendOpList(calledFunction.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.appendOpList(calledFunction.opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                         }
                                     }
                                 }
                                 //var
                                 if (node.value.func.value._astname === "Name") {
-                                    var valueVariable = complexityCalculatorHelperFunctions.getVariableObject(node.value.func.value.id.v);
+                                    var valueVariable = ccHelpers.getVariableObject(node.value.func.value.id.v);
                                     if (valueVariable != null) {
-                                        complexityCalculatorHelperFunctions.copyAttributes(valueVariable, complexityCalculatorState.getProperty('userFunctionReturns')[index], ["indexAndInput", "nested"]);
+                                        ccHelpers.copyAttributes(valueVariable, ccState.getProperty('userFunctionReturns')[index], ["indexAndInput", "nested"]);
                                         if (valueVariable.nodeElements.length > 0) {
-                                            complexityCalculatorState.getProperty('userFunctionReturns').nodeElements = [valueVariable.nodeElements[0]];
-                                            complexityCalculatorState.getProperty('userFunctionReturns').stringElements = [valueVariable.stringElements[0]];
+                                            ccState.getProperty('userFunctionReturns').nodeElements = [valueVariable.nodeElements[0]];
+                                            ccState.getProperty('userFunctionReturns').stringElements = [valueVariable.stringElements[0]];
                                         }
-                                        complexityCalculatorHelperFunctions.appendArray(valueVariable.containedValue, complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue);
-                                        complexityCalculatorHelperFunctions.appendOpList(valueVariable.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                        ccHelpers.appendArray(valueVariable.containedValue, ccState.getProperty('userFunctionReturns')[index].containedValue);
+                                        ccHelpers.appendOpList(valueVariable.opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                     }
                                 }
                             }
-                            var funcRet = complexityCalculatorHelperFunctions.getFunctionObject(arg.id.v);
+                            var funcRet = ccHelpers.getFunctionObject(arg.id.v);
                             if (funcRet != null && funcRet.returns !== "" && funcRet.returns !== "BinOp") {
                                 foundFunc = true;
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = funcRet.returns;
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].returns = funcRet.returns;
                                 if (funcRet.containedValue != null) {
-                                    complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = funcRet.containedValue;
+                                    ccState.getProperty('userFunctionReturns')[index].containedValue = funcRet.containedValue;
                                 }
                                 if (funcRet.opsDone != null) {
-                                    complexityCalculatorHelperFunctions.appendOpList(funcRet.opsDone, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                    ccHelpers.appendOpList(funcRet.opsDone, ccState.getProperty('userFunctionReturns')[index].opsDone);
                                 }
                             }
                             if (!foundFunc) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "func";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "func";
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
                             }
                         }
                         if (argType === "BinOp") {
                             var contVal = [];
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone = complexityCalculatorHelperFunctions.addOpToList("BinOp", complexityCalculatorState.getProperty('userFunctionReturns')[index], node.lineno);
-                            var binVal = complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(arg);
+                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('userFunctionReturns')[index], node.lineno);
+                            var binVal = ccHelpers.recursivelyAnalyzeBinOp(arg);
                             if (typeof binVal === "string") {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = binVal;
-                                complexityCalculatorHelperFunctions.listTypesWithin(arg, contVal, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].returns = binVal;
+                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
                             } else if (Array.isArray(binVal)) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = "List";
-                                complexityCalculatorHelperFunctions.listTypesWithin(arg, contVal, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].nodeElements = [{
+                                ccState.getProperty('userFunctionReturns')[index].returns = "List";
+                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
+                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                                ccState.getProperty('userFunctionReturns')[index].nodeElements = [{
                                     line: arg.lineno,
                                     elts: binVal
                                 }];
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].stringElements = [{
+                                ccState.getProperty('userFunctionReturns')[index].stringElements = [{
                                     line: arg.lineno,
-                                    elts: complexityCalculatorHelperFunctions.nodesToStrings(binVal)
+                                    elts: ccHelpers.nodesToStrings(binVal)
                                 }];
                             } else {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = "BinOp";
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].binOp = binVal;
-                                complexityCalculatorHelperFunctions.listTypesWithin(arg, contVal, complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput, complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
+                                ccState.getProperty('userFunctionReturns')[index].returns = "BinOp";
+                                ccState.getProperty('userFunctionReturns')[index].binOp = binVal;
+                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
                             }
                             if (contVal.length > 0) {
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = contVal;
+                                ccState.getProperty('userFunctionReturns')[index].containedValue = contVal;
                             }
                         }
                         if (argType === "List") {
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].flagVal = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].returns = "List";
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue = complexityCalculatorHelperFunctions.listTypesWithin(arg.elts,
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].containedValue,
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].indexAndInput,
-                                complexityCalculatorState.getProperty('userFunctionReturns')[index].opsDone);
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].nodeElements = [{
+                            ccState.getProperty('userFunctionReturns')[index].flagVal = "";
+                            ccState.getProperty('userFunctionReturns')[index].funcVar = "";
+                            ccState.getProperty('userFunctionReturns')[index].returns = "List";
+                            ccState.getProperty('userFunctionReturns')[index].containedValue = ccHelpers.listTypesWithin(arg.elts,
+                                ccState.getProperty('userFunctionReturns')[index].containedValue,
+                                ccState.getProperty('userFunctionReturns')[index].indexAndInput,
+                                ccState.getProperty('userFunctionReturns')[index].opsDone);
+                            ccState.getProperty('userFunctionReturns')[index].nodeElements = [{
                                 line: arg.lineno,
                                 elts: arg.elts
                             }];
-                            complexityCalculatorState.getProperty('userFunctionReturns')[index].stringElements = [{
+                            ccState.getProperty('userFunctionReturns')[index].stringElements = [{
                                 line: arg.lineno,
-                                elts: complexityCalculatorHelperFunctions.nodesToStrings(arg.elts)
+                                elts: ccHelpers.nodesToStrings(arg.elts)
                             }];
                         }
                     }
@@ -2546,43 +2540,43 @@ function lookForParamReturns(node) {
                     lineNumber = 0;
                     if (node.lineno != null) {
                         lineNumber = node.lineno;
-                        complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                        ccState.setProperty('parentLineNumber', lineNumber);
                     } else {
-                        lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                        lineNumber = ccState.getProperty('parentLineNumber');
                     }
-                    var originality = (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber));
+                    var originality = (ccState.getProperty('originalityLines').includes(lineNumber));
                     funcName = node.func.id.v;
                     nodeArgs = node.args;
                     var startLine = 0;
                     var endLine = 0;
-                    for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionReturns').length; f++) {
-                        if (complexityCalculatorState.getProperty('userFunctionReturns')[f].name === funcName && complexityCalculatorState.getProperty('userFunctionReturns')[f].paramsChanged != null) {
-                            modifiesParams = complexityCalculatorState.getProperty('userFunctionReturns')[f].paramsChanged;
-                            startLine = complexityCalculatorState.getProperty('userFunctionReturns')[f].startLine;
-                            endLine = complexityCalculatorState.getProperty('userFunctionReturns')[f].endLine;
+                    for (var f = 0; f < ccState.getProperty('userFunctionReturns').length; f++) {
+                        if (ccState.getProperty('userFunctionReturns')[f].name === funcName && ccState.getProperty('userFunctionReturns')[f].paramsChanged != null) {
+                            modifiesParams = ccState.getProperty('userFunctionReturns')[f].paramsChanged;
+                            startLine = ccState.getProperty('userFunctionReturns')[f].startLine;
+                            endLine = ccState.getProperty('userFunctionReturns')[f].endLine;
                             break;
                         }
                     }
                     for (var a = 0; a < nodeArgs.length; a++) {
                         if (modifiesParams.includes(a) && (nodeArgs[a]._astname === "Name" && nodeArgs[a].id.v !== "True" && nodeArgs[a].id.v !== "False")) {
-                            modString = complexityCalculatorState.getProperty('studentCode')[node.lineno - 1];
-                            for (var v = 0; v < complexityCalculatorState.getProperty('allVariables').length; v++) {
-                                if (complexityCalculatorState.getProperty('allVariables')[v].name === nodeArgs[a].id.v) {
+                            modString = ccState.getProperty('studentCode')[node.lineno - 1];
+                            for (var v = 0; v < ccState.getProperty('allVariables').length; v++) {
+                                if (ccState.getProperty('allVariables')[v].name === nodeArgs[a].id.v) {
                                     var lineNo = node.lineno;
-                                    for (var h = 0; h < complexityCalculatorState.getProperty('loopLocations').length; h++) {
-                                        if (lineNo >= complexityCalculatorState.getProperty('loopLocations')[h][0] && lineNo <= complexityCalculatorState.getProperty('loopLocations')[h][1]) {
-                                            lineNo = complexityCalculatorState.getProperty('loopLocations')[h][0];
+                                    for (var h = 0; h < ccState.getProperty('loopLocations').length; h++) {
+                                        if (lineNo >= ccState.getProperty('loopLocations')[h][0] && lineNo <= ccState.getProperty('loopLocations')[h][1]) {
+                                            lineNo = ccState.getProperty('loopLocations')[h][0];
                                             break;
                                         }
                                     }
-                                    complexityCalculatorState.getProperty('allVariables')[v].assignedModified.push({
+                                    ccState.getProperty('allVariables')[v].assignedModified.push({
                                         line: lineNo,
-                                        value: complexityCalculatorState.getProperty('studentCode')[lineNumber].trim(),
+                                        value: ccState.getProperty('studentCode')[lineNumber].trim(),
                                         original: originality,
                                         nodeValue: node
                                     });
-                                    complexityCalculatorState.getProperty("variableAssignments").push({ line: node.lineno, name: complexityCalculatorState.getProperty('allVariables')[v].name });
-                                    complexityCalculatorState.getProperty('allVariables')[v].modifyingFunctions.push([startLine, endLine]);
+                                    ccState.getProperty("variableAssignments").push({ line: node.lineno, name: ccState.getProperty('allVariables')[v].name });
+                                    ccState.getProperty('allVariables')[v].modifyingFunctions.push([startLine, endLine]);
                                     break;
                                 }
                             }
@@ -2600,9 +2594,9 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         return;
     }
     var originality = false;
-    originality = (complexityCalculatorState.getProperty('originalityLines').includes(node.lineno));
+    originality = (ccState.getProperty('originalityLines').includes(node.lineno));
     //add to apiFunctionCalls
-    var functionNameNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
+    var functionNameNode = ccHelpers.retrieveFromList(node.func);
     if (functionNameNode != null && functionNameNode._astname == "Name") {
         //add to api function calls
         var callObject = {};
@@ -2610,11 +2604,11 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         callObject.function = functionNameNode.id.v;
         callObject.args = [];
         if (node.args != null) {
-            callObject.args = complexityCalculatorHelperFunctions.getArgValuesFromArray(node.args, node.lineno);
+            callObject.args = ccHelpers.getArgValuesFromArray(node.args, node.lineno);
         }
-        complexityCalculatorState.getProperty("allCalls").push(callObject);
-        if (apiFunctions.includes(functionNameNode.id.v)) {
-            complexityCalculatorState.getProperty("apiCalls").push(callObject);
+        ccState.getProperty("allCalls").push(callObject);
+        if (ccState.apiFunctions.includes(functionNameNode.id.v)) {
+            ccState.getProperty("apiCalls").push(callObject);
         }
     } else if (functionNameNode != null && 'attr' in functionNameNode) {
         var callObject = {};
@@ -2622,16 +2616,16 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         callObject.function = functionNameNode.attr.v;
         callObject.args = [];
         if (node.args != null) {
-            callObject.args = complexityCalculatorHelperFunctions.getArgValuesFromArray([functionNameNode.value], node.lineno);
+            callObject.args = ccHelpers.getArgValuesFromArray([functionNameNode.value], node.lineno);
         }
-        complexityCalculatorState.getProperty("allCalls").push(callObject);
+        ccState.getProperty("allCalls").push(callObject);
     }
     //if it's a function that's been renamed, we count this as variables being 3
     if (originality) {
         //go through function renames
         //the varname is the first one
-        for (var i in complexityCalculatorState.getProperty('userFunctionRenames')) {
-            if (complexityCalculatorState.getProperty('userFunctionRenames')[i][0] === functionNameNode.id.v && results.variables < 3) {
+        for (var i in ccState.getProperty('userFunctionRenames')) {
+            if (ccState.getProperty('userFunctionRenames')[i][0] === functionNameNode.id.v && results.variables < 3) {
                 results.variables = 3;
             }
         }
@@ -2646,31 +2640,31 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
     } else if ('attr' in node.func) {
         funcName = node.func.attr.v;
     } else if (node.func._astname === "Subscript") {
-        var nameNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
+        var nameNode = ccHelpers.retrieveFromList(node.func);
         if (nameNode._astname === "Name") {
             funcName = nameNode.id.v;
-            if (originality || complexityCalculatorHelperFunctions.getFunctionObject(funcName).original) {
+            if (originality || ccHelpers.getFunctionObject(funcName).original) {
                 results["List"] = 4;
             }
         }
-    } else if (complexityCalculatorHelperFunctions.retrieveFromList(node.func) != node.func) {
-        var nameNode = complexityCalculatorHelperFunctions.retrieveFromList(node.func);
+    } else if (ccHelpers.retrieveFromList(node.func) != node.func) {
+        var nameNode = ccHelpers.retrieveFromList(node.func);
         if (nameNode._astname === "Name") {
             funcName = nameNode.id.v;
-            if (originality || complexityCalculatorHelperFunctions.getFunctionObject(funcName).original) {
+            if (originality || ccHelpers.getFunctionObject(funcName).original) {
                 results["List"] = 4;
             }
         }
     }
-    for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionParameters').length; f++) {
-        if (complexityCalculatorState.getProperty('userFunctionParameters')[f].name === funcName) {
+    for (var f = 0; f < ccState.getProperty('userFunctionParameters').length; f++) {
+        if (ccState.getProperty('userFunctionParameters')[f].name === funcName) {
             foundFunc = true;
             functionParametersIndex = f;
             break;
         }
     }
     //using a list as a makeBeat() parameter counts as indexing it for a purpose.
-    if ((funcName === "makeBeat" || complexityCalculatorState.getProperty('makeBeatRenames').includes(funcName)) && results.lists < 4 && node.args.length > 0) {
+    if ((funcName === "makeBeat" || ccState.getProperty('makeBeatRenames').includes(funcName)) && results.lists < 4 && node.args.length > 0) {
         //see if the arg is a list
         //get the first argument
         var firstArg = node.args[0];
@@ -2681,11 +2675,11 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
             mbList = true;
         }
         if (firstArg._astname === "BinOp") {
-            if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(firstArg))) {
+            if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(firstArg))) {
                 mbList = true;
             }
             var nestedItems = [];
-            complexityCalculatorHelperFunctions.getNestedVariables(firstArg, nestedItems);
+            ccHelpers.getNestedVariables(firstArg, nestedItems);
             for (var f = 0; f < nestedItems.length; f++) {
                 if (nestedItems[f].original) {
                     listOrig = true;
@@ -2695,8 +2689,8 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         }
         if (firstArg._astname === "Call") {
             if ('id' in firstArg.func) {
-                //else, is it a UDF/api func thatcomplexityCalculatorState.getProperty('returns')a list?
-                var calledFunc = complexityCalculatorHelperFunctions.getFunctionObject(firstArg.func.id.v);
+                //else, is it a UDF/api func thatccState.getProperty('returns')a list?
+                var calledFunc = ccHelpers.getFunctionObject(firstArg.func.id.v);
                 if (calledFunc != null && calledFunc.returns === "List") {
                     mbList = true;
                 }
@@ -2708,7 +2702,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         if (firstArg._astname === "Name") {
             //find the variable
             if ('id' in firstArg) {
-                var argVar = complexityCalculatorHelperFunctions.getVariableObject(firstArg.id.v);
+                var argVar = ccHelpers.getVariableObject(firstArg.id.v);
                 if (argVar != null && argVar.value === "List") {
                     mbList = true;
                     listOrig = argVar.original;
@@ -2735,7 +2729,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         nodeArgs = node.args;
     }
     var funcNode = node.func;
-    funcNode = complexityCalculatorHelperFunctions.retrieveFromList(funcNode);
+    funcNode = ccHelpers.retrieveFromList(funcNode);
     //get the function's name and arguments
     if ('id' in node.func) {
         funcName = node.func.id.v;
@@ -2755,7 +2749,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
             }
         }
     }
-    var thisFuncReturnObj = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+    var thisFuncReturnObj = ccHelpers.getFunctionObject(funcName);
     if (thisFuncReturnObj != null && thisFuncReturnObj.original != null && thisFuncReturnObj.original === true) {
         functionOriginality = true;
     }
@@ -2783,13 +2777,13 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         if (singleArg._astname === "UnaryOp") {
             singleArg = singleArg.operand;
         }
-        if (complexityCalculatorHelperFunctions.retrieveFromList(singleArg) != singleArg) {
+        if (ccHelpers.retrieveFromList(singleArg) != singleArg) {
             var varsIn = [];
-            complexityCalculatorHelperFunctions.getNestedVariables(singleArg, varsIn);
+            ccHelpers.getNestedVariables(singleArg, varsIn);
             var anyOriginality = originality;
             if (!anyOriginality) {
                 for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                    if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
+                    if (ccHelpers.getVariableObject(varsIn[varIn]) != null && ccHelpers.getVariableObject(varsIn[varIn]).original) {
                         anyOriginality = true;
                         break;
                     }
@@ -2801,16 +2795,16 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         }
         if (singleArg != null && singleArg._astname === "Subscript") {
             if (originality) {
-                if (complexityCalculatorHelperFunctions.getIndexingInNode(singleArg)[0]) {
+                if (ccHelpers.getIndexingInNode(singleArg)[0]) {
                     results["List"] = 4;
                 }
             }
             var varsIn = [];
-            complexityCalculatorHelperFunctions.getNestedVariables(singleArg, varsIn);
+            ccHelpers.getNestedVariables(singleArg, varsIn);
             var anyOriginality = originality;
             if (!anyOriginality) {
                 for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                    if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
+                    if (ccHelpers.getVariableObject(varsIn[varIn]) != null && ccHelpers.getVariableObject(varsIn[varIn]).original) {
                         anyOriginality = true;
                         break;
                     }
@@ -2820,7 +2814,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 purposeVars = true;
             }
         }
-        singleArg = complexityCalculatorHelperFunctions.retrieveFromList(singleArg);
+        singleArg = ccHelpers.retrieveFromList(singleArg);
         //then - what type of argument is it?
         if (singleArg != null) {
             if (singleArg._astname === "UnaryOp") {
@@ -2831,38 +2825,38 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 var nameString = "";
                 var funcExpOriginality = false;
                 nameString += singleArg.lineno + "|" + singleArg.col_offset;
-                for (var i in complexityCalculatorState.getProperty('userFunctionParameters')) {
-                    if (complexityCalculatorState.getProperty('userFunctionParameters')[i].name === nameString) {
-                        if (complexityCalculatorState.getProperty('userFunctionParameters')[i].params.length > 0) {
-                            complexityCalculatorState.setProperty('takesArgs', true);
+                for (var i in ccState.getProperty('userFunctionParameters')) {
+                    if (ccState.getProperty('userFunctionParameters')[i].name === nameString) {
+                        if (ccState.getProperty('userFunctionParameters')[i].params.length > 0) {
+                            ccState.setProperty('takesArgs', true);
                         }
                         break;
                     }
                 }
-                if (complexityCalculatorHelperFunctions.getFunctionObject(nameString) != null && complexityCalculatorHelperFunctions.getFunctionObject(nameString).returns != null && complexityCalculatorHelperFunctions.getFunctionObject(nameString).returns !== "") {
-                    complexityCalculatorState.setProperty('returns', true);
+                if (ccHelpers.getFunctionObject(nameString) != null && ccHelpers.getFunctionObject(nameString).returns != null && ccHelpers.getFunctionObject(nameString).returns !== "") {
+                    ccState.setProperty('returns', true);
                 }
-                if (complexityCalculatorHelperFunctions.getFunctionObject(nameString).originality != null && complexityCalculatorHelperFunctions.getFunctionObject(nameString).originality === true) {
+                if (ccHelpers.getFunctionObject(nameString).originality != null && ccHelpers.getFunctionObject(nameString).originality === true) {
                     funcExpOriginality = true;
                 }
                 if ((originality || funcExpOriginality) && Number.isInteger(results.userFunc) && results.userFunc < 3) {
                     results.userFunc = 3;
                 }
-                if (complexityCalculatorState.getProperty('takesArgs') && !returns && results.userFunc === 3) {
+                if (ccState.getProperty('takesArgs') && !returns && results.userFunc === 3) {
                     results.userFunc = "Args";
-                } else if (!complexityCalculatorState.getProperty('takesArgs') && complexityCalculatorState.getProperty('returns') && (results.userFunc === 3)) {
+                } else if (!ccState.getProperty('takesArgs') && ccState.getProperty('returns') && (results.userFunc === 3)) {
                     results.userFunc = "Returns";
-                } else if ((!complexityCalculatorState.getProperty('takesArgs') && complexityCalculatorState.getProperty('returns') && results.userFunc === "Args") || ((complexityCalculatorState.getProperty('takesArgs') && !returns && results.userFunc === "Returns"))) {
+                } else if ((!ccState.getProperty('takesArgs') && ccState.getProperty('returns') && results.userFunc === "Args") || ((ccState.getProperty('takesArgs') && !returns && results.userFunc === "Returns"))) {
                     results.userFunc = "ReturnAndArgs"
-                } else if (complexityCalculatorState.getProperty('takesArgs') && complexityCalculatorState.getProperty('returns') && (results.userFunc === 3 || results.userFunc === "Args" || results.userFunc === "Returns")) {
+                } else if (ccState.getProperty('takesArgs') && ccState.getProperty('returns') && (results.userFunc === 3 || results.userFunc === "Args" || results.userFunc === "Returns")) {
                     results.userFunc = "ReturnAndArgs";
                 }
                 if (functionParametersIndex > -1) {
                     //if a matches an index, make a fake node and recursively analyze
-                    for (var paramFunc in complexityCalculatorState.getProperty('userFunctionParameters')[functionParametersIndex].paramFuncsCalled) {
-                        if (complexityCalculatorState.getProperty('userFunctionParameters')[functionParametersIndex].paramFuncsCalled[paramFunc].index === a) {
+                    for (var paramFunc in ccState.getProperty('userFunctionParameters')[functionParametersIndex].paramFuncsCalled) {
+                        if (ccState.getProperty('userFunctionParameters')[functionParametersIndex].paramFuncsCalled[paramFunc].index === a) {
                             //make a fake node
-                            var fakeNode = Object.assign({}, complexityCalculatorState.getProperty('userFunctionParameters')[functionParametersIndex].paramFuncsCalled[paramFunc].node);
+                            var fakeNode = Object.assign({}, ccState.getProperty('userFunctionParameters')[functionParametersIndex].paramFuncsCalled[paramFunc].node);
                             if (singleArg._astname === "Name") {
                                 fakeNode.func = Object.assign({}, singleArg);
                                 fakeNode.func._astname = "Name";
@@ -2880,22 +2874,22 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 //get the name and arguments
                 var funcName = "";
                 var argFunc = singleArg.func;
-                argFunc = complexityCalculatorHelperFunctions.retrieveFromList(argFunc);
+                argFunc = ccHelpers.retrieveFromList(argFunc);
                 if ('id' in argFunc) {
                     funcName = argFunc.id.v;
                 } else if ('attr' in argFunc) {
                     funcName = argFunc.attr.v;
                 }
-                if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+                if (ccState.getProperty('listFuncs').includes(funcName)) {
                     argResults["Lists"] = true;
                 }
                 if (funcName === "readInput") {
                     results.consoleInput = 3;
                 }
-                //getcomplexityCalculatorState.getProperty('returns')values
+                //getccState.getProperty('returns')values
                 var funcReturn = "";
                 var returnContains = [];
-                var funcItem = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                var funcItem = ccHelpers.getFunctionObject(funcName);
                 if (funcItem != null) {
                     funcReturn = funcItem.returns;
                     if (funcItem.containedValue != null) {
@@ -2929,12 +2923,12 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 var listValues = [];
                 if (originality) {
                     var operations = [];
-                    listValues = complexityCalculatorHelperFunctions.listTypesWithin(singleArg.elts, listValues, listInputIndexing, operations);
+                    listValues = ccHelpers.listTypesWithin(singleArg.elts, listValues, listInputIndexing, operations);
                     if (listInputIndexing.indexed) {
                         results["List"] = 4;
                     }
                 } else {
-                    listValues = complexityCalculatorHelperFunctions.listTypesWithin(singleArg.elts, listValues, { input: false, indexed: false, strIndexed: false }, []);
+                    listValues = ccHelpers.listTypesWithin(singleArg.elts, listValues, { input: false, indexed: false, strIndexed: false }, []);
                 }
                 listValues.forEach(function (arg) {
                     argResults[arg] = true;
@@ -2943,11 +2937,11 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     results.consoleInput = 3;
                 }
                 var varsIn = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(singleArg, varsIn);
+                ccHelpers.getNestedVariables(singleArg, varsIn);
                 var anyOriginality = originality;
                 if (!anyOriginality) {
                     for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                        if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
+                        if (ccHelpers.getVariableObject(varsIn[varIn]) != null && ccHelpers.getVariableObject(varsIn[varIn]).original) {
                             anyOriginality = true;
                             break;
                         }
@@ -2959,7 +2953,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
             } else if (singleArg._astname === 'Name' && singleArg.id.v !== "True" && singleArg.id.v !== "False") {
                 //if it's a variable, we mark its value/contained values
                 var lineNumberToUse = node.lineno;
-                var otherVar = complexityCalculatorHelperFunctions.getVariableObject(singleArg.id.v);
+                var otherVar = ccHelpers.getVariableObject(singleArg.id.v);
                 if (otherVar != null) {
                     purposeVars = true;
                     originalAssignment = otherVar.original;
@@ -2979,7 +2973,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 var assignOriginality = false;
                 var varType = "";
                 var varInput = false;
-                var otherVar = complexityCalculatorHelperFunctions.getVariableObject(singleArg.id.v);
+                var otherVar = ccHelpers.getVariableObject(singleArg.id.v);
                 if (otherVar != null) {
                     var numberOfMods = 0;
                     //check if the variable's value has been changed at least once after it was declared
@@ -3045,7 +3039,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     }
                 }
             } else if ((singleArg._astname === "BinOp" || singleArg._astname === "BoolOp" || singleArg._astname === "Compare" || singleArg._astname === "List")) {
-                if (complexityCalculatorHelperFunctions.getIndexingInNode(singleArg)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(singleArg)[1])) {
+                if (ccHelpers.getIndexingInNode(singleArg)[0] && (originality || ccHelpers.getIndexingInNode(singleArg)[1])) {
                     results["List"] = 4;
                 }
             }
@@ -3055,23 +3049,23 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 var withinBinOp = [];
                 var binOpComponentOriginality = false;
                 var containedInOp = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(singleArg, containedInOp);
+                ccHelpers.getNestedVariables(singleArg, containedInOp);
                 for (var u = 0; u < containedInOp.length; u++) {
-                    if (complexityCalculatorHelperFunctions.getVariableObject(containedInOp[u]) != null && complexityCalculatorHelperFunctions.getVariableObject(containedInOp[u]).original) {
+                    if (ccHelpers.getVariableObject(containedInOp[u]) != null && ccHelpers.getVariableObject(containedInOp[u]).original) {
                         binOpComponentOriginality = true;
                         break;
                     }
                 }
                 if (originality || binOpComponentOriginality) {
-                    if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(singleArg)) && results.listOps < 3) {
+                    if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(singleArg)) && results.listOps < 3) {
                         results.listOps = 3;
                     }
-                    if (complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(singleArg) === "Str" && results.strOps < 3) {
+                    if (ccHelpers.recursivelyAnalyzeBinOp(singleArg) === "Str" && results.strOps < 3) {
                         results.strOps = 3;
                     }
                 }
                 if (!originality) {
-                    complexityCalculatorHelperFunctions.listTypesWithin(singleArg, withinBinOp, { input: false, indexed: false, strIndexed: false }, []);
+                    ccHelpers.listTypesWithin(singleArg, withinBinOp, { input: false, indexed: false, strIndexed: false }, []);
                 } else {
                     var inputIndexPurpose = {
                         input: false,
@@ -3079,7 +3073,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                         strIndexed: false
                     };
                     var operations = [];
-                    complexityCalculatorHelperFunctions.listTypesWithin(singleArg, withinBinOp, inputIndexPurpose, operations);
+                    ccHelpers.listTypesWithin(singleArg, withinBinOp, inputIndexPurpose, operations);
                     if (inputIndexPurpose.input) {
                         results.consoleInput = 3;
                     }
@@ -3096,7 +3090,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 //if it's a bool op, we need all the values in that
                 var boolOpValues = [];
                 if (!originality) {
-                    complexityCalculatorHelperFunctions.listTypesWithin(singleArg, boolOpValues, {
+                    ccHelpers.listTypesWithin(singleArg, boolOpValues, {
                         input: false,
                         indexed: false,
                         strIndexed: false
@@ -3108,7 +3102,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                         strIndexed: false
                     };
                     var operations = [];
-                    complexityCalculatorHelperFunctions.listTypesWithin(singleArg, boolOpValues, inputForPurposeInArg, operations);
+                    ccHelpers.listTypesWithin(singleArg, boolOpValues, inputForPurposeInArg, operations);
                     if (inputForPurposeInArg.input) {
                         results.consoleInput = 3;
                     }
@@ -3128,12 +3122,12 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     strIndexed: false
                 };
                 if (!originality) {
-                    complexityCalculatorHelperFunctions.listTypesWithin(singleArg, compareValues, { input: false, indexed: false, strIndexed: false }, []);
+                    ccHelpers.listTypesWithin(singleArg, compareValues, { input: false, indexed: false, strIndexed: false }, []);
                 } else {
                     var compareInd = false;
                     var compareStrInd = false;
                     var operations = [];
-                    complexityCalculatorHelperFunctions.listTypesWithin(singleArg, compareValues, indexInputItem, operations);
+                    ccHelpers.listTypesWithin(singleArg, compareValues, indexInputItem, operations);
                     if (indexInputItem.indexed) {
                         results["List"] = 4;
                     }
@@ -3149,11 +3143,11 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 if (singleArg._astname === "Compare" && originality) { results.comparisons = 3; }
                 var modOriginality = false;
                 var allNamesWithin = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(singleArg, allNamesWithin);
+                ccHelpers.getNestedVariables(singleArg, allNamesWithin);
                 //if ANY of these is marked as original, assignment counts as original
                 var originalAssign = false
                 for (var n = 0; n < allNamesWithin.length; n++) {
-                    var otherVariable = complexityCalculatorHelperFunctions.getVariableObject(allNamesWithin[n]);
+                    var otherVariable = ccHelpers.getVariableObject(allNamesWithin[n]);
                     if (otherVariable != null) {
                         var argModded = false;
                         var containedVal = otherVariable.value;
@@ -3217,22 +3211,22 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         }
     }
     //if the function or its call is original, update in results
-    if ((originality || (complexityCalculatorHelperFunctions.getFunctionObject(funcName) != null && complexityCalculatorHelperFunctions.getFunctionObject(funcName).original != null && complexityCalculatorHelperFunctions.getFunctionObject(funcName).original))) {
+    if ((originality || (ccHelpers.getFunctionObject(funcName) != null && ccHelpers.getFunctionObject(funcName).original != null && ccHelpers.getFunctionObject(funcName).original))) {
         if (Number.isInteger(results.userFunc) && results.userFunc < 3 && foundFunc) { results.userFunc = 3; }
-        var funcFound = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+        var funcFound = ccHelpers.getFunctionObject(funcName);
         if (funcFound == null) {
             //is it in ForLoopFuncs instead???
             var fLF = null;
-            for (var f in complexityCalculatorState.getProperty('forLoopFuncs')) {
-                if (complexityCalculatorState.getProperty('forLoopFuncs')[f].callName === funcName) {
-                    fLF = complexityCalculatorState.getProperty('forLoopFuncs')[f];
+            for (var f in ccState.getProperty('forLoopFuncs')) {
+                if (ccState.getProperty('forLoopFuncs')[f].callName === funcName) {
+                    fLF = ccState.getProperty('forLoopFuncs')[f];
                     break;
                 }
             }
             if (fLF != null) {
                 //handle variable originality too
                 var forLoopOrig = false;
-                if (!originality && complexityCalculatorState.getProperty('originalityLines').includes(fLF.startLine)) {
+                if (!originality && ccState.getProperty('originalityLines').includes(fLF.startLine)) {
                     //this is done only if the call isn't original, for efficiency's sake
                     forLoopOrig = true;
                 }
@@ -3240,20 +3234,20 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     results.variables = 4;
                 }
                 for (var otherName in fLF.functionNames) {
-                    var otherFunc = complexityCalculatorHelperFunctions.getFunctionObject(fLF.functionNames[otherName]);
+                    var otherFunc = ccHelpers.getFunctionObject(fLF.functionNames[otherName]);
                     var paramFuncIndex = -1;
                     if (otherFunc != null) {
                         if (Number.isInteger(results.userFunc) && results.userFunc < 3) {
                             results.userFunc = 3;
                         }
-                        for (var f = 0; f < complexityCalculatorState.getProperty('userFunctionParameters').length; f++) {
-                            if (complexityCalculatorState.getProperty('userFunctionParameters')[f].name === fLF.functionNames[otherName]) {
+                        for (var f = 0; f < ccState.getProperty('userFunctionParameters').length; f++) {
+                            if (ccState.getProperty('userFunctionParameters')[f].name === fLF.functionNames[otherName]) {
                                 paramFuncIndex = f;
                                 break;
                             }
                         }
                         if (otherFunc != null && otherFunc.returns !== "" && otherFunc.returns != null) {
-                            complexityCalculatorState.setProperty('returns', true);
+                            ccState.setProperty('returns', true);
                         }
                         if (otherFunc.indexAndInput != null) {
                             if (otherFunc.indexAndInput.indexed) {
@@ -3263,8 +3257,8 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                                 results.consoleInput = 3;
                             }
                         }
-                        if (complexityCalculatorState.getProperty('userFunctionParameters')[paramFuncIndex].params.length > 0) {
-                            complexityCalculatorState.setProperty('takesArgs', true);
+                        if (ccState.getProperty('userFunctionParameters')[paramFuncIndex].params.length > 0) {
+                            ccState.setProperty('takesArgs', true);
                         }
                     }
                 }
@@ -3272,7 +3266,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
         } else if (foundFunc) {
             //update results
             if (funcFound != null && funcFound.returns !== "" && funcFound.returns != null) {
-                complexityCalculatorState.setProperty('returns', true);
+                ccState.setProperty('returns', true);
             }
             if (funcFound.indexAndInput != null) {
                 if (funcFound.indexAndInput.indexed) {
@@ -3282,17 +3276,17 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     results.consoleInput = 3;
                 }
             }
-            if (functionParametersIndex != -1 && complexityCalculatorState.getProperty('userFunctionParameters')[functionParametersIndex].params.length > 0) {
-                complexityCalculatorState.setProperty('takesArgs', true);
+            if (functionParametersIndex != -1 && ccState.getProperty('userFunctionParameters')[functionParametersIndex].params.length > 0) {
+                ccState.setProperty('takesArgs', true);
             }
         }
-        if (complexityCalculatorState.getProperty('takesArgs') && !returns && results.userFunc === 3) {
+        if (ccState.getProperty('takesArgs') && !returns && results.userFunc === 3) {
             results.userFunc = "Args";
-        } else if (!complexityCalculatorState.getProperty('takesArgs') && complexityCalculatorState.getProperty('returns') && (results.userFunc === 3)) {
+        } else if (!ccState.getProperty('takesArgs') && ccState.getProperty('returns') && (results.userFunc === 3)) {
             results.userFunc = "Returns";
-        } else if ((!complexityCalculatorState.getProperty('takesArgs') && complexityCalculatorState.getProperty('returns') && results.userFunc === "Args") || ((complexityCalculatorState.getProperty('takesArgs') && !returns && results.userFunc === "Returns"))) {
+        } else if ((!ccState.getProperty('takesArgs') && ccState.getProperty('returns') && results.userFunc === "Args") || ((ccState.getProperty('takesArgs') && !returns && results.userFunc === "Returns"))) {
             results.userFunc = "ReturnAndArgs"
-        } else if (complexityCalculatorState.getProperty('takesArgs') && complexityCalculatorState.getProperty('returns') && (results.userFunc === 3 || results.userFunc === "Args" || results.userFunc === "Returns")) {
+        } else if (ccState.getProperty('takesArgs') && ccState.getProperty('returns') && (results.userFunc === 3 || results.userFunc === "Args" || results.userFunc === "Returns")) {
             results.userFunc = "ReturnAndArgs";
         }
     }
@@ -3306,11 +3300,11 @@ function analyzeASTNode(node, results, loopParent) {
         var lineNumber = 0;
         if (node.lineno != null) {
             lineNumber = node.lineno;
-            complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+            ccState.setProperty('parentLineNumber', lineNumber);
         } else {
-            lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+            lineNumber = ccState.getProperty('parentLineNumber');
         }
-        if (!complexityCalculatorState.getProperty('uncalledFunctionLines').includes(lineNumber + 1)) {
+        if (!ccState.getProperty('uncalledFunctionLines').includes(lineNumber + 1)) {
             //initilize usage booleans
             var uses = {
                 variables: false,
@@ -3327,9 +3321,9 @@ function analyzeASTNode(node, results, loopParent) {
             if (node._astname === 'Assign' || node[0] === 'Assign') {
                 uses["variables"] = true;
             }
-            if (node._astname === "Name" && node.id.v !== "True" && node.id.v !== "False" && complexityCalculatorHelperFunctions.getVariableObject(node.id.v) != null) {
+            if (node._astname === "Name" && node.id.v !== "True" && node.id.v !== "False" && ccHelpers.getVariableObject(node.id.v) != null) {
                 uses["variables"] = true;
-                if (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber) && results.variables < 2) {
+                if (ccState.getProperty('originalityLines').includes(lineNumber) && results.variables < 2) {
                     results.variables = 2;
                 }
             }
@@ -3342,7 +3336,7 @@ function analyzeASTNode(node, results, loopParent) {
             }
             //look for conditionals
             if (node._astname === 'If') {
-                complexityCalculatorHelperFunctions.notateConditional(node);
+                ccHelpers.notateConditional(node);
                 uses["conditionals"] = true;
                 if (node.test._astname === "Compare") {
                     usesCompare = true;
@@ -3351,11 +3345,11 @@ function analyzeASTNode(node, results, loopParent) {
                 if (node.test._astname === "BoolOp" || node.test._astname === "UnaryOp") {
                     usesBooleans = true;
                     var names = [];
-                    complexityCalculatorHelperFunctions.getNestedVariables(node.test, names);
+                    ccHelpers.getNestedVariables(node.test, names);
                     if (names.length > 0) { usesVarsWithPurpose = true; }
                     var anyOriginalNested = false;
                     for (var i = 0; i < names.length; i++) {
-                        var nameItem = complexityCalculatorHelperFunctions.getVariableObject(names[i]);
+                        var nameItem = ccHelpers.getVariableObject(names[i]);
                         if (nameItem != null && nameItem.original) {
                             anyOriginalNested = true;
                             break;
@@ -3397,35 +3391,35 @@ function analyzeASTNode(node, results, loopParent) {
                 //then we have to check the WHOLE NODE for originality
                 lineNumber = node.lineno - 1;
                 //lastLine = node.body[node.body.length - 1].lineno + 1;
-                var lastLine = complexityCalculatorHelperFunctions.getLastLine(node);
+                var lastLine = ccHelpers.getLastLine(node);
                 for (var chunkLine = node.lineno; chunkLine <= lastLine; chunkLine++) {
-                    if (complexityCalculatorState.getProperty('originalityLines').includes(chunkLine)) {
+                    if (ccState.getProperty('originalityLines').includes(chunkLine)) {
                         originality = true;
                         break;
                     }
                 }
                 //tree originaity, if we ever want to switch to this measure
-                // originality = complexityCalculatorHelperFunctions.TreeOriginality(node, 1, STRUCTURE_SAMPLES);
+                // originality = ccHelpers.TreeOriginality(node, 1, STRUCTURE_SAMPLES);
             } else {
                 //then this is one line and we only need to check a single line
                 lineNumber = 0;
                 if (node.lineno != null) {
                     lineNumber = node.lineno;
-                    complexityCalculatorState.setProperty('parentLineNumber', lineNumber);
+                    ccState.setProperty('parentLineNumber', lineNumber);
                 } else {
-                    lineNumber = complexityCalculatorState.getProperty('parentLineNumber');
+                    lineNumber = ccState.getProperty('parentLineNumber');
                 }
-                originality = (complexityCalculatorState.getProperty('originalityLines').includes(lineNumber));
+                originality = (ccState.getProperty('originalityLines').includes(lineNumber));
             }
             //originality value updates for functions, variables, etc.
             if (originality) {
                 if (node.id != null && node.id.v != null) {
-                    var foundVar = complexityCalculatorHelperFunctions.getVariableObject(node.id.v);
+                    var foundVar = ccHelpers.getVariableObject(node.id.v);
                     if (foundVar != null) {
                         var varName = foundVar.name;
-                        for (var f = 0; f < complexityCalculatorState.getProperty('allVariables').length; f++) {
-                            if (complexityCalculatorState.getProperty('allVariables')[f].name === varName) {
-                                complexityCalculatorState.getProperty('allVariables')[f].original = true; //the variable is assigned in  unique line
+                        for (var f = 0; f < ccState.getProperty('allVariables').length; f++) {
+                            if (ccState.getProperty('allVariables')[f].name === varName) {
+                                ccState.getProperty('allVariables')[f].original = true; //the variable is assigned in  unique line
                                 break;
                             }
                         }
@@ -3444,11 +3438,11 @@ function analyzeASTNode(node, results, loopParent) {
                     }
                     //does this function take arguments or return values? //TODO can we get rid of this???? I fell like it's wrong
                     if (node.args.args.length > 0) {
-                        complexityCalculatorState.setProperty('takesArgs', true);
+                        ccState.setProperty('takesArgs', true);
                     }
                     for (var i = 0; i < node.body.length; i++) {
                         if (node.body[i]._astname === 'Return') {
-                            complexityCalculatorState.setProperty('returns', true);
+                            ccState.setProperty('returns', true);
                             break;
                         }
                     }
@@ -3462,7 +3456,7 @@ function analyzeASTNode(node, results, loopParent) {
                         results["List"] = 4;
                     }
                     if (node.iter._astname === "Name") {
-                        var iterName = complexityCalculatorHelperFunctions.getVariableObject(node.iter.id.v);
+                        var iterName = ccHelpers.getVariableObject(node.iter.id.v);
                         if (iterName != null) {
                             if (iterName.value === "List") {
                                 results["List"] = 4;
@@ -3470,8 +3464,8 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                     }
                     if ('func' in node.iter) {
-                        if ('id' in node.iter.func && complexityCalculatorHelperFunctions.getFunctionObject(node.iter.func.id.v) != null) {
-                            var iterator = complexityCalculatorHelperFunctions.getFunctionObject(node.iter.func.id.v);
+                        if ('id' in node.iter.func && ccHelpers.getFunctionObject(node.iter.func.id.v) != null) {
+                            var iterator = ccHelpers.getFunctionObject(node.iter.func.id.v);
                             if (iterator.returns === "List") {
                                 results["List"] = 4;
                             }
@@ -3530,9 +3524,9 @@ function analyzeASTNode(node, results, loopParent) {
                     var anyOr = originality;
                     if (!originality) {
                         var unaryNames = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(testNode, unaryNames);
+                        ccHelpers.getNestedVariables(testNode, unaryNames);
                         for (var p in unaryNames) {
-                            var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                            var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                             if (isVar != null && isVar.original) {
                                 anyOr = true;
                                 break;
@@ -3544,10 +3538,10 @@ function analyzeASTNode(node, results, loopParent) {
                 }
                 //first, go through and grab all the bits of the test statement, whatever that may be
                 if (testNode._astname === "Subscript") {
-                    var isIndexedItem = complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0];
-                    var isStrIndexedItem = complexityCalculatorHelperFunctions.getStringIndexingInNode(testNode)[0];
+                    var isIndexedItem = ccHelpers.getIndexingInNode(testNode)[0];
+                    var isStrIndexedItem = ccHelpers.getStringIndexingInNode(testNode)[0];
                     if (isIndexedItem) { results["List"] = 4; }
-                    testNode = complexityCalculatorHelperFunctions.retrieveFromList(testNode);
+                    testNode = ccHelpers.retrieveFromList(testNode);
                 }
                 //unary op handling
                 //YES, this is in here twice. That IS intentional. -Erin
@@ -3555,9 +3549,9 @@ function analyzeASTNode(node, results, loopParent) {
                     var anyOr = originality;
                     if (!originality) {
                         var unaryNames = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(testNode, unaryNames);
+                        ccHelpers.getNestedVariables(testNode, unaryNames);
                         for (var p in unaryNames) {
-                            var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                            var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                             if (isVar != null && isVar.original) {
                                 anyOr = true;
                                 break;
@@ -3573,11 +3567,11 @@ function analyzeASTNode(node, results, loopParent) {
                 //check for using for a purpose inside the test
                 if (testNode != null && testNode._astname === "Compare") {
                     //update indexing variables
-                    if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
+                    if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        complexityCalculatorHelperFunctions.listTypesWithin(testNode, containedTypes, {
+                        ccHelpers.listTypesWithin(testNode, containedTypes, {
                             input: false,
                             indexed: false,
                             strIndexed: false
@@ -3590,7 +3584,7 @@ function analyzeASTNode(node, results, loopParent) {
                             strIndexed: false
                         };
                         var operations = [];
-                        complexityCalculatorHelperFunctions.listTypesWithin(testNode, containedTypes, inputIndexItem, operations);
+                        ccHelpers.listTypesWithin(testNode, containedTypes, inputIndexItem, operations);
                         if (inputIndexItem.indexed) {
                             results["List"] = 4;
                         }
@@ -3605,18 +3599,18 @@ function analyzeASTNode(node, results, loopParent) {
                         input: false,
                         strIndexed: false
                     };
-                    if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
+                    if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        complexityCalculatorHelperFunctions.listTypesWithin(testNode, containedTypes, {
+                        ccHelpers.listTypesWithin(testNode, containedTypes, {
                             indexed: false,
                             input: false,
                             strIndexed: false
                         }, []);
                     } else {
                         var operations = [];
-                        complexityCalculatorHelperFunctions.listTypesWithin(testNode, containedTypes, inputIndexItem, operations);
+                        ccHelpers.listTypesWithin(testNode, containedTypes, inputIndexItem, operations);
                     }
                     if (inputIndexItem.indexed) {
                         results["List"] = 4;
@@ -3631,18 +3625,18 @@ function analyzeASTNode(node, results, loopParent) {
                         indexed: false,
                         strIndexed: false
                     };
-                    if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
+                    if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        complexityCalculatorHelperFunctions.listTypesWithin(testNode, containedTypes, {
+                        ccHelpers.listTypesWithin(testNode, containedTypes, {
                             input: false,
                             indexed: false,
                             strIndexed: false
                         }, []);
                     } else {
                         var operations = [];
-                        complexityCalculatorHelperFunctions.listTypesWithin(testNode, containedTypes, inputIndexPurp, operations);
+                        ccHelpers.listTypesWithin(testNode, containedTypes, inputIndexPurp, operations);
                     }
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
@@ -3657,18 +3651,18 @@ function analyzeASTNode(node, results, loopParent) {
                         indexed: false,
                         strIndexed: false
                     };
-                    if (complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(testNode)[1])) {
+                    if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        containedTypes = complexityCalculatorHelperFunctions.listTypesWithin(testNode.elts, containedTypes, {
+                        containedTypes = ccHelpers.listTypesWithin(testNode.elts, containedTypes, {
                             input: false,
                             indexed: false,
                             strIndexed: false
                         }, []);
                     } else {
                         var operations = [];
-                        containedTypes = complexityCalculatorHelperFunctions.listTypesWithin(testNode.elts, containedTypes, inputIndexPurp, operations);
+                        containedTypes = ccHelpers.listTypesWithin(testNode.elts, containedTypes, inputIndexPurp, operations);
                     }
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
@@ -3682,7 +3676,7 @@ function analyzeASTNode(node, results, loopParent) {
                     if (testNode.id.v !== "True" && testNode.id.v !== "False") {
                         var value = "";
                         var containedValInTest = null;
-                        var testVar = complexityCalculatorHelperFunctions.getVariableObject(testNode.id.v);
+                        var testVar = ccHelpers.getVariableObject(testNode.id.v);
                         if (testVar != null) {
                             value = testVar.value;
                             if (testVar.indexAndInput.input) {
@@ -3718,7 +3712,7 @@ function analyzeASTNode(node, results, loopParent) {
                     }
                     //get the return value from the function
                     var callReturnVal = "";
-                    var returnFrom = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                    var returnFrom = ccHelpers.getFunctionObject(funcName);
                     if (returnFrom != null) {
                         callReturnVal = returnFrom.returns;
                         if (returnFrom.containedValue != null) {
@@ -3745,7 +3739,7 @@ function analyzeASTNode(node, results, loopParent) {
                 if (testNode != null && testNode._astname === "Name" && testNode.id.v !== "True" && testNode.id.v !== "False") {
                     var originalAssign = false;
                     var varInput = false;
-                    var testVariable = complexityCalculatorHelperFunctions.getVariableObject(node.test.id.v);
+                    var testVariable = ccHelpers.getVariableObject(node.test.id.v);
                     if (testVariable != null) {
                         var argModded = false;
                         var insideOutside = "outside"; //this will get set to "inside" if this call is within another function
@@ -3802,11 +3796,11 @@ function analyzeASTNode(node, results, loopParent) {
                     var originalAssign = false;
                     var varInput = false;
                     var allNamesWithin = [];
-                    complexityCalculatorHelperFunctions.getNestedVariables(testNode, allNamesWithin);
+                    ccHelpers.getNestedVariables(testNode, allNamesWithin);
                     //if ANY of these is marked as original, assignment counts as original
                     var originalAssign = false
                     for (var n = 0; n < allNamesWithin.length; n++) {
-                        var varWithin = complexityCalculatorHelperFunctions.getVariableObject(allNamesWithin[n]);
+                        var varWithin = ccHelpers.getVariableObject(allNamesWithin[n]);
                         if (varWithin != null) {
                             var insideOutside = "outside"; //this will get set to "inside" if this call is within another function
                             var insideLines = [-1, -1];
@@ -3870,9 +3864,9 @@ function analyzeASTNode(node, results, loopParent) {
                     var anyOr = originality;
                     if (!originality) {
                         var unaryNames = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(nodeIter, unaryNames);
+                        ccHelpers.getNestedVariables(nodeIter, unaryNames);
                         for (var p in unaryNames) {
-                            var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                            var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                             if (isVar != null && isVar.original) {
                                 anyOr = true;
                                 break;
@@ -3881,7 +3875,7 @@ function analyzeASTNode(node, results, loopParent) {
                     }
                     nodeIter = nodeIter.operand;
                 }
-                nodeIter = complexityCalculatorHelperFunctions.retrieveFromList(nodeIter);
+                nodeIter = ccHelpers.retrieveFromList(nodeIter);
                 if (nodeIter._astname === "UnaryOp") { nodeIter = nodeIter.operand; }
                 //these won't get anayzed automatically
                 analyzeASTNode(node.iter, results, loopParent);
@@ -3905,9 +3899,9 @@ function analyzeASTNode(node, results, loopParent) {
                                 var binOpStrIndex = false;
                                 if (originality) { //actually look for stuff if originality
                                     var operations = [];
-                                    complexityCalculatorHelperFunctions.listTypesWithin(nodeIter.args[fa], [], inputIndexItem, operations);
+                                    ccHelpers.listTypesWithin(nodeIter.args[fa], [], inputIndexItem, operations);
                                 } else { //feed it empty lists/objects
-                                    complexityCalculatorHelperFunctions.listTypesWithin(note.iter.args[fa], [], { input: false, indexed: false, strIndexed: false }, []);
+                                    ccHelpers.listTypesWithin(note.iter.args[fa], [], { input: false, indexed: false, strIndexed: false }, []);
                                 }
                                 //update results
                                 if (inputIndexItem.input && results.consoleInput < 3) {
@@ -3923,7 +3917,7 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                     } else if (nodeIter._astname === "List") {
                         //other things are also iterable!
-                        if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter)[0]) {
+                        if (ccHelpers.getIndexingInNode(nodeIter)[0]) {
                             results["List"] = 4;
                         }
                         datatypesUsed.push("List");
@@ -3933,7 +3927,7 @@ function analyzeASTNode(node, results, loopParent) {
                             strIndexed: false
                         };
                         var operations = [];
-                        var listTypes = complexityCalculatorHelperFunctions.listTypesWithin(nodeIter.elts, [], inputIndexItem, operations);
+                        var listTypes = ccHelpers.listTypesWithin(nodeIter.elts, [], inputIndexItem, operations);
                         for (var a = 0; a < listTypes.length; a++) {
                             datatypesUsed.push(listTypes[a]);
                         }
@@ -3948,7 +3942,7 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                     } else if (nodeIter._astname === "Name") {
                         //iterator is a variable
-                        var iteratorVar = complexityCalculatorHelperFunctions.getVariableObject(nodeIter.id.v);
+                        var iteratorVar = ccHelpers.getVariableObject(nodeIter.id.v);
                         if (iteratorVar != null) {
                             if (iteratorVar.value === "List") {
                                 results[iteratorVar.value] = 4;
@@ -3969,12 +3963,12 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                     } else if (nodeIter._astname === "BinOp") {
-                        if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter)[0]) {
+                        if (ccHelpers.getIndexingInNode(nodeIter)[0]) {
                             results["List"] = 4;
                         }
                         var iterableBinOpTypes = [];
                         var inputBinOp = false;
-                        var isList = Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeIter));
+                        var isList = Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeIter));
                         if (isList) {
                             results["List"] = 4;
                         }
@@ -3993,29 +3987,29 @@ function analyzeASTNode(node, results, loopParent) {
                         if ('id' in nodeIter.func) {
                             funcName = nodeIter.func.id.v;
                         } else if (nodeIter.func._astname === "Subscript") {
-                            var subscriptCall = complexityCalculatorHelperFunctions.retrieveFromList(nodeIter.func);
+                            var subscriptCall = ccHelpers.retrieveFromList(nodeIter.func);
                             if (subscriptCall._astname === "Name") {
                                 funcName = subscriptCall.id.v;
                             }
                         } else {
                             funcName = nodeIter.func.attr.v;
                         }
-                        if (complexityCalculatorState.getProperty('listFuncs').includes(funcName)) {
+                        if (ccState.getProperty('listFuncs').includes(funcName)) {
                             results.listOps = 3;
                         }
-                        for (var u = 0; u < complexityCalculatorState.getProperty('userFunctionReturns').length; u++) {
-                            if (complexityCalculatorState.getProperty('userFunctionReturns')[u].name === funcName) {
-                                results[complexityCalculatorState.getProperty('userFunctionReturns')[u].returns] = 3;
-                                if (originality && complexityCalculatorState.getProperty('userFunctionReturns')[u].indexAndInput.indexed) {
+                        for (var u = 0; u < ccState.getProperty('userFunctionReturns').length; u++) {
+                            if (ccState.getProperty('userFunctionReturns')[u].name === funcName) {
+                                results[ccState.getProperty('userFunctionReturns')[u].returns] = 3;
+                                if (originality && ccState.getProperty('userFunctionReturns')[u].indexAndInput.indexed) {
                                     results["List"] = 4;
                                 }
                             }
-                            if (complexityCalculatorState.getProperty('userFunctionReturns')[u].containedValue != null) {
-                                for (var cv = 0; cv < complexityCalculatorState.getProperty('userFunctionReturns')[u].containedValue.length; cv++) {
-                                    if (complexityCalculatorState.getProperty('userFunctionReturns')[u].containedValue[cv] === "List") {
+                            if (ccState.getProperty('userFunctionReturns')[u].containedValue != null) {
+                                for (var cv = 0; cv < ccState.getProperty('userFunctionReturns')[u].containedValue.length; cv++) {
+                                    if (ccState.getProperty('userFunctionReturns')[u].containedValue[cv] === "List") {
                                         results["List"] = 4;
                                     } else {
-                                        results[complexityCalculatorState.getProperty('userFunctionReturns')[u].containedValue[cv]] = 3;
+                                        results[ccState.getProperty('userFunctionReturns')[u].containedValue[cv]] = 3;
                                     }
                                 }
                             }
@@ -4035,16 +4029,16 @@ function analyzeASTNode(node, results, loopParent) {
                     } else if ('attr' in nodeIter.func) {
                         iterFuncName = nodeIter.func.attr.v;
                     } else if (nodeIter.func._astname === "Subscript") {
-                        var iterNameNode = complexityCalculatorHelperFunctions.retrieveFromList(nodeIter.func);
+                        var iterNameNode = ccHelpers.retrieveFromList(nodeIter.func);
                         if (iterNameNode._astname === "Name") {
                             iterFuncName = iterNameNode.id.v;
                         }
                         var varsIn = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(nodeIter.func, varsIn);
+                        ccHelpers.getNestedVariables(nodeIter.func, varsIn);
                         var anyOriginal = originality;
                         if (!anyOriginal) {
                             for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                                if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
+                                if (ccHelpers.getVariableObject(varsIn[varIn]) != null && ccHelpers.getVariableObject(varsIn[varIn]).original) {
                                     anyOriginal = true;
                                     break;
                                 }
@@ -4055,13 +4049,13 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                     }
                     //is it a call to function with a nested variable? let us check
-                    var iterArgFunc = complexityCalculatorHelperFunctions.getFunctionObject(iterFuncName);
+                    var iterArgFunc = ccHelpers.getFunctionObject(iterFuncName);
                     if (iterArgFunc != null && iterArgFunc.nested != null && iterArgFunc.nested) {
                         purposeVars = true;
                     }
                     for (var t = 0; t < nodeIter.args.length; t++) {
                         if (nodeIter.args[t]._astname === "Name") {
-                            var argVar = complexityCalculatorHelperFunctions.getVariableObject(nodeIter.args[t].id.v);
+                            var argVar = ccHelpers.getVariableObject(nodeIter.args[t].id.v);
                             //get input and indexing
                             if (argVar != null) {
                                 if (argVar.indexAndInput.input) {
@@ -4077,15 +4071,15 @@ function analyzeASTNode(node, results, loopParent) {
                             if (nodeIter.args[t]._astname === "Compare" && originality) {
                                 results.comparisons = 3;
                             }
-                            if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter.args[t])[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter.args[t])[1])) {
+                            if (ccHelpers.getIndexingInNode(nodeIter.args[t])[0] && (originality || ccHelpers.getIndexingInNode(nodeIter.args[t])[1])) {
                                 results["List"] = 4;
                             }
                             var allNamesWithin = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeIter.args[t], allNamesWithin);
+                            ccHelpers.getNestedVariables(nodeIter.args[t], allNamesWithin);
                             //if ANY of these is marked as original, assignment counts as original
                             var originalAssign = false
                             for (var n = 0; n < allNamesWithin.length; n++) {
-                                var nestedVar = complexityCalculatorHelperFunctions.getVariableObject(allNamesWithin[n]);
+                                var nestedVar = ccHelpers.getVariableObject(allNamesWithin[n]);
                                 if (nestedVar != null) {
                                     var containedVal = nestedVar.value;
                                     if (nestedVar.indexAndInput.input) {
@@ -4111,15 +4105,15 @@ function analyzeASTNode(node, results, loopParent) {
                                 if (nodeIter.args[t].value._astname === "Subscript" && (getNestedIndexing(nodeIter.args[t].value))) {
                                     results["List"] = 4;
                                 }
-                                if (nodeIter.args[t].value._astname === "BinOp" && Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeIter.args[t].value))) {
+                                if (nodeIter.args[t].value._astname === "BinOp" && Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeIter.args[t].value))) {
                                     results["List"] = 4;
                                 }
                                 if (nodeIter.args[t].value._astname === "Call") {
-                                    if ('id' in nodeIter.args[t].value && (complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.args[t].value.id.v) != null && complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.args[t].value.id.v).returns === "List")) {
+                                    if ('id' in nodeIter.args[t].value && (ccHelpers.getFunctionObject(nodeIter.args[t].value.id.v) != null && ccHelpers.getFunctionObject(nodeIter.args[t].value.id.v).returns === "List")) {
                                         results["List"] = 4;
                                     }
                                 }
-                                if (nodeIter.args[t].value._astname === "Name" && (complexityCalculatorHelperFunctions.getVariableObject(nodeIter.args[t].value.id.v).value === "List")) {
+                                if (nodeIter.args[t].value._astname === "Name" && (ccHelpers.getVariableObject(nodeIter.args[t].value.id.v).value === "List")) {
                                     results["List"] = 4;
                                 }
                             }
@@ -4129,12 +4123,12 @@ function analyzeASTNode(node, results, loopParent) {
                 //iterating over a list
                 if (nodeIter._astname === "List") {
                     var listVars = [];
-                    listVars = complexityCalculatorHelperFunctions.getNestedVariables(nodeIter, listVars);
-                    if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeIter)[0] && originality) {
+                    listVars = ccHelpers.getNestedVariables(nodeIter, listVars);
+                    if (ccHelpers.getIndexingInNode(nodeIter)[0] && originality) {
                         results["List"] = 4;
                     }
                     for (var m = 0; m < listVars.length; m++) {
-                        var listVariable = complexityCalculatorHelperFunctions.getVariableObject(listVars[m]);
+                        var listVariable = ccHelpers.getVariableObject(listVars[m]);
                         if (listVariable != null) {
                             //var init
                             var argModded = false;
@@ -4158,20 +4152,20 @@ function analyzeASTNode(node, results, loopParent) {
                                 }
                             }
                             var numberOfMods = 0;
-                            for (var z = 0; z < complexityCalculatorState.getProperty('allVariables')[m].assignedModified.length; z++) {
-                                if (complexityCalculatorState.getProperty('allVariables')[m].assignedModified[z].line > node.lineno) { break; } //stop loop before we get to the current line OR if both thigns we're looking for are already set to true.
+                            for (var z = 0; z < ccState.getProperty('allVariables')[m].assignedModified.length; z++) {
+                                if (ccState.getProperty('allVariables')[m].assignedModified[z].line > node.lineno) { break; } //stop loop before we get to the current line OR if both thigns we're looking for are already set to true.
                                 //is there a modification? is it original?
                                 if ((insideOutside === "inside" && node.lineno >= insideLines[0] && node.lineno <= insideLines[1]) || (insideOutside === "outside" && !insideLines.includes(node.lineno))) {
                                     argModded = true;
                                     numberOfMods += 1;
-                                    if (complexityCalculatorState.getProperty('allVariables')[m].assignedModified[z].original) { modOriginality = true; }
+                                    if (ccState.getProperty('allVariables')[m].assignedModified[z].original) { modOriginality = true; }
                                 }
                             }
                             //update results
                             if (argModded && (originality || modOriginality) && ((insideOutside === "outside" && numberOfMods > 1) || (insideOutside === "inside" && numberOfMods > 0))) {
                                 results.variables = 4;
                             }
-                            if (complexityCalculatorState.getProperty('allVariables')[a].nested && (results.variables < 3) && (originality || complexityCalculatorState.getProperty('allVariables')[a].original)) {
+                            if (ccState.getProperty('allVariables')[a].nested && (results.variables < 3) && (originality || ccState.getProperty('allVariables')[a].original)) {
                                 results.variables = 3;
                             }
                         }
@@ -4190,18 +4184,18 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                         if (nodeIter.value._astname === "BinOp") {
-                            if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeIter.value))) {
+                            if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeIter.value))) {
                                 results["List"] = 4;
                             }
-                            if (complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeIter.value) === "Str") {
+                            if (ccHelpers.recursivelyAnalyzeBinOp(nodeIter.value) === "Str") {
                                 var anyOriginality = false;
                                 if (originality) {
                                     anyOriginality = true;
                                 } else {
                                     var allVarsIn = [];
-                                    complexityCalculatorHelperFunctions.getNestedVariables(nodeIter.value, allVarsIn);
+                                    ccHelpers.getNestedVariables(nodeIter.value, allVarsIn);
                                     for (var o = 0; o < allVarsIn.length; o++) {
-                                        if (complexityCalculatorHelperFunctions.getVariableObject(allVarsIn[o]).original) {
+                                        if (ccHelpers.getVariableObject(allVarsIn[o]).original) {
                                             anyOriginality = true;
                                             break;
                                         }
@@ -4210,20 +4204,20 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                         if (nodeIter.value._astname === "Call") {
-                            //is it a listop, concat binop, OR a UDF thatcomplexityCalculatorState.getProperty('returns')a list
+                            //is it a listop, concat binop, OR a UDF thatccState.getProperty('returns')a list
                             if (originality) {
-                                if ('id' in nodeIter.value && complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.value.id.v) != null && complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.value.id.v).returns === "List") {
+                                if ('id' in nodeIter.value && ccHelpers.getFunctionObject(nodeIter.value.id.v) != null && ccHelpers.getFunctionObject(nodeIter.value.id.v).returns === "List") {
                                     results["List"] = 4;
                                 }
                                 //is it a string op
-                                if ('id' in nodeIter.value && complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.value.id.v) != null && complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.value.id.v).returns === "Str") {
+                                if ('id' in nodeIter.value && ccHelpers.getFunctionObject(nodeIter.value.id.v) != null && ccHelpers.getFunctionObject(nodeIter.value.id.v).returns === "Str") {
                                     results["List"] = 4;
                                 }
                             }
                             //is it a UDF and what does it return
                             if ('func' in nodeIter.value) {
                                 var isUserFunc = null;
-                                isUserFunc = complexityCalculatorHelperFunctions.getFunctionObject(nodeIter.value.func.id.v);
+                                isUserFunc = ccHelpers.getFunctionObject(nodeIter.value.func.id.v);
                                 if (isUserFunc != null) {
                                     if (isUserFunc.returns === "List" && (originality || isUserFunc.original)) {
                                         results["List"] = 4;
@@ -4233,7 +4227,7 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                         if (nodeIter.value._astname === "Name") {
                             //is it indexing a variable that contains a list?
-                            if (complexityCalculatorHelperFunctions.getVariableObject(nodeIter.value.id.v).value === "List" && (originality || complexityCalculatorHelperFunctions.getVariableObject(nodeIter.value.id.v).original)) {
+                            if (ccHelpers.getVariableObject(nodeIter.value.id.v).value === "List" && (originality || ccHelpers.getVariableObject(nodeIter.value.id.v).original)) {
                                 results["List"] = 4;
                             }
                         }
@@ -4245,9 +4239,9 @@ function analyzeASTNode(node, results, loopParent) {
                 if (testItem._astname === "UnaryOp") {
                     if (!originality) {
                         var unaryNames = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(testItem, unaryNames);
+                        ccHelpers.getNestedVariables(testItem, unaryNames);
                         for (var p in unaryNames) {
-                            var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                            var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                             if (isVar != null && isVar.original) {
                                 break;
                             }
@@ -4263,11 +4257,11 @@ function analyzeASTNode(node, results, loopParent) {
                     if (testItem.value._astname === "Subscript" && getNestedIndexing(testItem.value)) {
                         results["List"] = 4;
                     }
-                    if (testItem.value._astname === "BinOp" && Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(testItem.value))) {
+                    if (testItem.value._astname === "BinOp" && Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(testItem.value))) {
                         results["List"] = 4;
                     }
                     if (testItem.value._astname === "Call") {
-                        //is it a listop, concat binop, OR a UDF thatcomplexityCalculatorState.getProperty('returns')a list
+                        //is it a listop, concat binop, OR a UDF thatccState.getProperty('returns')a list
                         if ('id' in testItem.func) {
                             var calledFunc = getUserFunctionReturn(testItem.func.id.v);
                             if (calledFunc != null && calledFunc.returns === "List") {
@@ -4275,17 +4269,17 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                     }
-                    if (testItem.value._astname === "Name" && complexityCalculatorHelperFunctions.getVariableObject(testItem.value.id.v).value === "List") {
+                    if (testItem.value._astname === "Name" && ccHelpers.getVariableObject(testItem.value.id.v).value === "List") {
                         results["List"] = 4;
                     }
                 }
-                testItem = complexityCalculatorHelperFunctions.retrieveFromList(testItem);
+                testItem = ccHelpers.retrieveFromList(testItem);
                 if (testItem._astname === "UnaryOp") {
                     if (!originality) {
                         var unaryNames = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(testItem, unaryNames);
+                        ccHelpers.getNestedVariables(testItem, unaryNames);
                         for (var p in unaryNames) {
-                            var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                            var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                             if (isVar != null && isVar.original) {
                                 break;
                             }
@@ -4309,12 +4303,12 @@ function analyzeASTNode(node, results, loopParent) {
                     if (funcName === 'readInput') {
                         inputUsed = true;
                     }
-                    if (complexityCalculatorHelperFunctions.getFunctionObject(funcName).indexAndInput.indexed && (originality || complexityCalculatorHelperFunctions.getFunctionObject(funcName).original)) {
+                    if (ccHelpers.getFunctionObject(funcName).indexAndInput.indexed && (originality || ccHelpers.getFunctionObject(funcName).original)) {
                         results["List"] = 4;
                     }
                     //get the rturn value
                     var callReturnVal = "";
-                    var calledFunc = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                    var calledFunc = ccHelpers.getFunctionObject(funcName);
                     if (calledFunc != null) {
                         callReturnVal = calledFunc.returns;
                         if (calledFunc.containedValue != null) {
@@ -4347,7 +4341,7 @@ function analyzeASTNode(node, results, loopParent) {
                         strIndexed: false
                     };
                     var operations = [];
-                    complexityCalculatorHelperFunctions.listTypesWithin(testItem, allTypes, useInput, operations);
+                    ccHelpers.listTypesWithin(testItem, allTypes, useInput, operations);
                     if (testItem._astname === "Compare" && originality) {
                         results.comparisons = 3;
                     }
@@ -4361,10 +4355,10 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                     }
-                    var nestedVars = complexityCalculatorHelperFunctions.getNestedVariables(testItem, []);
+                    var nestedVars = ccHelpers.getNestedVariables(testItem, []);
                     var anyOriginality = false;
                     for (var i = 0; i < nestedVars.length; i++) {
-                        var nestVar = complexityCalculatorHelperFunctions.getVariableObject(nestedVars[i]);
+                        var nestVar = ccHelpers.getVariableObject(nestedVars[i]);
                         if (nestVar != null && nestVar.original) {
                             anyOriginality = true;
                             break;
@@ -4383,7 +4377,7 @@ function analyzeASTNode(node, results, loopParent) {
                     if ('func' in testItem) {
                         if (originality) {
                             var functionName = testItem.func.id.v;
-                            var testFunc = complexityCalculatorHelperFunctions.getFunctionObject(functionName);
+                            var testFunc = ccHelpers.getFunctionObject(functionName);
                             if (testFunc != null) {
                                 if (testFunc.nested) {
                                     purposeVars = true;
@@ -4404,7 +4398,7 @@ function analyzeASTNode(node, results, loopParent) {
                 }
                 //if the test is a variable
                 if (testItem._astname === "Name") {
-                    var argVar = complexityCalculatorHelperFunctions.getVariableObject(testItem.id.v);
+                    var argVar = ccHelpers.getVariableObject(testItem.id.v);
                     if (argVar != null) {
                         var varInput = false;
                         if (argVar.indexAndInput.input) {
@@ -4444,12 +4438,12 @@ function analyzeASTNode(node, results, loopParent) {
                     }
                     // we need variable NAMEs
                     var allNamesWithin = [];
-                    complexityCalculatorHelperFunctions.getNestedVariables(testItem, allNamesWithin);
+                    ccHelpers.getNestedVariables(testItem, allNamesWithin);
                     //if ANY of these is marked as original, assignment counts as original
                     var originalAssign = false;
                     var varInput = false;
                     for (var n = 0; n < allNamesWithin.length; n++) {
-                        var testVariable = complexityCalculatorHelperFunctions.getVariableObject(allNamesWithin[n]);
+                        var testVariable = ccHelpers.getVariableObject(allNamesWithin[n]);
                         if (testVariable != null) {
                             var containedVal = testVariable.value;
                             if (testVariable.indexAndInput.input) { varInput = true; }
@@ -4492,9 +4486,9 @@ function analyzeASTNode(node, results, loopParent) {
                         var anyOr = originality;
                         if (!originality) {
                             var unaryNames = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeValue, unaryNames);
+                            ccHelpers.getNestedVariables(nodeValue, unaryNames);
                             for (var p in unaryNames) {
-                                var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                                var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                                 if (isVar != null && isVar.original) {
                                     anyOr = true;
                                     break;
@@ -4515,10 +4509,10 @@ function analyzeASTNode(node, results, loopParent) {
                         if (nodeValue.value._astname === "Subscript" && getNestedIndexing(nodeValue.value)) {
                             results["List"] = 4;
                         }
-                        if (nodeValue.value._astname === "BinOp" && Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeValue.value))) {
+                        if (nodeValue.value._astname === "BinOp" && Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeValue.value))) {
                             results["List"] = 4;
                         }
-                        if (nodeValue.value._astname === "Call") {  //is it a listop, concat binop, OR a UDF thatcomplexityCalculatorState.getProperty('returns')a list
+                        if (nodeValue.value._astname === "Call") {  //is it a listop, concat binop, OR a UDF thatccState.getProperty('returns')a list
                             if ('id' in nodeValue.func) {
                                 var calledFunc = getUserFunctionReturn(nodeValue.func.id.v);
                                 if (calledFunc != null && calledFunc.returns === "List") {
@@ -4526,18 +4520,18 @@ function analyzeASTNode(node, results, loopParent) {
                                 }
                             }
                         }
-                        if (nodeValue.value._astname === "Name" && complexityCalculatorHelperFunctions.getVariableObject(nodeValue.value.id.v) != null && complexityCalculatorHelperFunctions.getVariableObject(nodeValue.value.id.v).value === "List") {
+                        if (nodeValue.value._astname === "Name" && ccHelpers.getVariableObject(nodeValue.value.id.v) != null && ccHelpers.getVariableObject(nodeValue.value.id.v).value === "List") {
                             results["List"] = 4;
                         }
                     }
-                    nodeValue = complexityCalculatorHelperFunctions.retrieveFromList(nodeValue);
+                    nodeValue = ccHelpers.retrieveFromList(nodeValue);
                     if (nodeValue != null && nodeValue._astname === "UnaryOp") {
                         var anyOr = originality;
                         if (!originality) {
                             var unaryNames = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeValue, unaryNames);
+                            ccHelpers.getNestedVariables(nodeValue, unaryNames);
                             for (var p in unaryNames) {
-                                var isVar = complexityCalculatorHelperFunctions.getVariableObject(unaryNames[p]);
+                                var isVar = ccHelpers.getVariableObject(unaryNames[p]);
                                 if (isVar != null && isVar.original) {
                                     anyOr = true;
                                     break;
@@ -4560,7 +4554,7 @@ function analyzeASTNode(node, results, loopParent) {
                         var assignOriginality = false;
                         var varType = "";
                         var varInput = false;
-                        var otherVar = complexityCalculatorHelperFunctions.getVariableObject(nodeValue.id.v);
+                        var otherVar = ccHelpers.getVariableObject(nodeValue.id.v);
                         if (otherVar != null) {
                             var numberOfMods = 0;
                             //is the use inside or outside a function?
@@ -4613,15 +4607,15 @@ function analyzeASTNode(node, results, loopParent) {
                 }
                 for (var e in nodesToCheck) {
                     var nodeToCheck = nodesToCheck[e];
-                    if (complexityCalculatorHelperFunctions.retrieveFromList(nodeToCheck) != nodeToCheck) {
+                    if (ccHelpers.retrieveFromList(nodeToCheck) != nodeToCheck) {
                         var varsIn = [];
-                        nodeToCheck = complexityCalculatorHelperFunctions.retrieveFromList(nodeToCheck);
+                        nodeToCheck = ccHelpers.retrieveFromList(nodeToCheck);
                         if (nodeToCheck != null) {
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeToCheck, varsIn);
+                            ccHelpers.getNestedVariables(nodeToCheck, varsIn);
                             var anyOriginality = originality;
                             if (!anyOriginality) {
                                 for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                                    if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
+                                    if (ccHelpers.getVariableObject(varsIn[varIn]) != null && ccHelpers.getVariableObject(varsIn[varIn]).original) {
                                         anyOriginality = true;
                                         break;
                                     }
@@ -4645,21 +4639,21 @@ function analyzeASTNode(node, results, loopParent) {
                                         isIndexedItem = true;
                                     }
                                     if (nodeToCheck.value._astname === "BinOp") {
-                                        if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeToCheck.value))) {
+                                        if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeToCheck.value))) {
                                             isIndexedItem = true;
                                         }
                                     }
                                     if (nodeToCheck.value._astname === "Call") {
-                                        //is it a listop, OR a UDF thatcomplexityCalculatorState.getProperty('returns')a list
+                                        //is it a listop, OR a UDF thatccState.getProperty('returns')a list
                                         if ('id' in nodeToCheck.value.func) {
-                                            var funcList = complexityCalculatorHelperFunctions.getFunctionObject(nodeToCheck.value.func.id.v);
+                                            var funcList = ccHelpers.getFunctionObject(nodeToCheck.value.func.id.v);
                                             if (funcList != null && funcList.returns === "List") {
                                                 isIndexedItem = true;
                                             }
                                         }
                                     }
                                     if (nodeToCheck.value._astname === "Name") {
-                                        isIndexedItem = (complexityCalculatorHelperFunctions.getVariableObject(nodeToCheck.value.id.v).value === "List");
+                                        isIndexedItem = (ccHelpers.getVariableObject(nodeToCheck.value.id.v).value === "List");
                                     }
                                 }
                                 if (isIndexedItem) {
@@ -4668,18 +4662,18 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                             //get any variables nested inside
                             var varsIn = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeToCheck, varsIn);
+                            ccHelpers.getNestedVariables(nodeToCheck, varsIn);
                             var anyOriginality = originality;
                             if (!anyOriginality) {
                                 for (var varIn = 0; varIn < varsIn.length; varIn++) {
-                                    if (complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]) != null && complexityCalculatorHelperFunctions.getVariableObject(varsIn[varIn]).original) {
+                                    if (ccHelpers.getVariableObject(varsIn[varIn]) != null && ccHelpers.getVariableObject(varsIn[varIn]).original) {
                                         anyOriginality = true;
                                         break;
                                     }
                                 }
                             }
                             if (varsIn.length > 0 && anyOriginality) { purposeVars = true; }
-                            nodeToCheck = complexityCalculatorHelperFunctions.retrieveFromList(nodeToCheck);
+                            nodeToCheck = ccHelpers.retrieveFromList(nodeToCheck);
                         }
                         //the node is a function call
                         if (nodeToCheck._astname === "Call") {
@@ -4687,7 +4681,7 @@ function analyzeASTNode(node, results, loopParent) {
                             // get the function name
                             var funcName = "";
                             var argFunc = nodeToCheck.func;
-                            argFunc = complexityCalculatorHelperFunctions.retrieveFromList(argFunc);
+                            argFunc = ccHelpers.retrieveFromList(argFunc);
                             if ('id' in argFunc) {
                                 funcName = argFunc.id.v;
                             } else if ('attr' in argFunc) {
@@ -4698,7 +4692,7 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                             var funcReturn = "";
                             var returnContains = [];
-                            var funcItem = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                            var funcItem = ccHelpers.getFunctionObject(funcName);
                             //update results
                             if (funcItem != null) {
                                 funcReturn = funcItem.returns;
@@ -4727,7 +4721,7 @@ function analyzeASTNode(node, results, loopParent) {
                             //then it's a variable. look up what's in there.
                             purposeVars = true;
                             var lineNumberToUse = node.lineno;
-                            var otherVar = complexityCalculatorHelperFunctions.getVariableObject(nodeToCheck.id.v);
+                            var otherVar = ccHelpers.getVariableObject(nodeToCheck.id.v);
                             if (otherVar != null) {
                                 originalAssignment = otherVar.original;
                                 if ((originalAssignment || originality) && otherVar.indexAndInput.indexed) {
@@ -4741,7 +4735,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 argResults[otherVar.value] = true;
                             }
                         } else if ((nodeToCheck._astname === "BinOp" || nodeToCheck._astname === "BoolOp" || nodeToCheck._astname === "Compare" || nodeToCheck._astname === "List")) {
-                            if (complexityCalculatorHelperFunctions.getIndexingInNode(nodeToCheck)[0] && (originality || complexityCalculatorHelperFunctions.getIndexingInNode(nodeToCheck)[1])) {
+                            if (ccHelpers.getIndexingInNode(nodeToCheck)[0] && (originality || ccHelpers.getIndexingInNode(nodeToCheck)[1])) {
                                 results["List"] = 4;
                             }
                         }
@@ -4752,23 +4746,23 @@ function analyzeASTNode(node, results, loopParent) {
                             var withinBinOp = [];
                             var binOpComponentOriginality = false;
                             var containedInOp = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeToCheck, containedInOp);
+                            ccHelpers.getNestedVariables(nodeToCheck, containedInOp);
                             for (var u = 0; u < containedInOp.length; u++) {
-                                if (complexityCalculatorHelperFunctions.getVariableObject(containedInOp[u]) != null && complexityCalculatorHelperFunctions.getVariableObject(containedInOp[u]).original) {
+                                if (ccHelpers.getVariableObject(containedInOp[u]) != null && ccHelpers.getVariableObject(containedInOp[u]).original) {
                                     binOpComponentOriginality = true;
                                     break;
                                 }
                             }
                             if (originality || binOpComponentOriginality) {
-                                if (Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeToCheck)) && results.listOps < 3) {
+                                if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeToCheck)) && results.listOps < 3) {
                                     results.listOps = 3;
                                 }
-                                if (complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeToCheck) === "Str" && results.strOps < 3) {
+                                if (ccHelpers.recursivelyAnalyzeBinOp(nodeToCheck) === "Str" && results.strOps < 3) {
                                     results.strOps = 3;
                                 }
                             }
                             if (!originality) {
-                                complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck, withinBinOp, {
+                                ccHelpers.listTypesWithin(nodeToCheck, withinBinOp, {
                                     input: false,
                                     indexed: false,
                                     strIndexed: false
@@ -4780,7 +4774,7 @@ function analyzeASTNode(node, results, loopParent) {
                                     strIndexed: false
                                 };
                                 var operations = [];
-                                complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck, withinBinOp, inputIndexPurpose, operations);
+                                ccHelpers.listTypesWithin(nodeToCheck, withinBinOp, inputIndexPurpose, operations);
                                 if (inputIndexPurpose.input) {
                                     results.consoleInput = 3;
                                 }
@@ -4797,7 +4791,7 @@ function analyzeASTNode(node, results, loopParent) {
                         } else if (nodeToCheck._astname === "BoolOp") {
                             var boolOpValues = [];
                             if (!originality) {
-                                complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck, boolOpValues, {
+                                ccHelpers.listTypesWithin(nodeToCheck, boolOpValues, {
                                     indexed: false,
                                     input: false,
                                     strIndexed: false
@@ -4809,7 +4803,7 @@ function analyzeASTNode(node, results, loopParent) {
                                     strIndexed: false
                                 };
                                 var operations = [];
-                                complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck, boolOpValues, inputForPurposeInArg, operations);
+                                ccHelpers.listTypesWithin(nodeToCheck, boolOpValues, inputForPurposeInArg, operations);
                                 if (inputForPurposeInArg.input) {
                                     results.consoleInput = 3;
                                 }
@@ -4829,7 +4823,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 strIndexed: false
                             };
                             if (!originality) {
-                                complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck, compareValues, {
+                                ccHelpers.listTypesWithin(nodeToCheck, compareValues, {
                                     input: false,
                                     indexed: false,
                                     strIndexed: false
@@ -4838,7 +4832,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 var compareInd = false;
                                 var compareStrInd = false;
                                 var operations = [];
-                                complexityCalculatorHelperFunctions.listTypesWithin(nodeToCheck, compareValues, indexInputItem, operations);
+                                ccHelpers.listTypesWithin(nodeToCheck, compareValues, indexInputItem, operations);
                                 if (indexInputItem.indexed) {
                                     results["List"] = 4;
                                 }
@@ -4859,7 +4853,7 @@ function analyzeASTNode(node, results, loopParent) {
                             var assignOriginality = false;
                             var varType = "";
                             var varInput = false;
-                            var otherVar = complexityCalculatorHelperFunctions.getVariableObject(nodeToCheck.id.v);
+                            var otherVar = ccHelpers.getVariableObject(nodeToCheck.id.v);
                             if (otherVar != null) {
                                 var numberOfMods = 0;
                                 //ops done
@@ -4920,11 +4914,11 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                             var modOriginality = false;
                             var allNamesWithin = [];
-                            complexityCalculatorHelperFunctions.getNestedVariables(nodeToCheck, allNamesWithin);
+                            ccHelpers.getNestedVariables(nodeToCheck, allNamesWithin);
                             //if ANY of these is marked as original, assignment counts as original
                             var originalAssign = false
                             for (var n = 0; n < allNamesWithin.length; n++) {
-                                var otherVariable = complexityCalculatorHelperFunctions.getVariableObject(allNamesWithin[n]);
+                                var otherVariable = ccHelpers.getVariableObject(allNamesWithin[n]);
                                 if (otherVariable != null) {
                                     var argModded = false;
                                     var insideOutside = "outside"; //this will get set to "inside" if this call is within another function
@@ -4996,9 +4990,9 @@ function analyzeASTNode(node, results, loopParent) {
                         var initOrig = originality;
                         var initVars = [];
                         if (!originality) {
-                            initVars = complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.getNestedVariables(node.init.targets[0], []), complexityCalculatorHelperFunctions.getNestedVariables(node.init.value, []));
+                            initVars = ccHelpers.appendArray(ccHelpers.getNestedVariables(node.init.targets[0], []), ccHelpers.getNestedVariables(node.init.value, []));
                             for (var i in initVars) {
-                                var iVar = complexityCalculatorHelperFunctions.getVariableObject(initVars[i]);
+                                var iVar = ccHelpers.getVariableObject(initVars[i]);
                                 if (iVar != null && iVar.original) {
                                     initOrig = true;
                                     break;
@@ -5016,7 +5010,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 indexed: false,
                                 strIndexed: false
                             };
-                            typesWithinAssign = complexityCalculatorHelperFunctions.listTypesWithin(node.init.targets[0], typesWithinAssign, assignIn, []);
+                            typesWithinAssign = ccHelpers.listTypesWithin(node.init.targets[0], typesWithinAssign, assignIn, []);
                             if ('list' in typesWithinAssign && results["List"] < 3) {
                                 results["List"] = 3;
                             }
@@ -5036,9 +5030,9 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                         var initVars = [];
                         if (!originality) {
-                            initVars = complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.getNestedVariables(node.init.target, []), complexityCalculatorHelperFunctions.getNestedVariables(node.init.value, []));
+                            initVars = ccHelpers.appendArray(ccHelpers.getNestedVariables(node.init.target, []), ccHelpers.getNestedVariables(node.init.value, []));
                             for (var i in initVars) {
-                                var iVar = complexityCalculatorHelperFunctions.getVariableObject(initVars[i]);
+                                var iVar = ccHelpers.getVariableObject(initVars[i]);
                                 if (iVar != null && iVar.original) {
                                     initOrig = true;
                                     break;
@@ -5059,7 +5053,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 indexed: false,
                                 strIndexed: false
                             };
-                            typesWithinAssign = complexityCalculatorHelperFunctions.listTypesWithin(node.init.target, typesWithinAssign, assignIn, []);
+                            typesWithinAssign = ccHelpers.listTypesWithin(node.init.target, typesWithinAssign, assignIn, []);
                             if ('list' in typesWithinAssign && results["List"] < 3) {
                                 results["List"] = 3;
                             }
@@ -5072,7 +5066,7 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                     }
                 }
-                //test node is always there. this is a comparison, or a bool, or a boolop. Something thatcomplexityCalculatorState.getProperty('returns')a bool.
+                //test node is always there. this is a comparison, or a bool, or a boolop. Something thatccState.getProperty('returns')a bool.
                 //We'll need typeswithin here as well as any other ops
                 var nodeTest = node.test;
                 if (nodeTest._astname === "UnaryOp") {
@@ -5087,7 +5081,7 @@ function analyzeASTNode(node, results, loopParent) {
                     if (nodeTest.value._astname === "Subscript" && getNestedIndexing(nodeTest.value)) {
                         results["List"] = 4;
                     }
-                    if (nodeTest.value._astname === "BinOp" && Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(nodeTest.value))) {
+                    if (nodeTest.value._astname === "BinOp" && Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeTest.value))) {
                         results["List"] = 4;
                     }
                     if (nodeTest.value._astname === "Call") {
@@ -5099,20 +5093,20 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                     }
-                    if (nodeTest.value._astname === "Name" && complexityCalculatorHelperFunctions.getVariableObject(nodeTest.value.id.v).value === "List") {
+                    if (nodeTest.value._astname === "Name" && ccHelpers.getVariableObject(nodeTest.value.id.v).value === "List") {
                         results["List"] = 4;
                     }
                 }
-                nodeTest = complexityCalculatorHelperFunctions.retrieveFromList(nodeTest);
+                nodeTest = ccHelpers.retrieveFromList(nodeTest);
                 if (nodeTest._astname === "UnaryOp") {
                     nodeTest = nodeTest.operand;
                 }
                 var nestedVars = [];
-                complexityCalculatorHelperFunctions.getNestedVariables(nodeTest, nestedVars);
+                ccHelpers.getNestedVariables(nodeTest, nestedVars);
                 var anyOriginal = originality;
                 if (!originality) {
                     for (var i in nestedVars) {
-                        var isVar = complexityCalculatorHelperFunctions.getVariableObject(nestedVars[i]);
+                        var isVar = ccHelpers.getVariableObject(nestedVars[i]);
                         if (isVar != null) {
                             if (isVar.original) {
                                 anyOriginal = true;
@@ -5132,7 +5126,7 @@ function analyzeASTNode(node, results, loopParent) {
                         indexed: false,
                         strIndexed: false
                     };
-                    dataTypesIn = complexityCalculatorHelperFunctions.listTypesWithin(nodeTest, dataTypesIn, indexingIn, []);
+                    dataTypesIn = ccHelpers.listTypesWithin(nodeTest, dataTypesIn, indexingIn, []);
                     var testItem = node.test;
                     //unary and subscript values
                     if (testItem._astname === "UnaryOp") {
@@ -5146,10 +5140,10 @@ function analyzeASTNode(node, results, loopParent) {
                         if (testItem.value._astname === "Subscript" && getNestedIndexing(testItem.value)) {
                             results["List"] = 4;
                         }
-                        if (testItem.value._astname === "BinOp" && Array.isArray(complexityCalculatorHelperFunctions.recursivelyAnalyzeBinOp(testItem.value))) {
+                        if (testItem.value._astname === "BinOp" && Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(testItem.value))) {
                             results["List"] = 4;
                         }
-                        if (testItem.value._astname === "Call") {  //is it a listop, concat binop, OR a UDF thatcomplexityCalculatorState.getProperty('returns')a list
+                        if (testItem.value._astname === "Call") {  //is it a listop, concat binop, OR a UDF thatccState.getProperty('returns')a list
                             if ('id' in testItem.func) {
                                 var calledFunc = getUserFunctionReturn(testItem.func.id.v);
                                 if (calledFunc != null && calledFunc.returns === "List") {
@@ -5157,11 +5151,11 @@ function analyzeASTNode(node, results, loopParent) {
                                 }
                             }
                         }
-                        if (testItem.value._astname === "Name" && complexityCalculatorHelperFunctions.getVariableObject(testItem.value.id.v).value === "List") {
+                        if (testItem.value._astname === "Name" && ccHelpers.getVariableObject(testItem.value.id.v).value === "List") {
                             results["List"] = 4;
                         }
                     }
-                    testItem = complexityCalculatorHelperFunctions.retrieveFromList(testItem);
+                    testItem = ccHelpers.retrieveFromList(testItem);
                     if (testItem._astname === "UnaryOp") {
                         testItem = testItem.operand;
                     }
@@ -5181,11 +5175,11 @@ function analyzeASTNode(node, results, loopParent) {
                         if (funcName === 'readInput') {
                             inputUsed = true;
                         }
-                        if (complexityCalculatorHelperFunctions.getFunctionObject(funcName).indexAndInput.indexed && (originality || complexityCalculatorHelperFunctions.getFunctionObject(funcName).original)) {
+                        if (ccHelpers.getFunctionObject(funcName).indexAndInput.indexed && (originality || ccHelpers.getFunctionObject(funcName).original)) {
                             results["List"] = 4;
                         }
                         var callReturnVal = "";
-                        var calledFunc = complexityCalculatorHelperFunctions.getFunctionObject(funcName);
+                        var calledFunc = ccHelpers.getFunctionObject(funcName);
                         //updates results and purpose booleans
                         if (calledFunc != null) {
                             callReturnVal = calledFunc.returns;
@@ -5209,13 +5203,13 @@ function analyzeASTNode(node, results, loopParent) {
                         if ('func' in testItem) {
                             if (originality) {
                                 var functionName = testItem.func.id.v;
-                                var testFunc = complexityCalculatorHelperFunctions.getFunctionObject(functionName);
+                                var testFunc = ccHelpers.getFunctionObject(functionName);
                                 if (testFunc != null) {
                                     if (testFunc.nested) {
                                         purposeVars = true;
                                     }
                                     if (testFunc.opsDone != null) {
-                                        var testOps = complexityCalculatorHelperFunctions.opsBeforeLine(testFunc.opsDone, node.lineno, "func", testFunc);
+                                        var testOps = ccHelpers.opsBeforeLine(testFunc.opsDone, node.lineno, "func", testFunc);
                                         if (testOps.includes("BinOp") || testOps.includes("AugAssign")) {
                                             results.mathematicalOperators = 3;
                                         }
@@ -5261,7 +5255,7 @@ function analyzeASTNode(node, results, loopParent) {
                             strIndexed: false
                         };
                         var operations = [];
-                        complexityCalculatorHelperFunctions.listTypesWithin(testItem, allTypes, useInput, operations);
+                        ccHelpers.listTypesWithin(testItem, allTypes, useInput, operations);
                         if (testItem._astname === "Compare" && originality) {
                             results.comparisons = 3;
                         }
@@ -5269,10 +5263,10 @@ function analyzeASTNode(node, results, loopParent) {
                         if (originality && allTypes.includes("List") && (results["List"] < 3)) {
                             results["List"] = 3;
                         }
-                        var nestedVars = complexityCalculatorHelperFunctions.getNestedVariables(testItem, []);
+                        var nestedVars = ccHelpers.getNestedVariables(testItem, []);
                         var anyOriginality = false;
                         for (var i = 0; i < nestedVars.length; i++) {
-                            var nestVar = complexityCalculatorHelperFunctions.getVariableObject(nestedVars[i]);
+                            var nestVar = ccHelpers.getVariableObject(nestedVars[i]);
                             if (nestVar != null && nestVar.original) {
                                 anyOriginality = true;
                                 break;
@@ -5287,7 +5281,7 @@ function analyzeASTNode(node, results, loopParent) {
                     }
                     //if test item is a variable
                     if (testItem._astname === "Name") {
-                        var argVar = complexityCalculatorHelperFunctions.getVariableObject(testItem.id.v);
+                        var argVar = ccHelpers.getVariableObject(testItem.id.v);
                         if (argVar != null) {
                             var varInput = false;
                             if (argVar.indexAndInput.input) {
@@ -5323,12 +5317,12 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                         //oh we need variable NAMEs hrngh
                         var allNamesWithin = [];
-                        complexityCalculatorHelperFunctions.getNestedVariables(testItem, allNamesWithin);
+                        ccHelpers.getNestedVariables(testItem, allNamesWithin);
                         //if ANY of these is marked as original, assignment counts as original
                         var originalAssign = false;
                         var varInput = false;
                         for (var n = 0; n < allNamesWithin.length; n++) {
-                            var testVariable = complexityCalculatorHelperFunctions.getVariableObject(allNamesWithin[n]);
+                            var testVariable = ccHelpers.getVariableObject(allNamesWithin[n]);
                             if (testVariable != null) {
                                 var containedVal = testVariable.value;
                                 if (testVariable.indexAndInput.input) {
@@ -5377,9 +5371,9 @@ function analyzeASTNode(node, results, loopParent) {
                         }
                         var updateVars = [];
                         if (!originality) {
-                            updateVars = complexityCalculatorHelperFunctions.appendArray(complexityCalculatorHelperFunctions.getNestedVariables(node.update.target, []), complexityCalculatorHelperFunctions.getNestedVariables(node.update.value, []));
+                            updateVars = ccHelpers.appendArray(ccHelpers.getNestedVariables(node.update.target, []), ccHelpers.getNestedVariables(node.update.value, []));
                             for (var i in updateVars) {
-                                var iVar = complexityCalculatorHelperFunctions.getVariableObject(updateVars[i]);
+                                var iVar = ccHelpers.getVariableObject(updateVars[i]);
                                 if (iVar != null && iVar.original) {
                                     updateOrig = true;
                                     break;
@@ -5400,7 +5394,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 indexed: false,
                                 strIndexed: false
                             };
-                            typesWithinAssign = complexityCalculatorHelperFunctions.listTypesWithin(node.update.target, typesWithinAssign, assignIn, []);
+                            typesWithinAssign = ccHelpers.listTypesWithin(node.update.target, typesWithinAssign, assignIn, []);
                             if ('list' in typesWithinAssign && results["List"] < 3) {
                                 results["List"] = 3;
                             }
@@ -5430,8 +5424,8 @@ function analyzeASTNode(node, results, loopParent) {
             if (purposeVars && (results.variables < 3) && (originality || originalAssignment)) {
                 results.variables = 3;
             }
-            complexityCalculatorState.setProperty('takesArgs', false);
-            complexityCalculatorState.setProperty('returns', false);
+            ccState.setProperty('takesArgs', false);
+            ccState.setProperty('returns', false);
             if (loopParent != null) { //this logic is wonky but i promise you it works
                 if (isForLoop && loopParent[0] && originality) {
                     results.forLoops = 5;

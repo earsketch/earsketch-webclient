@@ -63,7 +63,6 @@ window.esPrompt = msg => {
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
-Object.assign(window,require('ccSamples'));
 
 // Async loading
 require(['angular'], () => {
