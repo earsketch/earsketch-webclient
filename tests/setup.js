@@ -216,7 +216,6 @@ Object.assign(window,require('esAppDSP'));
 // Controllers
 require('mainController');
 require('ideController');
-require('promptController');
 require('uploadController');
 require('userHistoryController');
 
@@ -226,6 +225,5 @@ require('autograderController');
 require('autograder2Controller');
 require('autograderAWSController');
 require('autograder3Controller');
-require('inputsController');
 require('caiAnalysisModule');
 require('complexityCalculator');

@@ -55,12 +55,10 @@ module.exports = {
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-            promptController: path.resolve(__dirname,`${appDir}/promptController.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
             autograder2Controller: path.resolve(__dirname,`${appDir}/autograder2Controller.js`),
             autograderAWSController: path.resolve(__dirname,`${appDir}/autograderAWSController.js`),
             autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
-            inputsController: path.resolve(__dirname,`${appDir}/inputsController.js`),
             userHistoryController: path.resolve(__dirname,`${appDir}/userHistoryController.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),

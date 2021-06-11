@@ -91,7 +91,7 @@ export function compilePython(code: string, quality: number) {
 function runPythonCode(code: string) {
     Sk.resetCompiler()
     setupPythonAPI()
-    return Sk.importModuleInternal_("<stdin>", false, "__main__", code, undefined, false, true)
+    return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
 }
 
 // Attempts evaluating and replacing undefined names with a placeholder until the actual evaluation later.
