@@ -4,7 +4,6 @@ import { Provider, useDispatch, useSelector } from "react-redux"
 import * as app from "./appState"
 import * as collaboration from "./collaboration"
 import { ScriptEntity } from "common"
-import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
@@ -320,6 +319,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     }
 
     const shareToSoundCloud = () => {
+        const { t } = useTranslation()
         const sc = {
             name,
             sharing: ACCESS_OPTIONS[access].sharing,
@@ -333,11 +333,11 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             sc.description += "\n\n"
             sc.description += "-------------------------------------------------------------\n\n"
         }
-        sc.description += ESMessages.idecontroller.soundcloud.description + "\n\n"
+        sc.description += t('messages:idecontroller.soundcloud.description') + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += ESMessages.idecontroller.soundcloud.code + "\n\n" + script.source_code + "\n\n"
+        sc.description += t('messages:idecontroller.soundcloud.code') + "\n\n" + script.source_code + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += ESMessages.idecontroller.soundcloud.share + " " + sharelink + "\n\n"
+        sc.description += t('messages:idecontroller.soundcloud.share') + " " + sharelink + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
 
         save()
