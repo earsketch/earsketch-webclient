@@ -254,7 +254,7 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
-    const options = "" + (showCode ? "&hideCode" : "") + (showDAW ? "&hideDaw" : "")
+    const options = "" + (showCode ? "" : "&hideCode") + (showDAW ? "" : "&hideDaw")
     const height = (showCode || showDAW) ? 400 : 54
     const code = `<iframe width="600" height="${height}" src="${sharelink}&embedded=true${options}"></iframe>`
     const codeElement = useRef<HTMLTextAreaElement>(null)
