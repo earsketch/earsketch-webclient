@@ -888,28 +888,9 @@ export function readInput(result: DAWData, msg: string) {
 
     const args = [...arguments].slice(1)
     ptCheckArgs("readInput", args, 0, 1)
-    if (typeof msg !== "undefined") {
-        ptCheckType("readInput", "string", msg)
-    } else {
-        msg = ""
-    }
-
+    msg = msg ?? ""
+    ptCheckType("readInput", "string", msg)
     return (window as any).esPrompt(msg)
-
-    /*
-    const start = new Date().getTime()
-    const res = window.prompt(msg)
-    const end = new Date().getTime()
-
-    if (end - start < 50) {
-        // This interferes with the autograder. Commenting out until a better
-        // solution is found.
-        //userNotification.show(ESMessages.general.nopopup_general, "failure1")
-        //throw new Error(ESMessages.general.nopopup_readinput)
-    }
-
-    return res
-    */
 }
 
 // Replace a list element.

@@ -107,7 +107,9 @@ export async function multiTrack(script: ScriptEntity, quality: boolean) {
 }
 
 // Export the script to SoundCloud using the SoundCloud SDK.
-export async function soundcloud(script: ScriptEntity, quality: boolean, scData: any) {
+type SoundCloudOptions = { name: string, description: string, sharing: string, downloadable: boolean, tags: string, license: string }
+
+export async function soundcloud(script: ScriptEntity, quality: boolean, options: SoundCloudOptions) {
     esconsole("Requesting SoundCloud Access...", ["debug", "exporter"])
     await SC.connect()
 
@@ -124,27 +126,16 @@ export async function soundcloud(script: ScriptEntity, quality: boolean, scData:
 
     const track = await SC.upload({
         file: blob,
-        title: scData.options.name,
-        description: scData.options.description,
-        sharing: scData.options.sharing,
-        downloadable: scData.options.downloadable,
-        tag_list: scData.options.tags,
-        license: scData.options.license,
+        title: options.name,
+        description: options.description,
+        sharing: options.sharing,
+        downloadable: options.downloadable,
+        tag_list: options.tags,
+        license: options.license,
     })
 
     esconsole("SoundCloud upload finished.", "exporter")
-    scData.url = track.permalink_url
-    scData.button = "VIEW ON SOUNDCLOUD"
-    scData.uploaded = true
-    scData.message.spinner = false
-
-    if (scData.message.animation) {
-        clearInterval(scData.message.animation)
-        scData.message.animation = null
-    }
-
-    scData.message.text = "Finished uploading!"
-    helpers.getNgRootScope().$apply()
+    return track.permalink_url
 }
 
 // Print the source code.

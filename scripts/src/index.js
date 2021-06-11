@@ -50,17 +50,14 @@ import './app/completer'
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 // (This was previously in userConsole, but since that's now a module, the fields are read-only.)
 // (Also, it doesn't really have anything to do with the user console.)
-window.esPrompt = msg => {
-    const $uibModal = helpers.getNgService('$uibModal')
-    var modal = $uibModal.open({
-        templateUrl: 'templates/prompt.html',
-        controller: 'PromptController',
-        resolve: {
-            msg: function() { return msg }
-        },
-    })
+import { Prompt } from "./app/Prompt"
 
-    return modal.result
+window.esPrompt = message => {
+    const $uibModal = helpers.getNgService("$uibModal")
+    return new Promise(resolve => $uibModal.open({
+        component: "prompt",
+        resolve: { message() { return message } },
+    }).result.then(input => resolve(input), () => resolve("")))
 }
 
 Object.assign(window,require('setup'));
@@ -129,9 +126,7 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('promptController');
     require('uploadController');
-    require('shareScriptController');
     require('userHistoryController');
 
     require('adminWindowController');
@@ -153,6 +148,7 @@ require(['angular'], () => {
     require('./app/Notification')
     require('./app/Recorder')
     require('./app/Diff')
+    app.component("prompt", helpers.wrapModal(Prompt))
 
     // To be ported to React
     require('./layout/Layout');
@@ -162,7 +158,6 @@ require(['angular'], () => {
     require('autograder2Controller');
     require('autograderAWSController');
     require('autograder3Controller');
-    require('inputsController');
 
     // CAI
     require('./cai/CAI');

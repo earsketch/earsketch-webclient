@@ -27,6 +27,7 @@ import * as recommender from './recommender';
 import { RenameScript, RenameSound } from './Rename';
 import { ScriptAnalysis } from './ScriptAnalysis';
 import { ScriptHistory } from './ScriptHistory';
+import { ScriptShare } from './ScriptShare';
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 import i18n from "i18next";
@@ -42,6 +43,7 @@ app.component("renameController", wrapModal(RenameScript))
 app.component("renameSoundController", wrapModal(RenameSound))
 app.component("accountController", wrapModal(AccountCreator))
 app.component("submitCompetitionController", wrapModal(CompetitionSubmission))
+app.component("shareScriptController", wrapModal(ScriptShare))
 
 /**
  * @module mainController
@@ -884,8 +886,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         await userProject.saveScript(script.name, script.source_code);
         $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
-            templateUrl: 'templates/share-script.html',
-            controller: 'shareScriptController',
+            component: 'shareScriptController',
             size: 'lg',
             resolve: {
                 script() { return script; },
