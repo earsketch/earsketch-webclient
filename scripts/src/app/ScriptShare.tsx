@@ -1,19 +1,18 @@
 import React, { useRef, useState } from "react"
 import { Provider, useDispatch, useSelector } from "react-redux"
 
+import * as app from "./appState"
 import * as collaboration from "./collaboration"
+import { ScriptEntity } from "common"
 import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
+import store from "../reducers"
 import * as tabs from "../editor/tabState"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
-import { ScriptEntity } from "common"
-import * as app from "./appState"
-import store from "../reducers"
-import { get } from "./userProject"
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -26,7 +25,7 @@ async function queryID(query: any) {
         throw "You cannot share scripts with yourself!"
     }
 
-    const data = await get("/services/scripts/searchuser", { query })
+    const data = await userProject.get("/services/scripts/searchuser", { query })
     if (data) {
         return data.username
     }
@@ -163,14 +162,12 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                         </button>
                     </div>
                 </div>
-                <div id="share-link-container mt-5">
-                    <input ref={linkElement} className="share-link outline-none" type="text" value={link} size={link.length} readOnly />
-                    <div>
-                        <span className="download-share-url" onClick={downloadShareUrl}><i className="glyphicon glyphicon-download-alt" uib-tooltip="Download URL shortcut file" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
-                        <span onClick={() => { linkElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title="Copy to clipboard">
-                            <i className="icon icon-paste4"></i>
-                        </span>
-                    </div>
+                <div id="share-link-container" className="mt-5 flex">
+                    <input ref={linkElement} className="share-link outline-none flex-grow" type="text" value={link} readOnly />
+                    <span className="download-share-url" onClick={downloadShareUrl}><i className="glyphicon glyphicon-download-alt" uib-tooltip="Download URL shortcut file" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
+                    <span onClick={() => { linkElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title="Copy to clipboard">
+                        <i className="icon icon-paste4"></i>
+                    </span>
                 </div>
                 <hr className="mt-3" />
 
@@ -186,7 +183,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
+            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
                 <input type="submit" value={"SAVE" + (viewers.length ? " AND SEND" : "")} className="btn btn-primary text-white" />
@@ -244,7 +241,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
             <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => finalize.current = f} />
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
+            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
                 <input type="submit" value="SAVE" className="btn btn-primary text-white" />
@@ -283,7 +280,7 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
+            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
                 <input type="submit" value="SAVE" className="btn btn-primary text-white" />
@@ -293,95 +290,68 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
 }
 
 const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
+    const ACCESS_OPTIONS = [
+        { sharing: "private", downloadable: true, description: "Private. Only visible to me." },
+        { sharing: "public", downloadable: true, description: "Public. Others can download and stream." },
+        { sharing: "public", downloadable: false, description: "Public. Others can only stream." },
+    ]
+    const [name, setName] = useState(script.name)
+    const [access, setAccess] = useState(1)
     const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
-    const license = licenses[licenseID]
-    
-    const shareSoundCloud = () => {
-        if (!sc.uploaded) {
-            if (sc.options.name === "") {
-                sc.message.show = true
-                sc.message.text = "The song name cannot be empty!"
-                sc.message.color = "red"
-            } else {
-                sc.message.show = false
-                sc.message.color = "transparent"
-                shareToSoundCloud()
-            }
-        } else {
-            window.open(sc.url, "_blank")?.focus()
-            close()
-        }
-    }
+    const license = licenses[licenseID].license
 
-    const sc = {
-        options: {
-            name: script.name,
-            sharing: "public",
-            downloadable: true,
-            description,
-            tags: "EarSketch",
-            license: "cc-by"
-        },
-        uploaded: false,
-        url: "",
-        userAccess: [
-            "Private. Only visible to me.",
-            "Public. Others can download and stream.",
-            "Public. Others can only stream."
-        ],
-        selectedUserAccess: 1,
-        message: {
-            show: false,
-            spinner: false,
-            text: "",
-            color: "transparent",
-            animation: null
+    const [url, setURL] = useState("")
+    let animation = 0
+    const [message, setMessage] = useState("")
+    
+    const submit = () => {
+        if (url) {
+            // Already uploaded.
+            window.open(url, "_blank")?.focus()
+            close()
+        } else {
+            setMessage("")
+            shareToSoundCloud()
         }
     }
 
     const shareToSoundCloud = () => {
-        if (sc.selectedUserAccess === 0) {
-            sc.options.sharing = "private"
-            sc.options.downloadable = true
-        } else if (sc.selectedUserAccess === 1) {
-            sc.options.sharing = "public"
-            sc.options.downloadable = true
-        } else {
-            sc.options.sharing = "public"
-            sc.options.downloadable = false
+        const sc = {
+            name,
+            sharing: ACCESS_OPTIONS[access].sharing,
+            downloadable: ACCESS_OPTIONS[access].downloadable,
+            description,
+            tags: "EarSketch",
+            license: "cc-" + license.split(" ")[1].toLowerCase(),
         }
+
+        if (description !== "") {
+            sc.description += "\n\n"
+            sc.description += "-------------------------------------------------------------\n\n"
+        }
+        sc.description += ESMessages.idecontroller.soundcloud.description + "\n\n"
+        sc.description += "-------------------------------------------------------------\n\n"
+        sc.description += ESMessages.idecontroller.soundcloud.code + "\n\n" + script.source_code + "\n\n"
+        sc.description += "-------------------------------------------------------------\n\n"
+        sc.description += ESMessages.idecontroller.soundcloud.share + " " + sharelink + "\n\n"
+        sc.description += "-------------------------------------------------------------\n\n"
 
         save()
 
-        if (description !== "") {
-            sc.options.description = description + "\n\n"
-            sc.options.description += "-------------------------------------------------------------\n\n"
-        }
+        setMessage("UPLOADING")
+        animation = window.setInterval(() => {
+            const numDots = Math.floor(new Date().getTime() / 1000) % 5 + 1
+            let dots = ""
+            for (let i = 0; i < numDots; i++) {
+                dots += "."
+            }
+            setMessage("UPLOADING" + dots)
+        }, 1000)
 
-        sc.options.description += ESMessages.idecontroller.soundcloud.description + "\n\n"
-        sc.options.description += "-------------------------------------------------------------\n\n"
-        sc.options.description += ESMessages.idecontroller.soundcloud.code + "\n\n" + script.source_code + "\n\n"
-        sc.options.description += "-------------------------------------------------------------\n\n"
-        sc.options.description += ESMessages.idecontroller.soundcloud.share + " " + sharelink + "\n\n"
-        sc.options.description += "-------------------------------------------------------------\n\n"
-
-        sc.options.license = "cc-" + license.split(" ")[1].toLowerCase()
-
-        exporter.soundcloud(script, false, sc).then(function () {
-            sc.message.show = true
-            sc.message.color = "rgb(170,255,255,0.5)"
-            sc.message.spinner = true
-            sc.message.text = "UPLOADING"
-            // TODO(ijc): ?
-            // sc.message.animation = setInterval(function () {
-            //     var numDots = Math.floor(new Date().getTime() / 1000) % 5 + 1
-            //     var dots = ""
-            //     for (var i = 0; i < numDots; i++) {
-            //         dots += "."
-            //     }
-            //     sc.message.text = "UPLOADING" + dots
-            // }, 1000)
-
+        exporter.soundcloud(script, false, sc).then(url => {
+            setURL(url)
+            clearInterval(animation)        
+            setMessage("Finished uploading!")
             reporter.share("soundcloud", license)
         }).catch(function (err) {
             userNotification.show("Error exporting to SoundCloud.", "failure1")
@@ -389,7 +359,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
         })
     }
 
-    return <form>
+    return <form onSubmit={e => { e.preventDefault(); submit() }}>
         <div className="modal-body">
             <div className="modal-section-header">
                 <span>
@@ -397,40 +367,41 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
                     Song Name
                 </span>
             </div>
-            <textarea className="form-control border-0" rows={1} placeholder="Click here to start typing..." ng-model="sc.options.name"></textarea>
-            <hr className="mt-0" />
+            <input required type="text" className="form-control border-0" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
 
             <div className="modal-section-header">
                 <span>What can others do with your song on SoundCloud?</span>
             </div>
-            <div className="container" id="sc-options-container">
-                <div className="row my-3 justify-between flex">
-                    {sc.userAccess.map((accessType, index) =>
-                    <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline mt-3">
+            <div className="container">
+                <div className="row mt-5 justify-between flex">
+                    {ACCESS_OPTIONS.map(({ description }, index) =>
+                    <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline">
                         <label>
-                            <input type="radio" name="useraccess" ng-model="sc.selectedUserAccess" ng-value="$index"/>
-                            <span></span>{accessType}
+                            <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
+                            <span />{description}
                         </label>
                     </div>)}
                 </div>
             </div>
         </div>
         <div className="modal-footer border-t-0">
-            <MoreDetails {...{ script, licenses, licenseID, setLicenseID, description, setDescription }} />
+            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
 
-            <div ng-show="sc.message.show" className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: sc.message.color }}>
-                <span ng-show="sc.message.spinner"><i className="spinner icon icon-spinner"></i></span> {sc.message.text}
-            </div>
+            {message && <div className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: "rgb(170,255,255,0.5)" }}>
+                {message.startsWith("UPLOADING") && <i className="spinner icon icon-spinner"></i>} {message}
+            </div>}
 
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
                 <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value="UPLOAD" className="btn btn-primary text-white" />
+                <input type="submit" value={url ? "VIEW ON SOUNDCLOUD" : "UPLOAD"} className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
 }
 
-const MoreDetails = ({ script, licenses, licenseID, setLicenseID, description, setDescription }: any) => {
+const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }:
+    { licenses: { [key: string]: any }, licenseID: string, setLicenseID: (id: string) => void, description: string, setDescription: (ds: string) => void }
+) => {
     const [collapsed, setCollapsed] = useState(true)
     const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
 
