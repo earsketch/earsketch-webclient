@@ -60,7 +60,6 @@ module.exports = {
             autograder2Controller: path.resolve(__dirname,`${appDir}/autograder2Controller.js`),
             autograderAWSController: path.resolve(__dirname,`${appDir}/autograderAWSController.js`),
             autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
-            inputsController: path.resolve(__dirname,`${appDir}/inputsController.js`),
             userHistoryController: path.resolve(__dirname,`${appDir}/userHistoryController.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),

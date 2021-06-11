@@ -161,7 +161,6 @@ require(['angular'], () => {
     require('autograder2Controller');
     require('autograderAWSController');
     require('autograder3Controller');
-    require('inputsController');
 
     // CAI
     require('./cai/CAI');
