@@ -4,6 +4,7 @@ import esconsole from "../esconsole"
 import ESMessages from "../data/messages"
 import * as userNotification from "./userNotification"
 import { postForm } from "./userProject"
+import { useTranslation } from "react-i18next"
 
 export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
     const [error, setError] = useState("")
@@ -11,6 +12,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [email, setEmail] = useState("")
+    const { t } = useTranslation();
 
     const submit = async () => {
         setError("Please wait...")
@@ -32,7 +34,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
             if (data.state !== 0) {
                 esconsole("Error creating user: " + data.description, "error")
                 if (data.description === "useralreadyexists") {
-                    setError(ESMessages.createaccount.useralreadyexists)
+                    setError(t('messages:createaccount.useralreadyexists'))
                 }
             } else {
                 setError("")
@@ -41,7 +43,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
             }
         } catch (error) {
             esconsole(error, "error")
-            userNotification.show(ESMessages.createaccount.commerror, "failure1")
+            userNotification.show(t('messages:createaccount.commerror'), "failure1")
         }
     }
 
@@ -54,7 +56,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="form-group">
-                            <input type="text" className="form-control" name="username" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={ESMessages.createaccount.usernameconstraint} />
+                            <input type="text" className="form-control" name="username" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={t('messages:createaccount.usernameconstraint')} />
                         </div>
                     </div>
                 </div>
@@ -69,7 +71,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                     <div className="col-md-6">
                     <div className="form-group">
                         <input type="password" className="form-control" name="passwordconfirm" placeholder="Confirm Password" onChange={e => {
-                                e.target.setCustomValidity(e.target.value === password ? "" : ESMessages.createaccount.pwdfail)
+                                e.target.setCustomValidity(e.target.value === password ? "" : t('messages:createaccount.pwdfail'))
                                 setConfirmPassword(e.target.value)
                             }} value={confirmPassword} required  />
                     </div>

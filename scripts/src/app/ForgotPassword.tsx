@@ -12,10 +12,10 @@ export const ForgotPassword = ({ close }: { close: () => void }) => {
         const url = URL_DOMAIN + '/services/scripts/resetpwd?email=' + encodeURIComponent(email)
         fetch(url).then(response => {
             if (response.ok) {
-                esconsole(t('messages:forgotpassword.success'), "info")
+                esconsole("Forgot Password succeeded", "info")
                 userNotification.show(t('messages:forgotpassword.success'), "success", 3.5)
             } else {
-                esconsole(t('messages:forgotpassword.fail'), "info")
+                esconsole("Forgot Password failed", "info")
                 userNotification.show(t('messages:forgotpassword.fail'), "failure1", 3.5)
             }
         })

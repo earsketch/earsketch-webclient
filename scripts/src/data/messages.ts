@@ -26,18 +26,6 @@ const ESMessages = {
         'illegalCharacterInUserID': 'Please use only regular characters, numbers, or _ in the user ID.',
         'complexitySyntaxError': 'Failed to run the code indicator. There might be a syntax error in your code.',
     },
-    "createaccount" : {
-        "usernameconstraint": "Usernames must not start with a number and cannot include spaces or special characters",
-        "pwdfail": "Your password confirmation is not the same as your password.",
-        "pwdlength": "Your password is too short. Passwords must be at least 5 characters long.",
-        "timeout": "Timeout communication error.",
-        "nopwd": "Please enter password before creating user",
-        "usernamelength": "Username length is too long, try with a shorter username",
-        "accountsuccess": "User account created succesfully ...",
-        "useralreadyexists": "Provided username or email already exists. Please try 'Forgot Password' feature if you cannot access your account.",
-        "commerror": "Communication error ...",
-        "commerror2": "Communication error ..."
-    },
     "shareScript": {
         "menuDescriptions": {
             "viewOnly": "I want someone to see my script. (They cannot edit.)",

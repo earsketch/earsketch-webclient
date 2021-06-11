@@ -297,7 +297,7 @@ export async function login(username: string, password: string) {
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
 
-    esconsole(i18n.t('messages:user.scriptsuccess'), ["debug", "user"])
+    esconsole('List of scripts in Load script list successfully updated.', ["debug", "user"])
     const storedScripts = extractScripts(data)
     resetScripts()
 

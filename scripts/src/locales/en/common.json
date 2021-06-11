@@ -40,7 +40,6 @@
       "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
     },
     "user": {
-      "scriptsuccess": "List of scripts in Load script list successfully updated.",
       "scriptcloud": "Script successfully saved to the cloud.",
       "allscriptscloud": "All unsaved scripts successfully saved to the cloud.",
       "badsharelink": "Error opening a script. The share link in the URL may be wrong.",
@@ -94,6 +93,12 @@
       "nosupport": "Sorry, Quick Record is currently only supported in Chrome, and partially supported in FireFox.",
       "chrome_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the camera icon in your browser's address bar and select 'ask if earsketch.gatech.edu wants to access your microphone'. Then try the Quick Record feature again and be sure to allow microphone access.",
       "ff_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the microphone icon in your browser's address bar to share your microphone with EarSketch. If no microphone icon appears, click the earth icon to unblock microphone access. Then try the Quick Record feature again and be sure to share microphone access."
+    },
+    "createaccount" : {
+      "pwdfail": "Your password confirmation is not the same as your password.",
+      "useralreadyexists": "Provided username or email already exists. Please try 'Forgot Password' feature if you cannot access your account.",
+      "commerror": "Communication error ...",
+      "usernameconstraint": "Usernames must not start with a number and cannot include spaces or special characters"
     }
   }
 }
