@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 
 import esconsole from "../esconsole"
-import ESMessages from "../data/messages"
 import * as userNotification from "./userNotification"
 import { postForm } from "./userProject"
 import { useTranslation } from "react-i18next"
