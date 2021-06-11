@@ -196,24 +196,6 @@ function markVariable(node) {
             if (nestedBinOp.length > 0) {
                 variableObject.nested = true;
             }
-            binVal = ccHelpers.recursivelyAnalyzeBinOp(fakeBinOp);
-            if (Array.isArray(binVal)) {
-                varVal = "List";
-                variableObject.nodeElements.push({
-                    line: node.lineno,
-                    elts: ccHelpers.getAllBinOpLists(fakeBinOp)
-                });
-                variableObject.stringElements.push({
-                    line: node.lineno,
-                    elts: ccHelpers.nodesToStrings(ccHelpers.getAllBinOpLists(fakeBinOp), node.lineno)
-                });
-                ccHelpers.appendArray(ccHelpers.nodesToStrings(binVal, node.lineno), variableObject.containedValue);
-                variableObject.containedValue.push("List");
-                variableObject.opsDone = ccHelpers.addOpToList("ListOp", variableObject.opsDone, node.lineno);
-            }
-            if (typeof binVal !== "string" && !Array.isArray(binVal)) {
-                varVal = "BinOp";
-            }
             variableObject.opsDone = ccHelpers.addOpToList("BinOp", variableObject.opsDone, node.lineno);
             var binOpTypes = ccHelpers.listTypesWithin(fakeBinOp, [], variableObject.indexAndInput, variableObject.opsDone);
             ccHelpers.appendArray(binOpTypes, variableObject.containedValue);
@@ -230,7 +212,6 @@ function markVariable(node) {
                     value: ccHelpers.trimCommentsAndWhitespace(valueString),
                     original: modOriginality,
                     nodeValue: node,
-                    binop: binVal
                 });
                 ccState.getProperty("variableAssignments").push({ line: node.lineno, name: variableObject.name });
                 if (isInForLoop) { //push twice for loops
@@ -238,8 +219,7 @@ function markVariable(node) {
                         line: lineNo,
                         value: ccHelpers.trimCommentsAndWhitespace(valueString),
                         original: modOriginality,
-                        nodeValue: node,
-                        binop: binVal
+                        nodeValue: node
                     });
                 }
             }
@@ -349,8 +329,6 @@ function markVariable(node) {
         }
         //otherwise we go on to marking the variable
         var listElts = [];
-        funcOrVar = "";
-        flag = "";
         var indexOfExistingVariableObj = -1;
         var varTarget = ccHelpers.retrieveFromList(node.targets[0]);
         if ((varTarget != null && varTarget._astname !== "Name" && varTarget._astname !== "Subscript") || varTarget == null) {
@@ -358,7 +336,6 @@ function markVariable(node) {
         }
         //variable init
         varName = varTarget.id.v;
-        binVal = null;
         var inputIndexing = { input: false, indexed: false, strIndexed: false };
         var containsNested = false;
         var isNewAssignmentValue = false;
@@ -385,27 +362,7 @@ function markVariable(node) {
                 }
             } else if (nodeVal._astname === 'Name') { //this means it contains the value of another variable or function
                 containsNested = true;
-                otherVar = ccHelpers.getVariableObject(nodeVal.id.v);
-                if (otherVar != null && otherVar.value !== "" && otherVar.value !== "BinOp") {
-                    if (otherVar.indexAndInput.input) {
-                        inputIndexing.input = true;
-                    }
-                    containsOps = ccHelpers.appendOpList(otherVar.opsDone, containsOps);
-                    if (otherVar.indexAndInput.indexed) {
-                        inputIndexing.indexed = true;
-                    }
-                    if (otherVar.indexAndInput.strIndexed) {
-                        inputIndexing.strIndexed = true;
-                    }
-                    if (otherVar.nodeElements != null) {
-                        copiedElts = [];
-                        ccHelpers.appendArray(otherVar.nodeElements, copiedElts);
-                    }
-                    ccHelpers.appendArray(otherVar.containedValue, containedVal);
-                }
-                if (otherVar == null && ccHelpers.getFunctionObject(nodeVal.id.v) != null) {
-                    flag = nodeVal.id.v;
-                }
+               
             }
             if (nodeVal._astname === 'List') {
                 listElts = nodeVal.elts;
@@ -532,12 +489,6 @@ function markVariable(node) {
                 if (Array.isArray(ccHelpers.recursivelyAnalyzeBinOp(nodeVal))) {
                     listElts = ccHelpers.getAllBinOpLists(nodeVal);
                 }
-                binVal = ccHelpers.recursivelyAnalyzeBinOp(nodeVal);
-                if (Array.isArray(binVal)) {
-                    listElts = ccHelpers.getAllBinOpLists(nodeVal);
-                    containedVal = binVal;
-                    containsOps = ccHelpers.addOpToList("ListOp", containsOps, node.lineno);
-                }
                 containsOps = ccHelpers.addOpToList("BinOp", containsOps, node.lineno);
                 containedVal = ccHelpers.listTypesWithin(nodeVal, [], inputIndexing, containsOps);
             }
@@ -604,9 +555,6 @@ function markVariable(node) {
             }
             var userVariable = {
                 name: varName,
-                binOp: binVal,
-                flagVal: flag,
-                funcVar: funcOrVar,
                 containedValue: containedVal,
                 indexAndInput: {
                     input: inputIndexing.input,
@@ -635,8 +583,7 @@ function markVariable(node) {
                     line: lineNo,
                     value: ccHelpers.trimCommentsAndWhitespace(valueString),
                     original: modOriginality,
-                    nodeValue: node.value,
-                    binop: binVal
+                    nodeValue: node.value
                 });
                 //if we're inside a for loop we actually add this twice.
                 if (insideForLoop) {
@@ -644,8 +591,7 @@ function markVariable(node) {
                         line: lineNo,
                         value: ccHelpers.trimCommentsAndWhitespace(valueString),
                         original: modOriginality,
-                        nodeValue: node.value,
-                        binop: binVal
+                        nodeValue: node.value
                     });
                 }
             }
@@ -683,9 +629,6 @@ function markVariable(node) {
             if (inputIndexing.strIndexed) {
                 ccState.getProperty('allVariables')[indexOfExistingVariableObj].indexAndInput.strIndexed = true;
             }
-            if (binVal != null) {
-                ccState.getProperty('allVariables')[indexOfExistingVariableObj].binOp = binVal;
-            }
             var assignmentExists = false;
             for (var p = 0; p < ccState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified.length; p++) {
                 if (ccState.getProperty('allVariables')[indexOfExistingVariableObj].assignedModified[p].value === valueString) {
@@ -716,8 +659,7 @@ function markVariable(node) {
                     line: lineNo,
                     value: ccHelpers.trimCommentsAndWhitespace(valueString),
                     original: modOriginality,
-                    nodeValue: node.value,
-                    binop: binVal
+                    nodeValue: node.value
                 });
                 ccState.getProperty("variableAssignments").push({ line: node.lineno, name: ccState.getProperty('allVariables')[indexOfExistingVariableObj].name });
                 for (var uf = 0; uf < ccState.getProperty('userFunctionParameters').length; uf++) { //is this variable a parameter in this function? if so, what's its parameter index?
@@ -943,28 +885,7 @@ export function evaluateAllEmpties() {
                     //comparisons and boolops both become booleans and stored in containedValue
                     ccState.getProperty('userFunctionReturns')[r].returns = "Bool";
                     ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone);
-                } else if (indexValue._astname === "BinOp") {
-                    //if binop, evaluate and push contained values
-                    ccState.getProperty('userFunctionReturns')[r].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('userFunctionReturns')[r].opsDone, indexValue.lineno);
-                    var binVal = ccHelpers.recursivelyAnalyzeBinOp(indexValue);
-                    if (typeof binVal === "string") {
-                        ccState.getProperty('userFunctionReturns')[r].returns = binVal;
-                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone);
-                    } else if (Array.isArray(binVal)) {
-                        ccState.getProperty('userFunctionReturns')[r].returns = "List";
-                        ccState.getProperty('allVariables').nodeElements.push({
-                            line: indexValue.lineno,
-                            elts: binVal
-                        });
-                        ccState.getProperty('allVariables').stringElements.push({
-                            line: indexValue.lineno,
-                            elts: ccHelpers.nodesToStrings(binVal)
-                        });
-                    } else {//we re-frame as a binop object!
-                        ccState.getProperty('userFunctionReturns')[r].returns = "BinOp";
-                        ccState.getProperty('userFunctionReturns')[r].binOp = binVal;
-                    }
-                } else if (indexValue._astname === "List") {
+                }else if (indexValue._astname === "List") {
                     //list
                     ccState.getProperty('userFunctionReturns')[r].returns = "List";
                     ccHelpers.appendArray(ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone), ccState.getProperty('userFunctionReturns')[r].containedValue);
@@ -1124,35 +1045,6 @@ export function evaluateAllEmpties() {
                     }
                 } else if (indexValue._astname === "Num") {
                     ccState.getProperty('allVariables')[r].value = ccHelpers.isNodeFloat(indexValue) ? "Float" : "Int";
-                } else if (indexValue._astname === "Compare" || indexValue._astname === "BoolOp") {
-                    ccState.getProperty('allVariables')[r].value = "Bool";
-                    if (indexValue._astname === "Compare") {
-                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone);
-                    }
-                    if (indexValue._astname === "BoolOp") {
-                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone);
-                    }
-                } else if (indexValue._astname === "BinOp") {
-                    ccState.getProperty('allVariables')[r].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('allVariables')[r].opsDone, indexValue.lineno);
-                    var binVal = ccHelpers.recursivelyAnalyzeBinOp(indexValue);
-                    if (typeof binVal === "string") {
-                        ccState.getProperty('allVariables')[r].value = binVal;
-                        ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone);
-                    } else if (Array.isArray(binVal)) {
-                        ccState.getProperty('allVariables')[r].value = "List";
-                        ccState.getProperty('allVariables').nodeElements.push({
-                            line: indexValue.lineno,
-                            elts: binVal
-                        });
-                        ccState.getProperty('allVariables').stringElements.push({
-                            line: indexValue.lineno,
-                            elts: ccHelpers.nodesToStrings(binVal)
-                        });
-                    } else {
-                        //we re-frame as a binop object
-                        ccState.getProperty('allVariables')[r].value = "BinOp";
-                        ccState.getProperty('allVariables')[r].binOp = binVal;
-                    }
                 } else if (indexValue._astname === "List") {
                     ccState.getProperty('allVariables')[r].value = "List";
                     ccHelpers.appendArray(ccState.getProperty('allVariables')[r].containedValue, ccHelpers.listTypesWithin(indexValue, ccState.getProperty('allVariables')[r].containedValue, ccState.getProperty('allVariables')[r].indexAndInput, ccState.getProperty('allVariables')[r].opsDone));
@@ -1257,8 +1149,6 @@ function findReturnInBody(node, functionObject) {
         }
         //if this is the return value, populate functionObject with it
         if (node._astname === "Return" && node.value != null) {
-            contVal = null;
-            valueType = node.value._astname
             var opsPerformed = [];
             var inputTaken = false;
             var retVal = node.value;
@@ -1270,10 +1160,6 @@ function findReturnInBody(node, functionObject) {
             }
             if (node.value._astname === "Subscript") {
                 retVal = ccHelpers.retrieveFromList(node.value);
-                if (retVal == null) {
-                    valueType = "Subscript";
-                    flag = node.value;
-                }
                 if (ccHelpers.getIndexingInNode(node.value)[0]) {
                     functionObject.indexAndInput.isIndexed = true;
                 }
@@ -1283,8 +1169,6 @@ function findReturnInBody(node, functionObject) {
             }
             retVal = ccHelpers.retrieveFromList(node.value);
             if (typeof retVal === "string") {
-                valueType = "";
-                flag = retVal;
             } else if (retVal != null) {
                 //store the type of returned value
                 if (retVal._astname === "BinOp" || retVal._astname === "BoolOp" || retVal._astname === "Compare" || retVal._astname === "List") {
@@ -1293,10 +1177,8 @@ function findReturnInBody(node, functionObject) {
                     functionObject.indexAndInput.strIndexed = ccHelpers.getStringIndexingInNode(retVal)[0];
                 }
                 if (retVal._astname === "Num") {
-                    valueType = omplexityCalculatorHelperFunctions.isNodeFloat(retVal) ? "Float" : "Int";
                 } else if (retVal._astname === "Call") {
                     //if itccState.getProperty('returns')another function's return, we look up what THAT function returns. if we know.
-                    funcOrVar = "func";
                     var funcName = "";
                     if ('id' in retVal.func) {
                         funcName = retVal.func.id.v;
@@ -1308,27 +1190,19 @@ function findReturnInBody(node, functionObject) {
                     }
                     //special case -ccState.getProperty('returns')the returned value of a listOp
                     if (ccState.getProperty('listFuncs').includes(funcName)) {
-                        valueType = "List";
                         opsPerformed = ccHelpers.addOpToList("ListOp", opsPerformed, node.lineno);
                         if (retVal.func.value._astname === "List") {
                             var valuesInList = ccHelpers.listTypesWithin(retVal.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
-                            for (var vil = 0; vil < valuesInList; vil++) {
-                                contVal.push(valuesInList[vil]);
-                            }
+                     
                         }
                         if (retVal.func.value._astname === "BinOp") {
                             var valsInOp = [];
                             ccHelpers.listTypesWithin(retVal.func.value, valsInOp, functionObject.indexAndInput, opsPerformed);
-                            for (var vio = 0; vio < valsInOp.length; vio++) {
-                                contVal.push(valsInOp[vio]);
-                            }
+                         
                         }
                         if (retVal.func.value._astname === "Call") {
                             var retFunc = ccHelpers.getFunctionObject(retVal.func.value.func.id.v);
                             if (retFunc != null) {
-                                if (retFunc.containedValue != null) {
-                                    ccHelpers.appendArray(retFunc.containedValue, contVal);
-                                }
                                 if (retFunc.opsDone != null) {
                                     opsPerformed = ccHelpers.appendOpList(retFunc.opsDone, opsPerformed);
                                 }
@@ -1336,10 +1210,6 @@ function findReturnInBody(node, functionObject) {
                         }
                         if (retVal.func.value._astname === "Name") {  //we have to find the other variable
                             var retVar = ccHelpers.getVariableObject(retVal.func.value.id.v);
-                            if (retVar != null) {
-                                ccHelpers.appendArray(retVar.containedValue, contVal);
-                                opsPerformed = ccHelpers.appendOpList(retVar.opsDone, opsPerformed);
-                            }
                         }
                     }
                     flag = funcName;
@@ -1347,11 +1217,7 @@ function findReturnInBody(node, functionObject) {
                     var matchedFunc = ccHelpers.getFunctionObject(funcName);
                     //or itccState.getProperty('returns')the return of another function
                     if (matchedFunc != null) {
-                        valueType = matchedFunc.returns;
                         if (matchedFunc.containedValue != null) {
-                            if (matchedFunc.containedValue != null) {
-                                contVal = matchedFunc.containedValue;
-                            }
                             if (matchedFunc.opsDone != null) {
                                 opsPerformed = ccHelpers.appendOpList(matchedFunc.opsDone, opsPerformed);
                             }
@@ -1367,7 +1233,6 @@ function findReturnInBody(node, functionObject) {
                         }
                         if (!foundMatch) {
                             // this denotes that we do not yet know what  this returns
-                            valueType = "";
                         }
                     }
                 } else if (retVal._astname === "Name") {
@@ -1380,23 +1245,16 @@ function findReturnInBody(node, functionObject) {
                     }
                     if (isFunctionName) {
                         //the variable contains a function value
-                        valueType = "Function";
-                        flag = retVal.id.v;
                     } else {
                         //otherwise it's a variable the user has declared previously
                         if (retVal.id.v === "True" || retVal.id.v === "False") {
-                            valueType = "Bool";
+                          
                         } else {
-                            funcOrVar = "var";
-                            variableName = retVal.id.v;
-                            flag = variableName;
-                            valueType = "";
+                            var variableName = retVal.id.v;
                             variablesIncluded = true;
                             var varToCopy = ccHelpers.getVariableObject(variableName);
                             //copy values from the variable object
                             if (varToCopy != null && varToCopy.value !== "BinOp" && varToCopy.value !== "") {
-                                valueType = varToCopy.value;
-                                contVal = varToCopy.containedValue;
                                 opsPerformed = ccHelpers.appendOpList(varToCopy.opsDone, opsPerformed);
                                 if (varToCopy.nodeElements != null) {
                                     var nodeElementsIndex = -1;
@@ -1440,26 +1298,14 @@ function findReturnInBody(node, functionObject) {
                         }];
                     }
                     ccHelpers.getNestedVariables(retVal, varList);
-                    binVal = ccHelpers.recursivelyAnalyzeBinOp(retVal);
-                    if (binVal != null) {
-                        valueType = "BinOp";
-                        contVal = [];
-                        ccHelpers.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
-                    } else {
-                        valueType = "";
-                    }
+                    
                 } else if (retVal._astname === "BoolOp") {
                     //boolop becomes bool
-                    valueType = "Bool";
                     ccHelpers.getNestedVariables(retVal, varList);
-                    contVal = [];
                     opsPerformed = ccHelpers.addOpToList("BoolOp", opsPerformed, node.lineno);
-                    ccHelpers.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
                 } else if (retVal._astname === "List") {
                     //store "List" and also all values within that list in nodeElements, stringElements, and containedValue
-                    valueType = "List";
                     ccHelpers.getNestedVariables(retVal, varList);
-                    contVal = ccHelpers.listTypesWithin(retVal.elts, contVal, functionObject.indexAndInput, opsPerformed);
                     functionObject.nodeElements = [{
                         line: node.lineno,
                         elts: retVal.elts
@@ -1471,16 +1317,8 @@ function findReturnInBody(node, functionObject) {
                 } else if (retVal._astname === "Compare") {
                     //comparison also becomes a bool
                     ccHelpers.getNestedVariables(retVal, varList);
-                    valueType = "Bool";
-                    contVal = [];
                     opsPerformed = ccHelpers.addOpToList("Compare", opsPerformed, node.lineno);
-                    ccHelpers.listTypesWithin(retVal, contVal, functionObject.indexAndInput, opsPerformed);
                 }
-            }
-            //if we know what it is, we don't have to bother flagging it
-            if (valueType !== "" && valueType !== "Subscript" && valueType !== "BinOp") {
-                flag = "";
-                funcOrVar = "";
             }
             if (functionObject != null && functionObject.opsDone != null) {
                 opsPerformed = ccHelpers.appendOpList(functionObject.opsDone, opsPerformed);
@@ -1489,15 +1327,6 @@ function findReturnInBody(node, functionObject) {
                 variablesIncluded = true;
             }
             //fill in properties
-            functionObject.returns = valueType;
-            functionObject.funcVar = funcOrVar;
-            functionObject.flagVal = flag;
-            functionObject.binOp = binVal;
-            if (contVal != null) {
-                for (var g = 0; g < contVal.length; g++) {
-                    functionObject.containedValue.push(contVal[g]);
-                }
-            }
             if (isIndexed) {
                 functionObject.indexAndInput.indexed = true;
             }
@@ -1572,10 +1401,6 @@ function checkForFunctions(node, results) {
             params: paramList,
             paramFuncsCalled: []
         });
-        var funcOrVar = "";
-        var flag = "";
-        var valueType = "";
-        var binVal = null;
         var functionName = node.name.v;
         //create base function object
         var functionObj = {
@@ -1860,7 +1685,6 @@ function lookForParamReturns(node) {
                                 ccState.getProperty('userFunctionReturns')[index].indexAndInput.input = true;
                             }
                             if (ccState.getProperty('listFuncs').includes(funcName)) {
-                                valueType = "List";
                                 ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("ListOp", ccState.getProperty('userFunctionReturns')[index].opsDone, nodeItem.lineno);
                                 if (nodeItem.value.func.value._astname === "List") {
                                     var valuesInList = ccHelpers.listTypesWithin(nodeItem.value.func.value.elts, [], ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
@@ -1919,37 +1743,6 @@ function lookForParamReturns(node) {
                             if (!foundFunc) {
                                 ccState.getProperty('userFunctionReturns')[index].funcVar = "func";
                                 ccState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
-                            }
-                        }
-                        if (argType === "BinOp") {
-                            var contVal = [];
-                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('userFunctionReturns')[index], nodeItem.lineno);
-                            var binVal = ccHelpers.recursivelyAnalyzeBinOp(arg);
-                            if (typeof binVal === "string") {
-                                ccState.getProperty('userFunctionReturns')[index].returns = binVal;
-                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
-                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            } else if (Array.isArray(binVal)) {
-                                ccState.getProperty('userFunctionReturns')[index].returns = "List";
-                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
-                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                ccState.getProperty('userFunctionReturns')[index].nodeElements = [{
-                                    line: arg.lineno,
-                                    elts: binVal
-                                }];
-                                ccState.getProperty('userFunctionReturns')[index].stringElements = [{
-                                    line: arg.lineno,
-                                    elts: ccHelpers.nodesToStrings(binVal)
-                                }];
-                            } else {
-                                ccState.getProperty('userFunctionReturns')[index].returns = "BinOp";
-                                ccState.getProperty('userFunctionReturns')[index].binOp = binVal;
-                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
-                            }
-                            if (contVal.length > 0) {
-                                ccState.getProperty('userFunctionReturns')[index].containedValue = contVal;
                             }
                         }
                         if (argType === "List") {
@@ -2199,48 +1992,8 @@ function lookForParamReturns(node) {
                         } else if (type === "Name" && (argsIn[a].id.v === "True" || argsIn[a].id.v === "False")) {
                             paramArgVar.value = "Bool";
                         } else if (type === "Name") {
-                            var otherVar = node.args[a].id.v;
-                            var foundOtherVar = false;
-                            var otherVariableLocated = ccHelpers.getVariableObject(otherVar);
-                            if (otherVariableLocated != null && otherVariableLocated.value !== "" && otherVariableLocated.value !== "BinOp") {
-                                foundOtherVar = true;
-                                ccHelpers.copyAttributes(otherVariableLocated, paramArgVar, ["value", "flagVal", "binOp", "nested", "indexAndInput", "original", "nodeElements", "stringElements"]);
-                                ccHelpers.appendArray(otherVariableLocated.containedValue, paramArgVar.containedValue);
-                                paramArgVar.opsDone = ccHelpers.appendOpList(otherVariableLocated.opsDone, paramArgVar.opsDone);
-                            }
-                            if (!foundOtherVar) {
-                                paramArgVar.funcVar = "var";
-                                paramArgVar.flagVal = otherVar;
-                            }
-                        } else if (type === "BinOp") {
-                            var nestedBinOp = [];
-                            ccHelpers.getNestedVariables(node.args[a], nestedBinOp);
-                            paramArgVar.opsDone = ccHelpers.addOpToList("BinOp", paramArgVar.opsDone, node.lineno);
-                            if (nestedBinOp.length > 0) {
-                                paramArgVar.nested = true;
-                            }
-                            var binVal = ccHelpers.recursivelyAnalyzeBinOp(node.args[a]);
-                            if (binVal != null && typeof binVal === 'string' && !binVal.includes(':')) {
-                                paramArgVar.value = binVal;
-                            } else if (binVal != null && Array.isArray(binVal)) {
-                                //list binops
-                                paramArgVar.value = "List";
-                                paramArgVar.nodeElements.push({
-                                    line: node.lineno,
-                                    elts: binVal
-                                });
-                                paramArgVar.stringElements.push({
-                                    line: node.lineno,
-                                    elts: ccHelpers.nodesToStrings(binVal)
-                                });
-                            } else {
-                                //if we don't have an answer yet, store the binop object for later evaluation
-                                paramArgVar.value = "BinOp";
-                                paramArgVar.binOp = binVal;
-                            }
-                            var binOpTypes = ccHelpers.listTypesWithin(node.args[a], [], paramArgVar.indexAndInput, paramArgVar.opsDone);
-                            paramArgVar.containedVal = binOpTypes;
-                        } else if (type === "Call") {
+                           
+                        }  else if (type === "Call") {
                             //then it's whatever that call returns
                             var funcName = "";
                             var item = argsIn[a].func;
@@ -2254,7 +2007,6 @@ function lookForParamReturns(node) {
                                 functionObject.indexAndInput.input = true;
                             }
                             if (ccState.getProperty('listFuncs').includes(funcName)) {
-                                valueType = "List";
                                 paramArgVar.opsDone = ccHelpers.addOpToList("ListOp", paramArgVar.opsDone, node.lineno);
                                 if (node.value.func.value._astname === "List" || node.value.func.value._astname === "BinOp") {
                                     var valuesInList = ccHelpers.listTypesWithin(node.value.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
@@ -2422,7 +2174,6 @@ function lookForParamReturns(node) {
                                 ccState.getProperty('userFunctionReturns')[index].indexAndInput.input = true;
                             }
                             if (ccState.getProperty('listFuncs').includes(funcName)) {
-                                valueType = "List";
                                 ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("ListOp", ccState.getProperty('userFunctionReturns')[index].opsDone, node.lineno);
                                 if (node.value.func.value._astname === "List") {
                                     var valuesInList = ccHelpers.listTypesWithin(node.value.func.value.elts, [], ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
@@ -2483,37 +2234,7 @@ function lookForParamReturns(node) {
                                 ccState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
                             }
                         }
-                        if (argType === "BinOp") {
-                            var contVal = [];
-                            ccState.getProperty('userFunctionReturns')[index].opsDone = ccHelpers.addOpToList("BinOp", ccState.getProperty('userFunctionReturns')[index], node.lineno);
-                            var binVal = ccHelpers.recursivelyAnalyzeBinOp(arg);
-                            if (typeof binVal === "string") {
-                                ccState.getProperty('userFunctionReturns')[index].returns = binVal;
-                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
-                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
-                            } else if (Array.isArray(binVal)) {
-                                ccState.getProperty('userFunctionReturns')[index].returns = "List";
-                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
-                                ccState.getProperty('userFunctionReturns')[index].flagVal = "";
-                                ccState.getProperty('userFunctionReturns')[index].funcVar = "";
-                                ccState.getProperty('userFunctionReturns')[index].nodeElements = [{
-                                    line: arg.lineno,
-                                    elts: binVal
-                                }];
-                                ccState.getProperty('userFunctionReturns')[index].stringElements = [{
-                                    line: arg.lineno,
-                                    elts: ccHelpers.nodesToStrings(binVal)
-                                }];
-                            } else {
-                                ccState.getProperty('userFunctionReturns')[index].returns = "BinOp";
-                                ccState.getProperty('userFunctionReturns')[index].binOp = binVal;
-                                ccHelpers.listTypesWithin(arg, contVal, ccState.getProperty('userFunctionReturns')[index].indexAndInput, ccState.getProperty('userFunctionReturns')[index].opsDone);
-                            }
-                            if (contVal.length > 0) {
-                                ccState.getProperty('userFunctionReturns')[index].containedValue = contVal;
-                            }
-                        }
+
                         if (argType === "List") {
                             ccState.getProperty('userFunctionReturns')[index].flagVal = "";
                             ccState.getProperty('userFunctionReturns')[index].funcVar = "";
@@ -2953,17 +2674,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
             } else if (singleArg._astname === 'Name' && singleArg.id.v !== "True" && singleArg.id.v !== "False") {
                 //if it's a variable, we mark its value/contained values
                 var lineNumberToUse = node.lineno;
-                var otherVar = ccHelpers.getVariableObject(singleArg.id.v);
-                if (otherVar != null) {
-                    purposeVars = true;
-                    originalAssignment = otherVar.original;
-                    if ((originalAssignment || originality) && otherVar.indexAndInput.indexed) {
-                        results["List"] = 4;
-                    }
-                    if ((otherVar.containedValue != null && otherVar.containedValue.includes("List")) || otherVar.value == "List") {
-                        argResults["List"] = true;
-                    }
-                }
+               
                 //check to see if this is a variable whose value has been changed at least once before this call
                 var argModded = false;
                 var modOriginality = false;
@@ -2973,60 +2684,6 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 var assignOriginality = false;
                 var varType = "";
                 var varInput = false;
-                var otherVar = ccHelpers.getVariableObject(singleArg.id.v);
-                if (otherVar != null) {
-                    var numberOfMods = 0;
-                    //check if the variable's value has been changed at least once after it was declared
-                    //ops done
-                    //is the use inside or outside a function?
-                    for (var n = 0; n < otherVar.modifyingFunctions.length; n++) {
-                        if (node.lineno >= otherVar.modifyingFunctions[n][0] && node.lineno <= otherVar.modifyingFunctions[n][1]) {
-                            insideOutside = "inside";
-                            insideLines = otherVar.modifyingFunctions[n];
-                            break;
-                        }
-                    }
-                    if (insideOutside === "outside") {
-                        insideLines = [];
-                        for (var n = 0; n < otherVar.modifyingFunctions.length; n++) {
-                            for (var line = otherVar.modifyingFunctions[n][0]; line <= otherVar.modifyingFunctions[n][1]; line++) {
-                                insideLines.push(line);
-                            }
-                        }
-                    }
-                    for (var z = 0; z < otherVar.assignedModified.length; z++) {
-                        if (otherVar.assignedModified[z].line > node.lineno) {
-                            //stop loop before we get to the current line OR if both things we're looking for are already set to true.
-                            break;
-                        }
-                        //is there a modification? is it original? is it inside/outside the function as appropriate?
-                        if (otherVar.assignedModified[z].line <= node.lineno) {
-                            if ((insideOutside === "inside" && node.lineno >= insideLines[0] && node.lineno <= insideLines[1]) || (insideOutside === "outside" && !insideLines.includes(node.lineno))) {
-                                argModded = true;
-                                numberOfMods += 1;
-                                if (otherVar.assignedModified[z].original) {
-                                    modOriginality = true;
-                                }
-                            }
-                        }
-                    }
-                    varType = otherVar.value;
-                    varInput = otherVar.indexAndInput.input;
-                    //update results object
-                    if (argModded && (originality || modOriginality) && ((insideOutside === "outside" && numberOfMods > 1) || (insideOutside === "inside" && numberOfMods > 0))) {
-                        results.variables = 4;
-                    }
-                    if (otherVar.original || originality) {
-                        if (varInput && results.consoleInput < 3) {
-                            results.consoleInput = 3;
-                        }
-                        if (results.variables < 3) {
-                            results.variables = 3;
-                        } else if (results[varType] < 3 && varType == "List") {
-                            results[varType] = 3;
-                        }
-                    }
-                }
                 //update results
                 if (originality || assignOriginality || functionOriginality) {
                     if (purposeVars && (results.variables < 3)) {
@@ -3338,9 +2995,6 @@ function analyzeASTNode(node, results, loopParent) {
             if (node._astname === 'If') {
                 ccHelpers.notateConditional(node);
                 uses["conditionals"] = true;
-                if (node.test._astname === "Compare") {
-                    usesCompare = true;
-                }
                 if (node.test._astname === "Name") { usesBooleans = true; }
                 if (node.test._astname === "BoolOp" || node.test._astname === "UnaryOp") {
                     usesBooleans = true;
@@ -3517,7 +3171,6 @@ function analyzeASTNode(node, results, loopParent) {
                 }
                 purposeVars = false;
                 var inputUsed = false;
-                containedTypes = [];
                 //check the test node
                 var testNode = node.test;
                 if (testNode._astname === "UnaryOp") {
@@ -3571,11 +3224,7 @@ function analyzeASTNode(node, results, loopParent) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        ccHelpers.listTypesWithin(testNode, containedTypes, {
-                            input: false,
-                            indexed: false,
-                            strIndexed: false
-                        }, []);
+                        
                     } else {
                         results.comparisons = 3;
                         var inputIndexItem = {
@@ -3584,7 +3233,6 @@ function analyzeASTNode(node, results, loopParent) {
                             strIndexed: false
                         };
                         var operations = [];
-                        ccHelpers.listTypesWithin(testNode, containedTypes, inputIndexItem, operations);
                         if (inputIndexItem.indexed) {
                             results["List"] = 4;
                         }
@@ -3603,14 +3251,8 @@ function analyzeASTNode(node, results, loopParent) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        ccHelpers.listTypesWithin(testNode, containedTypes, {
-                            indexed: false,
-                            input: false,
-                            strIndexed: false
-                        }, []);
                     } else {
                         var operations = [];
-                        ccHelpers.listTypesWithin(testNode, containedTypes, inputIndexItem, operations);
                     }
                     if (inputIndexItem.indexed) {
                         results["List"] = 4;
@@ -3629,14 +3271,9 @@ function analyzeASTNode(node, results, loopParent) {
                         results["List"] = 4;
                     }
                     if (!originality) {
-                        ccHelpers.listTypesWithin(testNode, containedTypes, {
-                            input: false,
-                            indexed: false,
-                            strIndexed: false
-                        }, []);
+                      
                     } else {
                         var operations = [];
-                        ccHelpers.listTypesWithin(testNode, containedTypes, inputIndexPurp, operations);
                     }
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
@@ -3654,16 +3291,7 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
-                    if (!originality) {
-                        containedTypes = ccHelpers.listTypesWithin(testNode.elts, containedTypes, {
-                            input: false,
-                            indexed: false,
-                            strIndexed: false
-                        }, []);
-                    } else {
-                        var operations = [];
-                        containedTypes = ccHelpers.listTypesWithin(testNode.elts, containedTypes, inputIndexPurp, operations);
-                    }
+                    
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
                     }
@@ -4554,45 +4182,7 @@ function analyzeASTNode(node, results, loopParent) {
                         var assignOriginality = false;
                         var varType = "";
                         var varInput = false;
-                        var otherVar = ccHelpers.getVariableObject(nodeValue.id.v);
-                        if (otherVar != null) {
-                            var numberOfMods = 0;
-                            //is the use inside or outside a function?
-                            for (var n = 0; n < otherVar.modifyingFunctions.length; n++) {
-                                if (node.lineno >= otherVar.modifyingFunctions[n][0] && node.lineno <= otherVar.modifyingFunctions[n][1]) {
-                                    insideLines = otherVar.modifyingFunctions[n];
-                                    break;
-                                }
-                            }
-                            for (var z = 0; z < otherVar.assignedModified.length; z++) {
-                                if (otherVar.assignedModified[z].line > node.lineno) { break; } //stop loop before we get to the current line OR if both thigns we're looking for are already set to true.
-                                //is there a modification? is it original? is it inside/outside the function as appropriate?
-                                if (otherVar.assignedModified[z].line <= node.lineno) {
-                                    if ((insideOutside === "inside" && node.lineno >= insideLines[0] && node.lineno <= insideLines[1]) || (insideOutside === "outside" && !insideLines.includes(node.lineno))) {
-                                        argModded = true;
-                                        numberOfMods += 1;
-                                        if (otherVar.assignedModified[z].original) { modOriginality = true; }
-                                    }
-                                }
-                            }
-                            varType = otherVar.value;
-                            varInput = otherVar.indexAndInput.input;
-                            //update results
-                            if (argModded && (originality || modOriginality) && ((insideOutside === "outside" && numberOfMods > 1) || (insideOutside === "inside" && numberOfMods > 0))) {
-                                results.variables = 4;
-                            }
-                            if (otherVar.original || originality) {
-                                if (varInput && results.consoleInput < 3) {
-                                    results.consoleInput = 3;
-                                }
-                                if (results.variables < 3) {
-                                    results.variables = 3;
-                                }
-                                if (results[varType] < 3) {
-                                    results[varType] = 3;
-                                }
-                            }
-                        }
+                        
                     }
                 }
             }
@@ -4721,19 +4311,7 @@ function analyzeASTNode(node, results, loopParent) {
                             //then it's a variable. look up what's in there.
                             purposeVars = true;
                             var lineNumberToUse = node.lineno;
-                            var otherVar = ccHelpers.getVariableObject(nodeToCheck.id.v);
-                            if (otherVar != null) {
-                                originalAssignment = otherVar.original;
-                                if ((originalAssignment || originality) && otherVar.indexAndInput.indexed) {
-                                    results["List"] = 4;
-                                }
-                                if (otherVar.containedValue != null) {
-                                    for (var c = 0; c < otherVar.containedValue.length; c++) {
-                                        argResults[otherVar.containedValue[c]] = true;
-                                    }
-                                }
-                                argResults[otherVar.value] = true;
-                            }
+                            
                         } else if ((nodeToCheck._astname === "BinOp" || nodeToCheck._astname === "BoolOp" || nodeToCheck._astname === "Compare" || nodeToCheck._astname === "List")) {
                             if (ccHelpers.getIndexingInNode(nodeToCheck)[0] && (originality || ccHelpers.getIndexingInNode(nodeToCheck)[1])) {
                                 results["List"] = 4;
@@ -4853,59 +4431,7 @@ function analyzeASTNode(node, results, loopParent) {
                             var assignOriginality = false;
                             var varType = "";
                             var varInput = false;
-                            var otherVar = ccHelpers.getVariableObject(nodeToCheck.id.v);
-                            if (otherVar != null) {
-                                var numberOfMods = 0;
-                                //ops done
-                                //is the use inside or outside a function?
-                                for (var n = 0; n < otherVar.modifyingFunctions.length; n++) {
-                                    if (node.lineno >= otherVar.modifyingFunctions[n][0] && node.lineno <= otherVar.modifyingFunctions[n][1]) {
-                                        insideOutside = "inside";
-                                        insideLines = otherVar.modifyingFunctions[n];
-                                        break;
-                                    }
-                                }
-                                if (insideOutside === "outside") {
-                                    insideLines = [];
-                                    for (var n = 0; n < otherVar.modifyingFunctions.length; n++) {
-                                        for (var line = otherVar.modifyingFunctions[n][0]; line <= otherVar.modifyingFunctions[n][1]; line++) {
-                                            insideLines.push(line);
-                                        }
-                                    }
-                                }
-                                for (var z = 0; z < otherVar.assignedModified.length; z++) {
-                                    if (otherVar.assignedModified[z].line > node.lineno) {
-                                        //stop loop before we get to the current line OR if both things we're looking for are already set to true.
-                                        break;
-                                    }
-                                    //is there a modification? is it original? is it inside/outside the function as appropriate?
-                                    if (otherVar.assignedModified[z].line <= node.lineno) {
-                                        if ((insideOutside === "inside" && node.lineno >= insideLines[0] && node.lineno <= insideLines[1]) || (insideOutside === "outside" && !insideLines.includes(node.lineno))) {
-                                            argModded = true;
-                                            numberOfMods += 1;
-                                            if (otherVar.assignedModified[z].original) {
-                                                modOriginality = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                varType = otherVar.value;
-                                varInput = otherVar.indexAndInput.input;
-                                if (argModded && (originality || modOriginality) && ((insideOutside === "outside" && numberOfMods > 1) || (insideOutside === "inside" && numberOfMods > 0))) {
-                                    results.variables = 4;
-                                }
-                                if (otherVar.original || originality) {
-                                    if (varInput && results.consoleInput < 3) {
-                                        results.consoleInput = 3;
-                                    }
-                                    if (results.variables < 3) {
-                                        results.variables = 3;
-                                    }
-                                    if (varType === "List" && results["List"] < 3) {
-                                        results["List"] = 3;
-                                    }
-                                }
-                            }
+                           
                         }
                         //is it something else that can CONTAIN a variable value?
                         if (nodeToCheck._astname === "List" || nodeToCheck._astname === "BinOp" || nodeToCheck._astname === "BoolOp" || nodeToCheck._astname === "Compare") {
