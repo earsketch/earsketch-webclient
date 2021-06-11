@@ -240,7 +240,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             if (annotations.some(function (note) {
                     return note.type === 'error'
                 })) {
-                userConsole.warn(ESMessages.idecontroller.blocksyntaxerror);
+                userConsole.warn(i18n.t('messages:idecontroller.blocksyntaxerror'));
             } else {
                 userConsole.clear();
             }
@@ -653,7 +653,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
                 $scope.isWaitingForServerResponse = false;
             }).catch(function (err) {
-                userNotification.show(ESMessages.idecontroller.savefailed, 'failure1');
+                userNotification.show(i18n.t('messages:idecontroller.savefailed'), 'failure1');
                 $scope.isWaitingForServerResponse = false;
             });
         } else {
@@ -839,7 +839,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             $scope.notAllowedToAddSound = false;
         } else {
             if ($scope.logs) {
-                $scope.logs.push(ESMessages.general.unauthenticated);
+                $scope.logs.push(i18n.t('messages:general.unauthenticated'));
             } else {
                 esconsole('trying to add log to $scope.logs which does not exist', 'debug');
             }

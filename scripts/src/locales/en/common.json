@@ -99,6 +99,25 @@
       "useralreadyexists": "Provided username or email already exists. Please try 'Forgot Password' feature if you cannot access your account.",
       "commerror": "Communication error ...",
       "usernameconstraint": "Usernames must not start with a number and cannot include spaces or special characters"
+    },
+    "general": {
+      "unauthenticated": "Please login before using this feature...",
+      "loginsuccess": "Login successful",
+      "loginfailure": "Your username or password is incorrect. Please try logging in again or register a new account.",
+      "complexitySyntaxError": "Failed to run the code indicator. There might be a syntax error in your code.",
+      "soundrenamed": "Successfully renamed sound",
+      "renameSoundEmpty": "Sound name cannot be empty (or only contain \"_\")!",
+      "renameSoundSpecialChar": "Removing special characters in the renaming process...",
+      "renameSoundConflict": "Sound name already in use",
+      "shortname": "Please provide a name that is at least 3 characters long."
+    },
+    "idecontroller": {
+      "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
+      "illegalname": "Please use only regular characters, numbers, or _ in file names.",
+      "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",
+      "blocksyntaxerror": "Failed to switch to the block mode. Please make sure that there is no syntax error in the code.",
+      "saveallfailed": "Some scripts could not be saved to the cloud. Please save your changes offline to avoid losing them.",
+      "closealltabs":"This will close all open tabs. Are you sure you want to proceed?"
     }
   }
 }

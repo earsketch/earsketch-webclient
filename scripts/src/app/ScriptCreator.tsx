@@ -1,18 +1,20 @@
 import React, { useState } from "react"
 
-import ESMessages from "../data/messages"
 import * as userProject from './userProject'
+import { useTranslation } from "react-i18next"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
+    const { t } = useTranslation()
+
     if (name.length < 3) {
-        throw ESMessages.general.shortname
+        throw t('messages:general.shortname')
     } else if (/[$-/:-?{-~!"^#`\[\]\\]/g.test(name)) {
         // Why are hyphens banned from script names?
-        throw ESMessages.idecontroller.illegalname
+        throw t('messages:idecontroller.illegalname')
     } else if (Object.values(userProject.scripts).some(script => !script.soft_delete && script.name === fullname)) {
         // Conflict with existing script.
-        throw ESMessages.idecontroller.overwrite
+        throw t('messages:idecontroller.overwrite')
     } else {
         // Valid name.
         return name + extension

@@ -415,7 +415,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                             // showLoginMessageAfterLoading = true;
                             // $rootScope.$broadcast('showLoginMessage');
                         } else {
-                            userNotification.show(ESMessages.general.loginsuccess, 'normal', 0.5);
+                            userNotification.show(i18n.t('messages:general.loginsuccess'), 'normal', 0.5);
                         }
 
                         if ($location.search()['sharing'] && $scope.isManualLogin) {
@@ -432,7 +432,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
             }
         }).catch(error => {
-            userNotification.show(ESMessages.general.loginfailure, 'failure1',  3.5);
+            userNotification.show(i18n.t('messages:general.loginfailure'), 'failure1',  3.5);
             esconsole(error, ['main','login']);
         });
     };
@@ -473,7 +473,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             $ngRedux.dispatch(tabs.resetTabs());
             $ngRedux.dispatch(tabs.resetModifiedScripts());
         }).catch(function (err) {
-            $confirm({text: ESMessages.idecontroller.saveallfailed,
+            $confirm({text: i18n.t('messages:idecontroller.saveallfailed'),
                 cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
                 $scope.scripts = [];
                 userProject.clearUser();
@@ -1069,11 +1069,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.closeAllTabs = () => {
-        $confirm({text: ESMessages.idecontroller.closealltabs, ok: "Close All"}).then(() => {
+        $confirm({text: i18n.t('messages:idecontroller.closealltabs'), ok: "Close All"}).then(() => {
             userProject.saveAll().then(() => {
                 userNotification.show(i18n.t('messages:user.allscriptscloud'));
                 $ngRedux.dispatch(tabs.closeAllTabs());
-            }).catch(() => userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1'));
+            }).catch(() => userNotification.show(i18n.t('messages:idecontroller.saveallfailed'), 'failure1'));
 
             $scope.$applyAsync();
         });

@@ -681,7 +681,7 @@ export async function importScript(script: ScriptEntity) {
             imported.name = script.name
             return Promise.resolve(imported)
         } else {
-            throw ESMessages.general.unauthenticated
+            throw i18n.t('messages:general.unauthenticated')
         }
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).

@@ -1,6 +1,6 @@
 ﻿// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
-import ESMessages from '../data/messages'
 import * as userNotification from './userNotification'
+import i18n from "i18next"
 
 
 interface CodeFeatures {
@@ -39,7 +39,7 @@ function pythonAst(source: string) {
         const parse = Sk.parse("<analyzer>", source)
         return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
     } catch (error) {
-        userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5)
+        userNotification.show(i18n.t('messages:general.complexitySyntaxError'), 'failure2', 5)
         throw error
     }
 }
@@ -130,7 +130,7 @@ export function analyzeJavascript(source: string) {
         }
         return recursiveAnalyzeJavascript(ast, features)
     } catch (err) {
-        userNotification.show(ESMessages.general.complexitySyntaxError, 'failure2', 5)
+        userNotification.show(i18n.t('messages:general.complexitySyntaxError'), 'failure2', 5)
         throw err
     }
 }
