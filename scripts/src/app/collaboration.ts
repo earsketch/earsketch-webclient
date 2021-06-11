@@ -339,20 +339,19 @@ function onMemberLeftSession(data: Message) {
     helpers.getNgRootScope().$apply()  // update GUI
 }
 
-export function addCollaborators(shareID: string, userName: string, addedCollaborators: string[]) {
-    // #1858 Note: addedCollaborators are already converted to lower case in shareScriptController.js:328.
-    if (addedCollaborators.length !== 0) {
+export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
+    if (collaborators.length !== 0) {
         // add script name info (done in the server side now)
         websocket.send({
             ...makeWebsocketMessage(),
             action: "addCollaborators",
             scriptID: shareID,
             sender: userName.toLowerCase(),  // #1858
-            collaborators: addedCollaborators,
+            collaborators: collaborators,
         })
 
         if (scriptID === shareID && active) {
-            for (const member of addedCollaborators) {
+            for (const member of collaborators) {
                 otherMembers[member] = {
                     active: false,
                     canEdit: true
@@ -362,19 +361,18 @@ export function addCollaborators(shareID: string, userName: string, addedCollabo
     }
 }
 
-export function removeCollaborators(shareID: string, userName: string, removedCollaborators: string[]) {
-    // #1858 Note: removedCollaborators are already converted to lower case in shareScriptController.js:328.
-    if (removedCollaborators.length !== 0) {
+export function removeCollaborators(shareID: string, userName: string, collaborators: string[]) {
+    if (collaborators.length !== 0) {
         websocket.send({
             ...makeWebsocketMessage(),
             action: "removeCollaborators",
             scriptID: shareID,
             sender: userName.toLowerCase(),  // #1858
-            collaborators: removeCollaborators,
+            collaborators: collaborators,
         })
 
         if (scriptID === shareID && active) {
-            for (const member of removedCollaborators) {
+            for (const member of collaborators) {
                 delete otherMembers[member]
             }
         }
