@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { react2angular } from "react2angular"
 
 import * as recorder from "./esrecorder"
 
-const LevelMeter = () => {
+export const LevelMeter = () => {
     const HEIGHT = 15
     const WIDTH = 250
     const STROKE_WIDTH = 2
@@ -50,32 +49,47 @@ const BEAT_POSITIONS = {
     3: "topleft",
 } as { [key: number]: string }
 
-const Metronome = ({ micIsOn, hasBuffer, useMetro, isRecording, isPreviewing, curMeasure, curMeasureShow }:
-                   { micIsOn: boolean, hasBuffer: boolean, useMetro: boolean, isRecording: boolean,
-                     isPreviewing: boolean, curMeasure: number, curMeasureShow: number }) => {
-    const [state, setState] = useState("topright")
+export const Metronome = ({ countoff, hasBuffer, useMetro }: { countoff: number, hasBuffer: boolean, useMetro: boolean }) => {
+    const [state, setState] = useState("")
+    const [position, setPosition] = useState("topright")
+    const [measure, setMeasure] = useState(0)
+    const showMeasure = measure - countoff + 1
 
     recorder.callbacks.clickOnMetronome = (beat) => {
         if (recorder.properties.useMetro) {
-            setState(BEAT_POSITIONS[beat])
-        } else {
-            setState("hide-metronome")
+            setPosition(BEAT_POSITIONS[beat])
+        }
+        if (beat === 0) {
+            setMeasure(measure + 1)
         }
     }
 
-    return <div className={"counter-meter " + state}>
-        {micIsOn && !hasBuffer && !(useMetro && isRecording)
-        && <span id="record-button" onClick={recorder.toggleRecord}>
-            <i className={"icon icon-recording" + (isRecording ? " blink recording" : "")}></i>
-        </span>}
-        {isRecording && useMetro
-        && <span>{curMeasureShow}</span>}
-        {hasBuffer && !isRecording
-        && <div id="preview-button" onClick={recorder.togglePreview}>
-            {!isPreviewing && curMeasure >= 0
-            ? <span id="play-icon"><i className="icon icon-play4"></i></span>
-            : <span id="stop-icon"><i className="icon icon-stop2"></i></span>}
-        </div>}
+    if (hasBuffer) {
+        if (state === "record") {
+            setState("")
+            setMeasure(0)
+        }
+    }
+
+    const IndicatorButton = () => {
+        if (state === "record") {
+            if (useMetro) {
+                return showMeasure > 0 ? <span className="text-7xl">{showMeasure}</span> : <span className="text-2xl font-bold">Get ready!</span>
+            } else {
+                return <i className="text-5xl icon icon-recording blink recording" onClick={() => { recorder.stopRecording(); setState("") }} />
+            }
+        } else if (state === "preview") {
+            return <i className="text-5xl block icon icon-stop2" onClick={() => { recorder.stopPreview(); setState("") }} />
+        } else if (hasBuffer) {
+            return <i className="text-5xl block icon icon-play4" onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }} />
+        } else {
+            return <i className="text-5xl icon icon-recording" onClick={() => { recorder.startRecording(); setState("record") }} />
+        }
+    }
+
+    return <div className="flex items-center">
+        <div className="text-center z-10" style={{ marginLeft: "10px", width: "60px" }}><IndicatorButton /></div>
+        <div className={"fixed counter-meter " + (useMetro ? position : "hide-metronome")} />
     </div>
 }
 
@@ -104,7 +118,7 @@ function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp:
     }
 }
 
-const Waveform = () => {
+export const Waveform = () => {
     const setup = useCallback(canvas => {
         if (!canvas) return
 
@@ -166,7 +180,3 @@ const Waveform = () => {
 
     return <canvas ref={setup} width={WIDTH} height={HEIGHT}></canvas>
 }
-
-app.component("levelMeter", react2angular(LevelMeter))
-app.component("visualMetronome", react2angular(Metronome, ["micIsOn", "hasBuffer", "useMetro", "isRecording", "isPreviewing", "curMeasure", "curMeasureShow"]))
-app.component("drawWaveform", react2angular(Waveform))

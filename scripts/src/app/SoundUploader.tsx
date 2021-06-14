@@ -1,18 +1,19 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
-import * as RecorderService from './esrecorder'
+import * as recorder from './esrecorder'
 import * as sounds from '../browser/soundsState'
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification'
 import * as userProject from './userProject'
 import i18n from "i18next"
 import store from "../reducers"
+import { LevelMeter, Metronome, Waveform } from "./Recorder"
 
-async function uploadFile(file: File, key: string, tempo: number, onProgress: (frac: number) => void) {
+async function uploadFile(file: Blob, key: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
     if (userProject.getUsername() == null) {
         throw i18n.t('messages:uploadcontroller.userAuth')
     }
@@ -37,7 +38,8 @@ async function uploadFile(file: File, key: string, tempo: number, onProgress: (f
         file,
         username: userProject.getUsername(),
         file_key: key,
-        filename: file.name,
+        // TODO: I don't think the server should allow arbitrary filenames unrelated to the key. This field should probably be replaced or removed.
+        filename: `${key}${extension}`,
         tempo: tempo + "",
     })
 
@@ -98,7 +100,7 @@ const FileTab = ({ close }: { close: () => void }) => {
 
     const submit = async () => {
         try {
-            await uploadFile(file!, key, tempo === "" ? -1 : +tempo, setProgress)
+            await uploadFile(file!, key, extension, tempo === "" ? -1 : +tempo, setProgress)
             close()
         } catch (error) {
             setError(error)
@@ -120,7 +122,7 @@ const FileTab = ({ close }: { close: () => void }) => {
                     </label>
                 </div>
                 <div className="modal-section-header">
-                    <span>Constant Value (required)</span>
+                    <span>Constant Name (required)</span>
                     <span>Tempo (Optional)</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
@@ -137,128 +139,141 @@ const FileTab = ({ close }: { close: () => void }) => {
     </form>
 }
 
-const RecordTab = () => {
-    // $scope.recError = ''
-    // $scope.micAccessError = false
-    // $scope.micAccessMessage = ''
-    // $scope.notAllowedToRecord = false
+const RecordTab = ({ close }: { close: () => void }) => {
+    const [key, setKey] = useState("")
+    const [error, setError] = useState("")
+    const [progress, setProgress] = useState(null as number | null)
+    const [blob, setBlob] = useState(null as Blob | null)
 
-    // $scope.recorder = RecorderService
-    // RecorderService.callbacks.prepareForUpload = (data, useMetro, tempo) => {
-    //     $scope.file.data = data
-    //     if (useMetro) {
-    //         $scope.file.tempo = tempo
-    //     }
-    // }
+    const [tempo, _setTempo] = useState(120)
+    const [metronome, _setMetronome] = useState(true)
+    const [click, _setClick] = useState(false)
+    const [countoff, _setCountoff] = useState(1)
+    const [measures, _setMeasures] = useState(2)
+    const [micReady, setMicReady] = useState(false)
 
-    // $scope.openRecordMenu = function () {
-    //     if (ESUtils.whichBrowser().match('Chrome|Firefox') == null) {
-    //         $scope.recError = i18n.t('messages:uploadcontroller.nosupport')
-    //     } else {
-    //         RecorderService.init()
-    //     }
-    // }
+    // TODO: Remove duplicate state from recorder.
+    const setTempo = (tempo: number) => {
+        _setTempo(tempo)
+        recorder.properties.bpm = tempo
+    }
 
-    // RecorderService.callbacks.micAccessBlocked = function (error) {
-    //     $scope.$apply(function () {
-    //         $scope.micAccessError = true
-    //         if (error == "chrome_mic_noaccess") {
-    //             $scope.micAccessMessage = i18n.t('messages:uploadcontroller.chrome_mic_noaccess')
-    //         } else if (error == "ff_mic_noaccess") {
-    //             $scope.micAccessMessage = i18n.t('messages:uploadcontroller.ff_mic_noaccess')
-    //         }
-    //         $scope.notAllowedToRecord = true
-    //         $timeout(function () {
-    //             $scope.notAllowedToRecord = false
-    //         }, 1000)
-    //     })
-    // }
+    const setMetronome = (metronome: boolean) => {
+        _setMetronome(metronome)
+        recorder.properties.useMetro = metronome
+    }
 
-    // RecorderService.callbacks.openRecordMenu = function () {
-    //     $scope.$apply(function () {
-    //         $scope.micAccessError = false
-    //         $scope.micAccessMessage = ''
-    //     })
-    //     // $scope.activePill = $scope.menus.record
-    // }
+    const setClick = (click: boolean) => {
+        _setClick(click)
+        recorder.properties.clicks = click
+    }
 
-    // return <form onSubmit={e => { e.preventDefault(); submit() }}>
-    //     <div className="modal-body">
-    //         <div className="alert alert-danger" ng-show="uploadError">
-    //             {uploadError}
-    //         </div>
-    //         <div className="alert alert-danger" ng-show="recError">
-    //             {recError}
-    //         </div>
-    //         <div className="alert alert-danger" ng-show="micAccessError">
-    //             <p>{micAccessMessage}</p>
-    //             <span className="shake" ng-className="{'notAllowedTo':notAllowedToRecord, '':!notAllowedToRecord}">
-    //                 <button className="buttonmodal" ng-click="openRecordMenu()">ENABLE MIC AND CLICK HERE TO TRY AGAIN.</button>
-    //             </span>
-    //         </div>
-    //         <div ng-hide="recError || micAccessError">
-    //             <div className="modal-section-header">
-    //                 <span>Constant Value (required)</span>
-    //             </div>
-    //             <div className="modal-section-content"> 
-    //                 <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" id="key" ng-model="file.key" ng-change="showUploadButton()" />
-    //             </div>
-    //             <div className="modal-section-header">
-    //                 <span>Measures Control</span>
-    //                 <button type="button" className="btn btn-hollow btn-filter" ng-show="recorder.properties.useMetro" ng-className="recorder.properties.clicks ? 'active' : ''" ng-click="recorder.properties.clicks = !recorder.properties.clicks">
-    //                     <span>CLICK WHILE RECORDING</span>
-    //                 </button>
-    //                 <button type="button" className="btn btn-hollow btn-filter" ng-className="recorder.properties.useMetro ? 'active' : ''" ng-click="recorder.properties.useMetro = !recorder.properties.useMetro">
-    //                     <span>METRONOME</span>
-    //                 </button>
-    //             </div>
-    //             <div className="modal-section-content" ng-show="recorder.properties.useMetro" id="count-measures-input">
-    //                 <div>
-    //                     <label>Tempo (beats per minute)</label>
-    //                     <input type="text" placeholder="e.g. 120" ng-model="recorder.properties.bpm" />
-    //                     <input id="tempoSlider" type="range" ng-model="recorder.properties.bpm" name="rangeTempo" min="45" max="220" />
-    //                 </div>
-    //                 <div>
-    //                     <label>Countoff Measures</label>
-    //                     <input type="text" placeholder="{{recorder.properties.countoff}}" ng-model="recorder.properties.countoff" />
-    //                 </div>
-    //                 <div>
-    //                     <label>Measures to Record</label>
-    //                     <input type="text" placeholder="{{recorder.properties.numMeasures}}" ng-model="recorder.properties.numMeasures" />
-    //                 </div>
-    //             </div>
-    //             <div className="modal-section-header">
-    //                 <span>Record Sound</span>
-    //                 <div id="levelmeter-container">
-    //                     <LevelMeter />
-    //                 </div>
-    //             </div>
-    //             <div className="modal-section-content" id="record-section-container">
-    //                 <div id="metronome">
-    //                     <VisualMetronome
-    //                         mic-is-on="recorder.micIsOn"
-    //                         has-buffer="recorder.hasBuffer"
-    //                         use-metro="recorder.properties.useMetro"
-    //                         is-recording="recorder.isRecording"
-    //                         is-previewing="recorder.isPreviewing"
-    //                         cur-measure="recorder.curMeasure"
-    //                         cur-measure-show="recorder.curMeasureShow" />
-    //                 </div>       
-    //                 <div id="waveform">
-    //                     <Waveform id="wavedisplay" />
-    //                 </div>
-    //                 <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" ng-show="recorder.hasBuffer" ng-click="recorder.clear(true);">
-    //                     <span>CLEAR</span>
-    //                 </button>
-    //             </div>
-    //         </div>
-    //     </div>
-    //     <div className="modal-footer">
-    //         <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-    //         <input type="submit" value="UPLOAD" className="btn btn-primary text-white" />
-    //     </div>
-    // </form>
-    return null
+    const setCountoff = (countoff: number) => {
+        _setCountoff(countoff)
+        recorder.properties.countoff = countoff
+    }
+
+    const setMeasures = (measures: number) => {
+        _setMeasures(measures)
+        recorder.properties.numMeasures = measures
+    }
+
+    recorder.callbacks.prepareForUpload = (blob, useMetro, tempo) => {
+        setBlob(blob)
+    }
+
+    const submit = async () => {
+        try {
+            await uploadFile(blob!, key, ".wav", metronome ? tempo : 120, setProgress)
+            close()
+        } catch (error) {
+            setError(error)
+        }
+    }
+
+    const openRecordMenu = () => {
+        setError("")
+        // TODO: Is this check still valid?
+        if (!/Chrome|Firefox/.test(ESUtils.whichBrowser())) {
+            setError(i18n.t('messages:uploadcontroller.nosupport'))
+        } else {
+            recorder.init()
+        }
+    }
+
+    recorder.callbacks.micAccessBlocked = error => {
+        if (error == "chrome_mic_noaccess") {
+            setError(i18n.t('messages:uploadcontroller.chrome_mic_noaccess'))
+        } else if (error == "ff_mic_noaccess") {
+            setError(i18n.t('messages:uploadcontroller.ff_mic_noaccess'))
+        }
+    }
+
+    recorder.callbacks.openRecordMenu = () => setMicReady(true)
+
+    useEffect(() => openRecordMenu(), [])
+
+    return <form onSubmit={e => { e.preventDefault(); submit() }}>
+        <div className="modal-body transparent">
+            {error && <div className="alert alert-danger">{error}</div>}
+            {!micReady &&
+            (error
+            ? <input type="button" className="btn btn-primary block m-auto" onClick={openRecordMenu} value="Enable mic and click here to try again." />
+            : "Waiting for microphone access...")}
+            {micReady && <div>
+                <div className="modal-section-header">
+                    <span>Constant Name (required)</span>
+                </div>
+                <div className="modal-section-content"> 
+                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} required />
+                </div>
+                <div className="modal-section-header">
+                    <span>Measures Control</span>
+                    {metronome && 
+                    <button type="button" className={"btn btn-hollow btn-filter" + (click ? " active" : "")} onClick={() => setClick(!click)}>
+                        <span>CLICK WHILE RECORDING</span>
+                    </button>}
+                    <button type="button" className={"btn btn-hollow btn-filter" + (metronome ? " active" : "")}
+                            onClick={() => setMetronome(!metronome)}>
+                        <span>METRONOME</span>
+                    </button>
+                </div>
+                {metronome &&
+                <div className="modal-section-content" id="count-measures-input">
+                    <label>
+                        Tempo (beats per minute)
+                        <input type="number" placeholder="e.g. 120" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
+                        <input id="tempoSlider" type="range" name="rangeTempo" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
+                    </label>
+                    <label>
+                        Countoff Measures
+                        <input type="number" value={countoff} onChange={e => setCountoff(+e.target.value)} required={metronome} />
+                    </label>
+                    <label>
+                        Measures to Record
+                        <input type="number" value={measures} onChange={e => setMeasures(+e.target.value)} required={metronome} />
+                    </label>
+                </div>}
+                <div className="modal-section-header">
+                    <span>Record Sound</span>
+                    <LevelMeter />
+                </div>
+                <div className="modal-section-content flex items-center justify-between">
+                    <Metronome countoff={countoff} hasBuffer={blob !== null} useMetro={metronome} />
+                    <Waveform />
+                    {recorder.hasBuffer &&
+                    <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(true); setBlob(null) }}>
+                        <span>CLEAR</span>
+                    </button>}
+                </div>
+            </div>}
+        </div>
+        <div className="modal-footer">
+            {progress !== null && <ProgressBar progress={progress} />}
+            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={blob === null} />
+        </div>
+    </form>
 }
 
 const FreesoundTab = () => {

@@ -21,8 +21,6 @@ let curBeat = -1
 export let analyserNode: AnalyserNode | null
 export let micIsOn = false
 export let isRecording = false
-export let curMeasure = 0
-export let curMeasureShow = 0
 export let buffer: AudioBuffer | null
 export let hasBuffer = false
 export let isPreviewing = false
@@ -53,8 +51,6 @@ export function clear(softClear?: boolean) {
         micIsOn = false
     }
     isRecording = false
-    curMeasure = 0
-    curMeasureShow = 0
     curBeat = -1
     buffer = null
     hasBuffer = false
@@ -165,7 +161,7 @@ function scheduleRecord() {
     // stop recording
     buffEventCall(240.0 / properties.bpm * (properties.countoff + properties.numMeasures + 0.3), () => {
         if (isRecording) {
-            toggleRecord()
+            stopRecording()
         }
     })
 
@@ -212,18 +208,6 @@ function onRecordStart() {
         source.onended = () => {
             curBeat = (curBeat + 1) % 4
             callbacks.clickOnMetronome(curBeat)
-
-            if (curBeat === 0) {
-                curMeasure++
-
-                if (curMeasure < 0) {
-                    curMeasureShow = curMeasure
-                } else {
-                    curMeasureShow = curMeasure + 1
-                }
-
-                helpers.getNgRootScope().$apply()
-            }
         }
     }
 }
@@ -238,28 +222,13 @@ function buffEventCall(lenInSec: number, onEnded: (this: AudioScheduledSourceNod
     eventBuffSrc.push(buffSrc)
 }
 
-export function toggleRecord() {
-    if (micIsOn) {
-        if (isRecording) {
-            stopRecording()
-        } else {
-            startRecording()
-        }
-    } else {
-        alert("Please make sure that microphone input is turned on.")
-    }
-}
-
-function startRecording() {
+export function startRecording() {
     if (properties.useMetro) {
         checkInputFields()
-        curMeasure = -properties.countoff
-        curMeasureShow = curMeasure
         curBeat = 0
         scheduleRecord()
     } else {
         hasBuffer = false
-        curMeasure = 0
         audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
         audioRecorder.clear()
         audioRecorder.record()
@@ -269,21 +238,13 @@ function startRecording() {
     callbacks.showSpectrogram()
 }
 
-function stopRecording() {
+export function stopRecording() {
     audioRecorder.stop()
-    curMeasureShow = 0
-
-    // should have at least > 0 recorded frame
-    if (curMeasure > -1) {
-        audioRecorder.getBuffer(gotBuffer)
-    }
-
+    audioRecorder.getBuffer(gotBuffer)
     if (properties.useMetro) {
         stopWebAudioEvents()
         isRecording = false
         curBeat = -1
-        curMeasure = 0
-        curMeasureShow = 0
     } else {
         isRecording = false
     }
@@ -349,15 +310,7 @@ function doneEncoding(blob: any) {
     callbacks.prepareForUpload(blob, properties.useMetro, properties.bpm)
 }
 
-export function togglePreview() {
-    if (!isPreviewing) {
-        startPreview()
-    } else {
-        stopPreview()
-    }
-}
-
-function startPreview() {
+export function startPreview(previewEnded: () => void) {
     if (buffer !== null) {
         isPreviewing = true
 
@@ -369,17 +322,13 @@ function startPreview() {
         previewSource.connect(amp)
         amp.connect(audioContext.destination)
         previewSource.start(audioContext.currentTime)
-        helpers.getNgRootScope().$apply()
-        previewSource.onended = () => {
-            isPreviewing = false
-            helpers.getNgRootScope().$apply()
-        }
+        previewSource.onended = previewEnded
     } else {
         console.log("buffer is empty")
     }
 }
 
-function stopPreview() {
+export function stopPreview() {
     if (previewSource) {
         previewSource.stop(audioContext.currentTime)
         previewSource = null
