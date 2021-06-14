@@ -1,7 +1,5 @@
 import audioContext from "./audiocontext"
 import * as ESUtils from "../esutils"
-import * as helpers from "../helpers"
-import { encodeWAV } from "./renderer"
 
 const RECORDER_OPTIONS = {
     bufferLen: 2048,
@@ -16,48 +14,33 @@ let startTime = 0
 let metroOsc: OscillatorNode[] = []
 let beatBuffSrc: AudioBufferSourceNode[] = []
 let eventBuffSrc: AudioBufferSourceNode[] = []
-let curBeat = -1
+let isRecording = false
+let buffer: AudioBuffer | null
 
 export let analyserNode: AnalyserNode | null
-export let micIsOn = false
-export let isRecording = false
-export let buffer: AudioBuffer | null
-export let hasBuffer = false
-export let isPreviewing = false
 export let meterVal = 0
 
 export const callbacks = {
-    prepareForUpload: (blob: Blob, useMetro: boolean, bpm: number) => {},
-    openRecordMenu: () => {},
+    bufferReady: (buffer: AudioBuffer) => {},
+    micReady: () => {},
     micAccessBlocked: (type: string) => {},
-    showSpectrogram: () => {},
-    showRecordedWaveform: () => {},
-    clickOnMetronome: (beat: number) => {},
+    beat: () => {},
 }
 
+// TODO: Maybe refactor this into a class and make these members.
 export const properties = {
     useMetro: true,
-    clicks: false,
     bpm: 120,
     countoff: 1,
     numMeasures: 2,
 }
 
-export function clear(softClear?: boolean) {
+export function clear() {
     audioRecorder = null
     previewSource = null
-
-    if (!softClear) {
-        micIsOn = false
-    }
     isRecording = false
-    curBeat = -1
     buffer = null
-    hasBuffer = false
-    isPreviewing = false
     meterVal = 0
-
-    callbacks.showRecordedWaveform()
 }
 
 export function init() {
@@ -92,9 +75,7 @@ export function init() {
     if (!nav.requestAnimationFrame)
         nav.requestAnimationFrame = nav.webkitRequestAnimationFrame || nav.mozRequestAnimationFrame
 
-    if (!micIsOn) {
-        navigator.getUserMedia(audioOptions as MediaStreamConstraints, gotAudio, mediaNotAccessible)
-    } 
+    navigator.getUserMedia(audioOptions as MediaStreamConstraints, gotAudio, mediaNotAccessible)
 }
 
 function mediaNotAccessible() {
@@ -106,8 +87,7 @@ function mediaNotAccessible() {
 }
 
 function gotAudio(stream: any) {
-    micIsOn = true
-    callbacks.openRecordMenu();  // proceed to open the record menu UI
+    callbacks.micReady()  // proceed to open the record menu UI
 
     const mic = audioContext.createMediaStreamSource(stream)
     mic.connect(meter)
@@ -126,21 +106,17 @@ function gotAudio(stream: any) {
     zeroGain.connect(audioContext.destination)
 
     updateMeter()
-    callbacks.showSpectrogram()
 }
 
-function scheduleRecord() {
+function scheduleRecord(click: boolean) {
     eventBuffSrc = []
 
     // start recording immediately
     if (properties.countoff === 0) {
         // reset the recorder audio process timing
         audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
-
         audioRecorder.clear()
         audioRecorder.record()
-        hasBuffer = false
-
         startTime = audioContext.currentTime
     } else {
         // start after count off
@@ -148,11 +124,8 @@ function scheduleRecord() {
             if (isRecording) {
                 // reset the recorder instance
                 audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
-
                 audioRecorder.clear()
                 audioRecorder.record()
-                hasBuffer = false
-
                 startTime = audioContext.currentTime
             }
         })
@@ -166,10 +139,10 @@ function scheduleRecord() {
     })
 
     // might need to be called as a callback from the audioRecorder
-    onRecordStart()
+    onRecordStart(click)
 }
 
-function onRecordStart() {
+function onRecordStart(click: boolean) {
     const sr = audioContext.sampleRate
     const beats = 4
     metroOsc = []
@@ -177,7 +150,7 @@ function onRecordStart() {
 
     for (let i = 0; i < (properties.numMeasures + properties.countoff) * beats; i++) {
         // scheduled metronome sounds
-        if (i < properties.countoff * beats || properties.clicks) {
+        if (i < properties.countoff * beats || click) {
             metroOsc[i] = audioContext.createOscillator()
             const metroGain = audioContext.createGain()
             const del = 60.0 / properties.bpm * i + audioContext.currentTime
@@ -205,10 +178,7 @@ function onRecordStart() {
         source.buffer = beatBuff
         source.connect(audioContext.destination)
         source.start(audioContext.currentTime + 60.0 / properties.bpm * i)
-        source.onended = () => {
-            curBeat = (curBeat + 1) % 4
-            callbacks.clickOnMetronome(curBeat)
-        }
+        source.onended = () => callbacks.beat()
     }
 }
 
@@ -222,20 +192,17 @@ function buffEventCall(lenInSec: number, onEnded: (this: AudioScheduledSourceNod
     eventBuffSrc.push(buffSrc)
 }
 
-export function startRecording() {
+export function startRecording(click: boolean) {
     if (properties.useMetro) {
         checkInputFields()
-        curBeat = 0
-        scheduleRecord()
+        scheduleRecord(click)
     } else {
-        hasBuffer = false
         audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
         audioRecorder.clear()
         audioRecorder.record()
     }
 
     isRecording = true
-    callbacks.showSpectrogram()
 }
 
 export function stopRecording() {
@@ -244,7 +211,6 @@ export function stopRecording() {
     if (properties.useMetro) {
         stopWebAudioEvents()
         isRecording = false
-        curBeat = -1
     } else {
         isRecording = false
     }
@@ -290,30 +256,16 @@ function gotBuffer(buf: Float32Array[]) {
         }
     } else {
         buffer = audioContext.createBuffer(buf.length, buf[0].length, audioContext.sampleRate)
-
         for (let ch = 0; ch < buf.length; ch++) {
             buffer.getChannelData(ch).set(buf[ch])
         }
     }
 
-    callbacks.showRecordedWaveform()
-    hasBuffer = true
-
-    const view = encodeWAV(buffer.getChannelData(0))
-    const blob = new Blob([view], { type: "audio/wav" })
-    doneEncoding(blob)
-}
-
-function doneEncoding(blob: any) {
-    blob.lastModifiedDate = new Date()
-    blob.name = "QUICK_RECORD"
-    callbacks.prepareForUpload(blob, properties.useMetro, properties.bpm)
+    callbacks.bufferReady(buffer)
 }
 
 export function startPreview(previewEnded: () => void) {
     if (buffer !== null) {
-        isPreviewing = true
-
         previewSource = audioContext.createBufferSource()
         previewSource.buffer = buffer
 
@@ -333,5 +285,4 @@ export function stopPreview() {
         previewSource.stop(audioContext.currentTime)
         previewSource = null
     }
-    isPreviewing = false
 }

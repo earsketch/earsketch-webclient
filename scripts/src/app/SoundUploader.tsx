@@ -4,14 +4,15 @@ import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
+import i18n from "i18next"
 import * as recorder from './esrecorder'
 import * as sounds from '../browser/soundsState'
+import { LevelMeter, Metronome, Waveform } from "./Recorder"
+import store from "../reducers"
+import { encodeWAV } from "./renderer"
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification'
 import * as userProject from './userProject'
-import i18n from "i18next"
-import store from "../reducers"
-import { LevelMeter, Metronome, Waveform } from "./Recorder"
 
 async function uploadFile(file: Blob, key: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
     if (userProject.getUsername() == null) {
@@ -143,48 +144,36 @@ const RecordTab = ({ close }: { close: () => void }) => {
     const [key, setKey] = useState("")
     const [error, setError] = useState("")
     const [progress, setProgress] = useState(null as number | null)
-    const [blob, setBlob] = useState(null as Blob | null)
+    const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
-    const [tempo, _setTempo] = useState(120)
-    const [metronome, _setMetronome] = useState(true)
-    const [click, _setClick] = useState(false)
-    const [countoff, _setCountoff] = useState(1)
-    const [measures, _setMeasures] = useState(2)
+    const [tempo, setTempo] = useState(120)
+    const [metronome, setMetronome] = useState(true)
+    const [click, setClick] = useState(false)
+    const [countoff, setCountoff] = useState(1)
+    const [measures, setMeasures] = useState(2)
     const [micReady, setMicReady] = useState(false)
+    const [beat, setBeat] = useState(0)
 
-    // TODO: Remove duplicate state from recorder.
-    const setTempo = (tempo: number) => {
-        _setTempo(tempo)
+    const startRecording = () => {
         recorder.properties.bpm = tempo
-    }
-
-    const setMetronome = (metronome: boolean) => {
-        _setMetronome(metronome)
         recorder.properties.useMetro = metronome
-    }
-
-    const setClick = (click: boolean) => {
-        _setClick(click)
-        recorder.properties.clicks = click
-    }
-
-    const setCountoff = (countoff: number) => {
-        _setCountoff(countoff)
         recorder.properties.countoff = countoff
-    }
-
-    const setMeasures = (measures: number) => {
-        _setMeasures(measures)
         recorder.properties.numMeasures = measures
+        recorder.startRecording(click)
     }
 
-    recorder.callbacks.prepareForUpload = (blob, useMetro, tempo) => {
-        setBlob(blob)
+    recorder.callbacks.bufferReady = (buffer) => {
+        setBeat(0)
+        setBuffer(buffer)
     }
+
+    recorder.callbacks.beat = () => setBeat(beat + 1)
 
     const submit = async () => {
         try {
-            await uploadFile(blob!, key, ".wav", metronome ? tempo : 120, setProgress)
+            const view = encodeWAV(buffer!.getChannelData(0))
+            const blob = new Blob([view], { type: "audio/wav" })
+            await uploadFile(blob, key, ".wav", metronome ? tempo : 120, setProgress)
             close()
         } catch (error) {
             setError(error)
@@ -209,7 +198,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
         }
     }
 
-    recorder.callbacks.openRecordMenu = () => setMicReady(true)
+    recorder.callbacks.micReady = () => setMicReady(true)
 
     useEffect(() => openRecordMenu(), [])
 
@@ -259,10 +248,10 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <LevelMeter />
                 </div>
                 <div className="modal-section-content flex items-center justify-between">
-                    <Metronome countoff={countoff} hasBuffer={blob !== null} useMetro={metronome} />
-                    <Waveform />
-                    {recorder.hasBuffer &&
-                    <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(true); setBlob(null) }}>
+                    <Metronome beat={beat - countoff * 4} hasBuffer={buffer !== null} useMetro={metronome} startRecording={startRecording} />
+                    <Waveform buffer={buffer} />
+                    {buffer &&
+                    <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(); setBuffer(null) }}>
                         <span>CLEAR</span>
                     </button>}
                 </div>
@@ -271,7 +260,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
         <div className="modal-footer">
             {progress !== null && <ProgressBar progress={progress} />}
             <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={blob === null} />
+            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={buffer === null} />
         </div>
     </form>
 }
