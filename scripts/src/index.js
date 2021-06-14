@@ -123,7 +123,6 @@ require(['angular'], () => {
     // Controllers
     require('mainController');
     require('ideController');
-    require('uploadController');
     require('userHistoryController');
 
     require('adminWindowController');
