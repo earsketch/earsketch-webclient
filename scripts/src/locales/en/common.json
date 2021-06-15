@@ -152,7 +152,13 @@
       "array": "Array",
       "integer": "Integer",
       "listArray": "List/Array",
-      "string": "String"
+      "list": "List",
+      "string": "String",
+      "stringOptional": "String, Optional",
+      "stringNumberList": "String/Number/List",
+      "any": "Any type",
+      "booleanOptional": "Boolean, Optional",
+      "soundOrList": "Sound Constant or List/array"
     }
   }
 }

@@ -86,7 +86,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
     const theme = useSelector(appState.selectColorTheme)
 
-    const returnText = 'Returns: ' + (obj.returns ? `(${obj.returns.type}) - ${t(obj.returns.descriptionKey)}` : 'undefined')
+    const returnText = 'Returns: ' + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : 'undefined')
     return (
         <div
             className={`p-5 border-b border-r border-black ${theme === 'light' ? 'border-gray-500' : 'border-gray-700'}`}
@@ -118,7 +118,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 <span className="px-1">(</span>
                 {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter ]) => (
                     <span key={param}>
-                        <span title={`${param} (${paramVal.type}) - ${paramVal.descriptionKey}`}>{param}</span>
+                        <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
                         {paramVal.hasOwnProperty('default') &&
                         <span>
                             <span className="text-gray-600 px-1">=</span>
@@ -150,7 +150,7 @@ const Details = ({ obj }: { obj: APIItem  }) => {
                     <div key={param}>
                         <div className="ml-6 mt-4">
                             <span className="font-bold">{param}</span>:&nbsp;
-                            <span className="text-gray-600">{paramVal.type}</span>
+                            <span className="text-gray-600">{t(paramVal.typeKey)}</span>
 
                             {/* rhythmEffects parameter description has a link to curriculum */}
                             <div className="text-xl"><span dangerouslySetInnerHTML={{__html: t(paramVal.descriptionKey)}} /></div>
@@ -166,7 +166,7 @@ const Details = ({ obj }: { obj: APIItem  }) => {
             </div>}
             {obj.returns &&
             <div className="mt-8">
-                <span className="text-2xl font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{obj.returns.type}</span>
+                <span className="text-2xl font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
                 <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-8">

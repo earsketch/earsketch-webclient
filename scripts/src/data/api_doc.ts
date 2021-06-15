@@ -2,7 +2,7 @@
 import i18n from "i18next";
 
 export interface APIParameter {
-    type: string
+    typeKey: string
     descriptionKey: string
     default?: string
 }
@@ -18,7 +18,7 @@ export interface APIItem {
         [name: string]: APIParameter
     }
     returns?: {
-        type: string
+        typeKey: string
         descriptionKey: string
     }
     meta?: any
@@ -32,17 +32,17 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:analyze.description",
             "parameters": {
                 "audioFile": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:analyze.parameters.audioFile.description"
                 },
 
                 "featureForAnalysis": {
-                    "type": i18n.t("api:types.analysisConstant"),
+                    "typeKey": "api:types.analysisConstant",
                     "descriptionKey": "api:analyze.parameters.featureForAnalysis.description"
                 }
             },
             "returns": {
-                "type": "Float",
+                "typeKey": "api:types.float",
                 "descriptionKey": "api:analyze.returns.description"
             },
             "example": {
@@ -57,24 +57,24 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:analyzeForTime.description",
             "parameters": {
                 "audioFile": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:analyzeForTime.parameters.audioFile.description"
                 },
                 "featureForAnalysis": {
-                    "type": i18n.t("api:types.analysisConstant"),
+                    "typeKey": "api:types.analysisConstant",
                     "descriptionKey": "api:analyzeForTime.parameters.featureForAnalysis.description"
                 },
                 "startTime": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:analyzeForTime.parameters.startTime.description"
                 },
                 "endTime": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:analyzeForTime.parameters.endTime.description"
                 }
             },
             "returns": {
-                "type": "Float",
+                "typeKey": "api:types.float",
                 "descriptionKey": "api:analyzeForTime.returns.description"
             },
             "example": {
@@ -89,16 +89,16 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:analyzeTrack.description",
             "parameters": {
                 "trackNumber": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:analyzeTrack.parameters.trackNumber.description"
                 },
                 "featureForAnalysis": {
-                    "type": i18n.t("api:types.analysisConstant"),
+                    "typeKey": "api:types.analysisConstant",
                     "descriptionKey": "api:analyzeTrack.parameters.featureForAnalysis.description"
                 }
             },
             "returns": {
-                "type": "Float",
+                "typeKey": "api:types.float",
                 "descriptionKey": "api:analyzeTrack.returns.description"
             },
             "example": {
@@ -113,24 +113,24 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:analyzeTrackForTime.description",
             "parameters": {
                 "trackNumber": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:analyzeTrackForTime.parameters.trackNumber.description"
                 },
                 "featureForAnalysis": {
-                    "type": i18n.t("api:types.analysisConstant"),
+                    "typeKey": "api:types.analysisConstant",
                     "descriptionKey": "api:analyzeTrackForTime.parameters.featureForAnalysis.description"
                 },
                 "startTime": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:analyzeTrackForTime.parameters.startTime.description"
                 },
                 "endTime": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:analyzeTrackForTime.parameters.endTime.description"
                 }
             },
             "returns": {
-                "type": "Float",
+                "typeKey": "api:types.float",
                 "descriptionKey": "api:analyzeTrackForTime.returns.description"
             },
             "example": {
@@ -145,15 +145,15 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:createAudioSlice.description",
             "parameters": {
                 "fileName": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:createAudioSlice.parameters.fileName.description"
                 },
                 "startPosition": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:createAudioSlice.parameters.startPosition.description"
                 },
                 "endPosition": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:createAudioSlice.parameters.endPosition.description"
                 },
             },
@@ -163,7 +163,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "javascript": "var slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
             },
             "returns": {
-                "type": i18n.t("api:types.soundConstant"),
+                "typeKey": "api:types.soundConstant",
                 "descriptionKey": "api:createAudioSlice.returns.description"
             },
             "autocomplete": "createAudioSlice(fileName, startPosition, endPosition)",
@@ -173,7 +173,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:dur.description",
             "parameters": {
                 "fileName": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:dur.parameters.fileName.description"
                 }
             },
@@ -183,7 +183,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "javascript": "dur(HOUSE_BREAKBEAT_001);"
             },
             "returns": {
-                "type": "Float",
+                "typeKey": "api:types.float",
                 "descriptionKey": "api:dur.returns.description"
             },
             "autocomplete": "dur(fileName)",
@@ -202,19 +202,19 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:fitMedia.description",
             "parameters": {
                 "fileName": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:fitMedia.parameters.fileName.description"
                 },
                 "trackNumber": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:fitMedia.parameters.trackNumber.description"
                 },
                 "startLocation": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:fitMedia.parameters.startLocation.description"
                 },
                 "endLocation": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:fitMedia.parameters.endLocation.description"
                 }
             },
@@ -230,19 +230,19 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:importImage.description",
             "parameters": {
                 "imageURL": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:importImage.parameters.imageURL.description"
                 },
                 "nrows": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:importImage.parameters.nrows.description"
                 },
                 "ncols": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:importImage.parameters.ncols.description"
                 },
                 "includeRGB": {
-                    "type": "Boolean, Optional",
+                    "typeKey": "api:types.booleanOptional",
                     "default": "False",
                     "descriptionKey": "api:importImage.parameters.includeRGB.description"
                 }
@@ -253,7 +253,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "javascript": "// Turn an image into a 10x10 grayscale list\nvar pixelData = importImage(\"https://cdn.pixabay.com/photo/2012/04/05/01/17/ear-25595_640.png\", 10, 10);\nprintln(pixelData);"
             },
             "returns": {
-                "type": "List",
+                "typeKey": "api:types.list",
                 "descriptionKey": "api:importImage.returns.description"
             },
             "autocomplete": "importImage(imageURL, nrows, ncols, False)"
@@ -263,7 +263,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:importFile.description",
             "parameters": {
                 "fileURL": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:importFile.parameters.fileURL.description"
                 }
             },
@@ -273,7 +273,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "javascript": "// Load a file via URL\nvar fileData = importFile(\"http://www.gutenberg.org/files/16780/16780-0.txt\");\nprintln(fileData);"
             },
             "returns": {
-                "type": "String",
+                "typeKey": "api:types.string",
                 "descriptionKey": "api:importFile.returns.description"
             },
             "autocomplete": "importFile(fileUrl)"
@@ -292,15 +292,15 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:insertMedia.description",
             "parameters": {
                 "fileName": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:insertMedia.parameters.fileName.description"
                 },
                 "trackNumber": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:insertMedia.parameters.trackNumber.description"
                 },
                 "trackLocation": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:insertMedia.parameters.trackLocation.description"
                 }
             },
@@ -317,23 +317,23 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:insertMediaSection.description",
             "parameters": {
                 "fileName": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:insertMediaSection.parameters.fileName.description"
                 },
                 "trackNumber": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:insertMediaSection.parameters.trackNumber.description"
                 },
                 "trackLocation": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:insertMediaSection.parameters.trackLocation.description"
                 },
                 "mediaStartLocation": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:insertMediaSection.parameters.mediaStartLocation.description"
                 },
                 "mediaEndLocation": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:insertMediaSection.parameters.mediaEndLocation.description"
                 }
             },
@@ -349,19 +349,19 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:makeBeat.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant or List/array",
+                    "typeKey": "api:types.soundOrList",
                     "descriptionKey": "api:makeBeat.parameters.fileName.description"
                 },
                 "track": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:makeBeat.parameters.track.description"
                 },
                 "measure": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:makeBeat.parameters.measure.description"
                 },
                 "string": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:makeBeat.parameters.string.description"
                 }
             },
@@ -377,23 +377,23 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:makeBeatSlice.description",
             "parameters": {
                 "fileName": {
-                    "type": i18n.t("api:types.soundConstant"),
+                    "typeKey": "api:types.soundConstant",
                     "descriptionKey": "api:makeBeatSlice.parameters.fileName.description"
                 },
                 "track": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:makeBeatSlice.parameters.track.description"
                 },
                 "measure": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:makeBeatSlice.parameters.measure.description"
                 },
                 "string": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:makeBeatSlice.parameters.string.description"
                 },
                 "beatNumber": {
-                    "type": "List/array",
+                    "typeKey": "api:types.listArray",
                     "descriptionKey": "api:makeBeatSlice.parameters.beatNumber.description"
                 }
             },
@@ -409,7 +409,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:print.description",
             "parameters": {
                 "input": {
-                    "type": "String/Number/List",
+                    "typeKey": "api.types.stringNumberList",
                     "descriptionKey": "api:print.parameters.input.description"
                 }
             },
@@ -426,7 +426,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:println.description",
             "parameters": {
                 "input": {
-                    "type": "String/Number/List",
+                    "typeKey": "api:types.stringNumberList",
                     "descriptionKey": "api:println.parameters.input.description"
                 }
             },
@@ -443,7 +443,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:readInput.description",
             "parameters": {
                 "prompt": {
-                    "type": "String, Optional",
+                    "typeKey": "api:types.stringOptional",
                     "descriptionKey": "api:readInput.parameters.prompt.description"
                 }
             },
@@ -452,7 +452,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "javascript": "// Ask the user for a beat pattern for makeBeat\nbeatPattern = readInput(\"Give me your beat pattern:\");\n"
             },
             "returns": {
-                "type": "String",
+                "typeKey": "api:types.string",
                 "descriptionKey": "api:readInput.returns.description"
             },
             "autocomplete": "readInput(prompt)"
@@ -462,15 +462,15 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:replaceListElement.description",
             "parameters": {
                 "inputList": {
-                    "type": "List/array",
+                    "typeKey": "api:types.listArray",
                     "descriptionKey": "api:replaceListElement.parameters.inputList.description"
                 },
                 "elementToReplace": {
-                    "type": "Any type",
+                    "typeKey": "api:types.any",
                     "descriptionKey": "api:replaceListElement.parameters.elementToReplace.description"
                 },
                 "withElement": {
-                    "type": "Any type",
+                    "typeKey": "api:types.any",
                     "descriptionKey": "api:replaceListElement.parameters.withElement.description"
                 }
             },
@@ -486,20 +486,20 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:replaceString.description",
             "parameters": {
                 "string": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:replaceString.parameters.string.description"
                 },
                 "characterToReplace": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:replaceString.parameters.characterToReplace.description"
                 },
                 "withCharacter": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:replaceString.parameters.withCharacter.description"
                 }
             },
             "returns": {
-                "type": "String",
+                "typeKey": "api:types.string",
                 "descriptionKey": "api:replaceString.returns.description"
             },
             "example": {
@@ -514,12 +514,12 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:reverseList.description",
             "parameters": {
                 "inputList": {
-                    "type": "List/array",
+                    "typeKey": "api:types.listArray",
                     "descriptionKey": "api:reverseList.parameters.inputList.description"
                 }
             },
             "returns": {
-                "type": "List/array",
+                "typeKey": "api:types.listArray",
                 "descriptionKey": "api:reverseList.returns.description"
             },
             "example": {
@@ -534,12 +534,12 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:reverseString.description",
             "parameters": {
                 "inputString": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:reverseString.parameters.inputString.description"
                 }
             },
             "returns": {
-                "type": "String",
+                "typeKey": "api:types.string",
                 "descriptionKey": "api:reverseString.returns.description"
             },
             "example": {
@@ -554,27 +554,27 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:rhythmEffects.description",
             "parameters": {
                 "track": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:rhythmEffects.parameters.track.description"
                 },
                 "effectType": {
-                    "type": i18n.t("api:types.effectConstant"),
+                    "typeKey": "api:types.effectConstant",
                     "descriptionKey": "api:rhythmEffects.parameters.effectType.description"
                 },
                 "effectParameter": {
-                    "type": i18n.t("api:types.effectParameterConstant"),
+                    "typeKey": "api:types.effectParameterConstant",
                     "descriptionKey": "api:rhythmEffects.parameters.effectParameter.description"
                 },
                 "effectList": {
-                    "type": "List/array",
+                    "typeKey": "api:types.listArray",
                     "descriptionKey": "api:rhythmEffects.parameters.effectList.description"
                 },
                 "measure": {
-                    "type": "Float",
+                    "typeKey": "api:types.float",
                     "descriptionKey": "api:rhythmEffects.parameters.measure.description"
                 },
                 "beatString": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:rhythmEffects.parameters.beatString.description"
                 }
             },
@@ -590,12 +590,12 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:selectRandomFile.description",
             "parameters": {
                 "folder": {
-                    "type": i18n.t("api:types.folderConstant"),
+                    "typeKey": "api:types.folderConstant",
                     "descriptionKey": "api:selectRandomFile.parameters.folder.description"
                 }
             },
             "returns": {
-                type: i18n.t("api:types.soundConstant"),
+                typeKey: "api:types.soundConstant",
                 descriptionKey: "api:selectRandomFile.returns.description"
             },
             "example": {
@@ -611,19 +611,19 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "descriptionKey": "api:setEffect1.description",
                 "parameters": {
                     "track": {
-                        "type": "Integer",
+                        "typeKey": "api:types.integer",
                         "descriptionKey": "api:setEffect1.parameters.track.description"
                     },
                     "effectType": {
-                        "type": i18n.t("api:types.effectConstant"),
+                        "typeKey": "api:types.effectConstant",
                         "descriptionKey": "api:setEffect1.parameters.effectType.description"
                     },
                     "effectParameter": {
-                        "type": i18n.t("api:types.effectParameterConstant"),
+                        "typeKey": "api:types.effectParameterConstant",
                         "descriptionKey": "api:setEffect1.parameters.effectParameter.description"
                     },
                     "effectValue": {
-                        "type": "Float",
+                        "typeKey": "api:types.float",
                         "descriptionKey": "api:setEffect1.parameters.effectValue.description"
                     }
                 },
@@ -638,31 +638,31 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "descriptionKey": "api:setEffect2.description",
                 "parameters": {
                     "track": {
-                        "type": "Integer",
+                        "typeKey": "api:types.integer",
                         "descriptionKey": "api:setEffect1.parameters.track.description"
                     },
                     "effectType": {
-                        "type": i18n.t("api:types.effectConstant"),
+                        "typeKey": "api:types.effectConstant",
                         "descriptionKey": "api:setEffect1.parameters.effectType.description"
                     },
                     "effectParameter": {
-                        "type": i18n.t("api:types.effectParameterConstant"),
+                        "typeKey": "api:types.effectParameterConstant",
                         "descriptionKey": "api:setEffect1.parameters.effectParameter.description"
                     },
                     "effectStartValue": {
-                        "type": "Float",
+                        "typeKey": "api:types.float",
                         "descriptionKey": "api:setEffect2.parameters.effectStartValue.description"
                     },
                     "effectStartLocation": {
-                        "type": "Float",
+                        "typeKey": "api:types.float",
                         "descriptionKey": "api:setEffect2.parameters.effectStartLocation.description"
                     },
                     "effectEndValue": {
-                        "type": "Float",
+                        "typeKey": "api:types.float",
                         "descriptionKey": "api:setEffect2.parameters.effectEndValue.description"
                     },
                     "effectEndLocation": {
-                        "type": "Float",
+                        "typeKey": "api:types.float",
                         "descriptionKey": "api:setEffect2.parameters.effectEndLocation.description"
                     }
                 },
@@ -679,7 +679,7 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:setTempo.description",
             "parameters": {
                 "tempo": {
-                    "type": "Integer",
+                    "typeKey": "api:types.integer",
                     "descriptionKey": "api:setTempo.parameters.tempo.description"
                 }
             },
@@ -695,12 +695,12 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:shuffleList.description",
             "parameters": {
                 "inputList": {
-                    "type": "List/array",
+                    "typeKey": "api:types.listArray",
                     "descriptionKey": "api:shuffleList.parameters.inputList.description"
                 }
             },
             "returns": {
-                "type": "List/array",
+                "typeKey": "api:types.listArray",
                 "descriptionKey": "api:shuffleList.returns.description"
             },
             "example": {
@@ -715,12 +715,12 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:shuffleString.description",
             "parameters": {
                 "inputString": {
-                    "type": "String",
+                    "typeKey": "api:types.string",
                     "descriptionKey": "api:shuffleString.parameters.inputString.description"
                 }
             },
             "returns": {
-                "type": "String",
+                "typeKey": "api:types.string",
                 "descriptionKey": "api:shuffleString.returns.description"
             },
             "example": {
