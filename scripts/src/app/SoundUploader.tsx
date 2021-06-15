@@ -1,38 +1,41 @@
+import i18n from "i18next"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 
-import audioContext from './audiocontext'
-import * as audioLibrary from './audiolibrary'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
-import i18n from "i18next"
-import * as recorder from './esrecorder'
-import * as sounds from '../browser/soundsState'
+import audioContext from "./audiocontext"
+import * as audioLibrary from "./audiolibrary"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
+import * as recorder from "./esrecorder"
 import { LevelMeter, Metronome, Waveform } from "./Recorder"
 import store from "../reducers"
+import * as sounds from "../browser/soundsState"
 import { encodeWAV } from "./renderer"
-import * as userConsole from './userconsole'
-import * as userNotification from './userNotification'
-import * as userProject from './userProject'
+import * as userConsole from "./userconsole"
+import * as userNotification from "./userNotification"
+import * as userProject from "./userProject"
+
+function validateUpload(key: string, tempo: number) {
+    const username = userProject.getUsername()
+    if (username === null) {
+        throw i18n.t("messages:uploadcontroller.userAuth")
+    }
+    const keys = sounds.selectAllFileKeys(store.getState())
+    const fullKey = username.toUpperCase() + "_" + key
+    if (keys.some(k => k === fullKey)) {
+        throw `${key} (${fullKey})${i18n.t("messages:uploadcontroller.alreadyused")}`
+    } else if (tempo > 200 || (tempo > -1 && tempo < 45)) {
+        throw i18n.t("messages:esaudio.tempoRange")
+    }
+}
 
 async function uploadFile(file: Blob, key: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
-    if (userProject.getUsername() == null) {
-        throw i18n.t('messages:uploadcontroller.userAuth')
-    }
+    validateUpload(key, tempo)
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = await audioContext.decodeAudioData(arrayBuffer)
     if (buffer.duration > 30) {
         esconsole("Rejecting the upload of audio file with duration: " + buffer.duration, ["upload", "error"])
-        throw i18n.t('messages:uploadcontroller.bigsize')
-    }
-
-    const fileKeys = sounds.selectAllFileKeys(store.getState())
-    if (fileKeys.some(fileKey => fileKey === (userProject.getUsername() + '_' + key).toUpperCase())) {
-        throw `${key} (${(userProject.getUsername() + '_' + key).toUpperCase()})${i18n.t('messages:uploadcontroller.alreadyused')}`
-    }
-
-    if (tempo > 200 || (tempo > -1 && tempo < 45)) {
-        throw i18n.t('messages:esaudio.tempoRange')
+        throw i18n.t("messages:uploadcontroller.bigsize")
     }
 
     // TODO: This endpoint should require authentication.
@@ -50,22 +53,22 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
     request.upload.onprogress = e => onProgress(e.loaded / e.total)
 
     request.timeout = 60000
-    request.ontimeout = () => userConsole.error(i18n.t('messages:uploadcontroller.timeout'))
+    request.ontimeout = () => userConsole.error(i18n.t("messages:uploadcontroller.timeout"))
     const promise = new Promise<void>((resolve, reject) => {
         request.onload = () => {
             if (request.readyState === 4) {
                 if (request.status === 200) {
-                    userNotification.show(i18n.t('messages:uploadcontroller.uploadsuccess'), "success")
+                    userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
                     // Clear the cache so it gets reloaded.
                     audioLibrary.clearAudioTagCache()
                     store.dispatch(sounds.resetUserSounds())
                     store.dispatch(sounds.getUserSounds(userProject.getUsername()))
                     resolve()
                 } else {
-                    reject(i18n.t('messages:uploadcontroller.commerror'))
+                    reject(i18n.t("messages:uploadcontroller.commerror"))
                 }
             } else {
-                reject(i18n.t('messages:uploadcontroller.commerror2'))
+                reject(i18n.t("messages:uploadcontroller.commerror2"))
             }
         }
     })
@@ -78,12 +81,16 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
 
 const ProgressBar = ({ progress }: { progress: number }) => {
     const percent = Math.floor(progress * 100) + "%"
-    return <div id="progressbar">
-        <div className="col-sm-12">
-            <div className="progress">
-                <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
-            </div>
-        </div>
+    return <div className="progress flex-grow mb-0 mr-3">
+        <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
+    </div>
+}
+
+const Footer = ({ ready, progress, close }: { ready: boolean, progress?: number | null, close: () => void }) => {
+    return <div className="modal-footer flex items-center">
+        {progress !== undefined && progress !== null && <ProgressBar progress={progress} />}
+        <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d" }} />
+        <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!ready} />
     </div>
 }
 
@@ -133,11 +140,7 @@ const FileTab = ({ close }: { close: () => void }) => {
                 </div>
             </div>
         </div>
-        <div className="modal-footer">
-            {progress !== null && <ProgressBar progress={progress} />}
-            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={file === null} />
-        </div>
+        <Footer ready={file !== null} progress={progress} close={close} />
     </form>
 }
 
@@ -181,34 +184,24 @@ const RecordTab = ({ close }: { close: () => void }) => {
         }
     }
 
-    const openRecordMenu = () => {
-        setError("")
-        // TODO: Is this check still valid?
-        if (!/Chrome|Firefox/.test(ESUtils.whichBrowser())) {
-            setError(i18n.t('messages:uploadcontroller.nosupport'))
-        } else {
-            recorder.init()
-        }
-    }
-
     recorder.callbacks.micAccessBlocked = error => {
         if (error == "chrome_mic_noaccess") {
-            setError(i18n.t('messages:uploadcontroller.chrome_mic_noaccess'))
+            setError(i18n.t("messages:uploadcontroller.chrome_mic_noaccess"))
         } else if (error == "ff_mic_noaccess") {
-            setError(i18n.t('messages:uploadcontroller.ff_mic_noaccess'))
+            setError(i18n.t("messages:uploadcontroller.ff_mic_noaccess"))
         }
     }
 
     recorder.callbacks.micReady = () => setMicReady(true)
 
-    useEffect(() => openRecordMenu(), [])
+    useEffect(() => recorder.init(), [])
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             {!micReady &&
                 (error
-                    ? <input type="button" className="btn btn-primary block m-auto" onClick={openRecordMenu} value="Enable mic and click here to try again." />
+                    ? <input type="button" className="btn btn-primary block m-auto" onClick={() => { setError(""); recorder.init() }} value="Enable mic and click here to try again." />
                     : "Waiting for microphone access...")}
             {micReady && <div>
                 <div className="modal-section-header">
@@ -258,11 +251,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                 </div>
             </div>}
         </div>
-        <div className="modal-footer">
-            {progress !== null && <ProgressBar progress={progress} />}
-            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={buffer === null} />
-        </div>
+        <Footer ready={buffer !== null} progress={progress} close={close} />
     </form>
 }
 
@@ -304,43 +293,31 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     }
 
     const submit = async () => {
-        // TODO: Reduce duplication with uploadFile().
-        if (username === "") {
-            setError(i18n.t('messages:uploadcontroller.userAuth'))
-            return
-        }
-
         const result = results![selected!]
-        const tempo = result.bpm
-
-        const keys = sounds.selectAllFileKeys(store.getState())
-        const fullKey = username.toUpperCase() + '_' + key
-        if (keys.some(other => other === fullKey)) {
-            setError(`${key} (${fullKey})${i18n.t('messages:uploadcontroller.alreadyused')}`)
-            return
+        try {
+            validateUpload(key, result.bpm)
+            try {
+                // TODO: This endpoint should require authentication.
+                await userProject.post("/services/files/uploadfromfreesound", {
+                    username,
+                    file_key: key,
+                    tempo: result.bpm + "",
+                    filename: key + ".mp3",
+                    creator: result.creator,
+                    url: result.downloadURL,
+                })
+            } catch (error) {
+                throw i18n.t("messages:uploadcontroller.commerror")
+            }
+            userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
+            // Clear the cache so it gets reloaded.
+            audioLibrary.clearAudioTagCache()
+            store.dispatch(sounds.resetUserSounds())
+            store.dispatch(sounds.getUserSounds(username))
+            close()
+        } catch (error) {
+            setError(error)
         }
-
-        if (tempo > 200 || (tempo > -1 && tempo < 45)) {
-            setError(i18n.t('messages:esaudio.tempoRange'))
-            return
-        }
-
-        // TODO: This endpoint should require authentication.
-        await userProject.post("/services/files/uploadfromfreesound", {
-            username,
-            file_key: key,
-            tempo: tempo + "",
-            filename: key + ".mp3",
-            creator: result.creator,
-            url: result.downloadURL,
-        })
-
-        userNotification.show(i18n.t('messages:uploadcontroller.uploadsuccess'), "success")
-        // clear the cache so it gets reloaded
-        audioLibrary.clearAudioTagCache()
-        store.dispatch(sounds.resetUserSounds())
-        store.dispatch(sounds.getUserSounds(username))
-        close()
     }
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
@@ -372,8 +349,8 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                         </label>
                         <audio controls preload="none">
                             <source src={result.previewURL} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                    </audio>
+                            Your browser does not support the audio element.
+                        </audio>
                         <hr className="my-3 border-gray-300" />
                     </div>)}
                 </div>}
@@ -383,10 +360,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             <div className="modal-section-header"><span>Constant Name (required)</span></div>
             <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
         </div>
-        <div className="modal-footer">
-            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="SAVE" className="btn btn-primary text-white" disabled={selected === null} />
-        </div>
+        <Footer ready={selected !== null} close={close} />
     </form>
 }
 
@@ -437,11 +411,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
             <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
         </div>
-        <div className="modal-footer">
-            {progress !== null && <ProgressBar progress={progress} />}
-            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!ready} />
-        </div>
+        <Footer ready={ready} progress={progress} close={close} />
     </form>
 }
 
@@ -461,7 +431,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
             } else if (message.data == 1) {
                 setReady(true)
             } else {
-                const file = new Blob([message.data.wavData], { type: 'audio/wav' })
+                const file = new Blob([message.data.wavData], { type: "audio/wav" })
                 try {
                     await uploadFile(file, key, ".wav", message.data.tempo, setProgress)
                     close()
@@ -480,11 +450,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
             <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
         </div>
-        <div className="modal-footer">
-            {progress !== null && <ProgressBar progress={progress} />}
-            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!ready} />
-        </div>
+        <Footer ready={ready} progress={progress} close={close} />
     </form>
 }
 
@@ -507,16 +473,14 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ title, icon }, index) =>
-                        <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
-                            <a href="" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">
+                        <li key={index} className={"flex-grow" + (activeTab === index ? " active" : "")}>
+                            <a href="" onClick={() => setActiveTab(index)} className="h-full flex justify-center items-center">
                                 <i className={`icon icon-${icon} mr-3`}></i>{title}
                             </a>
                         </li>)}
                 </ul>
             </div>
         </div>
-        <div id="upload-sound-tabcontainer">
-            <TabBody close={close} />
-        </div>
+        <div id="upload-sound-tabcontainer"><TabBody close={close} /></div>
     </>
 }
