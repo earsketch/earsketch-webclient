@@ -1,6 +1,6 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 
-import ESApiDoc, { APIItem } from '../data/api_doc';
+import { APIItem, ESApiDoc } from '../data/api_doc';
 import { selectScriptLanguage } from '../app/appState';
 import { RootState } from '../reducers';
 
@@ -27,10 +27,10 @@ export const selectFilteredEntries = createSelector(
     [selectSearchText, selectScriptLanguage],
     (searchText, language) => {
         searchText = searchText.toLowerCase()
-        return Object.entries(ESApiDoc).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
+        return Object.entries(ESApiDoc()).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
             const entries = Array.isArray(data) ? data : [data]
             return entries.some(obj => {
-                const description = obj.description?.toLowerCase();
+                const description = obj.descriptionKey?.toLowerCase();
                 const params = obj.parameters && Object.keys(obj.parameters)
                 const field = `${name.toLowerCase()}${description}${params}`
                 return field.includes(searchText) && (!obj.meta || (obj.meta.language === language))

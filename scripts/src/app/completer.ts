@@ -1,14 +1,14 @@
 // Register Ace completer for EarSketch API and audio constants.
 import { Ace, require as aceRequire } from "ace-builds"
 
-import ESApiDoc from "../data/api_doc"
+import { ESApiDoc } from "../data/api_doc"
 import * as audioLibrary from "./audiolibrary"
 
 const langTools = aceRequire("ace/ext/language_tools")
 
 // Get the list of autocompletions
 const apiCompletions: string[] = []
-for (const data of Object.values(ESApiDoc)) {
+for (const data of Object.values(ESApiDoc())) {
     const entries = Array.isArray(data) ? data : [data]
     apiCompletions.push(...entries.map(entry => entry.autocomplete).filter(a => a !== undefined))
 }

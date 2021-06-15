@@ -133,5 +133,11 @@
         "soundCloud": "I want to publish my song on SoundCloud."
       }
     }
+  },
+  "api" : {
+    "analyze": {
+      "description": "This function analyzes an audio file for the specified feature."
+    },
+    "noparams": "No Parameters"
   }
 }
