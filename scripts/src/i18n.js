@@ -9,7 +9,7 @@ i18n
         fallbackLng: 'en',
         ns: ['common', 'messages', 'api'],
         defaultNS: 'common',
-        debug: true,
+        debug: false,
 
         interpolation: {
             escapeValue: false // react already safes from xss
