@@ -1,7 +1,7 @@
 // Register Ace completer for EarSketch API and audio constants.
 import { Ace, require as aceRequire } from "ace-builds"
 
-import ESApiDoc from "../data/api_doc"
+import { ESApiDoc } from "../data/api_doc"
 import * as audioLibrary from "./audiolibrary"
 
 const langTools = aceRequire("ace/ext/language_tools")

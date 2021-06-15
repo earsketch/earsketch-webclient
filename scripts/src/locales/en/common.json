@@ -133,5 +133,462 @@
         "soundCloud": "I want to publish my song on SoundCloud."
       }
     }
+  },
+  "api" : {
+    "noparams": "No Parameters",
+    "parameters": "Parameters",
+    "returnValue": "Return Value",
+    "example": "Example",
+    "defaultValue": "Default Value",
+    "open": "Open",
+    "close": "Close",
+    "types": {
+      "soundConstant": "Sound Constant",
+      "analysisConstant": "Analysis Constant",
+      "folderConstant": "Folder Constant",
+      "effectConstant": "Effect Constant",
+      "effectParameterConstant": "Effect Parameter Constant",
+      "float": "Float",
+      "array": "Array",
+      "integer": "Integer",
+      "listArray": "List/Array",
+      "list": "List",
+      "string": "String",
+      "stringOptional": "String, Optional",
+      "stringNumberList": "String/Number/List",
+      "any": "Any type",
+      "booleanOptional": "Boolean, Optional",
+      "soundOrList": "Sound Constant or List/array"
+    },
+    "analyze": {
+      "description": "This function analyzes an audio file for the specified feature.",
+      "parameters": {
+        "audioFile": {
+          "description": "Audio file to analyze, typically this is a constant from the sound browser."
+        },
+
+        "featureForAnalysis": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        }
+      },
+      "returns": {
+        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      }
+    },
+
+    "analyzeForTime": {
+      "description": "This function analyzes an audio file for the specified feature, for the specified start and end times.",
+      "parameters": {
+        "audioFile": {
+          "description": "Audio file to analyze, typically this is a constant from the sound browser."
+        },
+        "featureForAnalysis": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        },
+        "startTime": {
+          "description": "Start location to begin analysis"
+        },
+        "endTime": {
+          "description": "End Location to end analysis"
+        }
+      },
+      "returns": {
+        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      }
+    },
+
+    "analyzeTrack": {
+      "description": "This function analyzes an entire track for the specified feature.",
+      "parameters": {
+        "trackNumber": {
+          "description": "Track number to analyze."
+        },
+        "featureForAnalysis": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        }
+      },
+      "returns": {
+        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      }
+    },
+
+    "analyzeTrackForTime": {
+      "description": "This function analyzes a specified track between a start and end time.",
+      "parameters": {
+        "trackNumber": {
+          "description": "Track number to analyze."
+        },
+        "featureForAnalysis": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        },
+        "startTime": {
+          "description": "Start location to begin analysis"
+        },
+        "endTime": {
+          "description": "End Location to end analysis"
+        }
+      },
+      "returns": {
+        "description": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+      }
+    },
+
+    "createAudioSlice": {
+      "description": "Returns a sound constant that represents a slice of audio from an existing audio clip.",
+      "parameters": {
+        "fileName": {
+          "description": "The audio file from which to create a slice. This is a constant from the sound browser."
+        },
+        "startPosition": {
+          "description": "The start position of the slice."
+        },
+        "endPosition": {
+          "description": "The end position of the slice."
+        }
+      },
+      "returns": {
+        "description": "A new Sound Constant representing the slice of audio. "
+      }
+    },
+
+    "dur": {
+      "description": "Returns the duration of an audio file in measures.",
+      "parameters": {
+        "fileName": {
+          "description": "The audio file whose duration to return. Typically, this is a constant from the sound browser."
+        }
+      },
+      "returns": {
+        "description": "The duration in measures."
+      }
+    },
+
+    "finish": {
+      "description": "You must call this function at the end of your EarSketch script. This ensures your music is prepared for playback in the digital audio workstation (DAW)."
+    },
+
+    "fitMedia": {
+      "description": "Adds an audio file to a specified track at specified start and end times. The audio file will be repeated or cut short as needed to fill the specified amount of time.",
+      "parameters": {
+        "fileName": {
+          "description": "Audio file to place on track, typically this is a constant from the sound browser"
+        },
+        "trackNumber": {
+          "description": "Track number to insert audio file onto"
+        },
+        "startLocation": {
+          "description": "Location where the soundfile will begin (e.g. 1 will start at the beginning of measure 1)."
+        },
+        "endLocation": {
+          "description": "Location where the soundfile will end (e.g. 5 will stop the soundfile at the beginning of measure 5)."
+        }
+      }
+    },
+
+    "importImage": {
+      "description": "This function retrieves an image from the web and converts it into a two-dimensional array/list of grayscale values or a three-dimensional list of RGB color values, scaled to the specified number of rows and columns.",
+      "parameters": {
+        "imageURL": {
+          "description": "The URL at which the image is located"
+        },
+        "nrows": {
+          "description": "The number of rows of pixel data to return (the image will be scaled to match this number of rows)"
+        },
+        "ncols": {
+          "description": "The number of columns of pixel data to return (the image will be scaled to match this number of columns)"
+        },
+        "includeRGB": {
+          "default": "False",
+          "description": "If false, returns a two-dimensional grayscale list. If true, returns a three-dimensional RGB color pixel list, with the third dimension being for R, G, and B, respectively."
+        }
+      },
+      "returns": {
+        "description": "Multidimensional list of integers (0-255) representing pixels."
+      }
+    },
+
+    "importFile": {
+      "description": "This function retrieves a file from the web and returns its contents as a string.",
+      "parameters": {
+        "fileURL": {
+          "description": "The URL at which the file is located"
+        }
+      },
+      "returns": {
+        "description": "File contents as string."
+      }
+    },
+
+    "init": {
+      "description": "This must be the first function call in every EarSketch script. It prepares the digital audio workstation to create your music."
+    },
+
+    "insertMedia": {
+      "description": "Inserts the entire media file onto a specified track at the specified starting time.",
+      "parameters": {
+        "fileName": {
+          "description": "Audio file to insert on track, typically this is a constant from the sound browser"
+        },
+        "trackNumber": {
+          "description": "Track number to insert soundfile onto"
+        },
+        "trackLocation": {
+          "description": "The location at which to start playback of the soundfile. (The soundfile will play through one time, so the end time depends on the length of the soundfile.)"
+        }
+      }
+    },
+
+
+    "insertMediaSection": {
+      "description": "Inserts a part of an audio file on a specified track at a specified location.",
+      "parameters": {
+        "fileName": {
+          "description": "Audio file to insert on track, typically this is a constant from the sound browser"
+        },
+        "trackNumber": {
+          "description": "Track number to insert soundfile onto"
+        },
+        "trackLocation": {
+          "description": "The location at which to start playback of the soundfile."
+        },
+        "mediaStartLocation": {
+          "description": "Start location within the soundfile to include (e.g. 1.0 is the beginning of the soundfile and 2.0 is measure 2 of the soundfile)."
+        },
+        "mediaEndLocation": {
+          "description": "End location within the soundfile to include (e.g. 2.0 is measure 2 of the soundfile)."
+        }
+      }
+    },
+
+    "makeBeat": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
+      "parameters": {
+        "fileName": {
+          "description": "A single soundfile or a list/array of soundfiles, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "measure": {
+          "description": "Location to start pattern"
+        },
+        "string": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the soundfile for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+        }
+      }
+    },
+
+    "makeBeatSlice": {
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a soundfile. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same soundfile.",
+      "parameters": {
+        "fileName": {
+          "description": "A single soundfile, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track to place pattern onto"
+        },
+        "measure": {
+          "description": "Location to start pattern"
+        },
+        "string": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the soundfile at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+        },
+        "beatNumber": {
+          "description": "A list/array of start locations within audio file (e.g. [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the soundfile that can be referenced in the beat string by \"0\" and \"1\" respectively."
+        }
+      }
+    },
+
+    "print": {
+      "description": "Displays the input in the console.",
+      "parameters": {
+        "input": {
+          "description": "Value(s) to print"
+        }
+      }
+    },
+
+    "println": {
+      "description": "Displays the input in the console.",
+      "parameters": {
+        "input": {
+          "description": "Value(s) to print"
+        }
+      }
+    },
+
+    "readInput": {
+      "description": "Use this function to prompt a user for input.",
+      "parameters": {
+        "prompt": {
+          "description": "A prompt to provide the user when asking for input."
+        }
+      },
+      "returns": {
+        "description": "The result of the user input."
+      }
+    },
+
+    "replaceListElement": {
+      "description": "Replace all occurrences of a list/array element with a new element.",
+      "parameters": {
+        "inputList": {
+          "description": "Original list/array"
+        },
+        "elementToReplace": {
+          "description": "Element of the list to replace."
+        },
+        "withElement": {
+          "description": "New element that will replace all occurrences of elementToReplace."
+        }
+      }
+    },
+
+    "replaceString": {
+      "description": "This function replaces all instances of a character in the original string with a new character.",
+      "parameters": {
+        "string": {
+          "description": "Original string"
+        },
+        "characterToReplace": {
+          "description": "Character in the original string to replace"
+        },
+        "withCharacter": {
+          "description": "New character that will replace all occurrences of characterToReplace"
+        }
+      },
+      "returns": {
+        "description": "New string with appropriate character(s) replaced"
+      }
+    },
+
+    "reverseList": {
+      "description": "Reverse the order of the elements of a list/array.",
+      "parameters": {
+        "inputList": {
+          "description": "List/array to reverse"
+        }
+      },
+      "returns": {
+        "description": "A new list/array with the elements in reverse order"
+      }
+    },
+
+    "reverseString": {
+      "description": "Reverse the order of characters in a string.",
+      "parameters": {
+        "inputString": {
+          "description": "String to reverse"
+        }
+      },
+      "returns": {
+        "description": "A new string with the characters in reverse order"
+      }
+    },
+
+    "rhythmEffects": {
+      "description": "Creates a rhythmic effect envelope through specifying a string of characters.",
+      "parameters": {
+        "track": {
+          "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
+        },
+        "effectType": {
+          "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+        },
+        "effectParameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+        },
+        "effectList": {
+          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+        },
+        "measure": {
+          "description": "Location to start pattern"
+        },
+        "beatString": {
+          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+        }
+      }
+    },
+
+    "selectRandomFile": {
+      "description": "Selects a random soundfile from a specified folder.",
+      "parameters": {
+        "folder": {
+          "description": "Folder to get random soundfile from. Typically, this is a constant from the sound browser (a folder name, not a file name)."
+        }
+      },
+      "returns": {
+        "description": "A random Sound Constant from the specified folder."
+      }
+    },
+
+    "setEffect1": {
+      "description": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a> in the curriculum.",
+      "parameters": {
+        "track": {
+          "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
+        },
+        "effectType": {
+          "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+        },
+        "effectParameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See Every Effect Explained in Detail in the curriculum sidebar for a complete list of effect parameters.)"
+        },
+        "effectValue": {
+          "description": "Value of effect parameter"
+        }
+      }
+    },
+
+    "setEffect2": {
+      "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a>",
+      "parameters": {
+        "effectStartValue": {
+          "description": "Value of effect parameter at beginning of effect envelope"
+        },
+        "effectStartLocation": {
+          "description": "Location of the effectStartValue"
+        },
+        "effectEndValue": {
+          "description": "Value of effect parameter at end of effect envelope"
+        },
+        "effectEndLocation": {
+          "description": "Location of the effectEndValue"
+        }
+      }
+    },
+
+    "setTempo": {
+      "description": "Sets the tempo for the project.",
+      "parameters": {
+        "tempo": {
+          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45. Maximum tempo is 220."
+        }
+      }
+    },
+
+    "shuffleList": {
+      "description": "Randomly rearrange the elements in a list/array.",
+      "parameters": {
+        "inputList": {
+          "description": "List/array to shuffle"
+        }
+      },
+      "returns": {
+        "description": "A new list/array with the order of the list elements randomized."
+      }
+    },
+
+    "shuffleString": {
+      "description": "Randomly rearrange the characters in a string.",
+      "parameters": {
+        "inputString": {
+          "description": "String to shuffle"
+        }
+      },
+      "returns": {
+        "description": "A new string with the order of the characters randomized."
+      }
+    }
   }
 }
