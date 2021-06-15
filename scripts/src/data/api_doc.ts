@@ -32,18 +32,18 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             "descriptionKey": "api:analyze.description",
             "parameters": {
                 "audioFile": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "Audio file to analyze, typically this is a constant from the sound browser."
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:analyze.parameters.audioFile.description"
                 },
 
                 "featureForAnalysis": {
-                    "type": "Analysis Constant",
-                    "descriptionKey": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+                    "type": i18n.t("api:types.analysisConstant"),
+                    "descriptionKey": "api:analyze.parameters.featureForAnalysis.description"
                 }
             },
             "returns": {
                 "type": "Float",
-                "descriptionKey": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+                "descriptionKey": "api:analyze.returns.description"
             },
             "example": {
                 "python": "# Find the spectral centroid of the audio file specified \ncentroidValue = analyze(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID)",
@@ -54,28 +54,28 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "analyzeForTime": {
-            "descriptionKey": "This function analyzes an audio file for the specified feature, for the specified start and end times.",
+            "descriptionKey": "api:analyzeForTime.description",
             "parameters": {
                 "audioFile": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "Audio file to analyze, typically this is a constant from the sound browser."
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:analyzeForTime.parameters.audioFile.description"
                 },
                 "featureForAnalysis": {
-                    "type": "Analysis Constant",
-                    "descriptionKey": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+                    "type": i18n.t("api:types.analysisConstant"),
+                    "descriptionKey": "api:analyzeForTime.parameters.featureForAnalysis.description"
                 },
                 "startTime": {
                     "type": "Float",
-                    "descriptionKey": "Start location to begin analysis"
+                    "descriptionKey": "api:analyzeForTime.parameters.startTime.description"
                 },
                 "endTime": {
                     "type": "Float",
-                    "descriptionKey": "End Location to end analysis"
+                    "descriptionKey": "api:analyzeForTime.parameters.endTime.description"
                 }
             },
             "returns": {
                 "type": "Float",
-                "descriptionKey": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+                "descriptionKey": "api:analyzeForTime.returns.description"
             },
             "example": {
                 "python": "# Find the spectral centroid for the first measure of the audio file\ncentroidValue = analyzeForTime(HOUSE_BREAKBEAT_001, SPECTRAL_CENTROID, 1.0, 2.0)",
@@ -86,20 +86,20 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "analyzeTrack": {
-            "descriptionKey": "This function analyzes an entire track for the specified feature.",
+            "descriptionKey": "api:analyzeTrack.description",
             "parameters": {
                 "trackNumber": {
                     "type": "Integer",
-                    "descriptionKey": "Track number to analyze."
+                    "descriptionKey": "api:analyzeTrack.parameters.trackNumber.description"
                 },
                 "featureForAnalysis": {
-                    "type": "Analysis Constant",
-                    "descriptionKey": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+                    "type": i18n.t("api:types.analysisConstant"),
+                    "descriptionKey": "api:analyzeTrack.parameters.featureForAnalysis.description"
                 }
             },
             "returns": {
                 "type": "Float",
-                "descriptionKey": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+                "descriptionKey": "api:analyzeTrack.returns.description"
             },
             "example": {
                 "python": "# Find the spectral centroid of all of track 1\ncentroidValue = analyzeTrack(1, SPECTRAL_CENTROID)",
@@ -110,28 +110,28 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "analyzeTrackForTime": {
-            "descriptionKey": "This function analyzes a specified track between a start and end time.",
+            "descriptionKey": "api:analyzeTrackForTime.description",
             "parameters": {
                 "trackNumber": {
                     "type": "Integer",
-                    "descriptionKey": "Track number to analyze."
+                    "descriptionKey": "api:analyzeTrackForTime.parameters.trackNumber.description"
                 },
                 "featureForAnalysis": {
-                    "type": "Analysis Constant",
-                    "descriptionKey": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+                    "type": i18n.t("api:types.analysisConstant"),
+                    "descriptionKey": "api:analyzeTrackForTime.parameters.featureForAnalysis.description"
                 },
                 "startTime": {
                     "type": "Float",
-                    "descriptionKey": "Start location to begin analysis"
+                    "descriptionKey": "api:analyzeTrackForTime.parameters.startTime.description"
                 },
                 "endTime": {
                     "type": "Float",
-                    "descriptionKey": "End Location to end analysis"
+                    "descriptionKey": "api:analyzeTrackForTime.parameters.endTime.description"
                 }
             },
             "returns": {
                 "type": "Float",
-                "descriptionKey": "Result of the calculation for the specified feature (always between 0 and 1 inclusive)."
+                "descriptionKey": "api:analyzeTrackForTime.returns.description"
             },
             "example": {
                 "python": "# Find the spectral centroid of all of track 1 between measures 1 and 9\ncentroidValue = analyzeTrackForTime(1, SPECTRAL_CENTROID, 1.0, 9.0)",
@@ -142,19 +142,19 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "createAudioSlice": {
-            "descriptionKey": "Returns a sound constant that represents a slice of audio from an existing audio clip.",
+            "descriptionKey": "api:createAudioSlice.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "The audio file from which to create a slice. This is a constant from the sound browser."
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:createAudioSlice.parameters.fileName.description"
                 },
                 "startPosition": {
                     "type": "Float",
-                    "descriptionKey": "The start position of the slice."
+                    "descriptionKey": "api:createAudioSlice.parameters.startPosition.description"
                 },
                 "endPosition": {
                     "type": "Float",
-                    "descriptionKey": "The end position of the slice."
+                    "descriptionKey": "api:createAudioSlice.parameters.endPosition.description"
                 },
             },
             "example": {
@@ -163,18 +163,18 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "javascript": "var slice = createAudioSlice(HOUSE_BREAKBEAT_001, 1.5, 2.5);\nfitMedia(slice, 1, 1, 3);"
             },
             "returns": {
-                "type": "Sound Constant",
-                "descriptionKey": "A new Sound Constant representing the slice of audio. "
+                "type": i18n.t("api:types.soundConstant"),
+                "descriptionKey": "api:createAudioSlice.returns.description"
             },
             "autocomplete": "createAudioSlice(fileName, startPosition, endPosition)",
         },
 
         "dur": {
-            "descriptionKey": "Returns the duration of an audio file in measures.",
+            "descriptionKey": "api:dur.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "The audio file whose duration to return. Typically, this is a constant from the sound browser."
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:dur.parameters.fileName.description"
                 }
             },
             "example": {
@@ -184,13 +184,13 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             },
             "returns": {
                 "type": "Float",
-                "descriptionKey": "The duration in measures."
+                "descriptionKey": "api:dur.returns.description"
             },
             "autocomplete": "dur(fileName)",
         },
 
         "finish": {
-            "descriptionKey": "You must call this function at the end of your EarSketch script. This ensures your music is prepared for playback in the digital audio workstation (DAW).",
+            "descriptionKey": "api:finish.description",
             "example": {
                 "python": "# Rest of script above this line...\nfinish()",
                 "javascript": "// Rest of script above this line...\nfinish();"
@@ -199,23 +199,23 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "fitMedia": {
-            "descriptionKey": "Adds an audio file to a specified track at specified start and end times. The audio file will be repeated or cut short as needed to fill the specified amount of time.",
+            "descriptionKey": "api:fitMedia.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "Audio file to place on track, typically this is a constant from the sound browser"
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:fitMedia.parameters.fileName.description"
                 },
                 "trackNumber": {
                     "type": "Integer",
-                    "descriptionKey": "Track number to insert audio file onto"
+                    "descriptionKey": "api:fitMedia.parameters.trackNumber.description"
                 },
                 "startLocation": {
                     "type": "Float",
-                    "descriptionKey": "Location where the soundfile will begin (e.g. 1 will start at the beginning of measure 1)."
+                    "descriptionKey": "api:fitMedia.parameters.startLocation.description"
                 },
                 "endLocation": {
                     "type": "Float",
-                    "descriptionKey": "Location where the soundfile will end (e.g. 5 will stop the soundfile at the beginning of measure 5)."
+                    "descriptionKey": "api:fitMedia.parameters.endLocation.description"
                 }
             },
             "example": {
@@ -227,24 +227,24 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "importImage": {
-            "descriptionKey": "This function retrieves an image from the web and converts it into a two-dimensional array/list of grayscale values or a three-dimensional list of RGB color values, scaled to the specified number of rows and columns.",
+            "descriptionKey": "api:importImage.description",
             "parameters": {
                 "imageURL": {
                     "type": "String",
-                    "descriptionKey": "The URL at which the image is located"
+                    "descriptionKey": "api:importImage.parameters.imageURL.description"
                 },
                 "nrows": {
                     "type": "Integer",
-                    "descriptionKey": "The number of rows of pixel data to return (the image will be scaled to match this number of rows)"
+                    "descriptionKey": "api:importImage.parameters.nrows.description"
                 },
                 "ncols": {
                     "type": "Integer",
-                    "descriptionKey": "The number of columns of pixel data to return (the image will be scaled to match this number of columns)"
+                    "descriptionKey": "api:importImage.parameters.ncols.description"
                 },
                 "includeRGB": {
                     "type": "Boolean, Optional",
                     "default": "False",
-                    "descriptionKey": "If false, returns a two-dimensional grayscale list. If true, returns a three-dimensional RGB color pixel list, with the third dimension being for R, G, and B, respectively."
+                    "descriptionKey": "api:importImage.parameters.includeRGB.description"
                 }
             },
             "example": {
@@ -254,17 +254,17 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             },
             "returns": {
                 "type": "List",
-                "descriptionKey": "Multidimensional list of integers (0-255) representing pixels."
+                "descriptionKey": "api:importImage.returns.description"
             },
             "autocomplete": "importImage(imageURL, nrows, ncols, False)"
         },
 
         "importFile": {
-            "descriptionKey": "This function retrieves a file from the web and returns its contents as a string.",
+            "descriptionKey": "api:importFile.description",
             "parameters": {
                 "fileURL": {
                     "type": "String",
-                    "descriptionKey": "The URL at which the file is located"
+                    "descriptionKey": "api:importFile.parameters.fileURL.description"
                 }
             },
             "example": {
@@ -274,13 +274,13 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             },
             "returns": {
                 "type": "String",
-                "descriptionKey": "File contents as string."
+                "descriptionKey": "api:importFile.returns.description"
             },
             "autocomplete": "importFile(fileUrl)"
         },
 
         "init": {
-            "descriptionKey": "This must be the first function call in every EarSketch script. It prepares the digital audio workstation to create your music.",
+            "descriptionKey": "api:init.description",
             "example": {
                 "python": "init()\n# Rest of script below this line...",
                 "javascript": "init();\n// Rest of script below this line..."
@@ -289,19 +289,19 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "insertMedia": {
-            "descriptionKey": "Inserts the entire media file onto a specified track at the specified starting time.",
+            "descriptionKey": "api:insertMedia.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "Audio file to insert on track, typically this is a constant from the sound browser"
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:insertMedia.parameters.fileName.description"
                 },
                 "trackNumber": {
                     "type": "Integer",
-                    "descriptionKey": "Track number to insert soundfile onto"
+                    "descriptionKey": "api:insertMedia.parameters.trackNumber.description"
                 },
                 "trackLocation": {
                     "type": "Float",
-                    "descriptionKey": "The location at which to start playback of the soundfile. (The soundfile will play through one time, so the end time depends on the length of the soundfile.)"
+                    "descriptionKey": "api:insertMedia.parameters.trackLocation.description"
                 }
             },
             "example": {
@@ -314,27 +314,27 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
 
 
         "insertMediaSection": {
-            "descriptionKey": "Inserts a part of an audio file on a specified track at a specified location.",
+            "descriptionKey": "api:insertMediaSection.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "Audio file to insert on track, typically this is a constant from the sound browser"
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:insertMediaSection.parameters.fileName.description"
                 },
                 "trackNumber": {
                     "type": "Integer",
-                    "descriptionKey": "Track number to insert soundfile onto"
+                    "descriptionKey": "api:insertMediaSection.parameters.trackNumber.description"
                 },
                 "trackLocation": {
                     "type": "Float",
-                    "descriptionKey": "The location at which to start playback of the soundfile."
+                    "descriptionKey": "api:insertMediaSection.parameters.trackLocation.description"
                 },
                 "mediaStartLocation": {
                     "type": "Float",
-                    "descriptionKey": "Start location within the soundfile to include (e.g. 1.0 is the beginning of the soundfile and 2.0 is measure 2 of the soundfile)."
+                    "descriptionKey": "api:insertMediaSection.parameters.mediaStartLocation.description"
                 },
                 "mediaEndLocation": {
                     "type": "Float",
-                    "descriptionKey": "End location within the soundfile to include (e.g. 2.0 is measure 2 of the soundfile)."
+                    "descriptionKey": "api:insertMediaSection.parameters.mediaEndLocation.description"
                 }
             },
             "example": {
@@ -346,23 +346,23 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "makeBeat": {
-            "descriptionKey": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
+            "descriptionKey": "api:makeBeat.description",
             "parameters": {
                 "fileName": {
                     "type": "Sound Constant or List/array",
-                    "descriptionKey": "A single soundfile or a list/array of soundfiles, typically this is a constant from the sound browser"
+                    "descriptionKey": "api:makeBeat.parameters.fileName.description"
                 },
                 "track": {
                     "type": "Integer",
-                    "descriptionKey": "Track to place pattern onto"
+                    "descriptionKey": "api:makeBeat.parameters.track.description"
                 },
                 "measure": {
                     "type": "Float",
-                    "descriptionKey": "Location to start pattern"
+                    "descriptionKey": "api:makeBeat.parameters.measure.description"
                 },
                 "string": {
                     "type": "String",
-                    "descriptionKey": "A string indicating the rhythmic pattern to play. \"0\" plays the soundfile for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+                    "descriptionKey": "api:makeBeat.parameters.string.description"
                 }
             },
             "example": {
@@ -374,27 +374,27 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "makeBeatSlice": {
-            "descriptionKey": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a soundfile. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same soundfile.",
+            "descriptionKey": "api:makeBeatSlice.description",
             "parameters": {
                 "fileName": {
-                    "type": "Sound Constant",
-                    "descriptionKey": "A single soundfile, typically this is a constant from the sound browser"
+                    "type": i18n.t("api:types.soundConstant"),
+                    "descriptionKey": "api:makeBeatSlice.parameters.fileName.description"
                 },
                 "track": {
                     "type": "Integer",
-                    "descriptionKey": "Track to place pattern onto"
+                    "descriptionKey": "api:makeBeatSlice.parameters.track.description"
                 },
                 "measure": {
                     "type": "Float",
-                    "descriptionKey": "Location to start pattern"
+                    "descriptionKey": "api:makeBeatSlice.parameters.measure.description"
                 },
                 "string": {
                     "type": "String",
-                    "descriptionKey": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the soundfile at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+                    "descriptionKey": "api:makeBeatSlice.parameters.string.description"
                 },
                 "beatNumber": {
                     "type": "List/array",
-                    "descriptionKey": "A list/array of start locations within audio file (e.g. [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the soundfile that can be referenced in the beat string by \"0\" and \"1\" respectively."
+                    "descriptionKey": "api:makeBeatSlice.parameters.beatNumber.description"
                 }
             },
             "example": {
@@ -406,11 +406,11 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "print": {
-            "descriptionKey": "Displays the input in the console.",
+            "descriptionKey": "api:print.description",
             "parameters": {
                 "input": {
                     "type": "String/Number/List",
-                    "descriptionKey": "Value(s) to print"
+                    "descriptionKey": "api:print.parameters.input.description"
                 }
             },
             "example": {
@@ -423,11 +423,11 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "println": {
-            "descriptionKey": "Displays the input in the console.",
+            "descriptionKey": "api:println.description",
             "parameters": {
                 "input": {
                     "type": "String/Number/List",
-                    "descriptionKey": "Value(s) to print"
+                    "descriptionKey": "api:println.parameters.input.description"
                 }
             },
             "example": {
@@ -440,11 +440,11 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "readInput": {
-            "descriptionKey": "Use this function to prompt a user for input.",
+            "descriptionKey": "api:readInput.description",
             "parameters": {
                 "prompt": {
                     "type": "String, Optional",
-                    "descriptionKey": "A prompt to provide the user when asking for input."
+                    "descriptionKey": "api:readInput.parameters.prompt.description"
                 }
             },
             "example": {
@@ -453,25 +453,25 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             },
             "returns": {
                 "type": "String",
-                "descriptionKey": "The result of the user input."
+                "descriptionKey": "api:readInput.returns.description"
             },
             "autocomplete": "readInput(prompt)"
         },
 
         "replaceListElement": {
-            "descriptionKey": "Replace all occurrences of a list/array element with a new element.",
+            "descriptionKey": "api:replaceListElement.description",
             "parameters": {
                 "inputList": {
                     "type": "List/array",
-                    "descriptionKey": "Original list/array"
+                    "descriptionKey": "api:replaceListElement.parameters.inputList.description"
                 },
                 "elementToReplace": {
                     "type": "Any type",
-                    "descriptionKey": "Element of the list to replace."
+                    "descriptionKey": "api:replaceListElement.parameters.elementToReplace.description"
                 },
                 "withElement": {
                     "type": "Any type",
-                    "descriptionKey": "New element that will replace all occurrences of elementToReplace."
+                    "descriptionKey": "api:replaceListElement.parameters.withElement.description"
                 }
             },
             "example": {
@@ -483,24 +483,24 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "replaceString": {
-            "descriptionKey": "This function replaces all instances of a character in the original string with a new character.",
+            "descriptionKey": "api:replaceString.description",
             "parameters": {
                 "string": {
                     "type": "String",
-                    "descriptionKey": "Original string"
+                    "descriptionKey": "api:replaceString.parameters.string.description"
                 },
                 "characterToReplace": {
                     "type": "String",
-                    "descriptionKey": "Character in the original string to replace"
+                    "descriptionKey": "api:replaceString.parameters.characterToReplace.description"
                 },
                 "withCharacter": {
                     "type": "String",
-                    "descriptionKey": "New character that will replace all occurrences of characterToReplace"
+                    "descriptionKey": "api:replaceString.parameters.withCharacter.description"
                 }
             },
             "returns": {
                 "type": "String",
-                "descriptionKey": "New string with appropriate character(s) replaced"
+                "descriptionKey": "api:replaceString.returns.description"
             },
             "example": {
                 "python": "# Change all '0's to '1's\nnewString = replaceString(\"0---0---0---0---\", \"0\", \"1\")",
@@ -511,16 +511,16 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "reverseList": {
-            "descriptionKey": "Reverse the order of the elements of a list/array.",
+            "descriptionKey": "api:reverseList.description",
             "parameters": {
                 "inputList": {
                     "type": "List/array",
-                    "descriptionKey": "List/array to reverse"
+                    "descriptionKey": "api:reverseList.parameters.inputList.description"
                 }
             },
             "returns": {
                 "type": "List/array",
-                "descriptionKey": "A new list/array with the elements in reverse order"
+                "descriptionKey": "api:reverseList.returns.description"
             },
             "example": {
                 "python": "# Reverses a list of audio constants\naudioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nreversedList = reverseList(audioFiles)",
@@ -531,16 +531,16 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "reverseString": {
-            "descriptionKey": "Reverse the order of characters in a string.",
+            "descriptionKey": "api:reverseString.description",
             "parameters": {
                 "inputString": {
                     "type": "String",
-                    "descriptionKey": "String to reverse"
+                    "descriptionKey": "api:reverseString.parameters.inputString.description"
                 }
             },
             "returns": {
                 "type": "String",
-                "descriptionKey": "A new string with the characters in reverse order"
+                "descriptionKey": "api:reverseString.returns.description"
             },
             "example": {
                 "python": "# inputs \"0+++0---0++-00-0\" outputs \"0-00-++0---0+++0\"\nnewString = reverseString(\"0+++0---0++-00-0\")",
@@ -551,31 +551,31 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "rhythmEffects": {
-            "descriptionKey": "Creates a rhythmic effect envelope through specifying a string of characters.",
+            "descriptionKey": "api:rhythmEffects.description",
             "parameters": {
                 "track": {
                     "type": "Integer",
-                    "descriptionKey": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
+                    "descriptionKey": "api:rhythmEffects.parameters.track.description"
                 },
                 "effectType": {
-                    "type": "Effect Constant",
-                    "descriptionKey": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+                    "type": i18n.t("api:types.effectConstant"),
+                    "descriptionKey": "api:rhythmEffects.parameters.effectType.description"
                 },
                 "effectParameter": {
-                    "type": "Effect Parameter Constant",
-                    "descriptionKey": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+                    "type": i18n.t("api:types.effectParameterConstant"),
+                    "descriptionKey": "api:rhythmEffects.parameters.effectParameter.description"
                 },
                 "effectList": {
                     "type": "List/array",
-                    "descriptionKey": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+                    "descriptionKey": "api:rhythmEffects.parameters.effectList.description"
                 },
                 "measure": {
                     "type": "Float",
-                    "descriptionKey": "Location to start pattern"
+                    "descriptionKey": "api:rhythmEffects.parameters.measure.description"
                 },
                 "beatString": {
                     "type": "String",
-                    "descriptionKey": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+                    "descriptionKey": "api:rhythmEffects.parameters.beatString.description"
                 }
             },
             "example": {
@@ -587,12 +587,16 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "selectRandomFile": {
-            "descriptionKey": "Selects a random soundfile from a specified folder.",
+            "descriptionKey": "api:selectRandomFile.description",
             "parameters": {
                 "folder": {
-                    "type": "Folder Constant",
-                    "descriptionKey": "Folder to get random soundfile from. Typically, this is a constant from the sound browser (a folder name, not a file name)."
+                    "type": i18n.t("api:types.folderConstant"),
+                    "descriptionKey": "api:selectRandomFile.parameters.folder.description"
                 }
+            },
+            "returns": {
+                type: i18n.t("api:types.soundConstant"),
+                descriptionKey: "api:selectRandomFile.returns.description"
             },
             "example": {
                 "python": "# Get random audio file from the ALT_POP_GUITAR folder and assign to randomAudio\nrandomAudio = selectRandomFile(ALT_POP_GUITAR)",
@@ -604,23 +608,23 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
 
         "setEffect": [
             {
-                "descriptionKey": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a> in the curriculum.",
+                "descriptionKey": "api:setEffect1.description",
                 "parameters": {
                     "track": {
                         "type": "Integer",
-                        "descriptionKey": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
+                        "descriptionKey": "api:setEffect1.parameters.track.description"
                     },
                     "effectType": {
-                        "type": "Effect Constant",
-                        "descriptionKey": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+                        "type": i18n.t("api:types.effectConstant"),
+                        "descriptionKey": "api:setEffect1.parameters.effectType.description"
                     },
                     "effectParameter": {
-                        "type": "Effect Parameter Constant",
-                        "descriptionKey": "Constant indicating which parameter of the effectType to create the envelope for. (See Every Effect Explained in Detail in the curriculum sidebar for a complete list of effect parameters.)"
+                        "type": i18n.t("api:types.effectParameterConstant"),
+                        "descriptionKey": "api:setEffect1.parameters.effectParameter.description"
                     },
                     "effectValue": {
                         "type": "Float",
-                        "descriptionKey": "Value of effect parameter"
+                        "descriptionKey": "api:setEffect1.parameters.effectValue.description"
                     }
                 },
                 "example": {
@@ -631,35 +635,35 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
                 "autocomplete": "setEffect(track, effectType, effectParameter, effectValue)"
             },
             {
-                "descriptionKey": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a>",
+                "descriptionKey": "api:setEffect2.description",
                 "parameters": {
                     "track": {
                         "type": "Integer",
-                        "descriptionKey": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
+                        "descriptionKey": "api:setEffect1.parameters.track.description"
                     },
                     "effectType": {
-                        "type": "Effect Constant",
-                        "descriptionKey": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+                        "type": i18n.t("api:types.effectConstant"),
+                        "descriptionKey": "api:setEffect1.parameters.effectType.description"
                     },
                     "effectParameter": {
-                        "type": "Effect Parameter Constant",
-                        "descriptionKey": "Constant indicating which parameter of the effectType to create the envelope for. (See Every Effect Explained in Detail in the curriculum sidebar for a complete list of effect parameters.)"
+                        "type": i18n.t("api:types.effectParameterConstant"),
+                        "descriptionKey": "api:setEffect1.parameters.effectParameter.description"
                     },
                     "effectStartValue": {
                         "type": "Float",
-                        "descriptionKey": "Value of effect parameter at beginning of effect envelope"
+                        "descriptionKey": "api:setEffect2.parameters.effectStartValue.description"
                     },
                     "effectStartLocation": {
                         "type": "Float",
-                        "descriptionKey": "Location of the effectStartValue"
+                        "descriptionKey": "api:setEffect2.parameters.effectStartLocation.description"
                     },
                     "effectEndValue": {
                         "type": "Float",
-                        "descriptionKey": "Value of effect parameter at end of effect envelope"
+                        "descriptionKey": "api:setEffect2.parameters.effectEndValue.description"
                     },
                     "effectEndLocation": {
                         "type": "Float",
-                        "descriptionKey": "Location of the effectEndValue"
+                        "descriptionKey": "api:setEffect2.parameters.effectEndLocation.description"
                     }
                 },
                 "example": {
@@ -672,11 +676,11 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         ],
 
         "setTempo": {
-            "descriptionKey": "Sets the tempo for the project.",
+            "descriptionKey": "api:setTempo.description",
             "parameters": {
                 "tempo": {
                     "type": "Integer",
-                    "descriptionKey": "The project tempo in beats per minute (BPM). Minimum tempo is 45. Maximum tempo is 220."
+                    "descriptionKey": "api:setTempo.parameters.tempo.description"
                 }
             },
             "example": {
@@ -688,16 +692,16 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "shuffleList": {
-            "descriptionKey": "Randomly rearrange the elements in a list/array.",
+            "descriptionKey": "api:shuffleList.description",
             "parameters": {
                 "inputList": {
                     "type": "List/array",
-                    "descriptionKey": "List/array to shuffle"
+                    "descriptionKey": "api:shuffleList.parameters.inputList.description"
                 }
             },
             "returns": {
                 "type": "List/array",
-                "descriptionKey": "A new list/array with the order of the list elements randomized."
+                "descriptionKey": "api:shuffleList.returns.description"
             },
             "example": {
                 "python": "audioFiles = [HOUSE_BREAKBEAT_001, HOUSE_BREAKBEAT_002, HOUSE_BREAKBEAT_003, HOUSE_BREAKBEAT_004]\nshuffledList = shuffleList(audioFiles)",
@@ -708,16 +712,16 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
         },
 
         "shuffleString": {
-            "descriptionKey": "Randomly rearrange the characters in a string.",
+            "descriptionKey": "api:shuffleString.description",
             "parameters": {
                 "inputString": {
                     "type": "String",
-                    "descriptionKey": "String to shuffle"
+                    "descriptionKey": "api:shuffleString.parameters.inputString.description"
                 }
             },
             "returns": {
                 "type": "String",
-                "descriptionKey": "A new string with the order of the characters randomized."
+                "descriptionKey": "api:shuffleString.returns.description"
             },
             "example": {
                 "python": "# inputs \"0+++0---0++-00-0\" and shuffles it randomly\nnewString = shuffleString(\"0+++0---0++-00-0\")",

@@ -135,9 +135,13 @@
     }
   },
   "api" : {
-    "analyze": {
-      "description": "This function analyzes an audio file for the specified feature."
-    },
-    "noparams": "No Parameters"
+    "noparams": "No Parameters",
+    "types": {
+      "soundConstant": "Sound Constant",
+      "analysisConstant": "Analysis Constant",
+      "folderConstant": "Folder Constant",
+      "effectConstant": "Effect Constant",
+      "effectParameterConstant": "Effect Parameter Constant"
+    }
   }
 }
