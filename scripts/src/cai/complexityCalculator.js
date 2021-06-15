@@ -378,8 +378,7 @@ function markVariable(node) {
                 var funcName = "";
                 if ('id' in nodeVal.func) {
                     funcName = nodeVal.func.id.v;
-                }
-                else if ('attr' in nodeVal.func) {
+                } else if ('attr' in nodeVal.func) {
                     funcName = nodeVal.func.attr.v;
                 }
                 if (funcName === 'readInput') {
@@ -885,7 +884,7 @@ export function evaluateAllEmpties() {
                     //comparisons and boolops both become booleans and stored in containedValue
                     ccState.getProperty('userFunctionReturns')[r].returns = "Bool";
                     ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone);
-                }else if (indexValue._astname === "List") {
+                } else if (indexValue._astname === "List") {
                     //list
                     ccState.getProperty('userFunctionReturns')[r].returns = "List";
                     ccHelpers.appendArray(ccHelpers.listTypesWithin(indexValue, ccState.getProperty('userFunctionReturns')[r].containedValue, ccState.getProperty('userFunctionReturns')[r].indexAndInput, ccState.getProperty('userFunctionReturns')[r].opsDone), ccState.getProperty('userFunctionReturns')[r].containedValue);
@@ -1176,8 +1175,7 @@ function findReturnInBody(node, functionObject) {
                     isIndexed = ccHelpers.getIndexingInNode(retVal)[0];
                     functionObject.indexAndInput.strIndexed = ccHelpers.getStringIndexingInNode(retVal)[0];
                 }
-                if (retVal._astname === "Num") {
-                } else if (retVal._astname === "Call") {
+                if (retVal._astname === "Call") {
                     //if itccState.getProperty('returns')another function's return, we look up what THAT function returns. if we know.
                     var funcName = "";
                     if ('id' in retVal.func) {
@@ -1193,12 +1191,10 @@ function findReturnInBody(node, functionObject) {
                         opsPerformed = ccHelpers.addOpToList("ListOp", opsPerformed, node.lineno);
                         if (retVal.func.value._astname === "List") {
                             var valuesInList = ccHelpers.listTypesWithin(retVal.func.value.elts, [], functionObject.indexAndInput, opsPerformed);
-                     
                         }
                         if (retVal.func.value._astname === "BinOp") {
                             var valsInOp = [];
                             ccHelpers.listTypesWithin(retVal.func.value, valsInOp, functionObject.indexAndInput, opsPerformed);
-                         
                         }
                         if (retVal.func.value._astname === "Call") {
                             var retFunc = ccHelpers.getFunctionObject(retVal.func.value.func.id.v);
@@ -1212,8 +1208,6 @@ function findReturnInBody(node, functionObject) {
                             var retVar = ccHelpers.getVariableObject(retVal.func.value.id.v);
                         }
                     }
-                    flag = funcName;
-                    foundMatch = false;
                     var matchedFunc = ccHelpers.getFunctionObject(funcName);
                     //or itccState.getProperty('returns')the return of another function
                     if (matchedFunc != null) {
@@ -1229,10 +1223,6 @@ function findReturnInBody(node, functionObject) {
                                 functionObject.stringElements = [matchedFunc.stringElements[0]]
                             }
                             var isIndexed = false;
-                            foundMatch = true;
-                        }
-                        if (!foundMatch) {
-                            // this denotes that we do not yet know what  this returns
                         }
                     }
                 } else if (retVal._astname === "Name") {
@@ -1243,13 +1233,9 @@ function findReturnInBody(node, functionObject) {
                             isFunctionName = true;
                         }
                     }
-                    if (isFunctionName) {
-                        //the variable contains a function value
-                    } else {
+                    if (!isFunctionName) {
                         //otherwise it's a variable the user has declared previously
-                        if (retVal.id.v === "True" || retVal.id.v === "False") {
-                          
-                        } else {
+                        if (retVal.id.v !== "True" && retVal.id.v !== "False") {
                             var variableName = retVal.id.v;
                             variablesIncluded = true;
                             var varToCopy = ccHelpers.getVariableObject(variableName);
@@ -1298,7 +1284,6 @@ function findReturnInBody(node, functionObject) {
                         }];
                     }
                     ccHelpers.getNestedVariables(retVal, varList);
-                    
                 } else if (retVal._astname === "BoolOp") {
                     //boolop becomes bool
                     ccHelpers.getNestedVariables(retVal, varList);
@@ -1991,9 +1976,7 @@ function lookForParamReturns(node) {
                             paramArgVar.value = ccHelpers.isNodeFloat(node.args[a]) ? "Float" : "Int";
                         } else if (type === "Name" && (argsIn[a].id.v === "True" || argsIn[a].id.v === "False")) {
                             paramArgVar.value = "Bool";
-                        } else if (type === "Name") {
-                           
-                        }  else if (type === "Call") {
+                        } else if (type === "Call") {
                             //then it's whatever that call returns
                             var funcName = "";
                             var item = argsIn[a].func;
@@ -2234,7 +2217,6 @@ function lookForParamReturns(node) {
                                 ccState.getProperty('userFunctionReturns')[index].flagVal = arg.func.id.v;
                             }
                         }
-
                         if (argType === "List") {
                             ccState.getProperty('userFunctionReturns')[index].flagVal = "";
                             ccState.getProperty('userFunctionReturns')[index].funcVar = "";
@@ -2643,8 +2625,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 };
                 var listValues = [];
                 if (originality && listInputIndexing.indexed) {
-                        results["List"] = 4;
-                    
+                        results["List"] = 4;       
                 } else {
                     listValues = ccHelpers.listTypesWithin(singleArg.elts, listValues, { input: false, indexed: false, strIndexed: false }, []);
                 }
@@ -2671,7 +2652,6 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
             } else if (singleArg._astname === 'Name' && singleArg.id.v !== "True" && singleArg.id.v !== "False") {
                 //if it's a variable, we mark its value/contained values
                 var lineNumberToUse = node.lineno;
-               
                 //check to see if this is a variable whose value has been changed at least once before this call
                 var argModded = false;
                 var modOriginality = false;
@@ -2774,7 +2754,6 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     ccHelpers.listTypesWithin(singleArg, compareValues, { input: false, indexed: false, strIndexed: false }, []);
                 } else if (indexInputItem.indexed) {
                         results["List"] = 4;
-                    
                 }
                 if (indexInputItem.input) {
                     results.consoleInput = 3;
@@ -3247,7 +3226,6 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
-                    
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
                     }
@@ -3264,7 +3242,6 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
-                    
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
                     }
@@ -3304,10 +3281,6 @@ function analyzeASTNode(node, results, loopParent) {
                     if (funcName === 'readInput') {
                         inputUsed = true;
                     }
-                    //get the return value from the function
-                    var callReturnVal = "";
-                    var returnFrom = ccHelpers.getFunctionObject(funcName);
-                    
                 }
                 recursiveAnalyzeAST(testNode, results, loopParent);
                 var modOriginality = false;
@@ -3472,7 +3445,6 @@ function analyzeASTNode(node, results, loopParent) {
                                 };
                                 var binOpIndex = false;
                                 var binOpStrIndex = false;
-                                
                                 //update results
                                 if (inputIndexItem.input && results.consoleInput < 3) {
                                     results.consoleInput = 3;
@@ -3862,10 +3834,6 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getFunctionObject(funcName).indexAndInput.indexed && (originality || ccHelpers.getFunctionObject(funcName).original)) {
                         results["List"] = 4;
                     }
-                    //get the rturn value
-                    var callReturnVal = "";
-                    var calledFunc = ccHelpers.getFunctionObject(funcName);
-                    
                 }
                 //now, if it's something that has values within it, we chack through that
                 if (testItem._astname === "Compare" || testItem._astname === "List" || testItem._astname === "BinOp" || testItem._astname === "BoolOp") {
@@ -4088,7 +4056,6 @@ function analyzeASTNode(node, results, loopParent) {
                         var assignOriginality = false;
                         var varType = "";
                         var varInput = false;
-                        
                     }
                 }
             }
@@ -4217,7 +4184,6 @@ function analyzeASTNode(node, results, loopParent) {
                             //then it's a variable. look up what's in there.
                             purposeVars = true;
                             var lineNumberToUse = node.lineno;
-                            
                         } else if ((nodeToCheck._astname === "BinOp" || nodeToCheck._astname === "BoolOp" || nodeToCheck._astname === "Compare" || nodeToCheck._astname === "List")) {
                             if (ccHelpers.getIndexingInNode(nodeToCheck)[0] && (originality || ccHelpers.getIndexingInNode(nodeToCheck)[1])) {
                                 results["List"] = 4;
@@ -4299,7 +4265,6 @@ function analyzeASTNode(node, results, loopParent) {
                             } else if (indexInputItem.indexed) {
                                     results["List"] = 4;
                             }
-                            
                             if (indexInputItem.input) {
                                 results.consoleInput = 3;
                             }
@@ -4376,7 +4341,6 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                     }
-                   
                 }
             }
             //JS for loops have up to 3 components that need to be checked
@@ -4515,7 +4479,7 @@ function analyzeASTNode(node, results, loopParent) {
                 if (anyOriginal) {
                     //we need: datatypes and ops. and contained datatypes. and whether or not any vars are used or nested.
                     if (nestedVars.length > 0 && results.variables < 3) {
-                        results.variables = 3
+                        results.variables = 3;
                     }
                     var dataTypesIn = [];
                     var indexingIn = {
@@ -4580,7 +4544,6 @@ function analyzeASTNode(node, results, loopParent) {
                         //updates results and purpose booleans
                         if (calledFunc != null) {
                             callReturnVal = calledFunc.returns;
-                            
                             if (calledFunc.indexAndInput.input) {
                                 inputUsed = true;
                             }
@@ -4663,7 +4626,7 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                         //input, indexing
-                        if (anyOriginality || anyOriginality) {
+                        if (anyOriginality) {
                             if (useInput.input || useInput.indexed) {
                                 results["List"] = 4;
                             }
