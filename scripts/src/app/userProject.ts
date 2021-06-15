@@ -91,7 +91,7 @@ export async function postForm(endpoint: string, data?: { [key: string]: string 
     }
 }
 
-async function postAuthForm(endpoint: string, data: { [key: string]: string | Blob }={}) {
+export async function postAuthForm(endpoint: string, data: { [key: string]: string | Blob }={}) {
     return postForm(endpoint, { username: getUsername(), password: getPassword(), ...data })
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 
 import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
@@ -78,7 +78,7 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
 
 const ProgressBar = ({ progress }: { progress: number }) => {
     const percent = Math.floor(progress * 100) + "%"
-    return <div id="progressbar"> 
+    return <div id="progressbar">
         <div className="col-sm-12">
             <div className="progress">
                 <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
@@ -119,8 +119,8 @@ const FileTab = ({ close }: { close: () => void }) => {
                         <span><i className="icon icon-cloud-upload"></i></span>
                         <span>{name || "Choose a file..."}</span>
                         {extension
-                        ? <kbd className="kbd">{extension}</kbd>
-                        : <><kbd className="kbd">.wav</kbd><kbd className="kbd">.aiff</kbd><kbd className="kbd">.mp3</kbd></>}
+                            ? <kbd className="kbd">{extension}</kbd>
+                            : <><kbd className="kbd">.wav</kbd><kbd className="kbd">.aiff</kbd><kbd className="kbd">.mp3</kbd></>}
                     </label>
                 </div>
                 <div className="modal-section-header">
@@ -207,43 +207,43 @@ const RecordTab = ({ close }: { close: () => void }) => {
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             {!micReady &&
-            (error
-            ? <input type="button" className="btn btn-primary block m-auto" onClick={openRecordMenu} value="Enable mic and click here to try again." />
-            : "Waiting for microphone access...")}
+                (error
+                    ? <input type="button" className="btn btn-primary block m-auto" onClick={openRecordMenu} value="Enable mic and click here to try again." />
+                    : "Waiting for microphone access...")}
             {micReady && <div>
                 <div className="modal-section-header">
                     <span>Constant Name (required)</span>
                 </div>
-                <div className="modal-section-content"> 
+                <div className="modal-section-content">
                     <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
                 </div>
                 <div className="modal-section-header">
                     <span>Measures Control</span>
-                    {metronome && 
-                    <button type="button" className={"btn btn-hollow btn-filter" + (click ? " active" : "")} onClick={() => setClick(!click)}>
-                        <span>CLICK WHILE RECORDING</span>
-                    </button>}
+                    {metronome &&
+                        <button type="button" className={"btn btn-hollow btn-filter" + (click ? " active" : "")} onClick={() => setClick(!click)}>
+                            <span>CLICK WHILE RECORDING</span>
+                        </button>}
                     <button type="button" className={"btn btn-hollow btn-filter" + (metronome ? " active" : "")}
-                            onClick={() => setMetronome(!metronome)}>
+                        onClick={() => setMetronome(!metronome)}>
                         <span>METRONOME</span>
                     </button>
                 </div>
                 {metronome &&
-                <div className="modal-section-content" id="count-measures-input">
-                    <label>
-                        Tempo (beats per minute)
+                    <div className="modal-section-content" id="count-measures-input">
+                        <label>
+                            Tempo (beats per minute)
                         <input type="number" placeholder="e.g. 120" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
-                        <input id="tempoSlider" type="range" name="rangeTempo" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
-                    </label>
-                    <label>
-                        Countoff Measures
+                            <input id="tempoSlider" type="range" name="rangeTempo" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
+                        </label>
+                        <label>
+                            Countoff Measures
                         <input type="number" value={countoff} onChange={e => setCountoff(+e.target.value)} required={metronome} />
-                    </label>
-                    <label>
-                        Measures to Record
+                        </label>
+                        <label>
+                            Measures to Record
                         <input type="number" value={measures} onChange={e => setMeasures(+e.target.value)} required={metronome} />
-                    </label>
-                </div>}
+                        </label>
+                    </div>}
                 <div className="modal-section-header">
                     <span>Record Sound</span>
                     <LevelMeter />
@@ -252,9 +252,9 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <Metronome beat={beat - countoff * 4} hasBuffer={buffer !== null} useMetro={metronome} startRecording={startRecording} />
                     <Waveform buffer={buffer} />
                     {buffer &&
-                    <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(); setBuffer(null) }}>
-                        <span>CLEAR</span>
-                    </button>}
+                        <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(); setBuffer(null) }}>
+                            <span>CLEAR</span>
+                        </button>}
                 </div>
             </div>}
         </div>
@@ -352,34 +352,34 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             </div>
             <div className="search-block flex">
                 <input className="form-control shake form-search flex-grow" placeholder="Search" type="text" value={query}
-                       onChange={e => setQuery(e.target.value) } onKeyDown={e => { if (e.key === "Enter") search() }} required /> 
+                    onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Enter") search() }} required />
                 <input type="button" onClick={search} className="btn btn-hollow btn-filter" value="SEARCH" />
             </div>
             {searched && <div className="modal-section-header justify-start mb-3">Results</div>}
             {results && results.length > 0 &&
-            <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
-                {results.map((result, index) => <div>
-                    <label>
-                        <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
-                            onChange={e => {
-                                if (e.target.checked) {
-                                    setSelected(index)
-                                    setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
-                                    setError("")
-                                }
-                            }} />
-                        {result.name}: {result.bpm} bpm. Uploaded by Freesound user {result.creator}
-                    </label>
-                    <audio controls preload="none">
-                        <source src={result.previewURL} type="audio/mpeg" />
+                <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
+                    {results.map((result, index) => <div>
+                        <label>
+                            <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
+                                onChange={e => {
+                                    if (e.target.checked) {
+                                        setSelected(index)
+                                        setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
+                                        setError("")
+                                    }
+                                }} />
+                            {result.name}: {result.bpm} bpm. Uploaded by Freesound user {result.creator}
+                        </label>
+                        <audio controls preload="none">
+                            <source src={result.previewURL} type="audio/mpeg" />
                     Your browser does not support the audio element.
                     </audio>
-                    <hr className="my-3 border-gray-300" />
-                </div>)}
-            </div>}
+                        <hr className="my-3 border-gray-300" />
+                    </div>)}
+                </div>}
             {searched &&
-            (results === null && <div><i className="inline-block animate-spin icon icon-spinner" /> Searching Freesound...</div>
-            || results!.length === 0 && <div>No results</div>)}
+                (results === null && <div><i className="inline-block animate-spin icon icon-spinner" /> Searching Freesound...</div>
+                    || results!.length === 0 && <div>No results</div>)}
             <div className="modal-section-header"><span>Constant Name (required)</span></div>
             <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
         </div>
@@ -390,115 +390,61 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     </form>
 }
 
-const TunepadTab = () => {
-    // $scope.tunepadURL = ""
-    // $scope.tunepadIsShowingProjectPage = false
-    // $scope.isSafari = ESUtils.whichBrowser().match('Safari')
+const TunepadTab = ({ close }: { close: () => void }) => {
+    const tunepadWindow = useRef<Window>()
+    const tunepadOrigin = useRef("")
+    const [onProjectPage, setOnProjectPage] = useState(false)
+    const [error, setError] = useState("")
+    const [key, setKey] = useState("")
+    const [progress, setProgress] = useState(null as number | null)
 
-    // $scope.loginToEmbeddedTunepad = function(){
-    //     if ($scope.isSafari) return null
-  
-    //     var username = userProject.getUsername()
-    //     var encodedPassword = userProject.getPassword()
-    //     var url = URL_DOMAIN + '/services/scripts/getembeddedtunepadid'
-  
-    //     var payload = new FormData()
-    //     payload.append('username', username)
-    //     payload.append('password', encodedPassword)
-  
-    //     $.ajax({
-    //         type: "POST",
-    //         enctype: 'multipart/form-data',
-    //         url: url,
-    //         data: payload,
-    //         processData: false,
-    //         contentType: false,
-    //         cache: false,
-    //         success: function (result) {
-  
-    //           console.log("tunepadembed SUCCESS : ", result)
-    //           // TODO: This is a temporary hack for the event listener expecting a different URL structure from the embedded TunePad. We need a proper fix soon.
-    //           // $scope.tunepadURL = result.url.split("?")[0]
-    //           $scope.tunepadURL = result.url.split("?")[0].replace('/redirect-via-EarSketch', '')
-  
-    //           if($scope.tunepadURL[$scope.tunepadURL.length-1] === "/") $scope.tunepadURL = $scope.tunepadURL.slice(0, -1) //remove trailing "/" from url
-    //           var tunepadIFrame = $("#tunepadIFrame")[0]; //.attr("src", result.url)
-  
-    //           // TODO: This is also a hack-fix where the TunePad iframe was not loaded in the "embed" mode.
-    //           // tunepadIFrame.contentWindow.location.replace(result.url)
-    //           tunepadIFrame.contentWindow.location.replace(result.url.replace('redirect-via-EarSketch/?', '?embedded=true&client=earsketch&'))
-    //         },
-    //         error: function(result){
-    //           console.log("tunepadembed Failure: ", result)
-    //           $("#wrongPassword").show()
-    //         }
-    //     })
-    // }
-  
-    // $scope.loginToEmbeddedTunepad()
+    const login = useCallback(iframe => {
+        if (!iframe) return
 
-    // window.addEventListener('message', function(message) {
-    //     // you can also check message.origin to see if it matches the expected ifram
-    //     // you can check message.isTrusted 
-    //     if (message.origin == $scope.tunepadURL && message.isTrusted) {            
-    //         // console.log(JSON.parse(message.data))
-    //         if(message.data === "dropbook-view") $scope.tunepadIsShowingProjectPage = true
-    //         else if(message.data === "project-embed-list") $scope.tunepadIsShowingProjectPage = false
-    //         else {
-    //             var tpData = JSON.parse(message.data)
-    //             if(tpData.wavData) {
-    //                 $scope.file.tempo = tpData.bpm
+        userProject.postAuthForm("/services/scripts/getembeddedtunepadid")
+            .then(result => {
+                tunepadWindow.current = iframe.contentWindow
+                tunepadOrigin.current = new URL(result.url).origin
+                iframe.contentWindow.location.replace(result.url.replace("redirect-via-EarSketch/?", "?embedded=true&client=earsketch&"))
+            })
+    }, [])
 
-    //                 var wavBytes = new Uint8Array(tpData.wavData.length)
-    //                 tpData.wavData.forEach(function(v, i){wavBytes[i] = v})
-    //                 var d = new Date()
-    //                 var defaultName = $scope.cleanFilename("Tunepad"+"_"+d.toLocaleDateString() + " _" + d.toLocaleTimeString())
-    //                 var u8File = new File([wavBytes], defaultName+".wav", {type:"audio/wav"})
+    useEffect(() => {
+        const handleMessage = async (message: MessageEvent) => {
+            if (message.origin !== tunepadOrigin.current || !message.isTrusted) return
+            if (message.data === "dropbook-view") {
+                setOnProjectPage(true)
+            } else if (message.data === "project-embed-list") {
+                setOnProjectPage(false)
+            } else {
+                const { wavData: data, bpm: tempo } = JSON.parse(message.data)
+                const bytes = Uint8Array.from(data)
+                const file = new Blob([bytes], { type: "audio/wav" })
+                try {
+                    await uploadFile(file, key, ".wav", tempo, setProgress)
+                    close()
+                } catch (error) {
+                    setError(error)
+                }
+            }
+        }
 
-    //                 //todo tpEmbed: hack-something with username and timestamp as a placeholder
-    //                 //todo tpEmbed: use real tunepad data here once serialization is fixed
-    //                 // $scope.file.data = dataURItoFile(/*tpData.wavData*/bdStr, "tunepadAudio.wav")
+        window.addEventListener("message", handleMessage)
+        return () => window.removeEventListener("message", handleMessage)
+    }, [key])
 
-    //                 $scope.file.data = u8File
-
-    //                 //todo tpEmbed: still need to specify filename before submit button can be activated,
-    //                 $scope.$apply()
-    //                 $scope.uploadFile()
-    //             }
-    //         }
-    //         $scope.$apply()
-    //     }
-    // })
-
-    // var tunepadWindow
-    // $scope.saveTunepadWavData = function() {
-    //     if(!tunepadWindow) tunepadWindow = document.getElementById("tunepadIFrame").contentWindow
-    //     if (tunepadWindow != null) {
-    //         tunepadWindow.postMessage("save-wav-data", "*")
-    //     }
-    // }
-
-    // return <form onSubmit={e => { e.preventDefault(); submit() }}>
-    //     <div className="modal-body">
-    //         <div className="alert alert-danger" ng-show="uploadError">
-    //             {uploadError}
-    //         </div>
-    //         <div>
-    //             <div ng-show="isSafari" style="text-align:center; margin:2em;">
-    //                 Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or FireFox.
-    //             </div>
-    //             <iframe ng-show="!isSafari" name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-    //         </div>
-    //         <div className="modal-section-body" id="upload-details">
-    //             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" ng-model="file.key" ng-change="showUploadButton()" />
-    //         </div>
-    //     </div>
-    //     <div className="modal-footer">
-    //         <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-    //         <input type="submit" value="UPLOAD" className="btn btn-primary text-white" />
-    //     </div>
-    // </form>
-    return null
+    return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
+        <div className="modal-body">
+            {error && <div className="alert alert-danger">{error}</div>}
+            <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
+            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+        </div>
+        <div className="modal-footer">
+            {progress !== null && <ProgressBar progress={progress} />}
+            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!onProjectPage} />
+        </div>
+    </form>
 }
 
 const GrooveMachineTab = () => {
@@ -507,7 +453,7 @@ const GrooveMachineTab = () => {
     // $scope.openGrooveMachineMenu = function () {
     //     $scope.activePill = $scope.menus.groovemachine
     //     $scope.gmLogin()
-        
+
     // }
 
     // $scope.gmLogin = function() {
@@ -538,13 +484,13 @@ const GrooveMachineTab = () => {
     //         } 
     //         else {
     //             var gmData = message.data
- 
+
     //             var date = new Date()
     //             var dateString = date.toLocaleDateString()
     //             var timeString = date.toLocaleTimeString()
     //             var defaultName = $scope.cleanFilename("GrooveMachine"+"_"+ dateString + " _" + timeString)
     //             var u8File = new File([new Blob([gmData.wavData], { type: 'audio/wav' })], defaultName+".wav", {type:"audio/wav"})
-                
+
     //             $scope.file.tempo = gmData.tempo
     //             $scope.file.data = u8File
     //             $scope.$apply()
@@ -586,18 +532,18 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
     const TabBody = Tabs[activeTab].component
 
-    return  <>
+    return <>
         <div className="modal-header">
             <h4 className="modal-title">Add a New Sound</h4>
             <hr className="my-4 border-gray-200" />
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ title, icon }, index) =>
-                    <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
-                        <a href="" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">
-                            <i className={`icon icon-${icon} mr-3`}></i>{title}
-                        </a>
-                    </li>)}
+                        <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
+                            <a href="" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">
+                                <i className={`icon icon-${icon} mr-3`}></i>{title}
+                            </a>
+                        </li>)}
                 </ul>
             </div>
         </div>
