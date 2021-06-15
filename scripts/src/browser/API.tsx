@@ -108,7 +108,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                         <i className="icon icon-paste2" />
                     </button>
                     <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap" onClick={() => { obj.details = !obj.details; forceUpdate() }}>
-                        <div className="inline-block w-12">{obj.details ? "Close" : "Open"}</div>
+                        <div className="inline-block w-12">{obj.details ? t("api:close") : t("api:open")}</div>
                         <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? 'arrow-down' : 'arrow-right'}`} />
                     </button>
                 </div>
@@ -145,7 +145,7 @@ const Details = ({ obj }: { obj: APIItem  }) => {
             <span dangerouslySetInnerHTML={{__html: t(obj.descriptionKey)}} />
             {obj.parameters &&
             <div className="mt-4">
-                <div className="text-2xl font-bold">Parameters</div>
+                <div className="text-2xl font-bold">{t("api:parameters")}</div>
                 {Object.entries(obj.parameters).map(([param, paramVal]) => (
                     <div key={param}>
                         <div className="ml-6 mt-4">
@@ -157,7 +157,7 @@ const Details = ({ obj }: { obj: APIItem  }) => {
 
                             {paramVal.default &&
                             <div>
-                                <span className={`${theme==='dark'?'text-white':'text-black'}`}>Default value</span>:&nbsp;
+                                <span className={`${theme==='dark'?'text-white':'text-black'}`}>{t("api:defaultValue")}</span>:&nbsp;
                                 <span className="text-blue-600">{paramVal.default}</span>
                             </div>}
                         </div>
@@ -166,11 +166,11 @@ const Details = ({ obj }: { obj: APIItem  }) => {
             </div>}
             {obj.returns &&
             <div className="mt-8">
-                <span className="text-2xl font-bold">Return Value</span>: <span className="text-gray-600">{obj.returns.type}</span>
+                <span className="text-2xl font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{obj.returns.type}</span>
                 <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
             </div>}
             <div className="mt-8">
-                <div className="text-2xl font-bold mb-1">Example</div>
+                <div className="text-2xl font-bold mb-1">{t("api:example")}</div>
                 <div>
                     {/* note: don't indent the tags inside pre's! it will affect the styling */}
                     {language === 'python'

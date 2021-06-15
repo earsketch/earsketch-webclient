@@ -136,12 +136,23 @@
   },
   "api" : {
     "noparams": "No Parameters",
+    "parameters": "Parameters",
+    "returnValue": "Return Value",
+    "example": "Example",
+    "defaultValue": "Default Value",
+    "open": "Open",
+    "close": "Close",
     "types": {
       "soundConstant": "Sound Constant",
       "analysisConstant": "Analysis Constant",
       "folderConstant": "Folder Constant",
       "effectConstant": "Effect Constant",
-      "effectParameterConstant": "Effect Parameter Constant"
+      "effectParameterConstant": "Effect Parameter Constant",
+      "float": "Float",
+      "array": "Array",
+      "integer": "Integer",
+      "listArray": "List/Array",
+      "string": "String"
     }
   }
 }
