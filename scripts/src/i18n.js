@@ -7,17 +7,16 @@ i18n
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
         fallbackLng: 'en',
+        ns: ['common', 'messages'],
         defaultNS: 'common',
         debug: false,
-
-        keySeparator: false, // we do not use keys in form messages.welcome
 
         interpolation: {
             escapeValue: false // react already safes from xss
         },
         resources: {
-            en,
-            es
+            en: en,
+            es: es
         }
     });
 

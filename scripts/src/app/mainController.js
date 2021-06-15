@@ -1,7 +1,11 @@
+import { AccountCreator } from './AccountCreator';
 import * as appState from '../app/appState';
 import audioContext from './audiocontext'
 import * as audioLibrary from './audiolibrary'
+import { ChangePassword } from './ChangePassword'
+import { CompetitionSubmission } from './CompetitionSubmission'
 import * as collaboration from './collaboration'
+import { Download } from './Download'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as exporter from './exporter'
@@ -20,14 +24,26 @@ import * as cai from '../cai/caiState';
 import { wrapModal } from '../helpers';
 import { ProfileEditor } from './ProfileEditor';
 import * as recommender from './recommender';
+import { RenameScript, RenameSound } from './Rename';
 import { ScriptAnalysis } from './ScriptAnalysis';
+import { ScriptHistory } from './ScriptHistory';
+import { ScriptShare } from './ScriptShare';
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
+import i18n from "i18next";
 
 // Temporary glue from $uibModal to React components.
 app.component("forgotpasswordController", wrapModal(ForgotPassword))
 app.component("analyzeScriptController", wrapModal(ScriptAnalysis))
 app.component("editProfileController", wrapModal(ProfileEditor))
+app.component("changepasswordController", wrapModal(ChangePassword))
+app.component("downloadController", wrapModal(Download))
+app.component("scriptVersionController", wrapModal(ScriptHistory))
+app.component("renameController", wrapModal(RenameScript))
+app.component("renameSoundController", wrapModal(RenameSound))
+app.component("accountController", wrapModal(AccountCreator))
+app.component("submitCompetitionController", wrapModal(CompetitionSubmission))
+app.component("shareScriptController", wrapModal(ScriptShare))
 
 /**
  * @module mainController
@@ -231,11 +247,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         userNotification.state.isInLoadingScreen = true;
     };
 
-    $scope.downloadSpinnerClick = function () {
-        esconsole('***** downloadSpinnerClick *****');
-        document.getElementById('download-loader').style.display = 'none';
-    };
-
     /**
      *
      * @param compress
@@ -361,7 +372,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
                     if (userInfo.role === 'teacher') {
                         if (userInfo.firstname === '' || userInfo.lastname === '' || userInfo.email === '') {
-                            userNotification.show(ESMessages.user.teachersLink, 'editProfile');
+                            userNotification.show(i18n.t('messages:user.teachersLink'), 'editProfile');
                         }
                     }
                 } else {
@@ -406,7 +417,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                             // showLoginMessageAfterLoading = true;
                             // $rootScope.$broadcast('showLoginMessage');
                         } else {
-                            userNotification.show(ESMessages.general.loginsuccess, 'normal', 0.5);
+                            userNotification.show(i18n.t('messages:general.loginsuccess'), 'normal', 0.5);
                         }
 
                         if ($location.search()['sharing'] && $scope.isManualLogin) {
@@ -423,7 +434,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
             }
         }).catch(error => {
-            userNotification.show(ESMessages.general.loginfailure, 'failure1',  3.5);
+            userNotification.show(i18n.t('messages:general.loginfailure'), 'failure1',  3.5);
             esconsole(error, ['main','login']);
         });
     };
@@ -440,7 +451,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         // save all unsaved open scripts
         userProject.saveAll().then(function () {
             if (userProject.openScripts.length > 0) {
-                userNotification.show(ESMessages.user.allscriptscloud);
+                userNotification.show(i18n.t('messages:user.allscriptscloud'));
             }
 
             const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
@@ -464,7 +475,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             $ngRedux.dispatch(tabs.resetTabs());
             $ngRedux.dispatch(tabs.resetModifiedScripts());
         }).catch(function (err) {
-            $confirm({text: ESMessages.idecontroller.saveallfailed,
+            $confirm({text: i18n.t('messages:idecontroller.saveallfailed'),
                 cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
                 $scope.scripts = [];
                 userProject.clearUser();
@@ -490,7 +501,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         userProject.getUserInfo().then(function (userInfo) {
             if (userInfo.hasOwnProperty('role') && (userInfo.role === 'teacher' || userInfo.role === 'admin')) {
                 if (userInfo.firstname === '' || userInfo.lastname === '' || userInfo.email === '') {
-                    userNotification.show(ESMessages.user.teachersLink, 'editProfile');
+                    userNotification.show(i18n.t('messages:user.teachersLink'), 'editProfile');
                 } else {
                     var url = URL_DOMAIN + '/services/scripts/getlmsloginurl';
                     var payload = new FormData();
@@ -516,11 +527,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                         if (result.data.hasOwnProperty('loginurl')) {
                             lmsWindow.location = result.data.loginurl;
                         } else if (result.data.hasOwnProperty('debuginfo')) {
-                            message = ESMessages.user.teacherSiteLoginError + result.data.debuginfo + ESMessages.user.promptFixAtTeacherSite;
+                            message = i18n.t('messages:user.teacherSiteLoginError') + result.data.debuginfo + i18n.t('messages:user.promptFixAtTeacherSite');
                             userNotification.show(message, 'editProfile');
                             lmsWindow.location = homepage;
                         } else {
-                            message = ESMessages.user.teacherSiteLoginError + 'Opening the home page without logging in..' + ESMessages.user.promptFixAtTeacherSite;
+                            message = i18n.t('messages:user.teacherSiteLoginError') + 'Opening the home page without logging in..' + i18n.t('messages:user.promptFixAtTeacherSite');
                             userNotification.show(message, 'editProfile');
                             lmsWindow.location = result.data.loginurl;
                         }
@@ -529,7 +540,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                     });
                 }
             } else {
-                userNotification.show(ESMessages.user.teachersPageNoAccess, 'failure1');
+                userNotification.show(i18n.t('messages:user.teachersPageNoAccess'), 'failure1');
             }
         });
     };
@@ -568,11 +579,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
 
     $scope.createAccount = function () {
-        $uibModal.open({
-            templateUrl: 'templates/create-account.html',
-            controller: 'accountController',
-            scope: $scope
-        });
+        $uibModal.open({ component: 'accountController' }).result.then(result => {
+            if (!result) return
+            $scope.username = result.username
+            $scope.password = result.password
+            $scope.openShareAfterLogin()
+            $scope.login()
+        })
     };
 
     $scope.forgotPass = function () {
@@ -580,11 +593,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.changePassword = function () {
-        $uibModal.open({
-            templateUrl: 'templates/change-password.html',
-            controller: 'changepasswordController',
-            scope: $scope
-        });
+        $uibModal.open({ component: 'changepasswordController' });
     };
 
     $scope.editProfile = function () {
@@ -840,8 +849,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.renameSound = sound => {
         $uibModal.open({
-            templateUrl: 'templates/rename-sound.html',
-            controller: 'renameSoundController',
+            component: 'renameSoundController',
             size: 'sm',
             resolve: {
                 sound() { return sound; }
@@ -869,7 +877,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.copyScript = script => {
         userProject.saveScript(script.name, script.source_code, false)
             .then(() => {
-                userNotification.show(ESMessages.user.scriptcopied);
+                userNotification.show(i18n.t('messages:user.scriptcopied'));
                 $ngRedux.dispatch(scripts.syncToNgUserProject());
             });
     };
@@ -878,8 +886,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         await userProject.saveScript(script.name, script.source_code);
         $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
-            templateUrl: 'templates/share-script.html',
-            controller: 'shareScriptController',
+            component: 'shareScriptController',
             size: 'lg',
             resolve: {
                 script() { return script; },
@@ -894,8 +901,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         const scriptCopy = Object.assign({}, script);
 
         const modal = $uibModal.open({
-            templateUrl: 'templates/rename-script.html',
-            controller: 'renameController',
+            component: 'renameController',
             size: 100,
             resolve: {
                 script() { return scriptCopy; }
@@ -903,6 +909,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         });
 
         modal.result.then(async newScript => {
+            if (!newScript) return;
             await userProject.renameScript(scriptCopy.shareid, newScript.name);
             $ngRedux.dispatch(scripts.syncToNgUserProject());
             reporter.renameScript();
@@ -911,8 +918,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.downloadScript = script => {
         $uibModal.open({
-            templateUrl: 'templates/download.html',
-            controller: 'downloadController',
+            component: 'downloadController',
             resolve: {
                 script() { return script; },
                 quality() { return $scope.audioQuality; }
@@ -928,8 +934,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         await userProject.saveScript(script.name, script.source_code);
         $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
         $uibModal.open({
-            templateUrl: 'templates/script-versions.html',
-            controller: 'scriptVersionController',
+            component: 'scriptVersionController',
             size: 'lg',
             resolve: {
                 script() { return script; },
@@ -996,14 +1001,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.submitToCompetition = async script => {
         await userProject.saveScript(script.name, script.source_code);
         $ngRedux.dispatch(tabs.removeModifiedScript(script.shareid));
+        const shareID = await userProject.getLockedSharedScriptId(script.shareid);
         $uibModal.open({
-            templateUrl: 'templates/submit-script-aws.html',
-            controller: 'submitAWSController',
+            component: 'submitCompetitionController',
             size: 'lg',
             resolve: {
-                script() { return script; },
-                quality() { return $scope.audioQuality; },
-                licenses() { return $scope.licenses; }
+                name() { return script.name; },
+                shareID() { return shareID; },
             }
         });
     };
@@ -1066,11 +1070,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     };
 
     $scope.closeAllTabs = () => {
-        $confirm({text: ESMessages.idecontroller.closealltabs, ok: "Close All"}).then(() => {
+        $confirm({text: i18n.t('messages:idecontroller.closealltabs'), ok: "Close All"}).then(() => {
             userProject.saveAll().then(() => {
-                userNotification.show(ESMessages.user.allscriptscloud);
+                userNotification.show(i18n.t('messages:user.allscriptscloud'));
                 $ngRedux.dispatch(tabs.closeAllTabs());
-            }).catch(() => userNotification.show(ESMessages.idecontroller.saveallfailed, 'failure1'));
+            }).catch(() => userNotification.show(i18n.t('messages:idecontroller.saveallfailed'), 'failure1'));
 
             $scope.$applyAsync();
         });

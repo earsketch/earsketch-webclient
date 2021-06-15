@@ -5,72 +5,68 @@ import * as compiler from "./compiler"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
-import ESMessages from "../data/messages"
 import { DAWData } from "./player"
 import * as renderer from "./renderer"
+import i18n from "i18next"
 
-// Make a dummy anchor for downloading the script as text.
+// Make a dummy anchor for downloading blobs.
 let dummyAnchor = document.createElement("a")
 document.body.appendChild(dummyAnchor)
 dummyAnchor.style.display = "none"
 
-// Export the script as a text file.
-export function text(script: ScriptEntity) {
-    esconsole("Downloading script locally.", ["debug", "exporter"])
-    const blob = new Blob([script.source_code], { type: "text/plain" })
+function download(name: string, blob: Blob) {
     const url = window.URL.createObjectURL(blob)
-    // Download the script.
     dummyAnchor.href = url
-    dummyAnchor.download = script.name
+    dummyAnchor.download = name
     dummyAnchor.target = "_blank"
     esconsole("File location: " + url, ["debug", "exporter"])
     dummyAnchor.click()
 }
 
-async function compile(script: ScriptEntity, quality: number) {
+// Export the script as a text file.
+export function text(script: ScriptEntity) {
+    esconsole("Downloading script locally.", ["debug", "exporter"])
+    const blob = new Blob([script.source_code], { type: "text/plain" })
+    download(script.name, blob)
+}
+
+async function compile(script: ScriptEntity, quality: boolean) {
     const lang = ESUtils.parseLanguage(script.name)
     let result
     try {
-        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code, quality)
+        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code, +quality)
     } catch {
-        throw ESMessages.download.compileerror
+        throw i18n.t('messages:download.compileerror')
     }
     if (result.length === 0) {
-        throw ESMessages.download.emptyerror
+        throw i18n.t('messages:download.emptyerror')
     }
     return result
 }
 
 // Exports the script as an audio file.
-async function exportAudio(script: ScriptEntity, quality: number, type: string, render: (result: DAWData) => Promise<Blob>) {
+async function exportAudio(script: ScriptEntity, quality: boolean, type: string, render: (result: DAWData) => Promise<Blob>) {
     const name = ESUtils.parseName(script.name)
     const result = await compile(script, quality)
-
-    let blob
     try {
-        blob = await render(result)
+        const blob = await render(result)
+        esconsole(`Ready to download ${type} file.`, ["debug", "exporter"])
+        download(`${name}.${type}`, blob)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
-        throw ESMessages.download.rendererror
-    }
-
-    esconsole(`Ready to download ${type} file.`, ["debug", "exporter"])
-    // save the file locally without sending to the server.
-    return {
-        path: (window.URL || window.webkitURL).createObjectURL(blob),
-        name: `${name}.${type}`,
+        throw i18n.t('messages:download.rendererror')
     }
 }
 
-export function wav(script: ScriptEntity, quality: number) {
+export function wav(script: ScriptEntity, quality: boolean) {
     return exportAudio(script, quality, "wav", renderer.renderWav)
 }
 
-export function mp3(script: ScriptEntity, quality: number) {
+export function mp3(script: ScriptEntity, quality: boolean) {
     return exportAudio(script, quality, "mp3", renderer.renderMp3)
 }
 
-export async function multiTrack(script: ScriptEntity, quality: number) {
+export async function multiTrack(script: ScriptEntity, quality: boolean) {
     const result = await compile(script, quality)
     const name = ESUtils.parseName(script.name)
 
@@ -95,7 +91,7 @@ export async function multiTrack(script: ScriptEntity, quality: number) {
             blob = await renderer.renderWav(copy)
         } catch (err) {
             esconsole(err, ["error", "exporter"])
-            throw ESMessages.download.rendererror
+            throw i18n.t('messages:download.rendererror')
         }
         zip.file(name + "/" + "track_" + trackNum.toString() + ".wav", blob)
     }
@@ -106,20 +102,14 @@ export async function multiTrack(script: ScriptEntity, quality: number) {
     }
     await Promise.all(promises)
 
-    if (ESUtils.whichBrowser().includes("Safari")) {
-        // TODO: Why is this exception here? Does it work? Is it still necessary?
-        return zip.generateAsync({ type: "base64" })
-    } else {
-        const blob = await zip.generateAsync({ type: "blob" })
-        return {
-            path: (window.URL || window.webkitURL).createObjectURL(blob),
-            name: name + ".zip",
-        }
-    }
+    const blob = await zip.generateAsync({ type: "blob" })
+    download(`${name}.zip`, blob)
 }
 
 // Export the script to SoundCloud using the SoundCloud SDK.
-export async function soundcloud(script: ScriptEntity, quality: number, scData: any) {
+type SoundCloudOptions = { name: string, description: string, sharing: string, downloadable: boolean, tags: string, license: string }
+
+export async function soundcloud(script: ScriptEntity, quality: boolean, options: SoundCloudOptions) {
     esconsole("Requesting SoundCloud Access...", ["debug", "exporter"])
     await SC.connect()
 
@@ -129,34 +119,23 @@ export async function soundcloud(script: ScriptEntity, quality: number, scData: 
         blob = renderer.renderWav(result)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
-        throw ESMessages.download.rendererror
+        throw i18n.t('messages:download.rendererror')
     }
 
     esconsole("Uploading to SoundCloud.", "exporter")
 
     const track = await SC.upload({
         file: blob,
-        title: scData.options.name,
-        description: scData.options.description,
-        sharing: scData.options.sharing,
-        downloadable: scData.options.downloadable,
-        tag_list: scData.options.tags,
-        license: scData.options.license,
+        title: options.name,
+        description: options.description,
+        sharing: options.sharing,
+        downloadable: options.downloadable,
+        tag_list: options.tags,
+        license: options.license,
     })
 
     esconsole("SoundCloud upload finished.", "exporter")
-    scData.url = track.permalink_url
-    scData.button = "VIEW ON SOUNDCLOUD"
-    scData.uploaded = true
-    scData.message.spinner = false
-
-    if (scData.message.animation) {
-        clearInterval(scData.message.animation)
-        scData.message.animation = null
-    }
-
-    scData.message.text = "Finished uploading!"
-    helpers.getNgRootScope().$apply()
+    return track.permalink_url
 }
 
 // Print the source code.

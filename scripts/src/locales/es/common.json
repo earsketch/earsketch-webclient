@@ -12,5 +12,22 @@
     "soundBrowser.filterDropdown.artists": "Spanish Here",
     "soundBrowser.filterDropdown.genres": "Spanish Here",
     "soundBrowser.filterDropdown.instruments": "Spanish Here"
+  },
+  "messages": {
+    "interpreter": {
+      "runSuccess": "Script ran successfully! Click the play button to hear your music.",
+      "runFailed": "There are one or more errors in your script. Look at the console for details.",
+      "noimport": " is undefined. Perhaps \"from earsketch import *\" is missing."
+    },
+    "dawservice": {
+      "effecttrackwarning": "Adding an effect track before the audio track is created"
+    },
+    "esaudio": {
+      "stringindex": "Beat string index is out of bounds",
+      "nonlistRangeError": "beat strings can only contain 0, +, or -",
+      "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
+      "pitchshiftTooLong": "SPANISH The clip is too long for the PITCHSHIFT effect. The max length is 5 minutes. Please use a shorter clip.",
+      "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
+    }
   }
 }

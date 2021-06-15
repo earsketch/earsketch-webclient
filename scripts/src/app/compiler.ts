@@ -4,13 +4,13 @@ import * as audioLibrary from "./audiolibrary"
 import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
 import setupPythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
-import ESMessages from "../data/messages"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "./userconsole"
 import { Clip, DAWData, Track } from "./player"
 import { AugmentedBuffer } from "./audiolibrary"
+import i18n from "i18next"
 
 export let testRun = false
 
@@ -91,7 +91,7 @@ export function compilePython(code: string, quality: number) {
 function runPythonCode(code: string) {
     Sk.resetCompiler()
     setupPythonAPI()
-    return Sk.importModuleInternal_("<stdin>", false, "__main__", code, undefined, false, true)
+    return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
 }
 
 // Attempts evaluating and replacing undefined names with a placeholder until the actual evaluation later.
@@ -146,10 +146,10 @@ export async function importPython(code: string, quality: number) {
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
     Sk.builtins["init"] = new Sk.builtin.func(() => {
-        throw new Error("init()" + ESMessages.interpreter.noimport)
+        throw new Error("init()" + i18n.t('messages:interpreter.noimport'))
     })
     Sk.builtins["finish"] = new Sk.builtin.func(() => {
-        throw new Error("finish()" + ESMessages.interpreter.noimport)
+        throw new Error("finish()" + i18n.t('messages:interpreter.noimport'))
     })
     Sk.builtins["__AUDIO_QUALITY"] = false
 
@@ -680,7 +680,7 @@ function checkEffects(result: DAWData) {
         const effectCount  = Object.keys(track.effects).length
 
         if (effectCount > 0 && clipCount == 0) {
-            userConsole.warn(ESMessages.dawservice.effecttrackwarning + ` (Track ${i})`)
+            userConsole.warn(i18n.t('messages:dawservice.effecttrackwarning') + ` (Track ${i})`)
         }
     }
 }

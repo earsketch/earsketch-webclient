@@ -4,6 +4,7 @@
 // That raises the question: do we want to do this in real-time? Do we want the same algorithm?
 // (For example, it looks like Tone.js has a simple PitchShift that can be implemented with just stock Web Audio nodes.)
 import ctx from "./audiocontext"
+import * as dsp from "../../lib/earsketch-appdsp"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as userConsole from "./userconsole"
@@ -43,7 +44,7 @@ const computeFrameEnvelope = (bendinfo: Point[], numFrames: number) => {
 
 const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) => {
     const startPoint = {
-        sampletime: Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / ESDSP_HOP_SIZE),
+        sampletime: Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / dsp.HOP_SIZE),
         semitone: effect.startValue,
         type: "start",
     } as Point
@@ -86,7 +87,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
     points.push(startPoint)
 
     const endPoint = {
-        sampletime: Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / ESDSP_HOP_SIZE),
+        sampletime: Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / dsp.HOP_SIZE),
         semitone: effect.endValue,
         type: "end",
     } as Point
@@ -122,16 +123,16 @@ const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
         outBuffer.copyToChannel(buffer.getChannelData(0), 0, 0)
         return outBuffer
     }
-    const numFrames = computeNumberOfFrames(buffer.length)
+    const numFrames = dsp.computeNumberOfFrames(buffer.length)
     const frameEnvelope = computeFrameEnvelope(bendinfo, numFrames)
-    const outBuffer = computePitchShift(buffer.getChannelData(0), frameEnvelope, ctx)
+    const outBuffer = dsp.computePitchShift(buffer.getChannelData(0), frameEnvelope, ctx)
     esconsole("Pitchshift done with a buffer length of " + outBuffer.length, ["debug", "pitchshift"])
     return outBuffer
 }
 
 const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) => {
-    const clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / ESDSP_HOP_SIZE)
-    const clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end-clip.start), tempo) * 44100 / ESDSP_HOP_SIZE)
+    const clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / dsp.HOP_SIZE)
+    const clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end-clip.start), tempo) * 44100 / dsp.HOP_SIZE)
     const clipLenInSamps = clipEndInSamps - clipStartInSamps
 
     // clone the env-point-object array

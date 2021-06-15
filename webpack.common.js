@@ -53,21 +53,12 @@ module.exports = {
             mainController: path.resolve(__dirname,`${appDir}/mainController.js`),
             ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             uploadController: path.resolve(__dirname,`${appDir}/uploadController.js`),
-            createAccountController: path.resolve(__dirname,`${appDir}/createaccountController.js`),
-            changePasswordController: path.resolve(__dirname,`${appDir}/changepasswordController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
-            scriptVersionController: path.resolve(__dirname,`${appDir}/scriptVersionController.js`),
-            shareScriptController: path.resolve(__dirname,`${appDir}/shareScriptController.js`),
-            submitAWSController: path.resolve(__dirname,`${appDir}/submitAWSController.js`),
-            downloadController: path.resolve(__dirname,`${appDir}/downloadController.js`),
-            renameController: path.resolve(__dirname,`${appDir}/renameController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-            promptController: path.resolve(__dirname,`${appDir}/promptController.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
             autograder2Controller: path.resolve(__dirname,`${appDir}/autograder2Controller.js`),
             autograderAWSController: path.resolve(__dirname,`${appDir}/autograderAWSController.js`),
             autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
-            inputsController: path.resolve(__dirname,`${appDir}/inputsController.js`),
             userHistoryController: path.resolve(__dirname,`${appDir}/userHistoryController.js`),
 
             setup: path.resolve(__dirname,`scripts/src/setup.js`),
@@ -156,13 +147,6 @@ module.exports = {
             options: {
                 type: 'commonjs',
                 exports: ['Module']
-            }
-        }, {
-            test: path.resolve(__dirname,`${libDir}/earsketch-appdsp.js`),
-            loader: 'exports-loader',
-            options: {
-                type: 'commonjs',
-                exports: ['ESDSP_NumberOfSamples','ESDSP_WINDOW_SIZE','ESDSP_HOP_SIZE','ESDSP_MAX_BUFFERSIZE','ESDSP_MAX_OUTSAMPLES','ESDSP_MAX_FRAMES','ESDSP_FRAMES','ESDSP_OUTSAMPLES','ESDSP_INTERSAMPLES','esdsploadtest','setupCWrappers','initHeap','setupHeap','initDSPLibrary','freeHeap','setOutSample','setVariableShift','computeNumberOfFrames','computePitchShift']
             }
         }]
     },

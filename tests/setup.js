@@ -216,23 +216,14 @@ Object.assign(window,require('esAppDSP'));
 // Controllers
 require('mainController');
 require('ideController');
-require('promptController');
 require('uploadController');
-require('renameController');
-require('downloadController');
-require('shareScriptController');
-require('scriptVersionController');
 require('userHistoryController');
 
-require('createAccountController');
-require('changePasswordController');
 require('adminWindowController');
-require('submitAWSController');
 
 require('autograderController');
 require('autograder2Controller');
 require('autograderAWSController');
 require('autograder3Controller');
-require('inputsController');
 require('caiAnalysisModule');
 require('complexityCalculator');

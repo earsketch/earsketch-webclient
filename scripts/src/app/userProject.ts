@@ -15,7 +15,7 @@ import * as tabs from "../editor/tabState"
 import * as userNotification from "./userNotification"
 import * as websocket from "./websocket"
 import { ScriptEntity } from "common"
-import ESMessages from "../data/messages"
+import i18n from "i18next"
 
 const USER_STATE_KEY = "userstate"
 
@@ -66,10 +66,12 @@ export function form(obj: { [key: string]: string | Blob }={}) {
 // (The helpers with "auth" and "admin" prepopulate some parameters for convenience.)
 
 // Expects query parameters, returns JSON.
-async function get(endpoint: string, params?: { [key: string]: string }) {
+export async function get(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     try {
-        return (await fetch(url)).json()
+        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
+        const text = await (await fetch(url)).text()
+        return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`get failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])
@@ -78,7 +80,7 @@ async function get(endpoint: string, params?: { [key: string]: string }) {
 }
 
 // Expects form data, returns JSON.
-async function postForm(endpoint: string, data?: { [key: string]: string }) {
+export async function postForm(endpoint: string, data?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
     try {
         return (await fetch(url, { method: "POST", body: form(data) })).json()
@@ -100,7 +102,7 @@ async function postAdminForm(endpoint: string, data: { [key: string]: string }={
 // Expects query parameters, returns XML.
 async function post(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
-    const text = (await fetch(url, { method: "POST" })).text()
+    const text = await (await fetch(url, { method: "POST" })).text()
     try {
         return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
     } catch (err) {
@@ -145,7 +147,7 @@ window.onbeforeunload = () => {
                 saving = true
                 saveScript(scripts[shareID].name, scripts[shareID].source_code).then(() => {
                     store.dispatch(scriptsState.syncToNgUserProject())
-                    userNotification.show(ESMessages.user.scriptcloud, "success")
+                    userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
                 })
             }
         }
@@ -296,7 +298,7 @@ export async function login(username: string, password: string) {
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
 
-    esconsole(ESMessages.user.scriptsuccess, ["debug", "user"])
+    esconsole('List of scripts in Load script list successfully updated.', ["debug", "user"])
     const storedScripts = extractScripts(data)
     resetScripts()
 
@@ -412,7 +414,7 @@ export async function refreshCodeBrowser() {
 
 // Format a date to ISO 8601
 // TODO: dates should be stored in the database so as to make this unnecessary
-function formatDateToISO(date: string){
+function formatDateToISO(date: string) {
     // Format created date to ISO 8601
     const isoFormat = date.slice(0,-2).replace(" ", "T")
     // javascript Date.parse() requires ISO 8601
@@ -432,9 +434,9 @@ export async function getScriptHistory(scriptid: string) {
 }
 
 // Fetch a specific version of a script.
-export async function getScriptVersion(scriptid: string, versionid: string) {
+export async function getScriptVersion(scriptid: string, versionid: number) {
     esconsole("Getting script history: " + scriptid + "  version: " + versionid, ["debug", "user"])
-    const data = await postAuthForm("/services/scripts/scriptversion", { scriptid, versionid })
+    const data = await postAuthForm("/services/scripts/scriptversion", { scriptid, versionid: versionid + "" })
     return data === null ? [] : [data]
 }
 
@@ -526,7 +528,7 @@ export async function loadScript(id: string, sharing: boolean) {
         const data = await get("/services/scripts/scriptbyid", { scriptid: id })
         if (sharing && data === "") {
             if (!userNotification.state.isInLoadingScreen) {
-                userNotification.show(ESMessages.user.badsharelink, "failure1", 3)
+                userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
             }
             throw "Script was not found."
         }
@@ -552,7 +554,6 @@ export async function renameAudio(audiokey: string, newaudiokey: string) {
     try {
         await postAuth("/services/audio/rename", { audiokey, newaudiokey })
         esconsole(`Successfully renamed audiokey: ${audiokey} to ${newaudiokey}`, ["debug", "user"])
-        userNotification.show(ESMessages.general.soundrenamed, "normal", 2)
         audioLibrary.clearAudioTagCache()  // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)
@@ -635,14 +636,16 @@ export async function deleteScript(scriptid: string) {
 }
 
 async function promptForRename(script: ScriptEntity) {
-    const name = (await helpers.getNgService("$uibModal").open({
-        templateUrl: "templates/rename-import-script.html",
-        controller: "renamecontroller",
+    const oldName = script.name
+    await helpers.getNgService("$uibModal").open({
+        component: "renameController",
         size: 100,
-        resolve: { script: () => script },
-    }).result).name
+        resolve: { script: () => script, conflict: () => true },
+    }).result
 
-    script.name = name === script.name ? nextName(name) : name
+    if (script.name === oldName) {
+        script.name = nextName(oldName)
+    }
 }
 
 // Restore a script deleted by the user.
@@ -679,7 +682,7 @@ export async function importScript(script: ScriptEntity) {
             imported.name = script.name
             return Promise.resolve(imported)
         } else {
-            throw ESMessages.general.unauthenticated
+            throw i18n.t('messages:general.unauthenticated')
         }
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
@@ -889,7 +892,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
             saved: true,
             tooltipText: "",
             collaborators: [],
-        } as ScriptEntity
+        } as any as ScriptEntity
         localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
         return scripts[shareid]
     }

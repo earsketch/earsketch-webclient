@@ -1,9 +1,9 @@
 import React, { useState } from "react"
 
 import esconsole from "../esconsole"
-import ESMessages from "../data/messages"
 import * as userNotification from "./userNotification"
 import { form } from "./userProject"
+import { useTranslation } from "react-i18next"
 
 export const ProfileEditor = ({ username, password, email: _email, role, firstName: _firstName, lastName: _lastName, changePassword, close }:
     { username: string, password: string, email: string, role: string, firstName: string, lastName: string, changePassword: () => void, close: (info?: any) => void }) => {
@@ -11,8 +11,10 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
     const [firstName, setFirstName] = useState(_firstName)
     const [lastName, setLastName] = useState(_lastName)
     const [email, setEmail] = useState(_email)
+    const { t } = useTranslation();
 
     const updateProfile = () => {
+        const { t } = useTranslation();
         const _firstName = firstName.trim()
         const _lastName = lastName.trim()
         const _email = email.trim()
@@ -32,7 +34,7 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
         }).then(response => {
             if (response.status !== 200) {
                 esconsole("Error updating profile", ["editProfile", "error"])
-                setError(ESMessages.user.emailConflict)
+                setError(t('messages:user.emailConflict'))
                 return
             }
 
@@ -43,7 +45,7 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
                 }
             } else {
                 if (role === "teacher") {
-                    userNotification.show(ESMessages.user.teachersLink, "editProfile")
+                    userNotification.show(t('messages:user.teachersLink'), "editProfile")
                 }
             }
             userNotification.show("Your user profile was updated!", "success")
@@ -77,7 +79,7 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
                 </div>}
 
                 {role !== "student" && <>
-                    <div style={{display: "flex", justifyContent: "center", height: "2.5em"}}>{ESMessages.user.infoRequired}</div>
+                    <div style={{display: "flex", justifyContent: "center", height: "2.5em"}}>{t('messages:user.infoRequired')}</div>
 
                     <div className="row">
                         <div className="col-md-6">
