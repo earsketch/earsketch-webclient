@@ -393,14 +393,13 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 const TunepadTab = ({ close }: { close: () => void }) => {
     const tunepadWindow = useRef<Window>()
     const tunepadOrigin = useRef("")
-    const [onProjectPage, setOnProjectPage] = useState(false)
+    const [ready, setReady] = useState(false)
     const [error, setError] = useState("")
     const [key, setKey] = useState("")
     const [progress, setProgress] = useState(null as number | null)
 
     const login = useCallback(iframe => {
         if (!iframe) return
-
         userProject.postAuthForm("/services/scripts/getembeddedtunepadid")
             .then(result => {
                 tunepadWindow.current = iframe.contentWindow
@@ -413,9 +412,9 @@ const TunepadTab = ({ close }: { close: () => void }) => {
         const handleMessage = async (message: MessageEvent) => {
             if (message.origin !== tunepadOrigin.current || !message.isTrusted) return
             if (message.data === "dropbook-view") {
-                setOnProjectPage(true)
+                setReady(true)
             } else if (message.data === "project-embed-list") {
-                setOnProjectPage(false)
+                setReady(false)
             } else {
                 const { wavData: data, bpm: tempo } = JSON.parse(message.data)
                 const bytes = Uint8Array.from(data)
@@ -428,13 +427,12 @@ const TunepadTab = ({ close }: { close: () => void }) => {
                 }
             }
         }
-
         window.addEventListener("message", handleMessage)
         return () => window.removeEventListener("message", handleMessage)
     }, [key])
 
     return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
-        <div className="modal-body">
+        <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
@@ -442,82 +440,52 @@ const TunepadTab = ({ close }: { close: () => void }) => {
         <div className="modal-footer">
             {progress !== null && <ProgressBar progress={progress} />}
             <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!onProjectPage} />
+            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!ready} />
         </div>
     </form>
 }
 
-const GrooveMachineTab = () => {
-    // $scope.groovemachineURL = ""
+const GrooveMachineTab = ({ close }: { close: () => void }) => {
+    const GROOVEMACHINE_URL = "https://groovemachine.lmc.gatech.edu"
+    const [error, setError] = useState("")
+    const [key, setKey] = useState("")
+    const [progress, setProgress] = useState(null as number | null)
+    const [ready, setReady] = useState(false)
+    const gmWindow = useRef<Window>()
 
-    // $scope.openGrooveMachineMenu = function () {
-    //     $scope.activePill = $scope.menus.groovemachine
-    //     $scope.gmLogin()
+    useEffect(() => {
+        const handleMessage = async (message: MessageEvent) => {
+            if (message.origin !== GROOVEMACHINE_URL || !message.isTrusted) return
+            if (message.data === 0) {
+                setReady(false)
+            } else if (message.data == 1) {
+                setReady(true)
+            } else {
+                const file = new Blob([message.data.wavData], { type: 'audio/wav' })
+                try {
+                    await uploadFile(file, key, ".wav", message.data.tempo, setProgress)
+                    close()
+                } catch (error) {
+                    setError(error)
+                }
+            }
+        }
+        window.addEventListener("message", handleMessage)
+        return () => window.removeEventListener("message", handleMessage)
+    }, [key])
 
-    // }
-
-    // $scope.gmLogin = function() {
-    //     var gmIFrame = $("#gmIFrame")[0]; //.attr("src", result.url)
-    //     $scope.groovemachineURL = 'https://groovemachine.lmc.gatech.edu'
-    //     gmIFrame.contentWindow.location.replace($scope.groovemachineURL)
-    // }
-
-    // var gmWindow
-    // $scope.saveGrooveMachineWavData = function() {
-    //     if(!gmWindow) gmWindow = document.getElementById("gmIFrame").contentWindow
-    //     if (gmWindow != null) {
-    //         gmWindow.postMessage("save-wav-data", "*")
-    //     }
-    // }
-
-    // $scope.gmReady = false
-
-    // window.addEventListener('message', function(message) {
-    //     // you can also check message.origin to see if it matches the expected ifram
-    //     // you can check message.isTrusted 
-    //     if (message.origin == $scope.groovemachineURL) {
-    //         if (message.data == 0) {
-    //             $scope.gmReady = false
-    //         } 
-    //         else if (message.data == 1) {
-    //             $scope.gmReady = true
-    //         } 
-    //         else {
-    //             var gmData = message.data
-
-    //             var date = new Date()
-    //             var dateString = date.toLocaleDateString()
-    //             var timeString = date.toLocaleTimeString()
-    //             var defaultName = $scope.cleanFilename("GrooveMachine"+"_"+ dateString + " _" + timeString)
-    //             var u8File = new File([new Blob([gmData.wavData], { type: 'audio/wav' })], defaultName+".wav", {type:"audio/wav"})
-
-    //             $scope.file.tempo = gmData.tempo
-    //             $scope.file.data = u8File
-    //             $scope.$apply()
-    //             $scope.uploadFile()
-    //         }
-    //         $scope.$apply()
-    //     } 
-    // })
-
-    // return <form onSubmit={e => { e.preventDefault(); submit() }}>
-    //     <div className="modal-body">
-    //         <div className="alert alert-danger" ng-show="uploadError">
-    //             {uploadError}
-    //         </div>
-    //         <div>
-    //             <iframe name="gmIFrame" id="gmIFrame" allow="microphone"  width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-    //         </div>
-    //         <div className="modal-section-body" id="upload-details">
-    //             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" ng-model="file.key" ng-change="showUploadButton()" />
-    //         </div>
-    //     </div>
-    //     <div className="modal-footer">
-    //         <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-    //         <input type="submit" value="UPLOAD" className="btn btn-primary text-white" />
-    //     </div>
-    // </form>
-    return null
+    return <form onSubmit={e => { e.preventDefault(); gmWindow.current!.postMessage("save-wav-data", "*") }}>
+        <div className="modal-body transparent">
+            {error && <div className="alert alert-danger">{error}</div>}
+            <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
+            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+        </div>
+        <div className="modal-footer">
+            {progress !== null && <ProgressBar progress={progress} />}
+            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+            <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!ready} />
+        </div>
+    </form>
 }
 
 const Tabs = [
