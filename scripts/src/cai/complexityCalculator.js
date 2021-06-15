@@ -2642,12 +2642,9 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                     strIndexed: false
                 };
                 var listValues = [];
-                if (originality) {
-                    var operations = [];
-                    listValues = ccHelpers.listTypesWithin(singleArg.elts, listValues, listInputIndexing, operations);
-                    if (listInputIndexing.indexed) {
+                if (originality && listInputIndexing.indexed) {
                         results["List"] = 4;
-                    }
+                    
                 } else {
                     listValues = ccHelpers.listTypesWithin(singleArg.elts, listValues, { input: false, indexed: false, strIndexed: false }, []);
                 }
@@ -2728,10 +2725,7 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                         input: false,
                         indexed: false,
                         strIndexed: false
-                    };
-                    var operations = [];
-                    ccHelpers.listTypesWithin(singleArg, withinBinOp, inputIndexPurpose, operations);
-                    if (inputIndexPurpose.input) {
+                    };  if (inputIndexPurpose.input) {
                         results.consoleInput = 3;
                     }
                     if (inputIndexPurpose.indexed) {
@@ -2758,8 +2752,6 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                         indexed: false,
                         strIndexed: false
                     };
-                    var operations = [];
-                    ccHelpers.listTypesWithin(singleArg, boolOpValues, inputForPurposeInArg, operations);
                     if (inputForPurposeInArg.input) {
                         results.consoleInput = 3;
                     }
@@ -2780,14 +2772,9 @@ function analyzeFunctionCall(node, results, loopParent, opsUsed, purposeVars) {
                 };
                 if (!originality) {
                     ccHelpers.listTypesWithin(singleArg, compareValues, { input: false, indexed: false, strIndexed: false }, []);
-                } else {
-                    var compareInd = false;
-                    var compareStrInd = false;
-                    var operations = [];
-                    ccHelpers.listTypesWithin(singleArg, compareValues, indexInputItem, operations);
-                    if (indexInputItem.indexed) {
+                } else if (indexInputItem.indexed) {
                         results["List"] = 4;
-                    }
+                    
                 }
                 if (indexInputItem.input) {
                     results.consoleInput = 3;
@@ -2994,10 +2981,7 @@ function analyzeASTNode(node, results, loopParent) {
             //look for conditionals
             if (node._astname === 'If') {
                 ccHelpers.notateConditional(node);
-                uses["conditionals"] = true;
-                if (node.test._astname === "Name") { usesBooleans = true; }
                 if (node.test._astname === "BoolOp" || node.test._astname === "UnaryOp") {
-                    usesBooleans = true;
                     var names = [];
                     ccHelpers.getNestedVariables(node.test, names);
                     if (names.length > 0) { usesVarsWithPurpose = true; }
@@ -3223,16 +3207,13 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
-                    if (!originality) {
-                        
-                    } else {
+                    if (originality) {
                         results.comparisons = 3;
                         var inputIndexItem = {
                             input: false,
                             indexed: false,
                             strIndexed: false
                         };
-                        var operations = [];
                         if (inputIndexItem.indexed) {
                             results["List"] = 4;
                         }
@@ -3250,10 +3231,6 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
-                    if (!originality) {
-                    } else {
-                        var operations = [];
-                    }
                     if (inputIndexItem.indexed) {
                         results["List"] = 4;
                     }
@@ -3270,11 +3247,7 @@ function analyzeASTNode(node, results, loopParent) {
                     if (ccHelpers.getIndexingInNode(testNode)[0] && (originality || ccHelpers.getIndexingInNode(testNode)[1])) {
                         results["List"] = 4;
                     }
-                    if (!originality) {
-                      
-                    } else {
-                        var operations = [];
-                    }
+                    
                     if (inputIndexPurp.indexed) {
                         results["List"] = 4;
                     }
@@ -3315,13 +3288,6 @@ function analyzeASTNode(node, results, loopParent) {
                                 results["List"] = 4
                             }
                         }
-                        //update usage booleans
-                        argResults[value] = true;
-                        if (value === "List" || containedValInTest != null) {
-                            for (var k = 0; k < containedValInTest.length; k++) {
-                                argResults[containedValInTest[k]] = true;
-                            }
-                        }
                     } 
                 } else if (testNode != null && testNode._astname === "Call") {
                     analyzeASTNode(testNode, results, parent);
@@ -3341,26 +3307,7 @@ function analyzeASTNode(node, results, loopParent) {
                     //get the return value from the function
                     var callReturnVal = "";
                     var returnFrom = ccHelpers.getFunctionObject(funcName);
-                    if (returnFrom != null) {
-                        callReturnVal = returnFrom.returns;
-                        if (returnFrom.containedValue != null) {
-                            for (var c = 0; c < returnFrom.containedValue.length; c++) {
-                                var returnElement = returnFrom.containedValue[c];
-                                argResults[returnElement] = true;
-                            }
-                        }
-                        //update results accordingly
-                        if (returnFrom.indexAndInput.indexed && (originality || returnFrom.original)) {
-                            results["List"] = 4;
-                        }
-                        if (returnFrom.indexAndInput.input) {
-                            inputUsed = true;
-                        }
-                        if (returnFrom.nested) {
-                            purposeVars = true;
-                        }
-                    }
-                    argResults[callReturnVal] = true;
+                    
                 }
                 recursiveAnalyzeAST(testNode, results, loopParent);
                 var modOriginality = false;
@@ -3525,12 +3472,7 @@ function analyzeASTNode(node, results, loopParent) {
                                 };
                                 var binOpIndex = false;
                                 var binOpStrIndex = false;
-                                if (originality) { //actually look for stuff if originality
-                                    var operations = [];
-                                    ccHelpers.listTypesWithin(nodeIter.args[fa], [], inputIndexItem, operations);
-                                } else { //feed it empty lists/objects
-                                    ccHelpers.listTypesWithin(note.iter.args[fa], [], { input: false, indexed: false, strIndexed: false }, []);
-                                }
+                                
                                 //update results
                                 if (inputIndexItem.input && results.consoleInput < 3) {
                                     results.consoleInput = 3;
@@ -3554,20 +3496,6 @@ function analyzeASTNode(node, results, loopParent) {
                             indexed: false,
                             strIndexed: false
                         };
-                        var operations = [];
-                        var listTypes = ccHelpers.listTypesWithin(nodeIter.elts, [], inputIndexItem, operations);
-                        for (var a = 0; a < listTypes.length; a++) {
-                            datatypesUsed.push(listTypes[a]);
-                        }
-                        if (inputIndexItem.indexed) {
-                            results["List"] = 4;
-                        }
-                        if (inputIndexItem.strIndexed) {
-                            results["Str"] = 4;
-                        }
-                        if (inputIndexItem.input) {
-                            inputTaken = true;
-                        }
                     } else if (nodeIter._astname === "Name") {
                         //iterator is a variable
                         var iteratorVar = ccHelpers.getVariableObject(nodeIter.id.v);
@@ -3937,27 +3865,7 @@ function analyzeASTNode(node, results, loopParent) {
                     //get the rturn value
                     var callReturnVal = "";
                     var calledFunc = ccHelpers.getFunctionObject(funcName);
-                    if (calledFunc != null) {
-                        callReturnVal = calledFunc.returns;
-                        if (calledFunc.containedValue != null) {
-                            for (var c = 0; c < calledFunc.containedValue.length; c++) {
-                                var returnElement = calledFunc.containedValue[c];
-                                argResults[returnElement] = true;
-                            }
-                        }
-                        if (calledFunc.indexAndInput.input) {
-                            inputUsed = true;
-                        }
-                        if (originality && calledFunc.indexAndInput.indexed) {
-                            results["List"] = 4;
-                        }
-                        if (calledFunc.nested) {
-                            purposeVars = true;
-                        }
-                    }
-                    if (callReturnVal == "List") {
-                        argResults[callReturnVal] = true;
-                    }
+                    
                 }
                 //now, if it's something that has values within it, we chack through that
                 if (testItem._astname === "Compare" || testItem._astname === "List" || testItem._astname === "BinOp" || testItem._astname === "BoolOp") {
@@ -3968,8 +3876,6 @@ function analyzeASTNode(node, results, loopParent) {
                         indexed: false,
                         strIndexed: false
                     };
-                    var operations = [];
-                    ccHelpers.listTypesWithin(testItem, allTypes, useInput, operations);
                     if (testItem._astname === "Compare" && originality) {
                         results.comparisons = 3;
                     }
@@ -4351,14 +4257,6 @@ function analyzeASTNode(node, results, loopParent) {
                                     indexed: false,
                                     strIndexed: false
                                 };
-                                var operations = [];
-                                ccHelpers.listTypesWithin(nodeToCheck, withinBinOp, inputIndexPurpose, operations);
-                                if (inputIndexPurpose.input) {
-                                    results.consoleInput = 3;
-                                }
-                                if (inputIndexPurpose.indexed) {
-                                    results["List"] = 4;
-                                }
                             }
                             for (var p = 0; p < withinBinOp.length; p++) {
                                 if (Array.isArray(withinBinOp[p])) {
@@ -4380,18 +4278,10 @@ function analyzeASTNode(node, results, loopParent) {
                                     indexed: false,
                                     strIndexed: false
                                 };
-                                var operations = [];
-                                ccHelpers.listTypesWithin(nodeToCheck, boolOpValues, inputForPurposeInArg, operations);
-                                if (inputForPurposeInArg.input) {
-                                    results.consoleInput = 3;
-                                }
                                 if (inputForPurposeInArg.indexed) {
                                     results["List"] = 4;
                                 }
                             }
-                            boolOpValues[b].forEach(function (arg) {
-                                if (arg == "List") { argResults[arg] = true; }
-                            });
                         } else if (nodeToCheck._astname === "Compare") {
                             //check all values inside the comparison
                             var compareValues = [];
@@ -4406,26 +4296,17 @@ function analyzeASTNode(node, results, loopParent) {
                                     indexed: false,
                                     strIndexed: false
                                 }, []);
-                            } else {
-                                var compareInd = false;
-                                var compareStrInd = false;
-                                var operations = [];
-                                ccHelpers.listTypesWithin(nodeToCheck, compareValues, indexInputItem, operations);
-                                if (indexInputItem.indexed) {
+                            } else if (indexInputItem.indexed) {
                                     results["List"] = 4;
-                                }
                             }
+                            
                             if (indexInputItem.input) {
                                 results.consoleInput = 3;
                             }
-                            compareValues[b].forEach(function (arg) {
-                                if (arg == "List") { argResults[arg] = true; }
-                            });
                         }
                         if (nodeToCheck._astname === "Name" && nodeToCheck.id.v !== "True" && nodeToCheck.id.v !== "False") {
                             var argModded = false;
                             var modOriginality = false;
-                            var modString = "";
                             var insideOutside = "outside"; //this will get set to "inside" if this call is within another function
                             var insideLines = [-1, -1];
                             var assignOriginality = false;
@@ -4495,17 +4376,7 @@ function analyzeASTNode(node, results, loopParent) {
                             }
                         }
                     }
-                    //if anything reaches a new level, update the results.
-                    if (originality || originalAssignment) {
-                        for (let arg in argResults) {
-                            if (argResults[arg] && results[arg] < 3) {
-                                results[arg] = 3;
-                            }
-                        }
-                        if (purposeVars && (results.variables < 3)) {
-                            results.variables = 3;
-                        }
-                    }
+                   
                 }
             }
             //JS for loops have up to 3 components that need to be checked
@@ -4709,11 +4580,7 @@ function analyzeASTNode(node, results, loopParent) {
                         //updates results and purpose booleans
                         if (calledFunc != null) {
                             callReturnVal = calledFunc.returns;
-                            if (calledFunc.containedValue != null) {
-                                calledFunc.containedValue.forEach(function (arg) {
-                                    if (argResults[arg]) { argResults[arg] = true; }
-                                });
-                            }
+                            
                             if (calledFunc.indexAndInput.input) {
                                 inputUsed = true;
                             }
@@ -4724,7 +4591,6 @@ function analyzeASTNode(node, results, loopParent) {
                                 purposeVars = true;
                             }
                         }
-                        argResults[callReturnVal] = true;
                         //if the test is a function call
                         if ('func' in testItem) {
                             if (originality) {
@@ -4780,8 +4646,6 @@ function analyzeASTNode(node, results, loopParent) {
                             indexed: false,
                             strIndexed: false
                         };
-                        var operations = [];
-                        ccHelpers.listTypesWithin(testItem, allTypes, useInput, operations);
                         if (testItem._astname === "Compare" && originality) {
                             results.comparisons = 3;
                         }
