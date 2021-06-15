@@ -593,7 +593,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                         reporter.readererror(e.toString() + ". Location: " + stackString);
                     }
                     
-                    console.log("autograder", report);
+                    console.log("complexityCalculator", report);
                     if (FLAGS.SHOW_CAI) {
                         $ngRedux.dispatch(cai.compileCAI([result, language, code]));
                     }
