@@ -100,7 +100,7 @@ async function postAdminForm(endpoint: string, data: { [key: string]: string | B
 }
 
 // Expects query parameters, returns XML.
-async function post(endpoint: string, params?: { [key: string]: string }) {
+export async function post(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     const text = await (await fetch(url, { method: "POST" })).text()
     try {

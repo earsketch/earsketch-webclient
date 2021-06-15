@@ -35,6 +35,7 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
         throw i18n.t('messages:esaudio.tempoRange')
     }
 
+    // TODO: This endpoint should require authentication.
     const data = userProject.form({
         file,
         username: userProject.getUsername(),
@@ -127,7 +128,7 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <span>Tempo (Optional)</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
-                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" value={key} onChange={e => setKey(e.target.value)} required />
+                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
                     <input type="number" placeholder="e.g. 120" className="form-control shake" id="tempo" value={tempo} onChange={e => setTempo(e.target.value)} />
                 </div>
             </div>
@@ -214,7 +215,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <span>Constant Name (required)</span>
                 </div>
                 <div className="modal-section-content"> 
-                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} required />
+                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
                 </div>
                 <div className="modal-section-header">
                     <span>Measures Control</span>
@@ -265,221 +266,128 @@ const RecordTab = ({ close }: { close: () => void }) => {
     </form>
 }
 
-const FreesoundTab = () => {
-    // $scope.freesoundChoice = -1
-    // $scope.freesoundResults = []
-    // $scope.searchform = {'searchQuery': ''}
+interface FreesoundResult {
+    name: string
+    bpm: number
+    creator: string
+    previewURL: string
+    downloadURL: string
+}
 
-    // $scope.entryLimit = 3
-    // $scope.currentPage = 1
-    // $scope.maxSize = 4; //pagination max size
-    // $scope.noOfPages =  0
-    // $scope.firstSearchExecuted = false
+const FreesoundTab = ({ close }: { close: () => void }) => {
+    const [error, setError] = useState("")
+    const [results, setResults] = useState(null as FreesoundResult[] | null)
+    const [searched, setSearched] = useState(false)
+    const [query, setQuery] = useState("")
+    const [selected, setSelected] = useState(null as number | null)
+    const [key, setKey] = useState("")
 
-    // $scope.selectFreesoundResult = function(resultIndex){
-    //     $scope.freesoundChoice = resultIndex
-    //     $scope.file.key = $scope.cleanFilename($scope.freesoundResults[resultIndex].name).toUpperCase()
-    //     $scope.file.tempo = Math.round($scope.freesoundResults[resultIndex].bpm)
-    //     console.log(resultIndex); //AVN log
-    // }
+    const username = userProject.getUsername() ?? ""
 
-    // $scope.searchFreesound = function() {
-    //     var searchUrl = URL_SEARCHFREESOUND
-    //     var queryParams = {'query': $scope.searchform.searchQuery}
+    const search = async () => {
+        setSearched(true)
+        setResults(null)
+        setSelected(null)
 
-    //     $scope.firstSearchExecuted = true
+        const data = await userProject.get("/services/audio/searchfreesound", { query })
+        const results = data.results
+            .filter((result: any) => result.analysis?.rhythm?.bpm)
+            .map((result: any) => ({
+                previewURL: result.previews["preview-lq-mp3"],
+                iframe: `https://freesound.org/embed/sound/iframe/${result.id}/simple/small/`,
+                downloadURL: result.previews["preview-hq-mp3"],
+                creator: result.username,
+                name: result.name,
+                bpm: Math.round(result.analysis.rhythm.bpm)
+            }))
+        setResults(results)
+    }
 
-    //     $scope.currentPage = 1
-    //     $scope.freesoundResults = []
+    const submit = async () => {
+        // TODO: Reduce duplication with uploadFile().
+        if (username === "") {
+            setError(i18n.t('messages:uploadcontroller.userAuth'))
+            return
+        }
 
-    //     var hasBpmData = function(freesoundResult){
-    //         var r = freesoundResult
-    //         return !!r.analysis && !!r.analysis.rhythm && !!r.analysis.rhythm.bpm
-    //     }
+        const result = results![selected!]
+        const tempo = result.bpm
 
-    //     $http.get(searchUrl, {params: queryParams}).then(function(result) {
-    //         $scope.freesoundResults = result.data.results.filter(hasBpmData).map($scope.resultToUrlSet)
-    //         console.log('Posted query', result); //AVN log
-    //     }).catch(function(err) {
-    //         $scope.freesoundResults = freesoundResults
-    //             .map(function(url){ return {'raw':url, 'trusted': $sce.trustAsResourceUrl(url)}})
-    //         $scope.noOfPages = Math.ceil($scope.freesoundResults.length/$scope.entryLimit)
+        const keys = sounds.selectAllFileKeys(store.getState())
+        const fullKey = username.toUpperCase() + '_' + key
+        if (keys.some(other => other === fullKey)) {
+            setError(`${key} (${fullKey})${i18n.t('messages:uploadcontroller.alreadyused')}`)
+            return
+        }
 
-    //         //console.log('query failure', url, data, err); //AVN log
-    //     })
+        if (tempo > 200 || (tempo > -1 && tempo < 45)) {
+            setError(i18n.t('messages:esaudio.tempoRange'))
+            return
+        }
 
-    //     $scope.freesoundChoice = -1
-    //     $scope.file.key = ''
-    //     $scope.file.tempo = ''
-    // }
+        // TODO: This endpoint should require authentication.
+        await userProject.post("/services/files/uploadfromfreesound", {
+            username,
+            file_key: key,
+            tempo: tempo + "",
+            filename: key + ".mp3",
+            creator: result.creator,
+            url: result.downloadURL,
+        })
 
-    // $scope.resultToUrlSet = function(singleResult, resultInd){
-    //     var fileUrl = singleResult.previews['preview-lq-mp3']
-    //     var secureFileUrl = fileUrl.indexOf('https') === -1 ? fileUrl.replace('http', 'https') : fileUrl
-    //     return {
-    //         trustedFile: $sce.trustAsResourceUrl(secureFileUrl),
-    //         trustedIframe: $sce.trustAsResourceUrl("https://freesound.org/embed/sound/iframe/"+singleResult.id+"/simple/small/"),
-    //         rawFileUrl: singleResult.previews['preview-hq-mp3'],
-    //         resultIndex: resultInd,
-    //         creator: singleResult.username,
-    //         filename: $scope.cleanFilename(singleResult.name) + ".mp3",
-    //         name: singleResult.name,
-    //         bpm: Math.round(singleResult.analysis.rhythm.bpm)
-    //     }
-    // }
+        userNotification.show(i18n.t('messages:uploadcontroller.uploadsuccess'), "success")
+        // clear the cache so it gets reloaded
+        audioLibrary.clearAudioTagCache()
+        store.dispatch(sounds.resetUserSounds())
+        store.dispatch(sounds.getUserSounds(username))
+        close()
+    }
 
-    // $scope.cleanFilename = function(name){
-    //     var alphaNumeric = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    //     var splitName = name.split("")
-    //     for(var i = 0; i < splitName.length; i++){
-    //         if(!alphaNumeric.includes(splitName[i])) {
-    //             splitName[i] = "_"
-    //         }
-    //     }
-    //     return splitName.join("")
-    // }
-
-    // $scope.saveFreesoundToServer = function() {
-    //     var url = URL_SAVEFREESOUND
-
-    //     //AVN TODO - refactor this copy-paste into validateFilenameAndTempo() function
-    //     var key = $scope.file.key,
-    //         tempo = $scope.file.tempo
-
-    //     var flagerr = false
-
-    //     // TODO: show these userConsole warnings as notification messages instead
-    //     if (userProject.getUsername() == null) {
-    //         esconsole('User not authenticated', 'warning')
-    //         userConsole.warn(i18n.t('messages:uploadcontroller.userAuth'))
-    //         $scope.uploadError = i18n.t('messages:uploadcontroller.userAuth')
-    //         flagerr = true
-    //     }
-
-    //     if($scope.freesoundChoice === -1){
-    //         esconsole('No selection made for Freesound upload', 'warning')
-    //         userConsole.warn(i18n.t('messages:uploadcontroller.freesoundSelection'))
-    //         flagerr = true
-    //     }
-
-    //     try {
-    //         if (typeof(key) === 'undefined') {
-    //             esconsole('Key Undefined ...', 'warning')
-    //             userConsole.warn(i18n.t('messages:uploadcontroller.undefinedconstant'))
-    //             $scope.uploadError = i18n.t('messages:uploadcontroller.undefinedconstant')
-    //             flagerr = true
-    //         } else {
-    //             var jsstr = 'let ' + key + '=5'
-    //             esconsole(jsstr, 'debug')
-    //             eval(jsstr); // TODO: This is a truly horrible hack.
-    //             const fileKeys = sounds.selectAllFileKeys($ngRedux.getState())
-    //             if (fileKeys.some(fileKey => fileKey === (userProject.getUsername() + '_' + key).toUpperCase())) {
-    //                 esconsole('Key Already Exists ...', 'info')
-    //                 userConsole.warn(key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  i18n.t('messages:uploadcontroller.alreadyused'))
-    //                 $scope.uploadError = key + ' (' + (userProject.getUsername() + '_' + key).toUpperCase() + ')' +  i18n.t('messages:uploadcontroller.alreadyused')
-    //                 flagerr = true
-    //             }
-    //         }
-    //     } catch (err) {
-    //         esconsole(err)
-
-    //         flagerr = true
-    //         esconsole('Key value not allowed', 'warning')
-    //         userConsole.warn(key + ' ' + i18n.t('messages:uploadcontroller.invalidconstant'))
-    //         $scope.uploadError = key + ' ' + i18n.t('messages:uploadcontroller.invalidconstant')
-    //     }
-
-    //     if (tempo == null || tempo == "") {
-    //         tempo = '-1'
-    //     } else {
-    //         esconsole(parseInt(tempo), 'debug')
-    //         if ( isNaN(parseInt(tempo)) || tempo < -1) {
-    //             flagerr = true
-    //             esconsole('Tempo is NaN', 'warning')
-    //             userConsole.warn(i18n.t('messages:uploadcontroller.tempointeger'))
-    //             $scope.uploadError = i18n.t('messages:uploadcontroller.tempointeger')
-    //         }
-    //         if(tempo > 200 || (tempo > -1 && tempo < 45)){
-    //             flagerr = true
-    //             esconsole('Tempo is out of range 45-200', 'warning')
-    //             userConsole.warn(i18n.t('messages:esaudio.tempoRange'))
-    //             $scope.uploadError = i18n.t('messages:esaudio.tempoRange')
-    //         }
-    //     }
-
-    //     if(!flagerr) {
-    //         //console.log("properly formatted filesave info") //AVN log
-            
-    //         var data = {
-    //             username: userProject.getUsername(),
-    //             file_key: key, 
-    //             tempo: tempo,
-    //             filename: $scope.freesoundResults[$scope.freesoundChoice].filename,
-    //             creator: $scope.freesoundResults[$scope.freesoundChoice].creator,
-    //             url: $scope.freesoundResults[$scope.freesoundChoice].rawFileUrl
-    //         }
-
-    //         $http.post(url, undefined, {params:data}).then(function(result) {
-    //             userNotification.show(i18n.t('messages:uploadcontroller.uploadsuccess'), 'success')
-
-    //             // clear the cache so it gets reloaded
-    //             audioLibrary.clearAudioTagCache()
-
-    //             $ngRedux.dispatch(sounds.resetUserSounds())
-    //             $ngRedux.dispatch(sounds.getUserSounds(userProject.getUsername()))
-
-    //             $scope.close()
-    //         }).catch(function(err) {
-    //             console.log('query failure', url, data, err); //AVN log
-    //         })
-    //     }
-    // }
-
-    // return <form onSubmit={e => { e.preventDefault(); submit() }}>
-    //     <div>
-    //         <div className="alert alert-danger" ng-show="uploadError">
-    //             {uploadError}
-    //         </div>
-    //         <div>
-    //             <a href="http://freesound.org/" target="_blank">Freesound.org</a> is an online database with thousands of free audio clips, including everything from music to field recordings, all licensed under Creative Commons licenses. EarSketch allows you to search the Freesound database without having to leave the EarSketch site. Try it below! 
-    //         </div>
-    //         <div className="search-block">
-    //                 <input className="form-control shake form-search" placeholder="Enter your sound search query here" ng-model="searchform.searchQuery" type="text" required /> 
-    //                 <button ng-click="searchFreesound()" className="btn btn-hollow btn-filter">SEARCH</button>
-    //         </div>
-    //         <p>
-    //             <div className="modal-section-header">
-    //                 <span ng-hide="freesoundResults.length === 0">Results</span>
-    //             </div>
-    //             <div ng-repeat="result in freesoundResults">
-    //                 <div ng-show="(currentPage-1)*entryLimit <= result.resultIndex && result.resultIndex < currentPage*entryLimit">
-    //                     <div>{result.name}: {result.bp} bpm. Uploaded by Freesound user {result.creator}</div>
-    //                     <audio controls>
-    //                         <source ng-src="{{result.trustedFile}}" type="audio/mpeg" />
-    //                     Your browser does not support the audio element.
-    //                     </audio>
-    //                     <span ng-click="selectFreesoundResult(result.resultIndex)">
-    //                         <span> &nbsp; &nbsp;</span>
-    //                         <i className="ng-class: freesoundChoice === result.resultIndex ? 'icon selection icon-checkmark' : 'icon selection icon-plus2'"></i>
-    //                     </span>
-    //                     <p></p>
-    //                 </div>
-    //             </div>
-    //             <div ng-show="freesoundResults.length === 0 && firstSearchExecuted">
-    //                 <br />No results<br />
-    //             </div>
-    //         </p>
-    //         <div className="modal-section-body" id="upload-details">
-    //             <input type="text" placeholder="e.g. MYSOUND_01" className="form-control shake" id="key" ng-model="file.key" />
-    //         </div>
-    //         <div uib-pagination boundary-links="true" max-size="maxSize" num-pages="noOfPages" total-items="freesoundResults.length" ng-model="currentPage"  items-per-page="entryLimit" className="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" ng-show="freesoundResults.length > 0" />
-    //     </div>
-    //     <div className="modal-footer">
-    //         <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-    //         <input type="submit" value="UPLOAD" className="btn btn-primary text-white" />
-    //     </div>
-    // </form>
-    return null
+    return <form onSubmit={e => { e.preventDefault(); submit() }}>
+        <div className="modal-body transparent">
+            {error && <div className="alert alert-danger">{error}</div>}
+            <div>
+                <a href="https://freesound.org/" target="_blank">Freesound</a> is an online database of thousands of free audio clips, including everything from music to field recordings, all under Creative Commons licenses.
+                You can search for clips on Freesound and save them to EarSketch below.
+            </div>
+            <div className="search-block flex">
+                <input className="form-control shake form-search flex-grow" placeholder="Search" type="text" value={query}
+                       onChange={e => setQuery(e.target.value) } onKeyDown={e => { if (e.key === "Enter") search() }} required /> 
+                <input type="button" onClick={search} className="btn btn-hollow btn-filter" value="SEARCH" />
+            </div>
+            {searched && <div className="modal-section-header justify-start mb-3">Results</div>}
+            {results && results.length > 0 &&
+            <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
+                {results.map((result, index) => <div>
+                    <label>
+                        <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
+                            onChange={e => {
+                                if (e.target.checked) {
+                                    setSelected(index)
+                                    setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
+                                    setError("")
+                                }
+                            }} />
+                        {result.name}: {result.bpm} bpm. Uploaded by Freesound user {result.creator}
+                    </label>
+                    <audio controls preload="none">
+                        <source src={result.previewURL} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                    </audio>
+                    <hr className="my-3 border-gray-300" />
+                </div>)}
+            </div>}
+            {searched &&
+            (results === null && <div><i className="inline-block animate-spin icon icon-spinner" /> Searching Freesound...</div>
+            || results!.length === 0 && <div>No results</div>)}
+            <div className="modal-section-header"><span>Constant Name (required)</span></div>
+            <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+        </div>
+        <div className="modal-footer">
+            <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+            <input type="submit" value="SAVE" className="btn btn-primary text-white" disabled={selected === null} />
+        </div>
+    </form>
 }
 
 const TunepadTab = () => {
