@@ -27,7 +27,7 @@ export const selectFilteredEntries = createSelector(
     [selectSearchText, selectScriptLanguage],
     (searchText, language) => {
         searchText = searchText.toLowerCase()
-        return Object.entries(ESApiDoc()).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
+        return Object.entries(ESApiDoc).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
             const entries = Array.isArray(data) ? data : [data]
             return entries.some(obj => {
                 const description = obj.descriptionKey?.toLowerCase();

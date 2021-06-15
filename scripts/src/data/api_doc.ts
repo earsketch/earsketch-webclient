@@ -1,5 +1,4 @@
 // TODO: There are some links to the curriculum that relies on Angular main controller for accessing the Redux store. We should import the store and curriculumState here to dispatch the action directly. (#2232)
-import i18n from "i18next";
 
 export interface APIParameter {
     typeKey: string
@@ -26,8 +25,8 @@ export interface APIItem {
     caveats?: string
 }
 
-export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
-    return {
+export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
+    {
         "analyze": {
             "descriptionKey": "api:analyze.description",
             "parameters": {
@@ -730,5 +729,4 @@ export function ESApiDoc(): { [key: string]: APIItem | readonly APIItem[] } {
             },
             "autocomplete": "shuffleString(inputString)"
         }
-    }
-}
+    } as const
