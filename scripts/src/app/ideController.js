@@ -27,10 +27,7 @@ const ACE_THEMES = {
     dark: "ace/theme/monokai",
 }
 
-/**
- * Angular controller for the IDE (text editor) and surrounding items.
- * @module ideController
- */
+// Angular controller for the IDE (text editor) and surrounding items.
 app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, caiAnalysisModule, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
@@ -51,10 +48,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
     // Tracks the selected tab data (script). Note that it might not be most up to date (modified / unsaved).
     $scope.activeScript = null;
-    /**
-     * Flag to prevent successive compilation / script save request
-     * @type {boolean}
-     */
+    // Flag to prevent successive compilation / script save request
     $scope.isWaitingForServerResponse = false;
 
     // for report error
@@ -93,12 +87,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.compileCode();
     })
 
-
-    /**
-     * Function to pipe Skulpt's stdout to the EarSketch console.
-     *
-     * @private
-     */
+    // Function to pipe Skulpt's stdout to the EarSketch console.
     function outf(text) {
         // For some reason, skulpt prints a newline character after every
         // call to print(), so let's ignore those
@@ -110,17 +99,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         userConsole.log(text);
     }
 
-    /**
-     *
-     * @private
-     */
     function builtinRead(x) {
-        if (Sk.builtinFiles === undefined ||
-            Sk.builtinFiles["files"][x] === undefined) {
-
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) {
             throw "File not found: '" + x + "'";
         }
-
         return Sk.builtinFiles["files"][x];
     }
 
@@ -128,11 +110,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     Sk.pre = "output";
     Sk.configure({output:outf,read: builtinRead});
 
-    /**
-     * Gets the ace editor of droplet instance, and calls openShare().
-     * @name initEditor
-     * @function
-     */
+    // Gets the ace editor of droplet instance, and calls openShare().
+    // TODO: Move to Editor?
     $scope.initEditor = function () {
         esconsole('initEditor called', 'IDE');
 
@@ -177,20 +156,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             }
         });
 
-        // editor.commands.addCommand({
-        //     name: 'goToLine',
-        //     bindKey: {
-        //         win: 'Ctrl-L',
-        //         mac: 'Command-L',
-        //         sender: 'editor|cli'
-        //     },
-        //     exec: function(env, args, request) {
-        //         if($scope.tabs.length > 0) {
-
-        //         }
-        //     }
-        // });
-
         editor.ace.commands.addCommand({
             name: 'runCode',
             bindKey: {
@@ -228,13 +193,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
     };
 
-    
-
-    /**
-     * toggles between blocks (droplet) and text mode
-     * @name toggleBlocks
-     * @function
-     */
+    // toggles between blocks (droplet) and text mode
     $scope.toggleBlocks = function () {
         if (!editor.droplet.currentlyUsingBlocks) {
             // ask Ace editor if there are any syntax errors
@@ -254,12 +213,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         return editor.droplet.toggleBlocks();
     };
 
-    /**
-     * @name openShare
-     * @function
-     */
     $scope.openShare = function (shareid) {
-        var result = {};
         var alreadySaved = false;
         var promise;
 
@@ -370,11 +324,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         userProject.openSharedScript(sharedScript.shareid);
     };
 
-    /**
-     * Prompts the user for a name and language, then calls the userProject
-     * service to create the script from an empty template. The tab will be
-     * automatically opened and switched to.
-     */
+    // Prompts the user for a name and language, then calls the userProject
+    // service to create the script from an empty template. The tab will be
+    // automatically opened and switched to.
     $scope.createScript = function () {
         const { bubble } = $ngRedux.getState();
         if (bubble.active && bubble.currentPage===9) {
@@ -384,11 +336,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         var modalInstance = $uibModal.open({
             component: 'createScriptController',
             // pass the current language to use as the default selected lang.
-            resolve: {
-                language: function () {
-                    return $scope.dispLang;
-                }
-            }
+            resolve: { language() { return $scope.dispLang } }
         });
 
         reporter.createScript();
@@ -405,12 +353,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         });
     };
 
-    /**
-     * @name selectScript
-     * @function
-     * @param script
-     * @returns {null}
-     */
     $scope.selectScript = function (script) {
         // DON'T open the script if it has been soft-deleted
         if (!script.soft_delete) {
@@ -422,14 +364,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
     };
 
-    /**
-     * @name setLanguage
-     * @function
-     * @param language {string} 'python' or 'javascript'
-     */
     $scope.setLanguage = function (language) {
-        var prevLang = $scope.currentLanguage;
-
         if (language === 'python') {
             $scope.currentLanguage = 'python';
             $scope.scriptExtension = '.py';
@@ -442,25 +377,11 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         editor.setLanguage(language);
 
-        // re-enable blocks mode if language changes
-        // TODO: questionable code: localStorage.getItem('blocks') === 'yes'
-        // currentlyUsingBlocks would be off when we switch the language
-        // maybe we need a global-state scope variable
-        // if (localStorage.getItem('blocks') === 'yes' && prevLang !== $scope.currentLanguage) {
-        //     $scope.toggleBlocks();
-        // }
-
         // switch global language mode and save current language to local storage.
         $scope.languageModeSelect($scope.currentLanguage);
         $rootScope.$broadcast('language', $scope.currentLanguage);
     };
 
-    /**
-     * @name pasteCurriculumCode
-     * @function
-     * @param key {string}
-     * @returns {null}
-     */
     $scope.pasteCurriculumCode = function (key) {
         var patt = /<[^>]*>/g;
         var pattScriptName = /script_name: (.*)/;
@@ -498,12 +419,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
     };
 
-    /**
-     * Compile the code in the editor for the current language selection.
-     * @name getResult
-     * @function
-     * @returns {Promise} A promise that resolves to the compiled result.
-     */
+    // Compile the code in the editor for the current language selection.
     $scope.getResult = function () {
         if ($scope.currentLanguage === 'python') {
             return compiler.compilePython(
@@ -516,14 +432,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 $scope.audioQuality
             );
         }
-
     };
 
-    /**
-     * Compile code in the editor and broadcast the result to all scopes.
-     * @name compileCode
-     * @function
-     */
+    // Compile code in the editor and broadcast the result to all scopes.
     $scope.compileCode = function () {
         if ($scope.isWaitingForServerResponse) {
             // prevent successive run command
@@ -663,11 +574,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
     };
 
-    /**
-     * @name highlightError
-     * @function
-     * @param err {object}
-     */
     $scope.highlightError = function (err) {
         var line, aceRange, range;
 
@@ -692,11 +598,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
     };
 
-
-    /**
-     * @name clearErrors
-     * @function
-     */
     $scope.clearErrors = function () {
         if (editor.droplet.currentlyUsingBlocks) {
             if ($scope.lineNumber !== undefined) {
@@ -711,20 +612,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         editor.ace.setTheme(ACE_THEMES[theme]);
     });
 
-    /**
-     * @name setPage
-     * @function
-     * @param page {number}
-     */
-    $scope.setPage = function (page) {
-        $state.transitionTo(page);
-    };
-
-    /**
-     * @name languageModeSelect
-     * @function
-     * @param lang {string} 'python' or 'javascript'
-     */
     $scope.languageModeSelect = function (lang) {
         if (lang === 'python') {
             $scope.currentLanguage = 'python';
@@ -738,23 +625,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $rootScope.$broadcast('language', $scope.currentLanguage);
     };
 
-    // TODO: not sure if this function is ever used
-    /**
-     * @name codeMode
-     * @function
-     * @param arg
-     */
-    $scope.codeMode = function (arg) {
-        $scope.currentLanguage = arg;
-        $rootScope.$broadcast('language', arg); // language mode used in different controllers
-    };
-
-    /**
-     * @name reportError
-     * @function
-     */
     $scope.reportError = function () {
-
         if (userProject.isLoggedIn()) {
             userProject.getUserInfo().then(function (user) {
 
@@ -784,12 +655,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
     };
 
-    /**
-     * @name pasteCode
-     * @function
-     * @param key
-     * @returns {*}
-     */
     $scope.pasteCode = function (key) {
         esconsole('paste key ' + key, 'debug');
         if (editor.droplet.currentlyUsingBlocks) {
@@ -799,14 +664,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             editor.ace.focus();
         }
         return key;
-    };
-
-    /**
-     * @name showEmptyFilename
-     * @function
-     */
-    $scope.showEmptyFilename = function () {
-        userNotification.show('Empty file name!', 'failure1');
     };
 
     $scope.setFontSize = function (val) {
@@ -823,15 +680,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.setFontSize(val);
     });
 
-    //Listen for call to uploadModel from soundbrowserController
-    $scope.$on('uploadModal', function () {
-        $scope.openUploadWindow()
-    });
-
-    /**
-     * @name openUploadWindow
-     * @function
-     */
     $scope.openUploadWindow = function () {
         if (userProject.isLoggedIn()) {
             $uibModal.open({ component: 'uploadSoundController' });
@@ -849,47 +697,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             userNotification.show('Please login before using this feature.', 'failure1');
         }
     };
-
-    /**
-     * @name downloadProtectedData
-     * @function
-     */
-    $scope.downloadProtectedData = function () {
-        var modalInstance = $uibModal.open({
-            templateUrl: 'templates/download-teacher-materials.html',
-            controller: 'DownloadTeacherMaterialsCtrl',
-            size: '100'
-        });
-    };
 }]);
-
-app.directive('fileModel', ['$parse', function ($parse) {
-    return {
-        restrict: 'A',
-        link: function (scope, element, attrs) {
-
-            var model = $parse(attrs.fileModel);
-            var modelSetter = model.assign;
-
-            element.bind('change', function () {
-                scope.$apply(function () {
-                    modelSetter(scope, element[0].files[0]);
-                });
-            });
-        }
-    };
-}]);
-
 
 function createIssue(jsreport) {
-
     var formData = new FormData();
-
     formData.append('jsreport', jsreport);
-
     var request = new XMLHttpRequest();
     request.open("POST", URL_DOMAIN + '/services/files/reportissue');
-
     request.onload = function () {
         if (request.readyState === 4) {
             if (request.status === 200) {
@@ -900,29 +714,15 @@ function createIssue(jsreport) {
     request.send(formData);
 }
 
-/**
- * @module ReportErrorCtrl
- */
 app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance',
     function ($scope,$uibModalInstance) {
-        /**
-         * Closes the modal instance.
-         * @name cancel
-         * @function
-         */
+
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
             esconsole('Clicked cancel', 'debug');
             esconsole('clicked cancel', 'user', 0);
         };
 
-        /**
-         * @name sendError
-         * @function
-         * @param userName {string}
-         * @param userEmail {string}
-         * @param errorDesc {string}
-         */
         $scope.sendError = function (userName, userEmail, errorDesc) {
             esconsole('Clicked send', 'debug');
 
@@ -988,79 +788,5 @@ app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance',
                 $uibModalInstance.close();
             }
         };
-    }]);
-
-/**
- * @module DownloadTeacherMaterialsCtrl
- */
-app.controller('DownloadTeacherMaterialsCtrl', ['$scope', '$http', '$uibModalInstance', 'esconsole', function ($scope, $http, $uibModalInstance, esconsole) {
-    $scope.error = "";
-    $scope.keypass = "";
-
-    /**
-     * @name download
-     * @function
-     */
-    $scope.download = function () {
-        if ($scope.keypass === "") {
-            $scope.error = i18n.t('messages:downloadprotecteddata.nopassword');
-            return;
-        }
-
-        var formData = new FormData();
-        formData.append('keypass', btoa($scope.keypass));
-
-        var request = new XMLHttpRequest();
-        request.open("POST", URL_DOMAIN+'/services/files/getprotecteddata');
-        request.timeout = 10000;
-
-        request.ontimeout = function () {
-            $scope.error = i18n.t('messages:downloadprotecteddata.servertimeout');
-            esconsole('Timeout while requesting teacher materials from server.', 'error');
-        };
-
-        request.onload = function () {
-            if (request.readyState === 4) {
-                if (request.status === 200) {
-                    var jsonData = JSON.parse(request.responseText);
-                    if (jsonData.path !== undefined) {
-                        var anchor = document.createElement("a");
-                        document.body.appendChild(anchor);
-                        anchor.setAttribute("type", "hidden");
-                        anchor.href = jsonData.path;
-                        anchor.download = "TeacherMaterials.zip";
-                        anchor.click();
-                        $uibModalInstance.close();
-                        return;
-                    } else {
-                        $scope.error = i18n.t('messages:downloadprotecteddata.servertimeout');
-                    }
-                } else if (request.status === 403){
-                    $scope.error = "Incorrect password.";
-                    $scope.$apply();
-                    return;
-                }
-            }
-            esconsole('Error in download teacher materials: STATUS '+ request.status, 'error');
-            $scope.error = i18n.t('messages:downloadprotecteddata.unexpectederror');
-            $scope.$apply();
-        };
-
-        request.send(formData);
-    };
-
-    /**
-     * Closes the modal instance.
-     * @name cancel
-     * @function
-     */
-    $scope.cancel = function () {
-        $uibModalInstance.close();
-    };
-
-    $scope.enterSubmit = function (event) {
-        if (event.keyCode === 13) {
-            $scope.download();
-        }
-    } 
-}]);
+    }
+]);
