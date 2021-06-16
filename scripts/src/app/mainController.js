@@ -53,6 +53,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         $scope.bubble = state;
     });
 
+    $ngRedux.connect(state => ({ language: state.app.scriptLanguage }))(({ language }) => $scope.dispLang = language)
+
     $scope.numTabs = 0;
     $ngRedux.connect(state => ({ openTabs: state.tabs.openTabs }))(tabs => {
         $scope.numTabs = tabs.openTabs.length;
@@ -316,15 +318,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     // these should be populated from somewhere else and not hard-coded, most likely
     $scope.languages = [{'lang': 'Python'}, {'lang': 'JavaScript'}];
     $scope.fontSizes = [{'size': 10}, {'size': 12}, {'size': 14}, {'size': 18}, {'size': 24}, {'size': 36}];
-
-    // mainly for alternate display in curriculum / API browser
-    $scope.dispLang = localStorage.getItem('language') ?? 'python';
-    // this may be overridden by URL parameter later
-
-    $scope.$on('language', function (event, value) {
-        // TODO: this is getting too many times when switching tabs
-        $scope.dispLang = value;
-    });
 
     $scope.openShareAfterLogin = function() {
         $scope.isManualLogin = true;
@@ -742,7 +735,7 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.setFontSize = function (fontSize) {
         esconsole('resizing global font size to ' + fontSize, 'debug');
         $scope.selectedFont = fontSize;
-        $rootScope.$broadcast('fontSizeChanged', fontSize);
+        $ngRedux.dispatch(appState.setFontSize(fontSize));
     };
 
     $scope.enterKeySubmit = function (event) {
@@ -1027,7 +1020,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         if (openTabs.includes(script.shareid)) {
             $ngRedux.dispatch(tabs.setActiveTabAndEditor(imported.shareid));
             userProject.openScript(imported.shareid);
-            $rootScope.$broadcast('selectScript', imported.shareid);
         }
     };
     
@@ -1080,11 +1072,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         });
     };
 
-    // TODO: Remove this.
-    $scope.$on('createScript', () => {
-        $ngRedux.dispatch(scripts.syncToNgUserProject());
-    });
-
     $scope.$on('recommenderScript', (event, script) => {
         if (script) {
             let input = recommender.addRecInput([], script);
@@ -1118,12 +1105,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         }
         script && $rootScope.$broadcast('recommenderScript', script);
     });
-
-    $scope.$on('language', (event, language) => {
-        $ngRedux.dispatch(appState.setScriptLanguage(language));
-    })
-
-    $scope.$on('fontSizeChanged', (event, val) => $ngRedux.dispatch(appState.setFontSize(val)))
 
     $scope.$on('newCAIMessage', () => {
         if (FLAGS.SHOW_CAI && !$scope.showCAIWindow) {

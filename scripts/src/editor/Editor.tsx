@@ -33,9 +33,10 @@ export function setReadOnly(value: boolean) {
     droplet.setReadOnly(value)
 }
 
+// TODO: Do this in a useEffect with an app.fontSize dependency.
 export function setFontSize(value: string) {
-    ace.setFontSize(value)
-    droplet.setFontSize(value)
+    ace?.setFontSize(value)
+    droplet?.setFontSize(value)
 }
 
 export function undo() {
@@ -82,15 +83,16 @@ export function clearHistory() {
     }
 }
 
+// TODO: Do this in a useEffect with an app.scriptLanguage dependency.
 export function setLanguage(currentLanguage: string) {
     if (currentLanguage === "python") {
-        droplet.setMode("python", config.blockPalettePython.modeOptions)
-        droplet.setPalette(config.blockPalettePython.palette)
+        droplet?.setMode("python", config.blockPalettePython.modeOptions)
+        droplet?.setPalette(config.blockPalettePython.palette)
     } else if (currentLanguage === "javascript") {
-        droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-        droplet.setPalette(config.blockPaletteJavascript.palette)
+        droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+        droplet?.setPalette(config.blockPaletteJavascript.palette)
     }
-    ace.getSession().setMode("ace/mode/" + currentLanguage)
+    ace?.getSession().setMode("ace/mode/" + currentLanguage)
 }
 
 function setupAceHandlers(ace: Ace.Editor) {

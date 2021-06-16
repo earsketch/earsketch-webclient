@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import * as layout from '../layout/layoutState';
+import * as scripts from '../browser/scriptsState';
 import * as tabs from '../editor/tabState';
 import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
@@ -51,8 +52,7 @@ const createSampleScript = createAsyncThunk(
         return userProject.saveScript(fileName, code, true)
             .then((script: ScriptEntity) => {
                 userProject.openScript(script.shareid);
-                rootScope.$broadcast('createScript', script.shareid);
-
+                dispatch(scripts.syncToNgUserProject());
                 dispatch(tabs.setActiveTabAndEditor(script.shareid));
             });
     }

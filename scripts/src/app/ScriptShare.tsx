@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as app from "./appState"
 import * as collaboration from "./collaboration"
@@ -8,7 +8,6 @@ import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
-import store from "../reducers"
 import * as tabs from "../editor/tabState"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
@@ -484,8 +483,6 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
             </div>
             <div className="text-center mt-4">{t(Tabs[activeTab].descriptionKey)}</div>
         </div>
-        <Provider store={store}>
-            <ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} />
-        </Provider>
+        <ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} />
     </div>
 }

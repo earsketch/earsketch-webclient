@@ -192,8 +192,6 @@ export const TitleBar = () => {
                         title="Switch script language"
                         onClick={() => {
                             const newLanguage = (language === 'python' ? 'javascript' : 'python')
-                            // TODO: Remove angular $broadcast after moving other components to React.
-                            $rootScope?.$broadcast('language', newLanguage)
                             dispatch(appState.setScriptLanguage(newLanguage))
                         }}>
                     {language === 'python' ? 'PY' : 'JS'}
@@ -361,12 +359,8 @@ const HotCurriculum = hot((props: {
         }
 
         $rootScope = props.$rootScope
-        // TODO: Remove angular $broadcast after moving other components to React.
-        const language = props.$ngRedux.getState().app.scriptLanguage
 
         if ($rootScope) {
-            $rootScope.$broadcast('language', language)
-
             // Hack to facilitate Angular loading curriculum page for errors in console.
             // TODO: Remove this after we've ported templates/index.html to React.
             $rootScope.loadChapterForError = (errorMessage: string) => {

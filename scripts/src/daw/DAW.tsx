@@ -52,7 +52,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         // TODO: Update after relevant components get ported.
         if (needCompile) {
-            helpers.getNgRootScope().$broadcast('compileembeddedTrack', true)
+            helpers.getNgController("ideController").compileCode()
             setNeedCompile(false)
             return
         }

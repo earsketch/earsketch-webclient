@@ -10,7 +10,6 @@ import * as scripts from "../browser/scriptsState"
 import * as userProject from "./userProject"
 import { useSelector, useDispatch, Provider } from "react-redux"
 import { Diff } from "./Diff"
-import store from "../reducers"
 import { DAWData } from "./player"
 import { DAW, setDAWData } from "../daw/DAW"
 
@@ -48,7 +47,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
     </tr>
 }
 
-const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, allowRevert: boolean, close: () => void }) => {
+export const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, allowRevert: boolean, close: () => void }) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTabID = useSelector(tabs.selectActiveTabID)
@@ -164,6 +163,3 @@ const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, a
         </div>}
     </>
 }
-
-const Wrapper = (props: any) => <Provider store={store}><ScriptHistory {...props} /></Provider>
-export { Wrapper as ScriptHistory }

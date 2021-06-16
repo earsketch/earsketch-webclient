@@ -29,10 +29,6 @@ const ACE_THEMES = {
 
 // Angular controller for the IDE (text editor) and surrounding items.
 app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, caiAnalysisModule, $ngRedux) {
-    $scope.callScriptBrowserFunction = function (fnName, tab) {
-        $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
-    };
-
     // local storage fields
     var LS_FONT_KEY = 'fontsize';
     window.ideScope = $scope;
@@ -82,10 +78,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.logs = userConsole.logs;
         $scope.$$phase || $scope.$digest();
     };
-
-    $scope.$on('compileembeddedTrack', function(){
-        $scope.compileCode();
-    })
 
     // Function to pipe Skulpt's stdout to the EarSketch console.
     function outf(text) {
@@ -333,11 +325,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             $ngRedux.dispatch(dismissBubble());
         }
 
-        var modalInstance = $uibModal.open({
-            component: 'createScriptController',
-            // pass the current language to use as the default selected lang.
-            resolve: { language() { return $scope.dispLang } }
-        });
+        var modalInstance = $uibModal.open({ component: 'createScriptController' });
 
         reporter.createScript();
 
@@ -346,7 +334,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 userProject.closeScript(filename);
                 return userProject.createScript(filename).then(function (script) {
                     // script saved and opened
-                    script && $rootScope.$broadcast('createScript', script.shareid);
+                    script && $ngRedux.dispatch(scripts.syncToNgUserProject())
                     $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
                 });
             }
@@ -357,29 +345,23 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // DON'T open the script if it has been soft-deleted
         if (!script.soft_delete) {
             esconsole('selected a script', 'IDE');
-
             userProject.openScript(script.shareid);
-            // refresh tab state to keep $scope.tabs up-to-date before we call getTabId
-            $scope.$broadcast('selectScript', script.shareid);
         }
     };
 
     $scope.setLanguage = function (language) {
         if (language === 'python') {
-            $scope.currentLanguage = 'python';
             $scope.scriptExtension = '.py';
         } else if (language === 'javascript') {
-            $scope.currentLanguage = 'javascript';
             $scope.scriptExtension = '.js';
         } else {
             throw new Error('bad language value');
         }
-
+        $scope.currentLanguage = language;
         editor.setLanguage(language);
-
         // switch global language mode and save current language to local storage.
-        $scope.languageModeSelect($scope.currentLanguage);
-        $rootScope.$broadcast('language', $scope.currentLanguage);
+        $scope.languageModeSelect(language);
+        $ngRedux.dispatch(appState.setScriptLanguage(language));
     };
 
     $scope.pasteCurriculumCode = function (key) {
@@ -398,8 +380,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         esconsole("paste key" + key, 'debug');
         const ideTargetLanguage = $ngRedux.getState().app.scriptLanguage;
         const ext = ideTargetLanguage === 'python' ? '.py' : '.js';
-
-        $rootScope.$broadcast('language', ideTargetLanguage);
 
         // Create a fake script object to load into a tab.
         var fake_script = {
@@ -513,10 +493,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 }, 0);
             }
 
-            $timeout(function () {
-                if($scope.isEmbedded) $rootScope.$broadcast('embeddedCodeCompiled', result);
-            }, 200);
-
             if (collaboration.active && collaboration.tutoring) {
                 collaboration.sendCompilationRecord('success');
             }
@@ -539,9 +515,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
             $scope.saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL);
 
-            // auto-opens the user console if there is an error and if the console is currently closed
-            $rootScope.$broadcast('openConsoleOnCodeCompileError');
-            $rootScope.$broadcast("compileError", [err]);
             if (collaboration.active && collaboration.tutoring) {
                 collaboration.sendCompilationRecord(errType);
             }
@@ -613,16 +586,10 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     });
 
     $scope.languageModeSelect = function (lang) {
-        if (lang === 'python') {
-            $scope.currentLanguage = 'python';
-            $scope.scriptExtension = '.py';
-        } else {
-            $scope.currentLanguage = 'javascript';
-            $scope.scriptExtension = '.js';
-        }
-
-        localStorage.setItem('language', $scope.currentLanguage);
-        $rootScope.$broadcast('language', $scope.currentLanguage);
+        $scope.currentLanguage = lang
+        $scope.scriptExtension = lang === 'python' ? '.py' : '.js';
+        localStorage.setItem('language', lang);
+        $ngRedux.dispatch(appState.setScriptLanguage(lang));
     };
 
     $scope.reportError = function () {
@@ -673,12 +640,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         editor.setLanguage($scope.currentLanguage);
 
         localStorage.setItem(LS_FONT_KEY, $scope.fontSizNum);
-        editor.ace.focus();
     };
 
-    $scope.$on('fontSizeChanged', function (event, val) {
-        $scope.setFontSize(val);
-    });
+    $ngRedux.connect(state => ({ size: state.app.fontSize }))(({ size }) => $scope.setFontSize(size))
 
     $scope.openUploadWindow = function () {
         if (userProject.isLoggedIn()) {

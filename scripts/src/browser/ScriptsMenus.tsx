@@ -14,9 +14,7 @@ import { ScriptEntity, ScriptType } from 'common';
 import * as userProject from '../app/userProject';
 
 export const openScript = (script: ScriptEntity) => {
-    const rootScope = helpers.getNgRootScope();
     userProject.openScript(script.shareid);
-    rootScope.$broadcast('selectScript', script.shareid);
 };
 
 export const openSharedScript = (script: ScriptEntity) => {
