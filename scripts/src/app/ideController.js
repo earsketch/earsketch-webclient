@@ -9,8 +9,9 @@ import * as editorState from '../editor/editorState';
 import reporter from './reporter';
 import * as tabs from '../editor/tabState';
 import * as cai from '../cai/caiState';
-import { wrapModal } from '../helpers';
+import * as helpers from '../helpers';
 import { ScriptCreator } from './ScriptCreator';
+import store from '../reducers';
 import { SoundUploader } from './SoundUploader'
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
@@ -19,18 +20,12 @@ import * as WaveformCache from './waveformcache';
 import i18n from "i18next";
 
 // Temporary glue from $uibModal to React components.
-app.component("createScriptController", wrapModal(ScriptCreator))
-app.component("uploadSoundController", wrapModal(SoundUploader))
-
-const ACE_THEMES = {
-    light: "ace/theme/chrome",
-    dark: "ace/theme/monokai",
-}
+app.component("createScriptController", helpers.wrapModal(ScriptCreator))
+app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
 
 // Angular controller for the IDE (text editor) and surrounding items.
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, caiAnalysisModule, $ngRedux) {
+app.controller("ideController", ['$scope', function ($scope) {
     // local storage fields
-    var LS_FONT_KEY = 'fontsize';
     window.ideScope = $scope;
 
     $scope.scriptName = 'untitled';
@@ -39,7 +34,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     $scope.shareDisabled = false;
     $scope.flagNewScript = false;
     $scope.scriptExtension = '.py';
-    $scope.fontSizNum = 14;
     $scope.compiled = null;
 
     // Tracks the selected tab data (script). Note that it might not be most up to date (modified / unsaved).
@@ -61,7 +55,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     $scope.loaded = true; // shows spinning icon when false
 
     //embedableTrack - changeCss and
-    $scope.isEmbedded = $location.search()["embedded"] === "true";
     $scope.dynamicStyle = function(embedded){
         if(embedded){
             return {top: "0", left:"0"}
@@ -107,17 +100,6 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     $scope.initEditor = function () {
         esconsole('initEditor called', 'IDE');
 
-        editor.ace.setOptions({
-            mode: 'ace/mode/' + $scope.currentLanguage,
-            theme: ACE_THEMES[$ngRedux.getState().app.colorTheme],
-            fontSize: $scope.fontSizNum,
-            enableBasicAutocompletion: true,
-            enableSnippets: false,
-            enableLiveAutocompletion: false,
-            showPrintMargin: false,
-            wrap: false
-        });
-
         // suppressing a minor error message in FF
         editor.ace.$blockScrolling = Infinity;
 
@@ -129,7 +111,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 sender: 'editor|cli'
             },
             exec: function () {
-                const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+                const activeTabID = tabs.selectActiveTabID(store.getState());
 
                 // TODO: Potentially could use $scope.activeScript instead.
                 let script = null;
@@ -140,11 +122,11 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 }
 
                 if (!script?.saved) {
-                    $ngRedux.dispatch(tabs.saveScriptIfModified(activeTabID));
+                    store.dispatch(tabs.saveScriptIfModified(activeTabID));
                 } else if (script?.collaborative) {
                     collaboration.saveScript();
                 }
-                activeTabID && $ngRedux.dispatch(tabs.removeModifiedScript(activeTabID));
+                activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID));
             }
         });
 
@@ -162,27 +144,21 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
         editor.droplet.setEditorState(false);
 
-        const fontSize = localStorage.getItem(LS_FONT_KEY);
-        if (fontSize !== null) {
-            $scope.setFontSize(parseInt(fontSize));
-            $rootScope.$broadcast('initFontSize', parseInt(fontSize));
-        }
-
         // open shared script from URL
-        var shareID = $location.search()['sharing'];
-        if (typeof(shareID) !== 'undefined') {
+        const shareID = ESUtils.getURLParameter("sharing")
+        if (shareID) {
             $scope.openShare(shareID).then(() => {
-                $ngRedux.dispatch(scripts.syncToNgUserProject());
-                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareID));
+                store.dispatch(scripts.syncToNgUserProject());
+                store.dispatch(tabs.setActiveTabAndEditor(shareID));
             });
         }
 
-        $ngRedux.dispatch(editorState.setEditorInstance(editor));
-        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
-        activeTabID && $ngRedux.dispatch(tabs.setActiveTabAndEditor(activeTabID));
+        store.dispatch(editorState.setEditorInstance(editor));
+        const activeTabID = tabs.selectActiveTabID(store.getState());
+        activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID));
 
-        const activeScript = tabs.selectActiveTabScript($ngRedux.getState());
-        editor.setReadOnly($scope.isEmbedded || activeScript?.readonly);
+        const activeScript = tabs.selectActiveTabScript(store.getState());
+        editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly);
     };
 
     // toggles between blocks (droplet) and text mode
@@ -208,17 +184,18 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     $scope.openShare = function (shareid) {
         var alreadySaved = false;
         var promise;
+        const isEmbedded = store.getState().app.embedMode;
 
         if (userProject.isLoggedIn()) {
             // User is logged in
             promise = userProject.getSharedScripts($scope.username, $scope.password).then(function (result) {
                 // Check if the shared script has been saved
-                angular.forEach(result, function(script) {
+                for (const script of result) {
                     if (script.shareid === shareid) {
                         result = script;
                         alreadySaved = true;
                     }
-                });
+                }
 
                 if (!alreadySaved) {
                     // Close the script if it was opened when the user was not logged in
@@ -228,8 +205,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
                     // user has not opened this shared link before
                     promise = userProject.loadScript(shareid, true).then(function (result) {
-                        if ($scope.isEmbedded) {
-                            $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                        if (isEmbedded) {
+                            helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
                         }
 
                         if (result.username !== $scope.username) {
@@ -247,12 +224,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                             // TODO: use broadcast or service
                             editor.ace.focus();
 
-                            if ($scope.isEmbedded) {
+                            if (isEmbedded) {
                                 $scope.selectScript(result);
 
                                 // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
-                                $ngRedux.dispatch(scripts.syncToNgUserProject());
-                                $ngRedux.dispatch(tabs.setActiveTabAndEditor(shareid));
+                                store.dispatch(scripts.syncToNgUserProject());
+                                store.dispatch(tabs.setActiveTabAndEditor(shareid));
                             } else {
                                 userNotification.show('This shared script link points to your own script.');
                             }
@@ -268,7 +245,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     // user has already opened this shared link before
                     if (userProject.isLoggedIn()) {
                         promise = userProject.getSharedScripts($scope.username, $scope.password).then(function () {
-                            if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                            if(isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
                             $scope.selectSharedScript(result);
                             $scope.switchToShareMode();
                         });
@@ -282,7 +259,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         } else {
             // User is not logged in
             promise = userProject.loadScript(shareid, true).then(function (result) {
-                if($scope.isEmbedded) $rootScope.$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
+                if(isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid});
                 userProject.saveSharedScript(shareid,result.name,
                     result.source_code, result.username).then(function () {
                     $scope.selectSharedScript(result);
@@ -298,14 +275,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
 
     $scope.switchToShareMode = function() {
         editor.ace.focus();
-        $ngRedux.dispatch(scripts.setFeatureSharedScript(true));
+        store.dispatch(scripts.setFeatureSharedScript(true));
     };
 
     // listens to the broadcast message sent by mainController on clicking login button
-    $rootScope.$on('openShareAfterLogin', function() {
-        $scope.openShare($location.search()['sharing']).then(() => {
-            $ngRedux.dispatch(scripts.syncToNgUserProject());
-        });
+    helpers.getNgRootScope().$on('openShareAfterLogin', function() {
+        $scope.openShare(ESUtils.getURLParameter("sharing")).then(() => store.dispatch(scripts.syncToNgUserProject()))
     });
 
     $scope.openCollabScript = function (scriptID) {
@@ -320,12 +295,12 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     // service to create the script from an empty template. The tab will be
     // automatically opened and switched to.
     $scope.createScript = function () {
-        const { bubble } = $ngRedux.getState();
+        const { bubble } = store.getState();
         if (bubble.active && bubble.currentPage===9) {
-            $ngRedux.dispatch(dismissBubble());
+            store.dispatch(dismissBubble());
         }
 
-        var modalInstance = $uibModal.open({ component: 'createScriptController' });
+        var modalInstance = helpers.getNgService("$uibModal").open({ component: 'createScriptController' });
 
         reporter.createScript();
 
@@ -334,8 +309,8 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 userProject.closeScript(filename);
                 return userProject.createScript(filename).then(function (script) {
                     // script saved and opened
-                    script && $ngRedux.dispatch(scripts.syncToNgUserProject())
-                    $ngRedux.dispatch(tabs.setActiveTabAndEditor(script.shareid));
+                    script && store.dispatch(scripts.syncToNgUserProject())
+                    store.dispatch(tabs.setActiveTabAndEditor(script.shareid));
                 });
             }
         });
@@ -361,7 +336,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         editor.setLanguage(language);
         // switch global language mode and save current language to local storage.
         $scope.languageModeSelect(language);
-        $ngRedux.dispatch(appState.setScriptLanguage(language));
+        store.dispatch(appState.setScriptLanguage(language));
     };
 
     $scope.pasteCurriculumCode = function (key) {
@@ -378,7 +353,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         }
 
         esconsole("paste key" + key, 'debug');
-        const ideTargetLanguage = $ngRedux.getState().app.scriptLanguage;
+        const ideTargetLanguage = store.getState().app.scriptLanguage;
         const ext = ideTargetLanguage === 'python' ? '.py' : '.js';
 
         // Create a fake script object to load into a tab.
@@ -392,9 +367,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         // force a digest cycle because the click is registered by jQuery, and
         // does not trigger Angular digest.
         $scope.$apply(function () {
-            $ngRedux.dispatch(scripts.addReadOnlyScript(Object.assign({}, fake_script)));
+            store.dispatch(scripts.addReadOnlyScript(Object.assign({}, fake_script)));
             editor.ace.focus();
-            $ngRedux.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
+            store.dispatch(tabs.setActiveTabAndEditor(fake_script.shareid));
         });
 
     };
@@ -438,13 +413,13 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         $scope.clearErrors();
         userConsole.status('Running script...');
 
-        const scriptID = tabs.selectActiveTabID($ngRedux.getState());
-        $ngRedux.dispatch(tabs.removeModifiedScript(scriptID));
+        const scriptID = tabs.selectActiveTabID(store.getState());
+        store.dispatch(tabs.removeModifiedScript(scriptID));
 
         promise.then(function (result) {
             var duration = Date.now() - startTime;
             $scope.loaded = true;
-            $rootScope.$broadcast('compiled', result);
+            helpers.getNgRootScope().$broadcast('compiled', result);
             $scope.compiled = result;
             // TODO: refactor notifications
 
@@ -455,16 +430,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             $scope.saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL);
 
             // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-            $timeout(function () {
-                userConsole.status('Script ran successfully.');
-            }, 200);
+            setTimeout(() => userConsole.status('Script ran successfully.'), 200);
 
             // asyncronously report the script complexity
             if (FLAGS.SHOW_AUTOGRADER) {
-                $timeout(function() {
+                setTimeout(() => {
                     // reporter.complexity(language, code);
                     try{
-                        var report = caiAnalysisModule.analyzeCodeAndMusic(language, code, result);
+                        var report = helpers.getNgService("caiAnalysisModule").analyzeCodeAndMusic(language, code, result);
                     }
                     catch (e) {
                         // TODO: Make this work across browsers. (See esconsole for reference.)
@@ -488,18 +461,18 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                     
                     console.log("complexityCalculator", report);
                     if (FLAGS.SHOW_CAI) {
-                        $ngRedux.dispatch(cai.compileCAI([result, language, code]));
+                        store.dispatch(cai.compileCAI([result, language, code]));
                     }
-                }, 0);
+                });
             }
 
             if (collaboration.active && collaboration.tutoring) {
                 collaboration.sendCompilationRecord('success');
             }
 
-            const { bubble } = $ngRedux.getState();
+            const { bubble } = store.getState();
             if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
-                $ngRedux.dispatch(setReady(true));
+                store.dispatch(setReady(true));
             }
         }).catch(function (err) {
             var duration = Date.now() - startTime;
@@ -522,7 +495,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
     };
 
     $scope.saveActiveScriptWithRunStatus = status => {
-        const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
+        const activeTabID = tabs.selectActiveTabID(store.getState());
         let script = null;
 
         if (activeTabID in userProject.scripts) {
@@ -536,7 +509,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         } else if (script && !script.readonly && !script.isShared && !script.saved) {
             // save the script on a successful run
             userProject.saveScript(script.name, script.source_code, true, status).then(function () {
-                $ngRedux.dispatch(scripts.syncToNgUserProject());
+                store.dispatch(scripts.syncToNgUserProject());
                 $scope.isWaitingForServerResponse = false;
             }).catch(function (err) {
                 userNotification.show(i18n.t('messages:idecontroller.savefailed'), 'failure1');
@@ -580,16 +553,11 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         editor.ace.getSession().removeMarker($scope.marker);
     };
 
-    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
-        if (!editor.ace) return;
-        editor.ace.setTheme(ACE_THEMES[theme]);
-    });
-
     $scope.languageModeSelect = function (lang) {
         $scope.currentLanguage = lang
         $scope.scriptExtension = lang === 'python' ? '.py' : '.js';
         localStorage.setItem('language', lang);
-        $ngRedux.dispatch(appState.setScriptLanguage(lang));
+        store.dispatch(appState.setScriptLanguage(lang));
     };
 
     $scope.reportError = function () {
@@ -599,14 +567,14 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 $scope.userName = user.firstname + " " + user.lastname;
                 $scope.userEmail = user.email;
 
-                $uibModal.open({
+                helpers.getNgService("$uibModal").open({
                     templateUrl: 'templates/report-error.html',
                     controller: 'ReportErrorCtrl',
                     scope: $scope
                 });
             }).catch(function (err) {
                 //if user info could not be retrieved just open the modal
-                $uibModal.open({
+                helpers.getNgService("$uibModal").open({
                     templateUrl: 'templates/report-error.html',
                     controller: 'ReportErrorCtrl',
                     scope: $scope
@@ -614,7 +582,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
             });
         } else {
             //if user is not logged in just open the modal
-            $uibModal.open({
+            helpers.getNgService("$uibModal").open({
                 templateUrl: 'templates/report-error.html',
                 controller: 'ReportErrorCtrl',
                 scope: $scope
@@ -633,20 +601,9 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
         return key;
     };
 
-    $scope.setFontSize = function (val) {
-        $scope.fontSizNum = val;
-        editor.setFontSize(val);
-        // need to refresh the droplet palette section -- otherwise the block layout becomes weird
-        editor.setLanguage($scope.currentLanguage);
-
-        localStorage.setItem(LS_FONT_KEY, $scope.fontSizNum);
-    };
-
-    $ngRedux.connect(state => ({ size: state.app.fontSize }))(({ size }) => $scope.setFontSize(size))
-
     $scope.openUploadWindow = function () {
         if (userProject.isLoggedIn()) {
-            $uibModal.open({ component: 'uploadSoundController' });
+            helpers.getNgService("$uibModal").open({ component: 'uploadSoundController' });
             $scope.notAllowedToAddSound = false;
         } else {
             if ($scope.logs) {
@@ -655,9 +612,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
                 esconsole('trying to add log to $scope.logs which does not exist', 'debug');
             }
             $scope.notAllowedToAddSound = true;
-            $timeout(function () {
-                $scope.notAllowedToAddSound = false;
-            }, 1000);
+            setTimeout(() => $scope.notAllowedToAddSound = false, 1000);
             userNotification.show('Please login before using this feature.', 'failure1');
         }
     };

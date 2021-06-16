@@ -14,6 +14,11 @@ import store from "../reducers"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 
+const ACE_THEMES = {
+    light: "ace/theme/chrome",
+    dark: "ace/theme/monokai",
+}
+
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0
 
@@ -33,9 +38,8 @@ export function setReadOnly(value: boolean) {
     droplet.setReadOnly(value)
 }
 
-// TODO: Do this in a useEffect with an app.fontSize dependency.
-export function setFontSize(value: string) {
-    ace?.setFontSize(value)
+export function setFontSize(value: number) {
+    ace?.setFontSize(value + "px")
     droplet?.setFontSize(value)
 }
 
@@ -83,7 +87,6 @@ export function clearHistory() {
     }
 }
 
-// TODO: Do this in a useEffect with an app.scriptLanguage dependency.
 export function setLanguage(currentLanguage: string) {
     if (currentLanguage === "python") {
         droplet?.setMode("python", config.blockPalettePython.modeOptions)
@@ -183,7 +186,7 @@ function setupAceHandlers(ace: Ace.Editor) {
 
 let setupDone = false
 
-function setup(element: HTMLDivElement, language: string, ideScope: any) {
+function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number, ideScope: any) {
     if (setupDone) return
 
     if (language === "python") {
@@ -194,6 +197,18 @@ function setup(element: HTMLDivElement, language: string, ideScope: any) {
 
     ace = droplet.aceEditor
     setupAceHandlers(ace)
+    
+    ace.setOptions({
+        mode: "ace/mode/" + language,
+        theme: ACE_THEMES[theme],
+        fontSize,
+        enableBasicAutocompletion: true,
+        enableSnippets: false,
+        enableLiveAutocompletion: false,
+        showPrintMargin: false,
+        wrap: false,
+    })
+
     ideScope.initEditor()
     ideScope.collaboration = collaboration
     setupDone = true
@@ -203,13 +218,24 @@ const Editor = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
+    const theme = useSelector(appState.selectColorTheme)
+    const fontSize = useSelector(appState.selectFontSize)
     const ideScope = helpers.getNgController("ideController").scope()
     const editorElement = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!editorElement.current) return
-        setup(editorElement.current, language, ideScope)
+        setup(editorElement.current, language, theme, fontSize, ideScope)
     }, [editorElement.current])
+
+    useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
+
+    useEffect(() => {
+        console.log("HELLO! FONT SIZE IS", fontSize)
+        setFontSize(fontSize)
+        // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
+        setLanguage(language)
+    }, [fontSize])
 
     return <>
         {/* TODO: using parent (ideController) scope... cannot isolate them well */}

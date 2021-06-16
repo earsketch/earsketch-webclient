@@ -723,18 +723,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     //=================================================
 
-    /**
-     * @name setFontSize
-     * @function
-     * @param fontSize {number}
-     */
-    $scope.$on('initFontSize', function (event, val) {
-        $scope.selectedFont = val;
-    });
+    $ngRedux.connect(state => ({ size: state.app.fontSize }))(({ size }) => $scope.selectedFont = size)
 
     $scope.setFontSize = function (fontSize) {
-        esconsole('resizing global font size to ' + fontSize, 'debug');
-        $scope.selectedFont = fontSize;
         $ngRedux.dispatch(appState.setFontSize(fontSize));
     };
 
