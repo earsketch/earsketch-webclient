@@ -48,42 +48,23 @@ export function init() {
 
     meter = createAudioMeter(audioContext, 1, 0.95, 500)
     micGain = audioContext.createGain()  // to feed to the recorder
+    micGain.gain.value = 1
     startTime = 0
     metroOsc = []
     beatBuffSrc = []
     eventBuffSrc = []
 
-    const audioOptions = {
-        "audio": {
-            "mandatory": {
-                "googEchoCancellation": "false",
-                "googAutoGainControl": "false",
-                "googNoiseSuppression": "false",
-                "googHighpassFilter": "false"
-            },
-            "optional": []
+    const options = {
+        audio: {
+            echoCancellation: false,
+            autoGainControl: false,
+            noiseSuppression: false,
         }
     }
 
-    micGain.gain.value = 1
-
-    const nav = navigator as any
-    if (!nav.getUserMedia)
-        nav.getUserMedia = nav.webkitGetUserMedia || nav.mozGetUserMedia
-    if (!nav.cancelAnimationFrame)
-        nav.cancelAnimationFrame = nav.webkitCancelAnimationFrame || nav.mozCancelAnimationFrame
-    if (!nav.requestAnimationFrame)
-        nav.requestAnimationFrame = nav.webkitRequestAnimationFrame || nav.mozRequestAnimationFrame
-
-    navigator.getUserMedia(audioOptions as MediaStreamConstraints, gotAudio, mediaNotAccessible)
-}
-
-function mediaNotAccessible() {
-    if ((ESUtils.whichBrowser().indexOf("Chrome") > -1)) {
-        callbacks.micAccessBlocked("chrome_mic_noaccess")
-    } else if ((ESUtils.whichBrowser().indexOf("Firefox") > -1)) {
-        callbacks.micAccessBlocked("ff_mic_noaccess")
-    }
+    navigator.mediaDevices.getUserMedia(options)
+        .then(gotAudio)
+        .catch(() => callbacks.micAccessBlocked(ESUtils.whichBrowser().includes("Firefox") ? "ff_mic_noaccess" : "chrome_mic_noaccess"))
 }
 
 function gotAudio(stream: any) {
