@@ -14,6 +14,10 @@ import * as userConsole from "./userconsole"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
 
+function cleanKey(key: string) {
+    return key.replace(/\W/g, "").toUpperCase()
+}
+
 function validateUpload(key: string, tempo: number) {
     const username = userProject.getUsername()
     if (username === null) {
@@ -103,7 +107,7 @@ const FileTab = ({ close }: { close: () => void }) => {
 
     const name = file ? ESUtils.parseName(file.name) : ""
     if (key === "" && name !== "") {
-        setKey(name.trim().toUpperCase().replace(/\W/g, "_").replace(/_+/g, "_"))
+        setKey(name.trim().replace(/\W/g, "_").replace(/_+/g, "_").toUpperCase())
     }
     const extension = file ? ESUtils.parseExt(file.name) : ""
 
@@ -135,7 +139,7 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <span>Tempo (Optional)</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
-                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
                     <input type="number" placeholder="e.g. 120" className="form-control shake" id="tempo" value={tempo} onChange={e => setTempo(e.target.value)} />
                 </div>
             </div>
@@ -208,7 +212,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <span>Constant Name (required)</span>
                 </div>
                 <div className="modal-section-content">
-                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
                 </div>
                 <div className="modal-section-header">
                     <span>Measures Control</span>
@@ -358,7 +362,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 (results === null && <div><i className="inline-block animate-spin icon icon-spinner" /> Searching Freesound...</div>
                     || results!.length === 0 && <div>No results</div>)}
             <div className="modal-section-header"><span>Constant Name (required)</span></div>
-            <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+            <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
         </div>
         <Footer ready={selected !== null} close={close} />
     </form>
@@ -409,7 +413,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
         </div>
         <Footer ready={ready} progress={progress} close={close} />
     </form>
@@ -448,7 +452,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(e.target.value)} pattern="[A-Z0-9_]+" required />
+            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
         </div>
         <Footer ready={ready} progress={progress} close={close} />
     </form>
