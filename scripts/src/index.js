@@ -158,9 +158,6 @@ require(['angular'], () => {
     require('caiDialogue');
     require('codeSuggestion');
 
-    // TODO: Use a module.
-    window.REPORT_LOG = [];
-
     app.factory('$exceptionHandler', function() {
         return function(exception, cause) {
             console.log(exception);

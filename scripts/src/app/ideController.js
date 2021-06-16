@@ -6,6 +6,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState";
 import * as scripts from '../browser/scriptsState';
 import * as editor from '../editor/Editor';
 import * as editorState from '../editor/editorState';
+import { ErrorForm } from './ErrorForm';
 import reporter from './reporter';
 import * as tabs from '../editor/tabState';
 import * as cai from '../cai/caiState';
@@ -22,6 +23,7 @@ import i18n from "i18next";
 // Temporary glue from $uibModal to React components.
 app.component("createScriptController", helpers.wrapModal(ScriptCreator))
 app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
+app.component("errorController", helpers.wrapModal(ErrorForm))
 
 // Angular controller for the IDE (text editor) and surrounding items.
 app.controller("ideController", ['$scope', function ($scope) {
@@ -561,33 +563,7 @@ app.controller("ideController", ['$scope', function ($scope) {
     };
 
     $scope.reportError = function () {
-        if (userProject.isLoggedIn()) {
-            userProject.getUserInfo().then(function (user) {
-
-                $scope.userName = user.firstname + " " + user.lastname;
-                $scope.userEmail = user.email;
-
-                helpers.getNgService("$uibModal").open({
-                    templateUrl: 'templates/report-error.html',
-                    controller: 'ReportErrorCtrl',
-                    scope: $scope
-                });
-            }).catch(function (err) {
-                //if user info could not be retrieved just open the modal
-                helpers.getNgService("$uibModal").open({
-                    templateUrl: 'templates/report-error.html',
-                    controller: 'ReportErrorCtrl',
-                    scope: $scope
-                });
-            });
-        } else {
-            //if user is not logged in just open the modal
-            helpers.getNgService("$uibModal").open({
-                templateUrl: 'templates/report-error.html',
-                controller: 'ReportErrorCtrl',
-                scope: $scope
-            });
-        }
+        helpers.getNgService("$uibModal").open({ component: "errorController" });
     };
 
     $scope.pasteCode = function (key) {
@@ -617,95 +593,3 @@ app.controller("ideController", ['$scope', function ($scope) {
         }
     };
 }]);
-
-function createIssue(jsreport) {
-    var formData = new FormData();
-    formData.append('jsreport', jsreport);
-    var request = new XMLHttpRequest();
-    request.open("POST", URL_DOMAIN + '/services/files/reportissue');
-    request.onload = function () {
-        if (request.readyState === 4) {
-            if (request.status === 200) {
-                esconsole('******* Send Issue Report OK*********', 'info');
-            }
-        }
-    };
-    request.send(formData);
-}
-
-app.controller('ReportErrorCtrl', ['$scope', '$uibModalInstance',
-    function ($scope,$uibModalInstance) {
-
-        $scope.cancel = function () {
-            $uibModalInstance.dismiss('cancel');
-            esconsole('Clicked cancel', 'debug');
-            esconsole('clicked cancel', 'user', 0);
-        };
-
-        $scope.sendError = function (userName, userEmail, errorDesc) {
-            esconsole('Clicked send', 'debug');
-
-            var lang = $scope.currentLanguage;
-            if (['python', 'javascript'].indexOf(lang) === -1) {
-                lang = '';
-            }
-
-            var notify_team_members = ["@xfreeman", "@heerman", "@manodrum"];
-            var body = notify_team_members.join(" ")+"\r\n";
-
-            if (userName || userEmail) {
-                body = body + "\r\n**Reported by:** ";
-                if (userName) {
-                    body = body + userName + " ";
-                }
-                if (userEmail) {
-                    body = body + "[" +userEmail+"]";
-                }
-                body = body + "\r\n";
-            }
-
-            var localStorageLog = "";
-            
-            Object.keys(localStorage).forEach(function (key) {
-                try {
-                    if (key === "userstate") {
-                        var localUserState = JSON.parse(localStorage.getItem(key));
-                        if (localUserState.hasOwnProperty('password')) {
-                            localUserState.password = '';
-                        }
-                        localStorageLog += key + ": " + JSON.stringify(localUserState) + "\r\n";
-                    } else {
-                        localStorageLog += key + ": " + localStorage.getItem(key) + "\r\n";
-                    }
-                } catch (e) {
-                    if (e && e.hasOwnProperty(message)) {
-                        localStorageLog += "exception for key ["+key+"]: " + e.message;
-                    }
-                }
-            });
-
-            body = body + "\r\n**OS:** "+ESUtils.whichOS()+"\t **Browser:** "+ESUtils.whichBrowser()+"\r\n";
-
-            if (errorDesc) {
-                body = body + "\r\n**Error Description:** "+errorDesc+"\r\n";
-            }
-
-            body = body + "\r\n**SOURCE CODE:** \r\n```"+lang+"\r\n" + editor.getValue() + "\r\n```";
-            body = body + "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```";
-            body = body + "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageLog + "\r\n```";
-
-            var errorinfo = {};
-            errorinfo.title = "User reported bug";
-            errorinfo.labels = ["report"];
-            errorinfo.body = body;
-
-            createIssue(JSON.stringify(errorinfo));
-            userNotification.show('Thank you for your submission! Your error has been reported', 'success');
-
-            setTimeout(func, 1000);
-            function func() {
-                $uibModalInstance.close();
-            }
-        };
-    }
-]);

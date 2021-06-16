@@ -3,7 +3,6 @@ window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 window.SITE_DIRECTORY = '/base';
 window.SITE_BASE_URI = location.origin + '/base';
 window.BUILD_NUM = 0;
-window.REPORT_LOG = [];
 window.URL_DOMAIN = URL_DOMAIN;
 window.URL_LOADAUDIO = URL_LOADAUDIO;
 window.ES_PASSTHROUGH = ES_PASSTHROUGH;

@@ -133,7 +133,7 @@ const AddSound = () => {
     return (
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
-            onClick={() => helpers.getNgController("ideController").openUploadWindow()}
+            onClick={() => helpers.getNgController("ideController").scope().openUploadWindow()}
         >
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
                 <i className='icon icon-plus2' />
