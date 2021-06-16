@@ -188,13 +188,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
         }
     }
 
-    recorder.callbacks.micAccessBlocked = error => {
-        if (error == "chrome_mic_noaccess") {
-            setError(i18n.t("messages:uploadcontroller.chrome_mic_noaccess"))
-        } else if (error == "ff_mic_noaccess") {
-            setError(i18n.t("messages:uploadcontroller.ff_mic_noaccess"))
-        }
-    }
+    recorder.callbacks.micAccessBlocked = error => setError(i18n.t("messages:uploadcontroller." + error))
 
     recorder.callbacks.micReady = () => setMicReady(true)
 
