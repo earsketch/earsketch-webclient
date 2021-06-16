@@ -9,8 +9,9 @@ import * as caiProjectModel from "../../cai/projectModel"
 import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree'
 import * as recommender from '../recommender'
 import * as userProject from '../userProject'
+import * as caiStudentHistoryModule from "../../cai/studentHistory"
 
-app.factory('caiDialogue', ['codeSuggestion', 'caiStudentHistoryModule', function (codeSuggestion, caiStudentHistoryModule) {
+app.factory('caiDialogue', ['codeSuggestion', function (codeSuggestion) {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};

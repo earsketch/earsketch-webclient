@@ -156,7 +156,6 @@ require(['angular'], () => {
     // CAI
     require('./cai/CAI');
     require('caiAnalysisModule');
-    require('caiStudentHistoryModule');
     require('caiDialogue');
     require('codeSuggestion');
 

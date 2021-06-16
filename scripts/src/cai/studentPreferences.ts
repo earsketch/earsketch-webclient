@@ -26,7 +26,6 @@ let activeProject = ""
 
 function setActiveProject(projectName: string) {
     activeProject = projectName
-
     if (!allSoundsSuggested[projectName]) {
         allSoundsSuggested[projectName] = []
     }
@@ -42,29 +41,24 @@ function setActiveProject(projectName: string) {
     if (!soundsContributedByStudent[projectName]) {
         soundsContributedByStudent[projectName] = []
     }
-
     if (!codeSuggestionsUsed[projectName]) {
         codeSuggestionsUsed[projectName] = []
     }
-
     if (!codeSuggestionsMade[projectName]) {
         codeSuggestionsMade[projectName] = []
     }
     if (!sampleSuggestionsMade[projectName]) {
         sampleSuggestionsMade[projectName] = []
     }
-
     if (!acceptanceRatio[projectName]) {
         acceptanceRatio[projectName] = 0
     }
-
     if (!suggestionsAccepted[projectName]) {
         suggestionsAccepted[projectName] = 0
     }
     if (!suggestionsRejected[projectName]) {
         suggestionsRejected[projectName] = 0
     }
-
     if (!soundSuggestionTracker[activeProject]) {
         soundSuggestionTracker[activeProject] = []
     }
@@ -88,7 +82,6 @@ function updateHistoricalArrays(currentSounds?: string[]) {
             }
         }
     }
-
     //update historical list of all sounds used
     if (currentSounds != null) {
         for (const sound of currentSounds) {
@@ -97,15 +90,12 @@ function updateHistoricalArrays(currentSounds?: string[]) {
             }
         }
     }
-
     //update historical list of sound suggestions used
     for (const sound of allSoundsUsed[activeProject]) {
         if (allSoundsSuggested[activeProject].includes(sound) && !soundsSuggestedAndUsed[activeProject].includes(sound) && !soundsContributedByStudent[activeProject].includes(sound)) {
             soundsSuggestedAndUsed[activeProject].push(sound)
         }
     }
-
-
     //if current sounds passed, update "currently used suggestions" list
     if (currentSounds != null) {
         const newCurrentSuggs = []
@@ -114,16 +104,13 @@ function updateHistoricalArrays(currentSounds?: string[]) {
                 newCurrentSuggs.push(sound)
             }
         }
-
         for (const sound of currentSounds) {
             if (allSoundsSuggested[activeProject].includes(sound) && !newCurrentSuggs.includes(sound)) {
                 newCurrentSuggs.push(sound)
             }
         }
-
         currentSoundSuggestionsPresent[activeProject] = newCurrentSuggs.slice(0)
     }
-
     if (currentSounds != null) {
         for (const sound of currentSounds) {
             if (!allSoundsSuggested[activeProject].includes(sound) && !soundsContributedByStudent[activeProject].includes(sound)) {
@@ -131,13 +118,9 @@ function updateHistoricalArrays(currentSounds?: string[]) {
             }
         }
     }
-
     //push this set of lists to the student model
-
     const suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent, soundsContributedByStudent: soundsContributedByStudent }
-
     caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker })
-
 }
 
 function addSoundSuggestion(suggestionArray: string[]) {
@@ -147,11 +130,9 @@ function addSoundSuggestion(suggestionArray: string[]) {
 
 function runSound(soundsUsedArray: string[]) {
     updateHistoricalArrays(soundsUsedArray)
-
     const newArray: SoundSuggestion[] = []
     for (const suggestion of sampleSuggestionsMade[activeProject]) {
         let wasUsed = false
-
         //were any of the sounds used?
         for (const sound of soundsUsedArray) {
             if (suggestion[1].includes(sound)) {
@@ -159,31 +140,23 @@ function runSound(soundsUsedArray: string[]) {
                 break
             }
         }
-
         //decrement
-
-
         suggestion[0] += 1
         //if 0, add to the rejection category and delete the item
         if (wasUsed) {
             suggestionsAccepted[activeProject] += 1
             soundSuggestionTracker[activeProject].push(suggestion)
             updateAcceptanceRatio()
-        }
-        else {
+        } else {
             if (suggestion[0] == 0) {
             //    suggestionsRejected[activeProject] += 1
             //    updateAcceptanceRatio()
-            }
-            else {
+            } else {
                 newArray.push([...suggestion])
             }
         }
-
     }
-
     sampleSuggestionsMade[activeProject] = [...newArray]
-
 }
 
 function addCodeSuggestion(complexityObj: any, utterance: string) {
@@ -194,37 +167,28 @@ function runCode(complexityOutput: any) {
     const newArray: CodeSuggestion[] = []
     for (const suggestion of codeSuggestionsMade[activeProject]) {
         let wasUsed = true
-
         //were any reqs readched?
         for (const key of Object.keys(suggestion[1])) {
             if (complexityOutput[key] < suggestion[1][key]) {
                 wasUsed = false
             }
         }
-
         //decrement
-
         suggestion[0] += 1
-
         //if 0, add to the rejection category and delete the item
         if (wasUsed) {
             suggestionsAccepted[activeProject] += 1
             updateAcceptanceRatio()
             codeSuggestionsUsed[activeProject].push(suggestion)
-        }
-        else {
+        } else {
             if (suggestion[0] == 0) {
                 // suggestionsRejected[activeProject] += 1
                 // updateAcceptanceRatio()
-            }
-            else {
+            } else {
                 newArray.push([...suggestion])
             }
         }
-
-
     }
-
     codeSuggestionsMade[activeProject] = [...newArray]
 }
 
@@ -244,7 +208,6 @@ const recentCompiles = 3
 const compileTS: any[] = []
 const compileErrors: any[] = []
 const mousePos: any[] = []
-
 
 function addOnPageStatus(status: any, time: any) {
     onPageHistory.push({status,time})

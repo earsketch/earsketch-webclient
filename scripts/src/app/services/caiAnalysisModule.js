@@ -743,6 +743,3 @@ app.factory('caiAnalysisModule', [function () {
   };
 
 }]);
-
-
-

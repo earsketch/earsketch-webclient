@@ -77,7 +77,6 @@ module.exports = {
             caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
             codeSuggestion: path.resolve(__dirname,`${servicesDir}/codeSuggestion.js`),
             codeRecommendations: path.resolve(__dirname,`${dataDir}/codeRecommendations.js`),
-            caiStudentHistoryModule: path.resolve(__dirname, `${servicesDir}/caiStudentHistoryModule.js`),
         }
     },
     module: {

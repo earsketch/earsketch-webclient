@@ -1,10 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState, ThunkAPI } from '../reducers'
-import angular from 'angular';
+import angular from 'angular'
 import * as caiStudentPreferenceModule from './studentPreferences'
 import * as editor from '../editor/Editor'
 import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
+import * as userProject from '../app/userProject'
+let complexityCalculator = require('./complexityCalculator');
+let complexityCalculatorPY = require('./complexityCalculatorPY');
+let complexityCalculatorJS = require('./complexityCalculatorJS');
 
 interface caiState {
     activeProject: string
@@ -119,7 +123,6 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
     (input, { getState, dispatch }) => {
         const caiDialogue = helpers.getNgService('caiDialogue')
         const codeSuggestion = helpers.getNgService('codeSuggestion')
-        const userProject = helpers.getNgService('userProject')
         const ideScope = helpers.getNgController('ideController').scope()
         const rootScope = helpers.getNgRootScope()
 
@@ -189,8 +192,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
             dispatch(setErrorOptions([]))
 
             caiDialogue.clearNodeHistory()
-        }
-        else {
+        } else {
             dispatch(setActiveProject(activeProject))
             caiDialogue.setActiveProject(activeProject)
 
@@ -211,7 +213,6 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     'cai/compileCAI',
     (data, { getState, dispatch }) => {
 
-        const complexityCalculator = helpers.getNgService('complexityCalculator')
         const caiDialogue = helpers.getNgService('caiDialogue')
         const codeSuggestion = helpers.getNgService('codeSuggestion')
         const caiStudentHistoryModule = helpers.getNgService('caiStudentHistoryModule')
@@ -226,7 +227,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         const language = data[1]
         const code = data[2]
 
-        const results = language === "python" ? complexityCalculator.analyzePython(code) : complexityCalculator.analyzeJavascript(code)
+        const results = language === "python" ? complexityCalculatorPY.analyzePython(code) : complexityCalculatorJS.analyzeJavascript(code)
 
         codeSuggestion.generateResults(code, language)
         caiStudentHistoryModule.addScoreToAggregate(code, language)
@@ -272,8 +273,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
             dispatch(setDefaultInputOptions())
             dispatch(setErrorOptions([{ label: "do you know anything about this error i'm getting", value: "error" }]))
             dispatch(autoScrollCAI())
-        }
-        else {
+        } else {
             dispatch(setErrorOptions([]))
         }
     }
