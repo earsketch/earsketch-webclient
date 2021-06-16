@@ -62,9 +62,19 @@ export function init() {
         }
     }
 
+    const micErrorForBrowser = (browser: string) => {
+        if (browser.includes("Firefox")) {
+            return "ff_mic_noaccess"
+        } else if (browser.includes("Chrome")) {
+            return "chrome_mic_noaccess"
+        } else {
+            return "mic_noaccess"
+        }
+    }
+
     navigator.mediaDevices.getUserMedia(options)
         .then(gotAudio)
-        .catch(() => callbacks.micAccessBlocked(ESUtils.whichBrowser().includes("Firefox") ? "ff_mic_noaccess" : "chrome_mic_noaccess"))
+        .catch(() => callbacks.micAccessBlocked(micErrorForBrowser(ESUtils.whichBrowser())))
 }
 
 function gotAudio(stream: any) {
