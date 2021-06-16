@@ -59,7 +59,6 @@ function($scope, caiAnalysisModule) {
       "MEASUREVIEW": false,
       "GENRE": false,
       "SOUNDPROFILE": false,
-      "RECOMMENDATIONS": false,
       "MIXING": false,
       "HISTORY": false,
       "APICALLS": false,
@@ -156,54 +155,40 @@ function($scope, caiAnalysisModule) {
           var sourceCode = script.source_code;
 
           if (sourceCode.indexOf('readInput') !== -1 || sourceCode.indexOf('input') !== -1 ) {
-
             var sourceCodeLines = sourceCode.split('\n');
-
             for (var i = 0; i < sourceCodeLines.length; i++) {
               if (sourceCodeLines[i].indexOf('readInput') !== -1) {
                 console.log("read input", sourceCodeLines[i]);
               }
             }
-
             window.esPrompt = $scope.hijackedPrompt();
-
           }
 
           return $scope.compile(sourceCode, script.name).then(function(compiler_output) {
-
             esconsole(compiler_output, ['DEBUG']);
-
             var language = 'python';
             if (ESUtils.parseExt(script.name) == '.js') 
               language = 'javascript';
-
             var complexity = caiAnalysisModule.analyzeCode(language, sourceCode);
-
             var reports = caiAnalysisModule.analyzeMusic(compiler_output);
             reports["COMPLEXITY"] = complexity;
-
             Object.keys($scope.options).forEach(function(option) {
               if (reports[option] && !$scope.options[option])
                 delete reports[option];
             });
-
             console.log(script.name, reports);
-
             $scope.results.push({
               script: script,
               version: version,
               reports: Object.assign({}, reports),
             });
-
             }).catch(function(err) {
               esconsole(err, ['ERROR']);
-
               $scope.results.push({
                 script: script,
                 version: version,
                 error: err,
               });
-
           });
     };
 

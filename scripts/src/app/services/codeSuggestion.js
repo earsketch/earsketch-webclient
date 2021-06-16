@@ -1,12 +1,13 @@
 import {CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI} from 'codeRecommendations';
-import * as caiProjectModel from "../../cai/projectModel"
+import * as caiProjectModel from "../../cai/projectModel";
+import * as complexityCalculatorHelperFunctions from "../../cai/complexityCalculatorHelperFunctions";
 
 /**
  * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
  *
  * @author Erin Truesdell, Jason Smith
  */
-app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', function (caiAnalysisModule, complexityCalculator) {
+app.factory('codeSuggestion', ['caiAnalysisModule', function (caiAnalysisModule) {
 
     var currentDelta = { soundsAdded: [], sections: 0 };
     var currentDeltaSum = 0;
@@ -658,9 +659,8 @@ app.factory('codeSuggestion', ['caiAnalysisModule', 'complexityCalculator', func
             };
         }
 
-        // CAI_DICT = [];
         try {
-            CAI_DICT = complexityCalculator.lineDict();
+            CAI_DICT = complexityCalculatorHelperFunctions.lineDict();
         }
         catch (e) {
             CAI_DICT = [];

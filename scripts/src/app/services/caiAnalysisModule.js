@@ -1,17 +1,14 @@
-/**
- * Analysis module for CAI (Co-creative Artificial Intelligence) Project.
- *
- * @author Jason Smith
- */
 import * as audioLibrary from '../audiolibrary';
 import * as caiStudent from '../../cai/student';
 import esconsole from '../../esconsole';
 import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
 import * as recommender from '../recommender';
+import * as complexityCalculator from '../../cai/complexityCalculator';
+import * as complexityCalculatorPY from '../../cai/complexityCalculatorPY';
+import * as complexityCalculatorJS from '../../cai/complexityCalculatorJS';
 
-app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCalculator) {
-
+app.factory('caiAnalysisModule', [function () {
   var librarySounds = [];
   var librarySoundGenres = [];
   var keyGenreDict = {};
@@ -61,10 +58,8 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
   }
 
   function populateGenreDistribution() {
-
     var genre_dist = Array(librarySoundGenres.length).fill().map(() => Array(librarySoundGenres.length).fill(0));
     var genre_count = Array(librarySoundGenres.length).fill().map(() => Array(librarySoundGenres.length).fill(0));
-
     for (var keys in AUDIOKEYS_RECOMMENDATIONS) {
       try {
       //this checks to ensure that key is in dictionary
@@ -86,7 +81,6 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
           continue;
       }
     }
-
     // iterates through matrix and averages
     for (var num in genre_dist) {
       for (var number in genre_dist) {
@@ -95,7 +89,6 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
         }
       }
     }
-
     return genre_dist;
   }
 
@@ -112,13 +105,13 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
    * @param script {string} The script source code
    */
   function analyzeCode(language, script) {
-    if (language == "python") {
-      return complexityCalculator.analyzePython(script);
-    } else if (language == "javascript") {
-      return complexityCalculator.analyzeJavascript(script);
-    } else {
-      return;
-    }
+      if (language == "python") {
+          return complexityCalculatorPY.analyzePython(script);
+      } else if (language == "javascript") {
+          return complexityCalculatorJS.analyzeJavascript(script);
+      } else {
+          return;
+      }
   }
 
   /**
@@ -132,36 +125,31 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
   }
 
   /**
-   * Report the code complexity and music analysis of a script.
-   *
-   * @param language {string} The language python or javascript
-   * @param script {string} The script source code
-   * @param trackListing {dict} Compiler output
-   */
-   function analyzeCodeAndMusic(language, script, trackListing) {
-    var codeComplexity = analyzeCode(language, script);
-       var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.apiCalls());
-       savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis });
-       if (caiStudent != null && FLAGS.SHOW_CAI) {
-           //caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity });
-           caiStudent.updateModel("musicAttributes", musicAnalysis);
-       }
-    return Object.assign({}, {'Code':codeComplexity}, {'Music':musicAnalysis});
-   }
-
-
-  /*
-  * Convert compiler output to timeline representation.
+  * Report the code complexity and music analysis of a script.
+  *
+  * @param language {string} The language python or javascript
+  * @param script {string} The script source code
+  * @param trackListing {dict} Compiler output
   */
+  function analyzeCodeAndMusic(language, script, trackListing) {
+    var codeComplexity = analyzeCode(language, script);
+    var musicAnalysis = analyzeMusic(trackListing, complexityCalculator.getApiCalls());
+    savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis });
+    if (caiStudent != null && FLAGS.SHOW_CAI) {
+      //caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity });
+      caiStudent.updateModel("musicAttributes", musicAnalysis);
+    }
+    return Object.assign({}, {'Code':codeComplexity}, {'Music':musicAnalysis});
+  }
+
+  // Convert compiler output to timeline representation.
   function trackToTimeline(output, apiCalls = null) {
-
       var report = {};
-
       // basic music information
       report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length * 4.0)};
       report["EFFECTS"] = {};
 
-      apiCalls = complexityCalculator.apiCalls();
+      apiCalls = complexityCalculator.getApiCalls();
 
       if(apiCalls.length > 0) {
         report["APICALLS"] = apiCalls;
@@ -171,33 +159,29 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
 
       // report sounds used in each track
       for (var i = 0; i < output.tracks.length - 1; i++) {
-
         for (var j = 0; j < output.tracks[i].clips.length; j++) {
           var sample = output.tracks[i].clips[j];
           // report sound for every measure it is used in.
           for (var k = sample.measure; k < (sample.measure + sample.end - sample.start); k++) {
               var rounded = Math.floor(k);
-            if(measureView[rounded] == null){
+            if (measureView[rounded] == null) {
                 measureView[rounded] = [];
             }
-            if(measureView[rounded]) {
-
+            if (measureView[rounded]) {
                 //check for duplicate
                 var isDupe = false;
-
-                for(var p in Object.keys(measureView[rounded])){
-                    if(measureView[rounded][Object.keys(measureView[rounded])[p]].name == sample.filekey){
+                for (var p in Object.keys(measureView[rounded])) {
+                    if (measureView[rounded][Object.keys(measureView[rounded])[p]].name == sample.filekey) {
                         isDupe = true;
                         break;
                     }
                 }
-                if(!isDupe){
+                if (!isDupe) {
                     measureView[rounded].push({type: "sound", track: i, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey]});
                 }
             }
           }
         }
-
         // report effects used in each track
         Object.keys(output.tracks[i].effects).forEach(function(effectName) {
           var arr = output.tracks[i].effects[effectName]
@@ -220,8 +204,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
                   if (report["EFFECTS"][sample.name] < 2) {
                     report["EFFECTS"][sample.name] = 2;
                   }
-                }
-                else {
+                } else {
                   // effect is modified (level 3)
                   var interpStep = (n - sample.startMeasure) / (sample.endMeasure - sample.startMeasure);
                   var interpValue = (sample.endValue - sample.startValue) * interpStep;
@@ -286,13 +269,12 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
           var sectionUse = 0;
 
           section_measures.forEach(function(section) {
-            if(!(section.value in sectionPairs)) {
+            if (!(section.value in sectionPairs)) {
               sectionPairs[section.value] = sectionNames[sectionUse];
               sectionUse = sectionUse + 1;
               sectionRepetitions[section.value] = 0;
               section.value = sectionPairs[section.value];
-            }
-            else {
+            } else {
               sectionRepetitions[section.value] += 1;
               var prime = "";
               for (var i = 0; i < sectionRepetitions[section.value]; i++) {
@@ -461,8 +443,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
     for (var v in vals) {
       if (((expect + threshold) >= vals[v] && vals[v] >= (expect - threshold)) || expect == null) {
         run.push(vals[v]);
-      }
-      else {
+      } else {
         result.push(run);
         run = [vals[v]];
       }
@@ -474,8 +455,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
       if (lis.length != 1) {
         span.push({value: lis[0], measure: [track, track + lis.length - 1]});
         track += lis.length;
-      }
-      else {
+      } else {
         track += lis.length;
       }
     }
@@ -507,7 +487,6 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
           var sound = librarySounds.filter(sound => {
             return sound.file_key === measureView[measure][item].name;
           });
-
           genres[genres.length-1].push(sound[0].genre);
         }
       }
@@ -515,9 +494,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
     return genres;
   }
 
-  /*
-  * Genre Analysis: return measure-by-measure list of recommended genre using co-usage data.
-  */
+  // Genre Analysis: return measure-by-measure list of recommended genre using co-usage data.
   function kMeansGenre(measureView) {
 
     function genreStrNearestGenre(genre) {
@@ -705,10 +682,11 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
         switch (outputType) {
           case "value":
           case "measure":
-            if(Object.keys(soundAtLine).length > 0 || Object.keys(effectAtLine). length > 0)
+            if (Object.keys(soundAtLine).length > 0 || Object.keys(effectAtLine). length > 0) {
               return section[outputType]; 
-            else
+            } else {
               return [];
+            }
             break;
           case "sound":
             return soundAtLine;
@@ -746,8 +724,7 @@ app.factory('caiAnalysisModule', ['complexityCalculator', function (complexityCa
         if(section["effect"][effect].measure.includes(inputValue))
           ret = ret.concat(section["effect"][effect].line);
       });
-    }
-    else {
+    } else {
       Object.keys(section[inputType]).forEach(function(item) {
         if (item === inputValue || inputValue === -1)
           ret = ret.concat(section[inputType][item].line);

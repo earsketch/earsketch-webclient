@@ -36,9 +36,7 @@ import { Editor } from './editor/Editor'
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
 import reporter from './app/reporter'
-// TODO: Remove this after making complexityCalculator a module instead of a service.
-import * as caiErrorHandling from './cai/errorHandling'
-window.caiErrorHandling = caiErrorHandling
+
 window.droplet = droplet
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
@@ -60,7 +58,6 @@ window.esPrompt = message => {
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
-Object.assign(window,require('ccSamples'));
 
 // Async loading
 require(['angular'], () => {
@@ -158,8 +155,6 @@ require(['angular'], () => {
     require('./cai/CAI');
     require('caiAnalysisModule');
     require('caiStudentHistoryModule');
-    require('complexityCalculator');
-    require('complexityCalculatorHelperFunctions');
     require('caiDialogue');
     require('codeSuggestion');
 
