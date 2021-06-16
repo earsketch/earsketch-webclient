@@ -1,19 +1,19 @@
 import React, { useState } from "react"
 
 import * as userProject from './userProject'
-import i18n from "i18next";
+import { useTranslation } from "react-i18next"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
 
     if (name.length < 3) {
-        throw i18n.t('messages:general.shortname')
+        throw 'messages:general.shortname'
     } else if (/[$-/:-?{-~!"^#`\[\]\\]/g.test(name)) {
         // Why are hyphens banned from script names?
-        throw i18n.t('messages:idecontroller.illegalname')
+        throw 'messages:idecontroller.illegalname'
     } else if (Object.values(userProject.scripts).some(script => !script.soft_delete && script.name === fullname)) {
         // Conflict with existing script.
-        throw i18n.t('messages:idecontroller.overwrite')
+        throw 'messages:idecontroller.overwrite'
     } else {
         // Valid name.
         return name + extension
@@ -24,12 +24,13 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
     const [name, setName] = useState("")
     const [error, setError] = useState("")
     const [extension, setExtension] = useState(language === "python" ? ".py" : ".js")
+    const { t } = useTranslation()
 
     const confirm = () => {
         try {
             close(validateScriptName(name, extension))
         } catch (error) {
-            setError(error)
+            setError(t(error))
         }
     }
 
