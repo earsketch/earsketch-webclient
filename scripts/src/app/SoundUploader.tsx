@@ -209,12 +209,6 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     : "Waiting for microphone access...")}
             {micReady && <div>
                 <div className="modal-section-header">
-                    <span>Constant Name (required)</span>
-                </div>
-                <div className="modal-section-content">
-                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
-                </div>
-                <div className="modal-section-header">
                     <span>Measures Control</span>
                     {metronome &&
                         <button type="button" className={"btn btn-hollow btn-filter" + (click ? " active" : "")} onClick={() => setClick(!click)}>
@@ -252,6 +246,12 @@ const RecordTab = ({ close }: { close: () => void }) => {
                         <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(); setBuffer(null) }}>
                             <span>CLEAR</span>
                         </button>}
+                </div>
+                <div className="modal-section-header">
+                    <span>Constant Name (required)</span>
+                </div>
+                <div className="modal-section-content">
+                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
                 </div>
             </div>}
         </div>
