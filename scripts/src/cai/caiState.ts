@@ -6,9 +6,10 @@ import * as editor from '../editor/Editor'
 import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
 import * as userProject from '../app/userProject'
-let complexityCalculator = require('./complexityCalculator');
-let complexityCalculatorPY = require('./complexityCalculatorPY');
-let complexityCalculatorJS = require('./complexityCalculatorJS');
+import * as analysis from './analysis'
+let complexityCalculator = require('./complexityCalculator')
+let complexityCalculatorPY = require('./complexityCalculatorPY')
+let complexityCalculatorJS = require('./complexityCalculatorJS')
 
 interface caiState {
     activeProject: string
@@ -95,26 +96,30 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
         const caiDialogue = helpers.getNgService('caiDialogue')
         const rootScope = helpers.getNgRootScope()
 
-        const msgText = caiDialogue.generateOutput("Chat with CAI");
-        caiDialogue.studentInteract(false);
-        dispatch(setInputOptions(caiDialogue.createButtons()))
-        dispatch(setErrorOptions([]))
+        // reinitialize recommendation dictionary
+        analysis.fillDict().then(function() {
 
-        if (msgText !== "") {
-            const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
-            for (let msg in messages) {
-                const outputMessage = {
-                    text: messages[msg][0],
-                    keyword: messages[msg][1],
-                    date: Date.now(),
-                    sender: "CAI"
-                } as CAIMessage
+            const msgText = caiDialogue.generateOutput("Chat with CAI");
+            caiDialogue.studentInteract(false);
+            dispatch(setInputOptions(caiDialogue.createButtons()))
+            dispatch(setErrorOptions([]))
 
-                dispatch(addToMessageList(outputMessage))
-                dispatch(autoScrollCAI())
-                rootScope.$broadcast('newCAIMessage')
+            if (msgText !== "") {
+                const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
+                for (let msg in messages) {
+                    const outputMessage = {
+                        text: messages[msg][0],
+                        keyword: messages[msg][1],
+                        date: Date.now(),
+                        sender: "CAI"
+                    } as CAIMessage
+
+                    dispatch(addToMessageList(outputMessage))
+                    dispatch(autoScrollCAI())
+                    rootScope.$broadcast('newCAIMessage')
+                }
             }
-        }
+        })
     }
 );
 

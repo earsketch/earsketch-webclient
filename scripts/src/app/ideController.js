@@ -16,6 +16,7 @@ import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 import * as WaveformCache from './waveformcache';
 import i18n from "i18next";
+import * as caiAnalysisModule from '../cai/analysis';
 
 // Temporary glue from $uibModal to React components.
 app.component("createScriptController", wrapModal(ScriptCreator))
@@ -29,7 +30,7 @@ const ACE_THEMES = {
  * Angular controller for the IDE (text editor) and surrounding items.
  * @module ideController
  */
-app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', 'caiAnalysisModule', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, caiAnalysisModule, $ngRedux) {
+app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location', '$timeout', '$ngRedux', function ($rootScope, $scope, $uibModal, $location, $timeout, $ngRedux) {
     $scope.callScriptBrowserFunction = function (fnName, tab) {
         $rootScope.$broadcast('manageScriptFromScriptContextMenu', fnName, tab);
     };

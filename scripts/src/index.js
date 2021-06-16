@@ -155,7 +155,6 @@ require(['angular'], () => {
 
     // CAI
     require('./cai/CAI');
-    require('caiAnalysisModule');
     require('caiDialogue');
     require('codeSuggestion');
 
