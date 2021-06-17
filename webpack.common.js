@@ -68,10 +68,6 @@ module.exports = {
             // Recommendation JSON/js file
             numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
             audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
-
-            // CAI
-            caiDialogue: path.resolve(__dirname,`${servicesDir}/caiDialogue.js`),
-            caiTree: path.resolve(__dirname,`${dataDir}/caitree.js`),
         }
     },
     module: {

@@ -22,7 +22,7 @@ export function getKeyDict(type: string) {
     } else if (type === 'instrument') { 
         return keyInstrumentDict 
     } else { 
-        return null
+        return {}
     }
 }
 

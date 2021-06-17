@@ -552,7 +552,7 @@ export function storeHistory(historyList: any[]){
     storedHistory = historyList
 }
 
-export function randomNucleus(history: any, suppressRepetition = true) {
+export function randomNucleus(history: any = {}, suppressRepetition = true) {
     let isAlreadySaid = true
     let newNucleus : any = { utterance: "" }
     let threshold = 10
