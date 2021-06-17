@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, LegacyRef } from 'react';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { hot } from 'react-hot-loader/root';
+import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
 import * as classNames from 'classnames';
 
@@ -10,7 +9,6 @@ import * as helpers from '../helpers';
 import { createScript } from '../app/IDE';
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 import * as scripts from '../browser/scriptsState';
-import store from '../reducers';
 import * as tabs from './tabState';
 import * as userProject from '../app/userProject';
 
@@ -213,7 +211,7 @@ const TabDropdown = () => {
     </>);
 };
 
-const Tabs = () => {
+export const Tabs = () => {
     const dispatch = useDispatch();
     const openTabs = useSelector(tabs.selectOpenTabs);
     const truncated = useSelector(tabs.selectTabsTruncated);
@@ -254,7 +252,3 @@ const Tabs = () => {
         </div>
     );
 };
-
-const HotTabs = hot(() => <Provider store={store}><Tabs /></Provider>)
-
-export { HotTabs as Tabs }

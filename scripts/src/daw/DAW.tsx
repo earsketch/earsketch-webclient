@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
 
 import * as appState from '../app/appState'
@@ -1053,7 +1053,7 @@ const DAW = () => {
 
 const HotDAW = hot(() => {
     setup()
-    return <Provider store={store}><DAW /></Provider>
+    return <DAW />
 })
 
 export { HotDAW as DAW }

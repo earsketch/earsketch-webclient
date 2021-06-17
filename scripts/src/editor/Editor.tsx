@@ -1,7 +1,6 @@
 import { Ace, Range } from "ace-builds"
-import { hot } from "react-hot-loader/root"
 import i18n from "i18next"
-import { Provider, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
 
 import * as appState from "../app/appState"
@@ -255,7 +254,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
     setupDone = true
 }
 
-const Editor = () => {
+export const Editor = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
@@ -319,7 +318,3 @@ const Editor = () => {
         </div>}
     </div>
 }
-
-const HotEditor = hot(() => <Provider store={store}><Editor /></Provider>)
-
-export { HotEditor as Editor }

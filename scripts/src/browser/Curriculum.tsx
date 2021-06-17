@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, MutableRefObject, ChangeEvent } from 'react'
 import { hot } from 'react-hot-loader/root'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
@@ -8,7 +8,6 @@ import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as helpers from '../helpers'
 import * as layout from '../layout/layoutState'
-import store from '../reducers'
 import * as userNotification from '../app/userNotification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 
@@ -367,9 +366,7 @@ const HotCurriculum = hot(() => {
         }
     }
 
-    return <Provider store={store}>
-        <CurriculumPane />
-    </Provider>
+    return <CurriculumPane />
 })
 
 export { HotCurriculum as Curriculum }

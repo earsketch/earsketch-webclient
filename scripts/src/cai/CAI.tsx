@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
-import { hot } from 'react-hot-loader/root'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Collapsed } from '../browser/Browser'
 
 import * as cai from './caiState'
@@ -140,7 +139,7 @@ const CaiFooter = () => {
 }
 
 
-const CaiPane = () => {
+export const CAI = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
@@ -161,10 +160,6 @@ const CaiPane = () => {
     ) : <Collapsed title='CAI' position='east' />
 }
 
-
-const HotCAI = hot(() => <Provider store={store}><CaiPane /></Provider>)
-
-export { HotCAI as CAI }
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { hot } from 'react-hot-loader/root';
+import { useSelector, useDispatch } from 'react-redux';
 
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
@@ -9,7 +8,6 @@ import * as editorState from './editorState';
 import { compileCode } from '../app/IDE';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
-import store from '../reducers';
 import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 
@@ -48,7 +46,7 @@ const UndoRedoButtons = () => {
     </>);
 };
 
-const EditorHeader = () => {
+export const EditorHeader = () => {
     const dispatch = useDispatch();
     const mainScope = helpers.getNgMainController().scope();
     const openTabs = useSelector(tabs.selectOpenTabs);
@@ -137,7 +135,3 @@ const EditorHeader = () => {
         </div>
     );
 };
-
-const HotEditorHeader = hot(() => <Provider store={store}><EditorHeader /></Provider>)
-
-export { HotEditorHeader as EditorHeader }

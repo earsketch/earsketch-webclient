@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
 import { ScriptEntity, SoundEntity } from "common"

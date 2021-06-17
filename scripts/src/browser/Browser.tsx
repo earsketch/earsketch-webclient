@@ -1,7 +1,6 @@
 import React, { ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { usePopper } from "react-popper";
-import { hot } from 'react-hot-loader/root';
 import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
@@ -9,7 +8,7 @@ import * as layout from '../layout/layoutState';
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
-import store, { RootState } from '../reducers';
+import { RootState } from '../reducers';
 import { BrowserTabType } from "../layout/layoutState";
 
 const darkBgColor = '#223546';
@@ -301,7 +300,7 @@ const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
     [BrowserTabType.API]: APIBrowser
 };
 
-const Browser = () => {
+export const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector((state: RootState) => state.layout.west.open);
     const { t } = useTranslation();
@@ -330,7 +329,3 @@ const Browser = () => {
         </div>
     );
 };
-
-const HotBrowser = hot(() => <Provider store={store}><Browser /></Provider>);
-
-export { HotBrowser as Browser }
