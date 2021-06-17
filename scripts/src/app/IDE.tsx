@@ -151,6 +151,12 @@ export function initEditor() {
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
 }
 
+function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
+    store.dispatch(appState.setEmbeddedScriptUsername(username))
+    store.dispatch(appState.setEmbeddedScriptName(scriptName))
+    store.dispatch(appState.setEmbeddedShareID(shareid))
+}
+
 export async function openShare(shareid: string) {
     const isEmbedded = store.getState().app.embedMode
 
@@ -164,7 +170,7 @@ export async function openShare(shareid: string) {
             // user has already opened this shared link before
             if (userProject.isLoggedIn()) {
                 await userProject.getSharedScripts()
-                if (isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid})
+                if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
                 userProject.openSharedScript(result.shareid)
             }
             switchToShareMode()
@@ -176,9 +182,7 @@ export async function openShare(shareid: string) {
 
             // user has not opened this shared link before
             result = await userProject.loadScript(shareid, true) as ScriptEntity
-            if (isEmbedded) {
-                helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid})
-            }
+            if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
 
             if (result.username !== userProject.getUsername()) {
                 // the shared script doesn't belong to the logged-in user
@@ -213,7 +217,7 @@ export async function openShare(shareid: string) {
     } else {
         // User is not logged in
         const result = await userProject.loadScript(shareid, true)
-        if (isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", { scriptName: result.name, username: result.username, shareid: result.shareid })
+        if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
         await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
         userProject.openSharedScript(result.shareid)
         switchToShareMode()

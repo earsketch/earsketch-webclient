@@ -1,7 +1,9 @@
 import React, { useState, useEffect, LegacyRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { usePopper } from 'react-popper';
 import PopperJS from '@popperjs/core';
+
 import * as appState from "../app/appState";
 import * as exporter from "../app/exporter";
 import * as user from '../user/userState';
@@ -10,6 +12,7 @@ import store from '../reducers';
 import * as tabs from "../editor/tabState";
 import * as helpers from "../helpers";
 import { ScriptEntity, ScriptType } from 'common';
+import * as userNotification from '../app/userNotification';
 import * as userProject from '../app/userProject';
 
 export const openScript = (script: ScriptEntity) => {
@@ -91,6 +94,7 @@ const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }: MenuIte
 const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference;
 
 const SingletonDropdownMenu = () => {
+    const { t } = useTranslation()
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
@@ -160,7 +164,10 @@ const SingletonDropdownMenu = () => {
                 visible={type==='regular'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    scope.copyScript(unsavedScript);
+                    userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
+                        userNotification.show(t('messages:user.scriptcopied'))
+                        dispatch(scripts.syncToNgUserProject())
+                    })
                 }}
             />
             <MenuItem

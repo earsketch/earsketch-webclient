@@ -27,11 +27,6 @@ export const callbacks = {
     addSharedScript: (shareID: string, id: string) => {},
 }
 
-export const state = {
-    // TODO: Why is this here?
-    isInLoadingScreen: false,
-}
-
 export const show = (text: string, type: string="", duration: number | undefined=undefined) => {
     // check type for registering to the notification history
     // TODO: handle with proper message types defined

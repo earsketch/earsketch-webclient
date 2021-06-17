@@ -9,7 +9,6 @@ import { Download } from './Download'
 import esconsole from '../esconsole'
 import { ErrorForm } from './ErrorForm'
 import * as ESUtils from '../esutils'
-import * as exporter from './exporter'
 import { ForgotPassword } from './ForgotPassword'
 import { openShare } from './IDE'
 import * as user from '../user/userState';
@@ -50,9 +49,6 @@ app.component("shareScriptController", helpers.wrapModal(ScriptShare))
 app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
 app.component("errorController", helpers.wrapModal(ErrorForm))
 
-/**
- * @module mainController
- */
 app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', '$location', '$q', '$confirm', '$sce', '$document', '$ngRedux', function ($rootScope, $scope, $http, $uibModal, $location, $q, $confirm, $sce, $document, $ngRedux) {
     $ngRedux.connect(state => ({ ...state.bubble }))(state => {
         $scope.bubble = state;
@@ -88,7 +84,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.showChatWindow = false;
 
     // CAI visibility
-    $scope.enableCAI = FLAGS.SHOW_CAI;
     $scope.showCAIWindow = FLAGS.SHOW_CAI;
 
     // TEMPORARY FOR AWS CONTEST TESTING
@@ -96,21 +91,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $scope.showAmazonSounds = FLAGS.SHOW_AMAZON_SOUNDS;
     $scope.showAmazonBanner = FLAGS.SHOW_AMAZON_BANNER;
 
-    // TEMPORARY FOR GM TESTING
-    $scope.showGM = FLAGS.SHOW_GM;
-
     // TEMPORARY FOR I18N DEVELOPMENT
     $scope.showLocaleSwitcher = FLAGS.SHOW_LOCALE_SWITCHER;
 
-    if ($scope.showAmazon) {
-        $rootScope.$broadcast('showAmazon');
-    }
-
-    if ($scope.showAmazonSounds) {
-        $rootScope.$broadcast('showAmazonSounds');
-    }
-
-    /* User data */
+    // User data
     $scope.firstname = '';
     $scope.lastname = '';
     $scope.email = '';
@@ -125,13 +109,9 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     esconsole.getURLParameters();
 
-    var trustedHtml = {};
-
     $scope.isEmbedded = $location.search()["embedded"] === "true";
     $scope.hideDAW = $scope.isEmbedded && $location.search()['hideDaw'];
     $scope.hideEditor = $scope.isEmbedded && $location.search()['hideCode'];
-    $scope.embeddedScriptUsername = "";
-    $scope.embeddedScriptName = '';
 
     if ($scope.isEmbedded) {
         $ngRedux.dispatch(appState.setColorTheme("light"))
@@ -166,135 +146,11 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         $ngRedux.dispatch(appState.setHideEditor(true));
     }
 
-    $scope.$on('embeddedScriptLoaded', function(event, data){
-        $scope.embeddedScriptUsername = data.username;
-        $scope.embeddedScriptName = data.scriptName;
-        $ngRedux.dispatch(appState.setEmbeddedScriptUsername(data.username));
-        $ngRedux.dispatch(appState.setEmbeddedScriptName(data.scriptName));
-        $ngRedux.dispatch(appState.setEmbeddedShareID(data.shareid));
-    });
-
-    /**
-     * get trusted HTML content for Popover
-     */
-    $scope.getPopoverContent = function(action) {
-        var content = '';
-        var os = '';
-
-        if ($scope.detectOS ==='MacOS') {
-            os = 'Cmd';
-        } else {
-            os = 'Ctrl';
-        }
-
-        switch (action) {
-            case "run":
-                var key = 'Enter';
-                content = "<div><kbd class='kbd'>"+os+"</kbd> + <kbd class='kbd'>"+key+"</kbd></div>";
-                break;
-            case "editor":
-                var shortcuts = [
-                    {key:'S',action:'SAVE',shift:false},
-                    {key:'Z',action:'UNDO',shift:false},
-                    {key:'Z',action:'REDO',shift:true},
-                    {key:'/',action:'COMMENT',shift:false},
-                    {key:'L',action:'GO TO LINE',shift:false},
-                    {key:'Space',action:'COMPLETE WORD',shift:false}
-                ];
-                content = "<table>";
-
-                for (index in shortcuts) {
-                    content = content + "<tr>";
-                    content = content + "<td><span class='label-shortcut-key label-success'>"+shortcuts[index].action+"</span></td>";
-                    content = content + "<td>";
-
-                    if (shortcuts[index].action === 'COMPLETE WORD') {
-                        if ($scope.detectOS ==='MacOS') {
-                            content = content + "<kbd class='kbd'>"+'Alt'+"</kbd> + ";
-                        } else {
-                            content = content + "<kbd class='kbd'>"+'Ctrl'+"</kbd> + ";
-                        }
-                    } else {
-                        content = content + "<kbd class='kbd'>"+os+"</kbd> + ";
-                    }
-                    if (shortcuts[index].shift) {
-                        content = content + "<kbd class='kbd'>Shift</kbd> + ";
-                    }
-                    content = content + "<kbd class='kbd'>"+shortcuts[index].key+"</kbd>";
-                    content = content + "</td></tr>";
-                }
-                content = content + "</table>";
-                break;
-        }
-
-        return trustedHtml[content] || (trustedHtml[content] = $sce.trustAsHtml(content));
-    };
-
-    /**
-     * Detect keydown events
-     */
-    $scope.keydownES = function(e) {
-
-        /* Play/Pause  Cmd + >  */
-        if (e.keyCode === 190 && e.metaKey) {
-            e.preventDefault();
-            $rootScope.$broadcast('togglePlay');
-        }
-
-        /* Reset Playhead  Cmd + <  */
-        // if (e.keyCode === 188 && e.metaKey) {
-        //     $rootScope.$broadcast('resetPlayhead');
-        // }
-    };
-
-    /**
-     *
-     */
-    $scope.init = function () {
-        esconsole('initializing main controller 1 ...', ['debug', 'init']);
-
-        $scope.loaded = true;
-        $scope.updateSoundQualityGlyph($scope.audioQuality);
-
-        userNotification.state.isInLoadingScreen = true;
-    };
-
-    // TODO: is this doing anything??? check
-    /**
-     *
-     */
-    $scope.updateSoundQualityGlyph = function () {
-        if (ESUtils.whichBrowser().match('Safari') !== null || ESUtils.whichBrowser().match('Edge') !== null) {
-            angular.element("#bw i").removeClass("glyphicon glyphicon-ok").addClass("glyphicon glyphicon-ok-sign");
-        }
-        else {
-            if ($scope.audioQuality) {
-                angular.element("#bw i").removeClass("glyphicon glyphicon-ok-sign").addClass("glyphicon glyphicon-unchecked");
-            }
-            else {
-                angular.element("#bw i").removeClass("glyphicon glyphicon-unchecked").addClass("glyphicon glyphicon-ok-sign");
-            }
-        }
-        if (!$scope.audioQuality)
-            esconsole('Loading wav', ['debug', 'init']);
-        else
-            esconsole('Loading ogg', ['debug', 'init']);
-    };
-
     $scope.scripts = [];
-    $scope.isManualLogin = false;
 
     // these should be populated from somewhere else and not hard-coded, most likely
-    $scope.languages = [{'lang': 'Python'}, {'lang': 'JavaScript'}];
     $scope.fontSizes = [{'size': 10}, {'size': 12}, {'size': 14}, {'size': 18}, {'size': 24}, {'size': 36}];
 
-    $scope.openShareAfterLogin = function() {
-        $scope.isManualLogin = true;
-    };
-
-    /**
-     *
-     */
     $scope.login = function () {
         esconsole('Logging in', ['DEBUG','MAIN']);
 
@@ -314,16 +170,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                     username: $scope.username,
                     password: $scope.password
                 }));
-
-                // $ngRedux.dispatch(scripts.getRegularScripts({
-                //     username: $scope.username,
-                //     password: $scope.password
-                // }));
-                //
-                // $ngRedux.dispatch(scripts.getSharedScripts({
-                //     username: $scope.username,
-                //     password: $scope.password
-                // }));
 
                 // Always override with the returned username in case the letter cases mismatch.
                 $scope.username = userInfo.username;
@@ -365,22 +211,15 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
                         $scope.showAmazon = true;
                         $scope.showAmazonSounds = true;
                         $scope.showAmazonBanner = true;
-                        $rootScope.$broadcast('showAmazon');
-                        $rootScope.$broadcast('showAmazonSounds');
                     }
 
                     // show alert
                     if (!$scope.loggedIn) {
                         $scope.loggedIn = true;
 
-                        // "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
+                        // TODO: "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
                         // the initial login message is taken care in the sound browser controller
-                        if (userNotification.state.isInLoadingScreen) {
-                            // showLoginMessageAfterLoading = true;
-                            // $rootScope.$broadcast('showLoginMessage');
-                        } else {
-                            userNotification.show(i18n.t('messages:general.loginsuccess'), 'normal', 0.5);
-                        }
+                        userNotification.show(i18n.t('messages:general.loginsuccess'), 'normal', 0.5);
 
                         $scope.loggedInUserName = $scope.username;
 
@@ -402,9 +241,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         $ngRedux.dispatch(sounds.resetUserSounds());
         $ngRedux.dispatch(sounds.resetFavorites());
         $ngRedux.dispatch(sounds.resetAllFilters());
-
-        // $ngRedux.dispatch(scripts.resetRegularScripts());
-        // $ngRedux.dispatch(scripts.resetSharedScripts());
 
         // save all unsaved open scripts
         userProject.saveAll().then(function () {
@@ -446,61 +282,13 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         $scope.loggedIn = false;
         $scope.showTeachersLink = false;
 
-        /* User data */
+        // User data
         $scope.firstname = '';
         $scope.lastname = '';
         $scope.email = '';
         $scope.userrole = 'student';
         $scope.loggedInUserName = ' '; // this is shown in the top right corner -- it cannot be initialized with an empty string '' as ngModel doesn't seem to like it
 
-    };
-
-    $scope.openLMSPage = function(){
-        userProject.getUserInfo().then(function (userInfo) {
-            if (userInfo.hasOwnProperty('role') && (userInfo.role === 'teacher' || userInfo.role === 'admin')) {
-                if (userInfo.firstname === '' || userInfo.lastname === '' || userInfo.email === '') {
-                    userNotification.show(i18n.t('messages:user.teachersLink'), 'editProfile');
-                } else {
-                    var url = URL_DOMAIN + '/services/scripts/getlmsloginurl';
-                    var payload = new FormData();
-                    payload.append('username', userProject.getUsername());
-                    payload.append('password', userProject.getPassword());
-                    var opts = {
-                        transformRequest: angular.identity,
-                        headers: {'Content-Type': undefined}
-                    };
-
-                    return $http.post(url, payload, opts).then(function (result) {
-                        var lmsWindow = window.open("", "_blank");
-                        var message, homepage;
-
-                        if(!lmsWindow || lmsWindow.closed || typeof lmsWindow.closed === 'undefined'){
-                            userNotification.show("The teachers page is being blocked by a popup blocker", 'popup');
-                        }
-
-                        if (result.data.hasOwnProperty('failback')) {
-                            homepage = JSON.parse(result.data.failback)['loginurl'];
-                        }
-
-                        if (result.data.hasOwnProperty('loginurl')) {
-                            lmsWindow.location = result.data.loginurl;
-                        } else if (result.data.hasOwnProperty('debuginfo')) {
-                            message = i18n.t('messages:user.teacherSiteLoginError') + result.data.debuginfo + i18n.t('messages:user.promptFixAtTeacherSite');
-                            userNotification.show(message, 'editProfile');
-                            lmsWindow.location = homepage;
-                        } else {
-                            message = i18n.t('messages:user.teacherSiteLoginError') + 'Opening the home page without logging in..' + i18n.t('messages:user.promptFixAtTeacherSite');
-                            userNotification.show(message, 'editProfile');
-                            lmsWindow.location = result.data.loginurl;
-                        }
-                    }).catch(function (error) {
-                        console.log(error);
-                    });
-                }
-            } else {
-                userNotification.show(i18n.t('messages:user.teachersPageNoAccess'), 'failure1');
-            }
-        });
     };
 
     // attempt to load userdata from a previous session
@@ -541,7 +329,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             if (!result) return
             $scope.username = result.username
             $scope.password = result.password
-            $scope.openShareAfterLogin()
             $scope.login()
         })
     };
@@ -675,19 +462,8 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.enterKeySubmit = function (event) {
         if (event.keyCode === 13) {
-            $scope.openShareAfterLogin();
             $scope.login();
         }
-    };
-
-    // TODO: since this goes across scopes, we should use a service
-    $scope.toggleShortcutHelper = function () {
-        $scope.showKeyShortcuts = !$scope.showKeyShortcuts;
-        $rootScope.$broadcast('showDAWKeyShortcuts');
-    };
-
-    $scope.isShortcutHelperOpen = function () {
-        return $scope.showKeyShortcuts;
     };
 
     $scope.toggleColorTheme = function () {
@@ -751,20 +527,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             $scope.showAmazon = true;
             $scope.showAmazonSounds = true;
             $scope.showAmazonBanner = true;
-            $rootScope.$broadcast('showAmazon');
-            $rootScope.$broadcast('showAmazonSounds');
         }
     } catch (error) {
         esconsole(error, ['main', 'url']);
     }
-
-    $scope.openFacebook = function () {
-        window.open('https://www.facebook.com/EarSketch/', '_blank');
-    };
-
-    $scope.openTwitter = function () {
-        window.open('https://twitter.com/earsketch', '_blank');
-    };
 
     $scope.resumeQuickTour = () => {
         $ngRedux.dispatch(bubble.reset());
@@ -793,18 +559,10 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
 
     $scope.licenses = {};
     userProject.getLicenses().then(licenses => {
-        angular.forEach(licenses,  license => {
-            $scope.licenses[license.id] = license;
-        });
+        for (const license of Object.values(licenses)) {
+            $scope.licenses[license.id] = license
+        }
     });
-
-    $scope.copyScript = script => {
-        userProject.saveScript(script.name, script.source_code, false)
-            .then(() => {
-                userNotification.show(i18n.t('messages:user.scriptcopied'));
-                $ngRedux.dispatch(scripts.syncToNgUserProject());
-            });
-    };
 
     $scope.shareScript = async script => {
         await userProject.saveScript(script.name, script.source_code);
@@ -849,10 +607,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
             }
         });
     };
-
-    $scope.printScript = script => {
-        exporter.print(script);
-    }
 
     $scope.openScriptHistory = async (script, allowRevert) => {
         await userProject.saveScript(script.name, script.source_code);
@@ -1003,27 +757,6 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         });
     };
 
-    $scope.$on('recommenderScript', (event, script) => {
-        if (script) {
-            let input = recommender.addRecInput([], script);
-            let res = [];
-            if (input.length === 0) {
-                const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities($ngRedux.getState()));
-                if (filteredScripts.length) {
-                    const lim = Math.min(5, filteredScripts.length);
-
-                    for (let i = 0; i < lim; i++) {
-                        input = recommender.addRecInput(input, filteredScripts[i]);
-                    }
-                }
-            }
-            [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
-                res = recommender.recommend(res, input, ...v);
-            });
-            $ngRedux.dispatch(recommenderState.setRecommendations(res));
-        }
-    });
-
     $scope.$on('reloadRecommendations', () => {
         const activeTabID = tabs.selectActiveTabID($ngRedux.getState());
 
@@ -1034,7 +767,23 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
         } else if (activeTabID in userProject.sharedScripts) {
             script = userProject.sharedScripts[activeTabID];
         }
-        script && $rootScope.$broadcast('recommenderScript', script);
+        if (!script) return
+        let input = recommender.addRecInput([], script);
+        let res = [];
+        if (input.length === 0) {
+            const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities($ngRedux.getState()));
+            if (filteredScripts.length) {
+                const lim = Math.min(5, filteredScripts.length);
+
+                for (let i = 0; i < lim; i++) {
+                    input = recommender.addRecInput(input, filteredScripts[i]);
+                }
+            }
+        }
+        [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
+            res = recommender.recommend(res, input, ...v);
+        });
+        $ngRedux.dispatch(recommenderState.setRecommendations(res));
     });
 
     $scope.$on('newCAIMessage', () => {
@@ -1055,11 +804,5 @@ app.controller("mainController", ['$rootScope', '$scope', '$http', '$uibModal', 
     $document.on('click', resumeAudioContext);
 }]);
 
-/**
- * Filter for calculating last modified time unit (previously in scriptBrowserController)
- */
-app.filter('formatTimer', function () {
-    return function (input) {
-        return ESUtils.formatTimer(input)
-    }
-});
+// Filter for calculating last modified time unit (previously in scriptBrowserController)
+app.filter('formatTimer', () => ESUtils.formatTimer);

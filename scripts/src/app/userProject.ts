@@ -529,9 +529,7 @@ export async function loadScript(id: string, sharing: boolean) {
     try {
         const data = await get("/services/scripts/scriptbyid", { scriptid: id })
         if (sharing && data === "") {
-            if (!userNotification.state.isInLoadingScreen) {
-                userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
-            }
+            userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
             throw "Script was not found."
         }
         return data
