@@ -14,6 +14,7 @@ import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
+import { useTranslation } from "react-i18next";
 
 const CreateScriptButton = () => {
     const ideControllerScope = helpers.getNgController('ideController').scope();
@@ -117,7 +118,8 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
 
 const CloseAllTab = () => {
     const mainControllerScope = helpers.getNgMainController().scope();
-
+    const { t } = useTranslation();
+    
     return (
         <div
             className={`
@@ -130,7 +132,7 @@ const CloseAllTab = () => {
                 mainControllerScope?.closeAllTabs();
             }}
         >
-            Close All
+            {t('tabs.closeAll')}
         </div>
     );
 };
@@ -165,6 +167,7 @@ const TabDropdown = () => {
     const allScripts = useSelector(scripts.selectAllScriptEntities);
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
+    const { t } = useTranslation()
 
     const [showDropdown, setShowDropdown] = useState(false);
     const [referenceElement, setReferenceElement] = useState(null);
@@ -191,7 +194,7 @@ const TabDropdown = () => {
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
         >
-            { openTabs.length === hiddenTabs.length ? 'All Tabs' : 'Other Tabs' }
+            { openTabs.length === hiddenTabs.length ? 'All Tabs' : t('tabs.otherTabs') }
             <i className='icon icon-arrow-down2 text-lg p-2' />
         </div>
         <div

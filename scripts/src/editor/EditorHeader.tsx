@@ -3,6 +3,7 @@ import { Store } from 'redux';
 import { Provider, useSelector, useDispatch } from 'react-redux';
 import { hot } from 'react-hot-loader/root';
 import { react2angular } from 'react2angular';
+import { useTranslation } from "react-i18next";
 
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
@@ -61,6 +62,7 @@ const EditorHeader = () => {
     const loggedIn = useSelector(user.selectLoggedIn);
     const script = allScripts[activeTab];
     const scriptType = (!script || script.readonly) && 'readonly' || script.isShared && 'shared' || 'regular';
+    const { t } = useTranslation()
 
     return (
         <div
@@ -72,7 +74,7 @@ const EditorHeader = () => {
             `}
         >
             <div className={`font-semibold truncate`}>
-                CODE EDITOR
+                {t('editor.title').toLocaleUpperCase()}
             </div>
             <div className={`${openTabs.length ? 'flex' : 'hidden'} items-center space-x-8`}>
                 <UndoRedoButtons />
@@ -97,7 +99,7 @@ const EditorHeader = () => {
                                 `}>
                                 <div className='w-4 h-4 bg-white rounded-full'>&nbsp;</div>
                             </div>
-                            BLOCKS MODE
+                            {t('editor.blocksMode').toLocaleUpperCase()}
                         </div>
                     )
                 }
@@ -118,7 +120,7 @@ const EditorHeader = () => {
                             }}
                         >
                             <i className='icon-share32 pr-2' />
-                            SHARE
+                            {t('script.share').toLocaleUpperCase()}
                         </div>
                     )
                 }
@@ -135,7 +137,7 @@ const EditorHeader = () => {
                     <div className='flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1'>
                         <i className='icon-arrow-right22 font-bold text-green-600' />
                     </div>
-                    RUN
+                    {t('editor.run').toLocaleUpperCase()}
                 </div>
             </div>
         </div>

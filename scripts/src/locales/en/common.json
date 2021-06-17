@@ -37,7 +37,13 @@
     "daw.tooltip.solo": "Solo",
     "daw.tooltip.mute": "Mute",
     "daw.tooltip.toggleEffects": "Toggle All Effects",
-    "daw.bypass": "Bypass"
+    "daw.bypass": "Bypass",
+    "editor.title": "Code Editor",
+    "editor.blocksMode": "Blocks Mode",
+    "script.share": "Share",
+    "editor.run": "Run",
+    "tabs.otherTabs": "Other Tabs",
+    "tabs.closeAll": "Close All"
   },
   "messages": {
     "interpreter": {
