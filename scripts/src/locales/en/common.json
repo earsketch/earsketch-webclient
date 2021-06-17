@@ -77,12 +77,16 @@
     "formFieldPlaceholder.emailOptional": "Email Address (Optional)",
     "formFieldPlaceholder.firstName": "First Name",
     "formFieldPlaceholder.lastName": "Last Name",
+    "formFieldPlaceholder.oldPassword": "Old password",
+    "formFieldPlaceholder.newPassword": "New password",
+    "formFieldPlaceholder.confirmNewPassword": "Confirm new password",
     "cancel": "Cancel",
     "update": "Update",
     "profileEditor.prompt": "Edit Profile for {{username}}",
     "profileEditor.error": "There was an error when updating the user profile.",
     "profileEditor.success": "Your user profile was updated!",
-    "changePassword.prompt": "Change Password"
+    "changePassword.prompt": "Change Password",
+    "changePassword.success": "Password changed successfully!"
   },
   "messages": {
     "interpreter": {

@@ -18,7 +18,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
         fetch(URL_DOMAIN + "/services/scripts/modifypwd?" + new URLSearchParams(params)).then(response => {
             if (response.status === 200) {
                 userProject.setPassword(newPassword)
-                userNotification.show("Password changed successfully!", "success")
+                userNotification.show(t('changePassword.success'), "success")
                 close()
             } else if (response.status === 401) {
                 setError(t('messages:changepassword.pwdauth'))
@@ -41,7 +41,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
-                            <input type="password" className="form-control" name="oldpassword" placeholder="Old password"
+                            <input type="password" className="form-control" name="oldpassword" placeholder={t('formFieldPlaceholder.oldPassword')}
                                    value={oldPassword} onChange={e => setOldPassword(e.target.value)} required />
                         </div>
                     </div>
@@ -49,7 +49,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
-                            <input type="password" className="form-control" name="newpassword1" placeholder="New password"
+                            <input type="password" className="form-control" name="newpassword1" placeholder={t('formFieldPlaceholder.newPassword')}
                                    value={newPassword} onChange={e => {
                                        e.target.setCustomValidity(e.target.validity.valid ? "" : t('messages:changepassword.pwdlength'))
                                        setNewPassword(e.target.value)
@@ -61,7 +61,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
-                            <input type="password" className="form-control" name="newpassword2" placeholder="Confirm new password" onChange={e => {
+                            <input type="password" className="form-control" name="newpassword2" placeholder={t('formFieldPlaceholder.confirmNewPassword')} onChange={e => {
                                     e.target.setCustomValidity(e.target.value === newPassword ? "" : t('messages:changepassword.pwdfail'))
                                     setConfirmPassword(e.target.value)
                                 }} value={confirmPassword} required />
@@ -70,8 +70,8 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                 </div>
 
                 <div className="modal-footer">
-                    <input type="button" className="btn btn-warning" onClick={close} value="Cancel" />
-                    <input type="submit" className="btn btn-primary" value="Change Password" />
+                    <input type="button" className="btn btn-warning" onClick={close} value={t('cancel') as string} />
+                    <input type="submit" className="btn btn-primary" value={t('changePassword.prompt') as string} />
                 </div>
             </div>
         </form>
