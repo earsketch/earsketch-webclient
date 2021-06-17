@@ -22,7 +22,22 @@
     "soundBrowser.clip.tooltip.previewSound": "Preview sound",
     "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
     "soundBrowser.clip.tooltip.paste": "Paste to editor",
-    "scriptBrowser.title": "SCRIPTS"
+    "scriptBrowser.title": "SCRIPTS",
+    "daw.title": "DIGITAL AUDIO WORKSTATION",
+    "daw.shortTitle": "DAW",
+    "daw.effect": "Effect",
+    "daw.effect_plural": "Effects",
+    "daw.tooltip.reset": "Reset",
+    "daw.tooltip.play": "Play",
+    "daw.tooltip.loopProject": "Loop Project",
+    "daw.tooltip.pause": "Pause",
+    "daw.tooltip.autoScroll": "Auto-scroll to follow the playback",
+    "daw.tooltip.toggleMetronome": "Toggle Metronome",
+    "daw.tooltip.toggleVolume": "Toggle Volume",
+    "daw.tooltip.solo": "Solo",
+    "daw.tooltip.mute": "Mute",
+    "daw.tooltip.toggleEffects": "Toggle All Effects",
+    "daw.bypass": "Bypass"
   },
   "messages": {
     "interpreter": {
