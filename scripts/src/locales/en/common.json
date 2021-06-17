@@ -50,6 +50,7 @@
     "footer.teachers": "Teachers",
     "footer.help": "Help / Contact",
     "thing.open": "Open",
+    "thing.close": "Close",
     "script.copy": "Create Copy",
     "script.rename": "Rename",
     "script.download": "Download",
@@ -86,7 +87,9 @@
     "profileEditor.error": "There was an error when updating the user profile.",
     "profileEditor.success": "Your user profile was updated!",
     "changePassword.prompt": "Change Password",
-    "changePassword.success": "Password changed successfully!"
+    "changePassword.success": "Password changed successfully!",
+    "script": "Script",
+    "download.multiTrack": "Multi Track"
   },
   "messages": {
     "interpreter": {

@@ -7,10 +7,10 @@ import { useTranslation } from "react-i18next"
 
 const EXPORT_TYPES = {
     // Thin wrapper for `exporter.text()` since it breaks the pattern (not async, doesn't take quality).
-    script: { name: "Script", async function(script: ScriptEntity, quality: boolean) { exporter.text(script) } },
-    wav: { name: "WAV", function: exporter.wav },
-    mp3: { name: "MP3", function: exporter.mp3 },
-    multitrack: { name: "Multi Track", function: exporter.multiTrack },
+    script: { nameKey: "script", async function(script: ScriptEntity, quality: boolean) { exporter.text(script) } },
+    wav: { nameKey: "WAV", function: exporter.wav },
+    mp3: { nameKey: "MP3", function: exporter.mp3 },
+    multitrack: { nameKey: "download.multiTrack", function: exporter.multiTrack },
 }
 
 export const Download = ({ script, quality, close }: { script: ScriptEntity, quality: boolean, close: () => void }) => {
@@ -39,15 +39,15 @@ export const Download = ({ script, quality, close }: { script: ScriptEntity, qua
     return <>
         <div className="modal-header">
             <h4 className="modal-title">
-                <i className="icon icon-cloud-download"></i>&nbsp;Download&nbsp;"{script.name}"
+                <i className="icon icon-cloud-download"></i>&nbsp;{t('script.download')}&nbsp;"{script.name}"
             </h4>
         </div>
         <div className="modal-body" style={{ textAlign: "center" }}>
-            {Object.entries(EXPORT_TYPES).map(([type, { name }]) =>
+            {Object.entries(EXPORT_TYPES).map(([type, { nameKey }]) =>
             <div key={type} className="row vertical-center">
                 <div className="col-md-2">
                     <h3><i className="glyphicon glyphicon-music"></i></h3>
-                    <h4>{name}</h4>
+                    <h4>{t(nameKey)}</h4>
                 </div>
                 <div className="col-md-1">
                     <h3>
@@ -64,7 +64,7 @@ export const Download = ({ script, quality, close }: { script: ScriptEntity, qua
             </div>)}
         </div>
         <div className="modal-footer">
-            <button className="btn btn-primary" onClick={close}>Close</button>
+            <button className="btn btn-primary" onClick={close}>{t('thing.close')}</button>
         </div>
     </>
 }
