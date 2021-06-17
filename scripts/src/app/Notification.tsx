@@ -1,10 +1,7 @@
 import React, { useState } from "react"
-import { hot } from "react-hot-loader/root"
-import { Provider, useSelector } from "react-redux"
-import { react2angular } from "react2angular"
+import { useSelector } from "react-redux"
 
 import * as appState from "./appState"
-import store from "../reducers"
 import * as userNotification from "./userNotification"
 
 const colors: { [key: string]: { [key: string]: string } } = {
@@ -101,9 +98,3 @@ export const NotificationPopup = () => {
         </div>
     </div>
 }
-
-const HotNotificationBar = hot(() => <Provider store={store}><NotificationBar /></Provider>)
-const HotNotificationPopup = hot(() => <Provider store={store}><NotificationPopup /></Provider>)
-
-app.component("notificationBar", react2angular(HotNotificationBar))
-app.component("notificationPopup", react2angular(HotNotificationPopup))

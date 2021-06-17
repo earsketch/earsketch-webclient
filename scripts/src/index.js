@@ -41,9 +41,7 @@ import './app/completer'
 
 import { react2angular } from "react2angular"
 
-import { mainController } from "./app/App"
-import { IDE } from "./app/IDE"
-import { DropdownMenuContainer } from "./browser/ScriptsMenus"
+import { App } from "./app/App"
 // Now entering: the modal zone.
 import { AccountCreator } from './app/AccountCreator'
 import { ChangePassword } from './app/ChangePassword'
@@ -136,15 +134,8 @@ require(['angular'], () => {
     // Controllers
     require('adminWindowController');
 
-    // React components
-    require('./bubble/Bubble');
-    require('./app/Footer');
-    require('./top/LocaleSelector')
-    require('./app/Notification')
-    app.controller("mainController", ["$scope", "$ngRedux", mainController])
+    app.component("app", react2angular(App))
     app.filter("formatTimer", () => ESUtils.formatTimer)
-    app.component("ide", react2angular(IDE))
-    app.component("scriptDropdownMenu", react2angular(DropdownMenuContainer))
     // Temporary glue from $uibModal to React components.
     app.component("prompt", helpers.wrapModal(Prompt))
     app.component("createScriptController", helpers.wrapModal(ScriptCreator))

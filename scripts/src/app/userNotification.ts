@@ -3,7 +3,7 @@ import * as helpers from '../helpers'
 // TODO: Once we port the notification UI to React, we should probably move this state to Redux.
 
 interface Notification {
-    message: { text: string, json?: string, action?: string }
+    message: { text: string, json?: string, action?: string, hyperlink?: string }
     notification_type: string
     time: number
     unread: boolean

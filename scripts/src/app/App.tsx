@@ -1,30 +1,41 @@
-import * as appState from '../app/appState';
-import * as audioLibrary from '../app/audiolibrary'
-import * as collaboration from './collaboration'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
-import * as helpers from '../helpers'
-import { openShare } from './IDE'
-import * as user from '../user/userState';
-import reporter from './reporter';
-import * as scripts from '../browser/scriptsState';
-import * as sounds from '../browser/soundsState';
-import store from '../reducers';
-import * as recommenderState from '../browser/recommenderState';
-import * as bubble from '../bubble/bubbleState';
-import * as tabs from '../editor/tabState';
-import * as curriculum from '../browser/curriculumState';
-import * as layout from '../layout/layoutState';
-import * as Layout from '../layout/Layout';
-import * as cai from '../cai/caiState';
-import * as recommender from './recommender';
-import * as userNotification from './userNotification';
-import * as userProject from './userProject';
-import i18n from "i18next";
-import { ScriptEntity, SoundEntity } from 'common';
+import i18n from "i18next"
+import { Menu } from "@headlessui/react"
+import React, { useEffect, useState } from "react"
+import { Provider, useDispatch, useSelector } from "react-redux"
+
+import * as appState from "../app/appState"
+import * as audioLibrary from "./audiolibrary"
+import { Bubble } from "../bubble/Bubble"
+import * as collaboration from "./collaboration"
+import { ScriptEntity, SoundEntity } from "common"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
+import * as helpers from "../helpers"
+import { IDE, openShare } from "./IDE"
+import { LocaleSelector } from "../top/LocaleSelector"
+import { NotificationBar, NotificationPopup } from "./Notification"
+import reporter from "./reporter"
+import * as scripts from "../browser/scriptsState"
+import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
+import * as sounds from "../browser/soundsState"
+import store from "../reducers"
+import * as recommenderState from "../browser/recommenderState"
+import * as bubble from "../bubble/bubbleState"
+import * as tabs from "../editor/tabState"
+import * as curriculum from "../browser/curriculumState"
+import * as layout from "../layout/layoutState"
+import * as Layout from "../layout/Layout"
+import * as cai from "../cai/caiState"
+import * as recommender from "./recommender"
+import * as user from "../user/userState"
+import * as userNotification from "./userNotification"
+import * as userProject from "./userProject"
+import { hot } from "react-hot-loader/root"
+
+const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
 export function changePassword() {
-    helpers.getNgService("$uibModal").open({ component: 'changepasswordController' })
+    helpers.getNgService("$uibModal").open({ component: "changepasswordController" })
 }
 
 export function renameSound(sound: SoundEntity) {
@@ -37,701 +48,758 @@ export function renameSound(sound: SoundEntity) {
 
 export function renameScript(script: ScriptEntity) {
     // userProject, etc. will try to mutate the immutable redux script  state.
-    const scriptCopy = Object.assign({}, script);
+    const scriptCopy = Object.assign({}, script)
 
     const modal = helpers.getNgService("$uibModal").open({
-        component: 'renameController',
+        component: "renameController",
         size: 100,
         resolve: { script() { return scriptCopy } }
     })
 
     modal.result.then(async (newScript: ScriptEntity | null) => {
-        if (!newScript) return;
-        await userProject.renameScript(scriptCopy.shareid, newScript.name);
-        store.dispatch(scripts.syncToNgUserProject());
-        reporter.renameScript();
-    });
-};
+        if (!newScript) return
+        await userProject.renameScript(scriptCopy.shareid, newScript.name)
+        store.dispatch(scripts.syncToNgUserProject())
+        reporter.renameScript()
+    })
+}
 
 export function downloadScript(script: ScriptEntity) {
     helpers.getNgService("$uibModal").open({
-        component: 'downloadController',
+        component: "downloadController",
         resolve: {
             script() { return script; },
             quality() { return 0; }
         }
-    });
-};
+    })
+}
 
 export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
-    await userProject.saveScript(script.name, script.source_code);
-    store.dispatch(tabs.removeModifiedScript(script.shareid));
+    await userProject.saveScript(script.name, script.source_code)
+    store.dispatch(tabs.removeModifiedScript(script.shareid))
     helpers.getNgService("$uibModal").open({
-        component: 'scriptVersionController',
-        size: 'lg',
+        component: "scriptVersionController",
+        size: "lg",
         resolve: {
             script() { return script; },
             allowRevert: allowRevert
         }
-    });
-    reporter.openHistory();
-};
+    })
+    reporter.openHistory()
+}
 
 export function openCodeIndicator(script: ScriptEntity) {
     helpers.getNgService("$uibModal").open({
-        component: 'analyzeScriptController',
+        component: "analyzeScriptController",
         size: 100,
         resolve: {
             script() { return script; }
         }
-    });
+    })
 }
 
 export function deleteScript(script: ScriptEntity) {
     (helpers.getNgService("$confirm") as any)({
-        text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
+        text: 'Deleted scripts disappear from Scripts list and can be restored from the list of "deleted scripts".',
         ok: "Delete"
     }).then(async () => {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
-            collaboration.closeScript(script.shareid);
+            collaboration.closeScript(script.shareid)
         }
-        await userProject.saveScript(script.name, script.source_code);
-        await userProject.deleteScript(script.shareid);
-        reporter.deleteScript();
+        await userProject.saveScript(script.name, script.source_code)
+        await userProject.deleteScript(script.shareid)
+        reporter.deleteScript()
 
-        store.dispatch(scripts.syncToNgUserProject());
-        store.dispatch(tabs.closeDeletedScript(script.shareid));
-        store.dispatch(tabs.removeModifiedScript(script.shareid));
-    });
+        store.dispatch(scripts.syncToNgUserProject())
+        store.dispatch(tabs.closeDeletedScript(script.shareid))
+        store.dispatch(tabs.removeModifiedScript(script.shareid))
+    })
 }
 
 export function deleteSharedScript(script: ScriptEntity) {
     if (script.collaborative) {
-        (helpers.getNgService("$confirm") as any)({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(() => {
+        (helpers.getNgService("$confirm") as any)({text: 'Do you want to leave the collaboration on "" + script.name + ""?", ok: "Leave'}).then(() => {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
-                collaboration.closeScript(script.shareid);
-                userProject.closeSharedScript(script.shareid);
+                collaboration.closeScript(script.shareid)
+                userProject.closeSharedScript(script.shareid)
             }
             // Apply state change first
-            delete userProject.sharedScripts[script.shareid];
-            store.dispatch(scripts.syncToNgUserProject());
-            store.dispatch(tabs.closeDeletedScript(script.shareid));
-            store.dispatch(tabs.removeModifiedScript(script.shareid));
+            delete userProject.sharedScripts[script.shareid]
+            store.dispatch(scripts.syncToNgUserProject())
+            store.dispatch(tabs.closeDeletedScript(script.shareid))
+            store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
-            collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
+            collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false)
         })
     } else {
         (helpers.getNgService("$confirm") as any)({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
             userProject.deleteSharedScript(script.shareid).then(() => {
-                store.dispatch(scripts.syncToNgUserProject());
-                store.dispatch(tabs.closeDeletedScript(script.shareid));
-                store.dispatch(tabs.removeModifiedScript(script.shareid));
-            });
-        });
+                store.dispatch(scripts.syncToNgUserProject())
+                store.dispatch(tabs.closeDeletedScript(script.shareid))
+                store.dispatch(tabs.removeModifiedScript(script.shareid))
+            })
+        })
     }
 }
 
 export async function submitToCompetition(script: ScriptEntity) {
-    await userProject.saveScript(script.name, script.source_code);
-    store.dispatch(tabs.removeModifiedScript(script.shareid));
-    const shareID = await userProject.getLockedSharedScriptId(script.shareid);
+    await userProject.saveScript(script.name, script.source_code)
+    store.dispatch(tabs.removeModifiedScript(script.shareid))
+    const shareID = await userProject.getLockedSharedScriptId(script.shareid)
     helpers.getNgService("$uibModal").open({
-        component: 'submitCompetitionController',
-        size: 'lg',
+        component: "submitCompetitionController",
+        size: "lg",
         resolve: {
             name() { return script.name; },
             shareID() { return shareID; },
         }
-    });
+    })
 }
 
 export async function importScript(script: ScriptEntity) {
     if (!script) {
-        script = tabs.selectActiveTabScript(store.getState());
+        script = tabs.selectActiveTabScript(store.getState())
     }
 
-    const imported = await userProject.importScript(Object.assign({},script));
-    await userProject.refreshCodeBrowser();
-    store.dispatch(scripts.syncToNgUserProject());
+    const imported = await userProject.importScript(Object.assign({},script))
+    await userProject.refreshCodeBrowser()
+    store.dispatch(scripts.syncToNgUserProject())
 
-    const openTabs = tabs.selectOpenTabs(store.getState());
-    store.dispatch(tabs.closeTab(script.shareid));
+    const openTabs = tabs.selectOpenTabs(store.getState())
+    store.dispatch(tabs.closeTab(script.shareid))
 
     if (openTabs.includes(script.shareid)) {
-        store.dispatch(tabs.setActiveTabAndEditor(imported.shareid));
-        userProject.openScript(imported.shareid);
+        store.dispatch(tabs.setActiveTabAndEditor(imported.shareid))
+        userProject.openScript(imported.shareid)
     }
 }
 
 export function deleteSound(sound: SoundEntity) {
     (helpers.getNgService("$confirm") as any)({text: "Do you really want to delete sound " + sound.file_key + "?", ok: "Delete"}).then(() => {
         userProject.deleteAudio(sound.file_key).then(() => {
-            store.dispatch(sounds.deleteLocalUserSound(sound.file_key));
-            audioLibrary.clearAudioTagCache();
-        });
-    });
+            store.dispatch(sounds.deleteLocalUserSound(sound.file_key))
+            audioLibrary.clearAudioTagCache()
+        })
+    })
 }
 
-export const mainController = function ($scope: any, $ngRedux: any) {
-    $ngRedux.connect((state: any) => ({ ...state.bubble }))((state: any) => {
-        $scope.bubble = state;
-    });
+export function closeAllTabs() {
+    (helpers.getNgService("$confirm") as any)({text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All"}).then(() => {
+        userProject.saveAll().then(() => {
+            userNotification.show(i18n.t("messages:user.allscriptscloud"))
+            store.dispatch(tabs.closeAllTabs())
+        }).catch(() => userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1"))
+    })
+}
 
-    $ngRedux.connect((state: any) => ({ language: state.app.scriptLanguage }))(({ language }: { language: string }) => $scope.dispLang = language)
+const licenses = {}
 
-    store.dispatch(sounds.getDefaultSounds());
+userProject.getLicenses().then(licenses => {
+    for (const license of Object.values(licenses)) {
+        licenses[(license as any).id] = license
+    }
+})
+
+export async function shareScript(script: ScriptEntity) {
+    await userProject.saveScript(script.name, script.source_code)
+    store.dispatch(tabs.removeModifiedScript(script.shareid))
+    helpers.getNgService("$uibModal").open({
+        component: "shareScriptController",
+        size: "lg",
+        resolve: {
+            script() { return script },
+            quality() { return 0 },
+            licenses() { return licenses }
+        }
+    })
+}
+
+export function openUploadWindow() {
+    if (userProject.isLoggedIn()) {
+        helpers.getNgService("$uibModal").open({ component: "uploadSoundController" })
+    } else {
+        userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
+    }
+}
+
+export function reloadRecommendations() {
+    const activeTabID = tabs.selectActiveTabID(store.getState())!
+    // Get the modified / unsaved script.
+    let script = null
+    if (activeTabID in userProject.scripts) {
+        script = userProject.scripts[activeTabID]
+    } else if (activeTabID in userProject.sharedScripts) {
+        script = userProject.sharedScripts[activeTabID]
+    }
+    if (!script) return
+    let input = recommender.addRecInput([], script)
+    let res = [] as any[]
+    if (input.length === 0) {
+        const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities(store.getState()))
+        if (filteredScripts.length) {
+            const lim = Math.min(5, filteredScripts.length)
+            for (let i = 0; i < lim; i++) {
+                input = recommender.addRecInput(input, filteredScripts[i])
+            }
+        }
+    }
+    [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
+        res = recommender.recommend(res, input, ...v)
+    })
+    store.dispatch(recommenderState.setRecommendations(res))
+}
+
+async function readMessage(index: number, item: any) {
+    if (item.notification_type === "broadcast" || userNotification.history[index].id === undefined) return
+    try {
+        await userProject.postAuthForm("/services/scripts/markread", { notification_id: userNotification.history[index].id! })
+        userNotification.history[index].unread = false
+    } catch (error) {
+        esconsole(error, ["mainctrl", "error"])
+    }
+}
+
+function markAllAsRead() {
+    userNotification.history.forEach((item, index) => {
+        if (item.unread && item.notification_type !== "broadcast") {
+            // TODO: handle broadcast as well
+            readMessage(index, item)
+        }
+    })
+}
+
+function toggleColorTheme() {
+    store.dispatch(appState.toggleColorTheme())
+    reporter.toggleColorTheme()
+}
+
+function resumeQuickTour() {
+    store.dispatch(bubble.reset())
+    store.dispatch(bubble.resume())
+}
+
+function reportError() {
+    helpers.getNgService("$uibModal").open({ component: "errorController" })
+}
+
+function openAdminWindow() {
+    helpers.getNgService("$uibModal").open({
+        templateUrl: "templates/admin-window.html",
+        controller: "adminwindowController",
+        scope: {}
+    })
+}
+
+function forgotPass() {
+    helpers.getNgService("$uibModal").open({ component: "forgotpasswordController" })
+}
+
+const Footer = () => {
+    const embedMode = useSelector(appState.selectEmbedMode)
+
+    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`}>
+        <div>V{BUILD_NUM}</div>
+        <div className="space-x-6">
+            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank">TEACHERS</a>
+            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">HELP / CONTACT</a>
+        </div>
+    </div>
+}
+
+let _showCAI = false
+
+function setup() {
+    store.dispatch(sounds.getDefaultSounds())
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
-        store.dispatch(sounds.setFeaturedSoundVisibility(true));
+        store.dispatch(sounds.setFeaturedSoundVisibility(true))
     }
     if (FLAGS.FEATURED_ARTISTS && FLAGS.FEATURED_ARTISTS.length) {
-        store.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS));
+        store.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS))
     }
 
-    $scope.forgotPass = () => {
-        helpers.getNgService("$uibModal").open({ component: 'forgotpasswordController' });
-    };
-    
-    $scope.reportError = () => helpers.getNgService("$uibModal").open({ component: "errorController" });
-    
-    $scope.openUploadWindow = () => {
-        if (userProject.isLoggedIn()) {
-            helpers.getNgService("$uibModal").open({ component: 'uploadSoundController' })
-        } else {
-            userNotification.show(i18n.t('messages:general.unauthenticated'), 'failure1')
-        }
-    };
-    
-    $scope.getNumUnread = () => {
-        return userNotification.history.filter(function (v) { return v && (v.unread || v.notification_type === 'broadcast'); }).length;
-    };
-    
-    $scope.setFontSize = (fontSize: number) => {
-        store.dispatch(appState.setFontSize(fontSize));
-    };
-    
-    $scope.toggleColorTheme = () => {
-        store.dispatch(appState.toggleColorTheme());
-        reporter.toggleColorTheme();
-    };
-    
-    $scope.resumeQuickTour = () => {
-        store.dispatch(bubble.reset());
-        store.dispatch(bubble.resume());
-    };
+    esconsole.getURLParameters()
 
-    $scope.loggedIn = false;
-    $scope.showIDE = true;
-    $scope.showAll = false;
-    $scope.colorTheme = store.getState().app.colorTheme;
-    $scope.hljsTheme = 'monokai-sublime';
-    $scope.selectedFont = 14;
-    $scope.enableChat = false; // Chat window toggle button. Hidden by default.
-    $scope.showChatWindow = false;
+    const isEmbedded = ESUtils.getURLParameter("embedded") === "true"
+    const hideDAW = isEmbedded && ESUtils.getURLParameter("hideDaw")
+    const hideEditor = isEmbedded && ESUtils.getURLParameter("hideCode")
 
-    // CAI visibility
-    $scope.showCAIWindow = FLAGS.SHOW_CAI;
-
-    // TEMPORARY FOR AWS CONTEST TESTING
-    $scope.showAmazon = FLAGS.SHOW_AMAZON;
-    $scope.showAmazonSounds = FLAGS.SHOW_AMAZON_SOUNDS;
-    $scope.showAmazonBanner = FLAGS.SHOW_AMAZON_BANNER;
-
-    // TEMPORARY FOR I18N DEVELOPMENT
-    $scope.showLocaleSwitcher = FLAGS.SHOW_LOCALE_SWITCHER;
-
-    // User data
-    $scope.firstname = '';
-    $scope.lastname = '';
-    $scope.email = '';
-    $scope.username = '';
-    $scope.userrole = 'student';
-    $scope.loggedInUserName = ' '; // this is shown in the top right corner -- it cannot be initialized with an empty string '' as ngModel doesn't seem to like it
-
-    // Loading ogg by default for browsers other than Safari
-    // and Chrome 58 which has bad ogg decoder (May 22, 2017)
-    $scope.audioQuality = ESUtils.whichBrowser().match('Opera|Firefox|Msie|Trident') !== null;
-    $scope.detectOS = ESUtils.whichOS();
-
-    esconsole.getURLParameters();
-
-    $scope.isEmbedded = ESUtils.getURLParameter("embedded") === "true"
-    $scope.hideDAW = $scope.isEmbedded && ESUtils.getURLParameter("hideDaw")
-    $scope.hideEditor = $scope.isEmbedded && ESUtils.getURLParameter("hideCode")
-
-    if ($scope.isEmbedded) {
+    if (isEmbedded) {
         store.dispatch(appState.setColorTheme("light"))
-        store.dispatch(appState.setEmbedMode(true));
-        Layout.destroy();
-        layout.setMinSize(0);
+        store.dispatch(appState.setEmbedMode(true))
+        Layout.destroy()
+        layout.setMinSize(0)
 
-        if ($scope.hideEditor) {
-            layout.setGutterSize(0);
+        if (hideEditor) {
+            layout.setGutterSize(0)
         }
-        Layout.initialize();
-        store.dispatch(layout.collapseWest());
-        store.dispatch(layout.collapseEast());
-        store.dispatch(layout.collapseSouth());
+        Layout.initialize()
+        store.dispatch(layout.collapseWest())
+        store.dispatch(layout.collapseEast())
+        store.dispatch(layout.collapseSouth())
 
-        if ($scope.hideEditor) {
+        if (hideEditor) {
             // Note: hideDAW-only currently does not fit the layout height to the DAW player height as the below API only supports ratios.
-            store.dispatch(layout.setNorthFromRatio([100,0,0]));
+            store.dispatch(layout.setNorthFromRatio([100,0,0]))
         } else {
-            store.dispatch(layout.setNorthFromRatio([25,75,0]));
+            store.dispatch(layout.setNorthFromRatio([25,75,0]))
         }
     } else {
-        userProject.loadLocalScripts();
-        store.dispatch(scripts.syncToNgUserProject());
+        userProject.loadLocalScripts()
+        store.dispatch(scripts.syncToNgUserProject())
     }
 
-    if ($scope.hideDAW) {
-        store.dispatch(appState.setHideDAW(true));
+    if (hideDAW) {
+        store.dispatch(appState.setHideDAW(true))
     }
 
-    if ($scope.hideEditor) {
-        store.dispatch(appState.setHideEditor(true));
+    if (hideEditor) {
+        store.dispatch(appState.setHideEditor(true))
     }
-
-    $scope.scripts = [];
-
-    // these should be populated from somewhere else and not hard-coded, most likely
-    $scope.fontSizes = [{'size': 10}, {'size': 12}, {'size': 14}, {'size': 18}, {'size': 24}, {'size': 36}];
-
-    $scope.login = function () {
-        esconsole('Logging in', ['DEBUG','MAIN']);
-
-        //save all unsaved open scripts (don't need no promises)
-        userProject.saveAll();
-
-        return userProject.getUserInfo($scope.username, $scope.password).then(function (userInfo) {
-            // userInfo !== undefined if user exists.
-            if (userInfo) {
-                store.dispatch(user.login({
-                    username: $scope.username,
-                    password: $scope.password
-                }));
-
-                store.dispatch(sounds.getUserSounds($scope.username));
-                store.dispatch(sounds.getFavorites({
-                    username: $scope.username,
-                    password: $scope.password
-                }));
-
-                // Always override with the returned username in case the letter cases mismatch.
-                $scope.username = userInfo.username;
-
-                // get user role (can verify the admin / teacher role here?)
-                if (userInfo.hasOwnProperty('role')) {
-                    $scope.userrole = userInfo.role;
-
-                    if (userInfo.role === 'teacher') {
-                        if (userInfo.firstname === '' || userInfo.lastname === '' || userInfo.email === '') {
-                            userNotification.show(i18n.t('messages:user.teachersLink'), 'editProfile');
-                        }
-                    }
-                } else {
-                    $scope.role = 'student';
-                }
-
-                $scope.firstname = userInfo.firstname;
-                $scope.lastname = userInfo.lastname;
-                $scope.email = userInfo.email;
-
-                // Always show TEACHERS link in case the teacher-user does not have the teacher role and should be directed to request one.
-                $scope.showTeachersLink = true;
-
-                userNotification.user.role = userInfo.role;
-
-                // Retrieve the user scripts.
-                return userProject.login($scope.username, $scope.password).then(function (result) {
-                    esconsole('Logged in as ' + $scope.username, ['DEBUG','MAIN']);
-
-                    // load user scripts
-                    $scope.scripts = result;
-
-                    store.dispatch(scripts.syncToNgUserProject());
-
-                    var url = location.href;
-                    var competitionMode = url.includes('competition');
-                    if (competitionMode) {
-                        $scope.showAmazon = true;
-                        $scope.showAmazonSounds = true;
-                        $scope.showAmazonBanner = true;
-                    }
-
-                    // show alert
-                    if (!$scope.loggedIn) {
-                        $scope.loggedIn = true;
-
-                        // TODO: "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
-                        // the initial login message is taken care in the sound browser controller
-                        userNotification.show(i18n.t('messages:general.loginsuccess'), 'normal', 0.5);
-
-                        $scope.loggedInUserName = $scope.username;
-
-                        const activeTabID = tabs.selectActiveTabID(store.getState());
-                        activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID));
-                    }
-                });
-            } else {
-
-            }
-        }).catch(error => {
-            userNotification.show(i18n.t('messages:general.loginfailure'), 'failure1',  3.5);
-            esconsole(error, ['main','login']);
-        });
-    };
-
-    $scope.logout = function () {
-        store.dispatch(user.logout());
-        store.dispatch(sounds.resetUserSounds());
-        store.dispatch(sounds.resetFavorites());
-        store.dispatch(sounds.resetAllFilters());
-
-        // save all unsaved open scripts
-        userProject.saveAll().then(function () {
-            if (userProject.openScripts.length > 0) {
-                userNotification.show(i18n.t('messages:user.allscriptscloud'));
-            }
-
-            const activeTabID = tabs.selectActiveTabID(store.getState());
-            if (activeTabID) {
-                const allScriptEntities = scripts.selectAllScriptEntities(store.getState());
-                if (allScriptEntities[activeTabID].collaborative) {
-                    collaboration.leaveSession(activeTabID);
-                }
-            }
-
-            // once all scripts have been saved, clear scripts
-            $scope.scripts = [];
-
-            userProject.clearUser();
-            userNotification.clearHistory();
-            $scope.notificationList = [];
-            reporter.logout();
-
-            store.dispatch(scripts.syncToNgUserProject());
-            store.dispatch(scripts.resetReadOnlyScripts());
-            store.dispatch(tabs.resetTabs());
-            store.dispatch(tabs.resetModifiedScripts());
-        }).catch(function (err) {
-            (helpers.getNgService("$confirm") as any)({text: i18n.t('messages:idecontroller.saveallfailed'),
-                cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
-                $scope.scripts = [];
-                userProject.clearUser();
-            });
-        });
-
-        // clear out all the values set at login
-        $scope.username = '';
-        $scope.password = '';
-        $scope.loggedIn = false;
-        $scope.showTeachersLink = false;
-
-        // User data
-        $scope.firstname = '';
-        $scope.lastname = '';
-        $scope.email = '';
-        $scope.userrole = 'student';
-        $scope.loggedInUserName = ' '; // this is shown in the top right corner -- it cannot be initialized with an empty string '' as ngModel doesn't seem to like it
-
-    };
-
-    // attempt to load userdata from a previous session
-    if (userProject.isLoggedIn()) {
-        var userStore = userProject.loadUser();
-        $scope.username = userStore.username;
-        $scope.password = userStore.password;
-
-        $scope.login().catch((error: Error) => {
-            if (window.confirm('We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.')) {
-                localStorage.clear();
-                window.location.reload();
-                esconsole(error, ['ERROR']);
-                reporter.exception('Auto-login failed. Clearing localStorage.');
-            }
-        });
-    } else {
-        store.dispatch(scripts.syncToNgUserProject());
-                                  
-
-        const openTabs = tabs.selectOpenTabs(store.getState());
-        const allScripts = scripts.selectAllScriptEntities(store.getState());
-        openTabs.forEach(scriptID => {
-            if (!allScripts.hasOwnProperty(scriptID)) {
-                store.dispatch(tabs.closeAndSwitchTab(scriptID));
-            }
-        });
-
-        // Show bubble tutorial when not opening a share link or in a CAI study mode.
-        if (!ESUtils.getURLParameter("sharing") && !FLAGS.SHOW_CAI) {
-            store.dispatch(bubble.resume());
-        }
-    }
-
-
-    $scope.createAccount = function () {
-        helpers.getNgService("$uibModal").open({ component: 'accountController' }).result.then((result: any) => {
-            if (!result) return
-            $scope.username = result.username
-            $scope.password = result.password
-            $scope.login()
-        })
-    };
-
-    $scope.editProfile = function () {
-        $scope.showNotification = false;
-        helpers.getNgService("$uibModal").open({
-            component: 'editProfileController',
-            resolve: {
-                username() { return $scope.username },
-                password() { return $scope.password },
-                email() { return $scope.email },
-                role() { return $scope.userrole },
-                firstName() { return $scope.firstname },
-                lastName() { return $scope.lastname },
-            }
-        }).result.then((result: any) => {
-            if (result !== undefined) {
-                $scope.firstname = result.firstName;
-                $scope.lastname = result.lastName;
-                $scope.email = result.email;
-            }
-        });
-    };
-
-    $scope.openAdminWindow = function () {
-        helpers.getNgService("$uibModal").open({
-            templateUrl: 'templates/admin-window.html',
-            controller: 'adminwindowController',
-            scope: $scope
-        });
-    };
-
-    $scope.showNotification = false;
-    $scope.notificationList = userNotification.history;
-    $scope.showNotificationHistory = false;
-
-    $scope.$on('notificationsUpdated', function () {
-        $scope.notificationList = userNotification.history;
-    });
-
-    // This is for updating the currentTime for the date label.
-    // TODO: find a way to do this with callback from the uib popover element
-    $scope.$watch('showNotification', function (val: boolean) {
-        if (val) {
-            $scope.currentTime = Date.now();
-        }
-    });
-
-    $scope.toggleNotificationHistory = function (bool: boolean) {
-        $scope.showNotificationHistory = bool;
-        if (bool) {
-            $scope.showNotification = false;
-        }
-    };
-
-    //=================================================
-    // TODO: move these to an appropriate directive!
-
-    $scope.readMessage = async function (index: number, item: any) {
-        if (item.notification_type === 'broadcast' || userNotification.history[index].id === undefined) return
-        try {
-            await userProject.postAuthForm("/services/scripts/markread", { notification_id: userNotification.history[index].id! })
-            userNotification.history[index].unread = false
-            $scope.unreadMessages = userNotification.history.filter(v => v.unread).length
-            $scope.notificationList = userNotification.history
-        } catch (error) {
-            esconsole(error, ['mainctrl', 'error'])
-        }
-    }
-
-    $scope.markAllAsRead = function () {
-        userNotification.history.forEach(function (item, index) {
-            if (item.unread && item.notification_type !== 'broadcast') {
-                // TODO: handle broadcast as well
-                $scope.readMessage(index, item);
-            }
-        });
-    };
-
-    $scope.openSharedScript = function (shareid: string) {
-        esconsole('opening a shared script: ' + shareid, 'main');
-        openShare(shareid).then(() => store.dispatch(scripts.syncToNgUserProject()));
-        $scope.showNotification = false;
-        $scope.showNotificationHistory = false;
-    };
-
-    $scope.openCollaborativeScript = function (shareID: string) {
-        if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
-            $scope.openSharedScript(shareID);
-            // collaboration.openScript(userProject.sharedScripts[shareID], userProject.getUsername());
-            store.dispatch(tabs.setActiveTabAndEditor(shareID));
-        } else {
-            $scope.showNotification = false;
-            userNotification.show('Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser', 'failure1');
-        }
-    };
-
-    $scope.currentTime = Date.now();
-
-    //=================================================
-
-    $ngRedux.connect((state: any) => ({ size: state.app.fontSize }))(({ size }: { size: number }) => $scope.selectedFont = size)
-
-    $scope.enterKeySubmit = function (event: KeyboardEvent) {
-        if (event.key === "Enter") {
-            $scope.login();
-        }
-    };
-
-    $ngRedux.connect((state: any) => ({ theme: state.app.colorTheme }))(({ theme }: { theme: string }) => {
-        $scope.colorTheme = theme
-        $scope.hljsTheme = theme === 'dark' ? 'monokai-sublime' : 'vs'
-    })
 
     try {
-        var shareID = ESUtils.getURLParameter('edit');
-
+        const shareID = ESUtils.getURLParameter("edit")
         if (shareID) {
-            esconsole('opening a shared script in edit mode', ['main', 'url']);
-            userProject.openSharedScriptForEdit(shareID);
+            esconsole("opening a shared script in edit mode", ["main", "url"])
+            userProject.openSharedScriptForEdit(shareID)
         }
     } catch (error) {
-        esconsole(error, ['main', 'url']);
+        esconsole(error, ["main", "url"])
     }
-
-    try {
-        var layoutParamString = ESUtils.getURLParameter('layout');
-        if (layoutParamString && layoutParamString.hasOwnProperty('split')) {
-            layoutParamString.split(',').forEach(function (item) {
-                var keyval = item.split(':');
-                if (keyval.length === 2) {
-                    esconsole('*Not* setting layout from URL parameters', ['main', 'url']);
-                    // layout.set(keyval[0], parseInt(keyval[1]));
-                }
-            });
-        }
-    } catch (error) {
-        esconsole(error, ['main', 'url']);
-    }
-
-    try {
-        var url = location.href;
-        var chatMode = url.includes('chat') || url.includes('tutor');
-        if (chatMode) {
-            $scope.enableChat = true;
-        }
-    } catch (error) {
-        esconsole(error, ['main', 'url']);
-    }
-
-    try {
-        var url = location.href;
-        var competitionMode = url.includes('competition');
-        if (competitionMode) {
-            $scope.showAmazon = true;
-            $scope.showAmazonSounds = true;
-            $scope.showAmazonBanner = true;
-        }
-    } catch (error) {
-        esconsole(error, ['main', 'url']);
-    }
-
-    $scope.licenses = {};
-    userProject.getLicenses().then(licenses => {
-        for (const license of Object.values(licenses)) {
-            $scope.licenses[(license as any).id] = license
-        }
-    });
-
-    $scope.shareScript = async (script: ScriptEntity) => {
-        await userProject.saveScript(script.name, script.source_code);
-        store.dispatch(tabs.removeModifiedScript(script.shareid));
-        helpers.getNgService("$uibModal").open({
-            component: 'shareScriptController',
-            size: 'lg',
-            resolve: {
-                script() { return script; },
-                quality() { return $scope.audioQuality; },
-                licenses() { return $scope.licenses; }
-            }
-        });
-    };
-    
-    $scope.toggleCAIWindow = () => {
-        $scope.showCAIWindow = !$scope.showCAIWindow;
-        if ($scope.showCAIWindow) {
-            store.dispatch(layout.setEast({ open: true }));
-            Layout.resetHorizontalSplits();
-            document.getElementById('caiButton')!.classList.remove('flashNavButton');
-            store.dispatch(cai.autoScrollCAI());
-        }
-    };
 
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
-        store.dispatch(layout.setEast({ open: true }));
-        Layout.resetHorizontalSplits();
+        store.dispatch(layout.setEast({ open: true }))
+        Layout.resetHorizontalSplits()
+
+        helpers.getNgRootScope().$on("newCAIMessage", () => {
+            if (FLAGS.SHOW_CAI && !_showCAI) {
+                document.getElementById("caiButton")!.classList.add("flashNavButton")
+            }
+        })
     }
+}
+
+const App = () => {
+    const now = Date.now()
+
+    const dispatch = useDispatch()
+    const fontSize = useSelector(appState.selectFontSize)
+    const theme = useSelector(appState.selectColorTheme)
+
+    const numUnread = userNotification.history.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
+
+    // User data
+    let firstname = ""
+    let lastname = ""
+    let email = ""
+    const savedLoginInfo = userProject.loadUser()
+    const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
+    const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
+    const [role, setRole] = useState("student")
+    const [loggedIn, setLoggedIn] = useState(false)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
-    $scope.loadCurriculumChapter = (location: string) => {
-        if ($scope.showCAIWindow) {
-            $scope.toggleCAIWindow();
+    ;(window as any).loadCurriculumChapter = (location: string) => {
+        if (showCAI) {
+            toggleCAIWindow()
         }
-        store.dispatch(curriculum.fetchContent({ location: location.split('-') }));
+        store.dispatch(curriculum.fetchContent({ location: location.split("-") }))
+    }
 
-        if (FLAGS.SHOW_CAI) {
-            // Note: delay $scope.$apply() to update the angular CAI Window.
-            window.setTimeout(() => {
-                $scope.$apply();
-            }, 100);
-        }
-    };
+    let showNotification = false
+    let showNotificationHistory = false
+    const [showCAI, setShowCAI] = useState(FLAGS.SHOW_CAI)
+    _showCAI = showCAI
 
-    $scope.closeAllTabs = () => {
-        (helpers.getNgService("$confirm") as any)({text: i18n.t('messages:idecontroller.closealltabs'), ok: "Close All"}).then(() => {
-            userProject.saveAll().then(() => {
-                userNotification.show(i18n.t('messages:user.allscriptscloud'));
-                store.dispatch(tabs.closeAllTabs());
-            }).catch(() => userNotification.show(i18n.t('messages:idecontroller.saveallfailed'), 'failure1'));
+    const showAmazonBanner = FLAGS.SHOW_AMAZON_BANNER || location.href.includes("competition")
 
-            $scope.$applyAsync();
-        });
-    };
+    const MISC_ACTIONS = [
+        { name: "Start Quick Tour", action: resumeQuickTour },
+        { name: "Switch Theme", action: toggleColorTheme },
+        { name: "Report Error", action: reportError },
+    ]
 
-    $scope.$on('reloadRecommendations', () => {
-        const activeTabID = tabs.selectActiveTabID(store.getState())!
-
-        // Get the modified / unsaved script.
-        let script = null;
-        if (activeTabID in userProject.scripts) {
-            script = userProject.scripts[activeTabID];
-        } else if (activeTabID in userProject.sharedScripts) {
-            script = userProject.sharedScripts[activeTabID];
-        }
-        if (!script) return
-        let input = recommender.addRecInput([], script);
-        let res = [] as any[];
-        if (input.length === 0) {
-            const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities(store.getState()));
-            if (filteredScripts.length) {
-                const lim = Math.min(5, filteredScripts.length);
-
-                for (let i = 0; i < lim; i++) {
-                    input = recommender.addRecInput(input, filteredScripts[i]);
+    useEffect(() => {
+        // Attempt to load userdata from a previous session.
+        if (userProject.isLoggedIn()) {
+            login().catch((error: Error) => {
+                if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
+                    localStorage.clear()
+                    window.location.reload()
+                    esconsole(error, ["error"])
+                    reporter.exception("Auto-login failed. Clearing localStorage.")
                 }
+            })
+        } else {
+            store.dispatch(scripts.syncToNgUserProject())
+            const openTabs = tabs.selectOpenTabs(store.getState())
+            const allScripts = scripts.selectAllScriptEntities(store.getState())
+            openTabs.forEach(scriptID => {
+                if (!allScripts.hasOwnProperty(scriptID)) {
+                    store.dispatch(tabs.closeAndSwitchTab(scriptID))
+                }
+            })
+            // Show bubble tutorial when not opening a share link or in a CAI study mode.
+            if (!ESUtils.getURLParameter("sharing") && !FLAGS.SHOW_CAI) {
+                store.dispatch(bubble.resume())
             }
         }
-        [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
-            res = recommender.recommend(res, input, ...v);
-        });
-        store.dispatch(recommenderState.setRecommendations(res));
-    });
 
-    $scope.$on('newCAIMessage', () => {
-        if (FLAGS.SHOW_CAI && !$scope.showCAIWindow) {
-            document.getElementById('caiButton')!.classList.add('flashNavButton');
+        setup()
+    }, [])
+
+    const login = async () => {
+        esconsole("Logging in", ["DEBUG","MAIN"])
+        //save all unsaved open scripts (don't need no promises)
+        userProject.saveAll()
+
+        let userInfo
+        try {
+            userInfo = await userProject.getUserInfo(username, password)
+        } catch (error) {
+            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1",  3.5)
+            esconsole(error, ["main", "login"])
+            return
         }
-    });
+
+        store.dispatch(user.login({ username, password }))
+
+        store.dispatch(sounds.getUserSounds(username))
+        store.dispatch(sounds.getFavorites({ username, password }))
+
+        // Always override with the returned username in case the letter cases mismatch.
+        setUsername(userInfo.username)
+
+        // get user role (can verify the admin / teacher role here?)
+        if (userInfo.role) {
+            setRole(userInfo.role)
+
+            if (userInfo.role === "teacher") {
+                if (userInfo.firstname === "" || userInfo.lastname === "" || userInfo.email === "") {
+                    userNotification.show(i18n.t("messages:user.teachersLink"), "editProfile")
+                }
+            }
+        } else {
+            setRole("student")
+        }
+
+        firstname = userInfo.firstname
+        lastname = userInfo.lastname
+        email = userInfo.email
+
+        userNotification.user.role = userInfo.role
+
+        // Retrieve the user scripts.
+        await userProject.login(username, password)
+        esconsole("Logged in as " + username, ["DEBUG","MAIN"])
+        store.dispatch(scripts.syncToNgUserProject())
+
+        if (!loggedIn) {
+            setLoggedIn(true)
+            // TODO: "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
+            // the initial login message is taken care in the sound browser controller
+            userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
+            const activeTabID = tabs.selectActiveTabID(store.getState())
+            activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
+        }
+    }
+
+    const logout = async () => {
+        dispatch(user.logout())
+        dispatch(sounds.resetUserSounds())
+        dispatch(sounds.resetFavorites())
+        dispatch(sounds.resetAllFilters())
+
+        // save all unsaved open scripts
+        try {
+            await userProject.saveAll()
+            if (userProject.openScripts.length > 0) {
+                userNotification.show(i18n.t("messages:user.allscriptscloud"))
+            }
+
+            const activeTabID = tabs.selectActiveTabID(store.getState())
+            if (activeTabID) {
+                const allScriptEntities = scripts.selectAllScriptEntities(store.getState())
+                if (allScriptEntities[activeTabID].collaborative) {
+                    collaboration.leaveSession(activeTabID)
+                }
+            }
+
+            userProject.clearUser()
+            userNotification.clearHistory()
+            reporter.logout()
+
+            dispatch(scripts.syncToNgUserProject())
+            dispatch(scripts.resetReadOnlyScripts())
+            dispatch(tabs.resetTabs())
+            dispatch(tabs.resetModifiedScripts())
+        } catch (error) {
+            await (helpers.getNgService("$confirm") as any)({ text: i18n.t("messages:idecontroller.saveallfailed"), cancel: "Keep unsaved tabs open", ok: "Ignore" })
+            userProject.clearUser()
+        }
+
+        // Clear out all the values set at login.
+        setUsername("")
+        setPassword("")
+        setLoggedIn(false)
+
+        // User data
+        firstname = ""
+        lastname = ""
+        email = ""
+        setRole("student")
+    }
+
+    const createAccount = async () => {
+        const result = await helpers.getNgService("$uibModal").open({ component: "accountController" }).result
+        if (result) {
+            setUsername(result.username)
+            setPassword(result.password)
+            login()
+        }
+    }
+
+    const editProfile = async () => {
+        showNotification = false
+        const result = await helpers.getNgService("$uibModal").open({
+            component: "editProfileController",
+            resolve: {
+                username() { return username },
+                password() { return password },
+                email() { return email },
+                role() { return role },
+                firstName() { return firstname },
+                lastName() { return lastname },
+            }
+        })
+        if (result !== undefined) {
+            firstname = result.firstName
+            lastname = result.lastName
+            email = result.email
+        }
+    }
+
+    const toggleCAIWindow = () => {
+        if (!showCAI) {
+            store.dispatch(layout.setEast({ open: true }))
+            Layout.resetHorizontalSplits()
+            document.getElementById("caiButton")!.classList.remove("flashNavButton")
+            store.dispatch(cai.autoScrollCAI())
+        }
+        setShowCAI(!showCAI)
+    }
+
+    const toggleNotificationHistory = (bool: boolean) => {
+        showNotificationHistory = bool
+        if (bool) {
+            showNotification = false
+        }
+    }
+
+    const openSharedScript = (shareid: string) => {
+        esconsole("opening a shared script: " + shareid, "main")
+        openShare(shareid).then(() => store.dispatch(scripts.syncToNgUserProject()))
+        showNotification = false
+        showNotificationHistory = false
+    }
+
+    const openCollaborativeScript = (shareID: string) => {
+        if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
+            openSharedScript(shareID)
+            store.dispatch(tabs.setActiveTabAndEditor(shareID))
+        } else {
+            showNotification = false
+            userNotification.show("Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser", "failure1")
+        }
+    }
+
+    return <>
+        {/* dynamically set the color theme */}
+        <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
+        
+        {/* highlight js style */}
+        <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
+        
+        {showNotificationHistory && <div id="notification-history">
+            <div className="flex justify-between" style={{ padding: "1em" }}>
+                <div>
+                    <a href="#" onClick={() => toggleNotificationHistory(false)}>
+                        <i id="back-button" className="icon icon-arrow-right22"></i>
+                    </a>
+                    <span style={{ color: "grey" }}>
+                        <i className="icon icon-bell"></i> Notifications
+                    </span>
+                </div>
+                <div>
+                    <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={() => toggleNotificationHistory(false)}><span><i className="icon icon-cross2" /></span>CLOSE</a>
+                </div>
+            </div>
+        
+            <div className="notification-type-header">Pinned Notifications</div>
+            {userNotification.history.map((item, index) =>
+            ["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
+                <div style={{ margin: "10px 20px" }}>
+                    <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
+                        <div><i className="icon icon-pushpin"></i></div>
+                    </div>
+                    <div className="flex justify-between">
+                        <div>
+                            <div>{item.message.text}</div>
+                            <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTimer(now - item.time)}</div>
+                        </div>
+                        {item.message.hyperlink && <div>
+                            <a href={item.message.hyperlink} target="_blank" className="cursor-pointer">MORE</a>
+                        </div>}
+                    </div>
+                </div>
+                {index < userNotification.history.length - 1 &&
+                <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
+            </div>)}
+        
+            <div className="notification-type-header flex justify-between">
+                <div>Other Notifications</div>
+                <div><a href="#" onClick={markAllAsRead}>MARK ALL AS READ</a></div>
+            </div>
+            {userNotification.history.map((item, index) =>
+            !["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
+                <div className="cursor-pointer" style={{ margin: "10px 20px" }} onClick={() => readMessage(index, item)}>
+                    <div className="flex items-center float-left" style={{ margin: "10px" }}>
+                        <div className={item.unread ? "marker" : "empty-marker"}></div>
+                    </div>
+                    <div className="flex justify-between">
+                        <div>
+                            <div>
+                                {item.message.text}
+                            </div>
+                            <div style={{ fontSize: "10px", color: "grey" }}>
+                                {ESUtils.formatTimer(now - item.time)}
+                            </div>
+                        </div>
+                        {item.notification_type === "share_script" && <div>
+                            <span onClick={() => openSharedScript(item.shareid!)}><a href="#" className="cursor-pointer">OPEN</a></span>
+                        </div>}
+                    </div>
+                </div>
+                <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} ng-show="$index < notificationList.length-1" />
+            </div>)}
+        </div>}
+        
+        <div className="flex flex-col justify-start h-screen max-h-screen">
+            <div id="top-header-nav" ng-show="!isEmbedded">
+                <div id="top-header-nav-left">
+                    <div id="app-title-container" className="pull-left">
+                        <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
+                        <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title">EarSketch</a>
+                    </div>
+        
+                    <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
+                        <div>
+                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }}>
+                                <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
+                                Celebrity Remix
+                            </a>}
+                        </div>
+                    </div>
+                    <div className="clear:both"></div>
+                </div>
+        
+                {/* temporary place for the app-generated notifications */}
+                <NotificationBar />
+        
+                {/* top-right icons */}
+                <div id="top-header-nav-form">
+                    {/* CAI-window toggle */}
+                    {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393"}} onClick={toggleCAIWindow} title="CAI">
+                        <i id="caiButton" className="icon icon-bubbles"></i>
+                    </button>}
+        
+                    {/* TODO: Bring back keyboard shortcuts. */}
+                    {/*<div>
+                        <button id="keyboard-shortcuts" type="button" className="top-header-nav-button btn btn-xs btn-clear" ng-click="toggleShortcutHelper()" ng-className="showKeyShortcuts ? "grow-in-size":""" title="Show/Hide Keyboard Shortcuts">
+                            <i className="icon icon-keyboard"></i>
+                                <span className="sr-only">Keyboard Shortcuts</span>
+                        </button>
+                    </div>*/}
+                    {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
+                    
+                    {/* Font Size */}
+                    <Menu as="div" className="relative inline-block text-left mx-3">
+                        <Menu.Button className="text-gray-400 text-4xl">
+                            <div className="flex flex-row items-center">
+                                <div><i className="icon icon-font-size2" /></div>
+                                <div className="ml-1"><span className="caret" /></div>
+                            </div>
+                        </Menu.Button>
+                        <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            {FONT_SIZES.map(size =>
+                            <Menu.Item key={size}>
+                                {({ active }) =>
+                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`}
+                                        onClick={() => dispatch(appState.setFontSize(size))}>
+                                    {size} {fontSize === size && <i className="ml-3 icon icon-checkmark4" />}
+                                </button>}
+                            </Menu.Item>)}
+                        </Menu.Items>
+                    </Menu>
+        
+                    {/* Misc. actions */}
+                    <Menu as="div" className="relative inline-block text-left mx-3">
+                        <Menu.Button className="text-gray-400 text-4xl">
+                            <div className="flex flex-row items-center">
+                                <div><i className="icon icon-cog2" /></div>
+                                <div className="ml-1"><span className="caret" /></div>
+                            </div>
+                        </Menu.Button>
+                        <Menu.Items className="w-52 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            {MISC_ACTIONS.map(({ name, action }) =>
+                            <Menu.Item key={name}>
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
+                            </Menu.Item>)}
+                        </Menu.Items>
+                    </Menu>
+        
+                    {/* notification (bell) button */}
+                    <div className="user-notification">
+                        <div id="bell-icon-container" className=".btn" popover-placement="bottom-right" popover-trigger="outsideClick" popover-is-open="showNotification" uib-popover-template="templates/user-notification.html">
+                            <i className="icon icon-bell" id="user-notification-icon"></i>
+                            {numUnread > 0 && <div id="badge">{numUnread}</div>}
+                        </div>
+                        <NotificationPopup />
+                    </div>
+        
+                    {/* user login menu */}
+                    {!loggedIn &&
+                    <form className="flex items-center" onSubmit={e => { e.preventDefault(); login() }}>
+                        <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" required />
+                        <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
+                        <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
+                    </form>}
+                    <Menu as="div" className="relative inline-block text-left mx-3">
+                        <Menu.Button className="text-gray-400 text-4xl">
+                            {loggedIn
+                            ? <div id="logged-in" className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px" }}><em style={{ color: "#0078e0" }}>{username}</em>&nbsp;<span className="caret" /></div>
+                            : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>Create / Reset Account</div>}
+                        </Menu.Button>
+                        <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            {(loggedIn
+                            ? [{ name: "Edit Profile", action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: "Logout", action: logout }]
+                            : [{ name: "Register a New Account", action: createAccount }, { name: "Forgot Your Password?", action: forgotPass }])
+                            .map(({ name, action }) =>
+                            <Menu.Item key={name}>
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
+                            </Menu.Item>)}
+                        </Menu.Items>
+                    </Menu>
+                </div>
+            </div>
+            <IDE />
+            <Footer />
+        </div>
+        <Bubble />
+        <ScriptDropdownMenu />
+    </>
 }
+
+const AppWrapper = hot(() => <Provider store={store}><App /></Provider>)
+
+export { AppWrapper as App }

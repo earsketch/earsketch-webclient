@@ -3,9 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
 import * as classNames from 'classnames';
 
+import { closeAllTabs } from '../app/App';
 import * as appState from '../app/appState';
 import * as editor from './editorState';
-import * as helpers from '../helpers';
 import { createScript } from '../app/IDE';
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 import * as scripts from '../browser/scriptsState';
@@ -112,8 +112,6 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
 };
 
 const CloseAllTab = () => {
-    const mainControllerScope = helpers.getNgMainController().scope();
-
     return (
         <div
             className={`
@@ -121,10 +119,7 @@ const CloseAllTab = () => {
                 flex items-center
                 text-white bg-gray-800 border border-gray-800    
             `}
-            onClick={() => {
-                // Dispatch needs to be inside $confirm.
-                mainControllerScope?.closeAllTabs();
-            }}
+            onClick={closeAllTabs}
         >
             Close All
         </div>

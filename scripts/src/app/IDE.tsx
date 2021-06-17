@@ -366,8 +366,8 @@ const IDE = () => {
 
     useEffect(() => Layout.initialize(), [])
 
-    return <div id="main-container" style={embedMode ? { top: "0", left: "0" } : {}}>
-        <div className="h-full">
+    return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
+        <div className="w-full h-full">
             <div id="layout-container" className="split flex flex-row h-full">
                 <div id="sidebar-container" style={{ zIndex: bubbleActive && [5,6,7,9].includes(bubblePage) ? 35 : 0 }}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
