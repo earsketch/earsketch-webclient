@@ -10,8 +10,9 @@ import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from 'caiTree'
 import * as recommender from '../recommender'
 import * as userProject from '../userProject'
 import * as caiStudentHistoryModule from "../../cai/studentHistory"
+import * as codeSuggestion from "../../cai/codeSuggestion"
 
-app.factory('caiDialogue', ['codeSuggestion', function (codeSuggestion) {
+app.factory('caiDialogue', [function () {
     var currentInput = {};
     var currentParameters = {};
     var currentTreeNode = {};
@@ -1308,7 +1309,7 @@ app.factory('caiDialogue', ['codeSuggestion', function (codeSuggestion) {
             addToNodeHistory(["request", "codeRequest"]);
         }
 
-        var outputObj = codeSuggestion.generateCodeSuggestion(null, nodeHistory[activeProject]);
+        var outputObj = codeSuggestion.generateCodeSuggestion(nodeHistory[activeProject]);
         currentSuggestion[activeProject] = Object.assign({}, outputObj);
 
         if (outputObj != null) {

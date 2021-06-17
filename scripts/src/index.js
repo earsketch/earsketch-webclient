@@ -156,7 +156,6 @@ require(['angular'], () => {
     // CAI
     require('./cai/CAI');
     require('caiDialogue');
-    require('codeSuggestion');
 
     // TODO: Use a module.
     window.REPORT_LOG = [];

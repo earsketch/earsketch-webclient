@@ -7,6 +7,7 @@ import * as helpers from '../helpers'
 import * as curriculum from '../browser/curriculumState'
 import * as userProject from '../app/userProject'
 import * as analysis from './analysis'
+import * as codeSuggestion from './codeSuggestion'
 let complexityCalculator = require('./complexityCalculator')
 let complexityCalculatorPY = require('./complexityCalculatorPY')
 let complexityCalculatorJS = require('./complexityCalculatorJS')
@@ -127,7 +128,6 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
     'cai/sendCAIMessage',
     (input, { getState, dispatch }) => {
         const caiDialogue = helpers.getNgService('caiDialogue')
-        const codeSuggestion = helpers.getNgService('codeSuggestion')
         const ideScope = helpers.getNgController('ideController').scope()
         const rootScope = helpers.getNgRootScope()
 
@@ -219,7 +219,6 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     (data, { getState, dispatch }) => {
 
         const caiDialogue = helpers.getNgService('caiDialogue')
-        const codeSuggestion = helpers.getNgService('codeSuggestion')
         const caiStudentHistoryModule = helpers.getNgService('caiStudentHistoryModule')
         const rootScope = helpers.getNgRootScope()
 
