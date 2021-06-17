@@ -33,7 +33,7 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
     }
 
     return <div>
-        <div className="modal-header"><h3>Change Password</h3></div>
+        <div className="modal-header"><h3>{t('changePassword.prompt')}</h3></div>
 
         <form onSubmit={e => { e.preventDefault(); submitPassword() }}>
             <div className="modal-body">
