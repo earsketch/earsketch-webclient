@@ -397,25 +397,25 @@ const IDE = () => {
 
     return <div id="main-container" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="h-full">
-            <div id="layout-container" className="flex flex-row h-full">
-                <div className="split" id="sidebar-container" style={{ zIndex: bubbleActive && [5,6,7,9].includes(bubblePage) ? 35 : 0 }}>
+            <div id="layout-container" className="split flex flex-row h-full">
+                <div id="sidebar-container" style={{ zIndex: bubbleActive && [5,6,7,9].includes(bubblePage) ? 35 : 0 }}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
                         <Browser />
                     </div>
                 </div>
 
                 <div className="split flex flex-col" id="content">
-                    <div className="split" id="devctrl">
+                    <div id="devctrl">
                         <div className="h-full max-h-full" id="workspace">
                             {loading
                             ? <div className="loading text-center h-full w-full flex items-center justify-center">
-                                <i className="spinner icon icon-spinner inline-block animate-spin"></i> Loading...
+                                <i className="spinner icon icon-spinner inline-block animate-spin mr-3"></i> Loading...
                             </div>
                             : <div className="workstation h-full w-full"><DAW /></div>}
                         </div>
                     </div>
 
-                    {!hideEditor && <div className="split flex flex-col" id="coder" style={{ zIndex: bubbleActive && [1,2,9].includes(bubblePage) ? 35 : 0 }}>
+                    {!hideEditor && <div className="flex flex-col" id="coder" style={{ zIndex: bubbleActive && [1,2,9].includes(bubblePage) ? 35 : 0 }}>
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
@@ -446,32 +446,28 @@ const IDE = () => {
                         </div>
                     </div>}
 
-                    <div className="split" id="console-frame" style={{ zIndex: bubbleActive && [9].includes(bubblePage) ? 35 : 0 }}>
-                        <div className="results">
-                            <div className="row">
-                                <div id="console">
-                                    {userConsole.logs.map((msg: any, index: number) => {
-                                    <div key={index} className="console-line">
-                                        <span className={"console-" + msg.level.replace("status", "info")}>
-                                            {msg.text}
-                                            {msg.level === "error" &&
-                                            <a className="cursor-pointer" onClick={() => helpers.getNgRootScope().loadChapterForError(msg.text)}>
-                                                Click here for more information.
-                                            </a>}
-                                        </span>
-                                    </div>})}
-                                </div>
+                    <div className="results" id="console-frame" style={{ zIndex: bubbleActive && [9].includes(bubblePage) ? 35 : 0 }}>
+                        <div className="row">
+                            <div id="console">
+                                {userConsole.logs.map((msg: any, index: number) =>
+                                <div key={index} className="console-line">
+                                    <span className={"console-" + msg.level.replace("status", "info")}>
+                                        {msg.text}
+                                        {msg.level === "error" &&
+                                        <a className="cursor-pointer" onClick={() => helpers.getNgRootScope().loadChapterForError(msg.text)}>
+                                            Click here for more information.
+                                        </a>}
+                                    </span>
+                                </div>)}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="split" id="curriculum-container" style={{ zIndex: bubbleActive && [8,9].includes(bubblePage) ? 35 : 0 }}>
-                    <div className="h-full">
-                        {helpers.getNgMainController().scope().showCAIWindow
-                        ? <CAI />
-                        : <Curriculum />}
-                    </div>
+                <div className="h-full" id="curriculum-container" style={{ zIndex: bubbleActive && [8,9].includes(bubblePage) ? 35 : 0 }}>
+                    {helpers.getNgMainController().scope().showCAIWindow
+                    ? <CAI />
+                    : <Curriculum />}
                     {/* <div chatwindow id="chat-window" ng-show="showChatWindow"></div> */}
                 </div>
             </div>
