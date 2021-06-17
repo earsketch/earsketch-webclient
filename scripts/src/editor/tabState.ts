@@ -4,6 +4,7 @@ import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import * as ace from 'ace-builds';
 
+import * as app from '../app/appState';
 import * as collaboration from '../app/collaboration';
 import * as helpers from '../helpers';
 import * as scripts from '../browser/scriptsState';
@@ -144,14 +145,12 @@ const tabsMutableState: TabsMutableState = {
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/setActiveTabAndEditor',
     (scriptID, { getState, dispatch }) => {
-        const ideScope = helpers.getNgController('ideController').scope();
         const prevTabID = selectActiveTabID(getState());
         const script = scripts.selectAllScriptEntities(getState())[scriptID];
 
         if (!script) return;
 
         if (editor.selectBlocksMode(getState())) {
-            ideScope.toggleBlocks();
             dispatch(editor.setBlocksMode(false));
         }
 
@@ -169,8 +168,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
         }
         editor.setSession(editSession);
 
-        ideScope.activeScript = script;
-        ideScope.setLanguage(language);
+        dispatch(app.setScriptLanguage(language));
         editor.setReadOnly(script.readonly);
 
         if (script.collaborative) {
@@ -217,8 +215,6 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
     'tabs/closeAllTabs',
     (_, { getState, dispatch }) => {
         if (editor.selectBlocksMode(getState())) {
-            const ideScope = helpers.getNgController('ideController').scope();
-            ideScope.toggleBlocks();
             dispatch(editor.setBlocksMode(false));
         }
 

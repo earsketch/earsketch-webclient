@@ -1,5 +1,5 @@
 import angular from 'angular';
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import { react2angular } from 'react2angular';
 
@@ -25,7 +25,7 @@ export const getNgRootScope = () => angular.element(document).injector().get('$r
 
 export const getNgMainController = () => angular.element(document.body);
 
-export function wrapModal(Component: FunctionComponent) {
+export function wrapModal(Component: any) {
     const Wrapped = ({ modalInstance, resolve, ...props}: any) =>
         React.createElement(Provider, { store }, React.createElement(Component, { close: modalInstance.close, ...resolve, ...props }, null))
     return react2angular(Wrapped, ["modalInstance", "resolve"])

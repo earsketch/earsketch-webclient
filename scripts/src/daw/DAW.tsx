@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
 
 import * as appState from '../app/appState'
 import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
+import { compileCode } from "../app/IDE"
 import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
@@ -52,7 +52,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         // TODO: Update after relevant components get ported.
         if (needCompile) {
-            helpers.getNgController("ideController").compileCode()
+            compileCode()
             setNeedCompile(false)
             return
         }
@@ -684,11 +684,9 @@ const setup = () => {
     if (setupDone) return
     setupDone = true
 
-    const $scope = helpers.getNgController('ideController').scope()
-
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', (result: player.DAWData | null | undefined) => {
+    helpers.getNgRootScope().$on('compiled', (event: any, result: player.DAWData | null | undefined) => {
         if (result) {
             esconsole("code compiled", "daw")
             setDAWData(result)
@@ -696,7 +694,7 @@ const setup = () => {
     })
 }
 
-export const DAW = () => {
+const DAW = () => {
     const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const trackColors = useSelector(daw.selectTrackColors)
@@ -1055,11 +1053,7 @@ export const DAW = () => {
 
 const HotDAW = hot(() => {
     setup()
-    return (
-        <Provider store={store}>
-            <DAW />
-        </Provider>
-    )
+    return <Provider store={store}><DAW /></Provider>
 })
 
-app.component('daw', react2angular(HotDAW))
+export { HotDAW as DAW }

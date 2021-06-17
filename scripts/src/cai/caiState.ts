@@ -120,7 +120,6 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         const caiDialogue = helpers.getNgService('caiDialogue')
         const codeSuggestion = helpers.getNgService('codeSuggestion')
         const userProject = helpers.getNgService('userProject')
-        const ideScope = helpers.getNgController('ideController').scope()
         const rootScope = helpers.getNgRootScope()
 
         caiDialogue.studentInteract()
@@ -135,8 +134,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         } as CAIMessage
 
         const text = editor.ace.getValue();
-        // TODO: use the script language selector from appState
-        const lang = ideScope.currentLanguage;
+        const lang = getState().app.scriptLanguage
         codeSuggestion.generateResults(text, lang)
         caiDialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList(message))

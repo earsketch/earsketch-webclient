@@ -24,10 +24,6 @@
 
 var myLayout, innerLayout;
 
-function doCopy(that){
-    angular.element($('#devctrl')).scope().pasteCurriculumCode(that.nextSibling.innerHTML);
-}
-
 function resizeNavigationWidth(override, size){
     if(override){
         $("#curriculum div.navigation").width(0);

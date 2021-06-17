@@ -2,6 +2,7 @@
 // earsketch-appdsp.ts is a light wrapper over it.
 // Created by Juan Martinez Nieto <jcm7@gatech.edu> on 2015-09-01.
 // Converted into a TypeScript module and cleaned up by Ian Clester <ijc@gatech.edu> on 2021-06-09.
+import { Module } from "./earsketch-dsp"
 
 const WINDOW_SIZE = 1024
 export const HOP_SIZE = 256
@@ -9,8 +10,6 @@ export const HOP_SIZE = 256
 const MAX_BUFFERSIZE = 8388608
 const MAX_OUTSAMPLES = MAX_BUFFERSIZE * 2
 const MAX_FRAMES =  MAX_BUFFERSIZE / HOP_SIZE
-
-declare const Module: any
 
 const initDSP = Module.cwrap("initDSP", "number")
 const fillHann = Module.cwrap("fillHann", "number", ["number", "number"])
@@ -29,20 +28,6 @@ function allocateBuffer(type: typeof Int32Array | typeof Float32Array, length: n
     return new type(Module.HEAPF32.buffer, ptr, length)
 }
 
-// Heap variables
-// Foreboding old comment: "TODO: REVIEW EMSCRIPTEN HEAP FOR OVERLAP AND INTERPOLATION  EXTENDS TOTAL MEMORY 
-//   IN THE HEAP OR USE STANDARD FLOAT ARRAY AND USE THE COPY FUNCTION"
-const hannWindow = allocateBuffer(Float32Array, WINDOW_SIZE)
-const windowed = allocateBuffer(Float32Array, WINDOW_SIZE)
-const lastPhase = allocateBuffer(Float32Array, WINDOW_SIZE/2 + 1)
-const magFreqPairs = allocateBuffer(Float32Array, WINDOW_SIZE + 2)
-const accumPhase = allocateBuffer(Float32Array, WINDOW_SIZE/2 + 1)
-const overlapped = allocateBuffer(Float32Array, MAX_OUTSAMPLES)
-const interpolated = allocateBuffer(Float32Array, MAX_BUFFERSIZE)
-const hopOut = allocateBuffer(Int32Array, MAX_FRAMES)
-
-fillHann(hannWindow.byteOffset, WINDOW_SIZE)
-
 function setOutSample(envelope: Float32Array, frames: number) {
     let hopOut = 0
     let numSamples = 0
@@ -54,14 +39,6 @@ function setOutSample(envelope: Float32Array, frames: number) {
     }
     numSamples += WINDOW_SIZE - hopOut
     return numSamples
-}
-
-function setVariableShift(envelope: Float32Array, frames: number) {
-    for (let f = 0; f < frames; f++) {
-        const step = envelope[f]
-        const alpha = Math.pow(2, step/12)
-        hopOut[f] = Math.round(alpha * HOP_SIZE)
-    }
 }
 
 export function computeNumberOfFrames(totalsamples: number) {
@@ -82,8 +59,25 @@ export function computePitchShift(data: Float32Array, envelope: Float32Array, co
         throw "Max interpolation size exceeded"
     }
 
+    // Allocate buffers on the heap.
+    // Foreboding old comment: "TODO: REVIEW EMSCRIPTEN HEAP FOR OVERLAP AND INTERPOLATION  EXTENDS TOTAL MEMORY 
+    //   IN THE HEAP OR USE STANDARD FLOAT ARRAY AND USE THE COPY FUNCTION"
+    const hannWindow = allocateBuffer(Float32Array, WINDOW_SIZE)
+    const windowed = allocateBuffer(Float32Array, WINDOW_SIZE)
+    const lastPhase = allocateBuffer(Float32Array, WINDOW_SIZE/2 + 1)
+    const magFreqPairs = allocateBuffer(Float32Array, WINDOW_SIZE + 2)
+    const accumPhase = allocateBuffer(Float32Array, WINDOW_SIZE/2 + 1)
+    const overlapped = allocateBuffer(Float32Array, MAX_OUTSAMPLES)
+    const interpolated = allocateBuffer(Float32Array, MAX_BUFFERSIZE)
+    const hopOut = allocateBuffer(Int32Array, MAX_FRAMES)
+    fillHann(hannWindow.byteOffset, WINDOW_SIZE)
+
     initDSP()
-    setVariableShift(envelope, numFrames)
+    for (let f = 0; f < numFrames; f++) {
+        const step = envelope[f]
+        const alpha = Math.pow(2, step/12)
+        hopOut[f] = Math.round(alpha * HOP_SIZE)
+    }
     overlapped.fill(0)
 
     let offset = 0
@@ -95,7 +89,7 @@ export function computePitchShift(data: Float32Array, envelope: Float32Array, co
         windowSignal(hannWindow.byteOffset, windowed.byteOffset, WINDOW_SIZE)
         // Forward real FFT
         rfft(windowed.byteOffset, WINDOW_SIZE/2, 1)
-        // Computing instantaneous frequency
+        // Compute instantaneous frequency
         convert(windowed.byteOffset, magFreqPairs.byteOffset, WINDOW_SIZE/2, HOP_SIZE, lastPhase.byteOffset)
         // Compute complex FFT from instantaneous frequency
         unconvert(magFreqPairs.byteOffset, windowed.byteOffset, WINDOW_SIZE/2, hopOut[f], accumPhase.byteOffset)
@@ -111,5 +105,15 @@ export function computePitchShift(data: Float32Array, envelope: Float32Array, co
 
     const audiobuffer = context.createBuffer(1, numSamples, context.sampleRate)
     audiobuffer.getChannelData(0).set(interpolated.subarray(0, numSamples))
+
+    Module._free(hannWindow.byteOffset);
+	Module._free(windowed.byteOffset);
+	Module._free(lastPhase.byteOffset);
+	Module._free(magFreqPairs.byteOffset);
+	Module._free(accumPhase.byteOffset);
+	Module._free(overlapped.byteOffset);
+	Module._free(interpolated.byteOffset);
+	Module._free(hopOut.byteOffset);
+
     return audiobuffer
 }

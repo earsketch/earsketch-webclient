@@ -12,6 +12,9 @@ const editorSlice = createSlice({
     reducers: {
         setBlocksMode(state, { payload }) {
             state.blocksMode = payload;
+        },
+        toggleBlocksMode(state) {
+            state.blocksMode = !state.blocksMode
         }
     }
 });
@@ -24,7 +27,8 @@ const persistConfig = {
 
 export default persistReducer(persistConfig, editorSlice.reducer);
 export const {
-    setBlocksMode
+    setBlocksMode,
+    toggleBlocksMode,
 } = editorSlice.actions;
 
 // Note: Do not export. Only modify through asyncThunk as side effects.

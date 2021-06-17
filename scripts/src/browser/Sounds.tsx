@@ -8,6 +8,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import * as helpers from '../helpers';
 import * as sounds from './soundsState';
 import * as appState from '../app/appState';
+import * as editor from '../editor/Editor';
 import * as user from '../user/userState';
 import * as tabs from '../editor/tabState';
 import { RootState } from '../reducers';
@@ -133,7 +134,7 @@ const AddSound = () => {
     return (
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
-            onClick={() => helpers.getNgController("ideController").scope().openUploadWindow()}
+            onClick={() => helpers.getNgMainController().scope().openUploadWindow()}
         >
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
                 <i className='icon icon-plus2' />
@@ -165,7 +166,6 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
     const userName = useSelector(user.selectUserName) as string;
     const isUserOwned = loggedIn && clip.folder === userName.toUpperCase();
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length;
-    const ideScope = tabsOpen && helpers.getNgController('ideController').scope();
 
     return (
         <div className='flex flex-row justify-start'>
@@ -201,11 +201,11 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                         )
                     }
                     {
-                        (tabsOpen && ideScope) &&
+                        tabsOpen &&
                         (
                             <button
                                 className='btn btn-xs btn-action'
-                                onClick={() => ideScope.pasteCode(fileKey)}
+                                onClick={() => editor.pasteCode(fileKey)}
                                 title={t('soundBrowser.clip.tooltip.paste')}
                             >
                                 <i className='icon icon-paste2' />

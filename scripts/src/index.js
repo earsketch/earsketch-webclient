@@ -29,10 +29,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
 
-import { react2angular } from 'react2angular'
-
 import * as helpers from './helpers'
-import { Editor } from './editor/Editor'
 import esconsole from './esconsole'
 import * as ESUtils from './esutils'
 import reporter from './app/reporter'
@@ -54,6 +51,12 @@ window.esPrompt = message => {
         resolve: { message() { return message } },
     }).result.then(input => resolve(input), () => resolve("")))
 }
+
+import { react2angular } from "react2angular"
+
+import { IDE } from "./app/IDE"
+import { ScriptCreator } from "./app/ScriptCreator"
+import { DropdownMenuContainer } from "./browser/ScriptsMenus"
 
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
@@ -119,7 +122,6 @@ require(['angular'], () => {
 
     // Controllers
     require('mainController');
-    require('ideController');
 
     require('adminWindowController');
 
@@ -135,12 +137,14 @@ require(['angular'], () => {
     require('./app/Footer');
     require('./editor/Tabs');
     require('./editor/EditorHeader');
-    app.component("editor", react2angular(Editor))
     require('./top/LocaleSelector')
     require('./app/Notification')
     require('./app/Recorder')
     require('./app/Diff')
+    app.component("ide", react2angular(IDE))
     app.component("prompt", helpers.wrapModal(Prompt))
+    app.component("createScriptController", helpers.wrapModal(ScriptCreator))
+    app.component("scriptDropdownMenu", react2angular(DropdownMenuContainer))
 
     // To be ported to React
     require('./layout/Layout');

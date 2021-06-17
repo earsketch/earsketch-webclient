@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useRef, LegacyRef } from 'react';
 import { Provider, useSelector, useDispatch } from 'react-redux';
-import { Store } from 'redux';
 import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
 import { usePopper } from "react-popper";
 import * as classNames from 'classnames';
 
 import * as appState from '../app/appState';
-import * as tabs from './tabState';
-import * as scripts from '../browser/scriptsState';
 import * as editor from './editorState';
 import * as helpers from '../helpers';
+import { createScript } from '../app/IDE';
+import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
+import * as scripts from '../browser/scriptsState';
+import store from '../reducers';
+import * as tabs from './tabState';
 import * as userProject from '../app/userProject';
 
-import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
-
 const CreateScriptButton = () => {
-    const ideControllerScope = helpers.getNgController('ideController').scope();
     return (
         <div
             className={`
@@ -26,7 +24,7 @@ const CreateScriptButton = () => {
                 text-lg cursor-pointer
             `}
             id='create-script-button'
-            onClick={() => ideControllerScope?.createScript()}
+            onClick={createScript}
         >
             <i className='icon icon-plus2' />
         </div>
@@ -257,12 +255,6 @@ const Tabs = () => {
     );
 };
 
-const HotTabs = hot((props: { $ngRedux: Store }) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <Tabs />
-        </Provider>
-    );
-});
+const HotTabs = hot(() => <Provider store={store}><Tabs /></Provider>)
 
-app.component('scriptTabs', react2angular(HotTabs,null,['$ngRedux']));
+export { HotTabs as Tabs }

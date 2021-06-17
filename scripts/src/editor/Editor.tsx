@@ -1,5 +1,6 @@
-import { Ace } from "ace-builds"
+import { Ace, Range } from "ace-builds"
 import { hot } from "react-hot-loader/root"
+import i18n from "i18next"
 import { Provider, useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
 
@@ -7,8 +8,11 @@ import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
+import * as editor from "./editorState"
 import * as helpers from "../helpers"
+import { initEditor } from "../app/IDE"
 import * as tabs from "./tabState"
+import * as userConsole from "../app/userconsole"
 import * as userProject from "../app/userProject"
 import store from "../reducers"
 
@@ -96,6 +100,44 @@ export function setLanguage(currentLanguage: string) {
         droplet?.setPalette(config.blockPaletteJavascript.palette)
     }
     ace?.getSession().setMode("ace/mode/" + currentLanguage)
+}
+
+export function pasteCode(code: string) {
+    if (droplet.currentlyUsingBlocks) {
+        droplet.setFocusedText(code)
+    } else {
+        ace.insert(code)
+        ace.focus()
+    }
+}
+
+let lineNumber: number | null = null
+let marker: number | null = null
+
+export function highlightError(err: any) {
+    const language = store.getState().app.scriptLanguage
+    let range
+
+    let line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    if (line !== undefined) {
+        lineNumber = line - 1
+        if (droplet.currentlyUsingBlocks) {
+            droplet.markLine(lineNumber, { color: "red" })
+        }
+        range = new Range(lineNumber, 0, lineNumber, 2000)
+        marker = ace.getSession().addMarker(range, "error-highlight", "fullLine")
+    }
+}
+
+export function clearErrors() {
+    if (droplet.currentlyUsingBlocks) {
+        if (lineNumber !== null) {
+            droplet.unmarkLine(lineNumber)
+        }
+    }
+    if (marker !== null) {
+        ace.getSession().removeMarker(marker)
+    }
 }
 
 function setupAceHandlers(ace: Ace.Editor) {
@@ -186,7 +228,7 @@ function setupAceHandlers(ace: Ace.Editor) {
 
 let setupDone = false
 
-function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number, ideScope: any) {
+function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number) {
     if (setupDone) return
 
     if (language === "python") {
@@ -209,8 +251,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
         wrap: false,
     })
 
-    ideScope.initEditor()
-    ideScope.collaboration = collaboration
+    initEditor()
     setupDone = true
 }
 
@@ -220,29 +261,44 @@ const Editor = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
-    const ideScope = helpers.getNgController("ideController").scope()
+    const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!editorElement.current) return
-        setup(editorElement.current, language, theme, fontSize, ideScope)
+        setup(editorElement.current, language, theme, fontSize)
     }, [editorElement.current])
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
 
+    useEffect(() => setLanguage(language), [language])
+
     useEffect(() => {
-        console.log("HELLO! FONT SIZE IS", fontSize)
         setFontSize(fontSize)
         // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
         setLanguage(language)
     }, [fontSize])
 
-    return <>
-        {/* TODO: using parent (ideController) scope... cannot isolate them well */}
+    useEffect(() => {
+        if (blocksMode && !droplet.currentlyUsingBlocks) {
+            // Ask Ace editor if there are any syntax errors.
+            const annotations = ace.getSession().getAnnotations()
+            if (annotations.some(note => note.type === "error")) {
+                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+            } else {
+                userConsole.clear()
+            }
+            droplet.toggleBlocks()
+        } else if (!blocksMode && droplet.currentlyUsingBlocks) {
+            droplet.toggleBlocks()
+        }
+    }, [blocksMode])
+
+    return <div className="flex flex-grow h-full max-h-full overflow-y-hidden">
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode
-            && <div className="floating-bar" onClick={ideScope.importScript}>
+            && <div className="floating-bar" onClick={() => helpers.getNgMainController().scope().importScript(activeScript)}>
                 <div>{/* DO NOT REMOVE: this is an empty div to block the space before the next div */}</div>
                 <div className="btn-action btn-floating shake">
                     <i className="icon icon-import"></i><span>IMPORT TO EDIT</span>
@@ -250,7 +306,6 @@ const Editor = () => {
             </div>}
         </div>
 
-        {/* Note: activeScript managed in ideController and tabState */}
         {activeScript?.collaborative && <div id="collab-badges-container">
             {Object.entries(collaboration.otherMembers).map(([name, state], index) => 
             <div key={name} className="collaborator-badge prevent-selection" style={{
@@ -262,7 +317,7 @@ const Editor = () => {
                 {name[0].toUpperCase()}
             </div>)}
         </div>}
-    </>
+    </div>
 }
 
 const HotEditor = hot(() => <Provider store={store}><Editor /></Provider>)

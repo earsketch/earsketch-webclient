@@ -214,7 +214,6 @@ Object.assign(window,require('esAppDSP'));
 
 // Controllers
 require('mainController');
-require('ideController');
 
 require('adminWindowController');
 

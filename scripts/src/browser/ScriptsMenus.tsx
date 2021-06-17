@@ -1,13 +1,12 @@
 import React, { useState, useEffect, LegacyRef } from 'react';
-import { Store } from "redux";
 import { Provider, useDispatch, useSelector } from "react-redux";
-import { react2angular } from 'react2angular';
 import { usePopper } from 'react-popper';
 import PopperJS from '@popperjs/core';
 import * as appState from "../app/appState";
 import * as exporter from "../app/exporter";
 import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
+import store from '../reducers';
 import * as tabs from "../editor/tabState";
 import * as helpers from "../helpers";
 import { ScriptEntity, ScriptType } from 'common';
@@ -302,10 +301,4 @@ export const DropdownContextMenuCaller: React.FC<DropdownContextMenuCallerType> 
     );
 };
 
-const DropdownMenuContainer = (props: { $ngRedux: Store }) => (
-    <Provider store={props.$ngRedux}>
-        <SingletonDropdownMenu />
-    </Provider>
-);
-
-app.component('scriptDropdownMenu', react2angular(DropdownMenuContainer, null, ['$ngRedux']));
+export const DropdownMenuContainer = () => <Provider store={store}><SingletonDropdownMenu /></Provider>

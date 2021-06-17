@@ -215,7 +215,7 @@ const MessageBox = () => {
 };
 
 const Bubble = () => {
-    const active = useSelector(bubble.selectBubbleActive);
+    const active = useSelector(bubble.selectActive);
     return (
         <div
             className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}

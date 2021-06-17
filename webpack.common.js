@@ -42,7 +42,6 @@ module.exports = {
 
             // Emscripten
             esDSP: path.resolve(__dirname,`${libDir}/earsketch-dsp.js`),
-            esAppDSP: path.resolve(__dirname,`${libDir}/earsketch-appdsp.js`),
 
             ngClipboard: 'angular-clipboard',
             uiUtils: path.resolve(__dirname,`${vendorDir}/angular/angular-ui-utils.min.js`),
@@ -51,7 +50,6 @@ module.exports = {
 
             // Controllers
             mainController: path.resolve(__dirname,`${appDir}/mainController.js`),
-            ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),

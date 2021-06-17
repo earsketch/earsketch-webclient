@@ -123,6 +123,6 @@ export const proceed = createAsyncThunk(
     }
 );
 
-export const selectBubbleActive = (state: RootState) => state.bubble.active;
+export const selectActive = (state: RootState) => state.bubble.active;
 export const selectCurrentPage = (state: RootState) => state.bubble.currentPage;
 export const selectReadyToProceed = (state: RootState) => state.bubble.readyToProceed;

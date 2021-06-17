@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { Collapsed } from '../browser/Browser'
 
@@ -163,15 +162,9 @@ const CaiPane = () => {
 }
 
 
-const HotCAI = hot((props: {
-    $ngRedux: any // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
-}) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <CaiPane />
-        </Provider>
-    )
-})
+const HotCAI = hot(() => <Provider store={store}><CaiPane /></Provider>)
+
+export { HotCAI as CAI }
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
@@ -191,5 +184,3 @@ if (FLAGS.SHOW_CAI) {
         }
     }, 5000)
 }
-
-app.component('cai', react2angular(HotCAI, null, ['$ngRedux']))
