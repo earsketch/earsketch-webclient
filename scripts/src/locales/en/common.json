@@ -40,12 +40,22 @@
     "daw.bypass": "Bypass",
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",
-    "script.share": "Share",
     "editor.run": "Run",
     "tabs.otherTabs": "Other Tabs",
     "tabs.closeAll": "Close All",
     "footer.teachers": "Teachers",
-    "footer.help": "Help / Contact"
+    "footer.help": "Help / Contact",
+    "script.open": "Open",
+    "script.copy": "Create Copy",
+    "script.rename": "Rename",
+    "script.download": "Download",
+    "script.print": "Print",
+    "script.share": "Share",
+    "script.submitCompetition": "Submit to Competition",
+    "script.history": "History",
+    "script.codeIndicator": "Code Indicator",
+    "script.import": "Import",
+    "script.delete": "Delete"
   },
   "messages": {
     "interpreter": {

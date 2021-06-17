@@ -12,6 +12,7 @@ import * as tabs from "../editor/tabState";
 import * as helpers from "../helpers";
 import { ScriptEntity, ScriptType } from 'common';
 import * as userProject from '../app/userProject';
+import { useTranslation } from "react-i18next";
 
 export const openScript = (script: ScriptEntity) => {
     const rootScope = helpers.getNgRootScope();
@@ -100,6 +101,7 @@ const SingletonDropdownMenu = () => {
     const script = useSelector(scripts.selectDropdownMenuScript);
     const type = useSelector(scripts.selectDropdownMenuType);
     const context = useSelector(scripts.selectDropdownMenuContext);
+    const { t } = useTranslation()
 
     // For some operations, get the most up-to-date script being kept in userProject.
     const unsavedScript = useSelector(scripts.selectUnsavedDropdownMenuScript);
@@ -144,7 +146,7 @@ const SingletonDropdownMenu = () => {
                 />
             </div>
             <MenuItem
-                name='Open' icon='icon-file-empty'
+                name={t('script.open')} icon='icon-file-empty'
                 visible={!context}
                 onClick={() => {
                     if (!script) return;
@@ -159,7 +161,7 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='Create Copy' icon='icon-copy'
+                name={t('script.copy')} icon='icon-copy'
                 visible={type==='regular'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
@@ -167,7 +169,7 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='Rename' icon='icon-pencil2'
+                name={t('script.rename')} icon='icon-pencil2'
                 visible={type==='regular'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
@@ -175,20 +177,20 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='Download' icon='icon-cloud-download'
+                name={t('script.download')} icon='icon-cloud-download'
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     scope.downloadScript(unsavedScript);
                 }}
             />
             <MenuItem
-                name='Print' icon='icon-printer'
+                name={t('script.print')} icon='icon-printer'
                 onClick={() => {
                     exporter.print(unsavedScript!);
                 }}
             />
             <MenuItem
-                name='Share' icon='icon-share32'
+                name={t('script.share')} icon='icon-share32'
                 visible={type==='regular'}
                 disabled={!loggedIn}
                 onClick={() => {
@@ -196,7 +198,7 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='Submit to Competition' icon='icon-share2'
+                name={t('script.submitCompetition')} icon='icon-share2'
                 visible={type==='regular' && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
                 onClick={() => {
@@ -205,7 +207,7 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='History' icon='icon-history'
+                name={t('script.history')} icon='icon-history'
                 disabled={!loggedIn || type==='readonly'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
@@ -213,14 +215,14 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='Code Indicator' icon='glyphicon glyphicon-info-sign'
+                name={t('script.codeIndicator')} icon='glyphicon glyphicon-info-sign'
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
                     scope.openCodeIndicator(unsavedScript);
                 }}
             />
             <MenuItem
-                name='Import' icon='icon-import'
+                name={t('script.import')} icon='icon-import'
                 visible={['shared','readonly'].includes(type as string)}
                 onClick={async () => {
                     let imported;
@@ -242,7 +244,7 @@ const SingletonDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name='Delete' icon='icon-bin'
+                name={t('script.delete')} icon='icon-bin'
                 visible={type!=='readonly'}
                 onClick={async () => {
                     const scope = helpers.getNgMainController().scope();
