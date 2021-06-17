@@ -68,10 +68,10 @@ function saveActiveScriptWithRunStatus(status: number) {
         isWaitingForServerResponse = false
     } else if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
-        userProject.saveScript(script.name, script.source_code, true, status).then(function () {
+        userProject.saveScript(script.name, script.source_code, true, status).then(() => {
             store.dispatch(scripts.syncToNgUserProject())
             isWaitingForServerResponse = false
-        }).catch(function (err) {
+        }).catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
             isWaitingForServerResponse = false
         })
@@ -102,7 +102,7 @@ export function initEditor() {
             win: "Ctrl-S",
             mac: "Command-S",
         },
-        exec: function () {
+        exec() {
             const activeTabID = tabs.selectActiveTabID(store.getState())!
 
             let script = null
@@ -127,7 +127,7 @@ export function initEditor() {
             win: "Ctrl-Enter",
             mac: "Command-Enter",
         },
-        exec: function () {
+        exec() {
             compileCode()
         }
     })
@@ -152,110 +152,82 @@ export function initEditor() {
 }
 
 export async function openShare(shareid: string) {
-    let alreadySaved = false
-    let promise: Promise<any>
     const isEmbedded = store.getState().app.embedMode
 
     if (userProject.isLoggedIn()) {
         // User is logged in
-        promise = userProject.getSharedScripts().then(function (results) {
-            // Check if the shared script has been saved
-            let result: ScriptEntity
-            for (const script of results) {
-                if (script.shareid === shareid) {
-                    result = script
-                    alreadySaved = true
-                    break
-                }
+        const results = await userProject.getSharedScripts()
+        // Check if the shared script has been saved
+        let result = results.find(script => script.shareid === shareid)
+
+        if (result) {
+            // user has already opened this shared link before
+            if (userProject.isLoggedIn()) {
+                await userProject.getSharedScripts()
+                if (isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid})
+                userProject.openSharedScript(result.shareid)
+            }
+            switchToShareMode()
+        } else {
+            // Close the script if it was opened when the user was not logged in
+            if (initialSharedScripts[shareid]) {
+                userProject.closeSharedScript(shareid)
             }
 
-            if (!alreadySaved) {
-                // Close the script if it was opened when the user was not logged in
-                if (initialSharedScripts[shareid]) {
-                    userProject.closeSharedScript(shareid)
-                }
+            // user has not opened this shared link before
+            result = await userProject.loadScript(shareid, true) as ScriptEntity
+            if (isEmbedded) {
+                helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid})
+            }
 
-                // user has not opened this shared link before
-                promise = userProject.loadScript(shareid, true).then(function (result) {
-                    if (isEmbedded) {
-                        helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid})
-                    }
+            if (result.username !== userProject.getUsername()) {
+                // the shared script doesn't belong to the logged-in user
+                switchToShareMode()
 
-                    if (result.username !== userProject.getUsername()) {
-                        // the shared script doesn't belong to the logged-in user
-                        switchToShareMode()
-
-                        return userProject.saveSharedScript(shareid, result.name, result.source_code, result.username).then(function () {
-                            return userProject.getSharedScripts().then(function () {
-                                userProject.openSharedScript(result.shareid)
-                            })
-                        })
-
-                    } else {
-                        // the shared script belongs to the logged-in user
-                        // TODO: use broadcast or service
-                        editor.ace.focus()
-
-                        if (isEmbedded) {
-                            // DON'T open the script if it has been soft-deleted
-                            if (!result.soft_delete) {
-                                userProject.openScript(result.shareid)
-                            }
-
-                            // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
-                            store.dispatch(scripts.syncToNgUserProject())
-                            store.dispatch(tabs.setActiveTabAndEditor(shareid))
-                        } else {
-                            userNotification.show("This shared script link points to your own script.")
-                        }
-
-                        // Manually removing the user-owned shared script from the browser.
-                        // TODO: Better to have refreshShareBrowser or something.
-                        delete userProject.sharedScripts[shareid]
-                    }
-                }, function (err) {
-                    esconsole(err, ["share", "ide"])
-                })
+                await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
+                await userProject.getSharedScripts()
+                userProject.openSharedScript(result.shareid)
             } else {
-                // user has already opened this shared link before
-                if (userProject.isLoggedIn()) {
-                    promise = userProject.getSharedScripts().then(function () {
-                        if (isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", {scriptName: result.name, username: result.username, shareid: result.shareid})
-                        userProject.openSharedScript(result.shareid)
-                        switchToShareMode()
-                    })
-                } else {
-                    switchToShareMode()
-                }
-            }
+                // the shared script belongs to the logged-in user
+                // TODO: use broadcast or service
+                editor.ace.focus()
 
-            return promise
-        })
+                if (isEmbedded) {
+                    // DON'T open the script if it has been soft-deleted
+                    if (!result.soft_delete) {
+                        userProject.openScript(result.shareid)
+                    }
+
+                    // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
+                    store.dispatch(scripts.syncToNgUserProject())
+                    store.dispatch(tabs.setActiveTabAndEditor(shareid))
+                } else {
+                    userNotification.show("This shared script link points to your own script.")
+                }
+
+                // Manually removing the user-owned shared script from the browser.
+                // TODO: Better to have refreshShareBrowser or something.
+                delete userProject.sharedScripts[shareid]
+            }
+        }
     } else {
         // User is not logged in
-        promise = userProject.loadScript(shareid, true).then(function (result) {
-            if(isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", { scriptName: result.name, username: result.username, shareid: result.shareid })
-            userProject.saveSharedScript(shareid, result.name, result.source_code, result.username).then(function () {
-                    userProject.openSharedScript(result.shareid)
-            })
-            switchToShareMode()
-        })
+        const result = await userProject.loadScript(shareid, true)
+        if (isEmbedded) helpers.getNgRootScope().$broadcast("embeddedScriptLoaded", { scriptName: result.name, username: result.username, shareid: result.shareid })
+        await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
+        userProject.openSharedScript(result.shareid)
+        switchToShareMode()
     }
-
-    return promise
 }
 
 // For curriculum pages.
 (window as any).doCopy = (that: HTMLElement) => {
-    var patt = /<[^>]*>/g
-    var pattScriptName = /script_name: (.*)/
-    var pattRemoveSpecialChars = /[^\w_]/g
-    const key = (that.nextSibling as HTMLElement).innerHTML.replace(patt, "")
+    const key = (that.nextSibling as HTMLElement).innerHTML.replace(/<[^>]*>/g, "")
     // TODO: Something like this might still be necessary: key = _.unescape(key)
-    let result = pattScriptName.exec(key)
+    let result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
-        scriptName = result[1].replace(pattRemoveSpecialChars, "")
+        scriptName = result[1].replace(/[^\w_]/g, "")
     } else {
         scriptName = "curriculum"
     }
@@ -288,9 +260,9 @@ export function compileCode() {
 
     setLoading(true)
 
-    var code = editor.getValue()
+    const code = editor.getValue()
 
-    var startTime = Date.now()
+    const startTime = Date.now()
     const language = store.getState().app.scriptLanguage
     const promise = (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue(), 0)
 
@@ -301,16 +273,12 @@ export function compileCode() {
     const scriptID = tabs.selectActiveTabID(store.getState())
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
-    promise.then(function (result) {
-        var duration = Date.now() - startTime
+    promise.then(result => {
+        const duration = Date.now() - startTime
         setLoading(false)
         helpers.getNgRootScope().$broadcast("compiled", result)
-        // TODO: refactor notifications
-
         reporter.compile(language, true, undefined, duration)
-
         userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
-
         saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
 
         // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
@@ -320,19 +288,19 @@ export function compileCode() {
         if (FLAGS.SHOW_AUTOGRADER) {
             setTimeout(() => {
                 // reporter.complexity(language, code)
-                try{
-                    var report = helpers.getNgService("caiAnalysisModule").analyzeCodeAndMusic(language, code, result)
-                }
-                catch (e) {
+                let report
+                try {
+                    report = helpers.getNgService("caiAnalysisModule").analyzeCodeAndMusic(language, code, result)
+                } catch (e) {
                     // TODO: Make this work across browsers. (See esconsole for reference.)
-                    var traceDepth = 5
-                    var stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1]
-                    var startIndex = stackString.indexOf("reader.js")
+                    const traceDepth = 5
+                    let stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1]
+                    let startIndex = stackString.indexOf("reader.js")
                     stackString = stackString.substring(startIndex)
                     stackString = stackString.substring(0, stackString.indexOf(")"))
 
-                    for (var i = 0; i < traceDepth; i++) {
-                        var addItem = e.stack.split(" at")[2 + i]
+                    for (let i = 0; i < traceDepth; i++) {
+                        let addItem = e.stack.split(" at")[2 + i]
                         startIndex = addItem.lastIndexOf("/")
                         addItem = addItem.substring(startIndex + 1)
                         addItem = addItem.substring(0, addItem.indexOf(")"))
@@ -358,14 +326,14 @@ export function compileCode() {
         if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
             store.dispatch(setReady(true))
         }
-    }).catch(function (err) {
-        var duration = Date.now() - startTime
-        esconsole(err, ["ERROR","IDE"])
+    }).catch(err => {
+        const duration = Date.now() - startTime
+        esconsole(err, ["ERROR", "IDE"])
         setLoading(false)
         userConsole.error(err)
         editor.highlightError(err)
 
-        var errType = String(err).split(":")[0]
+        const errType = String(err).split(":")[0]
         reporter.compile(language, false, errType, duration)
 
         userNotification.showBanner(i18n.t("messages:interpreter.runFailed"), "failure1")
@@ -468,7 +436,7 @@ const IDE = () => {
                     {helpers.getNgMainController().scope().showCAIWindow
                     ? <CAI />
                     : <Curriculum />}
-                    {/* <div chatwindow id="chat-window" ng-show="showChatWindow"></div> */}
+                    {/* NOTE: The chat window might come back here at some point. */}
                 </div>
             </div>
         </div>
