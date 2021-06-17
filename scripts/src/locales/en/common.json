@@ -41,11 +41,15 @@
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",
     "editor.run": "Run",
+    "editor.noScriptsLoaded": "You have no scripts loaded.",
+    "editor.clickHereCreateScript": "Click here to create a new script!",
+    "editor.mode": "You are currently in {{scriptlang}} mode.",
+    "editor.ifYouWant": "If you want to switch to {{otherScriptLang}} mode, please open a script with {{otherScriptExt}} or create a new one and select {{otherScriptLang}} as the script language.",
     "tabs.otherTabs": "Other Tabs",
     "tabs.closeAll": "Close All",
     "footer.teachers": "Teachers",
     "footer.help": "Help / Contact",
-    "script.open": "Open",
+    "thing.open": "Open",
     "script.copy": "Create Copy",
     "script.rename": "Rename",
     "script.download": "Download",
@@ -55,7 +59,14 @@
     "script.history": "History",
     "script.codeIndicator": "Code Indicator",
     "script.import": "Import",
-    "script.delete": "Delete"
+    "script.delete": "Delete",
+    "default": "Default",
+    "notifications.title": "Notifications",
+    "notifications.viewAll": "View All",
+    "forgotPassword.title": "Forgot your password?",
+    "forgotPassword.prompt": "Please enter the email associated with your account",
+    "forgotPassword.submit": "Recover",
+    "forgotPassword.email": "Email"
   },
   "messages": {
     "interpreter": {

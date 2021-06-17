@@ -24,17 +24,17 @@ export const ForgotPassword = ({ close }: { close: () => void }) => {
 
     return <>
         <div className="modal-header">
-            <h3>Forgot your password?</h3>
+            <h3>{t('forgotPassword.title')}</h3>
         </div>
         <form onSubmit={e => { e.preventDefault(); resetPassword() }}>
             <div className="modal-body">
                 <label className="w-full">
-                    Please enter the email associated with your account
-                    <input type="email" className="form-control" name="email" placeholder="Email" required autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
+                    {t('forgotPassword.prompt')}
+                    <input type="email" className="form-control" name="email" placeholder={t('forgotPassword.email')} required autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
                 </label>
             </div>
             <div className="modal-footer">
-                <input type="submit" value="Recover" className="btn btn-primary" />
+                <input type="submit" value={t('forgotPassword.submit').toString()} className="btn btn-primary" />
             </div>
         </form>
     </>

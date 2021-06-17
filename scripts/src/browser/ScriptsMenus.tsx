@@ -146,7 +146,7 @@ const SingletonDropdownMenu = () => {
                 />
             </div>
             <MenuItem
-                name={t('script.open')} icon='icon-file-empty'
+                name={t('thing.open')} icon='icon-file-empty'
                 visible={!context}
                 onClick={() => {
                     if (!script) return;
