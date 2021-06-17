@@ -222,8 +222,7 @@ export async function openShare(shareid: string) {
 
 // For curriculum pages.
 (window as any).doCopy = (that: HTMLElement) => {
-    const key = (that.nextSibling as HTMLElement).innerHTML.replace(/<[^>]*>/g, "")
-    // TODO: Something like this might still be necessary: key = _.unescape(key)
+    const key = (that.nextSibling as HTMLElement).textContent!
     let result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
