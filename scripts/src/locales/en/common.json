@@ -103,9 +103,11 @@
     "scriptHistory.fetching": "Fetching script history.",
     "renameScript.title": "Rename Script",
     "renameScript.prompt": "Enter the new name for this script:",
-    "renameScript.submit": "Rename",
+    "rename.submit": "Rename",
     "renameScript.appendSuffix": "Append Suffix",
-    "renameScript.alreadyExists": "A script named '{{scriptName}}' already exists in your workspace.`"
+    "renameScript.alreadyExists": "A script named '{{scriptName}}' already exists in your workspace.`",
+    "renameSound.title": "Rename Sound",
+    "renameSound.prompt": "Enter the new name for your sound:"
   },
   "messages": {
     "interpreter": {
