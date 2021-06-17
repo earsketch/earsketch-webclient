@@ -33,7 +33,7 @@ $ ls -l earsketch-webclient/curriculum
 # if you do not see directory contents, including curr_toc.js, then re-create it
 $ cd earsketch-webclient
 $ rm curriculum
-$ ln -s ../earsketch-currciulum/curriculum-local currciulum
+$ ln -s ../earsketch-currciulum/curriculum-local curriculum
 ```
 
 4. Serve the client with npm
