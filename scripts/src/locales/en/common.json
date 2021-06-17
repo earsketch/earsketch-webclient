@@ -43,7 +43,9 @@
     "script.share": "Share",
     "editor.run": "Run",
     "tabs.otherTabs": "Other Tabs",
-    "tabs.closeAll": "Close All"
+    "tabs.closeAll": "Close All",
+    "footer.teachers": "Teachers",
+    "footer.help": "Help / Contact"
   },
   "messages": {
     "interpreter": {

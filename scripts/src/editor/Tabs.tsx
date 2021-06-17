@@ -119,7 +119,7 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
 const CloseAllTab = () => {
     const mainControllerScope = helpers.getNgMainController().scope();
     const { t } = useTranslation();
-    
+
     return (
         <div
             className={`
