@@ -23,6 +23,7 @@
     "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
     "soundBrowser.clip.tooltip.paste": "Paste to editor",
     "scriptBrowser.title": "SCRIPTS",
+    "scriptBrowser.myScripts": "MY SCRIPTS",
     "daw.title": "DIGITAL AUDIO WORKSTATION",
     "daw.shortTitle": "DAW",
     "daw.effect": "Effect",
@@ -89,7 +90,17 @@
     "changePassword.prompt": "Change Password",
     "changePassword.success": "Password changed successfully!",
     "script": "Script",
-    "download.multiTrack": "Multi Track"
+    "download.multiTrack": "Multi Track",
+    "scriptHistory.running": "Running script version...",
+    "scriptHistory.versionSuccess": "This version ran successfully.",
+    "scriptHistory.versionError": "There was an error in this version.",
+    "scriptHistory.restore": "Restore version",
+    "scriptHistory.title": "Version history for {{scriptName}}",
+    "scriptHistory.heading": "Version History",
+    "scriptHistory.diff": "Diff with Previous Version",
+    "scriptHistory.activeCollab": "Active Collaborators",
+    "scriptHistory.onlyMyScripts": "You can only revert the scripts under $t(scriptBrowser.myScripts)",
+    "scriptHistory.fetching": "Fetching script history."
   },
   "messages": {
     "interpreter": {

@@ -19,6 +19,7 @@ import {
     openScript, openSharedScript, shareScript,
     generateGetBoundingClientRect, VirtualRef, VirtualReference, DropdownMenuCaller
 } from './ScriptsMenus';
+import { useTranslation } from "react-i18next";
 
 const CreateScriptButton = () => {
     const ideScope = helpers.getNgController('ideController').scope();
@@ -445,10 +446,11 @@ const RegularScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredActiveScriptEntities);
     const scriptIDs = useSelector(scripts.selectFilteredActiveScriptIDs);
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length;
+    const { t } = useTranslation()
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const type: ScriptType = 'regular';
-    const title = `MY SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
+    const title = `${t('scriptBrowser.myScripts')} (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
     const initExpanded = !useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
     return <WindowedScriptCollection { ...props } />;

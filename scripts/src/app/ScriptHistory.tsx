@@ -13,6 +13,7 @@ import { Diff } from "./Diff"
 import store from "../reducers"
 import { DAWData } from "./player"
 import { DAW, setDAWData } from "../daw/DAW"
+import { useTranslation } from "react-i18next"
 
 function parseActiveUsers(activeUsers: string | string[]) {
     return Array.isArray(activeUsers) ? activeUsers.join(", ") : activeUsers
@@ -20,11 +21,12 @@ function parseActiveUsers(activeUsers: string | string[]) {
 
 const Version = ({ version, now, allowRevert, compiled, active, activate, run, revert, closeDAW }:
     { version: any, now: number, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any }) => {
+    const { t } = useTranslation()
     return <tr className={active ? "active" : ""}>
         <td>
             {({
-                1: <i className="icon icon-checkmark4" title="This version ran successfully."></i>,
-                2: <i className="icon icon-bug" title="There was an error in this version."></i>,
+                1: <i className="icon icon-checkmark4" title={t('scriptHistory.versionSuccess')}></i>,
+                2: <i className="icon icon-bug" title={t('scriptHistory.versionError')}></i>,
             } as any)[version.run_status] ?? null}
         </td>
         <td onClick={activate}>
@@ -33,7 +35,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
             <br />
             <span className="text-muted">{ESUtils.formatTimer(now - version.created)}</span>
         </td>
-        {allowRevert && <td><a href="#" onClick={revert} title="Restore version">
+        {allowRevert && <td><a href="#" onClick={revert} title={t('scriptHistory.restore')}>
             <i className="icon-rotate-cw2 inline-block" style={{ transform: "scaleX(-1)" }}></i>
         </a></td>}
         <td>{version.run_status === 1
@@ -63,6 +65,7 @@ const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, a
     const original = history?.[active + 1]
     const modified = history?.[active]
     const now = Date.now()
+    const { t } = useTranslation()
 
     useEffect(() => {
         userProject.getScriptHistory(script.shareid).then(result => {
@@ -117,20 +120,20 @@ const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, a
         <div className="modal-header">
             <button type="button" className="close" id="script-history-close" onClick={close}>&times;</button>
             <h4 className="modal-title">
-                Version history for "{script.name}"
-                {!allowRevert && <span>(You can only revert the scripts under MY SCRIPTS)</span>}
+                {t('scriptHistory.title', {scriptName: '"'+script.name+'"'})}
+                {!allowRevert && <span>({t('scriptHistory.onlyMyScripts')})</span>}
             </h4>
         </div>
 
         {history.length === 0
-        ? <div className="modal-body">Fetching script history.</div>
+        ? <div className="modal-body">{t('scriptHistory.fetching')}</div>
         : <div className="modal-body">
             <div className="row column-labels">
                 <div className="col-md-4" style={{ margin: 0, padding: 0 }}>
-                    <div className="column-label">Version History</div>
+                    <div className="column-label">{t('scriptHistory.heading')}</div>
                 </div>
                 <div className="col-md-8">
-                    {compiledResult === null && <div className="column-label">Diff with Previous Version</div>}
+                    {compiledResult === null && <div className="column-label">{t('scriptHistory.diff')}</div>}
                 </div>
             </div>
 
@@ -154,11 +157,11 @@ const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, a
                 ? <div className="col-md-8 scroll-50 relative"><DAW /></div>
                 : (compiling
                 ? <div className="col-md-8 scroll-50">
-                    <i className="animate-spin inline-block icon icon-spinner"></i> Running script version...
+                    <i className="animate-spin inline-block icon icon-spinner"></i> {t('scriptHistory.running')}
                 </div>
                 : <div className="col-md-8 scroll-50">
                     <pre><Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} /></pre>
-                    {original?.activeUsers && <div>Active Collaborators: {parseActiveUsers(original.activeUsers)}</div>}
+                    {original?.activeUsers && <div>{t('scriptHistory.activeCollab')}: {parseActiveUsers(original.activeUsers)}</div>}
                 </div>)}
             </div>
         </div>}
