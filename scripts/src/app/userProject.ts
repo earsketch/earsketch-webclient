@@ -80,7 +80,7 @@ export async function get(endpoint: string, params?: { [key: string]: string }) 
 }
 
 // Expects form data, returns JSON.
-export async function postForm(endpoint: string, data?: { [key: string]: string }) {
+export async function postForm(endpoint: string, data?: { [key: string]: string | Blob }) {
     const url = URL_DOMAIN + endpoint
     try {
         return (await fetch(url, { method: "POST", body: form(data) })).json()
@@ -91,16 +91,16 @@ export async function postForm(endpoint: string, data?: { [key: string]: string 
     }
 }
 
-async function postAuthForm(endpoint: string, data: { [key: string]: string }={}) {
+export async function postAuthForm(endpoint: string, data: { [key: string]: string | Blob }={}) {
     return postForm(endpoint, { username: getUsername(), password: getPassword(), ...data })
 }
 
-async function postAdminForm(endpoint: string, data: { [key: string]: string }={}) {
+async function postAdminForm(endpoint: string, data: { [key: string]: string | Blob }={}) {
     return postForm(endpoint, { adminusername: getUsername(), password: getPassword(), ...data })
 }
 
 // Expects query parameters, returns XML.
-async function post(endpoint: string, params?: { [key: string]: string }) {
+export async function post(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     const text = await (await fetch(url, { method: "POST" })).text()
     try {

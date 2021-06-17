@@ -69,8 +69,6 @@ module.exports = merge(common, {
             ),
             URL_DOMAIN: JSON.stringify(`${esHost}/EarSketchWS`),
             URL_WEBSOCKET: JSON.stringify(`${wsHost}/EarSketchWS`),
-            URL_SEARCHFREESOUND: JSON.stringify(`${esHost}/EarSketchWS/services/audio/searchfreesound`),
-            URL_SAVEFREESOUND: JSON.stringify(`${esHost}/EarSketchWS/services/files/uploadfromfreesound`),
             URL_LOADAUDIO: JSON.stringify(`${esHost}/EarSketchWS/services/audio/getaudiosample`),
             SITE_BASE_URI: JSON.stringify(`http://localhost:${port}/${clientPath}`)
         }),

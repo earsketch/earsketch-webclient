@@ -1476,7 +1476,8 @@ input.form-search {
   margin-bottom: 10px;
 }
 
-.modal-body.transparent input {
+.modal-body.transparent input[type="text"],
+.modal-body.transparent input[type="number"] {
     background: transparent;
     border: solid 2px transparent;
     border-bottom: solid 2px gray;
@@ -1501,20 +1502,6 @@ input.form-search {
   margin-right: 40px;
 }
 
-
-#record-section-container {
-  height: 70px;
-}
-
-#record-section-container > div {
-  position: absolute;
-}
-
-#waveform {
-  left: 135px;
-  bottom: 10px;
-}
-
 #count-measures-input #tempoSlider {
   width: 150px;
   margin-top: 10px;
@@ -1531,46 +1518,8 @@ input.form-search {
   transform: rotate(-45deg); 
 }
 
-.counter-meter span {
-  font-size: 3em;
-  position: relative;
-  left: 5px;
-  top: -4px;
-  display:block;
-  -ms-transform: rotate(45deg); 
-  -webkit-transform: rotate(45deg); 
-  transform: rotate(45deg); 
-}
-
 .counter-meter.hide-metronome {
   border-color: transparent;
-}
-
-#upload-sound-tabcontainer #wavedisplay { 
-  border-bottom: 3px solid gray;
-}
-
-#stop-icon {
-  top: -7px;
-}
-
-#record-button {
-  left: 7px;
-  top: -10px;
-}
-
-#record-button i,
-#preview-button i {
-  font-size: 30px;
-  -webkit-transition: text-shadow 0.5s ease;
-  -moz-transition: text-shadow 0.5s ease;
-  -o-transition: text-shadow 0.5s ease;
-  transition: text-shadow 0.5s ease;
-}
-
-#record-clear-button {
-  float: right;
-  margin-right: 3px;
 }
 
 #upload-sound-tabcontainer #record-button:hover {

@@ -47,8 +47,6 @@ module.exports = env => {
                 FLAGS: require('dotenv').config({ path: envFile }).parsed,
                 URL_DOMAIN: JSON.stringify(`${apiHost}/EarSketchWS`),
                 URL_WEBSOCKET: JSON.stringify(`${webSocketURL}`),
-                URL_SEARCHFREESOUND: JSON.stringify(`${apiHost}/EarSketchWS/services/audio/searchfreesound`),
-                URL_SAVEFREESOUND: JSON.stringify(`${apiHost}/EarSketchWS/services/files/uploadfromfreesound`),
                 URL_LOADAUDIO: JSON.stringify(`${apiHost}/EarSketchWS/services/audio/getaudiosample`),
                 SITE_BASE_URI: JSON.stringify(`${clientBaseURI}`)
             }),

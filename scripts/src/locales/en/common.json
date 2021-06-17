@@ -90,9 +90,9 @@
       "uploadsuccess": "Success uploading custom sound",
       "commerror": "Communication Error uploading sound ...",
       "commerror2": "Communication Error uploading sound ...",
-      "nosupport": "Sorry, Quick Record is currently only supported in Chrome, and partially supported in FireFox.",
-      "chrome_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the camera icon in your browser's address bar and select 'ask if earsketch.gatech.edu wants to access your microphone'. Then try the Quick Record feature again and be sure to allow microphone access.",
-      "ff_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the microphone icon in your browser's address bar to share your microphone with EarSketch. If no microphone icon appears, click the earth icon to unblock microphone access. Then try the Quick Record feature again and be sure to share microphone access."
+      "chrome_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the 'i' icon in your browser's address bar and select 'Allow' next to 'Microphone'. Then, try again.",
+      "ff_mic_noaccess": "You have blocked access to your microphone. To enable recording, click the microphone icon in your browser's address bar to share your microphone with EarSketch. Then, try again.",
+      "mic_noaccess": "You have blocked access to your microphone. To enable recording, unblock mic access in your browser's settings. Then, try again."
     },
     "createaccount" : {
       "pwdfail": "Your password confirmation is not the same as your password.",

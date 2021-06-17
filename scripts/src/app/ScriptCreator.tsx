@@ -5,16 +5,15 @@ import { useTranslation } from "react-i18next"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
-    const { t } = useTranslation()
 
     if (name.length < 3) {
-        throw t('messages:general.shortname')
+        throw 'messages:general.shortname'
     } else if (/[$-/:-?{-~!"^#`\[\]\\]/g.test(name)) {
         // Why are hyphens banned from script names?
-        throw t('messages:idecontroller.illegalname')
+        throw 'messages:idecontroller.illegalname'
     } else if (Object.values(userProject.scripts).some(script => !script.soft_delete && script.name === fullname)) {
         // Conflict with existing script.
-        throw t('messages:idecontroller.overwrite')
+        throw 'messages:idecontroller.overwrite'
     } else {
         // Valid name.
         return name + extension
@@ -25,12 +24,13 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
     const [name, setName] = useState("")
     const [error, setError] = useState("")
     const [extension, setExtension] = useState(language === "python" ? ".py" : ".js")
+    const { t } = useTranslation()
 
     const confirm = () => {
         try {
             close(validateScriptName(name, extension))
         } catch (error) {
-            setError(error)
+            setError(t(error))
         }
     }
 
@@ -61,13 +61,11 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
                 </div>
                 <div className="row">
                     <div className="col-md-6">
-                        <form>
-                            <div className="input-group">
-                                <input className="form-control" autoFocus tabIndex={1} autoComplete="off"
-                                    value={name} onChange={e => setName(e.target.value)} />
-                                <div className="input-group-addon">{extension}</div>
-                            </div>
-                        </form>
+                        <div className="input-group">
+                            <input className="form-control" autoFocus tabIndex={1} autoComplete="off"
+                                value={name} onChange={e => setName(e.target.value)} />
+                            <div className="input-group-addon">{extension}</div>
+                        </div>
                     </div>
 
                     <div className="col-md-6">

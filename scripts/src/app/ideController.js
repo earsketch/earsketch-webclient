@@ -11,6 +11,7 @@ import * as tabs from '../editor/tabState';
 import * as cai from '../cai/caiState';
 import { wrapModal } from '../helpers';
 import { ScriptCreator } from './ScriptCreator';
+import { SoundUploader } from './SoundUploader'
 import * as userConsole from './userconsole'
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
@@ -20,6 +21,7 @@ import * as caiAnalysisModule from '../cai/analysis';
 
 // Temporary glue from $uibModal to React components.
 app.component("createScriptController", wrapModal(ScriptCreator))
+app.component("uploadSoundController", wrapModal(SoundUploader))
 
 const ACE_THEMES = {
     light: "ace/theme/chrome",
@@ -833,10 +835,7 @@ app.controller("ideController", ['$rootScope', '$scope', '$uibModal', '$location
      */
     $scope.openUploadWindow = function () {
         if (userProject.isLoggedIn()) {
-            $uibModal.open({
-                templateUrl: 'templates/upload-sound.html',
-                controller: 'UploadSoundCtrl'
-            });
+            $uibModal.open({ component: 'uploadSoundController' });
             $scope.notAllowedToAddSound = false;
         } else {
             if ($scope.logs) {

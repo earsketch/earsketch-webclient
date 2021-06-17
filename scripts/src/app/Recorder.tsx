@@ -1,9 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { react2angular } from "react2angular"
+import React, { useEffect, useRef, useState } from "react"
 
 import * as recorder from "./esrecorder"
 
-const LevelMeter = () => {
+export const LevelMeter = () => {
     const HEIGHT = 15
     const WIDTH = 250
     const STROKE_WIDTH = 2
@@ -50,37 +49,44 @@ const BEAT_POSITIONS = {
     3: "topleft",
 } as { [key: number]: string }
 
-const Metronome = ({ micIsOn, hasBuffer, useMetro, isRecording, isPreviewing, curMeasure, curMeasureShow }:
-                   { micIsOn: boolean, hasBuffer: boolean, useMetro: boolean, isRecording: boolean,
-                     isPreviewing: boolean, curMeasure: number, curMeasureShow: number }) => {
-    const [state, setState] = useState("topright")
+export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat: number, hasBuffer: boolean, useMetro: boolean, startRecording: () => void }) => {
+    const [state, setState] = useState("")
+    const measure = Math.floor(beat / 4) + 1
 
-    recorder.callbacks.clickOnMetronome = (beat) => {
-        if (recorder.properties.useMetro) {
-            setState(BEAT_POSITIONS[beat])
-        } else {
-            setState("hide-metronome")
+    if (hasBuffer) {
+        if (state === "record") {
+            setState("")
         }
     }
 
-    return <div className={"counter-meter " + state}>
-        {micIsOn && !hasBuffer && !(useMetro && isRecording)
-        && <span id="record-button" onClick={recorder.toggleRecord}>
-            <i className={"icon icon-recording" + (isRecording ? " blink recording" : "")}></i>
-        </span>}
-        {isRecording && useMetro
-        && <span>{curMeasureShow}</span>}
-        {hasBuffer && !isRecording
-        && <div id="preview-button" onClick={recorder.togglePreview}>
-            {!isPreviewing && curMeasure >= 0
-            ? <span id="play-icon"><i className="icon icon-play4"></i></span>
-            : <span id="stop-icon"><i className="icon icon-stop2"></i></span>}
-        </div>}
+    const IndicatorButton = () => {
+        if (state === "record") {
+            if (useMetro) {
+                return measure > 0 ? <span className="text-7xl">{measure}</span> : <span className="text-2xl font-bold">Get ready!</span>
+            } else {
+                return <i className="cursor-pointer text-5xl icon icon-recording blink recording" onClick={() => { recorder.stopRecording(); setState("") }} />
+            }
+        } else if (state === "preview") {
+            return <i className="cursor-pointer text-5xl block icon icon-stop2" onClick={() => { recorder.stopPreview(); setState("") }} />
+        } else if (hasBuffer) {
+            return <i className="cursor-pointer text-5xl block icon icon-play4" onClick={() => { recorder.startPreview(() => setState("")); setState("preview") }} />
+        } else {
+            return <i className="cursor-pointer text-5xl icon icon-recording" onClick={() => { startRecording(); setState("record") }} />
+        }
+    }
+
+    return <div className="flex items-center">
+        <div className="text-center z-10" style={{ marginLeft: "10px", width: "60px" }}><IndicatorButton /></div>
+        <div className={"fixed counter-meter " + (useMetro ? BEAT_POSITIONS[((beat % 4) + 4) % 4] : "hide-metronome")} />
     </div>
 }
 
+
 const WIDTH = 420
 const HEIGHT = 80
+const SPACING = 3
+const BAR_WIDTH = 1
+const NUM_BARS = Math.round(WIDTH / SPACING)
 
 function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp: number) {
     const step = Math.ceil(buf.length / WIDTH)
@@ -104,69 +110,49 @@ function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp:
     }
 }
 
-const Waveform = () => {
-    const setup = useCallback(canvas => {
-        if (!canvas) return
+const drawSpectrogram = (context: CanvasRenderingContext2D) => {
+    const freqByteData = new Uint8Array(recorder.analyserNode!.frequencyBinCount)
+    recorder.analyserNode!.getByteFrequencyData(freqByteData)
 
-        const context = canvas.getContext("2d")
-        context.fillStyle = "gray"
-        const amp = HEIGHT / 2
+    context.clearRect(0, 0, WIDTH, HEIGHT)
+    context.fillStyle = "#f6d565"
+    context.lineCap = "round"
+    const multiplier = recorder.analyserNode!.frequencyBinCount / NUM_BARS
 
-        const SPACING = 3
-        const BAR_WIDTH = 1
-        const numBars = Math.round(WIDTH / SPACING)
-        let handle = 0
-
-        context.clearRect(0, 0, WIDTH, HEIGHT)
-
-        recorder.callbacks.showSpectrogram = () => {
-            if (!handle) {
-                drawSpectrogram()
-            }
+    // Draw rectangle for each frequency bin.
+    for (let i = 0; i < NUM_BARS; i++) {
+        let magnitude = 0
+        const offset = Math.floor(i * multiplier)
+        // gotta sum/average the block, or we miss narrow-bandwidth spikes
+        for (let j = 0; j < multiplier; j++) {
+            magnitude += freqByteData[offset + j]
         }
-    
-        recorder.callbacks.showRecordedWaveform = () => {
-            if (handle) {
-                cancelAnimationFrame(handle)
-                handle = 0
-            }
-    
-            if (recorder.buffer) {
-                drawWaveform(context, recorder.buffer.getChannelData(0), amp)
-            } else {
-                context.clearRect(0, 0, WIDTH, HEIGHT)
-            }
-        }
-    
-        // analyzer draw code here
-        const drawSpectrogram = () => {
-            const freqByteData = new Uint8Array(recorder.analyserNode!.frequencyBinCount)
-            recorder.analyserNode!.getByteFrequencyData(freqByteData)
-    
-            context.clearRect(0, 0, WIDTH, HEIGHT)
-            context.fillStyle = "#f6d565"
-            context.lineCap = "round"
-            const multiplier = recorder.analyserNode!.frequencyBinCount / numBars
-    
-            // Draw rectangle for each frequency bin.
-            for (let i = 0; i < numBars; i++) {
-                let magnitude = 0
-                const offset = Math.floor(i * multiplier)
-                // gotta sum/average the block, or we miss narrow-bandwidth spikes
-                for (let j = 0; j < multiplier; j++) {
-                    magnitude += freqByteData[offset + j]
-                }
-                magnitude = magnitude / multiplier
-                context.fillStyle = `hsl(${Math.round((i*360) / numBars)}, 100%, 50%)`
-                context.fillRect(i * SPACING, HEIGHT * 3/2, BAR_WIDTH, -magnitude * 3/5)
-            }
-            handle = requestAnimationFrame(drawSpectrogram)
-        }
-    }, [])
-
-    return <canvas ref={setup} width={WIDTH} height={HEIGHT}></canvas>
+        magnitude = magnitude / multiplier
+        context.fillStyle = `hsl(${Math.round((i*360) / NUM_BARS)}, 100%, 50%)`
+        context.fillRect(i * SPACING, HEIGHT * 3/2, BAR_WIDTH, -magnitude * 3/5)
+    }
 }
 
-app.component("levelMeter", react2angular(LevelMeter))
-app.component("visualMetronome", react2angular(Metronome, ["micIsOn", "hasBuffer", "useMetro", "isRecording", "isPreviewing", "curMeasure", "curMeasureShow"]))
-app.component("drawWaveform", react2angular(Waveform))
+export const Waveform = ({ buffer }: { buffer: AudioBuffer | null }) => {
+    const canvas = useRef<HTMLCanvasElement>(null)
+    const handle = useRef<number>(0)
+
+    useEffect(() => {
+        if (!canvas.current) return
+        const context = canvas.current!.getContext("2d")!
+        if (buffer) {
+            cancelAnimationFrame(handle.current)
+            handle.current = 0
+            drawWaveform(context, buffer.getChannelData(0), HEIGHT / 2)
+        } else if (!handle.current) {
+            context.clearRect(0, 0, WIDTH, HEIGHT)
+            const loop = () => {
+                drawSpectrogram(context);
+                handle.current = requestAnimationFrame(loop)
+            }
+            loop()
+        }
+    }, [buffer])
+
+    return <canvas ref={canvas} width={WIDTH} height={HEIGHT}></canvas>
+}
