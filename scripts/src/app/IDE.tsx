@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Provider, useSelector } from "react-redux"
 
 import * as appState from "../app/appState"
@@ -17,6 +17,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState"
 import * as scripts from "../browser/scriptsState"
 import * as editor from "../editor/Editor"
 import * as editorState from "../editor/editorState"
+import * as Layout from "../layout/Layout"
 import reporter from "./reporter"
 import * as tabs from "../editor/tabState"
 import * as cai from "../cai/caiState"
@@ -391,6 +392,8 @@ const IDE = () => {
 
     const [loading, _setLoading] = useState(false)
     setLoading = _setLoading
+
+    useEffect(() => Layout.initialize(), [])
 
     return <div id="main-container" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="h-full">
