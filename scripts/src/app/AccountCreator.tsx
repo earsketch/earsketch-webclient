@@ -87,8 +87,8 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
             </div>
             
             <div className="modal-footer">
-                <input type="submit" className="btn btn-primary" value={t('accountCreator.submit').toString()} />
-                <input type="button" className="btn btn-default" onClick={close} value={t('cancel').toString()} />
+                <input type="submit" className="btn btn-primary" value={t('accountCreator.submit') as string} />
+                <input type="button" className="btn btn-default" onClick={close} value={t('cancel') as string} />
             </div>
         </form>
     </>

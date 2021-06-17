@@ -34,7 +34,7 @@ export const ForgotPassword = ({ close }: { close: () => void }) => {
                 </label>
             </div>
             <div className="modal-footer">
-                <input type="submit" value={t('forgotPassword.submit').toString()} className="btn btn-primary" />
+                <input type="submit" value={t('forgotPassword.submit') as string} className="btn btn-primary" />
             </div>
         </form>
     </>
