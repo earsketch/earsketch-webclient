@@ -4,6 +4,7 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import { usePopper } from 'react-popper';
 import PopperJS from '@popperjs/core';
 
+import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, submitToCompetition } from '../app/App';
 import * as appState from "../app/appState";
 import * as exporter from "../app/exporter";
 import * as user from '../user/userState';
@@ -173,17 +174,11 @@ const SingletonDropdownMenu = () => {
             <MenuItem
                 name='Rename' icon='icon-pencil2'
                 visible={type==='regular'}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.renameScript(script);
-                }}
+                onClick={() => renameScript(script!)}
             />
             <MenuItem
                 name='Download' icon='icon-cloud-download'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.downloadScript(unsavedScript);
-                }}
+                onClick={() => downloadScript(unsavedScript!)}
             />
             <MenuItem
                 name='Print' icon='icon-printer'
@@ -195,33 +190,25 @@ const SingletonDropdownMenu = () => {
                 name='Share' icon='icon-share32'
                 visible={type==='regular'}
                 disabled={!loggedIn}
-                onClick={() => {
-                    shareScript(unsavedScript!);
-                }}
+                onClick={() => shareScript(unsavedScript!)}
             />
             <MenuItem
                 name='Submit to Competition' icon='icon-share2'
                 visible={type==='regular' && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.submitToCompetition(unsavedScript);
-                }}
+                onClick={() => submitToCompetition(unsavedScript!)}
             />
             <MenuItem
                 name='History' icon='icon-history'
                 disabled={!loggedIn || type==='readonly'}
                 onClick={() => {
                     const scope = helpers.getNgMainController().scope();
-                    script && scope.openScriptHistory(unsavedScript, !script.isShared);
+                    script && openScriptHistory(unsavedScript!, !script.isShared);
                 }}
             />
             <MenuItem
                 name='Code Indicator' icon='glyphicon glyphicon-info-sign'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.openCodeIndicator(unsavedScript);
-                }}
+                onClick={() => openCodeIndicator(unsavedScript!)}
             />
             <MenuItem
                 name='Import' icon='icon-import'
@@ -247,13 +234,13 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name='Delete' icon='icon-bin'
-                visible={type!=='readonly'}
+                visible={type !== 'readonly'}
                 onClick={async () => {
                     const scope = helpers.getNgMainController().scope();
-                    if (type==='regular') {
-                        await scope.deleteScript(unsavedScript);
-                    } else if (type==='shared') {
-                        await scope.deleteSharedScript(script);
+                    if (type === 'regular') {
+                        await deleteScript(unsavedScript!);
+                    } else if (type === 'shared') {
+                        await deleteSharedScript(script!);
                     }
                     await userProject?.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());

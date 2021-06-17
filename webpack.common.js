@@ -49,7 +49,6 @@ module.exports = {
             uiScrollGrid: path.resolve(__dirname,`${libDir}/ui-scroll-grid.min.js`),
 
             // Controllers
-            mainController: path.resolve(__dirname,`${appDir}/mainController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),

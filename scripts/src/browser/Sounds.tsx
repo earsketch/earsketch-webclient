@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
+import { renameSound, deleteSound } from '../app/App';
 import * as helpers from '../helpers';
 import * as sounds from './soundsState';
 import * as appState from '../app/appState';
@@ -218,20 +219,14 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                             <>
                                 <button
                                     className='btn btn-xs btn-action'
-                                    onClick={() => {
-                                        const mainScope = helpers.getNgMainController().scope();
-                                        mainScope.renameSound(clip);
-                                    }}
+                                    onClick={() => renameSound(clip)}
                                     title='Rename sound'
                                 >
                                     <i className='icon icon-pencil3' />
                                 </button>
                                 <button
                                     className='btn btn-xs btn-action'
-                                    onClick={() => {
-                                        const mainScope = helpers.getNgMainController().scope();
-                                        mainScope.deleteSound(clip);
-                                    }}
+                                    onClick={() => deleteSound(clip)}
                                     title='Delete sound'
                                 >
                                     <i className='icon icon-backspace' />

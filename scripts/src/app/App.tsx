@@ -1,15 +1,9 @@
-import { AccountCreator } from './AccountCreator';
 import * as appState from '../app/appState';
-import audioContext from './audiocontext'
-import * as audioLibrary from './audiolibrary'
-import { ChangePassword } from './ChangePassword'
-import { CompetitionSubmission } from './CompetitionSubmission'
+import * as audioLibrary from '../app/audiolibrary'
 import * as collaboration from './collaboration'
-import { Download } from './Download'
 import esconsole from '../esconsole'
-import { ErrorForm } from './ErrorForm'
 import * as ESUtils from '../esutils'
-import { ForgotPassword } from './ForgotPassword'
+import * as helpers from '../helpers'
 import { openShare } from './IDE'
 import * as user from '../user/userState';
 import reporter from './reporter';
@@ -23,39 +17,167 @@ import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
 import * as cai from '../cai/caiState';
-import * as helpers from '../helpers';
-import { ProfileEditor } from './ProfileEditor';
 import * as recommender from './recommender';
-import { RenameScript, RenameSound } from './Rename';
-import { ScriptAnalysis } from './ScriptAnalysis';
-import { ScriptHistory } from './ScriptHistory';
-import { ScriptShare } from './ScriptShare';
-import { SoundUploader } from './SoundUploader'
 import * as userNotification from './userNotification';
 import * as userProject from './userProject';
 import i18n from "i18next";
+import { ScriptEntity, SoundEntity } from 'common';
 
-// Temporary glue from $uibModal to React components.
-app.component("forgotpasswordController", helpers.wrapModal(ForgotPassword))
-app.component("analyzeScriptController", helpers.wrapModal(ScriptAnalysis))
-app.component("editProfileController", helpers.wrapModal(ProfileEditor))
-app.component("changepasswordController", helpers.wrapModal(ChangePassword))
-app.component("downloadController", helpers.wrapModal(Download))
-app.component("scriptVersionController", helpers.wrapModal(ScriptHistory))
-app.component("renameController", helpers.wrapModal(RenameScript))
-app.component("renameSoundController", helpers.wrapModal(RenameSound))
-app.component("accountController", helpers.wrapModal(AccountCreator))
-app.component("submitCompetitionController", helpers.wrapModal(CompetitionSubmission))
-app.component("shareScriptController", helpers.wrapModal(ScriptShare))
-app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
-app.component("errorController", helpers.wrapModal(ErrorForm))
+export function changePassword() {
+    helpers.getNgService("$uibModal").open({ component: 'changepasswordController' })
+}
 
-app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRedux) {
-    $ngRedux.connect(state => ({ ...state.bubble }))(state => {
+export function renameSound(sound: SoundEntity) {
+    helpers.getNgService("$uibModal").open({
+        component: "renameSoundController",
+        size: "sm",
+        resolve: { sound() { return sound } }
+    })
+}
+
+export function renameScript(script: ScriptEntity) {
+    // userProject, etc. will try to mutate the immutable redux script  state.
+    const scriptCopy = Object.assign({}, script);
+
+    const modal = helpers.getNgService("$uibModal").open({
+        component: 'renameController',
+        size: 100,
+        resolve: { script() { return scriptCopy } }
+    })
+
+    modal.result.then(async (newScript: ScriptEntity | null) => {
+        if (!newScript) return;
+        await userProject.renameScript(scriptCopy.shareid, newScript.name);
+        store.dispatch(scripts.syncToNgUserProject());
+        reporter.renameScript();
+    });
+};
+
+export function downloadScript(script: ScriptEntity) {
+    helpers.getNgService("$uibModal").open({
+        component: 'downloadController',
+        resolve: {
+            script() { return script; },
+            quality() { return 0; }
+        }
+    });
+};
+
+export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
+    await userProject.saveScript(script.name, script.source_code);
+    store.dispatch(tabs.removeModifiedScript(script.shareid));
+    helpers.getNgService("$uibModal").open({
+        component: 'scriptVersionController',
+        size: 'lg',
+        resolve: {
+            script() { return script; },
+            allowRevert: allowRevert
+        }
+    });
+    reporter.openHistory();
+};
+
+export function openCodeIndicator(script: ScriptEntity) {
+    helpers.getNgService("$uibModal").open({
+        component: 'analyzeScriptController',
+        size: 100,
+        resolve: {
+            script() { return script; }
+        }
+    });
+}
+
+export function deleteScript(script: ScriptEntity) {
+    (helpers.getNgService("$confirm") as any)({
+        text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
+        ok: "Delete"
+    }).then(async () => {
+        if (script.shareid === collaboration.scriptID && collaboration.active) {
+            collaboration.closeScript(script.shareid);
+        }
+        await userProject.saveScript(script.name, script.source_code);
+        await userProject.deleteScript(script.shareid);
+        reporter.deleteScript();
+
+        store.dispatch(scripts.syncToNgUserProject());
+        store.dispatch(tabs.closeDeletedScript(script.shareid));
+        store.dispatch(tabs.removeModifiedScript(script.shareid));
+    });
+}
+
+export function deleteSharedScript(script: ScriptEntity) {
+    if (script.collaborative) {
+        (helpers.getNgService("$confirm") as any)({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(() => {
+            if (script.shareid === collaboration.scriptID && collaboration.active) {
+                collaboration.closeScript(script.shareid);
+                userProject.closeSharedScript(script.shareid);
+            }
+            // Apply state change first
+            delete userProject.sharedScripts[script.shareid];
+            store.dispatch(scripts.syncToNgUserProject());
+            store.dispatch(tabs.closeDeletedScript(script.shareid));
+            store.dispatch(tabs.removeModifiedScript(script.shareid));
+            // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
+            collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
+        })
+    } else {
+        (helpers.getNgService("$confirm") as any)({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
+            userProject.deleteSharedScript(script.shareid).then(() => {
+                store.dispatch(scripts.syncToNgUserProject());
+                store.dispatch(tabs.closeDeletedScript(script.shareid));
+                store.dispatch(tabs.removeModifiedScript(script.shareid));
+            });
+        });
+    }
+}
+
+export async function submitToCompetition(script: ScriptEntity) {
+    await userProject.saveScript(script.name, script.source_code);
+    store.dispatch(tabs.removeModifiedScript(script.shareid));
+    const shareID = await userProject.getLockedSharedScriptId(script.shareid);
+    helpers.getNgService("$uibModal").open({
+        component: 'submitCompetitionController',
+        size: 'lg',
+        resolve: {
+            name() { return script.name; },
+            shareID() { return shareID; },
+        }
+    });
+}
+
+export async function importScript(script: ScriptEntity) {
+    if (!script) {
+        script = tabs.selectActiveTabScript(store.getState());
+    }
+
+    const imported = await userProject.importScript(Object.assign({},script));
+    await userProject.refreshCodeBrowser();
+    store.dispatch(scripts.syncToNgUserProject());
+
+    const openTabs = tabs.selectOpenTabs(store.getState());
+    store.dispatch(tabs.closeTab(script.shareid));
+
+    if (openTabs.includes(script.shareid)) {
+        store.dispatch(tabs.setActiveTabAndEditor(imported.shareid));
+        userProject.openScript(imported.shareid);
+    }
+}
+
+export function deleteSound(sound: SoundEntity) {
+    (helpers.getNgService("$confirm") as any)({text: "Do you really want to delete sound " + sound.file_key + "?", ok: "Delete"}).then(() => {
+        userProject.deleteAudio(sound.file_key).then(() => {
+            store.dispatch(sounds.deleteLocalUserSound(sound.file_key));
+            audioLibrary.clearAudioTagCache();
+        });
+    });
+}
+
+export const mainController = function ($scope: any, $ngRedux: any) {
+    $ngRedux.connect((state: any) => ({ ...state.bubble }))((state: any) => {
         $scope.bubble = state;
     });
 
-    $ngRedux.connect(state => ({ language: state.app.scriptLanguage }))(({ language }) => $scope.dispLang = language)
+    $ngRedux.connect((state: any) => ({ language: state.app.scriptLanguage }))(({ language }: { language: string }) => $scope.dispLang = language)
 
     store.dispatch(sounds.getDefaultSounds());
     if (FLAGS.SHOW_FEATURED_SOUNDS) {
@@ -65,6 +187,10 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
         store.dispatch(sounds.setFeaturedArtists(FLAGS.FEATURED_ARTISTS));
     }
 
+    $scope.forgotPass = () => {
+        helpers.getNgService("$uibModal").open({ component: 'forgotpasswordController' });
+    };
+    
     $scope.reportError = () => helpers.getNgService("$uibModal").open({ component: "errorController" });
     
     $scope.openUploadWindow = () => {
@@ -73,6 +199,24 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
         } else {
             userNotification.show(i18n.t('messages:general.unauthenticated'), 'failure1')
         }
+    };
+    
+    $scope.getNumUnread = () => {
+        return userNotification.history.filter(function (v) { return v && (v.unread || v.notification_type === 'broadcast'); }).length;
+    };
+    
+    $scope.setFontSize = (fontSize: number) => {
+        store.dispatch(appState.setFontSize(fontSize));
+    };
+    
+    $scope.toggleColorTheme = () => {
+        store.dispatch(appState.toggleColorTheme());
+        reporter.toggleColorTheme();
+    };
+    
+    $scope.resumeQuickTour = () => {
+        store.dispatch(bubble.reset());
+        store.dispatch(bubble.resume());
     };
 
     $scope.loggedIn = false;
@@ -270,7 +414,7 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
             store.dispatch(tabs.resetTabs());
             store.dispatch(tabs.resetModifiedScripts());
         }).catch(function (err) {
-            helpers.getNgService("$confirm")({text: i18n.t('messages:idecontroller.saveallfailed'),
+            (helpers.getNgService("$confirm") as any)({text: i18n.t('messages:idecontroller.saveallfailed'),
                 cancel: "Keep unsaved tabs open", ok: "Ignore"}).then(function () {
                 $scope.scripts = [];
                 userProject.clearUser();
@@ -298,7 +442,7 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
         $scope.username = userStore.username;
         $scope.password = userStore.password;
 
-        $scope.login().catch(error => {
+        $scope.login().catch((error: Error) => {
             if (window.confirm('We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.')) {
                 localStorage.clear();
                 window.location.reload();
@@ -326,20 +470,12 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
 
 
     $scope.createAccount = function () {
-        helpers.getNgService("$uibModal").open({ component: 'accountController' }).result.then(result => {
+        helpers.getNgService("$uibModal").open({ component: 'accountController' }).result.then((result: any) => {
             if (!result) return
             $scope.username = result.username
             $scope.password = result.password
             $scope.login()
         })
-    };
-
-    $scope.forgotPass = function () {
-        helpers.getNgService("$uibModal").open({ component: 'forgotpasswordController' });
-    };
-
-    $scope.changePassword = function () {
-        helpers.getNgService("$uibModal").open({ component: 'changepasswordController' });
     };
 
     $scope.editProfile = function () {
@@ -353,9 +489,8 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
                 role() { return $scope.userrole },
                 firstName() { return $scope.firstname },
                 lastName() { return $scope.lastname },
-                changePassword() { return $scope.changePassword },
             }
-        }).result.then(result => {
+        }).result.then((result: any) => {
             if (result !== undefined) {
                 $scope.firstname = result.firstName;
                 $scope.lastname = result.lastName;
@@ -382,30 +517,26 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
 
     // This is for updating the currentTime for the date label.
     // TODO: find a way to do this with callback from the uib popover element
-    $scope.$watch('showNotification', function (val) {
+    $scope.$watch('showNotification', function (val: boolean) {
         if (val) {
             $scope.currentTime = Date.now();
         }
     });
 
-    $scope.toggleNotificationHistory = function (bool) {
+    $scope.toggleNotificationHistory = function (bool: boolean) {
         $scope.showNotificationHistory = bool;
         if (bool) {
             $scope.showNotification = false;
         }
     };
 
-    $scope.getNumUnread = function () {
-        return userNotification.history.filter(function (v) { return v && (v.unread || v.notification_type === 'broadcast'); }).length;
-    };
-
     //=================================================
     // TODO: move these to an appropriate directive!
 
-    $scope.readMessage = async function (index, item) {
+    $scope.readMessage = async function (index: number, item: any) {
         if (item.notification_type === 'broadcast' || userNotification.history[index].id === undefined) return
         try {
-            await postAuthForm("/services/scripts/markread", { notification_id: userNotification.history[index].id })
+            await userProject.postAuthForm("/services/scripts/markread", { notification_id: userNotification.history[index].id! })
             userNotification.history[index].unread = false
             $scope.unreadMessages = userNotification.history.filter(v => v.unread).length
             $scope.notificationList = userNotification.history
@@ -423,14 +554,14 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
         });
     };
 
-    $scope.openSharedScript = function (shareid) {
+    $scope.openSharedScript = function (shareid: string) {
         esconsole('opening a shared script: ' + shareid, 'main');
         openShare(shareid).then(() => store.dispatch(scripts.syncToNgUserProject()));
         $scope.showNotification = false;
         $scope.showNotificationHistory = false;
     };
 
-    $scope.openCollaborativeScript = function (shareID) {
+    $scope.openCollaborativeScript = function (shareID: string) {
         if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
             $scope.openSharedScript(shareID);
             // collaboration.openScript(userProject.sharedScripts[shareID], userProject.getUsername());
@@ -445,35 +576,18 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
 
     //=================================================
 
-    $ngRedux.connect(state => ({ size: state.app.fontSize }))(({ size }) => $scope.selectedFont = size)
+    $ngRedux.connect((state: any) => ({ size: state.app.fontSize }))(({ size }: { size: number }) => $scope.selectedFont = size)
 
-    $scope.setFontSize = function (fontSize) {
-        store.dispatch(appState.setFontSize(fontSize));
-    };
-
-    $scope.enterKeySubmit = function (event) {
-        if (event.keyCode === 13) {
+    $scope.enterKeySubmit = function (event: KeyboardEvent) {
+        if (event.key === "Enter") {
             $scope.login();
         }
     };
 
-    $scope.toggleColorTheme = function () {
-        store.dispatch(appState.toggleColorTheme());
-        reporter.toggleColorTheme();
-    };
-
-    $ngRedux.connect(state => ({ theme: state.app.colorTheme }))(({ theme }) => {
-        $scope.colorTheme = theme;
-
-        if (theme === 'dark') {
-            angular.element('body').css('background', 'black');
-            $scope.hljsTheme = 'monokai-sublime';
-
-        } else {
-            angular.element('body').css('background', 'white');
-            $scope.hljsTheme = 'vs';
-        }
-    });
+    $ngRedux.connect((state: any) => ({ theme: state.app.colorTheme }))(({ theme }: { theme: string }) => {
+        $scope.colorTheme = theme
+        $scope.hljsTheme = theme === 'dark' ? 'monokai-sublime' : 'vs'
+    })
 
     try {
         var shareID = ESUtils.getURLParameter('edit');
@@ -523,39 +637,14 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
         esconsole(error, ['main', 'url']);
     }
 
-    $scope.resumeQuickTour = () => {
-        store.dispatch(bubble.reset());
-        store.dispatch(bubble.resume());
-    };
-
-    $scope.renameSound = sound => {
-        helpers.getNgService("$uibModal").open({
-            component: 'renameSoundController',
-            size: 'sm',
-            resolve: {
-                sound() { return sound; }
-            }
-        });
-    };
-
-    $scope.deleteSound = sound => {
-        helpers.getNgService("$confirm")({text: "Do you really want to delete sound " + sound.file_key + "?",
-            ok: "Delete"}).then(() => {
-            userProject.deleteAudio(sound.file_key).then(() => {
-                store.dispatch(sounds.deleteLocalUserSound(sound.file_key));
-                audioLibrary.clearAudioTagCache();
-            });
-        });
-    };
-
     $scope.licenses = {};
     userProject.getLicenses().then(licenses => {
         for (const license of Object.values(licenses)) {
-            $scope.licenses[license.id] = license
+            $scope.licenses[(license as any).id] = license
         }
     });
 
-    $scope.shareScript = async script => {
+    $scope.shareScript = async (script: ScriptEntity) => {
         await userProject.saveScript(script.name, script.source_code);
         store.dispatch(tabs.removeModifiedScript(script.shareid));
         helpers.getNgService("$uibModal").open({
@@ -568,149 +657,14 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
             }
         });
     };
-
-    $scope.renameScript = script => {
-        // userProject, etc. will try to mutate the immutable redux script  state.
-        const scriptCopy = Object.assign({}, script);
-
-        const modal = helpers.getNgService("$uibModal").open({
-            component: 'renameController',
-            size: 100,
-            resolve: {
-                script() { return scriptCopy; }
-            }
-        });
-
-        modal.result.then(async newScript => {
-            if (!newScript) return;
-            await userProject.renameScript(scriptCopy.shareid, newScript.name);
-            store.dispatch(scripts.syncToNgUserProject());
-            reporter.renameScript();
-        });
-    };
-
-    $scope.downloadScript = script => {
-        helpers.getNgService("$uibModal").open({
-            component: 'downloadController',
-            resolve: {
-                script() { return script; },
-                quality() { return $scope.audioQuality; }
-            }
-        });
-    };
-
-    $scope.openScriptHistory = async (script, allowRevert) => {
-        await userProject.saveScript(script.name, script.source_code);
-        store.dispatch(tabs.removeModifiedScript(script.shareid));
-        helpers.getNgService("$uibModal").open({
-            component: 'scriptVersionController',
-            size: 'lg',
-            resolve: {
-                script() { return script; },
-                allowRevert: allowRevert
-            }
-        });
-        reporter.openHistory();
-    };
-
-    $scope.openCodeIndicator = script => {
-        helpers.getNgService("$uibModal").open({
-            component: 'analyzeScriptController',
-            size: 100,
-            resolve: {
-                script() { return script; }
-            }
-        });
-    };
-
-    $scope.deleteScript = script => {
-        helpers.getNgService("$confirm")({
-            text: "Deleted scripts disappear from Scripts list and can be restored from the list of 'deleted scripts'.",
-            ok: "Delete"
-        }).then(async () => {
-            if (script.shareid === collaboration.scriptID && collaboration.active) {
-                collaboration.closeScript(script.shareid);
-            }
-            await userProject.saveScript(script.name, script.source_code);
-            await userProject.deleteScript(script.shareid);
-            reporter.deleteScript();
-
-            store.dispatch(scripts.syncToNgUserProject());
-            store.dispatch(tabs.closeDeletedScript(script.shareid));
-            store.dispatch(tabs.removeModifiedScript(script.shareid));
-        });
-    };
-
-    $scope.deleteSharedScript = script => {
-        if (script.collaborative) {
-            helpers.getNgService("$confirm")({text: 'Do you want to leave the collaboration on "' + script.name + '"?', ok: 'Leave'}).then(() => {
-                if (script.shareid === collaboration.scriptID && collaboration.active) {
-                    collaboration.closeScript(script.shareid, userProject.getUsername());
-                    userProject.closeSharedScript(script.shareid);
-                }
-                // Apply state change first
-                delete userProject.sharedScripts[script.shareid];
-                store.dispatch(scripts.syncToNgUserProject());
-                store.dispatch(tabs.closeDeletedScript(script.shareid));
-                store.dispatch(tabs.removeModifiedScript(script.shareid));
-                // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
-                collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false);
-            })
-        } else {
-            helpers.getNgService("$confirm")({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
-                userProject.deleteSharedScript(script.shareid).then(() => {
-                    store.dispatch(scripts.syncToNgUserProject());
-                    store.dispatch(tabs.closeDeletedScript(script.shareid));
-                    store.dispatch(tabs.removeModifiedScript(script.shareid));
-                });
-            });
-        }
-    };
-
-    $scope.submitToCompetition = async script => {
-        await userProject.saveScript(script.name, script.source_code);
-        store.dispatch(tabs.removeModifiedScript(script.shareid));
-        const shareID = await userProject.getLockedSharedScriptId(script.shareid);
-        helpers.getNgService("$uibModal").open({
-            component: 'submitCompetitionController',
-            size: 'lg',
-            resolve: {
-                name() { return script.name; },
-                shareID() { return shareID; },
-            }
-        });
-    };
-
-    $scope.importScript = async script => {
-        if (!script) {
-            script = tabs.selectActiveTabScript(store.getState());
-        }
-
-        const imported = await userProject.importScript(Object.assign({},script));
-        await userProject.refreshCodeBrowser();
-        store.dispatch(scripts.syncToNgUserProject());
-
-        const openTabs = tabs.selectOpenTabs(store.getState());
-        store.dispatch(tabs.closeTab(script.shareid));
-
-        if (openTabs.includes(script.shareid)) {
-            store.dispatch(tabs.setActiveTabAndEditor(imported.shareid));
-            userProject.openScript(imported.shareid);
-        }
-    };
     
     $scope.toggleCAIWindow = () => {
         $scope.showCAIWindow = !$scope.showCAIWindow;
         if ($scope.showCAIWindow) {
             store.dispatch(layout.setEast({ open: true }));
             Layout.resetHorizontalSplits();
-            angular.element('curriculum').hide();
-            angular.element('div[caiwindow]').show();
-            document.getElementById('caiButton').classList.remove('flashNavButton');
+            document.getElementById('caiButton')!.classList.remove('flashNavButton');
             store.dispatch(cai.autoScrollCAI());
-        } else {
-            angular.element('div[caiwindow]').hide();
-            angular.element('curriculum').show();
         }
     };
 
@@ -718,12 +672,10 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
     if (FLAGS.SHOW_CAI) {
         store.dispatch(layout.setEast({ open: true }));
         Layout.resetHorizontalSplits();
-        angular.element('curriculum').hide();
-        angular.element('div[caiwindow]').show();
     }
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
-    $scope.loadCurriculumChapter = location => {
+    $scope.loadCurriculumChapter = (location: string) => {
         if ($scope.showCAIWindow) {
             $scope.toggleCAIWindow();
         }
@@ -731,14 +683,14 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
 
         if (FLAGS.SHOW_CAI) {
             // Note: delay $scope.$apply() to update the angular CAI Window.
-            $setTimeout(function() {
+            window.setTimeout(() => {
                 $scope.$apply();
             }, 100);
         }
     };
 
     $scope.closeAllTabs = () => {
-        helpers.getNgService("$confirm")({text: i18n.t('messages:idecontroller.closealltabs'), ok: "Close All"}).then(() => {
+        (helpers.getNgService("$confirm") as any)({text: i18n.t('messages:idecontroller.closealltabs'), ok: "Close All"}).then(() => {
             userProject.saveAll().then(() => {
                 userNotification.show(i18n.t('messages:user.allscriptscloud'));
                 store.dispatch(tabs.closeAllTabs());
@@ -749,7 +701,7 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
     };
 
     $scope.$on('reloadRecommendations', () => {
-        const activeTabID = tabs.selectActiveTabID(store.getState());
+        const activeTabID = tabs.selectActiveTabID(store.getState())!
 
         // Get the modified / unsaved script.
         let script = null;
@@ -760,7 +712,7 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
         }
         if (!script) return
         let input = recommender.addRecInput([], script);
-        let res = [];
+        let res = [] as any[];
         if (input.length === 0) {
             const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities(store.getState()));
             if (filteredScripts.length) {
@@ -779,21 +731,7 @@ app.controller("mainController", ['$scope', '$ngRedux', function ($scope, $ngRed
 
     $scope.$on('newCAIMessage', () => {
         if (FLAGS.SHOW_CAI && !$scope.showCAIWindow) {
-            document.getElementById('caiButton').classList.add('flashNavButton');
+            document.getElementById('caiButton')!.classList.add('flashNavButton');
         }
     });
-    // for Chrome 66+ web-audio restriction
-    // see: https://bugs.chromium.org/p/chromium/issues/detail?id=807017
-    function resumeAudioContext() {
-        esconsole('resuming the suspended audio context', 'main');
-        if (audioContext.status !== 'running') {
-            audioContext.resume();
-        }
-        document.removeEventListener('click', resumeAudioContext); // unbind from this event listener
-    }
-
-    document.addEventListener('click', resumeAudioContext);
-}]);
-
-// Filter for calculating last modified time unit (previously in scriptBrowserController)
-app.filter('formatTimer', () => ESUtils.formatTimer);
+}

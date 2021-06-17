@@ -267,8 +267,7 @@ const ensureCollabScriptIsClosed = createAsyncThunk<void, string, ThunkAPI>(
         const activeTabID = selectActiveTabID(getState());
         const script = scripts.selectAllScriptEntities(getState())[scriptID];
         if (scriptID === activeTabID && script?.collaborative) {
-            const userName = user.selectUserName(getState())!;
-            collaboration.closeScript(scriptID, userName);
+            collaboration.closeScript(scriptID);
         }
     }
 );

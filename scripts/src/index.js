@@ -39,11 +39,30 @@ window.droplet = droplet
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
 import './app/completer'
 
+import { react2angular } from "react2angular"
+
+import { mainController } from "./app/App"
+import { IDE } from "./app/IDE"
+import { DropdownMenuContainer } from "./browser/ScriptsMenus"
+// Now entering: the modal zone.
+import { AccountCreator } from './app/AccountCreator'
+import { ChangePassword } from './app/ChangePassword'
+import { CompetitionSubmission } from './app/CompetitionSubmission'
+import { Download } from './app/Download'
+import { ErrorForm } from './app/ErrorForm'
+import { ForgotPassword } from './app/ForgotPassword'
+import { ProfileEditor } from './app/ProfileEditor'
+import { Prompt } from "./app/Prompt"
+import { RenameScript, RenameSound } from './app/Rename'
+import { ScriptAnalysis } from './app/ScriptAnalysis'
+import { ScriptCreator } from "./app/ScriptCreator"
+import { ScriptHistory } from './app/ScriptHistory'
+import { ScriptShare } from './app/ScriptShare'
+import { SoundUploader } from './app/SoundUploader'
+
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 // (This was previously in userConsole, but since that's now a module, the fields are read-only.)
 // (Also, it doesn't really have anything to do with the user console.)
-import { Prompt } from "./app/Prompt"
-
 window.esPrompt = message => {
     const $uibModal = helpers.getNgService("$uibModal")
     return new Promise(resolve => $uibModal.open({
@@ -51,12 +70,6 @@ window.esPrompt = message => {
         resolve: { message() { return message } },
     }).result.then(input => resolve(input), () => resolve("")))
 }
-
-import { react2angular } from "react2angular"
-
-import { IDE } from "./app/IDE"
-import { ScriptCreator } from "./app/ScriptCreator"
-import { DropdownMenuContainer } from "./browser/ScriptsMenus"
 
 Object.assign(window,require('setup'));
 Object.assign(window,require('dsp'));
@@ -121,30 +134,33 @@ require(['angular'], () => {
     require('recorder');
 
     // Controllers
-    require('mainController');
-
     require('adminWindowController');
 
     // React components
-    require('./browser/Browser');
     require('./bubble/Bubble');
-    require('./browser/API');
-    require('./browser/Sounds');
-    require('./browser/Scripts');
-    require('./browser/Curriculum');
-    require('./browser/ScriptsMenus');
-    require('./daw/DAW');
     require('./app/Footer');
-    require('./editor/Tabs');
-    require('./editor/EditorHeader');
     require('./top/LocaleSelector')
     require('./app/Notification')
-    require('./app/Recorder')
-    require('./app/Diff')
+    app.controller("mainController", ["$scope", "$ngRedux", mainController])
+    app.filter("formatTimer", () => ESUtils.formatTimer)
     app.component("ide", react2angular(IDE))
+    app.component("scriptDropdownMenu", react2angular(DropdownMenuContainer))
+    // Temporary glue from $uibModal to React components.
     app.component("prompt", helpers.wrapModal(Prompt))
     app.component("createScriptController", helpers.wrapModal(ScriptCreator))
-    app.component("scriptDropdownMenu", react2angular(DropdownMenuContainer))
+    app.component("forgotpasswordController", helpers.wrapModal(ForgotPassword))
+    app.component("analyzeScriptController", helpers.wrapModal(ScriptAnalysis))
+    app.component("editProfileController", helpers.wrapModal(ProfileEditor))
+    app.component("changepasswordController", helpers.wrapModal(ChangePassword))
+    app.component("downloadController", helpers.wrapModal(Download))
+    app.component("scriptVersionController", helpers.wrapModal(ScriptHistory))
+    app.component("renameController", helpers.wrapModal(RenameScript))
+    app.component("renameSoundController", helpers.wrapModal(RenameSound))
+    app.component("accountController", helpers.wrapModal(AccountCreator))
+    app.component("submitCompetitionController", helpers.wrapModal(CompetitionSubmission))
+    app.component("shareScriptController", helpers.wrapModal(ScriptShare))
+    app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
+    app.component("errorController", helpers.wrapModal(ErrorForm))
 
     // To be ported to React
     require('./layout/Layout');

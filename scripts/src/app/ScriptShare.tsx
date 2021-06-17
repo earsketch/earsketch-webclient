@@ -227,7 +227,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
                 }
                 collaboration.openScript(script, username)
             } else if (oldCollaborators.length > 0 && newCollaborators.length === 0) {
-                collaboration.closeScript(script.shareid, username)
+                collaboration.closeScript(script.shareid)
             }
         }
         dispatch(scripts.syncToNgUserProject())

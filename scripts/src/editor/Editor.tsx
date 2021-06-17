@@ -3,6 +3,7 @@ import i18n from "i18next"
 import { useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
 
+import { importScript } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "../app/collaboration"
@@ -302,7 +303,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode
-            && <div className="floating-bar" onClick={() => helpers.getNgMainController().scope().importScript(activeScript)}>
+            && <div className="floating-bar" onClick={() => importScript(activeScript)}>
                 <div>{/* DO NOT REMOVE: this is an empty div to block the space before the next div */}</div>
                 <div className="btn-action btn-floating shake">
                     <i className="icon icon-import"></i><span>IMPORT TO EDIT</span>

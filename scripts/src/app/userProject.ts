@@ -138,11 +138,10 @@ async function postXMLAuth(endpoint: string, xml: string) {
 window.onbeforeunload = () => {
     if (isLoggedIn()) {
         let saving = false
-        const username = getUsername()
 
         for (const shareID of openScripts) {
             if (scripts[shareID] && scripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID, username)
+                collaboration.leaveSession(shareID)
             }
 
             if (scripts[shareID] && !scripts[shareID].saved) {
@@ -156,7 +155,7 @@ window.onbeforeunload = () => {
 
         for (const shareID of openSharedScripts) {
             if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID, username)
+                collaboration.leaveSession(shareID)
             }
         }
 
@@ -230,7 +229,7 @@ function resetOpenScripts() {
 
         // special case for collaborative script. TODO: manage this in the tabs service.
         if (scripts.hasOwnProperty(popped) && scripts[popped].collaborative) {
-            collaboration.closeScript(popped, getUsername())
+            collaboration.closeScript(popped)
         }
     }
 }
@@ -697,7 +696,7 @@ export async function importCollaborativeScript(script: ScriptEntity) {
     }
     const text = await collaboration.getScriptText(script.shareid)
     userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
-    collaboration.closeScript(script.shareid, getUsername())
+    collaboration.closeScript(script.shareid)
     return saveScript(script.name, text)
 }
 
