@@ -66,7 +66,15 @@
     "forgotPassword.title": "Forgot your password?",
     "forgotPassword.prompt": "Please enter the email associated with your account",
     "forgotPassword.submit": "Recover",
-    "forgotPassword.email": "Email"
+    "forgotPassword.email": "Email",
+    "accountCreator.prompt": "Create an account",
+    "accountCreator.success": "Account created!",
+    "accountCreator.submit": "Create Account",
+    "formfieldPlaceholder.username": "Username",
+    "formfieldPlaceholder.password": "Password",
+    "formfieldPlaceholder.confirmPassword": "Confirm Password",
+    "formFieldPlaceholder.emailOptional": "Email Address (Optional)",
+    "cancel": "Cancel"
   },
   "messages": {
     "interpreter": {

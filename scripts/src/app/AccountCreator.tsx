@@ -37,7 +37,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                 }
             } else {
                 setError("")
-                userNotification.show("Account created!", "success")
+                userNotification.show(t('accountCreator.success'), "success")
                 close({ username, password })
             }
         } catch (error) {
@@ -47,7 +47,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
     }
 
     return <>
-        <div className="modal-header"><h3>Create an account</h3></div>
+        <div className="modal-header"><h3>{t('accountCreator.prompt')}</h3></div>
         
         <form name="userForm" onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
@@ -55,7 +55,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="row">
                     <div className="col-md-12">
                         <div className="form-group">
-                            <input type="text" className="form-control" name="username" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={t('messages:createaccount.usernameconstraint')} />
+                            <input type="text" className="form-control" name="username" placeholder={t('formfieldPlaceholder.username')} value={username} onChange={e => setUsername(e.target.value)} required maxLength={25} pattern="[a-zA-Z_][0-9a-zA-Z_]*" title={t('messages:createaccount.usernameconstraint')} />
                         </div>
                     </div>
                 </div>
@@ -63,13 +63,13 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="row">
                     <div className="col-md-6">
                     <div className="form-group">
-                        <input type="password" className="form-control" name="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
+                        <input type="password" className="form-control" name="password" placeholder={t('formfieldPlaceholder.password')} value={password} onChange={e => setPassword(e.target.value)} required minLength={5} />
                     </div>
                     </div>
             
                     <div className="col-md-6">
                     <div className="form-group">
-                        <input type="password" className="form-control" name="passwordconfirm" placeholder="Confirm Password" onChange={e => {
+                        <input type="password" className="form-control" name="passwordconfirm" placeholder={t('formfieldPlaceholder.confirmPassword')} onChange={e => {
                                 e.target.setCustomValidity(e.target.value === password ? "" : t('messages:createaccount.pwdfail'))
                                 setConfirmPassword(e.target.value)
                             }} value={confirmPassword} required  />
@@ -80,15 +80,15 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="row">
                     <div className="col-md-12">
                     <div className="form-group">
-                        <input type="email" className="form-control" name="email" placeholder="Email Address (Optional)" value={email} onChange={e => setEmail(e.target.value)} />
+                        <input type="email" className="form-control" name="email" placeholder={t('formFieldPlaceholder.emailOptional')} value={email} onChange={e => setEmail(e.target.value)} />
                     </div>
                     </div>
                 </div>
             </div>
             
             <div className="modal-footer">
-                <input type="submit" className="btn btn-primary" value="Create Account" />
-                <input type="button" className="btn btn-default" onClick={close} value="Cancel" />
+                <input type="submit" className="btn btn-primary" value={t('accountCreator.submit').toString()} />
+                <input type="button" className="btn btn-default" onClick={close} value={t('cancel').toString()} />
             </div>
         </form>
     </>
