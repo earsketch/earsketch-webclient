@@ -37,7 +37,7 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
     return <>
         <div className="modal-header">
             <h4 className="modal-title">
-                Create a new script
+                {t('scriptCreator.title')}
             </h4>
         </div>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
@@ -48,14 +48,14 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
-                            <label>Script name</label>
-                            <p className="small">What should we call your script?</p>
+                            <label>{t('scriptCreator.scriptName')}</label>
+                            <p className="small">{t('scriptCreator.scriptName.subtext')}</p>
                         </div>
                     </div>
                     <div className="col-md-6">
                         <div className="form-group">
-                            <label>Script language</label>
-                            <p className="small">What programming language are you using?</p>
+                            <label>{t('scriptCreator.scriptLang')}</label>
+                            <p className="small">{t('scriptCreator.scriptLang.subtext')}</p>
                         </div>
                     </div>
                 </div>
@@ -77,8 +77,8 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
                 </div>
             </div>
             <div className="modal-footer">
-                <input type="submit" className="btn btn-primary" tabIndex={3} value="Create" />
-                <input type="button" className="btn btn-warning" onClick={() => close()} value="Cancel" />
+                <input type="submit" className="btn btn-primary" tabIndex={3} value={t('create') as string} />
+                <input type="button" className="btn btn-warning" onClick={() => close()} value={t('cancel') as string} />
             </div>
         </form>
     </>
