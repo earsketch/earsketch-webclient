@@ -6,10 +6,10 @@ import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys'
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations'
 import * as recommender from '../app/recommender'
 import { SoundEntity } from 'common'
-import {getDefaultSounds} from '../browser/soundsState'
-let complexityCalculator = require('./complexityCalculator')
-let complexityCalculatorPY = require('./complexityCalculatorPY')
-let complexityCalculatorJS = require('./complexityCalculatorJS')
+import { getDefaultSounds } from '../browser/soundsState'
+import { getApiCalls } from './complexityCalculator'
+import { analyzePython } from './complexityCalculatorPY'
+import { analyzeJavascript } from './complexityCalculatorJS'
 
 let librarySounds : SoundEntity[] = []
 let librarySoundGenres : string[] = []
@@ -91,9 +91,9 @@ fillDict()
 // Report the code complexity analysis of a script.
 export function analyzeCode(language: string, script: string) {
     if (language == "python") {
-        return complexityCalculatorPY.analyzePython(script)
+        return analyzePython(script)
     } else if (language == "javascript") {
-        return complexityCalculatorJS.analyzeJavascript(script)
+        return analyzeJavascript(script)
     } else {
         return
     }
@@ -107,7 +107,7 @@ export function analyzeMusic(trackListing: any, apiCalls: any = null) {
 // Report the code complexity and music analysis of a script.
 export function analyzeCodeAndMusic(language: string, script: string, trackListing: any) {
   const codeComplexity = analyzeCode(language, script)
-  const musicAnalysis = analyzeMusic(trackListing, complexityCalculator.getApiCalls())
+  const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
   savedAnalysis = Object.assign({}, { 'Code': codeComplexity }, { 'Music': musicAnalysis })
   if (caiStudent != null && FLAGS.SHOW_CAI) {
     //caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity })
@@ -122,7 +122,7 @@ function trackToTimeline(output: any, apiCalls: any = null) {
     // basic music information
     report["OVERVIEW"] = {"tempo": output.tempo, "measures": output.length, "length (seconds)": (60.0 / output.tempo * output.length * 4.0)}
     report["EFFECTS"] = {}
-    apiCalls = complexityCalculator.getApiCalls()
+    apiCalls = getApiCalls()
     if(apiCalls !== null) {
         report["APICALLS"] = apiCalls
     }

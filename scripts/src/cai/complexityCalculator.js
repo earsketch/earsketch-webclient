@@ -7,6 +7,14 @@ export function getApiCalls() {
     return ccState.getProperty("apiCalls");
 }
 
+export function getUserFunctionReturns() {
+    return ccState.getProperty("userFunctionReturns");
+}
+
+export function getAllVariables() {
+    return ccState.getProperty("allVariables");
+}
+
 // Translate recorded integer values from the results into human-readable English
 function translateIntegerValues(resultsObj) {
     var translatedIntegerValues = {

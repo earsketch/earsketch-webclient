@@ -2,8 +2,8 @@
 import * as caiStudent from "./student";
 import * as caiStudentPreferenceModule from "./studentPreferences";
 import * as userProject from "../app/userProject";
-let complexityCalculatorPY = require("./complexityCalculatorPY");
-let complexityCalculatorJS = require("./complexityCalculatorJS");
+import { analyzePython } from "./complexityCalculatorPY";
+import { analyzeJavascript } from "./complexityCalculatorJS";
 
 let aggregateScore: { [key: string]: number } = {}
 let curriculumPagesViewed: string[] = []
@@ -80,9 +80,9 @@ export function calculateAggregateCodeScore() {
             let output
             try {
                 if (ty == "py") {
-                    output = Object.assign({}, complexityCalculatorPY.analyzePython(sc))
+                    output = Object.assign({}, analyzePython(sc))
                 } else {
-                    output = Object.assign({}, complexityCalculatorJS.analyzeJavascript(sc))
+                    output = Object.assign({}, analyzeJavascript(sc))
                 }
             }
             catch (error) {
@@ -117,9 +117,9 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     let newOutput
     //analyze new code
     if (scriptType == "python") {
-        newOutput = Object.assign({}, complexityCalculatorPY.analyzePython(script))
+        newOutput = Object.assign({}, analyzePython(script))
     } else {
-        newOutput = Object.assign({}, complexityCalculatorJS.analyzeJavascript(script))
+        newOutput = Object.assign({}, analyzeJavascript(script))
     }
     //numeric replacement
     if (newOutput["userFunc"] === "Args" || newOutput["userFunc"] === "Returns") {

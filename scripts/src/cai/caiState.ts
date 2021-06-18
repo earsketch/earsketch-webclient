@@ -9,9 +9,9 @@ import * as userProject from '../app/userProject'
 import * as analysis from './analysis'
 import * as codeSuggestion from './codeSuggestion'
 import * as dialogue from './dialogue'
-let complexityCalculator = require('./complexityCalculator')
-let complexityCalculatorPY = require('./complexityCalculatorPY')
-let complexityCalculatorJS = require('./complexityCalculatorJS')
+import { getUserFunctionReturns, getAllVariables } from './complexityCalculator'
+import { analyzePython } from './complexityCalculatorPY'
+import { analyzeJavascript } from './complexityCalculatorJS'
 
 interface caiState {
     activeProject: string
@@ -227,12 +227,12 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         const language = data[1]
         const code = data[2]
 
-        const results = language === "python" ? complexityCalculatorPY.analyzePython(code) : complexityCalculatorJS.analyzeJavascript(code)
+        const results = language === "python" ? analyzePython(code) : analyzeJavascript(code)
 
         codeSuggestion.generateResults(code, language)
         caiStudentHistoryModule.addScoreToAggregate(code, language)
 
-        const output : any = dialogue.processCodeRun(code, complexityCalculator.userFunctionReturns, complexityCalculator.allVariables, results, {})
+        const output : any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
         if (output !== null && output !== "" && output[0][0] !== "") {
             const message = {
                 text: output[0], 
