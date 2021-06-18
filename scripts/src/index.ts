@@ -1,57 +1,57 @@
 // Global imports of CSS
-import '../../css/earsketch/allstyles.less'
-import './tailwind.css'
-import './i18n'
+import "../../css/earsketch/allstyles.less"
+import "./tailwind.css"
+import "./i18n"
 
-import angular from 'angular'
+import angular from "angular"
 
 import { Question } from "./browser/questions"
 (window as any).Question = Question  // Used inside curriculum.
 
-import '../../fonts/icomoon_ultimate/style.css'
+import "../../fonts/icomoon_ultimate/style.css"
 
-import * as ace from 'ace-builds'
-import 'ace-builds/src-noconflict/theme-monokai'
-import 'ace-builds/src-noconflict/theme-chrome'
-import 'ace-builds/src-noconflict/mode-python'
-import 'ace-builds/src-noconflict/mode-javascript'
-import 'ace-builds/src-noconflict/ext-language_tools'
+import * as ace from "ace-builds"
+import "ace-builds/src-noconflict/theme-monokai"
+import "ace-builds/src-noconflict/theme-chrome"
+import "ace-builds/src-noconflict/mode-python"
+import "ace-builds/src-noconflict/mode-javascript"
+import "ace-builds/src-noconflict/ext-language_tools"
 
 // NOTE: This bloats the webpack output
-// import 'ace-builds/webpack-resolver'
+// import "ace-builds/webpack-resolver"
 
 // https://github.com/ajaxorg/ace/blob/master/demo/webpack/demo.js#L12
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
-import * as helpers from './helpers'
-import esconsole from './esconsole'
-import * as ESUtils from './esutils'
-import reporter from './app/reporter'
+import * as helpers from "./helpers"
+import esconsole from "./esconsole"
+import * as ESUtils from "./esutils"
+import reporter from "./app/reporter"
 
 window.droplet = droplet
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
-import './app/completer'
+import "./app/completer"
 
 import { react2angular } from "react2angular"
 
 import { App } from "./app/App"
 // Now entering: the modal zone.
-import { AccountCreator } from './app/AccountCreator'
-import { ChangePassword } from './app/ChangePassword'
-import { CompetitionSubmission } from './app/CompetitionSubmission'
-import { Download } from './app/Download'
-import { ErrorForm } from './app/ErrorForm'
-import { ForgotPassword } from './app/ForgotPassword'
-import { ProfileEditor } from './app/ProfileEditor'
+import { AccountCreator } from "./app/AccountCreator"
+import { ChangePassword } from "./app/ChangePassword"
+import { CompetitionSubmission } from "./app/CompetitionSubmission"
+import { Download } from "./app/Download"
+import { ErrorForm } from "./app/ErrorForm"
+import { ForgotPassword } from "./app/ForgotPassword"
+import { ProfileEditor } from "./app/ProfileEditor"
 import { Prompt } from "./app/Prompt"
-import { RenameScript, RenameSound } from './app/Rename'
-import { ScriptAnalysis } from './app/ScriptAnalysis'
+import { RenameScript, RenameSound } from "./app/Rename"
+import { ScriptAnalysis } from "./app/ScriptAnalysis"
 import { ScriptCreator } from "./app/ScriptCreator"
-import { ScriptHistory } from './app/ScriptHistory'
-import { ScriptShare } from './app/ScriptShare'
-import { SoundUploader } from './app/SoundUploader'
+import { ScriptHistory } from "./app/ScriptHistory"
+import { ScriptShare } from "./app/ScriptShare"
+import { SoundUploader } from "./app/SoundUploader"
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 ;(window as any).esPrompt = (message: string) => {
@@ -73,7 +73,7 @@ const SOUNDCLOUD_ID_MAP = {
 
 const domain = Object.keys(SOUNDCLOUD_ID_MAP).find(domain => SITE_BASE_URI.includes(domain))
 if (domain) {
-    SC.initialize({ client_id: SOUNDCLOUD_ID_MAP[domain], redirect_uri: SITE_BASE_URI + '/sc.html' })
+    SC.initialize({ client_id: SOUNDCLOUD_ID_MAP[domain], redirect_uri: SITE_BASE_URI + "/sc.html" })
 }
 
 if (ESUtils.isMobileBrowser()) {
@@ -81,59 +81,57 @@ if (ESUtils.isMobileBrowser()) {
 }
 
 // Check for IE <= 10. This excludes 11, which returns appName as "Netscape" (like every other browser).
-if (window.navigator.appName === 'Microsoft Internet Explorer') {
-    var ua = window.navigator.userAgent
-    var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})")
-    if (re.exec(ua) != null) {  // If any IE version
+if (window.navigator.appName === "Microsoft Internet Explorer") {
+    if (/MSIE ([0-9]{1,}[\.0-9]{0,})/.exec(navigator.userAgent) !== null) {
         if (!Number.isNaN(parseFloat(RegExp.$1))) {
-            window.location.replace('sorry.html')
+            window.location.replace("sorry.html")
         }
     }
 }
 
 // Check for minimum version of Chrome/Firefox. TODO: Update?
-const M = ESUtils.whichBrowser().split(' ')
+const M = ESUtils.whichBrowser().split(" ")
 if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
 }
 
 // Async loading
-(require as any)(['angular'], () => {
+(require as any)(["angular"], () => {
     // NPM
-    require('bootstrapBundle')
-    require('uiBootstrap')
-    require('angular-animate')
-    require('ng-file-upload')
-    require('ngClipboard')
-    require('angular-confirm')
+    require("bootstrapBundle")
+    require("uiBootstrap")
+    require("angular-animate")
+    require("ng-file-upload")
+    require("ngClipboard")
+    require("angular-confirm")
 
-    require('skulpt')
-    require('skulptStdLib')
-    require('js-interpreter')
-    require('droplet')
-    require('highlight')
-    require('jsDiffLib')
-    require('jsDiffView')
-    require('lodash')
-    require('kali')
-    require('chance')
+    require("skulpt")
+    require("skulptStdLib")
+    require("js-interpreter")
+    require("droplet")
+    require("highlight")
+    require("jsDiffLib")
+    require("jsDiffView")
+    require("lodash")
+    require("kali")
+    require("chance")
 
-    window.app = angular.module('EarSketchApp', [
-        'ui.bootstrap',
-        'ngAnimate',
-        'ngFileUpload',
-        'angular-clipboard',
-        'angular-confirm',
+    window.app = angular.module("EarSketchApp", [
+        "ui.bootstrap",
+        "ngAnimate",
+        "ngFileUpload",
+        "angular-clipboard",
+        "angular-confirm",
     ]).config(["$locationProvider", ($locationProvider: any) => {
         // Prevent legacy hash-bang URL being overwritten by $location.
-        $locationProvider.html5Mode(true).hashPrefix('')
+        $locationProvider.html5Mode(true).hashPrefix("")
     }])
 
     // In-house modules
-    require('recorder')
+    require("recorder")
 
     // Controllers
-    require('adminWindowController')
+    require("adminWindowController")
 
     app.component("app", react2angular(App))
     app.filter("formatTimer", () => ESUtils.formatTime)
@@ -155,21 +153,21 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     app.component("errorController", helpers.wrapModal(ErrorForm))
 
     // Autograders
-    require('autograderController')
-    require('autograder2Controller')
-    require('autograderAWSController')
-    require('autograder3Controller')
+    require("autograderController")
+    require("autograder2Controller")
+    require("autograderAWSController")
+    require("autograder3Controller")
 
     // CAI
-    require('caiAnalysisModule')
-    require('caiStudentHistoryModule')
-    require('caiDialogue')
-    require('codeSuggestion')
+    require("caiAnalysisModule")
+    require("caiStudentHistoryModule")
+    require("caiDialogue")
+    require("codeSuggestion")
 
-    app.factory('$exceptionHandler', () => {
+    app.factory("$exceptionHandler", () => {
         return (exception: any, cause: any) => {
             console.log(exception)
-            esconsole(exception, ['ERROR','ANGULAR'])
+            esconsole(exception, ["error", "angular"])
             // ensures we don't report Skulpt errors to GA
             if (exception.args === undefined) {
                 reporter.exception(exception.toString())
@@ -184,7 +182,7 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
             $delegate.get = (url: any, config: any) => {
                 // ignore Angular Bootstrap UI templates
                 // also unit tests won't like release numbers added
-                if (!url.includes('template/') && BUILD_NUM !== undefined) {
+                if (!url.includes("template/") && BUILD_NUM !== undefined) {
                     const parser = document.createElement("a")
                     parser.href = url
                     if (!parser.search) {
@@ -200,5 +198,5 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
         }])
     }])
 
-    angular.bootstrap(document, ['EarSketchApp'], { strictDi: true })
+    angular.bootstrap(document, ["EarSketchApp"], { strictDi: true })
 })
