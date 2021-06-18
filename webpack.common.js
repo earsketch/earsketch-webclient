@@ -21,7 +21,6 @@ module.exports = {
         extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
-            tabdrop: 'bootstrap-tabdrop-ro/js/bootstrap-tabdrop.js',
             bootstrapBundle: 'bootstrap/dist/js/bootstrap.bundle.min.js',
             uiBootstrap: 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
             skulpt: path.resolve(__dirname,`${vendorDir}/skulpt/skulpt.min.js`),
@@ -44,9 +43,6 @@ module.exports = {
             esDSP: path.resolve(__dirname,`${libDir}/earsketch-dsp.js`),
 
             ngClipboard: 'angular-clipboard',
-            uiUtils: path.resolve(__dirname,`${vendorDir}/angular/angular-ui-utils.min.js`),
-            uiScroll: path.resolve(__dirname,`${libDir}/ui-scroll.min.js`),
-            uiScrollGrid: path.resolve(__dirname,`${libDir}/ui-scroll-grid.min.js`),
 
             // Controllers
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
@@ -142,7 +138,7 @@ module.exports = {
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
-            // AngularJS and bootstrap-tabdrop depend on the global jQuery variable
+            // AngularJS depends on the global jQuery variable
             'window.jQuery': 'jquery',
 
             SC: 'soundcloud',

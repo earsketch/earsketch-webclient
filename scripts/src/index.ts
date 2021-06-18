@@ -1,32 +1,28 @@
 // Global imports of CSS
 import '../../css/earsketch/allstyles.less'
-import './tailwind.css';
-import './i18n';
+import './tailwind.css'
+import './i18n'
 
-import angular from 'angular';
+import angular from 'angular'
 
-require('jquery');
-require('jqueryUI');
-window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
 import { Question } from "./browser/questions"
-(window as any).Question = Question; // Used inside curriculum HTMLs.
+(window as any).Question = Question  // Used inside curriculum.
 
-import 'angularjs-slider/dist/rzslider.css';
-import '../../fonts/icomoon_ultimate/style.css';
+import '../../fonts/icomoon_ultimate/style.css'
 
-import * as ace from 'ace-builds';
-import 'ace-builds/src-noconflict/theme-monokai';
-import 'ace-builds/src-noconflict/theme-chrome';
-import 'ace-builds/src-noconflict/mode-python';
-import 'ace-builds/src-noconflict/mode-javascript';
-import 'ace-builds/src-noconflict/ext-language_tools';
+import * as ace from 'ace-builds'
+import 'ace-builds/src-noconflict/theme-monokai'
+import 'ace-builds/src-noconflict/theme-chrome'
+import 'ace-builds/src-noconflict/mode-python'
+import 'ace-builds/src-noconflict/mode-javascript'
+import 'ace-builds/src-noconflict/ext-language_tools'
 
 // NOTE: This bloats the webpack output
-// import 'ace-builds/webpack-resolver';
+// import 'ace-builds/webpack-resolver'
 
 // https://github.com/ajaxorg/ace/blob/master/demo/webpack/demo.js#L12
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
-ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl);
+ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 import * as helpers from './helpers'
 import esconsole from './esconsole'
@@ -58,8 +54,6 @@ import { ScriptShare } from './app/ScriptShare'
 import { SoundUploader } from './app/SoundUploader'
 
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
-// (This was previously in userConsole, but since that's now a module, the fields are read-only.)
-// (Also, it doesn't really have anything to do with the user console.)
 ;(window as any).esPrompt = (message: string) => {
     const $uibModal = helpers.getNgService("$uibModal")
     return new Promise(resolve => $uibModal.open({
@@ -82,67 +76,64 @@ if (domain) {
     SC.initialize({ client_id: SOUNDCLOUD_ID_MAP[domain], redirect_uri: SITE_BASE_URI + '/sc.html' })
 }
 
-Object.assign(window,require('dsp'));
-Object.assign(window,require('esDSP'));
+if (ESUtils.isMobileBrowser()) {
+    alert("It appears you are using a mobile browser. EarSketch is not equipped for mobile use.")
+}
+
+// Check for IE <= 10. This excludes 11, which returns appName as "Netscape" (like every other browser).
+if (window.navigator.appName === 'Microsoft Internet Explorer') {
+    var ua = window.navigator.userAgent
+    var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})")
+    if (re.exec(ua) != null) {  // If any IE version
+        if (!Number.isNaN(parseFloat(RegExp.$1))) {
+            window.location.replace('sorry.html')
+        }
+    }
+}
+
+// Check for minimum version of Chrome/Firefox. TODO: Update?
+const M = ESUtils.whichBrowser().split(' ')
+if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
+    alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
+}
 
 // Async loading
 (require as any)(['angular'], () => {
     // NPM
-    require('angular-ui-router');
-    require('bootstrapBundle');
-    require('uiBootstrap');
-    require('angular-animate');
-    require('ng-file-upload');
-    require('ngClipboard');
-    require('angular-confirm');
-    require('angularjs-slider');
-    require('tabdrop');
-    require('ng-redux');
+    require('bootstrapBundle')
+    require('uiBootstrap')
+    require('angular-animate')
+    require('ng-file-upload')
+    require('ngClipboard')
+    require('angular-confirm')
 
-    // vendor files
-    require('uiUtils');
-    require('uiScroll');
-    require('uiScrollGrid');
-    require('skulpt');
-    require('skulptStdLib');
-    require('js-interpreter');
-    require('droplet');
-    require('highlight');
-    require('jsDiffLib');
-    require('jsDiffView');
-    require('lodash');
-    require('kali');
-    require('chance');
-
-    // let config = require('ace/config');
-    // config.set('packaged', true);
-    // let path = 'ace-builds/src-min'
-    // config.set('basePath', path);
+    require('skulpt')
+    require('skulptStdLib')
+    require('js-interpreter')
+    require('droplet')
+    require('highlight')
+    require('jsDiffLib')
+    require('jsDiffView')
+    require('lodash')
+    require('kali')
+    require('chance')
 
     window.app = angular.module('EarSketchApp', [
-        'ui.router',
         'ui.bootstrap',
-        'ui.utils',
         'ngAnimate',
         'ngFileUpload',
         'angular-clipboard',
         'angular-confirm',
-        'rzModule',
-        'ui.scroll',
-        'ui.scroll.grid',
-        'ngRedux'
     ]).config(["$locationProvider", ($locationProvider: any) => {
         // Prevent legacy hash-bang URL being overwritten by $location.
-        $locationProvider.html5Mode(true).hashPrefix('');
-    }]);
-
-    // app.component('rootComponent', react2angular(RootComponent));
+        $locationProvider.html5Mode(true).hashPrefix('')
+    }])
 
     // In-house modules
-    require('recorder');
+    require('recorder')
 
     // Controllers
-    require('adminWindowController');
+    require('adminWindowController')
 
     app.component("app", react2angular(App))
     app.filter("formatTimer", () => ESUtils.formatTime)
@@ -163,123 +154,51 @@ Object.assign(window,require('esDSP'));
     app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
     app.component("errorController", helpers.wrapModal(ErrorForm))
 
-    // To be ported to React
-    require('./layout/Layout');
-
     // Autograders
-    require('autograderController');
-    require('autograder2Controller');
-    require('autograderAWSController');
-    require('autograder3Controller');
+    require('autograderController')
+    require('autograder2Controller')
+    require('autograderAWSController')
+    require('autograder3Controller')
 
     // CAI
-    require('./cai/CAI');
-    require('caiAnalysisModule');
-    require('caiStudentHistoryModule');
-    require('caiDialogue');
-    require('codeSuggestion');
+    require('caiAnalysisModule')
+    require('caiStudentHistoryModule')
+    require('caiDialogue')
+    require('codeSuggestion')
 
-    app.factory('$exceptionHandler', function() {
-        return function(exception: any, cause: any) {
-            console.log(exception);
-            esconsole(exception, ['ERROR','ANGULAR']);
+    app.factory('$exceptionHandler', () => {
+        return (exception: any, cause: any) => {
+            console.log(exception)
+            esconsole(exception, ['ERROR','ANGULAR'])
             // ensures we don't report Skulpt errors to GA
             if (exception.args === undefined) {
-                reporter.exception(exception.toString());
-            }
-        };
-    });
-
-    app.run(['$window', function ($window: any) {
-        // Returns the version of Internet Explorer or a -1
-        // (indicating the use of another browser).
-        function getInternetExplorerVersion() {
-            var rv = -1; // Return value assumes failure.
-            if ($window.navigator.appName === 'Microsoft Internet Explorer') {
-                var ua = $window.navigator.userAgent;
-                var re = new RegExp("MSIE ([0-9]{1,}[\.0-9]{0,})");
-                if (re.exec(ua) != null)
-                    rv = parseFloat(RegExp.$1);
-            }
-            return rv;
-        }
-
-        function checkIE() {
-            var ver = getInternetExplorerVersion();
-            if (ver > -1) //If any IE version
-            {
-                $window.location.replace('sorry.html');
+                reporter.exception(exception.toString())
             }
         }
+    })
 
-        //Minimum version for chrome and firefox
-        function checkMinVersion() {
-            var chromeMin = 24;
-            var ffMin = 25;
-
-            var M = ESUtils.whichBrowser().split(' ');
-
-            if ((M[0] === "Chrome" && +M[1] < chromeMin) || (M[0] === "Firefox" && +M[1] < ffMin)) {
-                alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.");
-                return false;
-            }
-            return true;
-        }
-
-        function mobileCheck() {
-            if (ESUtils.isMobileBrowser()) {
-                alert("It appears you are using a mobile browser. EarSketch is not equipped for mobile use.");
-            }
-        }
-
-        mobileCheck();
-        checkIE();
-        checkMinVersion();
-    }]);
-
-    /**
-     * Angular template cache buster. Uses the BUILD_NUM from main.js
-     */
+    // Angular template cache buster. Uses the BUILD_NUM from main.js
     app.config(["$provide", function($provide: any) {
         return $provide.decorator("$http", ["$delegate", function($delegate: any) {
-            var get = $delegate.get;
-            $delegate.get = function(url: any, config: any) {
+            const get = $delegate.get
+            $delegate.get = (url: any, config: any) => {
                 // ignore Angular Bootstrap UI templates
                 // also unit tests won't like release numbers added
-                if (!~url.indexOf('template/') &&
-                    !~url.indexOf('rzSliderTpl.html') &&
-                    !~url.indexOf('tocPopoverTemplate.html') &&
-                    !~url.indexOf('sound-browser-tooltip.html') &&
-                    !~url.indexOf('mySlideTemplate.html') &&
-                    typeof(BUILD_NUM) !== 'undefined') {
-                    var parser = document.createElement("a");
-                    parser.href = url;
+                if (!url.includes('template/') && BUILD_NUM !== undefined) {
+                    const parser = document.createElement("a")
+                    parser.href = url
                     if (!parser.search) {
-                        parser.search = "?release=" + BUILD_NUM;
+                        parser.search = "?release=" + BUILD_NUM
                     } else {
-                        parser.search += "&release=" + BUILD_NUM;
+                        parser.search += "&release=" + BUILD_NUM
                     }
-                    url = parser.href;
+                    url = parser.href
                 }
-                return get(url, config);
-            };
-            return $delegate;
-        }]);
-    }]);
+                return get(url, config)
+            }
+            return $delegate
+        }])
+    }])
 
-    app.directive('rightClickMenu', ['$parse', function ($parse: any) {
-        return function(scope: any, element: any, attrs: any) {
-            var fn = $parse(attrs.rightClickMenu);
-            element.bind('contextmenu', function (event: any) {
-                scope.$apply(function() {
-                    event.preventDefault();
-                    fn(scope, {$event:event});
-                });
-            });
-        };
-    }]);
-
-    angular.bootstrap(document, ['EarSketchApp'], {
-        strictDi: true
-    });
-});
+    angular.bootstrap(document, ['EarSketchApp'], { strictDi: true })
+})
