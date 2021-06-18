@@ -83,7 +83,9 @@ export async function get(endpoint: string, params?: { [key: string]: string }) 
 export async function postForm(endpoint: string, data?: { [key: string]: string | Blob }) {
     const url = URL_DOMAIN + endpoint
     try {
-        return (await fetch(url, { method: "POST", body: form(data) })).json()
+        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
+        const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
+        return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])

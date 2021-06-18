@@ -386,8 +386,7 @@ const IDE = () => {
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
-                            {numTabs > 0
-                            ? <div className="h-full flex flex-col">
+                            <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
                                 <Tabs />
                                 {embedMode && <div className="embedded-script-info h-auto" >
                                     <p>Script: {embeddedScriptName}</p>
@@ -395,7 +394,7 @@ const IDE = () => {
                                 </div>}
                                 <Editor />
                             </div>
-                            : <div className="h-full flex flex-col justify-evenly text-4xl text-center">
+                            {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">You have no scripts loaded.</div>
                                     <a href="#" onClick={createScript}>Click here to create a new script!</a>
@@ -408,7 +407,6 @@ const IDE = () => {
                                         and select <span className="empty-script-lang">{language === "python" ? "JavaScript" : "Python"}</span> as the script language.</p>
                                 </div>
                             </div>}
-
                             <iframe id="ifmcontentstoprint" className="h-0 w-0 invisible absolute"></iframe>
                         </div>
                     </div>}
