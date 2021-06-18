@@ -260,7 +260,10 @@ function resumeQuickTour() {
 }
 
 function reportError() {
-    helpers.getNgService("$uibModal").open({ component: "errorController" })
+    helpers.getNgService("$uibModal").open({
+        component: "errorController",
+        resolve: { email() { return email } }
+    })
 }
 
 function openAdminWindow() {
@@ -286,8 +289,6 @@ const Footer = () => {
         </div>
     </div>
 }
-
-let _showCAI = false
 
 function setup() {
     store.dispatch(sounds.getDefaultSounds())
@@ -351,27 +352,22 @@ function setup() {
     if (FLAGS.SHOW_CAI) {
         store.dispatch(layout.setEast({ open: true }))
         Layout.resetHorizontalSplits()
-
-        helpers.getNgRootScope().$on("newCAIMessage", () => {
-            if (FLAGS.SHOW_CAI && !_showCAI) {
-                document.getElementById("caiButton")!.classList.add("flashNavButton")
-            }
-        })
     }
 }
 
-const App = () => {
-    const now = Date.now()
+// TODO: Move to userState, and maybe get rid of firstname/lastname.
+let firstname = ""
+let lastname = ""
+let email = ""
 
+const App = () => {
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
+    const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     const numUnread = userNotification.history.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
 
-    let firstname = ""
-    let lastname = ""
-    let email = ""
     const savedLoginInfo = userProject.loadUser()
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
@@ -381,16 +377,12 @@ const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (location: string) => {
-        if (showCAI) {
-            toggleCAIWindow()
-        }
-        store.dispatch(curriculum.fetchContent({ location: location.split("-") }))
+        dispatch(layout.openEast("CURRICULUM"))
+        dispatch(curriculum.fetchContent({ location: location.split("-") }))
     }
 
     const [showNotifications, setShowNotifications] = useState(false)
     const [showNotificationHistory, setShowNotificationHistory] = useState(false)
-    const [showCAI, setShowCAI] = useState(FLAGS.SHOW_CAI)
-    _showCAI = showCAI
 
     const showAmazonBanner = FLAGS.SHOW_AMAZON_BANNER || location.href.includes("competition")
 
@@ -560,12 +552,12 @@ const App = () => {
 
     const toggleCAIWindow = () => {
         if (!showCAI) {
-            store.dispatch(layout.setEast({ open: true }))
-            Layout.resetHorizontalSplits()
+            dispatch(layout.openEast("CAI"))
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
-            store.dispatch(cai.autoScrollCAI())
+            dispatch(cai.autoScrollCAI())
+        } else {
+            dispatch(layout.setEast({ kind: "CURRICULUM" }))
         }
-        setShowCAI(!showCAI)
     }
 
     const toggleNotificationHistory = (bool: boolean) => {

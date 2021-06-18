@@ -3,13 +3,12 @@ import i18n from "i18next"
 import { useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
 
-import { importScript } from "../app/App"
+import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./editorState"
-import * as helpers from "../helpers"
 import { initEditor } from "../app/IDE"
 import * as tabs from "./tabState"
 import * as userConsole from "../app/userconsole"
@@ -178,7 +177,7 @@ function setupAceHandlers(ace: Ace.Editor) {
         }
 
         recommendationTimer = window.setTimeout(() => {
-            helpers.getNgRootScope().$broadcast("reloadRecommendations")
+            reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
             }

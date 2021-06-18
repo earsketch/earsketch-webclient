@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Provider, useSelector } from "react-redux"
+import { Provider, useDispatch, useSelector } from "react-redux"
 
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
@@ -8,6 +8,7 @@ import { CAI } from "../cai/CAI"
 import * as collaboration from "./collaboration"
 import * as compiler from "./compiler"
 import { Curriculum } from "../browser/Curriculum"
+import * as curriculum from "../browser/curriculumState"
 import { DAW } from "../daw/DAW"
 import { Editor } from "../editor/Editor"
 import { EditorHeader } from "../editor/EditorHeader"
@@ -17,6 +18,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState"
 import * as scripts from "../browser/scriptsState"
 import * as editor from "../editor/Editor"
 import * as editorState from "../editor/editorState"
+import * as layout from "../layout/layoutState"
 import * as Layout from "../layout/Layout"
 import reporter from "./reporter"
 import * as tabs from "../editor/tabState"
@@ -350,6 +352,7 @@ export function compileCode() {
 }
 
 const IDE = () => {
+    const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const numTabs = useSelector(tabs.selectOpenTabs).length
 
@@ -360,6 +363,8 @@ const IDE = () => {
 
     const bubbleActive = useSelector(bubble.selectActive)
     const bubblePage = useSelector(bubble.selectCurrentPage)
+
+    const showCAI = useSelector(layout.selectEastKind) === "CAI" && FLAGS.SHOW_CAI
 
     const [loading, _setLoading] = useState(false)
     setLoading = _setLoading
@@ -423,7 +428,7 @@ const IDE = () => {
                                     <span className={"console-" + msg.level.replace("status", "info")}>
                                         {msg.text}
                                         {msg.level === "error" &&
-                                        <a className="cursor-pointer" onClick={() => helpers.getNgRootScope().loadChapterForError(msg.text)}>
+                                        <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
                                             Click here for more information.
                                         </a>}
                                     </span>
@@ -434,7 +439,7 @@ const IDE = () => {
                 </div>
 
                 <div className="h-full" id="curriculum-container" style={{ zIndex: bubbleActive && [8,9].includes(bubblePage) ? 35 : 0 }}>
-                    {helpers.getNgMainController().scope().showCAIWindow
+                    {showCAI
                     ? <CAI />
                     : <Curriculum />}
                     {/* NOTE: The chat window might come back here at some point. */}

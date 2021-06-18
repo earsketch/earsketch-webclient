@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
+import { shareScript } from '../app/App';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as editor from './Editor';
@@ -8,7 +9,6 @@ import * as editorState from './editorState';
 import { compileCode } from '../app/IDE';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
-import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 
 const UndoRedoButtons = () => {
@@ -48,7 +48,6 @@ const UndoRedoButtons = () => {
 
 export const EditorHeader = () => {
     const dispatch = useDispatch();
-    const mainScope = helpers.getNgMainController().scope();
     const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID) as string;
     const allScripts = useSelector(scripts.selectAllScriptEntities);
@@ -108,7 +107,7 @@ export const EditorHeader = () => {
                             onClick={() => {
                                 // This temporary hack assumes any types of not-owned script are not sharable from the editor header.
                                 const unsavedScript = userProject.scripts[activeTab];
-                                mainScope.shareScript(Object.assign({}, unsavedScript));
+                                shareScript(Object.assign({}, unsavedScript));
                             }}
                         >
                             <i className='icon-share32 pr-2' />

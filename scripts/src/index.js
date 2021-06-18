@@ -135,7 +135,7 @@ require(['angular'], () => {
     require('adminWindowController');
 
     app.component("app", react2angular(App))
-    app.filter("formatTimer", () => ESUtils.formatTimer)
+    app.filter("formatTimer", () => ESUtils.formatTime)
     // Temporary glue from $uibModal to React components.
     app.component("prompt", helpers.wrapModal(Prompt))
     app.component("createScriptController", helpers.wrapModal(ScriptCreator))

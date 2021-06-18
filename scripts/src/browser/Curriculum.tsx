@@ -349,21 +349,7 @@ const HotCurriculum = hot(() => {
             dispatch(appState.setScriptLanguage(languageParam))
         }
 
-        const $rootScope = helpers.getNgRootScope()
-        if ($rootScope) {
-            // Hack to facilitate Angular loading curriculum page for errors in console.
-            // TODO: Remove this after we've ported templates/index.html to React.
-            $rootScope.loadChapterForError = (errorMessage: string) => {
-                const aliases: any = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
-                const types = ["importerror", "indentationerror", "indexerror", "nameerror",
-                    "parseerror", "syntaxerror", "typeerror", "valueerror"]
-                let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
-                type = aliases[type] || type
-                const anchor = types.includes(type) ? '#' + type : ''
-                dispatch(curriculum.fetchContent({ url: `every-error-explained-in-detail.html${anchor}` }))
-            }
-            initialized = true
-        }
+        initialized = true
     }
 
     return <CurriculumPane />

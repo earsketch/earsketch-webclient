@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState, ThunkAPI } from '../reducers'
+import store, { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
 import * as caiStudentPreferenceModule from './studentPreferences'
+import * as curriculum from '../browser/curriculumState'
 import * as editor from '../editor/Editor'
 import * as helpers from '../helpers'
-import * as curriculum from '../browser/curriculumState'
+import * as layout from '../layout/layoutState'
 
 interface caiState {
     activeProject: string
@@ -85,6 +86,14 @@ export interface CAIMessage {
     date: number
 }
 
+// TODO: Avoid DOM manipulation.
+function newCAIMessage() {
+    const east = store.getState().layout.east
+    if (!(east.open && east.kind === "CAI")) {
+        document.getElementById("caiButton")!.classList.add("flashNavButton")
+    }
+}
+
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     'cai/introduceCAI',
     (_, { getState, dispatch }) => {
@@ -108,7 +117,7 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
 
                 dispatch(addToMessageList(outputMessage))
                 dispatch(autoScrollCAI())
-                rootScope.$broadcast('newCAIMessage')
+                newCAIMessage()
             }
         }
     }
@@ -164,7 +173,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
                     } as CAIMessage
                     dispatch(addToMessageList(outputMessage))
                     dispatch(autoScrollCAI())
-                    rootScope.$broadcast('newCAIMessage')
+                    newCAIMessage()
                 }
             }
         }            
@@ -247,7 +256,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         }
         dispatch(setDropupLabel(caiDialogue.getDropup()))
         dispatch(autoScrollCAI())
-        rootScope.$broadcast('newCAIMessage')
+        newCAIMessage()
 
         var t = Date.now()
         caiStudentPreferenceModule.addCompileTS(t)
@@ -280,9 +289,8 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
 export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], ThunkAPI>(
     'cai/openCurriculum',
     ([message, location], { getState, dispatch }) => {
-        const mainControllerScope = helpers.getNgMainController().scope()
         dispatch(curriculum.fetchContent({location: message.keyword[location][1].split('-')}))
-        mainControllerScope.toggleCAIWindow()
+        dispatch(layout.openEast("CURRICULUM"))
     }
 );
 

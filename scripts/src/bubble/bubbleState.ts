@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import * as editor from '../editor/Editor';
 import * as layout from '../layout/layoutState';
 import * as scripts from '../browser/scriptsState';
 import * as tabs from '../editor/tabState';
-import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';
@@ -48,7 +48,6 @@ const createSampleScript = createAsyncThunk(
         const { bubble: { language } } = getState() as { bubble: BubbleState };
         const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
-        const rootScope = helpers.getNgService('$rootScope');
         return userProject.saveScript(fileName, code, true)
             .then((script: ScriptEntity) => {
                 userProject.openScript(script.shareid);
@@ -63,8 +62,7 @@ const setEditorReadOnly = createAsyncThunk(
     'bubble/setEditorWritable',
     async (payload: boolean) => {
         return new Promise(resolve => {
-            const editorScope = helpers.getNgDirective('editor').scope();
-            editorScope?.editor.setReadOnly(payload);
+            editor.setReadOnly(payload);
             setTimeout(resolve, 100);
         });
     }

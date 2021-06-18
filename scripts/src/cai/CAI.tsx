@@ -54,7 +54,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 </div>
             </div>
             <div className="chat-message-date" style={{float: message.sender !== "CAI" ? 'left' : 'right'}}>
-                {ESUtils.formatTimer(Date.now() - message.date)}
+                {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
     )
@@ -146,7 +146,7 @@ export const CAI = () => {
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
 
-    useEffect (() => {
+    useEffect(() => {
         dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
         dispatch(cai.curriculumPage(curriculumLocation))
     })

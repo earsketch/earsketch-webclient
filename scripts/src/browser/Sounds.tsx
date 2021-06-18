@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { VariableSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-import { renameSound, deleteSound } from '../app/App';
-import * as helpers from '../helpers';
+import { renameSound, deleteSound, openUploadWindow } from '../app/App';
 import * as sounds from './soundsState';
 import * as appState from '../app/appState';
 import * as editor from '../editor/Editor';
@@ -135,7 +134,7 @@ const AddSound = () => {
     return (
         <div
             className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer'
-            onClick={() => helpers.getNgMainController().scope().openUploadWindow()}
+            onClick={() => openUploadWindow()}
         >
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
                 <i className='icon icon-plus2' />

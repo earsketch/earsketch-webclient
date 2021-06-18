@@ -139,7 +139,7 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                             {item.message.text}
                         </div>
                         <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
-                            {ESUtils.formatTimer(now - item.time)}
+                            {ESUtils.formatTime(now - item.time)}
                         </div>
 
                         {/* special actions */}
@@ -200,7 +200,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                 <div className="flex justify-between">
                     <div>
                         <div>{item.message.text}</div>
-                        <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTimer(now - item.time)}</div>
+                        <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTime(now - item.time)}</div>
                     </div>
                     {item.message.hyperlink && <div>
                         <a href={item.message.hyperlink} target="_blank" className="cursor-pointer">MORE</a>
@@ -227,7 +227,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                             {item.message.text}
                         </div>
                         <div style={{ fontSize: "10px", color: "grey" }}>
-                            {ESUtils.formatTimer(now - item.time)}
+                            {ESUtils.formatTime(now - item.time)}
                         </div>
                     </div>
                     {item.notification_type === "share_script" && <div>

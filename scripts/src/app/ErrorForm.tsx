@@ -5,14 +5,14 @@ import { REPORT_LOG } from "../esconsole"
 import * as app from "../app/appState"
 import * as editor from "../editor/Editor"
 import * as ESUtils from "../esutils"
-import * as helpers from "../helpers"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
 
-export const ErrorForm = ({ close }: { close: () => void }) => {
+export const ErrorForm = ({ email: storedEmail, close }: { email: string, close: () => void }) => {
+    console.log("storedEmail is", storedEmail)
     const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
-    const [email, setEmail] = useState(helpers.getNgMainController().scope().email)
+    const [email, setEmail] = useState(storedEmail)
     const [description, setDescription] = useState("")
 
     const submit = () => {

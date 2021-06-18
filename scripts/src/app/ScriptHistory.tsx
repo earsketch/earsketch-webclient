@@ -30,7 +30,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
             Version {version.id}
             {version.activeUsers && <span><i className="icon-users" style={{ color: "#6dfed4" }}></i></span>}
             <br />
-            <span className="text-muted">{ESUtils.formatTimer(now - version.created)}</span>
+            <span className="text-muted">{ESUtils.formatTime(now - version.created)}</span>
         </td>
         {allowRevert && <td><a href="#" onClick={revert} title="Restore version">
             <i className="icon-rotate-cw2 inline-block" style={{ transform: "scaleX(-1)" }}></i>

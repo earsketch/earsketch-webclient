@@ -23,8 +23,6 @@ export const getNgDirective = (directiveName: string) => {
 
 export const getNgRootScope = () => angular.element(document).injector().get('$rootScope');
 
-export const getNgMainController = () => angular.element(document.body);
-
 export function wrapModal(Component: any) {
     const Wrapped = ({ modalInstance, resolve, ...props}: any) =>
         React.createElement(Provider, { store }, React.createElement(Component, { close: modalInstance.close, ...resolve, ...props }, null))
