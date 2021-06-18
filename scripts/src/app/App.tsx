@@ -542,7 +542,7 @@ const App = () => {
                 firstName() { return firstname },
                 lastName() { return lastname },
             }
-        })
+        }).result
         if (result !== undefined) {
             firstname = result.firstName
             lastname = result.lastName
