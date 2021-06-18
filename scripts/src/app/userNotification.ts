@@ -1,4 +1,4 @@
-import * as helpers from '../helpers'
+import * as userProject from "./userProject"
 
 // TODO: Once we port the notification UI to React, we should probably move this state to Redux.
 
@@ -149,7 +149,6 @@ export const loadHistory = (notificationList: Notification[]) => {
     history.sort((a, b) => b.time - a.time)
 
     truncateBroadcast()
-    scopeDigest()
 }
 
 export const clearHistory = () => history = []
@@ -161,7 +160,6 @@ export const handleBroadcast = (data: Notification) => {
     data.pinned = true
     history.unshift(data)
     truncateBroadcast()
-    scopeDigest()
 }
 
 export const handleTeacherBroadcast = (data: Notification) => {
@@ -174,11 +172,19 @@ export const handleTeacherBroadcast = (data: Notification) => {
     data.pinned = true
     history.unshift(data)
     // truncateBroadcast()
-    scopeDigest()
 }
 
-const scopeDigest = () => {
-    const $rootScope = helpers.getNgRootScope()
-    $rootScope.$broadcast('notificationsUpdated')
-    $rootScope.$applyAsync()
+export async function readMessage(index: number, item: any) {
+    if (item.notification_type === "broadcast" || history[index].id === undefined) return
+    await userProject.postAuthForm("/services/scripts/markread", { notification_id: history[index].id! })
+    history[index].unread = false
+}
+
+export function markAllAsRead() {
+    history.forEach((item, index) => {
+        if (item.unread && item.notification_type !== "broadcast") {
+            // TODO: handle broadcast as well
+            readMessage(index, item)
+        }
+    })
 }

@@ -13,7 +13,7 @@ import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import { IDE, openShare } from "./IDE"
 import { LocaleSelector } from "../top/LocaleSelector"
-import { NotificationBar, NotificationPopup } from "./Notification"
+import { NotificationBar, NotificationHistory, NotificationList } from "./Notification"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
@@ -249,25 +249,6 @@ export function reloadRecommendations() {
     store.dispatch(recommenderState.setRecommendations(res))
 }
 
-async function readMessage(index: number, item: any) {
-    if (item.notification_type === "broadcast" || userNotification.history[index].id === undefined) return
-    try {
-        await userProject.postAuthForm("/services/scripts/markread", { notification_id: userNotification.history[index].id! })
-        userNotification.history[index].unread = false
-    } catch (error) {
-        esconsole(error, ["mainctrl", "error"])
-    }
-}
-
-function markAllAsRead() {
-    userNotification.history.forEach((item, index) => {
-        if (item.unread && item.notification_type !== "broadcast") {
-            // TODO: handle broadcast as well
-            readMessage(index, item)
-        }
-    })
-}
-
 function toggleColorTheme() {
     store.dispatch(appState.toggleColorTheme())
     reporter.toggleColorTheme()
@@ -388,7 +369,6 @@ const App = () => {
 
     const numUnread = userNotification.history.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
 
-    // User data
     let firstname = ""
     let lastname = ""
     let email = ""
@@ -397,6 +377,7 @@ const App = () => {
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [role, setRole] = useState("student")
     const [loggedIn, setLoggedIn] = useState(false)
+    const embedMode = useSelector(appState.selectEmbedMode)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (location: string) => {
@@ -406,8 +387,8 @@ const App = () => {
         store.dispatch(curriculum.fetchContent({ location: location.split("-") }))
     }
 
-    let showNotification = false
-    let showNotificationHistory = false
+    const [showNotifications, setShowNotifications] = useState(false)
+    const [showNotificationHistory, setShowNotificationHistory] = useState(false)
     const [showCAI, setShowCAI] = useState(FLAGS.SHOW_CAI)
     _showCAI = showCAI
 
@@ -496,9 +477,7 @@ const App = () => {
 
         if (!loggedIn) {
             setLoggedIn(true)
-            // TODO: "login success" message to be shown only when re-logged in with sounds already loaded (after splash screen).
-            // the initial login message is taken care in the sound browser controller
-            userNotification.show(i18n.t("messages:general.loginsuccess"), "normal", 0.5)
+            userNotification.show(i18n.t("messages:general.loginsuccess"), "history", 0.5)
             const activeTabID = tabs.selectActiveTabID(store.getState())
             activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
         }
@@ -560,7 +539,7 @@ const App = () => {
     }
 
     const editProfile = async () => {
-        showNotification = false
+        setShowNotifications(false)
         const result = await helpers.getNgService("$uibModal").open({
             component: "editProfileController",
             resolve: {
@@ -590,17 +569,17 @@ const App = () => {
     }
 
     const toggleNotificationHistory = (bool: boolean) => {
-        showNotificationHistory = bool
+        setShowNotificationHistory(bool)
         if (bool) {
-            showNotification = false
+            setShowNotifications(false)
         }
     }
 
     const openSharedScript = (shareid: string) => {
         esconsole("opening a shared script: " + shareid, "main")
         openShare(shareid).then(() => store.dispatch(scripts.syncToNgUserProject()))
-        showNotification = false
-        showNotificationHistory = false
+        setShowNotifications(false)
+        setShowNotificationHistory(false)
     }
 
     const openCollaborativeScript = (shareID: string) => {
@@ -608,7 +587,7 @@ const App = () => {
             openSharedScript(shareID)
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         } else {
-            showNotification = false
+            setShowNotifications(false)
             userNotification.show("Error opening the collaborative script! You may no longer the access. Try refreshing the page and checking the shared scripts browser", "failure1")
         }
     }
@@ -619,73 +598,11 @@ const App = () => {
         
         {/* highlight js style */}
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
-        
-        {showNotificationHistory && <div id="notification-history">
-            <div className="flex justify-between" style={{ padding: "1em" }}>
-                <div>
-                    <a href="#" onClick={() => toggleNotificationHistory(false)}>
-                        <i id="back-button" className="icon icon-arrow-right22"></i>
-                    </a>
-                    <span style={{ color: "grey" }}>
-                        <i className="icon icon-bell"></i> Notifications
-                    </span>
-                </div>
-                <div>
-                    <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={() => toggleNotificationHistory(false)}><span><i className="icon icon-cross2" /></span>CLOSE</a>
-                </div>
-            </div>
-        
-            <div className="notification-type-header">Pinned Notifications</div>
-            {userNotification.history.map((item, index) =>
-            ["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
-                <div style={{ margin: "10px 20px" }}>
-                    <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
-                        <div><i className="icon icon-pushpin"></i></div>
-                    </div>
-                    <div className="flex justify-between">
-                        <div>
-                            <div>{item.message.text}</div>
-                            <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTimer(now - item.time)}</div>
-                        </div>
-                        {item.message.hyperlink && <div>
-                            <a href={item.message.hyperlink} target="_blank" className="cursor-pointer">MORE</a>
-                        </div>}
-                    </div>
-                </div>
-                {index < userNotification.history.length - 1 &&
-                <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
-            </div>)}
-        
-            <div className="notification-type-header flex justify-between">
-                <div>Other Notifications</div>
-                <div><a href="#" onClick={markAllAsRead}>MARK ALL AS READ</a></div>
-            </div>
-            {userNotification.history.map((item, index) =>
-            !["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
-                <div className="cursor-pointer" style={{ margin: "10px 20px" }} onClick={() => readMessage(index, item)}>
-                    <div className="flex items-center float-left" style={{ margin: "10px" }}>
-                        <div className={item.unread ? "marker" : "empty-marker"}></div>
-                    </div>
-                    <div className="flex justify-between">
-                        <div>
-                            <div>
-                                {item.message.text}
-                            </div>
-                            <div style={{ fontSize: "10px", color: "grey" }}>
-                                {ESUtils.formatTimer(now - item.time)}
-                            </div>
-                        </div>
-                        {item.notification_type === "share_script" && <div>
-                            <span onClick={() => openSharedScript(item.shareid!)}><a href="#" className="cursor-pointer">OPEN</a></span>
-                        </div>}
-                    </div>
-                </div>
-                <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} ng-show="$index < notificationList.length-1" />
-            </div>)}
-        </div>}
+
+        {showNotificationHistory && <NotificationHistory {...{ openSharedScript, toggleNotificationHistory }} />}
         
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            <div id="top-header-nav" ng-show="!isEmbedded">
+            {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
                 <div id="top-header-nav-left">
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
@@ -759,12 +676,14 @@ const App = () => {
                     </Menu>
         
                     {/* notification (bell) button */}
-                    <div className="user-notification">
-                        <div id="bell-icon-container" className=".btn" popover-placement="bottom-right" popover-trigger="outsideClick" popover-is-open="showNotification" uib-popover-template="templates/user-notification.html">
-                            <i className="icon icon-bell" id="user-notification-icon"></i>
+                    <div className="user-notification relative">
+                        <div id="bell-icon-container" className=".btn text-gray-400 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
+                            <i className="icon icon-bell" />
                             {numUnread > 0 && <div id="badge">{numUnread}</div>}
                         </div>
-                        <NotificationPopup />
+                        {showNotifications && <div className="popover-content absolute z-50 right-0 mt-2">
+                            <NotificationList {...{ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }} />
+                        </div>}
                     </div>
         
                     {/* user login menu */}
@@ -777,7 +696,7 @@ const App = () => {
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 text-4xl">
                             {loggedIn
-                            ? <div id="logged-in" className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px" }}><em style={{ color: "#0078e0" }}>{username}</em>&nbsp;<span className="caret" /></div>
+                            ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl"><em style={{ color: "#0078e0" }}>{username}</em>&nbsp;<span className="caret" /></div>
                             : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>Create / Reset Account</div>}
                         </Menu.Button>
                         <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
@@ -791,7 +710,7 @@ const App = () => {
                         </Menu.Items>
                     </Menu>
                 </div>
-            </div>
+            </div>}
             <IDE />
             <Footer />
         </div>
