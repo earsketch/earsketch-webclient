@@ -56,7 +56,6 @@ module.exports = {
             autograderAWSController: path.resolve(__dirname,`${appDir}/autograderAWSController.js`),
             autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
 
-            setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
             
             // Curriculum Data
@@ -122,13 +121,6 @@ module.exports = {
                   outputPath: 'fonts/'
                 }
               }],
-        }, {
-            test: path.resolve(__dirname,'scripts/src/setup.js'),
-            loader: 'exports-loader',
-            options: {
-                type: 'commonjs',
-                exports: ['doCopy','resizeNavigationWidth']
-            }
         }, {
             test: path.resolve(__dirname,`${libDir}/dsp.js`),
             loader: 'exports-loader',

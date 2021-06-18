@@ -69,7 +69,20 @@ window.esPrompt = message => {
     }).result.then(input => resolve(input), () => resolve("")))
 }
 
-Object.assign(window,require('setup'));
+// Initialize SoundCloud.
+// TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
+const SOUNDCLOUD_ID_MAP = {
+    "earsketch.gatech.edu": "595113847a0edfd82dcfadeed2051dca",
+    "earsketch-dev.lmc.gatech.edu": "0d5850bd5b161fa72864477f71de2317",
+    "localhost:9090": "63b0323e190f967594cdaf5f8151ccf0",
+    "localhost/": "cc046c69568c6aa15f4468e5b327b134",
+}
+
+const domain = Object.keys(SOUNDCLOUD_ID_MAP).find(domain => SITE_BASE_URI.includes(domain))
+if (domain) {
+    SC.initialize({ client_id: SOUNDCLOUD_ID_MAP[domain], redirect_uri: SITE_BASE_URI + '/sc.html' })
+}
+
 Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
 
