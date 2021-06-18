@@ -101,7 +101,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     require("bootstrapBundle")
     require("uiBootstrap")
     require("angular-animate")
-    require("ng-file-upload")
     require("ngClipboard")
     require("angular-confirm")
 
@@ -119,7 +118,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     window.app = angular.module("EarSketchApp", [
         "ui.bootstrap",
         "ngAnimate",
-        "ngFileUpload",
         "angular-clipboard",
         "angular-confirm",
     ]).config(["$locationProvider", ($locationProvider: any) => {

@@ -197,7 +197,7 @@ angular.module('ui.bootstrap',[])
     .service('$uibModal',function(){})
     .service('$uibModalProvider',function(){});
 
-window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layout','ui.utils','ngAnimate','ngFileUpload','angular-clipboard','angular-confirm','rzModule','ui.scroll','ui.scroll.grid']).config($locationProvider => {
+window.app = angular.module('EarSketchApp',['ui.bootstrap','ngAnimate','angular-clipboard','angular-confirm']).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
 });
