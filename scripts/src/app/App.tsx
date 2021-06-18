@@ -360,7 +360,7 @@ let firstname = ""
 let lastname = ""
 let email = ""
 
-const App = () => {
+export const App = () => {
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
@@ -710,7 +710,3 @@ const App = () => {
         <ScriptDropdownMenu />
     </>
 }
-
-const AppWrapper = hot(() => <Provider store={store}><App /></Provider>)
-
-export { AppWrapper as App }

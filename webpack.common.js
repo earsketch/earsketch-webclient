@@ -15,7 +15,7 @@ const dataDir = 'scripts/src/data';
 
 module.exports = {
     entry: {
-        main: './scripts/src/index.ts'
+        main: './scripts/src/index.tsx'
     },
     resolve: {
         extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
@@ -179,7 +179,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'index.html'),
-            template: 'templates/index.html'
+            template: 'public/index.html'
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'autograder/index.html'),
