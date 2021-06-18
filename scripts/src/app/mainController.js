@@ -23,7 +23,7 @@ import * as curriculum from '../browser/curriculumState';
 import * as layout from '../layout/layoutState';
 import * as Layout from '../layout/Layout';
 import * as cai from '../cai/caiState';
-import { wrapModal } from '../helpers';
+import * as helpers from '../helpers';
 import { ProfileEditor } from './ProfileEditor';
 import * as recommender from './recommender';
 import { RenameScript, RenameSound } from './Rename';
@@ -36,19 +36,19 @@ import * as userProject from './userProject';
 import i18n from "i18next";
 
 // Temporary glue from $uibModal to React components.
-app.component("forgotpasswordController", wrapModal(ForgotPassword))
-app.component("analyzeScriptController", wrapModal(ScriptAnalysis))
-app.component("editProfileController", wrapModal(ProfileEditor))
-app.component("changepasswordController", wrapModal(ChangePassword))
-app.component("downloadController", wrapModal(Download))
-app.component("scriptVersionController", wrapModal(ScriptHistory))
-app.component("renameController", wrapModal(RenameScript))
-app.component("renameSoundController", wrapModal(RenameSound))
-app.component("accountController", wrapModal(AccountCreator))
-app.component("submitCompetitionController", wrapModal(CompetitionSubmission))
-app.component("shareScriptController", wrapModal(ScriptShare))
-app.component("uploadSoundController", wrapModal(SoundUploader))
-app.component("errorController", wrapModal(ErrorForm))
+app.component("forgotpasswordController", helpers.wrapModal(ForgotPassword))
+app.component("analyzeScriptController", helpers.wrapModal(ScriptAnalysis))
+app.component("editProfileController", helpers.wrapModal(ProfileEditor))
+app.component("changepasswordController", helpers.wrapModal(ChangePassword))
+app.component("downloadController", helpers.wrapModal(Download))
+app.component("scriptVersionController", helpers.wrapModal(ScriptHistory))
+app.component("renameController", helpers.wrapModal(RenameScript))
+app.component("renameSoundController", helpers.wrapModal(RenameSound))
+app.component("accountController", helpers.wrapModal(AccountCreator))
+app.component("submitCompetitionController", helpers.wrapModal(CompetitionSubmission))
+app.component("shareScriptController", helpers.wrapModal(ScriptShare))
+app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
+app.component("errorController", helpers.wrapModal(ErrorForm))
 
 /**
  * @module mainController
