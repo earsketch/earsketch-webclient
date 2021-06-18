@@ -18,6 +18,9 @@ import * as daw from './dawState'
 // Width of track control box
 const X_OFFSET = 100
 
+// Hack because local state gets cleared when the DAW is replaced by a loading screen...
+let _embedCompiled = false
+
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
     const playLength = useSelector(daw.selectPlayLength)
@@ -31,7 +34,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const [embedCompiled, setEmbedCompiled] = useState(false)
+    const [embedCompiled, setEmbedCompiled] = useState(_embedCompiled)
     const needCompile = embedMode && !embedCompiled
 
     const playbackStartedCallback = () => {
@@ -55,6 +58,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         if (embedMode && !embedCompiled) {
             compileCode()
             setEmbedCompiled(true)
+            _embedCompiled = true
             return
         }
 
