@@ -108,28 +108,25 @@ export const loadHistory = (notificationList: Notification[]) => {
                 callbacks.addSharedScript(v.shareid!, v.id!)
             }
         } else if (v.notification_type === 'collaborate_script') {
-            const data = JSON.parse(v.message.json!)
-            // $rootScope.$emit('notificationHistoryLoaded', data); // trigger subscribed callbacks
-
-            // received only by the ones affected
-            switch (data.action) {
-                case 'userAddedToCollaboration':
-                    text = data.sender + ' added you as a collaborator on ' + data.scriptName
-                    break
-                case 'userRemovedFromCollaboration':
-                    text = data.sender + ' removed you from collaboration on ' + data.scriptName
-                    break
-                case 'userLeftCollaboration':
-                    text = data.sender + ' left the collaboration on ' + data.scriptName
-                    break
-                case 'scriptRenamed':
-                    text = 'Collaborative script "' + data.oldName + '" was renamed to "' + data.newName + '"'
-                    break
-            }
-
-            v.message = {
-                text,
-                action: data.action
+            // This notification may have been processed before.
+            if (v.message.json) {
+                const data = JSON.parse(v.message.json!)
+                // received only by the ones affected
+                switch (data.action) {
+                    case 'userAddedToCollaboration':
+                        text = data.sender + ' added you as a collaborator on ' + data.scriptName
+                        break
+                    case 'userRemovedFromCollaboration':
+                        text = data.sender + ' removed you from collaboration on ' + data.scriptName
+                        break
+                    case 'userLeftCollaboration':
+                        text = data.sender + ' left the collaboration on ' + data.scriptName
+                        break
+                    case 'scriptRenamed':
+                        text = 'Collaborative script "' + data.oldName + '" was renamed to "' + data.newName + '"'
+                        break
+                }
+                v.message = { text, action: data.action }
             }
         } else if (v.notification_type === 'teacher_broadcast') {
             v.message.text = '[Teacher] ' + v.message.text
