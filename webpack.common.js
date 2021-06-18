@@ -15,7 +15,7 @@ const dataDir = 'scripts/src/data';
 
 module.exports = {
     entry: {
-        main: './scripts/src/index.js'
+        main: './scripts/src/index.ts'
     },
     resolve: {
         extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
@@ -76,7 +76,7 @@ module.exports = {
     },
     module: {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
-        // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.js.
+        // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.ts.
         rules: [{
             test: /\.(js|jsx|mjs)$/,
             exclude: [
@@ -138,7 +138,7 @@ module.exports = {
         }]
     },
     plugins: [
-        // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.js.
+        // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',

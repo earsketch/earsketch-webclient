@@ -2,20 +2,19 @@
 import '../../css/earsketch/allstyles.less'
 import './tailwind.css';
 import './i18n';
-import store from './reducers';
 
+import angular from 'angular';
 
 require('jquery');
 require('jqueryUI');
 window.$ = $; // Groove-machine curriculum chapter needs a global $ object.
-window.Question = Question; // Used inside curriculum HTMLs.
+import { Question } from "./browser/questions"
+(window as any).Question = Question; // Used inside curriculum HTMLs.
 
 import 'angularjs-slider/dist/rzslider.css';
 import '../../fonts/icomoon_ultimate/style.css';
 
 import * as ace from 'ace-builds';
-// ace.config.set('basePath', 'dist');
-
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-chrome';
 import 'ace-builds/src-noconflict/mode-python';
@@ -61,12 +60,12 @@ import { SoundUploader } from './app/SoundUploader'
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 // (This was previously in userConsole, but since that's now a module, the fields are read-only.)
 // (Also, it doesn't really have anything to do with the user console.)
-window.esPrompt = message => {
+;(window as any).esPrompt = (message: string) => {
     const $uibModal = helpers.getNgService("$uibModal")
     return new Promise(resolve => $uibModal.open({
         component: "prompt",
         resolve: { message() { return message } },
-    }).result.then(input => resolve(input), () => resolve("")))
+    }).result.then((input: string) => resolve(input), () => resolve("")))
 }
 
 // Initialize SoundCloud.
@@ -76,7 +75,7 @@ const SOUNDCLOUD_ID_MAP = {
     "earsketch-dev.lmc.gatech.edu": "0d5850bd5b161fa72864477f71de2317",
     "localhost:9090": "63b0323e190f967594cdaf5f8151ccf0",
     "localhost/": "cc046c69568c6aa15f4468e5b327b134",
-}
+} as { [key: string]: string }
 
 const domain = Object.keys(SOUNDCLOUD_ID_MAP).find(domain => SITE_BASE_URI.includes(domain))
 if (domain) {
@@ -87,7 +86,7 @@ Object.assign(window,require('dsp'));
 Object.assign(window,require('esDSP'));
 
 // Async loading
-require(['angular'], () => {
+(require as any)(['angular'], () => {
     // NPM
     require('angular-ui-router');
     require('bootstrapBundle');
@@ -132,12 +131,10 @@ require(['angular'], () => {
         'ui.scroll',
         'ui.scroll.grid',
         'ngRedux'
-    ]).config($locationProvider => {
+    ]).config(["$locationProvider", ($locationProvider: any) => {
         // Prevent legacy hash-bang URL being overwritten by $location.
         $locationProvider.html5Mode(true).hashPrefix('');
-    }).config($ngReduxProvider => {
-        $ngReduxProvider.provideStore(store);
-    });
+    }]);
 
     // app.component('rootComponent', react2angular(RootComponent));
 
@@ -183,7 +180,7 @@ require(['angular'], () => {
     require('codeSuggestion');
 
     app.factory('$exceptionHandler', function() {
-        return function(exception, cause) {
+        return function(exception: any, cause: any) {
             console.log(exception);
             esconsole(exception, ['ERROR','ANGULAR']);
             // ensures we don't report Skulpt errors to GA
@@ -193,7 +190,7 @@ require(['angular'], () => {
         };
     });
 
-    app.run(['$window', function ($window) {
+    app.run(['$window', function ($window: any) {
         // Returns the version of Internet Explorer or a -1
         // (indicating the use of another browser).
         function getInternetExplorerVersion() {
@@ -222,7 +219,7 @@ require(['angular'], () => {
 
             var M = ESUtils.whichBrowser().split(' ');
 
-            if ((M[0] === "Chrome" && M[1] < chromeMin) || (M[0] === "Firefox" && M[1] < ffMin)) {
+            if ((M[0] === "Chrome" && +M[1] < chromeMin) || (M[0] === "Firefox" && +M[1] < ffMin)) {
                 alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.");
                 return false;
             }
@@ -243,10 +240,10 @@ require(['angular'], () => {
     /**
      * Angular template cache buster. Uses the BUILD_NUM from main.js
      */
-    app.config(["$provide", function($provide) {
-        return $provide.decorator("$http", ["$delegate", function($delegate) {
+    app.config(["$provide", function($provide: any) {
+        return $provide.decorator("$http", ["$delegate", function($delegate: any) {
             var get = $delegate.get;
-            $delegate.get = function(url, config) {
+            $delegate.get = function(url: any, config: any) {
                 // ignore Angular Bootstrap UI templates
                 // also unit tests won't like release numbers added
                 if (!~url.indexOf('template/') &&
@@ -270,10 +267,10 @@ require(['angular'], () => {
         }]);
     }]);
 
-    app.directive('rightClickMenu', ['$parse', function ($parse) {
-        return function(scope, element, attrs) {
+    app.directive('rightClickMenu', ['$parse', function ($parse: any) {
+        return function(scope: any, element: any, attrs: any) {
             var fn = $parse(attrs.rightClickMenu);
-            element.bind('contextmenu', function (event) {
+            element.bind('contextmenu', function (event: any) {
                 scope.$apply(function() {
                     event.preventDefault();
                     fn(scope, {$event:event});

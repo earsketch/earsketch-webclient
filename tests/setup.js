@@ -204,8 +204,6 @@ angular.module('ui.bootstrap',[])
 window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layout','ui.utils','ngAnimate','ngFileUpload','angular-clipboard','angular-confirm','rzModule','ui.scroll','ui.scroll.grid','ngRedux']).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
-}).config($ngReduxProvider => {
-    $ngReduxProvider.provideStore(store);
 });
 
 require('recorder');
