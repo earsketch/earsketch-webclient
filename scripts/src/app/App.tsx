@@ -192,10 +192,10 @@ export function closeAllTabs() {
     })
 }
 
-const licenses = {}
+const licenses = {} as { [key: string]: any }
 
-userProject.getLicenses().then(licenses => {
-    for (const license of Object.values(licenses)) {
+userProject.getLicenses().then(ls => {
+    for (const license of Object.values(ls)) {
         licenses[(license as any).id] = license
     }
 })
