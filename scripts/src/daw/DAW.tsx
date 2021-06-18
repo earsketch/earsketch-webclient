@@ -31,7 +31,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const [needCompile, setNeedCompile] = useState(embedMode)
+    const [embedCompiled, setEmbedCompiled] = useState(false)
+    const needCompile = embedMode && !embedCompiled
 
     const playbackStartedCallback = () => {
         dispatch(daw.setPlaying(true))
@@ -50,10 +51,10 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             dispatch(setReady(true))
         }
 
-        // TODO: Update after relevant components get ported.
-        if (needCompile) {
+        // In embedded mode, play button doubles as run button.
+        if (embedMode && !embedCompiled) {
             compileCode()
-            setNeedCompile(false)
+            setEmbedCompiled(true)
             return
         }
 
