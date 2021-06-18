@@ -671,7 +671,7 @@ const App = () => {
                     <div className="user-notification relative">
                         <div id="bell-icon-container" className=".btn text-gray-400 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
                             <i className="icon icon-bell" />
-                            {numUnread > 0 && <div id="badge">{numUnread}</div>}
+                            {numUnread > 0 && <div id="badge" className="text-2xl">{numUnread}</div>}
                         </div>
                         {showNotifications && <div className="popover-content absolute z-50 right-0 mt-2">
                             <NotificationList {...{ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }} />
