@@ -266,6 +266,11 @@ export const Editor = () => {
     useEffect(() => {
         if (!editorElement.current) return
         setup(editorElement.current, language, theme, fontSize)
+        const observer = new ResizeObserver(() => droplet.resize())
+        observer.observe(editorElement.current)
+        return () => {
+            editorElement.current && observer.unobserve(editorElement.current)
+        }
     }, [editorElement.current])
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
