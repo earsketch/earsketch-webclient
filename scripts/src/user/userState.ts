@@ -1,8 +1,5 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../reducers';
-
-import * as app from '../app/appState';
-// import xml2js from 'xml2js';
 
 // TODO: Eventually replace userProject getUserInfo
 // export const login = createAsyncThunk(
@@ -27,19 +24,28 @@ import * as app from '../app/appState';
 //     }
 // );
 
-export interface UserState {
-    loggedIn: boolean
-    username: string | null
-    password: string | null
+export interface Notification {
+    message: { text: string, json?: string, action?: string, hyperlink?: string }
+    notification_type: string
+    time: number
+    unread: boolean
+    pinned: boolean
+    // Collaboration data.
+    sender?: string
+    script_name?: string
+    shareid?: string
+    id?: string
+    created?: string
 }
 
 const userSlice = createSlice({
     name: 'user',
     initialState: {
         loggedIn: false,
-        username: null,
-        password: null
-    } as UserState,
+        username: null as string | null,
+        password: null as string | null,
+        notifications: [] as Notification[],
+    },
     reducers: {
         login(state, { payload }) {
             state.loggedIn = true;
@@ -50,13 +56,30 @@ const userSlice = createSlice({
             state.username = null;
             state.password = null;
             state.loggedIn = false;
+        },
+        setNotifications(state, { payload: notifications }: { payload: Notification[] }) {
+            // Only show the latest broadcast.
+            const nonBroadcasts = notifications.filter(v => v.notification_type !== "broadcast")
+            const latestBroadcast = notifications.find(v => v.notification_type === "broadcast")
+            if (latestBroadcast !== undefined) {
+                nonBroadcasts.unshift(latestBroadcast)
+            }
+            state.notifications = nonBroadcasts
+        },
+        pushNotification(state, { payload }) {
+            state.notifications.unshift(payload)
         }
     }
 });
 
-export const { login, logout } = userSlice.actions;
+export const {
+    login,
+    logout,
+    setNotifications,
+    pushNotification,
+} = userSlice.actions;
 export default userSlice.reducer;
 
-/* Selectors */
 export const selectLoggedIn = (state: RootState) => state.user.loggedIn;
 export const selectUserName = (state: RootState) => state.user.username;
+export const selectNotifications = (state: RootState) => state.user.notifications;

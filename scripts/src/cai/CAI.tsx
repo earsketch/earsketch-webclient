@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Collapsed } from '../browser/Browser'
 
 import * as cai from './caiState'
-import * as tabs from '../editor/tabState'
+import * as tabs from '../ide/tabState'
 import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'

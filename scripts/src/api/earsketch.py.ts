@@ -1,6 +1,6 @@
 // EarSketch API: Python
 import * as ES_PASSTHROUGH from "./passthrough"
-import * as userConsole from "../app/userconsole"
+import * as userConsole from "../ide/console"
 
 // NOTE: We could just build this once and expose the module directly,
 // but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.

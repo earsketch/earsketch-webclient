@@ -6,7 +6,7 @@ import * as appState from '../app/appState'
 import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
-import { compileCode } from "../app/IDE"
+import { compileCode } from "../ide/IDE"
 import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'

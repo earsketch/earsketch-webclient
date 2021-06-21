@@ -8,8 +8,8 @@ import { selectScriptLanguage } from '../app/appState'
 
 import { SearchBar } from './Browser'
 import * as appState from "../app/appState";
-import * as editor from "../editor/Editor";
-import * as tabs from '../editor/tabState';
+import * as editor from "../ide/Editor";
+import * as tabs from '../ide/tabState';
 import { useTranslation } from "react-i18next";
 
 interface CodeHighlightProps {

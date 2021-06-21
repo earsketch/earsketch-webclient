@@ -1,38 +1,37 @@
-import React, { useEffect, useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import React, { useEffect, useRef, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
-import * as collaboration from "./collaboration"
-import * as compiler from "./compiler"
+import * as collaboration from "../app/collaboration"
+import * as compiler from "../app/compiler"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { DAW } from "../daw/DAW"
-import { Editor } from "../editor/Editor"
-import { EditorHeader } from "../editor/EditorHeader"
+import { Editor } from "./Editor"
+import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { setReady, dismissBubble } from "../bubble/bubbleState"
 import * as scripts from "../browser/scriptsState"
-import * as editor from "../editor/Editor"
-import * as editorState from "../editor/editorState"
+import * as editor from "./Editor"
+import * as ide from "./ideState"
 import * as layout from "../layout/layoutState"
 import * as Layout from "../layout/Layout"
-import reporter from "./reporter"
-import * as tabs from "../editor/tabState"
+import reporter from "../app/reporter"
+import * as tabs from "./tabState"
 import * as cai from "../cai/caiState"
 import * as helpers from "../helpers"
 import store from "../reducers"
-import { Tabs } from "../editor/Tabs"
-import * as userConsole from "./userconsole"
-import * as userNotification from "./userNotification"
-import * as userProject from "./userProject"
-import * as WaveformCache from "./waveformcache"
+import { Tabs } from "./Tabs"
+import * as ideConsole from "./console"
+import * as userNotification from "../user/notification"
+import * as userProject from "../app/userProject"
+import * as WaveformCache from "../app/waveformcache"
 import i18n from "i18next"
 import { ScriptEntity } from "common"
-import { hot } from "react-hot-loader/root"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -145,7 +144,7 @@ export function initEditor() {
         })
     }
 
-    store.dispatch(editorState.setEditorInstance(editor))
+    store.dispatch(ide.setEditorInstance(editor))
     const activeTabID = tabs.selectActiveTabID(store.getState())
     activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
 
@@ -272,8 +271,8 @@ export function compileCode() {
     const promise = (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue(), 0)
 
     editor.clearErrors()
-    userConsole.clear()
-    userConsole.status("Running script...")
+    ideConsole.clear()
+    ideConsole.status("Running script...")
 
     const scriptID = tabs.selectActiveTabID(store.getState())
     store.dispatch(tabs.removeModifiedScript(scriptID))
@@ -287,7 +286,7 @@ export function compileCode() {
         saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
 
         // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-        setTimeout(() => userConsole.status("Script ran successfully."), 200)
+        setTimeout(() => ideConsole.status("Script ran successfully."), 200)
 
         // asyncronously report the script complexity
         if (FLAGS.SHOW_AUTOGRADER) {
@@ -335,7 +334,7 @@ export function compileCode() {
         const duration = Date.now() - startTime
         esconsole(err, ["ERROR", "IDE"])
         setLoading(false)
-        userConsole.error(err)
+        ideConsole.error(err)
         editor.highlightError(err)
 
         const errType = String(err).split(":")[0]
@@ -366,10 +365,20 @@ export const IDE = () => {
 
     const showCAI = useSelector(layout.selectEastKind) === "CAI" && FLAGS.SHOW_CAI
 
+    const logs = useSelector(ide.selectLogs)
+    const consoleContainer = useRef<HTMLDivElement>(null)
+
     const [loading, _setLoading] = useState(false)
     setLoading = _setLoading
 
     useEffect(() => Layout.initialize(), [])
+
+    useEffect(() => {
+        // Scroll to the bottom of the console when new messages come in.
+        if (consoleContainer.current) {
+            consoleContainer.current.scrollTop = consoleContainer.current.scrollHeight
+        }
+    }, [logs])
 
     return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
@@ -420,10 +429,10 @@ export const IDE = () => {
                         </div>
                     </div>}
 
-                    <div className="results" id="console-frame" style={{ zIndex: bubbleActive && [9].includes(bubblePage) ? 35 : 0 }}>
+                    <div ref={consoleContainer} id="console-frame" className="results" style={{ zIndex: bubbleActive && [9].includes(bubblePage) ? 35 : 0 }}>
                         <div className="row">
                             <div id="console">
-                                {userConsole.logs.map((msg: any, index: number) =>
+                                {logs.map((msg: any, index: number) =>
                                 <div key={index} className="console-line">
                                     <span className={"console-" + msg.level.replace("status", "info")}>
                                         {msg.text}

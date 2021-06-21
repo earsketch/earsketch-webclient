@@ -1,9 +1,10 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
 
-import * as appState from "./appState"
+import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
-import * as userNotification from "./userNotification"
+import * as userNotification from "./notification"
+import * as user from "./userState"
 
 const colors: { [key: string]: { [key: string]: string } } = {
     dark: {
@@ -103,9 +104,11 @@ export const NotificationPopup = () => {
 export const NotificationList = ({ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }:
     { editProfile: () => void, openSharedScript: (shareid: string) => void, openCollaborativeScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }
 ) => {
+    const notifications = useSelector(user.selectNotifications)
     const now = Date.now()
+
     return <div style={{ padding: "10px", minWidth: "15em" }}>
-        {userNotification.history.length === 0
+        {notifications.length === 0
         ? <div>
             <div className="flex justify-between items-center">
                 <div className="text-center m-auto">There are no notifications.</div>
@@ -122,9 +125,9 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                 </div>
             </div>
             <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
-            {userNotification.history.slice(0, 5).map((item, index) =>
+            {notifications.slice(0, 5).map((item, index) =>
             <div key={index}>
-                <div style={{ margin: "10px" }} onClick={() => userNotification.readMessage(index, item)}>
+                <div style={{ margin: "10px" }} onClick={() => userNotification.markAsRead(item)}>
                     {/* pin or read/unread marker */}
                     <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
                         {item.pinned
@@ -162,9 +165,9 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                         </div>
                     </div>
                 </div>
-                {index < userNotification.history.length - 1 && <hr style={{ margin: "10px", border: "solid 1px dimgrey" }} />}
+                {index < notifications.length - 1 && <hr style={{ margin: "10px", border: "solid 1px dimgrey" }} />}
             </div>)}
-            {userNotification.history.length > 5 &&
+            {notifications.length > 5 &&
             <div onClick={() => toggleNotificationHistory(true)} className="text-center" style={{ fontSize: "20px", marginTop: "-10px" }}>
                 .....
             </div>}
@@ -173,6 +176,7 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
 }
 
 export const NotificationHistory = ({ openSharedScript, toggleNotificationHistory }: { openSharedScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }) => {
+    const notifications = useSelector(user.selectNotifications)
     const now = Date.now()
 
     return <div id="notification-history">
@@ -191,7 +195,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
         </div>
 
         <div className="notification-type-header">Pinned Notifications</div>
-        {userNotification.history.map((item, index) =>
+        {notifications.map((item, index) =>
         ["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
             <div style={{ margin: "10px 20px" }}>
                 <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
@@ -207,7 +211,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                     </div>}
                 </div>
             </div>
-            {index < userNotification.history.length - 1 &&
+            {index < notifications.length - 1 &&
             <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
         </div>)}
 
@@ -215,9 +219,9 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
             <div>Other Notifications</div>
             <div><a href="#" onClick={userNotification.markAllAsRead}>MARK ALL AS READ</a></div>
         </div>
-        {userNotification.history.map((item, index) =>
+        {notifications.map((item, index) =>
         !["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
-            <div className="cursor-pointer" style={{ margin: "10px 20px" }} onClick={() => userNotification.readMessage(index, item)}>
+            <div className="cursor-pointer" style={{ margin: "10px 20px" }} onClick={() => userNotification.markAsRead(item)}>
                 <div className="flex items-center float-left" style={{ margin: "10px" }}>
                     <div className={item.unread ? "marker" : "empty-marker"}></div>
                 </div>

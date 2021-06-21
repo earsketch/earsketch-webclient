@@ -2,13 +2,13 @@
 import { Ace, Range } from "ace-builds"
 
 import { ScriptEntity } from "common"
-import * as editor from "../editor/Editor"
+import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
 import * as helpers from "../helpers"
 import store from "../reducers"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 interface Message {

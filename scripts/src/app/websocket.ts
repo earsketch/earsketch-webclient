@@ -1,5 +1,5 @@
 import esconsole from "../esconsole"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 
 let ws: WebSocket | null
 let reconnect = 10

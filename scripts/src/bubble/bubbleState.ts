@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import * as editor from '../editor/Editor';
+import * as editor from '../ide/Editor';
 import * as layout from '../layout/layoutState';
 import * as scripts from '../browser/scriptsState';
-import * as tabs from '../editor/tabState';
+import * as tabs from '../ide/tabState';
 import * as userProject from '../app/userProject';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';

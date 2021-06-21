@@ -2,7 +2,7 @@
 import { Ace, require as aceRequire } from "ace-builds"
 
 import { ESApiDoc } from "../data/api_doc"
-import * as audioLibrary from "./audiolibrary"
+import * as audioLibrary from "../app/audiolibrary"
 
 const langTools = aceRequire("ace/ext/language_tools")
 

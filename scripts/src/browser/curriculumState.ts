@@ -6,7 +6,7 @@ import * as layout from '../layout/layoutState'
 
 import { RootState, ThunkAPI, AppDispatch } from '../reducers'
 import { BrowserTabType } from "../layout/layoutState";
-import * as userNotification from "../app/userNotification";
+import * as userNotification from "../user/notification";
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
