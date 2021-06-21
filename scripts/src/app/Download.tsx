@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 import * as exporter from "./exporter"
 import { ScriptEntity } from "common"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import { useTranslation } from "react-i18next"
 
 const EXPORT_TYPES = {

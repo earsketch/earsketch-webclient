@@ -11,7 +11,7 @@ import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
 import * as tabs from "../ide/tabState";
 import { ScriptEntity, ScriptType } from 'common';
-import * as userNotification from '../app/userNotification';
+import * as userNotification from '../user/notification';
 import * as userProject from '../app/userProject';
 
 export const openScript = (script: ScriptEntity) => {

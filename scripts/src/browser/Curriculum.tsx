@@ -8,7 +8,7 @@ import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
 import * as helpers from '../helpers'
 import * as layout from '../layout/layoutState'
-import * as userNotification from '../app/userNotification'
+import * as userNotification from '../user/notification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]

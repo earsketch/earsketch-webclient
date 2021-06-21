@@ -3,7 +3,6 @@ import { createSelectorCreator, defaultMemoize } from 'reselect';
 import { pickBy, isEqual } from 'lodash';
 
 import { RootState, ThunkAPI } from '../reducers';
-import { UserState } from '../user/userState';
 import { SoundEntity } from 'common';
 import context from '../app/audiocontext';
 import * as audioLibrary from '../app/audiolibrary';
@@ -250,7 +249,7 @@ export const markFavorite = createAsyncThunk<void, { fileKey: string, isFavorite
     async ({ fileKey, isFavorite }, { getState, dispatch }) => {
         const state = getState();
         const { user } = state;
-        const { username, password } = user as UserState;
+        const { username, password } = user;
         if (user.loggedIn && username && password) {
             const entities = selectAllEntities(state);
             const isUserOwned = entities[fileKey].folder === username.toUpperCase();

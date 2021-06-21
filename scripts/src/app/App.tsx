@@ -13,7 +13,7 @@ import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import { IDE, openShare } from "../ide/IDE"
 import { LocaleSelector } from "../top/LocaleSelector"
-import { NotificationBar, NotificationHistory, NotificationList } from "./Notification"
+import { NotificationBar, NotificationHistory, NotificationList } from "../user/Notification"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
@@ -28,9 +28,8 @@ import * as Layout from "../layout/Layout"
 import * as cai from "../cai/caiState"
 import * as recommender from "./recommender"
 import * as user from "../user/userState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { hot } from "react-hot-loader/root"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -366,7 +365,8 @@ export const App = () => {
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
-    const numUnread = userNotification.history.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
+    const notifications = useSelector(user.selectNotifications)
+    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
 
     const savedLoginInfo = userProject.loadUser()
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")

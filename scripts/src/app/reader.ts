@@ -1,5 +1,5 @@
 ﻿// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
-import * as userNotification from './userNotification'
+import * as userNotification from '../user/notification'
 import i18n from "i18next"
 
 

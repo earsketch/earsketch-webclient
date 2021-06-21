@@ -11,7 +11,7 @@ import store from "../reducers"
 import * as sounds from "../browser/soundsState"
 import { encodeWAV } from "./renderer"
 import * as userConsole from "./userconsole"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 
 function cleanKey(key: string) {

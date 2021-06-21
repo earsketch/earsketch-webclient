@@ -8,7 +8,7 @@ import * as helpers from "../helpers"
 import store from "../reducers"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 interface Message {
