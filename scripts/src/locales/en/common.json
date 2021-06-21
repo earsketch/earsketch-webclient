@@ -82,8 +82,12 @@
     "formFieldPlaceholder.oldPassword": "Old password",
     "formFieldPlaceholder.newPassword": "New password",
     "formFieldPlaceholder.confirmNewPassword": "Confirm new password",
+    "formFieldPlaceholder.clickToStartTyping": "Click here to start typing...",
     "cancel": "Cancel",
     "update": "Update",
+    "save": "Save",
+    "saveAndSend": "Save and Send",
+    "upload": "Upload",
     "profileEditor.prompt": "Edit Profile for {{username}}",
     "profileEditor.error": "There was an error when updating the user profile.",
     "profileEditor.success": "Your user profile was updated!",
@@ -124,7 +128,31 @@
     "category": "Category",
     "count": "Count",
     "total": "Total",
-    "exit": "Exit"
+    "exit": "Exit",
+    "scriptShare.title": "Share \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.title": "Let Others View",
+    "scriptShare.tab.viewonly.linkTitle": "Sharable View-only Link",
+    "scriptShare.tab.viewonly.shareCurrent": "Share Current Version",
+    "scriptShare.tab.viewonly.shareFuture": "Share Future Changes",
+    "scriptShare.tab.viewonly.otherUsers": "Send View-only Script to Other Users",
+    "scriptShare.tab.viewonly.usersPlaceholder": "Type user IDs, separated by space.",
+    "scriptShare.tab.collab.title": "Let Others Edit",
+    "scriptShare.tab.collab.addRemove": "Add or Remove Collaborators",
+    "scriptShare.tab.embed.title": "Share an Embedded Script",
+    "scriptShare.tab.embed.linkTitle": "Embeddable IFrame code",
+    "scriptShare.tab.embed.showCode": "Show Code:",
+    "scriptShare.tab.embed.showDAW": "Show DAW:",
+    "scriptShare.tab.soundcloud.title": "Share on SoundCloud",
+    "scriptShare.tab.soundcloud.shareDesc.private": "Private. Only visible to me.",
+    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "Public. Others can download and stream.",
+    "scriptShare.tab.soundcloud.shareDesc.public": "Public. Others can only stream.",
+    "scriptShare.tab.soundcloud.sharePrompt": "What can others do with your song on SoundCloud?",
+    "scriptShare.tab.soundcloud.songName": "Song Name",
+    "scriptShare.tab.soundcloud.view": "View on SoundCloud",
+    "scriptShare.moreDetails": "More Details (Description, License)...",
+    "scriptShare.descriptionOptional": "Description (optional)",
+    "scriptShare.licenseType": "License Type",
+    "scriptShare.copyClipboard": "Copy to clipboard"
   },
   "messages": {
     "interpreter": {
@@ -212,7 +240,9 @@
       "renameSoundSpecialChar": "Removing special characters in the renaming process...",
       "renameSoundConflict": "Sound name already in use",
       "shortname": "Please provide a name that is at least 3 characters long.",
-      "illegalCharacterInUserID": "Please use only regular characters, numbers, or _ in the user ID."
+      "illegalCharacterInUserID": "Please use only regular characters, numbers, or _ in the user ID.",
+      "userDoesntExist": "That user ID does not exist.",
+      "cantShareWYourself": "You cannot share scripts with yourself!"
     },
     "idecontroller": {
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
@@ -233,7 +263,9 @@
         "collaboration": "I want someone to be able to edit my script.",
         "embedded": "I want to be able to embed my song on a website.",
         "soundCloud": "I want to publish my song on SoundCloud."
-      }
+      },
+      "sharedViewOnly": "Shared {{scriptName}} as view-only with ",
+      "soundcloudError": "Error exporting to SoundCloud."
     }
   },
   "api" : {
