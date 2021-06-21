@@ -750,8 +750,6 @@
 
 export const CAI_TREES : { [key: string]: number } = { "Chat with CAI": 0, 'error': 26, 'begin': 1, 'sound_select': 72, 'suggest': 34, 'wrapup': 68, 'selectinstr': 71 , 'properties': 88}
 
-export const CAI_MUSIC_ANALYSIS = null
-
 export const CAI_ERRORS : { [key: string]: string } = {
     "ParseError": "looks like you've got a [LINK|parse error]. I think we might be missing something.",
     "ImportError": "something's not [LINK|importing] right. do we have the right package name up top?",

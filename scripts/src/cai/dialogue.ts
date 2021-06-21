@@ -2,7 +2,7 @@
 import * as caiErrorHandling from "./errorHandling"
 import * as caiStudentPreferenceModule from "./studentPreferences"
 import * as caiProjectModel from "./projectModel"
-import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from './caiTree'
+import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
 import * as recommender from '../app/recommender'
 import * as userProject from '../app/userProject'
 import * as caiStudentHistoryModule from "./studentHistory"
