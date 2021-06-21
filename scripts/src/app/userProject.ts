@@ -134,6 +134,20 @@ async function postXMLAuth(endpoint: string, xml: string) {
     return postXML(endpoint, xml, { username: getUsername(), password: getPassword() })
 }
 
+// Expects form data, returns XML.
+// As far as I can tell, there is only ONE endpoint like this: /services/scripts/import.
+async function postFormXML(endpoint: string, data?: { [key: string]: string | Blob }) {
+    const url = URL_DOMAIN + endpoint
+    // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
+    const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
+    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+}
+
+async function postAuthFormXML(endpoint: string, params: { [key: string]: string | Blob }) {
+    return postFormXML(endpoint, { username: getUsername(), password: getPassword(), ...params })
+}
+
+
 export function loadLocalScripts() {
     // Load scripts from local storage if they are available. When a user logs in
     // these scripts will be saved to the web service and deleted from local storage.
@@ -639,7 +653,6 @@ export async function importScript(script: ScriptEntity) {
         if (isLoggedIn()) {
             const imported = await importSharedScript(script.shareid)
             renameScript(imported.shareid, script.name)
-            imported.name = script.name
             return Promise.resolve(imported)
         } else {
             throw i18n.t('messages:general.unauthenticated')
@@ -687,11 +700,10 @@ export async function setScriptDesc(scriptname: string, scriptId: string, desc: 
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     if (isLoggedIn()) {
-        const data = await postAuth("/services/scripts/import", { scriptid })
-        if (scriptid) {
-            delete sharedScripts[scriptid]
-        }
+        const data = await postAuthFormXML("/services/scripts/import", { scriptid })
+        delete sharedScripts[scriptid]
         closeSharedScript(scriptid)
+        scripts[data.shareid] = data
         esconsole("Import script " + scriptid, ["debug", "user"])
         return data
     }
