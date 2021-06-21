@@ -306,6 +306,15 @@ export const getURLForLocation = (location: number[]) => {
     return locationToUrl[location.join(',')];
 }
 
+export function getChapterForError(errorMessage: string) {
+    const aliases: any = { referenceerror: "nameerror", rangeerror: "valueerror" }
+    const types = ["importerror", "indentationerror", "indexerror", "nameerror", "parseerror", "syntaxerror", "typeerror", "valueerror"]
+    let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
+    type = aliases[type] || type
+    const anchor = types.includes(type) ? '#' + type : ''
+    return { url: `every-error-explained-in-detail.html${anchor}` }
+}
+
 const urlToLocation: { [key:string]: number[] } = {}
 const locationToUrl: { [key:string]: string } = {}
 toc.forEach((unit: TOCItem, unitIdx: number) => {

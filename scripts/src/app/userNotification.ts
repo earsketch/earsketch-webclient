@@ -1,9 +1,9 @@
-import * as helpers from '../helpers'
+import * as userProject from "./userProject"
 
 // TODO: Once we port the notification UI to React, we should probably move this state to Redux.
 
 interface Notification {
-    message: { text: string, json?: string, action?: string }
+    message: { text: string, json?: string, action?: string, hyperlink?: string }
     notification_type: string
     time: number
     unread: boolean
@@ -25,11 +25,6 @@ export const callbacks = {
     show: (text: string, type: string="", duration?: number) => {},
     popup: (text: string, type: string="", duration: number | undefined=undefined) => {},
     addSharedScript: (shareID: string, id: string) => {},
-}
-
-export const state = {
-    // TODO: Why is this here?
-    isInLoadingScreen: false,
 }
 
 export const show = (text: string, type: string="", duration: number | undefined=undefined) => {
@@ -113,28 +108,25 @@ export const loadHistory = (notificationList: Notification[]) => {
                 callbacks.addSharedScript(v.shareid!, v.id!)
             }
         } else if (v.notification_type === 'collaborate_script') {
-            const data = JSON.parse(v.message.json!)
-            // $rootScope.$emit('notificationHistoryLoaded', data); // trigger subscribed callbacks
-
-            // received only by the ones affected
-            switch (data.action) {
-                case 'userAddedToCollaboration':
-                    text = data.sender + ' added you as a collaborator on ' + data.scriptName
-                    break
-                case 'userRemovedFromCollaboration':
-                    text = data.sender + ' removed you from collaboration on ' + data.scriptName
-                    break
-                case 'userLeftCollaboration':
-                    text = data.sender + ' left the collaboration on ' + data.scriptName
-                    break
-                case 'scriptRenamed':
-                    text = 'Collaborative script "' + data.oldName + '" was renamed to "' + data.newName + '"'
-                    break
-            }
-
-            v.message = {
-                text,
-                action: data.action
+            // This notification may have been processed before.
+            if (v.message.json) {
+                const data = JSON.parse(v.message.json!)
+                // received only by the ones affected
+                switch (data.action) {
+                    case 'userAddedToCollaboration':
+                        text = data.sender + ' added you as a collaborator on ' + data.scriptName
+                        break
+                    case 'userRemovedFromCollaboration':
+                        text = data.sender + ' removed you from collaboration on ' + data.scriptName
+                        break
+                    case 'userLeftCollaboration':
+                        text = data.sender + ' left the collaboration on ' + data.scriptName
+                        break
+                    case 'scriptRenamed':
+                        text = 'Collaborative script "' + data.oldName + '" was renamed to "' + data.newName + '"'
+                        break
+                }
+                v.message = { text, action: data.action }
             }
         } else if (v.notification_type === 'teacher_broadcast') {
             v.message.text = '[Teacher] ' + v.message.text
@@ -154,7 +146,6 @@ export const loadHistory = (notificationList: Notification[]) => {
     history.sort((a, b) => b.time - a.time)
 
     truncateBroadcast()
-    scopeDigest()
 }
 
 export const clearHistory = () => history = []
@@ -166,7 +157,6 @@ export const handleBroadcast = (data: Notification) => {
     data.pinned = true
     history.unshift(data)
     truncateBroadcast()
-    scopeDigest()
 }
 
 export const handleTeacherBroadcast = (data: Notification) => {
@@ -179,11 +169,19 @@ export const handleTeacherBroadcast = (data: Notification) => {
     data.pinned = true
     history.unshift(data)
     // truncateBroadcast()
-    scopeDigest()
 }
 
-const scopeDigest = () => {
-    const $rootScope = helpers.getNgRootScope()
-    $rootScope.$broadcast('notificationsUpdated')
-    $rootScope.$applyAsync()
+export async function readMessage(index: number, item: any) {
+    if (item.notification_type === "broadcast" || history[index].id === undefined) return
+    await userProject.postAuthForm("/services/scripts/markread", { notification_id: history[index].id! })
+    history[index].unread = false
+}
+
+export function markAllAsRead() {
+    history.forEach((item, index) => {
+        if (item.unread && item.notification_type !== "broadcast") {
+            // TODO: handle broadcast as well
+            readMessage(index, item)
+        }
+    })
 }

@@ -8,6 +8,7 @@
         "sourceMap": true,
         "module": "es6",
         "target": "es5",
+        "importHelpers": true,
         "jsx": "react",
         "allowJs": false,
         "moduleResolution": "Node",

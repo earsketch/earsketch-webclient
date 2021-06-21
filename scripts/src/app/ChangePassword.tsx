@@ -49,11 +49,8 @@ export const ChangePassword = ({ close }: { close: () => void }) => {
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
-                            <input type="password" className="form-control" name="newpassword1" placeholder={t('formFieldPlaceholder.newPassword')}
-                                   value={newPassword} onChange={e => {
-                                       e.target.setCustomValidity(e.target.validity.valid ? "" : t('messages:changepassword.pwdlength'))
-                                       setNewPassword(e.target.value)
-                                   }} required minLength={5} />
+                            <input type="password" className="form-control" name="newpassword1" placeholder="New password"
+                                   value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={5} />
                         </div>
                     </div>
                 </div>

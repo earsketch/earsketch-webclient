@@ -83,7 +83,9 @@ export async function get(endpoint: string, params?: { [key: string]: string }) 
 export async function postForm(endpoint: string, data?: { [key: string]: string | Blob }) {
     const url = URL_DOMAIN + endpoint
     try {
-        return (await fetch(url, { method: "POST", body: form(data) })).json()
+        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
+        const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
+        return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])
@@ -136,11 +138,10 @@ async function postXMLAuth(endpoint: string, xml: string) {
 window.onbeforeunload = () => {
     if (isLoggedIn()) {
         let saving = false
-        const username = getUsername()
 
         for (const shareID of openScripts) {
             if (scripts[shareID] && scripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID, username)
+                collaboration.leaveSession(shareID)
             }
 
             if (scripts[shareID] && !scripts[shareID].saved) {
@@ -154,7 +155,7 @@ window.onbeforeunload = () => {
 
         for (const shareID of openSharedScripts) {
             if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID, username)
+                collaboration.leaveSession(shareID)
             }
         }
 
@@ -228,7 +229,7 @@ function resetOpenScripts() {
 
         // special case for collaborative script. TODO: manage this in the tabs service.
         if (scripts.hasOwnProperty(popped) && scripts[popped].collaborative) {
-            collaboration.closeScript(popped, getUsername())
+            collaboration.closeScript(popped)
         }
     }
 }
@@ -527,9 +528,7 @@ export async function loadScript(id: string, sharing: boolean) {
     try {
         const data = await get("/services/scripts/scriptbyid", { scriptid: id })
         if (sharing && data === "") {
-            if (!userNotification.state.isInLoadingScreen) {
-                userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
-            }
+            userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
             throw "Script was not found."
         }
         return data
@@ -697,7 +696,7 @@ export async function importCollaborativeScript(script: ScriptEntity) {
     }
     const text = await collaboration.getScriptText(script.shareid)
     userNotification.show(`Saving a *copy* of collaborative script "${originalScriptName}" (created by ${script.username}) into MY SCRIPTS.`)
-    collaboration.closeScript(script.shareid, getUsername())
+    collaboration.closeScript(script.shareid)
     return saveScript(script.name, text)
 }
 

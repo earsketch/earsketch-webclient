@@ -1,9 +1,6 @@
 import React, { ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState } from 'react';
-import { Store } from 'redux';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { usePopper } from "react-popper";
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
 import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
@@ -303,7 +300,7 @@ const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
     [BrowserTabType.API]: APIBrowser
 };
 
-const Browser = () => {
+export const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector((state: RootState) => state.layout.west.open);
     const { t } = useTranslation();
@@ -332,13 +329,3 @@ const Browser = () => {
         </div>
     );
 };
-
-const HotBrowser = hot((props: { $ngRedux: Store }) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <Browser />
-        </Provider>
-    );
-});
-
-app.component('contentManager', react2angular(HotBrowser, null, ['$ngRedux']));

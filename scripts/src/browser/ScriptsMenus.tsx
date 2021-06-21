@@ -1,23 +1,22 @@
 import React, { useState, useEffect, LegacyRef } from 'react';
-import { Store } from "redux";
-import { Provider, useDispatch, useSelector } from "react-redux";
-import { react2angular } from 'react2angular';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from "react-redux";
 import { usePopper } from 'react-popper';
 import PopperJS from '@popperjs/core';
+
+import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, submitToCompetition, shareScript as _shareScript } from '../app/App';
 import * as appState from "../app/appState";
 import * as exporter from "../app/exporter";
 import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
 import * as tabs from "../editor/tabState";
-import * as helpers from "../helpers";
 import { ScriptEntity, ScriptType } from 'common';
+import * as userNotification from '../app/userNotification';
 import * as userProject from '../app/userProject';
 import { useTranslation } from "react-i18next";
 
 export const openScript = (script: ScriptEntity) => {
-    const rootScope = helpers.getNgRootScope();
     userProject.openScript(script.shareid);
-    rootScope.$broadcast('selectScript', script.shareid);
 };
 
 export const openSharedScript = (script: ScriptEntity) => {
@@ -25,9 +24,8 @@ export const openSharedScript = (script: ScriptEntity) => {
 };
 
 export const shareScript = (script: ScriptEntity) => {
-    const scope = helpers.getNgMainController().scope();
-    scope.shareScript(Object.assign({}, script));
-};
+    _shareScript(Object.assign({}, script))
+}
 
 export function generateGetBoundingClientRect(x=0, y=0) {
     return (): ClientRect => ({
@@ -94,7 +92,8 @@ const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }: MenuIte
 
 const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference;
 
-const SingletonDropdownMenu = () => {
+export const ScriptDropdownMenu = () => {
+    const { t } = useTranslation()
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
@@ -164,24 +163,20 @@ const SingletonDropdownMenu = () => {
                 name={t('script.copy')} icon='icon-copy'
                 visible={type==='regular'}
                 onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.copyScript(unsavedScript);
+                    userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
+                        userNotification.show(t('messages:user.scriptcopied'))
+                        dispatch(scripts.syncToNgUserProject())
+                    })
                 }}
             />
             <MenuItem
                 name={t('script.rename')} icon='icon-pencil2'
                 visible={type==='regular'}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.renameScript(script);
-                }}
+                onClick={() => renameScript(script!)}
             />
             <MenuItem
                 name={t('script.download')} icon='icon-cloud-download'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.downloadScript(unsavedScript);
-                }}
+                onClick={() => downloadScript(unsavedScript!)}
             />
             <MenuItem
                 name={t('script.print')} icon='icon-printer'
@@ -193,33 +188,24 @@ const SingletonDropdownMenu = () => {
                 name={t('script.share')} icon='icon-share32'
                 visible={type==='regular'}
                 disabled={!loggedIn}
-                onClick={() => {
-                    shareScript(unsavedScript!);
-                }}
+                onClick={() => shareScript(unsavedScript!)}
             />
             <MenuItem
                 name={t('script.submitCompetition')} icon='icon-share2'
                 visible={type==='regular' && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.submitToCompetition(unsavedScript);
-                }}
+                onClick={() => submitToCompetition(unsavedScript!)}
             />
             <MenuItem
                 name={t('script.history')} icon='icon-history'
                 disabled={!loggedIn || type==='readonly'}
                 onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    script && scope.openScriptHistory(unsavedScript, !script.isShared);
+                    script && openScriptHistory(unsavedScript!, !script.isShared);
                 }}
             />
             <MenuItem
                 name={t('script.codeIndicator')} icon='glyphicon glyphicon-info-sign'
-                onClick={() => {
-                    const scope = helpers.getNgMainController().scope();
-                    scope.openCodeIndicator(unsavedScript);
-                }}
+                onClick={() => openCodeIndicator(unsavedScript!)}
             />
             <MenuItem
                 name={t('script.import')} icon='icon-import'
@@ -245,13 +231,12 @@ const SingletonDropdownMenu = () => {
             />
             <MenuItem
                 name={t('script.delete')} icon='icon-bin'
-                visible={type!=='readonly'}
+                visible={type !== 'readonly'}
                 onClick={async () => {
-                    const scope = helpers.getNgMainController().scope();
-                    if (type==='regular') {
-                        await scope.deleteScript(unsavedScript);
-                    } else if (type==='shared') {
-                        await scope.deleteSharedScript(script);
+                    if (type === 'regular') {
+                        await deleteScript(unsavedScript!);
+                    } else if (type === 'shared') {
+                        await deleteSharedScript(script!);
                     }
                     await userProject?.refreshCodeBrowser();
                     dispatch(scripts.syncToNgUserProject());
@@ -305,11 +290,3 @@ export const DropdownContextMenuCaller: React.FC<DropdownContextMenuCallerType> 
         </div>
     );
 };
-
-const DropdownMenuContainer = (props: { $ngRedux: Store }) => (
-    <Provider store={props.$ngRedux}>
-        <SingletonDropdownMenu />
-    </Provider>
-);
-
-app.component('scriptDropdownMenu', react2angular(DropdownMenuContainer, null, ['$ngRedux']));

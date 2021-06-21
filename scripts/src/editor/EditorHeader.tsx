@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Store } from 'redux';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
+import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from "react-i18next";
 
+import { shareScript } from '../app/App';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as editor from './Editor';
 import * as editorState from './editorState';
+import { compileCode } from '../app/IDE';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
-import * as helpers from '../helpers';
 import * as userProject from '../app/userProject';
 
 const UndoRedoButtons = () => {
@@ -49,10 +47,8 @@ const UndoRedoButtons = () => {
     </>);
 };
 
-const EditorHeader = () => {
+export const EditorHeader = () => {
     const dispatch = useDispatch();
-    const mainScope = helpers.getNgMainController().scope();
-    const ideScope = helpers.getNgController('ideController').scope();
     const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID) as string;
     const allScripts = useSelector(scripts.selectAllScriptEntities);
@@ -84,10 +80,7 @@ const EditorHeader = () => {
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
-                                if (ideScope) {
-                                    ideScope.toggleBlocks();
-                                    dispatch(editorState.setBlocksMode(editor.droplet.currentlyUsingBlocks));
-                                }
+                                dispatch(editorState.toggleBlocksMode());
                             }}
                         >
                             <div
@@ -116,7 +109,7 @@ const EditorHeader = () => {
                             onClick={() => {
                                 // This temporary hack assumes any types of not-owned script are not sharable from the editor header.
                                 const unsavedScript = userProject.scripts[activeTab];
-                                mainScope.shareScript(Object.assign({}, unsavedScript));
+                                shareScript(Object.assign({}, unsavedScript));
                             }}
                         >
                             <i className='icon-share32 pr-2' />
@@ -132,7 +125,7 @@ const EditorHeader = () => {
                         text-white cursor-pointer
                     `}
                     id='run-button'
-                    onClick={() => ideScope?.compileCode()}
+                    onClick={compileCode}
                 >
                     <div className='flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1'>
                         <i className='icon-arrow-right22 font-bold text-green-600' />
@@ -143,13 +136,3 @@ const EditorHeader = () => {
         </div>
     );
 };
-
-const HotEditorHeader = hot((props: { $ngRedux: Store }) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <EditorHeader />
-        </Provider>
-    );
-});
-
-app.component('editorHeader', react2angular(HotEditorHeader, null, ['$ngRedux']));

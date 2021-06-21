@@ -8,9 +8,8 @@ import reporter from "./reporter"
 import * as tabs from "../editor/tabState"
 import * as scripts from "../browser/scriptsState"
 import * as userProject from "./userProject"
-import { useSelector, useDispatch, Provider } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import { Diff } from "./Diff"
-import store from "../reducers"
 import { DAWData } from "./player"
 import { DAW, setDAWData } from "../daw/DAW"
 import { useTranslation } from "react-i18next"
@@ -33,7 +32,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
             Version {version.id}
             {version.activeUsers && <span><i className="icon-users" style={{ color: "#6dfed4" }}></i></span>}
             <br />
-            <span className="text-muted">{ESUtils.formatTimer(now - version.created)}</span>
+            <span className="text-muted">{ESUtils.formatTime(now - version.created)}</span>
         </td>
         {allowRevert && <td><a href="#" onClick={revert} title={t('scriptHistory.restore')}>
             <i className="icon-rotate-cw2 inline-block" style={{ transform: "scaleX(-1)" }}></i>
@@ -50,7 +49,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
     </tr>
 }
 
-const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, allowRevert: boolean, close: () => void }) => {
+export const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, allowRevert: boolean, close: () => void }) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTabID = useSelector(tabs.selectActiveTabID)
@@ -167,6 +166,3 @@ const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, a
         </div>}
     </>
 }
-
-const Wrapper = (props: any) => <Provider store={store}><ScriptHistory {...props} /></Provider>
-export { Wrapper as ScriptHistory }
