@@ -1,6 +1,6 @@
 import { Ace, Range } from "ace-builds"
 import i18n from "i18next"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
 
 import { importScript, reloadRecommendations } from "../app/App"
@@ -255,6 +255,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
 }
 
 export const Editor = () => {
+    const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
@@ -285,14 +286,12 @@ export const Editor = () => {
 
     useEffect(() => {
         if (blocksMode && !droplet.currentlyUsingBlocks) {
-            // Ask Ace editor if there are any syntax errors.
-            const annotations = ace.getSession().getAnnotations()
-            if (annotations.some(note => note.type === "error")) {
-                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
-            } else {
+            if (droplet.toggleBlocks().success) {
                 userConsole.clear()
+            } else {
+                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+                dispatch(editor.setBlocksMode(false))
             }
-            droplet.toggleBlocks()
         } else if (!blocksMode && droplet.currentlyUsingBlocks) {
             droplet.toggleBlocks()
         }
