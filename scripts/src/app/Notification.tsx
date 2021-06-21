@@ -1,10 +1,8 @@
 import React, { useState } from "react"
-import { hot } from "react-hot-loader/root"
-import { Provider, useSelector } from "react-redux"
-import { react2angular } from "react2angular"
+import { useSelector } from "react-redux"
 
 import * as appState from "./appState"
-import store from "../reducers"
+import * as ESUtils from "../esutils"
 import * as userNotification from "./userNotification"
 
 const colors: { [key: string]: { [key: string]: string } } = {
@@ -102,8 +100,142 @@ export const NotificationPopup = () => {
     </div>
 }
 
-const HotNotificationBar = hot(() => <Provider store={store}><NotificationBar /></Provider>)
-const HotNotificationPopup = hot(() => <Provider store={store}><NotificationPopup /></Provider>)
+export const NotificationList = ({ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }:
+    { editProfile: () => void, openSharedScript: (shareid: string) => void, openCollaborativeScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }
+) => {
+    const now = Date.now()
+    return <div style={{ padding: "10px", minWidth: "15em" }}>
+        {userNotification.history.length === 0
+        ? <div>
+            <div className="flex justify-between items-center">
+                <div className="text-center m-auto">There are no notifications.</div>
+            </div>
+        </div>
+        : <div>
+            <div className="flex justify-between">
+                <div className="float-left" style={{ color: "grey" }}>
+                    <i className="icon icon-bell mr-3" />
+                    Notifications
+                </div>
+                <div className="float-right">
+                    <a href="#" onClick={() => toggleNotificationHistory(true)}>VIEW ALL</a>
+                </div>
+            </div>
+            <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
+            {userNotification.history.slice(0, 5).map((item, index) =>
+            <div key={index}>
+                <div style={{ margin: "10px" }} onClick={() => userNotification.readMessage(index, item)}>
+                    {/* pin or read/unread marker */}
+                    <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
+                        {item.pinned
+                        ? <i className="icon icon-pushpin" />
+                        : <div className={item.unread ? "marker" : "empty-marker"} />}
+                    </div>
 
-app.component("notificationBar", react2angular(HotNotificationBar))
-app.component("notificationPopup", react2angular(HotNotificationPopup))
+                    {/* contents */}
+                    <div style={{ width: "210px" }}>
+                        {/* common field (text & date) */}
+                        <div style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {item.message.text}
+                        </div>
+                        <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
+                            {ESUtils.formatTime(now - item.time)}
+                        </div>
+
+                        {/* special actions */}
+                        <div className="float-right">
+                            {item.notification_type === "broadcast" && item.message.hyperlink &&
+                            <div>
+                                <a href={item.message.hyperlink} target="_blank">MORE</a>
+                            </div>}
+                            {item.notification_type === "share_script" &&
+                            <div>
+                                <span onClick={() => openSharedScript(item.shareid!)}><a href="#">OPEN</a></span>
+                            </div>}
+                            {item.notification_type === "collaborate_script" &&
+                            <div>
+                                {item.message.action === "userAddedToCollaboration" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
+                                {item.message.action === "scriptRenamed" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
+                            </div>}
+                            {item.notification_type === "editProfile" &&
+                            <div><span onClick={editProfile}><a href="#">OPEN</a></span></div>}
+                        </div>
+                    </div>
+                </div>
+                {index < userNotification.history.length - 1 && <hr style={{ margin: "10px", border: "solid 1px dimgrey" }} />}
+            </div>)}
+            {userNotification.history.length > 5 &&
+            <div onClick={() => toggleNotificationHistory(true)} className="text-center" style={{ fontSize: "20px", marginTop: "-10px" }}>
+                .....
+            </div>}
+        </div>}
+    </div>
+}
+
+export const NotificationHistory = ({ openSharedScript, toggleNotificationHistory }: { openSharedScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }) => {
+    const now = Date.now()
+
+    return <div id="notification-history">
+        <div className="flex justify-between" style={{ padding: "1em" }}>
+            <div>
+                <a href="#" onClick={() => toggleNotificationHistory(false)}>
+                    <i id="back-button" className="icon icon-arrow-right22"></i>
+                </a>
+                <span style={{ color: "grey" }}>
+                    <i className="icon icon-bell" /> Notifications
+                </span>
+            </div>
+            <div>
+                <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={() => toggleNotificationHistory(false)}><span><i className="icon icon-cross2" /></span>CLOSE</a>
+            </div>
+        </div>
+
+        <div className="notification-type-header">Pinned Notifications</div>
+        {userNotification.history.map((item, index) =>
+        ["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
+            <div style={{ margin: "10px 20px" }}>
+                <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
+                    <div><i className="icon icon-pushpin"></i></div>
+                </div>
+                <div className="flex justify-between">
+                    <div>
+                        <div>{item.message.text}</div>
+                        <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTime(now - item.time)}</div>
+                    </div>
+                    {item.message.hyperlink && <div>
+                        <a href={item.message.hyperlink} target="_blank" className="cursor-pointer">MORE</a>
+                    </div>}
+                </div>
+            </div>
+            {index < userNotification.history.length - 1 &&
+            <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
+        </div>)}
+
+        <div className="notification-type-header flex justify-between">
+            <div>Other Notifications</div>
+            <div><a href="#" onClick={userNotification.markAllAsRead}>MARK ALL AS READ</a></div>
+        </div>
+        {userNotification.history.map((item, index) =>
+        !["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
+            <div className="cursor-pointer" style={{ margin: "10px 20px" }} onClick={() => userNotification.readMessage(index, item)}>
+                <div className="flex items-center float-left" style={{ margin: "10px" }}>
+                    <div className={item.unread ? "marker" : "empty-marker"}></div>
+                </div>
+                <div className="flex justify-between">
+                    <div>
+                        <div>
+                            {item.message.text}
+                        </div>
+                        <div style={{ fontSize: "10px", color: "grey" }}>
+                            {ESUtils.formatTime(now - item.time)}
+                        </div>
+                    </div>
+                    {item.notification_type === "share_script" && <div>
+                        <span onClick={() => openSharedScript(item.shareid!)}><a href="#" className="cursor-pointer">OPEN</a></span>
+                    </div>}
+                </div>
+            </div>
+            {index < history.length - 1 && <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
+        </div>)}
+    </div>
+}

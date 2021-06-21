@@ -1,11 +1,10 @@
 import React, { useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
 import { ScriptEntity, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
-import store from "../reducers"
 import { validateScriptName } from "./ScriptCreator"
 import * as sounds from "../browser/soundsState"
 import * as userNotification from "./userNotification"
@@ -53,7 +52,7 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
     </>
 }
 
-const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
+export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
     const dispatch = useDispatch()
     const soundNames = useSelector(sounds.selectAllFileKeys)
     const username = userProject.getUsername().toUpperCase()
@@ -106,6 +105,3 @@ const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }
         </form>
     </>
 }
-
-const Wrapper = (props: any) => <Provider store={store}><RenameSound {...props} /></Provider>
-export { Wrapper as RenameSound }

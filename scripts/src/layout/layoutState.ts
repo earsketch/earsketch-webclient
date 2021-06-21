@@ -158,11 +158,11 @@ export const collapseWest = createAsyncThunk(
     }
 );
 
-export const openEast = createAsyncThunk<void, void, ThunkAPI>(
+export const openEast = createAsyncThunk<void, string|void, ThunkAPI>(
     'layout/openEast',
-    (_, { getState, dispatch }) => {
+    (kind, { getState, dispatch }) => {
         if (layoutMutableState.horizontalSplits) {
-            dispatch(setEast({ open: true }));
+            dispatch(setEast(kind !== undefined ? { open: true, kind } : { open: true }));
             layoutMutableState.horizontalSplits.setSizes(selectHorizontalRatio(getState()));
             const gutter = document.getElementById(`gutter-horizontal-1`);
             if (gutter) gutter.style['pointerEvents'] = 'auto';
@@ -233,3 +233,4 @@ export const selectVerticalRatio = createSelector(
 );
 
 export const selectWestKind = (state: RootState) => state.layout.west.kind;
+export const selectEastKind = (state: RootState) => state.layout.east.kind;

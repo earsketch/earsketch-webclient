@@ -2,15 +2,13 @@ import React, { Component, useState, ChangeEvent, LegacyRef } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { isArray } from 'lodash'
-
 import * as api from './apiState'
 import { APIItem, APIParameter } from '../data/api_doc'
 import { selectScriptLanguage } from '../app/appState'
 
 import { SearchBar } from './Browser'
-import * as helpers from "../helpers";
 import * as appState from "../app/appState";
+import * as editor from "../editor/Editor";
 import * as tabs from '../editor/tabState';
 import { useTranslation } from "react-i18next";
 
@@ -73,8 +71,7 @@ const paste = (name: string, obj: APIItem) => {
         }
     }
 
-    const ideScope = helpers.getNgController('ideController').scope()
-    ideScope.pasteCode(`${name}(${args.join(', ')})`)
+    editor.pasteCode(`${name}(${args.join(', ')})`)
 }
 
 // Main point of this module.
@@ -199,7 +196,7 @@ const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
         {entries.map(([name, obj]: [string, APIItem ]) => {
-            const arr = isArray(obj) ? obj : [obj]
+            const arr = Array.isArray(obj) ? obj : [obj]
             return arr.map((o: APIItem , index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}
     </>)

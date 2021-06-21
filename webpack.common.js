@@ -15,13 +15,12 @@ const dataDir = 'scripts/src/data';
 
 module.exports = {
     entry: {
-        main: './scripts/src/index.js'
+        main: './scripts/src/index.ts'
     },
     resolve: {
         extensions: ['*','.js','.jsx','.ts','.tsx','.mjs','.wasm','.json','.css'],
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
-            tabdrop: 'bootstrap-tabdrop-ro/js/bootstrap-tabdrop.js',
             bootstrapBundle: 'bootstrap/dist/js/bootstrap.bundle.min.js',
             uiBootstrap: 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
             skulpt: path.resolve(__dirname,`${vendorDir}/skulpt/skulpt.min.js`),
@@ -42,16 +41,10 @@ module.exports = {
 
             // Emscripten
             esDSP: path.resolve(__dirname,`${libDir}/earsketch-dsp.js`),
-            esAppDSP: path.resolve(__dirname,`${libDir}/earsketch-appdsp.js`),
 
             ngClipboard: 'angular-clipboard',
-            uiUtils: path.resolve(__dirname,`${vendorDir}/angular/angular-ui-utils.min.js`),
-            uiScroll: path.resolve(__dirname,`${libDir}/ui-scroll.min.js`),
-            uiScrollGrid: path.resolve(__dirname,`${libDir}/ui-scroll-grid.min.js`),
 
             // Controllers
-            mainController: path.resolve(__dirname,`${appDir}/mainController.js`),
-            ideController: path.resolve(__dirname,`${appDir}/ideController.js`),
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
@@ -59,7 +52,6 @@ module.exports = {
             autograderAWSController: path.resolve(__dirname,`${appDir}/autograderAWSController.js`),
             autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
 
-            setup: path.resolve(__dirname,`scripts/src/setup.js`),
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
             
             // Curriculum Data
@@ -80,7 +72,7 @@ module.exports = {
     },
     module: {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
-        // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.js.
+        // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.ts.
         rules: [{
             test: /\.(js|jsx|mjs)$/,
             exclude: [
@@ -126,13 +118,6 @@ module.exports = {
                 }
               }],
         }, {
-            test: path.resolve(__dirname,'scripts/src/setup.js'),
-            loader: 'exports-loader',
-            options: {
-                type: 'commonjs',
-                exports: ['doCopy','resizeNavigationWidth']
-            }
-        }, {
             test: path.resolve(__dirname,`${libDir}/dsp.js`),
             loader: 'exports-loader',
             options: {
@@ -149,11 +134,11 @@ module.exports = {
         }]
     },
     plugins: [
-        // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.js.
+        // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
-            // AngularJS and bootstrap-tabdrop depend on the global jQuery variable
+            // AngularJS depends on the global jQuery variable
             'window.jQuery': 'jquery',
 
             SC: 'soundcloud',

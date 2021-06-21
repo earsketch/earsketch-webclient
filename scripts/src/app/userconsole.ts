@@ -4,13 +4,10 @@ interface Log {
 }
 
 export let logs: Log[] = []
-// TODO: This can likely be eliminated via Redux after migrating ideController.
-export let callbacks = { onUpdate: () => {} }
 
 // Clears the user's error log.
 export const clear = () => {
     logs = []
-    callbacks.onUpdate()
 }
 
 // Use this method for messages that are caused by internal EarSketch functions and not by user scripts.
@@ -20,7 +17,6 @@ export const status = (msg: string) => {
         text: String(msg)
     })
     scroll()
-    callbacks.onUpdate()
 }
 
 // Adds information labeled 'info' to the user's error log.
@@ -36,7 +32,6 @@ export const log = (msg: any) => {
         text: text
     })
     scroll()
-    callbacks.onUpdate()
 }
 
 // Adds information labeled 'warn' to the user's error log and notifies user on the console.
@@ -46,7 +41,6 @@ export const warn = (msg: string) => {
         text: 'Warning message >> ' + String(msg)
     })
     scroll()
-    callbacks.onUpdate()
 }
 
 // Adds information labeled 'error' to the user's error log and notifies user on the console.
@@ -56,7 +50,6 @@ export const error = (msg: string) => {
         text: 'Error message >> ' + humanize(String(msg))
     })
     scroll()
-    callbacks.onUpdate()
 }
 
 // Humanizes user warning and error messages printed to the user console. Available cases based on Skulpt's error messages and Node.js's errors.

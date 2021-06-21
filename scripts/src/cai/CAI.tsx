@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
-import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Collapsed } from '../browser/Browser'
 
 import * as cai from './caiState'
@@ -56,7 +54,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 </div>
             </div>
             <div className="chat-message-date" style={{float: message.sender !== "CAI" ? 'left' : 'right'}}>
-                {ESUtils.formatTimer(Date.now() - message.date)}
+                {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
     )
@@ -141,14 +139,14 @@ const CaiFooter = () => {
 }
 
 
-const CaiPane = () => {
+export const CAI = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
 
-    useEffect (() => {
+    useEffect(() => {
         dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
         dispatch(cai.curriculumPage(curriculumLocation))
     })
@@ -162,16 +160,6 @@ const CaiPane = () => {
     ) : <Collapsed title='CAI' position='east' />
 }
 
-
-const HotCAI = hot((props: {
-    $ngRedux: any // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
-}) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <CaiPane />
-        </Provider>
-    )
-})
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
@@ -191,5 +179,3 @@ if (FLAGS.SHOW_CAI) {
         }
     }, 5000)
 }
-
-app.component('cai', react2angular(HotCAI, null, ['$ngRedux']))

@@ -1,9 +1,6 @@
 import React from "react";
-import { Store } from "redux";
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
-import { Menu, Transition } from '@headlessui/react'
+import { useDispatch } from 'react-redux';
+import { Menu } from '@headlessui/react'
 
 import { useTranslation } from "react-i18next";
 
@@ -19,7 +16,7 @@ const AVAILABLE_LOCALES: locale[] = [
         {displayText: "Español", localeCode: "es"}
     ];
 
-const LocaleSelector = () => {
+export const LocaleSelector = () => {
     const dispatch = useDispatch();
     const { i18n } = useTranslation();
 
@@ -59,13 +56,3 @@ const LocaleSelector = () => {
         </div>
     );
 }
-
-const HotLocaleSelector = hot((props: { $ngRedux: Store }) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <LocaleSelector />
-        </Provider>
-    );
-});
-
-app.component('localeSelector', react2angular(HotLocaleSelector, null, ['$ngRedux']));

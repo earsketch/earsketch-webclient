@@ -5,7 +5,6 @@ import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
 import setupPythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as helpers from "../helpers"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "./userconsole"
 import { Clip, DAWData, Track } from "./player"
@@ -55,7 +54,6 @@ async function handlePitchshift(result: DAWData) {
 
     if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
         userConsole.status("Applying PITCHSHIFT on audio clips")
-        helpers.getNgService("$rootScope").$apply()
     }
 
     // Synchronize the userConsole print out with the asyncPitchShift processing.
@@ -64,7 +62,6 @@ async function handlePitchshift(result: DAWData) {
             if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
                 await pitchshift.pitchshiftClips(track, result.tempo)
                 userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
-                helpers.getNgService("$rootScope").$apply()
             }
         }
         esconsole("Pitchshifting promise resolved.", ["debug", "compiler"])

@@ -70,4 +70,11 @@ declare module 'angular' {
     interface IRootScopeService {
         [key: string]: any;
     }
+    var module: any
+    var bootstrap: any
+}
+
+declare module "file-loader!*" {
+    const value: any;
+    export default value;
 }

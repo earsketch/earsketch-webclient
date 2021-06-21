@@ -496,7 +496,7 @@
           "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "effectParameter": {
-          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
         "effectList": {
           "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
@@ -523,7 +523,7 @@
     },
 
     "setEffect1": {
-      "description": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a> in the curriculum.",
+      "description": "This function applies an effect to a specified track number and sets a parameter of that effect to a particular value for the entire track. For detailed information on all of the effects available to use with setEffect(), please see <a href='#' onclick='loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a> in the curriculum.",
       "parameters": {
         "track": {
           "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
@@ -541,7 +541,7 @@
     },
 
     "setEffect2": {
-      "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='angular.element(document.body).scope().loadCurriculumChapter(\"5-1-0\");'>Every Effect Explained in Detail</a>",
+      "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a>",
       "parameters": {
         "effectStartValue": {
           "description": "Value of effect parameter at beginning of effect envelope"

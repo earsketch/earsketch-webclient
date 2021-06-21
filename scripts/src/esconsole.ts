@@ -336,7 +336,7 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
  * EarSketch.Interpreter.getCompleteLog()
  * -> [..., .., '[CAT] meow!']
  */
-declare const REPORT_LOG: string[]
+export const REPORT_LOG: string[] = []
 
 const ESLog = (logText: string, tag: string | string[] | undefined=undefined) => {
     let TAG

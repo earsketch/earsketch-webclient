@@ -191,13 +191,11 @@ export function openScript(script_: ScriptEntity, userName: string) {
     reporter.openSharedScript()
 }
 
-export function closeScript(shareID: string, userName: string) {
-    userName = userName.toLowerCase()  // #1858
-
+export function closeScript(shareID: string) {
     if (scriptID === shareID) {
         esconsole("closing a collaborative script: " + shareID, "collab")
 
-        leaveSession(shareID, userName)
+        leaveSession(shareID)
         lockEditor = false
         removeOtherCursors()
         active = false
@@ -307,7 +305,7 @@ function openScriptOffline(script: ScriptEntity) {
     reporter.openSharedScript()
 }
 
-export function leaveSession(shareID: string, username?: string) {
+export function leaveSession(shareID: string) {
     esconsole("leaving collaboration session: " + shareID, "collab")
     lockEditor = true
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
@@ -959,7 +957,7 @@ async function onUserLeftCollaboration(data: Message) {
 
         // close collab session tab if it's active and no more collaborators left
         if (Object.keys(otherMembers).length === 0) {
-            closeScript(data.scriptID, userName)
+            closeScript(data.scriptID)
         }
     }
 

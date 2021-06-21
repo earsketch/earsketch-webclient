@@ -1,8 +1,5 @@
 import React, { useState, useEffect, Fragment, LegacyRef } from 'react';
-import { hot } from 'react-hot-loader/root';
-import { Store } from 'redux';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { react2angular } from 'react2angular';
+import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from 'react-popper';
 import { Placement } from '@popperjs/core';
 import parse from 'html-react-parser';
@@ -214,8 +211,8 @@ const MessageBox = () => {
     );
 };
 
-const Bubble = () => {
-    const active = useSelector(bubble.selectBubbleActive);
+export const Bubble = () => {
+    const active = useSelector(bubble.selectActive);
     return (
         <div
             className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
@@ -225,12 +222,3 @@ const Bubble = () => {
         </div>
     );
 };
-
-const HotBubble = hot((props: { $ngRedux: Store }) => (
-    <Provider store={props.$ngRedux}>
-        <Bubble />
-    </Provider>
-));
-
-// Export as an Angular component.
-app.component('hotBubble', react2angular(HotBubble,null,['$ngRedux']));
