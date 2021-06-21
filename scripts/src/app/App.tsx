@@ -11,9 +11,9 @@ import { ScriptEntity, SoundEntity } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
-import { IDE, openShare } from "./IDE"
+import { IDE, openShare } from "../ide/IDE"
 import { LocaleSelector } from "../top/LocaleSelector"
-import { NotificationBar, NotificationHistory, NotificationList } from "./Notification"
+import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notification"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
@@ -21,16 +21,15 @@ import * as sounds from "../browser/soundsState"
 import store from "../reducers"
 import * as recommenderState from "../browser/recommenderState"
 import * as bubble from "../bubble/bubbleState"
-import * as tabs from "../editor/tabState"
+import * as tabs from "../ide/tabState"
 import * as curriculum from "../browser/curriculumState"
 import * as layout from "../layout/layoutState"
 import * as Layout from "../layout/Layout"
 import * as cai from "../cai/caiState"
 import * as recommender from "./recommender"
 import * as user from "../user/userState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { hot } from "react-hot-loader/root"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -366,7 +365,8 @@ export const App = () => {
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
-    const numUnread = userNotification.history.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
+    const notifications = useSelector(user.selectNotifications)
+    const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
 
     const savedLoginInfo = userProject.loadUser()
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
@@ -673,6 +673,7 @@ export const App = () => {
                             <i className="icon icon-bell" />
                             {numUnread > 0 && <div id="badge" className="text-2xl">{numUnread}</div>}
                         </div>
+                        <NotificationPopup />
                         {showNotifications && <div className="popover-content absolute z-50 right-0 mt-2">
                             <NotificationList {...{ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }} />
                         </div>}

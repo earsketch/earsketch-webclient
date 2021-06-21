@@ -8,9 +8,9 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { renameSound, deleteSound, openUploadWindow } from '../app/App';
 import * as sounds from './soundsState';
 import * as appState from '../app/appState';
-import * as editor from '../editor/Editor';
+import * as editor from '../ide/Editor';
 import * as user from '../user/userState';
-import * as tabs from '../editor/tabState';
+import * as tabs from '../ide/tabState';
 import { RootState } from '../reducers';
 import { SoundEntity } from 'common';
 

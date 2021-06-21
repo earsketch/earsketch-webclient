@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 import { changePassword } from "./App"
 import esconsole from "../esconsole"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import { form } from "./userProject"
 import { useTranslation } from "react-i18next"
 
@@ -39,15 +39,8 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
                 return
             }
 
-            if (_firstName !== "" && _lastName !== "" && _email !== "") {
-                const index = userNotification.history.findIndex(item => item.notification_type === "editProfile")
-                if (index !== -1) {
-                    userNotification.history.splice(index, 1)
-                }
-            } else {
-                if (role === "teacher") {
-                    userNotification.show(t('messages:user.teachersLink'), "editProfile")
-                }
+            if (role === "teacher" && _firstName === "" || _lastName === "" || _email === "") {
+                userNotification.show(t('messages:user.teachersLink'), "editProfile")
             }
             userNotification.show("Your user profile was updated!", "success")
             close({ firstName: _firstName, lastName:_lastName, email: _email })

@@ -3,7 +3,7 @@ import store, { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
 import * as layout from '../layout/layoutState'
 import * as curriculum from '../browser/curriculumState'
-import * as editor from '../editor/Editor'
+import * as editor from '../ide/Editor'
 import * as helpers from '../helpers'
 import * as userProject from '../app/userProject'
 import * as analysis from './analysis'

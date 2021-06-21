@@ -5,8 +5,8 @@ import storage from 'redux-persist/lib/storage';
 
 import app from './app/appState';
 import user from './user/userState';
-import editor from './editor/editorState';
-import tabs from './editor/tabState';
+import ide from './ide/ideState';
+import tabs from './ide/tabState';
 import layout from './layout/layoutState';
 import bubble from './bubble/bubbleState';
 import sounds from './browser/soundsState';
@@ -20,7 +20,7 @@ import cai from './cai/caiState';
 const rootReducer = combineReducers({
     app,
     user,
-    editor,
+    ide,
     tabs,
     layout,
     bubble,

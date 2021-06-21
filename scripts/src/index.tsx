@@ -32,7 +32,7 @@ import reporter from "./app/reporter"
 window.droplet = droplet
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
-import "./app/completer"
+import "./ide/completer"
 
 import { react2angular } from "react2angular"
 import React from "react"

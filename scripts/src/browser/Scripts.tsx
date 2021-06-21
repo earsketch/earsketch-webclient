@@ -5,9 +5,9 @@ import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { usePopper } from 'react-popper';
 
-import { createScript } from '../app/IDE';
+import { createScript } from '../ide/IDE';
 import * as scripts from './scriptsState';
-import * as tabs from '../editor/tabState';
+import * as tabs from '../ide/tabState';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as userProject from '../app/userProject';

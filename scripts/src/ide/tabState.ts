@@ -9,7 +9,7 @@ import * as app from '../app/appState';
 import * as collaboration from '../app/collaboration';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
-import * as editor from "./editorState";
+import * as editor from "./ideState";
 import * as userProject from '../app/userProject';
 
 interface TabState {

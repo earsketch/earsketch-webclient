@@ -7,7 +7,7 @@ import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
 import * as sounds from "../browser/soundsState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
