@@ -72,7 +72,7 @@ module.exports = {
                 path.resolve(__dirname,libDir),
                 path.resolve(__dirname,vendorDir),
                 path.resolve(__dirname,dataDir),
-                path.resolve(__dirname,'scripts/analytics')
+                path.resolve(__dirname,'scripts/a nalytics')
             ],
             // loader: 'babel-loader',
             // options: { presets: ['@babel/env'] }
@@ -154,11 +154,6 @@ module.exports = {
             AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
             NUMBERS_AUDIOKEYS: 'exports-loader?type=commonjs&exports=single NUMBERS_AUDIOKEYS!numbersAudiokeys',
             AUDIOKEYS_RECOMMENDATIONS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_RECOMMENDATIONS!audiokeysRecommendations',
-
-            CAI_TREE_NODES: 'exports-loader?type=commonjs&exports=single CAI_TREE_NODES!caiTree',
-            CAI_TREES: 'exports-loader?type=commonjs&exports=single CAI_TREES!caiTree',
-            CAI_MUSIC_ANALYSIS: 'exports-loader?type=commonjs&exports=single CAI_MUSIC_ANALYSIS!caiTree',
-            CAI_ERRORS: 'exports-loader?type=commonjs&exports=single CAI_ERRORS!caiTree',
         }),
         new webpack.HotModuleReplacementPlugin(),
         new HappyPack({
