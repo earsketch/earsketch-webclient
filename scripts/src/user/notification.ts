@@ -10,6 +10,7 @@ export const callbacks = {
     addSharedScript: (shareID: string, id: string) => {},
 }
 
+// TODO: Clarify usage of temporary (popup) and "permanent" (history/list) notifications.
 export function show(text: string, type: string="", duration: number | undefined=undefined) {
     // check type for registering to the notification history
     // TODO: handle with proper message types defined

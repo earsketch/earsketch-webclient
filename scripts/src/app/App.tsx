@@ -13,7 +13,7 @@ import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import { IDE, openShare } from "../ide/IDE"
 import { LocaleSelector } from "../top/LocaleSelector"
-import { NotificationBar, NotificationHistory, NotificationList } from "../user/Notification"
+import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notification"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
@@ -673,6 +673,7 @@ export const App = () => {
                             <i className="icon icon-bell" />
                             {numUnread > 0 && <div id="badge" className="text-2xl">{numUnread}</div>}
                         </div>
+                        <NotificationPopup />
                         {showNotifications && <div className="popover-content absolute z-50 right-0 mt-2">
                             <NotificationList {...{ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }} />
                         </div>}
