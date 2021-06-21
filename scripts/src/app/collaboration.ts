@@ -2,7 +2,7 @@
 import { Ace, Range } from "ace-builds"
 
 import { ScriptEntity } from "common"
-import * as editor from "../editor/Editor"
+import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
 import * as helpers from "../helpers"
 import store from "../reducers"

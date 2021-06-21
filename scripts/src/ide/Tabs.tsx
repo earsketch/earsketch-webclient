@@ -5,8 +5,8 @@ import * as classNames from 'classnames';
 
 import { closeAllTabs } from '../app/App';
 import * as appState from '../app/appState';
-import * as editor from './editorState';
-import { createScript } from '../app/IDE';
+import * as editor from './ideState';
+import { createScript } from './IDE';
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 import * as scripts from '../browser/scriptsState';
 import * as tabs from './tabState';

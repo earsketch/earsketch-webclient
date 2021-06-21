@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import { REPORT_LOG } from "../esconsole"
 
 import * as app from "../app/appState"
-import * as editor from "../editor/Editor"
+import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"

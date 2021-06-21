@@ -3,7 +3,7 @@ import store, { RootState, ThunkAPI } from '../reducers'
 import angular from 'angular';
 import * as caiStudentPreferenceModule from './studentPreferences'
 import * as curriculum from '../browser/curriculumState'
-import * as editor from '../editor/Editor'
+import * as editor from '../ide/Editor'
 import * as helpers from '../helpers'
 import * as layout from '../layout/layoutState'
 
