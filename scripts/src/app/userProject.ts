@@ -21,7 +21,7 @@ const USER_STATE_KEY = "userstate"
 
 const LS_TABS_KEY = "tabs_v2"
 const LS_SHARED_TABS_KEY = "shared_tabs_v1"
-const LS_SCRIPTS_KEY = "scripts_v1"
+export const LS_SCRIPTS_KEY = "scripts_v1"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
@@ -132,46 +132,6 @@ async function postXML(endpoint: string, xml: string, params?: { [key: string]: 
 
 async function postXMLAuth(endpoint: string, xml: string) {
     return postXML(endpoint, xml, { username: getUsername(), password: getPassword() })
-}
-
-// websocket gets closed before onunload in FF
-window.onbeforeunload = () => {
-    if (isLoggedIn()) {
-        let saving = false
-
-        for (const shareID of openScripts) {
-            if (scripts[shareID] && scripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID)
-            }
-
-            if (scripts[shareID] && !scripts[shareID].saved) {
-                saving = true
-                saveScript(scripts[shareID].name, scripts[shareID].source_code).then(() => {
-                    store.dispatch(scriptsState.syncToNgUserProject())
-                    userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
-                })
-            }
-        }
-
-        for (const shareID of openSharedScripts) {
-            if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID)
-            }
-        }
-
-        // TODO: may not be properly working... check!
-        if (notificationsMarkedAsRead.length) {
-            for (const notification_id of notificationsMarkedAsRead) {
-                esconsole(`marking notification ${notification_id} as read`, "user")
-                postAuthForm("/services/scripts/markread", { notification_id })
-            }
-        }
-        return saving  // Show warning popover if true.
-    } else {
-        if (localStorage.getItem(LS_SCRIPTS_KEY) !== null) {
-            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-        }
-    }
 }
 
 export function loadLocalScripts() {
@@ -907,7 +867,7 @@ export async function createScript(scriptname: string) {
 
 // Adds a script to the list of open scripts. No effect if the script is already open.
 export function openScript(shareid: string) {
-    if (openScripts.includes(shareid)) {
+    if (!openScripts.includes(shareid)) {
         openScripts.push(shareid)
         localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts))
     }

@@ -711,3 +711,41 @@ export const App = () => {
         <ScriptDropdownMenu />
     </>
 }
+
+// websocket gets closed before onunload in FF
+window.onbeforeunload = () => {
+    if (userProject.isLoggedIn()) {
+        let saving = false
+
+        const openTabs = tabs.selectOpenTabs(store.getState())
+        const modifiedTabs = tabs.selectModifiedScripts(store.getState())
+        const sharedScripts = scripts.selectSharedScriptIDs(store.getState())
+        const scriptMap = scripts.selectActiveScriptEntities(store.getState())
+        for (const id of openTabs) {
+            if (sharedScripts.includes(id)) {
+                collaboration.leaveSession(id)
+            }
+        }
+
+        for (const id of modifiedTabs) {
+            saving = true
+            const script = scriptMap[id]
+            userProject.saveScript(script.name, script.source_code).then(() => {
+                store.dispatch(scripts.syncToNgUserProject())
+                userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
+            })
+        }
+
+        // userNotification.markAllAsRead()
+        // Show page-close warning if saving.
+        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right will be to call preventDefault.)
+        // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
+        if (saving) {
+            return ""
+        }
+    } else {
+        if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
+            localStorage.setItem(userProject.LS_SCRIPTS_KEY, JSON.stringify(scripts))
+        }
+    }
+}
