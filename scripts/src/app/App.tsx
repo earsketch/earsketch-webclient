@@ -31,6 +31,7 @@ import * as user from "../user/userState"
 import * as userNotification from "./userNotification"
 import * as userProject from "./userProject"
 import { hot } from "react-hot-loader/root"
+import { useTranslation } from "react-i18next"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -280,12 +281,13 @@ function forgotPass() {
 
 const Footer = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
+    const { t } = useTranslation()
 
     return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`}>
         <div>V{BUILD_NUM}</div>
         <div className="space-x-6">
-            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank">TEACHERS</a>
-            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">HELP / CONTACT</a>
+            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank">{t('footer.teachers').toLocaleUpperCase()}</a>
+            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">{t('footer.help').toLocaleUpperCase()}</a>
         </div>
     </div>
 }
