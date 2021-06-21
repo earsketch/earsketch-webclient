@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
 
 import * as appState from '../app/appState'
 import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
 import * as helpers from "../helpers"
+import { compileCode } from "../app/IDE"
 import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
@@ -17,6 +17,9 @@ import * as daw from './dawState'
 
 // Width of track control box
 const X_OFFSET = 100
+
+// Hack because local state gets cleared when the DAW is replaced by a loading screen...
+let _embedCompiled = false
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
@@ -31,7 +34,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const [needCompile, setNeedCompile] = useState(embedMode)
+    const [embedCompiled, setEmbedCompiled] = useState(_embedCompiled)
+    const needCompile = embedMode && !embedCompiled
 
     const playbackStartedCallback = () => {
         dispatch(daw.setPlaying(true))
@@ -50,10 +54,11 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             dispatch(setReady(true))
         }
 
-        // TODO: Update after relevant components get ported.
-        if (needCompile) {
-            helpers.getNgRootScope().$broadcast('compileembeddedTrack', true)
-            setNeedCompile(false)
+        // In embedded mode, play button doubles as run button.
+        if (embedMode && !embedCompiled) {
+            compileCode()
+            setEmbedCompiled(true)
+            _embedCompiled = true
             return
         }
 
@@ -168,7 +173,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 </button>
             </span>
 
-            <span id="daw-play-button" uib-popover-html="getPopoverContent('play')" popover-placement="bottom" popover-is-open="showDAWKeyShortcuts" popover-animation="true" popover-trigger="'none'">
+            <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
                     <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title="Play" onClick={play}>
@@ -684,11 +689,9 @@ const setup = () => {
     if (setupDone) return
     setupDone = true
 
-    const $scope = helpers.getNgController('ideController').scope()
-
     // everything in here gets reset when a new project is loaded
     // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', (result: player.DAWData | null | undefined) => {
+    helpers.getNgRootScope().$on('compiled', (event: any, result: player.DAWData | null | undefined) => {
         if (result) {
             esconsole("code compiled", "daw")
             setDAWData(result)
@@ -696,7 +699,7 @@ const setup = () => {
     })
 }
 
-export const DAW = () => {
+const DAW = () => {
     const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const trackColors = useSelector(daw.selectTrackColors)
@@ -1055,11 +1058,7 @@ export const DAW = () => {
 
 const HotDAW = hot(() => {
     setup()
-    return (
-        <Provider store={store}>
-            <DAW />
-        </Provider>
-    )
+    return <DAW />
 })
 
-app.component('daw', react2angular(HotDAW))
+export { HotDAW as DAW }

@@ -1,12 +1,13 @@
 import React, { useState } from "react"
 
+import { changePassword } from "./App"
 import esconsole from "../esconsole"
 import * as userNotification from "./userNotification"
 import { form } from "./userProject"
 import { useTranslation } from "react-i18next"
 
-export const ProfileEditor = ({ username, password, email: _email, role, firstName: _firstName, lastName: _lastName, changePassword, close }:
-    { username: string, password: string, email: string, role: string, firstName: string, lastName: string, changePassword: () => void, close: (info?: any) => void }) => {
+export const ProfileEditor = ({ username, password, email: _email, role, firstName: _firstName, lastName: _lastName, close }:
+    { username: string, password: string, email: string, role: string, firstName: string, lastName: string, close: (info?: any) => void }) => {
     const [error, setError] = useState("")
     const [firstName, setFirstName] = useState(_firstName)
     const [lastName, setLastName] = useState(_lastName)

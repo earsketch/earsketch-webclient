@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef, MutableRefObject, ChangeEvent } from 'react'
 import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
-import { Provider, useSelector, useDispatch } from 'react-redux'
-import { ClipboardService } from 'angular-clipboard'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
+import * as helpers from '../helpers'
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../app/userNotification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
@@ -16,12 +15,10 @@ const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
 const SECTION_URL_CHARACTER = ':'
 
-let clipboard: ClipboardService|null = null
-
 const copyURL = (language: string, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
-    clipboard?.copyText(url)
+    helpers.getNgService("clipboard").copyText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
 
@@ -192,8 +189,6 @@ export const TitleBar = () => {
                         title="Switch script language"
                         onClick={() => {
                             const newLanguage = (language === 'python' ? 'javascript' : 'python')
-                            // TODO: Remove angular $broadcast after moving other components to React.
-                            $rootScope?.$broadcast('language', newLanguage)
                             dispatch(appState.setScriptLanguage(newLanguage))
                         }}>
                     {language === 'python' ? 'PY' : 'JS'}
@@ -324,17 +319,11 @@ const NavigationBar = () => {
 }
 
 let initialized = false
-type RootScope = angular.IRootScopeService & { loadChapterForError: any } | null
-let $rootScope: RootScope = null
 
-const HotCurriculum = hot((props: {
-    clipboard: ClipboardService,
-    $ngRedux: any, // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
-    $rootScope: RootScope
-}) => {
+const HotCurriculum = hot(() => {
+    const dispatch = useDispatch()
+
     if (!initialized) {
-        clipboard = props.clipboard
-
         // Handle URL parameters.
         const curriculumParam = ESUtils.getURLParameter('curriculum')
 
@@ -342,51 +331,28 @@ const HotCurriculum = hot((props: {
             // check if this value exists in our old locations file first
             const url = ESCurr_OLD_LOCATIONS[curriculumParam]
             if (url !== undefined) {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ url }))
+                dispatch(curriculum.fetchContent({ url }))
             } else {
-                props.$ngRedux.dispatch(curriculum.fetchContent({ url: permalinkToURL(curriculumParam) }))
+                dispatch(curriculum.fetchContent({ url: permalinkToURL(curriculumParam) }))
             }
         }
 
         if (curriculumParam === null) {
             // Load welcome page initially.
-            props.$ngRedux.dispatch(curriculum.fetchContent({ location: [0] }))
+            dispatch(curriculum.fetchContent({ location: [0] }))
         }
 
         const languageParam = ESUtils.getURLParameter('language')
         if (languageParam && ['python', 'javascript'].indexOf(languageParam) > -1) {
             // If the user has a script open, that language overwrites this one due to ideController
             // this is probably a bug, but the old curriculumPaneController has the same behavior.
-            props.$ngRedux.dispatch(appState.setScriptLanguage(languageParam))
+            dispatch(appState.setScriptLanguage(languageParam))
         }
 
-        $rootScope = props.$rootScope
-        // TODO: Remove angular $broadcast after moving other components to React.
-        const language = props.$ngRedux.getState().app.scriptLanguage
-
-        if ($rootScope) {
-            $rootScope.$broadcast('language', language)
-
-            // Hack to facilitate Angular loading curriculum page for errors in console.
-            // TODO: Remove this after we've ported templates/index.html to React.
-            $rootScope.loadChapterForError = (errorMessage: string) => {
-                const aliases: any = {"referenceerror": "nameerror", "rangeerror": "valueerror"}
-                const types = ["importerror", "indentationerror", "indexerror", "nameerror",
-                    "parseerror", "syntaxerror", "typeerror", "valueerror"]
-                let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
-                type = aliases[type] || type
-                const anchor = types.includes(type) ? '#' + type : ''
-                props.$ngRedux.dispatch(curriculum.fetchContent({ url: `every-error-explained-in-detail.html${anchor}` }))
-            }
-            initialized = true
-        }
+        initialized = true
     }
 
-    return (
-        <Provider store={props.$ngRedux}>
-            <CurriculumPane />
-        </Provider>
-    )
+    return <CurriculumPane />
 })
 
-app.component('curriculum', react2angular(HotCurriculum, null, ['$ngRedux', 'clipboard', '$rootScope']))
+export { HotCurriculum as Curriculum }

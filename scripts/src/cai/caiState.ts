@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { RootState, ThunkAPI } from '../reducers'
-import angular from 'angular'
-import * as caiStudentPreferenceModule from './studentPreferences'
+import store, { RootState, ThunkAPI } from '../reducers'
+import angular from 'angular';
+import * as layout from '../layout/layoutState'
+import * as curriculum from '../browser/curriculumState'
 import * as editor from '../editor/Editor'
 import * as helpers from '../helpers'
-import * as curriculum from '../browser/curriculumState'
 import * as userProject from '../app/userProject'
 import * as analysis from './analysis'
 import * as codeSuggestion from './codeSuggestion'
 import * as dialogue from './dialogue'
+import * as studentPreferences from './studentPreferences'
 import { getUserFunctionReturns, getAllVariables } from './complexityCalculator'
 import { analyzePython } from './complexityCalculatorPY'
 import { analyzeJavascript } from './complexityCalculatorJS'
@@ -91,19 +92,24 @@ export interface CAIMessage {
     date: number
 }
 
+// TODO: Avoid DOM manipulation.
+function newCAIMessage() {
+    const east = store.getState().layout.east
+    if (!(east.open && east.kind === "CAI")) {
+        document.getElementById("caiButton")!.classList.add("flashNavButton")
+    }
+}
+
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     'cai/introduceCAI',
     (_, { getState, dispatch }) => {
         const rootScope = helpers.getNgRootScope()
-
         // reinitialize recommendation dictionary
         analysis.fillDict().then(function() {
-
             const msgText = dialogue.generateOutput("Chat with CAI");
             dialogue.studentInteract(false);
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
-
             if (msgText !== "") {
                 const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
                 for (let msg in messages) {
@@ -126,7 +132,6 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
 export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
     'cai/sendCAIMessage',
     (input, { getState, dispatch }) => {
-        const ideScope = helpers.getNgController('ideController').scope()
         const rootScope = helpers.getNgRootScope()
 
         dialogue.studentInteract()
@@ -141,8 +146,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         } as CAIMessage
 
         const text = editor.ace.getValue();
-        // TODO: use the script language selector from appState
-        const lang = ideScope.currentLanguage;
+        const lang = getState().app.scriptLanguage
         codeSuggestion.generateResults(text, lang)
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList(message))
@@ -172,7 +176,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
                     } as CAIMessage
                     dispatch(addToMessageList(outputMessage))
                     dispatch(autoScrollCAI())
-                    rootScope.$broadcast('newCAIMessage')
+                    newCAIMessage()
                 }
             }
         }            
@@ -250,10 +254,10 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         }
         dispatch(setDropupLabel(dialogue.getDropup()))
         dispatch(autoScrollCAI())
-        rootScope.$broadcast('newCAIMessage')
+        newCAIMessage()
 
         var t = Date.now()
-        caiStudentPreferenceModule.addCompileTS(t)
+        studentPreferences.addCompileTS(t)
     }
 
 );
@@ -281,9 +285,8 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
 export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], ThunkAPI>(
     'cai/openCurriculum',
     ([message, location], { getState, dispatch }) => {
-        const mainControllerScope = helpers.getNgMainController().scope()
         dispatch(curriculum.fetchContent({location: message.keyword[location][1].split('-')}))
-        mainControllerScope.toggleCAIWindow()
+        dispatch(layout.openEast("CURRICULUM"))
     }
 );
 
@@ -317,28 +320,28 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
 export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
     'cai/userOnPage',
     (time: number, {getState, dispatch}) => {
-        caiStudentPreferenceModule.addOnPageStatus(1,time)
+        studentPreferences.addOnPageStatus(1,time)
     }
 );
 
 export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
     'cai/userOffPage',
     (time: number, {getState, dispatch}) => {
-        caiStudentPreferenceModule.addOnPageStatus(0,time)
+        studentPreferences.addOnPageStatus(0,time)
     }
 );
 
 export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
     'cai/keyStroke',
     ([action, content, time], {getState, dispatch}) => {
-        caiStudentPreferenceModule.addKeystroke(action, content, time)
+        studentPreferences.addKeystroke(action, content, time)
     }
 );
 
 export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
     'cai/mousePosition',
     ([x,y], {getState, dispatch}) => {
-        caiStudentPreferenceModule.addMousePos({x,y})
+        studentPreferences.addMousePos({x,y})
     }
 );
 

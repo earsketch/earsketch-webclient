@@ -1,5 +1,6 @@
 // EarSketch API: Python
 import * as ES_PASSTHROUGH from "./passthrough"
+import * as userConsole from "../app/userconsole"
 
 // NOTE: We could just build this once and expose the module directly,
 // but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.
@@ -108,6 +109,28 @@ export function setupAPI() {
     const module = new Sk.builtin.module()
     Sk.sysmodules.mp$ass_subscript("earsketch", module)
     module.$d = mod
+
+    // Migrated from ideController:
+    // Function to pipe Skulpt's stdout to the EarSketch console.
+    function outf(text: string) {
+        // For some reason, skulpt prints a newline character after every
+        // call to print(), so let's ignore those
+        // TODO: users can't print newline characters...ugh
+        if (text === "\n") {
+            return
+        }
+        userConsole.log(text)
+    }
+
+    function builtinRead(x: string) {
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) {
+            throw "File not found: '" + x + "'"
+        }
+        return Sk.builtinFiles["files"][x]
+    }
+
+    Sk.pre = "output"
+    Sk.configure({ output: outf, read: builtinRead })
 }
 
 export default setupAPI

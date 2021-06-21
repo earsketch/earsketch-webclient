@@ -3,7 +3,6 @@ window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
 window.SITE_DIRECTORY = '/base';
 window.SITE_BASE_URI = location.origin + '/base';
 window.BUILD_NUM = 0;
-window.REPORT_LOG = [];
 window.URL_DOMAIN = URL_DOMAIN;
 window.URL_LOADAUDIO = URL_LOADAUDIO;
 window.ES_PASSTHROUGH = ES_PASSTHROUGH;
@@ -159,13 +158,10 @@ function checkSimilarity(actual, expected) {
     return valid;
 }
 
-import store from "../scripts/src/reducers";
-
 require('angular');
 window.angular = angular;
 
 require('angular-mocks');
-require('angular-ui-router');
 require('bootstrapBundle');
 require('uiBootstrap');
 require('angular-animate');
@@ -173,7 +169,6 @@ require('ng-file-upload');
 require('ngClipboard');
 require('angular-confirm');
 require('angularjs-slider');
-require('tabdrop');
 require('ng-redux');
 
 window.ngMidwayTester = require('ngMidwayTester');
@@ -202,11 +197,9 @@ angular.module('ui.bootstrap',[])
     .service('$uibModal',function(){})
     .service('$uibModalProvider',function(){});
 
-window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layout','ui.utils','ngAnimate','ngFileUpload','angular-clipboard','angular-confirm','rzModule','ui.scroll','ui.scroll.grid','ngRedux']).config($locationProvider => {
+window.app = angular.module('EarSketchApp',['ui.bootstrap','ngAnimate','angular-clipboard','angular-confirm']).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
-}).config($ngReduxProvider => {
-    $ngReduxProvider.provideStore(store);
 });
 
 require('recorder');
@@ -214,9 +207,6 @@ require('recorder');
 Object.assign(window,require('esAppDSP'));
 
 // Controllers
-require('mainController');
-require('ideController');
-
 require('adminWindowController');
 
 require('autograderController');

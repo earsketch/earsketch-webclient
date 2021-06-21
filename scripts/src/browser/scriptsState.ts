@@ -4,7 +4,6 @@ import storage from 'redux-persist/lib/storage';
 import { pickBy, keyBy, cloneDeep, each } from 'lodash';
 import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
-import * as helpers from '../helpers';
 import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity, ScriptType } from 'common';
 import * as userProject from '../app/userProject';

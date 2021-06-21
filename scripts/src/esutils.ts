@@ -213,8 +213,8 @@ export const checkIllegalCharacters = (input: string) => {
     return input.match(matchPattern)
 }
 
-// Calculates last modified time unit (previously in scriptBrowserController & mainController).
-export const formatTimer = (milliseconds: number) => {
+// Converts a time difference to a description of how much time has passed.
+export const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000)
     const minutes = Math.floor(seconds / 60)
     const hours = Math.floor(minutes / 60)

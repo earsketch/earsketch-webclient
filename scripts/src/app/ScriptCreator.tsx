@@ -1,6 +1,8 @@
 import React, { useState } from "react"
+import { useSelector } from "react-redux"
 
-import * as userProject from './userProject'
+import * as app from "../app/appState"
+import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
 export function validateScriptName(name: string, extension: string) {
@@ -20,7 +22,8 @@ export function validateScriptName(name: string, extension: string) {
     }
 }
 
-export const ScriptCreator = ({ language, close }: { language: string, close: (value?: any) => void, dismiss: () => void }) => {
+export const ScriptCreator = ({ close }: { close: (value?: any) => void, dismiss: () => void }) => {
+    const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
     const [error, setError] = useState("")
     const [extension, setExtension] = useState(language === "python" ? ".py" : ".js")

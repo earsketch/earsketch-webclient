@@ -51,8 +51,8 @@ phases:
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR
       - echo "Copying the client files to local distribution folder..."
-      - cp -r index.html sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ autograderAWS/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
-      - cp -r sc.html sorry.html favicon.ico tunepadESLogin.html tpBody.html autograder/ autograder2/ autograder3/ autograderAWS/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
+      - cp -r index.html sc.html sorry.html favicon.ico tpBody.html autograder/ autograder2/ autograder3/ autograderAWS/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
+      - cp -r sc.html sorry.html favicon.ico tpBody.html autograder/ autograder2/ autograder3/ autograderAWS/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
   post_build:
     commands:
       - |

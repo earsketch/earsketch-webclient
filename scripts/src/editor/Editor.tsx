@@ -1,18 +1,26 @@
-import { Ace } from "ace-builds"
-import { hot } from "react-hot-loader/root"
-import { Provider, useSelector } from "react-redux"
+import { Ace, Range } from "ace-builds"
+import i18n from "i18next"
+import { useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
 
+import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
-import * as helpers from "../helpers"
+import * as editor from "./editorState"
+import { initEditor } from "../app/IDE"
 import * as tabs from "./tabState"
+import * as userConsole from "../app/userconsole"
 import * as userProject from "../app/userProject"
 import store from "../reducers"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
+
+const ACE_THEMES = {
+    light: "ace/theme/chrome",
+    dark: "ace/theme/monokai",
+}
 
 // Millisecond timer for recommendation refresh update
 let recommendationTimer = 0
@@ -33,9 +41,9 @@ export function setReadOnly(value: boolean) {
     droplet.setReadOnly(value)
 }
 
-export function setFontSize(value: string) {
-    ace.setFontSize(value)
-    droplet.setFontSize(value)
+export function setFontSize(value: number) {
+    ace?.setFontSize(value + "px")
+    droplet?.setFontSize(value)
 }
 
 export function undo() {
@@ -84,13 +92,51 @@ export function clearHistory() {
 
 export function setLanguage(currentLanguage: string) {
     if (currentLanguage === "python") {
-        droplet.setMode("python", config.blockPalettePython.modeOptions)
-        droplet.setPalette(config.blockPalettePython.palette)
+        droplet?.setMode("python", config.blockPalettePython.modeOptions)
+        droplet?.setPalette(config.blockPalettePython.palette)
     } else if (currentLanguage === "javascript") {
-        droplet.setMode("javascript", config.blockPaletteJavascript.modeOptions)
-        droplet.setPalette(config.blockPaletteJavascript.palette)
+        droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
+        droplet?.setPalette(config.blockPaletteJavascript.palette)
     }
-    ace.getSession().setMode("ace/mode/" + currentLanguage)
+    ace?.getSession().setMode("ace/mode/" + currentLanguage)
+}
+
+export function pasteCode(code: string) {
+    if (droplet.currentlyUsingBlocks) {
+        droplet.setFocusedText(code)
+    } else {
+        ace.insert(code)
+        ace.focus()
+    }
+}
+
+let lineNumber: number | null = null
+let marker: number | null = null
+
+export function highlightError(err: any) {
+    const language = store.getState().app.scriptLanguage
+    let range
+
+    let line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    if (line !== undefined) {
+        lineNumber = line - 1
+        if (droplet.currentlyUsingBlocks) {
+            droplet.markLine(lineNumber, { color: "red" })
+        }
+        range = new Range(lineNumber, 0, lineNumber, 2000)
+        marker = ace.getSession().addMarker(range, "error-highlight", "fullLine")
+    }
+}
+
+export function clearErrors() {
+    if (droplet.currentlyUsingBlocks) {
+        if (lineNumber !== null) {
+            droplet.unmarkLine(lineNumber)
+        }
+    }
+    if (marker !== null) {
+        ace.getSession().removeMarker(marker)
+    }
 }
 
 function setupAceHandlers(ace: Ace.Editor) {
@@ -131,7 +177,7 @@ function setupAceHandlers(ace: Ace.Editor) {
         }
 
         recommendationTimer = window.setTimeout(() => {
-            helpers.getNgRootScope().$broadcast("reloadRecommendations")
+            reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
             }
@@ -181,7 +227,7 @@ function setupAceHandlers(ace: Ace.Editor) {
 
 let setupDone = false
 
-function setup(element: HTMLDivElement, language: string, ideScope: any) {
+function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number) {
     if (setupDone) return
 
     if (language === "python") {
@@ -192,29 +238,71 @@ function setup(element: HTMLDivElement, language: string, ideScope: any) {
 
     ace = droplet.aceEditor
     setupAceHandlers(ace)
-    ideScope.initEditor()
-    ideScope.collaboration = collaboration
+    
+    ace.setOptions({
+        mode: "ace/mode/" + language,
+        theme: ACE_THEMES[theme],
+        fontSize,
+        enableBasicAutocompletion: true,
+        enableSnippets: false,
+        enableLiveAutocompletion: false,
+        showPrintMargin: false,
+        wrap: false,
+    })
+
+    initEditor()
     setupDone = true
 }
 
-const Editor = () => {
+export const Editor = () => {
     const language = useSelector(appState.selectScriptLanguage)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const ideScope = helpers.getNgController("ideController").scope()
+    const theme = useSelector(appState.selectColorTheme)
+    const fontSize = useSelector(appState.selectFontSize)
+    const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         if (!editorElement.current) return
-        setup(editorElement.current, language, ideScope)
+        setup(editorElement.current, language, theme, fontSize)
+        const observer = new ResizeObserver(() => droplet.resize())
+        observer.observe(editorElement.current)
+        return () => {
+            editorElement.current && observer.unobserve(editorElement.current)
+        }
     }, [editorElement.current])
 
-    return <>
-        {/* TODO: using parent (ideController) scope... cannot isolate them well */}
+    useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
+
+    useEffect(() => setLanguage(language), [language])
+
+    useEffect(() => {
+        setFontSize(fontSize)
+        // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
+        setLanguage(language)
+    }, [fontSize])
+
+    useEffect(() => {
+        if (blocksMode && !droplet.currentlyUsingBlocks) {
+            // Ask Ace editor if there are any syntax errors.
+            const annotations = ace.getSession().getAnnotations()
+            if (annotations.some(note => note.type === "error")) {
+                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+            } else {
+                userConsole.clear()
+            }
+            droplet.toggleBlocks()
+        } else if (!blocksMode && droplet.currentlyUsingBlocks) {
+            droplet.toggleBlocks()
+        }
+    }, [blocksMode])
+
+    return <div className="flex flex-grow h-full max-h-full overflow-y-hidden">
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode
-            && <div className="floating-bar" onClick={ideScope.importScript}>
+            && <div className="floating-bar" onClick={() => importScript(activeScript)}>
                 <div>{/* DO NOT REMOVE: this is an empty div to block the space before the next div */}</div>
                 <div className="btn-action btn-floating shake">
                     <i className="icon icon-import"></i><span>IMPORT TO EDIT</span>
@@ -222,7 +310,6 @@ const Editor = () => {
             </div>}
         </div>
 
-        {/* Note: activeScript managed in ideController and tabState */}
         {activeScript?.collaborative && <div id="collab-badges-container">
             {Object.entries(collaboration.otherMembers).map(([name, state], index) => 
             <div key={name} className="collaborator-badge prevent-selection" style={{
@@ -234,9 +321,5 @@ const Editor = () => {
                 {name[0].toUpperCase()}
             </div>)}
         </div>}
-    </>
+    </div>
 }
-
-const HotEditor = hot(() => <Provider store={store}><Editor /></Provider>)
-
-export { HotEditor as Editor }

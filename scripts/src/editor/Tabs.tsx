@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef, LegacyRef } from 'react';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { Store } from 'redux';
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
+import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
 import * as classNames from 'classnames';
 
+import { closeAllTabs } from '../app/App';
 import * as appState from '../app/appState';
-import * as tabs from './tabState';
-import * as scripts from '../browser/scriptsState';
 import * as editor from './editorState';
-import * as helpers from '../helpers';
+import { createScript } from '../app/IDE';
+import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
+import * as scripts from '../browser/scriptsState';
+import * as tabs from './tabState';
 import * as userProject from '../app/userProject';
 
-import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
-
 const CreateScriptButton = () => {
-    const ideControllerScope = helpers.getNgController('ideController').scope();
     return (
         <div
             className={`
@@ -26,7 +22,7 @@ const CreateScriptButton = () => {
                 text-lg cursor-pointer
             `}
             id='create-script-button'
-            onClick={() => ideControllerScope?.createScript()}
+            onClick={createScript}
         >
             <i className='icon icon-plus2' />
         </div>
@@ -116,8 +112,6 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
 };
 
 const CloseAllTab = () => {
-    const mainControllerScope = helpers.getNgMainController().scope();
-
     return (
         <div
             className={`
@@ -125,10 +119,7 @@ const CloseAllTab = () => {
                 flex items-center
                 text-white bg-gray-800 border border-gray-800    
             `}
-            onClick={() => {
-                // Dispatch needs to be inside $confirm.
-                mainControllerScope?.closeAllTabs();
-            }}
+            onClick={closeAllTabs}
         >
             Close All
         </div>
@@ -215,7 +206,7 @@ const TabDropdown = () => {
     </>);
 };
 
-const Tabs = () => {
+export const Tabs = () => {
     const dispatch = useDispatch();
     const openTabs = useSelector(tabs.selectOpenTabs);
     const truncated = useSelector(tabs.selectTabsTruncated);
@@ -256,13 +247,3 @@ const Tabs = () => {
         </div>
     );
 };
-
-const HotTabs = hot((props: { $ngRedux: Store }) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <Tabs />
-        </Provider>
-    );
-});
-
-app.component('scriptTabs', react2angular(HotTabs,null,['$ngRedux']));

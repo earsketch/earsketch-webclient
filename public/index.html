@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="<%= BASE_URL %>">
+    <meta charset="UTF-8">
+    <title>EarSketch</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="scripts/vendor/newrelic/newrelicbrowser.<%= BUILD_CONFIG %>.js"></script>
+
+    <!-- Suppress favicon error -->
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <!-- Google Font -->
+    <link rel="stylesheet" type="text/css" href="fonts/lato/lato.css">
+    <link rel="stylesheet" type="text/css" href="fonts/roboto/roboto.css">
+    <link rel="stylesheet" type="text/css" href="fonts/hack/css/hack.css">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/vendor/bootstrap-glyphicons.css">
+
+    <!-- highlight js style -->
+    <link rel="stylesheet" type="text/css" href="scripts/lib/jsdifflib/diffview.css">
+
+    <link rel="stylesheet" type="text/css" href="css/vendor/colpick.css" />
+
+    <meta name="google-site-verification" content="ojwZ1r7MVOTRWsiqPITqwmhCOUou2CcqxRMG6itoci4"/>
+</head>
+<body>
+    <div id="screen" class="loader">
+        <br/><br/><br/><br/><br/><br/>
+        <div class="text-5xl text-center pb-16" style="font-size: 3rem; padding-bottom: 4rem">Loading EarSketch...</div>
+        <div class="loading-spinner"></div>
+    </div>
+    <script>
+        // dark loading screen -- since angular is loaded much later, CSS file swapping will be too late to change the color of the loading screen
+        if (localStorage['colorTheme'] === 'dark') {
+            document.body.style['background-color'] = '#000'
+        } else {
+            document.getElementsByClassName('loader')[0].style['background-color'] = '#EEE';
+            document.getElementsByClassName('loader')[0].style['color'] = '#4e4e4e';
+            document.body.style['background-color'] = '#EEE'
+        }
+    </script>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="text/javascript" src="/curriculum/curr_toc.js"></script>
+    <script type="text/javascript" src="/curriculum/curr_pages.js"></script>
+    <script type="text/javascript" src="/curriculum/curr_searchdoc.js"></script>
+</body>
+</html>
