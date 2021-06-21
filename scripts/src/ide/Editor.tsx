@@ -11,7 +11,7 @@ import * as config from "./editorConfig"
 import * as editor from "./ideState"
 import { initEditor } from "./IDE"
 import * as tabs from "./tabState"
-import * as userConsole from "../app/userconsole"
+import * as userConsole from "./console"
 import * as userProject from "../app/userProject"
 import store from "../reducers"
 

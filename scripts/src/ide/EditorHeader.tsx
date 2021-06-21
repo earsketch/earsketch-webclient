@@ -5,7 +5,7 @@ import { shareScript } from '../app/App';
 import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as editor from './Editor';
-import * as editorState from './ideState';
+import * as ide from './ideState';
 import { compileCode } from './IDE';
 import * as tabs from './tabState';
 import * as scripts from '../browser/scriptsState';
@@ -51,7 +51,7 @@ export const EditorHeader = () => {
     const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID) as string;
     const allScripts = useSelector(scripts.selectAllScriptEntities);
-    const blocksMode = useSelector(editorState.selectBlocksMode);
+    const blocksMode = useSelector(ide.selectBlocksMode);
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
     const loggedIn = useSelector(user.selectLoggedIn);
@@ -78,7 +78,7 @@ export const EditorHeader = () => {
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
-                                dispatch(editorState.toggleBlocksMode());
+                                dispatch(ide.toggleBlocksMode());
                             }}
                         >
                             <div

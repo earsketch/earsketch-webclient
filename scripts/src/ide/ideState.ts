@@ -4,10 +4,16 @@ import storage from 'redux-persist/lib/storage';
 import { Ace } from 'ace-builds';
 import { RootState } from '../reducers';
 
+interface Log {
+    level: string
+    text: string
+}
+
 const ideSlice = createSlice({
     name: 'ide',
     initialState: {
-        blocksMode: false
+        blocksMode: false,
+        logs: [] as Log[],
     },
     reducers: {
         setBlocksMode(state, { payload }) {
@@ -15,6 +21,12 @@ const ideSlice = createSlice({
         },
         toggleBlocksMode(state) {
             state.blocksMode = !state.blocksMode
+        },
+        setLogs(state, { payload }) {
+            state.logs = payload
+        },
+        pushLog(state, { payload }) {
+            state.logs.push(payload)
         }
     }
 });
@@ -29,7 +41,13 @@ export default persistReducer(persistConfig, ideSlice.reducer);
 export const {
     setBlocksMode,
     toggleBlocksMode,
+    setLogs,
+    pushLog,
 } = ideSlice.actions;
+
+export const selectBlocksMode = (state: RootState) => state.ide.blocksMode;
+
+export const selectLogs = (state: RootState) => state.ide.logs;
 
 // TODO: Consolidate with Editor.
 // Note: Do not export. Only modify through asyncThunk as side effects.
@@ -48,7 +66,6 @@ export const setEditorInstance = createAsyncThunk(
     }
 );
 
-export const selectBlocksMode = (state: RootState) => state.ide.blocksMode;
 export const setReadOnly = (bool: boolean) => {
     editorMutableState.editor?.ace.setReadOnly(bool);
     editorMutableState.editor?.droplet.setReadOnly(bool);

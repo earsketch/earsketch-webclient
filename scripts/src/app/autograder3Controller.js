@@ -1,7 +1,7 @@
 import * as compiler from './compiler'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
-import * as userConsole from './userconsole'
+import * as userConsole from '../ide/console'
 import * as userProject from './userProject'
 
 app.controller("autograder3Controller",
