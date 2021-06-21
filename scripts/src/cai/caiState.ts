@@ -10,6 +10,7 @@ import * as analysis from './analysis'
 import * as codeSuggestion from './codeSuggestion'
 import * as dialogue from './dialogue'
 import * as studentPreferences from './studentPreferences'
+import * as studentHistory from './studentHistory'
 import { getUserFunctionReturns, getAllVariables } from './complexityCalculator'
 import { analyzePython } from './complexityCalculatorPY'
 import { analyzeJavascript } from './complexityCalculatorJS'
@@ -218,8 +219,6 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     'cai/compileCAI',
     (data, { getState, dispatch }) => {
-
-        const caiStudentHistoryModule = helpers.getNgService('caiStudentHistoryModule')
         const rootScope = helpers.getNgRootScope()
 
         if (dialogue.isDone()) {
@@ -234,7 +233,9 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         const results = language === "python" ? analyzePython(code) : analyzeJavascript(code)
 
         codeSuggestion.generateResults(code, language)
-        caiStudentHistoryModule.addScoreToAggregate(code, language)
+        studentHistory.addScoreToAggregate(code, language)
+
+        dispatch(setErrorOptions([]))
 
         const output : any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
         if (output !== null && output !== "" && output[0][0] !== "") {
@@ -246,7 +247,6 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
             } as CAIMessage
             dispatch(addToMessageList(message))
             dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setErrorOptions([]))
             dispatch(setDefaultInputOptions())
         }
         if (output !== null && output === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {

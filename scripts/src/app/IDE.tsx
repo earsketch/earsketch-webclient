@@ -349,6 +349,10 @@ export function compileCode() {
         if (collaboration.active && collaboration.tutoring) {
             collaboration.sendCompilationRecord(errType)
         }
+
+        if (FLAGS.SHOW_CAI) {
+            store.dispatch(cai.compileError(err))
+        }
     })
 }
 
