@@ -473,7 +473,8 @@ export function shareWithPeople(shareid: string, users: string[]) {
         notification_type: "sharewithpeople",
         username: getUsername(),
         scriptid: shareid,
-        users,
+        // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
+        users: users.map(id => ({ id, exists: true })),
     }
 
     if (!websocket.isOpen) {
