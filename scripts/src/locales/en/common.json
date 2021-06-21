@@ -113,7 +113,18 @@
     "scriptCreator.scriptName": "Script name",
     "scriptCreator.scriptName.subtext": "What should we call your script?",
     "scriptCreator.scriptLang": "Script language",
-    "scriptCreator.scriptLang.subtext": "What programming language are you using?"
+    "scriptCreator.scriptLang.subtext": "What programming language are you using?",
+    "scriptAnalysis.title": "Code-Concept Indicator for {{scriptName}}",
+    "scriptAnalysis.category.loops": "Loops",
+    "scriptAnalysis.category.conditionals": "Conditionals",
+    "scriptAnalysis.category.conditionalsWBool": "Conditionals with Booleans",
+    "scriptAnalysis.category.lists": "Lists",
+    "scriptAnalysis.category.listStringOps": "List and String Operations",
+    "scriptAnalysis.category.userFunctions": "User-Defined Functions",
+    "category": "Category",
+    "count": "Count",
+    "total": "Total",
+    "exit": "Exit"
   },
   "messages": {
     "interpreter": {
