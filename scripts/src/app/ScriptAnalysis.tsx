@@ -1,11 +1,22 @@
+import i18n from "i18next"
 import React from "react"
 
 import { ScriptEntity } from "common"
 import { parseLanguage } from "../esutils"
+import * as notification from "../user/notification"
 import * as reader from "./reader"
 
 export const ScriptAnalysis = ({ script, close }: { script: ScriptEntity, close: () => void }) => {
-    const analysis = reader.analyze(parseLanguage(script.name), script.source_code)
+    let analysis
+    try {
+        analysis = reader.analyze(parseLanguage(script.name), script.source_code)
+    } catch {
+        // We use `setTimeout` here to avoid calling NotificationPopup's setState during ScriptAnalysis render.
+        // TODO: Bring popup state into Redux so this can be a dispatch instead.
+        setTimeout(() => notification.show(i18n.t('messages:general.complexitySyntaxError'), 'failure2', 5))
+        close()
+        return null
+    }
     const score = reader.total(analysis)
 
     const categories = [
