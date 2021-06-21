@@ -13,7 +13,6 @@ import * as tabs from "../editor/tabState";
 import { ScriptEntity, ScriptType } from 'common';
 import * as userNotification from '../app/userNotification';
 import * as userProject from '../app/userProject';
-import { useTranslation } from "react-i18next";
 
 export const openScript = (script: ScriptEntity) => {
     userProject.openScript(script.shareid);
@@ -93,7 +92,6 @@ const MenuItem = ({ name, icon, onClick, disabled=false, visible=true }: MenuIte
 const dropdownMenuVirtualRef = new VirtualRef() as VirtualReference;
 
 export const ScriptDropdownMenu = () => {
-    const { t } = useTranslation()
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
     const showDropdownMenu = useSelector(scripts.selectShowDropdownMenu);
