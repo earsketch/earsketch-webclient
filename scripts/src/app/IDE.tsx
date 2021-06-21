@@ -351,7 +351,7 @@ export function compileCode() {
     })
 }
 
-const IDE = () => {
+export const IDE = () => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
     const numTabs = useSelector(tabs.selectOpenTabs).length
@@ -448,7 +448,3 @@ const IDE = () => {
         </div>
     </div>
 }
-
-const HotIDE = hot(() => <Provider store={store}><IDE /></Provider>)
-
-export { HotIDE as IDE }

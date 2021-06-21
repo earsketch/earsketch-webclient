@@ -35,7 +35,10 @@ window.droplet = droplet
 import "./app/completer"
 
 import { react2angular } from "react2angular"
-
+import React from "react"
+import ReactDOM from "react-dom"
+import { Provider } from "react-redux"
+import store from "./reducers"
 import { App } from "./app/App"
 // Now entering: the modal zone.
 import { AccountCreator } from "./app/AccountCreator"
@@ -197,4 +200,12 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     }])
 
     angular.bootstrap(document, ["EarSketchApp"], { strictDi: true })
+
+    ReactDOM.render(
+        <React.StrictMode>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </React.StrictMode>,
+        document.getElementById("root"))
 })
