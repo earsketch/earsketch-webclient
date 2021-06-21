@@ -115,7 +115,7 @@ export async function soundcloud(script: ScriptEntity, quality: boolean, options
     const result = await compile(script, quality)
     let blob
     try {
-        blob = renderer.renderWav(result)
+        blob = await renderer.renderWav(result)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
         throw i18n.t('messages:download.rendererror')
