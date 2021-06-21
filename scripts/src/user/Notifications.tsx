@@ -128,40 +128,42 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
             {notifications.slice(0, 5).map((item, index) =>
             <div key={index}>
                 <div style={{ margin: "10px" }} onClick={() => userNotification.markAsRead(item)}>
-                    {/* pin or read/unread marker */}
-                    <div className="flex items-center float-left" style={{ margin: "10px", marginLeft: 0 }}>
-                        {item.pinned
-                        ? <i className="icon icon-pushpin" />
-                        : <div className={item.unread ? "marker" : "empty-marker"} />}
-                    </div>
-
-                    {/* contents */}
-                    <div style={{ width: "210px" }}>
-                        {/* common field (text & date) */}
-                        <div style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {item.message.text}
-                        </div>
-                        <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
-                            {ESUtils.formatTime(now - item.time)}
+                    <div className="flex items-start">
+                        {/* pin or read/unread marker */}
+                        <div className="mr-3">
+                            {item.pinned
+                            ? <i className="icon icon-pushpin" />
+                            : <div className={item.unread ? "marker" : "empty-marker"} />}
                         </div>
 
-                        {/* special actions */}
-                        <div className="float-right">
-                            {item.notification_type === "broadcast" && item.message.hyperlink &&
-                            <div>
-                                <a href={item.message.hyperlink} target="_blank">MORE</a>
-                            </div>}
-                            {item.notification_type === "share_script" &&
-                            <div>
-                                <span onClick={() => openSharedScript(item.shareid!)}><a href="#">OPEN</a></span>
-                            </div>}
-                            {item.notification_type === "collaborate_script" &&
-                            <div>
-                                {item.message.action === "userAddedToCollaboration" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
-                                {item.message.action === "scriptRenamed" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
-                            </div>}
-                            {item.notification_type === "editProfile" &&
-                            <div><span onClick={editProfile}><a href="#">OPEN</a></span></div>}
+                        {/* contents */}
+                        <div style={{ width: "210px" }}>
+                            {/* common field (text & date) */}
+                            <div style={{ maxWidth: "210px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {item.message.text}
+                            </div>
+                            <div className="flex justify-between">
+                                <div style={{ fontSize: "10px", color: "grey", float: "left" }}>
+                                    {ESUtils.formatTime(now - item.time)}
+                                </div>
+
+                                {/* special actions */}
+                                {item.notification_type === "broadcast" && item.message.hyperlink &&
+                                <div>
+                                    <a href={item.message.hyperlink} target="_blank">MORE</a>
+                                </div>}
+                                {item.notification_type === "share_script" &&
+                                <div>
+                                    <span onClick={() => openSharedScript(item.shareid!)}><a href="#">OPEN</a></span>
+                                </div>}
+                                {item.notification_type === "collaborate_script" &&
+                                <div>
+                                    {item.message.action === "userAddedToCollaboration" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
+                                    {item.message.action === "scriptRenamed" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
+                                </div>}
+                                {item.notification_type === "editProfile" &&
+                                <div><span onClick={editProfile}><a href="#">OPEN</a></span></div>}
+                            </div>
                         </div>
                     </div>
                 </div>
