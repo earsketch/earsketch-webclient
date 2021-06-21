@@ -3,8 +3,8 @@ import React, { useState } from "react"
 import { changePassword } from "./App"
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
-import { form } from "./userProject"
 import { useTranslation } from "react-i18next"
+import { form } from "./userProject"
 
 export const ProfileEditor = ({ username, password, email: _email, role, firstName: _firstName, lastName: _lastName, close }:
     { username: string, password: string, email: string, role: string, firstName: string, lastName: string, close: (info?: any) => void }) => {
@@ -12,10 +12,9 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
     const [firstName, setFirstName] = useState(_firstName)
     const [lastName, setLastName] = useState(_lastName)
     const [email, setEmail] = useState(_email)
-    const { t } = useTranslation();
+    const { t } = useTranslation()
 
     const updateProfile = () => {
-        const { t } = useTranslation();
         const _firstName = firstName.trim()
         const _lastName = lastName.trim()
         const _email = email.trim()
@@ -44,8 +43,7 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
             }
             userNotification.show("Your user profile was updated!", "success")
             close({ firstName: _firstName, lastName:_lastName, email: _email })
-        }).catch(error => {
-            esconsole("Error updating user profile", ["editProfile", "error"])
+        }).catch(() => {
             setError("There was an error when updating the user profile.")
         })
     }
