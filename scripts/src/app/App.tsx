@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Menu } from "@headlessui/react"
-import React, { useEffect, useState } from "react"
+import React, { ReactElement, useEffect, useState } from "react"
 import { Provider, useDispatch, useSelector } from "react-redux"
 
 import * as appState from "../app/appState"
@@ -259,11 +259,11 @@ function resumeQuickTour() {
     store.dispatch(bubble.resume())
 }
 
+import { ErrorForm } from "./ErrorForm"
+
 function reportError() {
-    helpers.getNgService("$uibModal").open({
-        component: "errorController",
-        resolve: { email() { return email } }
-    })
+    // TODO: Pass in email.
+    store.dispatch(appState.setModal(ErrorForm))
 }
 
 function openAdminWindow() {
@@ -376,6 +376,7 @@ export const App = () => {
     const [role, setRole] = useState("student")
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
+    const Modal = useSelector(appState.selectModal)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (location: string) => {
@@ -711,6 +712,33 @@ export const App = () => {
         </div>
         <Bubble />
         <ScriptDropdownMenu />
+        {Modal &&
+        <ModalContainer Modal={Modal} />}
+    </>
+}
+
+const ModalContainer = ({ Modal }: { Modal: (props: { close: (payload?: any) => void }) => ReactElement }) => {
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                dispatch(appState.setModal(null))
+            }
+        }
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [])
+
+    return <>
+        <div className="modal fade in" style={{ zIndex: 1050, display: "block" }} tabIndex={-1} onClick={() => dispatch(appState.setModal(null))}>
+            <div className="modal-dialog">
+                <div className="modal-content" onClick={e => e.stopPropagation()}>
+                    <Modal close={() => dispatch(appState.setModal(null))} />
+                </div>
+            </div>
+        </div>
+        <div className="modal-backdrop fade ng-scope in" style={{ zIndex: 1040 }}></div>
     </>
 }
 

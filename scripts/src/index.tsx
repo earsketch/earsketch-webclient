@@ -45,7 +45,6 @@ import { AccountCreator } from "./app/AccountCreator"
 import { ChangePassword } from "./app/ChangePassword"
 import { CompetitionSubmission } from "./app/CompetitionSubmission"
 import { Download } from "./app/Download"
-import { ErrorForm } from "./app/ErrorForm"
 import { ForgotPassword } from "./app/ForgotPassword"
 import { ProfileEditor } from "./app/ProfileEditor"
 import { Prompt } from "./app/Prompt"
@@ -149,7 +148,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     app.component("submitCompetitionController", helpers.wrapModal(CompetitionSubmission))
     app.component("shareScriptController", helpers.wrapModal(ScriptShare))
     app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
-    app.component("errorController", helpers.wrapModal(ErrorForm))
 
     // Autograders
     require("autograderController")
