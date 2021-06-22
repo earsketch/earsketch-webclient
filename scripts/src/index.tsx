@@ -78,7 +78,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     require("uiBootstrap")
     require("angular-animate")
     require("ngClipboard")
-    require("angular-confirm")
 
     require("skulpt")
     require("skulptStdLib")
@@ -95,7 +94,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
         "ui.bootstrap",
         "ngAnimate",
         "angular-clipboard",
-        "angular-confirm",
     ]).config(["$locationProvider", ($locationProvider: any) => {
         // Prevent legacy hash-bang URL being overwritten by $location.
         $locationProvider.html5Mode(true).hashPrefix("")
