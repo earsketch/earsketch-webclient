@@ -314,9 +314,8 @@ export const Editor = () => {
             <div key={name} className="collaborator-badge prevent-selection" style={{
                     borderColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
                     backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)`: "#666",
-                 }}
-                 uib-tooltip="{{name}}" tooltip-placement="left" uib-popover={collaboration.chat[name].text}
-                 popover-placement="left" popover-is-open="collaboration.chat[name].popover" popover-trigger="none">
+                 }}>
+                {/* TODO: Popover with collaborator username. */}
                 {name[0].toUpperCase()}
             </div>)}
         </div>}

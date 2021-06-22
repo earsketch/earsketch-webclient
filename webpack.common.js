@@ -22,7 +22,6 @@ module.exports = {
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
             bootstrapBundle: 'bootstrap/dist/js/bootstrap.bundle.min.js',
-            uiBootstrap: 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
             skulpt: path.resolve(__dirname,`${vendorDir}/skulpt/skulpt.min.js`),
             skulptStdLib: path.resolve(__dirname,`${vendorDir}/skulpt/skulpt-stdlib.js`),
             droplet: path.resolve(__dirname,`${libDir}/droplet/droplet-full.min.js`),

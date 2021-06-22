@@ -75,7 +75,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
 (require as any)(["angular"], () => {
     // NPM
     require("bootstrapBundle")
-    require("uiBootstrap")
     require("angular-animate")
     require("ngClipboard")
 
@@ -91,7 +90,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     require("chance")
 
     window.app = angular.module("EarSketchApp", [
-        "ui.bootstrap",
         "ngAnimate",
         "angular-clipboard",
     ]).config(["$locationProvider", ($locationProvider: any) => {

@@ -168,7 +168,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
                     <input ref={linkElement} className="share-link outline-none flex-grow" type="text" value={link} readOnly />
-                    <span className="download-share-url" onClick={downloadShareUrl}><i className="glyphicon glyphicon-download-alt" uib-tooltip="Download URL shortcut file" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
+                    <span className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></span>
                     <span onClick={() => { linkElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
                         <i className="icon icon-paste4"></i>
                     </span>

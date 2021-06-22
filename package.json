@@ -28,7 +28,6 @@
     "angular-clipboard": "^1.7.0",
     "angular-mocks": "^1.8.0",
     "angular-resource": "^1.8.0",
-    "angular-ui-bootstrap": "^2.5.6",
     "bootstrap": "^4.5.0",
     "chance": "^1.1.6",
     "classnames": "^2.2.6",

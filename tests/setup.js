@@ -191,12 +191,7 @@ require('lodash');
 require('kali');
 require('chance');
 
-// userConsole needs a mock for $uibModal
-angular.module('ui.bootstrap',[])
-    .service('$uibModal',function(){})
-    .service('$uibModalProvider',function(){});
-
-window.app = angular.module('EarSketchApp',['ui.bootstrap','ngAnimate','angular-clipboard']).config($locationProvider => {
+window.app = angular.module('EarSketchApp',['ngAnimate','angular-clipboard']).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
 });
