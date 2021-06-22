@@ -72,7 +72,7 @@ module.exports = {
                 path.resolve(__dirname,libDir),
                 path.resolve(__dirname,vendorDir),
                 path.resolve(__dirname,dataDir),
-                path.resolve(__dirname,'scripts/a nalytics')
+                path.resolve(__dirname,'scripts/analytics')
             ],
             // loader: 'babel-loader',
             // options: { presets: ['@babel/env'] }
