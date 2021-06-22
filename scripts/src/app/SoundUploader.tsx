@@ -179,7 +179,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
 
     const submit = async () => {
         try {
-            const view = encodeWAV(buffer!.getChannelData(0))
+            const view = encodeWAV(buffer!.getChannelData(0), audioContext.sampleRate, 1)
             const blob = new Blob([view], { type: "audio/wav" })
             await uploadFile(blob, key, ".wav", metronome ? tempo : 120, setProgress)
             close()
@@ -472,7 +472,7 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ title, icon }, index) =>
                         <li key={index} className={"flex-grow" + (activeTab === index ? " active" : "")}>
-                            <a href="" onClick={() => setActiveTab(index)} className="h-full flex justify-center items-center">
+                            <a href="#" onClick={() => setActiveTab(index)} className="h-full flex justify-center items-center">
                                 <i className={`icon icon-${icon} mr-3`}></i>{title}
                             </a>
                         </li>)}

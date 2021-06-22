@@ -69,9 +69,7 @@ import { SoundUploader } from "./app/SoundUploader"
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
 const SOUNDCLOUD_ID_MAP = {
     "earsketch.gatech.edu": "595113847a0edfd82dcfadeed2051dca",
-    "earsketch-dev.lmc.gatech.edu": "0d5850bd5b161fa72864477f71de2317",
-    "localhost:9090": "63b0323e190f967594cdaf5f8151ccf0",
-    "localhost/": "cc046c69568c6aa15f4468e5b327b134",
+    "localhost:8888": "05a5bed478578d302739bf9945a70539",
 } as { [key: string]: string }
 
 const domain = Object.keys(SOUNDCLOUD_ID_MAP).find(domain => SITE_BASE_URI.includes(domain))

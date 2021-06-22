@@ -37,7 +37,7 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
                 {error && <div className="alert alert-danger">
                     {error}
                 </div>}
-                {conflict && `A script named '${script.name}' already exists in your workspace.`}
+                {conflict && <>A script named '{script.name}' already exists in your workspace.<br /></>}
                 Enter the new name for this script:
                 <div className="input-group">
                     <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />

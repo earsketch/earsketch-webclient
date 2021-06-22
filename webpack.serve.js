@@ -11,8 +11,8 @@ const esHost = 'https://api-dev.ersktch.gatech.edu';
 const wsHost = esHost.replace('http', 'ws');
 
 module.exports = env => {
-    const port = (env && env.port) ? env.port : 8080;
-    const clientPath = (env && env.path) ? env.path : '';
+    const port = (env && env.port) ? env.port : 8888;
+    const clientPath = (env && env.path) ? '/' + env.path : '';
     const envFile = (env && env.flags) ? env.flags : path.resolve(__dirname, 'flags.env');
     const release = (env && env.release) ? env.release : Date.now();
     const buildConfig = (env && env.buildconfig) ? env.buildconfig : 'dev';
@@ -49,7 +49,7 @@ module.exports = env => {
                 URL_DOMAIN: JSON.stringify(`${esHost}/EarSketchWS`),
                 URL_WEBSOCKET: JSON.stringify(`${wsHost}/EarSketchWS`),
                 URL_LOADAUDIO: JSON.stringify(`${esHost}/EarSketchWS/services/audio/getaudiosample`),
-                SITE_BASE_URI: JSON.stringify(`http://localhost:${port}/${clientPath}`)
+                SITE_BASE_URI: JSON.stringify(`http://localhost:${port}${clientPath}`)
             })
         ],
         // This affects the rebuild (hot-reload) speed. Comment out for the fastest rebuild time.
