@@ -21,7 +21,7 @@ const USER_STATE_KEY = "userstate"
 
 const LS_TABS_KEY = "tabs_v2"
 const LS_SHARED_TABS_KEY = "shared_tabs_v1"
-const LS_SCRIPTS_KEY = "scripts_v1"
+export const LS_SCRIPTS_KEY = "scripts_v1"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
@@ -134,45 +134,19 @@ async function postXMLAuth(endpoint: string, xml: string) {
     return postXML(endpoint, xml, { username: getUsername(), password: getPassword() })
 }
 
-// websocket gets closed before onunload in FF
-window.onbeforeunload = () => {
-    if (isLoggedIn()) {
-        let saving = false
-
-        for (const shareID of openScripts) {
-            if (scripts[shareID] && scripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID)
-            }
-
-            if (scripts[shareID] && !scripts[shareID].saved) {
-                saving = true
-                saveScript(scripts[shareID].name, scripts[shareID].source_code).then(() => {
-                    store.dispatch(scriptsState.syncToNgUserProject())
-                    userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
-                })
-            }
-        }
-
-        for (const shareID of openSharedScripts) {
-            if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
-                collaboration.leaveSession(shareID)
-            }
-        }
-
-        // TODO: may not be properly working... check!
-        if (notificationsMarkedAsRead.length) {
-            for (const notification_id of notificationsMarkedAsRead) {
-                esconsole(`marking notification ${notification_id} as read`, "user")
-                postAuthForm("/services/scripts/markread", { notification_id })
-            }
-        }
-        return saving  // Show warning popover if true.
-    } else {
-        if (localStorage.getItem(LS_SCRIPTS_KEY) !== null) {
-            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-        }
-    }
+// Expects form data, returns XML.
+// As far as I can tell, there is only ONE endpoint like this: /services/scripts/import.
+async function postFormXML(endpoint: string, data?: { [key: string]: string | Blob }) {
+    const url = URL_DOMAIN + endpoint
+    // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
+    const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
+    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
 }
+
+async function postAuthFormXML(endpoint: string, params: { [key: string]: string | Blob }) {
+    return postFormXML(endpoint, { username: getUsername(), password: getPassword(), ...params })
+}
+
 
 export function loadLocalScripts() {
     // Load scripts from local storage if they are available. When a user logs in
@@ -513,7 +487,8 @@ export function shareWithPeople(shareid: string, users: string[]) {
         notification_type: "sharewithpeople",
         username: getUsername(),
         scriptid: shareid,
-        users,
+        // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
+        users: users.map(id => ({ id, exists: true })),
     }
 
     if (!websocket.isOpen) {
@@ -678,7 +653,6 @@ export async function importScript(script: ScriptEntity) {
         if (isLoggedIn()) {
             const imported = await importSharedScript(script.shareid)
             renameScript(imported.shareid, script.name)
-            imported.name = script.name
             return Promise.resolve(imported)
         } else {
             throw i18n.t('messages:general.unauthenticated')
@@ -726,11 +700,10 @@ export async function setScriptDesc(scriptname: string, scriptId: string, desc: 
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     if (isLoggedIn()) {
-        const data = await postAuth("/services/scripts/import", { scriptid })
-        if (scriptid) {
-            delete sharedScripts[scriptid]
-        }
+        const data = await postAuthFormXML("/services/scripts/import", { scriptid })
+        delete sharedScripts[scriptid]
         closeSharedScript(scriptid)
+        scripts[data.shareid] = data
         esconsole("Import script " + scriptid, ["debug", "user"])
         return data
     }
@@ -907,7 +880,7 @@ export async function createScript(scriptname: string) {
 
 // Adds a script to the list of open scripts. No effect if the script is already open.
 export function openScript(shareid: string) {
-    if (openScripts.includes(shareid)) {
+    if (!openScripts.includes(shareid)) {
         openScripts.push(shareid)
         localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts))
     }

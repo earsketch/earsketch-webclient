@@ -23,6 +23,7 @@ import * as Layout from "../layout/Layout"
 import reporter from "../app/reporter"
 import * as tabs from "./tabState"
 import * as cai from "../cai/caiState"
+import * as caiAnalysis from "../cai/analysis"
 import * as helpers from "../helpers"
 import store from "../reducers"
 import { Tabs } from "./Tabs"
@@ -294,7 +295,7 @@ export function compileCode() {
                 // reporter.complexity(language, code)
                 let report
                 try {
-                    report = helpers.getNgService("caiAnalysisModule").analyzeCodeAndMusic(language, code, result)
+                    report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
                 } catch (e) {
                     // TODO: Make this work across browsers. (See esconsole for reference.)
                     const traceDepth = 5
@@ -346,6 +347,10 @@ export function compileCode() {
 
         if (collaboration.active && collaboration.tutoring) {
             collaboration.sendCompilationRecord(errType)
+        }
+
+        if (FLAGS.SHOW_CAI) {
+            store.dispatch(cai.compileError(err))
         }
     })
 }

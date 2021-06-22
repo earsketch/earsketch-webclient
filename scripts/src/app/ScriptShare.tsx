@@ -323,7 +323,6 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     }
 
     const shareToSoundCloud = () => {
-        const { t } = useTranslation()
         const sc = {
             name,
             sharing: ACCESS_OPTIONS[access].sharing,
@@ -337,11 +336,11 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             sc.description += "\n\n"
             sc.description += "-------------------------------------------------------------\n\n"
         }
-        sc.description += t('messages:idecontroller.soundcloud.description') + "\n\n"
+        sc.description += i18n.t('messages:idecontroller.soundcloud.description') + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += t('messages:idecontroller.soundcloud.code') + "\n\n" + script.source_code + "\n\n"
+        sc.description += i18n.t('messages:idecontroller.soundcloud.code') + "\n\n" + script.source_code + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += t('messages:idecontroller.soundcloud.share') + " " + sharelink + "\n\n"
+        sc.description += i18n.t('messages:idecontroller.soundcloud.share') + " " + sharelink + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
 
         save()
@@ -396,7 +395,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
 
             {message && <div className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: "rgb(170,255,255,0.5)" }}>
-                {message.startsWith("UPLOADING") && <i className="spinner icon icon-spinner"></i>} {message}
+                {message.startsWith("UPLOADING") && <i className="inline-block animate-spin spinner icon icon-spinner"></i>} {message}
             </div>}
 
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
@@ -483,7 +482,7 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
                     <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
-                        <a onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">{t(titleKey).toLocaleUpperCase()}</a>
+                        <a href="#" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">{t(titleKey).toLocaleUpperCase()}</a>
                     </li>)}
                 </ul>
             </div>

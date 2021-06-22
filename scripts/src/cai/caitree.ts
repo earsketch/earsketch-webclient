@@ -1,5 +1,6 @@
-﻿const CAI_TREE_NODES =
-    [{
+﻿export const CAI_TREE_NODES : {
+    [key: string]: any
+} = [{
         id: 0,
         title: "",
         utterance: "[GREETING]",
@@ -745,20 +746,11 @@
         dropup: "Instruments",
         options: [37, 38, 39, 40, 41, 42, 43, 44, 45]
     },
-    ];
+]
 
+export const CAI_TREES : { [key: string]: number } = { "Chat with CAI": 0, 'error': 26, 'begin': 1, 'sound_select': 72, 'suggest': 34, 'wrapup': 68, 'selectinstr': 71 , 'properties': 88}
 
-const CAI_TREES = { "Chat with CAI": 0, 'error': 26, 'begin': 1, 'sound_select': 72, 'suggest': 34, 'wrapup': 68, 'selectinstr': 71 , 'properties': 88};
-
-const CAI_MUSIC_ANALYSIS = null;
-
-//var helpTopics = [
-//    { name: "fitMedia", utterance: "fitMedia adds an audio file to a specified track at specified start and end times. The audio file will be repeated or cut short as needed to fill the specified amount of time.", suggestionType: "music" },
-//    { name: "functions", suggestionType: "code", utterance: "info about UDFs" }
-//];
-
-
-const CAI_ERRORS = {
+export const CAI_ERRORS : { [key: string]: string } = {
     "ParseError": "looks like you've got a [LINK|parse error]. I think we might be missing something.",
     "ImportError": "something's not [LINK|importing] right. do we have the right package name up top?",
     "IndentationError": "looks like one of our lines isn't [LINK|indented] right.",
@@ -768,6 +760,4 @@ const CAI_ERRORS = {
     "TypeError": "it's saying [LINK|type error], which means that we put in the wrong kind of data, or we're missing something.",
     "ValueError": "i think something is wrong with one of our [LINK|function arguments].",
     "ServerError": "this is an issue with the ES server, and not with your code. we might have to make some changes."
-};
-
-export { CAI_TREE_NODES, CAI_TREES, CAI_MUSIC_ANALYSIS, CAI_ERRORS };
+}

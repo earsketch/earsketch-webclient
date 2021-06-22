@@ -9,7 +9,6 @@ import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 
 export const ErrorForm = ({ email: storedEmail, close }: { email: string, close: () => void }) => {
-    console.log("storedEmail is", storedEmail)
     const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
     const [email, setEmail] = useState(storedEmail)

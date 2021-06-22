@@ -1,7 +1,4 @@
 ﻿// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
-import * as userNotification from '../user/notification'
-import i18n from "i18next"
-
 
 interface CodeFeatures {
     userFunc: number
@@ -39,7 +36,6 @@ function pythonAst(source: string) {
         const parse = Sk.parse("<analyzer>", source)
         return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
     } catch (error) {
-        userNotification.show(i18n.t('messages:general.complexitySyntaxError'), 'failure2', 5)
         throw error
     }
 }
@@ -129,9 +125,8 @@ export function analyzeJavascript(source: string) {
             strOps: 0
         }
         return recursiveAnalyzeJavascript(ast, features)
-    } catch (err) {
-        userNotification.show(i18n.t('messages:general.complexitySyntaxError'), 'failure2', 5)
-        throw err
+    } catch (error) {
+        throw error
     }
 }
 

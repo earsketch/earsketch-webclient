@@ -2,6 +2,7 @@
 import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
 import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
 import {ScriptEntity} from 'common';
+import {fillDict} from '../cai/analysis';
 
 let keyGenreDict: { [key: string]: string } = {}
 let keyInstrumentDict: { [key: string]: string } = {}
@@ -21,19 +22,19 @@ export function getKeyDict(type: string) {
     } else if (type === 'instrument') { 
         return keyInstrumentDict 
     } else { 
-        return null
+        return {}
     }
 }
 
 // Load lists of numbers and keys
-var AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
+let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 export function addRecInput(recInput: string[], script: ScriptEntity) {
     // Generate list of input samples
-    var lines = script.source_code.split('\n')
-    for (var line = 0; line < lines.length; line++) {
-        for (var idx = 0; idx < AUDIOKEYS.length; idx++) {
-            var name = AUDIOKEYS[idx]
+    let lines = script.source_code.split('\n')
+    for (let line = 0; line < lines.length; line++) {
+        for (let idx = 0; idx < AUDIOKEYS.length; idx++) {
+            let name = AUDIOKEYS[idx]
             // exclude makebeat
             if (name.slice(0, 3) !== 'OS_' && lines[line].includes(name) && !recInput.includes(name)) {
                 // exclude comments
@@ -57,20 +58,26 @@ export function addRandomRecInput(recInput: string[] = []) {
     return recInput
 }
 
-export function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = []) {
-    var sounds = [];
-    for (var key in keyGenreDict) {
-        var genre = keyGenreDict[key]
-        if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(genre)) {
-            if (key in keyInstrumentDict) {
-                var instrument = keyInstrumentDict[key]
-                if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(instrument)) {
-                    sounds.push(key)
+export function findGenreInstrumentCombinations(genreLimit: string[] = [], instrumentLimit: string[] = []) : any {
+    let sounds = []
+    if (Object.keys(keyGenreDict).length < 1) { 
+        fillDict().then(function() {
+            return findGenreInstrumentCombinations(genreLimit, instrumentLimit) 
+        })
+    } else {
+        for (let key in keyGenreDict) {
+            const genre = keyGenreDict[key]
+            if (genreLimit.length === 0 || keyGenreDict === null || genreLimit.includes(genre)) {
+                if (key in keyInstrumentDict) {
+                    const instrument = keyInstrumentDict[key]
+                    if (instrumentLimit.length === 0 || keyInstrumentDict === null || instrumentLimit.includes(instrument)) {
+                        sounds.push(key)
+                    }
                 }
             }
         }
+        return sounds
     }
-    return sounds;
 }
 
 export function recommend(recommendedSounds: string[], inputSamples: string[], coUsage: number = 1, similarity: number = 1, 
@@ -131,11 +138,11 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     similarity = Math.sign(similarity)
     // Generate recommendations for each input sample and add together
     let recs: { [key: string] : number } = {}
-    for (var idx = 0; idx < inputSamples.length; idx++) {
-        var audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx])
+    for (let idx = 0; idx < inputSamples.length; idx++) {
+        let audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx])
         if (audioNumber !== undefined) {
-            var audioRec = AUDIOKEYS_RECOMMENDATIONS[String(audioNumber)]
-            for (var num in audioRec) {
+            let audioRec = AUDIOKEYS_RECOMMENDATIONS[String(audioNumber)]
+            for (let num in audioRec) {
                 if (!audioRec.hasOwnProperty(num)) {
                     throw new Error('Error enumerating the recommendation audioKeys')
                 }
@@ -168,7 +175,7 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
         while (i < bestLimit) {
             const maxScore = Object.values(recs).reduce((a, b) => a > b ? a : b);
             let maxRecs = []
-            for (var key in recs) {
+            for (let key in recs) {
                 if (recs[key] === maxScore) {
                     maxRecs.push(key)
                 }

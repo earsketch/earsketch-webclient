@@ -19,9 +19,6 @@ const ideSlice = createSlice({
         setBlocksMode(state, { payload }) {
             state.blocksMode = payload;
         },
-        toggleBlocksMode(state) {
-            state.blocksMode = !state.blocksMode
-        },
         setLogs(state, { payload }) {
             state.logs = payload
         },
@@ -40,7 +37,6 @@ const persistConfig = {
 export default persistReducer(persistConfig, ideSlice.reducer);
 export const {
     setBlocksMode,
-    toggleBlocksMode,
     setLogs,
     pushLog,
 } = ideSlice.actions;

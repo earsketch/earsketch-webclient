@@ -80,7 +80,7 @@ export const EditorHeader = () => {
                         <div
                             className={'flex items-center cursor-pointer truncate'}
                             onClick={() => {
-                                dispatch(ide.toggleBlocksMode());
+                                dispatch(ide.setBlocksMode(!blocksMode));
                             }}
                         >
                             <div
