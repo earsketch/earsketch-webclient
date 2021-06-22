@@ -5,6 +5,8 @@ import storage from 'redux-persist/lib/storage';
 
 import { RootState } from '../reducers';
 
+export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => ReactElement
+
 const appSlice = createSlice({
     name: 'app',
     initialState: {
@@ -18,7 +20,7 @@ const appSlice = createSlice({
         embeddedScriptName: null,
         embeddedScriptUsername: null,
         embeddedShareID: null,
-        modal: null as ((props: { close: (payload?: any) => void }) => ReactElement) | null,
+        modal: null as Modal | null,
     },
     reducers: {
         setScriptLanguage(state, { payload }) {

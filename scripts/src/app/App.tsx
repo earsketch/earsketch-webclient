@@ -261,9 +261,13 @@ function resumeQuickTour() {
 
 import { ErrorForm } from "./ErrorForm"
 
+// There is a little bit of magic here to make this type-safe: the compiler will check that `props` really matches the props expected by `modal`.
+function openModal<T extends appState.Modal>(modal: T, props: Omit<Parameters<T>[0], "close">) {
+    store.dispatch(appState.setModal(({ close }: { close: (payload?: any) => void }) => modal({ ...props, close })))
+}
+
 function reportError() {
-    // TODO: Pass in email.
-    store.dispatch(appState.setModal(ErrorForm))
+    openModal(ErrorForm, { email })
 }
 
 function openAdminWindow() {
@@ -731,7 +735,7 @@ const ModalContainer = ({ Modal }: { Modal: (props: { close: (payload?: any) => 
     }, [])
 
     return <>
-        <div className="modal fade in" style={{ zIndex: 1050, display: "block" }} tabIndex={-1} onClick={() => dispatch(appState.setModal(null))}>
+        <div className="modal fade in" style={{ zIndex: 1050 }} tabIndex={-1} onClick={() => dispatch(appState.setModal(null))}>
             <div className="modal-dialog">
                 <div className="modal-content" onClick={e => e.stopPropagation()}>
                     <Modal close={() => dispatch(appState.setModal(null))} />
