@@ -158,6 +158,8 @@
     "scriptShare.licenseType": "License Type",
     "scriptShare.copyClipboard": "Copy to clipboard",
     "soundUploader.title": "Add a New Sound",
+    "soundUploader.title.upload": "Upload sound",
+    "soundUploader.title.record": "Quick record",
     "soundUploader.file.prompt": "Choose a file...",
     "soundUploader.constantRequired": "Constant Name (required)",
     "soundUploader.tempoOptional": "Tempo (Optional)",

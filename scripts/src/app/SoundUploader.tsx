@@ -1,5 +1,6 @@
 import i18n from "i18next"
 import React, { useCallback, useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
@@ -13,7 +14,6 @@ import { encodeWAV } from "./renderer"
 import * as userConsole from "./userconsole"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { useTranslation } from "react-i18next"
 
 function cleanKey(key: string) {
     return key.replace(/\W/g, "").toUpperCase()
@@ -347,7 +347,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                                         setError("")
                                     }
                                 }} />
-                            {result.name}: {result.bpm} bpm. {t('soundUploader.freesound.uploadedBy', { userName: result.creator})}
+                            {result.name}: {result.bpm} bpm. {t('soundUploader.freesound.uploadedBy', { userName: result.creator })}
                         </label>
                         <audio controls preload="none">
                             <source src={result.previewURL} type="audio/mpeg" />
@@ -457,11 +457,11 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
 }
 
 const Tabs = [
-    { component: FileTab, title: "UPLOAD SOUND", icon: "cloud-upload" },
-    { component: RecordTab, title: "QUICK RECORD", icon: "microphone" },
-    { component: FreesoundTab, title: "FREESOUND", icon: "search", },
-    { component: TunepadTab, title: "TUNEPAD", icon: "cloud-upload" },
-    { component: GrooveMachineTab, title: "GROOVEMACHINE", icon: "cloud-upload" },
+    { component: FileTab, titleKey: "soundUploader.title.upload", icon: "cloud-upload" },
+    { component: RecordTab, titleKey: "soundUploader.title.record", icon: "microphone" },
+    { component: FreesoundTab, titleKey: "FREESOUND", icon: "search", },
+    { component: TunepadTab, titleKey: "TUNEPAD", icon: "cloud-upload" },
+    { component: GrooveMachineTab, titleKey: "GROOVEMACHINE", icon: "cloud-upload" },
 ]
 
 export const SoundUploader = ({ close }: { close: () => void }) => {
@@ -475,10 +475,10 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
             <hr className="my-4 border-gray-200" />
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
-                    {Tabs.map(({ title, icon }, index) =>
+                    {Tabs.map(({ titleKey, icon }, index) =>
                         <li key={index} className={"flex-grow" + (activeTab === index ? " active" : "")}>
                             <a href="" onClick={() => setActiveTab(index)} className="h-full flex justify-center items-center">
-                                <i className={`icon icon-${icon} mr-3`}></i>{title}
+                                <i className={`icon icon-${icon} mr-3`}></i>{t(titleKey).toLocaleUpperCase()}
                             </a>
                         </li>)}
                 </ul>
