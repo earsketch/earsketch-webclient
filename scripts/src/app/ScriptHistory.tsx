@@ -119,7 +119,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEn
         <div className="modal-header">
             <button type="button" className="close" id="script-history-close" onClick={close}>&times;</button>
             <h4 className="modal-title">
-                {t('scriptHistory.title', {scriptName: '"'+script.name+'"'})}
+                {t('scriptHistory.title', {scriptName: `"${script.name}"`})}
                 {!allowRevert && <span>({t('scriptHistory.onlyMyScripts')})</span>}
             </h4>
         </div>
