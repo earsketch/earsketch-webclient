@@ -426,7 +426,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
                 <div className="modal-section-header">
                     <span>{t('scriptShare.descriptionOptional')}</span>
                 </div>
-                <textarea className="form-control border-0" rows={2} placeholder={t('formFieldPlaceholder.clickToStartTyping')} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
+                <textarea className="form-control border-0" rows={2} placeholder={t('formFieldPlaceholder.typeDescriptionHere')} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
             </div>
 
             <div className="text-left">

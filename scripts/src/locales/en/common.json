@@ -85,7 +85,7 @@
     "formFieldPlaceholder.oldPassword": "Old password",
     "formFieldPlaceholder.newPassword": "New password",
     "formFieldPlaceholder.confirmNewPassword": "Confirm new password",
-    "formFieldPlaceholder.clickToStartTyping": "Click here to start typing...",
+    "formFieldPlaceholder.typeDescriptionHere": "Type description here",
     "cancel": "Cancel",
     "update": "Update",
     "save": "Save",
