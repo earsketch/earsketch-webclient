@@ -161,7 +161,6 @@ function checkSimilarity(actual, expected) {
 require('angular');
 window.angular = angular;
 
-require('angular-mocks');
 require('bootstrapBundle');
 
 window.ngMidwayTester = require('ngMidwayTester');
