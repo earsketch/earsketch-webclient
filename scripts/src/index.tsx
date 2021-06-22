@@ -75,6 +75,7 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
 (require as any)(["angular"], () => {
     // NPM
     require("bootstrapBundle")
+    require("ng-file-upload")
 
     require("skulpt")
     require("skulptStdLib")
@@ -87,7 +88,7 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     require("kali")
     require("chance")
 
-    window.app = angular.module("EarSketchApp", []).config(["$locationProvider", ($locationProvider: any) => {
+    window.app = angular.module("EarSketchApp", ["ngFileUpload"]).config(["$locationProvider", ($locationProvider: any) => {
         // Prevent legacy hash-bang URL being overwritten by $location.
         $locationProvider.html5Mode(true).hashPrefix("")
     }])

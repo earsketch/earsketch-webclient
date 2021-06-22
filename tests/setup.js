@@ -162,6 +162,7 @@ require('angular');
 window.angular = angular;
 
 require('bootstrapBundle');
+require('ng-file-upload');
 
 window.ngMidwayTester = require('ngMidwayTester');
 Object.assign(window,require('setup'));
@@ -180,7 +181,7 @@ require('lodash');
 require('kali');
 require('chance');
 
-window.app = angular.module('EarSketchApp', []).config($locationProvider => {
+window.app = angular.module('EarSketchApp', ["ngFileUpload"]).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
 });
