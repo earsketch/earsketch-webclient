@@ -244,7 +244,7 @@
       "shortname": "Please provide a name that is at least 3 characters long.",
       "illegalCharacterInUserID": "Please use only regular characters, numbers, or _ in the user ID.",
       "userDoesntExist": "That user ID does not exist.",
-      "cantShareWYourself": "You cannot share scripts with yourself!"
+      "noSelfShare": "You cannot share scripts with yourself!"
     },
     "idecontroller": {
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
