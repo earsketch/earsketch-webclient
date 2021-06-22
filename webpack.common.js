@@ -44,9 +44,9 @@ module.exports = {
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
-            autograder2Controller: path.resolve(__dirname,`${appDir}/autograder2Controller.js`),
-            autograderAWSController: path.resolve(__dirname,`${appDir}/autograderAWSController.js`),
-            autograder3Controller: path.resolve(__dirname,`${appDir}/autograder3Controller.js`),
+            codeAnalyzerController: path.resolve(__dirname,`${appDir}/codeAnalyzerController.js`),
+            codeAnalyzerContestController: path.resolve(__dirname,`${appDir}/codeAnalyzerContestController.js`),
+            codeAnalyzerCAIController: path.resolve(__dirname,`${appDir}/codeAnalyzerCAIController.js`),
 
             helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
             
@@ -165,16 +165,16 @@ module.exports = {
             template: 'autograder/index.template.html'
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname,'autograder2/index.html'),
-            template: 'autograder2/index.template.html'
+            filename: path.resolve(__dirname,'codeAnalyzer/index.html'),
+            template: 'codeAnalyzer/index.template.html'
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname,'autograder3/index.html'),
-            template: 'autograder3/index.template.html'
+            filename: path.resolve(__dirname,'codeAnalyzerCAI/index.html'),
+            template: 'codeAnalyzerCAI/index.template.html'
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname,'autograderAWS/index.html'),
-            template: 'autograderAWS/index.template.html'
+            filename: path.resolve(__dirname,'codeAnalyzerContest/index.html'),
+            template: 'codeAnalyzerContest/index.template.html'
         }),
         new TsconfigPathsPlugin({
             configFile: "tsconfig.json"

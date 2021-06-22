@@ -78,7 +78,7 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
 }
 
-if (/\/autograder\w*\/?$/.test(location.href)) {
+if (/\/autograder|codeAnalyzer\w*\/?$/.test(location.href)) {
     // Temporary hack for autograders: load angular and don't start the React app on autograder endpoints.
     // TODO: Replace this with normal routing after autograders have been migrated.
     // Async loading
@@ -97,9 +97,9 @@ if (/\/autograder\w*\/?$/.test(location.href)) {
 
         // Autograders
         require("autograderController")
-        require("autograder2Controller")
-        require("autograderAWSController")
-        require("autograder3Controller")
+        require("codeAnalyzerController")
+        require("codeAnalyzerContestController")
+        require("codeAnalyzerCAIController")
 
         app.factory("$exceptionHandler", () => {
             return (exception: any, cause: any) => {

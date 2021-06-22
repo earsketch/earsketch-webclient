@@ -5,7 +5,7 @@ import * as userConsole from '../ide/console'
 import * as userProject from './userProject'
 import * as caiAnalysisModule from '../cai/analysis'
 
-app.controller("autograder3Controller",
+app.controller("codeAnalyzerCAIController",
 ['$scope',
 function($scope) {
 
@@ -93,7 +93,7 @@ function($scope) {
       $scope.results = [];
       $scope.processing = null;
 
-      esconsole("Running autograder.", ['DEBUG']);
+      esconsole("Running code analyzer.", ['DEBUG']);
 
       if($scope.csvInputMode) {
         $scope.urls = document.querySelector('.output').innerText;
@@ -314,7 +314,7 @@ function($scope) {
       var url = window.URL.createObjectURL(blob);
       // download the script
       a.href = url;
-      a.download = 'autograder_report.csv';
+      a.download = 'code_analyzer_report.csv';
       a.target = '_blank';
       esconsole('File location: ' + a.href, ['debug','exporter']);
       a.click();

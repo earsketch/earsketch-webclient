@@ -5,7 +5,7 @@ import * as reader from './reader'
 import * as userProject from './userProject'
 import * as caiAnalysisModule from '../cai/analysis'
 
-app.controller("autograderAWSController",
+app.controller("codeAnalyzerContestController",
 ['$scope',
 function($scope) {
 
@@ -84,7 +84,7 @@ function($scope) {
 
       $scope.showIndividualGrades = document.getElementById('showIndividualGrades').checked;
 
-      esconsole("Running autograder.", ['DEBUG']);
+      esconsole("Running code analyzer.", ['DEBUG']);
       $scope.entries = document.querySelector('.output').innerText;
       $scope.entrants = document.querySelector('.hiddenOutput').innerText;
 
@@ -134,7 +134,7 @@ function($scope) {
 
       // Temporary: removal of readInput.
       // if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
-      //   console.log("Script contains readInput, cannot autograde.");
+      //   console.log("Script contains readInput, cannot analyze.");
       //   return 0;
       // }
 
@@ -323,7 +323,7 @@ function($scope) {
       var url = window.URL.createObjectURL(blob);
       // download the script
       a.href = url;
-      a.download = 'autograder_report.csv';
+      a.download = 'code_analyzer_report.csv';
       a.target = '_blank';
       esconsole('File location: ' + a.href, ['debug','exporter']);
       a.click();

@@ -5,7 +5,7 @@ import * as reader from './reader'
 import * as userConsole from '../ide/console'
 import * as userProject from './userProject'
 
-app.controller("autograder2Controller", ['$scope', function($scope) {
+app.controller("codeAnalyzerController", ['$scope', function($scope) {
     // Loading ogg by default for browsers other than Safari
     // setting default to wav for chrome 58 (May 22, 2017)
     if (ESUtils.whichBrowser().match('Opera|Firefox|Msie|Trident') !== null) {
@@ -59,7 +59,7 @@ app.controller("autograder2Controller", ['$scope', function($scope) {
       $scope.results = [];
       $scope.processing = null;
 
-      esconsole("Running autograder.", ['DEBUG']);
+      esconsole("Running code analyzer.", ['DEBUG']);
       var shareUrls = $scope.urls.split('\n');
       var re = /\?sharing=([^\s.,;])+/g
       var matches = $scope.urls.match(re);
@@ -73,6 +73,7 @@ app.controller("autograder2Controller", ['$scope', function($scope) {
         esconsole("ShareId: " + shareId, ['DEBUG']);
         p = p.then(function() {
           $scope.processing = shareId;
+          $scope.$apply();
           return userProject.loadScript(shareId).then($scope.runScript);
         });
       });
@@ -91,6 +92,7 @@ app.controller("autograder2Controller", ['$scope', function($scope) {
             reports: {'Code Complexity': $scope.read(script.source_code, script.name)},
           });
           $scope.processing = null;
+          $scope.$apply();
         }).catch(function(err) {
           esconsole(err, ['ERROR']);
           $scope.results.push({
@@ -98,6 +100,7 @@ app.controller("autograder2Controller", ['$scope', function($scope) {
             error: err,
           });
           $scope.processing = null;
+          $scope.$apply();
       });
     };
 
@@ -208,7 +211,7 @@ app.controller("autograder2Controller", ['$scope', function($scope) {
       var url = window.URL.createObjectURL(blob);
       // download the script
       a.href = url;
-      a.download = 'autograder_report.csv';
+      a.download = 'code_analyzer_report.csv';
       a.target = '_blank';
       esconsole('File location: ' + a.href, ['debug','exporter']);
       a.click();
