@@ -13,7 +13,7 @@ export const ScriptAnalysis = ({ script, close }: { script: ScriptEntity, close:
     const categories = [
         { nameKey: "loops", count: analysis.loops, value: reader.FEATURE_SCORES.loops },
         { nameKey: "conditionals", count: analysis.conditionals, value: reader.FEATURE_SCORES.conditionals },
-        { nameKey: "conditionalsWBool", count: analysis.booleanConditionals, value: reader.FEATURE_SCORES.booleanConditionals },
+        { nameKey: "conditionalsWithBool", count: analysis.booleanConditionals, value: reader.FEATURE_SCORES.booleanConditionals },
         { nameKey: "lists", count: analysis.lists, value: reader.FEATURE_SCORES.lists },
         { nameKey: "listStringOps", count: analysis.listOps + analysis.strOps, value: reader.FEATURE_SCORES.listOps },
         { nameKey: "userFunctions", count: analysis.userFunc, value: reader.FEATURE_SCORES.userFunc },

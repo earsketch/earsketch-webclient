@@ -123,7 +123,7 @@
     "scriptAnalysis.title": "Code-Concept Indicator for {{scriptName}}",
     "scriptAnalysis.category.loops": "Loops",
     "scriptAnalysis.category.conditionals": "Conditionals",
-    "scriptAnalysis.category.conditionalsWBool": "Conditionals with Booleans",
+    "scriptAnalysis.category.conditionalsWithBool": "Conditionals with Booleans",
     "scriptAnalysis.category.lists": "Lists",
     "scriptAnalysis.category.listStringOps": "List and String Operations",
     "scriptAnalysis.category.userFunctions": "User-Defined Functions",
