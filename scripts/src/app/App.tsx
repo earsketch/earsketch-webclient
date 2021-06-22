@@ -1,38 +1,55 @@
 import i18n from "i18next"
 import { Menu } from "@headlessui/react"
 import React, { ReactElement, useEffect, useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
+import * as bubble from "../bubble/bubbleState"
+import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
+import * as curriculum from "../browser/curriculumState"
 import { ScriptEntity, SoundEntity } from "common"
+import { ErrorForm } from "./ErrorForm"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import { IDE, openShare } from "../ide/IDE"
+import * as Layout from "../layout/Layout"
+import * as layout from "../layout/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
+import * as recommenderState from "../browser/recommenderState"
+import * as recommender from "./recommender"
+import { RenameScript } from "./Rename"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/soundsState"
 import store from "../reducers"
-import * as recommenderState from "../browser/recommenderState"
-import * as bubble from "../bubble/bubbleState"
 import * as tabs from "../ide/tabState"
-import * as curriculum from "../browser/curriculumState"
-import * as layout from "../layout/layoutState"
-import * as Layout from "../layout/Layout"
-import * as cai from "../cai/caiState"
-import * as recommender from "./recommender"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
+
+// There is a little type magic here to accomplish two things:
+// 1. Make the compiler check that `props` really matches the props expected by `modal`.
+// 2. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
+//    For example, if `modal` specifies that close has type `(foo: number?) => void`, then this should return `Promise<number | undefined>`.
+//    Note that the promise can always resolve to `undefined`, because the user can always dismiss the modal without completing it.
+function openModal<T extends appState.Modal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
+    return new Promise(resolve => {
+        const wrappedModal = ({ close }: { close: (payload?: any) => void }) => {
+            const closeWrapper = (payload?: any) => { resolve(payload); return close() }
+            return modal({ ...props, close: closeWrapper })
+        }
+        store.dispatch(appState.setModal(wrappedModal))
+    })
+}
 
 export function changePassword() {
     helpers.getNgService("$uibModal").open({ component: "changepasswordController" })
@@ -46,22 +63,14 @@ export function renameSound(sound: SoundEntity) {
     })
 }
 
-export function renameScript(script: ScriptEntity) {
-    // userProject, etc. will try to mutate the immutable redux script  state.
-    const scriptCopy = Object.assign({}, script)
-
-    const modal = helpers.getNgService("$uibModal").open({
-        component: "renameController",
-        size: 100,
-        resolve: { script() { return scriptCopy } }
-    })
-
-    modal.result.then(async (newScript: ScriptEntity | null) => {
-        if (!newScript) return
-        await userProject.renameScript(scriptCopy.shareid, newScript.name)
-        store.dispatch(scripts.syncToNgUserProject())
-        reporter.renameScript()
-    })
+export async function renameScript(script: ScriptEntity) {
+    // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
+    script = Object.assign({}, script)
+    const newScript = await openModal(RenameScript, { script })
+    if (!newScript) return
+    await userProject.renameScript(script.shareid, newScript.name)
+    store.dispatch(scripts.syncToNgUserProject())
+    reporter.renameScript()
 }
 
 export function downloadScript(script: ScriptEntity) {
@@ -257,13 +266,6 @@ function toggleColorTheme() {
 function resumeQuickTour() {
     store.dispatch(bubble.reset())
     store.dispatch(bubble.resume())
-}
-
-import { ErrorForm } from "./ErrorForm"
-
-// There is a little bit of magic here to make this type-safe: the compiler will check that `props` really matches the props expected by `modal`.
-function openModal<T extends appState.Modal>(modal: T, props: Omit<Parameters<T>[0], "close">) {
-    store.dispatch(appState.setModal(({ close }: { close: (payload?: any) => void }) => modal({ ...props, close })))
 }
 
 function reportError() {
