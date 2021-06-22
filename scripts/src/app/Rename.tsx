@@ -38,7 +38,7 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
                 {error && <div className="alert alert-danger">
                     {error}
                 </div>}
-                {conflict && t('renameScript.alreadyExists', {scriptName: script.name})}
+                {conflict && t('renameScript.alreadyExists', { scriptName: script.name })}
                 {t('renameScript.prompt')}
                 <div className="input-group">
                     <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
