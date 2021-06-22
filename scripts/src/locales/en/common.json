@@ -38,6 +38,8 @@
     "daw.tooltip.toggleVolume": "Toggle Volume",
     "daw.tooltip.solo": "Solo",
     "daw.tooltip.mute": "Mute",
+    "daw.abbreviation.solo": "S",
+    "daw.abbreviation.mute": "M",
     "daw.tooltip.toggleEffects": "Toggle All Effects",
     "daw.bypass": "Bypass",
     "editor.title": "Code Editor",

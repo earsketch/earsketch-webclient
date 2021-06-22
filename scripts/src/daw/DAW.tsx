@@ -244,8 +244,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t('daw.tooltip.solo')}>S</button>
-                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t('daw.tooltip.mute')}>M</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t('daw.tooltip.solo')}>{t('daw.abbreviation.solo')}</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t('daw.tooltip.mute')}>{t('daw.abbreviation.mute')}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
