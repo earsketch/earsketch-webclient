@@ -112,8 +112,8 @@ function($scope) {
         esconsole("ShareId: " + shareId, ['DEBUG']);
         p = p.then(function() {
           $scope.processing = shareId;
+          $scope.$apply();
           var ret = userProject.loadScript(shareId).then($scope.runScriptHistory);
-          $scope.processing = null;
           if (ret != 0)
             return ret;
         });
@@ -127,20 +127,13 @@ function($scope) {
           var scriptVersions = Object.keys(scriptHistory);
           if (!$scope.options["HISTORY"])
               scriptVersions = [scriptVersions[scriptVersions.length-1]];
-
           var p = new Promise(function(resolve) { resolve(); });
-
-
           angular.forEach(scriptVersions, function(version) {
-
             p = p.then(function() {
-
               scriptHistory[version].name = script.name;
-
               return $scope.runScript(scriptHistory[version], version).then(function(result) {
                 return result;
               });
-
           });
 
         });
@@ -183,13 +176,17 @@ function($scope) {
               version: version,
               reports: Object.assign({}, reports),
             });
-            }).catch(function(err) {
-              esconsole(err, ['ERROR']);
-              $scope.results.push({
-                script: script,
-                version: version,
-                error: err,
-              });
+            $scope.processing = null;
+            $scope.$apply();
+          }).catch(function(err) {
+            esconsole(err, ['ERROR']);
+            $scope.results.push({
+              script: script,
+              version: version,
+              error: err,
+            });
+            $scope.processing = null;
+            $scope.$apply();
           });
     };
 
@@ -269,7 +266,7 @@ function($scope) {
       var idx = 1;
 
       angular.forEach($scope.results, function(result) {
-        row = [];
+        var row = [];
         for (var i = 0; i < headers.length; i++) {
           row[i] = '';
         }

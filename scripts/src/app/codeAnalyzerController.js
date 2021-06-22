@@ -170,7 +170,7 @@ app.controller("codeAnalyzerController", ['$scope', function($scope) {
         }
       }
       angular.forEach($scope.results, function(result) {
-        row = [];
+        var row = [];
         for (var i = 0; i < headers.length; i++) {
           row[i] = '';
         }
