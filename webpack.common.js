@@ -10,7 +10,6 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const vendorDir = 'scripts/vendor';
 const libDir = 'scripts/lib';
 const appDir = 'scripts/src/app';
-const servicesDir = 'scripts/src/app/services';
 const dataDir = 'scripts/src/data';
 
 module.exports = {
@@ -22,7 +21,6 @@ module.exports = {
         alias: {
             jqueryUI: 'jquery-ui-dist/jquery-ui.js',
             bootstrapBundle: 'bootstrap/dist/js/bootstrap.bundle.min.js',
-            uiBootstrap: 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
             skulpt: path.resolve(__dirname,`${vendorDir}/skulpt/skulpt.min.js`),
             skulptStdLib: path.resolve(__dirname,`${vendorDir}/skulpt/skulpt-stdlib.js`),
             droplet: path.resolve(__dirname,`${libDir}/droplet/droplet-full.min.js`),
@@ -41,8 +39,6 @@ module.exports = {
 
             // Emscripten
             esDSP: path.resolve(__dirname,`${libDir}/earsketch-dsp.js`),
-
-            ngClipboard: 'angular-clipboard',
 
             // Controllers
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),

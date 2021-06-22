@@ -167,8 +167,8 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     </div>
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
-                    <input ref={linkElement} className="share-link outline-none flex-grow" type="text" value={link} readOnly />
-                    <span className="download-share-url" onClick={downloadShareUrl}><i className="glyphicon glyphicon-download-alt" uib-tooltip="Download URL shortcut file" tooltip-placement="bottom" tooltip-append-to-body="true"></i></span>
+                    <input ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                    <span className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></span>
                     <span onClick={() => { linkElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
                         <i className="icon icon-paste4"></i>
                     </span>
@@ -277,7 +277,7 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                     <label className="mr-3">{t('scriptShare.tab.embed.showDAW')} <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
                  </div>
                 <div id="share-link-container" className="mt-5">
-                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full" value={code} readOnly />
+                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full" style={{ backgroundColor: "inherit "}} value={code} readOnly />
                     <span onClick={() => { codeElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
                         <i className="icon icon-paste4"></i>
                     </span>
@@ -482,7 +482,7 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
                     <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
-                        <a href="#" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center">{t(titleKey).toLocaleUpperCase()}</a>
+                        <a href="#" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
                     </li>)}
                 </ul>
             </div>

@@ -1,7 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+
 import { RootState } from '../reducers';
+
+export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
 
 const appSlice = createSlice({
     name: 'app',
@@ -16,6 +19,7 @@ const appSlice = createSlice({
         embeddedScriptName: null,
         embeddedScriptUsername: null,
         embeddedShareID: null,
+        modal: null as Modal | null,
     },
     reducers: {
         setScriptLanguage(state, { payload }) {
@@ -25,7 +29,7 @@ const appSlice = createSlice({
             state.colorTheme = payload;
         },
         toggleColorTheme(state) {
-            state.colorTheme = state.colorTheme==='light' ? 'dark' : 'light';
+            state.colorTheme = state.colorTheme === 'light' ? 'dark' : 'light';
         },
         setFontSize(state, { payload }) {
             state.fontSize = payload
@@ -51,7 +55,10 @@ const appSlice = createSlice({
         },
         setLocale(state, { payload }) {
             state.locale = payload;
-        }
+        },
+        setModal(state, { payload }) {
+            state.modal = payload
+        },
     }
 });
 
@@ -74,6 +81,7 @@ export const {
     setEmbeddedScriptName,
     setEmbeddedShareID,
     setLocale,
+    setModal,
 } = appSlice.actions;
 
 export const selectScriptLanguage = (state: RootState) => state.app.scriptLanguage;
@@ -87,3 +95,4 @@ export const selectEmbeddedScriptUsername = (state: RootState) => state.app.embe
 export const selectEmbeddedScriptName = (state: RootState) => state.app.embeddedScriptName;
 export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedShareID;
 export const selectLocale = (state: RootState) => state.app.locale;
+export const selectModal = (state: RootState) => state.app.modal;

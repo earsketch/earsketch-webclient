@@ -6,7 +6,6 @@ import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
-import * as helpers from '../helpers'
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../user/notification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
@@ -18,7 +17,7 @@ const SECTION_URL_CHARACTER = ':'
 const copyURL = (language: string, currentLocation: number[]) => {
     const page = urlToPermalink(curriculum.getURLForLocation(currentLocation))
     const url = `${SITE_BASE_URI}/?curriculum=${page}&language=${language}`
-    helpers.getNgService("clipboard").copyText(url)
+    navigator.clipboard.writeText(url)
     userNotification.show('Curriculum URL was copied to the clipboard')
 }
 

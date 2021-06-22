@@ -22,7 +22,7 @@ export function validateScriptName(name: string, extension: string) {
     }
 }
 
-export const ScriptCreator = ({ close }: { close: (value?: any) => void, dismiss: () => void }) => {
+export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
     const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
     const [error, setError] = useState("")

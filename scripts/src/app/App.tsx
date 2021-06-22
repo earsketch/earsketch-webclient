@@ -1,32 +1,45 @@
 import i18n from "i18next"
-import { Menu } from "@headlessui/react"
-import React, { useEffect, useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import { Dialog, Menu, Transition } from "@headlessui/react"
+import React, { Fragment, useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 
+import { AccountCreator } from "./AccountCreator"
 import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
+import * as bubble from "../bubble/bubbleState"
+import * as cai from "../cai/caiState"
+import { ChangePassword } from "./ChangePassword"
 import * as collaboration from "./collaboration"
 import { ScriptEntity, SoundEntity } from "common"
+import { CompetitionSubmission } from "./CompetitionSubmission"
+import * as curriculum from "../browser/curriculumState"
+import { Download } from "./Download"
+import { ErrorForm } from "./ErrorForm"
+import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
 import { IDE, openShare } from "../ide/IDE"
+import * as Layout from "../layout/Layout"
+import * as layout from "../layout/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
+import { ProfileEditor } from "./ProfileEditor"
+import { Prompt } from "./Prompt"
+import * as recommenderState from "../browser/recommenderState"
+import * as recommender from "./recommender"
+import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
+import { ScriptAnalysis } from "./ScriptAnalysis"
+import { ScriptHistory } from "./ScriptHistory"
+import { ScriptShare } from "./ScriptShare"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/soundsState"
+import { SoundUploader } from "./SoundUploader"
 import store from "../reducers"
-import * as recommenderState from "../browser/recommenderState"
-import * as bubble from "../bubble/bubbleState"
 import * as tabs from "../ide/tabState"
-import * as curriculum from "../browser/curriculumState"
-import * as layout from "../layout/layoutState"
-import * as Layout from "../layout/Layout"
-import * as cai from "../cai/caiState"
-import * as recommender from "./recommender"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
@@ -34,75 +47,84 @@ import { useTranslation } from "react-i18next"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
+// There is a little type magic here to accomplish three things:
+// 1. Make the compiler check that `props` really matches the props expected by `modal`.
+// 2. Allow omitting the `props` argument when the modal only expects `close`, but require it if the modal expects additional props.
+// 3. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
+//    For example, if `modal` specifies that close has type `(foo?: number) => void`, then this should return `Promise<number | undefined>`.
+//    Note that the promise can always resolve to `undefined`, because the user can always dismiss the modal without completing it.
+type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => JSX.Element
+
+export function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+export function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
+// function openModal<T extends appState.Modal>(modal: T, ...props: ({} extends Omit<Parameters<T>[0], "close"> ? undefined : Omit<Parameters<T>[0], "close">)): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
+    return new Promise(resolve => {
+        const wrappedModal = ({ close }: { close: (payload?: any) => void }) => {
+            const closeWrapper = (payload?: any) => { resolve(payload); return close() }
+            return modal({ ...props, close: closeWrapper })
+        }
+        store.dispatch(appState.setModal(wrappedModal))
+    })
+}
+
+// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+(window as any).esPrompt = async (message: string) => {
+    return (await openModal(Prompt, { message })) ?? ""
+}
+
 export function changePassword() {
-    helpers.getNgService("$uibModal").open({ component: "changepasswordController" })
+    openModal(ChangePassword)
 }
 
 export function renameSound(sound: SoundEntity) {
-    helpers.getNgService("$uibModal").open({
-        component: "renameSoundController",
-        size: "sm",
-        resolve: { sound() { return sound } }
-    })
+    openModal(RenameSound, { sound })
 }
 
-export function renameScript(script: ScriptEntity) {
-    // userProject, etc. will try to mutate the immutable redux script  state.
-    const scriptCopy = Object.assign({}, script)
-
-    const modal = helpers.getNgService("$uibModal").open({
-        component: "renameController",
-        size: 100,
-        resolve: { script() { return scriptCopy } }
-    })
-
-    modal.result.then(async (newScript: ScriptEntity | null) => {
-        if (!newScript) return
-        await userProject.renameScript(scriptCopy.shareid, newScript.name)
-        store.dispatch(scripts.syncToNgUserProject())
-        reporter.renameScript()
-    })
+export async function renameScript(script: ScriptEntity) {
+    // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
+    script = Object.assign({}, script)
+    const newScript = await openModal(RenameScript, { script })
+    if (!newScript) return
+    await userProject.renameScript(script.shareid, newScript.name)
+    store.dispatch(scripts.syncToNgUserProject())
+    reporter.renameScript()
 }
 
 export function downloadScript(script: ScriptEntity) {
-    helpers.getNgService("$uibModal").open({
-        component: "downloadController",
-        resolve: {
-            script() { return script; },
-            quality() { return 0; }
-        }
-    })
+    openModal(Download, { script, quality: false })
 }
 
 export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
-    helpers.getNgService("$uibModal").open({
-        component: "scriptVersionController",
-        size: "lg",
-        resolve: {
-            script() { return script; },
-            allowRevert: allowRevert
-        }
-    })
+    openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
 }
 
 export function openCodeIndicator(script: ScriptEntity) {
-    helpers.getNgService("$uibModal").open({
-        component: "analyzeScriptController",
-        size: 100,
-        resolve: {
-            script() { return script; }
-        }
-    })
+    openModal(ScriptAnalysis, { script })
 }
 
-export function deleteScript(script: ScriptEntity) {
-    (helpers.getNgService("$confirm") as any)({
-        text: 'Deleted scripts disappear from Scripts list and can be restored from the list of "deleted scripts".',
-        ok: "Delete"
-    }).then(async () => {
+const Confirm = ({ text, ok, cancel, type, close }: { text?: string, ok?: string, cancel?: string, type?: string, close: (ok: boolean) => void }) => {
+    return <>
+        <div className="modal-header">
+            <h3 className="modal-title">Confirm</h3>
+        </div>
+        <div className="modal-body">{text}</div>
+        <div className="modal-footer">
+            <button className="btn btn-default" onClick={() => close(false)}>{cancel ?? "Cancel"}</button>
+            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{ok ?? "Okay"}</button>
+        </div>
+    </>
+}
+
+function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cancel?: string, type?: string }) {
+    return openModal(Confirm, { text, ok, cancel, type })
+}
+
+export async function deleteScript(script: ScriptEntity) {
+    if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
         }
@@ -113,12 +135,12 @@ export function deleteScript(script: ScriptEntity) {
         store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.closeDeletedScript(script.shareid))
         store.dispatch(tabs.removeModifiedScript(script.shareid))
-    })
+    }
 }
 
-export function deleteSharedScript(script: ScriptEntity) {
+export async function deleteSharedScript(script: ScriptEntity) {
     if (script.collaborative) {
-        (helpers.getNgService("$confirm") as any)({text: 'Do you want to leave the collaboration on "" + script.name + ""?", ok: "Leave'}).then(() => {
+        if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
                 userProject.closeSharedScript(script.shareid)
@@ -130,15 +152,14 @@ export function deleteSharedScript(script: ScriptEntity) {
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
             collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false)
-        })
+        }
     } else {
-        (helpers.getNgService("$confirm") as any)({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
-            userProject.deleteSharedScript(script.shareid).then(() => {
-                store.dispatch(scripts.syncToNgUserProject())
-                store.dispatch(tabs.closeDeletedScript(script.shareid))
-                store.dispatch(tabs.removeModifiedScript(script.shareid))
-            })
-        })
+        if (await confirm({ text: `Are you sure you want to delete the shared script "${script.name}"?`, ok: "Delete", type: "danger" })) {
+            await userProject.deleteSharedScript(script.shareid)
+            store.dispatch(scripts.syncToNgUserProject())
+            store.dispatch(tabs.closeDeletedScript(script.shareid))
+            store.dispatch(tabs.removeModifiedScript(script.shareid))
+        }
     }
 }
 
@@ -146,14 +167,7 @@ export async function submitToCompetition(script: ScriptEntity) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await userProject.getLockedSharedScriptId(script.shareid)
-    helpers.getNgService("$uibModal").open({
-        component: "submitCompetitionController",
-        size: "lg",
-        resolve: {
-            name() { return script.name; },
-            shareID() { return shareID; },
-        }
-    })
+    openModal(CompetitionSubmission, { name: script.name, shareID })
 }
 
 export async function importScript(script: ScriptEntity) {
@@ -174,22 +188,24 @@ export async function importScript(script: ScriptEntity) {
     }
 }
 
-export function deleteSound(sound: SoundEntity) {
-    (helpers.getNgService("$confirm") as any)({text: "Do you really want to delete sound " + sound.file_key + "?", ok: "Delete"}).then(() => {
-        userProject.deleteAudio(sound.file_key).then(() => {
-            store.dispatch(sounds.deleteLocalUserSound(sound.file_key))
-            audioLibrary.clearAudioTagCache()
-        })
-    })
+export async function deleteSound(sound: SoundEntity) {
+    if (await confirm({ text: `Do you really want to delete sound ${sound.file_key}?`, ok: "Delete", type: "danger" })) {
+        await userProject.deleteAudio(sound.file_key)
+        store.dispatch(sounds.deleteLocalUserSound(sound.file_key))
+        audioLibrary.clearAudioTagCache()
+    }
 }
 
-export function closeAllTabs() {
-    (helpers.getNgService("$confirm") as any)({text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All"}).then(() => {
-        userProject.saveAll().then(() => {
+export async function closeAllTabs() {
+    if (await confirm({ text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All" })) {
+        try {
+            await userProject.saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabs.closeAllTabs())
-        }).catch(() => userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1"))
-    })
+        } catch {
+            userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1")
+        }
+    }
 }
 
 const licenses = {} as { [key: string]: any }
@@ -203,20 +219,12 @@ userProject.getLicenses().then(ls => {
 export async function shareScript(script: ScriptEntity) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
-    helpers.getNgService("$uibModal").open({
-        component: "shareScriptController",
-        size: "lg",
-        resolve: {
-            script() { return script },
-            quality() { return 0 },
-            licenses() { return licenses }
-        }
-    })
+    openModal(ScriptShare, { script, licenses })
 }
 
 export function openUploadWindow() {
     if (userProject.isLoggedIn()) {
-        helpers.getNgService("$uibModal").open({ component: "uploadSoundController" })
+        openModal(SoundUploader)
     } else {
         userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
     }
@@ -260,10 +268,7 @@ function resumeQuickTour() {
 }
 
 function reportError() {
-    helpers.getNgService("$uibModal").open({
-        component: "errorController",
-        resolve: { email() { return email } }
-    })
+    openModal(ErrorForm, { email })
 }
 
 function openAdminWindow() {
@@ -275,7 +280,7 @@ function openAdminWindow() {
 }
 
 function forgotPass() {
-    helpers.getNgService("$uibModal").open({ component: "forgotpasswordController" })
+    openModal(ForgotPassword)
 }
 
 const Footer = () => {
@@ -507,8 +512,9 @@ export const App = () => {
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
         } catch (error) {
-            await (helpers.getNgService("$confirm") as any)({ text: i18n.t("messages:idecontroller.saveallfailed"), cancel: "Keep unsaved tabs open", ok: "Ignore" })
-            userProject.clearUser()
+            if (await confirm({ text: i18n.t("messages:idecontroller.saveallfailed"), cancel: "Keep unsaved tabs open", ok: "Ignore" })) {
+                userProject.clearUser()
+            }
         }
 
         // Clear out all the values set at login.
@@ -524,7 +530,7 @@ export const App = () => {
     }
 
     const createAccount = async () => {
-        const result = await helpers.getNgService("$uibModal").open({ component: "accountController" }).result
+        const result = await openModal(AccountCreator)
         if (result) {
             setUsername(result.username)
             setPassword(result.password)
@@ -534,17 +540,7 @@ export const App = () => {
 
     const editProfile = async () => {
         setShowNotifications(false)
-        const result = await helpers.getNgService("$uibModal").open({
-            component: "editProfileController",
-            resolve: {
-                username() { return username },
-                password() { return password },
-                email() { return email },
-                role() { return role },
-                firstName() { return firstname },
-                lastName() { return lastname },
-            }
-        }).result
+        const result = await openModal(ProfileEditor, { username, password, email, role, firstName: firstname, lastName: lastname })
         if (result !== undefined) {
             firstname = result.firstName
             lastname = result.lastName
@@ -711,7 +707,66 @@ export const App = () => {
         </div>
         <Bubble />
         <ScriptDropdownMenu />
+        <ModalContainer />
     </>
+}
+
+const ModalContainer = () => {
+    const dispatch = useDispatch()
+    const Modal = useSelector(appState.selectModal)!
+
+    const [closing, setClosing] = useState(false)
+
+    const close = () => {
+        setClosing(true)
+        setTimeout(() => {
+            dispatch(appState.setModal(null))
+            setClosing(false)
+        }, 300)
+    }
+
+    return <Transition appear show={Modal !== null && !closing} as={Fragment}>
+    <Dialog
+      as="div"
+      className="fixed inset-0 z-50 overflow-y-auto"
+      onClose={close}
+    >
+      <div className="min-h-screen px-4 text-center">
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+        </Transition.Child>
+
+        {/* This element is to trick the browser into centering the modal contents. */}
+        <span
+          className="inline-block h-screen"
+          aria-hidden="true"
+        >
+          &#8203;
+        </span>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0 scale-95"
+          enterTo="opacity-100 scale-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100 scale-100"
+          leaveTo="opacity-0 scale-95"
+        >
+            <div className="modal-content inline-block w-full max-w-6xl mt-16 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
+                {Modal && <Modal close={close} />}
+            </div>
+        </Transition.Child>
+      </div>
+    </Dialog>
+  </Transition>
 }
 
 // websocket gets closed before onunload in FF

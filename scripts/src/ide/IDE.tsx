@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
+import { openModal } from "../app/App"
 import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
@@ -25,6 +26,7 @@ import * as tabs from "./tabState"
 import * as cai from "../cai/caiState"
 import * as caiAnalysis from "../cai/analysis"
 import * as helpers from "../helpers"
+import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
 import { Tabs } from "./Tabs"
 import * as ideConsole from "./console"
@@ -47,7 +49,7 @@ export async function createScript() {
     }
 
     reporter.createScript()
-    const filename = await helpers.getNgService("$uibModal").open({ component: "createScriptController" }).result
+    const filename = await openModal(ScriptCreator)
     if (filename) {
         userProject.closeScript(filename)
         const script = await userProject.createScript(filename)
