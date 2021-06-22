@@ -1,8 +1,9 @@
 import i18n from "i18next"
 import { Menu } from "@headlessui/react"
-import React, { ReactElement, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
+import { AccountCreator } from "./AccountCreator"
 import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
@@ -10,9 +11,12 @@ import * as bubble from "../bubble/bubbleState"
 import * as cai from "../cai/caiState"
 import { ChangePassword } from "./ChangePassword"
 import * as collaboration from "./collaboration"
-import * as curriculum from "../browser/curriculumState"
 import { ScriptEntity, SoundEntity } from "common"
+import { CompetitionSubmission } from "./CompetitionSubmission"
+import * as curriculum from "../browser/curriculumState"
+import { Download } from "./Download"
 import { ErrorForm } from "./ErrorForm"
+import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as helpers from "../helpers"
@@ -21,13 +25,19 @@ import * as Layout from "../layout/Layout"
 import * as layout from "../layout/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
+import { ProfileEditor } from "./ProfileEditor"
+import { Prompt } from "./Prompt"
 import * as recommenderState from "../browser/recommenderState"
 import * as recommender from "./recommender"
-import { RenameScript } from "./Rename"
+import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
+import { ScriptAnalysis } from "./ScriptAnalysis"
+import { ScriptHistory } from "./ScriptHistory"
+import { ScriptShare } from "./ScriptShare"
 import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/soundsState"
+import { SoundUploader } from "./SoundUploader"
 import store from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
@@ -43,11 +53,11 @@ const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 // 3. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
 //    For example, if `modal` specifies that close has type `(foo: number?) => void`, then this should return `Promise<number | undefined>`.
 //    Note that the promise can always resolve to `undefined`, because the user can always dismiss the modal without completing it.
-type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => ReactElement
+type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => JSX.Element | null
 
-function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
-function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
-function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
+export function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+export function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
 // function openModal<T extends appState.Modal>(modal: T, ...props: ({} extends Omit<Parameters<T>[0], "close"> ? undefined : Omit<Parameters<T>[0], "close">)): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
     return new Promise(resolve => {
         const wrappedModal = ({ close }: { close: (payload?: any) => void }) => {
@@ -58,16 +68,17 @@ function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T
     })
 }
 
+// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
+(window as any).esPrompt = async (message: string) => {
+    return (await openModal(Prompt, { message })) ?? ""
+}
+
 export function changePassword() {
     openModal(ChangePassword)
 }
 
 export function renameSound(sound: SoundEntity) {
-    helpers.getNgService("$uibModal").open({
-        component: "renameSoundController",
-        size: "sm",
-        resolve: { sound() { return sound } }
-    })
+    openModal(RenameSound, { sound })
 }
 
 export async function renameScript(script: ScriptEntity) {
@@ -81,37 +92,18 @@ export async function renameScript(script: ScriptEntity) {
 }
 
 export function downloadScript(script: ScriptEntity) {
-    helpers.getNgService("$uibModal").open({
-        component: "downloadController",
-        resolve: {
-            script() { return script; },
-            quality() { return 0; }
-        }
-    })
+    openModal(Download, { script, quality: false })
 }
 
 export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
-    helpers.getNgService("$uibModal").open({
-        component: "scriptVersionController",
-        size: "lg",
-        resolve: {
-            script() { return script; },
-            allowRevert: allowRevert
-        }
-    })
+    openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
 }
 
 export function openCodeIndicator(script: ScriptEntity) {
-    helpers.getNgService("$uibModal").open({
-        component: "analyzeScriptController",
-        size: 100,
-        resolve: {
-            script() { return script; }
-        }
-    })
+    openModal(ScriptAnalysis, { script })
 }
 
 export function deleteScript(script: ScriptEntity) {
@@ -162,14 +154,7 @@ export async function submitToCompetition(script: ScriptEntity) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await userProject.getLockedSharedScriptId(script.shareid)
-    helpers.getNgService("$uibModal").open({
-        component: "submitCompetitionController",
-        size: "lg",
-        resolve: {
-            name() { return script.name; },
-            shareID() { return shareID; },
-        }
-    })
+    openModal(CompetitionSubmission, { name: script.name, shareID })
 }
 
 export async function importScript(script: ScriptEntity) {
@@ -219,20 +204,12 @@ userProject.getLicenses().then(ls => {
 export async function shareScript(script: ScriptEntity) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
-    helpers.getNgService("$uibModal").open({
-        component: "shareScriptController",
-        size: "lg",
-        resolve: {
-            script() { return script },
-            quality() { return 0 },
-            licenses() { return licenses }
-        }
-    })
+    openModal(ScriptShare, { script, licenses })
 }
 
 export function openUploadWindow() {
     if (userProject.isLoggedIn()) {
-        helpers.getNgService("$uibModal").open({ component: "uploadSoundController" })
+        openModal(SoundUploader)
     } else {
         userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
     }
@@ -288,7 +265,7 @@ function openAdminWindow() {
 }
 
 function forgotPass() {
-    helpers.getNgService("$uibModal").open({ component: "forgotpasswordController" })
+    openModal(ForgotPassword)
 }
 
 const Footer = () => {
@@ -538,7 +515,7 @@ export const App = () => {
     }
 
     const createAccount = async () => {
-        const result = await helpers.getNgService("$uibModal").open({ component: "accountController" }).result
+        const result = await openModal(AccountCreator)
         if (result) {
             setUsername(result.username)
             setPassword(result.password)
@@ -548,17 +525,7 @@ export const App = () => {
 
     const editProfile = async () => {
         setShowNotifications(false)
-        const result = await helpers.getNgService("$uibModal").open({
-            component: "editProfileController",
-            resolve: {
-                username() { return username },
-                password() { return password },
-                email() { return email },
-                role() { return role },
-                firstName() { return firstname },
-                lastName() { return lastname },
-            }
-        }).result
+        const result = await openModal(ProfileEditor, { username, password, email, role, firstName: firstname, lastName: lastname })
         if (result !== undefined) {
             firstname = result.firstName
             lastname = result.lastName
@@ -730,7 +697,7 @@ export const App = () => {
     </>
 }
 
-const ModalContainer = ({ Modal }: { Modal: (props: { close: (payload?: any) => void }) => ReactElement }) => {
+const ModalContainer = ({ Modal }: { Modal: (props: { close: (payload?: any) => void }) => JSX.Element | null }) => {
     const dispatch = useDispatch()
 
     useEffect(() => {

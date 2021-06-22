@@ -1,11 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { Component, FunctionComponent, ReactElement } from 'react';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
 import { RootState } from '../reducers';
 
-export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => ReactElement
+export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element | null
 
 const appSlice = createSlice({
     name: 'app',

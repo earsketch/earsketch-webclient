@@ -24,7 +24,6 @@ import "ace-builds/src-noconflict/ext-language_tools"
 import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
-import * as helpers from "./helpers"
 import esconsole from "./esconsole"
 import * as ESUtils from "./esutils"
 import reporter from "./app/reporter"
@@ -40,29 +39,6 @@ import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
 import store from "./reducers"
 import { App } from "./app/App"
-// Now entering: the modal zone.
-import { AccountCreator } from "./app/AccountCreator"
-import { ChangePassword } from "./app/ChangePassword"
-import { CompetitionSubmission } from "./app/CompetitionSubmission"
-import { Download } from "./app/Download"
-import { ForgotPassword } from "./app/ForgotPassword"
-import { ProfileEditor } from "./app/ProfileEditor"
-import { Prompt } from "./app/Prompt"
-import { RenameScript, RenameSound } from "./app/Rename"
-import { ScriptAnalysis } from "./app/ScriptAnalysis"
-import { ScriptCreator } from "./app/ScriptCreator"
-import { ScriptHistory } from "./app/ScriptHistory"
-import { ScriptShare } from "./app/ScriptShare"
-import { SoundUploader } from "./app/SoundUploader"
-
-// TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
-;(window as any).esPrompt = (message: string) => {
-    const $uibModal = helpers.getNgService("$uibModal")
-    return new Promise(resolve => $uibModal.open({
-        component: "prompt",
-        resolve: { message() { return message } },
-    }).result.then((input: string) => resolve(input), () => resolve("")))
-}
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
@@ -133,21 +109,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
 
     app.component("app", react2angular(App))
     app.filter("formatTimer", () => ESUtils.formatTime)
-    // Temporary glue from $uibModal to React components.
-    app.component("prompt", helpers.wrapModal(Prompt))
-    app.component("createScriptController", helpers.wrapModal(ScriptCreator))
-    app.component("forgotpasswordController", helpers.wrapModal(ForgotPassword))
-    app.component("analyzeScriptController", helpers.wrapModal(ScriptAnalysis))
-    app.component("editProfileController", helpers.wrapModal(ProfileEditor))
-    app.component("changepasswordController", helpers.wrapModal(ChangePassword))
-    app.component("downloadController", helpers.wrapModal(Download))
-    app.component("scriptVersionController", helpers.wrapModal(ScriptHistory))
-    app.component("renameController", helpers.wrapModal(RenameScript))
-    app.component("renameSoundController", helpers.wrapModal(RenameSound))
-    app.component("accountController", helpers.wrapModal(AccountCreator))
-    app.component("submitCompetitionController", helpers.wrapModal(CompetitionSubmission))
-    app.component("shareScriptController", helpers.wrapModal(ScriptShare))
-    app.component("uploadSoundController", helpers.wrapModal(SoundUploader))
 
     // Autograders
     require("autograderController")
