@@ -5,6 +5,7 @@ import { ScriptEntity } from "common"
 import * as userNotification from "../user/notification"
 import { useTranslation } from "react-i18next"
 
+// TODO: switch to a "name" property for non-localized types (wav and mp3)
 const EXPORT_TYPES = {
     // Thin wrapper for `exporter.text()` since it breaks the pattern (not async, doesn't take quality).
     script: { nameKey: "script", async function(script: ScriptEntity, quality: boolean) { exporter.text(script) } },
