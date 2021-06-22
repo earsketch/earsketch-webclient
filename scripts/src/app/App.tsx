@@ -106,11 +106,25 @@ export function openCodeIndicator(script: ScriptEntity) {
     openModal(ScriptAnalysis, { script })
 }
 
-export function deleteScript(script: ScriptEntity) {
-    (helpers.getNgService("$confirm") as any)({
-        text: 'Deleted scripts disappear from Scripts list and can be restored from the list of "deleted scripts".',
-        ok: "Delete"
-    }).then(async () => {
+const Confirm = ({ text, ok, cancel, type, close }: { text?: string, ok?: string, cancel?: string, type?: string, close: (ok: boolean) => void }) => {
+    return <>
+        <div className="modal-header">
+            <h3 className="modal-title">Confirm</h3>
+        </div>
+        <div className="modal-body">{text}</div>
+        <div className="modal-footer">
+            <button className="btn btn-default" onClick={() => close(false)}>{cancel ?? "Cancel"}</button>
+            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{ok ?? "Okay"}</button>
+        </div>
+    </>
+}
+
+function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cancel?: string, type?: string }) {
+    return openModal(Confirm, { text, ok, cancel, type })
+}
+
+export async function deleteScript(script: ScriptEntity) {
+    if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
         }
@@ -121,12 +135,12 @@ export function deleteScript(script: ScriptEntity) {
         store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.closeDeletedScript(script.shareid))
         store.dispatch(tabs.removeModifiedScript(script.shareid))
-    })
+    }
 }
 
-export function deleteSharedScript(script: ScriptEntity) {
+export async function deleteSharedScript(script: ScriptEntity) {
     if (script.collaborative) {
-        (helpers.getNgService("$confirm") as any)({text: 'Do you want to leave the collaboration on "" + script.name + ""?", ok: "Leave'}).then(() => {
+        if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
                 userProject.closeSharedScript(script.shareid)
@@ -138,15 +152,14 @@ export function deleteSharedScript(script: ScriptEntity) {
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
             collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false)
-        })
+        }
     } else {
-        (helpers.getNgService("$confirm") as any)({text: "Are you sure you want to delete the shared script '"+script.name+"'?", ok: "Delete"}).then(() => {
-            userProject.deleteSharedScript(script.shareid).then(() => {
-                store.dispatch(scripts.syncToNgUserProject())
-                store.dispatch(tabs.closeDeletedScript(script.shareid))
-                store.dispatch(tabs.removeModifiedScript(script.shareid))
-            })
-        })
+        if (await confirm({ text: `Are you sure you want to delete the shared script "${script.name}"?`, ok: "Delete", type: "danger" })) {
+            await userProject.deleteSharedScript(script.shareid)
+            store.dispatch(scripts.syncToNgUserProject())
+            store.dispatch(tabs.closeDeletedScript(script.shareid))
+            store.dispatch(tabs.removeModifiedScript(script.shareid))
+        }
     }
 }
 
@@ -175,22 +188,24 @@ export async function importScript(script: ScriptEntity) {
     }
 }
 
-export function deleteSound(sound: SoundEntity) {
-    (helpers.getNgService("$confirm") as any)({text: "Do you really want to delete sound " + sound.file_key + "?", ok: "Delete"}).then(() => {
-        userProject.deleteAudio(sound.file_key).then(() => {
-            store.dispatch(sounds.deleteLocalUserSound(sound.file_key))
-            audioLibrary.clearAudioTagCache()
-        })
-    })
+export async function deleteSound(sound: SoundEntity) {
+    if (await confirm({ text: `Do you really want to delete sound ${sound.file_key}?`, ok: "Delete", type: "danger" })) {
+        await userProject.deleteAudio(sound.file_key)
+        store.dispatch(sounds.deleteLocalUserSound(sound.file_key))
+        audioLibrary.clearAudioTagCache()
+    }
 }
 
-export function closeAllTabs() {
-    (helpers.getNgService("$confirm") as any)({text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All"}).then(() => {
-        userProject.saveAll().then(() => {
+export async function closeAllTabs() {
+    if (await confirm({ text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All" })) {
+        try {
+            await userProject.saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabs.closeAllTabs())
-        }).catch(() => userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1"))
-    })
+        } catch {
+            userNotification.show(i18n.t("messages:idecontroller.saveallfailed"), "failure1")
+        }
+    }
 }
 
 const licenses = {} as { [key: string]: any }
@@ -497,8 +512,9 @@ export const App = () => {
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
         } catch (error) {
-            await (helpers.getNgService("$confirm") as any)({ text: i18n.t("messages:idecontroller.saveallfailed"), cancel: "Keep unsaved tabs open", ok: "Ignore" })
-            userProject.clearUser()
+            if (await confirm({ text: i18n.t("messages:idecontroller.saveallfailed"), cancel: "Keep unsaved tabs open", ok: "Ignore" })) {
+                userProject.clearUser()
+            }
         }
 
         // Clear out all the values set at login.
