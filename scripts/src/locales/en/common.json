@@ -176,7 +176,22 @@
     "soundUploader.record.mic.reenable": "Enable mic and click here to try again.",
     "soundUploader.freesound.description": "is an online database of thousands of free audio clips, including everything from music to field recordings, all under Creative Commons licenses. You can search for clips on Freesound and save them to EarSketch below.",
     "soundUploader.freesound.searching": "Searching Freesound...",
-    "soundUploader.freesound.uploadedBy": "Uploaded by Freesound user {{userName}}"
+    "soundUploader.freesound.uploadedBy": "Uploaded by Freesound user {{userName}}",
+    "formattedTime.justNow": "just now",
+    "formattedTime.recently": "recently",
+    "formattedTime.oneMinuteAgo": "1 minute ago",
+    "formattedTime.minutesAgo": "{{minutes}} minutes ago",
+    "formattedTime.oneHourAgo": "1 hour ago",
+    "formattedTime.hoursAgo": "{{hours}} hours ago",
+    "formattedTime.yesterday": "yesterday",
+    "formattedTime.daysAgo": "{{days}} days ago",
+    "formattedTime.lastWeek": "last week",
+    "formattedTime.weeksAgo": "{{weeks}} weeks ago",
+    "formattedTime.lastMonth": "last month",
+    "formattedTime.monthsAgo": "{{months}} months ago",
+    "formattedTime.lastYear": "last year",
+    "formattedTime.yearsAgo": "{{years}} years ago"
+
   },
   "messages": {
     "interpreter": {
