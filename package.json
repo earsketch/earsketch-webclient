@@ -24,7 +24,6 @@
     "ace-builds": "^1.4.11",
     "acorn": "^7.3.1",
     "angular": "^1.8.0",
-    "angular-animate": "^1.8.0",
     "angular-mocks": "^1.8.0",
     "angular-resource": "^1.8.0",
     "bootstrap": "^4.5.0",

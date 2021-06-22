@@ -163,7 +163,6 @@ window.angular = angular;
 
 require('angular-mocks');
 require('bootstrapBundle');
-require('angular-animate');
 
 window.ngMidwayTester = require('ngMidwayTester');
 Object.assign(window,require('setup'));
@@ -182,7 +181,7 @@ require('lodash');
 require('kali');
 require('chance');
 
-window.app = angular.module('EarSketchApp',['ngAnimate']).config($locationProvider => {
+window.app = angular.module('EarSketchApp', []).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
 });
