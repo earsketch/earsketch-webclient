@@ -77,7 +77,7 @@ export const BrowserTabs = () => {
             <BrowserTab name={t('soundBrowser.title').toLocaleUpperCase()} type={BrowserTabType.Sound}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
-            <BrowserTab name={t('scriptBrowser.title').toLocaleUpperCase()} type={BrowserTabType.Script}>
+            <BrowserTab name={t('script', { count: 0 }).toLocaleUpperCase()} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
             <BrowserTab name='API' type={BrowserTabType.API}>
