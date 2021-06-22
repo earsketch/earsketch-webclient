@@ -10,7 +10,6 @@ const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const vendorDir = 'scripts/vendor';
 const libDir = 'scripts/lib';
 const appDir = 'scripts/src/app';
-const servicesDir = 'scripts/src/app/services';
 const dataDir = 'scripts/src/data';
 
 module.exports = {

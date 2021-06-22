@@ -148,11 +148,15 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
 
     angular.bootstrap(document, ["EarSketchApp"], { strictDi: true })
 
-    ReactDOM.render(
-        <React.StrictMode>
-          <Provider store={store}>
-            <App />
-          </Provider>
-        </React.StrictMode>,
-        document.getElementById("root"))
+    // Temporary hack for autograders: don't start the React app on autograder endpoints.
+    // TODO: Replace this with normal routing after autograders have been migrated.
+    if (!/\/autograder\w*\/?$/.test(location.href)) {
+        ReactDOM.render(
+            <React.StrictMode>
+            <Provider store={store}>
+                <App />
+            </Provider>
+            </React.StrictMode>,
+            document.getElementById("root"))
+    }
 })
