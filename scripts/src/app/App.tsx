@@ -746,7 +746,7 @@ const ModalContainer = () => {
 
         {/* This element is to trick the browser into centering the modal contents. */}
         <span
-          className="inline-block h-screen align-middle"
+          className="inline-block h-screen"
           aria-hidden="true"
         >
           &#8203;
@@ -760,7 +760,7 @@ const ModalContainer = () => {
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-            <div className="inline-block w-full max-w-6xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+            <div className="inline-block w-full max-w-6xl mt-16 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
                 {Modal && <Modal close={close} />}
             </div>
         </Transition.Child>
