@@ -986,7 +986,7 @@ const DAW = () => {
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
                     title={t('daw.tooltip.toggleEffects')} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span className="mr-1">{t('daw.effect', {count: 0}).toLocaleUpperCase()}</span>
+                <span className="mr-1">{t('daw.effect', { count: 0 }).toLocaleUpperCase()}</span>
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
 

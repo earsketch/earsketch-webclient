@@ -22,7 +22,7 @@ export const ScriptAnalysis = ({ script, close }: { script: ScriptEntity, close:
     return <>
         <div className="modal-header">
             <h4 className="modal-title">
-                <i className="glyphicon glyphicon-info-sign" ></i> {t('scriptAnalysis.title', {scriptName: script.name})}
+                <i className="glyphicon glyphicon-info-sign" ></i> {t('scriptAnalysis.title', { scriptName: script.name })}
             </h4>
         </div>
         <div className="modal-body">
