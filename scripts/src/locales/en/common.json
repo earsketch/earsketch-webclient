@@ -179,19 +179,18 @@
     "soundUploader.freesound.uploadedBy": "Uploaded by Freesound user {{userName}}",
     "formattedTime.justNow": "just now",
     "formattedTime.recently": "recently",
-    "formattedTime.oneMinuteAgo": "1 minute ago",
-    "formattedTime.minutesAgo": "{{minutes}} minutes ago",
-    "formattedTime.oneHourAgo": "1 hour ago",
-    "formattedTime.hoursAgo": "{{hours}} hours ago",
-    "formattedTime.yesterday": "yesterday",
-    "formattedTime.daysAgo": "{{days}} days ago",
-    "formattedTime.lastWeek": "last week",
-    "formattedTime.weeksAgo": "{{weeks}} weeks ago",
-    "formattedTime.lastMonth": "last month",
-    "formattedTime.monthsAgo": "{{months}} months ago",
-    "formattedTime.lastYear": "last year",
-    "formattedTime.yearsAgo": "{{years}} years ago"
-
+    "formattedTime.minutesAgo": "1 minute ago",
+    "formattedTime.minutesAgo_plural": "{{count}} minutes ago",
+    "formattedTime.hoursAgo": "1 hour ago",
+    "formattedTime.hoursAgo_plural": "{{count}} hours ago",
+    "formattedTime.daysAgo": "yesterday",
+    "formattedTime.daysAgo_plural": "{{count}} days ago",
+    "formattedTime.weeksAgo": "last week",
+    "formattedTime.weeksAgo_plural": "{{count}} weeks ago",
+    "formattedTime.monthsAgo": "last month",
+    "formattedTime.monthsAgo_plural": "{{count}} months ago",
+    "formattedTime.yearsAgo": "last year",
+    "formattedTime.yearsAgo_plural": "{{count}} years ago"
   },
   "messages": {
     "interpreter": {

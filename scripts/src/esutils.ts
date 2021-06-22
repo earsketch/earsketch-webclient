@@ -227,21 +227,14 @@ export const formatTime = (milliseconds: number) => {
     switch (true) {
         case seconds < 1: return i18n.t('formattedTime.justNow')
         case minutes < 1: return i18n.t('formattedTime.recently')
-        case minutes < 2: return i18n.t('formattedTime.oneMinuteAgo')
-        case hours < 1: return i18n.t('formattedTime.minutesAgo', { minutes })
-        case hours < 2: return i18n.t('formattedTime.oneHourAgo')
-        case days < 1: return i18n.t('formattedTime.hoursAgo', { hours })
-        case days < 2: return i18n.t('formattedTime.yesterday')
-        case weeks < 1: return i18n.t('formattedTime.daysAgo', { days })
-        case weeks < 2: return i18n.t('formattedTime.lastWeek')
-        case months < 1: return i18n.t('formattedTime.weeksAgo', { weeks })
-        case months < 2: return i18n.t('formattedTime.lastMonth')
-        case years < 1: return i18n.t('formattedTime.monthsAgo', { months })
-        case years < 2: return i18n.t('formattedTime.lastYear')
-        default: return i18n.t('formattedTime.yearsAgo', { years })
+        case hours < 1: return i18n.t('formattedTime.minutesAgo', { count: minutes })
+        case days < 1: return i18n.t('formattedTime.hoursAgo', { count: hours })
+        case weeks < 1: return i18n.t('formattedTime.daysAgo', { count: days })
+        case months < 1: return i18n.t('formattedTime.weeksAgo', { count: weeks })
+        case years < 1: return i18n.t('formattedTime.monthsAgo', { count: months })
+        default: return i18n.t('formattedTime.yearsAgo', { count: years })
     }
 }
-
 
 const defaultTo = (value: number, defaultValue: number) => {
     return isNaN(value) ? defaultValue : value
