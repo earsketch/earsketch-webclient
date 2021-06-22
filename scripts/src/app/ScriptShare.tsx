@@ -29,7 +29,7 @@ async function queryID(query: any) {
     if (data) {
         return data.username
     }
-    throw i18n.t('userDoesNotExist')
+    throw i18n.t('messages:general.userDoesNotExist')
 }
 
 const UserListInput = ({ users, setUsers, setFinalize }:
