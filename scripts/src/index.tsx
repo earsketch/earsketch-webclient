@@ -76,7 +76,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     // NPM
     require("bootstrapBundle")
     require("angular-animate")
-    require("ngClipboard")
 
     require("skulpt")
     require("skulptStdLib")
@@ -91,7 +90,6 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
 
     window.app = angular.module("EarSketchApp", [
         "ngAnimate",
-        "angular-clipboard",
     ]).config(["$locationProvider", ($locationProvider: any) => {
         // Prevent legacy hash-bang URL being overwritten by $location.
         $locationProvider.html5Mode(true).hashPrefix("")

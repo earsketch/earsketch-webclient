@@ -40,8 +40,6 @@ module.exports = {
             // Emscripten
             esDSP: path.resolve(__dirname,`${libDir}/earsketch-dsp.js`),
 
-            ngClipboard: 'angular-clipboard',
-
             // Controllers
             adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),

@@ -163,12 +163,7 @@ window.angular = angular;
 
 require('angular-mocks');
 require('bootstrapBundle');
-require('uiBootstrap');
 require('angular-animate');
-require('ng-file-upload');
-require('ngClipboard');
-require('angularjs-slider');
-require('ng-redux');
 
 window.ngMidwayTester = require('ngMidwayTester');
 Object.assign(window,require('setup'));
@@ -176,10 +171,6 @@ Object.assign(window,require('dsp'));
 // Object.assign(window,require('esDSP'));
 Object.assign(window,require('ccSamples'));
 
-require('uiLayout');
-require('uiUtils');
-require('uiScroll');
-require('uiScrollGrid');
 require('skulpt');
 require('skulptStdLib');
 require('js-interpreter');
@@ -191,7 +182,7 @@ require('lodash');
 require('kali');
 require('chance');
 
-window.app = angular.module('EarSketchApp',['ngAnimate','angular-clipboard']).config($locationProvider => {
+window.app = angular.module('EarSketchApp',['ngAnimate']).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix('');
 });
