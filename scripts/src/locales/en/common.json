@@ -243,7 +243,7 @@
       "renameSoundConflict": "Sound name already in use",
       "shortname": "Please provide a name that is at least 3 characters long.",
       "illegalCharacterInUserID": "Please use only regular characters, numbers, or _ in the user ID.",
-      "userDoesntExist": "That user ID does not exist.",
+      "userDoesNotExist": "That user ID does not exist.",
       "noSelfShare": "You cannot share scripts with yourself!"
     },
     "idecontroller": {

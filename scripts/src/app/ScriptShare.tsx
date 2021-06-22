@@ -29,7 +29,7 @@ async function queryID(query: any) {
     if (data) {
         return data.username
     }
-    throw i18n.t('userDoesntExist')
+    throw i18n.t('userDoesNotExist')
 }
 
 const UserListInput = ({ users, setUsers, setFinalize }:
