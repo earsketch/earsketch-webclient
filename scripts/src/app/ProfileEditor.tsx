@@ -63,7 +63,7 @@ export const ProfileEditor = ({ username, password, email: _email, role, firstNa
 
     return <>
         <div className="modal-header">
-            <h3>{t('profileEditor.prompt', {username: username})} ({role})</h3>
+            <h3>{t('profileEditor.prompt', { username })} ({role})</h3>
         </div>
 
         <form name="userForm">
