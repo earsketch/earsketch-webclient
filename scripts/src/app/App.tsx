@@ -1,6 +1,6 @@
 import i18n from "i18next"
-import { Dialog, Menu } from "@headlessui/react"
-import React, { useEffect, useState } from "react"
+import { Dialog, Menu, Transition } from "@headlessui/react"
+import React, { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AccountCreator } from "./AccountCreator"
@@ -51,7 +51,7 @@ const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 // 1. Make the compiler check that `props` really matches the props expected by `modal`.
 // 2. Allow omitting the `props` argument when the modal only expects `close`, but require it if the modal expects additional props.
 // 3. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
-//    For example, if `modal` specifies that close has type `(foo: number?) => void`, then this should return `Promise<number | undefined>`.
+//    For example, if `modal` specifies that close has type `(foo?: number) => void`, then this should return `Promise<number | undefined>`.
 //    Note that the promise can always resolve to `undefined`, because the user can always dismiss the modal without completing it.
 type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => JSX.Element | null
 
@@ -699,14 +699,58 @@ const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
 
-    const close = () => dispatch(appState.setModal(null))
+    const [closing, setClosing] = useState(false)
 
-    return <Dialog open={Modal !== null} onClose={close} className="fixed z-50 inset-0 overflow-y-auto">
-        <Dialog.Overlay className="fixed inset-0 bg-black opacity-40" />
-        <div className="modal-content max-w-6xl m-auto my-12">
-            {Modal && <Modal close={close} />}
-        </div>
+    const close = () => {
+        setClosing(true)
+        setTimeout(() => {
+            dispatch(appState.setModal(null))
+            setClosing(false)
+        }, 300)
+    }
+
+    return <Transition appear show={Modal !== null && !closing} as={Fragment}>
+    <Dialog
+      as="div"
+      className="fixed inset-0 z-50 overflow-y-auto"
+      onClose={close}
+    >
+      <div className="min-h-screen px-4 text-center">
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+        </Transition.Child>
+
+        {/* This element is to trick the browser into centering the modal contents. */}
+        <span
+          className="inline-block h-screen align-middle"
+          aria-hidden="true"
+        >
+          &#8203;
+        </span>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0 scale-95"
+          enterTo="opacity-100 scale-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100 scale-100"
+          leaveTo="opacity-0 scale-95"
+        >
+            <div className="inline-block w-full max-w-6xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+                {Modal && <Modal close={close} />}
+            </div>
+        </Transition.Child>
+      </div>
     </Dialog>
+  </Transition>
 }
 
 // websocket gets closed before onunload in FF
