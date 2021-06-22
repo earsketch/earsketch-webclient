@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { Menu } from "@headlessui/react"
+import { Dialog, Menu } from "@headlessui/react"
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -366,7 +366,6 @@ export const App = () => {
     const [role, setRole] = useState("student")
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const Modal = useSelector(appState.selectModal)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (location: string) => {
@@ -692,34 +691,22 @@ export const App = () => {
         </div>
         <Bubble />
         <ScriptDropdownMenu />
-        {Modal &&
-        <ModalContainer Modal={Modal} />}
+        <ModalContainer />
     </>
 }
 
-const ModalContainer = ({ Modal }: { Modal: (props: { close: (payload?: any) => void }) => JSX.Element | null }) => {
+const ModalContainer = () => {
     const dispatch = useDispatch()
+    const Modal = useSelector(appState.selectModal)!
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                dispatch(appState.setModal(null))
-            }
-        }
-        window.addEventListener("keydown", handleKeyDown)
-        return () => window.removeEventListener("keydown", handleKeyDown)
-    }, [])
+    const close = () => dispatch(appState.setModal(null))
 
-    return <>
-        <div className="modal fade in" style={{ zIndex: 1050 }} tabIndex={-1} onClick={() => dispatch(appState.setModal(null))}>
-            <div className="modal-dialog">
-                <div className="modal-content" onClick={e => e.stopPropagation()}>
-                    <Modal close={() => dispatch(appState.setModal(null))} />
-                </div>
-            </div>
+    return <Dialog open={Modal !== null} onClose={close} className="fixed z-50 inset-0 overflow-y-auto">
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-40" />
+        <div className="modal-content max-w-6xl m-auto my-12">
+            {Modal && <Modal close={close} />}
         </div>
-        <div className="modal-backdrop fade ng-scope in" style={{ zIndex: 1040 }}></div>
-    </>
+    </Dialog>
 }
 
 // websocket gets closed before onunload in FF

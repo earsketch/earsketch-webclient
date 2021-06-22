@@ -68,7 +68,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
                 </div>
                 <div className="form-group">
                     <label htmlFor="description">Description</label>
-                    <textarea id="description" className="form-control" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} required />
+                    <textarea id="description" className="form-control" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
                 </div>
             </div>
             <div className="modal-footer">
