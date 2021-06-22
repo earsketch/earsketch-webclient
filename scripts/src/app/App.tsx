@@ -53,7 +53,7 @@ const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 // 3. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
 //    For example, if `modal` specifies that close has type `(foo?: number) => void`, then this should return `Promise<number | undefined>`.
 //    Note that the promise can always resolve to `undefined`, because the user can always dismiss the modal without completing it.
-type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => JSX.Element | null
+type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => JSX.Element
 
 export function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
 export function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>

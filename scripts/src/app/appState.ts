@@ -4,7 +4,7 @@ import storage from 'redux-persist/lib/storage';
 
 import { RootState } from '../reducers';
 
-export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element | null
+export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
 
 const appSlice = createSlice({
     name: 'app',
