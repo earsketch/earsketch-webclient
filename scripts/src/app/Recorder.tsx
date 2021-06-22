@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 
 import * as recorder from "./esrecorder"
+import { useTranslation } from "react-i18next"
 
 export const LevelMeter = () => {
     const HEIGHT = 15
@@ -52,6 +53,7 @@ const BEAT_POSITIONS = {
 export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat: number, hasBuffer: boolean, useMetro: boolean, startRecording: () => void }) => {
     const [state, setState] = useState("")
     const measure = Math.floor(beat / 4) + 1
+    const { t } = useTranslation()
 
     if (hasBuffer) {
         if (state === "record") {
@@ -62,7 +64,7 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
     const IndicatorButton = () => {
         if (state === "record") {
             if (useMetro) {
-                return measure > 0 ? <span className="text-7xl">{measure}</span> : <span className="text-2xl font-bold">Get ready!</span>
+                return measure > 0 ? <span className="text-7xl">{measure}</span> : <span className="text-2xl font-bold">{t('soundUploader.record.getReady')}</span>
             } else {
                 return <i className="cursor-pointer text-5xl icon icon-recording blink recording" onClick={() => { recorder.stopRecording(); setState("") }} />
             }

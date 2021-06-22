@@ -106,7 +106,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchB
                 <input
                     className='w-full outline-none p-1 bg-transparent font-normal'
                     type='text'
-                    placeholder={t('contentManager.searchPlaceholder')}
+                    placeholder={t('search')}
                     value={searchText}
                     onChange={dispatchSearch}
                 />

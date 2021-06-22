@@ -13,6 +13,7 @@ import { encodeWAV } from "./renderer"
 import * as userConsole from "./userconsole"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import { useTranslation } from "react-i18next"
 
 function cleanKey(key: string) {
     return key.replace(/\W/g, "").toUpperCase()
@@ -91,10 +92,11 @@ const ProgressBar = ({ progress }: { progress: number }) => {
 }
 
 const Footer = ({ ready, progress, close }: { ready: boolean, progress?: number | null, close: () => void }) => {
+    const { t } = useTranslation()
     return <div className="modal-footer flex items-center">
         {progress !== undefined && progress !== null && <ProgressBar progress={progress} />}
-        <input type="button" value="CANCEL" onClick={close} className="btn btn-default" style={{ color: "#d04f4d" }} />
-        <input type="submit" value="UPLOAD" className="btn btn-primary text-white" disabled={!ready} />
+        <input type="button" value={t('cancel').toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d" }} />
+        <input type="submit" value={t('upload').toLocaleUpperCase()} className="btn btn-primary text-white" disabled={!ready} />
     </div>
 }
 
@@ -104,6 +106,7 @@ const FileTab = ({ close }: { close: () => void }) => {
     const [tempo, setTempo] = useState("")
     const [error, setError] = useState("")
     const [progress, setProgress] = useState(null as number | null)
+    const { t } = useTranslation()
 
     const name = file ? ESUtils.parseName(file.name) : ""
     if (key === "" && name !== "") {
@@ -128,15 +131,15 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <input id="file" className="inputfile" type="file" onChange={e => setFile(e.target.files![0])} accept=".wav,.aiff,.aif,.mp3,audio/wav,audio/aiff,audio/mpeg" required />
                     <label id="inputlabel" htmlFor="file">
                         <span><i className="icon icon-cloud-upload"></i></span>
-                        <span>{name || "Choose a file..."}</span>
+                        <span>{name || t('soundUploader.file.prompt')}</span>
                         {extension
                             ? <kbd className="kbd">{extension}</kbd>
                             : <><kbd className="kbd">.wav</kbd><kbd className="kbd">.aiff</kbd><kbd className="kbd">.mp3</kbd></>}
                     </label>
                 </div>
                 <div className="modal-section-header">
-                    <span>Constant Name (required)</span>
-                    <span>Tempo (Optional)</span>
+                    <span>{t('soundUploader.constantRequired')}</span>
+                    <span>{t('soundUploader.tempoOptional')}</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
                     <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
@@ -161,6 +164,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
     const [measures, setMeasures] = useState(2)
     const [micReady, setMicReady] = useState(false)
     const [beat, setBeat] = useState(0)
+    const { t } = useTranslation()
 
     const startRecording = () => {
         recorder.properties.bpm = tempo
@@ -199,38 +203,38 @@ const RecordTab = ({ close }: { close: () => void }) => {
             {error && <div className="alert alert-danger">{error}</div>}
             {!micReady &&
                 (error
-                    ? <input type="button" className="btn btn-primary block m-auto" onClick={() => { setError(""); recorder.init() }} value="Enable mic and click here to try again." />
-                    : "Waiting for microphone access...")}
+                    ? <input type="button" className="btn btn-primary block m-auto" onClick={() => { setError(""); recorder.init() }} value={t('soundUploader.record.mic.reenable') as string} />
+                    : t('soundUploader.record.mic.waiting'))}
             {micReady && <div>
                 <div className="modal-section-header">
-                    <span>Measures Control</span>
+                    <span>{t('soundUploader.record.measures.title')}</span>
                     {metronome &&
                         <button type="button" className={"btn btn-hollow btn-filter" + (click ? " active" : "")} onClick={() => setClick(!click)}>
-                            <span>CLICK WHILE RECORDING</span>
+                            <span>{t('soundUploader.record.measures.metronomeClick').toLocaleUpperCase()}</span>
                         </button>}
                     <button type="button" className={"btn btn-hollow btn-filter" + (metronome ? " active" : "")}
                         onClick={() => setMetronome(!metronome)}>
-                        <span>METRONOME</span>
+                        <span>{t('metronome').toLocaleUpperCase()}</span>
                     </button>
                 </div>
                 {metronome &&
                     <div className="modal-section-content" id="count-measures-input">
                         <label>
-                            Tempo (beats per minute)
+                            {t('soundUploader.record.measures.tempo')}
                         <input type="number" placeholder="e.g. 120" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
                             <input id="tempoSlider" type="range" name="rangeTempo" min={45} max={220} value={tempo} onChange={e => setTempo(+e.target.value)} required={metronome} />
                         </label>
                         <label>
-                            Countoff Measures
+                            {t('soundUploader.record.measures.countoff')}
                         <input type="number" value={countoff} onChange={e => setCountoff(+e.target.value)} required={metronome} />
                         </label>
                         <label>
-                            Measures to Record
+                            {t('soundUploader.record.measures.toRecord')}
                         <input type="number" value={measures} onChange={e => setMeasures(+e.target.value)} required={metronome} />
                         </label>
                     </div>}
                 <div className="modal-section-header">
-                    <span>Record Sound</span>
+                    <span>{t('soundUploader.record.prompt')}</span>
                     <LevelMeter />
                 </div>
                 <div className="modal-section-content flex items-center justify-between">
@@ -238,11 +242,11 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <Waveform buffer={buffer} />
                     {buffer &&
                         <button type="button" id="record-clear-button" className="btn btn-hollow btn-filter" onClick={() => { recorder.clear(); setBuffer(null) }}>
-                            <span>CLEAR</span>
+                            <span>{t('clear').toLocaleUpperCase()}</span>
                         </button>}
                 </div>
                 <div className="modal-section-header">
-                    <span>Constant Name (required)</span>
+                    <span>{t('soundUploader.constantRequired')}</span>
                 </div>
                 <div className="modal-section-content">
                     <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
@@ -268,6 +272,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     const [query, setQuery] = useState("")
     const [selected, setSelected] = useState(null as number | null)
     const [key, setKey] = useState("")
+    const { t } = useTranslation()
 
     const username = userProject.getUsername() ?? ""
 
@@ -322,15 +327,14 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             <div>
-                <a href="https://freesound.org/" target="_blank">Freesound</a> is an online database of thousands of free audio clips, including everything from music to field recordings, all under Creative Commons licenses.
-                You can search for clips on Freesound and save them to EarSketch below.
+                <a href="https://freesound.org/" target="_blank">Freesound</a> {t('soundUploader.freesound.description')}
             </div>
             <div className="search-block flex">
                 <input className="form-control shake form-search flex-grow" placeholder="Search" type="text" value={query}
                     onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Enter") search() }} required />
-                <input type="button" onClick={search} className="btn btn-hollow btn-filter" value="SEARCH" />
+                <input type="button" onClick={search} className="btn btn-hollow btn-filter" value={t('search').toLocaleUpperCase()} />
             </div>
-            {searched && <div className="modal-section-header justify-start mb-3">Results</div>}
+            {searched && <div className="modal-section-header justify-start mb-3">{t('results')}</div>}
             {results && results.length > 0 &&
                 <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
                     {results.map((result, index) => <div>
@@ -343,7 +347,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                                         setError("")
                                     }
                                 }} />
-                            {result.name}: {result.bpm} bpm. Uploaded by Freesound user {result.creator}
+                            {result.name}: {result.bpm} bpm. {t('soundUploader.freesound.uploadedBy', { userName: result.creator})}
                         </label>
                         <audio controls preload="none">
                             <source src={result.previewURL} type="audio/mpeg" />
@@ -353,9 +357,9 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                     </div>)}
                 </div>}
             {searched &&
-                (results === null && <div><i className="inline-block animate-spin icon icon-spinner" /> Searching Freesound...</div>
-                    || results!.length === 0 && <div>No results</div>)}
-            <div className="modal-section-header"><span>Constant Name (required)</span></div>
+                (results === null && <div><i className="inline-block animate-spin icon icon-spinner" />{t('soundUploader.freesound.searching')}</div>
+                    || results!.length === 0 && <div>{t('noResults')}</div>)}
+            <div className="modal-section-header"><span>{t('soundUploader.constantRequired')}</span></div>
             <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
         </div>
         <Footer ready={selected !== null} close={close} />
@@ -463,10 +467,11 @@ const Tabs = [
 export const SoundUploader = ({ close }: { close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
     const TabBody = Tabs[activeTab].component
+    const { t } = useTranslation()
 
     return <>
         <div className="modal-header">
-            <h4 className="modal-title">Add a New Sound</h4>
+            <h4 className="modal-title">{t('soundUploader.title')}</h4>
             <hr className="my-4 border-gray-200" />
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
