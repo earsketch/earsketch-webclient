@@ -73,7 +73,7 @@ const Filters = () => {
 
     return (
         <div className='p-3'>
-            <div className='pb-2 text-lg'>{t('soundBrowser.filterDropdown.title')}</div>
+            <div className='pb-2 text-lg'>{t('soundBrowser.filterDropdown.title').toLocaleUpperCase()}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
                     title={t('soundBrowser.filterDropdown.artists')}
@@ -327,7 +327,7 @@ const WindowedRecommendations = () => {
 
     return (
         <Collection
-            title={t('soundBrowser.title.recommendations')}
+            title={t('soundBrowser.title.recommendations').toLocaleUpperCase()}
             visible={loggedIn&&tabsOpen}
             initExpanded={false}
         >
@@ -426,7 +426,7 @@ const DefaultSoundCollection = () => {
     const numFileKeys = useSelector(sounds.selectAllRegularFileKeys).length;
     const numFilteredFileKeys = useSelector(sounds.selectFilteredRegularFileKeys).length;
     const filtered = numFilteredFileKeys !== numFileKeys;
-    const title = `${t('soundBrowser.title.collection')} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
+    const title = `${t('soundBrowser.title.collection').toLocaleUpperCase()} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
     const props = { title, folders, fileKeysByFolders, filteredListChanged };
     return <WindowedSoundCollection { ...props } />;
 };
@@ -442,7 +442,7 @@ const FeaturedArtistCollection = () => {
     const numFilteredFileKeys = useSelector(sounds.selectFilteredFeaturedFileKeys).length;
     const filtered = numFilteredFileKeys !== numFileKeys;
     const artists = useSelector(sounds.selectFeaturedArtists);
-    const title = `${t('soundBrowser.title.featuredArtist')}${artists.length>1 ? 'S' : ''} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
+    const title = `${t('soundBrowser.title.featuredArtist').toLocaleUpperCase()}${artists.length>1 ? 'S' : ''} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
     const props = { title, folders, fileKeysByFolders, filteredListChanged, visible, initExpanded };
     return <WindowedSoundCollection { ...props } />;
 };

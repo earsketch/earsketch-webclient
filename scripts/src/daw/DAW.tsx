@@ -135,7 +135,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const observer = new ResizeObserver(entries => {
         const width = entries[0].contentRect.width
         const short = t('daw.shortTitle')
-        const long = t('daw.title')
+        const long = t('daw.title').toLocaleUpperCase()
         if (embedMode) {
             setTitle(short)
         } else if (width > 590) {

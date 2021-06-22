@@ -24,7 +24,7 @@ export const TitleBar = () => {
             style={{minHeight: 'fit-content'}}  // Safari-specific issue
         >
             <div className='pl-3 pr-4 font-semibold truncate'>
-                {t('contentManager.title')}
+                {t('contentManager.title').toLocaleUpperCase()}
             </div>
             <div>
                 <div
@@ -74,10 +74,10 @@ export const BrowserTabs = () => {
                 minHeight: 'fit-content' // Safari-specific issue
             }}
         >
-            <BrowserTab name={t('soundBrowser.title')} type={BrowserTabType.Sound}>
+            <BrowserTab name={t('soundBrowser.title').toLocaleUpperCase()} type={BrowserTabType.Sound}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
-            <BrowserTab name={t('scriptBrowser.title')} type={BrowserTabType.Script}>
+            <BrowserTab name={t('scriptBrowser.title').toLocaleUpperCase()} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
             <BrowserTab name='API' type={BrowserTabType.API}>
@@ -324,7 +324,7 @@ export const Browser = () => {
                         <BrowserTabs />
                         <BrowserBody />
                     </>
-                ) : <Collapsed title={t('contentManager.title')} position='west' />
+                ) : <Collapsed title={t('contentManager.title').toLocaleUpperCase()} position='west' />
             }
         </div>
     );
