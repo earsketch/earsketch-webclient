@@ -1,21 +1,22 @@
 // TODO: Merge with userState as appropriate.
+import i18n from "i18next"
 import xml2js from "xml2js"
 
+import { openModal } from "./App"
 import * as appState from "./appState"
 import * as audioLibrary from "./audiolibrary"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
+import { ScriptEntity } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as helpers from "../helpers"
-import store from "../reducers"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
+import store from "../reducers"
+import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
-import { ScriptEntity } from "common"
-import i18n from "i18next"
 
 const USER_STATE_KEY = "userstate"
 
@@ -611,12 +612,7 @@ export async function deleteScript(scriptid: string) {
 
 async function promptForRename(script: ScriptEntity) {
     const oldName = script.name
-    await helpers.getNgService("$uibModal").open({
-        component: "renameController",
-        size: 100,
-        resolve: { script: () => script, conflict: () => true },
-    }).result
-
+    await openModal(RenameScript, { script, conflict: true })
     if (script.name === oldName) {
         script.name = nextName(oldName)
     }
