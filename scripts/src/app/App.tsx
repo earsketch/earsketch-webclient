@@ -8,6 +8,7 @@ import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import * as cai from "../cai/caiState"
+import { ChangePassword } from "./ChangePassword"
 import * as collaboration from "./collaboration"
 import * as curriculum from "../browser/curriculumState"
 import { ScriptEntity, SoundEntity } from "common"
@@ -36,12 +37,18 @@ import { useTranslation } from "react-i18next"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
-// There is a little type magic here to accomplish two things:
+// There is a little type magic here to accomplish three things:
 // 1. Make the compiler check that `props` really matches the props expected by `modal`.
-// 2. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
+// 2. Allow omitting the `props` argument when the modal only expects `close`, but require it if the modal expects additional props.
+// 3. Provide the correct return value: the Promise should resolve to whatever type that `modal` says `close` takes.
 //    For example, if `modal` specifies that close has type `(foo: number?) => void`, then this should return `Promise<number | undefined>`.
 //    Note that the promise can always resolve to `undefined`, because the user can always dismiss the modal without completing it.
-function openModal<T extends appState.Modal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
+type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => ReactElement
+
+function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
+// function openModal<T extends appState.Modal>(modal: T, ...props: ({} extends Omit<Parameters<T>[0], "close"> ? undefined : Omit<Parameters<T>[0], "close">)): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
     return new Promise(resolve => {
         const wrappedModal = ({ close }: { close: (payload?: any) => void }) => {
             const closeWrapper = (payload?: any) => { resolve(payload); return close() }
@@ -52,7 +59,7 @@ function openModal<T extends appState.Modal>(modal: T, props: Omit<Parameters<T>
 }
 
 export function changePassword() {
-    helpers.getNgService("$uibModal").open({ component: "changepasswordController" })
+    openModal(ChangePassword)
 }
 
 export function renameSound(sound: SoundEntity) {
