@@ -57,10 +57,18 @@ type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]:
 export function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
 export function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
 export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
-// function openModal<T extends appState.Modal>(modal: T, ...props: ({} extends Omit<Parameters<T>[0], "close"> ? undefined : Omit<Parameters<T>[0], "close">)): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
     return new Promise(resolve => {
         const wrappedModal = ({ close }: { close: (payload?: any) => void }) => {
-            const closeWrapper = (payload?: any) => { resolve(payload); return close() }
+            let closed = false
+            const closeWrapper = (payload?: any) => {
+                if (!closed) {
+                    closed = true
+                    resolve(payload)
+                    close()
+                }
+            }
+            // Close with no payload on unmount (i.e. modal was dismissed without completion).
+            useEffect(() => closeWrapper, [])
             return modal({ ...props, close: closeWrapper })
         }
         store.dispatch(appState.setModal(wrappedModal))
