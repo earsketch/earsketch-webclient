@@ -22,6 +22,7 @@ function($scope) {
     $scope.uniqueStems = 0;
     $scope.lengthRequirement = 0;
     $scope.showIndividualGrades = false;
+    $scope.startingID = 0;
 
     $scope.contestDict = {};
 
@@ -32,6 +33,35 @@ function($scope) {
     $scope.music_code_passed = [];
 
     $scope.processing = null;
+    $scope.contest_processing = null;
+
+    $scope.prompts = [];
+
+    // overwrite userConsole javascript prompt with a hijackable one
+    var nativePrompt = window.esPrompt;
+    $scope.listenerPrompt = function(text) {
+      return nativePrompt(text).then(function(response) {
+        $scope.prompts.push(response);
+        return response;
+      });
+    };
+    $scope.hijackedPrompt = function() {
+      var i = 0;
+      if ($scope.allowPrompts) {
+        return function(text) {
+          return nativePrompt(text);
+        };
+      } else {
+        return function(text) {
+            return new Promise(function(r) {
+                r($scope.prompts[i++ % $scope.prompts.length]);
+            });
+        }
+      }
+    };
+
+    // use the hijacked prompt function to input user input
+    window.esPrompt = $scope.hijackedPrompt();
 
     /**
      * Calculate the complexity of a script as python or javascript based on the extension and
@@ -74,6 +104,7 @@ function($scope) {
     $scope.run = function() {
 
       $scope.processing = null;
+      $scope.contest_processing = null;
 
       $scope.results = [];
       $scope.contestDict = {};
@@ -89,33 +120,42 @@ function($scope) {
       $scope.entrants = document.querySelector('.hiddenOutput').innerText;
 
       var shareID = $scope.entries.split(',');
+      var shareIDArray = [];
       var contestID = $scope.entrants.split(',');
 
       for (var i = 0; i < shareID.length; i++) {
-        if (shareID[i][0] == ','){
-          shareID[i] = shareID[i].substring(1);
+        if (Number(contestID[i]) >= Number($scope.startingID)) {
+          if (shareID[i][0] == ','){
+            shareID[i] = shareID[i].substring(1);
+          }
+          shareIDArray[i] = shareID[i].replace(/\n|\r/g, "");
+          $scope.contestDict[shareIDArray[i]] = contestID[i];
         }
-        shareID[i] = shareID[i].replace(/\n|\r/g, "");
-        $scope.contestDict[shareID[i]] = contestID[i];
       }
 
       // start with a promise that resolves immediately
       var p = new Promise(function(resolve) { resolve(); });
 
-      angular.forEach(shareID, function(id) {
+      angular.forEach(shareIDArray, function(id) {
         esconsole("ShareId: " + id, ['DEBUG']);
         p = p.then(function() {
-          $scope.processing = id;
-          var ret = userProject.loadScript(id).then($scope.compileScript);
+          try {
+            $scope.processing = id;
+            $scope.contest_processing = $scope.contestDict[id];
+            var ret = userProject.loadScript(id).then($scope.compileScript);
 
-          $scope.$applyAsync();
+            $scope.$applyAsync();
 
-          if (ret != 0)
-            return ret;
+            if (ret != 0)
+              return ret;
+          }
+          catch (e) {
+          }
         });
       });
 
       $scope.processing = null;
+      $scope.contest_processing = null;
     };
 
     $scope.compileScript = function(script) {
@@ -138,9 +178,16 @@ function($scope) {
       //   return 0;
       // }
 
-      var complexity = $scope.read(script.source_code, script.name);
-      var complexityScore = reader.total(complexity);
-      var complexityPass = complexityScore >= $scope.complexityThreshold;
+      try {
+        var complexity = $scope.read(script.source_code, script.name);
+        var complexityScore = reader.total(complexity);
+        var complexityPass = complexityScore >= $scope.complexityThreshold;
+      } catch (e) {
+        var complexity = { booleanConditionals: 0, conditionals: 0, listOps: 0,
+                           lists: 0, loops: 0, strOps: 0, userFunc: 0 };
+        var complexityScore = 0;
+        var complexityPass = 0;
+      }
 
       // TODO: process print statements through Skulpt. Temporary removal of print statements.
       var sourceCodeLines = script.source_code.split('\n');
@@ -153,6 +200,14 @@ function($scope) {
       }
 
       sourceCode = sourceCode.join('\n');
+
+      if (complexityPass < $scope.complexityThreshold) {
+        return 0;
+      }
+
+      if (!sourceCode.includes($scope.artistName)) {
+        return 0;
+      }
 
       return $scope.compile(sourceCode, script.name).then(function(compiler_output) {
         esconsole(compiler_output, ['DEBUG']);
@@ -194,6 +249,7 @@ function($scope) {
         });
         }
         $scope.processing = null;
+        $scope.contest_processing = null;
       }).catch(function(err) {
         $scope.results.push({
           script:script,
@@ -201,6 +257,7 @@ function($scope) {
         });
         esconsole(err, ['ERROR']);
         $scope.processing = null;
+        $scope.contest_processing = null;
     });
 
   };

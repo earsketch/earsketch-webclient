@@ -79,6 +79,11 @@
             <input type="text" id="complexityThreshold" ng-model="complexityThreshold" name="complexityThreshold" style="background: lightgray;">
             {{complexityThreshold}}
           </label>
+          <label>
+            Starting ID:
+            <input type="text" id="startingID" ng-model="startingID" name="startingID" style="background: lightgray;">
+            {{startingID}}
+          </label>
           <input type="checkbox" id="showIndividualGrades" name="showIndividualGrades">
           <label for="showIndividualGrades"> Show individual entry reports.</label><br>
           <input type="file" id="fileUpload" onchange="read(this)" multiple>
@@ -99,7 +104,7 @@
               var outputArr = [];
               var contestID = [];
 
-              var scriptIdx = 16;
+              var scriptIdx = 1;
               
               for(var i = 1; i < outputList.length; i++){
                  var outputID = outputList[i].split(',')[scriptIdx];
@@ -150,7 +155,7 @@
     </div> 
     <div class="container" ng-show="processing">
       <div class="alert alert-info">
-        Processing script id: {{processing}}
+        Processing script id ({{contest_processing}}): {{processing}}
       </div>
     </div>
     <div class="container" ng-hide="processing">
