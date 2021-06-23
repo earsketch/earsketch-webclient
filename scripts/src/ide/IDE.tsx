@@ -392,7 +392,7 @@ export const IDE = () => {
     return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <div id="layout-container" className="split flex flex-row h-full">
-                <div id="sidebar-container" style={{ zIndex: bubbleActive && [5,6,7,9].includes(bubblePage) ? 35 : 0 }}>
+                <div id="sidebar-container" style={bubbleActive && [5,6,7,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
                         <Browser />
                     </div>
@@ -409,7 +409,7 @@ export const IDE = () => {
                         </div>
                     </div>
 
-                    {!hideEditor && <div className="flex flex-col" id="coder" style={{ zIndex: bubbleActive && [1,2,9].includes(bubblePage) ? 35 : 0 }}>
+                    {!hideEditor && <div className="flex flex-col" id="coder" style={bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
@@ -438,7 +438,7 @@ export const IDE = () => {
                         </div>
                     </div>}
 
-                    <div ref={consoleContainer} id="console-frame" className="results" style={{ zIndex: bubbleActive && [9].includes(bubblePage) ? 35 : 0 }}>
+                    <div ref={consoleContainer} id="console-frame" className="results" style={bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                         <div className="row">
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
@@ -456,7 +456,7 @@ export const IDE = () => {
                     </div>
                 </div>
 
-                <div className="h-full" id="curriculum-container" style={{ zIndex: bubbleActive && [8,9].includes(bubblePage) ? 35 : 0 }}>
+                <div className="h-full" id="curriculum-container" style={bubbleActive && [8,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI
                     ? <CAI />
                     : <Curriculum />}

@@ -1,7 +1,8 @@
+import * as classNames from 'classnames';
 import React, { useState, useEffect, useRef, LegacyRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from "react-popper";
-import * as classNames from 'classnames';
+import { useTranslation } from "react-i18next";
 
 import { closeAllTabs } from '../app/App';
 import * as appState from '../app/appState';
@@ -11,7 +12,7 @@ import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 import * as scripts from '../browser/scriptsState';
 import * as tabs from './tabState';
 import * as userProject from '../app/userProject';
-import { useTranslation } from "react-i18next";
+import { useHeightLimiter } from "../Utils";
 
 const CreateScriptButton = () => {
     return (
@@ -161,15 +162,15 @@ const TabDropdown = () => {
     const { t } = useTranslation()
 
     const [showDropdown, setShowDropdown] = useState(false);
-    const [referenceElement, setReferenceElement] = useState(null);
-    const [popperElement, setPopperElement] = useState(null);
-    const { styles, attributes, update } = usePopper(referenceElement, popperElement, {
+    const [referenceElement, heightLimiterStyle] = useHeightLimiter(showDropdown, "4rem")
+    const popperElement = useRef(null);
+    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
         modifiers: [{ name: 'offset', options: { offset: [0,5] } }]
     });
 
     return (<>
         <div
-            ref={setReferenceElement as LegacyRef<HTMLDivElement>}
+            ref={referenceElement}
             className={`flex justify-around items-center flex-shrink-0 
                 h-12 p-3 
                 ${theme==='light' ? 'text-gray-800' : 'text-gray-200'}
@@ -189,8 +190,8 @@ const TabDropdown = () => {
             <i className='icon icon-arrow-down2 text-lg p-2' />
         </div>
         <div
-            ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={showDropdown ? styles.popper : { display:'none' }}
+            ref={popperElement}
+            style={showDropdown ? { ...styles.popper, ...heightLimiterStyle } : { display: 'none' }}
             { ...attributes.popper }
             className={`border border-black z-50 bg-white`}
         >

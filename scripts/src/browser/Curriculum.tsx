@@ -9,6 +9,7 @@ import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../user/notification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
+import { useHeightLimiter } from "../Utils"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
@@ -34,27 +35,6 @@ const permalinkToURL = (permalink: string) => {
         linkParts[0] += "#"
     }
     return linkParts.join('')
-}
-
-// Useful for preventing absolute-positioned elements from exceeding window height.
-const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
-    const [height, setHeight] = useState('100vh')
-    const el = useRef<HTMLDivElement|null>(null)
-
-    const handleResize = () => {
-        const elem = el.current
-        elem && setHeight(`calc(100vh - ${elem.getBoundingClientRect().top}px${marginBottom ? ' - ' + marginBottom : ''})`)
-    }
-
-    useEffect(() => {
-        if (show) {
-            window.addEventListener('resize', handleResize)
-            handleResize()
-            return () => window.removeEventListener('resize', handleResize)
-        }
-    }, [show])
-
-    return [el, { maxHeight: height, overflowY: 'scroll' }]
 }
 
 const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx:string, ch:curriculum.TOCItem, chIdx:string }) => {
