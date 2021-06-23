@@ -116,6 +116,7 @@ function($scope) {
             .then(function(script) {
                 $scope.referenceScript = script;
                 $scope.compilingReference = true;
+                $scope.$apply();
                 return $scope.compile(script, file.name);
             }).catch(function (err) {
                 console.error(err);
