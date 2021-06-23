@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from 'react-popper';
 import { Placement } from '@popperjs/core';
 import parse from 'html-react-parser';
+import { useTranslation } from "react-i18next";
 
 import { pages } from './bubbleData';
 import * as bubble from './bubbleState';
@@ -35,27 +36,28 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string}) => {
 const MessageFooter = () => {
     const currentPage = useSelector(bubble.selectCurrentPage);
     const dispatch = useDispatch();
+    const { t } = useTranslation()
 
     let buttons;
     if (currentPage === 0) {
         buttons = (
             <Fragment>
-                <NavButton name='Skip' tag='dismiss' />
-                <NavButton name='Start' tag='proceed' primary />
+                <NavButton name={t('bubble:buttons.skip')} tag='dismiss' />
+                <NavButton name={t('bubble:buttons.start')} tag='proceed' primary />
             </Fragment>
         );
     } else if (currentPage === 9) {
         buttons = (
             <Fragment>
                 <div className='w-40' />
-                <NavButton name='Close' tag='dismiss' primary/>
+                <NavButton name={t('bubble:buttons.close')} tag='dismiss' primary/>
             </Fragment>
         );
     } else {
         buttons = (
             <Fragment>
-                <NavButton name='Skip tour' tag='dismiss' />
-                <NavButton name='Next' tag='proceed' primary />
+                <NavButton name={t('bubble:buttons.skipTour')} tag='dismiss' />
+                <NavButton name={t('bubble:buttons.next')} tag='proceed' primary />
             </Fragment>
         );
     }
@@ -65,7 +67,7 @@ const MessageFooter = () => {
             <div className='w-1/2'>
                 { currentPage===0 && (
                     <div>
-                        <div className='text-sm'>Default programming language</div>
+                        <div className='text-sm'>{t('bubble:defaultProgrammingLanguage')}</div>
                         <select
                             className='border-0 border-b-2 border-black outline-none'
                             name="lang"
@@ -100,6 +102,7 @@ const DismissButton = () => {
 
 const MessageBox = () => {
     const currentPage = useSelector(bubble.selectCurrentPage);
+    const { t } = useTranslation()
 
     const [referenceElement, setReferenceElement] = useState<Element|null>(null);
     const [popperElement, setPopperElement] = useState(null);
@@ -196,10 +199,10 @@ const MessageBox = () => {
         >
             { [0,9].includes(currentPage) && <DismissButton /> }
             <div className='text-3xl font-black mb-4'>
-                { pages[currentPage].header }
+                { t(pages[currentPage].headerKey) }
             </div>
             <div>
-                { parse(pages[currentPage].body) }
+                { parse(t(pages[currentPage].bodyKey)) }
             </div>
             <MessageFooter />
             <div

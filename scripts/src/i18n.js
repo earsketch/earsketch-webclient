@@ -7,7 +7,7 @@ i18n
     .use(initReactI18next) // passes i18n down to react-i18next
     .init({
         fallbackLng: 'en',
-        ns: ['common', 'messages', 'api'],
+        ns: ['common', 'messages', 'api', 'bubble'],
         defaultNS: 'common',
         debug: false,
 
