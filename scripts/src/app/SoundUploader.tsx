@@ -337,7 +337,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             {searched && <div className="modal-section-header justify-start mb-3">{t('results')}</div>}
             {results && results.length > 0 &&
                 <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
-                    {results.map((result, index) => <div>
+                    {results.map((result, index) => <div key={index}>
                         <label>
                             <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
                                 onChange={e => {
