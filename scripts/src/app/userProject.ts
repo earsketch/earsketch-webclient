@@ -85,7 +85,11 @@ export async function postForm(endpoint: string, data?: { [key: string]: string 
     const url = URL_DOMAIN + endpoint
     try {
         // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
+        const text = await (await fetch(url, {
+            method: "POST",
+            body: form(data),
+            headers: { "Accept": "application/json" },
+        })).text()
         return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
@@ -133,19 +137,6 @@ async function postXML(endpoint: string, xml: string, params?: { [key: string]: 
 
 async function postXMLAuth(endpoint: string, xml: string) {
     return postXML(endpoint, xml, { username: getUsername(), password: getPassword() })
-}
-
-// Expects form data, returns XML.
-// As far as I can tell, there is only ONE endpoint like this: /services/scripts/import.
-async function postFormXML(endpoint: string, data?: { [key: string]: string | Blob }) {
-    const url = URL_DOMAIN + endpoint
-    // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-    const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
-    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
-}
-
-async function postAuthFormXML(endpoint: string, params: { [key: string]: string | Blob }) {
-    return postFormXML(endpoint, { username: getUsername(), password: getPassword(), ...params })
 }
 
 
@@ -696,7 +687,7 @@ export async function setScriptDesc(scriptname: string, scriptId: string, desc: 
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     if (isLoggedIn()) {
-        const data = await postAuthFormXML("/services/scripts/import", { scriptid })
+        const data = await postAuthForm("/services/scripts/import", { scriptid })
         delete sharedScripts[scriptid]
         closeSharedScript(scriptid)
         scripts[data.shareid] = data
