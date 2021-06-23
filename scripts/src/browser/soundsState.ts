@@ -178,27 +178,15 @@ export const {
 export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
     'sounds/getDefaultSounds',
     async (_, { getState, dispatch }) => {
-        const { sounds } = getState();
+        const { sounds } = getState()
         if (!sounds.defaultSounds.fileKeys.length) {
-            const endPoint = URL_DOMAIN + '/services/audio/getdefaultaudiotags';
-            const response = await fetch(endPoint, {
-                method: 'GET',
-                cache: 'default'
-            });
-            const data = await response.json();
-
-            const entities: { [key:string]: SoundEntity } = {};
-            const fileKeys = new Array(data.length);
-
-            data.forEach((sound: SoundEntity , i: number) => {
-                entities[sound.file_key] = sound;
-                fileKeys[i] = sound.file_key;
-            });
-
-            dispatch(setDefaultSounds({ entities, fileKeys }));
+            const data = await audioLibrary.getDefaultTagsMetadata()
+            const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.file_key]: sound })))
+            const fileKeys = data.map(sound => sound.file_key)
+            dispatch(setDefaultSounds({ entities, fileKeys }))
         }
     }
-);
+)
 
 export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
     'sounds/getUserSounds',
