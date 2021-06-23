@@ -4,6 +4,7 @@ import React, { Fragment, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AccountCreator } from "./AccountCreator"
+import { AdminWindow } from "./AdminWindow"
 import * as appState from "../app/appState"
 import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
@@ -278,10 +279,6 @@ function reportError() {
     openModal(ErrorForm, { email })
 }
 
-function openAdminWindow() {
-    // TODO
-}
-
 function forgotPass() {
     openModal(ForgotPassword)
 }
@@ -549,6 +546,11 @@ export const App = () => {
             lastname = result.lastName
             email = result.email
         }
+    }
+
+    const openAdminWindow = () => {
+        setShowNotifications(false)
+        const result = openModal(AdminWindow)
     }
 
     const toggleCAIWindow = () => {
