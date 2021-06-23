@@ -4,7 +4,6 @@ import { Ace, Range } from "ace-builds"
 import { ScriptEntity } from "common"
 import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
-import * as helpers from "../helpers"
 import store from "../reducers"
 import reporter from "./reporter"
 import * as scripts from "../browser/scriptsState"
@@ -323,7 +322,6 @@ function onMemberJoinedSession(data: Message) {
             canEdit: true
         }
     }
-    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 function onMemberLeftSession(data: Message) {
@@ -334,7 +332,6 @@ function onMemberLeftSession(data: Message) {
     }
 
     otherMembers[data.sender].active = false
-    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
@@ -677,8 +674,6 @@ function onSessionClosed(data: Message) {
     for (const member in otherMembers) {
         otherMembers[member].active = false
     }
-
-    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 function onSessionClosedForInactivity(data: Message) {

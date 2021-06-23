@@ -10,7 +10,7 @@ import * as collaboration from "../app/collaboration"
 import * as compiler from "../app/compiler"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
-import { DAW } from "../daw/DAW"
+import { DAW, setDAWData } from "../daw/DAW"
 import { Editor } from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
@@ -25,7 +25,6 @@ import reporter from "../app/reporter"
 import * as tabs from "./tabState"
 import * as cai from "../cai/caiState"
 import * as caiAnalysis from "../cai/analysis"
-import * as helpers from "../helpers"
 import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
 import { Tabs } from "./Tabs"
@@ -283,7 +282,10 @@ export function compileCode() {
     promise.then(result => {
         const duration = Date.now() - startTime
         setLoading(false)
-        helpers.getNgRootScope().$broadcast("compiled", result)
+        if (result) {
+            esconsole("Code compiled, updating DAW.", "ide")
+            setDAWData(result)
+        }
         reporter.compile(language, true, undefined, duration)
         userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
         saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)

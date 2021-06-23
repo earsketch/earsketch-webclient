@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import store, { RootState, ThunkAPI } from '../reducers'
-import angular from 'angular';
 import * as layout from '../layout/layoutState'
 import * as curriculum from '../browser/curriculumState'
 import * as editor from '../ide/Editor'
-import * as helpers from '../helpers'
 import * as userProject from '../app/userProject'
 import * as analysis from './analysis'
 import * as codeSuggestion from './codeSuggestion'
@@ -104,7 +102,6 @@ function newCAIMessage() {
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     'cai/introduceCAI',
     (_, { getState, dispatch }) => {
-        const rootScope = helpers.getNgRootScope()
         // reinitialize recommendation dictionary
         analysis.fillDict().then(function() {
             const msgText = dialogue.generateOutput("Chat with CAI");
@@ -123,7 +120,7 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
 
                     dispatch(addToMessageList(outputMessage))
                     dispatch(autoScrollCAI())
-                    rootScope.$broadcast('newCAIMessage')
+                    newCAIMessage()
                 }
             }
         })
@@ -133,8 +130,6 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
 export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
     'cai/sendCAIMessage',
     (input, { getState, dispatch }) => {
-        const rootScope = helpers.getNgRootScope()
-
         dialogue.studentInteract()
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, '') === '') {
             return
@@ -219,8 +214,6 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     'cai/compileCAI',
     (data, { getState, dispatch }) => {
-        const rootScope = helpers.getNgRootScope()
-
         if (dialogue.isDone()) {
             return
         }
@@ -294,8 +287,8 @@ export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
     'cai/autoScrollCAI',
     (_, { getState, dispatch }) => {
         // Auto scroll to the bottom (set on a timer to happen after message updates).
-        const caiBody = angular.element('#cai-body')[0]
-        setTimeout(function(){
+        const caiBody = document.getElementById('cai-body')
+        setTimeout(() => {
             if (caiBody) {
                 caiBody.scrollTop = caiBody.scrollHeight
             }

@@ -27,9 +27,8 @@ const appSlice = createSlice({
         },
         setColorTheme(state, { payload }) {
             state.colorTheme = payload;
-        },
-        toggleColorTheme(state) {
-            state.colorTheme = state.colorTheme === 'light' ? 'dark' : 'light';
+            // For the benefit of the loading screen:
+            localStorage.setItem("colorTheme", payload);
         },
         setFontSize(state, { payload }) {
             state.fontSize = payload
@@ -72,7 +71,6 @@ export default persistReducer(persistConfig, appSlice.reducer);
 export const {
     setScriptLanguage,
     setColorTheme,
-    toggleColorTheme,
     setFontSize,
     setEmbedMode,
     setHideDAW,

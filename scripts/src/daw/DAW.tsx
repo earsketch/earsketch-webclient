@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { hot } from 'react-hot-loader/root'
 
 import * as appState from '../app/appState'
 import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
-import * as helpers from "../helpers"
 import { compileCode } from "../ide/IDE"
 import * as player from '../app/player'
 import esconsole from '../esconsole'
@@ -688,22 +686,7 @@ export function setDAWData(result: player.DAWData) {
     dispatch(daw.setLoop(newLoop))
 }
 
-let setupDone = false
-const setup = () => {
-    if (setupDone) return
-    setupDone = true
-
-    // everything in here gets reset when a new project is loaded
-    // Listen for the IDE to compile code and return a JSON result
-    helpers.getNgRootScope().$on('compiled', (event: any, result: player.DAWData | null | undefined) => {
-        if (result) {
-            esconsole("code compiled", "daw")
-            setDAWData(result)
-        }
-    })
-}
-
-const DAW = () => {
+export const DAW = () => {
     const dispatch = useDispatch()
     const xScale = useSelector(daw.selectXScale)
     const trackColors = useSelector(daw.selectTrackColors)
@@ -1061,10 +1044,3 @@ const DAW = () => {
         </div>}
     </div>
 }
-
-const HotDAW = hot(() => {
-    setup()
-    return <DAW />
-})
-
-export { HotDAW as DAW }

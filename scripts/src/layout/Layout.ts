@@ -73,9 +73,6 @@ export const initialize = () => {
     // Initialize the draggability for the horizontal gutters.
     !layout.isWestOpen(store.getState()) && toggleHorizontalDrag(0, false);
     !layout.isEastOpen(store.getState()) && toggleHorizontalDrag(1, false);
-
-    // Not sure if this is the best place to hide the loading screen, but it seems to work okay.
-    document.getElementById("screen")!.style.display = "none";
 };
 
 export const destroy = () => {

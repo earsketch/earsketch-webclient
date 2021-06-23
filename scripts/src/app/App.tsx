@@ -19,7 +19,6 @@ import { ErrorForm } from "./ErrorForm"
 import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as helpers from "../helpers"
 import { IDE, openShare } from "../ide/IDE"
 import * as Layout from "../layout/Layout"
 import * as layout from "../layout/layoutState"
@@ -258,7 +257,7 @@ export function reloadRecommendations() {
 }
 
 function toggleColorTheme() {
-    store.dispatch(appState.toggleColorTheme())
+    store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === 'light' ? 'dark' : 'light'))
     reporter.toggleColorTheme()
 }
 
@@ -272,11 +271,7 @@ function reportError() {
 }
 
 function openAdminWindow() {
-    helpers.getNgService("$uibModal").open({
-        templateUrl: "templates/admin-window.html",
-        controller: "adminwindowController",
-        scope: {}
-    })
+    // TODO
 }
 
 function forgotPass() {

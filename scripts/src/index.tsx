@@ -5,6 +5,14 @@ import "./i18n"
 
 import angular from "angular"
 
+// TODO: These import globals for now.
+import "highlight"
+import "jsDiffLib"
+import "jsDiffView"
+import "kali"
+import "skulpt"
+import "skulptStdLib"
+
 import { Question } from "./browser/questions"
 (window as any).Question = Question  // Used inside curriculum.
 
@@ -33,7 +41,6 @@ window.droplet = droplet
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
 import "./ide/completer"
 
-import { react2angular } from "react2angular"
 import React from "react"
 import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
@@ -71,88 +78,72 @@ if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
     alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
 }
 
-// Async loading
-(require as any)(["angular"], () => {
-    // NPM
-    require("bootstrapBundle")
-    require("ng-file-upload")
-
-    require("skulpt")
-    require("skulptStdLib")
-    require("js-interpreter")
-    require("droplet")
-    require("highlight")
-    require("jsDiffLib")
-    require("jsDiffView")
-    require("lodash")
-    require("kali")
-    require("chance")
-
-    window.app = angular.module("EarSketchApp", ["ngFileUpload"]).config(["$locationProvider", ($locationProvider: any) => {
-        // Prevent legacy hash-bang URL being overwritten by $location.
-        $locationProvider.html5Mode(true).hashPrefix("")
-    }])
-
-    // In-house modules
-    require("recorder")
-
-    // Controllers
-    require("adminWindowController")
-
-    app.component("app", react2angular(App))
-    app.filter("formatTimer", () => ESUtils.formatTime)
-
-    // Autograders
-    require("autograderController")
-    require("autograder2Controller")
-    require("autograderAWSController")
-    require("autograder3Controller")
-
-    app.factory("$exceptionHandler", () => {
-        return (exception: any, cause: any) => {
-            console.log(exception)
-            esconsole(exception, ["error", "angular"])
-            // ensures we don't report Skulpt errors to GA
-            if (exception.args === undefined) {
-                reporter.exception(exception.toString())
-            }
-        }
-    })
-
-    // Angular template cache buster. Uses the BUILD_NUM from main.js
-    app.config(["$provide", function($provide: any) {
-        return $provide.decorator("$http", ["$delegate", function($delegate: any) {
-            const get = $delegate.get
-            $delegate.get = (url: any, config: any) => {
-                // ignore Angular Bootstrap UI templates
-                // also unit tests won't like release numbers added
-                if (!url.includes("template/") && BUILD_NUM !== undefined) {
-                    const parser = document.createElement("a")
-                    parser.href = url
-                    if (!parser.search) {
-                        parser.search = "?release=" + BUILD_NUM
-                    } else {
-                        parser.search += "&release=" + BUILD_NUM
-                    }
-                    url = parser.href
-                }
-                return get(url, config)
-            }
-            return $delegate
-        }])
-    }])
-
-    angular.bootstrap(document, ["EarSketchApp"], { strictDi: true })
-
-    // Temporary hack for autograders: don't start the React app on autograder endpoints.
+if (/\/autograder\w*\/?$/.test(location.href)) {
+    // Temporary hack for autograders: load angular and don't start the React app on autograder endpoints.
     // TODO: Replace this with normal routing after autograders have been migrated.
-    if (!/\/autograder\w*\/?$/.test(location.href)) {
-        ReactDOM.render(
-            <React.StrictMode>
+    // Async loading
+    (require as any)(["angular"], () => {
+        // NPM
+        require("bootstrapBundle")
+        require("ng-file-upload")
+        require("chance")
+
+        window.app = angular.module("EarSketchApp", ["ngFileUpload"]).config(["$locationProvider", ($locationProvider: any) => {
+            // Prevent legacy hash-bang URL being overwritten by $location.
+            $locationProvider.html5Mode(true).hashPrefix("")
+        }])
+
+        app.filter("formatTimer", () => ESUtils.formatTime)
+
+        // Autograders
+        require("autograderController")
+        require("autograder2Controller")
+        require("autograderAWSController")
+        require("autograder3Controller")
+
+        app.factory("$exceptionHandler", () => {
+            return (exception: any, cause: any) => {
+                console.log(exception)
+                esconsole(exception, ["error", "angular"])
+                // ensures we don't report Skulpt errors to GA
+                if (exception.args === undefined) {
+                    reporter.exception(exception.toString())
+                }
+            }
+        })
+
+        // Angular template cache buster. Uses the BUILD_NUM from main.js
+        app.config(["$provide", function($provide: any) {
+            return $provide.decorator("$http", ["$delegate", function($delegate: any) {
+                const get = $delegate.get
+                $delegate.get = (url: any, config: any) => {
+                    // ignore Angular Bootstrap UI templates
+                    // also unit tests won't like release numbers added
+                    if (!url.includes("template/") && BUILD_NUM !== undefined) {
+                        const parser = document.createElement("a")
+                        parser.href = url
+                        if (!parser.search) {
+                            parser.search = "?release=" + BUILD_NUM
+                        } else {
+                            parser.search += "&release=" + BUILD_NUM
+                        }
+                        url = parser.href
+                    }
+                    return get(url, config)
+                }
+                return $delegate
+            }])
+        }])
+
+        angular.bootstrap(document, ["EarSketchApp"], { strictDi: true })
+    })
+} else {
+    // Load the normal React app.
+    ReactDOM.render(
+        <React.StrictMode>
             <Provider store={store}>
                 <App />
             </Provider>
-            </React.StrictMode>,
-            document.getElementById("root"))
-    }
-})
+        </React.StrictMode>,
+        document.getElementById("root"))
+}
