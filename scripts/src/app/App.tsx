@@ -687,7 +687,7 @@ export const App = () => {
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 text-4xl">
                             {loggedIn
-                            ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl"><em className="text-black">{username}</em>&nbsp;<span className="caret" /></div>
+                            ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
                             : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>Create / Reset Account</div>}
                         </Menu.Button>
                         <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
