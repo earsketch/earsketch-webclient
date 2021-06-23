@@ -754,7 +754,7 @@ export async function addRole(username: string, role: string) {
 // Remove role from user
 export async function removeRole(username: string, role: string) {
     if (isLoggedIn()) {
-        return postAdminForm("/services/scripts/adduserrole", { username, role })
+        return postAdminForm("/services/scripts/removeuserrole", { username, role })
     } else {
         esconsole("Login failure", ["error", "user"])
     }
