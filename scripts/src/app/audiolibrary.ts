@@ -143,11 +143,13 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
 
     // STEP 3: decode the audio data.
     esconsole(`Decoding ${filekey} buffer`, ["debug", "audiolibrary"])
+    console.log("safari debugging", bytes[0], bytes[1], bytes[2], data)
     let buffer
     try {
         buffer = await ctx.decodeAudioData(data) as AugmentedBuffer
     } catch (err) {
         esconsole("Error decoding audio clip: " + filekey, ["error", "audiolibrary"])
+        console.log("safari debugging", err)
         throw err
     }
     esconsole(filekey + " buffer decoded", ["debug", "audiolibrary"])
