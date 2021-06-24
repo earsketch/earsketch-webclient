@@ -196,7 +196,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
 
     recorder.callbacks.micReady = () => setMicReady(true)
 
-    useEffect(() => recorder.init(), [])
+    useEffect(() => { recorder.init() }, [])
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
         <div className="modal-body transparent">
