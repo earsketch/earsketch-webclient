@@ -15,9 +15,9 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
         </div>
 
         <div className="modal-body">
-            <AdminManageRoles></AdminManageRoles>
-            <AdminSendBroadcast></AdminSendBroadcast>
-            <AdminResetUserPassword></AdminResetUserPassword>
+            <AdminManageRoles />
+            <AdminSendBroadcast />
+            <AdminResetUserPassword />
         </div>
 
         <div className="modal-footer">
@@ -48,20 +48,17 @@ const AdminManageRoles = () => {
             if (data !== null) {
                 const m = "Successfully removed " + role + " role from " + username
                 setModifyRoleStatus({ message: m, style: "alert alert-success" })
-                // on success, update list of users with roles
                 setUsersWithRoles(usersWithRoles.filter(u => u.username !== username))
-            } else {
-                const m = "Failed to remove " + role + " role from " + username
-                setModifyRoleStatus({ message: m, style: "alert alert-danger" })
+                return
             }
         } catch (error) {
-            const m = "Failed to remove " + role + " role from " + username
-            setModifyRoleStatus({ message: m, style: "alert alert-danger" })
-            esconsole(error, "error")
+            esconsole(error, ["error", "admin"])
         }
+        const m = "Failed to remove " + role + " role from " + username
+        setModifyRoleStatus({ message: m, style: "alert alert-danger" })
     }
 
-    const applyAdminRoleToUser = async () => {
+    const addAdminRoleToUser = async () => {
         const username = newAdmin
         const role = "admin"
         if (username == "") {
@@ -74,59 +71,52 @@ const AdminManageRoles = () => {
             if (data !== null) {
                 const m = "Successfully added " + role + " role to " + username
                 setModifyRoleStatus({ message: m, style: "alert alert-success" })
-                // on success, update list of users with roles
-                const user: User = {username: username, role: role}
+                const user: User = { username: username, role: role }
                 setUsersWithRoles([...usersWithRoles, user]
                   .sort((a, b) => a.username.localeCompare(b.username))
                 )
-            } else {
-                const m = "Failed to add " + role + " role to " + username
-                setModifyRoleStatus({ message: m, style: "alert alert-danger" })
+                return
             }
         } catch (error) {
-            const m = "Failed to add " + role + " role to " + username
-            setModifyRoleStatus({ message: m, style: "alert alert-danger" })
-            esconsole(error, "error")
+            esconsole(error, ["error", "admin"])
         }
+        const m = "Failed to add " + role + " role to " + username
+        setModifyRoleStatus({ message: m, style: "alert alert-danger" })
     }
 
-    return (
-        <>
-            <div className="modal-section-body">
-                <div className="m-2 px-4 pt-2 pb-4">
-                    {
-                        modifyRoleStatus.message &&
-                        <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>
-                    }
-                    <div className="font-bold text-3xl p-2">Remove Roles</div>
-                    <table className="p-2 text-left w-full">
-                        <tbody className="h-40 bg-grey-light flex flex-col overflow-y-scroll">
-                            {usersWithRoles.map(({username, role}) =>
-                                <tr className="flex w-11/12" key={username+role}>
-                                    <td className="my-px mx-2 w-1/4">{username}</td>
-                                    <td className="my-px mx-2 w-1/4">{role}&nbsp;
-                                        <i onClick={() => removeRole(username, role)}
-                                            title="Remove role"
-                                            className="icon icon-cross2" />
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+    return (<>
+        <div className="modal-section-body">
+            <div className="m-2 px-4 pt-2 pb-4">
+            {modifyRoleStatus.message && <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>}
+                <div className="font-bold text-3xl p-2">Remove Roles</div>
+                <table className="p-2 text-left w-full border border-gray-300">
+                    <tbody className="h-40 bg-grey-light flex flex-col overflow-y-scroll">
+                        {usersWithRoles.map(({ username, role }) =>
+                            <tr className="flex items-center w-11/12" key={username+role}>
+                                <td className="my-px mx-2 w-1/4">{username}</td>
+                                <td className="my-px mx-2 w-1/4">{role}&nbsp;
+                                    <i onClick={() => removeRole(username, role)}
+                                        title="Remove role"
+                                        className="icon icon-cross2" />
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-            <div className="modal-section-body">
-                <div className="m-2 p-4 border-t border-gray-400">
-                    <div className="font-bold text-3xl p-2">Add Roles</div>
-                    <form onSubmit={e => { e.preventDefault(); applyAdminRoleToUser() }} className="flex">
-                        <input type="text" placeholder="username" onChange={e => setNewAdmin(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
-                        <input type="submit" value="APPLY ADMIN ROLE" className="text-blue-600 bg-transparent flex-initial" />
-                    </form>
-                </div>
+        <div className="modal-section-body">
+            <div className="m-2 p-4 border-t border-gray-400">
+                <div className="font-bold text-3xl p-2">Add Roles</div>
+                <form onSubmit={e => { e.preventDefault(); addAdminRoleToUser() }} className="flex items-center">
+                    <input type="text" className="m-2 w-1/4 form-control"
+                           placeholder="Username" onChange={e => setNewAdmin(e.target.value)}/>
+                    <input type="submit" value="ADD ADMIN" className="btn btn-primary" />
+                </form>
             </div>
-        </>
-    )
+        </div>
+    </>)
 }
 
 const AdminSendBroadcast = () => {
@@ -135,42 +125,39 @@ const AdminSendBroadcast = () => {
     const [message, setMessage] = useState("")
     const [link, setLink] = useState("")
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
-    const [broadcastStatus, setBroadcastStatus] = useState({message: "", style: ""})
+    const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
 
     const sendBroadcast = () => {
         websocket.broadcast(message, userProject.getUsername(), link, expiration);
-        // always show 'message sent', as we have no indication of success or failure
+        // always show success message, as we have no indication of failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
     }
 
-    return (
-        <>
-            <div className="modal-section-body">
-                <div className="m-2 p-4 border-t border-gray-400">
-                    {
-                        broadcastStatus.message &&
-                        <div className={broadcastStatus.style}>{broadcastStatus.message}</div>
-                    }
-                    <div className="font-bold text-3xl p-2">Send Broadcast</div>
-                    <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
-                        <input type="text" placeholder="message" maxLength={500} onChange={e => setMessage(e.target.value)} className="m-2 w-10/12 form-control flex-initial" />
-                        <div className="flex">
-                            <input type="text" placeholder="hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
-                            <input type="number" placeholder="days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
-                            <input type="submit" value="SEND" className="text-blue-600 bg-transparent flex-initial" />
-                        </div>
-                    </form>
-                </div>
+    return (<>
+        <div className="modal-section-body">
+            <div className="m-2 p-4 border-t border-gray-400">
+                {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
+                <div className="font-bold text-3xl p-2">Send Broadcast</div>
+                <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
+                    <input type="text" className="m-2 w-10/12 form-control"
+                           placeholder="Message" maxLength={500} onChange={e => setMessage(e.target.value)} />
+                    <div className="flex items-center">
+                        <input type="text" className="m-2 w-1/4 form-control"
+                               placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
+                        <input type="number" className="m-2 w-1/4 form-control"
+                               placeholder="Days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
+                        <input type="submit" value="SEND"  className="btn btn-primary" />
+                    </div>
+                </form>
             </div>
-        </>
-  );
+        </div>
+    </>)
 }
 
 const AdminResetUserPassword = () => {
     const [username, setUsername] = useState("")
     const [adminPassphrase, setAdminPassphrase] = useState("")
     const [newUserPassword, setNewUserPassword] = useState("")
-    const [showResetControls, setShowResetControls] = useState(false)
     const [userDetails, setUserDetails] = useState({ username: "", email: "" })
     const [passwordStatus, setPasswordStatus] = useState({ message: "", style: "" })
 
@@ -179,15 +166,14 @@ const AdminResetUserPassword = () => {
             const data = await userProject.searchUsers(username)
             if (data !== null) {
                 setUserDetails({ username: data.username, email: data.email })
-                setShowResetControls(true)
-            } else {
-                setUserDetails({ username: "", email: "" })
-                setShowResetControls(false)
+                setPasswordStatus({ message: "", style: "" })
+                return
             }
         } catch (error) {
-            setShowResetControls(false)
-            esconsole(error, "error")
+            esconsole(error, ["error", "admin"])
         }
+        setUserDetails({ username: "", email: "" })
+        setPasswordStatus({ message: "No such user", style: "alert alert-danger" })
     }
 
     const setPassword = async () => {
@@ -195,51 +181,40 @@ const AdminResetUserPassword = () => {
             const data = await userProject.setPasswordForUser(username, newUserPassword, adminPassphrase)
             if (data !== null) {
                 const m = "New password set for " + username
-                // todo 401 is not handled, so for now this always returns success
-                setPasswordStatus({ message: "Done", style: "alert alert-success" })
-            } else {
-                const m = "Failed to set password for " + username
-                setPasswordStatus({ message: m, style: "alert alert-danger" })
+                setPasswordStatus({ message: m, style: "alert alert-success" })
+                return
             }
         } catch (error) {
-            const m = "Failed to set password for " + username
-            setPasswordStatus({ message: m, style: "alert alert-danger" })
-            esconsole(error, "error")
+            esconsole(error, ["error", "admin"])
         }
+        const m = "Failed to set password for " + username
+        setPasswordStatus({ message: m, style: "alert alert-danger" })
     }
 
-    return (
-        <>
-            <div className="modal-section-body">
-                <div className="m-2 p-4 border-t border-gray-400">
-                    {
-                        passwordStatus.message &&
-                        <div className={passwordStatus.style}>{passwordStatus.message}</div>
-                    }
-                    <div className="font-bold text-3xl p-2">Password Change</div>
-                    <form onSubmit={e => { e.preventDefault(); setPassword() }}>
-                        <div className="flex">
-                            <input type="text" placeholder="username" onChange={e => setUsername(e.target.value)} className="m-2 w-1/4 form-control flex-intial" />
-                            <div onClick={searchUsers} className="mt-5 align-middle text-blue-600 bg-transparent flex-initial">SEARCH USERS</div>
-                        </div>
-                        {
-                            // show password reset controls only after a valid username is entered
-                            showResetControls &&
-                            <div>
-                                <div className="p-4">
-                                    <div className="italic">Username: {userDetails.username}</div>
-                                    <div className="italic">Email: {userDetails.email}</div>
-                                </div>
-                                <div className="flex">
-                                    <input type="text" placeholder="admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
-                                    <input type="text" placeholder="new user password" onChange={e => setNewUserPassword(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
-                                    <input type="submit" value="SET PASSWORD" className="text-blue-600 bg-transparent flex-initial" />
-                                </div>
-                            </div>
-                        }
+    return (<>
+        <div className="modal-section-body">
+            <div className="m-2 p-4 border-t border-gray-400">
+                {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
+                <div className="font-bold text-3xl p-2">Password Change</div>
+                    <form onSubmit={e => {e.preventDefault(); searchUsers()}} className="flex items-center">
+                        <input type="text" className="m-2 w-1/4 form-control"
+                               placeholder="Username" onChange={e => setUsername(e.target.value)} />
+                        <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
                     </form>
-                </div>
+                    {userDetails.username.length > 0 && <form onSubmit={e => {e.preventDefault(); setPassword()}}>
+                        <div className="p-4">
+                            <div className="italic">Username: {userDetails.username}</div>
+                            <div className="italic">Email: {userDetails.email}</div>
+                        </div>
+                        <div className="flex items-center">
+                            <input type="password" className="m-2 w-1/4 form-control"
+                                   placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
+                            <input type="password" className="m-2 w-1/4 form-control"
+                                   placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
+                            <input type="submit" value="SET PASSWORD" className="btn btn-primary" />
+                        </div>
+                    </form>}
             </div>
-        </>
-    );
+        </div>
+    </>);
 }

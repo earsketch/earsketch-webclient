@@ -805,7 +805,7 @@ export async function setPasswordForUser(username: string, password: string, adm
         newpassword: encodeURIComponent(btoa(password)),
     }
     await postForm("/services/scripts/modifypwdadmin", data)
-    userNotification.show("Successfully set a new password for user: " + username + " with password: " + password, "history", 3)
+    userNotification.show("Successfully set a new password for " + username, "history", 3)
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
