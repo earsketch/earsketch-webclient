@@ -21,9 +21,7 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
         </div>
 
         <div className="modal-footer">
-            <span onClick={close}>
-                <a href="#" style={{color: "#d04f4d", marginRight: "14px"}}><i className="icon icon-cross2" />CLOSE</a>
-            </span>
+            <input type="button" className="btn btn-primary" onClick={close} value="CLOSE" />
         </div>
     </>
 }
@@ -121,8 +119,10 @@ const AdminManageRoles = () => {
             <div className="modal-section-body">
                 <div className="m-2 p-4 border-t border-gray-400">
                     <div className="font-bold text-3xl p-2">Add Roles</div>
-                    <input type="text" placeholder="username" onChange={e => setNewAdmin(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <a href="#" onClick={applyAdminRoleToUser}>APPLY ADMIN ROLE</a>
+                    <form onSubmit={e => { e.preventDefault(); applyAdminRoleToUser() }} className="flex">
+                        <input type="text" placeholder="username" onChange={e => setNewAdmin(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
+                        <input type="submit" value="APPLY ADMIN ROLE" className="text-blue-600 bg-transparent flex-initial" />
+                    </form>
                 </div>
             </div>
         </>
@@ -152,10 +152,14 @@ const AdminSendBroadcast = () => {
                         <div className={broadcastStatus.style}>{broadcastStatus.message}</div>
                     }
                     <div className="font-bold text-3xl p-2">Send Broadcast</div>
-                    <input type="text" placeholder="message" maxLength={500} onChange={e => setMessage(e.target.value)} className="m-2 w-10/12 border-2 border-gray-200 text-black" />
-                    <input type="text" placeholder="hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <input type="number" placeholder="days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <a href="#" onClick={sendBroadcast}>SEND</a>
+                    <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
+                        <input type="text" placeholder="message" maxLength={500} onChange={e => setMessage(e.target.value)} className="m-2 w-10/12 form-control flex-initial" />
+                        <div className="flex">
+                            <input type="text" placeholder="hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
+                            <input type="number" placeholder="days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
+                            <input type="submit" value="SEND" className="text-blue-600 bg-transparent flex-initial" />
+                        </div>
+                    </form>
                 </div>
             </div>
         </>
@@ -170,7 +174,7 @@ const AdminResetUserPassword = () => {
     const [userDetails, setUserDetails] = useState({ username: "", email: "" })
     const [passwordStatus, setPasswordStatus] = useState({ message: "", style: "" })
 
-    const searchForUser = async () => {
+    const searchUsers = async () => {
         try {
             const data = await userProject.searchUsers(username)
             if (data !== null) {
@@ -213,23 +217,27 @@ const AdminResetUserPassword = () => {
                         <div className={passwordStatus.style}>{passwordStatus.message}</div>
                     }
                     <div className="font-bold text-3xl p-2">Password Change</div>
-                    <input type="text" placeholder="username" onChange={e => setUsername(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <a href="#" onClick={searchForUser}>SEARCH USERS</a>
-                    {
-                        // show password reset controls only after a valid username is entered
-                        showResetControls &&
-                        <div>
-                            <div className="p-4">
-                                <div className="italic">Username: {userDetails.username}</div>
-                            <div className="italic">Email: {userDetails.email}</div>
-                            </div>
-                            <div>
-                                <input type="text" placeholder="admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                                <input type="text" placeholder="new user password" onChange={e => setNewUserPassword(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                                <a href="#" onClick={setPassword}>SET PASSWORD</a>
-                            </div>
+                    <form onSubmit={e => { e.preventDefault(); setPassword() }}>
+                        <div className="flex">
+                            <input type="text" placeholder="username" onChange={e => setUsername(e.target.value)} className="m-2 w-1/4 form-control flex-intial" />
+                            <div onClick={searchUsers} className="mt-5 align-middle text-blue-600 bg-transparent flex-initial">SEARCH USERS</div>
                         </div>
-                    }
+                        {
+                            // show password reset controls only after a valid username is entered
+                            showResetControls &&
+                            <div>
+                                <div className="p-4">
+                                    <div className="italic">Username: {userDetails.username}</div>
+                                    <div className="italic">Email: {userDetails.email}</div>
+                                </div>
+                                <div className="flex">
+                                    <input type="text" placeholder="admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
+                                    <input type="text" placeholder="new user password" onChange={e => setNewUserPassword(e.target.value)} className="m-2 w-1/4 form-control flex-initial" />
+                                    <input type="submit" value="SET PASSWORD" className="text-blue-600 bg-transparent flex-initial" />
+                                </div>
+                            </div>
+                        }
+                    </form>
                 </div>
             </div>
         </>
