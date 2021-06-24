@@ -21,7 +21,7 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
         </div>
 
         <div className="modal-footer">
-            <input type="button" className="btn btn-primary" onClick={close} value="CLOSE" />
+            <input type="button" className="btn btn-default" onClick={close} value="CLOSE" />
         </div>
     </>
 }
@@ -84,7 +84,7 @@ const AdminManageRoles = () => {
         setModifyRoleStatus({ message: m, style: "alert alert-danger" })
     }
 
-    return (<>
+    return <>
         <div className="modal-section-body">
             <div className="m-2 px-4 pt-2 pb-4">
             {modifyRoleStatus.message && <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>}
@@ -111,12 +111,12 @@ const AdminManageRoles = () => {
                 <div className="font-bold text-3xl p-2">Add Roles</div>
                 <form onSubmit={e => { e.preventDefault(); addAdminRoleToUser() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
-                           placeholder="Username" onChange={e => setNewAdmin(e.target.value)}/>
+                           placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
                     <input type="submit" value="ADD ADMIN" className="btn btn-primary" />
                 </form>
             </div>
         </div>
-    </>)
+    </>
 }
 
 const AdminSendBroadcast = () => {
@@ -133,25 +133,25 @@ const AdminSendBroadcast = () => {
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
     }
 
-    return (<>
+    return <>
         <div className="modal-section-body">
             <div className="m-2 p-4 border-t border-gray-400">
                 {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
                 <div className="font-bold text-3xl p-2">Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
                     <input type="text" className="m-2 w-10/12 form-control"
-                           placeholder="Message" maxLength={500} onChange={e => setMessage(e.target.value)} />
+                           placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
                     <div className="flex items-center">
                         <input type="text" className="m-2 w-1/4 form-control"
                                placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
                         <input type="number" className="m-2 w-1/4 form-control"
                                placeholder="Days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
-                        <input type="submit" value="SEND"  className="btn btn-primary" />
+                        <input type="submit" value="SEND" className="btn btn-primary" />
                     </div>
                 </form>
             </div>
         </div>
-    </>)
+    </>
 }
 
 const AdminResetUserPassword = () => {
@@ -191,14 +191,14 @@ const AdminResetUserPassword = () => {
         setPasswordStatus({ message: m, style: "alert alert-danger" })
     }
 
-    return (<>
+    return <>
         <div className="modal-section-body">
             <div className="m-2 p-4 border-t border-gray-400">
                 {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
                 <div className="font-bold text-3xl p-2">Password Change</div>
                     <form onSubmit={e => {e.preventDefault(); searchUsers()}} className="flex items-center">
                         <input type="text" className="m-2 w-1/4 form-control"
-                               placeholder="Username" onChange={e => setUsername(e.target.value)} />
+                               placeholder="Username" required onChange={e => setUsername(e.target.value)} />
                         <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
                     </form>
                     {userDetails.username.length > 0 && <form onSubmit={e => {e.preventDefault(); setPassword()}}>
@@ -216,5 +216,5 @@ const AdminResetUserPassword = () => {
                     </form>}
             </div>
         </div>
-    </>);
+    </>
 }

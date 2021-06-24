@@ -41,14 +41,11 @@ module.exports = {
             esDSP: path.resolve(__dirname,`${libDir}/earsketch-dsp.js`),
 
             // Controllers
-            adminWindowController: path.resolve(__dirname,`${appDir}/adminWindowController.js`),
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
             autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
             codeAnalyzerController: path.resolve(__dirname,`${appDir}/codeAnalyzerController.js`),
             codeAnalyzerContestController: path.resolve(__dirname,`${appDir}/codeAnalyzerContestController.js`),
             codeAnalyzerCAIController: path.resolve(__dirname,`${appDir}/codeAnalyzerCAIController.js`),
-
-            helpers: path.resolve(__dirname,`scripts/src/helpers.ts`),
             
             // Curriculum Data
             currQuestions: path.resolve(__dirname,`scripts/src/browser/questions.js`),

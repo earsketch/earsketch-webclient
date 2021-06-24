@@ -791,17 +791,17 @@ export async function setPasswordForUser(username: string, password: string, adm
     if (!isLoggedIn()) {
         throw "Login failure"
     }
-    const adminPwd = getPassword()
-    if (adminPwd === null) {
+    const adminpwd = getPassword()
+    if (adminpwd === null) {
         throw "Missing admin password"
     }
 
     esconsole("Admin setting a new password for user")
     const data = {
         adminid: getUsername(),
-        adminpwd: adminPwd,
+        adminpwd,
         adminpp: btoa(adminPassphrase),
-        username: username,
+        username,
         newpassword: encodeURIComponent(btoa(password)),
     }
     await postForm("/services/scripts/modifypwdadmin", data)
