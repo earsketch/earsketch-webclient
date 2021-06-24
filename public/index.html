@@ -45,15 +45,16 @@
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
-        <div style="height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center">
+        <div id="loading-screen" style="height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center">
             <div style="font-size: 3rem; padding-bottom: 4rem">Loading EarSketch...</div>
             <div id="loading-spinner"></div>
         </div>
         <script>
             // Since React is loaded later, CSS file swapping will be too late to change the color of the loading screen.
             if (localStorage['colorTheme'] === 'dark') {
-                document.body.style['background-color'] = '#282828'
-                document.body.style['color'] = '#EEE'
+                const element = document.getElementById("loading-screen")
+                element.style['background-color'] = '#282828'
+                element.style['color'] = '#EEE'
             }
         </script>
     </div>

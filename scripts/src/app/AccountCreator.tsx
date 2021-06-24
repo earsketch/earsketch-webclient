@@ -51,7 +51,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
         
         <form name="userForm" onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
-                {error && <div className="alert alert-danger">{error}</div>}     
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row">
                     <div className="col-md-12">
                         <div className="form-group">

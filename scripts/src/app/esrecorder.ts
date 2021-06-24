@@ -1,5 +1,6 @@
 import audioContext from "./audiocontext"
 import * as ESUtils from "../esutils"
+import "recorder"
 
 const RECORDER_OPTIONS = {
     bufferLen: 2048,
@@ -43,7 +44,7 @@ export function clear() {
     meterVal = 0
 }
 
-export function init() {
+export async function init() {
     clear()
 
     meter = createAudioMeter(audioContext, 1, 0.95, 500)
@@ -72,12 +73,17 @@ export function init() {
         }
     }
 
-    navigator.mediaDevices.getUserMedia(options)
-        .then(gotAudio)
-        .catch(() => callbacks.micAccessBlocked(micErrorForBrowser(ESUtils.whichBrowser())))
+    let stream
+    try {
+        stream = await navigator.mediaDevices.getUserMedia(options)
+    } catch (error) {
+        callbacks.micAccessBlocked(micErrorForBrowser(ESUtils.whichBrowser()))
+        return
+    }
+    setupAudio(stream)
 }
 
-function gotAudio(stream: any) {
+function setupAudio(stream: any) {
     callbacks.micReady()  // proceed to open the record menu UI
 
     const mic = audioContext.createMediaStreamSource(stream)

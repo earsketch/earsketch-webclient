@@ -415,11 +415,9 @@ function getClipTempo(result: DAWData) {
             if (tempoCache.hasOwnProperty(clip.filekey)) {
                 clip.tempo = tempoCache[clip.filekey]
             } else {
-                const match = metadata.find(item => {
-                    return item.file_key === clip.filekey
-                })
-                if (typeof match !== "undefined") {
-                    let tempo = parseInt(match.tempo)
+                const match = metadata.find(item => item.file_key === clip.filekey)
+                if (match !== undefined) {
+                    let tempo = +match.tempo
                     tempo = isNaN(tempo) ? -1 : tempo
                     clip.tempo = tempo
                     tempoCache[clip.filekey] = tempo

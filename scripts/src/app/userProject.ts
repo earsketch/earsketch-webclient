@@ -85,7 +85,11 @@ export async function postForm(endpoint: string, data?: { [key: string]: string 
     const url = URL_DOMAIN + endpoint
     try {
         // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
+        const text = await (await fetch(url, {
+            method: "POST",
+            body: form(data),
+            headers: { "Accept": "application/json" },
+        })).text()
         return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
@@ -133,19 +137,6 @@ async function postXML(endpoint: string, xml: string, params?: { [key: string]: 
 
 async function postXMLAuth(endpoint: string, xml: string) {
     return postXML(endpoint, xml, { username: getUsername(), password: getPassword() })
-}
-
-// Expects form data, returns XML.
-// As far as I can tell, there is only ONE endpoint like this: /services/scripts/import.
-async function postFormXML(endpoint: string, data?: { [key: string]: string | Blob }) {
-    const url = URL_DOMAIN + endpoint
-    // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-    const text = await (await fetch(url, { method: "POST", body: form(data) })).text()
-    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
-}
-
-async function postAuthFormXML(endpoint: string, params: { [key: string]: string | Blob }) {
-    return postFormXML(endpoint, { username: getUsername(), password: getPassword(), ...params })
 }
 
 
@@ -280,9 +271,8 @@ export async function login(username: string, password: string) {
 
     // update user project scripts
     for (const script of storedScripts) {
-        // reformat saved date to ISO 8601 format
         const offset = new Date().getTimezoneOffset()
-        script.modified = formatDateToISO(script.modified as string) + offset * 60000
+        script.modified = ESUtils.parseDate(script.modified as string) + offset * 60000
         scripts[script.shareid] = script
         // set this flag to false when the script gets modified
         // then set it to true when the script gets saved
@@ -363,8 +353,7 @@ export async function refreshCodeBrowser() {
         resetScripts()
 
         for (const script of fetchedScripts) {
-            // reformat saved date to ISO 8601 format
-            script.modified = formatDateToISO(script.modified as string)
+            script.modified = ESUtils.parseDate(script.modified as string)
             // set this flag to false when the script gets modified
             // then set it to true when the script gets saved
             script.saved = true
@@ -388,15 +377,6 @@ export async function refreshCodeBrowser() {
     }
 }
 
-// Format a date to ISO 8601
-// TODO: dates should be stored in the database so as to make this unnecessary
-function formatDateToISO(date: string) {
-    // Format created date to ISO 8601
-    const isoFormat = date.slice(0,-2).replace(" ", "T")
-    // javascript Date.parse() requires ISO 8601
-    return Date.parse(isoFormat)
-}
-
 // Fetch a script's history, authenticating via username and password.
 // Resolves to a list of historical scripts.
 export async function getScriptHistory(scriptid: string) {
@@ -404,7 +384,7 @@ export async function getScriptHistory(scriptid: string) {
     const data = await postAuthForm("/services/scripts/scripthistory", { scriptid })
     const scripts = extractScripts(data)
     for (const script of scripts) {
-        script.created = formatDateToISO(script.created as string)
+        script.created = ESUtils.parseDate(script.created as string)
     }
     return scripts
 }
@@ -696,7 +676,7 @@ export async function setScriptDesc(scriptname: string, scriptId: string, desc: 
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     if (isLoggedIn()) {
-        const data = await postAuthFormXML("/services/scripts/import", { scriptid })
+        const data = await postAuthForm("/services/scripts/import", { scriptid })
         delete sharedScripts[scriptid]
         closeSharedScript(scriptid)
         scripts[data.shareid] = data
