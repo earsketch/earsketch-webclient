@@ -747,13 +747,6 @@ const ModalContainer = () => {
           <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
         </Transition.Child>
 
-        {/* This element is to trick the browser into centering the modal contents. */}
-        <span
-          className="inline-block h-screen"
-          aria-hidden="true"
-        >
-          &#8203;
-        </span>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
