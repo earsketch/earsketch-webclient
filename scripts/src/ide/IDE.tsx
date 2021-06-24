@@ -262,9 +262,6 @@ export async function compileCode() {
 
     isWaitingForServerResponse = true
 
-    // TODO: only should clear when compiling another script?
-    WaveformCache.clear()
-
     setLoading(true)
 
     const code = editor.getValue()
@@ -310,6 +307,7 @@ export async function compileCode() {
     setLoading(false)
     if (result) {
         esconsole("Code compiled, updating DAW.", "ide")
+        WaveformCache.clear()
         setDAWData(result)
     }
     reporter.compile(language, true, undefined, duration)
