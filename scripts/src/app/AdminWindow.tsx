@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import esconsole from "../esconsole";
 import * as userProject from "./userProject";
 import * as websocket from "./websocket";
 
@@ -14,14 +15,14 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
         </div>
 
         <div className="modal-body">
-            <AdminManageRoles></AdminManageRoles><br />
-            <AdminSendBroadcast></AdminSendBroadcast><br />
-            <AdminResetUserPassword></AdminResetUserPassword><br />
+            <AdminManageRoles></AdminManageRoles>
+            <AdminSendBroadcast></AdminSendBroadcast>
+            <AdminResetUserPassword></AdminResetUserPassword>
         </div>
 
         <div className="modal-footer">
-            <span onClick={close}><a href="#" style={{color: "#d04f4d", marginRight: "14px"}}>
-                <i className="icon icon-cross2"></i>CANCEL</a>
+            <span onClick={close}>
+                <a href="#" style={{color: "#d04f4d", marginRight: "14px"}}><i className="icon icon-cross2" />CLOSE</a>
             </span>
         </div>
     </>
@@ -29,59 +30,79 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
 
 const AdminManageRoles = () => {
 
-    const usersWithRolesTest: User[] = [
-        {username: "music_user_1", role: "admin"},
-        {username: "music_user_2", role: "admin"},
-        {username: "music_user_3", role: "admin"},
-        {username: "music_user_4", role: "admin"},
-        {username: "music_user_5", role: "admin"},
-        {username: "music_user_6", role: "admin"},
-        {username: "music_user_7", role: "admin"},
-        {username: "music_user_8", role: "admin"},
-        {username: "music_user_9", role: "admin"},
-        {username: "music_user_10", role: "admin"},
-        {username: "music_user_11", role: "admin"},
-        {username: "music_user_12", role: "admin"},
-        {username: "music_user_13", role: "teacher"},
-        {username: "music_user_14", role: "teacher"},
-        {username: "music_user_15", role: "teacher"},
-    ]
-    const [usersWithRoles, setUsersWithRoles] = useState(usersWithRolesTest)
+    const [usersWithRoles, setUsersWithRoles] = useState([] as User[])
+    const [newAdmin, setNewAdmin] = useState("")
+    const [modifyRoleStatus, setModifyRoleStatus] = useState({ message: "", style: "" })
 
-    // infinite loop!
-    //const [usersWithRoles, setUsersWithRoles] = useState([] as User[])
-    //userProject.getAllUserRoles().then((res: User[]) => {
-    //    setUsersWithRoles(res.filter(usr => usr.role != "teacher"))
-    //})
+    useEffect(() => {
+        userProject.getAllUserRoles().then((res: User[]) => {
+            setUsersWithRoles(res
+                .filter(usr => usr.role === "admin")
+                .sort((a, b) => a.username.localeCompare(b.username))
+            )
+        })
+    }, [])
 
-    const removeRole = (username: string, role: string) => {
-        userProject.removeRole(username, role)
-        // todo: should check if the call above was successful
-        setUsersWithRoles(usersWithRoles.filter(user => user.username !== username))
+    const removeRole = async (username: string, role: string) => {
+        setModifyRoleStatus({ message: "Please wait...", style: "alert alert-secondary" })
+        try {
+            const data = await userProject.removeRole(username, role)
+            if (data !== null) {
+                const m = "Successfully removed " + role + " role from " + username
+                setModifyRoleStatus({ message: m, style: "alert alert-success" })
+                // on success, update list of users with roles
+                setUsersWithRoles(usersWithRoles.filter(u => u.username !== username))
+            } else {
+                const m = "Failed to remove " + role + " role from " + username
+                setModifyRoleStatus({ message: m, style: "alert alert-danger" })
+            }
+        } catch (error) {
+            const m = "Failed to remove " + role + " role from " + username
+            setModifyRoleStatus({ message: m, style: "alert alert-danger" })
+            esconsole(error, "error")
+        }
     }
 
-    const [newAdmin, setNewAdmin] = useState("")
-
-    const applyAdminRoleToNewAdmin = () => {
-        console.log("Apply admin role to user: " + newAdmin)
-        if (newAdmin == "") {
+    const applyAdminRoleToUser = async () => {
+        const username = newAdmin
+        const role = "admin"
+        if (username == "") {
             return
         }
 
-        userProject.addRole(newAdmin, "admin")
-        // todo: should check if the call above was successful
-        usersWithRoles.push({username: newAdmin, role: "admin"})  // is this working?
-        setUsersWithRoles(usersWithRoles)
+        setModifyRoleStatus({ message: "Please wait...", style: "alert alert-secondary" })
+        try {
+            const data = await userProject.addRole(newAdmin, role)
+            if (data !== null) {
+                const m = "Successfully added " + role + " role to " + username
+                setModifyRoleStatus({ message: m, style: "alert alert-success" })
+                // on success, update list of users with roles
+                const user: User = {username: username, role: role}
+                setUsersWithRoles([...usersWithRoles, user]
+                  .sort((a, b) => a.username.localeCompare(b.username))
+                )
+            } else {
+                const m = "Failed to add " + role + " role to " + username
+                setModifyRoleStatus({ message: m, style: "alert alert-danger" })
+            }
+        } catch (error) {
+            const m = "Failed to add " + role + " role to " + username
+            setModifyRoleStatus({ message: m, style: "alert alert-danger" })
+            esconsole(error, "error")
+        }
     }
 
     return (
         <>
             <div className="modal-section-body">
-                <div className="m-2 p-4 border-4 border-gray-400">
+                <div className="m-2 px-4 pt-2 pb-4">
+                    {
+                        modifyRoleStatus.message &&
+                        <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>
+                    }
                     <div className="font-bold text-3xl p-2">Remove Roles</div>
                     <table className="p-2 text-left w-full">
                         <tbody className="h-40 bg-grey-light flex flex-col overflow-y-scroll">
-                            {/* loop through list of users with roles */}
                             {usersWithRoles.map(({username, role}) =>
                                 <tr className="flex w-11/12" key={username+role}>
                                     <td className="my-px mx-2 w-1/4">{username}</td>
@@ -98,10 +119,10 @@ const AdminManageRoles = () => {
             </div>
 
             <div className="modal-section-body">
-                <div className="mt-10 mb-2 mx-2 p-4 border-4 border-gray-400">
+                <div className="m-2 p-4 border-t border-gray-400">
                     <div className="font-bold text-3xl p-2">Add Roles</div>
                     <input type="text" placeholder="username" onChange={e => setNewAdmin(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <a href="#" onClick={applyAdminRoleToNewAdmin}>ADD ADMIN ROLE</a>
+                    <a href="#" onClick={applyAdminRoleToUser}>APPLY ADMIN ROLE</a>
                 </div>
             </div>
         </>
@@ -114,16 +135,22 @@ const AdminSendBroadcast = () => {
     const [message, setMessage] = useState("")
     const [link, setLink] = useState("")
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
+    const [broadcastStatus, setBroadcastStatus] = useState({message: "", style: ""})
 
     const sendBroadcast = () => {
-        //console.log("Sending broadcast... " + message + ", " + link + ", " + expiration)
         websocket.broadcast(message, userProject.getUsername(), link, expiration);
+        // always show 'message sent', as we have no indication of success or failure
+        setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
     }
 
     return (
         <>
             <div className="modal-section-body">
-                <div className="m-2 p-4 border-4 border-gray-400">
+                <div className="m-2 p-4 border-t border-gray-400">
+                    {
+                        broadcastStatus.message &&
+                        <div className={broadcastStatus.style}>{broadcastStatus.message}</div>
+                    }
                     <div className="font-bold text-3xl p-2">Send Broadcast</div>
                     <input type="text" placeholder="message" maxLength={500} onChange={e => setMessage(e.target.value)} className="m-2 w-10/12 border-2 border-gray-200 text-black" />
                     <input type="text" placeholder="hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
@@ -139,41 +166,70 @@ const AdminResetUserPassword = () => {
     const [username, setUsername] = useState("")
     const [adminPassphrase, setAdminPassphrase] = useState("")
     const [newUserPassword, setNewUserPassword] = useState("")
+    const [showResetControls, setShowResetControls] = useState(false)
+    const [userDetails, setUserDetails] = useState({ username: "", email: "" })
+    const [passwordStatus, setPasswordStatus] = useState({ message: "", style: "" })
 
-    const searchForUser = () => {
-        console.log("Searching for user... " + username)
-        //function checkIdExists(id) {
-        //    var url = URL_DOMAIN + '/services/scripts/searchuser';
-        //    var opts = { params: {'query': id} };
-        //    return $http.get(url, opts);
-        //}
+    const searchForUser = async () => {
+        try {
+            const data = await userProject.searchUsers(username)
+            if (data !== null) {
+                setUserDetails({ username: data.username, email: data.email })
+                setShowResetControls(true)
+            } else {
+                setUserDetails({ username: "", email: "" })
+                setShowResetControls(false)
+            }
+        } catch (error) {
+            setShowResetControls(false)
+            esconsole(error, "error")
+        }
     }
 
-    const setPassword = () => {
-        console.log("Setting password for " + username + "... (" + adminPassphrase + ") " + newUserPassword)
-        userProject.setPasswordForUser(username, newUserPassword, adminPassphrase)
-        //  .then(function () {
-        //      $scope.showPasswordResetResult = true;
-        //      $scope.passwordResetResult = 'Successfully set a new password for user: ' + $scope.userToReset.id + ' with password: ' + $scope.userToReset.newPassword;
-        //      $scope.$applyAsync();
-        //  }).catch(function () {
-        //    $scope.showPasswordResetResult = true;
-        //    $scope.passwordResetResult = 'Error setting a new password for user: ' + $scope.userToReset.id;
-        //    $scope.$applyAsync();
-        //});
+    const setPassword = async () => {
+        try {
+            const data = await userProject.setPasswordForUser(username, newUserPassword, adminPassphrase)
+            if (data !== null) {
+                const m = "New password set for " + username
+                // todo 401 is not handled, so for now this always returns success
+                setPasswordStatus({ message: "Done", style: "alert alert-success" })
+            } else {
+                const m = "Failed to set password for " + username
+                setPasswordStatus({ message: m, style: "alert alert-danger" })
+            }
+        } catch (error) {
+            const m = "Failed to set password for " + username
+            setPasswordStatus({ message: m, style: "alert alert-danger" })
+            esconsole(error, "error")
+        }
     }
 
     return (
         <>
             <div className="modal-section-body">
-                <div className="m-2 p-4 border-4 border-gray-400">
+                <div className="m-2 p-4 border-t border-gray-400">
+                    {
+                        passwordStatus.message &&
+                        <div className={passwordStatus.style}>{passwordStatus.message}</div>
+                    }
                     <div className="font-bold text-3xl p-2">Password Change</div>
                     <input type="text" placeholder="username" onChange={e => setUsername(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
                     <a href="#" onClick={searchForUser}>SEARCH USERS</a>
-                    <br />
-                    <input type="text" placeholder="admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <input type="text" placeholder="new user password" onChange={e => setNewUserPassword(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
-                    <a href="#" onClick={setPassword}>SET PASSWORD</a>
+                    {
+                        // show password reset controls only after a valid username is entered
+                        showResetControls &&
+                        <div>
+                            <div className="p-4">
+                                <div className="italic">Username: {userDetails.username}</div>
+                            <div className="italic">Email: {userDetails.email}</div>
+                            </div>
+                            <div>
+                                <input type="text" placeholder="admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
+                                <input type="text" placeholder="new user password" onChange={e => setNewUserPassword(e.target.value)} className="m-2 w-1/4 border-2 border-gray-200 text-black" />
+                                <a href="#" onClick={setPassword}>SET PASSWORD</a>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </>

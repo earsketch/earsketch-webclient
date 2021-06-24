@@ -550,7 +550,7 @@ export const App = () => {
 
     const openAdminWindow = () => {
         setShowNotifications(false)
-        const result = openModal(AdminWindow)
+        openModal(AdminWindow)
     }
 
     const toggleCAIWindow = () => {

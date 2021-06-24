@@ -760,7 +760,13 @@ export async function removeRole(username: string, role: string) {
     }
 }
 
-export async function setPasswordForUser(userID: string, password: string, adminPassphrase: string) {
+// Search users and return user details - intended for admin use
+export async function searchUsers(username: string) {
+    return (await get("/services/scripts/searchuser", { query: username }))
+}
+
+// Set a user password with admin passphrase as credentials
+export async function setPasswordForUser(username: string, password: string, adminPassphrase: string) {
     if (!isLoggedIn()) {
         throw "Login failure"
     }
@@ -774,11 +780,11 @@ export async function setPasswordForUser(userID: string, password: string, admin
         adminid: getUsername(),
         adminpwd: adminPwd,
         adminpp: btoa(adminPassphrase),
-        username: userID,
+        username: username,
         newpassword: encodeURIComponent(btoa(password)),
     }
     await postForm("/services/scripts/modifypwdadmin", data)
-    userNotification.show("Successfully set a new password for user: " + userID + " with password: " + password, "history", 3)
+    userNotification.show("Successfully set a new password for user: " + username + " with password: " + password, "history", 3)
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
