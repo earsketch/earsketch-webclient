@@ -173,10 +173,14 @@ function($scope) {
       }
 
       // Temporary: removal of readInput.
-      // if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
-      //   console.log("Script contains readInput, cannot analyze.");
-      //   return 0;
-      // }
+      if (script.source_code.indexOf('readInput') !== -1 || script.source_code.indexOf('input') !== -1 ) {
+        console.log("Script contains readInput, cannot analyze.");
+        $scope.results.push({
+          script: script,
+          error: "Contains ReadInput"
+        });
+        return 0;
+      }
 
       try {
         var complexity = $scope.read(script.source_code, script.name);
@@ -189,23 +193,57 @@ function($scope) {
         var complexityPass = 0;
       }
 
+      if (!complexityPass) {
+        var complexityObj = complexity;
+        complexityObj["complexityScore"] = complexityScore;
+        $scope.results.push({
+          script: script,
+          error: "Failed Complexity Check",
+          reports: { 
+            OVERVIEW: { "tempo": 0,
+              "measures": 0,
+              "length (seconds)": 0
+            },
+            COMPLEXITY: complexityObj,
+            GRADE: {
+              code: 0,
+              music: 0,
+              music_code: 0
+            }
+          }
+        });
+        return 0;
+      }
+
       // TODO: process print statements through Skulpt. Temporary removal of print statements.
       var sourceCodeLines = script.source_code.split('\n');
       var sourceCode = [];
-
       for (var i = 0; i < sourceCodeLines.length; i++) {
         if (sourceCodeLines[i].indexOf('print') === -1) {
           sourceCode.push(sourceCodeLines[i]);
         }
       }
-
       sourceCode = sourceCode.join('\n');
 
-      if (complexityPass < $scope.complexityThreshold) {
-        return 0;
-      }
-
       if (!sourceCode.includes($scope.artistName)) {
+        var complexityObj = complexity;
+        complexityObj["complexityScore"] = complexityScore;
+        $scope.results.push({
+          script: script,
+          error: "No Contest Samples",
+          reports: { 
+            OVERVIEW: { "tempo": 0,
+              "measures": 0,
+              "length (seconds)": 0
+            },
+            COMPLEXITY: complexityObj,
+            GRADE: {
+              code: complexityPass,
+              music: 0,
+              music_code: 0
+            }
+          }
+        });
         return 0;
       }
 
@@ -293,7 +331,7 @@ function($scope) {
         report["UNIQUE_STEMS"] = {"stems": stems};
 
         if(report[$scope.artistName]["numStems"] > 0){
-          if (stems.length > Number($scope.uniqueStems)) {
+          if (stems.length >= Number($scope.uniqueStems)) {
             if(Number($scope.lengthRequirement) <= lengthInSeconds){
               report["GRADE"]["music"] = 1;
             }
@@ -353,7 +391,8 @@ function($scope) {
           } else {
             row[4] = result.error;
           }
-        } else if (result.reports) {
+        } 
+        if (result.reports) {
           angular.forEach(result.reports, function(report, name) {
             if (includeReports.includes(name)) {
               angular.forEach(Object.keys(report), function(key) {
