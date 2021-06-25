@@ -267,7 +267,7 @@ export async function compileCode() {
     const code = editor.getValue()
 
     const startTime = Date.now()
-    const language = tabs.selectActiveTabScript(store.getState())?.name.split('.')[1] === "py" ? "python" : "javascript"
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
 
     editor.clearErrors()
     ideConsole.clear()
@@ -368,7 +368,7 @@ export async function compileCode() {
 
 export const IDE = () => {
     const dispatch = useDispatch()
-    const language = useSelector(tabs.selectActiveTabScript)?.name.split('.')[1] === "py" ? "python" : "javascript"
+    const language = useSelector(appState.selectScriptLanguage)
     const numTabs = useSelector(tabs.selectOpenTabs).length
 
     const embedMode = useSelector(appState.selectEmbedMode)

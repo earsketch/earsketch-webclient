@@ -13,6 +13,7 @@ import { initEditor } from "./IDE"
 import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as userProject from "../app/userProject"
+import * as ESUtils from "../esutils"
 import store from "../reducers"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
@@ -114,7 +115,7 @@ let lineNumber: number | null = null
 let marker: number | null = null
 
 export function highlightError(err: any) {
-    const language = tabs.selectActiveTabScript(store.getState())?.name.split('.')[1] === "py" ? "python" : "javascript"
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
     let range
 
     let line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
@@ -262,7 +263,7 @@ export const Editor = () => {
     const fontSize = useSelector(appState.selectFontSize)
     const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
-    const language = activeScript?.name.split('.')[1] === "py" ? "python" : "javascript"
+    const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
 
     useEffect(() => {
         if (!editorElement.current) return
