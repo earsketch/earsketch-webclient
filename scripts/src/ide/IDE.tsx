@@ -391,8 +391,6 @@ export const IDE = () => {
     const [loading, _setLoading] = useState(false)
     setLoading = _setLoading
 
-    useEffect(() => Layout.initialize(), [])
-
     useEffect(() => {
         // Scroll to the bottom of the console when new messages come in.
         if (consoleContainer.current) {

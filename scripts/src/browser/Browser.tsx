@@ -304,7 +304,7 @@ export const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector((state: RootState) => state.layout.west.open);
     const { t } = useTranslation();
-    let kind = useSelector(layout.selectWestKind);
+    let kind: BrowserTabType = useSelector(layout.selectWestKind);
 
     if (!Object.values(BrowserTabType).includes(kind)) {
         kind = BrowserTabType.Sound;
