@@ -10,7 +10,6 @@ import * as audioLibrary from "./audiolibrary"
 import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import * as cai from "../cai/caiState"
-import { ChangePassword } from "./ChangePassword"
 import * as collaboration from "./collaboration"
 import { ScriptEntity, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
@@ -79,10 +78,6 @@ export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Param
 // TODO: Temporary workaround for autograders 1 & 3, which replace the prompt function.
 (window as any).esPrompt = async (message: string) => {
     return (await openModal(Prompt, { message })) ?? ""
-}
-
-export function changePassword() {
-    openModal(ChangePassword)
 }
 
 export function renameSound(sound: SoundEntity) {
