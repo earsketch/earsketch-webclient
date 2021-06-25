@@ -186,6 +186,10 @@ export async function openShare(shareid: string) {
 
             // user has not opened this shared link before
             result = await userProject.loadScript(shareid, true) as ScriptEntity
+            if (!result) {
+                userNotification.show("This share script link is invalid.")
+                return
+            }
             if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
 
             if (result.username !== userProject.getUsername()) {
