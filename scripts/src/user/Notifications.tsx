@@ -121,7 +121,7 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                     Notifications
                 </div>
                 <div className="float-right">
-                    <a href="#" onClick={() => toggleNotificationHistory(true)}>VIEW ALL</a>
+                    <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(true) }}>VIEW ALL</a>
                 </div>
             </div>
             <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
@@ -154,15 +154,15 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                                 </div>}
                                 {item.notification_type === "share_script" &&
                                 <div>
-                                    <span onClick={() => openSharedScript(item.shareid!)}><a href="#">OPEN</a></span>
+                                    <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>OPEN</a>
                                 </div>}
                                 {item.notification_type === "collaborate_script" &&
                                 <div>
-                                    {item.message.action === "userAddedToCollaboration" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
-                                    {item.message.action === "scriptRenamed" && <span onClick={() => openCollaborativeScript(item.shareid!)}><a href="#">OPEN</a></span>}
+                                    {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>OPEN</a>}
+                                    {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>OPEN</a>}
                                 </div>}
                                 {item.notification_type === "editProfile" &&
-                                <div><span onClick={editProfile}><a href="#">OPEN</a></span></div>}
+                                <div><a href="#" onClick={e => { e.preventDefault(); editProfile() }}>OPEN</a></div>}
                             </div>
                         </div>
                     </div>
@@ -184,7 +184,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
     return <div id="notification-history">
         <div className="flex justify-between" style={{ padding: "1em" }}>
             <div>
-                <a href="#" onClick={() => toggleNotificationHistory(false)}>
+                <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(false) }}>
                     <i id="back-button" className="icon icon-arrow-right22"></i>
                 </a>
                 <span style={{ color: "grey" }}>
@@ -219,7 +219,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
 
         <div className="notification-type-header flex justify-between">
             <div>Other Notifications</div>
-            <div><a href="#" onClick={userNotification.markAllAsRead}>MARK ALL AS READ</a></div>
+            <div><a href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>MARK ALL AS READ</a></div>
         </div>
         {notifications.map((item, index) =>
         !["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
@@ -237,7 +237,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                         </div>
                     </div>
                     {item.notification_type === "share_script" && <div>
-                        <span onClick={() => openSharedScript(item.shareid!)}><a href="#" className="cursor-pointer">OPEN</a></span>
+                        <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>OPEN</a>
                     </div>}
                 </div>
             </div>

@@ -34,9 +34,9 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
             <br />
             <span className="text-muted">{ESUtils.formatTime(now - version.created)}</span>
         </td>
-        {allowRevert && <td><a href="#" onClick={revert} title={t('scriptHistory.restore')}>
-            <i className="icon-rotate-cw2 inline-block" style={{ transform: "scaleX(-1)" }}></i>
-        </a></td>}
+        {allowRevert && <td><button onClick={revert} title={t('scriptHistory.restore')}>
+            <i className="icon-rotate-cw2 inline-block text-blue-500" style={{ transform: "scaleX(-1)" }}></i>
+        </button></td>}
         <td>{version.run_status === 1
             && (compiled
             ? <button className="btn btn-xs btn-clear" onClick={closeDAW}>

@@ -477,7 +477,7 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey, icon }, index) =>
                         <li key={index} className={"flex-grow" + (activeTab === index ? " active" : "")}>
-                            <a href="#" onClick={() => setActiveTab(index)} className="h-full flex justify-center items-center" style={{ textDecoration: "none" }}>
+                            <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="h-full flex justify-center items-center" style={{ textDecoration: "none" }}>
                                 <i className={`icon icon-${icon} mr-3`}></i>{t(titleKey).toLocaleUpperCase()}
                             </a>
                         </li>)}

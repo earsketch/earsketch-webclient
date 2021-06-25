@@ -431,7 +431,7 @@ export const IDE = () => {
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">You have no scripts loaded.</div>
-                                    <a href="#" onClick={createScript}>Click here to create a new script!</a>
+                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>Click here to create a new script!</a>
                                 </div>
 
                                 <div className="leading-relaxed empty-script-lang-message">

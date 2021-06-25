@@ -40,16 +40,17 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
+                    {/* TODO: Refactor using map. */}
                     {message.text[0]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,0]))} style={{color:"blue"}}>{message.keyword[0][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,0])) }} style={{ color:"blue" }}>{message.keyword[0][0]}</a>
                     {message.text[1]}
-                    <a href="#" onClick={() =>dispatch(cai.openCurriculum([message,1]))} style={{color:"blue"}}>{message.keyword[1][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,1])) }} style={{ color:"blue" }}>{message.keyword[1][0]}</a>
                     {message.text[2]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,2]))} style={{color:"blue"}}>{message.keyword[2][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,2])) }} style={{ color:"blue" }}>{message.keyword[2][0]}</a>
                     {message.text[3]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,3]))} style={{color:"blue"}}>{message.keyword[3][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,3])) }} style={{ color:"blue" }}>{message.keyword[3][0]}</a>
                     {message.text[4]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,4]))} style={{color:"blue"}}>{message.keyword[4][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,4])) }} style={{ color:"blue" }}>{message.keyword[4][0]}</a>
                     {message.text[5]}
                 </div>
             </div>
