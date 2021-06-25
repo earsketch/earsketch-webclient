@@ -13,7 +13,10 @@ export const toggleHorizontalDrag = (index: number, state: boolean) => {
     if (gutter) gutter.style['pointerEvents'] = state ? 'auto' : 'none';
 };
 
+let initialized = false
+
 export const initialize = () => {
+    if (initialized) return
     const horizontalSplits = Split(['#sidebar-container','#content','#curriculum-container'], {
         gutterSize: layout.getGutterSize(),
         minSize: layout.getMinSize(),
@@ -73,6 +76,8 @@ export const initialize = () => {
     // Initialize the draggability for the horizontal gutters.
     !layout.isWestOpen(store.getState()) && toggleHorizontalDrag(0, false);
     !layout.isEastOpen(store.getState()) && toggleHorizontalDrag(1, false);
+
+    initialized = true;
 };
 
 export const destroy = () => {
@@ -82,4 +87,5 @@ export const destroy = () => {
     verticalSplits?.destroy();
     layout.setHorizontalSplits(null);
     layout.setVerticalSplits(null);
+    initialized = false;
 };

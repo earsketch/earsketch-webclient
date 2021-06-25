@@ -302,13 +302,11 @@ function setup() {
 
     esconsole.getURLParameters()
 
-    const isEmbedded = ESUtils.getURLParameter("embedded") === "true"
-    const hideDAW = isEmbedded && ESUtils.getURLParameter("hideDaw")
-    const hideEditor = isEmbedded && ESUtils.getURLParameter("hideCode")
+    const isEmbedded = appState.selectEmbedMode(store.getState())
+    const hideEditor = appState.selectHideEditor(store.getState()) 
 
     if (isEmbedded) {
         store.dispatch(appState.setColorTheme("light"))
-        store.dispatch(appState.setEmbedMode(true))
         Layout.destroy()
         layout.setMinSize(0)
 
@@ -329,14 +327,6 @@ function setup() {
     } else {
         userProject.loadLocalScripts()
         store.dispatch(scripts.syncToNgUserProject())
-    }
-
-    if (hideDAW) {
-        store.dispatch(appState.setHideDAW(true))
-    }
-
-    if (hideEditor) {
-        store.dispatch(appState.setHideEditor(true))
     }
 
     try {
