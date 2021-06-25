@@ -90,6 +90,11 @@ export function recommend(recommendedSounds: string[], inputSamples: string[], c
     if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
         previousRecommendations = []
     }
+    for (let rec in recs) {
+        if (!keyGenreDict[rec]) {
+            delete recs[rec]
+        }
+    }
     filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, 
         previousRecommendations, bestLimit)
     return filteredRecs;
