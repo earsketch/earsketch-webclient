@@ -8,10 +8,10 @@ import { useTranslation } from "react-i18next"
 // TODO: switch to a "name" property for non-localized types (wav and mp3)
 const EXPORT_TYPES = {
     // Thin wrapper for `exporter.text()` since it breaks the pattern (not async, doesn't take quality).
-    script: { nameKey: "script", async function(script: ScriptEntity, quality: boolean) { exporter.text(script) } },
-    wav: { nameKey: "WAV", function: exporter.wav },
-    mp3: { nameKey: "MP3", function: exporter.mp3 },
-    multitrack: { nameKey: "download.multiTrack", function: exporter.multiTrack },
+    script: { nameKey: "script", icon: "file", async function(script: ScriptEntity, quality: boolean) { exporter.text(script) } },
+    wav: { nameKey: "WAV", icon: "music", function: exporter.wav },
+    mp3: { nameKey: "MP3", icon: "headphones", function: exporter.mp3 },
+    multitrack: { nameKey: "download.multiTrack", icon: "th-list", function: exporter.multiTrack },
 }
 
 export const Download = ({ script, quality, close }: { script: ScriptEntity, quality: boolean, close: () => void }) => {
@@ -44,17 +44,17 @@ export const Download = ({ script, quality, close }: { script: ScriptEntity, qua
             </h4>
         </div>
         <div className="modal-body" style={{ textAlign: "center" }}>
-            {Object.entries(EXPORT_TYPES).map(([type, { nameKey }]) =>
-            <div key={type} className="row vertical-center">
+            {Object.entries(EXPORT_TYPES).map(([type, { nameKey, icon }]) =>
+            <div key={type} className="row vertical-center pb-3 mb-3 border-b border-gray-300">
                 <div className="col-md-2">
-                    <h3><i className="glyphicon glyphicon-music"></i></h3>
+                    <h3><i className={`glyphicon glyphicon-${icon}`}></i></h3>
                     <h4>{t(nameKey)}</h4>
                 </div>
                 <div className="col-md-1">
                     <h3>
                         {loading[type as keyof typeof EXPORT_TYPES]
                         ? <i className="inline-block animate-spin icon icon-spinner" />
-                        : <a href="#" onClick={() => save(type as keyof typeof EXPORT_TYPES)}>
+                        : <a href="#" onClick={e => { e.preventDefault(); save(type as keyof typeof EXPORT_TYPES) }}>
                             <i className="glyphicon glyphicon-download-alt" />
                         </a>}
                     </h3>
