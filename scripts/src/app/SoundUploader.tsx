@@ -93,7 +93,7 @@ const ProgressBar = ({ progress }: { progress: number }) => {
 
 const Footer = ({ ready, progress, close }: { ready: boolean, progress?: number | null, close: () => void }) => {
     const { t } = useTranslation()
-    return <div className="modal-footer flex items-center">
+    return <div className="modal-footer flex items-center justify-end">
         {progress !== undefined && progress !== null && <ProgressBar progress={progress} />}
         <input type="button" value={t('cancel').toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d" }} />
         <input type="submit" value={t('upload').toLocaleUpperCase()} className="btn btn-primary text-white" disabled={!ready} />
@@ -367,10 +367,11 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
 }
 
 const TunepadTab = ({ close }: { close: () => void }) => {
+    const isSafari = ESUtils.whichBrowser().includes("Safari")
     const tunepadWindow = useRef<Window>()
     const tunepadOrigin = useRef("")
     const [ready, setReady] = useState(false)
-    const [error, setError] = useState("")
+    const [error, setError] = useState(isSafari ? "Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or Firefox." : "")
     const [key, setKey] = useState("")
     const [progress, setProgress] = useState(null as number | null)
 
@@ -410,8 +411,10 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
-            <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+            {!isSafari && <>
+                <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
+                <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+            </>}
         </div>
         <Footer ready={ready} progress={progress} close={close} />
     </form>
