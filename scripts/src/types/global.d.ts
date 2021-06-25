@@ -41,10 +41,6 @@ declare var Sk: any;
 declare module 'xml2js';
 declare var $: any;
 
-declare var FFT: any;
-declare var WindowFunction: any;
-declare var DSP: any;
-
 declare var createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode;
 declare var Recorder: any
 
@@ -77,4 +73,10 @@ declare module 'angular' {
 declare module "file-loader!*" {
     const value: any;
     export default value;
+}
+
+declare module "dsp" {
+    const DSP: any
+    const FFT: any
+    const WindowFunction: any
 }
