@@ -114,7 +114,7 @@ let lineNumber: number | null = null
 let marker: number | null = null
 
 export function highlightError(err: any) {
-    const language = store.getState().app.scriptLanguage
+    const language = tabs.selectActiveTabScript(store.getState())?.name.split('.')[1] === "py" ? "python" : "javascript"
     let range
 
     let line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
@@ -256,13 +256,13 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
 
 export const Editor = () => {
     const dispatch = useDispatch()
-    const language = useSelector(appState.selectScriptLanguage)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
     const fontSize = useSelector(appState.selectFontSize)
     const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
+    const language = activeScript?.name.split('.')[1] === "py" ? "python" : "javascript"
 
     useEffect(() => {
         if (!editorElement.current) return
