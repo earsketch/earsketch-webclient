@@ -49,7 +49,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
     return <>
         <div className="modal-header"><h3>{t('accountCreator.prompt')}</h3></div>
         
-        <form name="userForm" onSubmit={e => { e.preventDefault(); submit() }}>
+        <form onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row">
@@ -87,8 +87,8 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
             </div>
             
             <div className="modal-footer">
+                <input type="button" className="btn btn-default" onClick={() => close()} value={t('cancel') as string} />
                 <input type="submit" className="btn btn-primary" value={t('accountCreator.submit') as string} />
-                <input type="button" className="btn btn-default" onClick={close} value={t('cancel') as string} />
             </div>
         </form>
     </>

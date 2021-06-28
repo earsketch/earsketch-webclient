@@ -191,8 +191,6 @@ require('recorder');
 Object.assign(window,require('esAppDSP'));
 
 // Controllers
-require('adminWindowController');
-
 require('autograderController');
 require('autograder2Controller');
 require('autograderAWSController');

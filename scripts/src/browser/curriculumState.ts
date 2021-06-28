@@ -72,10 +72,11 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     })
 
     if (/WebKit/.test(navigator.userAgent)) {
-        // Apparent WebKit (including Safari) bug: adopted <video> elements are missing their controls.
+        // Apparent WebKit (including Safari) bug: adopted <video> and <audio> elements are missing their controls.
         // (This does not occur in Chrome or Firefox.)
         // Workaround: clone the element.
         root.querySelectorAll("video").forEach(video => video.replaceWith(video.cloneNode()))
+        root.querySelectorAll("audio").forEach(audio => audio.replaceWith(audio.cloneNode()))
     }
 
     if (location.length < 3) {

@@ -49,7 +49,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx:string, ch:cur
                 &emsp;
                 {ch.sections && ch.sections.length > 0 &&
                 <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? 'down' : 'right'}`} /></button>}
-                <a href="#" className={textClass} onClick={(e) => dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}>
+                <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx], url: ch.URL}))}}>
                     {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                 </a>
             </div>
@@ -59,7 +59,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx:string, ch:cur
                     <li key={secIdx} className="toc-sections py-1">
                         <div className="toc-item">
                             &emsp;&emsp;
-                            <a href="#" className={textClass} onClick={(e) => { e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
+                            <a href="#" className={textClass} onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({location: [unitIdx, chIdx, secIdx], url: sec.URL}))}}>
                                 {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx+1} {sec.title}
                             </a>
                         </div>
@@ -85,7 +85,7 @@ const TableOfContents = () => {
                     <div className="toc-item">
                         {unit.chapters && unit.chapters.length > 0 &&
                         <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? 'down' : 'right'}`} /></button>}
-                        <a href="#" className={textClass} onClick={() => dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}>{unit.title}</a>
+                        <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({location: [unitIdx], url: unit.URL}))}}>{unit.title}</a>
                     </div>
                     <ul>
                         {focus[0] === unitIdx && unit.chapters &&
@@ -134,7 +134,7 @@ const CurriculumSearchResults = () => {
     return showResults ? (
         <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`} style={resultsStyle}>
             {results.map(result =>
-            <a tabIndex={0} key={result.id} href="#" onClick={() => { dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
+            <a tabIndex={0} key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                 <div className={`px-5 py-2 search-item ${theme === 'light' ? 'text-black' : 'text-white'}`}>{result.title}</div>
             </a>)}
         </div>

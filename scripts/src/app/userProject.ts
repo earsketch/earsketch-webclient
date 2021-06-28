@@ -71,7 +71,11 @@ export async function get(endpoint: string, params?: { [key: string]: string }) 
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     try {
         // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const text = await (await fetch(url)).text()
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw `error code: ${response.status}`
+        }
+        const text = await response.text()
         return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`get failed: ${url}`, ["error", "user"])
@@ -85,11 +89,15 @@ export async function postForm(endpoint: string, data?: { [key: string]: string 
     const url = URL_DOMAIN + endpoint
     try {
         // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const text = await (await fetch(url, {
+        const response = await fetch(url, {
             method: "POST",
             body: form(data),
             headers: { "Accept": "application/json" },
-        })).text()
+        })
+        if (!response.ok) {
+            throw `error code: ${response.status}`
+        }
+        const text = await response.text()
         return text ? JSON.parse(text) : null
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
@@ -109,8 +117,12 @@ async function postAdminForm(endpoint: string, data: { [key: string]: string | B
 // Expects query parameters, returns XML.
 export async function post(endpoint: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
-    const text = await (await fetch(url, { method: "POST" })).text()
     try {
+        const response = await fetch(url, { method: "POST" })
+        if (!response.ok) {
+            throw `error code: ${response.status}`
+        }
+        const text = await response.text()
         return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
     } catch (err) {
         esconsole(`post failed: ${url}`, ["error", "user"])
@@ -126,13 +138,22 @@ async function postAuth(endpoint: string, params: { [key: string]: string }) {
 // Expects XML, returns XML.
 async function postXML(endpoint: string, xml: string, params?: { [key: string]: string }) {
     const url = URL_DOMAIN + endpoint
-    const response = await fetch(url + (params ? "?" + new URLSearchParams(params) : ""), {
-        method: "POST",
-        headers: new Headers({ "Content-Type": "application/xml" }),
-        body: xml,
-    })
-    const text = await response.text()
-    return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+    try {
+        const response = await fetch(url + (params ? "?" + new URLSearchParams(params) : ""), {
+            method: "POST",
+            headers: new Headers({ "Content-Type": "application/xml" }),
+            body: xml,
+        })
+        if (!response.ok) {
+            throw `error code: ${response.status}`
+        }
+        const text = await response.text()
+        return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+    } catch (err) {
+        esconsole(`postXML failed: ${url}`, ["error", "user"])
+        esconsole(err, ["error", "user"])
+        throw err
+    }
 }
 
 async function postXMLAuth(endpoint: string, xml: string) {
@@ -754,31 +775,37 @@ export async function addRole(username: string, role: string) {
 // Remove role from user
 export async function removeRole(username: string, role: string) {
     if (isLoggedIn()) {
-        return postAdminForm("/services/scripts/adduserrole", { username, role })
+        return postAdminForm("/services/scripts/removeuserrole", { username, role })
     } else {
         esconsole("Login failure", ["error", "user"])
     }
 }
 
-export async function setPasswordForUser(userID: string, password: string, adminPassphrase: string) {
+// Search users and return user details - intended for admin use
+export async function searchUsers(username: string) {
+    return (await get("/services/scripts/searchuser", { query: username }))
+}
+
+// Set a user password with admin passphrase as credentials
+export async function setPasswordForUser(username: string, password: string, adminPassphrase: string) {
     if (!isLoggedIn()) {
         throw "Login failure"
     }
-    const adminPwd = getPassword()
-    if (adminPwd === null) {
+    const adminpwd = getPassword()
+    if (adminpwd === null) {
         throw "Missing admin password"
     }
 
     esconsole("Admin setting a new password for user")
     const data = {
         adminid: getUsername(),
-        adminpwd: adminPwd,
+        adminpwd,
         adminpp: btoa(adminPassphrase),
-        username: userID,
+        username,
         newpassword: encodeURIComponent(btoa(password)),
     }
     await postForm("/services/scripts/modifypwdadmin", data)
-    userNotification.show("Successfully set a new password for user: " + userID + " with password: " + password, "history", 3)
+    userNotification.show("Successfully set a new password for " + username, "history", 3)
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...

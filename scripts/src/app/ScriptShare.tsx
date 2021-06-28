@@ -472,6 +472,7 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
     }
 
     const ShareBody = Tabs[activeTab].component
+    // TODO: Reduce duplication with tab component in SoundUploader.
     return <div className="share-script">
         <div className="modal-header">
             <h4 className="modal-title">
@@ -482,7 +483,7 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
                     <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
-                        <a href="#" onClick={() => setActiveTab(index)} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
+                        <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
                     </li>)}
                 </ul>
             </div>

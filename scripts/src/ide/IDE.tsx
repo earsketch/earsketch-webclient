@@ -7,6 +7,7 @@ import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as collaboration from "../app/collaboration"
+import { ScriptEntity } from "common"
 import * as compiler from "../app/compiler"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -33,7 +34,7 @@ import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
 import * as WaveformCache from "../app/waveformcache"
 import i18n from "i18next"
-import { ScriptEntity } from "common"
+import { DAWData } from "../app/player"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -185,6 +186,10 @@ export async function openShare(shareid: string) {
 
             // user has not opened this shared link before
             result = await userProject.loadScript(shareid, true) as ScriptEntity
+            if (!result) {
+                userNotification.show("This share script link is invalid.")
+                return
+            }
             if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
 
             if (result.username !== userProject.getUsername()) {
@@ -256,21 +261,17 @@ export async function openShare(shareid: string) {
 }
 
 // Compile code in the editor and broadcast the result to all scopes.
-export function compileCode() {
+export async function compileCode() {
     if (isWaitingForServerResponse) return
 
     isWaitingForServerResponse = true
-
-    // TODO: only should clear when compiling another script?
-    WaveformCache.clear()
 
     setLoading(true)
 
     const code = editor.getValue()
 
     const startTime = Date.now()
-    const language = store.getState().app.scriptLanguage
-    const promise = (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue(), 0)
+    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
 
     editor.clearErrors()
     ideConsole.clear()
@@ -279,70 +280,17 @@ export function compileCode() {
     const scriptID = tabs.selectActiveTabID(store.getState())
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
-    promise.then(result => {
+    let result: DAWData
+    try {
+        result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue(), 0)
+    } catch (error) {
         const duration = Date.now() - startTime
+        esconsole(error, ["ERROR", "IDE"])
         setLoading(false)
-        if (result) {
-            esconsole("Code compiled, updating DAW.", "ide")
-            setDAWData(result)
-        }
-        reporter.compile(language, true, undefined, duration)
-        userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
-        saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
+        ideConsole.error(error)
+        editor.highlightError(error)
 
-        // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-        setTimeout(() => ideConsole.status("Script ran successfully."), 200)
-
-        // asyncronously report the script complexity
-        if (FLAGS.SHOW_AUTOGRADER) {
-            setTimeout(() => {
-                // reporter.complexity(language, code)
-                let report
-                try {
-                    report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
-                } catch (e) {
-                    // TODO: Make this work across browsers. (See esconsole for reference.)
-                    const traceDepth = 5
-                    let stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1]
-                    let startIndex = stackString.indexOf("reader.js")
-                    stackString = stackString.substring(startIndex)
-                    stackString = stackString.substring(0, stackString.indexOf(")"))
-
-                    for (let i = 0; i < traceDepth; i++) {
-                        let addItem = e.stack.split(" at")[2 + i]
-                        startIndex = addItem.lastIndexOf("/")
-                        addItem = addItem.substring(startIndex + 1)
-                        addItem = addItem.substring(0, addItem.indexOf(")"))
-                        addItem = "|" + addItem
-                        stackString += addItem
-                    }
-
-                    reporter.readererror(e.toString() + ". Location: " + stackString)
-                }
-                
-                console.log("complexityCalculator", report)
-                if (FLAGS.SHOW_CAI) {
-                    store.dispatch(cai.compileCAI([result, language, code]))
-                }
-            })
-        }
-
-        if (collaboration.active && collaboration.tutoring) {
-            collaboration.sendCompilationRecord("success")
-        }
-
-        const { bubble } = store.getState()
-        if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
-            store.dispatch(setReady(true))
-        }
-    }).catch(err => {
-        const duration = Date.now() - startTime
-        esconsole(err, ["ERROR", "IDE"])
-        setLoading(false)
-        ideConsole.error(err)
-        editor.highlightError(err)
-
-        const errType = String(err).split(":")[0]
+        const errType = String(error).split(":")[0]
         reporter.compile(language, false, errType, duration)
 
         userNotification.showBanner(i18n.t("messages:interpreter.runFailed"), "failure1")
@@ -354,9 +302,72 @@ export function compileCode() {
         }
 
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.compileError(err))
+            store.dispatch(cai.compileError(error))
         }
-    })
+        return
+    }
+
+    const duration = Date.now() - startTime
+    setLoading(false)
+    if (result) {
+        esconsole("Code compiled, updating DAW.", "ide")
+        WaveformCache.clear()
+        setDAWData(result)
+    }
+    reporter.compile(language, true, undefined, duration)
+    userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
+    saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
+
+    // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
+    setTimeout(() => ideConsole.status("Script ran successfully."), 200)
+
+    // asyncronously report the script complexity
+    if (FLAGS.SHOW_AUTOGRADER) {
+        setTimeout(() => {
+            // reporter.complexity(language, code)
+            let report
+            try {
+                report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
+            } catch (e) {
+                // TODO: Make this work across browsers. (See esconsole for reference.)
+                let stackString = "unknown"
+                try {
+                    stackString = e.stack.split(" at")[0] + " at " + e.stack.split(" at")[1]
+                    let startIndex = stackString.indexOf("reader.js")
+                    stackString = stackString.substring(startIndex)
+                    stackString = stackString.substring(0, stackString.indexOf(")"))
+                    const traceDepth = 5
+
+                    for (let i = 0; i < traceDepth; i++) {
+                        let addItem = e.stack.split(" at")[2 + i]
+                        startIndex = addItem.lastIndexOf("/")
+                        addItem = addItem.substring(startIndex + 1)
+                        addItem = addItem.substring(0, addItem.indexOf(")"))
+                        addItem = "|" + addItem
+                        stackString += addItem
+                    }
+                } catch {
+                    console.log("Failed to parse stack track.")
+                }
+
+                reporter.readererror(e.toString() + ". Location: " + stackString)
+            }
+            
+            console.log("complexityCalculator", report)
+            if (FLAGS.SHOW_CAI) {
+                store.dispatch(cai.compileCAI([result, language, code]))
+            }
+        })
+    }
+
+    if (collaboration.active && collaboration.tutoring) {
+        collaboration.sendCompilationRecord("success")
+    }
+
+    const { bubble } = store.getState()
+    if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
+        store.dispatch(setReady(true))
+    }
 }
 
 export const IDE = () => {
@@ -424,7 +435,7 @@ export const IDE = () => {
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
                                 <div className="leading-relaxed">
                                     <div id="no-scripts-warning">You have no scripts loaded.</div>
-                                    <a href="#" onClick={createScript}>Click here to create a new script!</a>
+                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>Click here to create a new script!</a>
                                 </div>
 
                                 <div className="leading-relaxed empty-script-lang-message">

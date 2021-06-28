@@ -203,9 +203,6 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
     const waStartTime = context.currentTime + manualOffset
 
     // construct webaudio graph
-    if (renderingData.master) {
-        renderingData.master.disconnect()
-    }
     renderingData.master = context.createGain()
     renderingData.master.gain.setValueAtTime(1, context.currentTime)
 
@@ -236,7 +233,7 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
             // if master track
             renderingData.master.connect(trackGain)
             // if there is at least one effect set in master track
-            if (typeof(startNode) !== "undefined") {
+            if (startNode !== undefined) {
                 // TODO: master not connected to the analyzer?
                 trackGain.connect(startNode)
                 // effect tree connects to the context.master internally
@@ -247,7 +244,7 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
             }
             mix.connect(context.destination)
         } else {
-            if (typeof(startNode) !== "undefined") {
+            if (startNode !== undefined) {
                 // track gain -> effect tree
                 trackGain.connect(startNode)
             } else {
@@ -259,7 +256,7 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
 
         // for setValueAtTime bug in chrome v52
         // TODO: Chrome is now at version 90. Is this safe to remove?
-        if (ESUtils.whichBrowser().indexOf('Chrome') > -1 && typeof(startNode) !== 'undefined') {
+        if (ESUtils.whichBrowser().indexOf('Chrome') > -1 && startNode !== undefined) {
             const dummyOsc = context.createOscillator()
             const dummyGain = context.createGain()
             dummyGain.gain.value = 0

@@ -121,7 +121,7 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
 
     // STEP 2: Ask the server for the audio file
     esconsole(`Getting ${filekey} buffer from server`, ["debug", "audiolibrary"])
-    let data
+    let data: ArrayBuffer
     try {
         data = await (await fetch(url)).arrayBuffer()
     } catch (err) {
@@ -143,9 +143,11 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
 
     // STEP 3: decode the audio data.
     esconsole(`Decoding ${filekey} buffer`, ["debug", "audiolibrary"])
-    let buffer
+    let buffer: AugmentedBuffer
     try {
-        buffer = await ctx.decodeAudioData(data) as AugmentedBuffer
+        // decodeAudioData has a newer promise-based syntax, but unfortunately Safari does not support it.
+        // See https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData#browser_compatibility
+        buffer = await new Promise((resolve, reject) => ctx.decodeAudioData(data, buffer => resolve(buffer as AugmentedBuffer), reject))
     } catch (err) {
         esconsole("Error decoding audio clip: " + filekey, ["error", "audiolibrary"])
         throw err

@@ -612,7 +612,7 @@ let _setPlayPosition: ((a: number) => void) | null = null
 
 export function setDAWData(result: player.DAWData) {
     const { dispatch, getState } = store
-    const state = getState()
+    let state = getState()
 
     prepareWaveforms(result.tracks, result.tempo)
 
@@ -647,14 +647,6 @@ export function setDAWData(result: player.DAWData) {
         mix.label = 'MIX'
         mix.buttons = false
     }
-    if (metronome !== undefined) {
-        metronome.visible = false
-        metronome.mute = !state.daw.metronome
-        metronome.effects = {}
-    }
-
-    // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
-    dispatch(daw.setTracks(tracks))
 
     if (lastTab !== state.tabs.activeTabID) {
         // User switched tabs since the last run.
@@ -669,7 +661,18 @@ export function setDAWData(result: player.DAWData) {
         dispatch(daw.setTrackWidth(64000 / playLength))
         dispatch(daw.setTrackHeight(45))
         lastTab = state.tabs.activeTabID
+        // Get updated state after dispatches:
+        state = getState()
     }
+
+    if (metronome !== undefined) {
+        metronome.visible = false
+        metronome.mute = !state.daw.metronome
+        metronome.effects = {}
+    }
+
+    // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
+    dispatch(daw.setTracks(tracks))
 
     player.setRenderingData(result)
     player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
