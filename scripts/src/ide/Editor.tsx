@@ -264,6 +264,7 @@ export const Editor = () => {
     const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
+    const scriptID = useSelector(tabs.selectActiveTabID)
 
     useEffect(() => {
         if (!editorElement.current) return
@@ -294,9 +295,21 @@ export const Editor = () => {
                 dispatch(editor.setBlocksMode(false))
             }
         } else if (!blocksMode && droplet.currentlyUsingBlocks) {
+            // NOTE: toggleBlocks() has a nasty habit of overwriting Ace state.
+            // We save and restore the editor contents here in case we are exiting blocks mode due to switching to a script with syntax errors.
+            const value = ace.getValue()
             droplet.toggleBlocks()
+            ace.setValue(value)
         }
     }, [blocksMode])
+
+    useEffect(() => {
+        // User switched tabs. Try to maintain blocks mode in the new tab. Exit blocks mode if the new tab has syntax errors.
+        if (blocksMode && !droplet.copyAceEditor().success) {
+            userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+            dispatch(editor.setBlocksMode(false))
+        }
+    }, [scriptID])
 
     return <div className="flex flex-grow h-full max-h-full overflow-y-hidden">
         <div ref={editorElement} id="editor" className="code-container">

@@ -150,10 +150,6 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
 
         if (!script) return;
 
-        if (editor.selectBlocksMode(getState())) {
-            dispatch(editor.setBlocksMode(false));
-        }
-
         let editSession;
         const language = script.name.slice(-2) === 'py' ? 'python' : 'javascript';
 
@@ -295,8 +291,4 @@ export const deleteEditorSession = (scriptID: string) => {
     if (scriptID in tabsMutableState.editorSessions) {
         delete tabsMutableState.editorSessions[scriptID];
     }
-};
-
-const resetEditorSession = () => {
-    tabsMutableState.editorSessions = {};
 };
