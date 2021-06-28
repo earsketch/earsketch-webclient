@@ -49,7 +49,9 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
     const collaborators = script.collaborators as string[];
 
     useEffect(() => {
-        script.collaborative && dispatch(editor.setBlocksMode(false));
+        if (active && script.collaborative) {
+            dispatch(editor.setBlocksMode(false));
+        }
     }, [activeTabID]);
 
     let tabClass = classNames('w-48 flex-shrink-0 h-14 cursor-pointer border',
