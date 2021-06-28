@@ -968,7 +968,7 @@ export const DAW = () => {
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {!hideDAW &&
-        <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
+        <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
                     title={t('daw.tooltip.toggleEffects')} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>

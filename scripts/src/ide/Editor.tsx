@@ -333,7 +333,7 @@ export const Editor = () => {
         }
     }, [scriptID])
 
-    return <div className="flex flex-grow h-full max-h-full overflow-y-hidden">
+    return <div className="flex flex-grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode
