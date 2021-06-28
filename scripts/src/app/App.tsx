@@ -554,9 +554,12 @@ export const App = () => {
         }
     }
 
-    const openSharedScript = (shareid: string) => {
-        esconsole("opening a shared script: " + shareid, "main")
-        openShare(shareid).then(() => store.dispatch(scripts.syncToNgUserProject()))
+    const openSharedScript = (shareID: string) => {
+        esconsole("opening a shared script: " + shareID, "main")
+        openShare(shareID).then(() => {
+            store.dispatch(scripts.syncToNgUserProject())
+            store.dispatch(tabs.setActiveTabAndEditor(shareID))
+        })
         setShowNotifications(false)
         setShowNotificationHistory(false)
     }
