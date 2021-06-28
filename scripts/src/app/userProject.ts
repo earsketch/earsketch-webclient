@@ -650,9 +650,19 @@ export async function importScript(script: ScriptEntity) {
         if (isLoggedIn()) {
             const imported = await importSharedScript(script.shareid)
             renameScript(imported.shareid, script.name)
-            return Promise.resolve(imported)
+            return imported
         } else {
-            throw i18n.t('messages:general.unauthenticated')
+            // add sharer's info
+            script.creator = script.username
+            script.original_id = script.shareid
+            script.collaborative = false
+            script.readonly = false
+            // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
+            script.shareid = ESUtils.randomString(22)
+            scripts[script.shareid] = script
+            // re-save to local with above updated info
+            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
+            return script
         }
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
@@ -715,12 +725,7 @@ export async function openSharedScriptForEdit(shareID: string) {
         const script = await loadScript(shareID, true)
         // save with duplicate check
         const savedScript = await importScript(script)
-        // add sharer's info
-        savedScript.creator = script.username
-        savedScript.original_id = shareID
         openScript(savedScript.shareid)
-        // re-save to local with above updated info
-        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
     }
 }
 
