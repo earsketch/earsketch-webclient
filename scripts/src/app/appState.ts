@@ -8,8 +8,8 @@ import { RootState } from '../reducers';
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
 
 const embedMode = ESUtils.getURLParameter("embedded") === "true"
-const hideDAW = embedMode && ESUtils.getURLParameter("hideDaw")
-const hideEditor = embedMode && ESUtils.getURLParameter("hideCode")
+const hideDAW = embedMode && ESUtils.getURLParameter("hideDaw") !== null
+const hideEditor = embedMode && ESUtils.getURLParameter("hideCode") !== null
 
 const appSlice = createSlice({
     name: 'app',
