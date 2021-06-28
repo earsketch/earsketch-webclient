@@ -265,6 +265,7 @@ export const Editor = () => {
     const editorElement = useRef<HTMLDivElement>(null)
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
+    const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
 
     useEffect(() => {
         if (!editorElement.current) return
@@ -297,24 +298,38 @@ export const Editor = () => {
             // NOTE: toggleBlocks() has a nasty habit of overwriting Ace state.
             // We save and restore the editor contents here in case we are exiting blocks mode due to switching to a script with syntax errors.
             const value = ace.getValue()
+            const range = ace.selection.getRange()
             droplet.toggleBlocks()
             ace.setValue(value)
+            ace.selection.setRange(range)
+            if (!modified) {
+                // Correct for setValue from misleadingly marking the script as modified.
+                dispatch(tabs.removeModifiedScript(scriptID))
+            }
         }
     }, [blocksMode])
 
     useEffect(() => {
         // NOTE: Changing Droplet's language can overwrite Ace state and drop out of blocks mode, so we take precautions here.
-        const value = ace.getValue()
-        setLanguage(language)
-        ace.setValue(value)
         // User switched tabs. Try to maintain blocks mode in the new tab. Exit blocks mode if the new tab has syntax errors.
         if (blocksMode) {
+            const value = ace.getValue()
+            const range = ace.selection.getRange()
+            setLanguage(language)
+            ace.setValue(value)
+            ace.selection.setRange(range)
+            if (!modified) {
+                // Correct for setValue from misleadingly marking the script as modified.
+                dispatch(tabs.removeModifiedScript(scriptID))
+            }
             if (!droplet.copyAceEditor().success) {
                 userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
                 dispatch(editor.setBlocksMode(false))
             } else if (!droplet.currentlyUsingBlocks) {
                 droplet.toggleBlocks()
             }
+        } else {
+            setLanguage(language)
         }
     }, [scriptID])
 
