@@ -4,6 +4,10 @@ import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
 import {ScriptEntity} from 'common';
 import {fillDict} from '../cai/analysis';
 
+// Load lists of numbers and keys
+let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
+let AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
+
 let keyGenreDict: { [key: string]: string } = {}
 let keyInstrumentDict: { [key: string]: string } = {}
 
@@ -11,9 +15,23 @@ export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:
     keyGenreDict = genre
     keyInstrumentDict = instrument
 
+    // Clear unused samples from audio recommendations.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter(function(key) {
         return Object.keys(keyGenreDict).includes(key)
     });
+
+    AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
+    for (let key in AUDIO_RECS) {
+        if (NUMBERS_AUDIOKEYS[key].includes("GUN")) {
+            delete AUDIO_RECS[key]
+        } else {
+            for (let rec_key in AUDIO_RECS[key]) {
+                if (NUMBERS_AUDIOKEYS[rec_key].includes("GUN")) {
+                    delete AUDIO_RECS[key][rec_key]
+                }
+            }
+        }
+    }
 }
 
 export function getKeyDict(type: string) {
@@ -25,9 +43,6 @@ export function getKeyDict(type: string) {
         return {}
     }
 }
-
-// Load lists of numbers and keys
-let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 export function addRecInput(recInput: string[], script: ScriptEntity) {
     // Generate list of input samples
@@ -90,11 +105,6 @@ export function recommend(recommendedSounds: string[], inputSamples: string[], c
     if (previousRecommendations.length === Object.keys(keyGenreDict).length) {
         previousRecommendations = []
     }
-    for (let rec in recs) {
-        if (!keyGenreDict[rec]) {
-            delete recs[rec]
-        }
-    }
     filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, genreLimit, instrumentLimit, 
         previousRecommendations, bestLimit)
     return filteredRecs;
@@ -146,7 +156,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     for (let idx = 0; idx < inputSamples.length; idx++) {
         let audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx])
         if (audioNumber !== undefined) {
-            let audioRec = AUDIOKEYS_RECOMMENDATIONS[String(audioNumber)]
+            let audioRec = AUDIO_RECS[String(audioNumber)]
             for (let num in audioRec) {
                 if (!audioRec.hasOwnProperty(num)) {
                     throw new Error('Error enumerating the recommendation audioKeys')
