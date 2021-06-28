@@ -408,7 +408,7 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
             "descriptionKey": "api:print.description",
             "parameters": {
                 "input": {
-                    "typeKey": "api.types.stringNumberList",
+                    "typeKey": "api:types.stringNumberList",
                     "descriptionKey": "api:print.parameters.input.description"
                 }
             },
