@@ -184,6 +184,8 @@ export async function openShare(shareid: string) {
                 await userProject.getSharedScripts()
                 if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
                 userProject.openSharedScript(result.shareid)
+                store.dispatch(scripts.syncToNgUserProject())
+                store.dispatch(tabs.setActiveTabAndEditor(shareid))
             }
             switchToShareMode()
         } else {
@@ -206,7 +208,9 @@ export async function openShare(shareid: string) {
 
                 await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
                 await userProject.getSharedScripts()
-                userProject.openSharedScript(result.shareid)
+                userProject.openSharedScript(shareid)
+                store.dispatch(scripts.syncToNgUserProject())
+                store.dispatch(tabs.setActiveTabAndEditor(shareid))
             } else {
                 // the shared script belongs to the logged-in user
                 // TODO: use broadcast or service
