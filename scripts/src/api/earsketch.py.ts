@@ -113,13 +113,11 @@ export function setupAPI() {
     // Migrated from ideController:
     // Function to pipe Skulpt's stdout to the EarSketch console.
     function outf(text: string) {
-        // For some reason, skulpt prints a newline character after every
-        // call to print(), so let's ignore those
-        // TODO: users can't print newline characters...ugh
-        if (text === "\n") {
-            return
+        // Skulpt prints a newline character after every `print`.
+        // println and userConsole.log already print each message as a new line, so we ignore these newlines.
+        if (text !== "\n") {
+            ES_PASSTHROUGH.println(Sk.ffi.remapToJs(mod.__ES_RESULT), text)
         }
-        userConsole.log(text)
     }
 
     function builtinRead(x: string) {
