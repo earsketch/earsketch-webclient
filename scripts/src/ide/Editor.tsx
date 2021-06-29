@@ -255,6 +255,13 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
     setupDone = true
 }
 
+window.addEventListener('keydown', function(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+        event.preventDefault()
+        ace.commands.exec('saveScript',ace,[])
+    }
+})
+
 export const Editor = () => {
     const dispatch = useDispatch()
     const activeScript = useSelector(tabs.selectActiveTabScript)
