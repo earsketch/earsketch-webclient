@@ -22,6 +22,7 @@ let _embedCompiled = false
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
+    const hideDAW = useSelector(appState.selectHideDAW)
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector((state: RootState) => state.bubble)
     const playing = useSelector(daw.selectPlaying)
@@ -92,7 +93,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.setLoop(newLoop)
     }
 
-    const shareScriptLink = `${SITE_BASE_URI}?sharing=${useSelector(appState.selectEmbeddedShareID)}`
+    const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(appState.selectEmbeddedShareID)}`
 
     const [volume, setVolume] = useState(0)  // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
@@ -135,7 +136,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         const short = t('daw.shortTitle')
         const long = t('daw.title').toLocaleUpperCase()
         if (embedMode) {
-            setTitle(short)
+            setTitle(hideDAW ? null : short)
         } else if (width > 590) {
             setTitle(long)
         } else if (width > 405) {
@@ -162,7 +163,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             </span>
         </div>
         {embedMode && <div>
-            <a target="_blank" href={shareScriptLink}> Click Here to view in EarSketch </a>
+            <a target="_blank" href={shareScriptLink}> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
         <div className="daw-transport-container">
@@ -173,7 +174,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 </button>
             </span>
 
-            <span id="daw-play-button">
+            <span id="daw-play-button" style={bubble.active && [4].includes(bubble.currentPage) ? { zIndex: 35, backgroundColor: "white" } : {}}>
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
                     <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t('daw.tooltip.play')} onClick={play}>
