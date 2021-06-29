@@ -10,6 +10,7 @@ import * as collaboration from "./collaboration"
 import { ScriptEntity } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
+import { openShare } from "../ide/IDE"
 import reporter from "./reporter"
 import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
@@ -363,11 +364,7 @@ export async function login(username: string, password: string) {
         }
     }
 
-    store.dispatch(scriptsState.syncToNgUserProject())
-
-    for (const scriptid of Object.keys(sharedScripts)) {
-        store.dispatch(tabs.setActiveTabAndEditor(scriptid))
-    }
+    await Promise.all(Object.keys(sharedScripts).map(openShare))
 
     // load scripts in shared browser
     return getSharedScripts()
@@ -572,7 +569,7 @@ export async function setLicense(scriptName: string, scriptId: string, licenseID
 }
 
 // save a sharedscript into user's account.
-export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string){
+export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
     if (isLoggedIn()) {
         const script = await postAuth("/services/scripts/savesharedscript", { scriptid })
         esconsole(`Save shared script ${script.name} to ${username}`, ["debug", "user"])
