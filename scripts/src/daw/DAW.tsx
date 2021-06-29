@@ -22,6 +22,7 @@ let _embedCompiled = false
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
+    const hideDAW = useSelector(appState.selectHideDAW)
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector((state: RootState) => state.bubble)
     const playing = useSelector(daw.selectPlaying)
@@ -134,8 +135,10 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         const width = entries[0].contentRect.width
         const short = t('daw.shortTitle')
         const long = t('daw.title').toLocaleUpperCase()
-        if (embedMode) {
+        if (embedMode && !hideDAW) {
             setTitle(short)
+        } else if (embedMode && hideDAW) {
+            setTitle(null)
         } else if (width > 590) {
             setTitle(long)
         } else if (width > 405) {
