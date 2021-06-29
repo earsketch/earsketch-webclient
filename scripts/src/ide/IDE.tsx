@@ -125,6 +125,14 @@ export function initEditor() {
         }
     })
 
+    // Save scripts when not focused on editor.
+    window.addEventListener('keydown', event => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+            event.preventDefault()
+            editor.ace.commands.exec('saveScript', editor.ace, [])
+        }
+    })
+
     editor.ace.commands.addCommand({
         name: "runCode",
         bindKey: {
@@ -154,14 +162,6 @@ export function initEditor() {
     const activeScript = tabs.selectActiveTabScript(store.getState())
     editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
 }
-
-// Save scripts when not focused on editor.
-window.addEventListener('keydown', event => {
-    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-        event.preventDefault()
-        editor.ace.commands.exec('saveScript', editor.ace, [])
-    }
-})
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
     store.dispatch(appState.setEmbeddedScriptUsername(username))
