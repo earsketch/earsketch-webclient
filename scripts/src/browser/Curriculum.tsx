@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef, MutableRefObject, ChangeEvent } from 'react'
+import React, { useEffect, useState, useRef, ChangeEvent } from 'react'
 import { hot } from 'react-hot-loader/root'
 import { useSelector, useDispatch } from 'react-redux'
 
+import * as appState from '../app/appState'
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
-import * as appState from '../app/appState'
-import * as Editor from "../ide/Editor"
 import * as ESUtils from '../esutils'
+import { importScript } from "../ide/IDE"
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../user/notification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
@@ -200,10 +200,8 @@ const CurriculumPane = () => {
         if (content) {
             // Filter content by language.
             const p = (language === 'python')
-            content.querySelectorAll(".curriculum-python").forEach((e:HTMLElement) => e.hidden = !p)
-            content.querySelectorAll(".copy-btn-py").forEach((e:HTMLElement) => e.hidden = !p)
-            content.querySelectorAll(".curriculum-javascript").forEach((e:HTMLElement) => e.hidden = p)
-            content.querySelectorAll(".copy-btn-js").forEach((e:HTMLElement) => e.hidden = p)
+            content.querySelectorAll(".curriculum-python,.copy-btn-python").forEach((e:HTMLElement) => e.hidden = !p)
+            content.querySelectorAll(".curriculum-javascript,.copy-btn-javascript").forEach((e:HTMLElement) => e.hidden = p)
 
             // Apply color theme to code blocks.
             if (theme === 'light') {
@@ -225,7 +223,7 @@ const CurriculumPane = () => {
                 if (message.data === "langrequest") {
                     frame.contentWindow!.postMessage({ lang: language }, "*")
                 } else if (typeof message.data === "string") {
-                    Editor.pasteCode(message.data)
+                    importScript(message.data)
                 }
             }
         }

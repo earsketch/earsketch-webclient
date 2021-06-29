@@ -2,11 +2,10 @@ import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
 import lunr from 'lunr'
 
 import esconsole from '../esconsole'
+import { importScript } from "../ide/IDE"
 import * as layout from '../layout/layoutState'
-
 import { RootState, ThunkAPI, AppDispatch } from '../reducers'
-import { BrowserTabType } from "../layout/layoutState";
-import * as userNotification from "../user/notification";
+import * as userNotification from "../user/notification"
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
@@ -37,6 +36,11 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     // Highlight code blocks.
     root.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
 
+    // Connect copy buttons.
+    root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {
+        button.onclick = () => importScript(button.nextSibling!.textContent!)
+    })
+
     // Fix internal cross-references.
     root.querySelectorAll('a[href^="#"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
@@ -55,7 +59,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(layout.openWest(BrowserTabType.API))
+            dispatch(layout.openWest(layout.BrowserTabType.API))
         }
     })
 
