@@ -9,18 +9,17 @@ let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 let AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
 
 // Clear unused samples from audio recommendations.
-AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
-    for (let key in AUDIO_RECS) {
-        if (!Object.keys(NUMBERS_AUDIOKEYS).includes(key)) {
-            delete AUDIO_RECS[key]
-        } else {
-            for (let rec_key in AUDIO_RECS[key]) {
-                if (!Object.keys(NUMBERS_AUDIOKEYS).includes(rec_key)) {
-                    delete AUDIO_RECS[key][rec_key]
-                }
+for (let key in AUDIO_RECS) {
+    if (!Object.keys(NUMBERS_AUDIOKEYS).includes(key)) {
+        delete AUDIO_RECS[key]
+    } else {
+        for (let rec_key in AUDIO_RECS[key]) {
+            if (!Object.keys(NUMBERS_AUDIOKEYS).includes(rec_key)) {
+                delete AUDIO_RECS[key][rec_key]
             }
         }
     }
+}
 
 let keyGenreDict: { [key: string]: string } = {}
 let keyInstrumentDict: { [key: string]: string } = {}
