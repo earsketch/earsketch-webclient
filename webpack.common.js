@@ -46,13 +46,6 @@ module.exports = {
             codeAnalyzerController: path.resolve(__dirname,`${appDir}/codeAnalyzerController.js`),
             codeAnalyzerContestController: path.resolve(__dirname,`${appDir}/codeAnalyzerContestController.js`),
             codeAnalyzerCAIController: path.resolve(__dirname,`${appDir}/codeAnalyzerCAIController.js`),
-            
-            // Curriculum Data
-            currQuestions: path.resolve(__dirname,`scripts/src/browser/questions.js`),
-
-            // Recommendation JSON/js file
-            numbersAudiokeys: path.resolve(__dirname,`${dataDir}/numbers_audiokeys.js`),
-            audiokeysRecommendations: path.resolve(__dirname,`${dataDir}/audiokeys_recommendations.js`),
         }
     },
     module: {
@@ -137,15 +130,6 @@ module.exports = {
             Hilitor: 'exports-loader?type=commonjs&exports=single Hilitor!hilitor',
             createAudioMeter: 'exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter',
             difflib: 'exports-loader?type=commonjs&exports=single difflib!jsDiffLib',
-
-            // Data global variables
-            EarSketch: 'exports-loader?type=commonjs&exports=single EarSketch!modules',
-            ESNum_Slides: 'exports-loader?type=commonjs&exports=single ESNum_Slides!numSlides',
-            Question: 'exports-loader?type=commonjs&exports=single Question!currQuestions',
-
-            AUDIOKEYS_NUMBERS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_NUMBERS!audiokeysNumbers',
-            NUMBERS_AUDIOKEYS: 'exports-loader?type=commonjs&exports=single NUMBERS_AUDIOKEYS!numbersAudiokeys',
-            AUDIOKEYS_RECOMMENDATIONS: 'exports-loader?type=commonjs&exports=single AUDIOKEYS_RECOMMENDATIONS!audiokeysRecommendations',
         }),
         new webpack.HotModuleReplacementPlugin(),
         new HappyPack({

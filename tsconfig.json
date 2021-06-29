@@ -12,6 +12,7 @@
         "jsx": "react",
         "allowJs": false,
         "moduleResolution": "Node",
+        "resolveJsonModule": true,
         "baseUrl": "./scripts",
         "paths": {
             "*": ["src/types/*.d.ts"],

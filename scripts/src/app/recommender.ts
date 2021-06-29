@@ -1,25 +1,15 @@
-// recommend audio samples.
-import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
-import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
-import {ScriptEntity} from 'common';
-import {fillDict} from '../cai/analysis';
+// Recommend audio samples.
+import { fillDict } from "../cai/analysis"
+import { ScriptEntity } from "common"
+
+import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+
+const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
+const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 
 // Load lists of numbers and keys
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
-let AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
-
-// Clear unused samples from audio recommendations.
-for (let key in AUDIO_RECS) {
-    if (!Object.keys(NUMBERS_AUDIOKEYS).includes(key)) {
-        delete AUDIO_RECS[key]
-    } else {
-        for (let rec_key in AUDIO_RECS[key]) {
-            if (!Object.keys(NUMBERS_AUDIOKEYS).includes(rec_key)) {
-                delete AUDIO_RECS[key][rec_key]
-            }
-        }
-    }
-}
 
 let keyGenreDict: { [key: string]: string } = {}
 let keyInstrumentDict: { [key: string]: string } = {}
@@ -156,7 +146,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     for (let idx = 0; idx < inputSamples.length; idx++) {
         let audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx])
         if (audioNumber !== undefined) {
-            let audioRec = AUDIO_RECS[String(audioNumber)]
+            let audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
             for (let num in audioRec) {
                 if (!audioRec.hasOwnProperty(num)) {
                     throw new Error('Error enumerating the recommendation audioKeys')
