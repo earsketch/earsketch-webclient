@@ -8,6 +8,20 @@ import {fillDict} from '../cai/analysis';
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 let AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
 
+// Clear unused samples from audio recommendations.
+AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
+    for (let key in AUDIO_RECS) {
+        if (!Object.keys(NUMBERS_AUDIOKEYS).includes(key)) {
+            delete AUDIO_RECS[key]
+        } else {
+            for (let rec_key in AUDIO_RECS[key]) {
+                if (!Object.keys(NUMBERS_AUDIOKEYS).includes(rec_key)) {
+                    delete AUDIO_RECS[key][rec_key]
+                }
+            }
+        }
+    }
+
 let keyGenreDict: { [key: string]: string } = {}
 let keyInstrumentDict: { [key: string]: string } = {}
 
@@ -15,23 +29,10 @@ export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:
     keyGenreDict = genre
     keyInstrumentDict = instrument
 
-    // Clear unused samples from audio recommendations.
+    // Update list of audio samples for audio recommendation input/CAI output.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter(function(key) {
         return Object.keys(keyGenreDict).includes(key)
     });
-
-    AUDIO_RECS = Object.assign({}, AUDIOKEYS_RECOMMENDATIONS)
-    for (let key in AUDIO_RECS) {
-        if (NUMBERS_AUDIOKEYS[key].includes("GUN")) {
-            delete AUDIO_RECS[key]
-        } else {
-            for (let rec_key in AUDIO_RECS[key]) {
-                if (NUMBERS_AUDIOKEYS[rec_key].includes("GUN")) {
-                    delete AUDIO_RECS[key][rec_key]
-                }
-            }
-        }
-    }
 }
 
 export function getKeyDict(type: string) {
