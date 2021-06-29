@@ -44,20 +44,19 @@
 </head>
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-        <div id="loading-screen" style="height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center">
-            <div style="font-size: 3rem; padding-bottom: 4rem">Loading EarSketch...</div>
-            <div id="loading-spinner"></div>
-        </div>
-        <script>
-            // Since React is loaded later, CSS file swapping will be too late to change the color of the loading screen.
-            if (localStorage['colorTheme'] === 'dark') {
-                const element = document.getElementById("loading-screen")
-                element.style['background-color'] = '#282828'
-                element.style['color'] = '#EEE'
-            }
-        </script>
+    <div id="root"></div>
+    <div id="loading-screen" style="position: absolute; top: 0; left: 0; bottom: 30vh; right: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white">
+        <div style="font-size: 3rem; padding-bottom: 4rem">Loading EarSketch...</div>
+        <div id="loading-spinner"></div>
     </div>
+    <script>
+        // Since React is loaded later, CSS file swapping will be too late to change the color of the loading screen.
+        if (localStorage['colorTheme'] === 'dark') {
+            const element = document.getElementById("loading-screen")
+            element.style['background-color'] = '#282828'
+            element.style['color'] = '#EEE'
+        }
+    </script>
     <script type="text/javascript" src="/curriculum/curr_toc.js"></script>
     <script type="text/javascript" src="/curriculum/curr_pages.js"></script>
     <script type="text/javascript" src="/curriculum/curr_searchdoc.js"></script>

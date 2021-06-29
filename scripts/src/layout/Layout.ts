@@ -77,6 +77,7 @@ export const initialize = () => {
     !layout.isWestOpen(store.getState()) && toggleHorizontalDrag(0, false);
     !layout.isEastOpen(store.getState()) && toggleHorizontalDrag(1, false);
 
+    document.getElementById("loading-screen")!.style.display = "none";
     initialized = true;
 };
 
