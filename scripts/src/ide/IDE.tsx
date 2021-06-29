@@ -271,13 +271,16 @@ export async function compileCode() {
     const code = editor.getValue()
 
     const startTime = Date.now()
-    const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
+    const state = store.getState()
+    const hideEditor = appState.selectHideEditor(state)
+    const scriptName = (hideEditor ? appState.selectEmbeddedScriptName(state) : tabs.selectActiveTabScript(state).name)!
+    const language = ESUtils.parseLanguage(scriptName)
 
     editor.clearErrors()
     ideConsole.clear()
     ideConsole.status("Running script...")
 
-    const scriptID = tabs.selectActiveTabID(store.getState())
+    const scriptID = tabs.selectActiveTabID(state)
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
     let result: DAWData
@@ -364,7 +367,7 @@ export async function compileCode() {
         collaboration.sendCompilationRecord("success")
     }
 
-    const { bubble } = store.getState()
+    const { bubble } = state
     if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
         store.dispatch(setReady(true))
     }
@@ -390,8 +393,6 @@ export const IDE = () => {
 
     const [loading, _setLoading] = useState(false)
     setLoading = _setLoading
-
-    useEffect(() => Layout.initialize(), [])
 
     useEffect(() => {
         // Scroll to the bottom of the console when new messages come in.
@@ -420,7 +421,7 @@ export const IDE = () => {
                         </div>
                     </div>
 
-                    {!hideEditor && <div className="flex flex-col" id="coder" style={bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
@@ -447,7 +448,7 @@ export const IDE = () => {
                             </div>}
                             <iframe id="ifmcontentstoprint" className="h-0 w-0 invisible absolute"></iframe>
                         </div>
-                    </div>}
+                    </div>
 
                     <div ref={consoleContainer} id="console-frame" className="results" style={bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                         <div className="row">

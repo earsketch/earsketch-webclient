@@ -1,6 +1,10 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'
+import Split from 'split.js'
+
+import * as Layout from "./Layout"
 import { RootState, ThunkAPI } from '../reducers';
-import Split from 'split.js';
 
 export const BrowserTabType = {
     Sound: 0,
@@ -60,7 +64,24 @@ const layoutSlice = createSlice({
     }
 });
 
-export default layoutSlice.reducer;
+const persistConfig = {
+    key: 'layout',
+    transforms: [{
+        in: (obj: any) => {
+            // Wait until redux-persist has rehydrated the state before initializing layout.
+            // This is a bit of a hack, but it should become unnecessary when we switch to react-split.
+            // NOTE: Unlike stateReconciler, transforms get called even when the user has no persisted state.
+            if (obj.rehydrated) {
+                Layout.initialize()
+            }
+            return obj
+        },
+        out: (obj: any) => obj,
+    }],
+    storage,
+};
+
+export default persistReducer(persistConfig, layoutSlice.reducer);
 export const {
     setWest,
     setEast,

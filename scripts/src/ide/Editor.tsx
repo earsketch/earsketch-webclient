@@ -91,15 +91,15 @@ export function clearHistory() {
     }
 }
 
-export function setLanguage(currentLanguage: string) {
-    if (currentLanguage === "python") {
+export function setLanguage(language: string) {
+    if (language === "python") {
         droplet?.setMode("python", config.blockPalettePython.modeOptions)
         droplet?.setPalette(config.blockPalettePython.palette)
-    } else if (currentLanguage === "javascript") {
+    } else if (language === "javascript") {
         droplet?.setMode("javascript", config.blockPaletteJavascript.modeOptions)
         droplet?.setPalette(config.blockPaletteJavascript.palette)
     }
-    ace?.getSession().setMode("ace/mode/" + currentLanguage)
+    ace?.getSession().setMode("ace/mode/" + language)
 }
 
 export function pasteCode(code: string) {
@@ -264,6 +264,8 @@ export const Editor = () => {
     const blocksMode = useSelector(editor.selectBlocksMode)
     const editorElement = useRef<HTMLDivElement>(null)
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
+    const scriptID = useSelector(tabs.selectActiveTabID)
+    const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
 
     useEffect(() => {
         if (!editorElement.current) return
@@ -277,8 +279,6 @@ export const Editor = () => {
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
 
-    useEffect(() => setLanguage(language), [language])
-
     useEffect(() => {
         setFontSize(fontSize)
         // Need to refresh the droplet palette section, otherwise the block layout becomes weird.
@@ -287,6 +287,7 @@ export const Editor = () => {
 
     useEffect(() => {
         if (blocksMode && !droplet.currentlyUsingBlocks) {
+            setLanguage(language)
             if (droplet.toggleBlocks().success) {
                 userConsole.clear()
             } else {
@@ -294,11 +295,45 @@ export const Editor = () => {
                 dispatch(editor.setBlocksMode(false))
             }
         } else if (!blocksMode && droplet.currentlyUsingBlocks) {
+            // NOTE: toggleBlocks() has a nasty habit of overwriting Ace state.
+            // We save and restore the editor contents here in case we are exiting blocks mode due to switching to a script with syntax errors.
+            const value = ace.getValue()
+            const range = ace.selection.getRange()
             droplet.toggleBlocks()
+            ace.setValue(value)
+            ace.selection.setRange(range)
+            if (!modified) {
+                // Correct for setValue from misleadingly marking the script as modified.
+                dispatch(tabs.removeModifiedScript(scriptID))
+            }
         }
     }, [blocksMode])
 
-    return <div className="flex flex-grow h-full max-h-full overflow-y-hidden">
+    useEffect(() => {
+        // NOTE: Changing Droplet's language can overwrite Ace state and drop out of blocks mode, so we take precautions here.
+        // User switched tabs. Try to maintain blocks mode in the new tab. Exit blocks mode if the new tab has syntax errors.
+        if (blocksMode) {
+            const value = ace.getValue()
+            const range = ace.selection.getRange()
+            setLanguage(language)
+            ace.setValue(value)
+            ace.selection.setRange(range)
+            if (!modified) {
+                // Correct for setValue from misleadingly marking the script as modified.
+                dispatch(tabs.removeModifiedScript(scriptID))
+            }
+            if (!droplet.copyAceEditor().success) {
+                userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
+                dispatch(editor.setBlocksMode(false))
+            } else if (!droplet.currentlyUsingBlocks) {
+                droplet.toggleBlocks()
+            }
+        } else {
+            setLanguage(language)
+        }
+    }, [scriptID])
+
+    return <div className="flex flex-grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode

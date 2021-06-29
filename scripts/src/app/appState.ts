@@ -2,9 +2,14 @@ import { createSlice } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
+import * as ESUtils from "../esutils";
 import { RootState } from '../reducers';
 
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
+
+const embedMode = ESUtils.getURLParameter("embedded") === "true"
+const hideDAW = embedMode && ESUtils.getURLParameter("hideDaw") !== null
+const hideEditor = embedMode && ESUtils.getURLParameter("hideCode") !== null
 
 const appSlice = createSlice({
     name: 'app',
@@ -13,9 +18,9 @@ const appSlice = createSlice({
         scriptLanguage: 'python',
         colorTheme: "light" as "light" | "dark",
         fontSize: 14,
-        embedMode: false,
-        hideDAW: false,
-        hideEditor: false,
+        embedMode,
+        hideDAW,
+        hideEditor,
         embeddedScriptName: null,
         embeddedScriptUsername: null,
         embeddedShareID: null,

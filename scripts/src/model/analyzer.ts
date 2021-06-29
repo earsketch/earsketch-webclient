@@ -1,5 +1,7 @@
 // We need to keep track of the calls to the analysis APIs as we need to schedule them to be called after finish()
 // The reason being, the audio buffers would not have been loaded before that and the analysis would fail.
+import { DSP, FFT, WindowFunction } from "dsp"
+
 import * as ESUtils from '../esutils'
 
 const FEATURE_FUNCTIONS: { [key: string]: (data: Float32Array, blockSize: number, sampleRate: number) => number[] } = {

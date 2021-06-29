@@ -33,16 +33,8 @@ const rootReducer = combineReducers({
     cai,
 });
 
-// Note: Configuring store in rootReducer so it can be imported and accessed in non-React files.
-// Some persistence settings are done in individual reducers for more granularity.
-const persistConfig = {
-    key: 'root',
-    whitelist: ['layout'],
-    storage
-};
-
 const store = configureStore({
-    reducer: persistReducer(persistConfig, rootReducer),
+    reducer: rootReducer,
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware({
             // Toggle these on for sanity checks.
