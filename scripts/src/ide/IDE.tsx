@@ -233,8 +233,7 @@ export async function openShare(shareid: string) {
 }
 
 // For curriculum pages.
-(window as any).doCopy = (that: HTMLElement) => {
-    const key = (that.nextSibling as HTMLElement).textContent!
+export function importScript(key: string) {
     let result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {

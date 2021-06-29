@@ -1,8 +1,15 @@
-// recommend audio samples.
-import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys';
-import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations';
-import {ScriptEntity} from 'common';
-import {fillDict} from '../cai/analysis';
+// Recommend audio samples.
+import { fillDict } from "../cai/analysis"
+import { ScriptEntity } from "common"
+
+import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+
+const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
+const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
+
+// Load lists of numbers and keys
+let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 let keyGenreDict: { [key: string]: string } = {}
 let keyInstrumentDict: { [key: string]: string } = {}
@@ -11,6 +18,7 @@ export function setKeyDict(genre: { [key: string]: string }, instrument: { [key:
     keyGenreDict = genre
     keyInstrumentDict = instrument
 
+    // Update list of audio samples for audio recommendation input/CAI output.
     AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS).filter(function(key) {
         return Object.keys(keyGenreDict).includes(key)
     });
@@ -25,9 +33,6 @@ export function getKeyDict(type: string) {
         return {}
     }
 }
-
-// Load lists of numbers and keys
-let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
 
 export function addRecInput(recInput: string[], script: ScriptEntity) {
     // Generate list of input samples
@@ -141,7 +146,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     for (let idx = 0; idx < inputSamples.length; idx++) {
         let audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx])
         if (audioNumber !== undefined) {
-            let audioRec = AUDIOKEYS_RECOMMENDATIONS[String(audioNumber)]
+            let audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
             for (let num in audioRec) {
                 if (!audioRec.hasOwnProperty(num)) {
                     throw new Error('Error enumerating the recommendation audioKeys')

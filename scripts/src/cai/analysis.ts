@@ -2,14 +2,17 @@
 import * as audioLibrary from '../app/audiolibrary'
 import * as caiStudent from './student'
 import esconsole from '../esconsole'
-import {NUMBERS_AUDIOKEYS} from 'numbersAudiokeys'
-import {AUDIOKEYS_RECOMMENDATIONS} from 'audiokeysRecommendations'
 import * as recommender from '../app/recommender'
 import { SoundEntity } from 'common'
-import { getDefaultSounds } from '../browser/soundsState'
 import { getApiCalls } from './complexityCalculator'
 import { analyzePython } from './complexityCalculatorPY'
 import { analyzeJavascript } from './complexityCalculatorJS'
+
+import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+
+const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
+const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 
 let librarySounds : SoundEntity[] = []
 let librarySoundGenres : string[] = []
