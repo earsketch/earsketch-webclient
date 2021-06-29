@@ -362,6 +362,13 @@ export async function login(username: string, password: string) {
             }
         }
     }
+
+    store.dispatch(scriptsState.syncToNgUserProject())
+
+    for (const scriptid of Object.keys(sharedScripts)) {
+        store.dispatch(tabs.setActiveTabAndEditor(scriptid))
+    }
+
     // load scripts in shared browser
     return getSharedScripts()
 }

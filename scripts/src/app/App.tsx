@@ -458,9 +458,6 @@ export const App = () => {
         // Retrieve the user scripts.
         await userProject.login(username, password)
         esconsole("Logged in as " + username, ["DEBUG","MAIN"])
-        if (sharedScriptID) {
-            openShare(sharedScriptID)
-        }
         store.dispatch(scripts.syncToNgUserProject())
 
         if (!loggedIn) {
