@@ -647,23 +647,9 @@ export async function importScript(script: ScriptEntity) {
 
     if (script.isShared) {
         // The user is importing a shared script - need to call the webservice.
-        if (isLoggedIn()) {
-            const imported = await importSharedScript(script.shareid)
-            renameScript(imported.shareid, script.name)
-            return imported
-        } else {
-            // add sharer's info
-            script.creator = script.username
-            script.original_id = script.shareid
-            script.collaborative = false
-            script.readonly = false
-            // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
-            script.shareid = ESUtils.randomString(22)
-            scripts[script.shareid] = script
-            // re-save to local with above updated info
-            localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-            return script
-        }
+        const imported = await importSharedScript(script.shareid)
+        renameScript(imported.shareid, script.name)
+        return imported
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
         return saveScript(script.name, script.source_code)
@@ -706,14 +692,28 @@ export async function setScriptDesc(scriptname: string, scriptId: string, desc: 
 
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
+    let script
     if (isLoggedIn()) {
-        const data = await postAuthForm("/services/scripts/import", { scriptid })
-        delete sharedScripts[scriptid]
-        closeSharedScript(scriptid)
-        scripts[data.shareid] = data
-        esconsole("Import script " + scriptid, ["debug", "user"])
-        return data
+        script = await postAuthForm("/services/scripts/import", { scriptid }) as ScriptEntity
+    } else {
+        script = sharedScripts[scriptid]
+        script.creator = script.username
+        script.original_id = script.shareid
+        script.collaborative = false
+        script.readonly = false
+        // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
+        script.shareid = ESUtils.randomString(22)
+        scripts[script.shareid] = script
     }
+    delete sharedScripts[scriptid]
+    closeSharedScript(scriptid)
+    scripts[script.shareid] = script
+    esconsole("Import script " + scriptid, ["debug", "user"])
+    if (!isLoggedIn()) {
+        // re-save to local with above updated info
+        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
+    }
+    return script
 }
 
 export async function openSharedScriptForEdit(shareID: string) {
