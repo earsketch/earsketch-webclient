@@ -135,10 +135,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         const width = entries[0].contentRect.width
         const short = t('daw.shortTitle')
         const long = t('daw.title').toLocaleUpperCase()
-        if (embedMode && !hideDAW) {
-            setTitle(short)
-        } else if (embedMode && hideDAW) {
-            setTitle(null)
+        if (embedMode) {
+            setTitle(hideDAW ? null : short)
         } else if (width > 590) {
             setTitle(long)
         } else if (width > 405) {
