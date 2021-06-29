@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { SearchBar, Collapsed } from './Browser'
 import * as curriculum from './curriculumState'
 import * as appState from '../app/appState'
+import * as Editor from "../ide/Editor"
 import * as ESUtils from '../esutils'
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../user/notification'
@@ -214,6 +215,28 @@ const CurriculumPane = () => {
             }
         }
     }, [content, language, paneIsOpen])
+
+    // GrooveMachine integration, for the "Intro to GrooveMachine" chapter.
+    useEffect(() => {
+        const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
+        if (!frame) return
+        const handleMessage = (message: MessageEvent) => {
+            if (message.isTrusted) {
+                if (message.data === "langrequest") {
+                    frame.contentWindow!.postMessage({ lang: language }, "*")
+                } else if (typeof message.data === "string") {
+                    Editor.pasteCode(message.data)
+                }
+            }
+        }
+        window.addEventListener("message", handleMessage)
+        return () => window.removeEventListener("message", handleMessage)
+    }, [content])
+
+    useEffect(() => {
+        const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
+        if (frame) frame.contentWindow!.postMessage({ lang: language }, "*")
+    }, [language])
 
     // Highlight search text matches found in the curriculum.
     const hilitor = new Hilitor("curriculum-body")
