@@ -93,7 +93,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.setLoop(newLoop)
     }
 
-    const shareScriptLink = `${SITE_BASE_URI}?sharing=${useSelector(appState.selectEmbeddedShareID)}`
+    const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(appState.selectEmbeddedShareID)}`
 
     const [volume, setVolume] = useState(0)  // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
@@ -165,7 +165,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             </span>
         </div>
         {embedMode && <div>
-            <a target="_blank" href={shareScriptLink}> Click Here to view in EarSketch </a>
+            <a target="_blank" href={shareScriptLink}> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
         <div className="daw-transport-container">
