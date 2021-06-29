@@ -312,20 +312,15 @@ export const Browser = () => {
 
     const BrowserBody = BrowserComponents[kind];
 
-    return (
-        <div
+    return <div
             className={`flex flex-col h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
-            id='content-manager'
-        >
-            {
-                open ? (
-                    <>
-                        <TitleBar />
-                        <BrowserTabs />
-                        <BrowserBody />
-                    </>
-                ) : <Collapsed title={t('contentManager.title').toLocaleUpperCase()} position='west' />
-            }
+            id='content-manager'>
+        <div className={"flex flex-col h-full" + (open ? "" : " hidden")}>
+            <TitleBar />
+            <BrowserTabs />
+            {Object.entries(BrowserComponents).map(([type, TabBody]) =>
+            <div key={type} className={"flex flex-col flex-grow" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
         </div>
-    );
+        {!open && <Collapsed title={t('contentManager.title').toLocaleUpperCase()} position='west' />}
+    </div>
 };

@@ -357,12 +357,11 @@ interface WindowedSoundCollection {
     title: string
     folders: string[]
     fileKeysByFolders: any
-    filteredListChanged: boolean | number
     visible?: boolean
     initExpanded?: boolean
 }
 
-const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, filteredListChanged=false, visible=true, initExpanded=true }) => {
+const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, visible=true, initExpanded=true }) => {
     const [expanded, setExpanded] = useState(new Set());
     const listRef = useRef<List>(null);
 
@@ -372,7 +371,7 @@ const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, fol
         if (listRef?.current) {
             listRef.current.resetAfterIndex(0);
         }
-    }, [filteredListChanged]);
+    }, [folders, fileKeysByFolders]);
 
     const getItemSize = (index: number) => {
         const folderHeight = 40;
@@ -422,12 +421,11 @@ const DefaultSoundCollection = () => {
     const { t } = useTranslation();
     const folders = useSelector(sounds.selectFilteredRegularFolders);
     const fileKeysByFolders = useSelector(sounds.selectFilteredRegularFileKeysByFolders);
-    const filteredListChanged = useSelector(sounds.selectFilteredListChanged);
     const numFileKeys = useSelector(sounds.selectAllRegularFileKeys).length;
     const numFilteredFileKeys = useSelector(sounds.selectFilteredRegularFileKeys).length;
     const filtered = numFilteredFileKeys !== numFileKeys;
     const title = `${t('soundBrowser.title.collection').toLocaleUpperCase()} (${filtered ? numFilteredFileKeys+'/' : ''}${numFileKeys})`;
-    const props = { title, folders, fileKeysByFolders, filteredListChanged };
+    const props = { title, folders, fileKeysByFolders };
     return <WindowedSoundCollection { ...props } />;
 };
 
@@ -464,7 +462,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className='h-full flex flex-col justify-start'>
+            <div className='flex-grow flex flex-col justify-start'>
                 <DefaultSoundCollection />
                 <FeaturedArtistCollection />
                 <WindowedRecommendations />
