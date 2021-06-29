@@ -22,7 +22,7 @@ async function queryID(query: any) {
     } else if (ESUtils.checkIllegalCharacters(query)) {
         throw i18n.t('messages:general.illegalCharacterInUserID')
     } else if (query === userProject.getUsername().toLowerCase()) {
-        throw i18n.t('noSelfShare')
+        throw i18n.t('messages:general.noSelfShare')
     }
 
     const data = await userProject.get("/services/scripts/searchuser", { query })
