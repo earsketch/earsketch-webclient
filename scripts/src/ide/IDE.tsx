@@ -423,7 +423,7 @@ export const IDE = () => {
 
                 <div className="split flex flex-col" id="content">
                     <div id="devctrl">
-                        <div className="h-full max-h-full" id="workspace">
+                        <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3,4,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                             {loading
                             ? <div className="loading text-center h-full w-full flex items-center justify-center">
                                 <i className="spinner icon icon-spinner inline-block animate-spin mr-3"></i> Loading...
