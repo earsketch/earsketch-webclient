@@ -174,7 +174,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 </button>
             </span>
 
-            <span id="daw-play-button" style={bubble.active && [4].includes(bubble.currentPage) ? { zIndex: 35, backgroundColor: "white" } : {}}>
+            <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
                     <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t('daw.tooltip.play')} onClick={play}>
