@@ -364,7 +364,11 @@ export async function login(username: string, password: string) {
         }
     }
 
-    await Promise.all(Object.keys(sharedScripts).map(openShare))
+    const shareID = ESUtils.getURLParameter("sharing")
+    if (shareID && sharedScripts[shareID]) {
+        // User opened share link, and they haven't imported or deleted the shared script.
+        await openShare(shareID)
+    }
 
     // load scripts in shared browser
     return getSharedScripts()
