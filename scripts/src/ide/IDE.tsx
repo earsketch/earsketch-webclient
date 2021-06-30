@@ -237,6 +237,10 @@ export async function openShare(shareid: string) {
     } else {
         // User is not logged in
         const result = await userProject.loadScript(shareid, true)
+        if (!result) {
+            userNotification.show("This share script link is invalid.")
+            return
+        }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
         await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
         userProject.openSharedScript(result.shareid)
