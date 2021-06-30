@@ -6,7 +6,7 @@
     <title>EarSketch</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <style>
-        #loading-spinner {
+        .loading-spinner {
             border-radius: 50%;
             border: 16px solid #4286DA;
             border-left-color: #f3f3f3;
@@ -47,7 +47,7 @@
     <div id="root"></div>
     <div id="loading-screen" style="z-index: 999; position: absolute; top: 0; left: 0; bottom: 0; right: 0; padding-bottom: 30vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white">
         <div style="font-size: 3rem; padding-bottom: 4rem">Loading EarSketch...</div>
-        <div id="loading-spinner"></div>
+        <div class="loading-spinner"></div>
     </div>
     <script>
         // Since React is loaded later, CSS file swapping will be too late to change the color of the loading screen.
