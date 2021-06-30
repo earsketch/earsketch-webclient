@@ -56,7 +56,7 @@ export const pages = [
         headerKey: `bubble:header.end`,
         bodyKey: 'bubble:body.end',
         ref: '#create-script-button',
-        placement: 'left'
+        placement: 'bottom'
     }
 ];
 
