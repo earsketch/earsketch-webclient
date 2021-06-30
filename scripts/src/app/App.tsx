@@ -787,9 +787,7 @@ window.onbeforeunload = () => {
         if (saving) {
             return ""
         }
-    } else {
-        if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
-            localStorage.setItem(userProject.LS_SCRIPTS_KEY, JSON.stringify(scripts))
-        }
+    } else if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
+        localStorage.setItem(userProject.LS_SCRIPTS_KEY, JSON.stringify(userProject.scripts))
     }
 }
