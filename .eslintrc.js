@@ -22,7 +22,7 @@ module.exports = {
   rules: {
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': ['error'],
-    'space-before-function-paren': ['error', 'always'],
+    'space-before-function-paren': ['error', { named: 'never' }],
     'comma-dangle': ['error', 'always-multiline'],
   },
   overrides: [
