@@ -150,7 +150,7 @@ const curriculumSlice = createSlice({
                 }
             }
         },
-        loadChapter(state, { payload: { location } }) {
+        loadChapter(state,{ payload: { location } }) {
             state.currentLocation = location
             state.showTableOfContents = false
         },
