@@ -106,7 +106,7 @@ let scriptCheckTimerID: number = 0
 export const callbacks = {
     refreshScriptBrowser: null as Function | null,
     refreshSharedScriptBrowser: null as Function | null,
-    closeSharedScriptIfOpen: null as Function | null,
+    closeSharedScriptIfOpen: null as ((id: string) => void) | null,
     chat: null as Function | null,
     onJoin: null as Function | null,
     onLeave: null as Function | null,

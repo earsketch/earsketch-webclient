@@ -45,10 +45,6 @@ const TEMPLATES = {
 export let scripts: { [key: string]: ScriptEntity } = {}
 export const sharedScripts: { [key: string]: ScriptEntity } = {}
 
-// Script IDs that are currently open.
-export const openScripts: string[] = []
-const openSharedScripts: string[] = []
-
 // Helper functions for making API requests.
 export function form(obj: { [key: string]: string | Blob }={}) {
     const data = new FormData()
@@ -170,11 +166,6 @@ export function loadLocalScripts() {
     const activeTab = tabs.selectActiveTabID(store.getState())
     const openTabs = tabs.selectOpenTabs(store.getState())
     for (const scriptID of openTabs) {
-        if (scripts[scriptID]) {
-            openScripts.push(scriptID)
-        } else {
-            openSharedScripts.push(scriptID)
-        }
         // TODO: Right now, setActiveTabAndEditor is the only action that creates new editor sessions.
         // This is unfortunate, because we don't actually want to change the active tab here - just create the editor session.
         store.dispatch(tabs.setActiveTabAndEditor(scriptID))
@@ -196,23 +187,6 @@ function resetScripts() {
 function resetSharedScripts() {
     for (const key of Object.keys(sharedScripts)) {
         delete sharedScripts[key]
-    }
-}
-
-function resetOpenScripts() {
-    while (openScripts.length > 0) {
-        const popped = openScripts.pop()!
-
-        // special case for collaborative script. TODO: manage this in the tabs service.
-        if (scripts.hasOwnProperty(popped) && scripts[popped].collaborative) {
-            collaboration.closeScript(popped)
-        }
-    }
-}
-
-function resetSharedOpenScripts() {
-    while (openSharedScripts.length > 0) {
-        openSharedScripts.pop()
     }
 }
 
@@ -264,7 +238,7 @@ export async function login(username: string, password: string) {
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
     // TODO: potential race condition with server-side script renaming operation?
     collaboration.callbacks.refreshSharedScriptBrowser = getSharedScripts
-    collaboration.callbacks.closeSharedScriptIfOpen = closeSharedScript
+    collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabs.closeTab(id))
 
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = addSharedScript
@@ -316,7 +290,6 @@ export async function login(username: string, password: string) {
             }
         }
 
-        resetOpenScripts()
         store.dispatch(tabs.resetTabs())
 
         const savedScripts = await Promise.all(promises)
@@ -326,7 +299,6 @@ export async function login(username: string, password: string) {
         // once all scripts have been saved open them
         for (const savedScript of savedScripts) {
             if (savedScript) {
-                openScript(savedScript.shareid)
                 store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid))
             }
         }
@@ -424,9 +396,6 @@ export function loadUser() {
 
 // Delete a user saved to local storage. I.e., logout.
 export function clearUser() {
-    // TODO: use tunnelled
-    resetOpenScripts()
-    resetSharedOpenScripts()
     resetScripts()
     resetSharedScripts()
     localStorage.clear()
@@ -571,7 +540,6 @@ export async function deleteScript(scriptid: string) {
                 scripts[scriptid] = script
                 scripts[scriptid].modified = Date.now()
                 fixCollaborators(scripts[scriptid])
-                closeScript(scriptid)
             } else {
                 // script doesn't exist
             }
@@ -581,7 +549,6 @@ export async function deleteScript(scriptid: string) {
         }
     } else {
         // User is not logged in so alter local storage
-        closeScript(scriptid)
         scripts[scriptid].soft_delete = true
         localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
     }
@@ -648,10 +615,8 @@ export async function deleteSharedScript(scriptid: string) {
     if (isLoggedIn()) {
         await postAuth("/services/scripts/deletesharedscript", { scriptid })
         esconsole("Deleted shared script: " + scriptid, "debug")
-        closeSharedScript(scriptid)
         delete sharedScripts[scriptid]
     } else {
-        closeSharedScript(scriptid)
         delete sharedScripts[scriptid]
     }
 }
@@ -682,7 +647,6 @@ async function importSharedScript(scriptid: string) {
         scripts[script.shareid] = script
     }
     delete sharedScripts[scriptid]
-    closeSharedScript(scriptid)
     scripts[script.shareid] = script
     esconsole("Import script " + scriptid, ["debug", "user"])
     if (!isLoggedIn()) {
@@ -690,19 +654,6 @@ async function importSharedScript(scriptid: string) {
         localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
     }
     return script
-}
-
-export async function openSharedScriptForEdit(shareID: string) {
-    if (isLoggedIn()) {
-        const importedScript = await importSharedScript(shareID)
-        await refreshCodeBrowser()
-        openScript(importedScript.shareid)
-    } else {
-        const script = await loadScript(shareID, true)
-        // save with duplicate check
-        const savedScript = await importScript(script)
-        openScript(savedScript.shareid)
-    }
 }
 
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
@@ -853,58 +804,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
 export async function createScript(scriptname: string) {
     const language = ESUtils.parseLanguage(scriptname)
     const script = await saveScript(scriptname, TEMPLATES[language as "python" | "javascript"])
-    openScript(script.shareid)
     return script
-}
-
-// Adds a script to the list of open scripts. No effect if the script is already open.
-export function openScript(shareid: string) {
-    if (!openScripts.includes(shareid)) {
-        openScripts.push(shareid)
-    }
-    reporter.openScript()
-    return openScripts.indexOf(shareid)
-}
-
-// Adds a shared script to the list of open shared scripts. If the script is already open, it does nothing.
-export function openSharedScript(shareid: string) {
-    if (openSharedScripts.includes(shareid)) {
-        openSharedScripts.push(shareid)
-    }
-}
-
-// Removes a script name from the list of open scripts.
-export function closeScript(shareid: string) {
-    if (openScripts.includes(shareid)) {
-        if (openScripts.includes(shareid)) {
-            openScripts.splice(openScripts.indexOf(shareid), 1)
-        }
-    } else if (openSharedScripts.includes(shareid)) {
-        if (openSharedScripts.includes(shareid)) {
-            openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1)
-        }
-    }
-    return tabs.selectOpenTabs(store.getState()).slice()
-}
-
-// Removes a script name from the list of open shared scripts.
-export function closeSharedScript(shareid: string) {
-    if (openSharedScripts.includes(shareid)) {
-        openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1)
-    }
-    return openSharedScripts
-}
-
-// Save all open scripts.
-export function saveAll() {
-    const promises = []
-    for (const openScript of openScripts) {
-        // do not auto-save collaborative scripts
-        if (openScript in scripts && !scripts[openScript].saved && !scripts[openScript].collaborative) {
-            promises.push(saveScript(scripts[openScript].name, scripts[openScript].source_code))
-        }
-    }
-    return Promise.all(promises)
 }
 
 export async function getTutoringRecord(scriptid: string) {

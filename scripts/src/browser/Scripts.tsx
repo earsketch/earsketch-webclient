@@ -15,10 +15,7 @@ import { RootState } from '../reducers';
 import { ScriptEntity, ScriptType } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
-import {
-    openScript, openSharedScript, shareScript,
-    generateGetBoundingClientRect, VirtualRef, VirtualReference, DropdownMenuCaller
-} from './ScriptsMenus';
+import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, shareScript, VirtualReference } from './ScriptsMenus';
 import { useTranslation } from "react-i18next";
 
 const CreateScriptButton = () => {
@@ -358,10 +355,8 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
             onClick={() => {
                 if (type === 'regular') {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                    openScript(script);
                 } else if (type === 'shared') {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                    openSharedScript(script);
                 }
             }}
         >

@@ -50,7 +50,6 @@ const createSampleScript = createAsyncThunk(
         const code = sampleScript[language.toLowerCase()];
         return userProject.saveScript(fileName, code, true)
             .then((script: ScriptEntity) => {
-                userProject.openScript(script.shareid);
                 dispatch(scripts.syncToNgUserProject());
                 dispatch(tabs.setActiveTabAndEditor(script.shareid));
             });

@@ -10,6 +10,7 @@ import * as collaboration from '../app/collaboration';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
 import * as editor from "./ideState";
+import reporter from '../app/reporter';
 import * as userProject from '../app/userProject';
 
 interface TabState {
@@ -39,6 +40,7 @@ const tabSlice = createSlice({
         openAndActivateTab(state, { payload }) {
             if (!state.openTabs.includes(payload)) {
                 state.openTabs.push(payload);
+                reporter.openScript();
             }
             state.activeTabID = payload;
         },
@@ -241,9 +243,7 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
 
             if (restoredSession) {
                 const script = scripts.selectAllScriptEntities(getState())[scriptID];
-                userProject.saveScript(script.name, restoredSession.getValue()).then(() => {
-                    userProject.closeScript(scriptID);
-                });
+                userProject.saveScript(script.name, restoredSession.getValue());
             }
 
             dispatch(removeModifiedScript(scriptID));

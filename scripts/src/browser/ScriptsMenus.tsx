@@ -14,14 +14,6 @@ import { ScriptEntity, ScriptType } from 'common';
 import * as userNotification from '../user/notification';
 import * as userProject from '../app/userProject';
 
-export const openScript = (script: ScriptEntity) => {
-    userProject.openScript(script.shareid);
-};
-
-export const openSharedScript = (script: ScriptEntity) => {
-    userProject.openSharedScript(script.shareid);
-};
-
 export const shareScript = (script: ScriptEntity) => {
     _shareScript(Object.assign({}, script))
 }
@@ -150,10 +142,8 @@ export const ScriptDropdownMenu = () => {
 
                     if (type==='regular') {
                         dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                        script && openScript(script);
                     } else if (type==='shared') {
                         dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                        script && openSharedScript(script);
                     }
                 }}
             />
@@ -223,7 +213,6 @@ export const ScriptDropdownMenu = () => {
                     if (script && openTabs.includes(script.shareid) && !script.collaborative) {
                         dispatch(tabs.closeTab(script.shareid));
                         dispatch(tabs.setActiveTabAndEditor(imported.shareid));
-                        openScript(imported);
                     }
                 }}
             />

@@ -51,9 +51,8 @@ export async function createScript() {
     reporter.createScript()
     const filename = await openModal(ScriptCreator)
     if (filename) {
-        userProject.closeScript(filename)
         const script = await userProject.createScript(filename)
-        script && store.dispatch(scripts.syncToNgUserProject())
+        store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.setActiveTabAndEditor(script.shareid))
     }
 }
@@ -90,10 +89,6 @@ function switchToShareMode() {
 }
 
 let setLoading: (loading: boolean) => void
-
-
-// TODO AVN - quick hack, but it might also be the cleanest way to fix the shared script issue rather than moving openShare() to tabController
-const initialSharedScripts = Object.assign({}, userProject.sharedScripts)
 
 // Gets the ace editor of droplet instance, and calls openShare().
 // TODO: Move to Editor?
@@ -183,17 +178,11 @@ export async function openShare(shareid: string) {
             if (userProject.isLoggedIn()) {
                 await userProject.getSharedScripts()
                 if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-                userProject.openSharedScript(result.shareid)
                 store.dispatch(scripts.syncToNgUserProject())
                 store.dispatch(tabs.setActiveTabAndEditor(shareid))
             }
             switchToShareMode()
         } else {
-            // Close the script if it was opened when the user was not logged in
-            if (initialSharedScripts[shareid]) {
-                userProject.closeSharedScript(shareid)
-            }
-
             // user has not opened this shared link before
             result = await userProject.loadScript(shareid, true) as ScriptEntity
             if (!result) {
@@ -208,7 +197,6 @@ export async function openShare(shareid: string) {
 
                 await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
                 await userProject.getSharedScripts()
-                userProject.openSharedScript(shareid)
                 store.dispatch(scripts.syncToNgUserProject())
                 store.dispatch(tabs.setActiveTabAndEditor(shareid))
             } else {
@@ -217,11 +205,6 @@ export async function openShare(shareid: string) {
                 editor.ace.focus()
 
                 if (isEmbedded) {
-                    // DON'T open the script if it has been soft-deleted
-                    if (!result.soft_delete) {
-                        userProject.openScript(result.shareid)
-                    }
-
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
                     store.dispatch(scripts.syncToNgUserProject())
                     store.dispatch(tabs.setActiveTabAndEditor(shareid))
@@ -243,7 +226,8 @@ export async function openShare(shareid: string) {
         }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
         await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-        userProject.openSharedScript(result.shareid)
+        store.dispatch(scripts.syncToNgUserProject())
+        store.dispatch(tabs.setActiveTabAndEditor(shareid))
         switchToShareMode()
     }
 }

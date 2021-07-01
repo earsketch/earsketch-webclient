@@ -99,9 +99,6 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
                     className={closeButtonClass}
                     onClick={(event) => {
                         dispatch(tabs.closeAndSwitchTab(scriptID));
-
-                        userProject.closeScript(scriptID);
-
                         // The tab is reselected otherwise.
                         event.preventDefault();
                         event.stopPropagation();

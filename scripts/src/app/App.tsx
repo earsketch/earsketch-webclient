@@ -146,7 +146,6 @@ export async function deleteSharedScript(script: ScriptEntity) {
         if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
-                userProject.closeSharedScript(script.shareid)
             }
             // Apply state change first
             delete userProject.sharedScripts[script.shareid]
@@ -187,7 +186,6 @@ export async function importScript(script: ScriptEntity) {
 
     if (openTabs.includes(script.shareid)) {
         store.dispatch(tabs.setActiveTabAndEditor(imported.shareid))
-        userProject.openScript(imported.shareid)
     }
 }
 
@@ -202,7 +200,7 @@ export async function deleteSound(sound: SoundEntity) {
 export async function closeAllTabs() {
     if (await confirm({ text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All" })) {
         try {
-            await userProject.saveAll()
+            await saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabs.closeAllTabs())
         } catch {
@@ -328,16 +326,6 @@ function setup() {
         userProject.loadLocalScripts()
     }
 
-    try {
-        const shareID = ESUtils.getURLParameter("edit")
-        if (shareID) {
-            esconsole("opening a shared script in edit mode", ["main", "url"])
-            userProject.openSharedScriptForEdit(shareID)
-        }
-    } catch (error) {
-        esconsole(error, ["main", "url"])
-    }
-
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
         store.dispatch(layout.setEast({ open: true }))
@@ -412,6 +400,7 @@ export const App = () => {
                 }
             })
             // Show bubble tutorial when not opening a share link or in a CAI study mode.
+            // TODO: Don't show if the user already has scripts?
             if (!sharedScriptID && !FLAGS.SHOW_CAI) {
                 store.dispatch(bubble.resume())
             }
@@ -420,8 +409,7 @@ export const App = () => {
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG","MAIN"])
-        //save all unsaved open scripts (don't need no promises)
-        userProject.saveAll()
+        saveAll()
 
         let userInfo
         try {
@@ -479,18 +467,13 @@ export const App = () => {
 
         // save all unsaved open scripts
         try {
-            await userProject.saveAll()
-            if (userProject.openScripts.length > 0) {
+            const promise = saveAll()
+            await promise
+            if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
 
-            const activeTabID = tabs.selectActiveTabID(store.getState())
-            if (activeTabID) {
-                const allScriptEntities = scripts.selectAllScriptEntities(store.getState())
-                if (allScriptEntities[activeTabID].collaborative) {
-                    collaboration.leaveSession(activeTabID)
-                }
-            }
+            leaveCollaborationSession()
 
             userProject.clearUser()
             userNotification.clearHistory()
@@ -765,35 +748,45 @@ const ModalContainer = () => {
   </Transition>
 }
 
+function saveAll() {
+    const promises = []
+    const modifiedTabs = tabs.selectModifiedScripts(store.getState())
+    const scriptMap = scripts.selectActiveScriptEntities(store.getState())
+
+    for (const id of modifiedTabs) {
+        const script = scriptMap[id]
+        promises.push(userProject.saveScript(script.name, script.source_code))
+    }
+
+    if (promises.length) {
+        return Promise.all(promises).then(() => {
+            store.dispatch(scripts.syncToNgUserProject())
+        })
+    }
+    return promises.length ? Promise.all(promises) : null
+}
+
+function leaveCollaborationSession() {
+    const activeTabID = tabs.selectActiveTabID(store.getState())
+    if (activeTabID) {
+        const allScriptEntities = scripts.selectAllScriptEntities(store.getState())
+        if (allScriptEntities[activeTabID].collaborative) {
+            collaboration.leaveSession(activeTabID)
+        }
+    }
+}
+
 // websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
     if (userProject.isLoggedIn()) {
-        let saving = false
+        leaveCollaborationSession()
 
-        const openTabs = tabs.selectOpenTabs(store.getState())
-        const modifiedTabs = tabs.selectModifiedScripts(store.getState())
-        const sharedScripts = scripts.selectSharedScriptIDs(store.getState())
-        const scriptMap = scripts.selectActiveScriptEntities(store.getState())
-        for (const id of openTabs) {
-            if (sharedScripts.includes(id)) {
-                collaboration.leaveSession(id)
-            }
-        }
-
-        for (const id of modifiedTabs) {
-            saving = true
-            const script = scriptMap[id]
-            userProject.saveScript(script.name, script.source_code).then(() => {
-                store.dispatch(scripts.syncToNgUserProject())
-                userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
-            })
-        }
-
-        // userNotification.markAllAsRead()
         // Show page-close warning if saving.
-        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right will be to call preventDefault.)
+        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
-        if (saving) {
+        const promise = saveAll()
+        if (promise) {
+            promise.then(() => userNotification.show(i18n.t('messages:user.allscriptcloud'), "success"))
             return ""
         }
     } else if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
