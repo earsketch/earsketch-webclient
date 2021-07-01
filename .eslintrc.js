@@ -25,4 +25,12 @@ module.exports = {
     'space-before-function-paren': ['error', 'always'],
     'comma-dangle': ['error', 'always-multiline'],
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'no-undef': 'off',
+      },
+    },
+  ],
 }
