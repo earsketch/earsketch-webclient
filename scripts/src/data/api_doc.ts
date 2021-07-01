@@ -727,6 +727,6 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
 
                 "javascript": "// inputs \"0+++0---0++-00-0\" and shuffles it randomly\nvar newString = shuffleString(\"0+++0---0++-00-0\");"
             },
-            "autocomplete": "shuffleString(inputString)"
+            "autocomplete": "shuffleString(inputString)x"
         }
     } as const
