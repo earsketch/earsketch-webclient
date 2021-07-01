@@ -64,24 +64,7 @@ const layoutSlice = createSlice({
     }
 });
 
-const persistConfig = {
-    key: 'layout',
-    transforms: [{
-        in: (obj: any) => {
-            // Wait until redux-persist has rehydrated the state before initializing layout.
-            // This is a bit of a hack, but it should become unnecessary when we switch to react-split.
-            // NOTE: Unlike stateReconciler, transforms get called even when the user has no persisted state.
-            if (obj.rehydrated) {
-                Layout.initialize()
-            }
-            return obj
-        },
-        out: (obj: any) => obj,
-    }],
-    storage,
-};
-
-export default persistReducer(persistConfig, layoutSlice.reducer);
+export default layoutSlice.reducer;
 export const {
     setWest,
     setEast,

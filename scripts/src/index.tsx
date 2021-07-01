@@ -44,8 +44,10 @@ import "./ide/completer"
 import React from "react"
 import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
-import store from "./reducers"
+import { PersistGate } from "redux-persist/integration/react"
+
 import { App } from "./app/App"
+import store, { persistor } from "./reducers"
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
@@ -140,10 +142,12 @@ if (/\/autograder|codeAnalyzer\w*\/?$/.test(location.href)) {
 } else {
     // Load the normal React app.
     ReactDOM.render(
-        <React.StrictMode>
-            <Provider store={store}>
+    <React.StrictMode>
+        <Provider store={store}>
+            <PersistGate persistor={persistor}>
                 <App />
-            </Provider>
-        </React.StrictMode>,
-        document.getElementById("root"))
+            </PersistGate>
+        </Provider>
+    </React.StrictMode>,
+    document.getElementById("root"))
 }

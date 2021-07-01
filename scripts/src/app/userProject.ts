@@ -3,7 +3,6 @@ import i18n from "i18next"
 import xml2js from "xml2js"
 
 import { openModal } from "./App"
-import * as appState from "./appState"
 import * as audioLibrary from "./audiolibrary"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
@@ -21,8 +20,6 @@ import * as websocket from "./websocket"
 
 const USER_STATE_KEY = "userstate"
 
-const LS_TABS_KEY = "tabs_v2"
-const LS_SHARED_TABS_KEY = "shared_tabs_v1"
 export const LS_SCRIPTS_KEY = "scripts_v1"
 
 export const STATUS_SUCCESSFUL = 1
@@ -167,29 +164,22 @@ export function loadLocalScripts() {
     if (scriptData !== null) {
         scripts = Object.assign(scripts, JSON.parse(scriptData))
         store.dispatch(scriptsState.syncToNgUserProject())
-
-        const tabData = localStorage.getItem(LS_TABS_KEY)
-        if (tabData !== null) {
-            const storedTabs = JSON.parse(tabData)
-            if (storedTabs) {
-                for (const tab of storedTabs) {
-                    openScripts.push(tab)
-                    store.dispatch(tabs.setActiveTabAndEditor(tab))
-                }
-            }
-        }
-
-        const sharedTabData = localStorage.getItem(LS_SHARED_TABS_KEY)
-        if (sharedTabData !== null) {
-            const storedTabs = JSON.parse(sharedTabData)
-            if (storedTabs) {
-                for (const tab of storedTabs) {
-                    openSharedScripts.push(tab)
-                    store.dispatch(tabs.setActiveTabAndEditor(tab))
-                }
-            }
-        }
     }
+
+    // Back up active tab. (See comment below re. setActiveTabAndEditor.)
+    const activeTab = tabs.selectActiveTabID(store.getState())
+    const openTabs = tabs.selectOpenTabs(store.getState())
+    for (const scriptID of openTabs) {
+        if (scripts[scriptID]) {
+            openScripts.push(scriptID)
+        } else {
+            openSharedScripts.push(scriptID)
+        }
+        // TODO: Right now, setActiveTabAndEditor is the only action that creates new editor sessions.
+        // This is unfortunate, because we don't actually want to change the active tab here - just create the editor session.
+        store.dispatch(tabs.setActiveTabAndEditor(scriptID))
+    }
+    store.dispatch(tabs.setActiveTabAndEditor(activeTab!))
 }
 
 // Because scripts and openScripts are objects and we can't reset them
@@ -301,24 +291,6 @@ export async function login(username: string, password: string) {
         fixCollaborators(script)
     }
 
-    // when the user logs in and his/her scripts are loaded, we can restore
-    // their previous tab session stored in the browser's local storage
-    const embedMode = appState.selectEmbedMode(store.getState())
-    if (!embedMode) {
-        const tabData = localStorage.getItem(LS_TABS_KEY)
-        if (tabData !== null) {
-            openScripts.push(...Object.values(JSON.parse(tabData)) as string[])
-        }
-        const sharedTabData = localStorage.getItem(LS_SHARED_TABS_KEY)
-        if (sharedTabData !== null) {
-            openSharedScripts.push(...Object.values(JSON.parse(sharedTabData)) as string[])
-        }
-        const activeTabID = tabs.selectActiveTabID(store.getState())
-        if (activeTabID) {
-            store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
-        }
-    }
-
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
     }
@@ -349,8 +321,6 @@ export async function login(username: string, password: string) {
 
         const savedScripts = await Promise.all(promises)
         localStorage.removeItem(LS_SCRIPTS_KEY)
-        localStorage.removeItem(LS_TABS_KEY)
-        localStorage.removeItem(LS_SHARED_TABS_KEY)
 
         await refreshCodeBrowser()
         // once all scripts have been saved open them
@@ -891,7 +861,6 @@ export async function createScript(scriptname: string) {
 export function openScript(shareid: string) {
     if (!openScripts.includes(shareid)) {
         openScripts.push(shareid)
-        localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts))
     }
     reporter.openScript()
     return openScripts.indexOf(shareid)
@@ -901,7 +870,6 @@ export function openScript(shareid: string) {
 export function openSharedScript(shareid: string) {
     if (openSharedScripts.includes(shareid)) {
         openSharedScripts.push(shareid)
-        localStorage.setItem(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts))
     }
 }
 
@@ -910,14 +878,10 @@ export function closeScript(shareid: string) {
     if (openScripts.includes(shareid)) {
         if (openScripts.includes(shareid)) {
             openScripts.splice(openScripts.indexOf(shareid), 1)
-            // save tabs state
-            localStorage.setItem(LS_TABS_KEY, JSON.stringify(openScripts))
         }
     } else if (openSharedScripts.includes(shareid)) {
         if (openSharedScripts.includes(shareid)) {
             openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1)
-            // save tabs state
-            localStorage.setItem(LS_SHARED_TABS_KEY, JSON.stringify(openSharedScripts))
         }
     }
     return tabs.selectOpenTabs(store.getState()).slice()
@@ -927,7 +891,6 @@ export function closeScript(shareid: string) {
 export function closeSharedScript(shareid: string) {
     if (openSharedScripts.includes(shareid)) {
         openSharedScripts.splice(openSharedScripts.indexOf(shareid), 1)
-        localStorage[LS_SHARED_TABS_KEY] = JSON.stringify(openSharedScripts)
     }
     return openSharedScripts
 }

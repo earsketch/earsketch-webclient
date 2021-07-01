@@ -326,7 +326,6 @@ function setup() {
         }
     } else {
         userProject.loadLocalScripts()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 
     try {
@@ -387,6 +386,8 @@ export const App = () => {
     ]
 
     useEffect(() => {
+        Layout.initialize()
+
         // Attempt to load userdata from a previous session.
         if (userProject.isLoggedIn()) {
             login(username, password).catch((error: Error) => {
@@ -397,7 +398,11 @@ export const App = () => {
                     reporter.exception("Auto-login failed. Clearing localStorage.")
                 }
             })
-        } else {
+        }
+
+        setup()
+
+        if (!userProject.isLoggedIn()) {
             store.dispatch(scripts.syncToNgUserProject())
             const openTabs = tabs.selectOpenTabs(store.getState())
             const allScripts = scripts.selectAllScriptEntities(store.getState())
@@ -411,8 +416,6 @@ export const App = () => {
                 store.dispatch(bubble.resume())
             }
         }
-
-        setup()
     }, [])
 
     const login = async (username: string, password: string) => {
