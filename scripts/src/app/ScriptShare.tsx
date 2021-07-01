@@ -1,4 +1,6 @@
+import { Transition } from "@headlessui/react"
 import React, { useRef, useState } from "react"
+import { usePopper } from "react-popper"
 import { useDispatch, useSelector } from "react-redux"
 
 import * as app from "./appState"
@@ -112,6 +114,41 @@ interface TabParameters {
     close: () => void
 }
 
+export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLInputElement | HTMLTextAreaElement> }) => {
+    const [referenceElement, setReferenceElement] = useState(null as HTMLElement | null)
+    const [popperElement, setPopperElement] = useState(null as HTMLElement | null)
+    const { styles, attributes } = usePopper(referenceElement, popperElement, { placement: "top" })
+
+    const { t } = useTranslation()
+    const [copied, setCopied] = useState(false)
+
+    const handleClick = () => {
+        textElement.current?.select()
+        document.execCommand("copy")
+        setCopied(true)
+        setTimeout(() => setCopied(false), 1000)
+    }
+
+    return <>
+        <span ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
+            <i className="icon icon-paste4"></i>
+        </span>
+        <Transition
+            show={copied}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+        >
+            <div ref={setPopperElement} className="bg-white p-2 rounded-md shadow-md" style={{ ...styles.popper, bottom: "5px" }} {...attributes.popper}>
+                Copied!
+            </div>
+        </Transition>
+    </>
+}
+
 export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
     const [lockedShareID, setLockedShareID] = useState("")
     const [lock, setLock] = useState(false)
@@ -168,10 +205,8 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
                     <input ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                    <CopyButton textElement={linkElement} />
                     <span className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></span>
-                    <span onClick={() => { linkElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
-                        <i className="icon icon-paste4"></i>
-                    </span>
                 </div>
                 <hr className="mt-3" />
 
@@ -278,9 +313,7 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                  </div>
                 <div id="share-link-container" className="mt-5">
                     <textarea ref={codeElement} className="share-link outline-none resize-none w-full" style={{ backgroundColor: "inherit "}} value={code} readOnly />
-                    <span onClick={() => { codeElement.current?.select(); document.execCommand("copy") }} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
-                        <i className="icon icon-paste4"></i>
-                    </span>
+                    <CopyButton textElement={codeElement} />
                 </div>
                 <hr className="mt-3" />
             </div>
