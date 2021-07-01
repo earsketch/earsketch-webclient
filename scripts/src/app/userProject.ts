@@ -28,8 +28,6 @@ export const LS_SCRIPTS_KEY = "scripts_v1"
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
 
-const notificationsMarkedAsRead: string[] = []
-
 const TEMPLATES = {
     python: "#\t\tpython code\n#\t\tscript_name:\n#\n" +
             "#\t\tauthor:\n#\t\tdescription:\n#\n\n" +
@@ -746,11 +744,6 @@ async function addSharedScript(shareID: string, notificationID: string) {
             await saveSharedScript(shareID, script.name, script.source_code, script.username)
             getSharedScripts()
         }
-    }
-    // prevent repeated import upon page refresh by marking the notification message "read." The message may still appear as unread for the current session.
-    // TODO: separate this process from userProject if possible
-    if (notificationID) {
-        notificationsMarkedAsRead.push(notificationID)
     }
 }
 
