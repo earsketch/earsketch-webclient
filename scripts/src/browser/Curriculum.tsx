@@ -10,7 +10,7 @@ import { importScript } from "../ide/IDE"
 import * as layout from '../layout/layoutState'
 import * as userNotification from '../user/notification'
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
-import {useHeightLimiter } from "../Utils"
+import { useHeightLimiter } from "../Utils"
 
 const toc = ESCurr_TOC as [curriculum.TOCItem]
 const tocPages = ESCurr_Pages
