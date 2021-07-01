@@ -43,7 +43,6 @@ const TEMPLATES = {
 
 // keep a mapping of script names: script objects
 export let scripts: { [key: string]: ScriptEntity } = {}
-export const sharedScripts: { [key: string]: ScriptEntity } = {}
 
 // Helper functions for making API requests.
 export function form(obj: { [key: string]: string | Blob }={}) {
@@ -184,12 +183,6 @@ function resetScripts() {
     }
 }
 
-function resetSharedScripts() {
-    for (const key of Object.keys(sharedScripts)) {
-        delete sharedScripts[key]
-    }
-}
-
 // The script content from server may need adjustment in the collaborators parameter.
 function fixCollaborators(script: ScriptEntity, username?: string) {
     if (script.collaborators === undefined) {
@@ -305,6 +298,7 @@ export async function login(username: string, password: string) {
     }
 
     const shareID = ESUtils.getURLParameter("sharing")
+    const sharedScripts = scriptsState.selectSharedScriptEntities(store.getState())
     if (shareID && sharedScripts[shareID]) {
         // User opened share link, and they haven't imported or deleted the shared script.
         await openShare(shareID)
@@ -367,7 +361,7 @@ export async function getScriptVersion(scriptid: string, versionid: number) {
 
 // Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
 export async function getSharedScripts() {
-    resetSharedScripts()
+    const sharedScripts: { [key: string]: ScriptEntity } = {}
     const data = await postAuthForm("/services/scripts/getsharedscripts")
     const scripts = extractScripts(data)
     for (const script of scripts) {
@@ -375,6 +369,7 @@ export async function getSharedScripts() {
         fixCollaborators(script, getUsername())
         sharedScripts[script.shareid] = script
     }
+    store.dispatch(scriptsState.setSharedScripts(sharedScripts))
     return scripts
 }
 
@@ -397,7 +392,8 @@ export function loadUser() {
 // Delete a user saved to local storage. I.e., logout.
 export function clearUser() {
     resetScripts()
-    resetSharedScripts()
+    store.dispatch(scriptsState.resetRegularScripts())
+    store.dispatch(scriptsState.resetSharedScripts())
     localStorage.clear()
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
@@ -511,12 +507,13 @@ export async function setLicense(scriptName: string, scriptId: string, licenseID
 
 // save a sharedscript into user's account.
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
+    let script
     if (isLoggedIn()) {
-        const script = await postAuth("/services/scripts/savesharedscript", { scriptid })
+        script = await postAuth("/services/scripts/savesharedscript", { scriptid })
         esconsole(`Save shared script ${script.name} to ${username}`, ["debug", "user"])
-        return sharedScripts[script.shareid] = { ...script, isShared: true, readonly: true, modified: Date.now() }
+        script = { ...script, isShared: true, readonly: true, modified: Date.now() }
     } else {
-        return sharedScripts[scriptid] = {
+        script = {
             name: scriptname,
             shareid: scriptid,
             modified: Date.now(),
@@ -526,6 +523,9 @@ export async function saveSharedScript(scriptid: string, scriptname: string, sou
             username,
         } as ScriptEntity
     }
+    const sharedScripts = scriptsState.selectSharedScriptEntities(store.getState())
+    store.dispatch(scriptsState.setSharedScripts({ ...sharedScripts, [scriptid]: script }))
+    return script
 }
 
 // Delete a script if owned by the user.
@@ -615,10 +615,9 @@ export async function deleteSharedScript(scriptid: string) {
     if (isLoggedIn()) {
         await postAuth("/services/scripts/deletesharedscript", { scriptid })
         esconsole("Deleted shared script: " + scriptid, "debug")
-        delete sharedScripts[scriptid]
-    } else {
-        delete sharedScripts[scriptid]
     }
+    const { [scriptid]: _, ...sharedScripts } = scriptsState.selectSharedScriptEntities(store.getState())
+    store.dispatch(scriptsState.setSharedScripts(sharedScripts))
 }
 
 // Set a shared script description if owned by the user.
@@ -634,19 +633,24 @@ export async function setScriptDesc(scriptname: string, scriptId: string, desc: 
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     let script
+    const sharedScripts = scriptsState.selectSharedScriptEntities(store.getState())
     if (isLoggedIn()) {
         script = await postAuthForm("/services/scripts/import", { scriptid }) as ScriptEntity
     } else {
         script = sharedScripts[scriptid]
-        script.creator = script.username
-        script.original_id = script.shareid
-        script.collaborative = false
-        script.readonly = false
-        // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
-        script.shareid = ESUtils.randomString(22)
+        script = {
+            ...script,
+            creator: script.username,
+            original_id: script.shareid,
+            collaborative: false,
+            readonly: false,
+            // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
+            shareid: ESUtils.randomString(22),
+        }
         scripts[script.shareid] = script
     }
-    delete sharedScripts[scriptid]
+    const { [scriptid]: _, ...updatedSharedScripts } = sharedScripts
+    store.dispatch(scriptsState.setSharedScripts(updatedSharedScripts))
     scripts[script.shareid] = script
     esconsole("Import script " + scriptid, ["debug", "user"])
     if (!isLoggedIn()) {

@@ -148,8 +148,8 @@ export async function deleteSharedScript(script: ScriptEntity) {
                 collaboration.closeScript(script.shareid)
             }
             // Apply state change first
-            delete userProject.sharedScripts[script.shareid]
-            store.dispatch(scripts.syncToNgUserProject())
+            const { [script.shareid]: _, ...sharedScripts } = scripts.selectSharedScriptEntities(store.getState())
+            store.dispatch(scripts.setSharedScripts(sharedScripts))
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
@@ -158,7 +158,6 @@ export async function deleteSharedScript(script: ScriptEntity) {
     } else {
         if (await confirm({ text: `Are you sure you want to delete the shared script "${script.name}"?`, ok: "Delete", type: "danger" })) {
             await userProject.deleteSharedScript(script.shareid)
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
         }
@@ -233,13 +232,9 @@ export function openUploadWindow() {
 
 export function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
+    const allScripts = scripts.selectAllScriptEntities(store.getState())
     // Get the modified / unsaved script.
-    let script = null
-    if (activeTabID in userProject.scripts) {
-        script = userProject.scripts[activeTabID]
-    } else if (activeTabID in userProject.sharedScripts) {
-        script = userProject.sharedScripts[activeTabID]
-    }
+    const script = allScripts[activeTabID]
     if (!script) return
     let input = recommender.addRecInput([], script)
     let res = [] as any[]
@@ -479,7 +474,6 @@ export const App = () => {
             userNotification.clearHistory()
             reporter.logout()
 
-            dispatch(scripts.syncToNgUserProject())
             dispatch(scripts.resetReadOnlyScripts())
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
@@ -553,7 +547,8 @@ export const App = () => {
     }
 
     const openCollaborativeScript = (shareID: string) => {
-        if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
+        const sharedScripts = scripts.selectSharedScriptEntities(store.getState())
+        if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
             openSharedScript(shareID)
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         } else {

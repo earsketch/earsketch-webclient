@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { pickBy, keyBy, cloneDeep, each } from 'lodash';
+import { pickBy, keyBy, cloneDeep } from 'lodash';
 import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
 import { RootState, ThunkAPI } from '../reducers';
@@ -36,7 +36,7 @@ interface AllFilters extends Filters {
 interface ScriptsState {
     regularScripts: Scripts
     sharedScripts: Scripts
-    localScripts: Scripts
+    // localScripts: Scripts
     readOnlyScripts: Scripts
     filters: AllFilters
     featureSharedScript: boolean
@@ -63,10 +63,10 @@ const scriptsSlice = createSlice({
             entities: {},
             scriptIDs: []
         },
-        localScripts: {
-            entities: {},
-            scriptIDs: []
-        },
+        // localScripts: {
+        //     entities: {},
+        //     scriptIDs: []
+        // },
         readOnlyScripts: {
             entities: {},
             scriptIDs: []
@@ -187,6 +187,20 @@ const scriptsSlice = createSlice({
                 show: false,
                 script: null
             }
+        },
+        setScriptSource(state, { payload: { id, source } }) {
+            // TODO: Revisit this regrettable reducer once state consolidation is complete.
+            if (id in state.regularScripts.entities) {
+                state.regularScripts.entities[id].source_code = source
+                if (!state.regularScripts.entities[id].collaborative) {
+                    state.regularScripts.entities[id].saved = false
+                }
+            } else if (id in state.sharedScripts.entities) {
+                state.sharedScripts.entities[id].source_code = source
+                if (!state.sharedScripts.entities[id].collaborative) {
+                    state.sharedScripts.entities[id].saved = false
+                }
+            }
         }
     }
 });
@@ -219,7 +233,8 @@ export const {
     setDropdownMenu,
     resetDropdownMenu,
     setSharedScriptInfo,
-    resetSharedScriptInfo
+    resetSharedScriptInfo,
+    setScriptSource,
 } = scriptsSlice.actions;
 
 /*=== Thunks ===*/
@@ -228,18 +243,11 @@ export const syncToNgUserProject = createAsyncThunk(
     'scripts/syncToNgUserProject',
     (_, { dispatch }) => {
         const scripts = cloneDeep(userProject.scripts);
-        const sharedScripts = cloneDeep(userProject.sharedScripts);
-        each(scripts, script => {
+        Object.values(scripts).forEach(script => {
             script.imported = !!script.creator;
-        });
-        each(sharedScripts, script => {
-            if (!script.creator) {
-                script.creator = script.username;
-            }
         });
 
         dispatch(setRegularScripts(scripts));
-        dispatch(setSharedScripts(sharedScripts));
     }
 );
 
@@ -387,7 +395,7 @@ export const resetSharedScriptInfoAsync = createAsyncThunk<void ,void, ThunkAPI>
 /*=== Selectors ===*/
 const selectRegularScriptEntities = (state: RootState) => state.scripts.regularScripts.entities;
 const selectRegularScriptIDs = (state: RootState) => state.scripts.regularScripts.scriptIDs;
-const selectSharedScriptEntities = (state: RootState) => state.scripts.sharedScripts.entities;
+export const selectSharedScriptEntities = (state: RootState) => state.scripts.sharedScripts.entities;
 export const selectSharedScriptIDs = (state: RootState) => state.scripts.sharedScripts.scriptIDs;
 export const selectReadOnlyScriptEntities = (state: RootState) => state.scripts.readOnlyScripts.entities;
 const selectReadOnlyScriptIDs = (state: RootState) => state.scripts.readOnlyScripts.scriptIDs;
@@ -495,13 +503,13 @@ export const selectDropdownMenuContext = (state: RootState) => state.scripts.dro
 
 // TODO: Unsaved scripts should probably be tracked in the editor or tab state.
 export const selectUnsavedDropdownMenuScript = createSelector(
-    [selectDropdownMenuScript, selectDropdownMenuType, selectReadOnlyScriptEntities],
-    (script, type, readOnlyScripts) => {
+    [selectDropdownMenuScript, selectDropdownMenuType, selectSharedScriptEntities, selectReadOnlyScriptEntities],
+    (script, type, sharedScripts, readOnlyScripts) => {
         if (!script) {
             return null;
         }
         return type==='regular' && userProject.scripts[script.shareid]
-            || type==='shared' && userProject.sharedScripts[script.shareid]
+            || type==='shared' && sharedScripts[script.shareid]
             || type==='readonly' && readOnlyScripts[script.shareid] || null;
     }
 );

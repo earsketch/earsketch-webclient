@@ -59,13 +59,8 @@ export async function createScript() {
 
 function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
-    let script = null
+    const script = activeTabID === null ? null : scripts.selectAllScriptEntities(store.getState())[activeTabID]
 
-    if (activeTabID in userProject.scripts) {
-        script = userProject.scripts[activeTabID]
-    } else if (activeTabID in userProject.sharedScripts) {
-        script = userProject.sharedScripts[activeTabID]
-    }
     if (script?.collaborative) {
         script && collaboration.saveScript(script.shareid)
         isWaitingForServerResponse = false
@@ -103,13 +98,7 @@ export function initEditor() {
         },
         exec() {
             const activeTabID = tabs.selectActiveTabID(store.getState())!
-
-            let script = null
-            if (activeTabID in userProject.scripts) {
-                script = userProject.scripts[activeTabID]
-            } else if (activeTabID in userProject.sharedScripts) {
-                script = userProject.sharedScripts[activeTabID]
-            }
+            const script = activeTabID === null ? null : scripts.selectAllScriptEntities(store.getState())[activeTabID]
 
             if (!script?.saved) {
                 store.dispatch(tabs.saveScriptIfModified(activeTabID))
@@ -145,7 +134,6 @@ export function initEditor() {
     const shareID = ESUtils.getURLParameter("sharing")
     if (shareID) {
         openShare(shareID).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         })
     }
@@ -197,7 +185,6 @@ export async function openShare(shareid: string) {
 
                 await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
                 await userProject.getSharedScripts()
-                store.dispatch(scripts.syncToNgUserProject())
                 store.dispatch(tabs.setActiveTabAndEditor(shareid))
             } else {
                 // the shared script belongs to the logged-in user
@@ -212,9 +199,9 @@ export async function openShare(shareid: string) {
                     userNotification.show("This shared script link points to your own script.")
                 }
 
-                // Manually removing the user-owned shared script from the browser.
-                // TODO: Better to have refreshShareBrowser or something.
-                delete userProject.sharedScripts[shareid]
+                // Manually remove the user-owned shared script from the browser.
+                const { [shareid]: _, ...sharedScripts } = scripts.selectSharedScriptEntities(store.getState())
+                store.dispatch(scripts.setSharedScripts(sharedScripts))
             }
         }
     } else {
