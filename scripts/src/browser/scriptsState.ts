@@ -36,7 +36,6 @@ interface AllFilters extends Filters {
 interface ScriptsState {
     regularScripts: Scripts
     sharedScripts: Scripts
-    deletedScripts: Scripts
     localScripts: Scripts
     readOnlyScripts: Scripts
     filters: AllFilters
@@ -61,10 +60,6 @@ const scriptsSlice = createSlice({
             scriptIDs: []
         },
         sharedScripts: {
-            entities: {},
-            scriptIDs: []
-        },
-        deletedScripts: {
             entities: {},
             scriptIDs: []
         },
