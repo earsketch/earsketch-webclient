@@ -9,7 +9,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "standard",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js"
   },
@@ -119,7 +119,6 @@
     "ng-midway-tester": "^2.0.5",
     "postcss": "^8.1.1",
     "postcss-loader": "^4.0.3",
-    "standard": "*",
     "style-loader": "^1.2.1",
     "ts-loader": "^8.0.17",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
