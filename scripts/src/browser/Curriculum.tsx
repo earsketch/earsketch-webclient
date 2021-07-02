@@ -11,6 +11,7 @@ import * as layout from "../layout/layoutState"
 import * as userNotification from "../user/notification"
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
+import { useTranslation } from "react-i18next"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -100,7 +101,6 @@ const TableOfContents = () => {
 
 const CurriculumHeader = () => {
     const dispatch = useDispatch()
-    const location = useSelector(curriculum.selectCurrentLocation)
 
     return (
         <div id="curriculum-header" style={{ position: "relative" }}>
@@ -148,11 +148,12 @@ export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
+    const { t } = useTranslation()
 
     return (
         <div className="flex items-center p-3 text-2xl">
             <div className="pl-3 pr-4 font-semibold truncate">
-                CURRICULUM
+                { t('curriculum.title').toLocaleUpperCase() }
             </div>
             <div>
                 <div
@@ -163,11 +164,11 @@ export const TitleBar = () => {
                 </div>
             </div>
             <div className="ml-auto">
-                <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title="Copy curriculum URL">
+                <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={ t("curriculum.copyURL") }>
                     <i className="icon icon-link" />
                 </button>
                 <button className={`border-2 -my-1 ${theme === "light" ? "border-black" : "border-white"} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
-                    title="Switch script language"
+                    title={ t("curriculum.switchScriptLanguage") }
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
                         dispatch(appState.setScriptLanguage(newLanguage))
@@ -180,6 +181,7 @@ export const TitleBar = () => {
 }
 
 const CurriculumPane = () => {
+    const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
@@ -261,11 +263,12 @@ const CurriculumPane = () => {
                 </div>
             </div>
         )
-        : <Collapsed title="CURRICULUM" position="east" />
+        : <Collapsed title={ t("curriculum.switchScriptLanguage")} position="east" />
 }
 
 const NavigationBar = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const location = useSelector(curriculum.selectCurrentLocation)
     const toc = useSelector(curriculum.selectTableOfContents)
     const tocPages = useSelector(curriculum.selectPages)
@@ -298,16 +301,16 @@ const NavigationBar = () => {
                 onMouseLeave={() => setHighlight(false)}>
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title="Previous Page">
+                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={ t("curriculum.previousPage") }>
                         <i className="icon icon-arrow-left2" />
                     </button>}
-                <button ref={triggerRef} className="w-full" title="Show Table of Contents" onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
+                <button ref={triggerRef} className="w-full" title={ t("curriculum.showTOC") } onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
                     {pageTitle}
                     <i className="icon icon-arrow-down2 text-lg p-2" />
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title="Next Page">
+                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={ t("curriculum.nextPage") }>
                         <i className="icon icon-arrow-right2" />
                     </button>}
             </div>

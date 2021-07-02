@@ -53,7 +53,6 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
     })
     dispatch(setTableOfContents(tocData))
     dispatch(fetchContent({ location, url }))
-    console.log("fetchLocale complete")
 })
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {

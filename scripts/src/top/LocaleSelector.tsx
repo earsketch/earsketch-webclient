@@ -21,11 +21,12 @@ export const LocaleSelector = () => {
     const dispatch = useDispatch();
     const { i18n } = useTranslation();
     const curriculumLocation = useSelector(curriculumState.selectCurrentLocation)
+
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng);
         dispatch(appState.setLocale(lng));
         dispatch(curriculumState.fetchLocale({ location: curriculumLocation }))
-    };
+    }
 
     return (
         <div className="">
