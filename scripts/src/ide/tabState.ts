@@ -52,6 +52,7 @@ const tabSlice = createSlice({
         resetTabs(state) {
             state.openTabs = [];
             state.activeTabID = null;
+            state.modifiedScripts = [];
         },
         setNumVisibleTabs(state, { payload }) {
             state.numVisibleTabs = payload;

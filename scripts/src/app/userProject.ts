@@ -210,7 +210,6 @@ function extractScripts(data: any): Script[] {
 // Login, setup, restore scripts, return shared scripts.
 export async function login(username: string, password: string) {
     esconsole("Using username: " + username, ["debug", "user"])
-    const data = await postForm("/services/scripts/findall", { username, password: btoa(password) })
     reporter.login(username)
     // TODO: Don't store the password!
     storeUser(username, password)
@@ -239,7 +238,7 @@ export async function login(username: string, password: string) {
     // Copy scripts local storage to the web service.
     // TODO: Break out into separate function?
     const saved = scriptsState.selectRegularScripts(store.getState())
-    store.dispatch(scriptsState.resetRegularScripts())
+    await refreshCodeBrowser()
     if (Object.keys(saved).length > 0) {
         const promises = []
         for (const script of Object.values(saved)) {
@@ -268,8 +267,6 @@ export async function login(username: string, password: string) {
                 store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid))
             }
         }
-    } else {
-        await refreshCodeBrowser()
     }
 
     const shareID = ESUtils.getURLParameter("sharing")
@@ -302,7 +299,7 @@ export async function refreshCodeBrowser() {
         }
         store.dispatch(scriptsState.setRegularScripts(scripts))
     } else {
-        throw "This should never be called for anonymous users."
+        throw new Error("This should never be called for anonymous users.")
     }
 }
 
