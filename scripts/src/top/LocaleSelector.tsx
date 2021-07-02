@@ -38,22 +38,20 @@ export const LocaleSelector = () => {
                     </div>
                 </Menu.Button>
                 <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    {
-                        AVAILABLE_LOCALES.map((locale) =>
-                            <Menu.Item key={locale.localeCode}>
-                                {({ active }) => (
-                                    <button
-                                        className={`${
-                                            active ? "bg-gray-500 text-white" : "text-gray-900"
-                                        } group flex items-center w-full px-2 py-2`}
-                                        onClick={() => changeLanguage(locale.localeCode)}
-                                    >
-                                        {locale.displayText}
-                                    </button>
-                                )}
-                            </Menu.Item>,
-                        )
-                    }
+                    {AVAILABLE_LOCALES.map((locale) =>
+                        <Menu.Item key={locale.localeCode}>
+                            {({ active }) => (
+                                <button
+                                    className={`${
+                                        active ? "bg-gray-500 text-white" : "text-gray-900"
+                                    } group flex items-center w-full px-2 py-2`}
+                                    onClick={() => changeLanguage(locale.localeCode)}
+                                >
+                                    {locale.displayText}
+                                </button>
+                            )}
+                        </Menu.Item>,
+                    )}
                 </Menu.Items>
             </Menu>
         </div>
