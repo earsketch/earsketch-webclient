@@ -436,7 +436,7 @@ export const IDE = () => {
                         </div>
                     </div>
 
-                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
