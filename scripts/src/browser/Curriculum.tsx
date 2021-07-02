@@ -263,7 +263,7 @@ const CurriculumPane = () => {
                 </div>
             </div>
         )
-        : <Collapsed title={ t("curriculum.switchScriptLanguage")} position="east" />
+        : <Collapsed title={ t("curriculum.title").toLocaleUpperCase() } position="east" />
 }
 
 const NavigationBar = () => {
