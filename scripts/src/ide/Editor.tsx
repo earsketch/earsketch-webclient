@@ -190,7 +190,7 @@ function setupAceHandlers(ace: Ace.Editor) {
         const editSession = ace.getSession()
         tabs.setEditorSession(activeTabID, editSession)
 
-        const script = activeTabID === null ? null : scripts.selectAllScriptEntities(store.getState())[activeTabID]
+        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
         if (script) {
             store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
             if (!script.collaborative) {

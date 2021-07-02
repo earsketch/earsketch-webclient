@@ -11,7 +11,7 @@ import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
-import { ScriptEntity, SoundEntity } from "common"
+import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
 import { Download } from "./Download"
@@ -84,7 +84,7 @@ export function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
 }
 
-export async function renameScript(script: ScriptEntity) {
+export async function renameScript(script: Script) {
     // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
     script = Object.assign({}, script)
     const newScript = await openModal(RenameScript, { script })
@@ -93,18 +93,18 @@ export async function renameScript(script: ScriptEntity) {
     reporter.renameScript()
 }
 
-export function downloadScript(script: ScriptEntity) {
+export function downloadScript(script: Script) {
     openModal(Download, { script, quality: false })
 }
 
-export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
+export async function openScriptHistory(script: Script, allowRevert: boolean) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
 }
 
-export function openCodeIndicator(script: ScriptEntity) {
+export function openCodeIndicator(script: Script) {
     openModal(ScriptAnalysis, { script })
 }
 
@@ -125,7 +125,7 @@ function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cance
     return openModal(Confirm, { text, ok, cancel, type })
 }
 
-export async function deleteScript(script: ScriptEntity) {
+export async function deleteScript(script: Script) {
     if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
@@ -139,14 +139,14 @@ export async function deleteScript(script: ScriptEntity) {
     }
 }
 
-export async function deleteSharedScript(script: ScriptEntity) {
+export async function deleteSharedScript(script: Script) {
     if (script.collaborative) {
         if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
             }
             // Apply state change first
-            const { [script.shareid]: _, ...sharedScripts } = scripts.selectSharedScriptEntities(store.getState())
+            const { [script.shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
             store.dispatch(scripts.setSharedScripts(sharedScripts))
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
@@ -162,14 +162,14 @@ export async function deleteSharedScript(script: ScriptEntity) {
     }
 }
 
-export async function submitToCompetition(script: ScriptEntity) {
+export async function submitToCompetition(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await userProject.getLockedSharedScriptId(script.shareid)
     openModal(CompetitionSubmission, { name: script.name, shareID })
 }
 
-export async function importScript(script: ScriptEntity) {
+export async function importScript(script: Script) {
     if (!script) {
         script = tabs.selectActiveTabScript(store.getState())
     }
@@ -212,7 +212,7 @@ userProject.getLicenses().then(ls => {
     }
 })
 
-export async function shareScript(script: ScriptEntity) {
+export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script, licenses })
@@ -228,14 +228,14 @@ export function openUploadWindow() {
 
 export function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const allScripts = scripts.selectAllScriptEntities(store.getState())
+    const allScripts = scripts.selectAllScripts(store.getState())
     // Get the modified / unsaved script.
     const script = allScripts[activeTabID]
     if (!script) return
     let input = recommender.addRecInput([], script)
     let res = [] as any[]
     if (input.length === 0) {
-        const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities(store.getState()))
+        const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
         if (filteredScripts.length) {
             const lim = Math.min(5, filteredScripts.length)
             for (let i = 0; i < lim; i++) {
@@ -383,7 +383,7 @@ export const App = () => {
 
         if (!userProject.isLoggedIn()) {
             const openTabs = tabs.selectOpenTabs(store.getState())
-            const allScripts = scripts.selectAllScriptEntities(store.getState())
+            const allScripts = scripts.selectAllScripts(store.getState())
             openTabs.forEach(scriptID => {
                 if (!allScripts.hasOwnProperty(scriptID)) {
                     store.dispatch(tabs.closeAndSwitchTab(scriptID))
@@ -540,7 +540,7 @@ export const App = () => {
     }
 
     const openCollaborativeScript = (shareID: string) => {
-        const sharedScripts = scripts.selectSharedScriptEntities(store.getState())
+        const sharedScripts = scripts.selectSharedScripts(store.getState())
         if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
             openSharedScript(shareID)
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
@@ -739,7 +739,7 @@ const ModalContainer = () => {
 function saveAll() {
     const promises = []
     const modifiedTabs = tabs.selectModifiedScripts(store.getState())
-    const scriptMap = scripts.selectActiveScriptEntities(store.getState())
+    const scriptMap = scripts.selectActiveScripts(store.getState())
 
     for (const id of modifiedTabs) {
         const script = scriptMap[id]
@@ -755,7 +755,7 @@ function saveAll() {
 function leaveCollaborationSession() {
     const activeTabID = tabs.selectActiveTabID(store.getState())
     if (activeTabID) {
-        const allScriptEntities = scripts.selectAllScriptEntities(store.getState())
+        const allScriptEntities = scripts.selectAllScripts(store.getState())
         if (allScriptEntities[activeTabID].collaborative) {
             collaboration.leaveSession(activeTabID)
         }

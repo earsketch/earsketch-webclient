@@ -6,7 +6,7 @@ import { openModal } from "./App"
 import * as audioLibrary from "./audiolibrary"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { openShare } from "../ide/IDE"
@@ -152,11 +152,11 @@ export function loadLocalScripts() {
     const LS_SCRIPTS_KEY = "scripts_v1"
     const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
-        const scripts = JSON.parse(scriptData) as { [key: string]: ScriptEntity }
+        const scripts = JSON.parse(scriptData) as { [key: string]: Script }
         for (const script of Object.values(scripts)) {
             script.imported = !!script.creator
         }
-        store.dispatch(scriptsState.setRegularScripts(Object.assign(scriptsState.selectRegularScriptEntities(store.getState()), scripts)))
+        store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
         localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
@@ -172,7 +172,7 @@ export function loadLocalScripts() {
 }
 
 // The script content from server may need adjustment in the collaborators parameter.
-function fixCollaborators(script: ScriptEntity, username?: string) {
+function fixCollaborators(script: Script, username?: string) {
     if (script.collaborators === undefined) {
         script.collaborators = []
     } else if (typeof script.collaborators === "string") {
@@ -197,7 +197,7 @@ function fixCollaborators(script: ScriptEntity, username?: string) {
 }
 
 // Get an array of scripts, regardless of data (which might be null, or data.scripts might be a single object).
-function extractScripts(data: any): ScriptEntity[] {
+function extractScripts(data: any): Script[] {
     if (data === null) {
         return []
     } else if (Array.isArray(data.scripts)) {
@@ -238,7 +238,7 @@ export async function login(username: string, password: string) {
 
     // Copy scripts local storage to the web service.
     // TODO: Break out into separate function?
-    const saved = scriptsState.selectRegularScriptEntities(store.getState())
+    const saved = scriptsState.selectRegularScripts(store.getState())
     store.dispatch(scriptsState.resetRegularScripts())
     if (Object.keys(saved).length > 0) {
         const promises = []
@@ -273,7 +273,7 @@ export async function login(username: string, password: string) {
     }
 
     const shareID = ESUtils.getURLParameter("sharing")
-    const sharedScripts = scriptsState.selectSharedScriptEntities(store.getState())
+    const sharedScripts = scriptsState.selectSharedScripts(store.getState())
     if (shareID && sharedScripts[shareID]) {
         // User opened share link, and they haven't imported or deleted the shared script.
         await openShare(shareID)
@@ -290,7 +290,7 @@ export async function refreshCodeBrowser() {
 
         store.dispatch(scriptsState.resetRegularScripts())
 
-        const scripts: { [key: string]: ScriptEntity } = {}
+        const scripts: { [key: string]: Script } = {}
         for (const script of fetchedScripts) {
             script.modified = ESUtils.parseDate(script.modified as string)
             // set this flag to false when the script gets modified
@@ -327,7 +327,7 @@ export async function getScriptVersion(scriptid: string, versionid: number) {
 
 // Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
 export async function getSharedScripts() {
-    const sharedScripts: { [key: string]: ScriptEntity } = {}
+    const sharedScripts: { [key: string]: Script } = {}
     const data = await postAuthForm("/services/scripts/getsharedscripts")
     const scripts = extractScripts(data)
     for (const script of scripts) {
@@ -486,9 +486,9 @@ export async function saveSharedScript(scriptid: string, scriptname: string, sou
             isShared: true,
             readonly: true,
             username,
-        } as ScriptEntity
+        } as Script
     }
-    const sharedScripts = scriptsState.selectSharedScriptEntities(store.getState())
+    const sharedScripts = scriptsState.selectSharedScripts(store.getState())
     store.dispatch(scriptsState.setSharedScripts({ ...sharedScripts, [scriptid]: script }))
     return script
 }
@@ -501,7 +501,7 @@ export async function deleteScript(scriptid: string) {
             const script = await postAuth("/services/scripts/delete", { scriptid })
             esconsole("Deleted script: " + scriptid, "debug")
 
-            const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+            const scripts = scriptsState.selectRegularScripts(store.getState())
             if (scripts[scriptid]) {
                 script.modified = Date.now()
                 store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
@@ -515,13 +515,13 @@ export async function deleteScript(scriptid: string) {
         }
     } else {
         // User is not logged in so alter local storage
-        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        const scripts = scriptsState.selectRegularScripts(store.getState())
         const script = { ...scripts[scriptid], soft_delete: true }
         store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
     }
 }
 
-async function promptForRename(script: ScriptEntity) {
+async function promptForRename(script: Script) {
     const oldName = script.name
     await openModal(RenameScript, { script, conflict: true })
     if (script.name === oldName) {
@@ -530,7 +530,7 @@ async function promptForRename(script: ScriptEntity) {
 }
 
 // Restore a script deleted by the user.
-export async function restoreScript(script: ScriptEntity) {
+export async function restoreScript(script: Script) {
     if (lookForScriptByName(script.name, true)) {
         await promptForRename(script)
         renameScript(script.shareid, script.name)
@@ -543,13 +543,13 @@ export async function restoreScript(script: ScriptEntity) {
             modified: Date.now(),
         }
         esconsole("Restored script: " + restored.shareid, "debug")
-        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        const scripts = scriptsState.selectRegularScripts(store.getState())
         store.dispatch(scriptsState.setRegularScripts({ ...scripts, [restored.shareid]: restored }))
         return restored
     } else {
         script.modified = Date.now()
         script.soft_delete = false
-        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        const scripts = scriptsState.selectRegularScripts(store.getState())
         store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
         return script
     }
@@ -557,7 +557,7 @@ export async function restoreScript(script: ScriptEntity) {
 
 // Import a script by checking if it is shared or not, and saving it to
 // the user workspace. Returns a promise which resolves to the saved script.
-export async function importScript(script: ScriptEntity) {
+export async function importScript(script: Script) {
     if (lookForScriptByName(script.name)) {
         await promptForRename(script)
     }
@@ -573,7 +573,7 @@ export async function importScript(script: ScriptEntity) {
     }
 }
 
-export async function importCollaborativeScript(script: ScriptEntity) {
+export async function importCollaborativeScript(script: Script) {
     let originalScriptName = script.name
     if (lookForScriptByName(script.name)) {
         await promptForRename(script)
@@ -590,7 +590,7 @@ export async function deleteSharedScript(scriptid: string) {
         await postAuth("/services/scripts/deletesharedscript", { scriptid })
         esconsole("Deleted shared script: " + scriptid, "debug")
     }
-    const { [scriptid]: _, ...sharedScripts } = scriptsState.selectSharedScriptEntities(store.getState())
+    const { [scriptid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
     store.dispatch(scriptsState.setSharedScripts(sharedScripts))
 }
 
@@ -608,9 +608,9 @@ export async function setScriptDesc(scriptname: string, id: string, description:
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     let script
-    const sharedScripts = scriptsState.selectSharedScriptEntities(store.getState())
+    const sharedScripts = scriptsState.selectSharedScripts(store.getState())
     if (isLoggedIn()) {
-        script = await postAuthForm("/services/scripts/import", { scriptid }) as ScriptEntity
+        script = await postAuthForm("/services/scripts/import", { scriptid }) as Script
     } else {
         script = sharedScripts[scriptid]
         script = {
@@ -625,7 +625,7 @@ async function importSharedScript(scriptid: string) {
     }
     const { [scriptid]: _, ...updatedSharedScripts } = sharedScripts
     store.dispatch(scriptsState.setSharedScripts(updatedSharedScripts))
-    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+    const scripts = scriptsState.selectRegularScripts(store.getState())
     store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
     esconsole("Import script " + scriptid, ["debug", "user"])
     return script
@@ -712,7 +712,7 @@ function nextName(scriptname: string) {
     const ext = ESUtils.parseExt(scriptname)
 
     const matchedNames = new Set()
-    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+    const scripts = scriptsState.selectRegularScripts(store.getState())
     for (const script of Object.values(scripts)) {
         if (script.name.startsWith(name)) {
             matchedNames.add(script.name)
@@ -727,7 +727,7 @@ function nextName(scriptname: string) {
 }
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
-    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+    const scripts = scriptsState.selectRegularScripts(store.getState())
     return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
 }
 
@@ -736,7 +736,7 @@ function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean)
 //   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
 export async function saveScript(scriptname: string, source_code: string, overwrite: boolean=true, status: number=0) {
     const name = overwrite ? scriptname : nextName(scriptname)
-    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+    const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (isLoggedIn()) {
         reporter.saveScript()
@@ -768,7 +768,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
             saved: true,
             tooltipText: "",
             collaborators: [],
-        } as any as ScriptEntity
+        } as any as Script
         store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
         return script
     }

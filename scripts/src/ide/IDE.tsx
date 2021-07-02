@@ -7,7 +7,7 @@ import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as collaboration from "../app/collaboration"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as compiler from "../app/compiler"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -58,7 +58,7 @@ export async function createScript() {
 
 function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const script = activeTabID === null ? null : scripts.selectAllScriptEntities(store.getState())[activeTabID]
+    const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
 
     if (script?.collaborative) {
         script && collaboration.saveScript(script.shareid)
@@ -96,7 +96,7 @@ export function initEditor() {
         },
         exec() {
             const activeTabID = tabs.selectActiveTabID(store.getState())!
-            const script = activeTabID === null ? null : scripts.selectAllScriptEntities(store.getState())[activeTabID]
+            const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
 
             if (!script?.saved) {
                 store.dispatch(tabs.saveScriptIfModified(activeTabID))
@@ -169,7 +169,7 @@ export async function openShare(shareid: string) {
             switchToShareMode()
         } else {
             // user has not opened this shared link before
-            result = await userProject.loadScript(shareid, true) as ScriptEntity
+            result = await userProject.loadScript(shareid, true) as Script
             if (!result) {
                 userNotification.show("This share script link is invalid.")
                 return
@@ -196,7 +196,7 @@ export async function openShare(shareid: string) {
                 }
 
                 // Manually remove the user-owned shared script from the browser.
-                const { [shareid]: _, ...sharedScripts } = scripts.selectSharedScriptEntities(store.getState())
+                const { [shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
                 store.dispatch(scripts.setSharedScripts(sharedScripts))
             }
         }

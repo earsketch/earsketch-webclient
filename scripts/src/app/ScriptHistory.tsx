@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import * as collaboration from "./collaboration"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 import reporter from "./reporter"
@@ -49,12 +49,12 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
     </tr>
 }
 
-export const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEntity, allowRevert: boolean, close: () => void }) => {
+export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, allowRevert: boolean, close: () => void }) => {
     const dispatch = useDispatch()
     const openTabs = useSelector(tabs.selectOpenTabs)
     const activeTabID = useSelector(tabs.selectActiveTabID)
     // This is ordered from the newest version at index 0 to the oldest version at `history.length-1`.
-    const [history, setHistory] = useState([] as ScriptEntity[])
+    const [history, setHistory] = useState([] as Script[])
     // These are used for the embedded DAW.
     const [compiling, setCompiling] = useState(false)
     const [compiledResult, setCompiledResult] = useState(null as DAWData | null)

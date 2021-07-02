@@ -8,7 +8,7 @@ import store from "../reducers"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
-    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+    const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (name.length < 3) {
         throw 'messages:general.shortname'

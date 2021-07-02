@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 
 import * as app from "./appState"
 import * as collaboration from "./collaboration"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
@@ -104,7 +104,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
 }
 
 interface TabParameters {
-    script: ScriptEntity
+    script: Script
     licenses: { [key: string]: any }
     licenseID: string
     setLicenseID: (id: string) => void
@@ -169,7 +169,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         exporter.text({
             name: script.name + ".url",
             source_code: textContent
-        } as ScriptEntity)
+        } as Script)
     }
 
     const submit = async () => {

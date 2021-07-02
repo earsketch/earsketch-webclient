@@ -1,4 +1,4 @@
-export interface ScriptEntity {
+export interface Script {
     name: string
     shareid: string
     source_code: string

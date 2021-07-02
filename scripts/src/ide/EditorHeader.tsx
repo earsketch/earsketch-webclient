@@ -51,7 +51,7 @@ export const EditorHeader = () => {
     const dispatch = useDispatch();
     const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID) as string;
-    const allScripts = useSelector(scripts.selectAllScriptEntities);
+    const allScripts = useSelector(scripts.selectAllScripts);
     const blocksMode = useSelector(ide.selectBlocksMode);
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
@@ -107,7 +107,7 @@ export const EditorHeader = () => {
                                 ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
                             `}
                             onClick={() => {
-                                const unsavedScript = scripts.selectRegularScriptEntities(store.getState())[activeTab];
+                                const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab];
                                 shareScript(Object.assign({}, unsavedScript));
                             }}
                         >

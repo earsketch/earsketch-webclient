@@ -5,6 +5,7 @@ import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { usePopper } from 'react-popper';
 
+import { Script, ScriptType } from 'common';
 import { createScript } from '../ide/IDE';
 import * as scripts from './scriptsState';
 import * as tabs from '../ide/tabState';
@@ -12,7 +13,6 @@ import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as userProject from '../app/userProject';
 import { RootState } from '../reducers';
-import { ScriptEntity, ScriptType } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
 import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, shareScript, VirtualReference } from './ScriptsMenus';
@@ -187,14 +187,14 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     );
 };
 
-const ShareButton = ({ script }: { script: ScriptEntity }) => (
+const ShareButton = ({ script }: { script: Script }) => (
     <PillButton onClick={() => shareScript(script)}>
         <i className='icon-share32' />
         <div>Share</div>
     </PillButton>
 );
 
-const RestoreButton = ({ script }: { script: ScriptEntity }) => {
+const RestoreButton = ({ script }: { script: Script }) => {
     return (
         <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
             <i className='icon-rotate-cw2'/>
@@ -290,7 +290,7 @@ const SingletonSharedScriptInfo = () => {
     );
 };
 
-const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
+const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
     const dispatch = useDispatch();
 
     return (
@@ -309,7 +309,7 @@ const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
 };
 
 interface ScriptProps {
-    script: ScriptEntity
+    script: Script
     bgTint: boolean
     type: ScriptType
 }
@@ -391,7 +391,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
 
 interface WindowedScriptCollectionProps {
     title: string
-    entities: scripts.ScriptEntities
+    entities: scripts.Scripts
     scriptIDs: string[]
     type: ScriptType
     visible?: boolean
@@ -426,7 +426,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=tr
 );
 
 const RegularScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredActiveScriptEntities);
+    const entities = useSelector(scripts.selectFilteredActiveScripts);
     const scriptIDs = useSelector(scripts.selectFilteredActiveScriptIDs);
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length;
     const { t } = useTranslation()
@@ -440,7 +440,7 @@ const RegularScriptCollection = () => {
 };
 
 const SharedScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredSharedScriptEntities);
+    const entities = useSelector(scripts.selectFilteredSharedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredSharedScriptIDs);
     const numScripts = useSelector(scripts.selectSharedScriptIDs).length;
     const numFilteredScripts = scriptIDs.length;
@@ -453,7 +453,7 @@ const SharedScriptCollection = () => {
 };
 
 const DeletedScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredDeletedScriptEntities);
+    const entities = useSelector(scripts.selectFilteredDeletedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredDeletedScriptIDs);
     const numScripts = useSelector(scripts.selectDeletedScriptIDs).length;
     const numFilteredScripts = scriptIDs.length;

@@ -124,8 +124,8 @@ export const selectHiddenTabs = createSelector(
 
 export const selectModifiedScripts = (state: RootState) => state.tabs.modifiedScripts;
 export const selectActiveTabScript = createSelector(
-    [selectActiveTabID, scripts.selectAllScriptEntities],
-    (activeTabID: string, scriptEntities: scripts.ScriptEntities) => scriptEntities[activeTabID]
+    [selectActiveTabID, scripts.selectAllScripts],
+    (activeTabID: string, scriptEntities: scripts.Scripts) => scriptEntities[activeTabID]
 )
 
 // Note: Do not export and modify directly.
@@ -143,7 +143,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/setActiveTabAndEditor',
     (scriptID, { getState, dispatch }) => {
         const prevTabID = selectActiveTabID(getState());
-        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        const script = scripts.selectAllScripts(getState())[scriptID];
 
         if (!script) return;
 
@@ -180,7 +180,7 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
         const openTabs = selectOpenTabs(getState());
         const activeTabID = selectActiveTabID(getState());
         const closedTabIndex = openTabs.indexOf(scriptID);
-        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        const script = scripts.selectAllScripts(getState())[scriptID];
 
         dispatch(saveScriptIfModified(scriptID));
         dispatch(ensureCollabScriptIsClosed(scriptID));
@@ -218,7 +218,7 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
             dispatch(closeTab(scriptID));
             deleteEditorSession(scriptID);
 
-            const script = scripts.selectAllScriptEntities(getState())[scriptID];
+            const script = scripts.selectAllScripts(getState())[scriptID];
             script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID));
         });
 
@@ -237,7 +237,7 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
             const restoredSession = getEditorSession(scriptID);
 
             if (restoredSession) {
-                const script = scripts.selectAllScriptEntities(getState())[scriptID];
+                const script = scripts.selectAllScripts(getState())[scriptID];
                 userProject.saveScript(script.name, restoredSession.getValue());
             }
 
@@ -254,7 +254,7 @@ const ensureCollabScriptIsClosed = createAsyncThunk<void, string, ThunkAPI>(
     (scriptID, { getState }) => {
         // Note: Watch out for the order with closeScript.
         const activeTabID = selectActiveTabID(getState());
-        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        const script = scripts.selectAllScripts(getState())[scriptID];
         if (scriptID === activeTabID && script?.collaborative) {
             collaboration.closeScript(scriptID);
         }

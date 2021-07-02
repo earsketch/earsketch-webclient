@@ -44,7 +44,7 @@ export function calculateAggregateCodeScore() {
         let savedScripts : string[] = []
         let scriptTypes : string[] = []
         let savedNames : string[] = []
-        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        const scripts = scriptsState.selectRegularScripts(store.getState())
         const keys = Object.keys(scripts)
         //if needed, initialize aggregate score variable
         if (aggregateScore == null) {
