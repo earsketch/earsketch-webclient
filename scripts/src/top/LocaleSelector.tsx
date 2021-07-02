@@ -1,5 +1,5 @@
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { Menu } from "@headlessui/react"
 
 import { useTranslation } from "react-i18next"
@@ -20,12 +20,11 @@ const AVAILABLE_LOCALES: locale[] = [
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
-    const curriculumLocation = useSelector(curriculumState.selectCurrentLocation)
 
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng)
         dispatch(appState.setLocale(lng))
-        dispatch(curriculumState.fetchLocale({ location: curriculumLocation }))
+        dispatch(curriculumState.fetchLocale({ }))
     }
 
     return (

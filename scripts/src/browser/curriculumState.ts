@@ -52,6 +52,10 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
         })
     })
     dispatch(setTableOfContents(tocData))
+    const currentLocation = getState().curriculum.currentLocation
+    if(location === undefined && url === undefined) {
+        location = currentLocation
+    }
     dispatch(fetchContent({ location, url }))
 })
 
@@ -392,6 +396,7 @@ export const getURLForLocation = (location: number[]) => {
 
 const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
     const toc = store.getState().curriculum.tableOfContents
+
     if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href]
     }
