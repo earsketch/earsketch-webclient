@@ -82,12 +82,10 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: ScriptEn
             collaboration.saveScript()
         } else {
             // Replace code with reverted version and save.
-            userProject.scripts[script.shareid].source_code = version.source_code
+            dispatch(scripts.setScriptSource({ id: script.shareid, source: version.source_code }))
             userProject.saveScript(script.name, version.source_code, true, version.run_status).then(() => {
                 // TODO: this really isn't ideal
                 // close the script and then reload to reflect latest changes
-                dispatch(scripts.syncToNgUserProject())
-
                 if (openTabs.includes(script.shareid)) {
                     tabs.deleteEditorSession(script.shareid)
                     if (script.shareid === activeTabID) {

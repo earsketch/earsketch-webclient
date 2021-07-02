@@ -52,7 +52,6 @@ export async function createScript() {
     const filename = await openModal(ScriptCreator)
     if (filename) {
         const script = await userProject.createScript(filename)
-        store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.setActiveTabAndEditor(script.shareid))
     }
 }
@@ -67,7 +66,6 @@ function saveActiveScriptWithRunStatus(status: number) {
     } else if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
         userProject.saveScript(script.name, script.source_code, true, status).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             isWaitingForServerResponse = false
         }).catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
@@ -166,7 +164,6 @@ export async function openShare(shareid: string) {
             if (userProject.isLoggedIn()) {
                 await userProject.getSharedScripts()
                 if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-                store.dispatch(scripts.syncToNgUserProject())
                 store.dispatch(tabs.setActiveTabAndEditor(shareid))
             }
             switchToShareMode()
@@ -193,7 +190,6 @@ export async function openShare(shareid: string) {
 
                 if (isEmbedded) {
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
-                    store.dispatch(scripts.syncToNgUserProject())
                     store.dispatch(tabs.setActiveTabAndEditor(shareid))
                 } else {
                     userNotification.show("This shared script link points to your own script.")
@@ -213,7 +209,6 @@ export async function openShare(shareid: string) {
         }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
         await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-        store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.setActiveTabAndEditor(shareid))
         switchToShareMode()
     }

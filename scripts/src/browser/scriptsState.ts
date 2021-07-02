@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
-import { persistReducer } from 'redux-persist';
+import { createTransform, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { pickBy, keyBy, cloneDeep } from 'lodash';
+import { pickBy, keyBy } from 'lodash';
 import * as dayjs from 'dayjs';
 import { selectUserName } from '../user/userState';
 import { RootState, ThunkAPI } from '../reducers';
 import { ScriptEntity, ScriptType } from 'common';
-import * as userProject from '../app/userProject';
 
 export interface ScriptEntities {
     [scriptID: string]: ScriptEntity
@@ -34,9 +33,9 @@ interface AllFilters extends Filters {
 }
 
 interface ScriptsState {
+    // TODO: Rename to clarify: are regularScripts all scripts owned by user (including shared and collaborative scripts)?
     regularScripts: Scripts
     sharedScripts: Scripts
-    // localScripts: Scripts
     readOnlyScripts: Scripts
     filters: AllFilters
     featureSharedScript: boolean
@@ -63,10 +62,6 @@ const scriptsSlice = createSlice({
             entities: {},
             scriptIDs: []
         },
-        // localScripts: {
-        //     entities: {},
-        //     scriptIDs: []
-        // },
         readOnlyScripts: {
             entities: {},
             scriptIDs: []
@@ -111,14 +106,6 @@ const scriptsSlice = createSlice({
             state.sharedScripts.entities = {};
             state.sharedScripts.scriptIDs = [];
         },
-        // addLocalScript(state, { payload }) {
-        //     state.localScripts.entities[payload.scriptID] = payload;
-        //     state.localScripts.scriptIDs.push(payload.scriptID);
-        // },
-        // resetLocalScripts(state) {
-        //     state.localScripts.entities = {};
-        //     state.localScripts.scriptIDs = [];
-        // },
         addReadOnlyScript(state, { payload }) {
             state.readOnlyScripts.entities[payload.shareid] = payload;
             state.readOnlyScripts.scriptIDs.push(payload.shareid);
@@ -200,25 +187,53 @@ const scriptsSlice = createSlice({
                 if (!state.sharedScripts.entities[id].collaborative) {
                     state.sharedScripts.entities[id].saved = false
                 }
+            } else {
+                throw "Invalid script ID"
             }
-        }
+        },
+        setScriptDescription(state, { payload: { id, description }}) {
+            state.regularScripts.entities[id].description = description
+        },
+        setScriptName(state, { payload: { id, name }}) {
+            state.regularScripts.entities[id].name = name
+        },
+        setScriptLicense(state, { payload: { id, licenseID }}) {
+            state.regularScripts.entities[id].license_id = licenseID
+        },
+        setScriptCollaborators(state, { payload: { id, collaborators }}) {
+            state.regularScripts.entities[id].collaborators = collaborators
+            state.regularScripts.entities[id].collaborative = collaborators.length > 0
+        },
     }
 });
 
+import * as userProject from "../app/userProject"
+
+const LocalScriptTransform = createTransform(
+    // Transform state on its way to being persisted.
+    (inboundState: ScriptsState, key) => {
+        if (userProject.isLoggedIn()) {
+            return { entities: {}, scriptIDs: [] }
+        }
+        return inboundState
+    },
+    null,
+    { whitelist: ["regularScripts"] }
+)
+
 const persistConfig = {
     key: 'scripts',
-    whitelist: ['localScripts','readOnlyScripts'],
-    storage
+    whitelist: ['regularScripts','readOnlyScripts'],
+    transforms: [LocalScriptTransform],
+    storage,
 };
 
-export default persistReducer(persistConfig, scriptsSlice.reducer);
+export default persistReducer<ScriptsState>(persistConfig, scriptsSlice.reducer);
 export const {
     setRegularScripts,
     resetRegularScripts,
     setSharedScripts,
     resetSharedScripts,
-    // addLocalScript,
-    // resetLocalScripts,
     addReadOnlyScript,
     removeReadOnlyScript,
     resetReadOnlyScripts,
@@ -235,21 +250,13 @@ export const {
     setSharedScriptInfo,
     resetSharedScriptInfo,
     setScriptSource,
+    setScriptDescription,
+    setScriptName,
+    setScriptLicense,
+    setScriptCollaborators,
 } = scriptsSlice.actions;
 
-/*=== Thunks ===*/
-// TODO: This will need to be completely replaced by a Redux-only state mgmt.
-export const syncToNgUserProject = createAsyncThunk(
-    'scripts/syncToNgUserProject',
-    (_, { dispatch }) => {
-        const scripts = cloneDeep(userProject.scripts);
-        Object.values(scripts).forEach(script => {
-            script.imported = !!script.creator;
-        });
-
-        dispatch(setRegularScripts(scripts));
-    }
-);
+// === Thunks ===
 
 const encloseScripts = (scriptsData: any) => {
     if (scriptsData === null) {
@@ -361,23 +368,6 @@ export const getSharedScripts = createAsyncThunk<void, { username: string, passw
     }
 );
 
-// export const createScript = createAsyncThunk(
-//     'scripts/createScript',
-//     ({ name, code, overwrite=true }, { getState }) => {
-//
-//     }
-// );
-
-// export const saveScript = createAsyncThunk(
-//     'script/saveScript',
-//     () => {}
-// );
-
-// export const saveAllScripts = createAsyncThunk(
-//     'script/saveAllScripts',
-//     () => {}
-// );
-
 export const resetDropdownMenuAsync = createAsyncThunk<void, void, ThunkAPI>(
     'scripts/resetDropdownMenuAsync',
     (_, { dispatch }) => {
@@ -392,17 +382,32 @@ export const resetSharedScriptInfoAsync = createAsyncThunk<void ,void, ThunkAPI>
     }
 );
 
-/*=== Selectors ===*/
-const selectRegularScriptEntities = (state: RootState) => state.scripts.regularScripts.entities;
+// === Selectors ===
+
+// TODO: This is necessary for updates to propagate correctly, since .entities in not in the slice but embedded inside regularScripts.
+//       Others should do the same; ideally, regularScripts should simply be the entities already, rather than adding another layer...
+const selectRegularScripts = (state: RootState) => state.scripts.regularScripts
+export const selectRegularScriptEntities = (state: RootState) => state.scripts.regularScripts.entities;
 const selectRegularScriptIDs = (state: RootState) => state.scripts.regularScripts.scriptIDs;
 export const selectSharedScriptEntities = (state: RootState) => state.scripts.sharedScripts.entities;
 export const selectSharedScriptIDs = (state: RootState) => state.scripts.sharedScripts.scriptIDs;
 export const selectReadOnlyScriptEntities = (state: RootState) => state.scripts.readOnlyScripts.entities;
 const selectReadOnlyScriptIDs = (state: RootState) => state.scripts.readOnlyScripts.scriptIDs;
 
+// TODO: Move to ESUtils or use a polyfill... this is duplicated inline in various other modules.
+function fromEntries<V>(iterable: [string, V][]) {
+    return [...iterable].reduce((obj, [key, val]) => {
+        obj[key] = val
+        return obj
+    }, {} as { [key: string]: V })
+}
+
+// There is something generally suspicious going on with selector propagation here...
+// Having this depend on selectRegularScripts work, but having it depend on selectRegularScriptEntities does not.
+// (Even if `selectRegularScriptEntities = createSelector([selectRegularScripts], thing => thing.entities)`.)
 export const selectActiveScriptEntities = createSelector(
-    [selectRegularScriptEntities],
-    (entities) => pickBy(entities, v => ![true,'1'].includes(v.soft_delete as any))
+    [selectRegularScripts],
+    (thing) => fromEntries(Object.entries(thing.entities).filter(([k, v]) => ![true,'1'].includes(v.soft_delete as any)))
 );
 export const selectActiveScriptIDs = createSelector(
     [selectActiveScriptEntities],
@@ -503,14 +508,14 @@ export const selectDropdownMenuContext = (state: RootState) => state.scripts.dro
 
 // TODO: Unsaved scripts should probably be tracked in the editor or tab state.
 export const selectUnsavedDropdownMenuScript = createSelector(
-    [selectDropdownMenuScript, selectDropdownMenuType, selectSharedScriptEntities, selectReadOnlyScriptEntities],
-    (script, type, sharedScripts, readOnlyScripts) => {
+    [selectDropdownMenuScript, selectDropdownMenuType, selectRegularScriptEntities, selectSharedScriptEntities, selectReadOnlyScriptEntities],
+    (script, type, regularScripts, sharedScripts, readOnlyScripts) => {
         if (!script) {
             return null;
         }
-        return type==='regular' && userProject.scripts[script.shareid]
-            || type==='shared' && sharedScripts[script.shareid]
-            || type==='readonly' && readOnlyScripts[script.shareid] || null;
+        return type === "regular" && regularScripts[script.shareid]
+            || type === "shared" && sharedScripts[script.shareid]
+            || type === "readonly" && readOnlyScripts[script.shareid] || null;
     }
 );
 

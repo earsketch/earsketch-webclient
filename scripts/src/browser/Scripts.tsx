@@ -188,21 +188,15 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
 };
 
 const ShareButton = ({ script }: { script: ScriptEntity }) => (
-    <PillButton onClick={() => {
-        shareScript(script);
-    }}>
+    <PillButton onClick={() => shareScript(script)}>
         <i className='icon-share32' />
         <div>Share</div>
     </PillButton>
 );
 
 const RestoreButton = ({ script }: { script: ScriptEntity }) => {
-    const dispatch = useDispatch();
     return (
-        <PillButton onClick={async () => {
-            await userProject.restoreScript(Object.assign({}, script));
-            dispatch(scripts.syncToNgUserProject());
-        }}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
             <i className='icon-rotate-cw2'/>
             <div>Restore</div>
         </PillButton>
@@ -379,7 +373,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
-                        { loggedIn && (<ShareButton script={userProject.scripts[script.shareid]} />) }
+                        { loggedIn && (<ShareButton script={script} />) }
                         <DropdownMenuCaller script={script} type='regular' />
                     </div>
                     <div className={`${type==='shared' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>

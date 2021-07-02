@@ -582,7 +582,6 @@ export function saveScript(_scriptID?: string) {
 function onScriptSaved(data: Message) {
     if (!userIsCAI(data.sender))
         userNotification.show(data.sender + " saved the current version of the script.", "success")
-    store.dispatch(scripts.syncToNgUserProject())
 }
 
 export function storeCursor(position: Ace.Point) {
@@ -911,7 +910,6 @@ async function onUserAddedToCollaboration(data: Message) {
 
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 }
 
@@ -928,7 +926,6 @@ async function onUserRemovedFromCollaboration(data: Message) {
 
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 }
 
@@ -962,7 +959,6 @@ async function onUserLeftCollaboration(data: Message) {
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
     }
-    store.dispatch(scripts.syncToNgUserProject())
 }
 
 export function renameScript(scriptID: string, scriptName: string, userName: string) {
@@ -981,7 +977,6 @@ async function onScriptRenamed(data: Message) {
 
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 }
 

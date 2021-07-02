@@ -37,7 +37,7 @@ import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/soundsState"
 import { SoundUploader } from "./SoundUploader"
-import store from "../reducers"
+import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
@@ -90,7 +90,6 @@ export async function renameScript(script: ScriptEntity) {
     const newScript = await openModal(RenameScript, { script })
     if (!newScript) return
     await userProject.renameScript(script.shareid, newScript.name)
-    store.dispatch(scripts.syncToNgUserProject())
     reporter.renameScript()
 }
 
@@ -135,7 +134,6 @@ export async function deleteScript(script: ScriptEntity) {
         await userProject.deleteScript(script.shareid)
         reporter.deleteScript()
 
-        store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.closeDeletedScript(script.shareid))
         store.dispatch(tabs.removeModifiedScript(script.shareid))
     }
@@ -176,9 +174,7 @@ export async function importScript(script: ScriptEntity) {
         script = tabs.selectActiveTabScript(store.getState())
     }
 
-    const imported = await userProject.importScript(Object.assign({}, script))
-    await userProject.refreshCodeBrowser()
-    store.dispatch(scripts.syncToNgUserProject())
+    const imported = await userProject.importScript(script)
 
     const openTabs = tabs.selectOpenTabs(store.getState())
     store.dispatch(tabs.closeTab(script.shareid))
@@ -386,7 +382,6 @@ export const App = () => {
         setup()
 
         if (!userProject.isLoggedIn()) {
-            store.dispatch(scripts.syncToNgUserProject())
             const openTabs = tabs.selectOpenTabs(store.getState())
             const allScripts = scripts.selectAllScriptEntities(store.getState())
             openTabs.forEach(scriptID => {
@@ -444,7 +439,6 @@ export const App = () => {
         // Retrieve the user scripts.
         await userProject.login(username, password)
         esconsole("Logged in as " + username, ["DEBUG","MAIN"])
-        store.dispatch(scripts.syncToNgUserProject())
 
         if (!loggedIn) {
             setLoggedIn(true)
@@ -539,7 +533,6 @@ export const App = () => {
     const openSharedScript = (shareID: string) => {
         esconsole("opening a shared script: " + shareID, "main")
         openShare(shareID).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         })
         setShowNotifications(false)
@@ -754,9 +747,7 @@ function saveAll() {
     }
 
     if (promises.length) {
-        return Promise.all(promises).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
-        })
+        return Promise.all(promises)
     }
     return promises.length ? Promise.all(promises) : null
 }
@@ -784,7 +775,6 @@ window.onbeforeunload = () => {
             promise.then(() => userNotification.show(i18n.t('messages:user.allscriptcloud'), "success"))
             return ""
         }
-    } else if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
-        localStorage.setItem(userProject.LS_SCRIPTS_KEY, JSON.stringify(userProject.scripts))
     }
+    persistor.flush()
 }

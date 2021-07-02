@@ -251,12 +251,9 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         collaboration.removeCollaborators(script.shareid, username, removed)
 
         // Update the local script state.
-        script.collaborators = newCollaborators
-        userProject.scripts[script.shareid] = script
+        dispatch(scripts.setScriptCollaborators({ id: script.shareid, collaborators: newCollaborators }))
         save()
 
-        script.collaborators = newCollaborators
-        script.collaborative = newCollaborators.length > 0
         // Update the state of tab, if open.
         if (activeTabID === script.shareid) {
             if (oldCollaborators.length === 0 && newCollaborators.length > 0) {
@@ -268,7 +265,6 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
                 collaboration.closeScript(script.shareid)
             }
         }
-        dispatch(scripts.syncToNgUserProject())
         close()
     }
 

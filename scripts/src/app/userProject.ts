@@ -20,8 +20,6 @@ import * as websocket from "./websocket"
 
 const USER_STATE_KEY = "userstate"
 
-export const LS_SCRIPTS_KEY = "scripts_v1"
-
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
 
@@ -40,9 +38,6 @@ const TEMPLATES = {
                 "setTempo(120);\n\n\n\n" +
                 "finish();\n"
 }
-
-// keep a mapping of script names: script objects
-export let scripts: { [key: string]: ScriptEntity } = {}
 
 // Helper functions for making API requests.
 export function form(obj: { [key: string]: string | Blob }={}) {
@@ -153,12 +148,16 @@ async function postXMLAuth(endpoint: string, xml: string) {
 
 
 export function loadLocalScripts() {
-    // Load scripts from local storage if they are available. When a user logs in
-    // these scripts will be saved to the web service and deleted from local storage.
+    // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
+    const LS_SCRIPTS_KEY = "scripts_v1"
     const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
-        scripts = Object.assign(scripts, JSON.parse(scriptData))
-        store.dispatch(scriptsState.syncToNgUserProject())
+        const scripts = JSON.parse(scriptData) as { [key: string]: ScriptEntity }
+        for (const script of Object.values(scripts)) {
+            script.imported = !!script.creator
+        }
+        store.dispatch(scriptsState.setRegularScripts(Object.assign(scriptsState.selectRegularScriptEntities(store.getState()), scripts)))
+        localStorage.removeItem(LS_SCRIPTS_KEY)
     }
 
     // Back up active tab. (See comment below re. setActiveTabAndEditor.)
@@ -170,17 +169,6 @@ export function loadLocalScripts() {
         store.dispatch(tabs.setActiveTabAndEditor(scriptID))
     }
     store.dispatch(tabs.setActiveTabAndEditor(activeTab!))
-}
-
-// Because scripts and openScripts are objects and we can't reset them
-// simply by re-instantiating empty objects, we use resetScripts() to
-// clear them manually. This is necessary due to controllers watching these
-// variables passed by reference. If we orphan those references, the
-// controllers won't update properly anymore.
-function resetScripts() {
-    for (const key of Object.keys(scripts)) {
-        delete scripts[key]
-    }
 }
 
 // The script content from server may need adjustment in the collaborators parameter.
@@ -243,20 +231,6 @@ export async function login(username: string, password: string) {
     userNotification.user.loginTime = Date.now()
 
     esconsole('List of scripts in Load script list successfully updated.', ["debug", "user"])
-    const storedScripts = extractScripts(data)
-    resetScripts()
-
-    // update user project scripts
-    for (const script of storedScripts) {
-        const offset = new Date().getTimezoneOffset()
-        script.modified = ESUtils.parseDate(script.modified as string) + offset * 60000
-        scripts[script.shareid] = script
-        // set this flag to false when the script gets modified
-        // then set it to true when the script gets saved
-        script.saved = true
-        script.tooltipText = ""
-        fixCollaborators(script)
-    }
 
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
@@ -264,9 +238,9 @@ export async function login(username: string, password: string) {
 
     // Copy scripts local storage to the web service.
     // TODO: Break out into separate function?
-    const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
-    if (scriptData !== null) {
-        const saved = JSON.parse(scriptData) as { [key: string]: ScriptEntity }
+    const saved = scriptsState.selectRegularScriptEntities(store.getState())
+    store.dispatch(scriptsState.resetRegularScripts())
+    if (Object.keys(saved).length > 0) {
         const promises = []
         for (const script of Object.values(saved)) {
             if (!script.soft_delete) {
@@ -286,7 +260,6 @@ export async function login(username: string, password: string) {
         store.dispatch(tabs.resetTabs())
 
         const savedScripts = await Promise.all(promises)
-        localStorage.removeItem(LS_SCRIPTS_KEY)
 
         await refreshCodeBrowser()
         // once all scripts have been saved open them
@@ -295,6 +268,8 @@ export async function login(username: string, password: string) {
                 store.dispatch(tabs.setActiveTabAndEditor(savedScript.shareid))
             }
         }
+    } else {
+        await refreshCodeBrowser()
     }
 
     const shareID = ESUtils.getURLParameter("sharing")
@@ -313,8 +288,9 @@ export async function refreshCodeBrowser() {
         const data = await postAuthForm("/services/scripts/findall")
         const fetchedScripts = extractScripts(data)
 
-        resetScripts()
+        store.dispatch(scriptsState.resetRegularScripts())
 
+        const scripts: { [key: string]: ScriptEntity } = {}
         for (const script of fetchedScripts) {
             script.modified = ESUtils.parseDate(script.modified as string)
             // set this flag to false when the script gets modified
@@ -324,19 +300,9 @@ export async function refreshCodeBrowser() {
             scripts[script.shareid] = script
             fixCollaborators(script)
         }
+        store.dispatch(scriptsState.setRegularScripts(scripts))
     } else {
-        const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
-        if (scriptData !== null) {
-            const r = JSON.parse(scriptData)
-            resetScripts()
-            for (const i in r) {
-                const script = r[i]
-                script.saved = true
-                script.tooltipText = ""
-                fixCollaborators(script)
-                scripts[script.shareid] = script
-            }
-        }
+        throw "This should never be called for anonymous users."
     }
 }
 
@@ -391,7 +357,6 @@ export function loadUser() {
 
 // Delete a user saved to local storage. I.e., logout.
 export function clearUser() {
-    resetScripts()
     store.dispatch(scriptsState.resetRegularScripts())
     store.dispatch(scriptsState.resetSharedScripts())
     localStorage.clear()
@@ -491,7 +456,7 @@ export async function getUserInfo(username_?: string, password?: string) {
 }
 
 // Set a script license id if owned by the user.
-export async function setLicense(scriptName: string, scriptId: string, licenseID: string){
+export async function setLicense(scriptName: string, id: string, licenseID: string){
     if (isLoggedIn()) {
         try {
             // TODO: Why doesn't this endpoint require authentication?
@@ -501,7 +466,7 @@ export async function setLicense(scriptName: string, scriptId: string, licenseID
             esconsole(err, ["error"])
         }
         esconsole("Set License Id " + licenseID + " to " + scriptName, "debug")
-        scripts[scriptId].license_id = licenseID
+        store.dispatch(scriptsState.setScriptLicense({ id, licenseID }))
     }
 }
 
@@ -536,9 +501,10 @@ export async function deleteScript(scriptid: string) {
             const script = await postAuth("/services/scripts/delete", { scriptid })
             esconsole("Deleted script: " + scriptid, "debug")
 
+            const scripts = scriptsState.selectRegularScriptEntities(store.getState())
             if (scripts[scriptid]) {
-                scripts[scriptid] = script
-                scripts[scriptid].modified = Date.now()
+                script.modified = Date.now()
+                store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
                 fixCollaborators(scripts[scriptid])
             } else {
                 // script doesn't exist
@@ -549,8 +515,9 @@ export async function deleteScript(scriptid: string) {
         }
     } else {
         // User is not logged in so alter local storage
-        scripts[scriptid].soft_delete = true
-        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
+        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        const script = { ...scripts[scriptid], soft_delete: true }
+        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
     }
 }
 
@@ -570,14 +537,21 @@ export async function restoreScript(script: ScriptEntity) {
     }
 
     if (isLoggedIn()) {
-        const restored = await postAuth("/services/scripts/restore", { scriptid: script.shareid })
+        const restored = {
+            ...await postAuth("/services/scripts/restore", { scriptid: script.shareid }),
+            saved: true,
+            modified: Date.now(),
+        }
         esconsole("Restored script: " + restored.shareid, "debug")
-        scripts[restored.shareid] = { ...restored, saved: true, modified: Date.now() }
+        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [restored.shareid]: restored }))
         return restored
     } else {
-        scripts[script.shareid].modified = Date.now()
-        scripts[script.shareid].soft_delete = false
-        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
+        script.modified = Date.now()
+        script.soft_delete = false
+        const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
+        return script
     }
 }
 
@@ -621,13 +595,14 @@ export async function deleteSharedScript(scriptid: string) {
 }
 
 // Set a shared script description if owned by the user.
-export async function setScriptDesc(scriptname: string, scriptId: string, desc: string="") {
+export async function setScriptDesc(scriptname: string, id: string, description: string="") {
     if (isLoggedIn()) {
         // TODO: These values (especially the description) should be escaped.
-        const xml = `<scripts><username>${getUsername()}</username><name>${scriptname}</name><description><![CDATA[${desc}]]></description></scripts>`
+        const xml = `<scripts><username>${getUsername()}</username><name>${scriptname}</name><description><![CDATA[${description}]]></description></scripts>`
         await postXML("/services/scripts/setscriptdesc", xml)
-        scripts[scriptId].description = desc
+        store.dispatch(scriptsState.setScriptDescription({ id, description }))
     }
+    // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
 }
 
 // Import a shared script to the user's owned script list.
@@ -647,16 +622,12 @@ async function importSharedScript(scriptid: string) {
             // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
             shareid: ESUtils.randomString(22),
         }
-        scripts[script.shareid] = script
     }
     const { [scriptid]: _, ...updatedSharedScripts } = sharedScripts
     store.dispatch(scriptsState.setSharedScripts(updatedSharedScripts))
-    scripts[script.shareid] = script
+    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
+    store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
     esconsole("Import script " + scriptid, ["debug", "user"])
-    if (!isLoggedIn()) {
-        // re-save to local with above updated info
-        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-    }
     return script
 }
 
@@ -677,12 +648,8 @@ export async function renameScript(scriptid: string, newName: string) {
     if (isLoggedIn()) {
         await postAuth("/services/scripts/rename", { scriptid, scriptname: newName })
         esconsole(`Renamed script: ${scriptid} to ${newName}`, ["debug", "user"])
-        scripts[scriptid].name = newName
-    } else {
-        scripts[scriptid].name = newName
-        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-        return Promise.resolve(null)
     }
+    store.dispatch(scriptsState.setScriptName({ id: scriptid, name: newName }))
 }
 
 // Get all users and their roles
@@ -745,6 +712,7 @@ function nextName(scriptname: string) {
     const ext = ESUtils.parseExt(scriptname)
 
     const matchedNames = new Set()
+    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
     for (const script of Object.values(scripts)) {
         if (script.name.startsWith(name)) {
             matchedNames.add(script.name)
@@ -759,6 +727,7 @@ function nextName(scriptname: string) {
 }
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
+    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
     return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
 }
 
@@ -767,6 +736,7 @@ function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean)
 //   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
 export async function saveScript(scriptname: string, source_code: string, overwrite: boolean=true, status: number=0) {
     const name = overwrite ? scriptname : nextName(scriptname)
+    const scripts = scriptsState.selectRegularScriptEntities(store.getState())
 
     if (isLoggedIn()) {
         reporter.saveScript()
@@ -780,8 +750,8 @@ export async function saveScript(scriptname: string, source_code: string, overwr
         script.saved = true
         script.tooltipText = ""
         fixCollaborators(script)
-        scripts[script.shareid] = script
-        return scripts[script.shareid]
+        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
+        return script
     } else {
         let shareid
         if (overwrite) {
@@ -792,15 +762,15 @@ export async function saveScript(scriptname: string, source_code: string, overwr
             shareid = ESUtils.randomString(22)
         }
 
-        scripts[shareid] = { 
+        const script = { 
             name, shareid, source_code,
             modified: Date.now(),
             saved: true,
             tooltipText: "",
             collaborators: [],
         } as any as ScriptEntity
-        localStorage.setItem(LS_SCRIPTS_KEY, JSON.stringify(scripts))
-        return scripts[shareid]
+        store.dispatch(scriptsState.setRegularScripts({ ...scripts, [script.shareid]: script }))
+        return script
     }
 }
 

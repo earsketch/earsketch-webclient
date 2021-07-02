@@ -153,7 +153,6 @@ export const ScriptDropdownMenu = () => {
                 onClick={() => {
                     userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
                         userNotification.show(t('messages:user.scriptcopied'))
-                        dispatch(scripts.syncToNgUserProject())
                     })
                 }}
             />
@@ -208,7 +207,6 @@ export const ScriptDropdownMenu = () => {
                     }
 
                     await userProject.refreshCodeBrowser();
-                    dispatch(scripts.syncToNgUserProject());
 
                     if (script && openTabs.includes(script.shareid) && !script.collaborative) {
                         dispatch(tabs.closeTab(script.shareid));
@@ -225,8 +223,7 @@ export const ScriptDropdownMenu = () => {
                     } else if (type === 'shared') {
                         await deleteSharedScript(script!);
                     }
-                    await userProject?.refreshCodeBrowser();
-                    dispatch(scripts.syncToNgUserProject());
+                    await userProject.refreshCodeBrowser();
                 }}
             />
         </div>

@@ -247,7 +247,6 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
             }
 
             dispatch(removeModifiedScript(scriptID));
-            dispatch(scripts.syncToNgUserProject());
 
             // TODO: Save successful notification
 
