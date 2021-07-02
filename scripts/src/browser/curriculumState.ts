@@ -15,7 +15,7 @@ const locationToUrl: { [key:string]: string } = {}
 let idx: lunr.Index | null = null
 
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
-    dispatch(curriculumSlice.actions.setConentCache({}))
+    dispatch(curriculumSlice.actions.setContentCache({}))
     const locale = getState().app.locale
     const tocResponse = await fetch(CURRICULUM_DIR + "/" + locale + "/curr_toc.json")
     const tocData = await tocResponse.json()
@@ -226,7 +226,7 @@ const curriculumSlice = createSlice({
         showResults(state, { payload }) {
             state.showResults = payload
         },
-        setConentCache(state, { payload }) {
+        setContentCache(state, { payload }) {
             state.contentCache = payload
         },
     },
