@@ -282,7 +282,7 @@ const Footer = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t } = useTranslation()
 
-    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`}>
+    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div>V{BUILD_NUM}</div>
         <div className="space-x-6">
             <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank">{t('footer.teachers').toLocaleUpperCase()}</a>

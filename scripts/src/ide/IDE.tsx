@@ -465,7 +465,7 @@ export const IDE = () => {
                         </div>
                     </div>
 
-                    <div ref={consoleContainer} id="console-frame" className="results" style={bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                    <div ref={consoleContainer} id="console-frame" className="results" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <div className="row">
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
