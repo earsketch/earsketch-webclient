@@ -608,7 +608,7 @@ export const App = () => {
                 <NotificationBar />
         
                 {/* top-right icons */}
-                <div id="top-header-nav-form">
+                <div id="top-header-nav-form" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     {/* CAI-window toggle */}
                     {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393"}} onClick={toggleCAIWindow} title="CAI">
                         <i id="caiButton" className="icon icon-bubbles"></i>
