@@ -282,7 +282,7 @@ const Footer = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const { t } = useTranslation()
 
-    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`}>
+    return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div>V{BUILD_NUM}</div>
         <div className="space-x-6">
             <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank">{t('footer.teachers').toLocaleUpperCase()}</a>
@@ -587,7 +587,7 @@ export const App = () => {
         
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
-                <div id="top-header-nav-left">
+                <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
                         <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title">EarSketch</a>
