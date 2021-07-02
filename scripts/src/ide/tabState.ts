@@ -60,7 +60,6 @@ const tabSlice = createSlice({
             state.showTabDropdown = payload;
         },
         addModifiedScript(state, { payload }) {
-            // TODO: This is being triggered by keystrokes. Move to mutable state.
             !state.modifiedScripts.includes(payload) && state.modifiedScripts.push(payload);
         },
         removeModifiedScript(state, { payload }) {
@@ -134,14 +133,10 @@ interface TabsMutableState {
     editorSessions: {
         [key: string]: ace.Ace.EditSession
     }
-    modifiedScripts: scripts.Scripts
 }
+
 const tabsMutableState: TabsMutableState = {
     editorSessions: {},
-    modifiedScripts: {
-        entities: {},
-        scriptIDs: []
-    }
 };
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(

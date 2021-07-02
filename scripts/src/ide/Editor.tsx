@@ -184,6 +184,8 @@ function setupAceHandlers(ace: Ace.Editor) {
             }
         }, 1000)
 
+        // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
+        //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
         const activeTabID = tabs.selectActiveTabID(store.getState())
         const editSession = ace.getSession()
         tabs.setEditorSession(activeTabID, editSession)
