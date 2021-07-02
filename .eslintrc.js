@@ -33,6 +33,10 @@ module.exports = {
         indent: ["error", 4],
         quotes: ["error", "double", { avoidEscape: true }],
         "jsx-quotes": ["error", "prefer-double"],
+        "no-restricted-syntax": ["error", {
+            selector: "BinaryExpression > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
+            message: "Use .includes() instead of comparing the result of .indexOf()",
+        }],
     },
     overrides: [
         {
