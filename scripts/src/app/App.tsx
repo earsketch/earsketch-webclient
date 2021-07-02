@@ -587,7 +587,7 @@ export const App = () => {
         
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
-                <div id="top-header-nav-left">
+                <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
                         <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title">EarSketch</a>
@@ -608,7 +608,7 @@ export const App = () => {
                 <NotificationBar />
         
                 {/* top-right icons */}
-                <div id="top-header-nav-form" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+                <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
                     {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393"}} onClick={toggleCAIWindow} title="CAI">
                         <i id="caiButton" className="icon icon-bubbles"></i>
