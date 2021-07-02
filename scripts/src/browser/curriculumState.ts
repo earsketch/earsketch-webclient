@@ -4,18 +4,63 @@ import lunr from "lunr"
 import esconsole from "../esconsole"
 import { importScript } from "../ide/IDE"
 import * as layout from "../layout/layoutState"
-import { RootState, ThunkAPI, AppDispatch } from "../reducers"
+import store, { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import * as userNotification from "../user/notification"
 
-const CURRICULUM_DIR = "../curriculum/"
+const CURRICULUM_DIR = "../curriculum"
+
+const locationToPage: { [location:string]: number } = {}
+const urlToLocation: { [key:string]: number[] } = {}
+const locationToUrl: { [key:string]: string } = {}
+let idx: lunr.Index | null = null
 
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
-    const response = await fetch(CURRICULUM_DIR + "en" + "/curr_toc.js")
-    const data = await response.json()
+    const tocResponse = await fetch(CURRICULUM_DIR + "/" + "en" + "/curr_toc.json")
+    const tocData = await tocResponse.json()
+
+    const pagesResponse = await fetch(CURRICULUM_DIR + "/" + "en" + "/curr_pages.json")
+    const pagesData = await pagesResponse.json()
+
+    const searchResponse = await fetch(CURRICULUM_DIR + "/" + "en" + "/curr_searchdoc.json")
+    const searchData = await searchResponse.json()
+    dispatch(setSearchDoc(searchData))
+    idx = lunr(function () {
+        this.ref("id")
+        this.field("title")
+        this.field("text")
+
+        searchData.forEach(function (doc: SearchDoc) {
+            this.add(doc)
+        }, this)
+    })
+
+    pagesData.forEach((location: any[], pageIdx: number) => locationToPage[location.join(",")] = pageIdx)
+    dispatch(setPages(pagesData))
+
+    tocData.forEach((unit: TOCItem, unitIdx: number) => {
+        urlToLocation[unit.URL] = [unitIdx]
+        locationToUrl[[unitIdx].join(",")] = unit.URL
+        unit.chapters?.forEach((ch, chIdx) => {
+            urlToLocation[ch.URL] = [unitIdx, chIdx]
+            locationToUrl[[unitIdx, chIdx].join(",")] = ch.URL
+            ch.sections?.forEach((sec, secIdx) => {
+                urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
+                locationToUrl[[unitIdx, chIdx, secIdx].join(",")] = sec.URL
+            })
+        })
+    })
+    dispatch(setTableOfContents(tocData))
+    dispatch(fetchContent({ location, url }))
+    console.log("fetchLocale complete")
 })
 
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
+    // check that locale is loaded
+    if (state.curriculum.tableOfContents.length === 0) {
+        dispatch(fetchLocale({ location, url }))
+        return
+    }
     const { href: _url, loc: _location } = fixLocation(url, location)
     dispatch(loadChapter({ location: _location }))
     // Check cache before fetching.
@@ -23,6 +68,7 @@ export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fet
         esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
         return {}
     }
+
     const urlWithoutAnchor = _url.split("#", 1)[0]
     esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
     const response = await fetch(urlWithoutAnchor)
@@ -119,7 +165,8 @@ interface CurriculumState {
     showTableOfContents: boolean
     contentCache: any,
     tableOfContents: TOCItem[],
-    pages: any[]
+    pages: number[][],
+    searchDoc: SearchDoc[]
 }
 
 const curriculumSlice = createSlice({
@@ -133,6 +180,7 @@ const curriculumSlice = createSlice({
         contentCache: {},
         tableOfContents: [],
         pages: [],
+        searchDoc: [],
     } as CurriculumState,
     reducers: {
         setSearchText(state, { payload }) {
@@ -146,6 +194,9 @@ const curriculumSlice = createSlice({
         },
         setPages(state, { payload }) {
             state.pages = payload
+        },
+        setSearchDoc(state, { payload }) {
+            state.searchDoc = payload
         },
         showTableOfContents(state, { payload }) {
             state.showTableOfContents = payload
@@ -191,6 +242,9 @@ export default curriculumSlice.reducer
 export const {
     setSearchText,
     setCurrentLocation,
+    setTableOfContents,
+    setPages,
+    setSearchDoc,
     showTableOfContents,
     loadChapter,
     toggleFocus,
@@ -200,6 +254,8 @@ export const {
 export const selectTableOfContents = (state: RootState) => state.curriculum.tableOfContents
 
 export const selectPages = (state: RootState) => state.curriculum.pages
+
+export const selectSearchDoc = (state: RootState) => state.curriculum.searchDoc
 
 export const selectSearchText = (state: RootState) => state.curriculum.searchText
 
@@ -213,19 +269,11 @@ export const selectShowTableOfContents = (state: RootState) => state.curriculum.
 
 export const selectFocus = (state: RootState) => state.curriculum.focus
 
-// Search through chapter descriptions.
-// const documents = ESCurr_SearchDoc
-const documents: any[] = []
-
-const idx = lunr(function () {
-    this.ref("id")
-    this.field("title")
-    this.field("text")
-
-    documents.forEach(function (doc) {
-        this.add(doc)
-    }, this)
-})
+export interface SearchDoc {
+    title: string
+    id: string
+    text: string
+}
 
 export interface SearchResult {
     id: lunr.Index.Result["ref"],
@@ -233,13 +281,13 @@ export interface SearchResult {
 }
 
 export const selectSearchResults = createSelector(
-    [selectSearchText],
-    (searchText): SearchResult[] => {
-        if (!searchText) { return [] }
+    [selectSearchText, selectSearchDoc],
+    (searchText, searchDoc): SearchResult[] => {
+        if (!searchText || !idx) { return [] }
         try {
             return idx.search(searchText).map((res) => {
                 // @ts-ignore: TODO: handle not-found cases.
-                const title = documents.find((doc) => {
+                const title = searchDoc.find((doc) => {
                     return doc.id === res.ref
                 }).title
                 return {
@@ -258,6 +306,8 @@ export const selectSearchResults = createSelector(
 export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|string) => {
     unitIdx = typeof (unitIdx) === "number" ? unitIdx : parseInt(unitIdx)
     chIdx = typeof (chIdx) === "number" ? chIdx : parseInt(chIdx)
+
+    const toc = store.getState().curriculum.tableOfContents
     const unit = toc[unitIdx]
     if (unit.chapters && (unit.chapters[chIdx] === undefined || unit.chapters[chIdx].displayChNum === -1)) {
         return ""
@@ -267,8 +317,8 @@ export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|stri
 }
 
 export const selectPageTitle = createSelector(
-    [selectCurrentLocation, selectContent],
-    (location, content) => {
+    [selectCurrentLocation, selectContent, selectTableOfContents],
+    (location, content, toc) => {
         if (location[0] === -1) {
             return "Table of Contents"
         } else if (content === undefined) {
@@ -311,16 +361,8 @@ export interface TOCItem {
     displayChNum?: number
 }
 
-// const toc = ESCurr_TOC as [TOCItem]
-// const tocPages = ESCurr_Pages
-
-const toc: TOCItem[] = []
-const tocPages: string | any[] = []
-
-const locationToPage: { [location:string]: number } = {}
-// tocPages.forEach((location, pageIdx) => locationToPage[location.join(",")] = pageIdx)
-
 export const adjustLocation = (location: number[], delta: number) => {
+    const tocPages = store.getState().curriculum.pages
     let pageIdx = locationToPage[location.join(",")] + delta
     if (pageIdx < 0) {
         pageIdx = 0
@@ -340,26 +382,12 @@ export function getChapterForError(errorMessage: string) {
     return { url: `every-error-explained-in-detail.html${anchor}` }
 }
 
-const urlToLocation: { [key:string]: number[] } = {}
-const locationToUrl: { [key:string]: string } = {}
-toc.forEach((unit: TOCItem, unitIdx: number) => {
-    urlToLocation[unit.URL] = [unitIdx]
-    locationToUrl[[unitIdx].join(",")] = unit.URL
-    unit.chapters?.forEach((ch, chIdx) => {
-        urlToLocation[ch.URL] = [unitIdx, chIdx]
-        locationToUrl[[unitIdx, chIdx].join(",")] = ch.URL
-        ch.sections?.forEach((sec, secIdx) => {
-            urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
-            locationToUrl[[unitIdx, chIdx, secIdx].join(",")] = sec.URL
-        })
-    })
-})
-
 export const getURLForLocation = (location: number[]) => {
     return locationToUrl[location.join(",")]
 }
 
 const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
+    const toc = store.getState().curriculum.tableOfContents
     if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href]
     }
