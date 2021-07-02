@@ -12,8 +12,6 @@ import * as userNotification from "../user/notification"
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 
-const toc = ESCurr_TOC as [curriculum.TOCItem]
-const tocPages = ESCurr_Pages
 const SECTION_URL_CHARACTER = ":"
 
 const copyURL = (language: string, currentLocation: number[]) => {
@@ -75,6 +73,7 @@ const TableOfContents = () => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
     const theme = useSelector(appState.selectColorTheme)
+    const toc = useSelector(curriculum.selectTableOfContents)
     const textClass = "text-" + (theme === "light" ? "black" : "white")
     return (
         <>
@@ -268,6 +267,9 @@ const CurriculumPane = () => {
 const NavigationBar = () => {
     const dispatch = useDispatch()
     const location = useSelector(curriculum.selectCurrentLocation)
+    const toc = useSelector(curriculum.selectTableOfContents)
+    const tocPages = useSelector(curriculum.selectPages)
+
     // @ts-ignore: Assuming the structure is correct.
     const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / toc[location[0]].chapters[location[1]].sections.length)
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)

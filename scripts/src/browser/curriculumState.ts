@@ -7,6 +7,13 @@ import * as layout from "../layout/layoutState"
 import { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import * as userNotification from "../user/notification"
 
+const CURRICULUM_DIR = "../curriculum/"
+
+export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
+    const response = await fetch(CURRICULUM_DIR + "en" + "/curr_toc.js")
+    const data = await response.json()
+})
+
 export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
     const { href: _url, loc: _location } = fixLocation(url, location)
@@ -110,7 +117,9 @@ interface CurriculumState {
     currentLocation: number[]
     focus: [string|null, string|null]
     showTableOfContents: boolean
-    contentCache: any
+    contentCache: any,
+    tableOfContents: TOCItem[],
+    pages: any[]
 }
 
 const curriculumSlice = createSlice({
@@ -122,6 +131,8 @@ const curriculumSlice = createSlice({
         focus: [null, null], // unit, chapter
         showTableOfContents: false,
         contentCache: {},
+        tableOfContents: [],
+        pages: [],
     } as CurriculumState,
     reducers: {
         setSearchText(state, { payload }) {
@@ -129,6 +140,12 @@ const curriculumSlice = createSlice({
         },
         setCurrentLocation(state, { payload }) {
             state.currentLocation = payload
+        },
+        setTableOfContents(state, { payload }) {
+            state.tableOfContents = payload
+        },
+        setPages(state, { payload }) {
+            state.pages = payload
         },
         showTableOfContents(state, { payload }) {
             state.showTableOfContents = payload
@@ -180,6 +197,10 @@ export const {
     showResults,
 } = curriculumSlice.actions
 
+export const selectTableOfContents = (state: RootState) => state.curriculum.tableOfContents
+
+export const selectPages = (state: RootState) => state.curriculum.pages
+
 export const selectSearchText = (state: RootState) => state.curriculum.searchText
 
 export const selectShowResults = (state: RootState) => state.curriculum.showResults
@@ -193,7 +214,8 @@ export const selectShowTableOfContents = (state: RootState) => state.curriculum.
 export const selectFocus = (state: RootState) => state.curriculum.focus
 
 // Search through chapter descriptions.
-const documents = ESCurr_SearchDoc
+// const documents = ESCurr_SearchDoc
+const documents: any[] = []
 
 const idx = lunr(function () {
     this.ref("id")
@@ -289,11 +311,14 @@ export interface TOCItem {
     displayChNum?: number
 }
 
-const toc = ESCurr_TOC as [TOCItem]
-const tocPages = ESCurr_Pages
+// const toc = ESCurr_TOC as [TOCItem]
+// const tocPages = ESCurr_Pages
+
+const toc: TOCItem[] = []
+const tocPages: string | any[] = []
 
 const locationToPage: { [location:string]: number } = {}
-tocPages.forEach((location, pageIdx) => locationToPage[location.join(",")] = pageIdx)
+// tocPages.forEach((location, pageIdx) => locationToPage[location.join(",")] = pageIdx)
 
 export const adjustLocation = (location: number[], delta: number) => {
     let pageIdx = locationToPage[location.join(",")] + delta
@@ -304,10 +329,6 @@ export const adjustLocation = (location: number[], delta: number) => {
     }
 
     return tocPages[pageIdx]
-}
-
-export const getURLForLocation = (location: number[]) => {
-    return locationToUrl[location.join(",")]
 }
 
 export function getChapterForError(errorMessage: string) {
@@ -333,6 +354,10 @@ toc.forEach((unit: TOCItem, unitIdx: number) => {
         })
     })
 })
+
+export const getURLForLocation = (location: number[]) => {
+    return locationToUrl[location.join(",")]
+}
 
 const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
     if (loc === undefined && href !== undefined) {
@@ -385,6 +410,5 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         }
     }
 
-    const curriculumDir = "../curriculum/"
-    return { href: curriculumDir + href, loc }
+    return { href: CURRICULUM_DIR + href, loc }
 }
