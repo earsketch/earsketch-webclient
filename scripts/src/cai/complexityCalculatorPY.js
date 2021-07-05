@@ -61,8 +61,9 @@ export function analyzePython(source_code) {
             sounds: {}
         }
     };
-    ccState.setProperty('isJavascript', false);     
 
+    ccState.setProperty('isJavascript', false);     
+    cc.doAnalysis(ast, resultsObject);
 
 
 

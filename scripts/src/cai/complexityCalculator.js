@@ -26,7 +26,7 @@ export function getApiCalls() {
     //    }
     //}
 
-export function functionPass(ast) {
+function functionPass(ast) {
 
     if (ast != null && ast.body != null) {
         var astKeys = Object.keys(ast.body);
@@ -57,10 +57,37 @@ function collectFunctionInfo(node) {
         }
         //does the node contain a function def?
         if (node._astname == "FunctionDef") {
-            let functionObj = { name: node.name.v };
+            let functionObj = { name: node.name.v, returns: false, params: false };
+
+            //check for value return
+            for(let i = 0; i < node.body.length; i++){
+                if(searchForReturn(node.body[i])){
+                    functionObj.returns = true;
+                    break;
+                }
+            }
+
+            //check for parameters
+            if(node.args.args != null && node.args.args.length > 0){
+                functionObj.params = true;
+            }
+
 
             //TODO check for existence
-            ccState.getProperty("userFunctions").push(functionObj);
+            let alreadyExists = false;
+            let currentFuncs = ccState.getProperty("userFunctions");
+            for(let i = 0; i < currentFuncs.length; i++){
+                if(currentFuncs[i].name == functionObj.name){
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            if(!alreadyExists){
+                ccState.getProperty("userFunctions").push(functionObj);
+            }
+
+
         }
 
         //or a function call?
@@ -71,14 +98,44 @@ function collectFunctionInfo(node) {
     }
 }
 
-export function variablePass() {
+function searchForReturn(astNode){
+
+    if(astNode._astname == "Return"){
+        return true;
+    }
+    else{
+        if (astNode != null && astNode.body != null) {
+            var astNodeKeys = Object.keys(astNode.body);
+            for (var r = 0; r < astNodeKeys.length; r++) {
+                var node = astNode.body[astNodeKeys[r]];
+                if(searchForReturn(node)){
+                    return true;
+                }
+            }
+            return false;
+        } else if (astNode != null && (astNode[0] != null && Object.keys(astNode[0]) != null)) {
+            var astNodeKeys = Object.keys(astNode);
+            for (var r = 0; r < astNodeKeys.length; r++) {
+                var node = astNode[astNodeKeys[r]];
+                if(searchForReturn(node)){
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+
+}
+
+function variablePass(node) {
 
 }
 
 
-export function inputOutputPass() {
+//function inputOutputPass(node) {
 
-}
+//}
 
 
 // Analyze a single node of a Python AST.
@@ -97,7 +154,7 @@ function analyzeASTNode(node, results) {
 }
 
 // Recursively analyze a python abstract syntax tree.
-export function recursiveAnalyzeAST(ast, results) {
+function recursiveAnalyzeAST(ast, results) {
     if (ast != null && ast.body != null) {
         var astKeys = Object.keys(ast.body);
         for (var r = 0; r < astKeys.length; r++) {
@@ -107,4 +164,12 @@ export function recursiveAnalyzeAST(ast, results) {
         }
     } 
     return results;
+}
+
+export function doAnalysis(ast, results){
+    functionPass(ast);
+    console.log(ccState.getProperty("userFunctions"));
+    variablePass(ast);
+    recursiveAnalyzeAST(ast, results);
+    //inputOutputPass(node);
 }
