@@ -17,35 +17,43 @@ export function analyzeJavascript(source) {
     var allVariables = [];
     //initialize the results object
     var resultsObject = {
-        userFunc: 0,
-        conditionals: 0,
-        forLoops: 0,
-        List: 0,
-        variables: 0,
-        consoleInput: 0
+        codeFeatures: {
+            errors: 0,
+            variables: 0,
+            makeBeat: 0,
+            iteration: {
+                whileLoops: 0,
+                forLoopsPY: 0,
+                forLoopsJS: 0,
+                iterables: 0,
+                nesting: 0
+            },
+            conditionals: {
+                conditionals: 0,
+                usedInConditionals: []
+            },
+            functions: {
+                repeatExecution: 0,
+                manipulateValue: 0
+            },
+            features: {
+                indexing: 0,
+                consoleInput: 0,
+                listOps: 0,
+                strOps: 0,
+                binOps: 0,
+                comparisons: 0
+            }
+        },
+        codeStructure: {},
+        inputsOutputs: {
+            sections: {},
+            effects: {},
+            sounds: {}
+        }
     };
     ccState.setProperty('isJavascript', true);
-    //PASS 1: Do the same thing for function returns from user-defined functions
-    cc.evaluateUserFunctionParameters(newAST, resultsObject);
-    //PASS 2: Gather and label all user-defined variables. If the value is a function call or a BinOp
-    cc.gatherAllVariables(newAST);
-    //PASS 3: Account for the variables that only exist as function params. This pass also does a couple other things in the way of functions/removes called function lines from the uncalledFunctionLines so they get checked
-    cc.evaluateFunctionReturnParams(newAST);
-    //Now, use information gained from labeling user functions to fill in missing variable info, and vice-versa. 10 is the max number of times this will happen before we give up. we can change this if it proves problematic
-    var iterations = 0;
-    while (!ccHelpers.allReturnsFilled() && iterations < 10) {
-        cc.evaluateAllEmpties();
-        iterations++;
-    }
-    //PASS 4: Actually analyze the Python.
-    cc.recursiveAnalyzeAST(newAST, resultsObject, [false, false]);
-    //boolops and comparisons count as boolean values, so if they're used at a certain level, booleans should be AT LEAST the value of these
-    if (resultsObject.boolOps > resultsObject.booleans) {
-        resultsObject.booleans = resultsObject.boolOps;
-    }
-    if (resultsObject.comparisons > resultsObject.booleans) {
-        resultsObject.booleans = resultsObject.comparisons;
-    }
+  
     //translate the calculated values
     // translateIntegerValues(resultsObject);
     ccHelpers.lineDict();

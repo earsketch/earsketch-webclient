@@ -1,18 +1,18 @@
 ﻿// Manages the state of the complexity calculator service.
 
 let state : { [key:string]: any } = {
-    allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], originalityLines: [], 
-    loopLocations: [], functionLines: [], uncalledFunctionLines: [], userFunctionParameters: [], makeBeatRenames: [],
-    userFunctionRenames: [], forLoopFuncs: [], parentLineNumber: 0, studentCode: [],
-    takesArgs: false, returns: false, isJavascript: false, listFuncs: [],  userFunctionReturns: [], 
+    allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], 
+    loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
+    functionRenames: [],  parentLineNumber: 0, studentCode: [],
+    takesArgs: false, returns: false, isJavascript: false, listFuncs: []
 }
 
 export function resetState() {
     state = {
-        allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], originalityLines: [], 
-        loopLocations: [], functionLines: [], uncalledFunctionLines: [], userFunctionParameters: [], makeBeatRenames: [],
-        userFunctionRenames: [], forLoopFuncs: [], parentLineNumber: 0, studentCode: [],
-        takesArgs: false, returns: false, isJavascript: false, listFuncs: [],  userFunctionReturns: [], 
+        allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
+        loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
+        functionRenames: [],  parentLineNumber: 0, studentCode: [],
+        takesArgs: false, returns: false, isJavascript: false, listFuncs: []
     }
 }
 
