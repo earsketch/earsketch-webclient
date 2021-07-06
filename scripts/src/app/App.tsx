@@ -635,9 +635,9 @@ export const App = () => {
                             {FONT_SIZES.map(size =>
                             <Menu.Item key={size}>
                                 {({ active }) =>
-                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`}
+                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} ${fontSize === size ? "flex" : ""} text-right items-center w-full px-3 py-2`}
                                         onClick={() => dispatch(appState.setFontSize(size))}>
-                                    {size} {fontSize === size && <i className="ml-3 icon icon-checkmark4" />}
+                                    {fontSize === size && <i className="mr-3 icon icon-checkmark4" />} {size}
                                 </button>}
                             </Menu.Item>)}
                         </Menu.Items>

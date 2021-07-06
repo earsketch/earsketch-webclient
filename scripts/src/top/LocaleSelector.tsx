@@ -1,5 +1,5 @@
 import React from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { Menu } from "@headlessui/react"
 
 import { useTranslation } from "react-i18next"
@@ -20,6 +20,7 @@ const AVAILABLE_LOCALES: locale[] = [
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
+    const currentLocale = useSelector(appState.selectLocale)
 
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng)
@@ -36,16 +37,19 @@ export const LocaleSelector = () => {
                         <div className="ml-1"><span className="caret"></span></div>
                     </div>
                 </Menu.Button>
-                <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute w-32 z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     {AVAILABLE_LOCALES.map((locale) =>
                         <Menu.Item key={locale.localeCode}>
                             {({ active }) => (
                                 <button
                                     className={`${
                                         active ? "bg-gray-500 text-white" : "text-gray-900"
-                                    } group flex items-center w-full px-2 py-2`}
+                                    } inline-grid grid-flow-col justify-items-start items-center pl-3 py-2 w-full`}
                                     onClick={() => changeLanguage(locale.localeCode)}
+                                    style={{ gridTemplateColumns: "18px 1fr" }}
                                 >
+                                    {locale.localeCode === currentLocale && <i className="icon icon-checkmark4" />}
+                                    {locale.localeCode !== currentLocale && <span></span>}
                                     {locale.displayText}
                                 </button>
                             )}
