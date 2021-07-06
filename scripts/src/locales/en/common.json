@@ -10,7 +10,7 @@
     "soundBrowser.title.recommendations": "Recommendations",
     "soundBrowser.button.addSound": "Add sound",
     "soundBrowser.button.showOnlyStars": "Show only",
-    "soundBrowser.filterDropdown.title": "Filter",
+    "filter": "Filter",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
     "soundBrowser.filterDropdown.instruments": "Instruments",

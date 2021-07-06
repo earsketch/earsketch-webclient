@@ -26,10 +26,9 @@ const SoundSearchBar = () => {
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }: { category: keyof sounds.Filters, value: string }) => {
+const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false);
-    const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value));
+    const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
@@ -37,7 +36,7 @@ const FilterItem = ({ category, value }: { category: keyof sounds.Filters, value
         <div
             className={`flex justify-left cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
             onClick={() => {
-                if (isUtility) {
+                if (isClearItem) {
                     dispatch(sounds.resetFilter(category));
                 } else {
                     if (selected) dispatch(sounds.removeFilterItem({ category, value }));
@@ -73,7 +72,7 @@ const Filters = () => {
 
     return (
         <div className='p-3'>
-            <div className='pb-2 text-lg'>{t('soundBrowser.filterDropdown.title').toLocaleUpperCase()}</div>
+            <div className='pb-2 text-lg'>{t('filter').toLocaleUpperCase()}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
                     title={t('soundBrowser.filterDropdown.artists')}

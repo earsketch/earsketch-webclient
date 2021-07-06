@@ -44,10 +44,10 @@ const ScriptSearchBar = () => {
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }: { category: keyof scripts.Filters, value: string }) => {
+const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false);
-    const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
+    // const isUtility = value==='Clear';
+    const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
@@ -55,7 +55,7 @@ const FilterItem = ({ category, value }: { category: keyof scripts.Filters, valu
         <div
             className={`flex justify-left items-center cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
             onClick={() => {
-                if (isUtility) {
+                if (isClearItem) {
                     dispatch(scripts.resetFilter(category));
                 } else {
                     if (selected) dispatch(scripts.removeFilterItem({ category, value }));
@@ -110,10 +110,11 @@ const Filters = () => {
     const owners = useSelector(scripts.selectAllScriptOwners);
     const numOwnersSelected = useSelector(scripts.selectNumOwnersSelected);
     const numTypesSelected = useSelector(scripts.selectNumTypesSelected);
+    const { t } = useTranslation()
 
     return (
         <div className='p-3'>
-            <div className='pb-2 text-lg'>FILTER</div>
+            <div className='pb-2 text-lg'>{t('filter').toLocaleUpperCase()}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
                     title='Owner'
