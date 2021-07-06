@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Menu } from "@headlessui/react"
 
@@ -23,10 +23,13 @@ export const LocaleSelector = () => {
     const currentLocale = useSelector(appState.selectLocale)
 
     const changeLanguage = (lng: string) => {
-        i18n.changeLanguage(lng)
         dispatch(appState.setLocale(lng))
         dispatch(curriculumState.fetchLocale({ }))
     }
+
+    useEffect(() => {
+        i18n.changeLanguage(currentLocale)
+    }, [currentLocale])
 
     return (
         <div className="">
