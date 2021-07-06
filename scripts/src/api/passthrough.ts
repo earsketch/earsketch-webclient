@@ -870,7 +870,8 @@ export function println(result: DAWData, msg: string) {
         + msg,
         "PT")
 
-    checkInit(result)
+    // TODO: This is the only passthrough function that doesn't call checkInit(), because some users got used to the Python version not checking.
+    // Eventually, we should just make init() optional, as with finish().
 
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
