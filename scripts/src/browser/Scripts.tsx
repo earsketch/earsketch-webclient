@@ -442,7 +442,7 @@ const RegularScriptCollection = () => {
 const SharedScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredSharedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredSharedScriptIDs);
-    const numScripts = useSelector(scripts.selectSharedScriptIDs).length;
+    const numScripts = Object.keys(useSelector(scripts.selectSharedScripts)).length;
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const title = `SHARED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;

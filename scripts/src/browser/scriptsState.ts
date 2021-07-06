@@ -363,11 +363,8 @@ export const resetSharedScriptInfoAsync = createAsyncThunk<void, void, ThunkAPI>
 // === Selectors ===
 
 export const selectRegularScripts = (state: RootState) => state.scripts.regularScripts
-const selectRegularScriptIDs = (state: RootState) => Object.keys(state.scripts.regularScripts)
 export const selectSharedScripts = (state: RootState) => state.scripts.sharedScripts
-export const selectSharedScriptIDs = (state: RootState) => Object.keys(state.scripts.sharedScripts)
 export const selectReadOnlyScripts = (state: RootState) => state.scripts.readOnlyScripts
-const selectReadOnlyScriptIDs = (state: RootState) => Object.keys(state.scripts.readOnlyScripts)
 
 // TODO: Move to ESUtils or use a polyfill... this is duplicated inline in various other modules.
 function fromEntries<V>(iterable: [string, V][]) {
@@ -397,10 +394,6 @@ export const selectDeletedScriptIDs = createSelector(
 export const selectAllScripts = createSelector(
     [selectRegularScripts, selectSharedScripts, selectReadOnlyScripts],
     (regularScripts, sharedScripts, readOnlyScripts) => Object.assign({}, regularScripts, sharedScripts, readOnlyScripts)
-)
-export const selectAllScriptIDs = createSelector(
-    [selectRegularScriptIDs, selectSharedScriptIDs, selectReadOnlyScriptIDs],
-    (regularIDs, sharedIDs, readOnlyIDs) => [...regularIDs, ...sharedIDs, ...readOnlyIDs]
 )
 
 export const selectFilters = (state: RootState) => state.scripts.filters
@@ -495,10 +488,10 @@ export const selectShowSharedScriptInfo = (state: RootState) => state.scripts.sh
 export const selectSharedInfoScript = (state: RootState) => state.scripts.sharedScriptInfo.script
 
 export const selectAllScriptOwners = createSelector(
-    [selectUserName, selectSharedScripts, selectSharedScriptIDs],
-    (userName, sharedScripts, sharedScriptIDs): any[] => {
+    [selectUserName, selectSharedScripts],
+    (userName, sharedScripts): any[] => {
         // TODO: Refactor to return string[].
-        return [userName, ...new Set(sharedScriptIDs.map((v:string) => sharedScripts[v].username))]
+        return [userName, ...new Set(Object.values(sharedScripts).map(script => script.username))]
     },
 )
 
