@@ -117,7 +117,7 @@ const Filters = () => {
             <div className='pb-2 text-lg'>{t('filter').toLocaleUpperCase()}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
-                    title='Owner'
+                    title={t('scriptBrowser.filterDropdown.owner')}
                     category='owners'
                     items={owners}
                     numSelected={numOwnersSelected}
@@ -125,7 +125,7 @@ const Filters = () => {
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title='File Type'
+                    title={t('scriptBrowser.filterDropdown.fileType')}
                     category='types'
                     items={['Python','JavaScript']}
                     numSelected={numTypesSelected}
@@ -133,7 +133,7 @@ const Filters = () => {
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title='Sort By'
+                    title={t('scriptBrowser.filterDropdown.sortBy')}
                     category='sortBy'
                     items={['Date','A-Z']}
                     position='right'
@@ -146,6 +146,7 @@ const Filters = () => {
 
 const ShowDeletedScripts = () => {
     const dispatch = useDispatch();
+    const { t } = useTranslation()
     return (
         <div className='flex items-center'>
             <div className='pr-2'>
@@ -159,7 +160,7 @@ const ShowDeletedScripts = () => {
                 />
             </div>
             <div className='pr-1'>
-                Show deleted
+                {t('scriptBrowser.showDeleted')}
             </div>
         </div>
     );
