@@ -29,6 +29,7 @@
     "scriptBrowser.filterDropdown.sortBy": "Sort By",
     "scriptBrowser.showDeleted": "Show deleted",
     "script": "Script",
+    "version": "Version",
     "script_plural": "Scripts",
     "scriptBrowser.myScripts": "My Scripts",
     "daw.title": "Digital Audio Workstation",
