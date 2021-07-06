@@ -75,10 +75,11 @@ const TableOfContents = () => {
     const focus = useSelector(curriculum.selectFocus)
     const theme = useSelector(appState.selectColorTheme)
     const toc = useSelector(curriculum.selectTableOfContents)
+    const { t } = useTranslation()
     const textClass = "text-" + (theme === "light" ? "black" : "white")
     return (
         <>
-            <div className="inline-block font-bold text-center w-full">Table of Contents</div>
+            <div className="inline-block font-bold text-center w-full">{t("curriculum.toc")}</div>
             <hr className={`border-1 my-2 ${theme === "light" ? " border-black" : "border-white"}`} />
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
