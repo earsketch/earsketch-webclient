@@ -709,13 +709,19 @@ const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
 
+    useEffect(() => {
+        setClosing(false)
+    }, [Modal])
+
     const [closing, setClosing] = useState(false)
 
     const close = () => {
         setClosing(true)
         setTimeout(() => {
-            dispatch(appState.setModal(null))
-            setClosing(false)
+            if (Modal === appState.selectModal(store.getState())) {
+                dispatch(appState.setModal(null))
+                setClosing(false)
+            }
         }, 300)
     }
 
