@@ -725,7 +725,7 @@ function nextName(scriptname: string) {
 
 function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean) {
     const scripts = scriptsState.selectRegularScripts(store.getState())
-    return Object.keys(scripts).some(id => !(scripts[id].soft_delete && ignoreDeletedScripts) && scripts[id].name === scriptname)
+    return Object.keys(scripts).some(id => !([true, "1"].includes(scripts[id].soft_delete as any) && ignoreDeletedScripts) && scripts[id].name === scriptname)
 }
 
 // Save a user's script if they have permission to do so.
