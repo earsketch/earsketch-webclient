@@ -37,7 +37,7 @@ const permalinkToURL = (permalink: string) => {
     return linkParts.join("")
 }
 
-const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx:string, ch:curriculum.TOCItem, chIdx:string }) => {
+const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: curriculum.TOCItem, chIdx: string }) => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
     const theme = useSelector(appState.selectColorTheme)
@@ -63,7 +63,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx:string, ch:cur
                                 {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx + 1} {sec.title}
                             </a>
                         </div>
-                    </li>,
+                    </li>
                 )}
             </ul>
         </li>
@@ -154,7 +154,7 @@ export const TitleBar = () => {
     return (
         <div className="flex items-center p-3 text-2xl">
             <div className="pl-3 pr-4 font-semibold truncate">
-                { t('curriculum.title').toLocaleUpperCase() }
+                { t("curriculum.title").toLocaleUpperCase() }
             </div>
             <div>
                 <div
@@ -204,16 +204,16 @@ const CurriculumPane = () => {
         if (content) {
             // Filter content by language.
             const p = (language === "python")
-            content.querySelectorAll(".curriculum-python,.copy-btn-python").forEach((e:HTMLElement) => e.hidden = !p)
-            content.querySelectorAll(".curriculum-javascript,.copy-btn-javascript").forEach((e:HTMLElement) => e.hidden = p)
+            content.querySelectorAll(".curriculum-python,.copy-btn-python").forEach((e: HTMLElement) => e.hidden = !p)
+            content.querySelectorAll(".curriculum-javascript,.copy-btn-javascript").forEach((e: HTMLElement) => e.hidden = p)
 
             // Apply color theme to code blocks.
             if (theme === "light") {
-                content.querySelectorAll(".listingblock.curriculum-javascript").forEach((el:HTMLElement) => el.classList.add("default-pygment"))
-                content.querySelectorAll(".listingblock.curriculum-python").forEach((el:HTMLElement) => el.classList.add("default-pygment"))
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach((el: HTMLElement) => el.classList.add("default-pygment"))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach((el: HTMLElement) => el.classList.add("default-pygment"))
             } else {
-                content.querySelectorAll(".listingblock.curriculum-javascript").forEach((el:HTMLElement) => el.classList.remove("default-pygment"))
-                content.querySelectorAll(".listingblock.curriculum-python").forEach((el:HTMLElement) => el.classList.remove("default-pygment"))
+                content.querySelectorAll(".listingblock.curriculum-javascript").forEach((el: HTMLElement) => el.classList.remove("default-pygment"))
+                content.querySelectorAll(".listingblock.curriculum-python").forEach((el: HTMLElement) => el.classList.remove("default-pygment"))
             }
         }
     }, [content, language, paneIsOpen])
@@ -353,7 +353,7 @@ const HotCurriculum = hot(() => {
         }
 
         const languageParam = ESUtils.getURLParameter("language")
-        if (languageParam && ["python", "javascript"].indexOf(languageParam) > -1) {
+        if (languageParam && ["python", "javascript"].includes(languageParam)) {
             // If the user has a script open, that language overwrites this one due to ideController
             // this is probably a bug, but the old curriculumPaneController has the same behavior.
             dispatch(appState.setScriptLanguage(languageParam))

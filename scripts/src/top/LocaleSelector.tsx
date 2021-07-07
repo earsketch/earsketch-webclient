@@ -56,7 +56,7 @@ export const LocaleSelector = () => {
                                     {locale.displayText}
                                 </button>
                             )}
-                        </Menu.Item>,
+                        </Menu.Item>
                     )}
                 </Menu.Items>
             </Menu>

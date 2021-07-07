@@ -9,9 +9,9 @@ import * as userNotification from "../user/notification"
 
 const CURRICULUM_DIR = "../curriculum"
 
-const locationToPage: { [location:string]: number } = {}
-const urlToLocation: { [key:string]: number[] } = {}
-const locationToUrl: { [key:string]: string } = {}
+const locationToPage: { [location: string]: number } = {}
+const urlToLocation: { [key: string]: number[] } = {}
+const locationToUrl: { [key: string]: string } = {}
 let idx: lunr.Index | null = null
 
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
@@ -49,7 +49,7 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
     })
     dispatch(setTableOfContents(tocData))
     const currentLocation = getState().curriculum.currentLocation
-    if(location === undefined && url === undefined) {
+    if (location === undefined && url === undefined) {
         location = currentLocation
     }
     dispatch(fetchContent({ location, url }))
@@ -148,7 +148,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     // Special case: first section (sect2) should come with the opening blurb (sect1).
     // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
     const chapterLocation = location.slice(0, 2)
-    const map: { [key:string]: any } = {}
+    const map: { [key: string]: any } = {}
     const sect2 = Array.from(root.querySelectorAll("div.sect2"))
     for (const [idx, el] of sect2.slice(1).entries()) {
         map[chapterLocation.concat([idx + 1]).join(",")] = el
@@ -304,7 +304,7 @@ export const selectSearchResults = createSelector(
             esconsole(`lunr parse error on "${searchText}"`, "debug")
             return []
         }
-    },
+    }
 )
 
 export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|string) => {
@@ -354,7 +354,7 @@ export const selectPageTitle = createSelector(
             }
             return title
         }
-    },
+    }
 )
 
 export interface TOCItem {
