@@ -302,7 +302,6 @@ export const getRegularScripts = createAsyncThunk<void, { username: string, pass
             scriptList.forEach((script: Script) => {
                 script.saved = true
                 script.tooltipText = "" // For dirty tabs. Probably redundant.
-                script.imported = !!script.creator
                 removeUnusedFields(script)
                 formatDate(script)
                 setCollaborators(script)

@@ -338,7 +338,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
     }
     const borderColor = theme==='light' ? 'border-gray-500' : 'border-gray-700';
 
-    const shared = script.imported || script.isShared;
+    const shared = script.creator || script.isShared;
     const collaborators = script.collaborators as string[];
 
     return (

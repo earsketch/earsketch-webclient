@@ -153,9 +153,6 @@ export function loadLocalScripts() {
     const scriptData = localStorage.getItem(LS_SCRIPTS_KEY)
     if (scriptData !== null) {
         const scripts = JSON.parse(scriptData) as { [key: string]: Script }
-        for (const script of Object.values(scripts)) {
-            script.imported = !!script.creator
-        }
         store.dispatch(scriptsState.setRegularScripts(Object.assign({}, scriptsState.selectRegularScripts(store.getState()), scripts)))
         localStorage.removeItem(LS_SCRIPTS_KEY)
     }
