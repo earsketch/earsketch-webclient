@@ -35,6 +35,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
     const [embedCompiled, setEmbedCompiled] = useState(_embedCompiled)
+    const [width, setWidth] = useState(0)
     const needCompile = embedMode && !embedCompiled
     const { t } = useTranslation()
 
@@ -130,20 +131,25 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const el = useRef<HTMLDivElement>(null)
 
-    // Update title/icon display whenever element size changes.
-    const observer = new ResizeObserver(entries => {
-        const width = entries[0].contentRect.width
-        const short = t('daw.shortTitle')
-        const long = t('daw.title').toLocaleUpperCase()
+    const updatetitle = () => {
         if (embedMode) {
-            setTitle(hideDAW ? null : short)
+            setTitle(hideDAW ? null : shortTitle)
         } else if (width > 590) {
-            setTitle(long)
+            setTitle(longTitle)
         } else if (width > 405) {
-            setTitle(short)
+            setTitle(shortTitle)
         } else {
             setTitle(null)
         }
+    }
+
+    const shortTitle = t('daw.shortTitle')
+    const longTitle = t('daw.title').toLocaleUpperCase()
+    // Update title/icon display whenever element size changes.
+    const observer = new ResizeObserver(entries => {
+        const width = entries[0].contentRect.width
+        setWidth(width)
+        updatetitle()
     })
 
     useEffect(() => {
@@ -152,6 +158,10 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             if (el.current) observer.unobserve(el.current)
         }
     }, [el])
+
+    useEffect(() => {
+        updatetitle()
+    })
 
     return <div ref={el} id="dawHeader" className="flex-grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
