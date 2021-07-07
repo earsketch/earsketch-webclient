@@ -126,23 +126,23 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }
 
-    const [title, setTitle] = useState<string | null>(null)
+    const [titleKey, setTitleKey] = useState<string | null>(null)
 
     const el = useRef<HTMLDivElement>(null)
 
     // Update title/icon display whenever element size changes.
     const observer = new ResizeObserver(entries => {
         const width = entries[0].contentRect.width
-        const short = t('daw.shortTitle')
-        const long = t('daw.title').toLocaleUpperCase()
+        const shortKey = "daw.shortTitle"
+        const longKey = "daw.title"
         if (embedMode) {
-            setTitle(hideDAW ? null : short)
+            setTitleKey(hideDAW ? null : shortKey)
         } else if (width > 590) {
-            setTitle(long)
+            setTitleKey(longKey)
         } else if (width > 405) {
-            setTitle(short)
+            setTitleKey(shortKey)
         } else {
-            setTitle(null)
+            setTitleKey(null)
         }
     })
 
@@ -158,8 +158,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
-                {title
-                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{title}</span>}
+                {titleKey
+                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
             </span>
         </div>
         {embedMode && <div>
