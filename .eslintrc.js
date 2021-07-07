@@ -22,6 +22,7 @@ module.exports = {
     rules: {
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error", { functions: false, variables: false, classes: false }],
+        "@typescript-eslint/type-annotation-spacing": ["error"],
         "space-before-function-paren": ["error", { named: "never" }],
         "comma-dangle": ["error", {
             arrays: "always-multiline",
