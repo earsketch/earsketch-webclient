@@ -50,26 +50,29 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
     const { t } = useTranslation()
 
     return (
-        <div
-            className={`flex justify-left items-center cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
-            onClick={() => {
-                if (isClearItem) {
-                    dispatch(scripts.resetFilter(category));
-                } else {
-                    if (selected) dispatch(scripts.removeFilterItem({ category, value }));
-                    else dispatch(scripts.addFilterItem({ category, value }));
-                }
-            }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
-        >
-            <div className='w-8'>
-                <i className={`glyphicon glyphicon-ok ${selected ? 'block' : 'hidden'}`} />
+        <>
+            <div
+                className={`flex justify-left items-center cursor-pointer pr-8 ${theme === 'light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
+                onClick={() => {
+                    if (isClearItem) {
+                        dispatch(scripts.resetFilter(category));
+                    } else {
+                        if (selected) dispatch(scripts.removeFilterItem({category, value}));
+                        else dispatch(scripts.addFilterItem({category, value}));
+                    }
+                }}
+                onMouseEnter={() => setHighlight(true)}
+                onMouseLeave={() => setHighlight(false)}
+            >
+                <div className='w-8'>
+                    <i className={`glyphicon glyphicon-ok ${selected ? 'block' : 'hidden'}`}/>
+                </div>
+                <div className='select-none'>
+                    {isClearItem ? t("clear") : value}
+                </div>
             </div>
-            <div className='select-none'>
-                {isClearItem ? t("clear") : value}
-            </div>
-        </div>
+            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
+        </>
     );
 };
 

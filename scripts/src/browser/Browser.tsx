@@ -195,7 +195,6 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
                     category={category}
                     isClearItem={true}
                 />
-                {category !== "sortBy" && <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />}
                 {
                     items.map((item,index) => <FilterItem
                         key={index}
