@@ -89,11 +89,7 @@ const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribut
         <div
             className={`flex justify-left items-center cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
             onClick={() => {
-                if (isClearItem) {
-                    dispatch(scripts.resetSorter());
-                } else {
-                    dispatch(scripts.setSorter(value));
-                }
+                dispatch(scripts.setSorter(value))
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}

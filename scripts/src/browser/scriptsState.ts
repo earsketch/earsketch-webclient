@@ -121,12 +121,6 @@ const scriptsSlice = createSlice({
                 state.filters.sortBy.ascending = payload === "A-Z"
             }
         },
-        resetSorter(state) {
-            state.filters.sortBy = {
-                attribute: "Date",
-                ascending: false,
-            }
-        },
         setFeatureSharedScript(state, { payload }) {
             state.featureSharedScript = payload
         },
@@ -221,7 +215,6 @@ export const {
     removeFilterItem,
     resetFilter,
     setSorter,
-    resetSorter,
     setFeatureSharedScript,
     setDropdownMenu,
     resetDropdownMenu,
