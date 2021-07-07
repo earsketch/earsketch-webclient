@@ -520,17 +520,15 @@ export async function deleteScript(scriptid: string) {
 
 async function promptForRename(script: Script) {
     const oldName = script.name
-    await openModal(RenameScript, { script, conflict: true })
-    if (script.name === oldName) {
-        script.name = nextName(oldName)
-    }
+    const name = await openModal(RenameScript, { script, conflict: true })
+    return { ...script, name: name ?? nextName(oldName) }
 }
 
 // Restore a script deleted by the user.
 export async function restoreScript(script: Script) {
     if (lookForScriptByName(script.name, true)) {
-        await promptForRename(script)
-        renameScript(script.shareid, script.name)
+        script = await promptForRename(script)
+        await renameScript(script, script.name)
     }
 
     if (isLoggedIn()) {
@@ -556,14 +554,13 @@ export async function restoreScript(script: Script) {
 // the user workspace. Returns a promise which resolves to the saved script.
 export async function importScript(script: Script) {
     if (lookForScriptByName(script.name)) {
-        await promptForRename(script)
+        script = await promptForRename(script)
     }
 
     if (script.isShared) {
         // The user is importing a shared script - need to call the webservice.
         const imported = await importSharedScript(script.shareid)
-        renameScript(imported.shareid, script.name)
-        return imported
+        return renameScript(imported, script.name)
     } else {
         // The user is importing a read-only script (e.g. from the curriculum).
         return saveScript(script.name, script.source_code)
@@ -641,12 +638,14 @@ async function addSharedScript(shareID: string, notificationID: string) {
 }
 
 // Rename a script if owned by the user.
-export async function renameScript(scriptid: string, newName: string) {
+export async function renameScript(script: Script, newName: string) {
+    const id = script.shareid
     if (isLoggedIn()) {
-        await postAuth("/services/scripts/rename", { scriptid, scriptname: newName })
-        esconsole(`Renamed script: ${scriptid} to ${newName}`, ["debug", "user"])
+        await postAuth("/services/scripts/rename", { scriptid: id, scriptname: newName })
+        esconsole(`Renamed script: ${id} to ${newName}`, ["debug", "user"])
     }
-    store.dispatch(scriptsState.setScriptName({ id: scriptid, name: newName }))
+    store.dispatch(scriptsState.setScriptName({ id, name: newName }))
+    return { ...script, name: newName }
 }
 
 // Get all users and their roles
@@ -741,7 +740,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
         const xml = `<scripts><username>${getUsername()}</username>` + 
                     `<name>${name}</name><run_status>${status}</run_status>` +
                     `<source_code><![CDATA[${source_code}]]></source_code></scripts>`
-        const script = await postXMLAuth("/services/scripts/save", xml)
+        const script = await postXMLAuth("/services/scripts/save", xml) as Script
         esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
         script.modified = Date.now()
         script.saved = true
