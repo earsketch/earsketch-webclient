@@ -49,6 +49,7 @@
     "daw.abbreviation.mute": "M",
     "daw.tooltip.toggleEffects": "Toggle All Effects",
     "daw.bypass": "Bypass",
+    "newScript": "New script",
     "editor.title": "Code Editor",
     "editor.blocksMode": "Blocks Mode",
     "editor.run": "Run",

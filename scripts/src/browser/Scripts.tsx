@@ -22,13 +22,14 @@ import {
 import { useTranslation } from "react-i18next";
 
 const CreateScriptButton = () => {
+    const { t } = useTranslation()
     return (
         <div className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer' onClick={createScript}>
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
                 <i className='icon icon-plus2' />
             </div>
             <div className='mr-3'>
-                New script
+                {t("newScript")}
             </div>
         </div>
     );
