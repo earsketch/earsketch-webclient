@@ -46,10 +46,10 @@ const ScriptSearchBar = () => {
 
 const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false);
-    // const isUtility = value==='Clear';
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
+    const { t } = useTranslation()
 
     return (
         <div
@@ -69,25 +69,26 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                 <i className={`glyphicon glyphicon-ok ${selected ? 'block' : 'hidden'}`} />
             </div>
             <div className='select-none'>
-                {value}
+                {isClearItem ? t("clear") : value}
             </div>
         </div>
     );
 };
 
-const SortOptionsItem = ({ value }: { value: scripts.SortByAttribute | 'Clear'}) => {
+const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribute, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false);
-    const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector(scripts.selectSortByAttribute)===value;
+    const selected = isClearItem ? false : useSelector(scripts.selectSortByAttribute)===value;
     const ascending = useSelector(scripts.selectSortByAscending);
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
+
+    if (isClearItem) return null
 
     return (
         <div
             className={`flex justify-left items-center cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
             onClick={() => {
-                if (isUtility) {
+                if (isClearItem) {
                     dispatch(scripts.resetSorter());
                 } else {
                     dispatch(scripts.setSorter(value));
@@ -103,7 +104,7 @@ const SortOptionsItem = ({ value }: { value: scripts.SortByAttribute | 'Clear'})
                 {value}
             </div>
         </div>
-    );
+    )
 };
 
 const Filters = () => {

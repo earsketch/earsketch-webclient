@@ -135,7 +135,6 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ title, category, items, position, numSelected, FilterItem }) => {
     const theme = useSelector(appState.selectColorTheme);
-    const { t } = useTranslation()
     const [showTooltip, setShowTooltip] = useState(false);
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null);
     const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null);
@@ -193,11 +192,10 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
         >
             <div>
                 <FilterItem
-                    value={t("clear")}
                     category={category}
                     isClearItem={true}
                 />
-                <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />
+                {category !== "sortBy" && <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />}
                 {
                     items.map((item,index) => <FilterItem
                         key={index}
