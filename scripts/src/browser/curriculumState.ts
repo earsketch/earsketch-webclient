@@ -32,7 +32,7 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
         }, this)
     })
 
-    pagesData.forEach((location: any[], pageIdx: number) => locationToPage[location.join(",")] = pageIdx)
+    pagesData.forEach((location: any[], pageIdx: number) => (locationToPage[location.join(",")] = pageIdx))
     dispatch(setPages(pagesData))
 
     tocData.forEach((unit: TOCItem, unitIdx: number) => {
@@ -391,7 +391,7 @@ export const getURLForLocation = (location: number[]) => {
 }
 
 const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
-    const toc = store.getState().curriculum.tableOfContents
+    const toc = selectTableOfContents(store.getState())
 
     if (loc === undefined && href !== undefined) {
         loc = urlToLocation[href]
@@ -407,32 +407,25 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
     href ??= locationToUrl[loc.join(",")]
 
     if (loc.length === 1 && toc[loc[0]].chapters) {
-        // @ts-ignore
-        if (toc[loc[0]].chapters.length > 0) {
-            // @ts-ignore
-            if (toc[loc[0]].chapters[0].length > 0) {
-                loc = [loc[0], 0, 0]
-            } else {
-                loc.push(0)
-            }
+        if (toc[loc[0]].chapters!.length > 0) {
+            loc = [...loc, 0]
         }
     }
 
     if (loc.length === 2 && toc[loc[0]].chapters) {
-        // @ts-ignore
-        const currChapter = toc[loc[0]].chapters[loc[1]]
+        const currChapter = toc[loc[0]].chapters![loc[1]]
 
         if (currChapter.sections && currChapter.sections.length > 0) {
             const sectionDiv = href.split("#")[1]
             if (sectionDiv === undefined) {
                 // when opening a chapter-level page, also present the first section
-                loc.push(0) // add the first section (index 0)
+                loc = [...loc, 0] // add the first section (index 0)
                 href = currChapter.sections[0].URL
             } else {
                 // section id was sent in href, present the corresponding section
                 for (let i = 0; i < currChapter.sections.length; i++) {
                     if (sectionDiv === currChapter.sections[i].URL.split("#")[1]) {
-                        loc.push(i)
+                        loc = [...loc, i]
                         href = currChapter.sections[i].URL
                         break
                     }

@@ -204,8 +204,8 @@ const CurriculumPane = () => {
         if (content) {
             // Filter content by language.
             const p = (language === "python")
-            content.querySelectorAll(".curriculum-python,.copy-btn-python").forEach((e: HTMLElement) => e.hidden = !p)
-            content.querySelectorAll(".curriculum-javascript,.copy-btn-javascript").forEach((e: HTMLElement) => e.hidden = p)
+            content.querySelectorAll(".curriculum-python,.copy-btn-python").forEach((e: HTMLElement) => (e.hidden = !p))
+            content.querySelectorAll(".curriculum-javascript,.copy-btn-javascript").forEach((e: HTMLElement) => (e.hidden = p))
 
             // Apply color theme to code blocks.
             if (theme === "light") {
