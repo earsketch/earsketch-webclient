@@ -11,7 +11,6 @@ import { createScript } from './IDE';
 import { DropdownContextMenuCaller } from '../browser/ScriptsMenus';
 import * as scripts from '../browser/scriptsState';
 import * as tabs from './tabState';
-import * as userProject from '../app/userProject';
 import { useHeightLimiter } from "../Utils";
 
 const CreateScriptButton = () => {
@@ -41,7 +40,7 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
     const dispatch = useDispatch();
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID);
 
-    const allScripts = useSelector(scripts.selectAllScriptEntities);
+    const allScripts = useSelector(scripts.selectAllScripts);
     const script = allScripts[scriptID];
     const scriptType = script.isShared && 'shared' || script.readonly && 'readonly' || 'regular';
     const activeTabID = useSelector(tabs.selectActiveTabID);
@@ -99,9 +98,6 @@ const Tab: React.FC<TabProps> = ({ scriptID, scriptName, index }) => {
                     className={closeButtonClass}
                     onClick={(event) => {
                         dispatch(tabs.closeAndSwitchTab(scriptID));
-
-                        userProject.closeScript(scriptID);
-
                         // The tab is reselected otherwise.
                         event.preventDefault();
                         event.stopPropagation();
@@ -134,7 +130,7 @@ const CloseAllTab = () => {
 const MainTabGroup = () => {
     const openTabs = useSelector(tabs.selectOpenTabs);
     const visibleTabs = useSelector(tabs.selectVisibleTabs);
-    const allScripts = useSelector(scripts.selectAllScriptEntities);
+    const allScripts = useSelector(scripts.selectAllScripts);
 
     return (
         <div
@@ -158,7 +154,7 @@ const MainTabGroup = () => {
 const TabDropdown = () => {
     const openTabs = useSelector(tabs.selectOpenTabs);
     const hiddenTabs = useSelector(tabs.selectHiddenTabs);
-    const allScripts = useSelector(scripts.selectAllScriptEntities);
+    const allScripts = useSelector(scripts.selectAllScripts);
     const [highlight, setHighlight] = useState(false);
     const theme = useSelector(appState.selectColorTheme);
     const { t } = useTranslation()

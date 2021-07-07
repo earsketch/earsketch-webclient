@@ -10,9 +10,9 @@ import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
 import { initEditor } from "./IDE"
+import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
 import * as userConsole from "./console"
-import * as userProject from "../app/userProject"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
 
@@ -184,21 +184,16 @@ function setupAceHandlers(ace: Ace.Editor) {
             }
         }, 1000)
 
+        // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
+        //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
         const activeTabID = tabs.selectActiveTabID(store.getState())
         const editSession = ace.getSession()
         tabs.setEditorSession(activeTabID, editSession)
 
-        let script = null
-
-        if (activeTabID !== null && activeTabID in userProject.scripts) {
-            script = userProject.scripts[activeTabID]
-        } else if (activeTabID !== null && activeTabID in userProject.sharedScripts) {
-            script = userProject.sharedScripts[activeTabID]
-        }
+        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
         if (script) {
-            script.source_code = editSession.getValue()
+            store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
             if (!script.collaborative) {
-                script.saved = false
                 store.dispatch(tabs.addModifiedScript(activeTabID))
             }
         }

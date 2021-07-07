@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux"
 
 import * as app from "./appState"
 import * as collaboration from "./collaboration"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as ESUtils from "../esutils"
 import * as exporter from "./exporter"
 import reporter from "./reporter"
@@ -104,7 +104,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
 }
 
 interface TabParameters {
-    script: ScriptEntity
+    script: Script
     licenses: { [key: string]: any }
     licenseID: string
     setLicenseID: (id: string) => void
@@ -169,7 +169,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         exporter.text({
             name: script.name + ".url",
             source_code: textContent
-        } as ScriptEntity)
+        } as Script)
     }
 
     const submit = async () => {
@@ -251,12 +251,9 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         collaboration.removeCollaborators(script.shareid, username, removed)
 
         // Update the local script state.
-        script.collaborators = newCollaborators
-        userProject.scripts[script.shareid] = script
+        dispatch(scripts.setScriptCollaborators({ id: script.shareid, collaborators: newCollaborators }))
         save()
 
-        script.collaborators = newCollaborators
-        script.collaborative = newCollaborators.length > 0
         // Update the state of tab, if open.
         if (activeTabID === script.shareid) {
             if (oldCollaborators.length === 0 && newCollaborators.length > 0) {
@@ -268,7 +265,6 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
                 collaboration.closeScript(script.shareid)
             }
         }
-        dispatch(scripts.syncToNgUserProject())
         close()
     }
 

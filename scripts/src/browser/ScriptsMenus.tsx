@@ -6,23 +6,15 @@ import PopperJS from '@popperjs/core';
 
 import { deleteScript, deleteSharedScript, downloadScript, openCodeIndicator, openScriptHistory, renameScript, submitToCompetition, shareScript as _shareScript } from '../app/App';
 import * as appState from "../app/appState";
+import { Script, ScriptType } from 'common';
 import * as exporter from "../app/exporter";
 import * as user from '../user/userState';
 import * as scripts from "./scriptsState";
 import * as tabs from "../ide/tabState";
-import { ScriptEntity, ScriptType } from 'common';
 import * as userNotification from '../user/notification';
 import * as userProject from '../app/userProject';
 
-export const openScript = (script: ScriptEntity) => {
-    userProject.openScript(script.shareid);
-};
-
-export const openSharedScript = (script: ScriptEntity) => {
-    userProject.openSharedScript(script.shareid);
-};
-
-export const shareScript = (script: ScriptEntity) => {
+export const shareScript = (script: Script) => {
     _shareScript(Object.assign({}, script))
 }
 
@@ -150,10 +142,8 @@ export const ScriptDropdownMenu = () => {
 
                     if (type==='regular') {
                         dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                        script && openScript(script);
                     } else if (type==='shared') {
                         dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                        script && openSharedScript(script);
                     }
                 }}
             />
@@ -163,7 +153,6 @@ export const ScriptDropdownMenu = () => {
                 onClick={() => {
                     userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
                         userNotification.show(t('messages:user.scriptcopied'))
-                        dispatch(scripts.syncToNgUserProject())
                     })
                 }}
             />
@@ -218,12 +207,10 @@ export const ScriptDropdownMenu = () => {
                     }
 
                     await userProject.refreshCodeBrowser();
-                    dispatch(scripts.syncToNgUserProject());
 
                     if (script && openTabs.includes(script.shareid) && !script.collaborative) {
                         dispatch(tabs.closeTab(script.shareid));
                         dispatch(tabs.setActiveTabAndEditor(imported.shareid));
-                        openScript(imported);
                     }
                 }}
             />
@@ -236,15 +223,14 @@ export const ScriptDropdownMenu = () => {
                     } else if (type === 'shared') {
                         await deleteSharedScript(script!);
                     }
-                    await userProject?.refreshCodeBrowser();
-                    dispatch(scripts.syncToNgUserProject());
+                    await userProject.refreshCodeBrowser();
                 }}
             />
         </div>
     );
 };
 
-export const DropdownMenuCaller = ({ script, type }: { script: ScriptEntity, type: ScriptType }) => {
+export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch();
 
     return (
@@ -266,7 +252,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: ScriptEntity, typ
 };
 
 interface DropdownContextMenuCallerType {
-    script: ScriptEntity
+    script: Script
     type: ScriptType
     className: string
 }

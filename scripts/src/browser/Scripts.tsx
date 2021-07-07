@@ -5,6 +5,7 @@ import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { usePopper } from 'react-popper';
 
+import { Script, ScriptType } from 'common';
 import { createScript } from '../ide/IDE';
 import * as scripts from './scriptsState';
 import * as tabs from '../ide/tabState';
@@ -12,13 +13,9 @@ import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as userProject from '../app/userProject';
 import { RootState } from '../reducers';
-import { ScriptEntity, ScriptType } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
-import {
-    openScript, openSharedScript, shareScript,
-    generateGetBoundingClientRect, VirtualRef, VirtualReference, DropdownMenuCaller
-} from './ScriptsMenus';
+import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, shareScript, VirtualReference } from './ScriptsMenus';
 import { useTranslation } from "react-i18next";
 
 const CreateScriptButton = () => {
@@ -194,22 +191,16 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     );
 };
 
-const ShareButton = ({ script }: { script: ScriptEntity }) => (
-    <PillButton onClick={() => {
-        shareScript(script);
-    }}>
+const ShareButton = ({ script }: { script: Script }) => (
+    <PillButton onClick={() => shareScript(script)}>
         <i className='icon-share32' />
         <div>Share</div>
     </PillButton>
 );
 
-const RestoreButton = ({ script }: { script: ScriptEntity }) => {
-    const dispatch = useDispatch();
+const RestoreButton = ({ script }: { script: Script }) => {
     return (
-        <PillButton onClick={async () => {
-            await userProject.restoreScript(Object.assign({}, script));
-            dispatch(scripts.syncToNgUserProject());
-        }}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
             <i className='icon-rotate-cw2'/>
             <div>Restore</div>
         </PillButton>
@@ -303,7 +294,7 @@ const SingletonSharedScriptInfo = () => {
     );
 };
 
-const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
+const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
     const dispatch = useDispatch();
 
     return (
@@ -322,7 +313,7 @@ const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
 };
 
 interface ScriptProps {
-    script: ScriptEntity
+    script: Script
     bgTint: boolean
     type: ScriptType
 }
@@ -362,10 +353,8 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
             onClick={() => {
                 if (type === 'regular') {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                    openScript(script);
                 } else if (type === 'shared') {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                    openSharedScript(script);
                 }
             }}
         >
@@ -388,7 +377,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
-                        { loggedIn && (<ShareButton script={userProject.scripts[script.shareid]} />) }
+                        { loggedIn && (<ShareButton script={script} />) }
                         <DropdownMenuCaller script={script} type='regular' />
                     </div>
                     <div className={`${type==='shared' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
@@ -406,7 +395,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
 
 interface WindowedScriptCollectionProps {
     title: string
-    entities: scripts.ScriptEntities
+    entities: scripts.Scripts
     scriptIDs: string[]
     type: ScriptType
     visible?: boolean
@@ -441,7 +430,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=tr
 );
 
 const RegularScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredActiveScriptEntities);
+    const entities = useSelector(scripts.selectFilteredActiveScripts);
     const scriptIDs = useSelector(scripts.selectFilteredActiveScriptIDs);
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length;
     const { t } = useTranslation()
@@ -455,9 +444,9 @@ const RegularScriptCollection = () => {
 };
 
 const SharedScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredSharedScriptEntities);
+    const entities = useSelector(scripts.selectFilteredSharedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredSharedScriptIDs);
-    const numScripts = useSelector(scripts.selectSharedScriptIDs).length;
+    const numScripts = Object.keys(useSelector(scripts.selectSharedScripts)).length;
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
     const title = `SHARED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
@@ -468,7 +457,7 @@ const SharedScriptCollection = () => {
 };
 
 const DeletedScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredDeletedScriptEntities);
+    const entities = useSelector(scripts.selectFilteredDeletedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredDeletedScriptIDs);
     const numScripts = useSelector(scripts.selectDeletedScriptIDs).length;
     const numFilteredScripts = scriptIDs.length;

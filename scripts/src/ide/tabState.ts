@@ -10,6 +10,7 @@ import * as collaboration from '../app/collaboration';
 import * as scripts from '../browser/scriptsState';
 import * as user from '../user/userState';
 import * as editor from "./ideState";
+import reporter from '../app/reporter';
 import * as userProject from '../app/userProject';
 
 interface TabState {
@@ -39,6 +40,7 @@ const tabSlice = createSlice({
         openAndActivateTab(state, { payload }) {
             if (!state.openTabs.includes(payload)) {
                 state.openTabs.push(payload);
+                reporter.openScript();
             }
             state.activeTabID = payload;
         },
@@ -50,6 +52,7 @@ const tabSlice = createSlice({
         resetTabs(state) {
             state.openTabs = [];
             state.activeTabID = null;
+            state.modifiedScripts = [];
         },
         setNumVisibleTabs(state, { payload }) {
             state.numVisibleTabs = payload;
@@ -58,7 +61,6 @@ const tabSlice = createSlice({
             state.showTabDropdown = payload;
         },
         addModifiedScript(state, { payload }) {
-            // TODO: This is being triggered by keystrokes. Move to mutable state.
             !state.modifiedScripts.includes(payload) && state.modifiedScripts.push(payload);
         },
         removeModifiedScript(state, { payload }) {
@@ -123,8 +125,8 @@ export const selectHiddenTabs = createSelector(
 
 export const selectModifiedScripts = (state: RootState) => state.tabs.modifiedScripts;
 export const selectActiveTabScript = createSelector(
-    [selectActiveTabID, scripts.selectAllScriptEntities],
-    (activeTabID: string, scriptEntities: scripts.ScriptEntities) => scriptEntities[activeTabID]
+    [selectActiveTabID, scripts.selectAllScripts],
+    (activeTabID: string, scriptEntities: scripts.Scripts) => scriptEntities[activeTabID]
 )
 
 // Note: Do not export and modify directly.
@@ -132,21 +134,17 @@ interface TabsMutableState {
     editorSessions: {
         [key: string]: ace.Ace.EditSession
     }
-    modifiedScripts: scripts.Scripts
 }
+
 const tabsMutableState: TabsMutableState = {
     editorSessions: {},
-    modifiedScripts: {
-        entities: {},
-        scriptIDs: []
-    }
 };
 
 export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
     'tabs/setActiveTabAndEditor',
     (scriptID, { getState, dispatch }) => {
         const prevTabID = selectActiveTabID(getState());
-        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        const script = scripts.selectAllScripts(getState())[scriptID];
 
         if (!script) return;
 
@@ -183,7 +181,7 @@ export const closeAndSwitchTab = createAsyncThunk<void, string, ThunkAPI>(
         const openTabs = selectOpenTabs(getState());
         const activeTabID = selectActiveTabID(getState());
         const closedTabIndex = openTabs.indexOf(scriptID);
-        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        const script = scripts.selectAllScripts(getState())[scriptID];
 
         dispatch(saveScriptIfModified(scriptID));
         dispatch(ensureCollabScriptIsClosed(scriptID));
@@ -221,7 +219,7 @@ export const closeAllTabs = createAsyncThunk<void, void, ThunkAPI>(
             dispatch(closeTab(scriptID));
             deleteEditorSession(scriptID);
 
-            const script = scripts.selectAllScriptEntities(getState())[scriptID];
+            const script = scripts.selectAllScripts(getState())[scriptID];
             script.readonly && dispatch(scripts.removeReadOnlyScript(scriptID));
         });
 
@@ -240,14 +238,11 @@ export const saveScriptIfModified = createAsyncThunk<void, string, ThunkAPI>(
             const restoredSession = getEditorSession(scriptID);
 
             if (restoredSession) {
-                const script = scripts.selectAllScriptEntities(getState())[scriptID];
-                userProject.saveScript(script.name, restoredSession.getValue()).then(() => {
-                    userProject.closeScript(scriptID);
-                });
+                const script = scripts.selectAllScripts(getState())[scriptID];
+                userProject.saveScript(script.name, restoredSession.getValue());
             }
 
             dispatch(removeModifiedScript(scriptID));
-            dispatch(scripts.syncToNgUserProject());
 
             // TODO: Save successful notification
 
@@ -260,7 +255,7 @@ const ensureCollabScriptIsClosed = createAsyncThunk<void, string, ThunkAPI>(
     (scriptID, { getState }) => {
         // Note: Watch out for the order with closeScript.
         const activeTabID = selectActiveTabID(getState());
-        const script = scripts.selectAllScriptEntities(getState())[scriptID];
+        const script = scripts.selectAllScripts(getState())[scriptID];
         if (scriptID === activeTabID && script?.collaborative) {
             collaboration.closeScript(scriptID);
         }

@@ -1,6 +1,6 @@
 // Export a script as text, audio file, or zip full of audio files.
 // Also supports printing scripts and uploading to SoundCloud (which is perplexing because we have another moduled named "uploader").
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as compiler from "./compiler"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
@@ -23,13 +23,13 @@ function download(name: string, blob: Blob) {
 }
 
 // Export the script as a text file.
-export function text(script: ScriptEntity) {
+export function text(script: Script) {
     esconsole("Downloading script locally.", ["debug", "exporter"])
     const blob = new Blob([script.source_code], { type: "text/plain" })
     download(script.name, blob)
 }
 
-async function compile(script: ScriptEntity, quality: boolean) {
+async function compile(script: Script, quality: boolean) {
     const lang = ESUtils.parseLanguage(script.name)
     let result
     try {
@@ -44,7 +44,7 @@ async function compile(script: ScriptEntity, quality: boolean) {
 }
 
 // Exports the script as an audio file.
-async function exportAudio(script: ScriptEntity, quality: boolean, type: string, render: (result: DAWData) => Promise<Blob>) {
+async function exportAudio(script: Script, quality: boolean, type: string, render: (result: DAWData) => Promise<Blob>) {
     const name = ESUtils.parseName(script.name)
     const result = await compile(script, quality)
     try {
@@ -57,15 +57,15 @@ async function exportAudio(script: ScriptEntity, quality: boolean, type: string,
     }
 }
 
-export function wav(script: ScriptEntity, quality: boolean) {
+export function wav(script: Script, quality: boolean) {
     return exportAudio(script, quality, "wav", renderer.renderWav)
 }
 
-export function mp3(script: ScriptEntity, quality: boolean) {
+export function mp3(script: Script, quality: boolean) {
     return exportAudio(script, quality, "mp3", renderer.renderMp3)
 }
 
-export async function multiTrack(script: ScriptEntity, quality: boolean) {
+export async function multiTrack(script: Script, quality: boolean) {
     const result = await compile(script, quality)
     const name = ESUtils.parseName(script.name)
 
@@ -108,7 +108,7 @@ export async function multiTrack(script: ScriptEntity, quality: boolean) {
 // Export the script to SoundCloud using the SoundCloud SDK.
 type SoundCloudOptions = { name: string, description: string, sharing: string, downloadable: boolean, tags: string, license: string }
 
-export async function soundcloud(script: ScriptEntity, quality: boolean, options: SoundCloudOptions) {
+export async function soundcloud(script: Script, quality: boolean, options: SoundCloudOptions) {
     esconsole("Requesting SoundCloud Access...", ["debug", "exporter"])
     await SC.connect()
 
@@ -138,7 +138,7 @@ export async function soundcloud(script: ScriptEntity, quality: boolean, options
 }
 
 // Print the source code.
-export function print(script: ScriptEntity) {
+export function print(script: Script) {
     let content = script.source_code
     const lines = content.split(/\n/)
     const numlines = lines.length

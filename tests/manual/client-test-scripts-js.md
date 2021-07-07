@@ -89,6 +89,9 @@ setTempo(144);
 var user_input = readInput("Enter any text:");
 println(user_input);
 
+user_input = readInput("Enter more text:");
+println(user_input);
+
 finish();  // see internal earsketch console for output
 ```
 

@@ -1,9 +1,10 @@
 ﻿// Student History module for CAI (Co-creative Artificial Intelligence) Project.
-import * as caiStudent from "./student";
-import * as caiStudentPreferenceModule from "./studentPreferences";
-import * as userProject from "../app/userProject";
 import { analyzePython } from "./complexityCalculatorPY";
 import { analyzeJavascript } from "./complexityCalculatorJS";
+import store from "../reducers";
+import * as scriptsState from "../browser/scriptsState";
+import * as caiStudent from "./student";
+import * as caiStudentPreferenceModule from "./studentPreferences";
 
 let aggregateScore: { [key: string]: number } = {}
 let curriculumPagesViewed: string[] = []
@@ -43,7 +44,8 @@ export function calculateAggregateCodeScore() {
         let savedScripts : string[] = []
         let scriptTypes : string[] = []
         let savedNames : string[] = []
-        const keys = Object.keys(userProject.scripts)
+        const scripts = scriptsState.selectRegularScripts(store.getState())
+        const keys = Object.keys(scripts)
         //if needed, initialize aggregate score variable
         if (aggregateScore == null) {
             aggregateScore = {
@@ -65,10 +67,10 @@ export function calculateAggregateCodeScore() {
             }
         }
         for (let i = 0; i < keys.length; i++) {
-            if (!savedNames.includes(userProject.scripts[keys[i]].name)) {
-                savedNames.push(userProject.scripts[keys[i]].name)
-                savedScripts.push(userProject.scripts[keys[i]].source_code)
-                scriptTypes.push(userProject.scripts[keys[i]].name.substring(userProject.scripts[keys[i]].name.length - 2))
+            if (!savedNames.includes(scripts[keys[i]].name)) {
+                savedNames.push(scripts[keys[i]].name)
+                savedScripts.push(scripts[keys[i]].source_code)
+                scriptTypes.push(scripts[keys[i]].name.substring(scripts[keys[i]].name.length - 2))
                 if (savedNames.length >= 30) {
                     break
                 }

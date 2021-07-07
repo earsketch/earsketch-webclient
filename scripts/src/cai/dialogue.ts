@@ -3,11 +3,11 @@ import * as caiErrorHandling from "./errorHandling"
 import * as caiStudentPreferenceModule from "./studentPreferences"
 import * as caiProjectModel from "./projectModel"
 import { CAI_TREE_NODES, CAI_TREES, CAI_ERRORS } from "./caitree"
+import { Script } from 'common'
 import * as recommender from '../app/recommender'
 import * as userProject from '../app/userProject'
 import * as caiStudentHistoryModule from "./studentHistory"
 import * as codeSuggestion from "./codeSuggestion"
-import { ScriptEntity } from 'common'
 
 let currentInput : { [key:string]: any } = {}
 let currentParameters : { [key:string]: any } = {}
@@ -231,7 +231,7 @@ function explainError() {
 export function processCodeRun(studentCode: string, functions: any[], variables: any[], complexityResults: any, musicResults: any) {
     caiErrorHandling.updateNames(variables, functions)
     studentCodeObj = studentCode
-    const allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as ScriptEntity)
+    const allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
     caiStudentPreferenceModule.runSound(allSamples)
     //once that's done, record historicalinfo from the preference module
     const suggestionRecord = caiStudentPreferenceModule.getSoundSuggestionsUsed()
@@ -271,7 +271,7 @@ export function processCodeRun(studentCode: string, functions: any[], variables:
         return showNextDialogue()
     } else if (soundWait.node != -1) {
         //get array of sound names
-        const allSounds = recommender.addRecInput([], { source_code: studentCode } as ScriptEntity)
+        const allSounds = recommender.addRecInput([], { source_code: studentCode } as Script)
         let soundFound = false
         for (let i in soundWait.sounds) {
             if (allSounds.includes(soundWait.sounds[i])) {
@@ -334,7 +334,7 @@ export function createButtons() {
         if ('dropup' in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Genres") {
             //filter the button options
             let availableGenres = []
-            let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as ScriptEntity)
+            let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
             if (allSamples.length < 1) {
                 for (let i = 0; i < 5; i++)
                     allSamples = recommender.addRandomRecInput(allSamples)
@@ -349,7 +349,7 @@ export function createButtons() {
         } else if ('dropup' in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Instruments") {
             //filter the button options
             let availableInstruments = []
-            let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as ScriptEntity)
+            let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
             if (allSamples.length < 1) {
                 for (let i = 0; i < 5; i++) {
                     allSamples = recommender.addRandomRecInput(allSamples)
@@ -719,7 +719,7 @@ function showNextDialogue() {
           genreArray = [currentGenre]
         }
         const count = (utterance.match(/sound_rec/g) || []).length
-        let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as ScriptEntity)
+        let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
         if (allSamples.length < 1) {
             for (let i = 0; i < 5; i++)
                 allSamples = recommender.addRandomRecInput(allSamples)

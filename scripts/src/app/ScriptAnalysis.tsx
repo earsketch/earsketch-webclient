@@ -1,13 +1,13 @@
 import i18n from "i18next"
 import React from "react"
 
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import { parseLanguage } from "../esutils"
 import * as notification from "../user/notification"
 import * as reader from "./reader"
 import { useTranslation } from "react-i18next"
 
-export const ScriptAnalysis = ({ script, close }: { script: ScriptEntity, close: () => void }) => {
+export const ScriptAnalysis = ({ script, close }: { script: Script, close: () => void }) => {
     let analysis
     try {
         analysis = reader.analyze(parseLanguage(script.name), script.source_code)

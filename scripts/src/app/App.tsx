@@ -11,7 +11,7 @@ import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
-import { ScriptEntity, SoundEntity } from "common"
+import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
 import { Download } from "./Download"
@@ -37,7 +37,7 @@ import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/soundsState"
 import { SoundUploader } from "./SoundUploader"
-import store from "../reducers"
+import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
@@ -84,28 +84,27 @@ export function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
 }
 
-export async function renameScript(script: ScriptEntity) {
+export async function renameScript(script: Script) {
     // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
     script = Object.assign({}, script)
     const newScript = await openModal(RenameScript, { script })
     if (!newScript) return
     await userProject.renameScript(script.shareid, newScript.name)
-    store.dispatch(scripts.syncToNgUserProject())
     reporter.renameScript()
 }
 
-export function downloadScript(script: ScriptEntity) {
+export function downloadScript(script: Script) {
     openModal(Download, { script, quality: false })
 }
 
-export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
+export async function openScriptHistory(script: Script, allowRevert: boolean) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
 }
 
-export function openCodeIndicator(script: ScriptEntity) {
+export function openCodeIndicator(script: Script) {
     openModal(ScriptAnalysis, { script })
 }
 
@@ -126,7 +125,7 @@ function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cance
     return openModal(Confirm, { text, ok, cancel, type })
 }
 
-export async function deleteScript(script: ScriptEntity) {
+export async function deleteScript(script: Script) {
     if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
@@ -135,22 +134,20 @@ export async function deleteScript(script: ScriptEntity) {
         await userProject.deleteScript(script.shareid)
         reporter.deleteScript()
 
-        store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.closeDeletedScript(script.shareid))
         store.dispatch(tabs.removeModifiedScript(script.shareid))
     }
 }
 
-export async function deleteSharedScript(script: ScriptEntity) {
+export async function deleteSharedScript(script: Script) {
     if (script.collaborative) {
         if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
-                userProject.closeSharedScript(script.shareid)
             }
             // Apply state change first
-            delete userProject.sharedScripts[script.shareid]
-            store.dispatch(scripts.syncToNgUserProject())
+            const { [script.shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
+            store.dispatch(scripts.setSharedScripts(sharedScripts))
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
@@ -159,35 +156,31 @@ export async function deleteSharedScript(script: ScriptEntity) {
     } else {
         if (await confirm({ text: `Are you sure you want to delete the shared script "${script.name}"?`, ok: "Delete", type: "danger" })) {
             await userProject.deleteSharedScript(script.shareid)
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
         }
     }
 }
 
-export async function submitToCompetition(script: ScriptEntity) {
+export async function submitToCompetition(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await userProject.getLockedSharedScriptId(script.shareid)
     openModal(CompetitionSubmission, { name: script.name, shareID })
 }
 
-export async function importScript(script: ScriptEntity) {
+export async function importScript(script: Script) {
     if (!script) {
         script = tabs.selectActiveTabScript(store.getState())
     }
 
-    const imported = await userProject.importScript(Object.assign({}, script))
-    await userProject.refreshCodeBrowser()
-    store.dispatch(scripts.syncToNgUserProject())
+    const imported = await userProject.importScript(script)
 
     const openTabs = tabs.selectOpenTabs(store.getState())
     store.dispatch(tabs.closeTab(script.shareid))
 
     if (openTabs.includes(script.shareid)) {
         store.dispatch(tabs.setActiveTabAndEditor(imported.shareid))
-        userProject.openScript(imported.shareid)
     }
 }
 
@@ -202,7 +195,7 @@ export async function deleteSound(sound: SoundEntity) {
 export async function closeAllTabs() {
     if (await confirm({ text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All" })) {
         try {
-            await userProject.saveAll()
+            await saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabs.closeAllTabs())
         } catch {
@@ -219,7 +212,7 @@ userProject.getLicenses().then(ls => {
     }
 })
 
-export async function shareScript(script: ScriptEntity) {
+export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script, licenses })
@@ -235,18 +228,14 @@ export function openUploadWindow() {
 
 export function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
+    const allScripts = scripts.selectAllScripts(store.getState())
     // Get the modified / unsaved script.
-    let script = null
-    if (activeTabID in userProject.scripts) {
-        script = userProject.scripts[activeTabID]
-    } else if (activeTabID in userProject.sharedScripts) {
-        script = userProject.sharedScripts[activeTabID]
-    }
+    const script = allScripts[activeTabID]
     if (!script) return
     let input = recommender.addRecInput([], script)
     let res = [] as any[]
     if (input.length === 0) {
-        const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities(store.getState()))
+        const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
         if (filteredScripts.length) {
             const lim = Math.min(5, filteredScripts.length)
             for (let i = 0; i < lim; i++) {
@@ -326,17 +315,6 @@ function setup() {
         }
     } else {
         userProject.loadLocalScripts()
-        store.dispatch(scripts.syncToNgUserProject())
-    }
-
-    try {
-        const shareID = ESUtils.getURLParameter("edit")
-        if (shareID) {
-            esconsole("opening a shared script in edit mode", ["main", "url"])
-            userProject.openSharedScriptForEdit(shareID)
-        }
-    } catch (error) {
-        esconsole(error, ["main", "url"])
     }
 
     // If in CAI study mode, switch to active CAI view.
@@ -388,6 +366,8 @@ export const App = () => {
     ]
 
     useEffect(() => {
+        Layout.initialize()
+
         // Attempt to load userdata from a previous session.
         if (userProject.isLoggedIn()) {
             login(username, password).catch((error: Error) => {
@@ -398,28 +378,29 @@ export const App = () => {
                     reporter.exception("Auto-login failed. Clearing localStorage.")
                 }
             })
-        } else {
-            store.dispatch(scripts.syncToNgUserProject())
+        }
+
+        setup()
+
+        if (!userProject.isLoggedIn()) {
             const openTabs = tabs.selectOpenTabs(store.getState())
-            const allScripts = scripts.selectAllScriptEntities(store.getState())
+            const allScripts = scripts.selectAllScripts(store.getState())
             openTabs.forEach(scriptID => {
                 if (!allScripts.hasOwnProperty(scriptID)) {
                     store.dispatch(tabs.closeAndSwitchTab(scriptID))
                 }
             })
             // Show bubble tutorial when not opening a share link or in a CAI study mode.
+            // TODO: Don't show if the user already has scripts?
             if (!sharedScriptID && !FLAGS.SHOW_CAI) {
                 store.dispatch(bubble.resume())
             }
         }
-
-        setup()
     }, [])
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG","MAIN"])
-        //save all unsaved open scripts (don't need no promises)
-        userProject.saveAll()
+        saveAll()
 
         let userInfo
         try {
@@ -459,7 +440,6 @@ export const App = () => {
         // Retrieve the user scripts.
         await userProject.login(username, password)
         esconsole("Logged in as " + username, ["DEBUG","MAIN"])
-        store.dispatch(scripts.syncToNgUserProject())
 
         if (!loggedIn) {
             setLoggedIn(true)
@@ -477,24 +457,18 @@ export const App = () => {
 
         // save all unsaved open scripts
         try {
-            await userProject.saveAll()
-            if (userProject.openScripts.length > 0) {
+            const promise = saveAll()
+            await promise
+            if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
 
-            const activeTabID = tabs.selectActiveTabID(store.getState())
-            if (activeTabID) {
-                const allScriptEntities = scripts.selectAllScriptEntities(store.getState())
-                if (allScriptEntities[activeTabID].collaborative) {
-                    collaboration.leaveSession(activeTabID)
-                }
-            }
+            leaveCollaborationSession()
 
             userProject.clearUser()
             userNotification.clearHistory()
             reporter.logout()
 
-            dispatch(scripts.syncToNgUserProject())
             dispatch(scripts.resetReadOnlyScripts())
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
@@ -560,7 +534,6 @@ export const App = () => {
     const openSharedScript = (shareID: string) => {
         esconsole("opening a shared script: " + shareID, "main")
         openShare(shareID).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         })
         setShowNotifications(false)
@@ -568,7 +541,8 @@ export const App = () => {
     }
 
     const openCollaborativeScript = (shareID: string) => {
-        if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
+        const sharedScripts = scripts.selectSharedScripts(store.getState())
+        if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
             openSharedScript(shareID)
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         } else {
@@ -710,13 +684,19 @@ const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
 
+    useEffect(() => {
+        setClosing(false)
+    }, [Modal])
+
     const [closing, setClosing] = useState(false)
 
     const close = () => {
         setClosing(true)
         setTimeout(() => {
-            dispatch(appState.setModal(null))
-            setClosing(false)
+            if (Modal === appState.selectModal(store.getState())) {
+                dispatch(appState.setModal(null))
+                setClosing(false)
+            }
         }, 300)
     }
 
@@ -757,38 +737,45 @@ const ModalContainer = () => {
   </Transition>
 }
 
+function saveAll() {
+    const promises = []
+    const modifiedTabs = tabs.selectModifiedScripts(store.getState())
+    const scriptMap = scripts.selectActiveScripts(store.getState())
+
+    for (const id of modifiedTabs) {
+        const script = scriptMap[id]
+        promises.push(userProject.saveScript(script.name, script.source_code))
+    }
+
+    if (promises.length) {
+        return Promise.all(promises)
+    }
+    return promises.length ? Promise.all(promises) : null
+}
+
+function leaveCollaborationSession() {
+    const activeTabID = tabs.selectActiveTabID(store.getState())
+    if (activeTabID) {
+        const allScriptEntities = scripts.selectAllScripts(store.getState())
+        if (allScriptEntities[activeTabID].collaborative) {
+            collaboration.leaveSession(activeTabID)
+        }
+    }
+}
+
 // websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
     if (userProject.isLoggedIn()) {
-        let saving = false
+        leaveCollaborationSession()
 
-        const openTabs = tabs.selectOpenTabs(store.getState())
-        const modifiedTabs = tabs.selectModifiedScripts(store.getState())
-        const sharedScripts = scripts.selectSharedScriptIDs(store.getState())
-        const scriptMap = scripts.selectActiveScriptEntities(store.getState())
-        for (const id of openTabs) {
-            if (sharedScripts.includes(id)) {
-                collaboration.leaveSession(id)
-            }
-        }
-
-        for (const id of modifiedTabs) {
-            saving = true
-            const script = scriptMap[id]
-            userProject.saveScript(script.name, script.source_code).then(() => {
-                store.dispatch(scripts.syncToNgUserProject())
-                userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
-            })
-        }
-
-        // userNotification.markAllAsRead()
         // Show page-close warning if saving.
-        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right will be to call preventDefault.)
+        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
-        if (saving) {
+        const promise = saveAll()
+        if (promise) {
+            promise.then(() => userNotification.show(i18n.t('messages:user.allscriptcloud'), "success"))
             return ""
         }
-    } else if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
-        localStorage.setItem(userProject.LS_SCRIPTS_KEY, JSON.stringify(userProject.scripts))
     }
+    persistor.flush()
 }

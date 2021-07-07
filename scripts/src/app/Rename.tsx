@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
-import { ScriptEntity, SoundEntity } from "common"
+import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
@@ -11,7 +11,7 @@ import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
-export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity, conflict?: boolean, close: (value?: ScriptEntity) => void }) => {
+export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: Script) => void }) => {
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
