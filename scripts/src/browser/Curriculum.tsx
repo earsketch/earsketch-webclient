@@ -281,7 +281,7 @@ const NavigationBar = () => {
     const theme = useSelector(appState.selectColorTheme)
     const triggerRef = useRef<HTMLButtonElement>(null)
     const [highlight, setHighlight] = useState(false)
-    const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "8px")
+    const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
 
     const handleClick = (event: Event & { target: HTMLElement }) => {
         if (!dropdownRef.current?.contains(event.target) && !triggerRef.current?.contains(event.target)) {
