@@ -398,15 +398,6 @@ export const App = () => {
         }
     }, [])
 
-    const addBodyClass = (className: string) => document.body.classList.add(className);
-    const removeBodyClass = (className: string) => document.body.classList.remove(className);
-
-    useEffect(() => {
-        theme === "dark"
-            ? addBodyClass("dark")
-            : removeBodyClass("dark")
-    }, [theme])
-
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG","MAIN"])
         saveAll()
@@ -560,7 +551,7 @@ export const App = () => {
         }
     }
 
-    return <>
+    return <div className={theme === "dark" ? "dark" : ""}>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
         
@@ -689,7 +680,7 @@ export const App = () => {
         <Bubble />
         <ScriptDropdownMenu />
         <ModalContainer />
-    </>
+    </div>
 }
 
 const ModalContainer = () => {
