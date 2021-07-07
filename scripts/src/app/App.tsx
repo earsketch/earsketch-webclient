@@ -398,6 +398,15 @@ export const App = () => {
         }
     }, [])
 
+    const addBodyClass = (className: string) => document.body.classList.add(className);
+    const removeBodyClass = (className: string) => document.body.classList.remove(className);
+
+    useEffect(() => {
+        theme === "dark"
+            ? addBodyClass("dark")
+            : removeBodyClass("dark")
+    }, [theme])
+
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG","MAIN"])
         saveAll()
