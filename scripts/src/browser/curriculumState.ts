@@ -18,15 +18,8 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
     dispatch(curriculumSlice.actions.setContentCache({}))
     const locale = getState().app.locale
 
-    let responses = await Promise.all([
-        fetch(CURRICULUM_DIR + "/" + locale + "/curr_toc.json"),
-        fetch(CURRICULUM_DIR + "/" + locale + "/curr_pages.json"),
-        fetch(CURRICULUM_DIR + "/" + locale + "/curr_searchdoc.json"),
-    ])
-
-    const tocData = await responses[0].json()
-    const pagesData = await responses[1].json()
-    const searchData = await responses[2].json()
+    const [tocData, pagesData, searchData] = await Promise.all(["toc", "pages", "searchdoc"].map(
+        async res => (await fetch(`${CURRICULUM_DIR}/${locale}/curr_${res}.json`)).json()))
 
     dispatch(setSearchDoc(searchData))
     idx = lunr(function () {
