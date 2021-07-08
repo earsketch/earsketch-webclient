@@ -274,8 +274,7 @@ const NavigationBar = () => {
     const toc = useSelector(curriculum.selectTableOfContents)
     const tocPages = useSelector(curriculum.selectPages)
 
-    // @ts-ignore: Assuming the structure is correct.
-    const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / toc[location[0]].chapters[location[1]].sections.length)
+    const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / (toc[location[0]]!.chapters?.[location[1]].sections?.length ?? 1))
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)

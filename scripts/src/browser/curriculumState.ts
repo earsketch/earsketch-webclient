@@ -9,9 +9,10 @@ import * as userNotification from "../user/notification"
 
 const CURRICULUM_DIR = "../curriculum"
 
-const locationToPage: { [location: string]: number } = {}
-const urlToLocation: { [key: string]: number[] } = {}
-const locationToUrl: { [key: string]: string } = {}
+// TODO: Make these selectors instead.
+let locationToPage: { [location: string]: number } = {}
+let locationToUrl: { [key: string]: string } = {}
+let urlToLocation: { [key: string]: number[] } = {}
 let idx: lunr.Index | null = null
 
 export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
@@ -32,6 +33,10 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
         }, this)
     })
 
+    locationToPage = {}
+    locationToUrl = {}
+    urlToLocation = {}
+
     pagesData.forEach((location: any[], pageIdx: number) => (locationToPage[location.join(",")] = pageIdx))
     dispatch(setPages(pagesData))
 
@@ -47,8 +52,11 @@ export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetc
             })
         })
     })
-    dispatch(setTableOfContents(tocData))
     const currentLocation = getState().curriculum.currentLocation
+    // Temporarily switch to a safe location (every version of the curriculum has a welcome page),
+    // so that the location-TOC mismatch doesn't break anything between now and fetchContent.
+    dispatch(setCurrentLocation([0]))
+    dispatch(setTableOfContents(tocData))
     if (location === undefined && url === undefined) {
         location = currentLocation
     }
@@ -397,7 +405,7 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         loc = urlToLocation[href]
     }
 
-    if (loc === undefined) {
+    if (loc === undefined || locationToUrl[loc.join(",")] === undefined) {
         // if loc is still undefined then this is a request for an un-indexed page, default them to the welcome page
         loc = [0]
         href = undefined as any
