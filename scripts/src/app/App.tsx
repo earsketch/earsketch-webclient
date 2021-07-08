@@ -598,7 +598,7 @@ export const App = () => {
                     
                     {/* Font Size */}
                     <Menu as="div" className="relative inline-block text-left mx-3">
-                        <Menu.Button className="text-gray-400 text-4xl">
+                        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
                             <div className="flex flex-row items-center">
                                 <div><i className="icon icon-font-size2" /></div>
                                 <div className="ml-1"><span className="caret" /></div>
@@ -621,7 +621,7 @@ export const App = () => {
         
                     {/* Misc. actions */}
                     <Menu as="div" className="relative inline-block text-left mx-3">
-                        <Menu.Button className="text-gray-400 text-4xl">
+                        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
                             <div className="flex flex-row items-center">
                                 <div><i className="icon icon-cog2" /></div>
                                 <div className="ml-1"><span className="caret" /></div>
@@ -637,7 +637,7 @@ export const App = () => {
         
                     {/* notification (bell) button */}
                     <div className="user-notification relative">
-                        <div id="bell-icon-container" className=".btn text-gray-400 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
+                        <div id="bell-icon-container" className=".btn text-gray-400 hover:text-gray-300 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
                             <i className="icon icon-bell" />
                             {numUnread > 0 && <div id="badge" className="text-2xl">{numUnread}</div>}
                         </div>
