@@ -446,9 +446,10 @@ const SharedScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredSharedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredSharedScriptIDs);
     const numScripts = Object.keys(useSelector(scripts.selectSharedScripts)).length;
+    const { t } = useTranslation()
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
-    const title = `SHARED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
+    const title = `${t('scriptBrowser.sharedScripts').toLocaleUpperCase()} (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
     const type: ScriptType = 'shared'
     const initExpanded = useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
