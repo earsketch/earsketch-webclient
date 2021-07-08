@@ -191,7 +191,7 @@ const TabDropdown = () => {
             ref={popperElement}
             style={showDropdown ? { ...styles.popper, ...heightLimiterStyle } : { display: 'none' }}
             { ...attributes.popper }
-            className={`border border-black z-50 bg-white`}
+            className={`border border-black z-20 bg-white`}
         >
             {
                 hiddenTabs.map((ID: string) => allScripts[ID] && (
