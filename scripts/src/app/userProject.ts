@@ -23,22 +23,6 @@ const USER_STATE_KEY = "userstate"
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
 
-const TEMPLATES = {
-    python: "#\t\tpython code\n#\t\tscript_name:\n#\n" +
-            "#\t\tauthor:\n#\t\tdescription:\n#\n\n" +
-            "from earsketch import *\n\n" +
-            "init()\n" +
-            "setTempo(120)\n\n\n\n" +
-            "finish()\n",
-
-    javascript: '"use strict";\n\n' +
-                "//\t\tjavascript code\n//\t\tscript_name:\n//" +
-                "\n//\t\tauthor:\n//\t\tdescription:\n//\n\n" +
-                "init();\n" +
-                "setTempo(120);\n\n\n\n" +
-                "finish();\n"
-}
-
 // Helper functions for making API requests.
 export function form(obj: { [key: string]: string | Blob }={}) {
     const data = new FormData()
@@ -774,7 +758,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
 // Creates a new empty script and adds it to the list of open scripts, and saves it to a user's library.
 export async function createScript(scriptname: string) {
     const language = ESUtils.parseLanguage(scriptname)
-    const script = await saveScript(scriptname, TEMPLATES[language as "python" | "javascript"])
+    const script = await saveScript(scriptname, i18n.t(`templates:${language}`))
     return script
 }
 
