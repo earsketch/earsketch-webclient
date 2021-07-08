@@ -424,8 +424,9 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
                 ? c.localeCompare(d, undefined, lexicalSortOptions)
                 : d.localeCompare(c, undefined, lexicalSortOptions)
         } else {
-            c = a.modified
-            d = b.modified
+            // TODO: Consistency in our date fields.
+            c = typeof a.modified === "string" ? dayjs(a.modified).valueOf() : a.modified
+            d = typeof b.modified === "string" ? dayjs(b.modified).valueOf() : b.modified
             return ascending ? c - d : d - c
         }
     }).map(v => v.shareid)
