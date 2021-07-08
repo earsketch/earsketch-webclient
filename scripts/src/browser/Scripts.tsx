@@ -364,12 +364,8 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
                             {script.name}
                         </div>
                         <div className='pr-4 space-x-2'>
-                            {
-                                (shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} />)
-                            }
-                            {
-                                script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} />)
-                            }
+                            {(shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator ?? script.username}`} />)}
+                            {script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} />)}
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
