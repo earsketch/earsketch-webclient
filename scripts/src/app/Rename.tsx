@@ -46,7 +46,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
             </div>
             <div className="modal-footer">
                 <input type="submit" className="btn btn-primary" value={t('rename.submit') as string} />
-                <input type="button" className="btn btn-default" onClick={() => close()} value={conflict ? t('renameScript.appendSuffix') as string : t('cancel') as string} />
+                <input type="button" className="btn btn-default" onClick={() => close(userProject.nextName(script.name))} value={conflict ? t('renameScript.appendSuffix') as string : t('cancel') as string} />
             </div>
         </form>
     </>

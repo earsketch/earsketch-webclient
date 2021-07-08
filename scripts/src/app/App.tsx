@@ -173,6 +173,9 @@ export async function importScript(script: Script) {
     }
 
     const imported = await userProject.importScript(script)
+    if (!imported) {
+        return
+    }
 
     const openTabs = tabs.selectOpenTabs(store.getState())
     store.dispatch(tabs.closeTab(script.shareid))

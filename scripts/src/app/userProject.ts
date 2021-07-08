@@ -500,15 +500,20 @@ export async function deleteScript(scriptid: string) {
 }
 
 async function promptForRename(script: Script) {
-    const oldName = script.name
     const name = await openModal(RenameScript, { script, conflict: true })
-    return { ...script, name: name ?? nextName(oldName) }
+    if (name) {
+        return { ...script, name: name }
+    }
 }
 
 // Restore a script deleted by the user.
 export async function restoreScript(script: Script) {
     if (lookForScriptByName(script.name, true)) {
-        script = await promptForRename(script)
+        const result = await promptForRename(script)
+        if (!result) {
+            return
+        }
+        script = result
         await renameScript(script, script.name)
     }
 
@@ -535,7 +540,11 @@ export async function restoreScript(script: Script) {
 // the user workspace. Returns a promise which resolves to the saved script.
 export async function importScript(script: Script) {
     if (lookForScriptByName(script.name)) {
-        script = await promptForRename(script)
+        const result = await promptForRename(script)
+        if (!result) {
+            return
+        }
+        script = result
     }
 
     if (script.isShared) {
@@ -684,7 +693,7 @@ export async function setPasswordForUser(username: string, password: string, adm
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
-function nextName(scriptname: string) {
+export function nextName(scriptname: string) {
     const name = ESUtils.parseName(scriptname)
     const ext = ESUtils.parseExt(scriptname)
 
