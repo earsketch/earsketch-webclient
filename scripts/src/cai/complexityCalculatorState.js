@@ -1,19 +1,19 @@
 "use strict";
 // Manages the state of the complexity calculator service.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JS_STR_LIST_OVERLAP = exports.JS_STR_FUNCS = exports.JS_LIST_FUNCS = exports.JS_BUILT_IN_OBJECTS = exports.PY_CREATE_STR_FUNCS = exports.PY_CREATE_LIST_FUNCS = exports.PY_STR_FUNCS = exports.PY_LIST_FUNCS = exports.apiFunctions = exports.boolOps = exports.comparatorOps = exports.binOps = exports.setProperty = exports.getProperty = exports.getState = exports.resetState = void 0;
+exports.JS_STR_LIST_OVERLAP = exports.JS_STR_FUNCS = exports.JS_LIST_FUNCS = exports.JS_BUILT_IN_OBJECTS = exports.PY_CREATE_STR_FUNCS = exports.PY_CREATE_LIST_FUNCS = exports.PY_STR_FUNCS = exports.PY_LIST_FUNCS = exports.apiFunctions = exports.boolOps = exports.comparatorOps = exports.binOps = exports.setIsJavascript = exports.setProperty = exports.getProperty = exports.getState = exports.resetState = void 0;
 var state = {
     allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
     loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
     functionRenames: [], parentLineNumber: 0, studentCode: [],
-    takesArgs: false, returns: false, isJavascript: false, listFuncs: []
+    takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: []
 };
 function resetState() {
     state = {
         allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
         loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
         functionRenames: [], parentLineNumber: 0, studentCode: [],
-        takesArgs: false, returns: false, isJavascript: false, listFuncs: []
+        takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: []
     };
 }
 exports.resetState = resetState;
@@ -29,6 +29,18 @@ function setProperty(propertyName, value) {
     state[propertyName] = value;
 }
 exports.setProperty = setProperty;
+function setIsJavascript(value) {
+    state.isJavascript = value;
+    if (value) {
+        state.listFuncs = exports.JS_LIST_FUNCS.slice(0);
+        state.strFuncs = exports.JS_STR_FUNCS.slice(0);
+    }
+    else {
+        state.listFuncs = exports.PY_LIST_FUNCS.slice(0);
+        state.strFuncs = exports.PY_STR_FUNCS.slice(0);
+    }
+}
+exports.setIsJavascript = setIsJavascript;
 exports.binOps = {
     "+": "Add",
     "-": "Sub",

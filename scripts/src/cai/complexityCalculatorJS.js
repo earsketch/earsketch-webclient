@@ -52,7 +52,7 @@ export function analyzeJavascript(source) {
             sounds: {}
         }
     };
-    ccState.setProperty('isJavascript', true);
+    ccState.setIsJavascript(true);    
     cc.doAnalysis(ast, resultsObject);
     //translate the calculated values
     // translateIntegerValues(resultsObject);

@@ -4,7 +4,7 @@ let state : { [key:string]: any } = {
     allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], 
     loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
     functionRenames: [],  parentLineNumber: 0, studentCode: [],
-    takesArgs: false, returns: false, isJavascript: false, listFuncs: []
+    takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: []
 }
 
 export function resetState() {
@@ -12,7 +12,7 @@ export function resetState() {
         allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
         loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
         functionRenames: [],  parentLineNumber: 0, studentCode: [],
-        takesArgs: false, returns: false, isJavascript: false, listFuncs: []
+        takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: []
     }
 }
 
@@ -26,6 +26,19 @@ export function getProperty(propertyName: string) {
 
 export function setProperty(propertyName: string, value: any) {
     state[propertyName] = value
+}
+
+export function setIsJavascript(value: boolean) {
+    state.isJavascript = value;
+
+    if (value) {
+        state.listFuncs = JS_LIST_FUNCS.slice(0);
+        state.strFuncs = JS_STR_FUNCS.slice(0);
+    }
+    else {
+        state.listFuncs = PY_LIST_FUNCS.slice(0);
+        state.strFuncs = PY_STR_FUNCS.slice(0);
+    }
 }
 
 export const binOps = {
