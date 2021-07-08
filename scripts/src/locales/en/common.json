@@ -217,6 +217,7 @@
     "curriculum.copyURL": "Copy curriculum URL"
   },
   "bubble": {
+    "userLanguage": "Language",
     "defaultProgrammingLanguage": "Default programming language",
     "buttons": {
       "skip": "Skip",
