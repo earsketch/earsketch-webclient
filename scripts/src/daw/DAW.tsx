@@ -256,7 +256,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
             <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
-                <div className="dawTrackEffectName">Effect {index+1}</div>
+                <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
                 <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
                     {t('daw.bypass')}
                 </button>
@@ -424,7 +424,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
-                    Bypass
+                    {t('daw.bypass')}
                 </button>
             </div>
             <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
