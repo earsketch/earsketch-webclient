@@ -27,8 +27,6 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const bubble = useSelector((state: RootState) => state.bubble)
     const playing = useSelector(daw.selectPlaying)
     const soloMute = useSelector(daw.selectSoloMute)
-    const muted = useSelector(daw.selectMuted)
-    const bypass = useSelector(daw.selectBypass)
     const metronome = useSelector(daw.selectMetronome)
     const tracks = useSelector(daw.selectTracks)
     const loop = useSelector(daw.selectLoop)
@@ -44,10 +42,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const playbackEndedCallback = () => {
-        if (!loop.on) {
-            dispatch(daw.setPlaying(false))
-            setPlayPosition(1)
-        }
+        dispatch(daw.setPlaying(false))
+        setPlayPosition(1)
     }
 
     const play = () => {

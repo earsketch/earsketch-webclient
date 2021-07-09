@@ -61,18 +61,13 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
 }
 
 const Filters = () => {
-    const { t } = useTranslation()
-    const includeFeaturedArtists = useSelector(sounds.selectFeaturedSoundVisibility)
-    const artistsSelector = includeFeaturedArtists ? sounds.selectAllArtists : sounds.selectAllRegularArtists
-    const genresSelector = includeFeaturedArtists ? sounds.selectAllGenres : sounds.selectAllRegularGenres
-    const instrumentsSelector = includeFeaturedArtists ? sounds.selectAllInstruments : sounds.selectAllRegularInstruments
-
-    const artists = useSelector(artistsSelector)
-    const genres = useSelector(genresSelector)
-    const instruments = useSelector(instrumentsSelector)
-    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
-    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
-    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
+    const { t } = useTranslation();
+    const artists = useSelector(sounds.selectFilteredArtists);
+    const genres = useSelector(sounds.selectFilteredGenres);
+    const instruments = useSelector(sounds.selectFilteredInstruments);
+    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected);
+    const numGenresSelected = useSelector(sounds.selectNumGenresSelected);
+    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected);
 
     return (
         <div className="p-3">

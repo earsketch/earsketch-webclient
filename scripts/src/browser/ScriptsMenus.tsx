@@ -203,10 +203,12 @@ export const ScriptDropdownMenu = () => {
                     if (script?.collaborative) {
                         imported = await userProject.importCollaborativeScript(Object.assign({},script));
                     } else {
-                        imported = await userProject.importScript(Object.assign({},script));
+                        imported = await userProject.importScript(script!);
                     }
 
-                    await userProject.refreshCodeBrowser();
+                    if (!imported) {
+                        return
+                    }
 
                     if (script && openTabs.includes(script.shareid) && !script.collaborative) {
                         dispatch(tabs.closeTab(script.shareid));
