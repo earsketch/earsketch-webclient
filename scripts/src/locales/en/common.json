@@ -1,5 +1,6 @@
 {
   "common": {
+    "loading": "Loading...",
     "contentManager.title": "Content Manager",
     "search": "Search",
     "results": "Results",
@@ -31,6 +32,8 @@
     "scriptBrowser.filterDropdown.fileType": "File Type",
     "scriptBrowser.filterDropdown.sortBy": "Sort By",
     "scriptBrowser.showDeleted": "Show deleted",
+    "scriptBrowser.deletedscripts": "Deleted Scripts",
+    "scriptBrowser.restore": "Restore",
     "script": "Script",
     "version": "Version",
     "script_plural": "Scripts",
@@ -77,9 +80,12 @@
     "script.codeIndicator": "Code Indicator",
     "script.import": "Import",
     "script.delete": "Delete",
+    "ok": "Okay",
+    "confirm": "Confirm",
     "default": "Default",
     "notifications.title": "Notifications",
     "notifications.pinned": "Pinned Notifications",
+    "notifications.other": "Other Notifications",
     "notifications.viewAll": "View All",
     "notifications.markAllRead": "Mark all as read",
     "forgotPassword.title": "Forgot your password?",
@@ -219,6 +225,7 @@
   },
   "bubble": {
     "userLanguage": "Language",
+    "script.name": "quick_tour",
     "defaultProgrammingLanguage": "Default programming language",
     "buttons": {
       "skip": "Skip",
@@ -253,6 +260,9 @@
     }
   },
   "messages": {
+    "confirm": {
+      "deletescript": "Deleted scripts disappear from Scripts list and can be restored from \"Deleted Scripts\"."
+    },
     "interpreter": {
       "runSuccess": "Script ran successfully! Click the play button to hear your music.",
       "runFailed": "There are one or more errors in your script. Look at the console for details.",
@@ -343,6 +353,8 @@
       "noSelfShare": "You cannot share scripts with yourself!"
     },
     "idecontroller": {
+      "running": "Running script...",
+      "success": "Script ran successfully",
       "overwrite": "That name already exists. Please provide a unique name or first rename the existing script.",
       "illegalname": "Please use only regular characters, numbers, or _ in file names.",
       "savefailed": "Script could not be saved to the cloud. Please save your script offline to avoid losing changes.",

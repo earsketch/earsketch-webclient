@@ -109,12 +109,12 @@ export function openCodeIndicator(script: Script) {
 const Confirm = ({ text, ok, cancel, type, close }: { text?: string, ok?: string, cancel?: string, type?: string, close: (ok: boolean) => void }) => {
     return <>
         <div className="modal-header">
-            <h3 className="modal-title">Confirm</h3>
+            <h3 className="modal-title">{i18n.t("confirm")}</h3>
         </div>
         <div className="modal-body">{text}</div>
         <div className="modal-footer">
-            <button className="btn btn-default" onClick={() => close(false)}>{cancel ?? "Cancel"}</button>
-            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{ok ?? "Okay"}</button>
+            <button className="btn btn-default" onClick={() => close(false)}>{cancel ?? i18n.t("cancel")}</button>
+            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{ok ?? i18n.t("ok")}</button>
         </div>
     </>
 }
@@ -124,7 +124,7 @@ function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cance
 }
 
 export async function deleteScript(script: Script) {
-    if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
+    if (await confirm({ text: i18n.t("messages:confirm.deletescript"), ok: i18n.t("script.delete"), type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
         }

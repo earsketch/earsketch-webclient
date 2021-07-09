@@ -123,7 +123,7 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                     {t("notifications.title")}
                 </div>
                 <div className="float-right">
-                    <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(true) }}>VIEW ALL</a>
+                    <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(true) }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
                 </div>
             </div>
             <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
@@ -212,7 +212,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                         <div style={{ fontSize: "10px", color: "grey" }}>{ESUtils.formatTime(now - item.time)}</div>
                     </div>
                     {item.message.hyperlink && <div>
-                        <a href={item.message.hyperlink} target="_blank" className="cursor-pointer">MORE</a>
+                        <a href={item.message.hyperlink} target="_blank" className="cursor-pointer">{t("more").toLocaleUpperCase()}</a>
                     </div>}
                 </div>
             </div>
@@ -221,7 +221,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
         </div>)}
 
         <div className="notification-type-header flex justify-between">
-            <div>Other Notifications</div>
+            <div>{t("notifications.other")}</div>
             <div><a href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
         </div>
         {notifications.map((item, index) =>
@@ -240,7 +240,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                         </div>
                     </div>
                     {item.notification_type === "share_script" && <div>
-                        <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>OPEN</a>
+                        <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>
                     </div>}
                 </div>
             </div>
