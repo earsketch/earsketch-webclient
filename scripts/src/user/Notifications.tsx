@@ -5,6 +5,7 @@ import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
+import { useTranslation } from "react-i18next"
 
 const colors: { [key: string]: { [key: string]: string } } = {
     dark: {
@@ -105,20 +106,21 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
     { editProfile: () => void, openSharedScript: (shareid: string) => void, openCollaborativeScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }
 ) => {
     const notifications = useSelector(user.selectNotifications)
+    const { t } = useTranslation()
     const now = Date.now()
 
     return <div style={{ padding: "10px", minWidth: "15em" }}>
         {notifications.length === 0
         ? <div>
             <div className="flex justify-between items-center">
-                <div className="text-center m-auto">There are no notifications.</div>
+                <div className="text-center m-auto">{t("notifications.none")}</div>
             </div>
         </div>
         : <div>
             <div className="flex justify-between">
                 <div className="float-left" style={{ color: "grey" }}>
                     <i className="icon icon-bell mr-3" />
-                    Notifications
+                    {t("notifications.title")}
                 </div>
                 <div className="float-right">
                     <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(true) }}>VIEW ALL</a>
@@ -150,19 +152,19 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
                                 {/* special actions */}
                                 {item.notification_type === "broadcast" && item.message.hyperlink &&
                                 <div>
-                                    <a href={item.message.hyperlink} target="_blank">MORE</a>
+                                    <a href={item.message.hyperlink} target="_blank">{t("more").toLocaleUpperCase()}</a>
                                 </div>}
                                 {item.notification_type === "share_script" &&
                                 <div>
-                                    <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>OPEN</a>
+                                    <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>
                                 </div>}
                                 {item.notification_type === "collaborate_script" &&
                                 <div>
-                                    {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>OPEN</a>}
-                                    {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>OPEN</a>}
+                                    {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>}
+                                    {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>}
                                 </div>}
                                 {item.notification_type === "editProfile" &&
-                                <div><a href="#" onClick={e => { e.preventDefault(); editProfile() }}>OPEN</a></div>}
+                                <div><a href="#" onClick={e => { e.preventDefault(); editProfile() }}>{t("thing.open").toLocaleUpperCase()}</a></div>}
                             </div>
                         </div>
                     </div>
@@ -179,6 +181,7 @@ export const NotificationList = ({ editProfile, openSharedScript, openCollaborat
 
 export const NotificationHistory = ({ openSharedScript, toggleNotificationHistory }: { openSharedScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }) => {
     const notifications = useSelector(user.selectNotifications)
+    const { t } = useTranslation()
     const now = Date.now()
 
     return <div id="notification-history">
@@ -188,15 +191,15 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                     <i id="back-button" className="icon icon-arrow-right22"></i>
                 </a>
                 <span style={{ color: "grey" }}>
-                    <i className="icon icon-bell" /> Notifications
+                    <i className="icon icon-bell" /> {t("notifications.title")}
                 </span>
             </div>
             <div>
-                <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={() => toggleNotificationHistory(false)}><span><i className="icon icon-cross2" /></span>CLOSE</a>
+                <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={() => toggleNotificationHistory(false)}><span><i className="icon icon-cross2" /></span>{t("thing.close").toLocaleUpperCase()}</a>
             </div>
         </div>
 
-        <div className="notification-type-header">Pinned Notifications</div>
+        <div className="notification-type-header">{t("notifications.pinned")}</div>
         {notifications.map((item, index) =>
         ["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>
             <div style={{ margin: "10px 20px" }}>
@@ -219,7 +222,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
 
         <div className="notification-type-header flex justify-between">
             <div>Other Notifications</div>
-            <div><a href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>MARK ALL AS READ</a></div>
+            <div><a href="#" onClick={e => { e.preventDefault(); userNotification.markAllAsRead() }}>{t("notifications.markAllRead").toLocaleUpperCase()}</a></div>
         </div>
         {notifications.map((item, index) =>
         !["broadcast", "teacher_broadcast"].includes(item.notification_type) && <div key={index}>

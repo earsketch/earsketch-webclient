@@ -126,23 +126,23 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }
 
-    const [title, setTitle] = useState<string | null>(null)
+    const [titleKey, setTitleKey] = useState<string | null>(null)
 
     const el = useRef<HTMLDivElement>(null)
 
     // Update title/icon display whenever element size changes.
     const observer = new ResizeObserver(entries => {
         const width = entries[0].contentRect.width
-        const short = t('daw.shortTitle')
-        const long = t('daw.title').toLocaleUpperCase()
+        const shortKey = "daw.shortTitle"
+        const longKey = "daw.title"
         if (embedMode) {
-            setTitle(hideDAW ? null : short)
+            setTitleKey(hideDAW ? null : shortKey)
         } else if (width > 590) {
-            setTitle(long)
+            setTitleKey(longKey)
         } else if (width > 405) {
-            setTitle(short)
+            setTitleKey(shortKey)
         } else {
-            setTitle(null)
+            setTitleKey(null)
         }
     })
 
@@ -158,8 +158,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
-                {title
-                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{title}</span>}
+                {titleKey
+                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
             </span>
         </div>
         {embedMode && <div>
@@ -256,7 +256,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
             <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
-                <div className="dawTrackEffectName">Effect {index+1}</div>
+                <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
                 <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
                     {t('daw.bypass')}
                 </button>
@@ -424,7 +424,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
                 <div className="dawTrackName"></div>
                 <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
-                    Bypass
+                    {t('daw.bypass')}
                 </button>
             </div>
             <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />

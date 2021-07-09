@@ -1,33 +1,799 @@
 {
   "common": {
-    "contentManager.title": "SPANISH HERE",
-    "contentManager.searchPlaceholder": "Spanish",
-    "soundBrowser.title": "SPANISH SO",
-    "scriptBrowser.title": "SPANISH SCR",
-    "soundBrowser.title.collection": "Spanish",
-    "soundBrowser.title.featuredArtist": "Spanish Here",
-    "soundBrowser.title.recommendations": "Spanish",
-    "soundBrowser.button.addSound": "Spanish Here",
-    "soundBrowser.button.showOnlyStars": "Spanish Here",
-    "soundBrowser.filterDropdown.artists": "Spanish Here",
-    "soundBrowser.filterDropdown.genres": "Spanish Here",
-    "soundBrowser.filterDropdown.instruments": "Spanish Here"
+    "contentManager.title": "Gestor de contenidos",
+    "search": "Búsqueda",
+    "results": "Resultados",
+    "noResults": "No hay resultados",
+    "soundBrowser.title": "Sonidos",
+    "soundBrowser.title.collection": "Colección de Sonidos",
+    "soundBrowser.title.featuredArtist": "Artista Destacado/a",
+    "soundBrowser.title.recommendations": "Recomendaciones",
+    "soundBrowser.button.addSound": "Añadir sonido",
+    "soundBrowser.button.showOnlyStars": "Sólo muestra",
+    "filter": "Filtro",
+    "startQuickTour": "Empezar tutorial rápido",
+    "switchTheme": "Cambiar el tema",
+    "reportError": "Reportar error",
+    "soundBrowser.filterDropdown.artists": "Artistas",
+    "soundBrowser.filterDropdown.genres": "Géneros",
+    "soundBrowser.filterDropdown.instruments": "Instrumentos",
+    "soundBrowser.clip.tooltip.file": "Archivo",
+    "soundBrowser.clip.tooltip.folder": "Carpeta",
+    "soundBrowser.clip.tooltip.artist": "Artista",
+    "soundBrowser.clip.tooltip.genre": "Género",
+    "soundBrowser.clip.tooltip.instrument": "Instrumento",
+    "soundBrowser.clip.tooltip.originalTempo": "Tempo original",
+    "soundBrowser.clip.tooltip.year": "Año",
+    "soundBrowser.clip.tooltip.previewSound": "Escuchar el sonido",
+    "soundBrowser.clip.tooltip.markFavorite": "Marcar como favorito",
+    "soundBrowser.clip.tooltip.paste": "Pegar al editor",
+    "scriptBrowser.filterDropdown.owner": "Dueño",
+    "scriptBrowser.filterDropdown.fileType": "Tipo de archivo",
+    "scriptBrowser.filterDropdown.sortBy": "Clasificar por",
+    "scriptBrowser.showDeleted": "Mostrar scripts borrados",
+    "script": "Script",
+    "version": "Versión",
+    "script_plural": "Scripts",
+    "scriptBrowser.myScripts": "Mis scripts",
+    "daw.title": "Estación de Audio Digital",
+    "daw.shortTitle": "EAD",
+    "daw.effect": "Efecto",
+    "daw.effect_plural": "Efectos",
+    "daw.tooltip.reset": "Reiniciar",
+    "daw.tooltip.play": "Play",
+    "daw.tooltip.loopProject": "Proyecto con ciclos",
+    "daw.tooltip.pause": "Pausar",
+    "daw.tooltip.autoScroll": "Usar el scroll automático para seguir la reproducción de sonido",
+    "daw.tooltip.toggleMetronome": "Abrir/cerrar el metrónomo",
+    "daw.tooltip.toggleVolume": "Subir/bajar el volumen",
+    "daw.tooltip.solo": "Solo",
+    "daw.tooltip.mute": "Silenciar",
+    "daw.abbreviation.solo": "S",
+    "daw.abbreviation.mute": "M",
+    "daw.tooltip.toggleEffects": "Aplicar/quitar todos los efectos",
+    "daw.bypass": "Bypass",
+    "newScript": "Nuevo script",
+    "editor.title": "Editor de código",
+    "editor.blocksMode": "Modo de bloque",
+    "editor.run": "Ejecutar",
+    "editor.noScriptsLoaded": "No tienes ningún script cargado.",
+    "editor.clickHereCreateScript": "¡Haz clic aquí para crear un nuevo script!",
+    "editor.mode": "Actualmente estás en el modo <span class=\"empty-script-lang\">{{scriptlang}}</span>.",
+    "editor.ifYouWant": "Si quieres cambiar al modo <span class=\"empty-script-lang\">{{otherScriptLang}}</span>, <br /> por favor, abre un script con <span class=\"empty-script-lang\">{{otherScriptExt}}</span> o crea uno nuevo <br /> y selecciona <span class=\"empty-script-lang\">{{otherScriptLang}}</span> como lenguaje del script.",
+    "tabs.otherTabs": "Otras pestañas",
+    "tabs.closeAll": "Cerrar todas",
+    "footer.teachers": "Instructores",
+    "footer.help": "Ayuda / Contactar",
+    "thing.open": "Abrir",
+    "thing.close": "Cerrar",
+    "script.copy": "Crear copia",
+    "script.rename": "Renombrar",
+    "script.download": "Descargar",
+    "script.print": "Imprimir",
+    "script.share": "Compartir",
+    "script.submitCompetition": "Enviar al concurso",
+    "script.history": "Historial",
+    "script.codeIndicator": "Indicador de código",
+    "script.import": "Importar",
+    "script.delete": "Borrar",
+    "default": "Valor predeterminado",
+    "notifications.title": "Notificaciones",
+    "notifications.pinned": "Notificaciones ancladas",
+    "notifications.viewAll": "Ver todas",
+    "notifications.markAllRead": "Marcar todos como leídos",
+    "forgotPassword.title": "¿Olvidaste tu contraseña?",
+    "forgotPassword.prompt": "Por favor, introduce el correo electrónico asociado a tu cuenta.",
+    "forgotPassword.submit": "Recuperar",
+    "forgotPassword.email": "Correo electrónico",
+    "createResetAccount": "Crear / Reiniciar cuenta",
+    "accountCreator.prompt": "Crear una cuenta",
+    "accountCreator.success": "¡Cuenta creada!",
+    "accountCreator.submit": "Crear cuenta",
+    "formfieldPlaceholder.username": "Nombre de usuario",
+    "formfieldPlaceholder.password": "Contraseña",
+    "formfieldPlaceholder.confirmPassword": "Confirma contraseña",
+    "formFieldPlaceholder.email": "Dirección de correo electrónico",
+    "formFieldPlaceholder.emailOptional": "Dirección de correo electrónico (opcional)",
+    "formFieldPlaceholder.firstName": "Primer nombre",
+    "formFieldPlaceholder.lastName": "Apellido",
+    "formFieldPlaceholder.oldPassword": "Contraseña antigua",
+    "formFieldPlaceholder.newPassword": "Nueva contraseña",
+    "formFieldPlaceholder.confirmNewPassword": "Confirma tu nueva contraseña",
+    "formFieldPlaceholder.typeDescriptionHere": "Escribe la descripción aquí",
+    "cancel": "Cancelar",
+    "update": "Actualizar",
+    "save": "Guardar",
+    "saveAndSend": "Guardar y enviar",
+    "upload": "Cargar",
+    "editProfile": "Editar perfil",
+    "registerAccount": "Registrar una nueva cuenta",
+    "logout": "Salir",
+    "notifications.none": "No hay ningunas notificaciones.",
+    "profileEditor.prompt": "Editar perfil de {{username}}",
+    "profileEditor.error": "Hubo un error al actualizar el perfil de usuario.",
+    "profileEditor.success": "¡Tu perfil se ha actualizado!",
+    "changePassword.prompt": "Cambiar contraseña",
+    "changePassword.success": "¡La contraseña ha sido cambiada exitosamente!",
+    "download.multiTrack": "Multipista",
+    "scriptHistory.running": "Ejecutando versión del script...",
+    "scriptHistory.versionSuccess": "Esta versión se ejecutó exitosamente.",
+    "scriptHistory.versionError": "Hubo un error en esta versión.",
+    "scriptHistory.restore": "Restaurar versión",
+    "scriptHistory.title": "Historial de versiones de {{scriptName}}",
+    "scriptHistory.heading": "Historial de versiones",
+    "scriptHistory.diff": "Diferencia con versión anterior",
+    "scriptHistory.activeCollab": "Colaboradores activos",
+    "scriptHistory.onlyMyScripts": "Para revertir un script, hay que usar $t(scriptBrowser.myScripts)",
+    "scriptHistory.fetching": "Consiguiendo historial del script.",
+    "renameScript.title": "Renombrar script",
+    "renameScript.prompt": "Escribe el nuevo nombre de este script:",
+    "rename.submit": "Renombrar",
+    "renameScript.appendSuffix": "Añadir sufijo",
+    "renameScript.alreadyExists": "Un script llamado {{scriptName}} ya existe en tu espacio de trabajo.`",
+    "renameSound.title": "Renombrar sonido",
+    "renameSound.prompt": "Escribe el nuevo nombre de tu sonido:",
+    "create": "Crear",
+    "scriptCreator.title": "Crear un nuevo script",
+    "scriptCreator.scriptName": "Nombre del script",
+    "scriptCreator.scriptName.subtext": "¿Qué nombre quisieras poner a tu script?",
+    "scriptCreator.scriptLang": "Lenguaje del script",
+    "scriptCreator.scriptLang.subtext": "¿Qué lenguaje de programación estás usando?",
+    "scriptAnalysis.title": "Indicador de conceptos de código para {{scriptName}}",
+    "scriptAnalysis.category.loops": "Ciclos",
+    "scriptAnalysis.category.conditionals": "Condicionales",
+    "scriptAnalysis.category.conditionalsWithBool": "Condicionales con booleanos",
+    "scriptAnalysis.category.lists": "Listas",
+    "scriptAnalysis.category.listStringOps": "Operaciones de listas y cadenas",
+    "scriptAnalysis.category.userFunctions": "Funciones definidas por usuarios",
+    "category": "Categoría",
+    "count": "Conteo",
+    "total": "Total",
+    "exit": "Salir",
+    "more": "Más",
+    "scriptShare.title": "Compartir \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.title": "Permitir que otros vean",
+    "scriptShare.tab.viewonly.linkTitle": "Enlace no editable para compartir",
+    "scriptShare.tab.viewonly.shareCurrent": "Compartir versión actual",
+    "scriptShare.tab.viewonly.shareFuture": "Compartir futuros cambios",
+    "scriptShare.tab.viewonly.otherUsers": "Enviar script no editable a otros usuarios",
+    "scriptShare.tab.viewonly.usersPlaceholder": "Escribe las identificaciones de ususarios, separadas por un espacio.",
+    "scriptShare.tab.collab.title": "Permitir que otros editen",
+    "scriptShare.tab.collab.addRemove": "Agregar o remover colaboradores",
+    "scriptShare.tab.embed.title": "Compartir un script incrustado",
+    "scriptShare.tab.embed.linkTitle": "Código IFrame que se puede incrustar",
+    "scriptShare.tab.embed.showCode": "Mostrar código:",
+    "scriptShare.tab.embed.showDAW": "Mostrar EAD:",
+    "scriptShare.tab.soundcloud.title": "Compartir en SoundCloud",
+    "scriptShare.tab.soundcloud.shareDesc.private": "Privado. Sólo lo puedo ver yo.",
+    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "Público. Otros lo pueden descargar y transmitir.",
+    "scriptShare.tab.soundcloud.shareDesc.public": "Público. Otros sólo lo pueden transmitir.",
+    "scriptShare.tab.soundcloud.sharePrompt": "¿Qué pueden hacer los demás con tu canción en SoundCloud?",
+    "scriptShare.tab.soundcloud.songName": "Nombre de la canción",
+    "scriptShare.tab.soundcloud.view": "Ver en SoundCloud",
+    "scriptShare.moreDetails": "Más detalles (descripción, licencia)...",
+    "scriptShare.descriptionOptional": "Descripción (opcional)",
+    "scriptShare.licenseType": "Tipo de licencia",
+    "scriptShare.copyClipboard": "Copiar al portapapeles",
+    "soundUploader.title": "Añadir un nuevo sonido",
+    "soundUploader.title.upload": "Cargar sonido",
+    "soundUploader.title.record": "Grabación rápida",
+    "soundUploader.file.prompt": "Seleccionar un archivo...",
+    "soundUploader.constantRequired": "Nombre de la constante (obligatorio)",
+    "soundUploader.tempoOptional": "Tempo (opcional)",
+    "soundUploader.record.measures.title": "Control de compases",
+    "soundUploader.record.measures.metronomeClick": "Haz clic mientras grabas",
+    "soundUploader.record.measures.tempo": "Tempo (pulsaciones por minuto)",
+    "soundUploader.record.measures.countoff": "Compases por nada",
+    "soundUploader.record.measures.toRecord": "Compases para grabar",
+    "soundUploader.record.prompt": "Grabar sonido",
+    "soundUploader.record.getReady": "¡Prepárate!",
+    "metronome": "Metrónomo",
+    "clear": "Eliminar",
+    "soundUploader.record.mic.waiting": "Esperando acceso al micrófono...",
+    "soundUploader.record.mic.reenable": "Habilita el micrófono y haz clic aquí para intentarlo de nuevo.",
+    "soundUploader.freesound.description": "es una base de datos en línea de miles de clips de audio gratuitos. Incluye de todo, desde música hasta grabaciones de campo, todo bajo licencias de Creative Commons. Puedes buscar clips en Freesound y guardarlos a continuación en EarSketch.",
+    "soundUploader.freesound.searching": "Buscando Freesound...",
+    "soundUploader.freesound.uploadedBy": "Cargado por el/la usuario/a de Freesound {{userName}}",
+    "formattedTime.justNow": "ahora mismo",
+    "formattedTime.recently": "recientemente",
+    "formattedTime.minutesAgo": "hace 1 minuto",
+    "formattedTime.minutesAgo_plural": "hace {{count}} minutos",
+    "formattedTime.hoursAgo": "hace 1 hora",
+    "formattedTime.hoursAgo_plural": "hace {{count}} horas",
+    "formattedTime.daysAgo": "ayer",
+    "formattedTime.daysAgo_plural": "hace {{count}} días",
+    "formattedTime.weeksAgo": "la semana pasada",
+    "formattedTime.weeksAgo_plural": "hace {{count}} semanas",
+    "formattedTime.monthsAgo": "el mes pasado",
+    "formattedTime.monthsAgo_plural": "hace {{count}} meses",
+    "formattedTime.yearsAgo": "el año pasado",
+    "formattedTime.yearsAgo_plural": "hace {{count}} años",
+    "curriculum.title": "Currículo",
+    "curriculum.switchScriptLanguage": "Cambiar lenguaje de script",
+    "curriculum.showTOC": "Mostrar tabla de contenido",
+    "curriculum.toc": "Tabla de contenido",
+    "curriculum.previousPage": "Página previa",
+    "curriculum.nextPage": "Siguiente página",
+    "curriculum.copyURL": "Copiar URL del currículo"
+  },
+  "bubble": {
+    "userLanguage": "Lenguaje",
+    "defaultProgrammingLanguage": "Lenguaje de programación predeterminado",
+    "buttons": {
+      "skip": "Saltar",
+      "skipTour": "Saltar tutorial",
+      "start": "Iniciar",
+      "close": "Cerrar",
+      "next": "Siguiente"
+    },
+    "header": {
+      "start": "Bienvenidos a EarSketch",
+      "codeEditor": "1/8 Explora el editor de código",
+      "runCode": "2/8 Ejecuta tu código",
+      "previewMusic": "3/8 Escucha preliminarmente tu música",
+      "playMusic": "4/8 Pon tu música",
+      "exploreCode": "5/8 Explora tu código",
+      "addSounds": "6/8 Añade sonidos a tu código",
+      "saveCode": "7/8 Guarda tu código",
+      "readCurriculum": "8/8 Lee el currículo",
+      "end": "Fin"
+    },
+    "body": {
+      "start": "¿Estás listo/a para empezar a programar y componer? Si es la primera vez que lo haces, haz clic en <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Iniciar</span> abajo para un breve tutorial de la interfaz de EarSketch. Si tienes experiencia usándola, haz clic en <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Saltar</span> para empezar a programar.<br><br>*El lenguaje de programación predeterminado para este tutorial es Python, haz clic abajo para cambiarlo a JavaScript.",
+      "codeEditor": "El editor de código es el espacio de trabajo donde compones tu música. Es un editor de texto con líneas numeradas.",
+      "runCode": "Ejecuta tu código y míralo mientras se convierte en música. Haz clic en el botón<span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>EJECUTAR</span> y observa el código en la Estación de Audio Digital ubicada encima del editor de código.",
+      "previewMusic": "La Estación de Audio Digital (EAD) es una visualización cronológica de tu código que muestra el tiempo en segundos y compases. Debajo de esta sequencia cronológica, se colocan en pistas los clips de audio añadidos a tu canción.",
+      "playMusic": "Los botones en el parte superior derecha de la EAD te permitirán que controles cómo escuchar tu música. Puedes poner tu canción al hacer clic en el triangulo verde <span class=\"align-middle icon icon-play4 text-green-600 text-2xl\"></span>.",
+      "exploreCode": "En el lado izquierdo de la pantalla está el área del navegador. Haz clic en el botón de abrir y cerrar en la parte de arriba para abrir / cerrar. Hay varios tipos de navegadores. Exploraremos sus funciones en los siguientes pasos.",
+      "addSounds": "El primer navegador es <span class=\"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> SONIDOS. Desplázate y haz clic en las carpetas para descubrir más de 4.000 clips de audio para usar en tu música, compuestos por artistas de grabaciones populares.",
+      "saveCode": "Tu código se guarda automáticamente en <span class=\"text-yellow-500 text-3xl align-middle icon icon-embed2\"></span> SCRIPTS. Puedes hacer una búsqueda de scripts por fecha, lenguaje de programación y propietario.",
+      "readCurriculum": "En el lado derecho está el cuadro del currículo. Usa el botón abrir/cerrar para ver el currículo y la barra de Bienvenida para navegar por el contenido.",
+      "end": "¡Felicidades! Has completado el tutorial. Estás listo/a para empezar a componer música. Haz clic en <span class=\"align-middle icon icon-plus2\"></span> para abrir un nuevo script y empezar a programar."
+    }
   },
   "messages": {
     "interpreter": {
-      "runSuccess": "Script ran successfully! Click the play button to hear your music.",
-      "runFailed": "There are one or more errors in your script. Look at the console for details.",
-      "noimport": " is undefined. Perhaps \"from earsketch import *\" is missing."
+      "runSuccess": "¡El script se ejecutó exitosamente! Haz clic en el botón de play para escuchar tu música.",
+      "runFailed": "Hay un error o más en tu script. Mira la consola para más detalles.",
+      "noimport": "no está definido. Tal vez falta \"from earsketch import *\"."
     },
     "dawservice": {
-      "effecttrackwarning": "Adding an effect track before the audio track is created"
+      "effecttrackwarning": "Añadir una pista del efecto antes de crear la pista de audio"
     },
     "esaudio": {
-      "stringindex": "Beat string index is out of bounds",
-      "nonlistRangeError": "beat strings can only contain 0, +, or -",
-      "tempoRange": " Tempo must be between 45 bpm and 220 bpm",
-      "pitchshiftTooLong": "SPANISH The clip is too long for the PITCHSHIFT effect. The max length is 5 minutes. Please use a shorter clip.",
-      "analysisTimeTooShort": "The analysis time window (endTime - startTime) is too small"
+      "stringindex": "El índice de la cadena de tiempos está fuera de los límites",
+      "nonlistRangeError": "las cadenas de tiempos sólo pueden contener 0, + o -",
+      "tempoRange": "El tempo tiene que ser entre 45 ppm y 220 ppm",
+      "analysisTimeTooShort": "El periodo de tiempo de análisis (ultimoMomento - momentoInicial) es demasido pequeño"
+    },
+    "user": {
+      "scriptcloud": "El script se guardó exitosamente en la nube.",
+      "allscriptscloud": "Todos los scripts no guardados se han guardado exitosamente en la nube.",
+      "badsharelink": "Hubo un error al abrir un script. El enlace compartido en la URL puede ser incorrecto.",
+      "scriptcopied": "El script se copió exitosamente.",
+      "teachersLink": "La cuenta de instructor/a requiere que proporciones tu nombre completo y una dirección de correo electrónico única para iniciar una sesión en la página web de INSTRUCTORES. Por favor, provéelos en el menu \"Editar perfil\" en las opciones de la cuenta.",
+      "infoRequired": "Hay que dar su primer nombre, apellido, y dirección de correo electrónico para crear una cuenta de instructor/a.",
+      "emailConflict": "El perfil de usuario no se actualizó. Por favor, asegúrate de que se haya usado esta dirección de correo electrónico en otras cuentas de EarSketch. (Una pista: Si no reconoces los detalles de la cuenta de usuario, intenta salir de la sesión y escoge Reiniciar la cuenta -> opción ¿Olvidaste tu contraseña?. Esto permite que recuperes la cuenta vinculada a la dirección de correo electrónico.",
+      "teacherSiteLoginError": "¡Hubo un error al iniciar una sesión en la página web de INSTRUCTORES! ",
+      "promptFixAtTeacherSite": ". Por favor, trata de cambiar la información de usuario en Editar perfil.",
+      "teachersPageNoAccess": "Tienes que tener una cuenta de instructor/a para acceder a esta página. Puede pedir una en la página de CONTACTAR."
+    },
+    "download": {
+      "script": "Guardar tu código en un achivo de texto en tu computadora.",
+      "wav": "Guardar tu canción en un archivo de audio WAV (usa más espacio de disco y tiene mejor calidad de audio).",
+      "mp3": "Guarda tu canción en un archivo MP3 (usa menos espacio de disco y tiene peor calidad de audio).",
+      "multitrack": "Guardar cada pista de tu canción en un archivo WAV diferente (para importarlas a un programa de estación de audio digital como GarageBand, Logic, Pro Tools, Reaper, FruityLoops, Cubase, Audition o Live).",
+      "compileerror": "No se pudo compilar el script exitosamente.",
+      "emptyerror": "¡La canción está vacía!",
+      "rendererror": "Hubo un problema produciendo una imagen con el script."
+    },
+    "changepassword": {
+      "pwdauth": "La contraseña antigua es incorrecta. No se pudo cambiar la contraseña.",
+      "pwdfail": "La confirmación de tu contraseña no coincide con tu contraseña.",
+      "pwdlength": "Tu contraseña es demasiado corta. Las contraseñas deben tener al menos 5 caracteres.",
+      "commerror": "Error de comunicación...",
+      "commerror2": "Error de comunicación..."
+    },
+    "downloadprotecteddata": {
+      "nopassword": "Por favor, introduce tu contraseña.",
+      "servertimeout": "Ocurrió algún problema de nuestra parte. Por favor, inténtalo otra vez.",
+      "unexpectederror": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo o reporta el error desde el menú de las opciones."
+    },
+    "forgotpassword": {
+      "fail": "La dirección de correo electrónico que proporcionaste no es válida o no está asociada con ninguna cuenta de EarSketch.",
+      "success": "Por favor, busca en tu correo electrónico un mensaje de EarSketch explicándote cómo restablecer tu contraseña."
+    },
+    "uploadcontroller": {
+      "freesoundSelection": "Por favor, selecciona un sonido del los resultados de búsqueda de Freesound...",
+      "userAuth": "Usuario no autenticado...",
+      "wavsel": "Por favor, selecciona un archivo de audio válido...",
+      "invalidfile": "no es un archivo de audio válido...",
+      "undefinedconstant": "Indefinido no es una constante válida...",
+      "alreadyused": "ya se usa como constante",
+      "invalidconstant": "no es una constante válida...",
+      "tempointeger": "El tempo tiene que ser un número positivo...",
+      "bigsize": "Lo siento, el archivo de audio no puede durar más de 30 segundos.",
+      "timeout": "Error de retardo de comunicación al cargar el sonido...",
+      "uploadsuccess": "Éxito cargando sonido personalizado",
+      "commerror": "Error de comunicación al cargar el sonido...",
+      "commerror2": "Error de comunicación al cargar el sonido...",
+      "chrome_mic_noaccess": "Has bloqueado acceso a tu micrófono. Para habilitar la grabación, haz clic en el icono \"i\" en la barra de direcciones de tu navegador y selecciona 'Permitir' a lado de 'Micrófono'. Luego inténtalo de nuevo.",
+      "ff_mic_noaccess": "Has bloqueado acceso a tu micrófono. Para habilitar la grabación, haz clic en el icono del micrófono en la barra de direcciones de tu navegador para compartir tu micrófono con EarSketch. Luego inténtalo de nuevo.",
+      "mic_noaccess": "Has bloqueado acceso a tu micrófono. Para habilitar la grabación, desbloquea el acceso al micrófono en la configuración de tu navegador. Luego inténtalo de nuevo."
+    },
+    "createaccount": {
+      "pwdfail": "La confirmación de tu contraseña no coincide con tu contraseña.",
+      "useralreadyexists": "El nombre de usuario o correo electrónico proporcionado ya existe. Por favor, intenta usar la función de 'Contraseña olvidada' si no puedes acceder a tu cuenta.",
+      "commerror": "Error de comunicación...",
+      "usernameconstraint": "Los nombres de usuario no pueden empezar con un número y no pueden incluir espacios o caracteres especiales"
+    },
+    "general": {
+      "unauthenticated": "Por favor, inicia una sesión antes de usar esta función...",
+      "loginsuccess": "Se ha iniciado la sesión exitosamente",
+      "loginfailure": "Tu nombre de usuario o contraseña es incorrecto. Por favor, intenta iniciar la sesión de nuevo o crear una nueva cuenta.",
+      "complexitySyntaxError": "No se pudo ejecutar el indicador de código. Puede haber un error sintáctico en tu código.",
+      "soundrenamed": "Se renombró el sonido exitosamente",
+      "renameSoundEmpty": "¡El nombre del sonido no puede estar vacío (o sólo contener \"_\")!",
+      "renameSoundSpecialChar": "Removiendo caracteres especiales durante el proceso de renombramiento...",
+      "renameSoundConflict": "El nombre del sonido ya está en uso",
+      "shortname": "Por favor, proporciona un nombre que tenga por lo menos 3 caracteres.",
+      "illegalCharacterInUserID": "Por favor, sólo usa caracteres regulares, números, o _ para la identificación de usuario.",
+      "userDoesNotExist": "Esta identificación de usuario no existe.",
+      "noSelfShare": "¡No puedes compartir scripts contigo mismo!"
+    },
+    "idecontroller": {
+      "overwrite": "Ese nombre ya existe. Por favor, crea un nombre único o renombra primero el script que existe.",
+      "illegalname": "Por favor, sólo usa caracteres regulares, números, o _ para los nombres de los archivos.",
+      "savefailed": "No se pudo guardar el script en la nube. Por favor, guarda tu script offline para evitar perder los cambios.",
+      "blocksyntaxerror": "No se pudo cambiar al modo de bloque. Por favor, asegúrate de que no haya ningún error sintáctico en el código.",
+      "saveallfailed": "No se pudo guardar algunos scripts en la nube. Por favor, guarda tus cambios offline para no perderlos.",
+      "closealltabs": "Esto cerrará todas la pestañas abiertas. ¿Estás seguro/a que quieres continuar?",
+      "soundcloud": {
+        "description": "EarSketch te ayuda a aprender temas principales de la ciencia de cómputos, la música, y la tecnología musical en un ambiente divertido y motivador. Aprenderás a programar usando Python o JavaScript, dos de los lenguajes de programación más populares del mundo, mientras manejas ciclos, compones ritmos y aplicas efectos a una estación de audio digital de múltiples pistas. Para aprender más sobre EarSketch, ve a http://earsketch.gatech.edu.",
+        "share": "Para cargar esta pista a EarSketch, ve a",
+        "code": "El siguiente código generó esta música:"
+      }
+    },
+    "shareScript": {
+      "menuDescriptions": {
+        "viewOnly": "Quiero que alguien vea mi script. (No podrá editarlo.)",
+        "collaboration": "Quiero que alguien pueda editar mi script.",
+        "embedded": "Quiero poder insertar mi canción en una página web.",
+        "soundCloud": "Quiero publicar mi canción en SoundCloud."
+      },
+      "sharedViewOnly": "Compartiste una versión no editable de {{scriptName}} con",
+      "soundcloudError": "Ocurrió un error al exportarlo a SoundCloud."
     }
+  },
+  "api": {
+    "noparams": "Sin parámetros",
+    "parameters": "Parámetros",
+    "returnValue": "Valor de retorno",
+    "example": "Ejemplo",
+    "defaultValue": "Valor predeterminado",
+    "open": "Abrir",
+    "close": "Cerrar",
+    "types": {
+      "soundConstant": "Constante sonora",
+      "analysisConstant": "Constante de análisis",
+      "folderConstant": "Constante de archivo",
+      "effectConstant": "Constante de efecto",
+      "effectParameterConstant": "Constante de parámetro del efecto",
+      "float": "Float",
+      "array": "Matriz",
+      "integer": "Número entero",
+      "listArray": "Lista/Matriz",
+      "list": "Lista",
+      "string": "Cadena",
+      "stringOptional": "Cadena, opcional",
+      "stringNumberList": "Cadena/Número/Lista",
+      "any": "Cualquier tipo",
+      "booleanOptional": "Booleano, opcional",
+      "soundOrList": "Constante sonora o lista/matriz"
+    },
+    "analyze": {
+      "description": "Esta función analiza una característica específica de un archivo de audio.",
+      "parameters": {
+        "audioFile": {
+          "description": "Archivo de audio para analizar. Típicamente es una constante del navegador de sonidos."
+        },
+        "featureForAnalysis": {
+          "description": "Constante de función de analisis. Las funciones de análisis actualmente tienen dos funcionalidades: RMS_AMPLITUDE analiza cuán alto es el sonido y SPECTRAL_CENTROID analiza cuán brillante es el sonido."
+        }
+      },
+      "returns": {
+        "description": "El resultado del cálculo de una característica determinada (siempre será entre 0 y 1 inclusive)."
+      }
+    },
+    "analyzeForTime": {
+      "description": "Esta función analiza una característica específica de un archivo de audio entre puntos específicos de inicio y fin.",
+      "parameters": {
+        "audioFile": {
+          "description": "Archivo de audio para analizar. Típicamente es una constante del navegador de sonidos."
+        },
+        "featureForAnalysis": {
+          "description": "Constante de función de analisis. Las funciones de análisis actualmente tienen dos funcionalidades: RMS_AMPLITUDE analiza cuán alto es el sonido y SPECTRAL_CENTROID analiza cuán brillante es el sonido."
+        },
+        "startTime": {
+          "description": "Momento en que empieza el análisis"
+        },
+        "endTime": {
+          "description": "Momento en que termina el análisis"
+        }
+      },
+      "returns": {
+        "description": "El resultado del cálculo de una característica determinada (siempre será entre 0 y 1 inclusive)."
+      }
+    },
+    "analyzeTrack": {
+      "description": "Esta función analiza una característica determinada de un archivo de audio.",
+      "parameters": {
+        "trackNumber": {
+          "description": "Número de pista para analizar."
+        },
+        "featureForAnalysis": {
+          "description": "Característica que se analiza, una constante. Las funciones de análisis actualmente tienen dos funcionalidades: RMS_AMPLITUDE analiza cúan alto es el sonido y SPECTRAL_CENTROID analiza cúan brillante es el sonido."
+        }
+      },
+      "returns": {
+        "description": "El resultado del cálculo de una característica determinada (siempre será entre 0 y 1 inclusive)."
+      }
+    },
+    "analyzeTrackForTime": {
+      "description": "Esta función analiza una pista específica entre puntos de inicio y fin.",
+      "parameters": {
+        "trackNumber": {
+          "description": "Número de pista para analizar."
+        },
+        "featureForAnalysis": {
+          "description": "La caracteristica que se analiza, una constante. Las funciones de análisis actualmente tienen dos funcionalidades: RMS_AMPLITUDE analiza cúan alto es el sonido y SPECTRAL_CENTROID analiza cúan brillante es el sonido."
+        },
+        "startTime": {
+          "description": "Momento en que comienza el análisis"
+        },
+        "endTime": {
+          "description": "Momento en que termina el análisis"
+        }
+      },
+      "returns": {
+        "description": "El resultado del cálculo de una característica determinada (siempre será entre 0 y 1 inclusive)."
+      }
+    },
+    "createAudioSlice": {
+      "description": "Devuelve una constante sonora que representa una porción del audio de un clip de audio que existe.",
+      "parameters": {
+        "fileName": {
+          "description": "Archivo de audio desde el cual se saca una porción. Es una constante en el navegador de sonidos."
+        },
+        "startPosition": {
+          "description": "La posición incial de la porción."
+        },
+        "endPosition": {
+          "description": "La posicón final de la porción."
+        }
+      },
+      "returns": {
+        "description": "Una nueva Constante Sonora que representa la porción del audio."
+      }
+    },
+    "dur": {
+      "description": "Devuelve la duración de un archivo de audio en compases.",
+      "parameters": {
+        "fileName": {
+          "description": "El archivo de audio cuya duración se devuelve. Típicamente es una constante del navegador de sonidos."
+        }
+      },
+      "returns": {
+        "description": "La duración en compases."
+      }
+    },
+    "finish": {
+      "description": "Tienes que llamar a esta función al final de tu script de EarSketch. Esto guarantiza que se pueda reproducir tu música en la estación de audio digital (EAD)."
+    },
+    "fitMedia": {
+      "description": "Añade un archivo de audio a una pista determinada entre determinados momentos iniciales y finales. Se repetirá o se cortará el archivo de audio cuando sea necesario para llenar el espacio de tiempo determinado.",
+      "parameters": {
+        "fileName": {
+          "description": "El archivo de audio para colocar en la pista. Típicamente es una constante en el navegador de sonidos"
+        },
+        "trackNumber": {
+          "description": "Número de pista donde se insertará el archivo de audio"
+        },
+        "startLocation": {
+          "description": "Momento cuando el archivo de audio comenzará (por ejemplo, 1 empezará al comienzo del compás 1)."
+        },
+        "endLocation": {
+          "description": "Momento cuando el archivo de audio terminará (por ejemplo, 5 parará el archivo de audio al comienzo del compás 5)."
+        }
+      }
+    },
+    "importImage": {
+      "description": "Esta función saca una imagen del internet y la convierte en una matriz/lista bidimensional de valores en escala de grises o una lista tridimensional de valores de color RGB, adaptada al número determinado de filas y columnas.",
+      "parameters": {
+        "imageURL": {
+          "description": "La URL en la cual se ubica la imagen"
+        },
+        "nrows": {
+          "description": "El número de filas de datos de píxeles para devolver (la imagen será adaptada para coincidir con este número de filas)"
+        },
+        "ncols": {
+          "description": "El número de columnas de datos de píxeles para devolver (la imagen será adaptada para coincidir con este número de columnas)"
+        },
+        "includeRGB": {
+          "default": "False",
+          "description": "Si es false (falso), devuelve una lista bidimensional en escala de grises. Si es true (cierto), devuelve una lista tridimensional RBG de píxeles de color. Las tres dimensiones son para la R, G y B, respectivamente."
+        }
+      },
+      "returns": {
+        "description": "Lista multidimensional de números enteros (0-255) que representan píxeles."
+      }
+    },
+    "importFile": {
+      "description": "Esta función consigue un archivo del internet y devuelve sus contenidos en forma de cadena de caracteres.",
+      "parameters": {
+        "fileURL": {
+          "description": "La URL en la cual se ubica el archivo"
+        }
+      },
+      "returns": {
+        "description": "Contenidos del archivo en forma de cadena de caracteres."
+      }
+    },
+    "init": {
+      "description": "Esto debe ser la primera llamada a función en cada script de EarSketch. Prepara la estación de audio digital para crear tu música."
+    },
+    "insertMedia": {
+      "description": "Inserta el archivo multimedia entero en una pista determinada en un momento de inicio determinado.",
+      "parameters": {
+        "fileName": {
+          "description": "Archivo de audio para colocar en la pista. Típicamente es una constante en el navegador de sonidos"
+        },
+        "trackNumber": {
+          "description": "Número de pista donde se insertará el archivo de sonido"
+        },
+        "trackLocation": {
+          "description": "Momento para empezar a reproducir el archivo de sonido. (El archivo de sonido se tocará una vez, así que el momento en que termina depende de la duración del archivo de sonido.)"
+        }
+      }
+    },
+    "insertMediaSection": {
+      "description": "Inserta parte de un archivo de audio en un lugar determinado de una pista determinada.",
+      "parameters": {
+        "fileName": {
+          "description": "Archivo de audio para colocar en la pista. Típicamente es una constante en el navegador de sonidos"
+        },
+        "trackNumber": {
+          "description": "Número de pista donde se insertará el archivo de sonido"
+        },
+        "trackLocation": {
+          "description": "Momento para empezar a reproducir de archivo de sonido."
+        },
+        "mediaStartLocation": {
+          "description": "El lugar de comienzo dentro del archivo de sonido incluido (por ejemplo, 1.0 es el punto inicial del archivo de sonido y 2.0 es el compás 2 del archivo de sonido)."
+        },
+        "mediaEndLocation": {
+          "description": "El lugar donde termina el fragmento incluido del archivo de sonido (por ejemplo, 2.0 es el compás 2 del archivo de sonido)."
+        }
+      }
+    },
+    "makeBeat": {
+      "description": "Crea un patrón rítmico a través de una cadena de caracteres determinada. Esta cadena de caracteres puede ser de CUALQUIER tamaño. Se recomienda que escojas cadenas en múltiplos de 16 (por ejemplo, 16, 32, 64, etc.) porque esto hace que las duraciones de tu patrones coincidan con los compases (cada compás tiene 16 caracteres).",
+      "parameters": {
+        "fileName": {
+          "description": "Un solo archivo de sonido o una lista/matriz de archivos de sonido. Típicamente es una constante en el navegador de sonidos"
+        },
+        "track": {
+          "description": "Pista en donde colocar el patrón"
+        },
+        "measure": {
+          "description": "Momento de empezar el patrón"
+        },
+        "string": {
+          "description": "Una cadena que muestra el patrón rítimico que se tocará. \"0\" toca el archivo de sonido durante una semicorchea, o decimosexto de nota. \"+\" continúa o sostiene el archivo de sonido durante una semicorchea adicional. \"-\" es una pausa (crea un silencio) durante una semicorchea. Si el primer argumento de makeBeat es una lista/matriz de sonidos, un número entre \"0\" y \"9\" tocará el sonido representado por ese número de índice de lista/matriz durante una semicorchea."
+        }
+      }
+    },
+    "makeBeatSlice": {
+      "description": "Crea un patrón rítmico a través de una cadena de caracteres. Especifica la posición inicial dentro del archivo de sonido. A diferencia de makeBeat, que siempre toca los sonidos desde el principio, makeBeatSlice permite que hagas ritmos que combinen muchas porciones diferentes de sonido del mismo archivo.",
+      "parameters": {
+        "fileName": {
+          "description": "Un solo archivo de sonido. Típicamente es una constante en el navegador de sonidos"
+        },
+        "track": {
+          "description": "Pista en donde colocar el patrón"
+        },
+        "measure": {
+          "description": "Momento de empezar el patrón"
+        },
+        "string": {
+          "description": "Una cadena que muestra el patrón ritimico que se tocará. Un número entre \"0\" y \"9\" toca, en el momento específicado, el archivo de sonido que corresponde con ese número de índice de la lista/matriz durante una semicorchea, o decimosexto de nota. \"+\" continúa o sostiene el archivo de sonido durante una semicorchea adicional. \"-\" es una pausa (crea un silencio) durante una semicorchea."
+        },
+        "beatNumber": {
+          "description": "Una lista/matriz de puntos de tiempo iniciales dentro de un archivo de audio (por ejemplo, [1.0, 2.5] crea dos puntos de tiempo en los compases 1 y 2.5 del archivo de sonido; se puede referir a estos puntos en la cadena de rítmo al escribir \"0\" y \"1\" respectivamente.)"
+        }
+      }
+    },
+    "print": {
+      "description": "Muestra el valor en la consola.",
+      "parameters": {
+        "input": {
+          "description": "Valor(es) para imprimir"
+        }
+      }
+    },
+    "println": {
+      "description": "Muestra el valor en la consola.",
+      "parameters": {
+        "input": {
+          "description": "Valor(es) para imprimir"
+        }
+      }
+    },
+    "readInput": {
+      "description": "Usa esta función para pedir respuestas de un/a usuario/a.",
+      "parameters": {
+        "prompt": {
+          "description": "Mensaje a el/la usuario/a pidiendo una respuesta."
+        }
+      },
+      "returns": {
+        "description": "El resultado de la respuesta de el/la usuario/a."
+      }
+    },
+    "replaceListElement": {
+      "description": "Reemplazar cada apariencia de un elemento de una lista/matriz con un nuevo elemento.",
+      "parameters": {
+        "inputList": {
+          "description": "Lista/Matriz original"
+        },
+        "elementToReplace": {
+          "description": "Elemento de la lista para reemplazar."
+        },
+        "withElement": {
+          "description": "Nuevo elemento que reemplazará cada apariencia del elementoParaReemplazar."
+        }
+      }
+    },
+    "replaceString": {
+      "description": "Esta función reemplaza cada apariencia de un carácter de la cadena original con un nuevo carácter.",
+      "parameters": {
+        "string": {
+          "description": "Cadena original"
+        },
+        "characterToReplace": {
+          "description": "Carácter de la cadena original para reemplazar"
+        },
+        "withCharacter": {
+          "description": "Nuevo carácter que reemplazará cada apariencia del caracterParaReemplazar"
+        }
+      },
+      "returns": {
+        "description": "Nueva cadena con el/los carácter(es) apropiado(s) reemplazado(s)"
+      }
+    },
+    "reverseList": {
+      "description": "Invertir el order de los elementos en una lista/matriz.",
+      "parameters": {
+        "inputList": {
+          "description": "Lista/matriz para invertir"
+        }
+      },
+      "returns": {
+        "description": "Una nueva lista/matriz con los elementos en orden inverso"
+      }
+    },
+    "reverseString": {
+      "description": "Invertir el orden de los caracteres en una cadena.",
+      "parameters": {
+        "inputString": {
+          "description": "Cadena para invertir"
+        }
+      },
+      "returns": {
+        "description": "Una nueva cadena con los caracteres en orden inverso"
+      }
+    },
+    "rhythmEffects": {
+      "description": "Crea un envelope del efecto rítimico a través de una cadena de caracteres determinada.",
+      "parameters": {
+        "track": {
+          "description": "Pista en donde colocar el patrón (o MIX_TRACK para aplicarlo a todas las pistas)."
+        },
+        "effectType": {
+          "description": "Constante del efecto: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME o WAH."
+        },
+        "effectParameter": {
+          "description": "Constante que indica para que parámetro del tipoDelEfecto se está creando el envelope. (Ve <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a> en la barra lateral del currículo para ver una lista completa del los parámetros del efecto.)"
+        },
+        "effectList": {
+          "description": "Lista/Matriz de valores de parámetro del efecto (por ejemplo, [0.0, 5.3, -12])."
+        },
+        "measure": {
+          "description": "Momento de empezar el patrón"
+        },
+        "beatString": {
+          "description": "Una cadena que muestra el patrón de envelope rítimico que se creará. Un número entre \"0\" y \"9\" usa, en el momento determinado, el valor de parámetro del efecto que corresponde con el número de índice de la lista/matriz de efecto durante una semicorchea, o decimosexto de nota. \"+\" continúa o sostiene el valor de parámetro durante una semicorchea adicional. \"-\" crea un cambio gradual (una rampa) al siguiente valor de parámetro durante una semicorchea."
+        }
+      }
+    },
+    "selectRandomFile": {
+      "description": "Selecciona un archivo de audio al azar de una carpeta determinada.",
+      "parameters": {
+        "folder": {
+          "description": "Carpeta en donde se conseguirá un archivo de audio al azar. Típicamente es una constante en el navegador de sonidos (un nombre de carpeta, no un nombre de archivo)."
+        }
+      },
+      "returns": {
+        "description": "Una Constante Sonora escogida al azar de una carpeta determinada."
+      }
+    },
+    "setEffect1": {
+      "description": "Esta función aplica un efecto a un número de pista determinado y establece un valor particular para el parámetro del efecto durante toda la pista. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve a <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a>en el currículo.",
+      "parameters": {
+        "track": {
+          "description": "La pista en donde colocar el efecto (o MIX_TRACK para aplicarlo a todas las pistas)"
+        },
+        "effectType": {
+          "description": "Constante del efecto: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME o WAH"
+        },
+        "effectParameter": {
+          "description": "Constante que indica para qué parámetro del tipoDelEfecto se está creando el envelope. (Ve a Every Effect Explained in Detail en la barra lateral del currículo para una lista completa del los parámetros del efecto.)"
+        },
+        "effectValue": {
+          "description": "Valor del parámetro del efecto"
+        }
+      }
+    },
+    "setEffect2": {
+      "description": "Esta función aplica un efecto a un número de pista determinado. A diferencia de la otra versión de setEffect(), hay argumentos adicionales para crear un envelope que cambie el valor de un efecto de parámetro a lo largo del tiempo. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve al currículo: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a>",
+      "parameters": {
+        "effectStartValue": {
+          "description": "Valor del parámetro del efecto al comienzo del envelope del efecto"
+        },
+        "effectStartLocation": {
+          "description": "Ubicación del valorInicialDelEfecto"
+        },
+        "effectEndValue": {
+          "description": "Valor del parámetro del efecto al final del envelope del efecto"
+        },
+        "effectEndLocation": {
+          "description": "Ubicación del valorInicialDelEfecto"
+        }
+      }
+    },
+    "setTempo": {
+      "description": "Establece el tempo del proyecto.",
+      "parameters": {
+        "tempo": {
+          "description": "El tempo del proyecto en pulsaciones por minuto (PPM). El tempo mínimo es 45. El tempo máximo es 220."
+        }
+      }
+    },
+    "shuffleList": {
+      "description": "Reorganizar los elementos en una lista/matriz al azar.",
+      "parameters": {
+        "inputList": {
+          "description": "Lista/Matriz para aplicar al azar"
+        }
+      },
+      "returns": {
+        "description": "Una nueva lista/matriz con el orden de la lista de elementos organizado al azar."
+      }
+    },
+    "shuffleString": {
+      "description": "Reorganizar los caracteres en una cadena al azar.",
+      "parameters": {
+        "inputString": {
+          "description": "Cadena para aplicar al azar"
+        }
+      },
+      "returns": {
+        "description": "Una nueva cadena con el orden de los caracteres organizado al azar."
+      }
+    }
+  },
+  "templates": {
+    "python": "#\t\tcódigo python\n#\t\tnombre_del_script:\n#\n#\t\tautor:\n#\t\tdescripción:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
+    "javascript": "\"use strict\";\n\n//\t\tcódigo javascript\n//\t\tnombre_del_script:\n//\n//\t\tautor:\n//\t\tdescripción:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
   }
 }

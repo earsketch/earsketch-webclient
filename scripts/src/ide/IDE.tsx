@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useTranslation } from "react-i18next"
 
 import { openModal } from "../app/App"
 import * as appState from "../app/appState"
@@ -35,6 +36,7 @@ import * as userProject from "../app/userProject"
 import * as WaveformCache from "../app/waveformcache"
 import i18n from "i18next"
 import { DAWData } from "../app/player"
+import parse from "html-react-parser";
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -357,6 +359,7 @@ export async function compileCode() {
 export const IDE = () => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
+    const { t } = useTranslation()
     const numTabs = useSelector(tabs.selectOpenTabs).length
 
     const embedMode = useSelector(appState.selectEmbedMode)
@@ -373,6 +376,10 @@ export const IDE = () => {
     const consoleContainer = useRef<HTMLDivElement>(null)
 
     const [loading, _setLoading] = useState(false)
+
+    const scriptLang = language === "python" ? "Python" : "JavaScript"
+    const otherScriptLang = language === "python" ? "JavaScript" : "Python"
+    const otherScriptExt = language === "python" ? ".js" : ".py"
     setLoading = _setLoading
 
     useEffect(() => {
@@ -416,15 +423,13 @@ export const IDE = () => {
                             </div>
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
                                 <div className="leading-relaxed">
-                                    <div id="no-scripts-warning">You have no scripts loaded.</div>
-                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>Click here to create a new script!</a>
+                                    <div id="no-scripts-warning">{t("editor.noScriptsLoaded")}</div>
+                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
                                 </div>
 
                                 <div className="leading-relaxed empty-script-lang-message">
-                                    <p>You are currently in <span className="empty-script-lang">{language === "python" ? "Python" : "JavaScript"}</span> mode.</p>
-                                    <p>If you want to switch to <span className="empty-script-lang">{language === "python" ? "JavaScript" : "Python"}</span> mode, <br />
-                                        please open a script with <span className="empty-script-lang">{language === "python" ? ".js" : ".py"}</span> or create a new one <br />
-                                        and select <span className="empty-script-lang">{language === "python" ? "JavaScript" : "Python"}</span> as the script language.</p>
+                                    <p>{parse(t("editor.mode", { scriptlang: scriptLang }))}</p>
+                                    <p>{parse(t("editor.ifYouWant", { scriptLang: scriptLang, otherScriptLang: otherScriptLang, otherScriptExt: otherScriptExt }))}</p>
                                 </div>
                             </div>}
                             <iframe id="ifmcontentstoprint" className="h-0 w-0 invisible absolute"></iframe>

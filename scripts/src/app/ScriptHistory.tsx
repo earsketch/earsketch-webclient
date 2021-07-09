@@ -29,7 +29,7 @@ const Version = ({ version, now, allowRevert, compiled, active, activate, run, r
             } as any)[version.run_status] ?? null}
         </td>
         <td onClick={activate}>
-            Version {version.id}
+            {`${t('version')} ${version.id}`}
             {version.activeUsers && <span><i className="icon-users" style={{ color: "#6dfed4" }}></i></span>}
             <br />
             <span className="text-muted">{ESUtils.formatTime(now - version.created)}</span>

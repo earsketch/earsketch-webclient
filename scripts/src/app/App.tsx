@@ -85,11 +85,9 @@ export function renameSound(sound: SoundEntity) {
 }
 
 export async function renameScript(script: Script) {
-    // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
-    script = Object.assign({}, script)
-    const newScript = await openModal(RenameScript, { script })
-    if (!newScript) return
-    await userProject.renameScript(script.shareid, newScript.name)
+    const name = await openModal(RenameScript, { script })
+    if (!name) return
+    await userProject.renameScript(script, name)
     reporter.renameScript()
 }
 
@@ -331,6 +329,7 @@ let email = ""
 
 export const App = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
@@ -359,9 +358,9 @@ export const App = () => {
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
     const MISC_ACTIONS = [
-        { name: "Start Quick Tour", action: resumeQuickTour },
-        { name: "Switch Theme", action: toggleColorTheme },
-        { name: "Report Error", action: reportError },
+        { nameKey: "startQuickTour", action: resumeQuickTour },
+        { nameKey: "switchTheme", action: toggleColorTheme },
+        { nameKey: "reportError", action: reportError },
     ]
 
     useEffect(() => {
@@ -550,7 +549,7 @@ export const App = () => {
         }
     }
 
-    return <>
+    return <div className={theme === "dark" ? "dark" : ""}>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
         
@@ -609,9 +608,12 @@ export const App = () => {
                             {FONT_SIZES.map(size =>
                             <Menu.Item key={size}>
                                 {({ active }) =>
-                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`}
-                                        onClick={() => dispatch(appState.setFontSize(size))}>
-                                    {size} {fontSize === size && <i className="ml-3 icon icon-checkmark4" />}
+                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
+                                        onClick={() => dispatch(appState.setFontSize(size))}
+                                        style={{ gridTemplateColumns: "18px 1fr" }}>
+                                    {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
+                                    {fontSize !== size && <span></span>}
+                                    {size}
                                 </button>}
                             </Menu.Item>)}
                         </Menu.Items>
@@ -626,9 +628,9 @@ export const App = () => {
                             </div>
                         </Menu.Button>
                         <Menu.Items className="w-52 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {MISC_ACTIONS.map(({ name, action }) =>
-                            <Menu.Item key={name}>
-                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
+                            {MISC_ACTIONS.map(({ nameKey, action }) =>
+                            <Menu.Item key={nameKey}>
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{t(nameKey)}</button>}
                             </Menu.Item>)}
                         </Menu.Items>
                     </Menu>
@@ -648,20 +650,20 @@ export const App = () => {
                     {/* user login menu */}
                     {!loggedIn &&
                     <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-                        <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" required />
-                        <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
+                        <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+                        <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
                         <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
                     </form>}
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 text-4xl">
                             {loggedIn
                             ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                            : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>Create / Reset Account</div>}
+                            : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
                         </Menu.Button>
                         <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {(loggedIn
-                            ? [{ name: "Edit Profile", action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: "Logout", action: logout }]
-                            : [{ name: "Register a New Account", action: createAccount }, { name: "Forgot Your Password?", action: forgotPass }])
+                            ? [{ name: t("editProfile"), action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                            : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
                             .map(({ name, action }) =>
                             <Menu.Item key={name}>
                                 {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
@@ -676,7 +678,7 @@ export const App = () => {
         <Bubble />
         <ScriptDropdownMenu />
         <ModalContainer />
-    </>
+    </div>
 }
 
 const ModalContainer = () => {

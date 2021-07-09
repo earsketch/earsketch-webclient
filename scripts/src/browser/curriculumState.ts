@@ -1,23 +1,85 @@
-import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit'
-import lunr from 'lunr'
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
+import lunr from "lunr"
 
-import esconsole from '../esconsole'
+import esconsole from "../esconsole"
 import { importScript } from "../ide/IDE"
-import * as layout from '../layout/layoutState'
-import { RootState, ThunkAPI, AppDispatch } from '../reducers'
+import * as layout from "../layout/layoutState"
+import store, { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import * as userNotification from "../user/notification"
 
-export const fetchContent = createAsyncThunk<any, any, ThunkAPI>('curriculum/fetchContent', async ({ location, url }, { dispatch, getState }) => {
+const CURRICULUM_DIR = "../curriculum"
+
+// TODO: Make these selectors instead.
+let locationToPage: { [location: string]: number } = {}
+let locationToUrl: { [key: string]: string } = {}
+let urlToLocation: { [key: string]: number[] } = {}
+let idx: lunr.Index | null = null
+
+export const fetchLocale = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchLocale", async ({ location, url }, { dispatch, getState }) => {
+    dispatch(curriculumSlice.actions.setContentCache({}))
+    const locale = getState().app.locale
+
+    const [tocData, pagesData, searchData] = await Promise.all(["toc", "pages", "searchdoc"].map(
+        async res => (await fetch(`${CURRICULUM_DIR}/${locale}/curr_${res}.json`)).json()))
+
+    dispatch(setSearchDoc(searchData))
+    idx = lunr(function () {
+        this.ref("id")
+        this.field("title")
+        this.field("text")
+
+        searchData.forEach(function (doc: SearchDoc) {
+            this.add(doc)
+        }, this)
+    })
+
+    locationToPage = {}
+    locationToUrl = {}
+    urlToLocation = {}
+
+    pagesData.forEach((location: any[], pageIdx: number) => (locationToPage[location.join(",")] = pageIdx))
+    dispatch(setPages(pagesData))
+
+    tocData.forEach((unit: TOCItem, unitIdx: number) => {
+        urlToLocation[unit.URL] = [unitIdx]
+        locationToUrl[[unitIdx].join(",")] = unit.URL
+        unit.chapters?.forEach((ch, chIdx) => {
+            urlToLocation[ch.URL] = [unitIdx, chIdx]
+            locationToUrl[[unitIdx, chIdx].join(",")] = ch.URL
+            ch.sections?.forEach((sec, secIdx) => {
+                urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
+                locationToUrl[[unitIdx, chIdx, secIdx].join(",")] = sec.URL
+            })
+        })
+    })
+    const currentLocation = getState().curriculum.currentLocation
+    // Temporarily switch to a safe location (every version of the curriculum has a welcome page),
+    // so that the location-TOC mismatch doesn't break anything between now and fetchContent.
+    dispatch(setCurrentLocation([0]))
+    dispatch(setTableOfContents(tocData))
+    if (location === undefined && url === undefined) {
+        location = currentLocation
+    }
+    dispatch(fetchContent({ location, url }))
+})
+
+export const fetchContent = createAsyncThunk<any, any, ThunkAPI>("curriculum/fetchContent", async ({ location, url }, { dispatch, getState }) => {
     const state = getState()
-    const {href: _url, loc: _location} = fixLocation(url, location)
-    dispatch(loadChapter({location: _location}))
+    // check that locale is loaded
+    if (state.curriculum.tableOfContents.length === 0) {
+        dispatch(fetchLocale({ location, url }))
+        return
+    }
+    const { href: _url, loc: _location } = fixLocation(url, location)
+    dispatch(loadChapter({ location: _location }))
     // Check cache before fetching.
-    if (state.curriculum.contentCache[_location.join(',')] !== undefined) {
-        esconsole(`${_location} is in the cache, nothing else to do.`, 'debug')
+    if (state.curriculum.contentCache[_location.join(",")] !== undefined) {
+        esconsole(`${_location} is in the cache, nothing else to do.`, "debug")
         return {}
     }
-    const urlWithoutAnchor = _url.split('#', 1)[0]
-    esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, 'debug')
+
+    const urlWithoutAnchor = _url.split("#", 1)[0]
+    esconsole(`${_location} not in cache, fetching ${urlWithoutAnchor}.`, "debug")
     const response = await fetch(urlWithoutAnchor)
     // Add artificial latency; useful for testing:
     // await new Promise(r => setTimeout(r, 1000))
@@ -28,13 +90,13 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     const doc = new DOMParser().parseFromString(html, "text/html")
 
     // Bring these nodes into our document context, but replace the <body> with a <div>.
-    const root = document.createElement('div')
+    const root = document.createElement("div")
     while (doc.body.firstChild) {
         root.appendChild(document.adoptNode(doc.body.firstChild))
     }
 
     // Highlight code blocks.
-    root.querySelectorAll('pre code').forEach(block => hljs.highlightBlock(block))
+    root.querySelectorAll("pre code").forEach(block => hljs.highlightBlock(block))
 
     // Connect copy buttons.
     root.querySelectorAll(".copy-btn-python,.copy-btn-javascript").forEach((button: HTMLButtonElement) => {
@@ -45,7 +107,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[href^="#"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2).join(',')] + el.getAttribute("href") }))
+            dispatch(fetchContent({ url: locationToUrl[location.slice(0, 2).join(",")] + el.getAttribute("href") }))
         }
     })
     root.querySelectorAll('a[data-es-internallink="true"]').forEach((el: HTMLLinkElement) => {
@@ -85,22 +147,22 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
 
     if (location.length < 3) {
         // No sections, leave as-is.
-        return {[location.join(',')]: root}
+        return { [location.join(",")]: root }
     }
 
     // Chop the chapter up into sections.
-    const sect1 = root.querySelector('div.sect1')
+    const sect1 = root.querySelector("div.sect1")
     const body = sect1 ? sect1.parentNode : null
     // Special case: first section (sect2) should come with the opening blurb (sect1).
     // So, we put the body (with later sections removed) in the first slot, and skip the first sect2 in this for loop.
     const chapterLocation = location.slice(0, 2)
-    const map: { [key:string]: any } = {}
-    const sect2 = Array.from(root.querySelectorAll('div.sect2'))
-    for (let [idx, el] of sect2.slice(1).entries()) {
-        map[chapterLocation.concat([idx + 1]).join(',')] = el
+    const map: { [key: string]: any } = {}
+    const sect2 = Array.from(root.querySelectorAll("div.sect2"))
+    for (const [idx, el] of sect2.slice(1).entries()) {
+        map[chapterLocation.concat([idx + 1]).join(",")] = el
         el.remove()
     }
-    map[chapterLocation.concat([0]).join(',')] = body
+    map[chapterLocation.concat([0]).join(",")] = body
     return map
 }
 
@@ -110,18 +172,24 @@ interface CurriculumState {
     currentLocation: number[]
     focus: [string|null, string|null]
     showTableOfContents: boolean
-    contentCache: any
+    contentCache: any,
+    tableOfContents: TOCItem[],
+    pages: number[][],
+    searchDoc: SearchDoc[]
 }
 
 const curriculumSlice = createSlice({
-    name: 'curriculum',
+    name: "curriculum",
     initialState: {
-        searchText: '',
+        searchText: "",
         showResults: false,
         currentLocation: [0],
         focus: [null, null], // unit, chapter
         showTableOfContents: false,
         contentCache: {},
+        tableOfContents: [],
+        pages: [],
+        searchDoc: [],
     } as CurriculumState,
     reducers: {
         setSearchText(state, { payload }) {
@@ -130,11 +198,20 @@ const curriculumSlice = createSlice({
         setCurrentLocation(state, { payload }) {
             state.currentLocation = payload
         },
+        setTableOfContents(state, { payload }) {
+            state.tableOfContents = payload
+        },
+        setPages(state, { payload }) {
+            state.pages = payload
+        },
+        setSearchDoc(state, { payload }) {
+            state.searchDoc = payload
+        },
         showTableOfContents(state, { payload }) {
             state.showTableOfContents = payload
         },
         toggleFocus(state, { payload }) {
-            let [unitIdx, chIdx] = payload
+            const [unitIdx, chIdx] = payload
             if (chIdx) {
                 if (state.focus[1] === chIdx) {
                     state.focus[1] = null
@@ -157,28 +234,40 @@ const curriculumSlice = createSlice({
         showResults(state, { payload }) {
             state.showResults = payload
         },
+        setContentCache(state, { payload }) {
+            state.contentCache = payload
+        },
     },
     extraReducers: builder => {
         builder.addCase(fetchContent.fulfilled, (state: CurriculumState, action: { payload: any }) => {
             // Update the cache.
-            state.contentCache = {...state.contentCache, ...action.payload}
+            state.contentCache = { ...state.contentCache, ...action.payload }
         })
 
         builder.addCase(fetchContent.rejected, (...args) => {
-            esconsole("Fetch failed! " + JSON.stringify(args), 'error')
+            esconsole("Fetch failed! " + JSON.stringify(args), "error")
         })
-    }
+    },
 })
 
 export default curriculumSlice.reducer
 export const {
     setSearchText,
     setCurrentLocation,
+    setTableOfContents,
+    setPages,
+    setSearchDoc,
     showTableOfContents,
     loadChapter,
     toggleFocus,
     showResults,
 } = curriculumSlice.actions
+
+export const selectTableOfContents = (state: RootState) => state.curriculum.tableOfContents
+
+export const selectPages = (state: RootState) => state.curriculum.pages
+
+export const selectSearchDoc = (state: RootState) => state.curriculum.searchDoc
 
 export const selectSearchText = (state: RootState) => state.curriculum.searchText
 
@@ -186,75 +275,69 @@ export const selectShowResults = (state: RootState) => state.curriculum.showResu
 
 export const selectCurrentLocation = (state: RootState) => state.curriculum.currentLocation
 
-export const selectContent = (state: RootState) => state.curriculum.contentCache[state.curriculum.currentLocation.join(',')]
+export const selectContent = (state: RootState) => state.curriculum.contentCache[state.curriculum.currentLocation.join(",")]
 
 export const selectShowTableOfContents = (state: RootState) => state.curriculum.showTableOfContents
 
 export const selectFocus = (state: RootState) => state.curriculum.focus
 
-// Search through chapter descriptions.
-const documents = ESCurr_SearchDoc
-
-const idx = lunr(function () {
-    this.ref('id')
-    this.field('title')
-    this.field('text')
-
-    documents.forEach(function (doc) {
-        this.add(doc)
-    }, this)
-})
+export interface SearchDoc {
+    title: string
+    id: string
+    text: string
+}
 
 export interface SearchResult {
-    id: lunr.Index.Result['ref'],
+    id: lunr.Index.Result["ref"],
     title: string
 }
 
 export const selectSearchResults = createSelector(
-    [selectSearchText],
-    (searchText): SearchResult[] => {
-        if (!searchText)
-            return []
+    [selectSearchText, selectSearchDoc],
+    (searchText, searchDoc): SearchResult[] => {
+        if (!searchText || !idx) { return [] }
         try {
             return idx.search(searchText).map((res) => {
                 // @ts-ignore: TODO: handle not-found cases.
-                const title = documents.find((doc) => {
+                const title = searchDoc.find((doc) => {
                     return doc.id === res.ref
                 }).title
                 return {
                     id: res.ref,
-                    title: title
+                    title: title,
                 }
             })
         } catch (error) {
             // Not very concerning; searching for 'foo:', for example, causes a parse error.
-            esconsole(`lunr parse error on "${searchText}"`, 'debug')
+            esconsole(`lunr parse error on "${searchText}"`, "debug")
             return []
         }
     }
 )
 
 export const getChNumberForDisplay = (unitIdx: number|string, chIdx: number|string) => {
-    unitIdx = typeof(unitIdx)==='number' ? unitIdx : parseInt(unitIdx)
-    chIdx = typeof(chIdx)==='number' ? chIdx : parseInt(chIdx)
+    unitIdx = typeof (unitIdx) === "number" ? unitIdx : parseInt(unitIdx)
+    chIdx = typeof (chIdx) === "number" ? chIdx : parseInt(chIdx)
+
+    const toc = store.getState().curriculum.tableOfContents
     const unit = toc[unitIdx]
     if (unit.chapters && (unit.chapters[chIdx] === undefined || unit.chapters[chIdx].displayChNum === -1)) {
-        return ''
+        return ""
     } else {
         return unit.chapters && unit.chapters[chIdx].displayChNum
     }
 }
 
 export const selectPageTitle = createSelector(
-    [selectCurrentLocation, selectContent],
-    (location, content) => {
+    [selectCurrentLocation, selectContent, selectTableOfContents],
+    (location, content, toc) => {
         if (location[0] === -1) {
-            return 'Table of Contents'
+            return "Table of Contents"
         } else if (content === undefined) {
-            return 'Loading...'
+            return "Loading..."
         }
 
-        let title = ''
+        let title = ""
 
         if (location.length === 1) {
             return toc[location[0]].title
@@ -265,17 +348,17 @@ export const selectPageTitle = createSelector(
             }
             const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
             if (chNumForDisplay) {
-                title = chNumForDisplay + ': ' + title
+                title = chNumForDisplay + ": " + title
             }
             return title
         } else if (location.length === 3) {
             const h3 = content.querySelector("h3")
             if (h3) {
-                title = (+location[2]+1) + ': ' + h3.textContent
+                title = (+location[2] + 1) + ": " + h3.textContent
             }
             const chNumForDisplay = getChNumberForDisplay(location[0], location[1])
             if (chNumForDisplay) {
-                title = chNumForDisplay + '.' + title
+                title = chNumForDisplay + "." + title
             }
             return title
         }
@@ -290,14 +373,9 @@ export interface TOCItem {
     displayChNum?: number
 }
 
-const toc = ESCurr_TOC as [TOCItem]
-const tocPages = ESCurr_Pages
-
-const locationToPage: { [location:string]: number } = {}
-tocPages.forEach((location, pageIdx) => locationToPage[location.join(',')] = pageIdx)
-
 export const adjustLocation = (location: number[], delta: number) => {
-    let pageIdx = locationToPage[location.join(',')] + delta
+    const tocPages = store.getState().curriculum.pages
+    let pageIdx = locationToPage[location.join(",")] + delta
     if (pageIdx < 0) {
         pageIdx = 0
     } else if (pageIdx >= tocPages.length) {
@@ -307,75 +385,55 @@ export const adjustLocation = (location: number[], delta: number) => {
     return tocPages[pageIdx]
 }
 
-export const getURLForLocation = (location: number[]) => {
-    return locationToUrl[location.join(',')];
-}
-
 export function getChapterForError(errorMessage: string) {
     const aliases: any = { referenceerror: "nameerror", rangeerror: "valueerror" }
     const types = ["importerror", "indentationerror", "indexerror", "nameerror", "parseerror", "syntaxerror", "typeerror", "valueerror"]
     let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
     type = aliases[type] || type
-    const anchor = types.includes(type) ? '#' + type : ''
+    const anchor = types.includes(type) ? "#" + type : ""
     return { url: `every-error-explained-in-detail.html${anchor}` }
 }
 
-const urlToLocation: { [key:string]: number[] } = {}
-const locationToUrl: { [key:string]: string } = {}
-toc.forEach((unit: TOCItem, unitIdx: number) => {
-    urlToLocation[unit.URL] = [unitIdx]
-    locationToUrl[[unitIdx].join(',')] = unit.URL
-    unit.chapters?.forEach((ch, chIdx) => {
-        urlToLocation[ch.URL] = [unitIdx, chIdx]
-        locationToUrl[[unitIdx, chIdx].join(',')] = ch.URL
-        ch.sections?.forEach((sec, secIdx) => {
-            urlToLocation[sec.URL] = [unitIdx, chIdx, secIdx]
-            locationToUrl[[unitIdx, chIdx, secIdx].join(',')] = sec.URL
-        })
-    })
-})
+export const getURLForLocation = (location: number[]) => {
+    return locationToUrl[location.join(",")]
+}
 
 const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
+    const toc = selectTableOfContents(store.getState())
+
     if (loc === undefined && href !== undefined) {
-        loc = urlToLocation[href];
+        loc = urlToLocation[href]
     }
 
-    if (loc === undefined) {
+    if (loc === undefined || locationToUrl[loc.join(",")] === undefined) {
         // if loc is still undefined then this is a request for an un-indexed page, default them to the welcome page
-        loc = [0];
-        href = undefined as any;
-        userNotification.show('Failed to load curriculum link. Redirecting to welcome page.',"failure2", 2);
+        loc = [0]
+        href = undefined as any
+        userNotification.show("Failed to load curriculum link. Redirecting to welcome page.", "failure2", 2)
     }
 
-   href ??= locationToUrl[loc.join(',')]
+    href ??= locationToUrl[loc.join(",")]
 
     if (loc.length === 1 && toc[loc[0]].chapters) {
-        // @ts-ignore
-        if (toc[loc[0]].chapters.length > 0) {
-            // @ts-ignore
-            if (toc[loc[0]].chapters[0].length > 0) {
-                loc = [loc[0], 0, 0]
-            } else {
-                loc.push(0)
-            }
+        if (toc[loc[0]].chapters!.length > 0) {
+            loc = [...loc, 0]
         }
     }
 
     if (loc.length === 2 && toc[loc[0]].chapters) {
-        // @ts-ignore
-        var currChapter = toc[loc[0]].chapters[loc[1]]
+        const currChapter = toc[loc[0]].chapters![loc[1]]
 
         if (currChapter.sections && currChapter.sections.length > 0) {
-            const sectionDiv = href.split('#')[1]
+            const sectionDiv = href.split("#")[1]
             if (sectionDiv === undefined) {
                 // when opening a chapter-level page, also present the first section
-                loc.push(0) // add the first section (index 0)
+                loc = [...loc, 0] // add the first section (index 0)
                 href = currChapter.sections[0].URL
             } else {
-                //section id was sent in href, present the corresponding section
+                // section id was sent in href, present the corresponding section
                 for (let i = 0; i < currChapter.sections.length; i++) {
-                    if (sectionDiv === currChapter.sections[i].URL.split('#')[1]) {
-                        loc.push(i)
+                    if (sectionDiv === currChapter.sections[i].URL.split("#")[1]) {
+                        loc = [...loc, i]
                         href = currChapter.sections[i].URL
                         break
                     }
@@ -386,6 +444,5 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
         }
     }
 
-    const curriculumDir = '../curriculum/'
-    return {href: curriculumDir + href, loc}
+    return { href: CURRICULUM_DIR + href, loc }
 }

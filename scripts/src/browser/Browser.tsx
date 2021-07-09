@@ -192,10 +192,9 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
         >
             <div>
                 <FilterItem
-                    value='Clear'
                     category={category}
+                    isClearItem={true}
                 />
-                <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />
                 {
                     items.map((item,index) => <FilterItem
                         key={index}

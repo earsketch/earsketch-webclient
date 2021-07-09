@@ -121,12 +121,6 @@ const scriptsSlice = createSlice({
                 state.filters.sortBy.ascending = payload === "A-Z"
             }
         },
-        resetSorter(state) {
-            state.filters.sortBy = {
-                attribute: "Date",
-                ascending: false,
-            }
-        },
         setFeatureSharedScript(state, { payload }) {
             state.featureSharedScript = payload
         },
@@ -221,7 +215,6 @@ export const {
     removeFilterItem,
     resetFilter,
     setSorter,
-    resetSorter,
     setFeatureSharedScript,
     setDropdownMenu,
     resetDropdownMenu,
@@ -302,7 +295,6 @@ export const getRegularScripts = createAsyncThunk<void, { username: string, pass
             scriptList.forEach((script: Script) => {
                 script.saved = true
                 script.tooltipText = "" // For dirty tabs. Probably redundant.
-                script.imported = !!script.creator
                 removeUnusedFields(script)
                 formatDate(script)
                 setCollaborators(script)

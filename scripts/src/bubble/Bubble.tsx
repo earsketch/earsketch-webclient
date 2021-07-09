@@ -5,8 +5,11 @@ import { Placement } from '@popperjs/core';
 import parse from 'html-react-parser';
 import { useTranslation } from "react-i18next";
 
+import * as app from '../app/appState';
 import { pages } from './bubbleData';
 import * as bubble from './bubbleState';
+import * as curriculum from '../browser/curriculumState';
+import { AVAILABLE_LOCALES } from '../top/LocaleSelector';
 
 const Backdrop = () => {
     return (
@@ -35,6 +38,7 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string}) => {
 
 const MessageFooter = () => {
     const currentPage = useSelector(bubble.selectCurrentPage);
+    const locale = useSelector(app.selectLocale);
     const dispatch = useDispatch();
     const { t } = useTranslation()
 
@@ -64,21 +68,34 @@ const MessageFooter = () => {
 
     return (
         <div className='flex justify-between mt-8'>
-            <div className='w-1/2'>
-                { currentPage===0 && (
+            <div className='w-1/2 flex'>
+                {currentPage === 0 && <>
+                    <div className="mr-4">
+                        <div className='text-sm'>{t('bubble:userLanguage')}</div>
+                        <select
+                            className='border-0 border-b-2 border-black outline-none'
+                            onChange={e => {
+                                dispatch(app.setLocale(e.currentTarget.value))
+                                // TODO: This should happen automatically when the locale changes.
+                                dispatch(curriculum.fetchLocale({}))
+                            }}
+                            value={locale}
+                        >
+                            {AVAILABLE_LOCALES.map(({ displayText, localeCode }) => <option key={localeCode} value={localeCode}>{displayText}</option>)}
+                        </select>
+                    </div>
+
                     <div>
                         <div className='text-sm'>{t('bubble:defaultProgrammingLanguage')}</div>
                         <select
                             className='border-0 border-b-2 border-black outline-none'
-                            name="lang"
-                            id="lang"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                         >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>
                         </select>
                     </div>
-                )}
+                </>}
             </div>
             <div className='w-1/3 flex justify-evenly'>
                 { buttons }
