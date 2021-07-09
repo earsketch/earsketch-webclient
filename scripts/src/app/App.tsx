@@ -348,9 +348,9 @@ export const App = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
-    ;(window as any).loadCurriculumChapter = (location: string) => {
+    ;(window as any).loadCurriculumChapter = (url: string) => {
         dispatch(layout.openEast("CURRICULUM"))
-        dispatch(curriculum.fetchContent({ location: location.split("-") }))
+        dispatch(curriculum.fetchContent({ url: url }))
     }
 
     const [showNotifications, setShowNotifications] = useState(false)
