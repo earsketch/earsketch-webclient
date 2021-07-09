@@ -35,6 +35,7 @@
     "version": "Versión",
     "script_plural": "Scripts",
     "scriptBrowser.myScripts": "Mis scripts",
+    "scriptBrowser.sharedScripts": "Scripts compartidos",
     "daw.title": "Estación de Audio Digital",
     "daw.shortTitle": "EAD",
     "daw.effect": "Efecto",
@@ -217,7 +218,7 @@
     "curriculum.copyURL": "Copiar URL del currículo"
   },
   "bubble": {
-    "userLanguage": "Lenguaje",
+    "userLanguage": "Idioma",
     "defaultProgrammingLanguage": "Lenguaje de programación predeterminado",
     "buttons": {
       "skip": "Saltar",
@@ -239,7 +240,7 @@
       "end": "Fin"
     },
     "body": {
-      "start": "¿Estás listo/a para empezar a programar y componer? Si es la primera vez que lo haces, haz clic en <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Iniciar</span> abajo para un breve tutorial de la interfaz de EarSketch. Si tienes experiencia usándola, haz clic en <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Saltar</span> para empezar a programar.<br><br>*El lenguaje de programación predeterminado para este tutorial es Python, haz clic abajo para cambiarlo a JavaScript.",
+      "start": "¿Estás listo/a para empezar a programar y componer? Si es la primera vez que lo haces, haz clic en <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Iniciar</span>abajo para un breve tutorial de la interfaz de EarSketch. Si tienes experiencia usándola, haz clic en <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Saltar</span>para empezar a programar.<br><br>*El lenguaje de programación predeterminado para este tutorial es Python, haz clic abajo para cambiarlo a JavaScript.",
       "codeEditor": "El editor de código es el espacio de trabajo donde compones tu música. Es un editor de texto con líneas numeradas.",
       "runCode": "Ejecuta tu código y míralo mientras se convierte en música. Haz clic en el botón<span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>EJECUTAR</span> y observa el código en la Estación de Audio Digital ubicada encima del editor de código.",
       "previewMusic": "La Estación de Audio Digital (EAD) es una visualización cronológica de tu código que muestra el tiempo en segundos y compases. Debajo de esta sequencia cronológica, se colocan en pistas los clips de audio añadidos a tu canción.",
