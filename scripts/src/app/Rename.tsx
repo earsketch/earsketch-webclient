@@ -11,7 +11,7 @@ import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
-export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: Script) => void }) => {
+export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
@@ -24,8 +24,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                 collaboration.renameScript(script.shareid, fullname, userProject.getUsername())
                 reporter.renameSharedScript()
             }
-            script.name = fullname
-            close(script)
+            close(fullname)
         } catch (error) {
             setError(t(error))
         }

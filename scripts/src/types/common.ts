@@ -11,7 +11,6 @@ export interface Script {
     tooltipText: string
     collaborative: boolean
     collaborators: string[]
-    imported: boolean
     isShared: boolean
     run_status: number
     readonly: boolean

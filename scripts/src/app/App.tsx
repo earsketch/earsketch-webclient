@@ -85,11 +85,9 @@ export function renameSound(sound: SoundEntity) {
 }
 
 export async function renameScript(script: Script) {
-    // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
-    script = Object.assign({}, script)
-    const newScript = await openModal(RenameScript, { script })
-    if (!newScript) return
-    await userProject.renameScript(script.shareid, newScript.name)
+    const name = await openModal(RenameScript, { script })
+    if (!name) return
+    await userProject.renameScript(script, name)
     reporter.renameScript()
 }
 
