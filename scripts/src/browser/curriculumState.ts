@@ -391,7 +391,7 @@ export function getChapterForError(errorMessage: string) {
     let type = errorMessage.split(" ")[3].slice(0, -1).toLowerCase()
     type = aliases[type] || type
     const anchor = types.includes(type) ? "#" + type : ""
-    return { url: `every-error-explained-in-detail.html${anchor}` }
+    return { url: `/en/v1/every-error-explained-in-detail.html${anchor}` }
 }
 
 export const getURLForLocation = (location: number[]) => {
