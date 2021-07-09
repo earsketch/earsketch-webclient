@@ -28,7 +28,11 @@ export const LocaleSelector = () => {
     }
 
     useEffect(() => {
-        i18n.changeLanguage(currentLocale)
+        if (AVAILABLE_LOCALES.some(l => l.localeCode === currentLocale)) {
+            i18n.changeLanguage(currentLocale)
+        } else {
+            changeLanguage(AVAILABLE_LOCALES[0].localeCode)
+        }
     }, [currentLocale])
 
     return (
