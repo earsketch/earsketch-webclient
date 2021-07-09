@@ -704,7 +704,7 @@
           "description": "Constante del efecto: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME o WAH."
         },
         "effectParameter": {
-          "description": "Constante que indica para que parámetro del tipoDelEfecto se está creando el envelope. (Ve <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a> en la barra lateral del currículo para ver una lista completa del los parámetros del efecto.)"
+          "description": "Constante que indica para que parámetro del tipoDelEfecto se está creando el envelope. (Ve <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> en la barra lateral del currículo para ver una lista completa del los parámetros del efecto.)"
         },
         "effectList": {
           "description": "Lista/Matriz de valores de parámetro del efecto (por ejemplo, [0.0, 5.3, -12])."
@@ -729,7 +729,7 @@
       }
     },
     "setEffect1": {
-      "description": "Esta función aplica un efecto a un número de pista determinado y establece un valor particular para el parámetro del efecto durante toda la pista. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve a <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a>en el currículo.",
+      "description": "Esta función aplica un efecto a un número de pista determinado y establece un valor particular para el parámetro del efecto durante toda la pista. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve a <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>en el currículo.",
       "parameters": {
         "track": {
           "description": "La pista en donde colocar el efecto (o MIX_TRACK para aplicarlo a todas las pistas)"
@@ -746,7 +746,7 @@
       }
     },
     "setEffect2": {
-      "description": "Esta función aplica un efecto a un número de pista determinado. A diferencia de la otra versión de setEffect(), hay argumentos adicionales para crear un envelope que cambie el valor de un efecto de parámetro a lo largo del tiempo. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve al currículo: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"5-1-0\")'>Every Effect Explained in Detail</a>",
+      "description": "Esta función aplica un efecto a un número de pista determinado. A diferencia de la otra versión de setEffect(), hay argumentos adicionales para crear un envelope que cambie el valor de un efecto de parámetro a lo largo del tiempo. Para información detallada sobre todos los efectos disponibles con setEffect(), por favor, ve al currículo: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>",
       "parameters": {
         "effectStartValue": {
           "description": "Valor del parámetro del efecto al comienzo del envelope del efecto"
