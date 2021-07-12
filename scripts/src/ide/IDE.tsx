@@ -395,9 +395,10 @@ export const IDE = () => {
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
 
-    const horizontalRatio = useSelector(layout.selectHorizontalRatio)
+    let horizontalRatio = useSelector(layout.selectHorizontalRatio)
     let verticalRatio = useSelector(layout.selectVerticalRatio)
     if (embedMode) {
+        horizontalRatio = [0, 100, 0]
         verticalRatio = hideEditor ? [100, 0, 0] : [25, 75, 0]
     }
 
