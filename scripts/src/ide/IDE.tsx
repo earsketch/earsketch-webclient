@@ -409,7 +409,9 @@ export const IDE = () => {
                 onDragEnd={ratio => dispatch(layout.setHorizontalSizesFromRatio(ratio))}
             >
                 <div id="sidebar-container" style={bubbleActive && [5,6,7,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    <Browser />
+                    <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
+                        <Browser />
+                    </div>
                 </div>
 
                 <Split
