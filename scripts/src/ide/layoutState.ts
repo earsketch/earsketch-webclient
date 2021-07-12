@@ -87,6 +87,7 @@ const selectSouthSize = (state: RootState) => state.layout.south.size
 
 export const COLLAPSED_WIDTH = 45
 export const MIN_WIDTH = 280
+export const MIN_DAW_HEIGHT = 40
 
 export const selectHorizontalRatio = createSelector(
     [selectWestSize, selectEastSize, isWestOpen, isEastOpen],

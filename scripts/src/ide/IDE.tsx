@@ -365,6 +365,7 @@ export const IDE = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
     const embeddedScriptUsername = useSelector(appState.selectEmbeddedScriptUsername)
+    const hideDAW = useSelector(appState.selectHideDAW)
     const hideEditor = useSelector(appState.selectHideEditor)
 
     const bubbleActive = useSelector(bubble.selectActive)
@@ -394,13 +395,14 @@ export const IDE = () => {
     const isEastOpen = useSelector(layout.isEastOpen)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
-    const minHeights = embedMode ? [0, 0, 0] : [42, 100, 42]
+    const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, 100, layout.MIN_DAW_HEIGHT]
+    const maxHeights = hideDAW ? [layout.MIN_DAW_HEIGHT, Infinity, 0] : undefined
 
     let horizontalRatio = useSelector(layout.selectHorizontalRatio)
     let verticalRatio = useSelector(layout.selectVerticalRatio)
     if (embedMode) {
         horizontalRatio = [0, 100, 0]
-        verticalRatio = hideEditor ? [100, 0, 0] : [25, 75, 0]
+        verticalRatio = hideEditor ? [100, 0, 0] : (hideDAW ? [0, 100, 0] : [25, 75, 0])
     }
 
     return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
@@ -418,7 +420,7 @@ export const IDE = () => {
 
                 <Split
                     className="split flex flex-col" gutterSize={gutterSize} snapOffset={0}
-                    sizes={verticalRatio} minSize={minHeights} direction="vertical"
+                    sizes={verticalRatio} minSize={minHeights} maxSize={maxHeights} direction="vertical"
                     onDragEnd={ratio => dispatch(layout.setVerticalSizesFromRatio(ratio))}
                 >
                     <div id="devctrl">
