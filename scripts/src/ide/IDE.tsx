@@ -394,6 +394,7 @@ export const IDE = () => {
     const isEastOpen = useSelector(layout.isEastOpen)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
     const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
+    const minHeights = embedMode ? [0, 0, 0] : [42, 100, 42]
 
     let horizontalRatio = useSelector(layout.selectHorizontalRatio)
     let verticalRatio = useSelector(layout.selectVerticalRatio)
@@ -417,7 +418,7 @@ export const IDE = () => {
 
                 <Split
                     className="split flex flex-col" gutterSize={gutterSize} snapOffset={0}
-                    sizes={verticalRatio} direction="vertical"
+                    sizes={verticalRatio} minSize={minHeights} direction="vertical"
                     onDragEnd={ratio => dispatch(layout.setVerticalSizesFromRatio(ratio))}
                 >
                     <div id="devctrl">
