@@ -20,8 +20,7 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
-import * as Layout from "../layout/Layout"
-import * as layout from "../layout/layoutState"
+import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
@@ -293,27 +292,9 @@ function setup() {
     esconsole.getURLParameters()
 
     const isEmbedded = appState.selectEmbedMode(store.getState())
-    const hideEditor = appState.selectHideEditor(store.getState()) 
 
     if (isEmbedded) {
         store.dispatch(appState.setColorTheme("light"))
-        Layout.destroy()
-        layout.setMinSize(0)
-
-        if (hideEditor) {
-            layout.setGutterSize(0)
-        }
-        Layout.initialize()
-        store.dispatch(layout.collapseWest())
-        store.dispatch(layout.collapseEast())
-        store.dispatch(layout.collapseSouth())
-
-        if (hideEditor) {
-            // Note: hideDAW-only currently does not fit the layout height to the DAW player height as the below API only supports ratios.
-            store.dispatch(layout.setNorthFromRatio([100,0,0]))
-        } else {
-            store.dispatch(layout.setNorthFromRatio([25,75,0]))
-        }
     } else {
         userProject.loadLocalScripts()
     }
@@ -321,7 +302,6 @@ function setup() {
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
         store.dispatch(layout.setEast({ open: true }))
-        Layout.resetHorizontalSplits()
     }
 }
 
@@ -349,7 +329,7 @@ export const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
-        dispatch(layout.openEast("CURRICULUM"))
+        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
         dispatch(curriculum.fetchContent({ url: url }))
     }
 
@@ -367,7 +347,7 @@ export const App = () => {
     ]
 
     useEffect(() => {
-        Layout.initialize()
+        document.getElementById("loading-screen")!.style.display = "none"
 
         // Attempt to load userdata from a previous session.
         if (userProject.isLoggedIn()) {
@@ -517,7 +497,7 @@ export const App = () => {
 
     const toggleCAIWindow = () => {
         if (!showCAI) {
-            dispatch(layout.openEast("CAI"))
+            dispatch(layout.setEast({ open: true, kind: "CAI" }))
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {

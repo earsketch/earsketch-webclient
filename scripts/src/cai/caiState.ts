@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import store, { RootState, ThunkAPI } from '../reducers'
-import * as layout from '../layout/layoutState'
+import * as layout from '../ide/layoutState'
 import * as curriculum from '../browser/curriculumState'
 import * as editor from '../ide/Editor'
 import * as userProject from '../app/userProject'
@@ -279,7 +279,7 @@ export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], Thunk
     'cai/openCurriculum',
     ([message, location], { getState, dispatch }) => {
         dispatch(curriculum.fetchContent({location: message.keyword[location][1].split('-')}))
-        dispatch(layout.openEast("CURRICULUM"))
+        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
     }
 );
 

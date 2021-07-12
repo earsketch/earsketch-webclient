@@ -7,7 +7,7 @@ import { SearchBar, Collapsed } from "./Browser"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
 import { importScript } from "../ide/IDE"
-import * as layout from "../layout/layoutState"
+import * as layout from "../ide/layoutState"
 import * as userNotification from "../user/notification"
 import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
@@ -159,7 +159,7 @@ export const TitleBar = () => {
             <div>
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
-                    onClick={() => dispatch(layout.collapseEast())}
+                    onClick={() => dispatch(layout.setEast({ open: false }))}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </div>

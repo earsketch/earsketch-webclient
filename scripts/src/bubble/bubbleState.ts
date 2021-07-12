@@ -2,12 +2,12 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { Script } from 'common';
 import * as editor from '../ide/Editor';
-import * as layout from '../layout/layoutState';
+import * as layout from '../ide/layoutState';
 import * as tabs from '../ide/tabState';
 import * as userProject from '../app/userProject';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';
-import { BrowserTabType } from "../layout/layoutState";
+import { BrowserTabType } from "../ide/layoutState";
 
 interface BubbleState {
     active: boolean
@@ -87,8 +87,8 @@ export const proceed = createAsyncThunk(
 
         switch (currentPage) {
             case 0:
-                await dispatch(layout.collapseWest());
-                await dispatch(layout.collapseEast());
+                await dispatch(layout.setWest({ open: false }));
+                await dispatch(layout.setEast({ open: false }));
                 await dispatch(createSampleScript());
                 await dispatch(setEditorReadOnly(true));
                 break;
@@ -100,13 +100,13 @@ export const proceed = createAsyncThunk(
             case 4:
                 break;
             case 5:
-                await dispatch(layout.openWest(BrowserTabType.Sound));
+                await dispatch(layout.setWest({ open: true, kind: BrowserTabType.Sound }));
                 break;
             case 6:
-                await dispatch(layout.openWest(BrowserTabType.Script));
+                await dispatch(layout.setWest({ open: true, kind: BrowserTabType.Script }));
                 break;
             case 7:
-                await dispatch(layout.openEast());
+                await dispatch(layout.setEast({ open: true }));
                 break;
             case 8:
                 await dispatch(setEditorReadOnly(false));
