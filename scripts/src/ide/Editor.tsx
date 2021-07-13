@@ -93,8 +93,23 @@ export function setLanguage(language: string) {
 }
 
 export function pasteCode(code: string) {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.setFocusedText(code)
+    if (ace.getReadOnly()) {
+        return
+    } else if (droplet.currentlyUsingBlocks) {
+        if (!droplet.cursorAtSocket()) {
+            // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
+            // Press Enter once to start a new free-form block for text input.
+            const ENTER_KEY = 13
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { which: ENTER_KEY } as any))
+            // Fill the block with the pasted text.
+            droplet.setFocusedText(code)
+            // Press Enter again to finalize the block.
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { which: ENTER_KEY } as any))
+        } else {
+            droplet.setFocusedText(code)
+        }
     } else {
         ace.insert(code)
         ace.focus()
