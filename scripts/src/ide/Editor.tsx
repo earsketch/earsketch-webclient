@@ -81,16 +81,6 @@ export function checkRedo() {
     }
 }
 
-export function clearHistory() {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.clearUndoStack()
-    } else {
-        const undoManager = ace.getSession().getUndoManager()
-        undoManager.reset()
-        ace.getSession().setUndoManager(undoManager)
-    }
-}
-
 export function setLanguage(language: string) {
     if (language === "python") {
         droplet?.setMode("python", config.blockPalettePython.modeOptions)
@@ -282,8 +272,14 @@ export const Editor = () => {
 
     useEffect(() => {
         if (blocksMode && !droplet.currentlyUsingBlocks) {
+            const emptyUndo = droplet.undoStack.length === 0
             setLanguage(language)
             if (droplet.toggleBlocks().success) {
+                // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
+                // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
+                if (emptyUndo) {
+                    droplet.clearUndoStack()
+                }
                 userConsole.clear()
             } else {
                 userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
@@ -323,6 +319,8 @@ export const Editor = () => {
             } else if (!droplet.currentlyUsingBlocks) {
                 droplet.toggleBlocks()
             }
+            // Don't allow droplet to share undo stack between tabs.
+            droplet.clearUndoStack()
         } else {
             setLanguage(language)
         }
