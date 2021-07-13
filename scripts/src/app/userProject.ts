@@ -589,6 +589,15 @@ export async function setScriptDesc(scriptname: string, id: string, description:
     // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
 }
 
+export function generateAnonymousScriptID() {
+    // Find the max local script ID and add one to guarantee a new, unique ID.
+    // Note that local script IDs are prefixed with "local/" to prevent conflict with server share IDs (which consist of A-Z, a-z, 0-9, -, _, and =).
+    const PREFIX = "local/"
+    const scripts = scriptsState.selectAllScripts(store.getState())
+    const maxID = Math.max(...Object.keys(scripts).filter(s => s.startsWith(PREFIX)).map(s => parseInt(s.slice(PREFIX.length))))
+    return `local/${maxID === -Infinity ? 0 : maxID + 1}`
+}
+
 // Import a shared script to the user's owned script list.
 async function importSharedScript(scriptid: string) {
     let script
@@ -603,8 +612,7 @@ async function importSharedScript(scriptid: string) {
             original_id: script.shareid,
             collaborative: false,
             readonly: false,
-            // TODO: Here and in saveScript(), have a more robust method of generating share IDs...
-            shareid: ESUtils.randomString(22),
+            shareid: generateAnonymousScriptID(),
         }
     }
     const { [scriptid]: _, ...updatedSharedScripts } = sharedScripts
@@ -745,7 +753,7 @@ export async function saveScript(scriptname: string, source_code: string, overwr
             shareid = match?.shareid
         }
         if (shareid === undefined) {
-            shareid = ESUtils.randomString(22)
+            shareid = generateAnonymousScriptID()
         }
 
         const script = { 

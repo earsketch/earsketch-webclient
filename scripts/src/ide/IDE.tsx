@@ -234,7 +234,7 @@ export function importScript(key: string) {
     const fakeScript = {
         name: scriptName + ext,
         source_code: key,
-        shareid: ESUtils.randomString(22),
+        shareid: userProject.generateAnonymousScriptID(),
         readonly: true,
     }
 

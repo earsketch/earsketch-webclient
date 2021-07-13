@@ -219,13 +219,12 @@ export const ScriptDropdownMenu = () => {
             <MenuItem
                 name={t('script.delete')} icon='icon-bin'
                 visible={type !== 'readonly'}
-                onClick={async () => {
+                onClick={() => {
                     if (type === 'regular') {
-                        await deleteScript(unsavedScript!);
+                        deleteScript(unsavedScript!);
                     } else if (type === 'shared') {
-                        await deleteSharedScript(script!);
+                        deleteSharedScript(script!);
                     }
-                    await userProject.refreshCodeBrowser();
                 }}
             />
         </div>
