@@ -152,7 +152,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             dispatch(setErrorOptions([]))
         }
         if (msgText.includes("[ERRORFIX")) {
-            const errorS = msgText.substring(msgText.indexOf("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
+            const errorS = msgText.substring(msgText.includes("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
             const errorF = msgText.substring(msgText.lastIndexOf("|") + 1, msgText.length - 1)
             msgText = msgText.substring(0, msgText.indexOf("[ERRORFIX"))
             dialogue.setSuccessFail(parseInt(errorS), parseInt(errorF))

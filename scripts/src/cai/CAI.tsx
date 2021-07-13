@@ -17,10 +17,11 @@ const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about {}
+                    Talk to CAI about { }
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
-                        : <span>a project, when one is open</span>}
+                        : <span>a project, when one is open</span>
+                    }
                     .
                 </div>
             </div>
@@ -164,16 +165,16 @@ if (FLAGS.SHOW_CAI) {
     window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
     window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
 
-    let x: number | undefined, y: number | undefined
+    let mouseX: number | undefined, mouseY: number | undefined
 
     window.addEventListener("mousemove", e => {
-        x = e.x
-        y = e.y
+        mouseX = e.x
+        mouseY = e.y
     })
 
     window.setInterval(() => {
-        if (x && y) {
-            store.dispatch(cai.mousePosition([x, y]))
+        if (mouseX && mouseY) {
+            store.dispatch(cai.mousePosition([mouseX, mouseY]))
         }
     }, 5000)
 }
