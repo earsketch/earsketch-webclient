@@ -39,6 +39,7 @@ declare var SC: any;  // Soundcloud
 declare var Sk: any;
 
 declare module 'xml2js';
+declare module 'chance';
 declare var $: any;
 
 declare var createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode;
