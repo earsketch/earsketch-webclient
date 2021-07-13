@@ -17,6 +17,7 @@ import daw from "./daw/dawState"
 import curriculum from "./browser/curriculumState"
 import recommender from "./browser/recommenderState"
 import cai from "./cai/caiState"
+import chat from "./cai/chatState"
 
 const rootReducer = combineReducers({
     app,
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
     curriculum,
     recommender,
     cai,
+    chat,
 })
 
 const persistConfig = {
