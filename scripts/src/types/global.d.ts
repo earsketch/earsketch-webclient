@@ -11,15 +11,6 @@ declare var SITE_BASE_URI: string;
 declare var BUILD_NUM: string;
 declare var FLAGS: any;
 
-declare var ESCurr_TOC: any;
-declare var ESCurr_Pages: number[][];
-declare var ESCurr_SearchDoc: {
-    title: string
-    id: string
-    text: string
-}[];
-declare var ES_JAVASCRIPT_API: any;
-
 declare var acorn: any;
 declare var app: any;
 declare var difflib: any;

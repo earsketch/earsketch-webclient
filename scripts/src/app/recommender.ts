@@ -1,6 +1,6 @@
 // Recommend audio samples.
 import { fillDict } from "../cai/analysis"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
@@ -34,7 +34,7 @@ export function getKeyDict(type: string) {
     }
 }
 
-export function addRecInput(recInput: string[], script: ScriptEntity) {
+export function addRecInput(recInput: string[], script: Script) {
     // Generate list of input samples
     let lines = script.source_code.split('\n')
     for (let line = 0; line < lines.length; line++) {

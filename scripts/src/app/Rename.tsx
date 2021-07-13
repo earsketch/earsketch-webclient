@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
-import { ScriptEntity, SoundEntity } from "common"
+import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
 import { validateScriptName } from "./ScriptCreator"
@@ -11,7 +11,7 @@ import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
-export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity, conflict?: boolean, close: (value?: ScriptEntity) => void }) => {
+export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
@@ -24,8 +24,7 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
                 collaboration.renameScript(script.shareid, fullname, userProject.getUsername())
                 reporter.renameSharedScript()
             }
-            script.name = fullname
-            close(script)
+            close(fullname)
         } catch (error) {
             setError(t(error))
         }
@@ -47,7 +46,7 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
             </div>
             <div className="modal-footer">
                 <input type="submit" className="btn btn-primary" value={t('rename.submit') as string} />
-                <input type="button" className="btn btn-default" onClick={() => close()} value={conflict ? t('renameScript.appendSuffix') as string : t('cancel') as string} />
+                <input type="button" className="btn btn-default" onClick={() => close(userProject.nextName(script.name))} value={conflict ? t('renameScript.appendSuffix') as string : t('cancel') as string} />
             </div>
         </form>
     </>

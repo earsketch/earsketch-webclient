@@ -1,19 +1,21 @@
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
 
 import * as app from "../app/appState"
-import * as userProject from "./userProject"
-import { useTranslation } from "react-i18next"
+import * as scriptsState from "../browser/scriptsState"
+import store from "../reducers"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
+    const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (name.length < 3) {
         throw 'messages:general.shortname'
     } else if (/[$-/:-?{-~!"^#`\[\]\\]/g.test(name)) {
         // Why are hyphens banned from script names?
         throw 'messages:idecontroller.illegalname'
-    } else if (Object.values(userProject.scripts).some(script => !script.soft_delete && script.name === fullname)) {
+    } else if (Object.values(scripts).some(script => ![true, "1"].includes(script.soft_delete as any) && script.name === fullname)) {
         // Conflict with existing script.
         throw 'messages:idecontroller.overwrite'
     } else {

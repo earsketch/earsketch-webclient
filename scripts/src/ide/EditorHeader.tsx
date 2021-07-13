@@ -9,8 +9,8 @@ import * as editor from './Editor';
 import * as ide from './ideState';
 import { compileCode } from './IDE';
 import * as tabs from './tabState';
+import store from '../reducers';
 import * as scripts from '../browser/scriptsState';
-import * as userProject from '../app/userProject';
 
 const UndoRedoButtons = () => {
     const theme = useSelector(appState.selectColorTheme);
@@ -51,7 +51,7 @@ export const EditorHeader = () => {
     const dispatch = useDispatch();
     const openTabs = useSelector(tabs.selectOpenTabs);
     const activeTab = useSelector(tabs.selectActiveTabID) as string;
-    const allScripts = useSelector(scripts.selectAllScriptEntities);
+    const allScripts = useSelector(scripts.selectAllScripts);
     const blocksMode = useSelector(ide.selectBlocksMode);
     const embedMode = useSelector(appState.selectEmbedMode);
     const theme = useSelector(appState.selectColorTheme);
@@ -107,8 +107,7 @@ export const EditorHeader = () => {
                                 ${theme==='light' ? 'bg-black' : 'bg-gray-700'}
                             `}
                             onClick={() => {
-                                // This temporary hack assumes any types of not-owned script are not sharable from the editor header.
-                                const unsavedScript = userProject.scripts[activeTab];
+                                const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab];
                                 shareScript(Object.assign({}, unsavedScript));
                             }}
                         >

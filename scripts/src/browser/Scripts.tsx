@@ -5,6 +5,7 @@ import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { usePopper } from 'react-popper';
 
+import { Script, ScriptType } from 'common';
 import { createScript } from '../ide/IDE';
 import * as scripts from './scriptsState';
 import * as tabs from '../ide/tabState';
@@ -12,23 +13,20 @@ import * as appState from '../app/appState';
 import * as user from '../user/userState';
 import * as userProject from '../app/userProject';
 import { RootState } from '../reducers';
-import { ScriptEntity, ScriptType } from 'common';
 
 import { SearchBar, Collection, DropdownMultiSelector } from './Browser';
-import {
-    openScript, openSharedScript, shareScript,
-    generateGetBoundingClientRect, VirtualRef, VirtualReference, DropdownMenuCaller
-} from './ScriptsMenus';
+import { DropdownMenuCaller, generateGetBoundingClientRect, VirtualRef, shareScript, VirtualReference } from './ScriptsMenus';
 import { useTranslation } from "react-i18next";
 
 const CreateScriptButton = () => {
+    const { t } = useTranslation()
     return (
         <div className='flex items-center rounded-full py-1 bg-black text-white cursor-pointer' onClick={createScript}>
             <div className='align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm'>
                 <i className='icon icon-plus2' />
             </div>
             <div className='mr-3'>
-                New script
+                {t("newScript")}
             </div>
         </div>
     );
@@ -44,54 +42,54 @@ const ScriptSearchBar = () => {
     return <SearchBar { ...props } />;
 };
 
-const FilterItem = ({ category, value }: { category: keyof scripts.Filters, value: string }) => {
+const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false);
-    const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
+    const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value));
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
+    const { t } = useTranslation()
 
     return (
-        <div
-            className={`flex justify-left items-center cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
-            onClick={() => {
-                if (isUtility) {
-                    dispatch(scripts.resetFilter(category));
-                } else {
-                    if (selected) dispatch(scripts.removeFilterItem({ category, value }));
-                    else dispatch(scripts.addFilterItem({ category, value }));
-                }
-            }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
-        >
-            <div className='w-8'>
-                <i className={`glyphicon glyphicon-ok ${selected ? 'block' : 'hidden'}`} />
+        <>
+            <div
+                className={`flex justify-left items-center cursor-pointer pr-8 ${theme === 'light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
+                onClick={() => {
+                    if (isClearItem) {
+                        dispatch(scripts.resetFilter(category));
+                    } else {
+                        if (selected) dispatch(scripts.removeFilterItem({category, value}));
+                        else dispatch(scripts.addFilterItem({category, value}));
+                    }
+                }}
+                onMouseEnter={() => setHighlight(true)}
+                onMouseLeave={() => setHighlight(false)}
+            >
+                <div className='w-8'>
+                    <i className={`glyphicon glyphicon-ok ${selected ? 'block' : 'hidden'}`}/>
+                </div>
+                <div className='select-none'>
+                    {isClearItem ? t("clear") : value}
+                </div>
             </div>
-            <div className='select-none'>
-                {value}
-            </div>
-        </div>
+            {isClearItem && <hr className="border-1 my-2 border-black dark:border-white" />}
+        </>
     );
 };
 
-const SortOptionsItem = ({ value }: { value: scripts.SortByAttribute | 'Clear'}) => {
+const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribute, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false);
-    const isUtility = value==='Clear';
-    const selected = isUtility ? false : useSelector(scripts.selectSortByAttribute)===value;
+    const selected = isClearItem ? false : useSelector(scripts.selectSortByAttribute)===value;
     const ascending = useSelector(scripts.selectSortByAscending);
     const dispatch = useDispatch();
     const theme = useSelector(appState.selectColorTheme);
 
+    if (isClearItem) return null
+
     return (
         <div
             className={`flex justify-left items-center cursor-pointer pr-8 ${ theme==='light' ? (highlight ? 'bg-blue-200' : 'bg-white') : (highlight ? 'bg-blue-500' : 'bg-black')}`}
             onClick={() => {
-                if (isUtility) {
-                    dispatch(scripts.resetSorter());
-                } else {
-                    dispatch(scripts.setSorter(value));
-                }
+                dispatch(scripts.setSorter(value))
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
@@ -103,20 +101,21 @@ const SortOptionsItem = ({ value }: { value: scripts.SortByAttribute | 'Clear'})
                 {value}
             </div>
         </div>
-    );
+    )
 };
 
 const Filters = () => {
     const owners = useSelector(scripts.selectAllScriptOwners);
     const numOwnersSelected = useSelector(scripts.selectNumOwnersSelected);
     const numTypesSelected = useSelector(scripts.selectNumTypesSelected);
+    const { t } = useTranslation()
 
     return (
         <div className='p-3'>
-            <div className='pb-2 text-lg'>FILTER</div>
+            <div className='pb-2 text-lg'>{t('filter').toLocaleUpperCase()}</div>
             <div className='flex justify-between'>
                 <DropdownMultiSelector
-                    title='Owner'
+                    title={t('scriptBrowser.filterDropdown.owner')}
                     category='owners'
                     items={owners}
                     numSelected={numOwnersSelected}
@@ -124,7 +123,7 @@ const Filters = () => {
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title='File Type'
+                    title={t('scriptBrowser.filterDropdown.fileType')}
                     category='types'
                     items={['Python','JavaScript']}
                     numSelected={numTypesSelected}
@@ -132,7 +131,7 @@ const Filters = () => {
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title='Sort By'
+                    title={t('scriptBrowser.filterDropdown.sortBy')}
                     category='sortBy'
                     items={['Date','A-Z']}
                     position='right'
@@ -145,6 +144,7 @@ const Filters = () => {
 
 const ShowDeletedScripts = () => {
     const dispatch = useDispatch();
+    const { t } = useTranslation()
     return (
         <div className='flex items-center'>
             <div className='pr-2'>
@@ -158,7 +158,7 @@ const ShowDeletedScripts = () => {
                 />
             </div>
             <div className='pr-1'>
-                Show deleted
+                {t('scriptBrowser.showDeleted')}
             </div>
         </div>
     );
@@ -190,22 +190,16 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     );
 };
 
-const ShareButton = ({ script }: { script: ScriptEntity }) => (
-    <PillButton onClick={() => {
-        shareScript(script);
-    }}>
+const ShareButton = ({ script }: { script: Script }) => (
+    <PillButton onClick={() => shareScript(script)}>
         <i className='icon-share32' />
         <div>Share</div>
     </PillButton>
 );
 
-const RestoreButton = ({ script }: { script: ScriptEntity }) => {
-    const dispatch = useDispatch();
+const RestoreButton = ({ script }: { script: Script }) => {
     return (
-        <PillButton onClick={async () => {
-            await userProject.restoreScript(Object.assign({}, script));
-            dispatch(scripts.syncToNgUserProject());
-        }}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
             <i className='icon-rotate-cw2'/>
             <div>Restore</div>
         </PillButton>
@@ -299,7 +293,7 @@ const SingletonSharedScriptInfo = () => {
     );
 };
 
-const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
+const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
     const dispatch = useDispatch();
 
     return (
@@ -318,7 +312,7 @@ const SharedScriptInfoCaller = ({ script }: { script: ScriptEntity }) => {
 };
 
 interface ScriptProps {
-    script: ScriptEntity
+    script: Script
     bgTint: boolean
     type: ScriptType
 }
@@ -347,7 +341,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
     }
     const borderColor = theme==='light' ? 'border-gray-500' : 'border-gray-700';
 
-    const shared = script.imported || script.isShared;
+    const shared = script.creator || script.isShared;
     const collaborators = script.collaborators as string[];
 
     return (
@@ -358,10 +352,8 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
             onClick={() => {
                 if (type === 'regular') {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                    openScript(script);
                 } else if (type === 'shared') {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid));
-                    openSharedScript(script);
                 }
             }}
         >
@@ -375,16 +367,12 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
                             {script.name}
                         </div>
                         <div className='pr-4 space-x-2'>
-                            {
-                                (shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator}`} />)
-                            }
-                            {
-                                script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} />)
-                            }
+                            {(shared && !script.collaborative) && (<i className='icon-copy3 align-middle' title={`Shared by ${script.creator ?? script.username}`} />)}
+                            {script.collaborative && (<i className='icon-users4 align-middle' title={`Shared with ${collaborators.join(', ')}`} />)}
                         </div>
                     </div>
                     <div className={`${type==='regular' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
-                        { loggedIn && (<ShareButton script={userProject.scripts[script.shareid]} />) }
+                        { loggedIn && (<ShareButton script={script} />) }
                         <DropdownMenuCaller script={script} type='regular' />
                     </div>
                     <div className={`${type==='shared' ? 'flex' : 'hidden'} flex-column items-center space-x-4`}>
@@ -402,7 +390,7 @@ const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
 
 interface WindowedScriptCollectionProps {
     title: string
-    entities: scripts.ScriptEntities
+    entities: scripts.Scripts
     scriptIDs: string[]
     type: ScriptType
     visible?: boolean
@@ -437,7 +425,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible=tr
 );
 
 const RegularScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredActiveScriptEntities);
+    const entities = useSelector(scripts.selectFilteredActiveScripts);
     const scriptIDs = useSelector(scripts.selectFilteredActiveScriptIDs);
     const numScripts = useSelector(scripts.selectActiveScriptIDs).length;
     const { t } = useTranslation()
@@ -451,12 +439,13 @@ const RegularScriptCollection = () => {
 };
 
 const SharedScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredSharedScriptEntities);
+    const entities = useSelector(scripts.selectFilteredSharedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredSharedScriptIDs);
-    const numScripts = useSelector(scripts.selectSharedScriptIDs).length;
+    const numScripts = Object.keys(useSelector(scripts.selectSharedScripts)).length;
+    const { t } = useTranslation()
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
-    const title = `SHARED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
+    const title = `${t('scriptBrowser.sharedScripts').toLocaleUpperCase()} (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
     const type: ScriptType = 'shared'
     const initExpanded = useSelector(scripts.selectFeatureSharedScript);
     const props = { title, entities, scriptIDs, type, initExpanded };
@@ -464,7 +453,7 @@ const SharedScriptCollection = () => {
 };
 
 const DeletedScriptCollection = () => {
-    const entities = useSelector(scripts.selectFilteredDeletedScriptEntities);
+    const entities = useSelector(scripts.selectFilteredDeletedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredDeletedScriptIDs);
     const numScripts = useSelector(scripts.selectDeletedScriptIDs).length;
     const numFilteredScripts = scriptIDs.length;

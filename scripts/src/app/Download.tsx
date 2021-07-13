@@ -1,20 +1,20 @@
 import React, { useState } from "react"
 
 import * as exporter from "./exporter"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as userNotification from "../user/notification"
 import { useTranslation } from "react-i18next"
 
 // TODO: switch to a "name" property for non-localized types (wav and mp3)
 const EXPORT_TYPES = {
     // Thin wrapper for `exporter.text()` since it breaks the pattern (not async, doesn't take quality).
-    script: { nameKey: "script", icon: "file", async function(script: ScriptEntity, quality: boolean) { exporter.text(script) } },
+    script: { nameKey: "script", icon: "file", async function(script: Script, quality: boolean) { exporter.text(script) } },
     wav: { nameKey: "WAV", icon: "music", function: exporter.wav },
     mp3: { nameKey: "MP3", icon: "headphones", function: exporter.mp3 },
     multitrack: { nameKey: "download.multiTrack", icon: "th-list", function: exporter.multiTrack },
 }
 
-export const Download = ({ script, quality, close }: { script: ScriptEntity, quality: boolean, close: () => void }) => {
+export const Download = ({ script, quality, close }: { script: Script, quality: boolean, close: () => void }) => {
     const { t } = useTranslation();
     const [loading, setLoading] = useState({
         script: false,

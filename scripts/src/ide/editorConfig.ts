@@ -9,8 +9,8 @@ const blockModeOptions = {
     "functions": {
         "init": {"color": "purple"},
         "setTempo": {"color": "purple"},
-        "fitMedia": {"color": "purple", "dropdown": [null, blockDropdownNumbers]},
-        "makeBeat": {"color": "purple", "dropdown": [null, blockDropdownNumbers]},
+        "fitMedia": {"color": "purple", "dropdown": [null, blockDropdownNumbers, blockDropdownNumbers, blockDropdownNumbers]},
+        "makeBeat": {"color": "purple", "dropdown": [null, blockDropdownNumbers, blockDropdownNumbers]},
         "setEffect": {"color": "purple", "dropdown": [blockDropdownNumbers, blockDropdownEffects, blockDropdownEffectParameters]},
         "finish": {"color": "purple"},
         "println": {"color": "purple"},

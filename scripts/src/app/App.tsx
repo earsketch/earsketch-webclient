@@ -11,7 +11,7 @@ import { Bubble } from "../bubble/Bubble"
 import * as bubble from "../bubble/bubbleState"
 import * as cai from "../cai/caiState"
 import * as collaboration from "./collaboration"
-import { ScriptEntity, SoundEntity } from "common"
+import { Script, SoundEntity } from "common"
 import { CompetitionSubmission } from "./CompetitionSubmission"
 import * as curriculum from "../browser/curriculumState"
 import { Download } from "./Download"
@@ -20,8 +20,7 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
-import * as Layout from "../layout/Layout"
-import * as layout from "../layout/layoutState"
+import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
@@ -37,7 +36,7 @@ import * as scripts from "../browser/scriptsState"
 import { ScriptDropdownMenu } from "../browser/ScriptsMenus"
 import * as sounds from "../browser/soundsState"
 import { SoundUploader } from "./SoundUploader"
-import store from "../reducers"
+import store, { persistor } from "../reducers"
 import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
@@ -84,28 +83,25 @@ export function renameSound(sound: SoundEntity) {
     openModal(RenameSound, { sound })
 }
 
-export async function renameScript(script: ScriptEntity) {
-    // Make a copy, as userProject, etc. will try to mutate the immutable Redux script state.
-    script = Object.assign({}, script)
-    const newScript = await openModal(RenameScript, { script })
-    if (!newScript) return
-    await userProject.renameScript(script.shareid, newScript.name)
-    store.dispatch(scripts.syncToNgUserProject())
+export async function renameScript(script: Script) {
+    const name = await openModal(RenameScript, { script })
+    if (!name) return
+    await userProject.renameScript(script, name)
     reporter.renameScript()
 }
 
-export function downloadScript(script: ScriptEntity) {
+export function downloadScript(script: Script) {
     openModal(Download, { script, quality: false })
 }
 
-export async function openScriptHistory(script: ScriptEntity, allowRevert: boolean) {
+export async function openScriptHistory(script: Script, allowRevert: boolean) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
 }
 
-export function openCodeIndicator(script: ScriptEntity) {
+export function openCodeIndicator(script: Script) {
     openModal(ScriptAnalysis, { script })
 }
 
@@ -126,7 +122,7 @@ function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cance
     return openModal(Confirm, { text, ok, cancel, type })
 }
 
-export async function deleteScript(script: ScriptEntity) {
+export async function deleteScript(script: Script) {
     if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
@@ -135,22 +131,20 @@ export async function deleteScript(script: ScriptEntity) {
         await userProject.deleteScript(script.shareid)
         reporter.deleteScript()
 
-        store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.closeDeletedScript(script.shareid))
         store.dispatch(tabs.removeModifiedScript(script.shareid))
     }
 }
 
-export async function deleteSharedScript(script: ScriptEntity) {
+export async function deleteSharedScript(script: Script) {
     if (script.collaborative) {
         if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
-                userProject.closeSharedScript(script.shareid)
             }
             // Apply state change first
-            delete userProject.sharedScripts[script.shareid]
-            store.dispatch(scripts.syncToNgUserProject())
+            const { [script.shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
+            store.dispatch(scripts.setSharedScripts(sharedScripts))
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
             // userProject.getSharedScripts in this routine is not synchronous to websocket:leaveCollaboration
@@ -159,35 +153,34 @@ export async function deleteSharedScript(script: ScriptEntity) {
     } else {
         if (await confirm({ text: `Are you sure you want to delete the shared script "${script.name}"?`, ok: "Delete", type: "danger" })) {
             await userProject.deleteSharedScript(script.shareid)
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
         }
     }
 }
 
-export async function submitToCompetition(script: ScriptEntity) {
+export async function submitToCompetition(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     const shareID = await userProject.getLockedSharedScriptId(script.shareid)
     openModal(CompetitionSubmission, { name: script.name, shareID })
 }
 
-export async function importScript(script: ScriptEntity) {
+export async function importScript(script: Script) {
     if (!script) {
         script = tabs.selectActiveTabScript(store.getState())
     }
 
-    const imported = await userProject.importScript(Object.assign({}, script))
-    await userProject.refreshCodeBrowser()
-    store.dispatch(scripts.syncToNgUserProject())
+    const imported = await userProject.importScript(script)
+    if (!imported) {
+        return
+    }
 
     const openTabs = tabs.selectOpenTabs(store.getState())
     store.dispatch(tabs.closeTab(script.shareid))
 
     if (openTabs.includes(script.shareid)) {
         store.dispatch(tabs.setActiveTabAndEditor(imported.shareid))
-        userProject.openScript(imported.shareid)
     }
 }
 
@@ -202,7 +195,7 @@ export async function deleteSound(sound: SoundEntity) {
 export async function closeAllTabs() {
     if (await confirm({ text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All" })) {
         try {
-            await userProject.saveAll()
+            await saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
             store.dispatch(tabs.closeAllTabs())
         } catch {
@@ -219,7 +212,7 @@ userProject.getLicenses().then(ls => {
     }
 })
 
-export async function shareScript(script: ScriptEntity) {
+export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptShare, { script, licenses })
@@ -235,18 +228,14 @@ export function openUploadWindow() {
 
 export function reloadRecommendations() {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
+    const allScripts = scripts.selectAllScripts(store.getState())
     // Get the modified / unsaved script.
-    let script = null
-    if (activeTabID in userProject.scripts) {
-        script = userProject.scripts[activeTabID]
-    } else if (activeTabID in userProject.sharedScripts) {
-        script = userProject.sharedScripts[activeTabID]
-    }
+    const script = allScripts[activeTabID]
     if (!script) return
     let input = recommender.addRecInput([], script)
     let res = [] as any[]
     if (input.length === 0) {
-        const filteredScripts = Object.values(scripts.selectFilteredActiveScriptEntities(store.getState()))
+        const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
         if (filteredScripts.length) {
             const lim = Math.min(5, filteredScripts.length)
             for (let i = 0; i < lim; i++) {
@@ -303,46 +292,16 @@ function setup() {
     esconsole.getURLParameters()
 
     const isEmbedded = appState.selectEmbedMode(store.getState())
-    const hideEditor = appState.selectHideEditor(store.getState()) 
 
     if (isEmbedded) {
         store.dispatch(appState.setColorTheme("light"))
-        Layout.destroy()
-        layout.setMinSize(0)
-
-        if (hideEditor) {
-            layout.setGutterSize(0)
-        }
-        Layout.initialize()
-        store.dispatch(layout.collapseWest())
-        store.dispatch(layout.collapseEast())
-        store.dispatch(layout.collapseSouth())
-
-        if (hideEditor) {
-            // Note: hideDAW-only currently does not fit the layout height to the DAW player height as the below API only supports ratios.
-            store.dispatch(layout.setNorthFromRatio([100,0,0]))
-        } else {
-            store.dispatch(layout.setNorthFromRatio([25,75,0]))
-        }
     } else {
         userProject.loadLocalScripts()
-        store.dispatch(scripts.syncToNgUserProject())
-    }
-
-    try {
-        const shareID = ESUtils.getURLParameter("edit")
-        if (shareID) {
-            esconsole("opening a shared script in edit mode", ["main", "url"])
-            userProject.openSharedScriptForEdit(shareID)
-        }
-    } catch (error) {
-        esconsole(error, ["main", "url"])
     }
 
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
         store.dispatch(layout.setEast({ open: true }))
-        Layout.resetHorizontalSplits()
     }
 }
 
@@ -353,6 +312,7 @@ let email = ""
 
 export const App = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
     const showCAI = useSelector(layout.selectEastKind) === "CAI"
@@ -368,9 +328,9 @@ export const App = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
-    ;(window as any).loadCurriculumChapter = (location: string) => {
-        dispatch(layout.openEast("CURRICULUM"))
-        dispatch(curriculum.fetchContent({ location: location.split("-") }))
+    ;(window as any).loadCurriculumChapter = (url: string) => {
+        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
+        dispatch(curriculum.fetchContent({ url: url }))
     }
 
     const [showNotifications, setShowNotifications] = useState(false)
@@ -381,12 +341,14 @@ export const App = () => {
     const sharedScriptID = ESUtils.getURLParameter("sharing")
 
     const MISC_ACTIONS = [
-        { name: "Start Quick Tour", action: resumeQuickTour },
-        { name: "Switch Theme", action: toggleColorTheme },
-        { name: "Report Error", action: reportError },
+        { nameKey: "startQuickTour", action: resumeQuickTour },
+        { nameKey: "switchTheme", action: toggleColorTheme },
+        { nameKey: "reportError", action: reportError },
     ]
 
     useEffect(() => {
+        document.getElementById("loading-screen")!.style.display = "none"
+
         // Attempt to load userdata from a previous session.
         if (userProject.isLoggedIn()) {
             login(username, password).catch((error: Error) => {
@@ -397,28 +359,29 @@ export const App = () => {
                     reporter.exception("Auto-login failed. Clearing localStorage.")
                 }
             })
-        } else {
-            store.dispatch(scripts.syncToNgUserProject())
+        }
+
+        setup()
+
+        if (!userProject.isLoggedIn()) {
             const openTabs = tabs.selectOpenTabs(store.getState())
-            const allScripts = scripts.selectAllScriptEntities(store.getState())
+            const allScripts = scripts.selectAllScripts(store.getState())
             openTabs.forEach(scriptID => {
                 if (!allScripts.hasOwnProperty(scriptID)) {
                     store.dispatch(tabs.closeAndSwitchTab(scriptID))
                 }
             })
             // Show bubble tutorial when not opening a share link or in a CAI study mode.
+            // TODO: Don't show if the user already has scripts?
             if (!sharedScriptID && !FLAGS.SHOW_CAI) {
                 store.dispatch(bubble.resume())
             }
         }
-
-        setup()
     }, [])
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG","MAIN"])
-        //save all unsaved open scripts (don't need no promises)
-        userProject.saveAll()
+        saveAll()
 
         let userInfo
         try {
@@ -458,7 +421,6 @@ export const App = () => {
         // Retrieve the user scripts.
         await userProject.login(username, password)
         esconsole("Logged in as " + username, ["DEBUG","MAIN"])
-        store.dispatch(scripts.syncToNgUserProject())
 
         if (!loggedIn) {
             setLoggedIn(true)
@@ -476,24 +438,18 @@ export const App = () => {
 
         // save all unsaved open scripts
         try {
-            await userProject.saveAll()
-            if (userProject.openScripts.length > 0) {
+            const promise = saveAll()
+            await promise
+            if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
 
-            const activeTabID = tabs.selectActiveTabID(store.getState())
-            if (activeTabID) {
-                const allScriptEntities = scripts.selectAllScriptEntities(store.getState())
-                if (allScriptEntities[activeTabID].collaborative) {
-                    collaboration.leaveSession(activeTabID)
-                }
-            }
+            leaveCollaborationSession()
 
             userProject.clearUser()
             userNotification.clearHistory()
             reporter.logout()
 
-            dispatch(scripts.syncToNgUserProject())
             dispatch(scripts.resetReadOnlyScripts())
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
@@ -541,7 +497,7 @@ export const App = () => {
 
     const toggleCAIWindow = () => {
         if (!showCAI) {
-            dispatch(layout.openEast("CAI"))
+            dispatch(layout.setEast({ open: true, kind: "CAI" }))
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {
@@ -559,7 +515,6 @@ export const App = () => {
     const openSharedScript = (shareID: string) => {
         esconsole("opening a shared script: " + shareID, "main")
         openShare(shareID).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         })
         setShowNotifications(false)
@@ -567,7 +522,8 @@ export const App = () => {
     }
 
     const openCollaborativeScript = (shareID: string) => {
-        if (userProject.sharedScripts[shareID] && userProject.sharedScripts[shareID].collaborative) {
+        const sharedScripts = scripts.selectSharedScripts(store.getState())
+        if (sharedScripts[shareID] && sharedScripts[shareID].collaborative) {
             openSharedScript(shareID)
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         } else {
@@ -576,7 +532,7 @@ export const App = () => {
         }
     }
 
-    return <>
+    return <div className={theme === "dark" ? "dark" : ""}>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
         
@@ -625,7 +581,7 @@ export const App = () => {
                     
                     {/* Font Size */}
                     <Menu as="div" className="relative inline-block text-left mx-3">
-                        <Menu.Button className="text-gray-400 text-4xl">
+                        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
                             <div className="flex flex-row items-center">
                                 <div><i className="icon icon-font-size2" /></div>
                                 <div className="ml-1"><span className="caret" /></div>
@@ -635,9 +591,12 @@ export const App = () => {
                             {FONT_SIZES.map(size =>
                             <Menu.Item key={size}>
                                 {({ active }) =>
-                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`}
-                                        onClick={() => dispatch(appState.setFontSize(size))}>
-                                    {size} {fontSize === size && <i className="ml-3 icon icon-checkmark4" />}
+                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
+                                        onClick={() => dispatch(appState.setFontSize(size))}
+                                        style={{ gridTemplateColumns: "18px 1fr" }}>
+                                    {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
+                                    {fontSize !== size && <span></span>}
+                                    {size}
                                 </button>}
                             </Menu.Item>)}
                         </Menu.Items>
@@ -645,23 +604,23 @@ export const App = () => {
         
                     {/* Misc. actions */}
                     <Menu as="div" className="relative inline-block text-left mx-3">
-                        <Menu.Button className="text-gray-400 text-4xl">
+                        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
                             <div className="flex flex-row items-center">
                                 <div><i className="icon icon-cog2" /></div>
                                 <div className="ml-1"><span className="caret" /></div>
                             </div>
                         </Menu.Button>
                         <Menu.Items className="w-52 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            {MISC_ACTIONS.map(({ name, action }) =>
-                            <Menu.Item key={name}>
-                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
+                            {MISC_ACTIONS.map(({ nameKey, action }) =>
+                            <Menu.Item key={nameKey}>
+                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{t(nameKey)}</button>}
                             </Menu.Item>)}
                         </Menu.Items>
                     </Menu>
         
                     {/* notification (bell) button */}
                     <div className="user-notification relative">
-                        <div id="bell-icon-container" className=".btn text-gray-400 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
+                        <div id="bell-icon-container" className=".btn text-gray-400 hover:text-gray-300 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
                             <i className="icon icon-bell" />
                             {numUnread > 0 && <div id="badge" className="text-2xl">{numUnread}</div>}
                         </div>
@@ -674,20 +633,20 @@ export const App = () => {
                     {/* user login menu */}
                     {!loggedIn &&
                     <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-                        <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" required />
-                        <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required />
+                        <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+                        <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
                         <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
                     </form>}
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 text-4xl">
                             {loggedIn
                             ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                            : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>Create / Reset Account</div>}
+                            : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
                         </Menu.Button>
                         <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {(loggedIn
-                            ? [{ name: "Edit Profile", action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: "Logout", action: logout }]
-                            : [{ name: "Register a New Account", action: createAccount }, { name: "Forgot Your Password?", action: forgotPass }])
+                            ? [{ name: t("editProfile"), action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                            : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
                             .map(({ name, action }) =>
                             <Menu.Item key={name}>
                                 {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
@@ -702,20 +661,26 @@ export const App = () => {
         <Bubble />
         <ScriptDropdownMenu />
         <ModalContainer />
-    </>
+    </div>
 }
 
 const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
 
+    useEffect(() => {
+        setClosing(false)
+    }, [Modal])
+
     const [closing, setClosing] = useState(false)
 
     const close = () => {
         setClosing(true)
         setTimeout(() => {
-            dispatch(appState.setModal(null))
-            setClosing(false)
+            if (Modal === appState.selectModal(store.getState())) {
+                dispatch(appState.setModal(null))
+                setClosing(false)
+            }
         }, 300)
     }
 
@@ -756,38 +721,45 @@ const ModalContainer = () => {
   </Transition>
 }
 
+function saveAll() {
+    const promises = []
+    const modifiedTabs = tabs.selectModifiedScripts(store.getState())
+    const scriptMap = scripts.selectActiveScripts(store.getState())
+
+    for (const id of modifiedTabs) {
+        const script = scriptMap[id]
+        promises.push(userProject.saveScript(script.name, script.source_code))
+    }
+
+    if (promises.length) {
+        return Promise.all(promises)
+    }
+    return promises.length ? Promise.all(promises) : null
+}
+
+function leaveCollaborationSession() {
+    const activeTabID = tabs.selectActiveTabID(store.getState())
+    if (activeTabID) {
+        const allScriptEntities = scripts.selectAllScripts(store.getState())
+        if (allScriptEntities[activeTabID].collaborative) {
+            collaboration.leaveSession(activeTabID)
+        }
+    }
+}
+
 // websocket gets closed before onunload in FF
 window.onbeforeunload = () => {
     if (userProject.isLoggedIn()) {
-        let saving = false
+        leaveCollaborationSession()
 
-        const openTabs = tabs.selectOpenTabs(store.getState())
-        const modifiedTabs = tabs.selectModifiedScripts(store.getState())
-        const sharedScripts = scripts.selectSharedScriptIDs(store.getState())
-        const scriptMap = scripts.selectActiveScriptEntities(store.getState())
-        for (const id of openTabs) {
-            if (sharedScripts.includes(id)) {
-                collaboration.leaveSession(id)
-            }
-        }
-
-        for (const id of modifiedTabs) {
-            saving = true
-            const script = scriptMap[id]
-            userProject.saveScript(script.name, script.source_code).then(() => {
-                store.dispatch(scripts.syncToNgUserProject())
-                userNotification.show(i18n.t('messages:user.scriptcloud'), "success")
-            })
-        }
-
-        // userNotification.markAllAsRead()
         // Show page-close warning if saving.
-        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right will be to call preventDefault.)
+        // NOTE: For now, the cross-browser way to show the warning if to return a string in beforeunload. (Someday, the right way will be to call preventDefault.)
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
-        if (saving) {
+        const promise = saveAll()
+        if (promise) {
+            promise.then(() => userNotification.show(i18n.t('messages:user.allscriptcloud'), "success"))
             return ""
         }
-    } else if (localStorage.getItem(userProject.LS_SCRIPTS_KEY) !== null) {
-        localStorage.setItem(userProject.LS_SCRIPTS_KEY, JSON.stringify(userProject.scripts))
     }
+    persistor.flush()
 }

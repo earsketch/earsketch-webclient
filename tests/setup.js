@@ -6,9 +6,6 @@ window.BUILD_NUM = 0;
 window.URL_DOMAIN = URL_DOMAIN;
 window.URL_LOADAUDIO = URL_LOADAUDIO;
 window.ES_PASSTHROUGH = ES_PASSTHROUGH;
-window.ESCurr_TOC = ESCurr_TOC;
-window.ESCurr_Pages = ESCurr_Pages;
-window.ESCurr_SearchDoc = ESCurr_SearchDoc;
 
 window.customMatchers = {
     toMatchResult: function(util, customEqualityTesters) {

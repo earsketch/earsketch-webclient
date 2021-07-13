@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useTranslation } from "react-i18next"
+import Split from "react-split"
 
 import { openModal } from "../app/App"
 import * as appState from "../app/appState"
@@ -7,7 +9,7 @@ import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as collaboration from "../app/collaboration"
-import { ScriptEntity } from "common"
+import { Script } from "common"
 import * as compiler from "../app/compiler"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
@@ -20,8 +22,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState"
 import * as scripts from "../browser/scriptsState"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
-import * as layout from "../layout/layoutState"
-import * as Layout from "../layout/Layout"
+import * as layout from "./layoutState"
 import reporter from "../app/reporter"
 import * as tabs from "./tabState"
 import * as cai from "../cai/caiState"
@@ -35,6 +36,7 @@ import * as userProject from "../app/userProject"
 import * as WaveformCache from "../app/waveformcache"
 import i18n from "i18next"
 import { DAWData } from "../app/player"
+import parse from "html-react-parser";
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -51,29 +53,21 @@ export async function createScript() {
     reporter.createScript()
     const filename = await openModal(ScriptCreator)
     if (filename) {
-        userProject.closeScript(filename)
         const script = await userProject.createScript(filename)
-        script && store.dispatch(scripts.syncToNgUserProject())
         store.dispatch(tabs.setActiveTabAndEditor(script.shareid))
     }
 }
 
 function saveActiveScriptWithRunStatus(status: number) {
     const activeTabID = tabs.selectActiveTabID(store.getState())!
-    let script = null
+    const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
 
-    if (activeTabID in userProject.scripts) {
-        script = userProject.scripts[activeTabID]
-    } else if (activeTabID in userProject.sharedScripts) {
-        script = userProject.sharedScripts[activeTabID]
-    }
     if (script?.collaborative) {
         script && collaboration.saveScript(script.shareid)
         isWaitingForServerResponse = false
     } else if (script && !script.readonly && !script.isShared && !script.saved) {
         // save the script on a successful run
         userProject.saveScript(script.name, script.source_code, true, status).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             isWaitingForServerResponse = false
         }).catch(() => {
             userNotification.show(i18n.t("messages:idecontroller.savefailed"), "failure1")
@@ -91,10 +85,6 @@ function switchToShareMode() {
 
 let setLoading: (loading: boolean) => void
 
-
-// TODO AVN - quick hack, but it might also be the cleanest way to fix the shared script issue rather than moving openShare() to tabController
-const initialSharedScripts = Object.assign({}, userProject.sharedScripts)
-
 // Gets the ace editor of droplet instance, and calls openShare().
 // TODO: Move to Editor?
 export function initEditor() {
@@ -108,13 +98,7 @@ export function initEditor() {
         },
         exec() {
             const activeTabID = tabs.selectActiveTabID(store.getState())!
-
-            let script = null
-            if (activeTabID in userProject.scripts) {
-                script = userProject.scripts[activeTabID]
-            } else if (activeTabID in userProject.sharedScripts) {
-                script = userProject.sharedScripts[activeTabID]
-            }
+            const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
 
             if (!script?.saved) {
                 store.dispatch(tabs.saveScriptIfModified(activeTabID))
@@ -150,7 +134,6 @@ export function initEditor() {
     const shareID = ESUtils.getURLParameter("sharing")
     if (shareID) {
         openShare(shareID).then(() => {
-            store.dispatch(scripts.syncToNgUserProject())
             store.dispatch(tabs.setActiveTabAndEditor(shareID))
         })
     }
@@ -183,19 +166,12 @@ export async function openShare(shareid: string) {
             if (userProject.isLoggedIn()) {
                 await userProject.getSharedScripts()
                 if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-                userProject.openSharedScript(result.shareid)
-                store.dispatch(scripts.syncToNgUserProject())
                 store.dispatch(tabs.setActiveTabAndEditor(shareid))
             }
             switchToShareMode()
         } else {
-            // Close the script if it was opened when the user was not logged in
-            if (initialSharedScripts[shareid]) {
-                userProject.closeSharedScript(shareid)
-            }
-
             // user has not opened this shared link before
-            result = await userProject.loadScript(shareid, true) as ScriptEntity
+            result = await userProject.loadScript(shareid, true) as Script
             if (!result) {
                 userNotification.show("This share script link is invalid.")
                 return
@@ -208,8 +184,6 @@ export async function openShare(shareid: string) {
 
                 await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
                 await userProject.getSharedScripts()
-                userProject.openSharedScript(shareid)
-                store.dispatch(scripts.syncToNgUserProject())
                 store.dispatch(tabs.setActiveTabAndEditor(shareid))
             } else {
                 // the shared script belongs to the logged-in user
@@ -217,21 +191,15 @@ export async function openShare(shareid: string) {
                 editor.ace.focus()
 
                 if (isEmbedded) {
-                    // DON'T open the script if it has been soft-deleted
-                    if (!result.soft_delete) {
-                        userProject.openScript(result.shareid)
-                    }
-
                     // TODO: There might be async ops that are not finished. Could manifest as a redux-userProject sync issue with user accounts with a large number of scripts (not too critical).
-                    store.dispatch(scripts.syncToNgUserProject())
                     store.dispatch(tabs.setActiveTabAndEditor(shareid))
                 } else {
                     userNotification.show("This shared script link points to your own script.")
                 }
 
-                // Manually removing the user-owned shared script from the browser.
-                // TODO: Better to have refreshShareBrowser or something.
-                delete userProject.sharedScripts[shareid]
+                // Manually remove the user-owned shared script from the browser.
+                const { [shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
+                store.dispatch(scripts.setSharedScripts(sharedScripts))
             }
         }
     } else {
@@ -243,7 +211,7 @@ export async function openShare(shareid: string) {
         }
         if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
         await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-        userProject.openSharedScript(result.shareid)
+        store.dispatch(tabs.setActiveTabAndEditor(shareid))
         switchToShareMode()
     }
 }
@@ -391,11 +359,13 @@ export async function compileCode() {
 export const IDE = () => {
     const dispatch = useDispatch()
     const language = useSelector(appState.selectScriptLanguage)
+    const { t } = useTranslation()
     const numTabs = useSelector(tabs.selectOpenTabs).length
 
     const embedMode = useSelector(appState.selectEmbedMode)
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
     const embeddedScriptUsername = useSelector(appState.selectEmbeddedScriptUsername)
+    const hideDAW = useSelector(appState.selectHideDAW)
     const hideEditor = useSelector(appState.selectHideEditor)
 
     const bubbleActive = useSelector(bubble.selectActive)
@@ -407,6 +377,10 @@ export const IDE = () => {
     const consoleContainer = useRef<HTMLDivElement>(null)
 
     const [loading, _setLoading] = useState(false)
+
+    const scriptLang = language === "python" ? "Python" : "JavaScript"
+    const otherScriptLang = language === "python" ? "JavaScript" : "Python"
+    const otherScriptExt = language === "python" ? ".js" : ".py"
     setLoading = _setLoading
 
     useEffect(() => {
@@ -416,16 +390,39 @@ export const IDE = () => {
         }
     }, [logs])
 
+    const gutterSize = hideEditor ? 0 : 8
+    const isWestOpen = useSelector(layout.isWestOpen)
+    const isEastOpen = useSelector(layout.isEastOpen)
+    const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
+    const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
+    const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
+    const maxHeights = hideDAW ? [layout.MIN_DAW_HEIGHT, Infinity, 0] : undefined
+
+    let horizontalRatio = useSelector(layout.selectHorizontalRatio)
+    let verticalRatio = useSelector(layout.selectVerticalRatio)
+    if (embedMode) {
+        horizontalRatio = [0, 100, 0]
+        verticalRatio = hideEditor ? [100, 0, 0] : (hideDAW ? [0, 100, 0] : [25, 75, 0])
+    }
+
     return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
-            <div id="layout-container" className="split flex flex-row h-full">
+            <Split
+                className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
+                sizes={horizontalRatio} minSize={minWidths} maxSize={maxWidths}
+                onDragEnd={ratio => dispatch(layout.setHorizontalSizesFromRatio(ratio))}
+            >
                 <div id="sidebar-container" style={bubbleActive && [5,6,7,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
                         <Browser />
                     </div>
                 </div>
 
-                <div className="split flex flex-col" id="content">
+                <Split
+                    className="split flex flex-col" gutterSize={gutterSize} snapOffset={0}
+                    sizes={verticalRatio} minSize={minHeights} maxSize={maxHeights} direction="vertical"
+                    onDragEnd={ratio => dispatch(layout.setVerticalSizesFromRatio(ratio))}
+                >
                     <div id="devctrl">
                         <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3,4,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                             {loading
@@ -450,15 +447,13 @@ export const IDE = () => {
                             </div>
                             {numTabs === 0 && <div className="h-full flex flex-col justify-evenly text-4xl text-center">
                                 <div className="leading-relaxed">
-                                    <div id="no-scripts-warning">You have no scripts loaded.</div>
-                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>Click here to create a new script!</a>
+                                    <div id="no-scripts-warning">{t("editor.noScriptsLoaded")}</div>
+                                    <a href="#" onClick={e => { e.preventDefault(); createScript() }}>{t("editor.clickHereCreateScript")}</a>
                                 </div>
 
                                 <div className="leading-relaxed empty-script-lang-message">
-                                    <p>You are currently in <span className="empty-script-lang">{language === "python" ? "Python" : "JavaScript"}</span> mode.</p>
-                                    <p>If you want to switch to <span className="empty-script-lang">{language === "python" ? "JavaScript" : "Python"}</span> mode, <br />
-                                        please open a script with <span className="empty-script-lang">{language === "python" ? ".js" : ".py"}</span> or create a new one <br />
-                                        and select <span className="empty-script-lang">{language === "python" ? "JavaScript" : "Python"}</span> as the script language.</p>
+                                    <p>{parse(t("editor.mode", { scriptlang: scriptLang }))}</p>
+                                    <p>{parse(t("editor.ifYouWant", { scriptLang: scriptLang, otherScriptLang: otherScriptLang, otherScriptExt: otherScriptExt }))}</p>
                                 </div>
                             </div>}
                             <iframe id="ifmcontentstoprint" className="h-0 w-0 invisible absolute"></iframe>
@@ -481,7 +476,7 @@ export const IDE = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI
@@ -489,7 +484,7 @@ export const IDE = () => {
                     : <Curriculum />}
                     {/* NOTE: The chat window might come back here at some point. */}
                 </div>
-            </div>
+            </Split>
         </div>
     </div>
 }

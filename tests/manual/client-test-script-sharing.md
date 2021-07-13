@@ -52,11 +52,15 @@ Delete shared view-only script from list.
 Import a copy of view-only script from list. Verify the author information on 
 imported script.
 
-8. Import existing script name
+7. Import existing script name
 Import a shared script that has name same as existing script in workspace.
 
-9. Incorrect share link
+8. Incorrect share link
 Open an invalid share link.
 
-10. Current/Future version
+9. Current/Future version
 Share both current-version and future-version modes.
+
+10. Send View-only Script to Other Users
+In the script menu, click share, use "Let Others View" tab, enter another 
+username, and send. Confirm by logging in as the other user.

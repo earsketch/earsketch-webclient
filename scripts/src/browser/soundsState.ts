@@ -412,20 +412,22 @@ export const selectFavorites = (state: RootState) => state.sounds.filters.favori
 export const selectSearchText = (state: RootState) => state.sounds.filters.searchText;
 export const selectFilters = (state: RootState) => state.sounds.filters;
 
+function filterEntities(entities: SoundEntities, filters: ReturnType<typeof selectFilters>) {
+    const term = filters.searchText.toUpperCase()
+    return pickBy(entities, v => {
+        const field = `${v.folder}${v.file_key}${v.artist}${v.genre}${v.instrument}${v.tempo}`
+        return (term.length ? field.includes(term) : true)
+            && (filters.byFavorites ? filters.favorites.includes(v.file_key) : true)
+            && (filters.artists.length ? filters.artists.includes(v.artist) : true)
+            && (filters.genres.length ? filters.genres.includes(v.genre) : true)
+            && (filters.instruments.length ? filters.instruments.includes(v.instrument) : true)
+    })
+}
+
 export const selectFilteredRegularEntities = createSelector(
     [selectAllRegularEntities, selectFilters],
-    (entities: SoundEntities, filters) => {
-        const term = filters.searchText.toUpperCase();
-        return pickBy(entities, v => {
-            const field = `${v.folder}${v.file_key}${v.artist}${v.genre}${v.instrument}${v.tempo}`
-            return (term.length ? field.includes(term) : true)
-                && (filters.byFavorites ? filters.favorites.includes(v.file_key) : true)
-                && (filters.artists.length ? filters.artists.includes(v.artist) : true)
-                && (filters.genres.length ? filters.genres.includes(v.genre) : true)
-                && (filters.instruments.length ? filters.instruments.includes(v.instrument) : true)
-        });
-    }
-);
+    filterEntities
+)
 
 export const selectFilteredRegularFileKeys = createSelector(
     [selectFilteredRegularEntities],
@@ -457,17 +459,7 @@ export const selectFilteredRegularFileKeysByFolders = createSelector(
 
 export const selectFilteredFeaturedEntities = createSelector(
     [selectFeaturedEntities, selectFilters],
-    (entities: SoundEntities, filters) => {
-        const term = filters.searchText.toUpperCase();
-        return pickBy(entities, v => {
-            const field = `${v.folder}${v.file_key}${v.artist}${v.genre}${v.instrument}${v.tempo}`
-            return (term.length ? field.includes(term) : true)
-                && (filters.byFavorites ? filters.favorites.includes(v.file_key) : true)
-                && (filters.artists.length ? filters.artists.includes(v.artist) : true)
-                && (filters.genres.length ? filters.genres.includes(v.genre) : true)
-                && (filters.instruments.length ? filters.instruments.includes(v.instrument) : true)
-        });
-    }
+    filterEntities
 );
 
 export const selectFilteredFeaturedFileKeys = createSelector(
@@ -497,6 +489,11 @@ export const selectFilteredFeaturedFileKeysByFolders = createSelector(
         return result;
     }
 );
+
+const selectEntities = createSelector(
+    [selectFeaturedSoundVisibility, selectAllRegularEntities, selectAllEntities],
+    (includeFeaturedArtists, allEntities, regularEntities) => includeFeaturedArtists ? allEntities : regularEntities
+)
 
 // TODO: Possibly redundant -- filteredFileKeys could be checked for equality.
 export const selectFilteredListChanged = createDeepEqualSelector(
@@ -534,6 +531,30 @@ export const selectAllRegularInstruments = createSelector(
     [selectAllRegularEntities, selectAllRegularFileKeys],
     (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].instrument)))
 );
+
+export const selectFilteredArtists = createSelector(
+    [selectEntities, selectFilters],
+    (entities, filters) => {
+        entities = filterEntities(entities, { ...filters, artists: [] })
+        return Array.from(new Set(Object.values(entities).map(entity => entity.artist)))
+    }
+)
+
+export const selectFilteredGenres = createSelector(
+    [selectEntities, selectFilters],
+    (entities, filters) => {
+        entities = filterEntities(entities, { ...filters, genres: [] })
+        return Array.from(new Set(Object.values(entities).map(entity => entity.genre)))
+    }
+)
+
+export const selectFilteredInstruments = createSelector(
+    [selectEntities, selectFilters],
+    (entities, filters) => {
+        entities = filterEntities(entities, { ...filters, instruments: [] })
+        return Array.from(new Set(Object.values(entities).map(entity => entity.instrument)))
+    }
+)
 
 export const selectNumArtistsSelected = (state: RootState) => state.sounds.filters.artists.length;
 export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length;

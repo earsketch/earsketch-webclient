@@ -6,7 +6,7 @@ import * as cai from './caiState'
 import * as tabs from '../ide/tabState'
 import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
-import * as layout from '../layout/layoutState'
+import * as layout from '../ide/layoutState'
 import * as curriculum from '../browser/curriculumState'
 import store from '../reducers'
 

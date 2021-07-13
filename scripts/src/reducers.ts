@@ -1,13 +1,14 @@
 import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { persistStore } from 'redux-persist';
+import persistReducer from 'redux-persist/es/persistReducer';
+import storage from 'redux-persist/es/storage';
 
 import app from './app/appState';
 import user from './user/userState';
 import ide from './ide/ideState';
 import tabs from './ide/tabState';
-import layout from './layout/layoutState';
+import layout from './ide/layoutState';
 import bubble from './bubble/bubbleState';
 import sounds from './browser/soundsState';
 import scripts from './browser/scriptsState';
@@ -33,8 +34,14 @@ const rootReducer = combineReducers({
     cai,
 });
 
+const persistConfig = {
+    key: 'root',
+    whitelist: ['layout'],
+    storage,
+};
+
 const store = configureStore({
-    reducer: rootReducer,
+    reducer: persistReducer(persistConfig, rootReducer),
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware({
             // Toggle these on for sanity checks.
@@ -45,7 +52,7 @@ const store = configureStore({
     }
 });
 
-persistStore(store);
+export const persistor = persistStore(store);
 export default store;
 
 export type RootState = ReturnType<typeof rootReducer>;

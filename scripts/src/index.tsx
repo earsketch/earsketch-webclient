@@ -44,8 +44,10 @@ import "./ide/completer"
 import React from "react"
 import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
-import store from "./reducers"
+import { PersistGate } from "redux-persist/integration/react"
+
 import { App } from "./app/App"
+import store, { persistor } from "./reducers"
 
 import { Autograder } from "./app/Autograder"
 
@@ -150,10 +152,12 @@ if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
 } else {
     // Load the normal React app.
     ReactDOM.render(
-        <React.StrictMode>
-            <Provider store={store}>
+    <React.StrictMode>
+        <Provider store={store}>
+            <PersistGate persistor={persistor}>
                 <App />
-            </Provider>
-        </React.StrictMode>,
-        document.getElementById("root"))
+            </PersistGate>
+        </Provider>
+    </React.StrictMode>,
+    document.getElementById("root"))
 }

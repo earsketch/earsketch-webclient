@@ -349,7 +349,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                                 }} />
                             {result.name}: {result.bpm} bpm. {t('soundUploader.freesound.uploadedBy', { userName: result.creator })}
                         </label>
-                        <audio controls preload="none">
+                        <audio controls controlsList="nodownload" preload="none">
                             <source src={result.previewURL} type="audio/mpeg" />
                             Your browser does not support the audio element.
                         </audio>
