@@ -53,7 +53,7 @@ export const Download = ({ script, quality, close }: { script: Script, quality: 
                 <div className="col-md-1">
                     <h3>
                         {loading[type as keyof typeof EXPORT_TYPES]
-                        ? <i className="inline-block animate-spin icon icon-spinner" />
+                        ? <i className="animate-spin es-spinner" />
                         : <a href="#" onClick={e => { e.preventDefault(); save(type as keyof typeof EXPORT_TYPES) }}>
                             <i className="glyphicon glyphicon-download-alt" />
                         </a>}

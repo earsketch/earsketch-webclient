@@ -424,7 +424,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
 
             {message && <div className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: "rgb(170,255,255,0.5)" }}>
-                {message.startsWith("UPLOADING") && <i className="inline-block animate-spin spinner icon icon-spinner"></i>} {message}
+                {message.startsWith("UPLOADING") && <i className="animate-spin es-spinner"></i>} {message}
             </div>}
 
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>

@@ -427,7 +427,7 @@ export const IDE = () => {
                         <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3,4,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                             {loading
                             ? <div className="loading text-center h-full w-full flex items-center justify-center">
-                                <i className="spinner icon icon-spinner inline-block animate-spin mr-3"></i> Loading...
+                                <i className="es-spinner animate-spin mr-3"></i> Loading...
                             </div>
                             : <div className="workstation h-full w-full"><DAW /></div>}
                         </div>

@@ -154,7 +154,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
                 ? <div className="col-md-8 scroll-50 relative"><DAW /></div>
                 : (compiling
                 ? <div className="col-md-8 scroll-50">
-                    <i className="animate-spin inline-block icon icon-spinner"></i> {t('scriptHistory.running')}
+                    <i className="animate-spin es-spinner"></i> {t('scriptHistory.running')}
                 </div>
                 : <div className="col-md-8 scroll-50">
                     <pre><Diff original={original?.source_code ?? ""} modified={modified?.source_code ?? ""} /></pre>
