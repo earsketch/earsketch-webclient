@@ -496,7 +496,7 @@ export const selectFilteredFeaturedFileKeysByFolders = createSelector(
 );
 
 const selectEntities = createSelector(
-    [selectFeaturedSoundVisibility, selectAllRegularEntities, selectAllEntities],
+    [selectFeaturedSoundVisibility, selectAllEntities, selectAllRegularEntities],
     (includeFeaturedArtists, allEntities, regularEntities) => includeFeaturedArtists ? allEntities : regularEntities
 )
 
@@ -541,7 +541,7 @@ export const selectFilteredArtists = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, artists: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.artist)))
+        return Array.from(new Set(Object.values(entities).map(entity => entity.artist))).sort()
     }
 )
 
@@ -549,7 +549,7 @@ export const selectFilteredGenres = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, genres: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.genre)))
+        return Array.from(new Set(Object.values(entities).map(entity => entity.genre))).sort()
     }
 )
 
@@ -557,7 +557,7 @@ export const selectFilteredInstruments = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, instruments: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.instrument)))
+        return Array.from(new Set(Object.values(entities).map(entity => entity.instrument))).sort()
     }
 )
 
