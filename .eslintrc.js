@@ -20,6 +20,8 @@ module.exports = {
         "@typescript-eslint",
     ],
     rules: {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_$" }],
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error", { functions: false, variables: false, classes: false }],
         "no-redeclare": "off",

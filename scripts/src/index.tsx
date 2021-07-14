@@ -13,8 +13,7 @@ import "kali"
 import "skulpt"
 import "skulptStdLib"
 
-import { Question } from "./browser/questions"
-(window as any).Question = Question  // Used inside curriculum.
+import { Question } from "./browser/questions" // Used inside curriculum.
 
 import "../../fonts/icomoon_ultimate/style.css"
 
@@ -29,14 +28,12 @@ import "ace-builds/src-noconflict/ext-language_tools"
 // import "ace-builds/webpack-resolver"
 
 // https://github.com/ajaxorg/ace/blob/master/demo/webpack/demo.js#L12
-import jsWorkerUrl from "file-loader!aceJsWorker"; // Includes ES APIs.
-ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import jsWorkerUrl from "file-loader!aceJsWorker"
 
 import esconsole from "./esconsole"
 import * as ESUtils from "./esutils"
 import reporter from "./app/reporter"
-
-window.droplet = droplet
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
 import "./ide/completer"
@@ -48,6 +45,10 @@ import { PersistGate } from "redux-persist/integration/react"
 
 import { App } from "./app/App"
 import store, { persistor } from "./reducers"
+(window as any).Question = Question // Includes ES APIs.
+ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
+
+;(window as any).droplet = droplet
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
@@ -67,7 +68,7 @@ if (ESUtils.isMobileBrowser()) {
 
 // Check for IE <= 10. This excludes 11, which returns appName as "Netscape" (like every other browser).
 if (window.navigator.appName === "Microsoft Internet Explorer") {
-    if (/MSIE ([0-9]{1,}[\.0-9]{0,})/.exec(navigator.userAgent) !== null) {
+    if (/MSIE ([0-9]{1,}[.0-9]{0,})/.exec(navigator.userAgent) !== null) {
         if (!Number.isNaN(parseFloat(RegExp.$1))) {
             window.location.replace("sorry.html")
         }
@@ -90,7 +91,7 @@ if (/\/autograder|codeAnalyzer\w*\/?$/.test(location.href)) {
         require("ng-file-upload")
         require("chance")
 
-        window.app = angular.module("EarSketchApp", ["ngFileUpload"]).config(["$locationProvider", ($locationProvider: any) => {
+        ;(window as any).app = angular.module("EarSketchApp", ["ngFileUpload"]).config(["$locationProvider", ($locationProvider: any) => {
             // Prevent legacy hash-bang URL being overwritten by $location.
             $locationProvider.html5Mode(true).hashPrefix("")
         }])
@@ -104,7 +105,7 @@ if (/\/autograder|codeAnalyzer\w*\/?$/.test(location.href)) {
         require("codeAnalyzerCAIController")
 
         app.factory("$exceptionHandler", () => {
-            return (exception: any, cause: any) => {
+            return (exception: any) => {
                 console.log(exception)
                 esconsole(exception, ["error", "angular"])
                 // ensures we don't report Skulpt errors to GA
@@ -115,8 +116,8 @@ if (/\/autograder|codeAnalyzer\w*\/?$/.test(location.href)) {
         })
 
         // Angular template cache buster. Uses the BUILD_NUM from main.js
-        app.config(["$provide", function($provide: any) {
-            return $provide.decorator("$http", ["$delegate", function($delegate: any) {
+        app.config(["$provide", function ($provide: any) {
+            return $provide.decorator("$http", ["$delegate", function ($delegate: any) {
                 const get = $delegate.get
                 $delegate.get = (url: any, config: any) => {
                     // ignore Angular Bootstrap UI templates
@@ -142,12 +143,12 @@ if (/\/autograder|codeAnalyzer\w*\/?$/.test(location.href)) {
 } else {
     // Load the normal React app.
     ReactDOM.render(
-    <React.StrictMode>
-        <Provider store={store}>
-            <PersistGate persistor={persistor}>
-                <App />
-            </PersistGate>
-        </Provider>
-    </React.StrictMode>,
-    document.getElementById("root"))
+        <React.StrictMode>
+            <Provider store={store}>
+                <PersistGate persistor={persistor}>
+                    <App />
+                </PersistGate>
+            </Provider>
+        </React.StrictMode>,
+        document.getElementById("root"))
 }

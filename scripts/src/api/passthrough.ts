@@ -36,7 +36,7 @@ class InternalError extends Error {
 }
 
 // Set the initial state of the result object.
-export const init = (result: DAWData) => {
+export const init = () => {
     esconsole("Calling pt_init from passthrough", "PT")
 
     return {
