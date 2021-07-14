@@ -81,16 +81,6 @@ export function checkRedo() {
     }
 }
 
-export function clearHistory() {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.clearUndoStack()
-    } else {
-        const undoManager = ace.getSession().getUndoManager()
-        undoManager.reset()
-        ace.getSession().setUndoManager(undoManager)
-    }
-}
-
 export function setLanguage(language: string) {
     if (language === "python") {
         droplet?.setMode("python", config.blockPalettePython.modeOptions)
@@ -103,8 +93,23 @@ export function setLanguage(language: string) {
 }
 
 export function pasteCode(code: string) {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.setFocusedText(code)
+    if (ace.getReadOnly()) {
+        return
+    } else if (droplet.currentlyUsingBlocks) {
+        if (!droplet.cursorAtSocket()) {
+            // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
+            // Press Enter once to start a new free-form block for text input.
+            const ENTER_KEY = 13
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            // Fill the block with the pasted text.
+            droplet.setFocusedText(code)
+            // Press Enter again to finalize the block.
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+        } else {
+            droplet.setFocusedText(code)
+        }
     } else {
         ace.insert(code)
         ace.focus()
@@ -282,8 +287,14 @@ export const Editor = () => {
 
     useEffect(() => {
         if (blocksMode && !droplet.currentlyUsingBlocks) {
+            const emptyUndo = droplet.undoStack.length === 0
             setLanguage(language)
             if (droplet.toggleBlocks().success) {
+                // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
+                // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
+                if (emptyUndo) {
+                    droplet.clearUndoStack()
+                }
                 userConsole.clear()
             } else {
                 userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
@@ -323,6 +334,8 @@ export const Editor = () => {
             } else if (!droplet.currentlyUsingBlocks) {
                 droplet.toggleBlocks()
             }
+            // Don't allow droplet to share undo stack between tabs.
+            droplet.clearUndoStack()
         } else {
             setLanguage(language)
         }
