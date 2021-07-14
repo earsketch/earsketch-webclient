@@ -24,6 +24,8 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_$" }],
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error", { functions: false, variables: false, classes: false }],
+        "object-curly-spacing": "off",
+        "@typescript-eslint/object-curly-spacing": ["error", "always"],
         "no-redeclare": "off",
         "@typescript-eslint/no-redeclare": ["error"],
         "@typescript-eslint/type-annotation-spacing": ["error"],
