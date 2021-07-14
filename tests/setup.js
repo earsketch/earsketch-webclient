@@ -188,9 +188,6 @@ require('recorder');
 Object.assign(window,require('esAppDSP'));
 
 // Controllers
-require('autograderController');
-require('autograder2Controller');
-require('autograderAWSController');
-require('autograder3Controller');
-require('caiAnalysisModule');
-require('complexityCalculator');
+require('codeAnalyzerController');
+require('codeAnalyzerContestController');
+require('codeAnalyzerCAIController');

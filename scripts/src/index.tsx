@@ -140,22 +140,14 @@ if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
 
         angular.bootstrap(document, ["EarSketchApp"], { strictDi: true })
     })
-} else if (/\/autograder\w*\/?$/.test(location.href)) {
-    // Load the normal React app.
-    ReactDOM.render(
-        <React.StrictMode>
-            <Provider store={store}>
-                <Autograder />
-            </Provider>
-        </React.StrictMode>,
-        document.getElementById("root"))
 } else {
     // Load the normal React app.
+    const Content = /\/autograder\w*\/?$/.test(location.href) ? Autograder : App
     ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
             <PersistGate persistor={persistor}>
-                <App />
+                <Content />
             </PersistGate>
         </Provider>
     </React.StrictMode>,

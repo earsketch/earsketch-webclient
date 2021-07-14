@@ -141,7 +141,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'autograder/index.html'),
-            template: 'autograder/index.template.html'
+            template: 'public/index.html'
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'codeAnalyzer/index.html'),

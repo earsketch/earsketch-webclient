@@ -4,27 +4,28 @@ import * as ace from "ace-builds"
 import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 
-const prompts : any = []
+const prompts: any = []
 let quality = false
 
 // overwrite userConsole javascript prompt with a hijackable one
 const nativePrompt = (window as any).esPrompt
-function listenerPrompt(text: string) {
-    return nativePrompt(text).then(function (response: string) {
+
+const listenerPrompt = (text: string) => {
+    return nativePrompt(text).then((response: string) => {
         prompts.push(response)
         return response
     })
 }
 
-function hijackedPrompt(allowPrompts: boolean) {
+const hijackedPrompt = (allowPrompts: boolean) => {
     let i = 0
     if (allowPrompts) {
-        return function (text: string) {
+        return (text: string) => {
             return nativePrompt(text)
         }
     } else {
-        return function (text: string) {
-            return new Promise(function (resolve, reject) {
+        return (text: string) => {
+            return new Promise( (resolve, reject) => {
                 resolve(prompts[i++ % prompts.length])
             })
         }
@@ -32,8 +33,8 @@ function hijackedPrompt(allowPrompts: boolean) {
 }
 
 // overwrite JavaScript random implementations with seedable one
-function randomSeed(seed: number, useSeed: boolean) {
-    Math.random = function () {
+const randomSeed = (seed: number, useSeed: boolean) => {
+    Math.random = () => {
         const rng = new Chance(useSeed ? seed : Date.now())
         return rng.random()
     }
@@ -48,30 +49,30 @@ if (ESUtils.whichBrowser().match("Opera|Firefox|Msie|Trident") !== null) {
 }
 
 // Compile a script as python or javascript based on the extension and return the compilation promise.
-function compile(script: any, filename: string) {
+const compile = (script: any, filename: string) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
-        return compiler.compilePython(script, Number(quality))
+        return compiler.compilePython(script, quality ? 1 : 0)
     } else if (ext === ".js") {
-        return compiler.compileJavascript(script, Number(quality))
+        return compiler.compileJavascript(script, quality ? 1 : 0)
     } else {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
             reject(new Error("Invalid file extension " + ext))
         })
     }
 }
 
 // Read a File object and return a promise that will resolve to the file text contents.
-function readFile(file: any) {
-    const p = new Promise(function (resolve, reject) {
+const readFile = (file: any) => {
+    const p = new Promise((resolve, reject) => {
         const r = new FileReader()
-        r.onload = function (evt) {
+        r.onload = (evt) => {
             if (evt.target) {
                 const result = evt.target.result
                 resolve(result)
             }
         }
-        r.onerror = function (err) {
+        r.onerror = (err) => {
             reject(err)
         }
         r.readAsText(file)
@@ -80,22 +81,22 @@ function readFile(file: any) {
 }
 
 // Sort the clips in an object by measure.
-function sortClips(result: any) {
+const sortClips = (result: any) => {
     for (const i in result.tracks) {
         const track = result.tracks[i]
-        track.clips.sort(function (a:any, b: any) {
+        track.clips.sort((a: any, b: any) => {
             return a.measure - b.measure
         })
     }
 }
 
 // Sort effects by start measure.
-function sortEffects(result: any) {
+const sortEffects = (result: any) => {
     for (const i in result.tracks) {
         const track = result.tracks[i]
         for (const key in track.effects) {
             const effect = track.effects[key]
-            effect.sort(function (a:any, b: any) {
+            effect.sort((a: any, b: any) => {
                 return a.startMeasure - b.startMeasure
             })
         }
@@ -103,7 +104,7 @@ function sortEffects(result: any) {
 }
 
 // Function to compare the similarity of two script results.
-function compare(reference: any, test: any, testAllTracks: boolean, testTracks: boolean[]) {
+const compare = (reference: any, test: any, testAllTracks: boolean, testTracks: boolean[]) => {
     // create copies for destructive comparison
     reference = JSON.parse(JSON.stringify(reference))
     test = JSON.parse(JSON.stringify(test))
@@ -115,10 +116,10 @@ function compare(reference: any, test: any, testAllTracks: boolean, testTracks: 
     sortEffects(test)
     // remove tracks we're not testing
     if (!testAllTracks) {
-        reference.tracks = $.grep(reference.tracks, function (n:any, i:any) {
+        reference.tracks = $.grep(reference.tracks, (n: any, i: any) => {
             return testTracks[i]
         })
-        test.tracks = $.grep(test.tracks, function (n:any, i:any) {
+        test.tracks = $.grep(test.tracks, (n: any, i: any) => {
             return testTracks[i]
         })
     }
@@ -127,7 +128,7 @@ function compare(reference: any, test: any, testAllTracks: boolean, testTracks: 
 
 // Compile a test script and compare it to the reference script.
 // Returns a promise that resolves to an object describing the test results.
-function compileAndCompare(referenceResult: any, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) {
+const compileAndCompare = (referenceResult: any, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) => {
     const results = {
         file: file,
         script: testScript,
@@ -137,7 +138,7 @@ function compileAndCompare(referenceResult: any, file: any, testScript: any, tes
         error: "",
         pass: false,
     }
-    return compile(testScript, file.name).then(function (result : any) {
+    return compile(testScript, file.name).then((result: any) => {
         results.result = result
         results.compiled = true
         // check against reference script
@@ -146,14 +147,14 @@ function compileAndCompare(referenceResult: any, file: any, testScript: any, tes
             results.pass = true
         }
         return results
-    }).catch(function (err) {
+    }).catch( (err) => {
         results.error = err.toString()
         results.compiled = true
         return results
     })
 }
 
-const CodeEmbed = ({ sourceCode, language }: any) => {
+const CodeEmbed = ({ sourceCode, language }: {sourceCode: string, language: string}) => {
     const editorContainer = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -175,7 +176,7 @@ const CodeEmbed = ({ sourceCode, language }: any) => {
     )
 }
 
-const ReferenceScript = ({ referenceScript, compilingReference }: any) => {
+const ReferenceScript = ({ referenceScript, compilingReference }: {referenceScript: {name: string, sourceCode: string}, compilingReference: boolean}) => {
     const [collapse, setCollapse] = useState(true)
 
     return (
@@ -183,7 +184,7 @@ const ReferenceScript = ({ referenceScript, compilingReference }: any) => {
             <div className="panel panel-default">
                 <div className="panel-heading">
                     {compilingReference &&
-                        <i className="spinner icon icon-spinner"></i>
+                        <i className="spinner icon icon-spinner animate-spin inline-block mr-3"></i>
                     }
                     {referenceScript.name}
                     {collapse
@@ -199,10 +200,10 @@ const ReferenceScript = ({ referenceScript, compilingReference }: any) => {
     )
 }
 
-const ReferenceScriptUpload = ({ referenceScript, referenceResult, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks }: any) => {
+const ReferenceScriptUpload = ({ referenceScript, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks }: { referenceScript: {name: string, sourceCode: string}, compileError: string, setReferenceScript: any, setReferenceResult: any, setCompileError: any, setTestAllTracks: any, setTestTracks: any }) => {
     const [compilingReference, setCompilingReference] = useState(false)
 
-    function updateReferenceFile(file: any) {
+    const updateReferenceFile = (file: any) => {
         // restore prompt function to record inputs
         (window as any).esPrompt = listenerPrompt
 
@@ -213,7 +214,7 @@ const ReferenceScriptUpload = ({ referenceScript, referenceResult, compileError,
         if (file !== null) {
             // referenceLanguage = ESUtils.parseLanguage(file.name)
             readFile(file)
-                .then(function (script: any) {
+                .then( (script: any) => {
                     setReferenceScript({ sourceCode: script, name: file.name })
                     setCompilingReference(true)
                     return compile(script, file.name).then(function (result: any) {
@@ -221,14 +222,14 @@ const ReferenceScriptUpload = ({ referenceScript, referenceResult, compileError,
                         setTestTracks(new Array(result.tracks.length).fill(false))
                         return result
                     })
-                }).catch(function (err) {
+                }).catch( (err) => {
                     console.error(err)
                     setCompilingReference(false)
                     setCompileError(err.toString())
-                }).then(function (result: any) {
+                }).then( (result: any) => {
                     setCompilingReference(false)
                     setReferenceResult(result)
-                }).catch(function (err) {
+                }).catch( (err) => {
                     console.error(err)
                     setCompilingReference(false)
                     setCompileError(err)
@@ -259,17 +260,17 @@ const ReferenceScriptUpload = ({ referenceScript, referenceResult, compileError,
     )
 }
 
-const ConfigureTest = ({ referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, setAllowPrompts }: any) => {
+const ConfigureTest = ({ referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, setAllowPrompts }: { referenceResult: any, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setTestAllTracks: any, setTestTracks: any, setAllowPrompts: any}) => {
     const [useSeed, setUseSeed] = useState(true)
     const [seed, setSeed] = useState(Date.now())
 
-    function updateTestTracks(trackNumber: number, value: boolean) {
+    const updateTestTracks = (trackNumber: number, value: boolean) => {
         const tracks = testTracks
         tracks[trackNumber] = value
         setTestTracks(tracks)
     }
 
-    function updateSeed(seed: number, useSeed: boolean) {
+    const updateSeed = (seed: number, useSeed: boolean) => {
         setUseSeed(useSeed)
         if (useSeed) {
             setSeed(seed)
@@ -308,7 +309,7 @@ const ConfigureTest = ({ referenceResult, compileError, testAllTracks, testTrack
                                                 : <span>Track {index}</span>
                                             }
                                         </label>
-                                    </li>,
+                                    </li>
                                 )}
                             </ul>
                         </div>
@@ -323,7 +324,7 @@ const ConfigureTest = ({ referenceResult, compileError, testAllTracks, testTrack
                                         </label>
                                         <ol>
                                             {prompts.map(([index, prompt]: [number, any]) =>
-                                                <li key={index}><b>{{ prompt }}</b></li>,
+                                                <li key={index}><b>{{ prompt }}</b></li>
                                             )}
                                         </ol>
                                     </div>
@@ -352,14 +353,14 @@ const ConfigureTest = ({ referenceResult, compileError, testAllTracks, testTrack
     )
 }
 
-const TestResult = ({ upload, index }: any) => {
+const TestResult = ({ upload, index }: {upload: any, index: number}) => {
     const [showCode, setShowCode] = useState(false)
 
     return (
         <div className="panel panel-default">
             <div className="panel-heading">
                 {!upload.compiled &&
-                <i className="spinner icon icon-spinner"></i>
+                <i className="spinner icon icon-spinner animate-spin inline-block mr-3"></i>
                 }
                 <b> {index + 1} </b> {upload.file.name}
                 {upload.file.name.length > 50 &&
@@ -392,10 +393,10 @@ const TestResult = ({ upload, index }: any) => {
     )
 }
 
-const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }: any) => {
+const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }: { referenceResult: any, compileError: string, uploads: any[], testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setUploads: any, setFiles: any }) => {
     const [uploadError, setUploadError] = useState(false)
 
-    function updateFiles(files: any) {
+    const updateFiles = (files: any) => {
         // use the hijacked prompt function to input user input
         (window as any).esPrompt = hijackedPrompt(allowPrompts)
 
@@ -406,19 +407,19 @@ const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTrack
         setUploadError(false)
 
         // start with a promise that resolves immediately
-        let p = new Promise<void>(function (resolve) { resolve() })
+        let p = new Promise<void>((resolve) => { resolve() })
 
-        files.forEach(function (file: any, i: any) {
+        files.forEach( (file: any, i: any) => {
             // Begin compiling this script after the last one finishes. Daisy
             // chain calls to the queueFile() function so that scripts only start
             // compiling after the last one finished, thus avoiding erratic
             // behavior from scope variables crossing promise boundaries and stuff.
-            p = p.then(function () {
+            p = p.then( () => {
                 return readFile(file)
-            }).then(function (script) {
+            }).then( (script) => {
                 // if the script was read successfully, test it against the reference script copy
                 return compileAndCompare(referenceResult, file, script, testAllTracks, testTracks)
-            }).catch(function () {
+            }).catch( () => {
                 const results = {
                     file: file,
                     script: "",
@@ -432,7 +433,7 @@ const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTrack
                 uploads.push(results)
                 setUploadError(true)
                 return results
-            }).then(function (testResults: any) {
+            }).then( (testResults: any) => {
                 // add the test results to the list of uploads
                 setUploads(uploads.concat(testResults))
                 uploads.push(testResults)
@@ -462,7 +463,7 @@ const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTrack
     )
 }
 
-const TestResults = ({ referenceResult, compileError, testAllTracks, testTracks, allowPrompts }: any) => {
+const TestResults = ({ referenceResult, compileError, testAllTracks, testTracks, allowPrompts }: {referenceResult: any, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean}) => {
     const [uploads, setUploads] = useState([])
     const [files, setFiles] = useState([])
 
@@ -483,10 +484,11 @@ const TestResults = ({ referenceResult, compileError, testAllTracks, testTracks,
                     {uploads.map(([key, upload], index) =>
                         <li key={index}>
                             <TestResult upload={uploads[index]} index={index}/>
-                        </li>,
+                        </li>
                     )}
                 </ul>
             </div>
+            {uploads.length > 0 &&
             <div className="container">
                 {uploads.length === files.length
                     ? <div className="alert alert-success">
@@ -497,11 +499,14 @@ const TestResults = ({ referenceResult, compileError, testAllTracks, testTracks,
                     </div>
                 }
             </div>
+            }
         </div>
     )
 }
 
 export const Autograder = () => {
+    document.getElementById("loading-screen")!.style.display = "none"
+
     const [referenceScript, setReferenceScript] = useState({ name: "", sourceCode: "" })
     const [compileError, setCompileError] = useState("")
     const [referenceResult, setReferenceResult] = useState(null)
@@ -513,7 +518,6 @@ export const Autograder = () => {
         <div>
             <ReferenceScriptUpload
                 referenceScript={referenceScript}
-                referenceResult={referenceResult}
                 compileError = {compileError}
                 setReferenceScript={setReferenceScript}
                 setReferenceResult={setReferenceResult}
