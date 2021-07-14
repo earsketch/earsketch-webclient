@@ -22,7 +22,10 @@ module.exports = {
     rules: {
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error", { functions: false, variables: false, classes: false }],
+        "no-redeclare": "off",
+        "@typescript-eslint/no-redeclare": ["error"],
         "@typescript-eslint/type-annotation-spacing": ["error"],
+        "@typescript-eslint/prefer-for-of": ["error"],
         "space-before-function-paren": ["error", { named: "never" }],
         "comma-dangle": ["error", {
             arrays: "always-multiline",
@@ -35,9 +38,10 @@ module.exports = {
         quotes: ["error", "double", { avoidEscape: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "no-restricted-syntax": ["error", {
-            selector: "BinaryExpression > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
+            selector: "BinaryExpression[operator = /[=<>!]+/] > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
             message: "Use .includes() instead of comparing the result of .indexOf()",
         }],
+        "prefer-arrow-callback": ["error"],
     },
     overrides: [
         {

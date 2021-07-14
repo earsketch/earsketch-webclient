@@ -36,7 +36,7 @@ import * as userProject from "../app/userProject"
 import * as WaveformCache from "../app/waveformcache"
 import i18n from "i18next"
 import { DAWData } from "../app/player"
-import parse from "html-react-parser";
+import parse from "html-react-parser"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -106,14 +106,14 @@ export function initEditor() {
                 collaboration.saveScript()
             }
             activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
-        }
+        },
     })
 
     // Save scripts when not focused on editor.
-    window.addEventListener('keydown', event => {
-        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+    window.addEventListener("keydown", event => {
+        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault()
-            editor.ace.commands.exec('saveScript', editor.ace, [])
+            editor.ace.commands.exec("saveScript", editor.ace, [])
         }
     })
 
@@ -125,7 +125,7 @@ export function initEditor() {
         },
         exec() {
             compileCode()
-        }
+        },
     })
 
     editor.droplet.setEditorState(false)
@@ -218,7 +218,7 @@ export async function openShare(shareid: string) {
 
 // For curriculum pages.
 export function importScript(key: string) {
-    let result = /script_name: (.*)/.exec(key)
+    const result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
         scriptName = result[1].replace(/[^\w_]/g, "")
@@ -268,7 +268,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue(), 0)
+        result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -338,7 +338,7 @@ export async function compileCode() {
 
                 reporter.readererror(e.toString() + ". Location: " + stackString)
             }
-            
+
             console.log("complexityCalculator", report)
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.compileCAI([result, language, code]))
@@ -351,7 +351,7 @@ export async function compileCode() {
     }
 
     const { bubble } = state
-    if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
+    if (bubble.active && bubble.currentPage === 2 && !bubble.readyToProceed) {
         store.dispatch(setReady(true))
     }
 }
@@ -412,7 +412,7 @@ export const IDE = () => {
                 sizes={horizontalRatio} minSize={minWidths} maxSize={maxWidths}
                 onDragEnd={ratio => dispatch(layout.setHorizontalSizesFromRatio(ratio))}
             >
-                <div id="sidebar-container" style={bubbleActive && [5,6,7,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                <div id="sidebar-container" style={bubbleActive && [5, 6, 7, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
                         <Browser />
                     </div>
@@ -424,16 +424,16 @@ export const IDE = () => {
                     onDragEnd={ratio => dispatch(layout.setVerticalSizesFromRatio(ratio))}
                 >
                     <div id="devctrl">
-                        <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3,4,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                        <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3, 4, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                             {loading
-                            ? <div className="loading text-center h-full w-full flex items-center justify-center">
-                                <i className="es-spinner animate-spin mr-3"></i> Loading...
-                            </div>
-                            : <div className="workstation h-full w-full"><DAW /></div>}
+                                ? <div className="loading text-center h-full w-full flex items-center justify-center">
+                                    <i className="es-spinner animate-spin mr-3"></i> Loading...
+                                </div>
+                                : <div className="workstation h-full w-full"><DAW /></div>}
                         </div>
                     </div>
 
-                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
@@ -464,24 +464,24 @@ export const IDE = () => {
                         <div className="row">
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
-                                <div key={index} className="console-line">
-                                    <span className={"console-" + msg.level.replace("status", "info")}>
-                                        {msg.text}{" "}
-                                        {msg.level === "error" &&
+                                    <div key={index} className="console-line">
+                                        <span className={"console-" + msg.level.replace("status", "info")}>
+                                            {msg.text}{" "}
+                                            {msg.level === "error" &&
                                         <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
                                             Click here for more information.
                                         </a>}
-                                    </span>
-                                </div>)}
+                                        </span>
+                                    </div>)}
                             </div>
                         </div>
                     </div>
                 </Split>
 
-                <div className="h-full" id="curriculum-container" style={bubbleActive && [8,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI
-                    ? <CAI />
-                    : <Curriculum />}
+                        ? <CAI />
+                        : <Curriculum />}
                     {/* NOTE: The chat window might come back here at some point. */}
                 </div>
             </Split>

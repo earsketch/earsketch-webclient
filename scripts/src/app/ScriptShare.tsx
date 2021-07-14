@@ -22,16 +22,16 @@ async function queryID(query: any) {
     if (query === "") {
         return null
     } else if (ESUtils.checkIllegalCharacters(query)) {
-        throw i18n.t('messages:general.illegalCharacterInUserID')
+        throw i18n.t("messages:general.illegalCharacterInUserID")
     } else if (query === userProject.getUsername().toLowerCase()) {
-        throw i18n.t('messages:general.noSelfShare')
+        throw i18n.t("messages:general.noSelfShare")
     }
 
     const data = await userProject.get("/services/scripts/searchuser", { query })
     if (data) {
         return data.username
     }
-    throw i18n.t('messages:general.userDoesNotExist')
+    throw i18n.t("messages:general.userDoesNotExist")
 }
 
 const UserListInput = ({ users, setUsers, setFinalize }:
@@ -73,7 +73,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
             let newUsers = users
             if (!users.map((s: string) => s.toLowerCase()).includes(username.toLowerCase())) {
                 // Avoid duplicates.
-                newUsers = [ ...users, username ]
+                newUsers = [...users, username]
                 setUsers(newUsers)
             }
             setQuery("")
@@ -85,17 +85,17 @@ const UserListInput = ({ users, setUsers, setFinalize }:
     }
 
     const removeUser = (index: number) => {
-        setUsers(users.slice(0, index).concat(users.slice(index+1)))
+        setUsers(users.slice(0, index).concat(users.slice(index + 1)))
     }
 
     return <>
         <div className="mt-5">
             {users.map((name: string, index: number) =>
-            <div key={index} className="share-people-chip">
-                <span className="mr-1" style={{ color: theme === "dark" ? "white" : "black" }}>{name}</span>
-                <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
-            </div>)}
-            <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder={t('scriptShare.tab.viewonly.usersPlaceholder')} autoFocus
+                <div key={index} className="share-people-chip">
+                    <span className="mr-1" style={{ color: theme === "dark" ? "white" : "black" }}>{name}</span>
+                    <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
+                </div>)}
+            <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
@@ -130,7 +130,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <span ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t('scriptShare.copyClipboard')}>
+        <span ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
         </span>
         <Transition
@@ -153,12 +153,12 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     const [lockedShareID, setLockedShareID] = useState("")
     const [lock, setLock] = useState(false)
     const [viewers, setViewers] = useState([] as string[])
-    const finalize = useRef<undefined | (() => Promise<string[] | null>)>()
+    const finalize = useRef<undefined |(() => Promise<string[] | null>)>()
     const linkElement = useRef<HTMLInputElement>(null)
     const { t } = useTranslation()
 
-    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
-    const lockedShareLink = location.origin + location.pathname +"?sharing=" + lockedShareID
+    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
+    const lockedShareLink = location.origin + location.pathname + "?sharing=" + lockedShareID
     const link = lock ? lockedShareLink : sharelink
 
     userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
@@ -168,7 +168,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         // This is an "interesting" use of exporter.text().
         exporter.text({
             name: script.name + ".url",
-            source_code: textContent
+            source_code: textContent,
         } as Script)
     }
 
@@ -178,7 +178,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         save()
         reporter.share("link", licenses[licenseID].license)
         userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
-        userNotification.show(t('messages:shareScript.sharedViewOnly', {scriptName: script.name}) + users.join(", "))
+        userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
         close()
     }
 
@@ -188,18 +188,18 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 <div className="modal-section-header">
                     <span>
                         <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
-                        {t('scriptShare.tab.viewonly.linkTitle')}
+                        {t("scriptShare.tab.viewonly.linkTitle")}
                     </span>
                     <div className="btn-group">
                         <button type="button" onClick={() => setLock(true)}
-                                className={"btn " + (lock ? "btn-primary" : "btn-default")}
-                                style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}>
-                            {t('scriptShare.tab.viewonly.shareCurrent')}
+                            className={"btn " + (lock ? "btn-primary" : "btn-default")}
+                            style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}>
+                            {t("scriptShare.tab.viewonly.shareCurrent")}
                         </button>
                         <button type="button" onClick={() => setLock(false)}
-                                className={"btn " + (lock ? "btn-default" : "btn-primary")}
-                                style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}>
-                            {t('scriptShare.tab.viewonly.shareFuture')}
+                            className={"btn " + (lock ? "btn-default" : "btn-primary")}
+                            style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}>
+                            {t("scriptShare.tab.viewonly.shareFuture")}
                         </button>
                     </div>
                 </div>
@@ -214,18 +214,18 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     <div className="modal-section-header">
                         <span>
                             <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
-                            {t('scriptShare.tab.viewonly.otherUsers')}
+                            {t("scriptShare.tab.viewonly.otherUsers")}
                         </span>
                     </div>
-                    <UserListInput users={viewers} setUsers={setViewers} setFinalize={f => finalize.current = f} />
+                    <UserListInput users={viewers} setUsers={setViewers} setFinalize={f => { finalize.current = f }} />
                 </div>
             </div>
         </div>
         <div className="modal-footer border-t-0">
             <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t('cancel').toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={viewers.length ? t('saveAndSend').toLocaleUpperCase() : t('save').toLocaleUpperCase()} className="btn btn-primary text-white" />
+                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value={viewers.length ? t("saveAndSend").toLocaleUpperCase() : t("save").toLocaleUpperCase()} className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
@@ -235,7 +235,7 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
     const dispatch = useDispatch()
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const [collaborators, setCollaborators] = useState(script.collaborators)
-    const finalize = useRef<undefined | (() => Promise<string[] | null>)>()
+    const finalize = useRef<undefined |(() => Promise<string[] | null>)>()
     const { t } = useTranslation()
 
     const submit = async () => {
@@ -272,22 +272,22 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
         <div className="modal-body">
             <div className="modal-section-header">
                 <i className="icon icon-users" style={{ color: "#6dfed4" }}></i>
-                {t('scriptShare.tab.collab.addRemove')}
+                {t("scriptShare.tab.collab.addRemove")}
             </div>
-            <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => finalize.current = f} />
+            <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => { finalize.current = f }} />
         </div>
         <div className="modal-footer border-t-0">
             <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t('cancel').toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={t('save').toLocaleUpperCase()} className="btn btn-primary text-white" />
+                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value={t("save").toLocaleUpperCase()} className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
 }
 
 const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }: TabParameters) => {
-    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
+    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
     const [showCode, setShowCode] = useState(true)
     const [showDAW, setShowDAW] = useState(true)
     const options = "" + (showCode ? "" : "&hideCode") + (showDAW ? "" : "&hideDaw")
@@ -302,13 +302,13 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                 <div className="modal-section-header">
                     <span>
                         <i className="icon icon-copy" style={{ color: "#6dfed4" }}></i>
-                        {t('scriptShare.tab.embed.linkTitle')}
+                        {t("scriptShare.tab.embed.linkTitle")}
                     </span>
-                    <label className="mr-3">{t('scriptShare.tab.embed.showCode')} <input type="checkbox" checked={showCode} onChange={e => setShowCode(e.target.checked)} /></label>
-                    <label className="mr-3">{t('scriptShare.tab.embed.showDAW')} <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
-                 </div>
+                    <label className="mr-3">{t("scriptShare.tab.embed.showCode")} <input type="checkbox" checked={showCode} onChange={e => setShowCode(e.target.checked)} /></label>
+                    <label className="mr-3">{t("scriptShare.tab.embed.showDAW")} <input type="checkbox" checked={showDAW} onChange={e => setShowDAW(e.target.checked)} /></label>
+                </div>
                 <div id="share-link-container" className="mt-5">
-                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full" style={{ backgroundColor: "inherit "}} value={code} readOnly />
+                    <textarea ref={codeElement} className="share-link outline-none resize-none w-full" style={{ backgroundColor: "inherit " }} value={code} readOnly />
                     <CopyButton textElement={codeElement} />
                 </div>
                 <hr className="mt-3" />
@@ -317,8 +317,8 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
         <div className="modal-footer border-t-0">
             <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t('cancel').toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={t('save').toLocaleUpperCase()} className="btn btn-primary text-white" />
+                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value={t("save").toLocaleUpperCase()} className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
@@ -333,13 +333,13 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     const [name, setName] = useState(script.name)
     const [access, setAccess] = useState(1)
     const { t } = useTranslation()
-    const sharelink = location.origin + location.pathname +"?sharing=" + script.shareid
+    const sharelink = location.origin + location.pathname + "?sharing=" + script.shareid
     const license = licenses[licenseID].license
 
     const [url, setURL] = useState("")
     let animation = 0
     const [message, setMessage] = useState("")
-    
+
     const submit = () => {
         if (url) {
             // Already uploaded.
@@ -365,11 +365,11 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             sc.description += "\n\n"
             sc.description += "-------------------------------------------------------------\n\n"
         }
-        sc.description += i18n.t('messages:idecontroller.soundcloud.description') + "\n\n"
+        sc.description += i18n.t("messages:idecontroller.soundcloud.description") + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += i18n.t('messages:idecontroller.soundcloud.code') + "\n\n" + script.source_code + "\n\n"
+        sc.description += i18n.t("messages:idecontroller.soundcloud.code") + "\n\n" + script.source_code + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
-        sc.description += i18n.t('messages:idecontroller.soundcloud.share') + " " + sharelink + "\n\n"
+        sc.description += i18n.t("messages:idecontroller.soundcloud.share") + " " + sharelink + "\n\n"
         sc.description += "-------------------------------------------------------------\n\n"
 
         save()
@@ -384,13 +384,13 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             setMessage("UPLOADING" + dots)
         }, 1000)
 
-        exporter.soundcloud(script, false, sc).then(url => {
+        exporter.soundcloud(script, sc).then(url => {
             setURL(url)
-            clearInterval(animation)        
+            clearInterval(animation)
             setMessage("Finished uploading!")
             reporter.share("soundcloud", license)
-        }).catch(function (err) {
-            userNotification.show(t('messages:shareScript.soundcloudError'), "failure1")
+        }).catch((err) => {
+            userNotification.show(t("messages:shareScript.soundcloudError"), "failure1")
             console.log(err)
         })
     }
@@ -400,23 +400,23 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <div className="modal-section-header">
                 <span>
                     <i className="icon icon-soundcloud" style={{ color: "#6dfed4" }}></i>
-                    {t('scriptShare.tab.soundcloud.songName')}
+                    {t("scriptShare.tab.soundcloud.songName")}
                 </span>
             </div>
             <input required type="text" className="form-control border-0" placeholder="Click here to start typing..." value={name} onChange={e => setName(e.target.value)} autoFocus />
 
             <div className="modal-section-header">
-                <span>{t('scriptShare.tab.soundcloud.sharePrompt')}</span>
+                <span>{t("scriptShare.tab.soundcloud.sharePrompt")}</span>
             </div>
             <div className="container">
                 <div className="row mt-5 justify-between flex">
                     {ACCESS_OPTIONS.map(({ descriptionKey }, index) =>
-                    <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline">
-                        <label>
-                            <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
-                            <span />{t(descriptionKey)}
-                        </label>
-                    </div>)}
+                        <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline">
+                            <label>
+                                <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
+                                <span />{t(descriptionKey)}
+                            </label>
+                        </div>)}
                 </div>
             </div>
         </div>
@@ -428,8 +428,8 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             </div>}
 
             <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t('cancel').toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={url ? t('scriptShare.tab.soundcloud.view').toLocaleUpperCase() : t('upload').toLocaleUpperCase()} className="btn btn-primary text-white" />
+                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
+                <input type="submit" value={url ? t("scriptShare.tab.soundcloud.view").toLocaleUpperCase() : t("upload").toLocaleUpperCase()} className="btn btn-primary text-white" />
             </div>
         </div>
     </form>
@@ -443,39 +443,39 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
     const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
 
     return <div className="panel panel-default">
-        <div  className="panel-heading">
+        <div className="panel-heading">
             <h4 className="panel-title">
-                <a role="button" className="accordion-toggle" onClick={() => setCollapsed(!collapsed)}><span>{t('scriptShare.moreDetails')}</span></a>
+                <a role="button" className="accordion-toggle" onClick={() => setCollapsed(!collapsed)}><span>{t("scriptShare.moreDetails")}</span></a>
             </h4>
         </div>
-        {!collapsed
-        && <div className="panel-body">
+        {!collapsed &&
+        <div className="panel-body">
             <div className="form-group text-left">
                 <div className="modal-section-header">
-                    <span>{t('scriptShare.descriptionOptional')}</span>
+                    <span>{t("scriptShare.descriptionOptional")}</span>
                 </div>
-                <textarea className="form-control border-0" rows={2} placeholder={t('formFieldPlaceholder.typeDescriptionHere')} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
+                <textarea className="form-control border-0" rows={2} placeholder={t("formFieldPlaceholder.typeDescriptionHere")} value={description} onChange={e => setDescription(e.target.value)} maxLength={500}></textarea>
             </div>
 
             <div className="text-left">
                 <div className="modal-section-header">
-                    <span>{t('scriptShare.licenseType')}</span>
+                    <span>{t("scriptShare.licenseType")}</span>
                 </div>
 
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
                         {Object.entries(licenses).map(([id, license]: any) =>
-                        <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
-                            <label>
-                                <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
-                                <span></span>{license.license}
-                            </label>
-                        </div>)}
+                            <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
+                                <label>
+                                    <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
+                                    <span></span>{license.license}
+                                </label>
+                            </div>)}
                     </div>
                 </div>
 
                 <div className="description my-3 p-3">
-                    {licenses[licenseID].licenseDesc} Click <a href={licenseLink} target="_blank">here</a> to see more.
+                    {licenses[licenseID].licenseDesc} Click <a href={licenseLink} target="_blank" rel="noreferrer">here</a> to see more.
                 </div>
             </div>
         </div>}
@@ -483,10 +483,10 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
 }
 
 const Tabs = [
-    { component: LinkTab, titleKey: "scriptShare.tab.viewonly.title", descriptionKey: 'messages:shareScript.menuDescriptions.viewOnly' },
-    { component: CollaborationTab, titleKey: "scriptShare.tab.collab.title", descriptionKey: 'messages:shareScript.menuDescriptions.collaboration' },
-    { component: EmbedTab, titleKey: "scriptShare.tab.embed.title", descriptionKey: 'messages:shareScript.menuDescriptions.embedded' },
-    { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: 'messages:shareScript.menuDescriptions.soundCloud' },
+    { component: LinkTab, titleKey: "scriptShare.tab.viewonly.title", descriptionKey: "messages:shareScript.menuDescriptions.viewOnly" },
+    { component: CollaborationTab, titleKey: "scriptShare.tab.collab.title", descriptionKey: "messages:shareScript.menuDescriptions.collaboration" },
+    { component: EmbedTab, titleKey: "scriptShare.tab.embed.title", descriptionKey: "messages:shareScript.menuDescriptions.embedded" },
+    { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: "messages:shareScript.menuDescriptions.soundCloud" },
 ]
 
 export const ScriptShare = ({ script, licenses, close }: any) => {
@@ -505,19 +505,19 @@ export const ScriptShare = ({ script, licenses, close }: any) => {
     return <div className="share-script">
         <div className="modal-header">
             <h4 className="modal-title">
-                <i className="icon icon-share2 mr-3"></i>{t('scriptShare.title', {scriptName: script.name})}
+                <i className="icon icon-share2 mr-3"></i>{t("scriptShare.title", { scriptName: script.name })}
             </h4>
             <hr className="my-4 border-gray-200" />
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
-                    <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
-                        <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
-                    </li>)}
+                        <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
+                            <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
+                        </li>)}
                 </ul>
             </div>
             <div className="text-center mt-4">{t(Tabs[activeTab].descriptionKey)}</div>
         </div>
-        <ShareBody {...{script, licenses, licenseID, setLicenseID, description, setDescription, save, close}} />
+        <ShareBody {...{ script, licenses, licenseID, setLicenseID, description, setDescription, save, close }} />
     </div>
 }
