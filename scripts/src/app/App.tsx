@@ -664,7 +664,7 @@ export const App = () => {
     </div>
 }
 
-const ModalContainer = () => {
+export const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
 

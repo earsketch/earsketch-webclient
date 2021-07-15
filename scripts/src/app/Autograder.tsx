@@ -5,6 +5,7 @@ import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 
 import { DAWData, Clip, EffectRange } from "./player"
+import { ModalContainer } from "./App"
 
 // overwrite userConsole javascript prompt with a hijackable one
 const nativePrompt = (window as any).esPrompt
@@ -315,12 +316,12 @@ const ConfigureTest = ({
                                 ? prompts.length > 0
                                     ? <div>
                                         <label>
-                                            <input type="checkbox" checked={allowPrompts} onChange={e => setAllowPrompts(e.target.checked)}></input>
+                                            <input type="checkbox" checked={!allowPrompts} onChange={e => setAllowPrompts(!e.target.checked)}></input>
                                             Automatically use these prompts when needed in test scripts:
                                         </label>
                                         <ol>
                                             {prompts.map((prompt, index) =>
-                                                <li key={index}><b>{{ prompt }}</b></li>
+                                                <li key={index}><b>{ prompt }</b></li>
                                             )}
                                         </ol>
                                     </div>
@@ -395,18 +396,14 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
 }) => {
     const updateFiles = async (files: File[]) => {
         // use the hijacked prompt function to input user input
-        (window as any).esPrompt = () => {
+        (window as any).esPrompt = (text: string) => {
             let i = 0
             if (allowPrompts) {
-                return (text: string) => {
-                    return nativePrompt(text)
-                }
+                return nativePrompt(text)
             } else {
-                return (text: string) => {
-                    return new Promise((resolve, reject) => {
-                        resolve(prompts[i++ % prompts.length])
-                    })
-                }
+                return new Promise((resolve, reject) => {
+                    resolve(prompts[i++ % prompts.length])
+                })
             }
         }
 
@@ -484,7 +481,7 @@ export const Autograder = () => {
     const [referenceResult, setReferenceResult] = useState(null as DAWData | null)
     const [testAllTracks, setTestAllTracks] = useState(true)
     const [testTracks, setTestTracks] = useState([] as boolean[])
-    const [allowPrompts, setAllowPrompts] = useState(true)
+    const [allowPrompts, setAllowPrompts] = useState(false)
     const [prompts, setPrompts] = useState([] as string[])
     const [uploads, setUploads] = useState([] as Upload[])
     const [files, setFiles] = useState([] as File[])
@@ -525,6 +522,7 @@ export const Autograder = () => {
                 setUploads={setUploads}
                 setFiles={setFiles}
             />}
+            <ModalContainer />
         </div>
     )
 }
