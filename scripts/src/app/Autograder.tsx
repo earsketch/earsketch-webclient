@@ -4,6 +4,8 @@ import * as ace from "ace-builds"
 import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 
+import * as player from "./player"
+
 const prompts: any = []
 let quality = false
 
@@ -25,7 +27,7 @@ const hijackedPrompt = (allowPrompts: boolean) => {
         }
     } else {
         return (text: string) => {
-            return new Promise( (resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 resolve(prompts[i++ % prompts.length])
             })
         }
@@ -49,7 +51,7 @@ if (ESUtils.whichBrowser().match("Opera|Firefox|Msie|Trident") !== null) {
 }
 
 // Compile a script as python or javascript based on the extension and return the compilation promise.
-const compile = (script: any, filename: string) => {
+const compile = (script: string, filename: string) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
         return compiler.compilePython(script, quality ? 1 : 0)
@@ -81,9 +83,8 @@ const readFile = (file: any) => {
 }
 
 // Sort the clips in an object by measure.
-const sortClips = (result: any) => {
-    for (const i in result.tracks) {
-        const track = result.tracks[i]
+const sortClips = (result: player.DAWData) => {
+    for (const track of Object.values(result.tracks)) {
         track.clips.sort((a: any, b: any) => {
             return a.measure - b.measure
         })
@@ -91,11 +92,9 @@ const sortClips = (result: any) => {
 }
 
 // Sort effects by start measure.
-const sortEffects = (result: any) => {
-    for (const i in result.tracks) {
-        const track = result.tracks[i]
-        for (const key in track.effects) {
-            const effect = track.effects[key]
+const sortEffects = (result: player.DAWData) => {
+    for (const track of Object.values(result.tracks)) {
+        for (const effect of Object.values(track.effects)) {
             effect.sort((a: any, b: any) => {
                 return a.startMeasure - b.startMeasure
             })
@@ -104,7 +103,7 @@ const sortEffects = (result: any) => {
 }
 
 // Function to compare the similarity of two script results.
-const compare = (reference: any, test: any, testAllTracks: boolean, testTracks: boolean[]) => {
+const compare = (reference: player.DAWData, test: player.DAWData, testAllTracks: boolean, testTracks: boolean[]) => {
     // create copies for destructive comparison
     reference = JSON.parse(JSON.stringify(reference))
     test = JSON.parse(JSON.stringify(test))
@@ -128,7 +127,7 @@ const compare = (reference: any, test: any, testAllTracks: boolean, testTracks: 
 
 // Compile a test script and compare it to the reference script.
 // Returns a promise that resolves to an object describing the test results.
-const compileAndCompare = (referenceResult: any, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) => {
+const compileAndCompare = (referenceResult: player.DAWData, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) => {
     const results = {
         file: file,
         script: testScript,
@@ -147,7 +146,7 @@ const compileAndCompare = (referenceResult: any, file: any, testScript: any, tes
             results.pass = true
         }
         return results
-    }).catch( (err) => {
+    }).catch((err) => {
         results.error = err.toString()
         results.compiled = true
         return results
@@ -176,7 +175,13 @@ const CodeEmbed = ({ sourceCode, language }: {sourceCode: string, language: stri
     )
 }
 
-const ReferenceScript = ({ referenceScript, compilingReference }: {referenceScript: {name: string, sourceCode: string}, compilingReference: boolean}) => {
+interface ReferenceScript {
+    name: string,
+    sourceCode: string
+}
+
+const ReferenceFile = ({ referenceScript, compilingReference }:
+    {referenceScript: ReferenceScript, compilingReference: boolean}) => {
     const [collapse, setCollapse] = useState(true)
 
     return (
@@ -200,7 +205,11 @@ const ReferenceScript = ({ referenceScript, compilingReference }: {referenceScri
     )
 }
 
-const ReferenceScriptUpload = ({ referenceScript, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks }: { referenceScript: {name: string, sourceCode: string}, compileError: string, setReferenceScript: any, setReferenceResult: any, setCompileError: any, setTestAllTracks: any, setTestTracks: any }) => {
+const ReferenceScriptUpload = ({
+    referenceScript, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks,
+    setTestTracks, setUploads, setFiles,
+}: { referenceScript: ReferenceScript, compileError: string, setReferenceScript: any, setReferenceResult: any,
+        setCompileError: any, setTestAllTracks: any, setTestTracks: any, setUploads: any, setFiles: any }) => {
     const [compilingReference, setCompilingReference] = useState(false)
 
     const updateReferenceFile = (file: any) => {
@@ -210,26 +219,28 @@ const ReferenceScriptUpload = ({ referenceScript, compileError, setReferenceScri
         setCompileError("")
         setReferenceScript({ sourceCode: "", name: "" })
         setReferenceResult(null)
+        setUploads([])
+        setFiles([])
 
         if (file !== null) {
             // referenceLanguage = ESUtils.parseLanguage(file.name)
             readFile(file)
-                .then( (script: any) => {
-                    setReferenceScript({ sourceCode: script, name: file.name })
+                .then((script: any) => {
+                    setReferenceScript({ sourceCode: script, name: file.name } as ReferenceScript)
                     setCompilingReference(true)
                     return compile(script, file.name).then(function (result: any) {
                         setTestAllTracks(true)
                         setTestTracks(new Array(result.tracks.length).fill(false))
                         return result
                     })
-                }).catch( (err) => {
+                }).catch((err) => {
                     console.error(err)
                     setCompilingReference(false)
                     setCompileError(err.toString())
-                }).then( (result: any) => {
+                }).then((result: any) => {
                     setCompilingReference(false)
                     setReferenceResult(result)
-                }).catch( (err) => {
+                }).catch((err) => {
                     console.error(err)
                     setCompilingReference(false)
                     setCompileError(err)
@@ -254,13 +265,17 @@ const ReferenceScriptUpload = ({ referenceScript, compileError, setReferenceScri
                 </div>
             </div>
             {referenceScript!.name.length > 0 &&
-            <ReferenceScript referenceScript={referenceScript} compilingReference={compilingReference}/>
+            <ReferenceFile referenceScript={referenceScript} compilingReference={compilingReference}/>
             }
         </div>
     )
 }
 
-const ConfigureTest = ({ referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, setAllowPrompts }: { referenceResult: any, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setTestAllTracks: any, setTestTracks: any, setAllowPrompts: any}) => {
+const ConfigureTest = ({ 
+    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, 
+    setAllowPrompts 
+}: { referenceResult: any, compileError: string, testAllTracks: boolean, testTracks: boolean[],
+        allowPrompts: boolean, setTestAllTracks: any, setTestTracks: any, setAllowPrompts: any}) => {
     const [useSeed, setUseSeed] = useState(true)
     const [seed, setSeed] = useState(Date.now())
 
@@ -376,7 +391,7 @@ const TestResult = ({ upload, index }: {upload: any, index: number}) => {
                         Does not match.
                         </span>
                     : <span className="label label-danger" style={{ margin: "1%" }}>
-                    upload.error
+                        {upload.error}
                     </span>
                 }
                 {showCode
@@ -393,7 +408,9 @@ const TestResult = ({ upload, index }: {upload: any, index: number}) => {
     )
 }
 
-const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }: { referenceResult: any, compileError: string, uploads: any[], testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setUploads: any, setFiles: any }) => {
+const TestResults = ({ uploads, files, referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }:
+    {uploads: any[], files: any[], referenceResult: any, compileError: string, testAllTracks: boolean,
+        testTracks: boolean[], allowPrompts: boolean, setUploads: any, setFiles: any}) => {
     const [uploadError, setUploadError] = useState(false)
 
     const updateFiles = (files: any) => {
@@ -403,23 +420,23 @@ const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTrack
         // clear current uploads
         setFiles(files)
         uploads = []
-        setUploads(uploads)
+        setUploads([])
         setUploadError(false)
 
         // start with a promise that resolves immediately
         let p = new Promise<void>((resolve) => { resolve() })
 
-        files.forEach( (file: any, i: any) => {
+        files.forEach((file: any, i: any) => {
             // Begin compiling this script after the last one finishes. Daisy
             // chain calls to the queueFile() function so that scripts only start
             // compiling after the last one finished, thus avoiding erratic
             // behavior from scope variables crossing promise boundaries and stuff.
-            p = p.then( () => {
+            p = p.then(() => {
                 return readFile(file)
-            }).then( (script) => {
+            }).then((script) => {
                 // if the script was read successfully, test it against the reference script copy
                 return compileAndCompare(referenceResult, file, script, testAllTracks, testTracks)
-            }).catch( () => {
+            }).catch(() => {
                 const results = {
                     file: file,
                     script: "",
@@ -433,7 +450,7 @@ const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTrack
                 uploads.push(results)
                 setUploadError(true)
                 return results
-            }).then( (testResults: any) => {
+            }).then((testResults: any) => {
                 // add the test results to the list of uploads
                 setUploads(uploads.concat(testResults))
                 uploads.push(testResults)
@@ -442,43 +459,25 @@ const TestScriptUpload = ({ referenceResult, compileError, uploads, testAllTrack
     }
 
     return (
-        <div className="container">
-            {referenceResult && !compileError &&
-            <div className="panel panel-primary">
-                <div className="panel-heading">
-                    Step 3: Upload Test Scripts
-                </div>
-                <div className="panel-body">
-                    Drop scripts here or click to upload.
-                    <input type="file" multiple onChange={(file) => {
-                        if (file.target.files) { updateFiles(Object.values(file.target.files)) }
-                    }}></input>
-                    {uploadError &&
-                    <div className="alert alert-danger" role="alert">{uploadError}</div>
-                    }
-                </div>
-            </div>
-            }
-        </div>
-    )
-}
-
-const TestResults = ({ referenceResult, compileError, testAllTracks, testTracks, allowPrompts }: {referenceResult: any, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean}) => {
-    const [uploads, setUploads] = useState([])
-    const [files, setFiles] = useState([])
-
-    return (
         <div>
-            <TestScriptUpload
-                referenceResult={referenceResult}
-                compileError={compileError}
-                uploads={uploads}
-                testAllTracks={testAllTracks}
-                testTracks={testTracks}
-                allowPrompts={allowPrompts}
-                setUploads={setUploads}
-                setFiles={setFiles}
-            />
+            <div className="container">
+                {referenceResult && !compileError &&
+                <div className="panel panel-primary">
+                    <div className="panel-heading">
+                        Step 3: Upload Test Scripts
+                    </div>
+                    <div className="panel-body">
+                        Drop scripts here or click to upload.
+                        <input type="file" multiple onChange={(file) => {
+                            if (file.target.files) { updateFiles(Object.values(file.target.files)) }
+                        }}></input>
+                        {uploadError &&
+                        <div className="alert alert-danger" role="alert">{uploadError}</div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
             <div className="container">
                 <ul>
                     {uploads.map(([key, upload], index) =>
@@ -509,21 +508,25 @@ export const Autograder = () => {
 
     const [referenceScript, setReferenceScript] = useState({ name: "", sourceCode: "" })
     const [compileError, setCompileError] = useState("")
-    const [referenceResult, setReferenceResult] = useState(null)
+    const [referenceResult, setReferenceResult]: [player.DAWData | null, any] = useState(null)
     const [testAllTracks, setTestAllTracks] = useState(true)
     const [testTracks, setTestTracks] = useState([])
     const [allowPrompts, setAllowPrompts] = useState(true)
+    const [uploads, setUploads] = useState([])
+    const [files, setFiles] = useState([])
 
     return (
         <div>
             <ReferenceScriptUpload
                 referenceScript={referenceScript}
-                compileError = {compileError}
+                compileError={compileError}
                 setReferenceScript={setReferenceScript}
                 setReferenceResult={setReferenceResult}
-                setCompileError = {setCompileError}
+                setCompileError={setCompileError}
                 setTestAllTracks={setTestAllTracks}
                 setTestTracks={setTestTracks}
+                setUploads={setUploads}
+                setFiles={setFiles}
             />
             <ConfigureTest
                 referenceResult={referenceResult}
@@ -536,11 +539,15 @@ export const Autograder = () => {
                 setAllowPrompts={setAllowPrompts}
             />
             <TestResults
+                uploads={uploads}
+                files={files}
                 referenceResult={referenceResult}
                 compileError={compileError}
                 testAllTracks={testAllTracks}
                 testTracks={testTracks}
                 allowPrompts={allowPrompts}
+                setUploads={setUploads}
+                setFiles={setFiles}
             />
         </div>
     )
