@@ -311,6 +311,11 @@ let firstname = ""
 let lastname = ""
 let email = ""
 
+// Defunct localStorage key that contained username and password
+const USER_STATE_KEY = "userstate"
+const userstate = localStorage.getItem(USER_STATE_KEY)
+const savedLoginInfo = userstate === null ? undefined : JSON.parse(userstate)
+
 export const App = () => {
     const dispatch = useDispatch()
     const { t } = useTranslation()
@@ -321,7 +326,6 @@ export const App = () => {
     const notifications = useSelector(user.selectNotifications)
     const numUnread = notifications.filter(v => v && (v.unread || v.notification_type === "broadcast")).length
 
-    const savedLoginInfo = userProject.loadUser()
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
     const [role, setRole] = useState("student")
@@ -348,58 +352,75 @@ export const App = () => {
     ]
 
     useEffect(() => {
-        document.getElementById("loading-screen")!.style.display = "none"
+        (async () => {
+            document.getElementById("loading-screen")!.style.display = "none"
 
-        // Attempt to load userdata from a previous session.
-        if (userProject.isLoggedIn()) {
-            login(username, password).catch((error: Error) => {
-                if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
-                    localStorage.clear()
-                    window.location.reload()
-                    esconsole(error, ["error"])
-                    reporter.exception("Auto-login failed. Clearing localStorage.")
-                }
-            })
-        }
-
-        setup()
-
-        if (!userProject.isLoggedIn()) {
-            const openTabs = tabs.selectOpenTabs(store.getState())
-            const allScripts = scripts.selectAllScripts(store.getState())
-            for (const scriptID of openTabs) {
-                if (!allScripts[scriptID]) {
-                    store.dispatch(tabs.closeAndSwitchTab(scriptID))
+            // Attempt to load userdata from a previous session.
+            if (savedLoginInfo) {
+                await login(username, password).then(() => {
+                    // Remove defunct localStorage key
+                    localStorage.removeItem(USER_STATE_KEY)
+                }).catch((error: Error) => {
+                    if (window.confirm("We are unable to automatically log you back in to EarSketch. Press OK to reload this page and log in again.")) {
+                        localStorage.clear()
+                        window.location.reload()
+                        esconsole(error, ["error"])
+                        reporter.exception("Auto-login failed. Clearing localStorage.")
+                    }
+                })
+            } else {
+                const token = userProject.getToken()
+                if (token !== null) {
+                    await relogin(token)
                 }
             }
-            // Show bubble tutorial when not opening a share link or in a CAI study mode.
-            // TODO: Don't show if the user already has scripts?
-            if (!sharedScriptID && !FLAGS.SHOW_CAI) {
-                store.dispatch(bubble.resume())
+
+            setup()
+
+            if (!userProject.isLoggedIn()) {
+                const openTabs = tabs.selectOpenTabs(store.getState())
+                const allScripts = scripts.selectAllScripts(store.getState())
+                for (const scriptID of openTabs) {
+                    if (!allScripts[scriptID]) {
+                        store.dispatch(tabs.closeAndSwitchTab(scriptID))
+                    }
+                }
+                // Show bubble tutorial when not opening a share link or in a CAI study mode.
+                // TODO: Don't show if the user already has scripts?
+                if (!sharedScriptID && !FLAGS.SHOW_CAI) {
+                    store.dispatch(bubble.resume())
+                }
             }
-        }
+        })()
     }, [])
 
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
         saveAll()
 
-        let userInfo
+        let token
         try {
-            userInfo = await userProject.getUserInfo(username, password)
+            token = await userProject.authenticate(username, password)
         } catch (error) {
             userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
             esconsole(error, ["main", "login"])
             return
         }
 
-        store.dispatch(user.login({ username, password }))
+        await relogin(token)
+    }
+
+    const relogin = async (token: string) => {
+        const userInfo = await userProject.getUserInfo(token)
+        const username = userInfo.username
+
+        store.dispatch(user.login({ username, token }))
 
         store.dispatch(sounds.getUserSounds(username))
-        store.dispatch(sounds.getFavorites({ username, password }))
+        store.dispatch(sounds.getFavorites(token))
 
         // Always override with the returned username in case the letter cases mismatch.
-        setUsername(userInfo.username)
+        setUsername(username)
 
         // get user role (can verify the admin / teacher role here?)
         if (userInfo.role) {
@@ -420,7 +441,7 @@ export const App = () => {
         userNotification.user.role = userInfo.role
 
         // Retrieve the user scripts.
-        await userProject.login(username, password)
+        await userProject.login(username, token)
         esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
         if (!loggedIn) {
@@ -476,14 +497,13 @@ export const App = () => {
         const result = await openModal(AccountCreator)
         if (result) {
             setUsername(result.username)
-            setPassword(result.password)
             login(result.username, result.password)
         }
     }
 
     const editProfile = async () => {
         setShowNotifications(false)
-        const result = await openModal(ProfileEditor, { username, password, email, role, firstName: firstname, lastName: lastname })
+        const result = await openModal(ProfileEditor, { username, email, role, firstName: firstname, lastName: lastname })
         if (result !== undefined) {
             firstname = result.firstName
             lastname = result.lastName

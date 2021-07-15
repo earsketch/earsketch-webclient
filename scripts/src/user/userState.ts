@@ -1,37 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../reducers';
+import { createSlice } from "@reduxjs/toolkit"
 
-// TODO: Eventually replace userProject getUserInfo
-// export const login = createAsyncThunk(
-//     'user/login',
-//     async ({ username, password }, { getState }) => {
-//         const getUserAPI = URL_DOMAIN + '/services/scripts/getuserinfo';
-//         const payload = new FormData();
-//         payload.append('username', username);
-//         payload.append('password', btoa(password));
-//
-//         try {
-//             const response = await fetch(getUserAPI, {
-//                 method: 'POST',
-//                 body: payload
-//             });
-//             const xml = await response.text();
-//             // return await xml2js.parseStringPromise(xml, { explicitArray: false });
-//             return { username, password };
-//         } catch (error) {
-//             console.log(error);
-//         }
-//     }
-// );
+import { RootState } from "../reducers"
 
 export interface Notification {
     message: { text: string, json?: string, action?: string, hyperlink?: string }
+    // eslint-disable-next-line camelcase
     notification_type: string
     time: number
     unread: boolean
     pinned: boolean
     // Collaboration data.
     sender?: string
+    // eslint-disable-next-line camelcase
     script_name?: string
     shareid?: string
     id?: string
@@ -39,23 +19,23 @@ export interface Notification {
 }
 
 const userSlice = createSlice({
-    name: 'user',
+    name: "user",
     initialState: {
         loggedIn: false,
         username: null as string | null,
-        password: null as string | null,
+        token: null as string | null,
         notifications: [] as Notification[],
     },
     reducers: {
         login(state, { payload }) {
-            state.loggedIn = true;
-            state.username = payload.username;
-            state.password = payload.password;
+            state.loggedIn = true
+            state.username = payload.username
+            state.token = payload.token
         },
         logout(state) {
-            state.username = null;
-            state.password = null;
-            state.loggedIn = false;
+            state.username = null
+            state.token = null
+            state.loggedIn = false
         },
         setNotifications(state, { payload: notifications }: { payload: Notification[] }) {
             // Only show the latest broadcast.
@@ -68,18 +48,18 @@ const userSlice = createSlice({
         },
         pushNotification(state, { payload }) {
             state.notifications.unshift(payload)
-        }
-    }
-});
+        },
+    },
+})
 
 export const {
     login,
     logout,
     setNotifications,
     pushNotification,
-} = userSlice.actions;
-export default userSlice.reducer;
+} = userSlice.actions
+export default userSlice.reducer
 
-export const selectLoggedIn = (state: RootState) => state.user.loggedIn;
-export const selectUserName = (state: RootState) => state.user.username;
-export const selectNotifications = (state: RootState) => state.user.notifications;
+export const selectLoggedIn = (state: RootState) => state.user.loggedIn
+export const selectUserName = (state: RootState) => state.user.username
+export const selectNotifications = (state: RootState) => state.user.notifications

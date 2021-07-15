@@ -18,13 +18,13 @@ import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
-const USER_STATE_KEY = "userstate"
+const TOKEN_KEY = "token"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
 
 // Helper functions for making API requests.
-export function form(obj: { [key: string]: string | Blob }={}) {
+export function form(obj: { [key: string]: string | Blob } = {}) {
     const data = new FormData()
     for (const [key, value] of Object.entries(obj)) {
         data.append(key, value)
@@ -43,10 +43,9 @@ export async function get(endpoint: string, params?: { [key: string]: string }) 
         // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
         const response = await fetch(url)
         if (!response.ok) {
-            throw `error code: ${response.status}`
+            throw new Error(`error code: ${response.status}`)
         }
-        const text = await response.text()
-        return text ? JSON.parse(text) : null
+        return response.status === 204 ? undefined : response.json()
     } catch (err) {
         esconsole(`get failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])
@@ -55,20 +54,19 @@ export async function get(endpoint: string, params?: { [key: string]: string }) 
 }
 
 // Expects form data, returns JSON.
-export async function postForm(endpoint: string, data?: { [key: string]: string | Blob }) {
+export async function postForm(endpoint: string, data?: { [key: string]: string | Blob }, headers?: HeadersInit) {
     const url = URL_DOMAIN + endpoint
     try {
         // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
         const response = await fetch(url, {
             method: "POST",
             body: form(data),
-            headers: { "Accept": "application/json" },
+            headers: { Accept: "application/json", ...headers },
         })
         if (!response.ok) {
-            throw `error code: ${response.status}`
+            throw new Error(`error code: ${response.status}`)
         }
-        const text = await response.text()
-        return text ? JSON.parse(text) : null
+        return response.status === 204 ? undefined : response.json()
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])
@@ -76,21 +74,17 @@ export async function postForm(endpoint: string, data?: { [key: string]: string 
     }
 }
 
-export async function postAuthForm(endpoint: string, data: { [key: string]: string | Blob }={}) {
-    return postForm(endpoint, { username: getUsername(), password: getPassword(), ...data })
-}
-
-async function postAdminForm(endpoint: string, data: { [key: string]: string | Blob }={}) {
-    return postForm(endpoint, { adminusername: getUsername(), password: getPassword(), ...data })
+export async function postAuthForm(endpoint: string, data: { [key: string]: string | Blob } = {}) {
+    return postForm(endpoint, data, { Authorization: "Bearer " + getToken() })
 }
 
 // Expects query parameters, returns XML.
-export async function post(endpoint: string, params?: { [key: string]: string }) {
+export async function post(endpoint: string, params?: { [key: string]: string }, headers?: HeadersInit) {
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     try {
-        const response = await fetch(url, { method: "POST" })
+        const response = await fetch(url, { method: "POST", headers })
         if (!response.ok) {
-            throw `error code: ${response.status}`
+            throw new Error(`error code: ${response.status}`)
         }
         const text = await response.text()
         return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
@@ -102,20 +96,20 @@ export async function post(endpoint: string, params?: { [key: string]: string })
 }
 
 async function postAuth(endpoint: string, params: { [key: string]: string }) {
-    return post(endpoint, { username: getUsername(), password: getPassword(), ...params })
+    return post(endpoint, params, { Authorization: "Bearer " + getToken() })
 }
 
 // Expects XML, returns XML.
-async function postXML(endpoint: string, xml: string, params?: { [key: string]: string }) {
+async function postXML(endpoint: string, xml: string, headers?: HeadersInit) {
     const url = URL_DOMAIN + endpoint
     try {
-        const response = await fetch(url + (params ? "?" + new URLSearchParams(params) : ""), {
+        const response = await fetch(url, {
             method: "POST",
-            headers: new Headers({ "Content-Type": "application/xml" }),
+            headers: { "Content-Type": "application/xml", ...headers },
             body: xml,
         })
         if (!response.ok) {
-            throw `error code: ${response.status}`
+            throw new Error(`error code: ${response.status}`)
         }
         const text = await response.text()
         return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
@@ -127,9 +121,24 @@ async function postXML(endpoint: string, xml: string, params?: { [key: string]: 
 }
 
 async function postXMLAuth(endpoint: string, xml: string) {
-    return postXML(endpoint, xml, { username: getUsername(), password: getPassword() })
+    return postXML(endpoint, xml, { Authorization: "Bearer " + getToken() })
 }
 
+export async function authenticate(username: string, password: string) {
+    try {
+        const response = await fetch(URL_DOMAIN + "/services/scripts/authenticate", {
+            method: "POST",
+            body: form({ username, password: btoa(password) }),
+        })
+        if (!response.ok) {
+            throw new Error(`error code: ${response.status}`)
+        }
+        return response.text()
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
 
 export function loadLocalScripts() {
     // Migration code: if any anonymous users have saved scripts from before PR #198, bring them in to Redux state.
@@ -163,8 +172,8 @@ function fixCollaborators(script: Script, username?: string) {
     if (username) {
         // for shared-script browser: treat script as collaborative only when the user is listed among collaborators
         // #1858: List of collaborators may be recorded in mixed case (inconsistently).
-        if (script.collaborators.length !== 0
-            && script.collaborators.map((user: string) => user.toLowerCase()).includes(username.toLowerCase())) {
+        if (script.collaborators.length !== 0 &&
+            script.collaborators.map((user: string) => user.toLowerCase()).includes(username.toLowerCase())) {
             script.collaborative = true
             script.readonly = false
         } else {
@@ -189,11 +198,11 @@ function extractScripts(data: any): Script[] {
 }
 
 // Login, setup, restore scripts, return shared scripts.
-export async function login(username: string, password: string) {
+export async function login(username: string, token: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
-    // TODO: Don't store the password!
-    storeUser(username, password)
+    _username = username
+    storeToken(token)
 
     // register callbacks to the collaboration service
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
@@ -210,7 +219,7 @@ export async function login(username: string, password: string) {
     // used for managing websocket notifications locally
     userNotification.user.loginTime = Date.now()
 
-    esconsole('List of scripts in Load script list successfully updated.', ["debug", "user"])
+    esconsole("List of scripts in Load script list successfully updated.", ["debug", "user"])
 
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
@@ -284,8 +293,7 @@ export async function refreshCodeBrowser() {
     }
 }
 
-// Fetch a script's history, authenticating via username and password.
-// Resolves to a list of historical scripts.
+// Fetch a script's history. Resolves to a list of historical scripts.
 export async function getScriptHistory(scriptid: string) {
     esconsole("Getting script history: " + scriptid, ["debug", "user"])
     const data = await postAuthForm("/services/scripts/scripthistory", { scriptid })
@@ -318,19 +326,13 @@ export async function getSharedScripts() {
 }
 
 // Get shared id for locked version of latest script.
-export async function getLockedSharedScriptId(shareid: string){
+export async function getLockedSharedScriptId(shareid: string) {
     return (await get("/services/scripts/getlockedshareid", { shareid })).shareid
 }
 
-// Save a username and password to local storage to persist between sessions.
-function storeUser(username: string, password: string) {
-    localStorage.setItem(USER_STATE_KEY, JSON.stringify({ username, password }))
-}
-
-// Get a username and password from local storage, if it exists.
-export function loadUser() {
-    const userState = localStorage.getItem(USER_STATE_KEY)
-    return userState === null ? null : JSON.parse(userState)
+// Save token to local storage to persist between sessions.
+function storeToken(token: string) {
+    localStorage.setItem(TOKEN_KEY, token)
 }
 
 // Delete a user saved to local storage. I.e., logout.
@@ -346,26 +348,20 @@ export function clearUser() {
 
 // Check if a user is stored in local storage.
 export function isLoggedIn() {
-    return localStorage.getItem(USER_STATE_KEY) !== null
+    return localStorage.getItem(TOKEN_KEY) !== null
 }
 
-// Get a username from local storage.
-export function getUsername(): string {
-    return loadUser()?.username
-}
+let _username: string | undefined
 
-// Set a users new password.
-export function setPassword(pass: string) {
-    if (isLoggedIn()) {
-        storeUser(getUsername()!, pass)
-    }
+export function getUsername() {
+    return _username!
 }
 
 // Get the password from local storage.
 // TODO: Don't store the password in local storage! See #2406.
 // NOTE: The server expects this to be base64-encoded.
-export function getPassword() {
-    return btoa(loadUser().password)
+export function getToken() {
+    return localStorage.getItem(TOKEN_KEY)
 }
 
 export function shareWithPeople(shareid: string, users: string[]) {
@@ -389,8 +385,8 @@ export async function loadScript(id: string, sharing: boolean) {
     try {
         const data = await get("/services/scripts/scriptbyid", { scriptid: id })
         if (sharing && data === "") {
-            userNotification.show(i18n.t('messages:user.badsharelink'), "failure1", 3)
-            throw "Script was not found."
+            userNotification.show(i18n.t("messages:user.badsharelink"), "failure1", 3)
+            throw new Error("Script was not found.")
         }
         return data
     } catch {
@@ -403,7 +399,7 @@ export async function deleteAudio(audiokey: string) {
     try {
         await postAuth("/services/audio/delete", { audiokey })
         esconsole("Deleted audiokey: " + audiokey, ["debug", "user"])
-        audioLibrary.clearAudioTagCache()  // otherwise the deleted audio key is still usable by the user
+        audioLibrary.clearAudioTagCache() // otherwise the deleted audio key is still usable by the user
     } catch (err) {
         esconsole(err, ["error", "userproject"])
     }
@@ -414,7 +410,7 @@ export async function renameAudio(audiokey: string, newaudiokey: string) {
     try {
         await postAuth("/services/audio/rename", { audiokey, newaudiokey })
         esconsole(`Successfully renamed audiokey: ${audiokey} to ${newaudiokey}`, ["debug", "user"])
-        audioLibrary.clearAudioTagCache()  // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
+        audioLibrary.clearAudioTagCache() // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)
         esconsole(err, ["error", "userproject"])
@@ -426,15 +422,14 @@ export async function getLicenses() {
     return (await get("/services/scripts/getlicenses")).licenses
 }
 
-export async function getUserInfo(username_?: string, password?: string) {
-    esconsole("Get user info " + " for " + username_, "debug")
-    const data: { [key: string]: string } = { username: username_ ?? getUsername(), password: password ? btoa(password) : getPassword() }
-    const { username, email, first_name, last_name, role } = await postForm("/services/scripts/getuserinfo", data)
-    return { username, email, firstname: first_name ?? "", lastname: last_name ?? "", role }
+export async function getUserInfo(token?: string) {
+    token ??= getToken()!
+    const { username, email, firstname, lastname, role } = await postForm("/services/scripts/getuserinfo", {}, { Authorization: "Bearer " + token })
+    return { username, email, firstname: firstname ?? "", lastname: lastname ?? "", role }
 }
 
 // Set a script license id if owned by the user.
-export async function setLicense(scriptName: string, id: string, licenseID: string){
+export async function setLicense(scriptName: string, id: string, licenseID: string) {
     if (isLoggedIn()) {
         try {
             // TODO: Why doesn't this endpoint require authentication?
@@ -560,7 +555,7 @@ export async function importScript(script: Script) {
 }
 
 export async function importCollaborativeScript(script: Script) {
-    let originalScriptName = script.name
+    const originalScriptName = script.name
     if (lookForScriptByName(script.name)) {
         await promptForRename(script)
     }
@@ -581,7 +576,7 @@ export async function deleteSharedScript(scriptid: string) {
 }
 
 // Set a shared script description if owned by the user.
-export async function setScriptDesc(scriptname: string, id: string, description: string="") {
+export async function setScriptDesc(scriptname: string, id: string, description: string = "") {
     if (isLoggedIn()) {
         // TODO: These values (especially the description) should be escaped.
         const xml = `<scripts><username>${getUsername()}</username><name>${scriptname}</name><description><![CDATA[${description}]]></description></scripts>`
@@ -626,7 +621,7 @@ async function importSharedScript(scriptid: string) {
 }
 
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
-async function addSharedScript(shareID: string, notificationID: string) {
+async function addSharedScript(shareID: string) {
     if (isLoggedIn()) {
         const scriptList = await getSharedScripts()
         if (!scriptList.some(script => script.shareid === shareID)) {
@@ -651,7 +646,7 @@ export async function renameScript(script: Script, newName: string) {
 // Get all users and their roles
 export async function getAllUserRoles() {
     if (isLoggedIn()) {
-        return (await postAdminForm("/services/scripts/getalluserroles")).users
+        return (await postAuthForm("/services/scripts/getalluserroles")).users
     } else {
         esconsole("Login failure", ["error", "user"])
     }
@@ -660,7 +655,7 @@ export async function getAllUserRoles() {
 // Add role to user
 export async function addRole(username: string, role: string) {
     if (isLoggedIn()) {
-        return postAdminForm("/services/scripts/adduserrole", { username, role })
+        return postAuthForm("/services/scripts/adduserrole", { username, role })
     } else {
         esconsole("Login failure", ["error", "user"])
     }
@@ -669,7 +664,7 @@ export async function addRole(username: string, role: string) {
 // Remove role from user
 export async function removeRole(username: string, role: string) {
     if (isLoggedIn()) {
-        return postAdminForm("/services/scripts/removeuserrole", { username, role })
+        return postAuthForm("/services/scripts/removeuserrole", { username, role })
     } else {
         esconsole("Login failure", ["error", "user"])
     }
@@ -683,22 +678,16 @@ export async function searchUsers(username: string) {
 // Set a user password with admin passphrase as credentials
 export async function setPasswordForUser(username: string, password: string, adminPassphrase: string) {
     if (!isLoggedIn()) {
-        throw "Login failure"
-    }
-    const adminpwd = getPassword()
-    if (adminpwd === null) {
-        throw "Missing admin password"
+        throw new Error("Login failure")
     }
 
     esconsole("Admin setting a new password for user")
     const data = {
-        adminid: getUsername(),
-        adminpwd,
         adminpp: btoa(adminPassphrase),
         username,
-        newpassword: encodeURIComponent(btoa(password)),
+        newpassword: btoa(password),
     }
-    await postForm("/services/scripts/modifypwdadmin", data)
+    await postAuthForm("/services/scripts/modifypwdadmin", data)
     userNotification.show("Successfully set a new password for " + username, "history", 3)
 }
 
@@ -730,16 +719,16 @@ function lookForScriptByName(scriptname: string, ignoreDeletedScripts?: boolean)
 // Save a user's script if they have permission to do so.
 //   overwrite: If true, overwrite existing scripts. Otherwise, save with a new name.
 //   status: The run status of the script when saved. 0 = unknown, 1 = successful, 2 = unsuccessful.
-export async function saveScript(scriptname: string, source_code: string, overwrite: boolean=true, status: number=0) {
-    const name = overwrite ? scriptname : nextName(scriptname)
+export async function saveScript(name: string, source: string, overwrite: boolean = true, status: number = 0) {
+    name = overwrite ? name : nextName(name)
     const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (isLoggedIn()) {
         reporter.saveScript()
         // TODO: These values (especially the source code) should be escaped.
-        const xml = `<scripts><username>${getUsername()}</username>` + 
+        const xml = `<scripts><username>${getUsername()}</username>` +
                     `<name>${name}</name><run_status>${status}</run_status>` +
-                    `<source_code><![CDATA[${source_code}]]></source_code></scripts>`
+                    `<source_code><![CDATA[${source}]]></source_code></scripts>`
         const script = await postXMLAuth("/services/scripts/save", xml) as Script
         esconsole(`Saved script ${name} with shareid ${script.shareid}`, "user")
         script.modified = Date.now()
@@ -758,8 +747,10 @@ export async function saveScript(scriptname: string, source_code: string, overwr
             shareid = generateAnonymousScriptID()
         }
 
-        const script = { 
-            name, shareid, source_code,
+        const script = {
+            name,
+            shareid,
+            source_code: source,
             modified: Date.now(),
             saved: true,
             tooltipText: "",

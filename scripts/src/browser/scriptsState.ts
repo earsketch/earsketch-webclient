@@ -183,14 +183,14 @@ const scriptsSlice = createSlice({
 
 const LocalScriptTransform = createTransform(
     // Transform state on its way to being persisted.
-    (inboundState: ScriptsState, key) => {
+    (inboundState: ScriptsState) => {
         if (userProject.isLoggedIn()) {
             return {}
         }
         return inboundState
     },
     null,
-    { whitelist: ["regularScripts"] },
+    { whitelist: ["regularScripts"] }
 )
 
 const persistConfig = {
@@ -229,127 +229,129 @@ export const {
 
 // === Thunks ===
 
-const encloseScripts = (scriptsData: any): Script[] => {
-    if (scriptsData === null) {
-        return []
-    } else if (scriptsData.scripts instanceof Array) {
-        return scriptsData.scripts
-    } else {
-        return [scriptsData.scripts]
-    }
-}
+// TODO: Eventually use these thunks instead of their equivalents in userProject.
 
-const formatDate = (script: Script) => {
-    // Overwriting the date format for no good reason.
-    // TODO: save script API should accommodate UTC format, etc.
-    script.created = dayjs(script.created).valueOf()
-    script.modified = dayjs(script.modified).valueOf()
-}
+// const encloseScripts = (scriptsData: any): Script[] => {
+//     if (scriptsData === null) {
+//         return []
+//     } else if (scriptsData.scripts instanceof Array) {
+//         return scriptsData.scripts
+//     } else {
+//         return [scriptsData.scripts]
+//     }
+// }
 
-const removeUnusedFields = (script: Script) => {
-    script.id && delete script.id
-    script.file_location && delete script.file_location
-}
+// const formatDate = (script: Script) => {
+//     // Overwriting the date format for no good reason.
+//     // TODO: save script API should accommodate UTC format, etc.
+//     script.created = dayjs(script.created).valueOf()
+//     script.modified = dayjs(script.modified).valueOf()
+// }
 
-const setCollaborators = (script: Script, username: string | null = null) => {
-    if (script.collaborators === undefined) {
-        script.collaborators = []
-    } else if (typeof script.collaborators === "string") {
-        script.collaborators = [script.collaborators]
-    }
+// const removeUnusedFields = (script: Script) => {
+//     script.id && delete script.id
+//     script.file_location && delete script.file_location
+// }
 
-    const collaborators = script.collaborators as string[]
+// const setCollaborators = (script: Script, username: string | null = null) => {
+//     if (script.collaborators === undefined) {
+//         script.collaborators = []
+//     } else if (typeof script.collaborators === "string") {
+//         script.collaborators = [script.collaborators]
+//     }
 
-    // Provide username for the shared script browser.
-    if (username) {
-        if (!!collaborators.length && collaborators.map(v => v.toLowerCase()).includes(username.toLowerCase())) {
-            script.collaborative = true
-            script.readonly = false
-        } else {
-            script.collaborative = false
-            script.readonly = true
-        }
-    } else {
-        // For regular (aka "my") script browser.
-        script.collaborative = !!collaborators.length
-    }
-}
+//     const collaborators = script.collaborators as string[]
 
-export const getRegularScripts = createAsyncThunk<void, { username: string, password: string}, ThunkAPI>(
-    "scripts/getRegularScripts",
-    async ({ username, password }, { dispatch }) => {
-        const endPoint = URL_DOMAIN + "/services/scripts/findall"
-        const payload = new FormData()
-        payload.append("username", username)
-        payload.append("password", btoa(password))
+//     // Provide username for the shared script browser.
+//     if (username) {
+//         if (!!collaborators.length && collaborators.map(v => v.toLowerCase()).includes(username.toLowerCase())) {
+//             script.collaborative = true
+//             script.readonly = false
+//         } else {
+//             script.collaborative = false
+//             script.readonly = true
+//         }
+//     } else {
+//         // For regular (aka "my") script browser.
+//         script.collaborative = !!collaborators.length
+//     }
+// }
 
-        try {
-            const response = await fetch(endPoint, {
-                method: "POST",
-                body: payload,
-            })
-            const data = await response.json()
-            const scriptList = encloseScripts(data)
+// export const getRegularScripts = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
+//     "scripts/getRegularScripts",
+//     async ({ username, password }, { dispatch }) => {
+//         const endPoint = URL_DOMAIN + "/services/scripts/findall"
+//         const payload = new FormData()
+//         payload.append("username", username)
+//         payload.append("password", btoa(password))
 
-            // Mutating each script's data...
-            scriptList.forEach((script: Script) => {
-                script.saved = true
-                script.tooltipText = "" // For dirty tabs. Probably redundant.
-                removeUnusedFields(script)
-                formatDate(script)
-                setCollaborators(script)
-            })
-            dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
-        } catch (error) {
-            // TODO: Log error in user report. Should we also display the error to the user?
-            console.log(error)
-        }
-    },
-)
+//         try {
+//             const response = await fetch(endPoint, {
+//                 method: "POST",
+//                 body: payload,
+//             })
+//             const data = await response.json()
+//             const scriptList = encloseScripts(data)
 
-export const getSharedScripts = createAsyncThunk<void, { username: string, password: string}, ThunkAPI>(
-    "scripts/getSharedScripts",
-    async ({ username, password }, { dispatch }) => {
-        const endPoint = URL_DOMAIN + "/services/scripts/getsharedscripts"
-        const payload = new FormData()
-        payload.append("username", username)
-        payload.append("password", btoa(password))
+//             // Mutating each script's data...
+//             scriptList.forEach((script: Script) => {
+//                 script.saved = true
+//                 script.tooltipText = "" // For dirty tabs. Probably redundant.
+//                 removeUnusedFields(script)
+//                 formatDate(script)
+//                 setCollaborators(script)
+//             })
+//             dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
+//         } catch (error) {
+//             // TODO: Log error in user report. Should we also display the error to the user?
+//             console.log(error)
+//         }
+//     }
+// )
 
-        try {
-            const response = await fetch(endPoint, {
-                method: "POST",
-                body: payload,
-            })
-            const data = await response.json()
-            const scriptList = encloseScripts(data)
+// export const getSharedScripts = createAsyncThunk<void, { username: string, password: string }, ThunkAPI>(
+//     "scripts/getSharedScripts",
+//     async ({ username, password }, { dispatch }) => {
+//         const endPoint = URL_DOMAIN + "/services/scripts/getsharedscripts"
+//         const payload = new FormData()
+//         payload.append("username", username)
+//         payload.append("password", btoa(password))
 
-            scriptList.forEach((script: Script) => {
-                script.saved = true
-                script.tooltipText = "" // For dirty tabs. Probably redundant.
-                script.isShared = true // TODO: Call it shared.
-                removeUnusedFields(script)
-                formatDate(script)
-                setCollaborators(script, username)
-            })
-            dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
-        } catch (error) {
-            console.log(error)
-        }
-    },
-)
+//         try {
+//             const response = await fetch(endPoint, {
+//                 method: "POST",
+//                 body: payload,
+//             })
+//             const data = await response.json()
+//             const scriptList = encloseScripts(data)
+
+//             scriptList.forEach((script: Script) => {
+//                 script.saved = true
+//                 script.tooltipText = "" // For dirty tabs. Probably redundant.
+//                 script.isShared = true // TODO: Call it shared.
+//                 removeUnusedFields(script)
+//                 formatDate(script)
+//                 setCollaborators(script, username)
+//             })
+//             dispatch(setRegularScripts(fromEntries(scriptList.map(script => [script.shareid, script]))))
+//         } catch (error) {
+//             console.log(error)
+//         }
+//     }
+// )
 
 export const resetDropdownMenuAsync = createAsyncThunk<void, void, ThunkAPI>(
     "scripts/resetDropdownMenuAsync",
     (_, { dispatch }) => {
         setTimeout(() => dispatch(resetDropdownMenu()), 0)
-    },
+    }
 )
 
 export const resetSharedScriptInfoAsync = createAsyncThunk<void, void, ThunkAPI>(
     "scripts/resetSharedScriptInfoAsync",
     (_, { dispatch }) => {
         setTimeout(() => dispatch(resetSharedScriptInfo()), 0)
-    },
+    }
 )
 
 // === Selectors ===
@@ -368,7 +370,7 @@ function fromEntries<V>(iterable: [string, V][]) {
 
 export const selectActiveScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([k, v]) => ![true, "1"].includes(v.soft_delete as any)))
+    (scripts) => fromEntries(Object.entries(scripts).filter(([_, v]) => ![true, "1"].includes(v.soft_delete as any)))
 )
 export const selectActiveScriptIDs = createSelector(
     [selectActiveScripts],
@@ -377,7 +379,7 @@ export const selectActiveScriptIDs = createSelector(
 
 export const selectDeletedScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([k, v]) => [true, "1"].includes(v.soft_delete as any)))
+    (scripts) => fromEntries(Object.entries(scripts).filter(([_, v]) => [true, "1"].includes(v.soft_delete as any)))
 )
 export const selectDeletedScriptIDs = createSelector(
     [selectDeletedScripts],
@@ -400,12 +402,12 @@ const applyFilters = (scripts: Scripts, filters: AllFilters) => {
         Python: "py",
         JavaScript: "js",
     }
-    return fromEntries(Object.entries(scripts).filter(([k, v]) => {
+    return fromEntries(Object.entries(scripts).filter(([_, v]) => {
         const field = `${v.name.toLowerCase()}${v.username ? v.username.toLowerCase() : ""}`
         const types = filters.types.map(a => extensions[a as "Python"|"JavaScript"])
-        return (term.length ? field.includes(term) : true)
-            && (filters.owners.length ? filters.owners.includes(v.username) : true)
-            && (filters.types.length ? types.includes(v.name.slice(-2)) : true)
+        return (term.length ? field.includes(term) : true) &&
+            (filters.owners.length ? filters.owners.includes(v.username) : true) &&
+            (filters.types.length ? types.includes(v.name.slice(-2)) : true)
     }))
 }
 
@@ -415,7 +417,7 @@ const sortScriptIDs = (scripts: Scripts, sortBy: SortByAttribute, ascending: boo
         sensitivity: "base",
     }
     return Object.values(scripts).sort((a, b) => {
-        let c:any, d:any
+        let c: any, d: any
         if (sortBy === "A-Z") {
             c = a.name
             d = b.name
@@ -471,10 +473,10 @@ export const selectUnsavedDropdownMenuScript = createSelector(
         if (!script) {
             return null
         }
-        return type === "regular" && regularScripts[script.shareid]
-            || type === "shared" && sharedScripts[script.shareid]
-            || type === "readonly" && readOnlyScripts[script.shareid] || null
-    },
+        return (type === "regular" && regularScripts[script.shareid]) ||
+            (type === "shared" && sharedScripts[script.shareid]) ||
+            (type === "readonly" && readOnlyScripts[script.shareid]) || null
+    }
 )
 
 export const selectShowSharedScriptInfo = (state: RootState) => state.scripts.sharedScriptInfo.show
@@ -485,7 +487,7 @@ export const selectAllScriptOwners = createSelector(
     (userName, sharedScripts): any[] => {
         // TODO: Refactor to return string[].
         return [userName, ...new Set(Object.values(sharedScripts).map(script => script.username))]
-    },
+    }
 )
 
 export const selectNumOwnersSelected = (state: RootState) => state.scripts.filters.owners.length
