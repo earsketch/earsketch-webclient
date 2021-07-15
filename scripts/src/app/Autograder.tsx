@@ -4,10 +4,9 @@ import * as ace from "ace-builds"
 import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 
-import * as player from "./player"
+import { DAWData } from "./player"
 
 const prompts: any = []
-let quality = false
 
 // overwrite userConsole javascript prompt with a hijackable one
 const nativePrompt = (window as any).esPrompt
@@ -42,21 +41,13 @@ const randomSeed = (seed: number, useSeed: boolean) => {
     }
 }
 
-// Loading ogg by default for browsers other than Safari
-// setting default to wav for chrome 58 (May 22, 2017)
-if (ESUtils.whichBrowser().match("Opera|Firefox|Msie|Trident") !== null) {
-    quality = true // false wav, true ogg
-} else {
-    quality = false // false wav, true ogg
-}
-
 // Compile a script as python or javascript based on the extension and return the compilation promise.
 const compile = (script: string, filename: string) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
-        return compiler.compilePython(script, quality ? 1 : 0)
+        return compiler.compilePython(script, 0)
     } else if (ext === ".js") {
-        return compiler.compileJavascript(script, quality ? 1 : 0)
+        return compiler.compileJavascript(script, 0)
     } else {
         return new Promise((resolve, reject) => {
             reject(new Error("Invalid file extension " + ext))
@@ -66,12 +57,12 @@ const compile = (script: string, filename: string) => {
 
 // Read a File object and return a promise that will resolve to the file text contents.
 const readFile = (file: any) => {
-    const p = new Promise((resolve, reject) => {
+    const p = new Promise<string>((resolve, reject) => {
         const r = new FileReader()
         r.onload = (evt) => {
             if (evt.target) {
                 const result = evt.target.result
-                resolve(result)
+                resolve(result as string)
             }
         }
         r.onerror = (err) => {
@@ -83,7 +74,7 @@ const readFile = (file: any) => {
 }
 
 // Sort the clips in an object by measure.
-const sortClips = (result: player.DAWData) => {
+const sortClips = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
         track.clips.sort((a: any, b: any) => {
             return a.measure - b.measure
@@ -92,7 +83,7 @@ const sortClips = (result: player.DAWData) => {
 }
 
 // Sort effects by start measure.
-const sortEffects = (result: player.DAWData) => {
+const sortEffects = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
         for (const effect of Object.values(track.effects)) {
             effect.sort((a: any, b: any) => {
@@ -103,7 +94,7 @@ const sortEffects = (result: player.DAWData) => {
 }
 
 // Function to compare the similarity of two script results.
-const compare = (reference: player.DAWData, test: player.DAWData, testAllTracks: boolean, testTracks: boolean[]) => {
+const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, testTracks: boolean[]) => {
     // create copies for destructive comparison
     reference = JSON.parse(JSON.stringify(reference))
     test = JSON.parse(JSON.stringify(test))
@@ -125,15 +116,22 @@ const compare = (reference: player.DAWData, test: player.DAWData, testAllTracks:
     return JSON.stringify(reference) === JSON.stringify(test)
 }
 
+interface Upload {
+    file: File
+    script: string
+    compiled: boolean
+    result?: DAWData
+    error?: string
+    pass?: boolean
+}
+
 // Compile a test script and compare it to the reference script.
 // Returns a promise that resolves to an object describing the test results.
-const compileAndCompare = (referenceResult: player.DAWData, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) => {
-    const results = {
-        file: file,
+const compileAndCompare = (referenceResult: DAWData, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) => {
+    const results: Upload = {
+        file,
         script: testScript,
-        language: ESUtils.parseLanguage(file.name),
         compiled: false,
-        result: {},
         error: "",
         pass: false,
     }
@@ -206,10 +204,11 @@ const ReferenceFile = ({ referenceScript, compilingReference }:
 }
 
 const ReferenceScriptUpload = ({
-    referenceScript, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks,
-    setTestTracks, setUploads, setFiles,
-}: { referenceScript: ReferenceScript, compileError: string, setReferenceScript: any, setReferenceResult: any,
-        setCompileError: any, setTestAllTracks: any, setTestTracks: any, setUploads: any, setFiles: any }) => {
+    referenceScript, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles,
+}: {
+    referenceScript: ReferenceScript, compileError: string, setReferenceScript: any, setReferenceResult: any,
+    setCompileError: any, setTestAllTracks: any, setTestTracks: any, setUploads: (u: Upload[]) => void, setFiles: any
+}) => {
     const [compilingReference, setCompilingReference] = useState(false)
 
     const updateReferenceFile = (file: any) => {
@@ -223,7 +222,6 @@ const ReferenceScriptUpload = ({
         setFiles([])
 
         if (file !== null) {
-            // referenceLanguage = ESUtils.parseLanguage(file.name)
             readFile(file)
                 .then((script: any) => {
                     setReferenceScript({ sourceCode: script, name: file.name } as ReferenceScript)
@@ -271,11 +269,9 @@ const ReferenceScriptUpload = ({
     )
 }
 
-const ConfigureTest = ({ 
-    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, 
-    setAllowPrompts 
-}: { referenceResult: any, compileError: string, testAllTracks: boolean, testTracks: boolean[],
-        allowPrompts: boolean, setTestAllTracks: any, setTestTracks: any, setAllowPrompts: any}) => {
+const ConfigureTest = ({
+    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, setAllowPrompts,
+}: { referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setTestAllTracks: any, setTestTracks: any, setAllowPrompts: any}) => {
     const [useSeed, setUseSeed] = useState(true)
     const [seed, setSeed] = useState(Date.now())
 
@@ -368,7 +364,7 @@ const ConfigureTest = ({
     )
 }
 
-const TestResult = ({ upload, index }: {upload: any, index: number}) => {
+const TestResult = ({ upload, index }: { upload: any, index: number }) => {
     const [showCode, setShowCode] = useState(false)
 
     return (
@@ -401,67 +397,51 @@ const TestResult = ({ upload, index }: {upload: any, index: number}) => {
             </div>
             <div>
                 {upload.compiled && showCode &&
-                    <CodeEmbed sourceCode={upload.script} language={upload.language}/>
+                    <CodeEmbed sourceCode={upload.script} language={ESUtils.parseLanguage(upload.file.name)}/>
                 }
             </div>
         </div>
     )
 }
 
-const TestResults = ({ uploads, files, referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }:
-    {uploads: any[], files: any[], referenceResult: any, compileError: string, testAllTracks: boolean,
-        testTracks: boolean[], allowPrompts: boolean, setUploads: any, setFiles: any}) => {
-    const [uploadError, setUploadError] = useState(false)
-
-    const updateFiles = (files: any) => {
+const TestResults = ({ uploads, files, referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }: {
+    uploads: Upload[], files: any[], referenceResult: DAWData, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setUploads: (u: Upload[]) => void, setFiles: any
+}) => {
+    const updateFiles = async (files: any[]) => {
         // use the hijacked prompt function to input user input
         (window as any).esPrompt = hijackedPrompt(allowPrompts)
 
-        // clear current uploads
         setFiles(files)
-        let uploadList: any = []
-        setUploads(uploads)
-        setUploadError(false)
+        setUploads([])
 
-        // start with a promise that resolves immediately
-        let p = new Promise<void>((resolve) => { resolve() })
-
-        files.forEach((file: any, i: any) => {
-            // Begin compiling this script after the last one finishes. Daisy
-            // chain calls to the queueFile() function so that scripts only start
-            // compiling after the last one finished, thus avoiding erratic
-            // behavior from scope variables crossing promise boundaries and stuff.
-            p = p.then(() => {
-                return readFile(file)
-            }).then((script) => {
-                // if the script was read successfully, test it against the reference script copy
-                return compileAndCompare(referenceResult, file, script, testAllTracks, testTracks)
-            }).catch(() => {
-                const results = {
-                    file: file,
+        const results: Upload[] = []
+        for (const file of files) {
+            let script
+            try {
+                script = await readFile(file)
+            } catch {
+                const result = {
+                    file,
                     script: "",
-                    language: ESUtils.parseLanguage(file.name),
                     compiled: false,
-                    result: {},
                     error: "Read error, corrupted file?",
                     pass: false,
                 }
-                uploadList.push(results)
-                setUploads(uploadList)
-                setUploadError(true)
-                return results
-            }).then((testResults: any) => {
-                // add the test results to the list of uploads
-                uploadList.push(testResults)
-                setUploads(uploadList)
-            })
-        })
+                results.push(result)
+                setUploads(results)
+                continue
+            }
+            setUploads([...results, { file, script, compiled: false }])
+            const result = await compileAndCompare(referenceResult, file, script, testAllTracks, testTracks)
+            results.push(result)
+            setUploads(results)
+        }
     }
 
     return (
         <div>
             <div className="container">
-                {referenceResult && !compileError &&
+                {!compileError &&
                 <div className="panel panel-primary">
                     <div className="panel-heading">
                         Step 3: Upload Test Scripts
@@ -470,19 +450,16 @@ const TestResults = ({ uploads, files, referenceResult, compileError, testAllTra
                         Drop scripts here or click to upload.
                         <input type="file" multiple onChange={(file) => {
                             if (file.target.files) { updateFiles(Object.values(file.target.files)) }
-                        }}></input>
-                        {uploadError &&
-                        <div className="alert alert-danger" role="alert">{uploadError}</div>
-                        }
+                        }} />
                     </div>
                 </div>
                 }
             </div>
             <div className="container">
                 <ul>
-                    {uploads.map(([key, upload], index) =>
+                    {uploads.map((upload, index) =>
                         <li key={index}>
-                            <TestResult upload={uploads[index]} index={index}/>
+                            <TestResult upload={upload} index={index}/>
                         </li>
                     )}
                 </ul>
@@ -508,11 +485,11 @@ export const Autograder = () => {
 
     const [referenceScript, setReferenceScript] = useState({ name: "", sourceCode: "" })
     const [compileError, setCompileError] = useState("")
-    const [referenceResult, setReferenceResult]: [player.DAWData | null, any] = useState(null)
+    const [referenceResult, setReferenceResult] = useState(null as DAWData | null)
     const [testAllTracks, setTestAllTracks] = useState(true)
     const [testTracks, setTestTracks] = useState([])
     const [allowPrompts, setAllowPrompts] = useState(true)
-    const [uploads, setUploads] = useState([])
+    const [uploads, setUploads] = useState([] as any[])
     const [files, setFiles] = useState([])
 
     return (
@@ -538,7 +515,7 @@ export const Autograder = () => {
                 setTestTracks={setTestTracks}
                 setAllowPrompts={setAllowPrompts}
             />
-            <TestResults
+            {referenceResult && <TestResults
                 uploads={uploads}
                 files={files}
                 referenceResult={referenceResult}
@@ -548,7 +525,7 @@ export const Autograder = () => {
                 allowPrompts={allowPrompts}
                 setUploads={setUploads}
                 setFiles={setFiles}
-            />
+            />}
         </div>
     )
 }
