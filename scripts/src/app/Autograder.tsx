@@ -419,8 +419,8 @@ const TestResults = ({ uploads, files, referenceResult, compileError, testAllTra
 
         // clear current uploads
         setFiles(files)
-        uploads = []
-        setUploads([])
+        let uploadList: any = []
+        setUploads(uploads)
         setUploadError(false)
 
         // start with a promise that resolves immediately
@@ -446,14 +446,14 @@ const TestResults = ({ uploads, files, referenceResult, compileError, testAllTra
                     error: "Read error, corrupted file?",
                     pass: false,
                 }
-                setUploads(uploads.concat(results))
-                uploads.push(results)
+                uploadList.push(results)
+                setUploads(uploadList)
                 setUploadError(true)
                 return results
             }).then((testResults: any) => {
                 // add the test results to the list of uploads
-                setUploads(uploads.concat(testResults))
-                uploads.push(testResults)
+                uploadList.push(testResults)
+                setUploads(uploadList)
             })
         })
     }
