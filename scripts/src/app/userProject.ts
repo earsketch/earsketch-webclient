@@ -482,6 +482,8 @@ export async function deleteScript(scriptid: string) {
             const scripts = scriptsState.selectRegularScripts(store.getState())
             if (scripts[scriptid]) {
                 script.modified = Date.now()
+                // TODO: Inexplicably, the endpoint returns soft_delete as "true" here.
+                script.soft_delete = [true, "true"].includes(script.soft_delete)
                 store.dispatch(scriptsState.setRegularScripts({ ...scripts, [scriptid]: script }))
                 fixCollaborators(scripts[scriptid])
             } else {
