@@ -147,6 +147,7 @@ const AddSound = () => {
 const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
     const dispatch = useDispatch()
     const previewFileKey = useSelector(sounds.selectPreviewFileKey)
+    const previewNode = useSelector(sounds.selectPreviewNode)
     const fileKey = clip.file_key
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
@@ -178,9 +179,9 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                         onClick={() => dispatch(sounds.previewSound(fileKey))}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
-                        { previewFileKey === fileKey
-                            ? <i className="icon icon-stop2" />
-                            : <i className="icon icon-play4" />
+                        {previewFileKey === fileKey
+                        ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin inline-block icon-spinner" />)
+                        : <i className="icon icon-play4" />
                         }
                     </button>
                     {

@@ -314,9 +314,14 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 
         const bs = context.createBufferSource();
         dispatch(setPreviewFileKey(fileKey));
-        dispatch(setPreviewBSNode(bs));
+        dispatch(setPreviewBSNode(null));
 
         await audioLibrary.getAudioClip(fileKey,-1).then((buffer: AudioBuffer) => {
+            if (fileKey !== selectPreviewFileKey(getState())) {
+                // User started clicked play on something else before this finished loading.
+                return;
+            }
+            dispatch(setPreviewBSNode(bs));
             bs.buffer = buffer;
             bs.connect(context.destination);
             bs.start(0);
@@ -561,3 +566,4 @@ export const selectNumGenresSelected = (state: RootState) => state.sounds.filter
 export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length;
 
 export const selectPreviewFileKey = (state: RootState) => state.sounds.preview.fileKey;
+export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode;

@@ -38,11 +38,11 @@ const UndoRedoButtons = () => {
         <i
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: 'scaleX(-1)' }}
-            onClick={() => editor.undo()}
+            onClick={() => editor.checkUndo() && editor.undo()}
         />
         <i
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
-            onClick={() => editor.redo()}
+            onClick={() => editor.checkRedo() && editor.redo()}
         />
     </>);
 };
