@@ -4,34 +4,10 @@ import * as ace from "ace-builds"
 import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 
-import { DAWData } from "./player"
-
-const prompts: any = []
+import { DAWData, Clip, EffectRange } from "./player"
 
 // overwrite userConsole javascript prompt with a hijackable one
 const nativePrompt = (window as any).esPrompt
-
-const listenerPrompt = (text: string) => {
-    return nativePrompt(text).then((response: string) => {
-        prompts.push(response)
-        return response
-    })
-}
-
-const hijackedPrompt = (allowPrompts: boolean) => {
-    let i = 0
-    if (allowPrompts) {
-        return (text: string) => {
-            return nativePrompt(text)
-        }
-    } else {
-        return (text: string) => {
-            return new Promise((resolve, reject) => {
-                resolve(prompts[i++ % prompts.length])
-            })
-        }
-    }
-}
 
 // overwrite JavaScript random implementations with seedable one
 const randomSeed = (seed: number, useSeed: boolean) => {
@@ -49,14 +25,14 @@ const compile = (script: string, filename: string) => {
     } else if (ext === ".js") {
         return compiler.compileJavascript(script, 0)
     } else {
-        return new Promise((resolve, reject) => {
+        return new Promise<DAWData>((resolve, reject) => {
             reject(new Error("Invalid file extension " + ext))
         })
     }
 }
 
 // Read a File object and return a promise that will resolve to the file text contents.
-const readFile = (file: any) => {
+const readFile = (file: File) => {
     const p = new Promise<string>((resolve, reject) => {
         const r = new FileReader()
         r.onload = (evt) => {
@@ -76,7 +52,7 @@ const readFile = (file: any) => {
 // Sort the clips in an object by measure.
 const sortClips = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
-        track.clips.sort((a: any, b: any) => {
+        track.clips.sort((a: Clip, b: Clip) => {
             return a.measure - b.measure
         })
     }
@@ -86,7 +62,7 @@ const sortClips = (result: DAWData) => {
 const sortEffects = (result: DAWData) => {
     for (const track of Object.values(result.tracks)) {
         for (const effect of Object.values(track.effects)) {
-            effect.sort((a: any, b: any) => {
+            effect.sort((a: EffectRange, b: EffectRange) => {
                 return a.startMeasure - b.startMeasure
             })
         }
@@ -106,10 +82,10 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
     sortEffects(test)
     // remove tracks we're not testing
     if (!testAllTracks) {
-        reference.tracks = $.grep(reference.tracks, (n: any, i: any) => {
+        reference.tracks = $.grep(reference.tracks, (n: any, i: number) => {
             return testTracks[i]
         })
-        test.tracks = $.grep(test.tracks, (n: any, i: any) => {
+        test.tracks = $.grep(test.tracks, (n: any, i: number) => {
             return testTracks[i]
         })
     }
@@ -127,7 +103,7 @@ interface Upload {
 
 // Compile a test script and compare it to the reference script.
 // Returns a promise that resolves to an object describing the test results.
-const compileAndCompare = (referenceResult: DAWData, file: any, testScript: any, testAllTracks: boolean, testTracks: boolean[]) => {
+const compileAndCompare = (referenceResult: DAWData, file: File, testScript: string, testAllTracks: boolean, testTracks: boolean[]) => {
     const results: Upload = {
         file,
         script: testScript,
@@ -135,7 +111,7 @@ const compileAndCompare = (referenceResult: DAWData, file: any, testScript: any,
         error: "",
         pass: false,
     }
-    return compile(testScript, file.name).then((result: any) => {
+    return compile(testScript, file.name).then((result: DAWData) => {
         results.result = result
         results.compiled = true
         // check against reference script
@@ -203,46 +179,54 @@ const ReferenceFile = ({ referenceScript, compilingReference }:
     )
 }
 
-const ReferenceScriptUpload = ({
-    referenceScript, compileError, setReferenceScript, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles,
-}: {
-    referenceScript: ReferenceScript, compileError: string, setReferenceScript: any, setReferenceResult: any,
-    setCompileError: any, setTestAllTracks: any, setTestTracks: any, setUploads: (u: Upload[]) => void, setFiles: any
+const ReferenceScriptUpload = ({ compileError, prompts, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles, setPrompts }:
+    { compileError: string, prompts: string[], setReferenceResult: (r: DAWData | null) => void, setCompileError: (e: string) => void,
+        setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void,
+        setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void, setPrompts: (p: string[]) => void
 }) => {
+    const [referenceScript, setReferenceScript] = useState({ name: "", sourceCode: "" } as ReferenceScript)
     const [compilingReference, setCompilingReference] = useState(false)
 
-    const updateReferenceFile = (file: any) => {
-        // restore prompt function to record inputs
-        (window as any).esPrompt = listenerPrompt
+    const updateReferenceFile = async (file: File) => {
+        // use the hijacked prompt function to input user input
+        (window as any).esPrompt = (text: string) => {
+            return nativePrompt(text).then((response: string) => {
+                setPrompts([...prompts, response])
+                return response
+            })
+        }
 
         setCompileError("")
         setReferenceScript({ sourceCode: "", name: "" })
         setReferenceResult(null)
         setUploads([])
         setFiles([])
+        setPrompts([])
 
-        if (file !== null) {
-            readFile(file)
-                .then((script: any) => {
-                    setReferenceScript({ sourceCode: script, name: file.name } as ReferenceScript)
-                    setCompilingReference(true)
-                    return compile(script, file.name).then(function (result: any) {
-                        setTestAllTracks(true)
-                        setTestTracks(new Array(result.tracks.length).fill(false))
-                        return result
-                    })
-                }).catch((err) => {
-                    console.error(err)
-                    setCompilingReference(false)
-                    setCompileError(err.toString())
-                }).then((result: any) => {
-                    setCompilingReference(false)
-                    setReferenceResult(result)
-                }).catch((err) => {
-                    console.error(err)
-                    setCompilingReference(false)
-                    setCompileError(err)
-                })
+        if (file) {
+            let script
+            try {
+                script = await readFile(file)
+            } catch (err) {
+                console.error(err)
+                setCompilingReference(false)
+                setCompileError(err.toString())
+                return
+            }
+            setReferenceScript({ sourceCode: script, name: file.name } as ReferenceScript)
+            setCompilingReference(true)
+            let result
+            try {
+                result = await compile(script, file.name)
+                setTestAllTracks(true)
+                setTestTracks(new Array(result.tracks.length).fill(false))
+                setCompilingReference(false)
+                setReferenceResult(result)
+            } catch (err) {
+                console.error(err)
+                setCompilingReference(false)
+                setCompileError(err.toString())
+            }
         }
     }
 
@@ -270,8 +254,9 @@ const ReferenceScriptUpload = ({
 }
 
 const ConfigureTest = ({
-    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setTestAllTracks, setTestTracks, setAllowPrompts,
-}: { referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setTestAllTracks: any, setTestTracks: any, setAllowPrompts: any}) => {
+    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, prompts, setTestAllTracks, setTestTracks, setAllowPrompts,
+}: { referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, prompts: string[],
+    setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void, setAllowPrompts: (a: boolean) => void}) => {
     const [useSeed, setUseSeed] = useState(true)
     const [seed, setSeed] = useState(Date.now())
 
@@ -334,7 +319,7 @@ const ConfigureTest = ({
                                             Automatically use these prompts when needed in test scripts:
                                         </label>
                                         <ol>
-                                            {prompts.map(([index, prompt]: [number, any]) =>
+                                            {prompts.map((prompt, index) =>
                                                 <li key={index}><b>{{ prompt }}</b></li>
                                             )}
                                         </ol>
@@ -364,7 +349,7 @@ const ConfigureTest = ({
     )
 }
 
-const TestResult = ({ upload, index }: { upload: any, index: number }) => {
+const TestResult = ({ upload, index }: { upload: Upload, index: number }) => {
     const [showCode, setShowCode] = useState(false)
 
     return (
@@ -404,12 +389,26 @@ const TestResult = ({ upload, index }: { upload: any, index: number }) => {
     )
 }
 
-const TestResults = ({ uploads, files, referenceResult, compileError, testAllTracks, testTracks, allowPrompts, setUploads, setFiles }: {
-    uploads: Upload[], files: any[], referenceResult: DAWData, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, setUploads: (u: Upload[]) => void, setFiles: any
+const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTracks, allowPrompts, prompts, setUploads, setFiles }: {
+    uploads: Upload[], files: File[], referenceResult: DAWData, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean,
+    prompts: string[], setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void
 }) => {
-    const updateFiles = async (files: any[]) => {
+    const updateFiles = async (files: File[]) => {
         // use the hijacked prompt function to input user input
-        (window as any).esPrompt = hijackedPrompt(allowPrompts)
+        (window as any).esPrompt = () => {
+            let i = 0
+            if (allowPrompts) {
+                return (text: string) => {
+                    return nativePrompt(text)
+                }
+            } else {
+                return (text: string) => {
+                    return new Promise((resolve, reject) => {
+                        resolve(prompts[i++ % prompts.length])
+                    })
+                }
+            }
+        }
 
         setFiles(files)
         setUploads([])
@@ -441,7 +440,6 @@ const TestResults = ({ uploads, files, referenceResult, compileError, testAllTra
     return (
         <div>
             <div className="container">
-                {!compileError &&
                 <div className="panel panel-primary">
                     <div className="panel-heading">
                         Step 3: Upload Test Scripts
@@ -453,7 +451,6 @@ const TestResults = ({ uploads, files, referenceResult, compileError, testAllTra
                         }} />
                     </div>
                 </div>
-                }
             </div>
             <div className="container">
                 <ul>
@@ -483,27 +480,27 @@ const TestResults = ({ uploads, files, referenceResult, compileError, testAllTra
 export const Autograder = () => {
     document.getElementById("loading-screen")!.style.display = "none"
 
-    const [referenceScript, setReferenceScript] = useState({ name: "", sourceCode: "" })
     const [compileError, setCompileError] = useState("")
     const [referenceResult, setReferenceResult] = useState(null as DAWData | null)
     const [testAllTracks, setTestAllTracks] = useState(true)
-    const [testTracks, setTestTracks] = useState([])
+    const [testTracks, setTestTracks] = useState([] as boolean[])
     const [allowPrompts, setAllowPrompts] = useState(true)
-    const [uploads, setUploads] = useState([] as any[])
-    const [files, setFiles] = useState([])
+    const [prompts, setPrompts] = useState([] as string[])
+    const [uploads, setUploads] = useState([] as Upload[])
+    const [files, setFiles] = useState([] as File[])
 
     return (
         <div>
             <ReferenceScriptUpload
-                referenceScript={referenceScript}
                 compileError={compileError}
-                setReferenceScript={setReferenceScript}
+                prompts={prompts}
                 setReferenceResult={setReferenceResult}
                 setCompileError={setCompileError}
                 setTestAllTracks={setTestAllTracks}
                 setTestTracks={setTestTracks}
                 setUploads={setUploads}
                 setFiles={setFiles}
+                setPrompts={setPrompts}
             />
             <ConfigureTest
                 referenceResult={referenceResult}
@@ -511,18 +508,20 @@ export const Autograder = () => {
                 testAllTracks={testAllTracks}
                 testTracks={testTracks}
                 allowPrompts={allowPrompts}
+                prompts={prompts}
                 setTestAllTracks={setTestAllTracks}
                 setTestTracks={setTestTracks}
                 setAllowPrompts={setAllowPrompts}
             />
-            {referenceResult && <TestResults
+            {referenceResult && !compileError &&
+            <TestResults
                 uploads={uploads}
                 files={files}
                 referenceResult={referenceResult}
-                compileError={compileError}
                 testAllTracks={testAllTracks}
                 testTracks={testTracks}
                 allowPrompts={allowPrompts}
+                prompts={prompts}
                 setUploads={setUploads}
                 setFiles={setFiles}
             />}
