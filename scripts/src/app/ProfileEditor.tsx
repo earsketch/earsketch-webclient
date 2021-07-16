@@ -116,6 +116,7 @@ const PasswordEditor = ({ close }: { close: () => void }) => {
         })
     }
 
+    // jscpd:ignore-start
     return <div>
         <div className="modal-header"><h3>{t("changePassword.prompt")}</h3></div>
 
@@ -157,4 +158,5 @@ const PasswordEditor = ({ close }: { close: () => void }) => {
             </div>
         </form>
     </div>
+    // jscpd:ignore-end
 }

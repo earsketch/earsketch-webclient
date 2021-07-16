@@ -83,11 +83,8 @@ export async function post(endpoint: string, params?: { [key: string]: string },
     const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
     try {
         const response = await fetch(url, { method: "POST", headers })
-        if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
-        }
-        const text = await response.text()
-        return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+        if (!response.ok) throw new Error(`error code: ${response.status}`)
+        return xml2js.parseStringPromise(await response.text(), { explicitArray: false, explicitRoot: false })
     } catch (err) {
         esconsole(`post failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])
@@ -108,11 +105,8 @@ async function postXML(endpoint: string, xml: string, headers?: HeadersInit) {
             headers: { "Content-Type": "application/xml", ...headers },
             body: xml,
         })
-        if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
-        }
-        const text = await response.text()
-        return xml2js.parseStringPromise(text, { explicitArray: false, explicitRoot: false })
+        if (!response.ok) throw new Error(`error code: ${response.status}`)
+        return xml2js.parseStringPromise(await response.text(), { explicitArray: false, explicitRoot: false })
     } catch (err) {
         esconsole(`postXML failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])

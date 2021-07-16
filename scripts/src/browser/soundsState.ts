@@ -302,7 +302,7 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
 const fileKeysByFoldersSelector = (entities: SoundEntities, folders: string[]) => {
     const result: { [folder: string]: string[] } = {}
-    const entitiesList = Object.values(entities) as SoundEntity[]
+    const entitiesList = Object.values(entities)
     folders.forEach(folder => {
         result[folder] = entitiesList.filter(v => v.folder === folder).map(v => v.file_key).sort((a, b) => a.localeCompare(b, undefined, {
             numeric: true,
@@ -415,17 +415,7 @@ export const selectFilteredRegularFolders = createSelector(
 
 export const selectFilteredRegularFileKeysByFolders = createSelector(
     [selectFilteredRegularEntities, selectFilteredRegularFolders],
-    (entities: SoundEntities, folders) => {
-        const result: { [folder: string]: string[] } = {}
-        const entitiesList = Object.values(entities)
-        folders.forEach(folder => {
-            result[folder] = entitiesList.filter(v => v.folder === folder).map(v => v.file_key).sort((a, b) => a.localeCompare(b, undefined, {
-                numeric: true,
-                sensitivity: "base",
-            }))
-        })
-        return result
-    }
+    fileKeysByFoldersSelector
 )
 
 export const selectFilteredFeaturedEntities = createSelector(
@@ -448,17 +438,7 @@ export const selectFilteredFeaturedFolders = createSelector(
 
 export const selectFilteredFeaturedFileKeysByFolders = createSelector(
     [selectFilteredFeaturedEntities, selectFilteredFeaturedFolders],
-    (entities: SoundEntities, folders: string[]) => {
-        const result: { [folder: string]: string[] } = {}
-        const entitiesList = Object.values(entities)
-        folders.forEach(folder => {
-            result[folder] = entitiesList.filter(v => v.folder === folder).map(v => v.file_key).sort((a, b) => a.localeCompare(b, undefined, {
-                numeric: true,
-                sensitivity: "base",
-            }))
-        })
-        return result
-    }
+    fileKeysByFoldersSelector
 )
 
 const selectEntities = createSelector(
