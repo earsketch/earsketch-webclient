@@ -215,7 +215,7 @@ export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
 export const getFavorites = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/getFavorites",
     async (token, { dispatch }) => {
-        const result = get("/audio/favorites", {}, { Authorization: "Bearer " + token })
+        const result = await get("/audio/favorites", {}, { Authorization: "Bearer " + token })
         dispatch(setFavorites(result))
     }
 )
