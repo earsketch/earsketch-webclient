@@ -31,7 +31,7 @@ export const DetailEditor = ({ username, email: _email, role, firstName: _firstN
 
         // Maybe this should go in userProject.
         try {
-            await userProject.postAuthForm("/services/scripts/editprofile", { firstname: _firstName, lastname: _lastName, email: _email })
+            await userProject.postAuth("/services/scripts/editprofile", { firstname: _firstName, lastname: _lastName, email: _email })
         } catch {
             esconsole("Error updating profile", ["editProfile", "error"])
             setError(t("profileEditor.error"))

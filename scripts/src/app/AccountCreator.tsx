@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
-import { postForm } from "./userProject"
+import { post } from "./userProject"
 import { useTranslation } from "react-i18next"
 
 export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
@@ -17,7 +17,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
         setError("Please wait...")
         try {
             // TODO: This endpoint is poorly named - it creates new accounts.
-            const data = await postForm("/services/scripts/signin", {
+            const data = await post("/services/scripts/signin", {
                 username: username,
                 email: email,
                 password: btoa(password),

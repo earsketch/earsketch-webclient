@@ -8,6 +8,21 @@ import * as ESUtils from "../esutils"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 
+async function postJSON(endpoint: string, data: any) {
+    const url = URL_DOMAIN + endpoint
+    const response = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            Authorization: "Bearer " + userProject.getToken(),
+            "Content-Type": "application/json",
+        },
+    })
+    if (!response.ok) {
+        throw new Error(`error code: ${response.status}`)
+    }
+}
+
 export const ErrorForm = ({ email: storedEmail, close }: { email: string, close: () => void }) => {
     const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
@@ -45,9 +60,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         body += "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```"
         body += "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageDump + "\r\n```"
 
-        const info = { title: "User reported bug", labels: ["report"], body }
-        // TODO: This endpoint should not nest JSON inside form data.
-        userProject.postForm("/services/files/reportissue", { jsreport: JSON.stringify(info) })
+        postJSON("/services/files/reportissue", { title: "User reported bug", labels: ["report"], body })
             .then(() => userNotification.show("Thank you for your submission! Your error has been reported.", "success"))
             .catch(() => userNotification.show("Error submitting report.", "failure1"))
 
