@@ -370,7 +370,7 @@ function fromEntries<V>(iterable: [string, V][]) {
 
 export const selectActiveScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([_, v]) => ![true, "1"].includes(v.soft_delete as any)))
+    (scripts) => fromEntries(Object.entries(scripts).filter(([_, script]) => !script.soft_delete))
 )
 export const selectActiveScriptIDs = createSelector(
     [selectActiveScripts],
@@ -379,7 +379,7 @@ export const selectActiveScriptIDs = createSelector(
 
 export const selectDeletedScripts = createSelector(
     [selectRegularScripts],
-    (scripts) => fromEntries(Object.entries(scripts).filter(([_, v]) => [true, "1"].includes(v.soft_delete as any)))
+    (scripts) => fromEntries(Object.entries(scripts).filter(([_, script]) => script.soft_delete))
 )
 export const selectDeletedScriptIDs = createSelector(
     [selectDeletedScripts],
