@@ -248,7 +248,7 @@ export async function getAudioFolders() {
         const data = await (await fetch(URL_DOMAIN + "/audio/keys?tag=")).json()
         // return only a list of file keys
         const output = []
-        for (const file of Object.values(data.smallAudioFile) as any[]) {
+        for (const file of Object.values(data) as any[]) {
             if (file.scope === 0) continue
             const str = file.tags.toUpperCase()
             const tokens = str.split("__")
