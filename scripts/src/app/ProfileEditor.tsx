@@ -31,7 +31,7 @@ export const DetailEditor = ({ username, email: _email, role, firstName: _firstN
 
         // Maybe this should go in userProject.
         try {
-            await userProject.postAuth("/services/scripts/editprofile", { firstname: _firstName, lastname: _lastName, email: _email })
+            await userProject.postAuth("/users/edit", { firstname: _firstName, lastname: _lastName, email: _email })
         } catch {
             esconsole("Error updating profile", ["editProfile", "error"])
             setError(t("profileEditor.error"))
@@ -100,7 +100,7 @@ const PasswordEditor = ({ close }: { close: () => void }) => {
     const submit = () => {
         // TODO: This should not be a GET request, and these should not be URL parameters...
         const params = { username: userProject.getUsername(), password: btoa(oldPassword), newpassword: btoa(newPassword) }
-        fetch(URL_DOMAIN + "/services/scripts/modifypwd?" + new URLSearchParams(params)).then(response => {
+        fetch(URL_DOMAIN + "/users/modifypwd?" + new URLSearchParams(params)).then(response => {
             if (response.status === 200) {
                 userNotification.show(t("changePassword.success"), "success")
                 close()

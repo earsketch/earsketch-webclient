@@ -372,7 +372,7 @@ export async function getLicenses() {
 
 export async function getUserInfo(token?: string) {
     token ??= getToken()!
-    const { username, email, firstname, lastname, role } = await post("/users/info", {}, { Authorization: "Bearer " + token })
+    const { username, email, firstname, lastname, role } = await get("/users/info", {}, { Authorization: "Bearer " + token })
     return { username, email, firstname: firstname ?? "", lastname: lastname ?? "", role }
 }
 

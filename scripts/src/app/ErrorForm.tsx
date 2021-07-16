@@ -60,7 +60,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         body += "\r\n**TRACE LOG:** \r\n```\r\n" + REPORT_LOG.join("\r\n") + "\r\n```"
         body += "\r\n**LOCAL STORAGE:** \r\n```\r\n" + localStorageDump + "\r\n```"
 
-        postJSON("/services/files/reportissue", { title: "User reported bug", labels: ["report"], body })
+        postJSON("/thirdparty/reportissue", { title: "User reported bug", labels: ["report"], body })
             .then(() => userNotification.show("Thank you for your submission! Your error has been reported.", "success"))
             .catch(() => userNotification.show("Error submitting report.", "failure1"))
 

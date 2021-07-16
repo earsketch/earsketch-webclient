@@ -701,7 +701,7 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
 
     formData.append("image_url", imageURL)
     formData.append("width", "" + nrows)
-    formData.append("heigth", "" + ncols)
+    formData.append("height", "" + ncols)
     formData.append("color", "" + !!color)
 
     const request = new XMLHttpRequest()

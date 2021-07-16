@@ -17,7 +17,7 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
         setError("Please wait...")
         try {
             // TODO: This endpoint is poorly named - it creates new accounts.
-            const data = await post("/services/scripts/signin", {
+            const data = await post("/users/create", {
                 username: username,
                 email: email,
                 password: btoa(password),

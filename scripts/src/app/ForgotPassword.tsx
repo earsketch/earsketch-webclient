@@ -9,7 +9,7 @@ export const ForgotPassword = ({ close }: { close: () => void }) => {
     const [email, setEmail] = useState("")
 
     const resetPassword = () => {
-        const url = URL_DOMAIN + '/services/scripts/resetpwd?email=' + encodeURIComponent(email)
+        const url = URL_DOMAIN + '/users/resetpwd?email=' + encodeURIComponent(email)
         fetch(url).then(response => {
             if (response.ok) {
                 esconsole("Forgot Password succeeded", "info")

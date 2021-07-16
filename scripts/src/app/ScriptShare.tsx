@@ -27,7 +27,7 @@ async function queryID(query: any) {
         throw i18n.t("messages:general.noSelfShare")
     }
 
-    const data = await userProject.get("/services/scripts/searchuser", { query })
+    const data = await userProject.get("/users/search", { query })
     if (data) {
         return data.username
     }
