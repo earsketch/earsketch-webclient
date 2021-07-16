@@ -192,7 +192,7 @@ export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
 export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/getUserSounds",
     async (username, { dispatch }) => {
-        const endPoint = URL_DOMAIN + "/services/audio/getuseraudiotags"
+        const endPoint = URL_DOMAIN + "/audio/usertags"
         const params = new URLSearchParams({ username })
         const response = await fetch(`${endPoint}?${params}`, {
             method: "GET",
@@ -215,7 +215,7 @@ export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
 export const getFavorites = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/getFavorites",
     async (token, { dispatch }) => {
-        const result = get("/services/audio/getfavorites", {}, { Authorization: "Bearer " + token })
+        const result = get("/audio/favorites", {}, { Authorization: "Bearer " + token })
         dispatch(setFavorites(result))
     }
 )
@@ -233,10 +233,10 @@ export const markFavorite = createAsyncThunk<void, { fileKey: string, isFavorite
             const params = { audio_file_key: fileKey, userowned: isUserOwned.toString() }
 
             if (markAsFavorite) {
-                await postAuth("/services/audio/addfavorite", params)
+                await postAuth("/audio/addfavorite", params)
                 dispatch(addFavorite(fileKey))
             } else {
-                await postAuth("/services/audio/removefavorite", params)
+                await postAuth("/audio/removefavorite", params)
                 dispatch(removeFavorite(fileKey))
             }
         }

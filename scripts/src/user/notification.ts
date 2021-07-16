@@ -144,7 +144,7 @@ export function handleTeacherBroadcast(data: Notification) {
 export async function markAsRead(item: Notification) {
     const notifications = selectNotifications(store.getState())
     if (item.notification_type === "broadcast" || item.id === undefined) return
-    await userProject.postAuth("/services/scripts/markread", { notification_id: item.id! })
+    await userProject.postAuth("/users/readnotification", { notification_id: item.id! })
     const newNotifications = [{ ...notifications.find(other => item.id === other.id)!, unread: false }, ...notifications.filter(other => item.id !== other.id)]
     store.dispatch(setNotifications(newNotifications))
 }
@@ -155,7 +155,7 @@ export function markAllAsRead() {
     for (const item of notifications) {
         if (item.unread && item.notification_type !== "broadcast" && item.id !== undefined) {
             // TODO: handle broadcast as well
-            userProject.postAuth("/services/scripts/markread", { notification_id: item.id })
+            userProject.postAuth("/users/readnotification", { notification_id: item.id })
             newNotifications.push({ ...item, unread: false })
         }
     }

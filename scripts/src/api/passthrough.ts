@@ -708,7 +708,7 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
     // TODO: synchronous requests are deprecated, come up with a better way
     // to do this
     request.open(
-        "POST", URL_DOMAIN + "/services/files/stringifyimage", false
+        "POST", URL_DOMAIN + "/thirdparty/stringifyimage", false
     )
 
     let response: any = []
@@ -754,7 +754,7 @@ export function importFile(result: DAWData, fileURL: string) {
     // TODO: synchronous requests are deprecated, come up with a better way
     // to do this
     request.open(
-        "POST", URL_DOMAIN + "/services/files/stringifyfile", false
+        "POST", URL_DOMAIN + "/thirdparty/stringifyfile", false
     )
 
     let response = ""
@@ -1087,7 +1087,7 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
         extension = ".wav"
     }
 
-    let url = URL_DOMAIN + "/services/audio/getrandomaudiokey?tag=" + folder
+    let url = URL_DOMAIN + "/audio/randomkey?tag=" + folder
 
     if (userProject.isLoggedIn()) {
         url += "&username=" + userProject.getUsername()

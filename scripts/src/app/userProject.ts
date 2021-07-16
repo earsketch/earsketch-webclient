@@ -51,6 +51,10 @@ export async function get(endpoint: string, params?: { [key: string]: string }, 
     }
 }
 
+export async function getAuth(endpoint: string, params?: { [key: string]: string }) {
+    return get(endpoint, params, { Authorization: "Bearer " + getToken() })
+}
+
 // Expects form data, returns JSON.
 export async function post(endpoint: string, data?: { [key: string]: string }, headers?: HeadersInit) {
     const url = URL_DOMAIN + endpoint
@@ -101,7 +105,7 @@ export async function postForm(endpoint: string, data: { [key: string]: string |
 
 export async function authenticate(username: string, password: string) {
     try {
-        const response = await fetch(URL_DOMAIN + "/services/scripts/authenticate", {
+        const response = await fetch(URL_DOMAIN + "/users/authenticate", {
             method: "POST",
             body: new URLSearchParams({ username, password: btoa(password) }),
         })
@@ -235,7 +239,7 @@ export async function login(username: string) {
 
 export async function refreshCodeBrowser() {
     if (isLoggedIn()) {
-        const fetchedScripts: Script[] = await postAuth("/services/scripts/findall")
+        const fetchedScripts: Script[] = await getAuth("/scripts/owned")
 
         store.dispatch(scriptsState.resetRegularScripts())
 
@@ -258,7 +262,7 @@ export async function refreshCodeBrowser() {
 // Fetch a script's history. Resolves to a list of historical scripts.
 export async function getScriptHistory(scriptid: string) {
     esconsole("Getting script history: " + scriptid, ["debug", "user"])
-    const scripts: Script[] = await postAuth("/services/scripts/scripthistory", { scriptid })
+    const scripts: Script[] = await getAuth("/scripts/history", { scriptid })
     for (const script of scripts) {
         script.created = ESUtils.parseDate(script.created as string)
     }
@@ -268,7 +272,7 @@ export async function getScriptHistory(scriptid: string) {
 // Get shared scripts in the user account. Returns a promise that resolves to a list of user's shared script objects.
 export async function getSharedScripts() {
     const sharedScripts: { [key: string]: Script } = {}
-    const scripts: Script[] = await postAuth("/services/scripts/getsharedscripts")
+    const scripts: Script[] = await getAuth("/scripts/shared")
     for (const script of scripts) {
         script.isShared = true
         fixCollaborators(script, getUsername())
@@ -280,7 +284,7 @@ export async function getSharedScripts() {
 
 // Get shared id for locked version of latest script.
 export async function getLockedSharedScriptId(shareid: string) {
-    return (await get("/services/scripts/getlockedshareid", { shareid })).shareid
+    return (await get("/scripts/lockedshareid", { shareid })).shareid
 }
 
 // Delete a user saved to local storage. I.e., logout.
@@ -327,7 +331,7 @@ export function shareWithPeople(shareid: string, users: string[]) {
 // Fetch a script by ID.
 export async function loadScript(id: string, sharing: boolean) {
     try {
-        const data = await get("/services/scripts/scriptbyid", { scriptid: id })
+        const data = await get("/scripts/byid", { scriptid: id })
         if (sharing && data === "") {
             userNotification.show(i18n.t("messages:user.badsharelink"), "failure1", 3)
             throw new Error("Script was not found.")
@@ -341,7 +345,7 @@ export async function loadScript(id: string, sharing: boolean) {
 // Deletes an audio key if owned by the user.
 export async function deleteAudio(audiokey: string) {
     try {
-        await postAuth("/services/audio/delete", { audiokey })
+        await postAuth("/audio/delete", { audiokey })
         esconsole("Deleted audiokey: " + audiokey, ["debug", "user"])
         audioLibrary.clearAudioTagCache() // otherwise the deleted audio key is still usable by the user
     } catch (err) {
@@ -352,7 +356,7 @@ export async function deleteAudio(audiokey: string) {
 // Rename an audio key if owned by the user.
 export async function renameAudio(audiokey: string, newaudiokey: string) {
     try {
-        await postAuth("/services/audio/rename", { audiokey, newaudiokey })
+        await postAuth("/audio/rename", { audiokey, newaudiokey })
         esconsole(`Successfully renamed audiokey: ${audiokey} to ${newaudiokey}`, ["debug", "user"])
         audioLibrary.clearAudioTagCache() // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
     } catch (err) {
@@ -363,12 +367,12 @@ export async function renameAudio(audiokey: string, newaudiokey: string) {
 
 // Get a script license information from the back-end.
 export async function getLicenses() {
-    return (await get("/services/scripts/getlicenses")).licenses
+    return (await get("/scripts/licenses"))
 }
 
 export async function getUserInfo(token?: string) {
     token ??= getToken()!
-    const { username, email, firstname, lastname, role } = await post("/services/scripts/getuserinfo", {}, { Authorization: "Bearer " + token })
+    const { username, email, firstname, lastname, role } = await post("/users/info", {}, { Authorization: "Bearer " + token })
     return { username, email, firstname: firstname ?? "", lastname: lastname ?? "", role }
 }
 
@@ -376,7 +380,7 @@ export async function getUserInfo(token?: string) {
 export async function setLicense(name: string, id: string, licenseID: string) {
     if (isLoggedIn()) {
         try {
-            await postAuth("/services/scripts/setscriptlicense", { name, license_id: licenseID })
+            await postAuth("/scripts/setscriptlicense", { name, license_id: licenseID })
         } catch (err) {
             esconsole("Could not set license id: " + licenseID + " to " + name, "debug")
             esconsole(err, ["error"])
@@ -390,7 +394,7 @@ export async function setLicense(name: string, id: string, licenseID: string) {
 export async function saveSharedScript(scriptid: string, scriptname: string, sourcecode: string, username: string) {
     let script
     if (isLoggedIn()) {
-        script = await postAuth("/services/scripts/savesharedscript", { scriptid })
+        script = await postAuth("/scripts/saveshared", { scriptid })
         esconsole(`Save shared script ${script.name} to ${username}`, ["debug", "user"])
         script = { ...script, isShared: true, readonly: true, modified: Date.now() }
     } else {
@@ -414,7 +418,7 @@ export async function deleteScript(scriptid: string) {
     if (isLoggedIn()) {
         // User is logged in so make a call to the web service
         try {
-            const script = await postAuth("/services/scripts/delete", { scriptid })
+            const script = await postAuth("/scripts/delete", { scriptid })
             esconsole("Deleted script: " + scriptid, "debug")
 
             const scripts = scriptsState.selectRegularScripts(store.getState())
@@ -459,7 +463,7 @@ export async function restoreScript(script: Script) {
 
     if (isLoggedIn()) {
         const restored = {
-            ...await postAuth("/services/scripts/restore", { scriptid: script.shareid }),
+            ...await postAuth("/scripts/restore", { scriptid: script.shareid }),
             saved: true,
             modified: Date.now(),
         }
@@ -511,7 +515,7 @@ export async function importCollaborativeScript(script: Script) {
 // Delete a shared script if owned by the user.
 export async function deleteSharedScript(scriptid: string) {
     if (isLoggedIn()) {
-        await postAuth("/services/scripts/deletesharedscript", { scriptid })
+        await postAuth("/scripts/deleteshared", { scriptid })
         esconsole("Deleted shared script: " + scriptid, "debug")
     }
     const { [scriptid]: _, ...sharedScripts } = scriptsState.selectSharedScripts(store.getState())
@@ -521,7 +525,7 @@ export async function deleteSharedScript(scriptid: string) {
 // Set a shared script description if owned by the user.
 export async function setScriptDesc(name: string, id: string, description: string = "") {
     if (isLoggedIn()) {
-        await postAuth("/services/scripts/setscriptdesc", { name, description })
+        await postAuth("/scripts/setdescription", { name, description })
         store.dispatch(scriptsState.setScriptDescription({ id, description }))
     }
     // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
@@ -541,7 +545,7 @@ async function importSharedScript(scriptid: string) {
     let script
     const sharedScripts = scriptsState.selectSharedScripts(store.getState())
     if (isLoggedIn()) {
-        script = await postAuth("/services/scripts/import", { scriptid }) as Script
+        script = await postAuth("/scripts/import", { scriptid }) as Script
     } else {
         script = sharedScripts[scriptid]
         script = {
@@ -577,7 +581,7 @@ async function addSharedScript(shareID: string) {
 export async function renameScript(script: Script, newName: string) {
     const id = script.shareid
     if (isLoggedIn()) {
-        await postAuth("/services/scripts/rename", { scriptid: id, scriptname: newName })
+        await postAuth("/scripts/rename", { scriptid: id, scriptname: newName })
         esconsole(`Renamed script: ${id} to ${newName}`, ["debug", "user"])
     }
     store.dispatch(scriptsState.setScriptName({ id, name: newName }))
@@ -587,7 +591,7 @@ export async function renameScript(script: Script, newName: string) {
 // Get all users and their roles
 export async function getAllUserRoles() {
     if (isLoggedIn()) {
-        return postAuth("/services/scripts/getalluserroles")
+        return getAuth("/users/roles")
     } else {
         esconsole("Login failure", ["error", "user"])
     }
@@ -596,7 +600,7 @@ export async function getAllUserRoles() {
 // Add role to user
 export async function addRole(username: string, role: string) {
     if (isLoggedIn()) {
-        return postAuth("/services/scripts/adduserrole", { username, role })
+        return postAuth("/users/addrole", { username, role })
     } else {
         esconsole("Login failure", ["error", "user"])
     }
@@ -605,7 +609,7 @@ export async function addRole(username: string, role: string) {
 // Remove role from user
 export async function removeRole(username: string, role: string) {
     if (isLoggedIn()) {
-        return postAuth("/services/scripts/removeuserrole", { username, role })
+        return postAuth("/users/removerole", { username, role })
     } else {
         esconsole("Login failure", ["error", "user"])
     }
@@ -613,7 +617,7 @@ export async function removeRole(username: string, role: string) {
 
 // Search users and return user details - intended for admin use
 export async function searchUsers(username: string) {
-    return (await get("/services/scripts/searchuser", { query: username }))
+    return (await get("/users/search", { query: username }))
 }
 
 // Set a user password with admin passphrase as credentials
@@ -628,7 +632,7 @@ export async function setPasswordForUser(username: string, password: string, adm
         username,
         newpassword: btoa(password),
     }
-    await postAuth("/services/scripts/modifypwdadmin", data)
+    await postAuth("/users/modifypwdadmin", data)
     userNotification.show("Successfully set a new password for " + username, "history", 3)
 }
 
@@ -666,7 +670,7 @@ export async function saveScript(name: string, source: string, overwrite: boolea
 
     if (isLoggedIn()) {
         reporter.saveScript()
-        const script = await postAuth("/services/scripts/save", {
+        const script = await postAuth("/scripts/save", {
             name,
             run_status: status + "",
             source_code: source,
@@ -709,12 +713,8 @@ export async function createScript(scriptname: string) {
     return script
 }
 
-export async function getTutoringRecord(scriptid: string) {
-    return postAuth("/services/scripts/gettutoringrecord", { scriptid })
-}
-
 export async function uploadCAIHistory(project: string, node: any) {
     const data = { username: getUsername(), project, node: JSON.stringify(node) }
-    await post("/services/scripts/uploadcaihistory", data)
+    await post("/studies/caihistory", data)
     console.log("saved to CAI history:", project, node)
 }

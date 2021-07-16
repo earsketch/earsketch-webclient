@@ -97,7 +97,7 @@ async function _getAudioClip(filekey: string, tempo: number) {
 
     esconsole("Loading audio clip with filekey: " + filekey, ["debug", "audiolibrary"])
     const params = { key: filekey }
-    const url = URL_DOMAIN + "/services/audio/getunstretchedsample?" + new URLSearchParams(params)
+    const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams(params)
 
     // STEP 1: check if audio key exists
     // TODO: Sample download includes clip verification on server side, so probably we can skip the first part.
@@ -185,7 +185,7 @@ export async function getAudioTags() {
     if (cache.audioTags !== null) {
         return cache.audioTags
     }
-    const url = URL_DOMAIN + "/services/audio/getaudiotags"
+    const url = URL_DOMAIN + "/audio/tags"
     esconsole("Fetching audio tags", ["debug", "audiolibrary"])
     try {
         const data = await (await fetch(url)).json()
@@ -207,7 +207,7 @@ export async function getUserAudioTags() {
     if (cache.userAudioTags !== null) {
         return cache.userAudioTags
     }
-    const url = URL_DOMAIN + "/services/audio/getaudiokeys?tag="
+    const url = URL_DOMAIN + "/audio/keys?tag="
     esconsole("Fetching audio keys", ["debug", "audiolibrary"])
     try {
         const data = await (await fetch(url)).json()
@@ -245,7 +245,7 @@ export async function getAudioFolders() {
     }
     esconsole("Fetching audio folders", ["debug", "audiolibrary"])
     try {
-        const data = await (await fetch(URL_DOMAIN + "/services/audio/getaudiokeys?tag=")).json()
+        const data = await (await fetch(URL_DOMAIN + "/audio/keys?tag=")).json()
         // return only a list of file keys
         const output = []
         for (const file of Object.values(data.smallAudioFile) as any[]) {
@@ -271,7 +271,7 @@ async function getDefaultAudioFolders() {
     }
     esconsole("Fetching default audio folders", ["debug", "audiolibrary"])
     try {
-        const data = await (await fetch(URL_DOMAIN + "/services/audio/getdefaultaudiofolders")).json()
+        const data = await (await fetch(URL_DOMAIN + "/audio/defaultfolders")).json()
         esconsole("Found default audio folders", ["debug", "audiolibrary"])
         return (cache.defaultAudioFolders = data)
     } catch (err) {
@@ -286,7 +286,7 @@ async function getUserAudioFolders() {
     }
     esconsole("Fetching all the user audio folders", ["debug", "audiolibrary"])
     try {
-        const data = await (await fetch(URL_DOMAIN + "/services/audio/getuseraudiofolders")).json()
+        const data = await (await fetch(URL_DOMAIN + "/audio/userfolders")).json()
         esconsole("Found user audio folders", ["debug", "audiolibrary"])
         return (cache.userAudioFolders = data)
     } catch (err) {
@@ -327,7 +327,7 @@ export async function getDefaultTagsMetadata() {
     }
     esconsole("Fetching default sounds tag metadata", ["debug", "audiolibrary"])
     try {
-        const data: SoundEntity[] = await (await fetch(URL_DOMAIN + "/services/audio/getdefaultaudiotags")).json()
+        const data: SoundEntity[] = await (await fetch(URL_DOMAIN + "/audio/defaulttags")).json()
         esconsole("Found audio tags", ["debug", "audiolibrary"])
         return (cache.defaultTags = (cache.sounds = data))
     } catch (err) {
@@ -341,7 +341,7 @@ export async function getUserTagsMetadata(username: string) {
         return cache.userTags[username]
     }
     esconsole("Fetching user sounds tag metadata for " + username, ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/services/audio/getuseraudiotags?" + new URLSearchParams({ username })
+    const url = URL_DOMAIN + "/audio/usertags?" + new URLSearchParams({ username })
     try {
         const data = await (await fetch(url)).json()
         esconsole("Found audio tags", ["debug", "audiolibrary"])
@@ -354,7 +354,7 @@ export async function getUserTagsMetadata(username: string) {
 
 export async function verifyClip(name: string) {
     esconsole("Verifying the presence of audio clip for " + name, ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/services/audio/verifyclip?" + new URLSearchParams({ key: name })
+    const url = URL_DOMAIN + "/audio/metadata?" + new URLSearchParams({ key: name })
     const response = await fetch(url)
     const text = await response.text()
     if (!text) {
