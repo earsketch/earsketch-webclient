@@ -380,7 +380,7 @@ export async function getUserInfo(token?: string) {
 export async function setLicense(name: string, id: string, licenseID: string) {
     if (isLoggedIn()) {
         try {
-            await postAuth("/scripts/setscriptlicense", { name, license_id: licenseID })
+            await postAuth("/scripts/license", { name, license_id: licenseID })
         } catch (err) {
             esconsole("Could not set license id: " + licenseID + " to " + name, "debug")
             esconsole(err, ["error"])
@@ -523,7 +523,7 @@ export async function deleteSharedScript(scriptid: string) {
 // Set a shared script description if owned by the user.
 export async function setScriptDesc(name: string, id: string, description: string = "") {
     if (isLoggedIn()) {
-        await postAuth("/scripts/setdescription", { name, description })
+        await postAuth("/scripts/description", { name, description })
         store.dispatch(scriptsState.setScriptDescription({ id, description }))
     }
     // TODO: Currently script license and description of local scripts are NOT synced with web service on login.
