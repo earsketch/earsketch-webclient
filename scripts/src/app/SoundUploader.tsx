@@ -357,7 +357,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                     </div>)}
                 </div>}
             {searched &&
-                (results === null && <div><i className="inline-block animate-spin icon icon-spinner" />{t('soundUploader.freesound.searching')}</div>
+                (results === null && <div><i className="animate-spin es-spinner mr-3" />{t('soundUploader.freesound.searching')}</div>
                     || results!.length === 0 && <div>{t('noResults')}</div>)}
             <div className="modal-section-header"><span>{t('soundUploader.constantRequired')}</span></div>
             <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />

@@ -180,7 +180,7 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileKey === fileKey
-                        ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin inline-block icon-spinner" />)
+                        ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                         : <i className="icon icon-play4" />
                         }
                     </button>

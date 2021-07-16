@@ -207,10 +207,6 @@ export const compareObjStructure = (a: any, b: any): boolean => {
     })
 }
 
-export const randomString = (length: number) => {
-    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1)
-}
-
 // Returns the matching value or a null value if the parameter does not exist.
 export const getURLParameter = (key: string) => {
     const params = new URLSearchParams(window.location.search + window.location.hash)
@@ -253,7 +249,7 @@ const defaultTo = (value: number, defaultValue: number) => {
  * and standard deviation parameters.
  *
  * Uses the algorithm used in Java's random class, which in turn comes from
- * Donald Knuth's implementation of the BoxÐMuller transform.
+ * Donald Knuth's implementation of the Box-Muller transform.
  *
  * @param {Number} [mean = 0.0] The mean value, default 0.0
  * @param {Number} [standardDeviation = 1.0] The standard deviation, default 1.0

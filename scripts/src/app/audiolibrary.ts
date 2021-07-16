@@ -25,54 +25,54 @@ export const cache = {
     slicedClips: {} as { [key: string]: AugmentedBuffer },
     // Ongoing promises: this is so we don't launch a second request for the same information, while waiting on the first.
     // TODO: Also use this approach for other requests, besides getAudioClip.
-    promises: {} as { [key: string]: Promise<any> },
+    promises: {} as { [key: string]: Promise<AugmentedBuffer> },
 }
 
 // TODO: These don't belong in this module.
 export const EFFECT_TAGS = [
-    "VOLUME","GAIN","DELAY","DELAY_TIME","DELAY_FEEDBACK",
-    "DISTORTION","DISTO_GAIN","FILTER","FILTER_FREQ","FILTER_RESONANCE",
-    "COMPRESSOR","COMPRESSOR_THRESHOLD","COMPRESSOR_RATIO","PAN","LEFT_RIGHT",
-    "BANDPASS","BANDPASS_FREQ","BANDPASS_WIDTH","CHORUS","CHORUS_LENGTH",
-    "CHORUS_NUMVOICES","CHORUS_RATE","CHORUS_MOD","EQ3BAND","EQ3BAND_LOWGAIN",
-    "EQ3BAND_LOWFREQ","EQ3BAND_MIDGAIN","EQ3BAND_MIDFREQ","EQ3BAND_HIGHGAIN",
-    "EQ3BAND_HIGHFREQ","FLANGER","FLANGER_LENGTH","FLANGER_FEEDBACK",
-    "FLANGER_RATE","PHASER","PHASER_RATE","PHASER_RANGEMIN","PHASER_RANGEMAX",
-    "PHASER_FEEDBACK","PITCHSHIFT","PITCHSHIFT_SHIFT","TREMOLO","TREMOLO_FREQ",
-    "TREMOLO_AMOUNT","RINGMOD","RINGMOD_MODFREQ","RINGMOD_FEEDBACK","WAH",
-    "WAH_POSITION","REVERB","REVERB_TIME","REVERB_DAMPFREQ","MIX","BYPASS"
+    "VOLUME", "GAIN", "DELAY", "DELAY_TIME", "DELAY_FEEDBACK",
+    "DISTORTION", "DISTO_GAIN", "FILTER", "FILTER_FREQ", "FILTER_RESONANCE",
+    "COMPRESSOR", "COMPRESSOR_THRESHOLD", "COMPRESSOR_RATIO", "PAN", "LEFT_RIGHT",
+    "BANDPASS", "BANDPASS_FREQ", "BANDPASS_WIDTH", "CHORUS", "CHORUS_LENGTH",
+    "CHORUS_NUMVOICES", "CHORUS_RATE", "CHORUS_MOD", "EQ3BAND", "EQ3BAND_LOWGAIN",
+    "EQ3BAND_LOWFREQ", "EQ3BAND_MIDGAIN", "EQ3BAND_MIDFREQ", "EQ3BAND_HIGHGAIN",
+    "EQ3BAND_HIGHFREQ", "FLANGER", "FLANGER_LENGTH", "FLANGER_FEEDBACK",
+    "FLANGER_RATE", "PHASER", "PHASER_RATE", "PHASER_RANGEMIN", "PHASER_RANGEMAX",
+    "PHASER_FEEDBACK", "PITCHSHIFT", "PITCHSHIFT_SHIFT", "TREMOLO", "TREMOLO_FREQ",
+    "TREMOLO_AMOUNT", "RINGMOD", "RINGMOD_MODFREQ", "RINGMOD_FEEDBACK", "WAH",
+    "WAH_POSITION", "REVERB", "REVERB_TIME", "REVERB_DAMPFREQ", "MIX", "BYPASS",
 ]
 export const ANALYSIS_TAGS = ["SPECTRAL_CENTROID", "RMS_AMPLITUDE"]
 
 // Get an audio buffer from a file key.
 //   filekey: The constant associated with the audio clip that users type in EarSketch code.
 //   tempo: Tempo to scale the returned clip to.
-export function getAudioClip(filekey: string, tempo: number, quality: boolean=false) {
-    const cacheKey = [filekey, tempo, quality].toString()
+export function getAudioClip(filekey: string, tempo: number) {
+    const cacheKey = [filekey, tempo].toString()
     if (cacheKey in cache.promises) {
         return cache.promises[cacheKey]
     } else {
-        return cache.promises[cacheKey] = _getAudioClip(filekey, tempo, quality)
+        return (cache.promises[cacheKey] = _getAudioClip(filekey, tempo))
     }
 }
 
 const timestretch = (buffer: AudioBuffer, sourceTempo: number, targetTempo: number) => {
     // JS time stretcher; Seems to introduce an unwanted sample offset when the same instance is reused.
     const kali = new Kali(1)
-    kali.setup(ctx.sampleRate, targetTempo/sourceTempo, FLAGS.TS_QUICK_SEARCH)
+    kali.setup(ctx.sampleRate, targetTempo / sourceTempo, FLAGS.TS_QUICK_SEARCH)
 
     const offset = Math.round(buffer.length * 0.1)
-    const input = new Float32Array(buffer.length + offset*2)
+    const input = new Float32Array(buffer.length + offset * 2)
     const source = buffer.getChannelData(0)
     for (let i = 0; i < buffer.length; i++) {
-        input[i+offset] = source[i]
+        input[i + offset] = source[i]
     }
     kali.input(input)
     kali.process()
     // This weird calculation matches the output length of SOX time stretching.
-    const targetLength = Math.round((buffer.length + 1) * sourceTempo/targetTempo)
-    const outOffset = Math.round(offset * sourceTempo/targetTempo)
-    const output = new Float32Array(targetLength + outOffset*2)
+    const targetLength = Math.round((buffer.length + 1) * sourceTempo / targetTempo)
+    const outOffset = Math.round(offset * sourceTempo / targetTempo)
+    const output = new Float32Array(targetLength + outOffset * 2)
     kali.output(output)
     kali.flush()
     const newBuffer = ctx.createBuffer(1, targetLength, ctx.sampleRate)
@@ -84,8 +84,8 @@ const timestretch = (buffer: AudioBuffer, sourceTempo: number, targetTempo: numb
     return newBuffer
 }
 
-async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
-    const cacheKey = [filekey, tempo, quality].toString()
+async function _getAudioClip(filekey: string, tempo: number) {
+    const cacheKey = [filekey, tempo].toString()
 
     if (cacheKey in cache.clips) {
         return cache.clips[cacheKey]
@@ -96,14 +96,8 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
     }
 
     esconsole("Loading audio clip with filekey: " + filekey, ["debug", "audiolibrary"])
-    const params = FLAGS.USE_CLIENT_TS ? {
-        key: filekey
-    } : {
-        key: filekey,
-        tempo: tempo,
-        audioquality: quality ? 1 : 0
-    } as { [key: string]: any }
-    const url = (FLAGS.USE_CLIENT_TS ? URL_DOMAIN+"/services/audio/getunstretchedsample" : URL_LOADAUDIO) + "?" + new URLSearchParams(params)
+    const params = { key: filekey }
+    const url = URL_DOMAIN + "/services/audio/getunstretchedsample?" + new URLSearchParams(params)
 
     // STEP 1: check if audio key exists
     // TODO: Sample download includes clip verification on server side, so probably we can skip the first part.
@@ -128,9 +122,9 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
         esconsole("Error getting " + filekey + " from the server", ["error", "audiolibrary"])
         const status = err.status
         if (status <= 0) {
-            throw `NetworkError: Could not retreive sound file ${filekey} due to network error`
+            throw new Error(`NetworkError: Could not retreive sound file ${filekey} due to network error`)
         } else if (status >= 500 && status < 600) {
-            throw `ServerError: Could not retreive sound file ${filekey} due to server error`
+            throw new Error(`ServerError: Could not retreive sound file ${filekey} due to server error`)
         } else {
             throw err
         }
@@ -139,7 +133,7 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
     // Need to do this before decodeAudioData() call, as that 'detaches' the ArrayBuffer.
     const bytes = new Uint8Array(data)
     // Check for MP3 file signatures.
-    const isMP3 = (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] == 0x33) || (bytes[0] === 0xff || bytes[1] === 0xfb)
+    const isMP3 = (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) || (bytes[0] === 0xff || bytes[1] === 0xfb)
 
     // STEP 3: decode the audio data.
     esconsole(`Decoding ${filekey} buffer`, ["debug", "audiolibrary"])
@@ -159,13 +153,13 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
         const fixed = new Float32Array(buffer.length)
         // Offset chosen based on https://lame.sourceforge.io/tech-FAQ.txt
         buffer.copyFromChannel(fixed, 0, 1057)
-        buffer.copyToChannel(fixed, 0)        
+        buffer.copyToChannel(fixed, 0)
     }
 
-    if (!FLAGS.USE_CLIENT_TS || originalTempo === -1 || tempo === -1) {
-        esconsole("Using the server (sox) time stretcher.", ["debug", "audiolibrary"])
+    if (originalTempo === -1 || tempo === -1) {
+        esconsole("No time stretching required.", ["debug", "audiolibrary"])
     } else {
-        esconsole("Using client-side time stretcher for " + filekey, ["debug", "audiolibrary"])
+        esconsole("Time-stretching " + filekey, ["debug", "audiolibrary"])
         buffer = timestretch(buffer, originalTempo, tempo) as AugmentedBuffer
     }
 
@@ -182,8 +176,8 @@ async function _getAudioClip(filekey: string, tempo: number, quality: boolean) {
     return buffer
 }
 
-export function cacheSlicedClip(filekey: string, tempo: number, quality: boolean, buffer: AugmentedBuffer) {
-    cache.slicedClips[[filekey, tempo, quality].toString()] = buffer
+export function cacheSlicedClip(filekey: string, tempo: number, buffer: AugmentedBuffer) {
+    cache.slicedClips[[filekey, tempo].toString()] = buffer
 }
 
 // Get the list of audio tag names. (TODO: Doesn't this return a list of file keys?)
@@ -201,7 +195,7 @@ export async function getAudioTags() {
             output.push(tag.file_key)
         }
         esconsole("Found audio tags", ["debug", "audiolibrary"])
-        return cache.audioTags = output
+        return (cache.audioTags = output)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -223,7 +217,7 @@ export async function getUserAudioTags() {
             output.push(tag.file_key)
         }
         esconsole("Found audio keys", ["debug", "audiolibrary"])
-        return cache.userAudioTags = output
+        return (cache.userAudioTags = output)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -241,7 +235,7 @@ export function clearAudioTagCache() {
     cache.defaultTags = null
     cache.userTags = {}
     cache.sounds = []
-    cache.clips = {}  // this might be overkill, but otherwise deleted / renamed clip cache is still accessible
+    cache.clips = {} // this might be overkill, but otherwise deleted / renamed clip cache is still accessible
 }
 
 // Get a list of folder keys. NOTE: This is very inefficient. Prefer using getDefaultAudioFolders and getUserAudioFolders WS.
@@ -260,11 +254,11 @@ export async function getAudioFolders() {
             const tokens = str.split("__")
             // TODO: this token business is confusing
             output.push(tokens[0])
-            output.push(tokens[tokens.length-1])
+            output.push(tokens[tokens.length - 1])
             output.push(str.substr(str.indexOf("__") + 2, str.length))
         }
         esconsole("Found audio folders", ["debug", "audiolibrary"])
-        return cache.audioFolders = output
+        return (cache.audioFolders = output)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -279,7 +273,7 @@ async function getDefaultAudioFolders() {
     try {
         const data = await (await fetch(URL_DOMAIN + "/services/audio/getdefaultaudiofolders")).json()
         esconsole("Found default audio folders", ["debug", "audiolibrary"])
-        return cache.defaultAudioFolders = data
+        return (cache.defaultAudioFolders = data)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -294,7 +288,7 @@ async function getUserAudioFolders() {
     try {
         const data = await (await fetch(URL_DOMAIN + "/services/audio/getuseraudiofolders")).json()
         esconsole("Found user audio folders", ["debug", "audiolibrary"])
-        return cache.userAudioFolders = data
+        return (cache.userAudioFolders = data)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -335,7 +329,7 @@ export async function getDefaultTagsMetadata() {
     try {
         const data: SoundEntity[] = await (await fetch(URL_DOMAIN + "/services/audio/getdefaultaudiotags")).json()
         esconsole("Found audio tags", ["debug", "audiolibrary"])
-        return cache.defaultTags = cache.sounds = data
+        return (cache.defaultTags = (cache.sounds = data))
     } catch (err) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
         throw err
@@ -351,7 +345,7 @@ export async function getUserTagsMetadata(username: string) {
     try {
         const data = await (await fetch(url)).json()
         esconsole("Found audio tags", ["debug", "audiolibrary"])
-        return cache.userTags[username] = cache.sounds = data
+        return (cache.userTags[username] = (cache.sounds = data))
     } catch (err) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])
         throw err
