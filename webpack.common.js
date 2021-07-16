@@ -42,7 +42,6 @@ module.exports = {
 
             // Controllers
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-            codeAnalyzerController: path.resolve(__dirname,`${appDir}/codeAnalyzerController.js`),
             codeAnalyzerContestController: path.resolve(__dirname,`${appDir}/codeAnalyzerContestController.js`),
             codeAnalyzerCAIController: path.resolve(__dirname,`${appDir}/codeAnalyzerCAIController.js`),
         }
@@ -145,7 +144,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'codeAnalyzer/index.html'),
-            template: 'codeAnalyzer/index.template.html'
+            template: 'public/index.html'
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'codeAnalyzerCAI/index.html'),

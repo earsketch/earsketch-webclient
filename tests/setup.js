@@ -188,6 +188,5 @@ require('recorder');
 Object.assign(window,require('esAppDSP'));
 
 // Controllers
-require('codeAnalyzerController');
 require('codeAnalyzerContestController');
 require('codeAnalyzerCAIController');
