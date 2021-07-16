@@ -411,7 +411,14 @@ export const App = () => {
     }
 
     const relogin = async (token: string) => {
-        const userInfo = await userProject.getUserInfo(token)
+        let userInfo
+        try {
+            userInfo = await userProject.getUserInfo(token)
+        } catch {
+            userNotification.show("Your credentials have expired. Please login again with your username and password.", "failure1", 3.5)
+            dispatch(user.logout())
+            return
+        }
         const username = userInfo.username
 
         store.dispatch(user.login({ username, token }))
@@ -441,7 +448,7 @@ export const App = () => {
         userNotification.user.role = userInfo.role
 
         // Retrieve the user scripts.
-        await userProject.login(username, token)
+        await userProject.login(username)
         esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
         if (!loggedIn) {

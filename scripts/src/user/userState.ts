@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
+import { persistReducer } from "redux-persist"
+import storage from "redux-persist/es/storage"
 
 import { RootState } from "../reducers"
 
@@ -58,8 +60,16 @@ export const {
     setNotifications,
     pushNotification,
 } = userSlice.actions
-export default userSlice.reducer
+
+const persistConfig = {
+    key: "user",
+    whitelist: ["token"],
+    storage,
+}
+
+export default persistReducer(persistConfig, userSlice.reducer)
 
 export const selectLoggedIn = (state: RootState) => state.user.loggedIn
 export const selectUserName = (state: RootState) => state.user.username
+export const selectToken = (state: RootState) => state.user.token
 export const selectNotifications = (state: RootState) => state.user.notifications

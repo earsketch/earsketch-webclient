@@ -15,10 +15,9 @@ import * as scriptsState from "../browser/scriptsState"
 import store from "../reducers"
 import { RenameScript } from "./Rename"
 import * as tabs from "../ide/tabState"
+import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
-
-const TOKEN_KEY = "token"
 
 export const STATUS_SUCCESSFUL = 1
 export const STATUS_UNSUCCESSFUL = 2
@@ -192,11 +191,10 @@ function extractScripts(data: any): Script[] {
 }
 
 // Login, setup, restore scripts, return shared scripts.
-export async function login(username: string, token: string) {
+export async function login(username: string) {
     esconsole("Using username: " + username, ["debug", "user"])
     reporter.login(username)
     _username = username
-    storeToken(token)
 
     // register callbacks to the collaboration service
     collaboration.callbacks.refreshScriptBrowser = refreshCodeBrowser
@@ -324,11 +322,6 @@ export async function getLockedSharedScriptId(shareid: string) {
     return (await get("/services/scripts/getlockedshareid", { shareid })).shareid
 }
 
-// Save token to local storage to persist between sessions.
-function storeToken(token: string) {
-    localStorage.setItem(TOKEN_KEY, token)
-}
-
 // Delete a user saved to local storage. I.e., logout.
 export function clearUser() {
     store.dispatch(scriptsState.resetRegularScripts())
@@ -340,9 +333,8 @@ export function clearUser() {
     websocket.disconnect()
 }
 
-// Check if a user is stored in local storage.
 export function isLoggedIn() {
-    return localStorage.getItem(TOKEN_KEY) !== null
+    return user.selectLoggedIn(store.getState())
 }
 
 let _username: string | undefined
@@ -351,11 +343,8 @@ export function getUsername() {
     return _username!
 }
 
-// Get the password from local storage.
-// TODO: Don't store the password in local storage! See #2406.
-// NOTE: The server expects this to be base64-encoded.
 export function getToken() {
-    return localStorage.getItem(TOKEN_KEY)
+    return user.selectToken(store.getState())
 }
 
 export function shareWithPeople(shareid: string, users: string[]) {
