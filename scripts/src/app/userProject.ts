@@ -103,7 +103,7 @@ export async function authenticate(username: string, password: string) {
     try {
         const response = await fetch(URL_DOMAIN + "/services/scripts/authenticate", {
             method: "POST",
-            body: form({ username, password: btoa(password) }),
+            body: new URLSearchParams({ username, password: btoa(password) }),
         })
         if (!response.ok) {
             throw new Error(`error code: ${response.status}`)
@@ -258,7 +258,7 @@ export async function refreshCodeBrowser() {
 // Fetch a script's history. Resolves to a list of historical scripts.
 export async function getScriptHistory(scriptid: string) {
     esconsole("Getting script history: " + scriptid, ["debug", "user"])
-    const scripts = await postAuth("/services/scripts/scripthistory", { scriptid })
+    const scripts: Script[] = await postAuth("/services/scripts/scripthistory", { scriptid })
     for (const script of scripts) {
         script.created = ESUtils.parseDate(script.created as string)
     }
