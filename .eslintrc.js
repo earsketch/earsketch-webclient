@@ -20,9 +20,16 @@ module.exports = {
         "@typescript-eslint",
     ],
     rules: {
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_$" }],
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error", { functions: false, variables: false, classes: false }],
+        "object-curly-spacing": "off",
+        "@typescript-eslint/object-curly-spacing": ["error", "always"],
+        "no-redeclare": "off",
+        "@typescript-eslint/no-redeclare": ["error"],
         "@typescript-eslint/type-annotation-spacing": ["error"],
+        "@typescript-eslint/prefer-for-of": ["error"],
         "space-before-function-paren": ["error", { named: "never" }],
         "comma-dangle": ["error", {
             arrays: "always-multiline",
@@ -35,9 +42,10 @@ module.exports = {
         quotes: ["error", "double", { avoidEscape: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "no-restricted-syntax": ["error", {
-            selector: "BinaryExpression > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
+            selector: "BinaryExpression[operator = /[=<>!]+/] > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
             message: "Use .includes() instead of comparing the result of .indexOf()",
         }],
+        "prefer-arrow-callback": ["error"],
     },
     overrides: [
         {

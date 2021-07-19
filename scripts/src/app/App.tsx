@@ -20,8 +20,7 @@ import { ForgotPassword } from "./ForgotPassword"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { IDE, openShare } from "../ide/IDE"
-import * as Layout from "../layout/Layout"
-import * as layout from "../layout/layoutState"
+import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
@@ -55,7 +54,7 @@ const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 type NoPropModal = (props: { close: (payload?: any) => void } & { [key: string]: never }) => JSX.Element
 
 export function openModal<T extends NoPropModal>(modal: T, props?: undefined): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
-export function openModal<T extends appState.Modal, NoPropModal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
+export function openModal<T extends appState.Modal>(modal: T, props: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]>
 export function openModal<T extends appState.Modal>(modal: T, props?: Omit<Parameters<T>[0], "close">): Promise<Parameters<Parameters<T>[0]["close"]>[0]> {
     return new Promise(resolve => {
         const wrappedModal = ({ close }: { close: (payload?: any) => void }) => {
@@ -92,7 +91,7 @@ export async function renameScript(script: Script) {
 }
 
 export function downloadScript(script: Script) {
-    openModal(Download, { script, quality: false })
+    openModal(Download, { script })
 }
 
 export async function openScriptHistory(script: Script, allowRevert: boolean) {
@@ -244,14 +243,14 @@ export function reloadRecommendations() {
             }
         }
     }
-    [[1,1],[-1,1],[1,-1],[-1,-1]].forEach(v => {
+    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
         res = recommender.recommend(res, input, ...v)
     })
     store.dispatch(recommenderState.setRecommendations(res))
 }
 
 function toggleColorTheme() {
-    store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === 'light' ? 'dark' : 'light'))
+    store.dispatch(appState.setColorTheme(store.getState().app.colorTheme === "light" ? "dark" : "light"))
     reporter.toggleColorTheme()
 }
 
@@ -275,8 +274,8 @@ const Footer = () => {
     return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div>V{BUILD_NUM}</div>
         <div className="space-x-6">
-            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank">{t('footer.teachers').toLocaleUpperCase()}</a>
-            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank">{t('footer.help').toLocaleUpperCase()}</a>
+            <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">{t("footer.teachers").toLocaleUpperCase()}</a>
+            <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">{t("footer.help").toLocaleUpperCase()}</a>
         </div>
     </div>
 }
@@ -293,27 +292,9 @@ function setup() {
     esconsole.getURLParameters()
 
     const isEmbedded = appState.selectEmbedMode(store.getState())
-    const hideEditor = appState.selectHideEditor(store.getState()) 
 
     if (isEmbedded) {
         store.dispatch(appState.setColorTheme("light"))
-        Layout.destroy()
-        layout.setMinSize(0)
-
-        if (hideEditor) {
-            layout.setGutterSize(0)
-        }
-        Layout.initialize()
-        store.dispatch(layout.collapseWest())
-        store.dispatch(layout.collapseEast())
-        store.dispatch(layout.collapseSouth())
-
-        if (hideEditor) {
-            // Note: hideDAW-only currently does not fit the layout height to the DAW player height as the below API only supports ratios.
-            store.dispatch(layout.setNorthFromRatio([100,0,0]))
-        } else {
-            store.dispatch(layout.setNorthFromRatio([25,75,0]))
-        }
     } else {
         userProject.loadLocalScripts()
     }
@@ -321,7 +302,6 @@ function setup() {
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
         store.dispatch(layout.setEast({ open: true }))
-        Layout.resetHorizontalSplits()
     }
 }
 
@@ -349,7 +329,7 @@ export const App = () => {
 
     // Note: Used in api_doc links to the curriculum Effects chapter.
     ;(window as any).loadCurriculumChapter = (url: string) => {
-        dispatch(layout.openEast("CURRICULUM"))
+        dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
         dispatch(curriculum.fetchContent({ url: url }))
     }
 
@@ -367,7 +347,7 @@ export const App = () => {
     ]
 
     useEffect(() => {
-        Layout.initialize()
+        document.getElementById("loading-screen")!.style.display = "none"
 
         // Attempt to load userdata from a previous session.
         if (userProject.isLoggedIn()) {
@@ -386,11 +366,11 @@ export const App = () => {
         if (!userProject.isLoggedIn()) {
             const openTabs = tabs.selectOpenTabs(store.getState())
             const allScripts = scripts.selectAllScripts(store.getState())
-            openTabs.forEach(scriptID => {
-                if (!allScripts.hasOwnProperty(scriptID)) {
+            for (const scriptID of openTabs) {
+                if (!allScripts[scriptID]) {
                     store.dispatch(tabs.closeAndSwitchTab(scriptID))
                 }
-            })
+            }
             // Show bubble tutorial when not opening a share link or in a CAI study mode.
             // TODO: Don't show if the user already has scripts?
             if (!sharedScriptID && !FLAGS.SHOW_CAI) {
@@ -400,14 +380,14 @@ export const App = () => {
     }, [])
 
     const login = async (username: string, password: string) => {
-        esconsole("Logging in", ["DEBUG","MAIN"])
+        esconsole("Logging in", ["DEBUG", "MAIN"])
         saveAll()
 
         let userInfo
         try {
             userInfo = await userProject.getUserInfo(username, password)
         } catch (error) {
-            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1",  3.5)
+            userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
             esconsole(error, ["main", "login"])
             return
         }
@@ -440,7 +420,7 @@ export const App = () => {
 
         // Retrieve the user scripts.
         await userProject.login(username, password)
-        esconsole("Logged in as " + username, ["DEBUG","MAIN"])
+        esconsole("Logged in as " + username, ["DEBUG", "MAIN"])
 
         if (!loggedIn) {
             setLoggedIn(true)
@@ -517,7 +497,7 @@ export const App = () => {
 
     const toggleCAIWindow = () => {
         if (!showCAI) {
-            dispatch(layout.openEast("CAI"))
+            dispatch(layout.setEast({ open: true, kind: "CAI" }))
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {
@@ -555,23 +535,23 @@ export const App = () => {
     return <div className={theme === "dark" ? "dark" : ""}>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
-        
+
         {/* highlight js style */}
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
         {showNotificationHistory && <NotificationHistory {...{ openSharedScript, toggleNotificationHistory }} />}
-        
+
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
-                        <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title">EarSketch</a>
+                        <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a>
                     </div>
-        
+
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <div>
-                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }}>
+                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
@@ -579,26 +559,26 @@ export const App = () => {
                     </div>
                     <div className="clear:both"></div>
                 </div>
-        
+
                 {/* temporary place for the app-generated notifications */}
                 <NotificationBar />
-        
+
                 {/* top-right icons */}
                 <div id="top-header-nav-form">
                     {/* CAI-window toggle */}
-                    {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393"}} onClick={toggleCAIWindow} title="CAI">
+                    {FLAGS.SHOW_CAI && <button className="top-header-nav-button btn" style={{ color: showCAI ? "white" : "#939393" }} onClick={toggleCAIWindow} title="CAI">
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
-        
+
                     {/* TODO: Bring back keyboard shortcuts. */}
-                    {/*<div>
+                    {/* <div>
                         <button id="keyboard-shortcuts" type="button" className="top-header-nav-button btn btn-xs btn-clear" ng-click="toggleShortcutHelper()" ng-className="showKeyShortcuts ? "grow-in-size":""" title="Show/Hide Keyboard Shortcuts">
                             <i className="icon icon-keyboard"></i>
                                 <span className="sr-only">Keyboard Shortcuts</span>
                         </button>
-                    </div>*/}
+                    </div> */}
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
-                    
+
                     {/* Font Size */}
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
@@ -609,19 +589,19 @@ export const App = () => {
                         </Menu.Button>
                         <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {FONT_SIZES.map(size =>
-                            <Menu.Item key={size}>
-                                {({ active }) =>
-                                <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
-                                        onClick={() => dispatch(appState.setFontSize(size))}
-                                        style={{ gridTemplateColumns: "18px 1fr" }}>
-                                    {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
-                                    {fontSize !== size && <span></span>}
-                                    {size}
-                                </button>}
-                            </Menu.Item>)}
+                                <Menu.Item key={size}>
+                                    {({ active }) =>
+                                        <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
+                                            onClick={() => dispatch(appState.setFontSize(size))}
+                                            style={{ gridTemplateColumns: "18px 1fr" }}>
+                                            {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
+                                            {fontSize !== size && <span></span>}
+                                            {size}
+                                        </button>}
+                                </Menu.Item>)}
                         </Menu.Items>
                     </Menu>
-        
+
                     {/* Misc. actions */}
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
@@ -632,12 +612,12 @@ export const App = () => {
                         </Menu.Button>
                         <Menu.Items className="w-52 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {MISC_ACTIONS.map(({ nameKey, action }) =>
-                            <Menu.Item key={nameKey}>
-                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{t(nameKey)}</button>}
-                            </Menu.Item>)}
+                                <Menu.Item key={nameKey}>
+                                    {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{t(nameKey)}</button>}
+                                </Menu.Item>)}
                         </Menu.Items>
                     </Menu>
-        
+
                     {/* notification (bell) button */}
                     <div className="user-notification relative">
                         <div id="bell-icon-container" className=".btn text-gray-400 hover:text-gray-300 text-4xl" onClick={() => setShowNotifications(!showNotifications)}>
@@ -649,7 +629,7 @@ export const App = () => {
                             <NotificationList {...{ editProfile, openSharedScript, openCollaborativeScript, toggleNotificationHistory }} />
                         </div>}
                     </div>
-        
+
                     {/* user login menu */}
                     {!loggedIn &&
                     <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
@@ -660,17 +640,17 @@ export const App = () => {
                     <Menu as="div" className="relative inline-block text-left mx-3">
                         <Menu.Button className="text-gray-400 text-4xl">
                             {loggedIn
-                            ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                            : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
+                                ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
+                                : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
                         </Menu.Button>
                         <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {(loggedIn
-                            ? [{ name: t("editProfile"), action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
-                            : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
-                            .map(({ name, action }) =>
-                            <Menu.Item key={name}>
-                                {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
-                            </Menu.Item>)}
+                                ? [{ name: t("editProfile"), action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                                : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
+                                .map(({ name, action }) =>
+                                    <Menu.Item key={name}>
+                                        {({ active }) => <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} group flex items-center w-full px-4 py-2`} onClick={action}>{name}</button>}
+                                    </Menu.Item>)}
                         </Menu.Items>
                     </Menu>
                 </div>
@@ -684,7 +664,7 @@ export const App = () => {
     </div>
 }
 
-const ModalContainer = () => {
+export const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
 
@@ -705,40 +685,40 @@ const ModalContainer = () => {
     }
 
     return <Transition appear show={Modal !== null && !closing} as={Fragment}>
-    <Dialog
-      as="div"
-      className="fixed inset-0 z-50 overflow-y-auto"
-      onClose={close}
-    >
-      <div className="min-h-screen px-4 text-center">
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+        <Dialog
+            as="div"
+            className="fixed inset-0 z-50 overflow-y-auto"
+            onClose={close}
         >
-          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
-        </Transition.Child>
+            <div className="min-h-screen px-4 text-center">
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+                </Transition.Child>
 
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0 scale-95"
-          enterTo="opacity-100 scale-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100 scale-100"
-          leaveTo="opacity-0 scale-95"
-        >
-            <div className="modal-content inline-block w-full max-w-6xl mt-16 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
-                {Modal && <Modal close={close} />}
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 scale-95"
+                    enterTo="opacity-100 scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 scale-100"
+                    leaveTo="opacity-0 scale-95"
+                >
+                    <div className="modal-content inline-block w-full max-w-6xl mt-16 overflow-hidden text-left transition-all transform bg-white shadow-xl rounded-xl">
+                        {Modal && <Modal close={close} />}
+                    </div>
+                </Transition.Child>
             </div>
-        </Transition.Child>
-      </div>
-    </Dialog>
-  </Transition>
+        </Dialog>
+    </Transition>
 }
 
 function saveAll() {
@@ -777,7 +757,7 @@ window.onbeforeunload = () => {
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
         const promise = saveAll()
         if (promise) {
-            promise.then(() => userNotification.show(i18n.t('messages:user.allscriptcloud'), "success"))
+            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptcloud"), "success"))
             return ""
         }
     }

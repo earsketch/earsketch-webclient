@@ -9,7 +9,7 @@ import * as renderer from "./renderer"
 import i18n from "i18next"
 
 // Make a dummy anchor for downloading blobs.
-let dummyAnchor = document.createElement("a")
+const dummyAnchor = document.createElement("a")
 document.body.appendChild(dummyAnchor)
 dummyAnchor.style.display = "none"
 
@@ -29,44 +29,44 @@ export function text(script: Script) {
     download(script.name, blob)
 }
 
-async function compile(script: Script, quality: boolean) {
+async function compile(script: Script) {
     const lang = ESUtils.parseLanguage(script.name)
     let result
     try {
-        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code, +quality)
+        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code)
     } catch {
-        throw i18n.t('messages:download.compileerror')
+        throw i18n.t("messages:download.compileerror")
     }
     if (result.length === 0) {
-        throw i18n.t('messages:download.emptyerror')
+        throw i18n.t("messages:download.emptyerror")
     }
     return result
 }
 
 // Exports the script as an audio file.
-async function exportAudio(script: Script, quality: boolean, type: string, render: (result: DAWData) => Promise<Blob>) {
+async function exportAudio(script: Script, type: string, render: (result: DAWData) => Promise<Blob>) {
     const name = ESUtils.parseName(script.name)
-    const result = await compile(script, quality)
+    const result = await compile(script)
     try {
         const blob = await render(result)
         esconsole(`Ready to download ${type} file.`, ["debug", "exporter"])
         download(`${name}.${type}`, blob)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
-        throw i18n.t('messages:download.rendererror')
+        throw i18n.t("messages:download.rendererror")
     }
 }
 
-export function wav(script: Script, quality: boolean) {
-    return exportAudio(script, quality, "wav", renderer.renderWav)
+export function wav(script: Script) {
+    return exportAudio(script, "wav", renderer.renderWav)
 }
 
-export function mp3(script: Script, quality: boolean) {
-    return exportAudio(script, quality, "mp3", renderer.renderMp3)
+export function mp3(script: Script) {
+    return exportAudio(script, "mp3", renderer.renderMp3)
 }
 
-export async function multiTrack(script: Script, quality: boolean) {
-    const result = await compile(script, quality)
+export async function multiTrack(script: Script) {
+    const result = await compile(script)
     const name = ESUtils.parseName(script.name)
 
     const zip = new JSZip()
@@ -83,20 +83,20 @@ export async function multiTrack(script: Script, quality: boolean) {
     const renderAndZip = async (trackNum: number) => {
         const copy = Object.assign({}, result)
         // Narrow this down to the target track (plus the mix and metronome tracks to avoid breaking things).
-        copy.tracks = [result.tracks[0], result.tracks[trackNum], result.tracks[result.tracks.length-1]]
+        copy.tracks = [result.tracks[0], result.tracks[trackNum], result.tracks[result.tracks.length - 1]]
 
         let blob
         try {
             blob = await renderer.renderWav(copy)
         } catch (err) {
             esconsole(err, ["error", "exporter"])
-            throw i18n.t('messages:download.rendererror')
+            throw i18n.t("messages:download.rendererror")
         }
         zip.file(name + "/" + "track_" + trackNum.toString() + ".wav", blob)
     }
 
     const promises = []
-    for (let i = 1; i < result.tracks.length-1; i++) {
+    for (let i = 1; i < result.tracks.length - 1; i++) {
         promises.push(renderAndZip(i))
     }
     await Promise.all(promises)
@@ -108,17 +108,17 @@ export async function multiTrack(script: Script, quality: boolean) {
 // Export the script to SoundCloud using the SoundCloud SDK.
 type SoundCloudOptions = { name: string, description: string, sharing: string, downloadable: boolean, tags: string, license: string }
 
-export async function soundcloud(script: Script, quality: boolean, options: SoundCloudOptions) {
+export async function soundcloud(script: Script, options: SoundCloudOptions) {
     esconsole("Requesting SoundCloud Access...", ["debug", "exporter"])
     await SC.connect()
 
-    const result = await compile(script, quality)
+    const result = await compile(script)
     let blob
     try {
         blob = await renderer.renderWav(result)
     } catch (err) {
         esconsole(err, ["error", "exporter"])
-        throw i18n.t('messages:download.rendererror')
+        throw i18n.t("messages:download.rendererror")
     }
 
     esconsole("Uploading to SoundCloud.", "exporter")
@@ -149,7 +149,7 @@ export function print(script: Script) {
     for (let lineNum = 0; lineNum < numlines; lineNum++) {
         content = lines[lineNum]
         esconsole(content, "debug")
-        let lineNumStr = (lineNum+1).toString()
+        let lineNumStr = (lineNum + 1).toString()
         if (lineNumStr.length === 1) {
             lineNumStr = "  " + lineNumStr
         } else if (lineNumStr.length === 2) {

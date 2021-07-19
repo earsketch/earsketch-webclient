@@ -1,9 +1,9 @@
 // Play sounds from the JSON object output of scripts.
-import * as applyEffects from '../model/applyeffects'
-import context from './audiocontext'
-import { dbToFloat } from '../model/audioeffects'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
+import * as applyEffects from "../model/applyeffects"
+import context from "./audiocontext"
+import { dbToFloat } from "../model/audioeffects"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
 
 // Preliminary type declarations
 // TODO: Move some to compiler?
@@ -65,7 +65,6 @@ export interface DAWData {
     tracks: Track[]
     master: GainNode
     init: boolean
-    quality: boolean
     slicedClips: { [key: string]: ClipSlice }
 }
 
@@ -81,7 +80,7 @@ let playbackData = {
     startMeasure: 1,
     endMeasure: 1,
     playheadPos: 1,
-    startOffset: 0
+    startOffset: 0,
 }
 
 let loop = {
@@ -92,14 +91,14 @@ let loop = {
 }
 let loopScheduledWhilePaused = false
 
-let renderingDataQueue: (DAWData | null)[] = [null, null]
+const renderingDataQueue: (DAWData | null)[] = [null, null]
 let mutedTracks: number[] = []
 let bypassedEffects: { [key: number]: string[] } = {}
 
 const mix = context.createGain()
 
 const reset = () => {
-    esconsole('resetting', ['player', 'debug'])
+    esconsole("resetting", ["player", "debug"])
 
     clearAllAudioGraphs()
     clearAllTimers()
@@ -108,7 +107,7 @@ const reset = () => {
         startMeasure: 1,
         endMeasure: 1,
         playheadPos: 1,
-        startOffset: 0
+        startOffset: 0,
     }
 }
 
@@ -125,7 +124,7 @@ const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempo: numbe
 
     // set buffer & start/end time within clip
     if (pitchShift && !pitchShift.bypass) {
-        esconsole('Using pitchshifted audio for ' + clip.filekey, ['player', 'debug'])
+        esconsole("Using pitchshifted audio for " + clip.filekey, ["player", "debug"])
         clipSource.buffer = clip.pitchshift!.audio
         startTimeInClip = ESUtils.measureToTime(clip.pitchshift!.start, tempo)
         endTimeInClip = ESUtils.measureToTime(clip.pitchshift!.end, tempo)
@@ -151,10 +150,10 @@ const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempo: numbe
         }
         // clips -> track gain -> effect tree
         clipSource.connect(trackGain)
-        clipSource.start(waStartTime, startTimeInClip+clipStartOffset, clipDuration-clipStartOffset)
+        clipSource.start(waStartTime, startTimeInClip + clipStartOffset, clipDuration - clipStartOffset)
 
         // keep this flag so we only stop clips that are playing (otherwise we get an exception raised)
-        setTimeout(() => clip.playing = true, manualOffset * 1000)
+        setTimeout(() => { clip.playing = true }, manualOffset * 1000)
     } else {
         // case: clip is in the future
         const untilClipStart = clipStartTime - startTime
@@ -167,21 +166,21 @@ const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempo: numbe
             clipDuration = endTime - clipStartTime
         }
         clipSource.connect(trackGain)
-        clipSource.start(waStartTime+untilClipStart, startTimeInClip, clipDuration)
-        setTimeout(() => clip.playing = true, (manualOffset + untilClipStart) * 1000)
+        clipSource.start(waStartTime + untilClipStart, startTimeInClip, clipDuration)
+        setTimeout(() => { clip.playing = true }, (manualOffset + untilClipStart) * 1000)
     }
 
     // keep a reference to this audio source so we can pause it
     clip.source = clipSource
     clip.gain = trackGain // used to mute the track/clip
 
-    if (ESUtils.whichBrowser().indexOf('Chrome') === -1) {
+    if (!ESUtils.whichBrowser().includes("Chrome")) {
         clipSource.onended = () => clipSource.disconnect()
     }
 }
 
-export const play = (startMes: number, endMes: number, manualOffset=0) => {
-    esconsole('starting playback',  ['player', 'debug'])
+export const play = (startMes: number, endMes: number, manualOffset = 0) => {
+    esconsole("starting playback", ["player", "debug"])
 
     // init / convert
     if (loop.on && loop.selection) {
@@ -190,7 +189,7 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
     }
 
     if (renderingDataQueue[1] === null) {
-        esconsole('null in render queue', ['player', 'error'])
+        esconsole("null in render queue", ["player", "error"])
         return
     }
 
@@ -210,11 +209,11 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
         const track = renderingData.tracks[t]
 
         // skip muted tracks
-        if (mutedTracks.indexOf(t) > -1) continue
+        if (mutedTracks.includes(t)) continue
 
         // get the list of bypassed effects for this track
         const trackBypass = bypassedEffects[t] ?? []
-        esconsole('Bypassing effects: ' + JSON.stringify(trackBypass), ['DEBUG','PLAYER'])
+        esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
         // construct the effect graph
         const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempo, startTime, renderingData.master, trackBypass, false)
@@ -223,7 +222,7 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
         trackGain.gain.setValueAtTime(1.0, context.currentTime)
 
         // process each clip in the track
-        const pitchShift = track.effects['PITCHSHIFT-PITCHSHIFT_SHIFT']
+        const pitchShift = track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]
         for (const clipData of track.clips) {
             playClip(clipData, trackGain, pitchShift, tempo, startTime, endTime, waStartTime, manualOffset)
         }
@@ -256,13 +255,13 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
 
         // for setValueAtTime bug in chrome v52
         // TODO: Chrome is now at version 90. Is this safe to remove?
-        if (ESUtils.whichBrowser().indexOf('Chrome') > -1 && startNode !== undefined) {
+        if (ESUtils.whichBrowser().includes("Chrome") && startNode !== undefined) {
             const dummyOsc = context.createOscillator()
             const dummyGain = context.createGain()
             dummyGain.gain.value = 0
             dummyOsc.connect(dummyGain).connect(startNode)
             dummyOsc.start(startTime)
-            dummyOsc.stop(startTime+0.001)
+            dummyOsc.stop(startTime + 0.001)
         }
     }
 
@@ -292,7 +291,7 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
             playbackData.endMeasure = endMes
         }
 
-        esconsole('recording playback data: ' + [startMes,endMes].toString(), ['player', 'debug'])
+        esconsole("recording playback data: " + [startMes, endMes].toString(), ["player", "debug"])
 
         waTimeStarted = waStartTime
         isPlaying = true
@@ -303,28 +302,28 @@ export const play = (startMes: number, endMes: number, manualOffset=0) => {
     if (loop.on && loopScheduledWhilePaused) {
         clearTimeout(loopSchedTimer)
         loopSchedTimer = window.setTimeout(() => {
-            esconsole('scheduling loop', ['player', 'debug'])
+            esconsole("scheduling loop", ["player", "debug"])
             clearTimeout(loopSchedTimer)
             clearTimeout(playEndTimer)
-            const offset = (endTime-startTime)-(context.currentTime-waTimeStarted)
+            const offset = (endTime - startTime) - (context.currentTime - waTimeStarted)
             clearAllAudioGraphs(offset)
             loopScheduledWhilePaused = true
             play(startMes, endMes, offset)
-        }, (endTime-startTime+manualOffset) * 1000 * .95)
+        }, (endTime - startTime + manualOffset) * 1000 * 0.95)
     }
 
     // schedule to call the onFinished callback
     clearTimeout(playEndTimer)
     playEndTimer = window.setTimeout(() => {
-        esconsole('playbackTimer ended', 'player')
+        esconsole("playbackTimer ended", "player")
         pause()
         reset()
         callbacks.onFinishedCallback()
-    }, (endTime-startTime+manualOffset) * 1000)
+    }, (endTime - startTime + manualOffset) * 1000)
 }
 
 export const pause = () => {
-    esconsole('pausing',  ['player', 'debug'])
+    esconsole("pausing", ["player", "debug"])
     clearAllAudioGraphs()
     isPlaying = false
     playbackData.playheadPos = playbackData.startMeasure
@@ -345,7 +344,7 @@ const stopAllClips = (renderingData: DAWData | null, delay: number) => {
                     source.stop(context.currentTime + delay)
                 } catch (e) {
                     // TODO: Why does Safari throw an InvalidStateError?
-                    esconsole(e.toString(), ['WARNING','PLAYER'])
+                    esconsole(e.toString(), ["WARNING", "PLAYER"])
                 }
                 setTimeout(() => source.disconnect(), delay * 999)
                 clip.playing = false
@@ -354,8 +353,8 @@ const stopAllClips = (renderingData: DAWData | null, delay: number) => {
     }
 }
 
-const clearAudioGraph = (idx: number, delay=0) => {
-    if (ESUtils.whichBrowser().indexOf('Chrome') !== -1) {
+const clearAudioGraph = (idx: number, delay = 0) => {
+    if (ESUtils.whichBrowser().includes("Chrome")) {
         stopAllClips(renderingDataQueue[idx], delay)
     } else {
         if (!delay) {
@@ -373,7 +372,7 @@ const clearAudioGraph = (idx: number, delay=0) => {
                             clip.source.stop(context.currentTime + delay)
                             clip.gain!.gain.setValueAtTime(0, context.currentTime + delay)
                         } catch (e) {
-                            esconsole(e.toString(), ['player', 'warning'])
+                            esconsole(e.toString(), ["player", "warning"])
                         }
                         clip.playing = false
                     }
@@ -387,18 +386,18 @@ const clearAudioGraph = (idx: number, delay=0) => {
     }
 }
 
-const clearAllAudioGraphs = (delay=0) => {
-    esconsole('clearing the audio graphs',  ['player', 'debug'])
+const clearAllAudioGraphs = (delay = 0) => {
+    esconsole("clearing the audio graphs", ["player", "debug"])
     clearAudioGraph(0, delay)
     clearAudioGraph(1, delay)
 }
 
-const refresh = (clearAllGraphs=false) => {
+const refresh = (clearAllGraphs = false) => {
     if (isPlaying) {
-        esconsole('refreshing the rendering data', ['player', 'debug'])
+        esconsole("refreshing the rendering data", ["player", "debug"])
         const currentMeasure = getPosition()
         const nextMeasure = Math.ceil(currentMeasure)
-        const timeTillNextBar = ESUtils.measureToTime(nextMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
+        const timeTillNextBar = ESUtils.measureToTime(nextMeasure - currentMeasure + 1, renderingDataQueue[1]!.tempo)
 
         if (clearAllGraphs) {
             clearAllAudioGraphs(timeTillNextBar)
@@ -413,12 +412,12 @@ const refresh = (clearAllGraphs=false) => {
 
 // Set playback volume in decibels.
 export const setVolume = (gain: number) => {
-    esconsole('Setting context volume to ' + gain + 'dB', ['DEBUG','PLAYER'])
+    esconsole("Setting context volume to " + gain + "dB", ["DEBUG", "PLAYER"])
     mix.gain.setValueAtTime(dbToFloat(gain), context.currentTime)
 }
 
 export const setLoop = (loopObj: typeof loop) => {
-    if (loopObj && loopObj.hasOwnProperty('on')) {
+    if (loopObj && "on" in loopObj) {
         loop = loopObj
     } else {
         loop.on = !!loopObj
@@ -427,7 +426,7 @@ export const setLoop = (loopObj: typeof loop) => {
         playbackData.startMeasure = 1
         playbackData.endMeasure = renderingDataQueue[1]!.length + 1
     }
-    esconsole('setting loop: ' + loop.on, ['player', 'debug'])
+    esconsole("setting loop: " + loop.on, ["player", "debug"])
 
     clearAllTimers()
 
@@ -435,7 +434,7 @@ export const setLoop = (loopObj: typeof loop) => {
 
     if (loop.on) {
         if (isPlaying) {
-            esconsole('loop switched on while playing', ['player', 'debug'])
+            esconsole("loop switched on while playing", ["player", "debug"])
             loopScheduledWhilePaused = false
 
             currentMeasure = getPosition()
@@ -448,34 +447,34 @@ export const setLoop = (loopObj: typeof loop) => {
                 if (currentMeasure >= startMes && currentMeasure < endMes) {
                     if (currentMeasure < endMes - 1) {
                         startMes = Math.ceil(currentMeasure)
-                        timeTillLoopingBack = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
+                        timeTillLoopingBack = ESUtils.measureToTime(2 - (currentMeasure % 1), renderingDataQueue[1]!.tempo)
                     } else {
-                        timeTillLoopingBack = ESUtils.measureToTime(endMes-currentMeasure+1, renderingDataQueue[1]!.tempo)
+                        timeTillLoopingBack = ESUtils.measureToTime(endMes - currentMeasure + 1, renderingDataQueue[1]!.tempo)
                     }
                 } else {
-                    timeTillLoopingBack = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
+                    timeTillLoopingBack = ESUtils.measureToTime(2 - (currentMeasure % 1), renderingDataQueue[1]!.tempo)
                 }
             } else {
-                timeTillLoopingBack = ESUtils.measureToTime(renderingDataQueue[1]!.length-currentMeasure+2, renderingDataQueue[1]!.tempo)
+                timeTillLoopingBack = ESUtils.measureToTime(renderingDataQueue[1]!.length - currentMeasure + 2, renderingDataQueue[1]!.tempo)
                 startMes = 1
                 endMes = renderingDataQueue[1]!.length + 1
             }
 
-            esconsole(`timeTillLoopingBack = ${timeTillLoopingBack}, startMes = ${startMes}, endMes = ${endMes}`, ['player', 'debug'])
+            esconsole(`timeTillLoopingBack = ${timeTillLoopingBack}, startMes = ${startMes}, endMes = ${endMes}`, ["player", "debug"])
 
             // Schedule the next loop.
             // This is analagous to what play() does when loopScheduledWhilePaused = true.
             const waStartTime = context.currentTime
             clearTimeout(loopSchedTimer)
             loopSchedTimer = window.setTimeout(() => {
-                esconsole('scheduling loop', ['player', 'debug'])
+                esconsole("scheduling loop", ["player", "debug"])
                 clearTimeout(loopSchedTimer)
                 clearTimeout(playEndTimer)
                 const offset = timeTillLoopingBack - (context.currentTime - waStartTime)
                 clearAllAudioGraphs(offset)
                 loopScheduledWhilePaused = true
                 play(startMes, endMes, offset)
-            }, timeTillLoopingBack * 1000 * .95)
+            }, timeTillLoopingBack * 1000 * 0.95)
         } else {
             loopScheduledWhilePaused = true
         }
@@ -484,18 +483,18 @@ export const setLoop = (loopObj: typeof loop) => {
         loopScheduledWhilePaused = false
 
         if (isPlaying) {
-            esconsole('loop switched off while playing', ['player', 'debug'])
+            esconsole("loop switched off while playing", ["player", "debug"])
             currentMeasure = getPosition()
 
-            esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ['player', 'debug'])
-            if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length+1)) {
+            esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ["player", "debug"])
+            if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length + 1)) {
                 clearTimeout(playStartTimer)
                 clearTimeout(playEndTimer)
 
-                const timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure-currentMeasure+1, renderingDataQueue[1]!.tempo)
+                const timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure - currentMeasure + 1, renderingDataQueue[1]!.tempo)
 
                 startMes = playbackData.endMeasure
-                endMes = renderingDataQueue[1]!.length+1
+                endMes = renderingDataQueue[1]!.length + 1
 
                 clearAllAudioGraphs(timeTillContinuedPoint)
                 play(startMes, endMes, timeTillContinuedPoint)
@@ -505,7 +504,7 @@ export const setLoop = (loopObj: typeof loop) => {
 }
 
 export const setRenderingData = (result: DAWData) => {
-    esconsole('setting new rendering data', ['player', 'debug'])
+    esconsole("setting new rendering data", ["player", "debug"])
 
     clearAudioGraph(0)
     renderingDataQueue.shift()
@@ -519,7 +518,7 @@ export const setRenderingData = (result: DAWData) => {
 }
 
 export const setPosition = (position: number) => {
-    esconsole('setting position: ' + position, ['player', 'debug'])
+    esconsole("setting position: " + position, ["player", "debug"])
 
     clearAllTimers()
 
@@ -533,11 +532,11 @@ export const setPosition = (position: number) => {
                 // playbackData.startMeasure = loop.start
                 // playbackData.endMeasure = loop.end
             } else {
-                playbackData.endMeasure = renderingDataQueue[1]!.length+1
+                playbackData.endMeasure = renderingDataQueue[1]!.length + 1
             }
         }
 
-        const timeTillNextBar = ESUtils.measureToTime(2-(currentMeasure%1), renderingDataQueue[1]!.tempo)
+        const timeTillNextBar = ESUtils.measureToTime(2 - (currentMeasure % 1), renderingDataQueue[1]!.tempo)
 
         clearAllAudioGraphs(timeTillNextBar)
         play(position, playbackData.endMeasure, timeTillNextBar)
@@ -548,7 +547,7 @@ export const setPosition = (position: number) => {
 
 export const getPosition = () => {
     if (isPlaying) {
-        playbackData.playheadPos = (context.currentTime-waTimeStarted) * renderingDataQueue[1]!.tempo/60/4 + playbackData.startMeasure + playbackData.startOffset
+        playbackData.playheadPos = (context.currentTime - waTimeStarted) * renderingDataQueue[1]!.tempo / 60 / 4 + playbackData.startMeasure + playbackData.startOffset
     }
     return playbackData.playheadPos
 }

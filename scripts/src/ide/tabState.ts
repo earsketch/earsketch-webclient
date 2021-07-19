@@ -47,12 +47,14 @@ const tabSlice = createSlice({
         closeTab(state, { payload }) {
             if (state.openTabs.includes(payload)) {
                 state.openTabs.splice(state.openTabs.indexOf(payload), 1);
+                delete tabsMutableState.editorSessions[payload];
             }
         },
         resetTabs(state) {
             state.openTabs = [];
             state.activeTabID = null;
             state.modifiedScripts = [];
+            tabsMutableState.editorSessions = {};
         },
         setNumVisibleTabs(state, { payload }) {
             state.numVisibleTabs = payload;

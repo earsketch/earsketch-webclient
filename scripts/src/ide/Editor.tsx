@@ -31,7 +31,7 @@ let recommendationTimer = 0
 // Minor hack. None of these functions should get called before the component has mounted and `ace` is set.
 export let ace: Ace.Editor = null as unknown as Ace.Editor
 export let droplet: any = null
-export let callbacks = { onChange: null as (() => void) | null }
+export const callbacks = { onChange: null as (() => void) | null }
 
 export function getValue() {
     return ace.getValue()
@@ -81,16 +81,6 @@ export function checkRedo() {
     }
 }
 
-export function clearHistory() {
-    if (droplet.currentlyUsingBlocks) {
-        droplet.clearUndoStack()
-    } else {
-        const undoManager = ace.getSession().getUndoManager()
-        undoManager.reset()
-        ace.getSession().setUndoManager(undoManager)
-    }
-}
-
 export function setLanguage(language: string) {
     if (language === "python") {
         droplet?.setMode("python", config.blockPalettePython.modeOptions)
@@ -103,8 +93,22 @@ export function setLanguage(language: string) {
 }
 
 export function pasteCode(code: string) {
+    if (ace.getReadOnly()) return
     if (droplet.currentlyUsingBlocks) {
-        droplet.setFocusedText(code)
+        if (!droplet.cursorAtSocket()) {
+            // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
+            // Press Enter once to start a new free-form block for text input.
+            const ENTER_KEY = 13
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            // Fill the block with the pasted text.
+            droplet.setFocusedText(code)
+            // Press Enter again to finalize the block.
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keydown", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+            droplet.dropletElement.dispatchEvent(new KeyboardEvent("keyup", { keyCode: ENTER_KEY, which: ENTER_KEY } as any))
+        } else {
+            droplet.setFocusedText(code)
+        }
     } else {
         ace.insert(code)
         ace.focus()
@@ -118,7 +122,7 @@ export function highlightError(err: any) {
     const language = ESUtils.parseLanguage(tabs.selectActiveTabScript(store.getState()).name)
     let range
 
-    let line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
+    const line = language === "python" ? err.traceback?.[0]?.lineno : err.lineNumber
     if (line !== undefined) {
         lineNumber = line - 1
         if (droplet.currentlyUsingBlocks) {
@@ -150,9 +154,9 @@ function setupAceHandlers(ace: Ace.Editor) {
 
         const t = Date.now()
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.keyStroke([event["action"], event["lines"], t]))
+            store.dispatch(cai.keyStroke([event.action, event.lines, t]))
         }
-        
+
         if (collaboration.active && !collaboration.lockEditor) {
             // convert from positionObjects & lines to index & text
             const session = ace.getSession()
@@ -169,7 +173,7 @@ function setupAceHandlers(ace: Ace.Editor) {
                 start: start,
                 end: end,
                 text: text,
-                len: end - start
+                len: end - start,
             })
         }
 
@@ -227,14 +231,14 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
     if (setupDone) return
 
     if (language === "python") {
-        droplet = new window.droplet.Editor(element, config.blockPalettePython)
+        droplet = new (window as any).droplet.Editor(element, config.blockPalettePython)
     } else {
-        droplet = new window.droplet.Editor(element, config.blockPaletteJavascript)
+        droplet = new (window as any).droplet.Editor(element, config.blockPaletteJavascript)
     }
 
     ace = droplet.aceEditor
     setupAceHandlers(ace)
-    
+
     ace.setOptions({
         mode: "ace/mode/" + language,
         theme: ACE_THEMES[theme],
@@ -282,8 +286,14 @@ export const Editor = () => {
 
     useEffect(() => {
         if (blocksMode && !droplet.currentlyUsingBlocks) {
+            const emptyUndo = droplet.undoStack.length === 0
             setLanguage(language)
             if (droplet.toggleBlocks().success) {
+                // On initial switch into blocks mode, droplet starts with an undo action on the stack that clears the entire script.
+                // To deal with this idiosyncrasy, we clear the undo stack if it was already clear before switching into blocks mode.
+                if (emptyUndo) {
+                    droplet.clearUndoStack()
+                }
                 userConsole.clear()
             } else {
                 userConsole.warn(i18n.t("messages:idecontroller.blocksyntaxerror"))
@@ -323,6 +333,8 @@ export const Editor = () => {
             } else if (!droplet.currentlyUsingBlocks) {
                 droplet.toggleBlocks()
             }
+            // Don't allow droplet to share undo stack between tabs.
+            droplet.clearUndoStack()
         } else {
             setLanguage(language)
         }
@@ -331,8 +343,8 @@ export const Editor = () => {
     return <div className="flex flex-grow h-full max-h-full overflow-y-hidden" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
-            {activeScript?.readonly && !embedMode
-            && <div className="floating-bar" onClick={() => importScript(activeScript)}>
+            {activeScript?.readonly && !embedMode &&
+            <div className="floating-bar" onClick={() => importScript(activeScript)}>
                 <div>{/* DO NOT REMOVE: this is an empty div to block the space before the next div */}</div>
                 <div className="btn-action btn-floating shake">
                     <i className="icon icon-import"></i><span>IMPORT TO EDIT</span>
@@ -341,14 +353,14 @@ export const Editor = () => {
         </div>
 
         {activeScript?.collaborative && <div id="collab-badges-container">
-            {Object.entries(collaboration.otherMembers).map(([name, state], index) => 
-            <div key={name} className="collaborator-badge prevent-selection" style={{
+            {Object.entries(collaboration.otherMembers).map(([name, state], index) =>
+                <div key={name} className="collaborator-badge prevent-selection" style={{
                     borderColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.75)` : "#666",
-                    backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)`: "#666",
-                 }}>
-                {/* TODO: Popover with collaborator username. */}
-                {name[0].toUpperCase()}
-            </div>)}
+                    backgroundColor: state.active ? `rgba(${COLLAB_COLORS[index % 6].join()},0.5)` : "#666",
+                }}>
+                    {/* TODO: Popover with collaborator username. */}
+                    {name[0].toUpperCase()}
+                </div>)}
         </div>}
     </div>
 }

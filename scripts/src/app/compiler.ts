@@ -73,16 +73,17 @@ async function handlePitchshift(result: DAWData) {
 }
 
 // Compile a python script.
-export function compilePython(code: string, quality: number) {
+export function compilePython(code: string) {
     Sk.dateSet = false
     Sk.filesLoaded = false
-    //	Added to reset imports
+    // Added to reset imports
+    // eslint-disable-next-line new-cap
     Sk.sysmodules = new Sk.builtin.dict([])
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
 
-    return importPython(code, quality)
+    return importPython(code)
 }
 
 function runPythonCode(code: string) {
@@ -104,11 +105,10 @@ function recursiveNameCheckPY(code: string, undefinedNames: string[]): string[] 
             // Create a dummy constant and repeat.
             Sk.builtins[undefinedName] = Sk.ffi.remapToPy(undefinedName)
 
-            if (undefinedNames.indexOf(undefinedName) === -1) {
+            if (!undefinedNames.includes(undefinedName)) {
                 undefinedNames.push(undefinedName)
                 return recursiveNameCheckPY(code, undefinedNames)
             }
-
         }
     } finally {
         testRun = false
@@ -139,16 +139,17 @@ async function handleUndefinedNamesPY(code: string) {
 // reset the compiler though so it can be run inside another compiled
 // Python script (i.e., in the autograder.) For most use cases you should use
 // compilePython() instead and ignore this function.
-export async function importPython(code: string, quality: number) {
+export async function importPython(code: string) {
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
-    Sk.builtins["init"] = new Sk.builtin.func(() => {
-        throw new Error("init()" + i18n.t('messages:interpreter.noimport'))
+    // eslint-disable-next-line new-cap
+    Sk.builtins.init = new Sk.builtin.func(() => {
+        throw new Error("init()" + i18n.t("messages:interpreter.noimport"))
     })
-    Sk.builtins["finish"] = new Sk.builtin.func(() => {
-        throw new Error("finish()" + i18n.t('messages:interpreter.noimport'))
+    // eslint-disable-next-line new-cap
+    Sk.builtins.finish = new Sk.builtin.func(() => {
+        throw new Error("finish()" + i18n.t("messages:interpreter.noimport"))
     })
-    Sk.builtins["__AUDIO_QUALITY"] = false
 
     // A temporary switch for disabling the lazy evaluation of undefined names. analyze~ methods may be possibly excluded from the escape list, but they might have unexpected behaviors when combined with conditionals.
     const escapeWords = /readInput|raw_input|input|import random|analyzeTrackForTime|analyzeTrack|analyzeForTime|analyze|dur/
@@ -184,9 +185,6 @@ export async function importPython(code: string, quality: number) {
         }
     }
 
-    // inject audio quality as a builtin global, again not the ideal
-    // solution but it works
-    Sk.builtins["__AUDIO_QUALITY"] = quality
     // STEP 2: compile python code using Skulpt
     esconsole("Compiling script using Skulpt.", ["debug", "compiler"])
     const mod = await Sk.misceval.asyncToPromise(() => {
@@ -217,13 +215,12 @@ export async function importPython(code: string, quality: number) {
     return result
 }
 
-
 // The functions `recursiveNameCheckJS`, `handleUndefinedNamesJS`, and `createJSInterpreter` were introduced
 // to check the validity of code structure while skipping unknown names (e.g., user-defined audio clips) for later verification at compilation.
 // The JS version uses a duplicate "sub" interpreter as the state of main interpreter seems not resettable.
 // TODO: This probably does not need to be recursive.
-async function recursiveNameCheckJS(code: string, undefinedNames: string[], tags: string[], quality: number): Promise<string[]> {
-    const interpreter = createJsInterpreter(code, tags, quality)
+async function recursiveNameCheckJS(code: string, undefinedNames: string[], tags: string[]): Promise<string[]> {
+    const interpreter = createJsInterpreter(code, tags)
     for (const name of undefinedNames) {
         interpreter.setProperty(interpreter.getScope().object, name, name)
     }
@@ -232,10 +229,10 @@ async function recursiveNameCheckJS(code: string, undefinedNames: string[], tags
         await runJsInterpreter(interpreter)
     } catch (e) {
         if (e instanceof ReferenceError) {
-            const name = e.message.replace(" is not defined","")
+            const name = e.message.replace(" is not defined", "")
             // interpreter.setProperty(scope, name, name)
             undefinedNames.push(name)
-            return recursiveNameCheckJS(code, undefinedNames, tags, quality)
+            return recursiveNameCheckJS(code, undefinedNames, tags)
         }
     } finally {
         testRun = false
@@ -243,10 +240,10 @@ async function recursiveNameCheckJS(code: string, undefinedNames: string[], tags
     return undefinedNames
 }
 
-async function handleUndefinedNamesJS(code: string, interpreter: any, tags: string[], quality: number) {
+async function handleUndefinedNamesJS(code: string, interpreter: any, tags: string[]) {
     esconsole("Iterating through undefined variable names.", ["compiler", "debug"])
 
-    const undefinedNames = await recursiveNameCheckJS(code, [], tags, quality)
+    const undefinedNames = await recursiveNameCheckJS(code, [], tags)
     const clipData = await Promise.all(undefinedNames.map(audioLibrary.verifyClip))
     for (const clip of clipData) {
         if (clip) {
@@ -255,7 +252,7 @@ async function handleUndefinedNamesJS(code: string, interpreter: any, tags: stri
     }
 }
 
-function createJsInterpreter(code: string, tags: string[], quality: number) {
+function createJsInterpreter(code: string, tags: string[]) {
     let interpreter
     try {
         interpreter = new Interpreter(code, setupJavascriptAPI)
@@ -272,15 +269,12 @@ function createJsInterpreter(code: string, tags: string[], quality: number) {
     for (const tag of tags) {
         interpreter.setProperty(interpreter.getScope().object, tag, tag)
     }
-    // inject audio quality into the interpreter scope
-    interpreter.setProperty(interpreter.getScope().object, "__AUDIO_QUALITY", quality)
 
     return interpreter
 }
 
-
 // Compile a javascript script.
-export async function compileJavascript(code: string, quality: number) {
+export async function compileJavascript(code: string) {
     // printing for unit tests
     esconsole(ESUtils.formatScriptForTests(code), ["nolog", "compiler"])
 
@@ -314,8 +308,6 @@ export async function compileJavascript(code: string, quality: number) {
         for (const tag of tags) {
             interpreter.setProperty(interpreter.getScope().object, tag, tag)
         }
-        // inject audio quality into the interpreter scope
-        interpreter.setProperty(interpreter.getScope().object, "__AUDIO_QUALITY", quality)
 
         try {
             result = await runJsInterpreter(interpreter)
@@ -324,8 +316,8 @@ export async function compileJavascript(code: string, quality: number) {
             throwErrorWithLineNumber(err, lineNumber as number)
         }
     } else {
-        const mainInterpreter = createJsInterpreter(code, tags, quality)
-        await handleUndefinedNamesJS(code, mainInterpreter, tags, quality)
+        const mainInterpreter = createJsInterpreter(code, tags)
+        await handleUndefinedNamesJS(code, mainInterpreter, tags)
         try {
             result = await runJsInterpreter(mainInterpreter)
         } catch (err) {
@@ -339,9 +331,8 @@ export async function compileJavascript(code: string, quality: number) {
     return finalResult
 }
 
-
 function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 // This is a helper function for running JS-Interpreter to handle
@@ -354,7 +345,7 @@ async function runJsInterpreter(interpreter: any) {
     while (interpreter.run()) {
         await sleep(200)
     }
-    const result = interpreter.getProperty(interpreter.scope, '__ES_RESULT')
+    const result = interpreter.getProperty(interpreter.scope, "__ES_RESULT")
     if (result === undefined) {
         throw new EvalError("Missing call to init() or something went wrong.")
     }
@@ -380,7 +371,7 @@ function getLineNumber(interpreter: any, code: string, error: Error) {
     } else if (interpreter && interpreter.stateStack && interpreter.stateStack.length) {
         // get the character start location from the state stack
         const stack = interpreter.stateStack
-        start = stack[stack.length-1].node.start
+        start = stack[stack.length - 1].node.start
         if (start > 0) {
             newLines = code.slice(0, start).match(/\n/g)
         }
@@ -412,9 +403,8 @@ function getClipTempo(result: DAWData) {
 
     result.tracks.forEach(track => {
         track.clips.forEach(clip => {
-            if (tempoCache.hasOwnProperty(clip.filekey)) {
-                clip.tempo = tempoCache[clip.filekey]
-            } else {
+            clip.tempo = tempoCache[clip.filekey]
+            if (clip.tempo !== undefined) {
                 const match = metadata.find(item => item.file_key === clip.filekey)
                 if (match !== undefined) {
                     let tempo = +match.tempo
@@ -434,11 +424,7 @@ async function loadBuffers(result: DAWData) {
     for (const track of result.tracks) {
         for (const clip of track.clips) {
             const tempo = result.tempo
-            const promise = audioLibrary.getAudioClip(
-                clip.filekey,
-                tempo,
-                result.quality
-            )
+            const promise = audioLibrary.getAudioClip(clip.filekey, tempo)
             promises.push(promise)
         }
     }
@@ -458,11 +444,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     for (const [sliceKey, sliceDef] of Object.entries(result.slicedClips)) {
         sliceKeys.push(sliceKey)
 
-        const promise = audioLibrary.getAudioClip(
-            sliceDef.sourceFile,
-            result.tempo,
-            result.quality
-        )
+        const promise = audioLibrary.getAudioClip(sliceDef.sourceFile, result.tempo)
         promises.push(promise)
     }
 
@@ -471,7 +453,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
         const sliceKey = sliceKeys[i]
         const def = result.slicedClips[sliceKey]
         const buffer = sliceAudioBufferByMeasure(buffers[i], def.start, def.end, result.tempo)
-        audioLibrary.cacheSlicedClip(sliceKey, result.tempo, result.quality, buffer as AugmentedBuffer)
+        audioLibrary.cacheSlicedClip(sliceKey, result.tempo, buffer as AugmentedBuffer)
     }
     return result
 }
@@ -480,22 +462,22 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
 function sliceAudioBufferByMeasure(buffer: AugmentedBuffer, start: number, end: number, tempo: number) {
-    const lengthInBeats = (end - start) * 4  // 4 beats per measure
-    const lengthInSeconds = lengthInBeats * (60.0/tempo)
+    const lengthInBeats = (end - start) * 4 // 4 beats per measure
+    const lengthInSeconds = lengthInBeats * (60.0 / tempo)
     const lengthInSamples = lengthInSeconds * buffer.sampleRate
 
     const slicedBuffer = audioContext.createBuffer(buffer.numberOfChannels, lengthInSamples, buffer.sampleRate)
 
     // Sample range which will be extracted from the original buffer
     // Subtract 1 from start, end because measures are 1-indexed
-    const startSamp = (start-1) * 4 * (60.0/tempo) * buffer.sampleRate
-    const endSamp = (end-1) * 4 * (60.0/tempo) * buffer.sampleRate
+    const startSamp = (start - 1) * 4 * (60.0 / tempo) * buffer.sampleRate
+    const endSamp = (end - 1) * 4 * (60.0 / tempo) * buffer.sampleRate
 
     if (endSamp > buffer.length) {
         throw new RangeError(`End of slice at ${end} reaches past end of sample ${buffer.filekey}`)
     }
 
-    for (let i = 0; i < buffer.numberOfChannels; i++){
+    for (let i = 0; i < buffer.numberOfChannels; i++) {
         const newBufferData = slicedBuffer.getChannelData(i)
         const originalBufferData = buffer.getChannelData(i).slice(startSamp, endSamp)
         const copyLen = Math.min(newBufferData.length, originalBufferData.length)
@@ -572,7 +554,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
 
             // add clips to fill in empty space
             let k = 1
-            //the minimum measure length for which extra clips will be added to fill in the gap
+            // the minimum measure length for which extra clips will be added to fill in the gap
             const fillableGapMinimum = 0.01
             while (leftover > fillableGapMinimum && clip.loop) {
                 track.clips.push({
@@ -584,7 +566,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                     end: 1 + Math.min(duration, leftover),
                     scale: clip.scale,
                     loop: clip.loop,
-                    loopChild: true
+                    loopChild: true,
                 } as unknown as Clip)
                 leftover -= Math.min(posIncr, leftover)
                 k++
@@ -609,8 +591,8 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                     if (effect.startMeasure > endMeasureIfEmpty) {
                         effect.endMeasure = effect.startMeasure
                     } else {
-                        if (effects[j+1]) {
-                            effect.endMeasure = effects[j+1].startMeasure
+                        if (effects[j + 1]) {
+                            effect.endMeasure = effects[j + 1].startMeasure
                         } else {
                             effect.endMeasure = endMeasureIfEmpty
                         }
@@ -621,7 +603,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
 
             // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
             if (effects[0].startMeasure > 1) {
-                const fillEmptyStart = Object.assign({}, effects[0]); // clone the earliest effect automation
+                const fillEmptyStart = Object.assign({}, effects[0]) // clone the earliest effect automation
                 fillEmptyStart.startMeasure = 1
                 fillEmptyStart.endMeasure = effects[0].startMeasure
                 fillEmptyStart.startValue = effects[0].startValue
@@ -637,14 +619,14 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
 // Warn users when a clips overlap each other. Done in post-compile because
 // we don't know the length of clips until then.
 function checkOverlaps(result: DAWData) {
-    const truncateDigits = 5  // workaround for precision errors
+    const truncateDigits = 5 // workaround for precision errors
     const margin = 0.001
 
     for (const track of result.tracks) {
         for (let j = 0; j < track.clips.length; j++) {
             const clip = track.clips[j]
             for (let k = 0; k < track.clips.length; k++) {
-                if (k == j) continue
+                if (k === j) continue
                 const sibling = track.clips[k]
                 const clipLeft = clip.measure
                 const clipRight = clip.measure + ESUtils.truncate(clip.end - clip.start, truncateDigits)
@@ -666,16 +648,16 @@ function checkOverlaps(result: DAWData) {
     }
 }
 
-// Warn users when a track contains effects, but no audio. Done in post-compile 
+// Warn users when a track contains effects, but no audio. Done in post-compile
 // because we don't know if there are audio samples on the entire track
 // until then. (Moved from passthrough.js)
 function checkEffects(result: DAWData) {
     for (const [i, track] of Object.entries(result.tracks)) {
         const clipCount = track.clips.length
-        const effectCount  = Object.keys(track.effects).length
+        const effectCount = Object.keys(track.effects).length
 
-        if (effectCount > 0 && clipCount == 0) {
-            userConsole.warn(i18n.t('messages:dawservice.effecttrackwarning') + ` (Track ${i})`)
+        if (effectCount > 0 && clipCount === 0) {
+            userConsole.warn(i18n.t("messages:dawservice.effecttrackwarning") + ` (Track ${i})`)
         }
     }
 }
@@ -683,8 +665,8 @@ function checkEffects(result: DAWData) {
 // Adds a metronome as the last track of a result.
 async function addMetronome(result: DAWData) {
     const [stressed, unstressed] = await Promise.all([
-        audioLibrary.getAudioClip("METRONOME01", -1, result.quality),
-        audioLibrary.getAudioClip("METRONOME02", -1, result.quality),
+        audioLibrary.getAudioClip("METRONOME01", -1),
+        audioLibrary.getAudioClip("METRONOME02", -1),
     ])
     const track = {
         clips: [] as Clip[],
@@ -692,8 +674,8 @@ async function addMetronome(result: DAWData) {
         analyser: null as AnalyserNode | null,
     }
     for (let i = 1; i < result.length + 1; i += 0.25) {
-        let filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
-        let audio = i % 1 === 0 ? stressed : unstressed
+        const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
+        const audio = i % 1 === 0 ? stressed : unstressed
         track.clips.push({
             filekey: filekey,
             audio: audio,

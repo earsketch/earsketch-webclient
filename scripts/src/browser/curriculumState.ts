@@ -3,7 +3,7 @@ import lunr from "lunr"
 
 import esconsole from "../esconsole"
 import { importScript } from "../ide/IDE"
-import * as layout from "../layout/layoutState"
+import * as layout from "../ide/layoutState"
 import store, { RootState, ThunkAPI, AppDispatch } from "../reducers"
 import * as userNotification from "../user/notification"
 
@@ -121,7 +121,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
     root.querySelectorAll('a[href="<api>"]').forEach((el: HTMLLinkElement) => {
         el.onclick = (e) => {
             e.preventDefault()
-            dispatch(layout.openWest(layout.BrowserTabType.API))
+            dispatch(layout.setWest({ open: true, kind: layout.BrowserTabType.API }))
         }
     })
 

@@ -8,7 +8,7 @@ import app from './app/appState';
 import user from './user/userState';
 import ide from './ide/ideState';
 import tabs from './ide/tabState';
-import layout from './layout/layoutState';
+import layout from './ide/layoutState';
 import bubble from './bubble/bubbleState';
 import sounds from './browser/soundsState';
 import scripts from './browser/scriptsState';

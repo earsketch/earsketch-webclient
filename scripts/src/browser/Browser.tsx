@@ -4,12 +4,12 @@ import { usePopper } from "react-popper";
 import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
-import * as layout from '../layout/layoutState';
+import * as layout from '../ide/layoutState';
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
 import { RootState } from '../reducers';
-import { BrowserTabType } from "../layout/layoutState";
+import { BrowserTabType } from "../ide/layoutState";
 
 const darkBgColor = '#223546';
 
@@ -30,7 +30,7 @@ export const TitleBar = () => {
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
                     onClick={() => {
-                        dispatch(layout.collapseWest());
+                        dispatch(layout.setWest({ open: false }));
                     }}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -264,7 +264,7 @@ export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ p
         <div
             className={`${embedMode ? 'hidden' : 'flex'} flex-col h-full cursor-pointer`}
             onClick={() => {
-                position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
+                position==='west' ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }));
             }}
         >
             <div

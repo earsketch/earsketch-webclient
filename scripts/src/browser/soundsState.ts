@@ -314,9 +314,14 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 
         const bs = context.createBufferSource();
         dispatch(setPreviewFileKey(fileKey));
-        dispatch(setPreviewBSNode(bs));
+        dispatch(setPreviewBSNode(null));
 
         await audioLibrary.getAudioClip(fileKey,-1).then((buffer: AudioBuffer) => {
+            if (fileKey !== selectPreviewFileKey(getState())) {
+                // User started clicked play on something else before this finished loading.
+                return;
+            }
+            dispatch(setPreviewBSNode(bs));
             bs.buffer = buffer;
             bs.connect(context.destination);
             bs.start(0);
@@ -491,7 +496,7 @@ export const selectFilteredFeaturedFileKeysByFolders = createSelector(
 );
 
 const selectEntities = createSelector(
-    [selectFeaturedSoundVisibility, selectAllRegularEntities, selectAllEntities],
+    [selectFeaturedSoundVisibility, selectAllEntities, selectAllRegularEntities],
     (includeFeaturedArtists, allEntities, regularEntities) => includeFeaturedArtists ? allEntities : regularEntities
 )
 
@@ -536,7 +541,7 @@ export const selectFilteredArtists = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, artists: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.artist)))
+        return Array.from(new Set(Object.values(entities).map(entity => entity.artist))).sort()
     }
 )
 
@@ -544,7 +549,7 @@ export const selectFilteredGenres = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, genres: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.genre)))
+        return Array.from(new Set(Object.values(entities).map(entity => entity.genre))).sort()
     }
 )
 
@@ -552,7 +557,7 @@ export const selectFilteredInstruments = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, instruments: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.instrument)))
+        return Array.from(new Set(Object.values(entities).map(entity => entity.instrument))).sort()
     }
 )
 
@@ -561,3 +566,4 @@ export const selectNumGenresSelected = (state: RootState) => state.sounds.filter
 export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length;
 
 export const selectPreviewFileKey = (state: RootState) => state.sounds.preview.fileKey;
+export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode;

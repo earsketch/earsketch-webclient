@@ -42,7 +42,6 @@ module.exports = {
 
             // Controllers
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-            autograderController: path.resolve(__dirname,`${appDir}/autograderController.js`),
             codeAnalyzerController: path.resolve(__dirname,`${appDir}/codeAnalyzerController.js`),
             codeAnalyzerContestController: path.resolve(__dirname,`${appDir}/codeAnalyzerContestController.js`),
             codeAnalyzerCAIController: path.resolve(__dirname,`${appDir}/codeAnalyzerCAIController.js`),
@@ -142,7 +141,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'autograder/index.html'),
-            template: 'autograder/index.template.html'
+            template: 'public/index.html'
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'codeAnalyzer/index.html'),

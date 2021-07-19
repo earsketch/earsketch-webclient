@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
+import Split from "react-split"
 
 import { openModal } from "../app/App"
 import * as appState from "../app/appState"
@@ -21,8 +22,7 @@ import { setReady, dismissBubble } from "../bubble/bubbleState"
 import * as scripts from "../browser/scriptsState"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
-import * as layout from "../layout/layoutState"
-import * as Layout from "../layout/Layout"
+import * as layout from "./layoutState"
 import reporter from "../app/reporter"
 import * as tabs from "./tabState"
 import * as cai from "../cai/caiState"
@@ -36,7 +36,7 @@ import * as userProject from "../app/userProject"
 import * as WaveformCache from "../app/waveformcache"
 import i18n from "i18next"
 import { DAWData } from "../app/player"
-import parse from "html-react-parser";
+import parse from "html-react-parser"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -106,14 +106,14 @@ export function initEditor() {
                 collaboration.saveScript()
             }
             activeTabID && store.dispatch(tabs.removeModifiedScript(activeTabID))
-        }
+        },
     })
 
     // Save scripts when not focused on editor.
-    window.addEventListener('keydown', event => {
-        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+    window.addEventListener("keydown", event => {
+        if ((event.ctrlKey || event.metaKey) && event.key === "s") {
             event.preventDefault()
-            editor.ace.commands.exec('saveScript', editor.ace, [])
+            editor.ace.commands.exec("saveScript", editor.ace, [])
         }
     })
 
@@ -125,7 +125,7 @@ export function initEditor() {
         },
         exec() {
             compileCode()
-        }
+        },
     })
 
     editor.droplet.setEditorState(false)
@@ -218,7 +218,7 @@ export async function openShare(shareid: string) {
 
 // For curriculum pages.
 export function importScript(key: string) {
-    let result = /script_name: (.*)/.exec(key)
+    const result = /script_name: (.*)/.exec(key)
     let scriptName
     if (result && result[1]) {
         scriptName = result[1].replace(/[^\w_]/g, "")
@@ -234,7 +234,7 @@ export function importScript(key: string) {
     const fakeScript = {
         name: scriptName + ext,
         source_code: key,
-        shareid: ESUtils.randomString(22),
+        shareid: userProject.generateAnonymousScriptID(),
         readonly: true,
     }
 
@@ -268,7 +268,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue(), 0)
+        result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -338,7 +338,7 @@ export async function compileCode() {
 
                 reporter.readererror(e.toString() + ". Location: " + stackString)
             }
-            
+
             console.log("complexityCalculator", report)
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.compileCAI([result, language, code]))
@@ -351,7 +351,7 @@ export async function compileCode() {
     }
 
     const { bubble } = state
-    if (bubble.active && bubble.currentPage===2 && !bubble.readyToProceed) {
+    if (bubble.active && bubble.currentPage === 2 && !bubble.readyToProceed) {
         store.dispatch(setReady(true))
     }
 }
@@ -365,6 +365,7 @@ export const IDE = () => {
     const embedMode = useSelector(appState.selectEmbedMode)
     const embeddedScriptName = useSelector(appState.selectEmbeddedScriptName)
     const embeddedScriptUsername = useSelector(appState.selectEmbeddedScriptUsername)
+    const hideDAW = useSelector(appState.selectHideDAW)
     const hideEditor = useSelector(appState.selectHideEditor)
 
     const bubbleActive = useSelector(bubble.selectActive)
@@ -389,27 +390,50 @@ export const IDE = () => {
         }
     }, [logs])
 
+    const gutterSize = hideEditor ? 0 : 8
+    const isWestOpen = useSelector(layout.isWestOpen)
+    const isEastOpen = useSelector(layout.isEastOpen)
+    const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
+    const maxWidths = embedMode ? [0, Infinity, 0] : [isWestOpen ? Infinity : layout.COLLAPSED_WIDTH, Infinity, isEastOpen ? Infinity : layout.COLLAPSED_WIDTH]
+    const minHeights = embedMode ? [layout.MIN_DAW_HEIGHT, 0, 0] : [layout.MIN_DAW_HEIGHT, layout.MIN_EDITOR_HEIGHT, layout.MIN_DAW_HEIGHT]
+    const maxHeights = hideDAW ? [layout.MIN_DAW_HEIGHT, Infinity, 0] : undefined
+
+    let horizontalRatio = useSelector(layout.selectHorizontalRatio)
+    let verticalRatio = useSelector(layout.selectVerticalRatio)
+    if (embedMode) {
+        horizontalRatio = [0, 100, 0]
+        verticalRatio = hideEditor ? [100, 0, 0] : (hideDAW ? [0, 100, 0] : [25, 75, 0])
+    }
+
     return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
-            <div id="layout-container" className="split flex flex-row h-full">
-                <div id="sidebar-container" style={bubbleActive && [5,6,7,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+            <Split
+                className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
+                sizes={horizontalRatio} minSize={minWidths} maxSize={maxWidths}
+                onDragEnd={ratio => dispatch(layout.setHorizontalSizesFromRatio(ratio))}
+            >
+                <div id="sidebar-container" style={bubbleActive && [5, 6, 7, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     <div className="overflow-hidden" id="sidebar"> {/* re:overflow, split.js width calculation can cause the width to spill over the parent width */}
                         <Browser />
                     </div>
                 </div>
 
-                <div className="split flex flex-col" id="content">
+                <Split
+                    className="split flex flex-col" gutterSize={gutterSize} snapOffset={0}
+                    sizes={verticalRatio} minSize={minHeights} maxSize={maxHeights} direction="vertical"
+                    onDragEnd={ratio => dispatch(layout.setVerticalSizesFromRatio(ratio))}
+                >
                     <div id="devctrl">
-                        <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3,4,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                        <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3, 4, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                             {loading
-                            ? <div className="loading text-center h-full w-full flex items-center justify-center">
-                                <i className="spinner icon icon-spinner inline-block animate-spin mr-3"></i> {t("loading")}
-                            </div>
-                            : <div className="workstation h-full w-full"><DAW /></div>}
+                                ? <div className="loading text-center h-full w-full flex items-center justify-center">
+                                    <i className="es-spinner animate-spin mr-3"></i> {t("loading")}
+                                </div>
+                                : <div className="workstation h-full w-full"><DAW /></div>}
                         </div>
                     </div>
 
-                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1,2,9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
+                    <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <EditorHeader />
 
                         <div className="flex-grow h-full overflow-y-hidden">
@@ -440,27 +464,27 @@ export const IDE = () => {
                         <div className="row">
                             <div id="console">
                                 {logs.map((msg: any, index: number) =>
-                                <div key={index} className="console-line">
-                                    <span className={"console-" + msg.level.replace("status", "info")}>
-                                        {msg.text}{" "}
-                                        {msg.level === "error" &&
+                                    <div key={index} className="console-line">
+                                        <span className={"console-" + msg.level.replace("status", "info")}>
+                                            {msg.text}{" "}
+                                            {msg.level === "error" &&
                                         <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
                                             Click here for more information.
                                         </a>}
-                                    </span>
-                                </div>)}
+                                        </span>
+                                    </div>)}
                             </div>
                         </div>
                     </div>
-                </div>
+                </Split>
 
-                <div className="h-full" id="curriculum-container" style={bubbleActive && [8,9].includes(bubblePage) ? { zIndex: 35 } : {}}>
+                <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI
-                    ? <CAI />
-                    : <Curriculum />}
+                        ? <CAI />
+                        : <Curriculum />}
                     {/* NOTE: The chat window might come back here at some point. */}
                 </div>
-            </div>
+            </Split>
         </div>
     </div>
 }
