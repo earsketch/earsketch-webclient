@@ -1,5 +1,6 @@
 {
   "common": {
+    "loading": "Cargando...",
     "contentManager.title": "Gestor de contenidos",
     "search": "Búsqueda",
     "results": "Resultados",
@@ -14,6 +15,7 @@
     "startQuickTour": "Empezar tutorial rápido",
     "switchTheme": "Cambiar el tema",
     "reportError": "Reportar error",
+    "leave": "Leave",
     "soundBrowser.filterDropdown.artists": "Artistas",
     "soundBrowser.filterDropdown.genres": "Géneros",
     "soundBrowser.filterDropdown.instruments": "Instrumentos",
@@ -31,6 +33,10 @@
     "scriptBrowser.filterDropdown.fileType": "Tipo de archivo",
     "scriptBrowser.filterDropdown.sortBy": "Clasificar por",
     "scriptBrowser.showDeleted": "Mostrar scripts borrados",
+    "scriptBrowser.deletedscripts": "Scripts borrados",
+    "scriptBrowser.restore": "Restaurar",
+    "keepUnsavedTabs": "Keep unsaved tabs open",
+    "ignore": "Ignore",
     "script": "Script",
     "version": "Versión",
     "script_plural": "Scripts",
@@ -77,9 +83,12 @@
     "script.codeIndicator": "Indicador de código",
     "script.import": "Importar",
     "script.delete": "Borrar",
+    "ok": "OK",
+    "confirm": "Confirma",
     "default": "Valor predeterminado",
     "notifications.title": "Notificaciones",
     "notifications.pinned": "Notificaciones ancladas",
+    "notifications.other": "Otras notificaciones",
     "notifications.viewAll": "Ver todas",
     "notifications.markAllRead": "Marcar todos como leídos",
     "forgotPassword.title": "¿Olvidaste tu contraseña?",
@@ -219,6 +228,7 @@
   },
   "bubble": {
     "userLanguage": "Idioma",
+    "script.name": "tutorial_rápido",
     "defaultProgrammingLanguage": "Lenguaje de programación predeterminado",
     "buttons": {
       "skip": "Saltar",
@@ -253,6 +263,12 @@
     }
   },
   "messages": {
+    "confirm": {
+      "deletescript": "Scripts borrados desaparecen de la lista de los Scripts y se pueden restaurar desde \"Scripts borrados\".",
+      "deleteSharedScript": "Are you sure you want to delete the shared script \"{{scriptName}}\"?",
+      "deleteSound": "Do you really want to delete sound {{soundName}}",
+      "leaveCollaboration": "Do you want to leave the collaboration on \"{{scriptName}}\"?"
+    },
     "interpreter": {
       "runSuccess": "¡El script se ejecutó exitosamente! Haz clic en el botón de play para escuchar tu música.",
       "runFailed": "Hay un error o más en tu script. Mira la consola para más detalles.",
@@ -343,6 +359,8 @@
       "noSelfShare": "¡No puedes compartir scripts contigo mismo!"
     },
     "idecontroller": {
+      "running": "Ejecutando script...",
+      "success": "Script se ejecutó exitosamente",
       "overwrite": "Ese nombre ya existe. Por favor, crea un nombre único o renombra primero el script que existe.",
       "illegalname": "Por favor, sólo usa caracteres regulares, números, o _ para los nombres de los archivos.",
       "savefailed": "No se pudo guardar el script en la nube. Por favor, guarda tu script offline para evitar perder los cambios.",

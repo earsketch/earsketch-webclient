@@ -198,10 +198,11 @@ const ShareButton = ({ script }: { script: Script }) => (
 );
 
 const RestoreButton = ({ script }: { script: Script }) => {
+    const { t } = useTranslation()
     return (
         <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
             <i className='icon-rotate-cw2'/>
-            <div>Restore</div>
+            <div>{t("scriptBrowser.restore")}</div>
         </PillButton>
     );
 };
@@ -456,9 +457,10 @@ const DeletedScriptCollection = () => {
     const entities = useSelector(scripts.selectFilteredDeletedScripts);
     const scriptIDs = useSelector(scripts.selectFilteredDeletedScriptIDs);
     const numScripts = useSelector(scripts.selectDeletedScriptIDs).length;
+    const { t } = useTranslation()
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
-    const title = `DELETED SCRIPTS (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
+    const title = `${t("scriptBrowser.deletedscripts").toLocaleUpperCase()} (${filtered ? numFilteredScripts + "/" : ""}${numScripts})`;
     const type: ScriptType = 'deleted';
     const visible = useSelector(scripts.selectShowDeleted);
     const initExpanded = false;

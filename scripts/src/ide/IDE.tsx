@@ -261,7 +261,7 @@ export async function compileCode() {
 
     editor.clearErrors()
     ideConsole.clear()
-    ideConsole.status("Running script...")
+    ideConsole.status(i18n.t("messages:idecontroller.running"))
 
     const scriptID = tabs.selectActiveTabID(state)
     store.dispatch(tabs.removeModifiedScript(scriptID))
@@ -305,7 +305,7 @@ export async function compileCode() {
     saveActiveScriptWithRunStatus(userProject.STATUS_SUCCESSFUL)
 
     // Small hack -- if a pitchshift is present, it may print the success message after the compilation success message.
-    setTimeout(() => ideConsole.status("Script ran successfully."), 200)
+    setTimeout(() => ideConsole.status(i18n.t("messages:idecontroller.success")), 200)
 
     // asyncronously report the script complexity
     if (FLAGS.SHOW_AUTOGRADER) {
@@ -427,7 +427,7 @@ export const IDE = () => {
                         <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3, 4, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                             {loading
                                 ? <div className="loading text-center h-full w-full flex items-center justify-center">
-                                    <i className="es-spinner animate-spin mr-3"></i> Loading...
+                                    <i className="es-spinner animate-spin mr-3"></i> {t("loading")}
                                 </div>
                                 : <div className="workstation h-full w-full"><DAW /></div>}
                         </div>

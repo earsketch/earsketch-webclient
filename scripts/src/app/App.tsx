@@ -105,25 +105,26 @@ export function openCodeIndicator(script: Script) {
     openModal(ScriptAnalysis, { script })
 }
 
-const Confirm = ({ text, ok, cancel, type, close }: { text?: string, ok?: string, cancel?: string, type?: string, close: (ok: boolean) => void }) => {
+const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string, close: (ok: boolean) => void }) => {
+    const { t } = useTranslation()
     return <>
         <div className="modal-header">
-            <h3 className="modal-title">Confirm</h3>
+            <h3 className="modal-title">{t("confirm")}</h3>
         </div>
-        <div className="modal-body">{text}</div>
+        { textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div> }
         <div className="modal-footer">
-            <button className="btn btn-default" onClick={() => close(false)}>{cancel ?? "Cancel"}</button>
-            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{ok ?? "Okay"}</button>
+            <button className="btn btn-default" onClick={() => close(false)}>{cancelKey ? t(cancelKey) : t("cancel")}</button>
+            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{okKey ? t(okKey) : t("ok")}</button>
         </div>
     </>
 }
 
-function confirm({ text, ok, cancel, type }: { text?: string, ok?: string, cancel?: string, type?: string }) {
-    return openModal(Confirm, { text, ok, cancel, type })
+function confirm({ textKey, textReplacements, okKey, cancelKey, type }: { textKey?: string, textReplacements?: object, okKey?: string, cancelKey?: string, type?: string }) {
+    return openModal(Confirm, { textKey, textReplacements, okKey, cancelKey, type })
 }
 
 export async function deleteScript(script: Script) {
-    if (await confirm({ text: 'Deleted scripts disappear from Scripts list and can be restored from "Deleted Scripts".', ok: "Delete", type: "danger" })) {
+    if (await confirm({ textKey: "messages:confirm.deletescript", okKey: "script.delete", type: "danger" })) {
         if (script.shareid === collaboration.scriptID && collaboration.active) {
             collaboration.closeScript(script.shareid)
         }
@@ -138,7 +139,7 @@ export async function deleteScript(script: Script) {
 
 export async function deleteSharedScript(script: Script) {
     if (script.collaborative) {
-        if (await confirm({ text: `Do you want to leave the collaboration on "${script.name}"?`, ok: "Leave", type: "danger" })) {
+        if (await confirm({ textKey: "messages:confirm.leaveCollaboration", textReplacements: { scriptName: script.name }, okKey: "leave", type: "danger" })) {
             if (script.shareid === collaboration.scriptID && collaboration.active) {
                 collaboration.closeScript(script.shareid)
             }
@@ -151,7 +152,7 @@ export async function deleteSharedScript(script: Script) {
             collaboration.leaveCollaboration(script.shareid, userProject.getUsername(), false)
         }
     } else {
-        if (await confirm({ text: `Are you sure you want to delete the shared script "${script.name}"?`, ok: "Delete", type: "danger" })) {
+        if (await confirm({ textKey: "messages:confirm.deleteSharedScript", textReplacements: { scriptName: script.name }, okKey: "script.delete", type: "danger" })) {
             await userProject.deleteSharedScript(script.shareid)
             store.dispatch(tabs.closeDeletedScript(script.shareid))
             store.dispatch(tabs.removeModifiedScript(script.shareid))
@@ -185,7 +186,7 @@ export async function importScript(script: Script) {
 }
 
 export async function deleteSound(sound: SoundEntity) {
-    if (await confirm({ text: `Do you really want to delete sound ${sound.file_key}?`, ok: "Delete", type: "danger" })) {
+    if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.file_key }, okKey: "script.delete", type: "danger" })) {
         await userProject.deleteAudio(sound.file_key)
         store.dispatch(sounds.deleteLocalUserSound(sound.file_key))
         audioLibrary.clearAudioTagCache()
@@ -193,7 +194,7 @@ export async function deleteSound(sound: SoundEntity) {
 }
 
 export async function closeAllTabs() {
-    if (await confirm({ text: i18n.t("messages:idecontroller.closealltabs"), ok: "Close All" })) {
+    if (await confirm({ textKey: "messages:idecontroller.closealltabs", okKey: "tabs.closeAll" })) {
         try {
             await saveAll()
             userNotification.show(i18n.t("messages:user.allscriptscloud"))
@@ -454,7 +455,7 @@ export const App = () => {
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
         } catch (error) {
-            if (await confirm({ text: i18n.t("messages:idecontroller.saveallfailed"), cancel: "Keep unsaved tabs open", ok: "Ignore" })) {
+            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "keepUnsavedTabs", okKey: "ignore" })) {
                 userProject.clearUser()
             }
         }

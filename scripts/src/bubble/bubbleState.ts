@@ -8,6 +8,7 @@ import * as userProject from '../app/userProject';
 import { sampleScript } from "./bubbleData";
 import { RootState, ThunkAPI } from '../reducers';
 import { BrowserTabType } from "../ide/layoutState";
+import i18n from "i18next";
 
 interface BubbleState {
     active: boolean
@@ -46,7 +47,7 @@ const createSampleScript = createAsyncThunk(
     'bubble/createSampleScript',
     (_, { getState, dispatch }) => {
         const { bubble: { language } } = getState() as { bubble: BubbleState };
-        const fileName = `quick_tour.${language==='Python'?'py':'js'}`;
+        const fileName = `${i18n.t("bubble:script.name")}.${language==='Python'?'py':'js'}`;
         const code = sampleScript[language.toLowerCase()];
         return userProject.saveScript(fileName, code, true)
             .then((script: Script) => {
