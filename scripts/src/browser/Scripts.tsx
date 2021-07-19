@@ -460,7 +460,7 @@ const DeletedScriptCollection = () => {
     const { t } = useTranslation()
     const numFilteredScripts = scriptIDs.length;
     const filtered = numFilteredScripts !== numScripts;
-    const title = `${t('scriptBrowser.deletedscripts').toLocaleUpperCase()} (${filtered ? numFilteredScripts+'/' : ''}${numScripts})`;
+    const title = `${t("scriptBrowser.deletedscripts").toLocaleUpperCase()} (${filtered ? numFilteredScripts + "/" : ""}${numScripts})`;
     const type: ScriptType = 'deleted';
     const visible = useSelector(scripts.selectShowDeleted);
     const initExpanded = false;

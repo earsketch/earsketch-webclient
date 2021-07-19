@@ -15,6 +15,7 @@
     "startQuickTour": "Start Quick Tour",
     "switchTheme": "Switch Theme",
     "reportError": "Report Error",
+    "leave": "Leave",
     "soundBrowser.filterDropdown.artists": "Artists",
     "soundBrowser.filterDropdown.genres": "Genres",
     "soundBrowser.filterDropdown.instruments": "Instruments",
@@ -34,6 +35,8 @@
     "scriptBrowser.showDeleted": "Show deleted",
     "scriptBrowser.deletedscripts": "Deleted Scripts",
     "scriptBrowser.restore": "Restore",
+    "keepUnsavedTabs": "Keep unsaved tabs open",
+    "ignore": "Ignore",
     "script": "Script",
     "version": "Version",
     "script_plural": "Scripts",
@@ -261,7 +264,10 @@
   },
   "messages": {
     "confirm": {
-      "deletescript": "Deleted scripts disappear from Scripts list and can be restored from \"Deleted Scripts\"."
+      "deletescript": "Deleted scripts disappear from Scripts list and can be restored from \"Deleted Scripts\".",
+      "deleteSharedScript": "Are you sure you want to delete the shared script \"{{scriptName}}\"?",
+      "deleteSound": "Do you really want to delete sound {{soundName}}",
+      "leaveCollaboration": "Do you want to leave the collaboration on \"{{scriptName}}\"?"
     },
     "interpreter": {
       "runSuccess": "Script ran successfully! Click the play button to hear your music.",
