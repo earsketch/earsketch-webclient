@@ -45,13 +45,13 @@ import { PersistGate } from "redux-persist/integration/react"
 
 import { App } from "./app/App"
 import store, { persistor } from "./reducers"
+
+import { Autograder } from "./app/Autograder"
+import { CodeAnalyzer } from "./app/CodeAnalyzer"
 (window as any).Question = Question // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 ;(window as any).droplet = droplet
-
-import { Autograder } from "./app/Autograder"
-import { CodeAnalyzer } from "./app/CodeAnalyzer"
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
@@ -143,15 +143,15 @@ if (/\/codeAnalyzerCAI|codeAnalyzerContest\w*\/?$/.test(location.href)) {
     })
 } else {
     // Load the normal React app.
-    let Content 
-    if (/\/autograder\w*\/?$/.test(location.href)) { 
+    let Content
+    if (/\/autograder\w*\/?$/.test(location.href)) {
         Content = Autograder
     } else if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
         Content = CodeAnalyzer
     } else {
         Content = App
     }
-    
+
     ReactDOM.render(
         <React.StrictMode>
             <Provider store={store}>

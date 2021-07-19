@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 
-import * as compiler from "./compiler"
 import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
 
