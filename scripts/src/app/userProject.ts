@@ -372,8 +372,7 @@ export async function getLicenses() {
 
 export async function getUserInfo(token?: string) {
     token ??= getToken()!
-    const { username, email, firstname, lastname, role } = await get("/users/info", {}, { Authorization: "Bearer " + token })
-    return { username, email, firstname: firstname ?? "", lastname: lastname ?? "", role }
+    return get("/users/info", {}, { Authorization: "Bearer " + token })
 }
 
 // Set a script license id if owned by the user.
@@ -587,27 +586,18 @@ export async function renameScript(script: Script, newName: string) {
 }
 
 // Get all users and their roles
-export async function getAllUserRoles() {
+export async function getAdmins() {
     if (isLoggedIn()) {
-        return getAuth("/users/roles")
+        return getAuth("/users/admins")
     } else {
         esconsole("Login failure", ["error", "user"])
     }
 }
 
-// Add role to user
-export async function addRole(username: string, role: string) {
+// Promote user to admin or demote from admin.
+export async function setIsAdmin(username: string, isAdmin: boolean) {
     if (isLoggedIn()) {
-        return postAuth("/users/addrole", { username, role })
-    } else {
-        esconsole("Login failure", ["error", "user"])
-    }
-}
-
-// Remove role from user
-export async function removeRole(username: string, role: string) {
-    if (isLoggedIn()) {
-        return postAuth("/users/removerole", { username, role })
+        return postAuth("/users/admin", { username, isAdmin: "" + isAdmin })
     } else {
         esconsole("Login failure", ["error", "user"])
     }

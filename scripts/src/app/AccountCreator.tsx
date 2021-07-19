@@ -18,16 +18,9 @@ export const AccountCreator = ({ close }: { close: (value?: any) => void }) => {
         try {
             // TODO: This endpoint is poorly named - it creates new accounts.
             const data = await post("/users/create", {
-                username: username,
-                email: email,
+                username,
+                email,
                 password: btoa(password),
-                // TODO: The endpoint should fill these in.
-                first_name: "",
-                last_name: "",
-                // TODO: These appear to be unused, but the server returns 500 if they are omitted...
-                image_url: "http://earsketch.gatech.edu/media/img/profileImg/1.png",
-                description: "EarSketch User",
-                favorite_artists: "Richard Devine Young Guru",
             })
             if (data.state !== 0) {
                 esconsole("Error creating user: " + data.description, "error")

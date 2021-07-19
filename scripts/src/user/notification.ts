@@ -3,16 +3,16 @@ import store from "../reducers"
 import * as userProject from "../app/userProject"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
 
-export const user = { role: "", loginTime: Date.now() }
+export const user = { isAdmin: false, loginTime: Date.now() }
 
 export const callbacks = {
-    show: (text: string, type: string="", duration?: number) => {},
-    popup: (text: string, type: string="", duration: number | undefined=undefined) => {},
-    addSharedScript: (shareID: string, id: string) => {},
+    show: (() => {}) as (text: string, type?: string, duration?: number) => void,
+    popup: (() => {}) as (text: string, type?: string, duration?: number) => void,
+    addSharedScript: (() => {}) as (shareID: string, id: string) => void,
 }
 
 // TODO: Clarify usage of temporary (popup) and "permanent" (history/list) notifications.
-export function show(text: string, type: string="", duration: number | undefined=undefined) {
+export function show(text: string, type: string = "", duration: number | undefined = undefined) {
     // check type for registering to the notification history
     // TODO: handle with proper message types defined
     if (["bell", "popup", "history"].includes(type)) { // temporary tags for bell-icon dropdown notifications
@@ -26,7 +26,7 @@ export function show(text: string, type: string="", duration: number | undefined
     } else if (type === "editProfile") {
         const notifications = selectNotifications(store.getState())
         while (notifications.some(item => item.notification_type === "editProfile")) {
-            const index = notifications.findIndex(item => item["notification_type"] === "editProfile")
+            const index = notifications.findIndex(item => item.notification_type === "editProfile")
             if (index !== -1) {
                 notifications.splice(index, 1)
             }
@@ -55,14 +55,14 @@ export function show(text: string, type: string="", duration: number | undefined
     callbacks.popup(text, type, duration)
 }
 
-export const showBanner = (text: string, type: string="") => callbacks.show(text, type)
+export const showBanner = (text: string, type: string = "") => callbacks.show(text, type)
 
 // Fill the history array at initialization from webservice call as well as localStorage. Sorting might be needed.
 export function loadHistory(notifications: Notification[]) {
     let text = ""
 
     // filter out "teacherBroadcast" messages
-    if (!["teacher", "admin"].includes(user.role)) {
+    if (!user.isAdmin) {
         notifications = notifications.filter(v => v.notification_type !== "teacher_broadcast")
     }
 
@@ -85,18 +85,18 @@ export function loadHistory(notifications: Notification[]) {
                 const data = JSON.parse(v.message.json!)
                 // received only by the ones affected
                 switch (data.action) {
-                    case "userAddedToCollaboration":
-                        text = data.sender + " added you as a collaborator on " + data.scriptName
-                        break
-                    case "userRemovedFromCollaboration":
-                        text = data.sender + " removed you from collaboration on " + data.scriptName
-                        break
-                    case "userLeftCollaboration":
-                        text = data.sender + " left the collaboration on " + data.scriptName
-                        break
-                    case "scriptRenamed":
-                        text = `Collaborative script "${data.oldName}" was renamed to "${data.newName}"`
-                        break
+                case "userAddedToCollaboration":
+                    text = data.sender + " added you as a collaborator on " + data.scriptName
+                    break
+                case "userRemovedFromCollaboration":
+                    text = data.sender + " removed you from collaboration on " + data.scriptName
+                    break
+                case "userLeftCollaboration":
+                    text = data.sender + " left the collaboration on " + data.scriptName
+                    break
+                case "scriptRenamed":
+                    text = `Collaborative script "${data.oldName}" was renamed to "${data.newName}"`
+                    break
                 }
                 v.message = { text, action: data.action }
             }
@@ -126,16 +126,6 @@ export function clearHistory() {
 // TODO: should receive notification collection here as well
 export function handleBroadcast(data: Notification) {
     show("From EarSketch team: " + data.message.text, "broadcast")
-    data.time = Date.now()
-    data.pinned = true
-    store.dispatch(pushNotification(data))
-}
-
-export function handleTeacherBroadcast(data: Notification) {
-    if (user.role !== "teacher") {
-        return
-    }
-    show("From EarSketch team to teachers: " + data.message.text, "broadcast")
     data.time = Date.now()
     data.pinned = true
     store.dispatch(pushNotification(data))

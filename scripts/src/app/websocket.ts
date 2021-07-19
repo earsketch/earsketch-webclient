@@ -4,14 +4,14 @@ import * as userNotification from "../user/notification"
 let ws: WebSocket | null
 let reconnect = 10
 let timer = 0
-let pendingMessages: any[] = []
+const pendingMessages: any[] = []
 type Subscriber = (data: any) => void
-let subscribers: Subscriber[] = []
+const subscribers: Subscriber[] = []
 
 export let isOpen = false
 
 export function connect(username: string, callback?: Function) {
-    username = username.toLowerCase()  // Fix for issue #1858
+    username = username.toLowerCase() // Fix for issue #1858
     ws = new WebSocket(`${URL_WEBSOCKET}/socket/${username}/`)
 
     ws.onopen = () => {
@@ -48,8 +48,6 @@ export function connect(username: string, callback?: Function) {
             userNotification.loadHistory(data.notifications)
         } else if (data.notification_type === "broadcast") {
             userNotification.handleBroadcast(data)
-        } else if (data.notification_type === "teacher_broadcast") {
-            userNotification.handleTeacherBroadcast(data)
         } else if (data.notification_type === "collaboration") {
             // Handled by collaboration; don't spam the console.
         } else {
@@ -67,7 +65,7 @@ export function disconnect() {
 function checkin() {
     reconnect = 10
     if (isOpen) {
-        send({notification_type: "dummy"})
+        send({ notification_type: "dummy" })
     }
     timer = window.setTimeout(checkin, 20000)
 }
@@ -93,7 +91,7 @@ export function send(data: any) {
 // TODO: probably move this to the notification service
 export function broadcast(text: string, user: string, hyperlink?: string, expiration?: number, type?: string) {
     // TODO: For unknown reasons, expiration is ignored here.
-    user = user.toLowerCase()  // Fix for issue #1858
+    user = user.toLowerCase() // Fix for issue #1858
 
     send({
         notification_type: type ?? "broadcast",
@@ -101,7 +99,7 @@ export function broadcast(text: string, user: string, hyperlink?: string, expira
         message: {
             text: text,
             hyperlink: hyperlink ?? "",
-            expiration: 0
-        }
+            expiration: 0,
+        },
     })
 }

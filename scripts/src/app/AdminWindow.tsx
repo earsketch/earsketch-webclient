@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react"
-import esconsole from "../esconsole";
-import * as userProject from "./userProject";
-import * as websocket from "./websocket";
-
-interface User {
-    username: string
-    role: "admin" | "teacher"
-}
+import esconsole from "../esconsole"
+import * as userProject from "./userProject"
+import * as websocket from "./websocket"
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
     return <>
@@ -27,91 +22,74 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
 }
 
 const AdminManageRoles = () => {
-
-    const [usersWithRoles, setUsersWithRoles] = useState([] as User[])
+    const [admins, setAdmins] = useState([] as string[])
     const [newAdmin, setNewAdmin] = useState("")
     const [modifyRoleStatus, setModifyRoleStatus] = useState({ message: "", style: "" })
 
     useEffect(() => {
-        userProject.getAllUserRoles().then((res: User[]) => {
-            setUsersWithRoles(res
-                .filter(usr => usr.role === "admin")
-                .sort((a, b) => a.username.localeCompare(b.username))
-            )
+        userProject.getAdmins().then((res: { username: string }[]) => {
+            setAdmins(res.map(u => u.username).sort((a, b) => a.localeCompare(b)))
         })
     }, [])
 
-    const removeRole = async (username: string, role: string) => {
+    const removeAdmin = async (username: string) => {
         setModifyRoleStatus({ message: "Please wait...", style: "alert alert-secondary" })
         try {
-            const data = await userProject.removeRole(username, role)
+            const data = await userProject.setIsAdmin(username, false)
             if (data !== null) {
-                const m = "Successfully removed " + role + " role from " + username
+                const m = `Successfully demoted ${username} from admin.`
                 setModifyRoleStatus({ message: m, style: "alert alert-success" })
-                setUsersWithRoles(usersWithRoles.filter(u => u.username !== username))
+                setAdmins(admins.filter(u => u !== username))
                 return
             }
         } catch (error) {
             esconsole(error, ["error", "admin"])
         }
-        const m = "Failed to remove " + role + " role from " + username
+        const m = `Failed to demote ${username} from admin.`
         setModifyRoleStatus({ message: m, style: "alert alert-danger" })
     }
 
-    const addAdminRoleToUser = async () => {
+    const addAdmin = async () => {
         const username = newAdmin
-        const role = "admin"
-        if (username == "") {
+        if (username === "") {
             return
         }
 
         setModifyRoleStatus({ message: "Please wait...", style: "alert alert-secondary" })
         try {
-            const data = await userProject.addRole(newAdmin, role)
+            const data = await userProject.setIsAdmin(newAdmin, true)
             if (data !== null) {
-                const m = "Successfully added " + role + " role to " + username
+                const m = `Successfully promoted ${username} to admin.`
                 setModifyRoleStatus({ message: m, style: "alert alert-success" })
-                const user: User = { username: username, role: role }
-                setUsersWithRoles([...usersWithRoles, user]
-                  .sort((a, b) => a.username.localeCompare(b.username))
-                )
+                setAdmins([...admins, username].sort((a, b) => a.localeCompare(b)))
                 return
             }
         } catch (error) {
             esconsole(error, ["error", "admin"])
         }
-        const m = "Failed to add " + role + " role to " + username
+        const m = `Failed to promote ${username} to admin.`
         setModifyRoleStatus({ message: m, style: "alert alert-danger" })
     }
 
     return <>
         <div className="modal-section-body">
-            <div className="m-2 px-4 pt-2 pb-4">
-            {modifyRoleStatus.message && <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>}
-                <div className="font-bold text-3xl p-2">Remove Roles</div>
-                <table className="p-2 text-left w-full border border-gray-300">
-                    <tbody className="h-40 bg-grey-light flex flex-col overflow-y-scroll">
-                        {usersWithRoles.map(({ username, role }) =>
-                            <tr className="flex items-center w-11/12" key={username+role}>
-                                <td className="my-px mx-2 w-1/4">{username}</td>
-                                <td className="my-px mx-2 w-1/4">{role}&nbsp;
-                                    <i onClick={() => removeRole(username, role)}
-                                        title="Remove role"
-                                        className="icon icon-cross2" />
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+            <div className="mx-2 px-4 pb-1">
+                {modifyRoleStatus.message && <div className={modifyRoleStatus.style}>{modifyRoleStatus.message}</div>}
+                <div className="font-bold text-3xl p-2">Manage Admins</div>
+                <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
+                    {admins.map(username =>
+                        <div key={username} className="my-px mx-2 flex items-center">
+                            <button className="flex" title="Remove admin" onClick={() => removeAdmin(username)}><i className="icon icon-cross2" /></button>
+                            <td className="my-px mx-2">{username}</td>
+                        </div>
+                    )}
+                </div>
             </div>
-        </div>
 
-        <div className="modal-section-body">
-            <div className="m-2 p-4 border-t border-gray-400">
-                <div className="font-bold text-3xl p-2">Add Roles</div>
-                <form onSubmit={e => { e.preventDefault(); addAdminRoleToUser() }} className="flex items-center">
+            <div className="m-2 p-4 py-1">
+                <form onSubmit={e => { e.preventDefault(); addAdmin() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
-                           placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
+                        placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
                     <input type="submit" value="ADD ADMIN" className="btn btn-primary" />
                 </form>
             </div>
@@ -128,7 +106,7 @@ const AdminSendBroadcast = () => {
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
 
     const sendBroadcast = () => {
-        websocket.broadcast(message, userProject.getUsername(), link, expiration);
+        websocket.broadcast(message, userProject.getUsername(), link, expiration)
         // always show success message, as we have no indication of failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
     }
@@ -140,12 +118,12 @@ const AdminSendBroadcast = () => {
                 <div className="font-bold text-3xl p-2">Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
                     <input type="text" className="m-2 w-10/12 form-control"
-                           placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
+                        placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
                     <div className="flex items-center">
                         <input type="text" className="m-2 w-1/4 form-control"
-                               placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
+                            placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
                         <input type="number" className="m-2 w-1/4 form-control"
-                               placeholder="Days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
+                            placeholder="Days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
                         <input type="submit" value="SEND" className="btn btn-primary" />
                     </div>
                 </form>
@@ -196,24 +174,24 @@ const AdminResetUserPassword = () => {
             <div className="m-2 p-4 border-t border-gray-400">
                 {passwordStatus.message && <div className={passwordStatus.style}>{passwordStatus.message}</div>}
                 <div className="font-bold text-3xl p-2">Password Change</div>
-                    <form onSubmit={e => {e.preventDefault(); searchUsers()}} className="flex items-center">
-                        <input type="text" className="m-2 w-1/4 form-control"
-                               placeholder="Username" required onChange={e => setUsername(e.target.value)} />
-                        <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
-                    </form>
-                    {userDetails.username.length > 0 && <form onSubmit={e => {e.preventDefault(); setPassword()}}>
-                        <div className="p-4">
-                            <div className="italic">Username: {userDetails.username}</div>
-                            <div className="italic">Email: {userDetails.email}</div>
-                        </div>
-                        <div className="flex items-center">
-                            <input type="password" className="m-2 w-1/4 form-control"
-                                   placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
-                            <input type="password" className="m-2 w-1/4 form-control"
-                                   placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
-                            <input type="submit" value="SET PASSWORD" className="btn btn-primary" />
-                        </div>
-                    </form>}
+                <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
+                    <input type="text" className="m-2 w-1/4 form-control"
+                        placeholder="Username" required onChange={e => setUsername(e.target.value)} />
+                    <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
+                </form>
+                {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>
+                    <div className="p-4">
+                        <div className="italic">Username: {userDetails.username}</div>
+                        <div className="italic">Email: {userDetails.email}</div>
+                    </div>
+                    <div className="flex items-center">
+                        <input type="password" className="m-2 w-1/4 form-control"
+                            placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
+                        <input type="password" className="m-2 w-1/4 form-control"
+                            placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
+                        <input type="submit" value="SET PASSWORD" className="btn btn-primary" />
+                    </div>
+                </form>}
             </div>
         </div>
     </>

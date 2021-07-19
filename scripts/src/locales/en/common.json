@@ -113,7 +113,7 @@
     "formFieldPlaceholder.emailOptional": "Email Address (Optional)",
     "formFieldPlaceholder.firstName": "First Name",
     "formFieldPlaceholder.lastName": "Last Name",
-    "formFieldPlaceholder.oldPassword": "Old password",
+    "formFieldPlaceholder.currentPassword": "Verify your current password",
     "formFieldPlaceholder.newPassword": "New password",
     "formFieldPlaceholder.confirmNewPassword": "Confirm new password",
     "formFieldPlaceholder.typeDescriptionHere": "Type description here",

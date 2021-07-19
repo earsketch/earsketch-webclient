@@ -306,9 +306,7 @@ function setup() {
     }
 }
 
-// TODO: Move to userState, and maybe get rid of firstname/lastname.
-let firstname = ""
-let lastname = ""
+// TODO: Move to userState.
 let email = ""
 
 // Defunct localStorage key that contained username and password
@@ -328,7 +326,7 @@ export const App = () => {
 
     const [username, setUsername] = useState(savedLoginInfo?.username ?? "")
     const [password, setPassword] = useState(savedLoginInfo?.password ?? "")
-    const [role, setRole] = useState("student")
+    const [isAdmin, setIsAdmin] = useState(false)
     const [loggedIn, setLoggedIn] = useState(false)
     const embedMode = useSelector(appState.selectEmbedMode)
 
@@ -430,22 +428,18 @@ export const App = () => {
         setUsername(username)
 
         // get user role (can verify the admin / teacher role here?)
-        if (userInfo.role) {
-            setRole(userInfo.role)
-            if (userInfo.role === "teacher") {
-                if (userInfo.firstname === "" || userInfo.lastname === "" || userInfo.email === "") {
-                    userNotification.show(i18n.t("messages:user.teachersLink"), "editProfile")
-                }
+        if (userInfo.isAdmin) {
+            setIsAdmin(true)
+            if (userInfo.email === "") {
+                userNotification.show(i18n.t("messages:user.teachersLink"), "editProfile")
             }
         } else {
-            setRole("student")
+            setIsAdmin(false)
         }
 
-        firstname = userInfo.firstname
-        lastname = userInfo.lastname
         email = userInfo.email
 
-        userNotification.user.role = userInfo.role
+        userNotification.user.isAdmin = userInfo.isAdmin
 
         // Retrieve the user scripts.
         await userProject.login(username)
@@ -494,10 +488,8 @@ export const App = () => {
         setLoggedIn(false)
 
         // User data
-        firstname = ""
-        lastname = ""
         email = ""
-        setRole("student")
+        setIsAdmin(false)
     }
 
     const createAccount = async () => {
@@ -510,10 +502,8 @@ export const App = () => {
 
     const editProfile = async () => {
         setShowNotifications(false)
-        const result = await openModal(ProfileEditor, { username, email, role, firstName: firstname, lastName: lastname })
+        const result = await openModal(ProfileEditor, { username, email })
         if (result !== undefined) {
-            firstname = result.firstName
-            lastname = result.lastName
             email = result.email
         }
     }
@@ -673,7 +663,7 @@ export const App = () => {
                         </Menu.Button>
                         <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                             {(loggedIn
-                                ? [{ name: t("editProfile"), action: editProfile }, ...(role === "admin" ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
+                                ? [{ name: t("editProfile"), action: editProfile }, ...(isAdmin ? [{ name: "Admin Window", action: openAdminWindow }] : []), { name: t("logout"), action: logout }]
                                 : [{ name: t("registerAccount"), action: createAccount }, { name: t("forgotPassword.title"), action: forgotPass }])
                                 .map(({ name, action }) =>
                                     <Menu.Item key={name}>
