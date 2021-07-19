@@ -9,6 +9,7 @@ import * as reader from "./reader"
 import * as userProject from "./userProject"
 
 import { Script } from "common"
+import { compile } from "./Autograder"
 
 // Calculate the complexity of a script as python or javascript based on the extension and return the complexity scores.
 const read = async (script: string, filename: string) => {
@@ -17,18 +18,6 @@ const read = async (script: string, filename: string) => {
         return reader.analyzePython(script)
     } else if (ext === ".js") {
         return reader.analyzeJavascript(script)
-    } else {
-        throw new Error("Invalid file extension " + ext)
-    }
-}
-
-// Compile a script as python or javascript based on the extension and return the compilation promise.
-const compile = async (script: string, filename: string) => {
-    const ext = ESUtils.parseExt(filename)
-    if (ext === ".py") {
-        return compiler.compilePython(script)
-    } else if (ext === ".js") {
-        return compiler.compileJavascript(script)
     } else {
         throw new Error("Invalid file extension " + ext)
     }
@@ -90,7 +79,6 @@ const download = (results: Result[]) => {
     const file = generateCSV(results)
     const a = document.createElement("a")
     document.body.appendChild(a)
-    // a.style = "display: none"
 
     const aFileParts = [file]
     const blob = new Blob(aFileParts, { type: "text/plain" })
@@ -101,7 +89,6 @@ const download = (results: Result[]) => {
     a.target = "_blank"
     esconsole("File location: " + a.href, ["debug", "exporter"])
     a.click()
-    // window.URL.revokeObjectURL(url)
 }
 
 const Upload = ({ processing, setResults, setProcessing }: { processing: string | null, setResults: (r: Result[]) => void, setProcessing: (p: string | null) => void }) => {
@@ -134,7 +121,6 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
         setProcessing(null)
 
         esconsole("Running code analyzer.", ["DEBUG"])
-        // const shareUrls = urls.split("\n")
         const re = /\?sharing=([^\s.,])+/g
         const matches = urls.match(re)
 

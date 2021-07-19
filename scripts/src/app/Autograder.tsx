@@ -19,7 +19,7 @@ const randomSeed = (seed: number, useSeed: boolean) => {
 }
 
 // Compile a script as python or javascript based on the extension and return the compilation promise.
-const compile = async (script: string, filename: string) => {
+export const compile = async (script: string, filename: string) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
         return compiler.compilePython(script)
