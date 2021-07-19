@@ -143,8 +143,15 @@ if (/\/codeAnalyzerCAI|codeAnalyzerContest\w*\/?$/.test(location.href)) {
     })
 } else {
     // Load the normal React app.
-    let Content = /\/autograder\w*\/?$/.test(location.href) ? Autograder : App
-    Content = /\/codeAnalyzer\w*\/?$/.test(location.href) ? CodeAnalyzer : Content
+    let Content 
+    if (/\/autograder\w*\/?$/.test(location.href)) { 
+        Content = Autograder
+    } else if (/\/codeAnalyzer\w*\/?$/.test(location.href)) {
+        Content = CodeAnalyzer
+    } else {
+        Content = App
+    }
+    
     ReactDOM.render(
         <React.StrictMode>
             <Provider store={store}>
