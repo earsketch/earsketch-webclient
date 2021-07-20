@@ -1,6 +1,6 @@
 ﻿// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
-export interface CodeFeatures {
+interface CodeFeatures {
     userFunc: number
     booleanConditionals: number
     conditionals: number

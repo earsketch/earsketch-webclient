@@ -72,10 +72,10 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script) => {
         let result
-        let report
         try {
+            // Run the script to check for errors.
             await compile(script.source_code, script.name)
-            report = await reader.analyze(ESUtils.parseLanguage(script.name), script.source_code)
+            const report = reader.analyze(ESUtils.parseLanguage(script.name), script.source_code)
             result = {
                 script: script,
                 reports: { "Code Complexity": { ...report } },
@@ -150,51 +150,55 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     </div>
 }
 
+const ResultPanel = ({ result }: { result: Result }) => {
+    return <div className="container">
+        <div className="panel panel-primary">
+            {result.script &&
+            <div className="panel-heading" style={{ overflow: "auto" }}>
+                {result.script.name &&
+                    <b> {result.script.username} ({result.script.name}) </b>
+                }
+                <div className="pull-right">{result.script.shareid}</div>
+            </div>
+            }
+            {result.error &&
+              <div className="panel-body text-danger">
+                  <b>{result.error}</b>
+              </div>
+            }
+            {result.reports &&
+            <div className="row" >
+                <div className="col-md-6">
+                    <ul>
+                        {Object.entries(result.reports).map(([name, report]) =>
+                            <li key={name}>
+                                {name}
+                                <table className="table">
+                                    <tbody>
+                                        {Object.entries(report).map(([key, value]) =>
+                                            <tr key={key}>
+                                                <th>{key}</th><td>{value}</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </li>
+                        )}
+                    </ul>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+}
+
 const Results = ({ results, processing }: { results: Result[], processing: string | null }) => {
     return <div>
         {results.length > 0 &&
           <ul>
               {results.map((result, index) =>
                   <li key={index}>
-                      <div className="container">
-                          <div className="panel panel-primary">
-                              {result.script &&
-                              <div className="panel-heading" style={{ overflow: "auto" }}>
-                                  {result.script.name &&
-                                      <b> {result.script.username} ({result.script.name}) </b>
-                                  }
-                                  <div className="pull-right">{result.script.shareid}</div>
-                              </div>
-                              }
-                              {result.error &&
-                                <div className="panel-body text-danger">
-                                    <b>{result.error}</b>
-                                </div>
-                              }
-                              {result.reports &&
-                              <div className="row" >
-                                  <div className="col-md-6">
-                                      <ul>
-                                          {Object.entries(result.reports).map(([name, report]) =>
-                                              <li key={name}>
-                                                  {name}
-                                                  <table className="table">
-                                                      <tbody>
-                                                          {Object.entries(report).map(([key, value]) =>
-                                                              <tr key={key}>
-                                                                  <th>{key}</th><td>{value}</td>
-                                                              </tr>
-                                                          )}
-                                                      </tbody>
-                                                  </table>
-                                              </li>
-                                          )}
-                                      </ul>
-                                  </div>
-                              </div>
-                              }
-                          </div>
-                      </div>
+                      <ResultPanel result={result}/>
                   </li>
               )}
           </ul>
