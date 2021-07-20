@@ -216,7 +216,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
         },
     })
 
-    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(c) === undefined)
+    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(interpreter.getScope().object, c) === undefined)
 
     const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
     for (const clip of clipData) {
