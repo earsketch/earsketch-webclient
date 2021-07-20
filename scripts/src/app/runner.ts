@@ -1,4 +1,6 @@
 // Run user scripts.
+import * as walk from "acorn-walk"
+
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
 import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
@@ -108,13 +110,15 @@ class NodeVisitor {
     }
 }
 
+const SOUND_CONSTANT_PATTERN = /^[A-Z0-9][A-Z0-9_]*$/
+
 class SoundConstantFinder extends NodeVisitor {
     constants: string[] = []
 
     visitName(node: any) {
         // If this identifier matches the naming scheme for sound constants, add it to the list.
         const name = node.id.v
-        if (/^[A-Z0-9][A-Z0-9_]*$/.test(name)) {
+        if (SOUND_CONSTANT_PATTERN.test(name)) {
             this.constants.push(name)
         }
     }
@@ -201,8 +205,18 @@ export async function runPython(code: string) {
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsJS(code: string, interpreter: any) {
-    // TODO: Next commit!
-    const possibleSoundConstants = [] as string[]
+    const constants: string[] = []
+
+    walk.simple(acorn.parse(code), {
+        Identifier(node: any) {
+            if (SOUND_CONSTANT_PATTERN.test(node.name)) {
+                constants.push(node.name)
+            }
+        },
+    })
+
+    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(c) === undefined)
+
     const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
     for (const clip of clipData) {
         if (clip) {
