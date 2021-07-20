@@ -4,20 +4,20 @@
 
 // If your API function needs to be asynchronous, make sure it returns a
 // promise, and use suspendPassthrough() in the Javascript and Python wrappers.
+import i18n from "i18next"
 
 import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
-import * as compiler from "../app/runner"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
 import { Clip, DAWData, EffectRange, Track } from "../app/player"
 import { measureToTime } from "../esutils"
+import * as runner from "../app/runner"
 import * as userProject from "../app/userProject"
-import i18n from "i18next"
 
 class ValueError extends Error {
     constructor(message: string | undefined) {
@@ -469,7 +469,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         }
     }
 
-    return compiler.loadBuffersForSampleSlicing(result)
+    return runner.loadBuffersForSampleSlicing(result)
         .then(newResult => audioLibrary.getAudioClip(audioFile, newResult.tempo))
         .then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo))
 }
@@ -516,7 +516,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     }
 
     const tempo = result.tempo
-    return compiler.loadBuffersForSampleSlicing(result)
+    return runner.loadBuffersForSampleSlicing(result)
         .then(newResult => audioLibrary.getAudioClip(audioFile, newResult.tempo))
         .then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo, startTime, endTime))
 }
@@ -554,7 +554,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         length: result.length,
         slicedClips: result.slicedClips,
     }
-    return compiler.postRun(analyzeResult as any).then((compiled: DAWData) => {
+    return runner.postRun(analyzeResult as any).then((compiled: DAWData) => {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -622,7 +622,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         slicedClips: result.slicedClips,
     }
 
-    return compiler.postRun(analyzeResult as any).then((compiled: DAWData) => {
+    return runner.postRun(analyzeResult as any).then((compiled: DAWData) => {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -1242,7 +1242,7 @@ const ptCheckAudioSliceRange = (result: DAWData, fileKey: string, startTime: num
     // `dur` returns a promise, so `dur + 1` yields "[object Promise]1".
     // Compared against a number (endTime), this always returns false,
     // and the error never gets thrown.
-    // Instead the error gets caught in compiler's `sliceAudioBufferByMeasure`.
+    // Instead the error gets caught in runner's `sliceAudioBufferByMeasure`.
     // (The brokenness was discovered via TypeScript migration of audiolibrary.)
     const clipDuration = dur(result, fileKey) as unknown as number
     if (endTime > clipDuration + 1) {

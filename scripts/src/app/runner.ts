@@ -1,4 +1,5 @@
 // Run user scripts.
+import * as acorn from "acorn"
 import * as walk from "acorn-walk"
 
 import audioContext from "./audiocontext"

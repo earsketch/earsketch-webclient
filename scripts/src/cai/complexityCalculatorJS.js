@@ -1,4 +1,6 @@
-﻿import * as ccState from './complexityCalculatorState';
+﻿import * as acorn from "acorn"
+
+import * as ccState from './complexityCalculatorState';
 import * as caiErrorHandling from './errorHandling';
 import * as ccHelpers from './complexityCalculatorHelperFunctions';
 import * as cc from './complexityCalculator';

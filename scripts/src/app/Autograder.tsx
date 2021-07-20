@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
 import * as ace from "ace-builds"
 
-import * as compiler from "./runner"
+import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
 import { DAWData, Clip, EffectRange } from "./player"
-import { ModalContainer } from "./App"
+import * as runner from "./runner"
 
 // overwrite userConsole javascript prompt with a hijackable one
 const nativePrompt = (window as any).esPrompt
@@ -22,9 +22,9 @@ const randomSeed = (seed: number, useSeed: boolean) => {
 export const compile = async (script: string, filename: string) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
-        return compiler.runPython(script)
+        return runner.runPython(script)
     } else if (ext === ".js") {
-        return compiler.runJavaScript(script)
+        return runner.runJavaScript(script)
     } else {
         throw new Error("Invalid file extension " + ext)
     }

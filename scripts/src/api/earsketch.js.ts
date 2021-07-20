@@ -29,7 +29,7 @@ export function remapToNativeJs(v: any): any {
 }
 
 // This defines an init function for JS-Interpreter.
-// These functions will be injected into the interpreter by the compiler.
+// These functions will be injected into the interpreter by the runner.
 export default function setupAPI(interpreter: any, scope: any) {
     interpreter.setProperty(scope, "MIX_TRACK", (0))
     // Deprecated MASTER_TRACK alias for MIX_TRACK

@@ -6,7 +6,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 
 // Preliminary type declarations
-// TODO: Move some to compiler?
+// TODO: Move some to runner?
 export interface Pitchshift {
     audio: AudioBuffer
     start: number
@@ -45,7 +45,7 @@ export type Effect = EffectRange[] & { bypass?: boolean }
 
 export interface Track {
     clips: Clip[]
-    effects: {[key: string]: Effect}
+    effects: { [key: string]: Effect }
     analyser: AnalyserNode
     label?: string | number
     visible?: boolean
@@ -560,7 +560,7 @@ export const setMutedTracks = (_mutedTracks: number[]) => {
     }
 }
 
-export const setBypassedEffects = (_bypassedEffects: {[key: number]: string[]}) => {
+export const setBypassedEffects = (_bypassedEffects: { [key: number]: string[] }) => {
     bypassedEffects = _bypassedEffects
 
     if (isPlaying) {

@@ -1,4 +1,5 @@
 ﻿// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
+import * as acorn from "acorn"
 
 interface CodeFeatures {
     userFunc: number

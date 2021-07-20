@@ -8,7 +8,6 @@ declare const SITE_BASE_URI: string
 declare const BUILD_NUM: string
 declare const FLAGS: any
 
-declare const acorn: any
 declare const app: any
 declare const difflib: any
 declare const diffview: any
@@ -28,7 +27,7 @@ declare const Sk: any
 
 declare module "xml2js"
 declare module "chance"
-declare var $: any
+declare const $: any
 
 declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any

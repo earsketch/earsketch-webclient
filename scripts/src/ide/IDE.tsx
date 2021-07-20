@@ -8,9 +8,10 @@ import * as appState from "../app/appState"
 import { Browser } from "../browser/Browser"
 import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
+import * as cai from "../cai/caiState"
+import * as caiAnalysis from "../cai/analysis"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
-import * as compiler from "../app/runner"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { DAW, setDAWData } from "../daw/DAW"
@@ -24,12 +25,11 @@ import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
 import reporter from "../app/reporter"
-import * as tabs from "./tabState"
-import * as cai from "../cai/caiState"
-import * as caiAnalysis from "../cai/analysis"
+import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
 import store from "../reducers"
 import { Tabs } from "./Tabs"
+import * as tabs from "./tabState"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
@@ -268,7 +268,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? compiler.runPython : compiler.runJavaScript)(editor.getValue())
+        result = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
