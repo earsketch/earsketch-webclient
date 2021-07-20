@@ -1,6 +1,7 @@
+/* eslint-disable new-cap */
 // EarSketch API: Python
 import * as ES_PASSTHROUGH from "./passthrough"
-import * as userConsole from "../ide/console"
+import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
 
 // NOTE: We could just build this once and expose the module directly,
 // but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.
@@ -23,7 +24,7 @@ export function setupAPI() {
     // Function to initialize a new script in EarSketch.
     // Resets the global result variable to the default value.
     mod.init = new Sk.builtin.func(() => {
-        mod.__ES_RESULT = callPassthrough("init", Sk.builtins["__AUDIO_QUALITY"])
+        mod.__ES_RESULT = callPassthrough("init", Sk.builtins.__AUDIO_QUALITY)
     })
 
     const passthroughList = ["setTempo", "finish", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
@@ -121,14 +122,19 @@ export function setupAPI() {
     }
 
     function builtinRead(x: string) {
-        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) {
-            throw "File not found: '" + x + "'"
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles.files[x] === undefined) {
+            throw new Error(`File not found: '${x}'`)
         }
-        return Sk.builtinFiles["files"][x]
+        return Sk.builtinFiles.files[x]
     }
 
     Sk.pre = "output"
     Sk.configure({ output: outf, read: builtinRead })
+
+    // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
+    for (const constant of EFFECT_TAGS.concat(ANALYSIS_TAGS)) {
+        Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
+    }
 }
 
 export default setupAPI

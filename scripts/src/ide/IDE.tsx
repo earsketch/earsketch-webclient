@@ -10,7 +10,7 @@ import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
-import * as compiler from "../app/compiler"
+import * as compiler from "../app/runner"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { DAW, setDAWData } from "../daw/DAW"
@@ -268,7 +268,7 @@ export async function compileCode() {
 
     let result: DAWData
     try {
-        result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(editor.getValue())
+        result = await (language === "python" ? compiler.runPython : compiler.runJavaScript)(editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])

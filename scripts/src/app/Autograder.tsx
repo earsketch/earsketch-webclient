@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react"
 import { Chance } from "chance"
 import * as ace from "ace-builds"
 
-import * as compiler from "./compiler"
+import * as compiler from "./runner"
 import * as ESUtils from "../esutils"
 import { DAWData, Clip, EffectRange } from "./player"
 import { ModalContainer } from "./App"
@@ -22,9 +22,9 @@ const randomSeed = (seed: number, useSeed: boolean) => {
 export const compile = async (script: string, filename: string) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
-        return compiler.compilePython(script)
+        return compiler.runPython(script)
     } else if (ext === ".js") {
-        return compiler.compileJavascript(script)
+        return compiler.runJavaScript(script)
     } else {
         throw new Error("Invalid file extension " + ext)
     }

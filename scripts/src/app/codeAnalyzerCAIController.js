@@ -1,4 +1,4 @@
-import * as compiler from './compiler'
+import * as compiler from './runner'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
 import * as userConsole from '../ide/console'
@@ -75,9 +75,9 @@ function($scope) {
     $scope.compile = function(script, filename) {
         var ext = ESUtils.parseExt(filename);
         if (ext == '.py') {
-            return compiler.compilePython(script, $scope.quality);
+            return compiler.runPython(script, $scope.quality);
         } else if (ext == '.js') {
-            return compiler.compileJavascript(script, $scope.quality);
+            return compiler.runJavaScript(script, $scope.quality);
         } else {
           return new Promise(function(accept, reject) {
             reject("Invalid file extension " + ext);
@@ -327,4 +327,3 @@ function($scope) {
 
 
 }]);
-

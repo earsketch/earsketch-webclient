@@ -9,7 +9,7 @@ import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
-import * as compiler from "../app/compiler"
+import * as compiler from "../app/runner"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
@@ -554,7 +554,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         length: result.length,
         slicedClips: result.slicedClips,
     }
-    return compiler.postCompile(analyzeResult as any).then((compiled: DAWData) => {
+    return compiler.postRun(analyzeResult as any).then((compiled: DAWData) => {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -622,7 +622,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         slicedClips: result.slicedClips,
     }
 
-    return compiler.postCompile(analyzeResult as any).then((compiled: DAWData) => {
+    return compiler.postRun(analyzeResult as any).then((compiled: DAWData) => {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
@@ -794,9 +794,7 @@ export function println(result: DAWData, msg: string) {
     const args = [...arguments].slice(1)
     ptCheckArgs("println", args, 1, 1)
 
-    if (!compiler.testRun) {
-        userConsole.log(msg)
-    }
+    userConsole.log(msg)
 }
 
 // Prompt for user input.
@@ -1209,7 +1207,7 @@ const ptCheckFilekeyType = (filekey: string) => {
     }
 }
 
-const ptCheckRange = (name: string, arg: number, min: number | {min?: number, max?: number}, max: number | undefined = undefined) => {
+const ptCheckRange = (name: string, arg: number, min: number | { min?: number, max?: number }, max: number | undefined = undefined) => {
     if (typeof min === "number" && typeof max === "number") {
         if (arg < min || arg > max) {
             throw new TypeError(name + " exceeds the allowed range of " + min + " to " + max)

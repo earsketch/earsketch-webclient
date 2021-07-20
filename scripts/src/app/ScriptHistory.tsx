@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import * as collaboration from "./collaboration"
 import { Script } from "common"
-import * as compiler from "./compiler"
+import * as compiler from "./runner"
 import * as ESUtils from "../esutils"
 import reporter from "./reporter"
 import * as tabs from "../ide/tabState"
@@ -104,7 +104,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
         setCompiledResult(null)
         setActive(index)
         const language = ESUtils.parseLanguage(script.name)
-        const result = await (language === "python" ? compiler.compilePython : compiler.compileJavascript)(history[index].source_code)
+        const result = await (language === "python" ? compiler.runPython : compiler.runJavaScript)(history[index].source_code)
         // TODO: Looks like the embedded DAW was at some point intended to be independent.
         // For now, we just update the result in the outer DAW (which the embedded DAW mirrors).
         setDAWData(result)

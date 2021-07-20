@@ -1,4 +1,4 @@
-// Compile user scripts.
+// Run user scripts.
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
 import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
@@ -11,26 +11,23 @@ import { Clip, DAWData, Track } from "./player"
 import { AugmentedBuffer } from "./audiolibrary"
 import i18n from "i18next"
 
-export let testRun = false
-
-// After compiling code, go through each clip, load the audio file and
+// After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know
-// the length of each audio clip until after compiling (unless we
-// loaded the clips before compiling and did this during compilation, but
-// that's harder.) Follow up with pitchshifting and setting the result
-// length.
-export async function postCompile(result: DAWData) {
-    esconsole("Compiling finishing. Loading audio buffers...", ["debug", "compiler"])
+// the length of each audio clip until after running (unless we
+// loaded the clips beforehand and did this at runtime, but that's
+// harder.) Follow up with pitchshifting and setting the result length.
+export async function postRun(result: DAWData) {
+    esconsole("Execution finished. Loading audio buffers...", ["debug", "runner"])
     // NOTE: We used to check if `finish()` was called (by looking at result.finish) and throw an error if not.
     // However, since `finish()` doesn't actually do anything (other than set this flag), we no longer check.
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
-    esconsole("Loading buffers.", ["debug", "compiler"])
+    esconsole("Loading buffers.", ["debug", "runner"])
     result = await loadBuffersForSampleSlicing(result)
     // STEP 2: Load audio buffers needed for the result.
     const buffers = await loadBuffers(result)
-    esconsole("Filling in looped sounds.", ["debug", "compiler"])
+    esconsole("Filling in looped sounds.", ["debug", "runner"])
     // STEP 3: Insert buffers into clips and fix clip loops/effect lengths.
     // before fixing the clips, retrieve the clip tempo info from the metadata cache for a special treatment for the MAKEBEAT clips
     result = fixClips(getClipTempo(result), buffers)
@@ -38,19 +35,19 @@ export async function postCompile(result: DAWData) {
     checkOverlaps(result)
     checkEffects(result)
     // STEP 5: Pitchshift tracks that need it.
-    esconsole("Handling pitchshifted tracks.", ["debug", "compiler"])
+    esconsole("Handling pitchshifted tracks.", ["debug", "runner"])
     result = await handlePitchshift(result)
     // STEP 6: Insert metronome as the last track.
-    esconsole("Adding metronome track.", ["debug", "compiler"])
+    esconsole("Adding metronome track.", ["debug", "runner"])
     result = await addMetronome(result)
-    // STEP 7: Print out string for unit tests, return the post-compiled result.
-    esconsole(ESUtils.formatResultForTests(result), ["nolog", "compiler"])
+    // STEP 7: Print out string for unit tests, return the result.
+    esconsole(ESUtils.formatResultForTests(result), ["nolog", "runner"])
     return result
 }
 
 // Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
 async function handlePitchshift(result: DAWData) {
-    esconsole("Begin pitchshifting.", ["debug", "compiler"])
+    esconsole("Begin pitchshifting.", ["debug", "runner"])
 
     if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
         userConsole.status("Applying PITCHSHIFT on audio clips")
@@ -64,16 +61,84 @@ async function handlePitchshift(result: DAWData) {
                 userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
             }
         }
-        esconsole("Pitchshifting promise resolved.", ["debug", "compiler"])
+        esconsole("Pitchshifting promise resolved.", ["debug", "runner"])
         return result
     } catch (err) {
-        esconsole(err, ["error", "compiler"])
+        esconsole(err, ["error", "runner"])
         throw err
     }
 }
 
-// Compile a python script.
-export function compilePython(code: string) {
+// Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
+const iterFields = (node: any) => {
+    // Return a list of values for each field in `node._fields` that is present on `node`.
+    // Notice we skip every other field, since the odd elements are accessor functions.
+    const valueList = []
+    for (let i = 0; i < node._fields.length; i += 2) {
+        const field = node._fields[i]
+        if (field in node) {
+            valueList.push(node[field])
+        }
+    }
+    return valueList
+}
+
+class NodeVisitor {
+    // Visit a node.
+    visit(node: any) {
+        const methodName = `visit${node._astname}`
+        const visitor: Function = (this as any)[methodName] ?? this.genericVisit
+        return visitor.apply(this, [node])
+    }
+
+    // Called if no explicit visitor function exists for a node.
+    genericVisit(node: any) {
+        const fieldList = iterFields(node)
+        for (const value of Object.values(fieldList)) {
+            if (Array.isArray(value)) {
+                for (const subvalue of value) {
+                    if (subvalue._astname !== undefined) {
+                        this.visit(subvalue)
+                    }
+                }
+            } else if (value?._astname !== undefined) {
+                this.visit(value)
+            }
+        }
+    }
+}
+
+class SoundConstantFinder extends NodeVisitor {
+    constants: string[] = []
+
+    visitName(node: any) {
+        // If this identifier matches the naming scheme for sound constants, add it to the list.
+        const name = node.id.v
+        if (/^[A-Z0-9][A-Z0-9_]*$/.test(name)) {
+            this.constants.push(name)
+        }
+    }
+}
+
+// Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
+async function handleSoundConstantsPY(code: string) {
+    esconsole("Iterating through undefined variable names.")
+
+    const finder = new SoundConstantFinder()
+    const parse = Sk.parse("<analyzer>", code)
+    finder.visit(Sk.astFromParse(parse.cst, "<analyzer>", parse.flags))
+    const possibleSoundConstants = finder.constants.filter(c => Sk.builtins[c] === undefined)
+
+    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
+    for (const clip of clipData) {
+        if (clip) {
+            Sk.builtins[clip.file_key] = Sk.ffi.remapToPy(clip.file_key)
+        }
+    }
+}
+
+// Run a python script.
+export async function runPython(code: string) {
     Sk.dateSet = false
     Sk.filesLoaded = false
     // Added to reset imports
@@ -82,64 +147,8 @@ export function compilePython(code: string) {
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
-
-    return importPython(code)
-}
-
-function runPythonCode(code: string) {
-    Sk.resetCompiler()
     setupPythonAPI()
-    return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
-}
 
-// Attempts evaluating and replacing undefined names with a placeholder until the actual evaluation later.
-// TODO: This probably does not need to be recursive.
-function recursiveNameCheckPY(code: string, undefinedNames: string[]): string[] {
-    try {
-        testRun = true
-        runPythonCode(code)
-    } catch (e) {
-        if (e.tp$name && e.tp$name === "NameError") {
-            const undefinedName = e.toString().split("'")[1]
-
-            // Create a dummy constant and repeat.
-            Sk.builtins[undefinedName] = Sk.ffi.remapToPy(undefinedName)
-
-            if (!undefinedNames.includes(undefinedName)) {
-                undefinedNames.push(undefinedName)
-                return recursiveNameCheckPY(code, undefinedNames)
-            }
-        }
-    } finally {
-        testRun = false
-    }
-    return undefinedNames
-}
-
-// Collects user-defined names (e.g., audio clips) for later verificaiton. The lines containing readInput, etc. API are skipped, as they should not be evaluated until the actual compilation.
-async function handleUndefinedNamesPY(code: string) {
-    esconsole("Iterating through undefined variable names.")
-
-    const undefinedNames = recursiveNameCheckPY(code, [])
-    for (const name of undefinedNames) {
-        delete Sk.builtins[name]
-    }
-
-    Sk.resetCompiler()
-
-    const clipData = await Promise.all(undefinedNames.map(audioLibrary.verifyClip))
-    for (const clip of clipData) {
-        if (clip) {
-            Sk.builtins[clip.file_key] = Sk.ffi.remapToPy(clip.file_key)
-        }
-    }
-}
-
-// Imports the given python code into Skulpt as the __main__ module. Doesn't
-// reset the compiler though so it can be run inside another compiled
-// Python script (i.e., in the autograder.) For most use cases you should use
-// compilePython() instead and ignore this function.
-export async function importPython(code: string) {
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
     // eslint-disable-next-line new-cap
@@ -151,52 +160,27 @@ export async function importPython(code: string) {
         throw new Error("finish()" + i18n.t("messages:interpreter.noimport"))
     })
 
-    // A temporary switch for disabling the lazy evaluation of undefined names. analyze~ methods may be possibly excluded from the escape list, but they might have unexpected behaviors when combined with conditionals.
-    const escapeWords = /readInput|raw_input|input|import random|analyzeTrackForTime|analyzeTrack|analyzeForTime|analyze|dur/
-    const bypassOptimization = !FLAGS.LAZY_SCRIPT_COMPILER || escapeWords.test(code)
-    esconsole("Using lazy name loading: " + !bypassOptimization, ["compiler", "debug"])
-    const getTagsFn = bypassOptimization ? audioLibrary.getAllTags : audioLibrary.getDefaultTags
+    // STEP 1: Handle use of audio constants.
+    await handleSoundConstantsPY(code)
 
-    if (!bypassOptimization) {
-        await handleUndefinedNamesPY(code)
-    }
     const lines = code.match(/\n/g) ? code.match(/\n/g)!.length + 1 : 1
-    esconsole("Compiling " + lines + " lines of Python", ["debug", "compiler"])
+    esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
     // printing for unit tests
-    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "compiler"])
+    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "runner"])
 
-    // STEP 1: get a list of constants from the server and inject them into the skulpt list of builtins
-    let tags
-    try {
-        tags = await getTagsFn()
-    } catch (err) {
-        esconsole(err, ["error", "compiler"])
-        throw new Error("Failed to load audio tags from the server.")
-    }
-    esconsole("Finished fetching audio tags", ["debug", "compiler"])
-    // after loading audio tags, compile the script
-
-    // inject audio constants into the skulpt builtin globals
-    // TODO: come up with a proper solution for doing this in Skulpt
-    // https://groups.google.com/forum/#!topic/skulpt/6C_TnxnP8P0
-    for (const tag of tags) {
-        if (!(tag in Sk.builtins)) {
-            Sk.builtins[tag] = Sk.ffi.remapToPy(tag)
-        }
-    }
-
-    // STEP 2: compile python code using Skulpt
-    esconsole("Compiling script using Skulpt.", ["debug", "compiler"])
+    // STEP 2: Run Python code using Skulpt.
+    esconsole("Running script using Skulpt.", ["debug", "runner"])
     const mod = await Sk.misceval.asyncToPromise(() => {
         try {
-            return runPythonCode(code)
+            return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
         } catch (err) {
-            esconsole(err, ["error", "compiler"])
+            esconsole(err, ["error", "runner"])
             throw err
         }
     })
-    esconsole("Compiling finished. Extracting result.", ["debug", "compiler"])
+    esconsole("Execution finished. Extracting result.", ["debug", "runner"])
 
+    // STEP 3: Extract result.
     let result
     if (mod.$d.earsketch && mod.$d.earsketch.$d._getResult) {
         // case: import earsketch
@@ -207,44 +191,19 @@ export async function importPython(code: string) {
     } else {
         throw new ReferenceError("Something went wrong. Skulpt did not provide the expected output.")
     }
-    // STEP 4: Perform post-compilation steps on the result object
-    esconsole("Performing post-compilation steps.", ["debug", "compiler"])
-    result = await postCompile(result)
+    // STEP 4: Perform post-execution steps on the result object
+    esconsole("Performing post-execution steps.", ["debug", "runner"])
+    result = await postRun(result)
     // STEP 5: finally return the result
-    esconsole("Post-compilation steps finished. Return result.", ["debug", "compiler"])
+    esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
     return result
 }
 
-// The functions `recursiveNameCheckJS`, `handleUndefinedNamesJS`, and `createJSInterpreter` were introduced
-// to check the validity of code structure while skipping unknown names (e.g., user-defined audio clips) for later verification at compilation.
-// The JS version uses a duplicate "sub" interpreter as the state of main interpreter seems not resettable.
-// TODO: This probably does not need to be recursive.
-async function recursiveNameCheckJS(code: string, undefinedNames: string[], tags: string[]): Promise<string[]> {
-    const interpreter = createJsInterpreter(code, tags)
-    for (const name of undefinedNames) {
-        interpreter.setProperty(interpreter.getScope().object, name, name)
-    }
-    try {
-        testRun = true
-        await runJsInterpreter(interpreter)
-    } catch (e) {
-        if (e instanceof ReferenceError) {
-            const name = e.message.replace(" is not defined", "")
-            // interpreter.setProperty(scope, name, name)
-            undefinedNames.push(name)
-            return recursiveNameCheckJS(code, undefinedNames, tags)
-        }
-    } finally {
-        testRun = false
-    }
-    return undefinedNames
-}
-
-async function handleUndefinedNamesJS(code: string, interpreter: any, tags: string[]) {
-    esconsole("Iterating through undefined variable names.", ["compiler", "debug"])
-
-    const undefinedNames = await recursiveNameCheckJS(code, [], tags)
-    const clipData = await Promise.all(undefinedNames.map(audioLibrary.verifyClip))
+// Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
+async function handleSoundConstantsJS(code: string, interpreter: any) {
+    // TODO: Next commit!
+    const possibleSoundConstants = [] as string[]
+    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
     for (const clip of clipData) {
         if (clip) {
             interpreter.setProperty(interpreter.getScope().object, clip.file_key, clip.file_key)
@@ -252,7 +211,7 @@ async function handleUndefinedNamesJS(code: string, interpreter: any, tags: stri
     }
 }
 
-function createJsInterpreter(code: string, tags: string[]) {
+function createJsInterpreter(code: string) {
     let interpreter
     try {
         interpreter = new Interpreter(code, setupJavascriptAPI)
@@ -265,69 +224,28 @@ function createJsInterpreter(code: string, tags: string[]) {
         throw e
     }
 
-    // inject audio constants into the interpreter scope
-    for (const tag of tags) {
-        interpreter.setProperty(interpreter.getScope().object, tag, tag)
-    }
-
     return interpreter
 }
 
 // Compile a javascript script.
-export async function compileJavascript(code: string) {
+export async function runJavaScript(code: string) {
     // printing for unit tests
-    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "compiler"])
+    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "runner"])
 
-    // A temporary switch for disabling the lazy evaluation of undefined names.
-    // TODO: Update this if we remove `prompt`, which is currently an alias for `readInput` in the JS API.
-    const escapeWords = /Math\.random|readInput|prompt|analyzeTrackForTime|analyzeTrack|analyzeForTime|analyze|dur/
-    const bypassOptimization = !FLAGS.LAZY_SCRIPT_COMPILER || escapeWords.test(code)
-    esconsole("Using lazy name loading: " + !bypassOptimization, ["compiler", "debug"])
-    const getTagsFn = bypassOptimization ? audioLibrary.getAllTags : audioLibrary.getDefaultTags
+    esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
 
-    const tags = await getTagsFn()
-    // after loading audio tags, compile the script
-    esconsole("Finished fetching audio tags", ["debug", "compiler"])
-    esconsole("Compiling script using JS-Interpreter.", ["debug", "compiler"])
-
+    const mainInterpreter = createJsInterpreter(code)
+    await handleSoundConstantsJS(code, mainInterpreter)
     let result
-    if (bypassOptimization) {
-        let interpreter
-        try {
-            interpreter = new Interpreter(code, setupJavascriptAPI)
-        } catch (err) {
-            if (err.loc !== undefined) {
-                // acorn provides line numbers for syntax errors
-                err.message += " on line " + err.loc.line
-                err.lineNumber = err.loc.line
-            }
-            throw err
-        }
-
-        // inject audio constants into the interpreter scope
-        for (const tag of tags) {
-            interpreter.setProperty(interpreter.getScope().object, tag, tag)
-        }
-
-        try {
-            result = await runJsInterpreter(interpreter)
-        } catch (err) {
-            const lineNumber = getLineNumber(interpreter, code, err)
-            throwErrorWithLineNumber(err, lineNumber as number)
-        }
-    } else {
-        const mainInterpreter = createJsInterpreter(code, tags)
-        await handleUndefinedNamesJS(code, mainInterpreter, tags)
-        try {
-            result = await runJsInterpreter(mainInterpreter)
-        } catch (err) {
-            const lineNumber = getLineNumber(mainInterpreter, code, err)
-            throwErrorWithLineNumber(err, lineNumber as number)
-        }
+    try {
+        result = await runJsInterpreter(mainInterpreter)
+    } catch (err) {
+        const lineNumber = getLineNumber(mainInterpreter, code, err)
+        throwErrorWithLineNumber(err, lineNumber as number)
     }
-    esconsole("Performing post-compilation steps.", ["debug", "compiler"])
-    const finalResult = postCompile(result)
-    esconsole("Post-compilation steps finished. Return result.", ["debug", "compiler"])
+    esconsole("Performing post-execution steps.", ["debug", "runner"])
+    const finalResult = postRun(result)
+    esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
     return finalResult
 }
 
@@ -349,7 +267,7 @@ async function runJsInterpreter(interpreter: any) {
     if (result === undefined) {
         throw new EvalError("Missing call to init() or something went wrong.")
     }
-    esconsole("Compiling finished. Extracting result.", ["debug", "compiler"])
+    esconsole("Execution finished. Extracting result.", ["debug", "runner"])
     return remapToNativeJs(result)
 }
 
@@ -616,7 +534,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
     return result
 }
 
-// Warn users when a clips overlap each other. Done in post-compile because
+// Warn users when a clips overlap each other. Done after execution because
 // we don't know the length of clips until then.
 function checkOverlaps(result: DAWData) {
     const truncateDigits = 5 // workaround for precision errors
@@ -633,12 +551,12 @@ function checkOverlaps(result: DAWData) {
                 const siblingLeft = sibling.measure
                 const siblingRight = sibling.measure + ESUtils.truncate(sibling.end - sibling.start, truncateDigits)
                 if (clipLeft >= siblingLeft && clipLeft < (siblingRight - margin)) {
-                    esconsole([clip, sibling], "compiler")
+                    esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
                     track.clips.splice(j, 1)
                 } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
-                    esconsole([clip, sibling], "compiler")
+                    esconsole([clip, sibling], "runner")
                     userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
                     track.clips.splice(k, 1)
@@ -648,7 +566,7 @@ function checkOverlaps(result: DAWData) {
     }
 }
 
-// Warn users when a track contains effects, but no audio. Done in post-compile
+// Warn users when a track contains effects, but no audio. Done after execution
 // because we don't know if there are audio samples on the entire track
 // until then. (Moved from passthrough.js)
 function checkEffects(result: DAWData) {

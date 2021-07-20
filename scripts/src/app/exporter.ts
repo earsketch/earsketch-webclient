@@ -1,7 +1,7 @@
 // Export a script as text, audio file, or zip full of audio files.
 // Also supports printing scripts and uploading to SoundCloud (which is perplexing because we have another moduled named "uploader").
 import { Script } from "common"
-import * as compiler from "./compiler"
+import * as compiler from "./runner"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { DAWData } from "./player"
@@ -33,7 +33,7 @@ async function compile(script: Script) {
     const lang = ESUtils.parseLanguage(script.name)
     let result
     try {
-        result = await (lang === "python" ? compiler.compilePython : compiler.compileJavascript)(script.source_code)
+        result = await (lang === "python" ? compiler.runPython : compiler.runJavaScript)(script.source_code)
     } catch {
         throw i18n.t("messages:download.compileerror")
     }
