@@ -9,23 +9,12 @@ import * as userProject from "./userProject"
 
 import { Script } from "common"
 import { compile } from "./Autograder"
-
-// Calculate the complexity of a script as python or javascript based on the extension and return the complexity scores.
-const read = async (script: string, filename: string) => {
-    const ext = ESUtils.parseExt(filename)
-    if (ext === ".py") {
-        return reader.analyzePython(script)
-    } else if (ext === ".js") {
-        return reader.analyzeJavascript(script)
-    } else {
-        throw new Error("Invalid file extension " + ext)
-    }
-}
+import * as exporter from "./exporter"
 
 const generateCSV = (results: Result[]) => {
     const headers = ["username", "script_name", "shareid", "error"]
-    const rows: any = []
-    const colMap: any = {}
+    const rows: string[] = []
+    const colMap: { [key: string]: { [key: string]: number } } = {}
 
     for (const result of results) {
         if (result.reports) {
@@ -55,12 +44,9 @@ const generateCSV = (results: Result[]) => {
             row[2] = result.script.shareid
         }
         if (result.error) {
-            if (result.error.nativeError) {
-                row[3] = result.error.nativeError.v + " on line " + result.error.traceback[0].lineno
-            } else {
-                row[3] = result.error
-            }
-        } else if (result.reports) {
+            row[3] = result.error
+        }
+        if (result.reports) {
             for (const name of Object.keys(result.reports)) {
                 const report = result.reports[name]
                 for (const key of Object.keys(report)) {
@@ -76,18 +62,8 @@ const generateCSV = (results: Result[]) => {
 
 const download = (results: Result[]) => {
     const file = generateCSV(results)
-    const a = document.createElement("a")
-    document.body.appendChild(a)
-
-    const aFileParts = [file]
-    const blob = new Blob(aFileParts, { type: "text/plain" })
-    const url = window.URL.createObjectURL(blob)
-    // download the script
-    a.href = url
-    a.download = "code_analyzer_report.csv"
-    a.target = "_blank"
-    esconsole("File location: " + a.href, ["debug", "exporter"])
-    a.click()
+    const blob = new Blob([file], { type: "text/plain" })
+    exporter.download("code_analyzer_report.csv", blob)
 }
 
 const Upload = ({ processing, setResults, setProcessing }: { processing: string | null, setResults: (r: Result[]) => void, setProcessing: (p: string | null) => void }) => {
@@ -99,15 +75,15 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
         let report
         try {
             await compile(script.source_code, script.name)
-            report = await read(script.source_code, script.name)
+            report = await reader.analyze(ESUtils.parseLanguage(script.name), script.source_code)
             result = {
                 script: script,
-                reports: { "Code Complexity": report },
+                reports: { "Code Complexity": report as any },
             }
         } catch (err) {
             result = {
                 script: script,
-                error: err,
+                error: err.args.v[0].v + " on line " + err.traceback[0].lineno,
             }
         }
         setProcessing(null)
@@ -140,7 +116,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
             if (!script) {
                 const result = {
                     script: { username: "", shareid: shareId } as Script,
-                    error: { message: "Script not found." },
+                    error: "Script not found.",
                 }
                 results.push(result)
                 setResults(results)
@@ -183,42 +159,39 @@ const Results = ({ results, processing }: { results: Result[], processing: strin
                       <div className="container">
                           <div className="panel panel-primary">
                               {result.script &&
-                            <div className="panel-heading">
-                                <b>{result.script.username}</b> ({result.script.name})
-                                <div className="pull-right">{result.script.shareid}</div>
-                            </div>
+                              <div className="panel-heading" style={{ overflow: "auto" }}>
+                                  {result.script.name &&
+                                      <b> {result.script.username} ({result.script.name}) </b>
+                                  }
+                                  <div className="pull-right">{result.script.shareid}</div>
+                              </div>
                               }
-                              {result.error && result.error.args && result.error.traceback &&
+                              {result.error &&
                                 <div className="panel-body text-danger">
-                                    <b>{result.error.args.v[0].v}</b> on line {result.error.traceback[0].lineno}
-                                </div>
-                              }
-                              {result.error && result.error.message &&
-                                <div className="panel-body text-danger">
-                                    <b>{result.error.message}</b>
+                                    <b>{result.error}</b>
                                 </div>
                               }
                               {result.reports &&
-                            <div className="row" >
-                                <div className="col-md-6">
-                                    <ul>
-                                        {Object.keys(result.reports).map((name) =>
-                                            <li key={name}>
-                                                {name}
-                                                <table className="table">
-                                                    <tbody>
-                                                        {Object.keys(result.reports[name]).map((key) =>
-                                                            <tr key={key}>
-                                                                <th>{key}</th><td>{result.reports[name][key]}</td>
-                                                            </tr>
-                                                        )}
-                                                    </tbody>
-                                                </table>
-                                            </li>
-                                        )}
-                                    </ul>
-                                </div>
-                            </div>
+                              <div className="row" >
+                                  <div className="col-md-6">
+                                      <ul>
+                                          {Object.entries(result.reports).map(([name, report]) =>
+                                              <li key={name}>
+                                                  {name}
+                                                  <table className="table">
+                                                      <tbody>
+                                                          {Object.entries(report).map(([key, value]) =>
+                                                              <tr key={key}>
+                                                                  <th>{key}</th><td>{value}</td>
+                                                              </tr>
+                                                          )}
+                                                      </tbody>
+                                                  </table>
+                                              </li>
+                                          )}
+                                      </ul>
+                                  </div>
+                              </div>
                               }
                           </div>
                       </div>
@@ -248,8 +221,10 @@ const Results = ({ results, processing }: { results: Result[], processing: strin
 
 interface Result {
   script: Script
-  reports?: any
-  error?: any
+  reports?: {
+    [key: string]: { [key: string]: string|number }
+  }
+  error?: string
 }
 
 export const CodeAnalyzer = () => {

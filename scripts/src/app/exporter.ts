@@ -13,7 +13,7 @@ const dummyAnchor = document.createElement("a")
 document.body.appendChild(dummyAnchor)
 dummyAnchor.style.display = "none"
 
-function download(name: string, blob: Blob) {
+export function download(name: string, blob: Blob) {
     const url = window.URL.createObjectURL(blob)
     dummyAnchor.href = url
     dummyAnchor.download = name
