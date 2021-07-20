@@ -2,6 +2,7 @@ import { Ace, Range } from "ace-builds"
 import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef } from "react"
+import { useTranslation } from "react-i18next"
 
 import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
@@ -256,6 +257,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
 
 export const Editor = () => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const embedMode = useSelector(appState.selectEmbedMode)
     const theme = useSelector(appState.selectColorTheme)
@@ -347,7 +349,7 @@ export const Editor = () => {
             <div className="floating-bar" onClick={() => importScript(activeScript)}>
                 <div>{/* DO NOT REMOVE: this is an empty div to block the space before the next div */}</div>
                 <div className="btn-action btn-floating shake">
-                    <i className="icon icon-import"></i><span>IMPORT TO EDIT</span>
+                    <i className="icon icon-import"></i><span>{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>
             </div>}
         </div>

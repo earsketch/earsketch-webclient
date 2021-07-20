@@ -190,12 +190,15 @@ const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
     );
 };
 
-const ShareButton = ({ script }: { script: Script }) => (
-    <PillButton onClick={() => shareScript(script)}>
-        <i className='icon-share32' />
-        <div>Share</div>
-    </PillButton>
-);
+const ShareButton = ({ script }: { script: Script }) => {
+    const { t } = useTranslation()
+    return (
+        <PillButton onClick={() => shareScript(script)}>
+            <i className="icon-share32" />
+            <div>{t("script.share")}</div>
+        </PillButton>
+    )
+}
 
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
@@ -221,6 +224,7 @@ const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) 
 }
 
 const SingletonSharedScriptInfo = () => {
+    const { t } = useTranslation()
     const theme = useSelector(appState.selectColorTheme);
     const dispatch = useDispatch();
     const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo);
@@ -248,12 +252,12 @@ const SingletonSharedScriptInfo = () => {
     return (
         <div
             ref={setPopperElement as LegacyRef<HTMLDivElement>}
-            style={showSharedScriptInfo ? styles.popper : { display:'none' }}
+            style={showSharedScriptInfo ? styles.popper : { display: "none" }}
             { ...attributes.popper }
-            className={`border border-black p-2 z-50 ${theme==='light' ? 'bg-white' : 'bg-black'}`}
+            className="border border-black p-2 z-50 bg-white dark:bg-black"
         >
             <i
-                className={`icon-cross2 absolute top-0 right-0 p-4 align-middle cursor-pointer ${theme==='light' ? 'text-black' : 'text-gray-200'}`}
+                className="icon-cross2 absolute top-0 right-0 p-4 align-middle cursor-pointer text-black dark:text-gray-200"
                 onClick={() => {
                     dispatch(scripts.resetSharedScriptInfo());
                 }}
@@ -265,27 +269,27 @@ const SingletonSharedScriptInfo = () => {
                         body={
                             script.description?.length
                                 ? script.description
-                                : 'This script has no description.'
+                                : t("sharedScript.noDescription")
                         }
                     />
                     <SharedScriptInfoItem
-                        title='Original Author'
+                        title={t("sharedScript.originalAuthor")}
                         body={script.username}
                     />
                     <SharedScriptInfoItem
-                        title='Collaborators'
-                        body={script.collaborative ? script.collaborators.join(', ') : ""}
+                        title={t("sharedScript.collaborators")}
+                        body={script.collaborative ? script.collaborators.join(", ") : ""}
                     />
                     <SharedScriptInfoItem
-                        title='License Information'
+                        title={t("sharedScript.license")}
                         body={script.licenseInfo}
                     />
                     <SharedScriptInfoItem
-                        title='Last Modified'
+                        title={t("lastModified")}
                         body={script.modified as string}
                     />
                     <SharedScriptInfoItem
-                        title='View-Only Script Link'
+                        title={t("sharedScript.viewOnlyLink")}
                         body={`${SITE_BASE_URI}?sharing=${script.shareid}`}
                     />
                 </>)
