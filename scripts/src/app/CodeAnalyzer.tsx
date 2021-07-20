@@ -78,7 +78,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
             report = await reader.analyze(ESUtils.parseLanguage(script.name), script.source_code)
             result = {
                 script: script,
-                reports: { "Code Complexity": report as any },
+                reports: { "Code Complexity": { ...report } },
             }
         } catch (err) {
             result = {
