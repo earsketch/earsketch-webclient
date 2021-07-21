@@ -38,7 +38,7 @@ module.exports = {
             exports: "always-multiline",
             functions: "never",
         }],
-        indent: ["error", 4],
+        indent: ["error", 4, { SwitchCase: 1 }],
         quotes: ["error", "double", { avoidEscape: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "no-restricted-syntax": ["error", {
