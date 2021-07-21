@@ -53,7 +53,7 @@ export function analyzeJavascript(source) {
         }
     };
     ccState.setIsJavascript(true);    
-    cc.doAnalysis(ast, resultsObject);
+    cc.doAnalysis(newAST, resultsObject);
     //translate the calculated values
     // translateIntegerValues(resultsObject);
     ccHelpers.lineDict();
