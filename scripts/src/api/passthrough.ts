@@ -697,38 +697,17 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
     }
 
     // make the HTTP request
-    const formData = new FormData()
-
-    formData.append("image_url", imageURL)
-    formData.append("width", "" + nrows)
-    formData.append("height", "" + ncols)
-    formData.append("color", "" + !!color)
-
-    const request = new XMLHttpRequest()
-    // TODO: synchronous requests are deprecated, come up with a better way
-    // to do this
-    request.open(
-        "POST", URL_DOMAIN + "/thirdparty/stringifyimage", false
-    )
-
-    let response: any = []
-    request.onload = function () {
-        if (request.readyState === 4) {
-            if (request.status === 200) {
-                response = JSON.parse(request.responseText)
-
-                esconsole("Image data received: " + response, "PT")
-            }
-        }
-    }
-    request.onerror = () => {
+    return userProject.post("/thirdparty/stringifyimage", {
+        image_url: imageURL,
+        width: "" + nrows,
+        height: "" + ncols,
+        color: "" + !!color,
+    }).then(response => {
+        esconsole("Image data received: " + response, "PT")
+        return response
+    }).catch(() => {
         throw new InternalError("We could not load the image.")
-    }
-
-    // make the request
-    request.send(formData)
-
-    return response
+    })
 }
 
 export function importFile(result: DAWData, fileURL: string) {
@@ -746,39 +725,12 @@ export function importFile(result: DAWData, fileURL: string) {
     }
 
     // make the HTTP request
-    const formData = new FormData()
-
-    formData.append("file_url", fileURL)
-
-    const request = new XMLHttpRequest()
-    // TODO: synchronous requests are deprecated, come up with a better way
-    // to do this
-    request.open(
-        "POST", URL_DOMAIN + "/thirdparty/stringifyfile", false
-    )
-
-    let response = ""
-    request.onload = function () {
-        if (request.readyState === 4) {
-            if (request.status === 200) {
-                response = request.responseText
-                esconsole("File data received: " + response, "PT")
-            } else {
-                throw new InternalError(
-                    "We could not load the file. There was a bad server" +
-                    " response."
-                )
-            }
-        }
-    }
-    request.onerror = () => {
+    return userProject.post("/thirdparty/stringifyfile", { file_url: fileURL }).then(response => {
+        esconsole("File data received: " + response, "PT")
+        return response
+    }).catch(() => {
         throw new InternalError("We could not load the file.")
-    }
-
-    // make the request
-    request.send(formData)
-
-    return response
+    })
 }
 
 // Provides a way to print to the EarSketch console.

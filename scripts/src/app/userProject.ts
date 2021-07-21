@@ -55,7 +55,7 @@ export async function getAuth(endpoint: string, params?: { [key: string]: string
     return get(endpoint, params, { Authorization: "Bearer " + getToken() })
 }
 
-// Expects form data, returns JSON.
+// Expects form data, returns JSON or a string depending on response content type.
 export async function post(endpoint: string, data?: { [key: string]: string }, headers?: HeadersInit) {
     const url = URL_DOMAIN + endpoint
     try {
@@ -67,8 +67,13 @@ export async function post(endpoint: string, data?: { [key: string]: string }, h
         })
         if (!response.ok) {
             throw new Error(`error code: ${response.status}`)
+        } else if (response.status === 204) {
+            return undefined
+        } else if (response.headers.get("Content-Type") === "application/json") {
+            return response.json()
+        } else {
+            return response.text()
         }
-        return response.status === 204 ? undefined : response.json()
     } catch (err) {
         esconsole(`postForm failed: ${url}`, ["error", "user"])
         esconsole(err, ["error", "user"])

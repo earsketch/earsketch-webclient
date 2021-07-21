@@ -35,7 +35,7 @@ export function setupAPI() {
         })
     }
 
-    const returnablePassthroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
+    const returnablePassthroughList = ["gauss", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
 
     for (const name of returnablePassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => callPassthrough(name, ...args))
@@ -47,7 +47,7 @@ export function setupAPI() {
         mod[name] = new Sk.builtin.func((...args: any[]) => callModAndReturnPassthrough(name, ...args))
     }
 
-    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
+    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
 
     for (const name of suspendedPassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => suspendPassthrough(name, ...args))

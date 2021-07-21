@@ -59,7 +59,7 @@ export default function setupAPI(interpreter: any, scope: any) {
         })
     }
 
-    const returnablePassthroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
+    const returnablePassthroughList = ["gauss", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
 
     for (const name of returnablePassthroughList) {
         register(name, (...args: any[]) => callPassthrough(name, ...args))
@@ -75,7 +75,7 @@ export default function setupAPI(interpreter: any, scope: any) {
         })
     }
 
-    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
+    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
 
     for (const name of suspendedPassthroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
