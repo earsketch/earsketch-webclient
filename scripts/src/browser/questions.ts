@@ -1,5 +1,3 @@
-import i18n from "i18next"
-
 export function Question(qId: number, questionText: string, answer1: string, answer2: string, answer3: string, answer4: string, lang?: string, id?: number, codesnippet?: string) {
     let langClass = ""
 
@@ -10,14 +8,12 @@ export function Question(qId: number, questionText: string, answer1: string, ans
         langClass = "curriculum-python"
     } else if (lang === "javascript") {
         langClass = "curriculum-javascript"
-    }
-
-    questionText = i18n.t(questionText)
+    } 
 
     if (codesnippet != undefined) {
-        codesnippet = codesnippet.replace(new RegExp("\n", "g"), "<br />")
-        codesnippet = codesnippet.replace(new RegExp("\t", "g"), "&nbsp;")
-        questionText = questionText + "<p><kbd class='kbd " + langClass + "''>" + codesnippet + "</kbd></p>"
+        codesnippet = codesnippet.replace(new RegExp("\n", "g"),"<br />")
+        codesnippet = codesnippet.replace(new RegExp("\t", "g"),"&nbsp;")
+        questionText = questionText + "<p><kbd class='kbd "+langClass+"''>" + codesnippet + "</kbd></p>"
     }
 
     const question = document.createElement("li")
@@ -59,7 +55,7 @@ export function Question(qId: number, questionText: string, answer1: string, ans
             }
         }
         control.classList.add("control")
-        span.innerText = i18n.t(answerText) + " " // space included for wrapping ::after
+        span.innerText = answerText + " "  // space included for wrapping ::after
         return item
     })
 
