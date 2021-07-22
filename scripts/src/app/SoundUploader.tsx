@@ -22,7 +22,7 @@ function cleanKey(key: string) {
 function validateUpload(key: string, tempo: number) {
     const username = userProject.getUsername()
     if (username === null) {
-        throw i18n.t("messages:uploadcontroller.userAuth")
+        throw new Error(i18n.t("messages:uploadcontroller.userAuth"))
     }
     const keys = sounds.selectAllFileKeys(store.getState())
     const fullKey = username.toUpperCase() + "_" + key
@@ -40,7 +40,7 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
     const buffer = await audioContext.decodeAudioData(arrayBuffer)
     if (buffer.duration > 30) {
         esconsole("Rejecting the upload of audio file with duration: " + buffer.duration, ["upload", "error"])
-        throw i18n.t("messages:uploadcontroller.bigsize")
+        throw new Error(i18n.t("messages:uploadcontroller.bigsize"))
     }
 
     const data = userProject.form({
@@ -60,7 +60,7 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
     const promise = new Promise<void>((resolve, reject) => {
         request.onload = () => {
             if (request.readyState === 4) {
-                if (request.status === 200) {
+                if (request.status === 204) {
                     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
                     // Clear the cache so it gets reloaded.
                     audioLibrary.clearAudioTagCache()
@@ -77,8 +77,8 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
     })
 
     onProgress(0)
-    request.setRequestHeader("Authorization", "Bearer " + userProject.getToken())
     request.open("POST", URL_DOMAIN + "/audio/upload")
+    request.setRequestHeader("Authorization", "Bearer " + userProject.getToken())
     request.send(data)
     return promise
 }
@@ -118,7 +118,7 @@ const FileTab = ({ close }: { close: () => void }) => {
             await uploadFile(file!, key, extension, tempo === "" ? -1 : +tempo, setProgress)
             close()
         } catch (error) {
-            setError(error)
+            setError(error.toString())
         }
     }
 
@@ -187,7 +187,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
             await uploadFile(blob, key, ".wav", metronome ? tempo : 120, setProgress)
             close()
         } catch (error) {
-            setError(error)
+            setError(error.toString())
         }
     }
 
@@ -308,7 +308,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                     url: result.downloadURL,
                 })
             } catch (error) {
-                throw i18n.t("messages:uploadcontroller.commerror")
+                throw new Error(i18n.t("messages:uploadcontroller.commerror"))
             }
             userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
             // Clear the cache so it gets reloaded.
@@ -317,7 +317,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             store.dispatch(sounds.getUserSounds(username))
             close()
         } catch (error) {
-            setError(error)
+            setError(error.toString())
         }
     }
 
@@ -398,7 +398,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
                     await uploadFile(file, key, ".wav", tempo, setProgress)
                     close()
                 } catch (error) {
-                    setError(error)
+                    setError(error.toString())
                 }
             }
         }
@@ -439,7 +439,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
                     await uploadFile(file, key, ".wav", message.data.tempo, setProgress)
                     close()
                 } catch (error) {
-                    setError(error)
+                    setError(error.toString())
                 }
             }
         }
