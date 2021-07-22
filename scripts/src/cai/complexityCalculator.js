@@ -437,23 +437,23 @@ function reverseValueTrace(isVariable, name, ast, lineNo) {
                         //find name
                         calledName = node.func.id.v;
                         //is it a built-in func that returns a str or list? check that first
-                        //if (ccState.builtInNames.includes(calledName)) {
-                        //    //lookup and return
-                        //    for (let j = 0; j < ccState.builtInReturns.length; j++) {
-                        //        if (ccState.builtInReturns[j].name == calledName) {
-                        //            return ccState.builtInReturns[j].returns;
-                        //        }
-                        //    }
-                        //    return "";
-                        //}
-                        //else {
-                        //    //assume it's a user function.
-                        //    for (let j = 0; j < funcObjs.length; j++) {
-                        //        if ((funcObjs[j].name == calledName || funcObjs[j].aliases.includes(calledName)) && funcObj[j].returnVals.length > 0) {
-                        //            return getTypeFromASTNode(funcObj[j].returnVals[0]);
-                        //        }
-                        //    }
-                        //}
+                        if (ccState.builtInNames.includes(calledName)) {
+                            //lookup and return
+                            for (let j = 0; j < ccState.builtInReturns.length; j++) {
+                                if (ccState.builtInReturns[j].name == calledName) {
+                                    return ccState.builtInReturns[j].returns;
+                                }
+                            }
+                            return "";
+                        }
+                        else {
+                            //assume it's a user function.
+                            for (let j = 0; j < funcObjs.length; j++) {
+                                if ((funcObjs[j].name == calledName || funcObjs[j].aliases.includes(calledName)) && funcObj[j].returnVals.length > 0) {
+                                    return getTypeFromASTNode(funcObj[j].returnVals[0]);
+                                }
+                            }
+                        }
 
                     }
                     else if (node.func._astname == "Attribute") {
@@ -489,7 +489,7 @@ function getTypeFromASTNode(node) {
     return "";
 }
 
-function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar = null) {
+function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar) {
 
 
 
@@ -562,7 +562,7 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar = null)
 
 }
 
-function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar = null) {
+function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar) {
 
     if (node != null && node._astname != null) {
         //get linenumber info
@@ -692,9 +692,6 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar = 
 
 //takes all the collected info and generates the relevant results
 function doComplexityOutput(results) {
-
-
-
 
     //do loop nesting check
     let finalLoops = ccState.getProperty("loopLocations").slice(0);

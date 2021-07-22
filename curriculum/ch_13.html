@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>String Operations</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_13">String Operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Previously, the string data type was used to make beat strings for <code>makeBeat()</code>. Methods for modifying strings, string operations, are introduced in this chapter. Before we investigate these methods, let’s look at a new way to make use of use custom functions.</p>
+</div>
+<div class="sect2">
+<h3 id="returnstatements">Return Statements</h3>
+<div class="paragraph">
+<p>Previously when we have called a function, we provide it some input (arguments) and then it simply executes its code block. What if we wanted to use a value generated inside a function later on, maybe outside the function?</p>
+</div>
+<div class="paragraph">
+<p>In addition to taking some sort of input, functions can output a value. In programming, we call this returning a value. The statement that tells a function to return a value is called the <strong>return statement</strong>. Let’s look at a simple code example to see how return statements work.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Simple Return Statements
+#
+# author: The EarSketch Team
+#
+# description: Returning the result of a mathematical expression
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Body
+def addNumbers(numb1, numb2):
+  answer = numb1 + numb2
+  return answer
+
+result = addNumbers(2,2)
+# Print result to the console
+print result
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Simple Return Statements
+//
+// author: The EarSketch Team
+//
+// description: Returning the result of a mathematical expression
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Body
+function addNumbers(numb1, numb2){
+  var answer = numb1 + numb2;
+  return answer;
+}
+
+var result = addNumbers(2,2);
+// Print result to the console
+println(result);
+
+//Finsih
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>In the example above, the <code>addNumbers()</code> custom function takes two arguments, adds them together, and assigns the sum to the variable <code>answer</code>. The function returns this variable on line 20. The return statement in this example is saying, "Give the value in <code>answer</code> back to whatever called me." Instead of calling <code>addNumbers()</code> on its own, we assign it to the variable <code>result</code> on line 22. This lets us use the value that the function returns.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>In the example above, the <code>addNumbers()</code> custom function takes two arguments, adds them together, and assigns the sum to the variable <code>answer</code>. The function returns this variable on line 29. The return statement in this example is saying, "Give the value in <code>answer</code> back to whatever called me." Instead of calling <code>addNumbers()</code> on its own, we assign it to the variable <code>result</code> on line 22. This lets us use the value that the function returns.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>To see what our function has returned, we use the <code>print</code> statement, which prints <code>result</code> to the console. For a detailed description of printing check out <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_15.html#printingtotheconsole')">Printing to the Console</a>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>To see what our function has returned, we use the <code>println()</code> function, which prints <code>result</code> to the console. For a detailed description of printing check out <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_15.html#printingtotheconsole')">Printing to the Console</a>.</p>
+</div>
+<div class="paragraph">
+<p>In the next example, we use a return statement in a more musical context. Check out the following video for a walkthrough of the example and some in depth explanation of return statements.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video131py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/013-01-ReturnStatements-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/013-01-ReturnStatements-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video131js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/013-01-ReturnStatements-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/013-01-ReturnStatements-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Return Statements
+#
+# author: The EarSketch Team
+#
+# description: Linking two beats together with return statements
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(100)
+
+rhythm1 = "0+++0+0+0+--0+00"
+rhythm2 = "0+0-00++0-000+++"
+
+#Music
+
+def createBeat(startMeasure, soundClip, beatString):
+  endMeasure = startMeasure + 3
+  for measure in range(startMeasure, endMeasure):
+    makeBeat(soundClip, 1, measure, beatString)
+
+  # Return ending measure so we can use it outside function
+  return endMeasure
+
+# Function calls
+
+# Assigning the value we return to a variable
+newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1)
+# Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Return Statements
+//
+// author: The EarSketch Team
+//
+// description: Linking two beats together with return statements
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+var rhythm1 = "0+++0+0+0+--0+00";
+var rhythm2 = "0+0-00++0-000+++";
+
+//Music
+
+function createBeat(startMeasure, soundClip, beatString){
+  endMeasure = startMeasure + 3;
+  for (measure = startMeasure; measure &lt; endMeasure; measure++){
+    makeBeat(soundClip, 1, measure, beatString);
+  }
+
+  // Return ending measure so we can use it outside function
+  return endMeasure;
+}
+
+// Function calls
+
+// Assigning the value we return to a variable
+var newStart = createBeat(1, HIPHOP_DUSTYGROOVE_007, rhythm1);
+// Passing the returned value into another function
+createBeat(newStart, HIPHOP_DUSTYGROOVE_010, rhythm2);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The <code>createBeat()</code> custom function takes some inputs, performs its operations, and then returns the value assigned to <code>endMeasure</code>. In order to use the value, it must be assigned to a variable outside the function, like in line 33. The returned value is passed into the second function call as an argument. In this way, the beats created by each function call are chained together in time. With the addition of the return statement, the complete control flow for a function looks like this:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The <code>createBeat()</code> custom function takes some inputs, performs its operations, and then returns the value assigned to <code>endMeasure</code>. In order to use the value, it must be assigned to a variable outside the function, like in line 34. The returned value is passed into the second function call as an argument. In this way, the beats created by each function call are chained together in time. With the addition of the return statement, the complete control flow for a function looks like this:</p>
+</div>
+<div class="imageblock" id="return">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U2/Return.png"/>
+</div>
+<div class="title">Figure 13.1: Return statement control flow</div>
+</div>
+<div class="paragraph">
+<p>Without a return statement a function does not return or output any value. This is OK; functions do not need to have a return statement. Also be aware that the return statement signals the function to stop. If you have any statements after the return keyword, they will be ignored. We will see another example of how a return statement can be used later in this chapter.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="stringconcatenation">String Concatenation</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Concatenation</strong> is a means to link strings together. In doing so, a new string is formed. For example, concatenating the strings <code>"hello"</code> and <code>"world"</code> yields <code>"helloworld"</code>. Strings are concatenated with the <code>+</code> symbol, like in the following example. To view the new string we use the <code>print</code> statement to print the string to the console.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Concatenation</strong> is a means to link strings together. In doing so, a new string is formed. For example, concatenating the strings <code>"hello"</code> and <code>"world"</code> yields <code>"helloworld"</code>. Strings are concatenated with the <code>+</code> symbol, like in the following example. To view the new string we use the <code>println()</code> function to print the string to the console.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: String Concatenation
+#
+# author: The EarSketch Team
+#
+# description: Combining two strings into one string
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Concatenation
+stringA = "Computer"
+stringB = "Science!"
+
+# concatenating stringA and stringB with a space in between
+newString = stringA + " " + stringB
+
+print newString
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Concatenation
+//
+// author: The EarSketch Team
+//
+// description: Combining two strings into one string
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Concatenation
+
+var stringA = "Computer";
+var stringB = "Science!";
+
+// concatenating stringA and stringB with a space in between
+var newString = stringA + " " + stringB;
+
+println(newString);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>String concatenation can be used to form longer, more complex rhythms. In the example below, we define a set of shorter rhythms with beat strings. Then, these strings are concatenated together in different orders to form a series of final beat strings. The resulting rhythm can be easily modified by changing the concatenation order, or changing the individual beat strings at the top of the script.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Beat String Concatenation
+#
+# author: The EarSketch Team
+#
+# description: Combining beat strings to form a complex rhythm
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(100)
+
+
+#Music
+beatString1 = "0++00-0+"
+beatString2 = "-00+0---"
+beatString3 = "0+++0-0+"
+beatString4 = "0+00++00"
+beatString5 = "0+000-0+"
+kick = OS_KICK03
+snare = OS_SNARE01
+hat = OS_CLOSEDHAT03
+
+# creating different rhythms for each sound
+finalKick = beatString1 + beatString5 + beatString3 + beatString1 + beatString2 + beatString4
+finalSnare = beatString2 + beatString1 + beatString4 + beatString3 + beatString5 + beatString1
+finalHat = beatString5 + beatString4 + beatString3 + beatString2 + beatString1 + beatString3
+
+# function calls
+makeBeat(kick, 1, 1, finalKick)
+makeBeat(snare, 2, 1, finalSnare)
+makeBeat(hat, 3, 1, finalHat)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Beat String Concatenation
+//
+// author: The EarSketch Team
+//
+// description: Combining beat strings to form a complex rhythm
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+var beatString1 = "0++00-0+";
+var beatString2 = "-00+0---";
+var beatString3 = "0+++0-0+";
+var beatString4 = "0+00++00";
+var beatString5 = "0+000-0+";
+var kick = OS_KICK03;
+var snare = OS_SNARE01;
+var hat = OS_CLOSEDHAT03;
+
+// creating different rhythms for each sound
+var finalKick = beatString1 + beatString5 + beatString3 + beatString1 + beatString2 + beatString4;
+var finalSnare = beatString2 + beatString1 + beatString4 + beatString3 + beatString5 + beatString1;
+var finalHat = beatString5 + beatString4 + beatString3 + beatString2 + beatString1 + beatString3;
+
+// function calls
+makeBeat(kick, 1, 1, finalKick);
+makeBeat(snare, 2, 1, finalSnare);
+makeBeat(hat, 3, 1, finalHat);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="substrings">Substrings</h3>
+<div class="paragraph">
+<p>A <strong>substring</strong> is partial string, also known as a slice, that occurs inside of a larger string. This allows a beat to be sliced up, a very popular technique in electronic music and remixing.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Python’s <strong>slice notation</strong> is used to make a substring. Its syntax is <code>myString[startIndex: endIndex]</code>. Assigning this expression to a variable stores the substring in that variable. Like we have seen before, <code>startIndex</code> and <code>endIndex</code> are inclusive and exclusive, respectively. The substring includes the character at <code>startIndex</code> but not the character at <code>endIndex</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>JavaScript’s <strong>substring()</strong> function is used to make a substring. Its syntax is <code>oldString.substring(startIndex, endIndex)</code>. Assigning the return value of this function to a variable stores the substring in that variable. Like we have seen before, <code>startIndex</code> and <code>endIndex</code> are inclusive and exclusive, respectively. The substring includes the character at <code>startIndex</code> but not the character at <code>endIndex</code>.</p>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">DOT NOTATION</div>
+<div class="paragraph">
+<p><code>oldString.substring</code> is called <strong>dot-notation</strong>. JavaScript strings can be modified with a helper function, called a <strong>method</strong>. Methods are called by specifying the string (<code>oldString</code>) followed by a dot (<code>.</code>), and ending with the method. Methods cannot be called without dot-notation.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">INDICES</div>
+<div class="paragraph">
+<p>An <strong>index</strong> represents the position of a particular character in a string. In Python, string indices start at 0. Therefore, the last index of a string is its total length minus one. Python’s <code>len()</code> function can be used to get the length of a string, like <code>len(string)</code>. This value can be stored in a variable to use later, or printed to the console. The indices of the string <code>"EarSketch"</code> are shown in the table below.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Character</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Index</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">INDICES</div>
+<div class="paragraph">
+<p>An <strong>index</strong> represents the position of a particular character in a string. In JavaScript, string indices start at 0. Therefore, the last index of a string is its total length minus one. JavaScript’s <code>length</code> property can be used to get the length of a string, like <code>string.length</code>. Like the <code>substring</code> method, <code>length</code> uses dot-notation. However, unlike a method, a property in JavaScript should not be called using parentheses. The length value can be stored in a variable to use later, or printed to the console. The indices of the string <code>"EarSketch"</code> are shown in the table below.</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+<col style="width: 10%;"/>
+</colgroup>
+<tbody>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Character</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">E</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">a</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">r</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">k</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">e</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">t</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">c</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">h</p></td>
+</tr>
+<tr>
+<th class="tableblock halign-left valign-top"><p class="tableblock">Index</p></th>
+<td class="tableblock halign-center valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">6</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">8</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="paragraph">
+<p>The following code shows an example of substring syntax and obtaining the length of a string. The data for each is printed to the console.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Substrings
+#
+# author: The EarSketch Team
+#
+# description: Using slice notation to make substrings
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(100)
+
+# Extracting a substring
+a = "Pulling a rabbit out of a string"
+# Makes a new string from indices 10, 11, 12, 13 ,14 ,and 15
+b = a[10: 16]
+
+# print the contents of b to the console
+print b
+# print the length of b to the console
+print len(b)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Substrings
+//
+// author: The EarSketch Team
+//
+// description: Getting a part of a string using .substring()
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+// Extracting a substring
+var a = "Pulling a rabbit out of a string";
+// Makes a new string from indices 10,11,12,13,14,and 15
+var b = a.substring(10, 16);
+
+// print the contents of b to the console
+println(b);
+// print the length of b to the console
+println(b.length);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>We can use string operations to take a simple piece of code and expand it into a complex element of our composition. Let’s start with a very simple beat string: <code>"0+0-"</code>. Instead of simply repeating the string to lengthen it, we can use concatenation to take each individual piece of the beat and add it on to the larger string in stages. Let’s step through that process: Breaking apart our original beat, we have the elements <code>0</code>, <code>+</code>, <code>0</code>, and <code>-</code>. We can design a function to first concatenate <code>"0"</code>, then <code>"0+"</code>, then <code>"0+0"</code>, then <code>"0+0-"</code> all in a row, resulting in the <strong>newBeat</strong> string <code>"00+0+00+0-"</code>. Take a look at the code below; our <strong>expander()</strong> custom function uses slice notation to concatenate a much longer beat string into <strong>newBeat</strong>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>We can use string operations to take a simple piece of code and expand it into a complex element of our composition. Let’s start with a very simple beat string: <code>"0+0-"</code>. Instead of simply repeating the string to lengthen it, we can use concatenation to take each individual piece of the beat and add it on to the larger string in stages. Let’s step through that process: Breaking apart our original beat, we have the elements <code>0</code>, <code>+</code>, <code>0</code>, and <code>-</code>. We can design a function to first concatenate <code>"0"</code>, then <code>"0+"</code>, then <code>"0+0"</code>, then <code>"0+0-"</code> all in a row, resulting in the <strong>newBeat</strong> string <code>"00+0+00+0-"</code>. Take a look at the code below; our <strong>expander()</strong> function uses the substring method to concatenate a much longer beat string into <strong>newBeat</strong>.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video13py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/013-03-Substrings-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/013-03-Substrings-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video13js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/013-03-Substrings-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/013-03-Substrings-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: String Operations
+#
+# author: The EarSketch Team
+#
+# description: Expand a beat string into a longer beat string.
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+initialBeat = "0+0+00-00+++-0++"
+drumInstr = RD_UK_HOUSE_MAINBEAT_10
+
+def expander(beatString):
+  newBeat = ""
+  for i in range(0, len(beatString)):
+    beatSlice = beatString[0:i]
+    newBeat = newBeat + beatSlice
+  # return the new beat string so it can be used outside the function
+  return newBeat
+
+finalBeat = expander(initialBeat)
+print finalBeat
+
+#makeBeat(drumInstr, 1, 1, initialBeat) # initial beat string
+makeBeat(drumInstr, 1, 1, finalBeat)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: String Operations
+//
+// author: The EarSketch Team
+//
+// description: Expand a beat string into a longer beat string.
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var initialBeat = "0+0+00-00+++-0++";
+var drumInstr = RD_UK_HOUSE_MAINBEAT_10;
+
+function expander(beatString){
+  var newBeat = "";
+  for (var i = 0; i &lt; beatString.length; i = i + 1){
+    beatSlice = beatString.substring(0, i);
+    newBeat = newBeat + beatSlice;
+  }
+  // return the new beat string so it can be used outside the function
+  return newBeat;
+}
+
+var finalBeat = expander(initialBeat);
+println(finalBeat);
+
+//makeBeat(drumInstr, 1, 1, initialBeat); // initial beat string
+makeBeat(drumInstr, 1, 1, finalBeat);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter13summary">Chapter 13 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Concatenation</strong> is a means to link strings together, effectively forming a new string. It is used to form longer, more complex rhythms. In Python, strings are concatenated with the <code>+</code> symbol.</p>
+</li>
+<li>
+<p><strong>Substrings</strong> are partial strings sliced out of a larger string. The syntax for Python’s slice notation is <code>myString[startIndex, endIndex]</code>.</p>
+</li>
+<li>
+<p>An <strong>index</strong> refers to a character’s position within a string. Python indices start at 0.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Concatenation</strong> is a means to link strings together, effectively forming a new string. It is used to form longer, more complex rhythms. In Javascript, strings are concatenated with the <code>+</code> symbol.</p>
+</li>
+<li>
+<p><strong>Substrings</strong> are partial strings extracted out of a larger string. The syntax for JavaScript’s substring method is <code>oldString.substring(startIndex, endIndex)</code>.</p>
+</li>
+<li>
+<p>An <strong>index</strong> refers to a character’s position within a string. JavaScript indices start at 0.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "What is the following code doing?", "Assigning the first three index values of stringA to newString", "Slicing stringA into 4 parts", "Assigning newString to the first three indices of stringA", "Subtracting stringA from newString","python",1,"newString = stringA[0:3]");
+question2 = new Question(2, "Which of the following is an example of concatenation?", "x = beatstring1 + beatstring2", "x = beatstring1.beatstring2", "x = (beatstring1, beatstring2)", "x = beatstring1[beatstring2]","python");
+
+question3 = new Question(1, "What is the following code doing?", "Assigning the first three index values of stringA to newString", "Slicing stringA into 4 parts", "Assigning newString to the first three indices of stringA", "Subtracting stringA from newString","javascript",3,"newString = stringA.substring(0, 3);");
+question4 = new Question(2, "Which of the following is an example of concatenation?", "x = beatstring1 + beatstring2", "x = beatstring1.beatstring2", "x = (beatstring1, beatstring2)", "x = beatstring1[beatstring2]","javascript",4);
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

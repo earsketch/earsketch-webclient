@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Looping</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_12">Looping</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Repetition is an important element of music. Computers can execute statements over and over again using a <strong>loop</strong>. In this chapter, we will learn about loops, using them to code more efficiently and add repetition to our music.</p>
+</div>
+<div class="sect2">
+<h3 id="theforloop">The For-Loop</h3>
+<div class="paragraph curriculum-python">
+<p>A <strong>for-loop</strong> tells the computer to execute a section of code repeatedly, a common notation in most programming languages. We can use for-loops to avoid repeated lines or sections of code. In Python, for-loops look like this:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A <strong>for-loop</strong> tells the computer to execute a section of code repeatedly, a common notation in most programming languages. We can use for-loops to avoid repeated lines or sections of code. In JavaScript, for-loops look like this:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">for i in range(2):
+
+	# Repeat indented code after the colon (:) several times.</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">for (var i = 0; i &lt; 2; i++) {
+
+    //Repeat code between the curly braces ({}) several times.
+
+}</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="componentsofaforloop">Components of a For-Loop</h3>
+<div class="paragraph curriculum-python">
+<p>For-loops in Python consist of 3 basic parts:</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>For-loops in JavaScript consist of 4 basic parts:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-components-PY">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U1P2/Loop_Components_PY.png"/>
+</div>
+<div class="title">Figure 12.2: The basic components of a for-loop</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-components-JS">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U1P2/Loop_Components_JS.png"/>
+</div>
+<div class="title">Figure 12.2: The basic components of a for-loop</div>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Loop Body</strong>: The body of a loop contains statements that will execute repeatedly. It includes everything that is <strong>indented</strong> (using the <em>tab</em> key) directly after the colon <code>:</code>.</p>
+</li>
+<li>
+<p><strong>Loop Counter</strong>: Creates a variable to be used as a loop counter.</p>
+</li>
+<li>
+<p><strong>Range</strong>: A function that makes a list of numbers for the loop counter to count through. The keyword <code>in</code> checks if the loop counter value is in the specified range. <code>range()</code> takes two arguments, a starting point (inclusive) and ending point (exclusive): <code>range(startingNumber, endingNumber)</code>.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Loop Body</strong>: The body of a loop contains statements that will execute repeatedly. It is surrounded by curly braces <code>{ }</code>.</p>
+</li>
+<li>
+<p><strong>Initialization</strong>: This creates a variable to be used as a <strong>loop counter</strong> before the first loop runs.</p>
+</li>
+<li>
+<p><strong>Iteration statement</strong>: A statement that updates the loop counter. It counts up on each iteration.</p>
+</li>
+<li>
+<p><strong>Loop Condition</strong>: This checks whether the loop should run again. If the statement is true, the loop body executes again. If the counter gets too high, the statement will be false, and we exit the loop. The computer then continues executing code after the loop.</p>
+</li>
+</ul>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">CODE BLOCKS</div>
+<div class="paragraph">
+<p>A code block in JavaScript is a group of statements meant to be run together. It is usually placed between curly braces <code>{ }</code>. For-loops use them to show what code will be looped.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">INDENTATION</div>
+<div class="paragraph">
+<p>In Python, indentation affects how code is executed. The statements inside the for-loop body should be tabbed in from the first line and have the same indentation level. Python will not recognize unindented code as part of the loop, so the loop ends when the indentation ends.</p>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">INDENTATION</div>
+<div class="paragraph">
+<p>Indentation does not affect how code is executed in JavaScript, but it is very important to keep code human-readable. By convention, the statements inside a for-loop body should have the same indentation level by convention, usually tabbed in from the first line.</p>
+</div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>Let’s use a for-loop to repeat the makeBeat() pattern that we created in the previous chapter. By adding one more line of code and indenting the body, we can loop the beat four times to create four measures of music. In the following sections, we will examine for-loops in more detail.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Let’s use a for-loop to repeat the makeBeat() pattern that we created in the previous chapter. By adding one more line of code (not counting the ending bracket) and indenting the body, we can loop the beat four times to create four measures of music. In the following sections, we will examine for-loops in more detail.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Multi Beat
+#
+# author: The EarSketch Team
+#
+# description: Using a for-loop to create longer beats
+#
+#
+#
+
+#Setup
+
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+
+synth = DUBSTEP_FILTERCHORD_002
+cymbal = OS_CLOSEDHAT01
+beat1 = "-00-00+++00--0-0"
+beat2 = "0--0--000--00-0-"
+
+# By adding one extra line and indenting, we achieve repetition
+for measure in range(1,4):
+   makeBeat(synth, 1, measure, beat1)
+   makeBeat(cymbal, 2, measure, beat2)
+
+#Finish
+
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Multi Beat (with for-loop)
+//
+// author: The EarSketch Team
+//
+// description: Using a for-loop to create longer beats
+//
+//
+//
+
+//Setup
+
+init();
+setTempo(120);
+
+//Music
+
+var synth = DUBSTEP_FILTERCHORD_002;
+var cymbal = OS_CLOSEDHAT01;
+var beat1 = "-00-00+++00--0-0";
+var beat2 = "0--0--000--00-0-";
+
+// By adding one extra line and indentions, we achieve repetition
+for (var measure=1; measure &lt; 5; measure++) {
+   makeBeat(synth, 1, measure, beat1);
+   makeBeat(cymbal, 2, measure, beat2);
+}
+
+//Finish
+
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="exampleloop">Example Loop</h3>
+<div class="videoblock curriculum-python curriculum-mp4" id="video12bpy">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/012-03-ExampleLoop-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/012-03-ExampleLoop-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video12bjs">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/012-03-ExampleLoop-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/012-03-ExampleLoop-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Previously, we have created repetition in our music by typing <code>fitMedia()</code> again and again, with different measure numbers:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Drum beat (no loops)
+#
+# author: The EarSketch Team
+#
+#	description: Musical repetition created without code loops
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+# All of these fitMedia() calls could be replaced with two calls placed in a loop
+
+fitMedia(drums1, 1, 1, 1.5)
+fitMedia(drums2, 1, 1.5, 2)
+fitMedia(drums1, 1, 2, 2.5)
+fitMedia(drums2, 1, 2.5, 3)
+fitMedia(drums1, 1, 3, 3.5)
+fitMedia(drums2, 1, 3.5, 4)
+fitMedia(drums1, 1, 4, 4.5)
+fitMedia(drums2, 1, 4.5, 5)
+fitMedia(drums1, 1, 5, 5.5)
+fitMedia(drums2, 1, 5.5, 6)
+fitMedia(drums1, 1, 6, 6.5)
+fitMedia(drums2, 1, 6.5, 7)
+fitMedia(drums1, 1, 7, 7.5)
+fitMedia(drums2, 1, 7.5, 8)
+fitMedia(drums1, 1, 8, 8.5)
+fitMedia(drums2, 1, 8.5, 9)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Drum beat (no loops)
+//
+// author: The EarSketch Team
+//
+// description: Musical repetition created without code loops
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// All of these fitMedia() calls could be replaced with two calls placed in a loop
+
+fitMedia(drums1, 1, 1, 1.5);
+fitMedia(drums2, 1, 1.5, 2);
+fitMedia(drums1, 1, 2, 2.5);
+fitMedia(drums2, 1, 2.5, 3);
+fitMedia(drums1, 1, 3, 3.5);
+fitMedia(drums2, 1, 3.5, 4);
+fitMedia(drums1, 1, 4, 4.5);
+fitMedia(drums2, 1, 4.5, 5);
+fitMedia(drums1, 1, 5, 5.5);
+fitMedia(drums2, 1, 5.5, 6);
+fitMedia(drums1, 1, 6, 6.5);
+fitMedia(drums2, 1, 6.5, 7);
+fitMedia(drums1, 1, 7, 7.5);
+fitMedia(drums2, 1, 7.5, 8);
+fitMedia(drums1, 1, 8, 8.5);
+fitMedia(drums2, 1, 8.5, 9);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>We can use a for-loop to create the exact same music more efficiently.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">#	python code
+#
+#	script_name: Drum beat (with loops)
+#
+#	author: The EarSketch Team
+#
+#	description: Musical repetition created with code loops
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_008
+drums2 = ELECTRO_DRUM_MAIN_BEAT_007
+
+#Using a loop instead of repeatedly writing similar lines of code
+
+for measure in range (1, 9):
+  fitMedia(drums1, 1, measure, measure + 0.5)
+  fitMedia(drums2, 1, measure + 0.5 , measure + 1)
+
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Drum beat (with loops)
+//
+// author: The EarSketch Team
+//
+// description: Musical repetition created with code loops
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_008;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_007;
+
+// Using a loop instead of repeatedly writing similar lines of code
+
+for (var measure = 1; measure &lt; 9; measure = measure + 1) {
+  fitMedia(drums1, 1, measure, measure + 0.5);
+  fitMedia(drums2, 1, measure + 0.5 , measure + 1);
+}
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>In the example above, we create a loop counter, <code>measure</code>, to place music through a series of measures. We also specify a range function <code>range(1, 9)</code>, so our for-loop will count through the list 1, 2, 3, 4, 5, 6, 7, 8. Notice 9 is not included in this list. This is because the <code>range()</code> functions’s <code>endingNumber</code> is exclusive, meaning its number is not included in the list. <code>startNumber</code>, on the other hand, is inclusive. This for-loop is saying "keep looping until we count through all the numbers created by the range function." In this case, the range function we specified lets us place music up to (but not including) measure 9.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>In the example above, we set the initialization variable <code>measure</code> equal to 1, so we can start placing music at measure 1. We want to place music up to measure 9 (but not including measure 9), so we set a loop condition <code>measure &lt; 9</code>, meaning "keep looping until we get to measure 9." The iteration statement, <code>measure = measure + 1</code> increases the value of measure by 1 on each iteration. When this count reaches 9, the loop condition is no longer true, so we exit the loop.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="followingcontrolflow">Following Control Flow</h3>
+<div class="paragraph">
+<p>The <strong>interpreter</strong> reads and executes a script. The order it is executed in is called the <strong>control flow</strong>. It usually goes line by line, top to bottom. A loop is a <strong>control flow statement</strong>, which changes the order. At the end of a loop body, it jumps back to the top of the loop</p>
+</div>
+<div class="paragraph">
+<p>The following animation shows how the control flow moves when a for-loop is encountered, and how the value of the loop counter changes on each <strong>iteration</strong>, or repetition of the loop body:</p>
+</div>
+<div class="imageblock curriculum-python" id="loop-py">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U1P2/LoopPy_updated.gif"/>
+</div>
+<div class="title">Figure 12.4: Stepping through a for-loop</div>
+</div>
+<div class="imageblock curriculum-javascript" id="loop-js">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U1P2/LoopJS_updated.gif"/>
+</div>
+<div class="title">Figure 12.4: Stepping through a for-loop</div>
+</div>
+<div class="sidebarblock curriculum-python">
+<div class="content">
+<div class="title">INCREMENTING AND DECREMENTING</div>
+<div class="paragraph">
+<p>You may want to increment or decrement a variable like how the loop counter does on each iteration of a loop. Instead of writing something like <code>measure = measure + 1</code>, you can use the shorthand <code>+=</code> and <code>-=</code>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>measure += 1</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>This adds one to the variable’s current value. You can increment by any other number by changing the value to the right of the expression.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>measure -=1</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>This subtracts one from the variable. You can also decrement by any other number.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sidebarblock curriculum-javascript">
+<div class="content">
+<div class="title">INCREMENTING AND DECREMENTING</div>
+<div class="paragraph">
+<p>The following is a shorthand method for incrementing (or decrementing) a counter:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>measure++</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>This adds 1 to the current value of <code>measure</code>. It has the exact same meaning as <code>measure = measure + 1</code>, but is faster to write.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>measure--</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>This subtracts 1 from the current value of <code>measure</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We can use <code>+=</code> or <code>-=</code> as a shorthand to increment or decrement by a different number. For example:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>measure += 2</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>This adds two to the current value of <code>measure</code>. You can also increment by any other number.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>measure -= 2</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>This subtracts 2 from <code>measure</code>.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="addingeffectswithloops">Adding Effects with Loops</h3>
+<div class="paragraph">
+<p>Repeatedly adding media clips to a project is just one of many possible uses of for-loops in EarSketch. In the following video and example code, we use two loops to add clips to the DAW, and a third to add a panning effect on each track. Note: panning effects are more noticeable when using headphones.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video9py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/012-05-AddingEffectswithLoops-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/012-05-AddingEffectswithLoops-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video9js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/012-05-AddingEffectswithLoops-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/012-05-AddingEffectswithLoops-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Panning Loop
+#
+# author: The EarSketch Team
+#
+# description: Adding music with loops; panning incrementally with loops
+#
+#
+#
+
+from earsketch import *
+
+init()
+setTempo(130)
+
+#Music
+drums1 = ELECTRO_DRUM_MAIN_BEAT_005
+drums2 = ELECTRO_DRUM_MAIN_BEAT_006
+synth = Y02_KEYS_1
+guitar = Y09_WAH_GUITAR_1
+
+# for-loop to create alternating drum beat
+for measure in range(1, 9):
+  fitMedia(drums1, 1, measure, measure + 0.5)
+  fitMedia(drums2, 2, measure + 0.5 , measure + 1)
+
+# additional fitMedia() calls for guitar and synth
+fitMedia(guitar, 3, 1, 9)
+fitMedia(synth, 4, 5, 9)
+
+# panning effects for all tracks (1-4)
+for track in range(1, 5):
+	panAmount = 200 * (track - 1) / 3 - 100
+	setEffect(track, PAN, LEFT_RIGHT, panAmount)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Panning Loop
+//
+// author: The EarSketch Team
+//
+// description: Adding music with loops; panning incrementally with loops
+//
+//
+//
+
+//Setup
+init();
+setTempo(130);
+
+//Music
+var drums1 = ELECTRO_DRUM_MAIN_BEAT_005;
+var drums2 = ELECTRO_DRUM_MAIN_BEAT_006;
+var synth = Y02_KEYS_1;
+var guitar = Y09_WAH_GUITAR_1;
+
+// for-loop to create alternating drum beat
+for (var measure = 1; measure &lt; 9; measure++) {
+    fitMedia(drums1, 1, measure, measure + 0.5);
+    fitMedia(drums2, 2, measure + 0.5 , measure + 1);
+}
+
+// additional fitMedia() calls for guitar and synth
+fitMedia(guitar, 3, 1, 9);
+fitMedia(synth, 4, 5, 9);
+
+// panning effects for all tracks (1-4)
+for (var track = 1; track &lt; 5; track++) {
+	panAmount = 200 * (track - 1) / 3 - 100;
+	setEffect(track, PAN, LEFT_RIGHT, panAmount);
+}
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>The first for-loop in the script above is used to create an alternating drum beat. This looping technique results in the first drum sound playing only over the first half of each measure on track one. The second drum sound follows over the second half of each measure on track two. This gives us independent control of panning for each track. Staggering sounds with a for-loop is also an excellent way to vary a beat.</p>
+</div>
+<div class="paragraph">
+<p>The second for-loop automates track panning. It results in the sound file sending sounds to our left ear, right ear, or a combination. With each iteration, the loop steps through the four tracks and calculates a pan position, ranging from "hard" left (-100) to "hard" right (100) and two places between (-33 and 33). This gives the individual sounds their own "space" in the stereo field, which can create a sense of depth and movement in our compositions.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="automatingeffectswithloops">Automating Effects with Loops</h3>
+<div class="paragraph">
+<p>For-loops can be used to apply repeated effects envelopes to tracks. In the example below, each iteration of the loop adds a one measure long segment of the envelope. Automating the GAIN parameter creates rhythmic volume fades, an effect popular in EDM. Try toggling the effect bypass to hear the difference the effect makes.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Rhythmic Ramps
+#
+# author: The EarSketch Team
+#
+# description: Automating effects with a for-loop
+#
+#
+#
+
+# Setup
+from earsketch import *
+init()
+setTempo(120)
+
+# Music
+fitMedia(Y33_CHOIR_1, 1, 1, 17)
+fitMedia(RD_ELECTRO_MAINBEAT_5, 2, 1, 17)
+
+for measure in range(1, 17):
+  setEffect(1, VOLUME, GAIN, -60, measure, 0, measure+1)
+
+# Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Rhythmic Ramps
+//
+// author: The EarSketch Team
+//
+// description: Automating effects with a for-loop
+//
+//
+//
+
+// Setup
+init()
+setTempo(120)
+
+// Music
+fitMedia(Y33_CHOIR_1, 1, 1, 17)
+fitMedia(RD_ELECTRO_MAINBEAT_5, 2, 1, 17)
+
+for (var measure = 1; measure &lt; 17; measure++) {
+  setEffect(1, VOLUME, GAIN, -60, measure, 0, measure+1)
+}
+
+// Finish
+finish()</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter12summary">Chapter 12 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>A <strong>for-loop</strong> instructs the computer to execute a code section repeatedly, creating more efficient code. For-loops consist of a loop body, loop counter, and range. The code in the loop body must be indented. Revisit for-loop syntax <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_12.html#looping')">here</a>.</p>
+</li>
+<li>
+<p>The <strong>interpreter</strong> reads and executes a script in a particular order, which is called <strong>control flow</strong>.</p>
+</li>
+<li>
+<p>The repetition of the loop body, or its repeated execution, is called an <strong>iteration</strong>.</p>
+</li>
+<li>
+<p>For-loops provide additional ways to add effects to tracks, including effects that are automated.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>A <strong>for-loop</strong> instructs the computer to execute a code section repeatedly, creating more efficient code. For-loops consist of a loop body, initialization, iteration statement, and loop condition. The code in the loop body should be indented. Revisit for-loop syntax <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_12.html#theforloop')">here</a>.</p>
+</li>
+<li>
+<p>The <strong>interpreter</strong> reads and executes a script in a particular order, which is called <strong>control flow</strong>.</p>
+</li>
+<li>
+<p>The repetition of the loop body, or its repeated execution, is called an <strong>iteration</strong>.</p>
+</li>
+<li>
+<p>For-loops provide additional ways to add effects to tracks, including effects that are automated.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "Which of the following is not a component of a for-loop?", "Loop interpreter", "Loop Counter", "Loop Body", "Loop Range");
+question2 = new Question(2, "Which of the following is not a good use of loops in a musical composition?", "Creating a beat pattern than never repeats", "Placing musical clips on every third measure", "Automating effect parameter values over time", "Placing musical clips on odd measures");
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

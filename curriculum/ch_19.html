@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Data Structure Operations</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_19">Data Structure Operations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter covers two data structure operations: slicing and concatenation. Manipulation of these structures provides opportunities to create interesting musical changes.</p>
+</div>
+<div class="sect2">
+<h3 id="procedure">Procedure</h3>
+<div class="paragraph curriculum-python">
+<p><strong>List Operations</strong> are a set of tools for modifying a list. We performed similar operations on strings in <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_13.html')">Chapter 13</a>. Slice notation can be used to create a subset of a list from a larger, existing list. Its syntax is <code>newList = oldList[startIndex: endIndex]</code>. As with string slices, the indices for slice notation are inclusive and exclusive, respectively.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Array Operations</strong> are a set of methods for modifying an array. We performed similar operations on strings in <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_13.html')">Chapter 13</a>. Dot notation and the <code>slice</code> method can be used to slice out an array from a larger, existing array. Its syntax is <code>newArray = oldArray.slice(startIndex, endIndex)</code>. As with string slices, the indices are inclusive and exclusive, respectively.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Lists can also be combined with the concatenation operator (<code>+</code>). The syntax is <code>newList = listA + listB</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Arrays can also be combined using the <code>concat</code> method. The syntax is <code>newArray = arrayA.concat(arrayB)</code>.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video19py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/019-01-Procedure-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/019-01-Procedure-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video19js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/019-01-Procedure-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/019-01-Procedure-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="paragraph">
+<p>Let’s work through an example that uses concatenation and slicing. This example uses a new operator, modulo. The <strong>modulo operator</strong> (<code>%</code>) returns the remainder of the division of two numbers instead of the quotient. For example, 7 % 3 = 1 and 8 % 3 = 2. This operator is useful for counting in cycles, like executing a block of code only every third measure.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The example below creates a beat that dynamically changes. Notice <code>makeBeat()</code> 's beat string contains numbers other than 0; it is accessing different indices of the <code>drumSounds</code> list. Every four measures, the last element of <code>drumSounds</code> is moved to the beginning of the list, so <code>makeBeat()</code> 's output changes. This is achieved by slicing two lists from <code>drumSounds</code>, <code>lastSound</code> and <code>allButLastSound</code>. The last element of the <code>drumSounds</code> list is sliced by using a starting index of <code>len(drumSounds) - 1</code> and an ending index of <code>len(drumSounds)</code>. The resulting <code>lastSound</code> list is then concatenated to the front of the <code>allButLastSound</code> list, to make a new version of <code>drumSounds</code>. The <em>if</em> statement condition <code>measure % 4 == 0</code> means this switch will only happen every 4 measures (when the value of <code>measure</code> divided by 4 has no remainder).</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The example below creates a beat that dynamically changes. Notice <code>makeBeat()’s beat string contains numbers other than 0; it is accessing different indices of the `drumSounds</code> array. Every four measures, the last element of <code>drumSounds</code> is moved to the beginning of the array, so <code>makeBeat()’s output changes. This is achieved by slicing two arrays from `drumSounds</code>, <code>lastSound</code> and <code>allButLastSound</code>. The last element of the <code>drumSounds</code> array is sliced by using a starting index of <code>drumSounds.length - 1</code> and an ending index of <code>drumSounds.length</code>. The <code>lastSound</code> array is then concatenated to the front of the <code>allButLastSound</code> array, to make a new version of <code>drumSounds</code>. The <em>if</em> statement condition <code>measure % 4 === 0</code> means this switch will only happen every 4 measures (when the value of <code>measure</code> divided by 4 has no remainder).</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: List Operations
+#
+# author: The EarSketch Team
+#
+# description: Using list operations to change our drum sounds every four measures
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+drumSounds = [OS_CLAP01, OS_CLOSEDHAT01, OS_COWBELL01, OS_KICK01, OS_LOWTOM01, OS_SNARE01]
+beatString = "5-5132-034550011"
+
+for measure in range(1, 33):
+	makeBeat(drumSounds, 1, measure, beatString)
+	if (measure % 4 == 0): # Only True at every fourth measure
+		# rotate list items so last item moves to first slot
+		listLength = len(drumSounds)
+		lastSound = drumSounds[listLength-1:listLength]
+		allButLastSound = drumSounds[0:listLength-1]
+		drumSounds = lastSound + allButLastSound
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Array Operations
+//
+// author: The EarSketch Team
+//
+// description: Using array operations to change our drum sounds every four measures
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var drumSounds = [OS_CLAP01, OS_CLOSEDHAT01, OS_COWBELL01, OS_KICK01, OS_LOWTOM01, OS_SNARE01];
+var beatString = "5-5132-034550011";
+
+for (var measure = 1; measure &lt; 33; measure++) {
+	makeBeat(drumSounds, 1, measure, beatString);
+	if (measure % 4 == 0) { // Only true at every 4th measure
+		// rotate array items so last item moves to first slot
+		var arrLength = drumSounds.length;
+		var lastSound = drumSounds.slice(arrLength - 1, arrLength);
+		var allButLastSound = drumSounds.slice(0, arrLength - 1);
+		drumSounds = lastSound.concat(allButLastSound);
+	}
+}
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter19summary">Chapter 19 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lists can be concatenated and sliced using <strong>list operations</strong>, a set of tools for modifying a list.</p>
+</li>
+<li>
+<p>The syntax for creating a subset of a list from a larger, existing list is <code>newList = oldList[startIndex: endIndex]</code>.</p>
+</li>
+<li>
+<p>Lists can be combined using the concatenation operator, <code>+</code>, like <code>newList = listA + listB</code>.</p>
+</li>
+<li>
+<p>The <strong>modulo operator</strong> is used to obtain the remainder after dividing one number by another, rather than the quotient.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Arrays can be concatenated and sliced using <strong>array operations</strong>, a set of tools for modifying an array.</p>
+</li>
+<li>
+<p>The syntax for slicing out an array from a larger, existing array is <code>newArray = oldArray.slice(startIndex: endIndex)</code>.</p>
+</li>
+<li>
+<p>Arrays can be combined using the <code>concat</code> method, like <code>newArray = arrayA.concat(arrayB)</code>.</p>
+</li>
+<li>
+<p>The <strong>modulo operator</strong> is used to obtain the remainder after dividing one number by another, rather than the quotient.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "Which of the following operations is used to join lists/arrays?", "Concatenation", "Slicing", "Modulo", "Addition");
+question2 = new Question(2, "Which of the following evaluates to True?", "100 % 10 == 0", "10 % 10 == 1", "10 % 1 == 10", "100 % 10 == 1");
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
