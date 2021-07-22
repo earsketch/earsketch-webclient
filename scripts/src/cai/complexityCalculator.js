@@ -1,7 +1,6 @@
 import * as ccState from './complexityCalculatorState';
 import * as ccHelpers from './complexityCalculatorHelperFunctions';
 import { func } from 'prop-types';
-import { latest } from 'immer/dist/internal';
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
@@ -33,19 +32,21 @@ function recursiveFunctionAnalysis(ast, results, rootAst) {
     }
 
     if (ast != null && ast._astname != null && "test" in ast) {
-        collectFunctionInfo(ast.test);
-        recursiveFunctionAnalysis(ast.test);
+        collectFunctionInfo(ast.test, results, rootAst);
+        recursiveFunctionAnalysis(ast.test, results, rootAst);
     }
 
     if (ast != null && ast._astname != null && "iter" in ast) {
-        collectFunctionInfo(ast.iter);
-        recursiveFunctionAnalysis(ast.iter);
+        collectFunctionInfo(ast.iter, results, rootAst);
+        recursiveFunctionAnalysis(ast.iter, results, rootAst);
     }
 }
 
-//recurses through AST and calls function info function on each node
-function functionPass(ast, results, rootAst) {
 
+
+
+//recurses through AST and calls function info function on each node
+function functionPass(ast, results) {
     recursiveFunctionAnalysis(ast, results, rootAst);
 
     //do calls
@@ -100,7 +101,7 @@ function functionPass(ast, results, rootAst) {
 }
 
 //collects function info from a node
-function collectFunctionInfo(node, results, rootAst) {
+function collectFunctionInfo(node, results) {
     if (node != null && node._astname != null) {
         //get linenumber info
         var lineNumber = 0;
@@ -220,12 +221,11 @@ function markMakeBeat(callNode, results) {
 
     //is makeBeat being used
     //beatString is either a variable or a string.
-    //hrm. leaving this for now. we're gonna do a reverse value trace because i am a genius
+    //hrm. leaving this for now. we're gonna use the soundprofile to build htis
 }
 
 //recursively searches for a "return" within an ast node
 function searchForReturn(astNode) {
-
     if (astNode._astname == "Return") {
         return astNode.value;
     }
@@ -252,7 +252,6 @@ function searchForReturn(astNode) {
             return null;
         }
     }
-
 
 }
 
@@ -376,6 +375,8 @@ function collectVariableInfo(node) {
     }
 }
 
+
+
 function reverseValueTrace(isVariable, name, ast, lineNo) {
     if (isVariable) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
@@ -479,6 +480,7 @@ function reverseValueTrace(isVariable, name, ast, lineNo) {
     else {
 
     }
+
 
 }
 
@@ -687,9 +689,9 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar = 
     return false;
 }
 
-//takes all the collected info and generates the relevant results
-function doComplexityOutput(results, rootAst) {
 
+//takes all the collected info and generates the relevant results
+function doComplexityOutput(results) {
 
 
 
@@ -756,11 +758,16 @@ function doComplexityOutput(results, rootAst) {
 
 
 
+
+
+
 }
 
 function sortLoopValues(a, b) {
     let scoreA = a[1] - a[0];
     let scoreB = b[1] - b[0];
+
+
     return scoreB - scoreA;
 }
 
@@ -926,4 +933,3 @@ export function doAnalysis(ast, results) {
     //inputOutputPass(node);
     doComplexityOutput(results, ast);
 }
-
