@@ -127,7 +127,10 @@ class SoundConstantFinder extends NodeVisitor {
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsPY(code: string) {
-    esconsole("Iterating through undefined variable names.")
+    // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
+    for (const constant of await audioLibrary.getAllFolders()) {
+        Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
+    }
 
     const finder = new SoundConstantFinder()
     const parse = Sk.parse("<analyzer>", code)
@@ -206,6 +209,12 @@ export async function runPython(code: string) {
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsJS(code: string, interpreter: any) {
+    // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
+    const scope = interpreter.getScope().object
+    for (const constant of await audioLibrary.getAllFolders()) {
+        interpreter.setProperty(scope, constant, constant)
+    }
+
     const constants: string[] = []
 
     walk.simple(acorn.parse(code), {
@@ -216,12 +225,12 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
         },
     })
 
-    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(interpreter.getScope().object, c) === undefined)
+    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(scope, c) === undefined)
 
     const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
     for (const clip of clipData) {
         if (clip) {
-            interpreter.setProperty(interpreter.getScope().object, clip.file_key, clip.file_key)
+            interpreter.setProperty(scope, clip.file_key, clip.file_key)
         }
     }
 }
@@ -331,7 +340,7 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
 }
 
 function getClipTempo(result: DAWData) {
-    const metadata = audioLibrary.cache.sounds
+    const metadata = audioLibrary.cache.defaultTags ?? []
     const tempoCache: { [key: string]: number } = {}
 
     result.tracks.forEach(track => {
