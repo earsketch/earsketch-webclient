@@ -31,16 +31,14 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                 </div>
                 <div className="text-center m-auto">
                     <a href={"https://rocketjudge.com/register/poRnymQW#scriptid=".concat(shareID)} target="_blank">
-                        <button style={{ minWidth: "270px", fontSize: "26px", color: "black", background: "#d3d25a" }}>Click Here to Submit </button>
+                        <button style={{ minWidth: "270px", fontSize: "26px", color: "black", background: "#d3d25a" }}>Click Here to Submit</button>
                     </a>
                 </div>
             </div>
         </div>
 
-        <div className="modal-footer border-t-0">
-            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <span onClick={close}><a href="#" style={{ color: "#d04f4d", marginRight: "14px" }}><i className="icon icon-cross2"></i>CANCEL</a></span>
-            </div>
+        <div className="modal-footer">
+            <button onClick={close} className="btn btn-default">CANCEL</button>
         </div>
     </div>
 }

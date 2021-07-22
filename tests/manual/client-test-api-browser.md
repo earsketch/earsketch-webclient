@@ -42,8 +42,9 @@ will show `print()`, javascript `println()`.
 4. Search
 Use the api browser's search box.
 
-5. (future test)
-
+5. Links to "Every effect explained in detail"
+Confirm that the curriculum chapter opens for the link within rhythmEffects, 
+setEffect, and setEffect 2.
 
 6. (future test)
 

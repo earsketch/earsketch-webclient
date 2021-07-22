@@ -1,7 +1,8 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 
-import ESApiDoc, { APIItem } from '../data/api_doc';
-import { selectScriptLanguage } from '../app/appState';
+import { APIItem, ESApiDoc } from '../data/api_doc';
+import { selectScriptLanguage, selectLocale } from '../app/appState';
+import i18n from "i18next";
 import { RootState } from '../reducers';
 
 const apiSlice = createSlice({
@@ -24,13 +25,13 @@ export const {
 export const selectSearchText = (state: RootState) => state.api.searchText
 
 export const selectFilteredEntries = createSelector(
-    [selectSearchText, selectScriptLanguage],
-    (searchText, language) => {
+    [selectSearchText, selectScriptLanguage, selectLocale],
+    (searchText, language, locale) => {
         searchText = searchText.toLowerCase()
         return Object.entries(ESApiDoc).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
             const entries = Array.isArray(data) ? data : [data]
             return entries.some(obj => {
-                const description = obj.description?.toLowerCase();
+                const description = i18n.t(obj.descriptionKey).toLowerCase();
                 const params = obj.parameters && Object.keys(obj.parameters)
                 const field = `${name.toLowerCase()}${description}${params}`
                 return field.includes(searchText) && (!obj.meta || (obj.meta.language === language))

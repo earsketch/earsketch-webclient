@@ -228,17 +228,10 @@ button:focus {
 }
 
 #logged-in {
-  button {
-    background-color: #939393;
-  }
-}
-
-#logged-in {
-  button {
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-size: 16px;
-  }
+  background-color: #939393;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 16px;
 }
 
 .floating-bar {
@@ -422,56 +415,6 @@ button:focus {
 //  margin: 8px 6px 0 0;
 //}
 
-/* Loader */
-.loader {
-  z-index: @front;
-  background-color: @bg;
-  color: @light-font;
-}
-
-.loading-spinner {
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid @earsketch-blue;
-  border-bottom: 16px solid @earsketch-blue;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-  display: block;
-  margin-left: auto;
-  margin-right: auto
-}
-
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-#screen {
-  position:absolute;
-  padding-top: 100px;
-  padding-bottom: 25px;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display:inline-table;
-}
-
-#screen p, #screen h1{
-  width: 80%;
-  margin: 0 auto;
-  text-align: center;
-}
-
 /* Content */
 #content {
   overflow-y:hidden;
@@ -638,10 +581,6 @@ i.selection {
 
 #container ~.dropdown-menu .glyphicon:empty {
   width: auto;
-}
-
-.dropdown.tabdrop {
-  margin-right: 0 !important;
 }
 
 /* ROW OVERRIDE */
@@ -852,10 +791,6 @@ textarea:focus {
 }
 
 //=== these might be obsolete===
-.loggedInMsg {
-  color: #eee;
-}
-
 .uploadSuccess {
   background-color: #dff0d8;
   -webkit-border-radius: 5px;
@@ -1476,7 +1411,8 @@ input.form-search {
   margin-bottom: 10px;
 }
 
-.modal-body.transparent input {
+.modal-body.transparent input[type="text"],
+.modal-body.transparent input[type="number"] {
     background: transparent;
     border: solid 2px transparent;
     border-bottom: solid 2px gray;
@@ -1501,20 +1437,6 @@ input.form-search {
   margin-right: 40px;
 }
 
-
-#record-section-container {
-  height: 70px;
-}
-
-#record-section-container > div {
-  position: absolute;
-}
-
-#waveform {
-  left: 135px;
-  bottom: 10px;
-}
-
 #count-measures-input #tempoSlider {
   width: 150px;
   margin-top: 10px;
@@ -1531,46 +1453,8 @@ input.form-search {
   transform: rotate(-45deg); 
 }
 
-.counter-meter span {
-  font-size: 3em;
-  position: relative;
-  left: 5px;
-  top: -4px;
-  display:block;
-  -ms-transform: rotate(45deg); 
-  -webkit-transform: rotate(45deg); 
-  transform: rotate(45deg); 
-}
-
 .counter-meter.hide-metronome {
   border-color: transparent;
-}
-
-#upload-sound-tabcontainer #wavedisplay { 
-  border-bottom: 3px solid gray;
-}
-
-#stop-icon {
-  top: -7px;
-}
-
-#record-button {
-  left: 7px;
-  top: -10px;
-}
-
-#record-button i,
-#preview-button i {
-  font-size: 30px;
-  -webkit-transition: text-shadow 0.5s ease;
-  -moz-transition: text-shadow 0.5s ease;
-  -o-transition: text-shadow 0.5s ease;
-  transition: text-shadow 0.5s ease;
-}
-
-#record-clear-button {
-  float: right;
-  margin-right: 3px;
 }
 
 #upload-sound-tabcontainer #record-button:hover {
@@ -1631,11 +1515,6 @@ input.form-search {
 .btn-filter.btn-show-fav:hover,
 .btn-filter.btn-show-deleted-scripts:hover {
   opacity: 0.7 !important;
-}
-
-textarea.form-control {
-  background: transparent;
-  margin-top: 15px;
 }
 
 .share-script-menu-descriptions {
@@ -1718,70 +1597,4 @@ textarea.form-control {
   color: black;
   font-family: Roboto, Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   font-size: 14px;
-}
-
-#admin-window {
-  .table-header {
-    font-size: 20px;
-  }
-
-  .remove-role {
-    color:#d04f4d;
-
-    &:hover {
-      font-size: 12px;
-    }
-  }
-
-  .add-role {
-    padding-top: 10px;
-
-    & > input {
-      width: 50%
-    }
-
-    & > div, & > a {
-      width: 25%;
-    }
-
-    & > div > button {
-      color: black;
-    }
-  }
-
-  .users-container {
-    max-height: 300px;
-    overflow: scroll;
-  }
-
-  .username-col {
-    padding-left: 0px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-  }
-
-  .role-col {
-    padding-left: 22px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-
-    .admin {
-      border: 1px solid white;
-      border-radius: 10px;
-      padding: 4px;
-    }
-
-    .teacher {
-      border: 1px solid white;
-      border-radius: 10px;
-      padding: 4px;
-    }
-  }
-
-  .add-role-button {
-    cursor: pointer;
-    padding-top: 5px;
-    padding-left: 0px;
-    margin-left: -10px;
-  }
 }

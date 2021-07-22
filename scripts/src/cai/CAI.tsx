@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react'
-import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
-import { Provider, useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Collapsed } from '../browser/Browser'
 
 import * as cai from './caiState'
-import * as tabs from '../editor/tabState'
+import * as tabs from '../ide/tabState'
 import * as appState from '../app/appState'
 import * as ESUtils from '../esutils'
-import * as layout from '../layout/layoutState'
+import * as layout from '../ide/layoutState'
 import * as curriculum from '../browser/curriculumState'
 import store from '../reducers'
 
@@ -42,21 +40,22 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 backgroundColor: message.sender !== "CAI" ? 'darkgray' : 'lightgray' }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
+                    {/* TODO: Refactor using map. */}
                     {message.text[0]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,0]))} style={{color:"blue"}}>{message.keyword[0][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,0])) }} style={{ color:"blue" }}>{message.keyword[0][0]}</a>
                     {message.text[1]}
-                    <a href="#" onClick={() =>dispatch(cai.openCurriculum([message,1]))} style={{color:"blue"}}>{message.keyword[1][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,1])) }} style={{ color:"blue" }}>{message.keyword[1][0]}</a>
                     {message.text[2]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,2]))} style={{color:"blue"}}>{message.keyword[2][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,2])) }} style={{ color:"blue" }}>{message.keyword[2][0]}</a>
                     {message.text[3]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,3]))} style={{color:"blue"}}>{message.keyword[3][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,3])) }} style={{ color:"blue" }}>{message.keyword[3][0]}</a>
                     {message.text[4]}
-                    <a href="#" onClick={() => dispatch(cai.openCurriculum([message,4]))} style={{color:"blue"}}>{message.keyword[4][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message,4])) }} style={{ color:"blue" }}>{message.keyword[4][0]}</a>
                     {message.text[5]}
                 </div>
             </div>
             <div className="chat-message-date" style={{float: message.sender !== "CAI" ? 'left' : 'right'}}>
-                {ESUtils.formatTimer(Date.now() - message.date)}
+                {ESUtils.formatTime(Date.now() - message.date)}
             </div>
         </div>
     )
@@ -141,14 +140,14 @@ const CaiFooter = () => {
 }
 
 
-const CaiPane = () => {
+export const CAI = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
 
-    useEffect (() => {
+    useEffect(() => {
         dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
         dispatch(cai.curriculumPage(curriculumLocation))
     })
@@ -162,16 +161,6 @@ const CaiPane = () => {
     ) : <Collapsed title='CAI' position='east' />
 }
 
-
-const HotCAI = hot((props: {
-    $ngRedux: any // TODO: Use ngRedux.INgRedux with proper generic type for dispatch
-}) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <CaiPane />
-        </Provider>
-    )
-})
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
@@ -191,5 +180,3 @@ if (FLAGS.SHOW_CAI) {
         }
     }, 5000)
 }
-
-app.component('cai', react2angular(HotCAI, null, ['$ngRedux']))

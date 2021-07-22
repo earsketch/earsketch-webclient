@@ -1,14 +1,11 @@
 // Manage client-side collaboration sessions.
 import { Ace, Range } from "ace-builds"
 
-import { ScriptEntity } from "common"
-import * as editor from "../editor/Editor"
+import { Script } from "common"
+import * as editor from "../ide/Editor"
 import esconsole from "../esconsole"
-import * as helpers from "../helpers"
-import store from "../reducers"
 import reporter from "./reporter"
-import * as scripts from "../browser/scriptsState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 interface Message {
@@ -58,7 +55,7 @@ interface MultiOperation {
 
 type EditOperation = InsertOperation | RemoveOperation | MultiOperation
 
-export let script: ScriptEntity | null = null  // script object: only used for the off-line mode
+export let script: Script | null = null  // script object: only used for the off-line mode
 export let scriptID: string | null = null  // collaboration session identity (both local and remote)
 
 export let userName = ""
@@ -107,7 +104,7 @@ let scriptCheckTimerID: number = 0
 export const callbacks = {
     refreshScriptBrowser: null as Function | null,
     refreshSharedScriptBrowser: null as Function | null,
-    closeSharedScriptIfOpen: null as Function | null,
+    closeSharedScriptIfOpen: null as ((id: string) => void) | null,
     chat: null as Function | null,
     onJoin: null as Function | null,
     onLeave: null as Function | null,
@@ -138,7 +135,7 @@ export function setUserName(username_: string) {
 }
 
 // Opening a script with collaborators starts a real-time collaboration session.
-export function openScript(script_: ScriptEntity, userName: string) {
+export function openScript(script_: Script, userName: string) {
     script = script_
     script.username = script.username.toLowerCase()  // #1858
     userName = userName.toLowerCase()  // #1858
@@ -191,13 +188,11 @@ export function openScript(script_: ScriptEntity, userName: string) {
     reporter.openSharedScript()
 }
 
-export function closeScript(shareID: string, userName: string) {
-    userName = userName.toLowerCase()  // #1858
-
+export function closeScript(shareID: string) {
     if (scriptID === shareID) {
         esconsole("closing a collaborative script: " + shareID, "collab")
 
-        leaveSession(shareID, userName)
+        leaveSession(shareID)
         lockEditor = false
         removeOtherCursors()
         active = false
@@ -292,7 +287,7 @@ function onSessionsFull(data: Message) {
     openScriptOffline(script!)
 }
 
-function openScriptOffline(script: ScriptEntity) {
+function openScriptOffline(script: Script) {
     esconsole("opening a collaborative script in the off-line mode", "collab")
     script.username = script.username.toLocaleString()  // #1858
     script.collaborative = false
@@ -307,7 +302,7 @@ function openScriptOffline(script: ScriptEntity) {
     reporter.openSharedScript()
 }
 
-export function leaveSession(shareID: string, username?: string) {
+export function leaveSession(shareID: string) {
     esconsole("leaving collaboration session: " + shareID, "collab")
     lockEditor = true
     websocket.send({ action: "leaveSession", ...makeWebsocketMessage() })
@@ -325,7 +320,6 @@ function onMemberJoinedSession(data: Message) {
             canEdit: true
         }
     }
-    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 function onMemberLeftSession(data: Message) {
@@ -336,7 +330,6 @@ function onMemberLeftSession(data: Message) {
     }
 
     otherMembers[data.sender].active = false
-    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 export function addCollaborators(shareID: string, userName: string, collaborators: string[]) {
@@ -587,7 +580,6 @@ export function saveScript(_scriptID?: string) {
 function onScriptSaved(data: Message) {
     if (!userIsCAI(data.sender))
         userNotification.show(data.sender + " saved the current version of the script.", "success")
-    store.dispatch(scripts.syncToNgUserProject())
 }
 
 export function storeCursor(position: Ace.Point) {
@@ -679,8 +671,6 @@ function onSessionClosed(data: Message) {
     for (const member in otherMembers) {
         otherMembers[member].active = false
     }
-
-    helpers.getNgRootScope().$apply()  // update GUI
 }
 
 function onSessionClosedForInactivity(data: Message) {
@@ -918,7 +908,6 @@ async function onUserAddedToCollaboration(data: Message) {
 
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 }
 
@@ -935,7 +924,6 @@ async function onUserRemovedFromCollaboration(data: Message) {
 
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 }
 
@@ -959,7 +947,7 @@ async function onUserLeftCollaboration(data: Message) {
 
         // close collab session tab if it's active and no more collaborators left
         if (Object.keys(otherMembers).length === 0) {
-            closeScript(data.scriptID, userName)
+            closeScript(data.scriptID)
         }
     }
 
@@ -969,7 +957,6 @@ async function onUserLeftCollaboration(data: Message) {
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
     }
-    store.dispatch(scripts.syncToNgUserProject())
 }
 
 export function renameScript(scriptID: string, scriptName: string, userName: string) {
@@ -988,7 +975,6 @@ async function onScriptRenamed(data: Message) {
 
     if (callbacks.refreshSharedScriptBrowser) {
         await callbacks.refreshSharedScriptBrowser()
-        store.dispatch(scripts.syncToNgUserProject())
     }
 }
 

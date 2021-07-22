@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Provider, useSelector, useDispatch } from 'react-redux'
-import { hot } from 'react-hot-loader/root'
-import { react2angular } from 'react2angular'
+import { useSelector, useDispatch } from 'react-redux'
 
 import * as appState from '../app/appState'
 import * as applyEffects from '../model/applyeffects'
 import { setReady } from '../bubble/bubbleState'
-import * as helpers from "../helpers"
+import { compileCode } from "../ide/IDE"
 import * as player from '../app/player'
 import esconsole from '../esconsole'
 import * as ESUtils from '../esutils'
@@ -14,24 +12,29 @@ import store, { RootState } from '../reducers'
 import * as WaveformCache from '../app/waveformcache'
 
 import * as daw from './dawState'
+import { useTranslation } from "react-i18next"
 
 // Width of track control box
 const X_OFFSET = 100
 
+// Hack because local state gets cleared when the DAW is replaced by a loading screen...
+let _embedCompiled = false
+
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
     const dispatch = useDispatch()
+    const hideDAW = useSelector(appState.selectHideDAW)
     const playLength = useSelector(daw.selectPlayLength)
     const bubble = useSelector((state: RootState) => state.bubble)
     const playing = useSelector(daw.selectPlaying)
     const soloMute = useSelector(daw.selectSoloMute)
-    const muted = useSelector(daw.selectMuted)
-    const bypass = useSelector(daw.selectBypass)
     const metronome = useSelector(daw.selectMetronome)
     const tracks = useSelector(daw.selectTracks)
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const [needCompile, setNeedCompile] = useState(embedMode)
+    const [embedCompiled, setEmbedCompiled] = useState(_embedCompiled)
+    const needCompile = embedMode && !embedCompiled
+    const { t } = useTranslation()
 
     const playbackStartedCallback = () => {
         dispatch(daw.setPlaying(true))
@@ -39,10 +42,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const playbackEndedCallback = () => {
-        if (!loop.on) {
-            dispatch(daw.setPlaying(false))
-            setPlayPosition(1)
-        }
+        dispatch(daw.setPlaying(false))
+        setPlayPosition(1)
     }
 
     const play = () => {
@@ -50,10 +51,11 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             dispatch(setReady(true))
         }
 
-        // TODO: Update after relevant components get ported.
-        if (needCompile) {
-            helpers.getNgRootScope().$broadcast('compileembeddedTrack', true)
-            setNeedCompile(false)
+        // In embedded mode, play button doubles as run button.
+        if (embedMode && !embedCompiled) {
+            compileCode()
+            setEmbedCompiled(true)
+            _embedCompiled = true
             return
         }
 
@@ -87,7 +89,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.setLoop(newLoop)
     }
 
-    const shareScriptLink = `${SITE_BASE_URI}?sharing=${useSelector(appState.selectEmbeddedShareID)}`
+    const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(appState.selectEmbeddedShareID)}`
 
     const [volume, setVolume] = useState(0)  // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
@@ -120,23 +122,23 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }
 
-    const [title, setTitle] = useState<string | null>(null)
+    const [titleKey, setTitleKey] = useState<string | null>(null)
 
     const el = useRef<HTMLDivElement>(null)
 
     // Update title/icon display whenever element size changes.
     const observer = new ResizeObserver(entries => {
         const width = entries[0].contentRect.width
-        const short = "DAW"
-        const long = "DIGITAL AUDIO WORKSTATION"
+        const shortKey = "daw.shortTitle"
+        const longKey = "daw.title"
         if (embedMode) {
-            setTitle(short)
+            setTitleKey(hideDAW ? null : shortKey)
         } else if (width > 590) {
-            setTitle(long)
+            setTitleKey(longKey)
         } else if (width > 405) {
-            setTitle(short)
+            setTitleKey(shortKey)
         } else {
-            setTitle(null)
+            setTitleKey(null)
         }
     })
 
@@ -147,38 +149,38 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="flex-grow-0 bg-gray-900">
+    return <div ref={el} id="dawHeader" className="flex-grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
-                {title
-                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{title}</span>}
+                {titleKey
+                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
             </span>
         </div>
         {embedMode && <div>
-            <a target="_blank" href={shareScriptLink}> Click Here to view in EarSketch </a>
+            <a target="_blank" href={shareScriptLink}> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
         <div className="daw-transport-container">
             {/* Beginning */}
             <span className="daw-transport-button">
-                <button type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title="Reset" onClick={reset}>
+                <button type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t('daw.tooltip.reset')} onClick={reset}>
                     <span className="icon icon-first"></span>
                 </button>
             </span>
 
-            <span id="daw-play-button" uib-popover-html="getPopoverContent('play')" popover-placement="bottom" popover-is-open="showDAWKeyShortcuts" popover-animation="true" popover-trigger="'none'">
+            <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title="Play" onClick={play}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t('daw.tooltip.play')} onClick={play}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title="Pause" onClick={pause}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t('daw.tooltip.pause')} onClick={pause}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -186,7 +188,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Loop Project" onClick={toggleLoop}>
+                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t('daw.tooltip.loopProject')} onClick={toggleLoop}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
@@ -195,14 +197,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 NOTE: In Angular implementation, this was conditional on `horzOverflow`, but it was 'always on for now'.
                 Hence, I have simply made it unconditional here. */}
             <span className="daw-transport-button follow-icon">
-                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title="Auto-scroll to follow the playback" onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t('daw.tooltip.autoScroll')} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
                 </button>
             </span>
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title="Toggle Metronome" data-placement="bottom" onClick={toggleMetronome}>
+                <button id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t('daw.tooltip.toggleMetronome')} data-placement="bottom" onClick={toggleMetronome}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -210,7 +212,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
-                    <button id="muteButton" className="btn dark:text-white hover:opacity-70" style={{width: "40px"}} title="Toggle Volume" data-toggle="tooltip" data-placement="bottom">
+                    <button id="muteButton" className="btn dark:text-white hover:opacity-70" style={{width: "40px"}} title={t('daw.tooltip.toggleVolume')} data-toggle="tooltip" data-placement="bottom">
                         <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
                     </button>
                 </span>
@@ -229,6 +231,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const showEffects = useSelector(daw.selectShowEffects)
+    const { t } = useTranslation()
 
     return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
@@ -236,8 +239,8 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title="Solo">S</button>
-                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title="Mute">M</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t('daw.tooltip.solo')}>{t('daw.abbreviation.solo')}</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t('daw.tooltip.mute')}>{t('daw.abbreviation.mute')}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
@@ -249,9 +252,9 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
             <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
-                <div className="dawTrackEffectName">Effect {index+1}</div>
+                <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
                 <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
-                    Bypass
+                    {t('daw.bypass')}
                 </button>
             </div>
             <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
@@ -399,6 +402,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
     const showEffects = useSelector(daw.selectShowEffects)
     const trackWidth = useSelector(daw.selectTrackWidth)
     const hideMixTrackLabel = trackWidth < 950
+    const { t } = useTranslation()
 
     return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
         <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
@@ -414,9 +418,9 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
         <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
             <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
                 <div className="dawTrackName"></div>
-                <div className="dawTrackEffectName">Effect {index+1}</div>
+                <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
                 <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
-                    Bypass
+                    {t('daw.bypass')}
                 </button>
             </div>
             <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
@@ -605,7 +609,7 @@ let _setPlayPosition: ((a: number) => void) | null = null
 
 export function setDAWData(result: player.DAWData) {
     const { dispatch, getState } = store
-    const state = getState()
+    let state = getState()
 
     prepareWaveforms(result.tracks, result.tempo)
 
@@ -640,14 +644,6 @@ export function setDAWData(result: player.DAWData) {
         mix.label = 'MIX'
         mix.buttons = false
     }
-    if (metronome !== undefined) {
-        metronome.visible = false
-        metronome.mute = !state.daw.metronome
-        metronome.effects = {}
-    }
-
-    // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
-    dispatch(daw.setTracks(tracks))
 
     if (lastTab !== state.tabs.activeTabID) {
         // User switched tabs since the last run.
@@ -662,7 +658,18 @@ export function setDAWData(result: player.DAWData) {
         dispatch(daw.setTrackWidth(64000 / playLength))
         dispatch(daw.setTrackHeight(45))
         lastTab = state.tabs.activeTabID
+        // Get updated state after dispatches:
+        state = getState()
     }
+
+    if (metronome !== undefined) {
+        metronome.visible = false
+        metronome.mute = !state.daw.metronome
+        metronome.effects = {}
+    }
+
+    // Without copying clips above, this dispatch freezes all of the clips, which breaks player.
+    dispatch(daw.setTracks(tracks))
 
     player.setRenderingData(result)
     player.setMutedTracks(daw.getMuted(tracks, state.daw.soloMute, state.daw.metronome))
@@ -677,23 +684,6 @@ export function setDAWData(result: player.DAWData) {
         newLoop.end = playLength
     }
     dispatch(daw.setLoop(newLoop))
-}
-
-let setupDone = false
-const setup = () => {
-    if (setupDone) return
-    setupDone = true
-
-    const $scope = helpers.getNgController('ideController').scope()
-
-    // everything in here gets reset when a new project is loaded
-    // Listen for the IDE to compile code and return a JSON result
-    $scope.$watch('compiled', (result: player.DAWData | null | undefined) => {
-        if (result) {
-            esconsole("code compiled", "daw")
-            setDAWData(result)
-        }
-    })
 }
 
 export const DAW = () => {
@@ -721,6 +711,8 @@ export const DAW = () => {
     const trackWidth = useSelector(daw.selectTrackWidth)
     const trackHeight = useSelector(daw.selectTrackHeight)
     const totalTrackHeight = useSelector(daw.selectTotalTrackHeight)
+
+    const { t } = useTranslation()
 
     const zoomX = (steps: number) => {
         dispatch(daw.setTrackWidth(Math.min(Math.max(650, trackWidth + steps * 100), 50000)))
@@ -973,11 +965,11 @@ export const DAW = () => {
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {!hideDAW &&
-        <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
+        <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
-                    title="Toggle All Effects" onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span className="mr-1">EFFECTS</span>
+                    title={t('daw.tooltip.toggleEffects')} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                <span className="mr-1">{t('daw.effect', { count: 0 }).toLocaleUpperCase()}</span>
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
 
@@ -1052,14 +1044,3 @@ export const DAW = () => {
         </div>}
     </div>
 }
-
-const HotDAW = hot(() => {
-    setup()
-    return (
-        <Provider store={store}>
-            <DAW />
-        </Provider>
-    )
-})
-
-app.component('daw', react2angular(HotDAW))

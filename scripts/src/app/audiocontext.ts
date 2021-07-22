@@ -27,3 +27,13 @@ context.onstatechange = () => {
     }
 }
 
+// For Chrome 66+ web-audio restriction.
+// See: https://bugs.chromium.org/p/chromium/issues/detail?id=807017
+function resumeAudioContext() {
+    if (context.state !== "running") {
+        context.resume()
+    }
+    document.removeEventListener("click", resumeAudioContext)
+}
+
+document.addEventListener("click", resumeAudioContext)

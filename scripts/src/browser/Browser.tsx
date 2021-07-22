@@ -1,18 +1,15 @@
 import React, { ChangeEventHandler, LegacyRef, MouseEventHandler, useEffect, useState } from 'react';
-import { Store } from 'redux';
-import { Provider, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { usePopper } from "react-popper";
-import { hot } from 'react-hot-loader/root';
-import { react2angular } from 'react2angular';
 import { useTranslation } from 'react-i18next';
 
 import * as appState from '../app/appState';
-import * as layout from '../layout/layoutState';
+import * as layout from '../ide/layoutState';
 import { SoundBrowser } from './Sounds';
 import { ScriptBrowser } from './Scripts';
 import { APIBrowser } from './API';
 import { RootState } from '../reducers';
-import { BrowserTabType } from "../layout/layoutState";
+import { BrowserTabType } from "../ide/layoutState";
 
 const darkBgColor = '#223546';
 
@@ -27,13 +24,13 @@ export const TitleBar = () => {
             style={{minHeight: 'fit-content'}}  // Safari-specific issue
         >
             <div className='pl-3 pr-4 font-semibold truncate'>
-                {t('contentManager.title')}
+                {t('contentManager.title').toLocaleUpperCase()}
             </div>
             <div>
                 <div
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme==='light' ? 'bg-black' : 'bg-gray-700'}`}
                     onClick={() => {
-                        dispatch(layout.collapseWest());
+                        dispatch(layout.setWest({ open: false }));
                     }}
                 >
                     <div className='w-5 h-5 bg-white rounded-full'>&nbsp;</div>
@@ -77,10 +74,10 @@ export const BrowserTabs = () => {
                 minHeight: 'fit-content' // Safari-specific issue
             }}
         >
-            <BrowserTab name={t('soundBrowser.title')} type={BrowserTabType.Sound}>
+            <BrowserTab name={t('soundBrowser.title').toLocaleUpperCase()} type={BrowserTabType.Sound}>
                 <i className='icon-headphones pr-2' />
             </BrowserTab>
-            <BrowserTab name={t('scriptBrowser.title')} type={BrowserTabType.Script}>
+            <BrowserTab name={t('script', { count: 0 }).toLocaleUpperCase()} type={BrowserTabType.Script}>
                 <i className='icon-embed2 pr-2' />
             </BrowserTab>
             <BrowserTab name='API' type={BrowserTabType.API}>
@@ -109,7 +106,7 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchB
                 <input
                     className='w-full outline-none p-1 bg-transparent font-normal'
                     type='text'
-                    placeholder={t('contentManager.searchPlaceholder')}
+                    placeholder={t('search')}
                     value={searchText}
                     onChange={dispatchSearch}
                 />
@@ -195,10 +192,9 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
         >
             <div>
                 <FilterItem
-                    value='Clear'
                     category={category}
+                    isClearItem={true}
                 />
-                <hr className={`border-1 my-2 ${theme==='light' ? ' border-black' : 'border-white'}`} />
                 {
                     items.map((item,index) => <FilterItem
                         key={index}
@@ -268,7 +264,7 @@ export const Collapsed:React.FC<{ position:'west'|'east', title:string }> = ({ p
         <div
             className={`${embedMode ? 'hidden' : 'flex'} flex-col h-full cursor-pointer`}
             onClick={() => {
-                position==='west' ? dispatch(layout.openWest()) : dispatch(layout.openEast());
+                position==='west' ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }));
             }}
         >
             <div
@@ -303,11 +299,11 @@ const BrowserComponents: { [key in BrowserTabType]: React.FC } = {
     [BrowserTabType.API]: APIBrowser
 };
 
-const Browser = () => {
+export const Browser = () => {
     const theme = useSelector(appState.selectColorTheme);
     const open = useSelector((state: RootState) => state.layout.west.open);
     const { t } = useTranslation();
-    let kind = useSelector(layout.selectWestKind);
+    let kind: BrowserTabType = useSelector(layout.selectWestKind);
 
     if (!Object.values(BrowserTabType).includes(kind)) {
         kind = BrowserTabType.Sound;
@@ -315,30 +311,15 @@ const Browser = () => {
 
     const BrowserBody = BrowserComponents[kind];
 
-    return (
-        <div
+    return <div
             className={`flex flex-col h-full w-full text-left font-sans ${theme==='light' ? 'bg-white text-black' : 'bg-gray-900 text-white'}`}
-            id='content-manager'
-        >
-            {
-                open ? (
-                    <>
-                        <TitleBar />
-                        <BrowserTabs />
-                        <BrowserBody />
-                    </>
-                ) : <Collapsed title={t('contentManager.title')} position='west' />
-            }
+            id='content-manager'>
+        <div className={"flex flex-col h-full" + (open ? "" : " hidden")}>
+            <TitleBar />
+            <BrowserTabs />
+            {Object.entries(BrowserComponents).map(([type, TabBody]) =>
+            <div key={type} className={"flex flex-col flex-grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
         </div>
-    );
+        {!open && <Collapsed title={t('contentManager.title').toLocaleUpperCase()} position='west' />}
+    </div>
 };
-
-const HotBrowser = hot((props: { $ngRedux: Store }) => {
-    return (
-        <Provider store={props.$ngRedux}>
-            <Browser />
-        </Provider>
-    );
-});
-
-app.component('contentManager', react2angular(HotBrowser, null, ['$ngRedux']));

@@ -120,7 +120,7 @@ export function getPropertyButtons() {
 }
 
 // Update model with key/value pair.
-export function updateModel(property: string, value: any) {
+export function updateModel(property: string, value: string) {
     switch (property) {
         case 'genre':
         case 'code structure':

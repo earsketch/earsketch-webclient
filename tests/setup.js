@@ -1,30 +1,24 @@
-window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000;
+/* eslint-env jasmine */
+window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000
 
-window.SITE_DIRECTORY = '/base';
-window.SITE_BASE_URI = location.origin + '/base';
-window.BUILD_NUM = 0;
-window.REPORT_LOG = [];
-window.URL_DOMAIN = URL_DOMAIN;
-window.URL_LOADAUDIO = URL_LOADAUDIO;
-window.ES_PASSTHROUGH = ES_PASSTHROUGH;
-window.ESCurr_TOC = ESCurr_TOC;
-window.ESCurr_Pages = ESCurr_Pages;
-window.ESCurr_SearchDoc = ESCurr_SearchDoc;
+window.SITE_DIRECTORY = "/base"
+window.SITE_BASE_URI = location.origin + "/base"
+window.BUILD_NUM = 0
 
-window.customMatchers = {
-    toMatchResult: function(util, customEqualityTesters) {
+export const customMatchers = {
+    toMatchResult() {
         return {
-            compare: function(actual, expected, script) {
-                const result = matchResult(actual, expected);
+            compare(actual, expected, script) {
+                const result = matchResult(actual, expected)
                 if (!result.pass) {
-                    result.message +='\nScript:\n\n';
-                    result.message += script;
+                    result.message += "\nScript:\n\n"
+                    result.message += script
                 }
                 return result
-            }
-        };
-    }
-};
+            },
+        }
+    },
+}
 
 /**
  * A custom Jasmine matcher that matches compiler result outputs. Does not
@@ -35,80 +29,77 @@ window.customMatchers = {
  * @returns true if actual is similar to expected
  */
 function matchResult(actual, expected) {
-
     if (actual.tempo !== expected.tempo) {
         return {
             pass: false,
-            message: 'Expected tempo: ' + expected.tempo + '\n'
-                + 'Actual tempo: ' + actual.tempo
+            message: "Expected tempo: " + expected.tempo + "\n" +
+                "Actual tempo: " + actual.tempo,
         }
     }
 
     if (actual.length !== expected.length) {
         return {
             pass: false,
-            message: 'Expected length: ' + expected.length + '\n'
-                + 'Actual length: ' + actual.length
+            message: "Expected length: " + expected.length + "\n" +
+                "Actual length: " + actual.length,
         }
     }
 
     // exclude metronome
-    var actualTracks = actual.tracks.slice(0,-1)
+    const actualTracks = actual.tracks.slice(0, -1)
 
     if (actualTracks.length !== expected.tracks.length) {
         return {
             pass: false,
-            message: 'Number of expected tracks: ' + expected.tracks.length + '\n'
-                + 'Actual number of tracks: ' + actualTracks.length
+            message: "Number of expected tracks: " + expected.tracks.length + "\n" +
+                "Actual number of tracks: " + actualTracks.length,
         }
     }
 
-    for (var track in actualTracks) {
-        var actualTrack = actualTracks[track];
-        var expectedTrack = expected.tracks[track];
+    for (const track in actualTracks) {
+        const actualTrack = actualTracks[track]
+        const expectedTrack = expected.tracks[track]
 
-        var actualClips = actualTrack.clips.sort(sortClips);
-        var expectedClips = expectedTrack.clips.sort(sortClips);
+        const actualClips = actualTrack.clips.sort(sortClips)
+        const expectedClips = expectedTrack.clips.sort(sortClips)
 
-        console.log(JSON.stringify(actualClips));
-        console.log('--------------');
-        console.log(JSON.stringify(expectedClips));
+        console.log(JSON.stringify(actualClips))
+        console.log("--------------")
+        console.log(JSON.stringify(expectedClips))
 
         if (!checkSimilarity(actualClips, expectedClips)) {
             return {
                 pass: false,
-                message: 'Differing track ' + track + '.\n'
-                    + 'Expected:\n\n' + JSON.stringify(expectedTrack) + '\n\n'
-                    + 'Actual:\n\n' + JSON.stringify(actualTrack) + '\n\n'
-            };
-        }
-
-        if (expectedTrack.effects !== undefined
-            && actualTrack.effects !== undefined) {
-            if (!checkSimilarity(actualTrack.effects, expectedTrack.effects)) {
-                return {
-                    pass: false,
-                    message: 'Differing effects on track ' + track + '.\n'
-                        + 'Expected:\n\n' + JSON.stringify(expectedTrack.effects) + '\n\n'
-                        + 'Actual:\n\n' + JSON.stringify(actualTrack.effects) + '\n\n'
-                }
+                message: "Differing track " + track + ".\n" +
+                    "Expected:\n\n" + JSON.stringify(expectedTrack) + "\n\n" +
+                    "Actual:\n\n" + JSON.stringify(actualTrack) + "\n\n",
             }
         }
 
+        if (expectedTrack.effects !== undefined &&
+            actualTrack.effects !== undefined) {
+            if (!checkSimilarity(actualTrack.effects, expectedTrack.effects)) {
+                return {
+                    pass: false,
+                    message: "Differing effects on track " + track + ".\n" +
+                        "Expected:\n\n" + JSON.stringify(expectedTrack.effects) + "\n\n" +
+                        "Actual:\n\n" + JSON.stringify(actualTrack.effects) + "\n\n",
+                }
+            }
+        }
     }
 
     return {
         pass: true,
-        message: 'Results are similar.'
+        message: "Results are similar.",
     }
-
 }
 
 /**
  * Sort clips by start measure.
  */
 function sortClips(a, b) {
-    return a.measure - b.measure;
+    return a.measure - b.measure
 }
 
 /**
@@ -124,106 +115,68 @@ function sortClips(a, b) {
  * @returns true if actual is similar to expected
  */
 function checkSimilarity(actual, expected) {
-    var valid = true;
+    let valid = true
 
     // can't be equal if they're not the same type
-    if (typeof(actual) !== typeof(expected)) {
-        return false;
+    if (typeof (actual) !== typeof (expected)) {
+        return false
     }
 
     // check floats to within 0.01 margin of error
-    if (typeof(actual) === 'number' && typeof(expected) === 'number' &&
-        (actual % 1 !== 0 || expected % 1 !== 0))
-    {
-        var e = 0.01;
-        return (expected - e <= actual && expected + e >= actual);
+    if (typeof (actual) === "number" && typeof (expected) === "number" &&
+        (actual % 1 !== 0 || expected % 1 !== 0)) {
+        const e = 0.01
+        return (expected - e <= actual && expected + e >= actual)
     }
 
     // check primitives
     if (!(actual instanceof Object && expected instanceof Object)) {
-        return (actual === expected);
+        return (actual === expected)
     }
 
     // recursively check objects
     // Only check keys that are expected, this check does not check for
     // extra keys that might be in the actual object
-    for (var key in expected) {
+    for (const key in expected) {
         if (actual[key] === undefined) {
-            return false;
+            return false
         }
         if (!checkSimilarity(actual[key], expected[key])) {
-            valid = false;
+            valid = false
         }
     }
 
-    return valid;
+    return valid
 }
 
-import store from "../scripts/src/reducers";
+require("bootstrapBundle")
 
-require('angular');
-window.angular = angular;
-
-require('angular-mocks');
-require('angular-ui-router');
-require('bootstrapBundle');
-require('uiBootstrap');
-require('angular-animate');
-require('ng-file-upload');
-require('ngClipboard');
-require('angular-confirm');
-require('angularjs-slider');
-require('tabdrop');
-require('ng-redux');
-
-window.ngMidwayTester = require('ngMidwayTester');
-Object.assign(window,require('setup'));
-Object.assign(window,require('dsp'));
+Object.assign(window, require("dsp"))
 // Object.assign(window,require('esDSP'));
-Object.assign(window,require('ccSamples'));
 
-require('uiLayout');
-require('uiUtils');
-require('uiScroll');
-require('uiScrollGrid');
-require('skulpt');
-require('skulptStdLib');
-require('js-interpreter');
-require('droplet');
-require('highlight');
-require('jsDiffLib');
-require('jsDiffView');
-require('lodash');
-require('kali');
-require('chance');
+require("skulpt")
+require("skulptStdLib")
+require("js-interpreter")
+require("droplet")
+require("highlight")
+require("jsDiffLib")
+require("jsDiffView")
+require("lodash")
+require("kali")
+require("chance")
+require("recorder")
 
-// userConsole needs a mock for $uibModal
-angular.module('ui.bootstrap',[])
-    .service('$uibModal',function(){})
-    .service('$uibModalProvider',function(){});
+require("angular")
+window.angular = angular
 
-window.app = angular.module('EarSketchApp',['ui.router','ui.bootstrap','ui.layout','ui.utils','ngAnimate','ngFileUpload','angular-clipboard','angular-confirm','rzModule','ui.scroll','ui.scroll.grid','ngRedux']).config($locationProvider => {
+require("bootstrapBundle")
+require("ng-file-upload")
+
+window.app = angular.module("EarSketchApp", ["ngFileUpload"]).config($locationProvider => {
     // Prevent legacy hash-bang URL being overwritten by $location.
-    $locationProvider.html5Mode(false).hashPrefix('');
-}).config($ngReduxProvider => {
-    $ngReduxProvider.provideStore(store);
-});
-
-require('recorder');
-
-Object.assign(window,require('esAppDSP'));
+    $locationProvider.html5Mode(false).hashPrefix("")
+})
 
 // Controllers
-require('mainController');
-require('ideController');
-require('uploadController');
-require('userHistoryController');
-
-require('adminWindowController');
-
-require('autograderController');
-require('autograder2Controller');
-require('autograderAWSController');
-require('autograder3Controller');
-require('caiAnalysisModule');
-require('complexityCalculator');
+require("codeAnalyzerContestController")
+require("codeAnalyzerCAIController")

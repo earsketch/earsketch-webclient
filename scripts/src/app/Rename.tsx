@@ -1,21 +1,21 @@
 import React, { useState } from "react"
-import { Provider, useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as collaboration from "./collaboration"
-import { ScriptEntity, SoundEntity } from "common"
+import { Script, SoundEntity } from "common"
 import { parseName, parseExt } from "../esutils"
 import reporter from "./reporter"
-import store from "../reducers"
 import { validateScriptName } from "./ScriptCreator"
 import * as sounds from "../browser/soundsState"
-import * as userNotification from "./userNotification"
+import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { useTranslation } from "react-i18next"
 
-export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity, conflict?: boolean, close: (value?: ScriptEntity) => void }) => {
+export const RenameScript = ({ script, conflict, close }: { script: Script, conflict?: boolean, close: (value?: string) => void }) => {
     const [name, setName] = useState(parseName(script.name))
     const extension = parseExt(script.name)
     const [error, setError] = useState("")
+    const { t } = useTranslation()
 
     const confirm = () => {
         try {
@@ -24,36 +24,35 @@ export const RenameScript = ({ script, conflict, close }: { script: ScriptEntity
                 collaboration.renameScript(script.shareid, fullname, userProject.getUsername())
                 reporter.renameSharedScript()
             }
-            script.name = fullname
-            close(script)
+            close(fullname)
         } catch (error) {
-            setError(error)
+            setError(t(error))
         }
     }
 
     return <>
-        <div className="modal-header">Rename Script</div>
+        <div className="modal-header">{t('renameScript.title')}</div>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
             <div className="modal-body">
                 {error && <div className="alert alert-danger">
                     {error}
                 </div>}
-                {conflict && `A script named '${script.name}' already exists in your workspace.`}
-                Enter the new name for this script:
+                {conflict && t('renameScript.alreadyExists', { scriptName: script.name })}
+                {t('renameScript.prompt')}
                 <div className="input-group">
                     <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
                     <span className="input-group-addon">{extension}</span>
                 </div>
             </div>
             <div className="modal-footer">
-                <input type="submit" className="btn btn-primary" value="Rename" />
-                <input type="button" className="btn btn-default" onClick={() => close()} value={conflict ? "Append Suffix" : "Cancel"} />
+                <input type="submit" className="btn btn-primary" value={t('rename.submit') as string} />
+                <input type="button" className="btn btn-default" onClick={() => close(userProject.nextName(script.name))} value={conflict ? t('renameScript.appendSuffix') as string : t('cancel') as string} />
             </div>
         </form>
     </>
 }
 
-const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
+export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
     const dispatch = useDispatch()
     const soundNames = useSelector(sounds.selectAllFileKeys)
     const username = userProject.getUsername().toUpperCase()
@@ -90,22 +89,19 @@ const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }
     }
 
     return <>
-        <div className="modal-header">Rename Sound</div>
+        <div className="modal-header">{t('renameSound.title')}</div>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
             <div className="modal-body">
-                <div>Enter the new name for your sound:</div>
+                <div>{t('renameSound.prompt')}</div>
                 <div className="flex items-center mt-3">
                     <span>{username}_</span>
                     <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} autoFocus />
                 </div>
             </div>
             <div className="modal-footer">
-                <input type="submit" className="btn btn-primary" value="Rename" />
-                <input type="button" className="btn btn-default" onClick={close} value="Cancel" />
+                <input type="submit" className="btn btn-primary" value={t('rename.submit') as string} />
+                <input type="button" className="btn btn-default" onClick={close} value={t('cancel') as string} />
             </div>
         </form>
     </>
 }
-
-const Wrapper = (props: any) => <Provider store={store}><RenameSound {...props} /></Provider>
-export { Wrapper as RenameSound }

@@ -7,7 +7,7 @@ import ctx from "./audiocontext"
 import * as dsp from "../../lib/earsketch-appdsp"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as userConsole from "./userconsole"
+import * as userConsole from "../ide/console"
 import { Clip, EffectRange, Track } from "./player"
 
 interface Point {

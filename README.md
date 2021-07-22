@@ -1,11 +1,57 @@
 # earsketch-webclient
+
 The AngularJS / React web browser client for EarSketch
 
-# Client Overview
+
+## Local client build
+
+1. Clone earsketch-webclient and earsketch-curriculum into the same directory
+
+```bash
+$ git clone https://github.com/GTCMT/earsketch-webclient.git
+$ git clone https://github.com/GTCMT/earsketch-curriculum.git
+```
+
+2. Run curriculum `local_dev_curriculum_asciidoc_builder.sh` _(python3 and BeautifulSoup4 package required)_
+
+```bash
+$ cd earsketch-curriculum/scripts
+
+$ ./local_dev_curriculum_asciidoc_builder.sh /path/to/earsketch-curriculum
+# creates earsketch-curriculum/curriculum-local/*.html
+# creates earsketch-curriculum/curriculum-local/curr_toc.js
+# creates earsketch-curriculum/curriculum-local/curr_pages.js
+# creates earsketch-curriculum/curriculum-local/curr_pages.js
+```
+
+3. Confirm the earsketch-webclient/curriculum link is working _(windows only)_
+
+```bash
+$ ls -l earsketch-webclient/curriculum
+# points to ../earsketch-curriculum/curriculum-local/
+
+# if you do not see directory contents, including curr_toc.js, then re-create it
+$ cd earsketch-webclient
+$ rm curriculum
+$ ln -s ../earsketch-currciulum/curriculum-local curriculum
+```
+
+4. Serve the client with npm
+
+```bash
+$ npm install
+$ grunt less     # prepares css files
+$ npm run serve  # serves client
+```
+
+More details in `earsketch-webclient/DeveloperDocs/build-guide-web-client.md`.
+
+
+## Client Overview
 
 This is a general overview of the web client architecture.
 
-## Libraries
+### Libraries
 
 - AngularJS (but we're transitioning to React)
 - Skulpt, for running Python code in the browser
@@ -19,7 +65,7 @@ This is a general overview of the web client architecture.
 - hilitor, for highlighting search keywords
 - Webpack
 
-## Layout
+### Layout
 
 Everything is under `webclient/`. Most of the subdirectories contain resources (audio, images, HTML, CSS). Some relevant contents:
 
@@ -70,7 +116,7 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
       More code lives in the subdirectory `services/`. The modules here don't touch the UI directly; rather, the are invoked by the relevant controllers. (For example, `dawController.js`(deprecated/removed) uses `services/player.js`, `ideController.js` uses `services/compiler.js`, etc.)
 
-## Notes and Maintenance TODOs
+### Notes and Maintenance TODOs
 
 - `doc/` is the destination folder for inline JSDoc generation, but it is kind of defunct.
 

@@ -1,5 +1,7 @@
+/* eslint-disable new-cap */
 // EarSketch API: Python
 import * as ES_PASSTHROUGH from "./passthrough"
+import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
 
 // NOTE: We could just build this once and expose the module directly,
 // but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.
@@ -22,7 +24,7 @@ export function setupAPI() {
     // Function to initialize a new script in EarSketch.
     // Resets the global result variable to the default value.
     mod.init = new Sk.builtin.func(() => {
-        mod.__ES_RESULT = callPassthrough("init", Sk.builtins["__AUDIO_QUALITY"])
+        mod.__ES_RESULT = callPassthrough("init", Sk.builtins.__AUDIO_QUALITY)
     })
 
     const passthroughList = ["setTempo", "finish", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
@@ -33,7 +35,7 @@ export function setupAPI() {
         })
     }
 
-    const returnablePassthroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
+    const returnablePassthroughList = ["gauss", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
 
     for (const name of returnablePassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => callPassthrough(name, ...args))
@@ -45,7 +47,7 @@ export function setupAPI() {
         mod[name] = new Sk.builtin.func((...args: any[]) => callModAndReturnPassthrough(name, ...args))
     }
 
-    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
+    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
 
     for (const name of suspendedPassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => suspendPassthrough(name, ...args))
@@ -108,6 +110,31 @@ export function setupAPI() {
     const module = new Sk.builtin.module()
     Sk.sysmodules.mp$ass_subscript("earsketch", module)
     module.$d = mod
+
+    // Migrated from ideController:
+    // Function to pipe Skulpt's stdout to the EarSketch console.
+    function outf(text: string) {
+        // Skulpt prints a newline character after every `print`.
+        // println and userConsole.log already print each message as a new line, so we ignore these newlines.
+        if (text !== "\n") {
+            ES_PASSTHROUGH.println(Sk.ffi.remapToJs(mod.__ES_RESULT), text)
+        }
+    }
+
+    function builtinRead(x: string) {
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles.files[x] === undefined) {
+            throw new Error(`File not found: '${x}'`)
+        }
+        return Sk.builtinFiles.files[x]
+    }
+
+    Sk.pre = "output"
+    Sk.configure({ output: outf, read: builtinRead })
+
+    // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
+    for (const constant of EFFECT_TAGS.concat(ANALYSIS_TAGS)) {
+        Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
+    }
 }
 
 export default setupAPI

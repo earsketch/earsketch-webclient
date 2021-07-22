@@ -1,4 +1,4 @@
-﻿import { AUDIOKEYS_RECOMMENDATIONS } from "audiokeysRecommendations"
+﻿import AUDIOKEYS_RECOMMENDATIONS from "../data/audiokeys_recommendations.json"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const PYTHON_AND_API = [
@@ -78,7 +78,7 @@ function handleNameError(error: any) {
 		const spliceIndex = codeString.indexOf(offendingName) + offendingName.length
 		const newLine = codeString.substring(0, codeString.indexOf(offendingName)) + bestReplacement + codeString.substring(spliceIndex)
 		return [error[0].traceback[0].lineno - 1, 0, error[0].traceback[0].lineno - 1, codeString.length, newLine]
-	}	
+	}
 }
 
 function handleIndentError(error: any) {

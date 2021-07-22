@@ -89,6 +89,9 @@ setTempo(80)
 user_input = readInput("Enter any text:")
 print(user_input)
 
+user_input = readInput("Enter more text:")
+print(user_input)
+
 finish()  # see internal earsketch console for output
 ```
 

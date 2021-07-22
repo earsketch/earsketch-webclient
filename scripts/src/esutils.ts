@@ -1,4 +1,5 @@
 import { DAWData } from "./app/player"
+import i18n from "i18next"
 
 export const measureToTime = (measure: number, tempo: number, timeSignature=4) => {
     if (tempo === -1) tempo = 120
@@ -36,6 +37,14 @@ export const parseName = (filename: string) => {
 export const parseExt = (filename: string) => {
     const match = filename.match(/\.[^.]*$/)
     return match ? match[0] : ""
+}
+
+// Change our custom (?) date format into ISO 8601, then parse.
+// TODO: Dates should be stored in a standard format in the database so as to make this unnecessary.
+export function parseDate(date: string) {
+    // Change created date to ISO 8601
+    const isoFormat = date.slice(0, -2).replace(" ", "T")
+    return Date.parse(isoFormat)
 }
 
 export const isMobileBrowser = () => {
@@ -198,10 +207,6 @@ export const compareObjStructure = (a: any, b: any): boolean => {
     })
 }
 
-export const randomString = (length: number) => {
-    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1)
-}
-
 // Returns the matching value or a null value if the parameter does not exist.
 export const getURLParameter = (key: string) => {
     const params = new URLSearchParams(window.location.search + window.location.hash)
@@ -213,8 +218,8 @@ export const checkIllegalCharacters = (input: string) => {
     return input.match(matchPattern)
 }
 
-// Calculates last modified time unit (previously in scriptBrowserController & mainController).
-export const formatTimer = (milliseconds: number) => {
+// Converts a time difference to a description of how much time has passed.
+export const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000)
     const minutes = Math.floor(seconds / 60)
     const hours = Math.floor(minutes / 60)
@@ -224,23 +229,16 @@ export const formatTimer = (milliseconds: number) => {
     const years = Math.floor(days / 365)
 
     switch (true) {
-        case seconds < 1: return 'just now'
-        case minutes < 1: return 'recently'
-        case minutes < 2: return '1 minute ago'
-        case hours < 1: return minutes + ' minutes ago'
-        case hours < 2: return '1 hour ago'
-        case days < 1: return hours + ' hours ago'
-        case days < 2: return 'yesterday'
-        case weeks < 1: return days + ' days ago'
-        case weeks < 2: return 'last week'
-        case months < 1: return weeks + ' weeks ago'
-        case months < 2: return 'last month'
-        case years < 1: return months + ' months ago'
-        case years < 2: return 'last year'
-        default: return years + ' years ago'
+        case seconds < 1: return i18n.t('formattedTime.justNow')
+        case minutes < 1: return i18n.t('formattedTime.recently')
+        case hours < 1: return i18n.t('formattedTime.minutesAgo', { count: minutes })
+        case days < 1: return i18n.t('formattedTime.hoursAgo', { count: hours })
+        case weeks < 1: return i18n.t('formattedTime.daysAgo', { count: days })
+        case months < 1: return i18n.t('formattedTime.weeksAgo', { count: weeks })
+        case years < 1: return i18n.t('formattedTime.monthsAgo', { count: months })
+        default: return i18n.t('formattedTime.yearsAgo', { count: years })
     }
 }
-
 
 const defaultTo = (value: number, defaultValue: number) => {
     return isNaN(value) ? defaultValue : value
@@ -251,7 +249,7 @@ const defaultTo = (value: number, defaultValue: number) => {
  * and standard deviation parameters.
  *
  * Uses the algorithm used in Java's random class, which in turn comes from
- * Donald Knuth's implementation of the BoxÐMuller transform.
+ * Donald Knuth's implementation of the Box-Muller transform.
  *
  * @param {Number} [mean = 0.0] The mean value, default 0.0
  * @param {Number} [standardDeviation = 1.0] The standard deviation, default 1.0

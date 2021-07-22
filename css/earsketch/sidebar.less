@@ -691,16 +691,20 @@ svg:hover path, .sound-browser-tab-icon path {
 .es-modal-tabcontainer > ul > li,
 .es-modal-tabcontainer > ul {
   margin: 0px;
-} 
+}
 
 .es-modal-tabcontainer .nav-pills > li > a {
+  border-radius: 0;
+}
+
+.es-modal-tabcontainer .nav-pills > li:first-child > a {
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
 
-.es-modal-tabcontainer .nav-pills > li + li > a {
+.es-modal-tabcontainer .nav-pills > li:last-child > a {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
   border-top-right-radius: 4px;
