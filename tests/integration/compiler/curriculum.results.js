@@ -181,7 +181,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 1, endMeasure: 3, inputStartValue: -60, inputEndValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 3, startValue: -60, endValue: 0 },
                     ],
                 },
             },
@@ -205,13 +205,13 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.31622776601683794, endValue: 0.31622776601683794, startMeasure: 1, endMeasure: 4, inputStartValue: -10, inputEndValue: -10 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.31622776601683794, endValue: 1, startMeasure: 4, endMeasure: 6.5, inputStartValue: -10, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 1, endValue: 0.31622776601683794, startMeasure: 7, endMeasure: 8.5, inputStartValue: 0, inputEndValue: -10 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.31622776601683794, endValue: 0.001, startMeasure: 8.5, endMeasure: 9, inputStartValue: -10, inputEndValue: -60 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 4, startValue: -10, endValue: -10 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 4, endMeasure: 6.5, startValue: -10, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 7, endMeasure: 8.5, startValue: 0, endValue: -10 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 8.5, endMeasure: 9, startValue: -10, endValue: -60 },
                     ],
                     "FILTER-FILTER_FREQ": [
-                        { track: 1, name: "FILTER", parameter: "FILTER_FREQ", startValue: 20, endValue: 10000, startMeasure: 1, endMeasure: 4, inputStartValue: 20, inputEndValue: 10000 },
+                        { track: 1, name: "FILTER", parameter: "FILTER_FREQ", startMeasure: 1, endMeasure: 4, startValue: 20, endValue: 10000 },
                     ],
                 },
             },
@@ -338,8 +338,8 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 1, endValue: 1, startMeasure: 1, endMeasure: 16, inputStartValue: 0, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 1, endValue: 1.1220184543019633, startMeasure: 16, endMeasure: 17, inputStartValue: 0, inputEndValue: 1 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 16, startValue: 0, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 16, endMeasure: 17, startValue: 0, endValue: 1 },
                     ],
                 },
             },
@@ -369,7 +369,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 4, name: "VOLUME", parameter: "GAIN", startValue: 0.31622776601683794, endValue: 0.31622776601683794, startMeasure: 1, endMeasure: 33, inputStartValue: -10, inputEndValue: -10 },
+                        { track: 4, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 33, startValue: -10, endValue: -10 },
                     ],
                 },
             },
@@ -394,7 +394,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 7, name: "VOLUME", parameter: "GAIN", startValue: 0.1, endValue: 0.1, startMeasure: 1, endMeasure: 33, inputStartValue: -20, inputEndValue: -20 },
+                        { track: 7, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 33, startValue: -20, endValue: -20 },
                     ],
                 },
             },
@@ -405,7 +405,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 8, name: "VOLUME", parameter: "GAIN", startValue: 0.1, endValue: 0.1, startMeasure: 1, endMeasure: 33, inputStartValue: -20, inputEndValue: -20 },
+                        { track: 8, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 33, startValue: -20, endValue: -20 },
                     ],
                 },
             },
@@ -497,7 +497,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 1, name: "PAN", parameter: "LEFT_RIGHT", startValue: -1, endValue: -1, startMeasure: 1, endMeasure: 8.5, inputStartValue: -100, inputEndValue: -100 },
+                        { track: 1, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 8.5, startValue: -100, endValue: -100 },
                     ],
                 },
             },
@@ -514,7 +514,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 2, name: "PAN", parameter: "LEFT_RIGHT", startValue: -1 / 3, endValue: -1 / 3, startMeasure: 1, endMeasure: 9, inputStartValue: -100 / 3, inputEndValue: -100 / 3 },
+                        { track: 2, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 9, startValue: -100 / 3, endValue: -100 / 3 },
                     ],
                 },
             },
@@ -525,7 +525,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 3, name: "PAN", parameter: "LEFT_RIGHT", startValue: 1 / 3, endValue: 1 / 3, startMeasure: 1, endMeasure: 9, inputStartValue: 100 / 3, inputEndValue: 100 / 3 },
+                        { track: 3, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 9, startValue: 100 / 3, endValue: 100 / 3 },
                     ],
                 },
             },
@@ -536,7 +536,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 4, name: "PAN", parameter: "LEFT_RIGHT", startValue: 1, endValue: 1, startMeasure: 1, endMeasure: 9, inputStartValue: 100, inputEndValue: 100 },
+                        { track: 4, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 9, startValue: 100, endValue: 100 },
                     ],
                 },
             },
@@ -560,22 +560,22 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 1, endMeasure: 2, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 2, endMeasure: 3, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 3, endMeasure: 4, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 4, endMeasure: 5, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 5, endMeasure: 6, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 6, endMeasure: 7, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 7, endMeasure: 8, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 8, endMeasure: 9, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 9, endMeasure: 10, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 10, endMeasure: 11, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 11, endMeasure: 12, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 12, endMeasure: 13, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 13, endMeasure: 14, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 14, endMeasure: 15, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 15, endMeasure: 16, inputStartValue: -60, inputEndValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startValue: 0.001, endValue: 1, startMeasure: 16, endMeasure: 17, inputStartValue: -60, inputEndValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 2, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 3, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 3, endMeasure: 4, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 4, endMeasure: 5, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 5, endMeasure: 6, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 6, endMeasure: 7, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 7, endMeasure: 8, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 8, endMeasure: 9, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 9, endMeasure: 10, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 10, endMeasure: 11, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 11, endMeasure: 12, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 12, endMeasure: 13, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 13, endMeasure: 14, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 14, endMeasure: 15, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 15, endMeasure: 16, startValue: -60, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 16, endMeasure: 17, startValue: -60, endValue: 0 },
                     ],
                 },
             },
@@ -638,8 +638,8 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "DELAY-DELAY_TIME": [
-                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startValue: 0.5, endValue: 0.5, startMeasure: 1, endMeasure: 1, inputStartValue: 500, inputEndValue: 500 },
-                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startValue: 0.5, endValue: 0.5, startMeasure: 1, endMeasure: 13, inputStartValue: 500, inputEndValue: 500 },
+                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startMeasure: 1, endMeasure: 1, startValue: 500, endValue: 500 },
+                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startMeasure: 1, endMeasure: 13, startValue: 500, endValue: 500 },
                     ],
                 },
             },
@@ -729,8 +729,8 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "DELAY-DELAY_TIME": [
-                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startValue: 0.5, endValue: 0.5, startMeasure: 1, endMeasure: 1, inputStartValue: 500, inputEndValue: 500 },
-                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startValue: 0.5, endValue: 0.5, startMeasure: 1, endMeasure: 13, inputStartValue: 500, inputEndValue: 500 },
+                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startMeasure: 1, endMeasure: 1, startValue: 500, endValue: 500 },
+                        { track: 4, name: "DELAY", parameter: "DELAY_TIME", startMeasure: 1, endMeasure: 13, startValue: 500, endValue: 500 },
                     ],
                 },
             },
@@ -1211,10 +1211,10 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startValue: 0.5011872336272722, endValue: 0.5011872336272722, startMeasure: 1, endMeasure: 32, inputStartValue: -6, inputEndValue: -6 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 32, startValue: -6, endValue: -6 },
                     ],
                     "FILTER-FILTER_FREQ": [
-                        { track: 2, name: "FILTER", parameter: "FILTER_FREQ", startValue: 750, endValue: 10000, startMeasure: 1, endMeasure: 5, inputStartValue: 750, inputEndValue: 10000 },
+                        { track: 2, name: "FILTER", parameter: "FILTER_FREQ", startMeasure: 1, endMeasure: 5, startValue: 750, endValue: 10000 },
                     ],
                 },
             },
@@ -1224,7 +1224,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 3, name: "VOLUME", parameter: "GAIN", startValue: 0.35481338923357547, endValue: 0.35481338923357547, startMeasure: 1, endMeasure: 32, inputStartValue: -9, inputEndValue: -9 },
+                        { track: 3, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 32, startValue: -9, endValue: -9 },
                     ],
                 },
             },
@@ -1362,7 +1362,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 4, name: "VOLUME", parameter: "GAIN", startValue: 0.12589254117941673, endValue: 0.12589254117941673, startMeasure: 1, endMeasure: 17, inputStartValue: -18, inputEndValue: -18 },
+                        { track: 4, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 17, startValue: -18, endValue: -18 },
                     ],
                 },
             },
@@ -1382,7 +1382,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 6, name: "VOLUME", parameter: "GAIN", startValue: 0.31622776601683794, endValue: 0.31622776601683794, startMeasure: 1, endMeasure: 17, inputStartValue: -10, inputEndValue: -10 },
+                        { track: 6, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 17, startValue: -10, endValue: -10 },
                     ],
                 },
             },
@@ -1458,14 +1458,14 @@ export const CURRICULUM_RESULTS = {
                 clips: [],
                 effects: {},
             },
-            { clips: [{ filekey: "YG_EDM_CLAPS_1", track: 1, measure: 1, start: 1, end: 2.9991000000000003, scale: false, loop: true, silence: 0, audio: { filekey: "YG_EDM_CLAPS_1" }, loopChild: false }, { filekey: "YG_EDM_CLAPS_1", audio: { filekey: "YG_EDM_CLAPS_1" }, track: 1, measure: 2.9991000000000003, start: 1, end: 2.9991000000000003, scale: false, loop: true, loopChild: true }], effects: { "FILTER-FILTER_FREQ": [{ track: 1, name: "FILTER", parameter: "FILTER_FREQ", startValue: 10000, endValue: 100, startMeasure: 1, endMeasure: 5, inputStartValue: 10000, inputEndValue: 100 }] }, analyser: {} },
+            { clips: [{ filekey: "YG_EDM_CLAPS_1", track: 1, measure: 1, start: 1, end: 2.9991000000000003, scale: false, loop: true, silence: 0, audio: { filekey: "YG_EDM_CLAPS_1" }, loopChild: false }, { filekey: "YG_EDM_CLAPS_1", audio: { filekey: "YG_EDM_CLAPS_1" }, track: 1, measure: 2.9991000000000003, start: 1, end: 2.9991000000000003, scale: false, loop: true, loopChild: true }], effects: { "FILTER-FILTER_FREQ": [{ track: 1, name: "FILTER", parameter: "FILTER_FREQ", startMeasure: 1, endMeasure: 5, startValue: 10000, endValue: 100 }] }, analyser: {} },
             {
                 clips: [
                     { filekey: "RD_EDM_SFX_RISER_AIR_1", measure: 1, start: 1, end: 5 },
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startValue: 0.31622776601683794, endValue: 0.31622776601683794, startMeasure: 1, endMeasure: 5, inputStartValue: -10, inputEndValue: -10 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 5, startValue: -10, endValue: -10 },
                     ],
                 },
             },
