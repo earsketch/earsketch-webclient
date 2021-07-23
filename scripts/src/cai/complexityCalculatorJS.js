@@ -1,4 +1,6 @@
-﻿import * as ccState from './complexityCalculatorState';
+﻿import * as acorn from "acorn"
+
+import * as ccState from './complexityCalculatorState';
 import * as caiErrorHandling from './errorHandling';
 import * as ccHelpers from './complexityCalculatorHelperFunctions';
 import * as cc from './complexityCalculator';
@@ -52,7 +54,7 @@ export function analyzeJavascript(source) {
             sounds: {}
         }
     };
-    ccState.setIsJavascript(true);    
+    ccState.setIsJavascript(true);
     cc.doAnalysis(newAST, resultsObject);
     //translate the calculated values
     // translateIntegerValues(resultsObject);
@@ -270,7 +272,7 @@ function convertASTNode(JsAst) {
                 }
                 returnObject.args = argsObj;
             }
-        } else if (object.callee.type === "MemberExpression" && 'object' in object.callee 
+        } else if (object.callee.type === "MemberExpression" && 'object' in object.callee
         	&& 'name' in object.callee.object && (ccState.JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
             returnObject.func.id = {
                 v: object.callee.property.name,

@@ -1,13 +1,14 @@
 import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { persistReducer, persistStore } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+import { persistStore } from 'redux-persist';
+import persistReducer from 'redux-persist/es/persistReducer';
+import storage from 'redux-persist/es/storage';
 
 import app from './app/appState';
 import user from './user/userState';
-import editor from './editor/editorState';
-import tabs from './editor/tabState';
-import layout from './layout/layoutState';
+import ide from './ide/ideState';
+import tabs from './ide/tabState';
+import layout from './ide/layoutState';
 import bubble from './bubble/bubbleState';
 import sounds from './browser/soundsState';
 import scripts from './browser/scriptsState';
@@ -20,7 +21,7 @@ import cai from './cai/caiState';
 const rootReducer = combineReducers({
     app,
     user,
-    editor,
+    ide,
     tabs,
     layout,
     bubble,
@@ -33,12 +34,10 @@ const rootReducer = combineReducers({
     cai,
 });
 
-// Note: Configuring store in rootReducer so it can be imported and accessed in non-React files.
-// Some persistence settings are done in individual reducers for more granularity.
 const persistConfig = {
     key: 'root',
     whitelist: ['layout'],
-    storage
+    storage,
 };
 
 const store = configureStore({
@@ -53,7 +52,7 @@ const store = configureStore({
     }
 });
 
-persistStore(store);
+export const persistor = persistStore(store);
 export default store;
 
 export type RootState = ReturnType<typeof rootReducer>;

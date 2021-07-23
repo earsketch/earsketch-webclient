@@ -62,7 +62,7 @@ export function analyzePython(source_code) {
         }
     };
 
-    ccState.setIsJavascript(false);     
+    ccState.setIsJavascript(false);
     cc.doAnalysis(ast, resultsObject);
 
 

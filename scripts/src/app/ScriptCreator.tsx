@@ -1,43 +1,48 @@
 import React, { useState } from "react"
-
-import * as userProject from './userProject'
 import { useTranslation } from "react-i18next"
+import { useSelector } from "react-redux"
+
+import * as app from "../app/appState"
+import * as scriptsState from "../browser/scriptsState"
+import store from "../reducers"
 
 export function validateScriptName(name: string, extension: string) {
     const fullname = name + extension
-    const { t } = useTranslation()
+    const scripts = scriptsState.selectRegularScripts(store.getState())
 
     if (name.length < 3) {
-        throw t('messages:general.shortname')
+        throw 'messages:general.shortname'
     } else if (/[$-/:-?{-~!"^#`\[\]\\]/g.test(name)) {
         // Why are hyphens banned from script names?
-        throw t('messages:idecontroller.illegalname')
-    } else if (Object.values(userProject.scripts).some(script => !script.soft_delete && script.name === fullname)) {
+        throw 'messages:idecontroller.illegalname'
+    } else if (Object.values(scripts).some(script => !script.soft_delete && script.name === fullname)) {
         // Conflict with existing script.
-        throw t('messages:idecontroller.overwrite')
+        throw 'messages:idecontroller.overwrite'
     } else {
         // Valid name.
         return name + extension
     }
 }
 
-export const ScriptCreator = ({ language, close }: { language: string, close: (value?: any) => void, dismiss: () => void }) => {
+export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
+    const language = useSelector(app.selectScriptLanguage)
     const [name, setName] = useState("")
     const [error, setError] = useState("")
     const [extension, setExtension] = useState(language === "python" ? ".py" : ".js")
+    const { t } = useTranslation()
 
     const confirm = () => {
         try {
             close(validateScriptName(name, extension))
         } catch (error) {
-            setError(error)
+            setError(t(error))
         }
     }
 
     return <>
         <div className="modal-header">
             <h4 className="modal-title">
-                Create a new script
+                {t('scriptCreator.title')}
             </h4>
         </div>
         <form onSubmit={e => { e.preventDefault(); confirm() }}>
@@ -48,26 +53,24 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
                 <div className="row">
                     <div className="col-md-6">
                         <div className="form-group">
-                            <label>Script name</label>
-                            <p className="small">What should we call your script?</p>
+                            <label>{t('scriptCreator.scriptName')}</label>
+                            <p className="small">{t('scriptCreator.scriptName.subtext')}</p>
                         </div>
                     </div>
                     <div className="col-md-6">
                         <div className="form-group">
-                            <label>Script language</label>
-                            <p className="small">What programming language are you using?</p>
+                            <label>{t('scriptCreator.scriptLang')}</label>
+                            <p className="small">{t('scriptCreator.scriptLang.subtext')}</p>
                         </div>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-6">
-                        <form>
-                            <div className="input-group">
-                                <input className="form-control" autoFocus tabIndex={1} autoComplete="off"
-                                    value={name} onChange={e => setName(e.target.value)} />
-                                <div className="input-group-addon">{extension}</div>
-                            </div>
-                        </form>
+                        <div className="input-group">
+                            <input className="form-control" autoFocus tabIndex={1} autoComplete="off"
+                                value={name} onChange={e => setName(e.target.value)} />
+                            <div className="input-group-addon">{extension}</div>
+                        </div>
                     </div>
 
                     <div className="col-md-6">
@@ -79,8 +82,8 @@ export const ScriptCreator = ({ language, close }: { language: string, close: (v
                 </div>
             </div>
             <div className="modal-footer">
-                <input type="submit" className="btn btn-primary" tabIndex={3} value="Create" />
-                <input type="button" className="btn btn-warning" onClick={() => close()} value="Cancel" />
+                <input type="submit" className="btn btn-primary" tabIndex={3} value={t('create') as string} />
+                <input type="button" className="btn btn-warning" onClick={() => close()} value={t('cancel') as string} />
             </div>
         </form>
     </>

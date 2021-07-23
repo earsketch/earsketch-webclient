@@ -1,5 +1,6 @@
 // EarSketch API: Javascript
 import * as ES_PASSTHROUGH from "./passthrough"
+import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
 
 // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
 // variable into a native javascript variable.
@@ -22,14 +23,13 @@ export function remapToNativeJs(v: any): any {
             for (const key in v.properties) {
                 nativeObject[key] = remapToNativeJs(v.properties[key])
             }
-
         }
     }
     return nativeObject
 }
 
 // This defines an init function for JS-Interpreter.
-// These functions will be injected into the interpreter by the compiler.
+// These functions will be injected into the interpreter by the runner.
 export default function setupAPI(interpreter: any, scope: any) {
     interpreter.setProperty(scope, "MIX_TRACK", (0))
     // Deprecated MASTER_TRACK alias for MIX_TRACK
@@ -59,7 +59,7 @@ export default function setupAPI(interpreter: any, scope: any) {
         })
     }
 
-    const returnablePassthroughList = ["gauss", "importImage", "importFile", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
+    const returnablePassthroughList = ["gauss", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
 
     for (const name of returnablePassthroughList) {
         register(name, (...args: any[]) => callPassthrough(name, ...args))
@@ -75,7 +75,7 @@ export default function setupAPI(interpreter: any, scope: any) {
         })
     }
 
-    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput"]
+    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
 
     for (const name of suspendedPassthroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
@@ -84,16 +84,17 @@ export default function setupAPI(interpreter: any, scope: any) {
         // but `createAsyncFunction` demands fixed-length arguments.
         // Hack: Use placeholder arguments (x6 to be safe) and enumerate.
         // TODO: Try ES6 arg spreading once it is allowed in the codebase.
-        registerAsync(name, function(a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        registerAsync(name, function (a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
             const args = []
-            for (let i = 0; i < arguments.length-1; i++) {
+            for (let i = 0; i < arguments.length - 1; i++) {
                 if (arguments[i] !== undefined) {
                     // Ignore unused placeholders (undefined)
                     args.push(arguments[i])
                 }
             }
             // Last item (g) is always the callback function.
-            const callback = arguments[arguments.length-1]
+            const callback = arguments[arguments.length - 1]
             suspendPassthrough(name, callback, ...args)
         })
     }
@@ -104,7 +105,7 @@ export default function setupAPI(interpreter: any, scope: any) {
     // Convert arguments to JavaScript types.
     const convertArgs = (args: any[]) => (
         [interpreter.getProperty(scope, "__ES_RESULT"), ...args]
-        .map(arg => arg === undefined ? arg : remapToNativeJs(arg))
+            .map(arg => arg === undefined ? arg : remapToNativeJs(arg))
     )
 
     // Helper function for easily wrapping a function around the passthrough.
@@ -117,7 +118,7 @@ export default function setupAPI(interpreter: any, scope: any) {
         const jsResultReturn = (ES_PASSTHROUGH as any)[name](...convertArgs(args))
         return {
             result: remapToPseudoJs(jsResultReturn.result),
-            returnVal: remapToPseudoJs(jsResultReturn.returnVal)
+            returnVal: remapToPseudoJs(jsResultReturn.returnVal),
         }
     }
 
@@ -152,5 +153,9 @@ export default function setupAPI(interpreter: any, scope: any) {
         } else {
             return interpreter.nativeToPseudo(v)
         }
+    }
+
+    for (const constant of EFFECT_TAGS.concat(ANALYSIS_TAGS)) {
+        interpreter.setProperty(scope, constant, constant)
     }
 }

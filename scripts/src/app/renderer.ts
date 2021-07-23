@@ -153,7 +153,7 @@ export async function renderWav(result: DAWData) {
     const pcmarrayR = buffer.getChannelData(1)
 
     const interleaved = interleave(pcmarrayL, pcmarrayR)
-    const dataview = encodeWAV(interleaved)
+    const dataview = encodeWAV(interleaved, SAMPLE_RATE, 2)
     return new Blob([dataview], { type: "audio/wav" })
 }
 
@@ -246,7 +246,7 @@ const interleave = (inputL: Float32Array, inputR: Float32Array) => {
 }
 
 // Encode an array of interleaved 2-channel samples to a WAV file.
-export const encodeWAV = (samples: Float32Array) => {
+export function encodeWAV(samples: Float32Array, sampleRate: number, numChannels: number) {
     const buffer = new ArrayBuffer(44 + samples.length * 2)
     const view = new DataView(buffer)
 
@@ -263,13 +263,13 @@ export const encodeWAV = (samples: Float32Array) => {
     // sample format (raw)
     view.setUint16(20, 1, true)
     // channel count
-    view.setUint16(22, 2, true)
+    view.setUint16(22, numChannels, true)
     // sample rate
-    view.setUint32(24, SAMPLE_RATE, true)
+    view.setUint32(24, sampleRate, true)
     // byte rate (sample rate * block align)
-    view.setUint32(28, SAMPLE_RATE * 4, true)
+    view.setUint32(28, sampleRate * 4, true)
     // block align (channel count * bytes per sample)
-    view.setUint16(32, 4, true)
+    view.setUint16(32, numChannels * 2, true)
     // bits per sample
     view.setUint16(34, 16, true)
     // data chunk identifier

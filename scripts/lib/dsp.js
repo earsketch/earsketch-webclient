@@ -57,13 +57,13 @@ var DSP = {
 function setupTypedArray(name, fallback) {
   // check if TypedArray exists
   // typeof on Minefield and Chrome return function, typeof on Webkit returns object.
-  if (typeof this[name] !== "function" && typeof this[name] !== "object") {
+  if (typeof window[name] !== "function" && typeof window[name] !== "object") {
     // nope.. check if WebGLArray exists
-    if (typeof this[fallback] === "function" && typeof this[fallback] !== "object") {
-      this[name] = this[fallback];
+    if (typeof window[fallback] === "function" && typeof window[fallback] !== "object") {
+      window[name] = window[fallback];
     } else {
       // nope.. set as Native JS array
-      this[name] = function(obj) {
+      window[name] = function(obj) {
         if (obj instanceof Array) {
           return obj;
         } else if (typeof obj === "number") {

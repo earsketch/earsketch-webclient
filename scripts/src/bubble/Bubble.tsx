@@ -1,14 +1,15 @@
 import React, { useState, useEffect, Fragment, LegacyRef } from 'react';
-import { hot } from 'react-hot-loader/root';
-import { Store } from 'redux';
-import { Provider, useSelector, useDispatch } from 'react-redux';
-import { react2angular } from 'react2angular';
+import { useSelector, useDispatch } from 'react-redux';
 import { usePopper } from 'react-popper';
 import { Placement } from '@popperjs/core';
 import parse from 'html-react-parser';
+import { useTranslation } from "react-i18next";
 
+import * as app from '../app/appState';
 import { pages } from './bubbleData';
 import * as bubble from './bubbleState';
+import * as curriculum from '../browser/curriculumState';
+import { AVAILABLE_LOCALES } from '../top/LocaleSelector';
 
 const Backdrop = () => {
     return (
@@ -37,49 +38,64 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string}) => {
 
 const MessageFooter = () => {
     const currentPage = useSelector(bubble.selectCurrentPage);
+    const locale = useSelector(app.selectLocale);
     const dispatch = useDispatch();
+    const { t } = useTranslation()
 
     let buttons;
     if (currentPage === 0) {
         buttons = (
             <Fragment>
-                <NavButton name='Skip' tag='dismiss' />
-                <NavButton name='Start' tag='proceed' primary />
+                <NavButton name={t('bubble:buttons.skip')} tag='dismiss' />
+                <NavButton name={t('bubble:buttons.start')} tag='proceed' primary />
             </Fragment>
         );
     } else if (currentPage === 9) {
         buttons = (
             <Fragment>
                 <div className='w-40' />
-                <NavButton name='Close' tag='dismiss' primary/>
+                <NavButton name={t('bubble:buttons.close')} tag='dismiss' primary/>
             </Fragment>
         );
     } else {
         buttons = (
             <Fragment>
-                <NavButton name='Skip tour' tag='dismiss' />
-                <NavButton name='Next' tag='proceed' primary />
+                <NavButton name={t('bubble:buttons.skipTour')} tag='dismiss' />
+                <NavButton name={t('bubble:buttons.next')} tag='proceed' primary />
             </Fragment>
         );
     }
 
     return (
         <div className='flex justify-between mt-8'>
-            <div className='w-1/2'>
-                { currentPage===0 && (
-                    <div>
-                        <div className='text-sm'>Default programming language</div>
+            <div className='w-1/2 flex'>
+                {currentPage === 0 && <>
+                    <div className="mr-4">
+                        <div className='text-sm'>{t('bubble:userLanguage')}</div>
                         <select
                             className='border-0 border-b-2 border-black outline-none'
-                            name="lang"
-                            id="lang"
+                            onChange={e => {
+                                dispatch(app.setLocale(e.currentTarget.value))
+                                // TODO: This should happen automatically when the locale changes.
+                                dispatch(curriculum.fetchLocale({}))
+                            }}
+                            value={locale}
+                        >
+                            {AVAILABLE_LOCALES.map(({ displayText, localeCode }) => <option key={localeCode} value={localeCode}>{displayText}</option>)}
+                        </select>
+                    </div>
+
+                    <div>
+                        <div className='text-sm'>{t('bubble:defaultProgrammingLanguage')}</div>
+                        <select
+                            className='border-0 border-b-2 border-black outline-none'
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                         >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>
                         </select>
                     </div>
-                )}
+                </>}
             </div>
             <div className='w-1/3 flex justify-evenly'>
                 { buttons }
@@ -103,6 +119,7 @@ const DismissButton = () => {
 
 const MessageBox = () => {
     const currentPage = useSelector(bubble.selectCurrentPage);
+    const { t } = useTranslation()
 
     const [referenceElement, setReferenceElement] = useState<Element|null>(null);
     const [popperElement, setPopperElement] = useState(null);
@@ -199,10 +216,10 @@ const MessageBox = () => {
         >
             { [0,9].includes(currentPage) && <DismissButton /> }
             <div className='text-3xl font-black mb-4'>
-                { pages[currentPage].header }
+                { t(pages[currentPage].headerKey) }
             </div>
             <div>
-                { parse(pages[currentPage].body) }
+                { parse(t(pages[currentPage].bodyKey)) }
             </div>
             <MessageFooter />
             <div
@@ -214,8 +231,8 @@ const MessageBox = () => {
     );
 };
 
-const Bubble = () => {
-    const active = useSelector(bubble.selectBubbleActive);
+export const Bubble = () => {
+    const active = useSelector(bubble.selectActive);
     return (
         <div
             className={`absolute top-0 w-full h-full flex justify-center items-center ${active ? 'inline-block' : 'hide'}`}
@@ -225,12 +242,3 @@ const Bubble = () => {
         </div>
     );
 };
-
-const HotBubble = hot((props: { $ngRedux: Store }) => (
-    <Provider store={props.$ngRedux}>
-        <Bubble />
-    </Provider>
-));
-
-// Export as an Angular component.
-app.component('hotBubble', react2angular(HotBubble,null,['$ngRedux']));

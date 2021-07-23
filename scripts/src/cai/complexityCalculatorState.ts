@@ -1,7 +1,7 @@
 ﻿// Manages the state of the complexity calculator service.
 
 let state : { [key:string]: any } = {
-    allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [], 
+    allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
     loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
     functionRenames: [],  parentLineNumber: 0, studentCode: [],
     takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: [], functionLines: []
@@ -66,9 +66,9 @@ export const boolOps = {
 }
 
 export const apiFunctions = [
-    "analyze", "random", "randint", "gauss", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", 
-    "fitMedia", "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "print", "readInput", 
-    "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile", "setEffect", "setTempo", 
+    "analyze", "random", "randint", "gauss", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish",
+    "fitMedia", "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "print", "readInput",
+    "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile", "setEffect", "setTempo",
     "shuffleList", "shuffleString"
 ]
 

@@ -459,7 +459,7 @@ function reverseValueTrace(isVariable, name, ast, lineNo) {
                     else if (node.func._astname == "Attribute") {
                         //console.log(node.func._astname);
                         calledName = node.func.attr.v;
-                        //TODO this is probably a string or list op, so let's maybe take a look into what it's being performed on 
+                        //TODO this is probably a string or list op, so let's maybe take a look into what it's being performed on
                     }
 
                 }

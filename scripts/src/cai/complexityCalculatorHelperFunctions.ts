@@ -294,7 +294,7 @@ export function getFunctionObject(funcName: string) {
 export function replaceNumericUnaryOps(ast: any) {
     for (let i in ast) {
         if (ast[i] != null && ast[i]._astname != null) {
-            if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) { 
+            if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) {
                 ast[i] = ast[i].operand
             } else if (ast[i] != null && 'body' in ast[i]) {
                 for (let p in ast[i].body) {
@@ -330,12 +330,12 @@ export function lineDict() {
         let calls : any[] = []
         let ifElse : any[] = []
         let userFunction : any[] = []
-        lineDictionary.push({ 
-            line: Number(i) + 1, 
-            variables: variables, 
-            loop: 0, 
-            calls: calls, 
-            ifElse: ifElse, 
+        lineDictionary.push({
+            line: Number(i) + 1,
+            variables: variables,
+            loop: 0,
+            calls: calls,
+            ifElse: ifElse,
             userFunction: userFunction,
             loopStart: 0
         })
