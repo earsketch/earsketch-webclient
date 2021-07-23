@@ -1,37 +1,32 @@
 /* eslint-disable new-cap */
 // EarSketch API: Python
-import * as ES_PASSTHROUGH from "./passthrough"
+import * as passthrough from "./passthrough"
 import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
+import { DAWData } from "../app/player"
+
+const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
+
+// The result of running the script (DAW state).
+export let dawData: DAWData
 
 // NOTE: We could just build this once and expose the module directly,
 // but skulpt is `require()`d asynchronously in index.js, so `Sk` is not available yet.
 
-export function setupAPI() {
+export function setup() {
     const mod: any = {}
 
-    // Global variable that will holds the output of the script (DAW state).
-    mod.__ES_RESULT = new Sk.builtin.dict()
+    dawData = Sk.ffi.remapToPy(passthrough.init())
 
     // Add MIX_TRACK as a global constant
     mod.MIX_TRACK = new Sk.builtin.int_(0)
     // MASTER_TRACK is a deprecated alias of MIX_TRACK
     mod.MASTER_TRACK = new Sk.builtin.int_(0)
 
-    // Function to get the global result variable from inside the module
-    // when a user imports it as "from earsketch import *"
-    mod._getResult = new Sk.builtin.func(() => mod.__ES_RESULT)
-
-    // Function to initialize a new script in EarSketch.
-    // Resets the global result variable to the default value.
-    mod.init = new Sk.builtin.func(() => {
-        mod.__ES_RESULT = callPassthrough("init", Sk.builtins.__AUDIO_QUALITY)
-    })
-
-    const passthroughList = ["setTempo", "finish", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
+    const passthroughList = ["init", "setTempo", "finish", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
 
     for (const name of passthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => {
-            mod.__ES_RESULT = callPassthrough(name, ...args)
+            dawData = callPassthrough(name, ...args)
         })
     }
 
@@ -76,16 +71,16 @@ export function setupAPI() {
     }
 
     // Convert arguments to JavaScript types.
-    const convertArgs = (args: any[]) => [mod.__ES_RESULT, ...args].map(arg => arg === undefined ? arg : Sk.ffi.remapToJs(arg))
+    const convertArgs = (args: any[]) => [dawData, ...args].map(arg => arg === undefined ? arg : Sk.ffi.remapToJs(arg))
 
     // Helper functions that convert input to Javascript and call the appropriate passthrough function.
     const callPassthrough = (name: string, ...args: any[]) => {
-        return mapJsErrors(() => Sk.ffi.remapToPy((ES_PASSTHROUGH as any)[name](...convertArgs(args))))
+        return mapJsErrors(() => Sk.ffi.remapToPy(ES_PASSTHROUGH[name](...convertArgs(args))))
     }
 
     const callModAndReturnPassthrough = (name: string, ...args: any[]) => {
-        const { result, returnVal } = (ES_PASSTHROUGH as any)[name](...convertArgs(args))
-        mod.__ES_RESULT = mapJsErrors(() => Sk.ffi.remapToPy(result))
+        const { result, returnVal } = ES_PASSTHROUGH[name](...convertArgs(args))
+        dawData = mapJsErrors(() => Sk.ffi.remapToPy(result))
         return mapJsErrors(() => Sk.ffi.remapToPy(returnVal))
     }
 
@@ -93,7 +88,7 @@ export function setupAPI() {
     // https://github.com/skulpt/skulpt/blob/master/doc/suspensions.txt
     const suspendPassthrough = (name: string, ...args: any[]) => {
         return mapJsErrors(() => {
-            const promise = (ES_PASSTHROUGH as any)[name](...convertArgs(args))
+            const promise = ES_PASSTHROUGH[name](...convertArgs(args))
             const susp = new Sk.misceval.Suspension()
             susp.resume = () => Sk.ffi.remapToPy(susp.data.result)
             susp.data = {
@@ -117,7 +112,7 @@ export function setupAPI() {
         // Skulpt prints a newline character after every `print`.
         // println and userConsole.log already print each message as a new line, so we ignore these newlines.
         if (text !== "\n") {
-            ES_PASSTHROUGH.println(Sk.ffi.remapToJs(mod.__ES_RESULT), text)
+            passthrough.println(Sk.ffi.remapToJs(dawData), text)
         }
     }
 
@@ -136,5 +131,3 @@ export function setupAPI() {
         Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
     }
 }
-
-export default setupAPI

@@ -4,8 +4,8 @@ import * as walk from "acorn-walk"
 
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
-import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
-import setupPythonAPI from "../api/earsketch.py"
+import * as javascriptAPI from "../api/earsketch.js"
+import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as pitchshift from "./pitchshifter"
@@ -155,7 +155,7 @@ export async function runPython(code: string) {
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
-    setupPythonAPI()
+    pythonAPI.setup()
 
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
@@ -178,7 +178,7 @@ export async function runPython(code: string) {
 
     // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
-    const mod = await Sk.misceval.asyncToPromise(() => {
+    await Sk.misceval.asyncToPromise(() => {
         try {
             return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
         } catch (err) {
@@ -189,16 +189,7 @@ export async function runPython(code: string) {
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
 
     // STEP 3: Extract result.
-    let result
-    if (mod.$d.earsketch && mod.$d.earsketch.$d._getResult) {
-        // case: import earsketch
-        result = Sk.ffi.remapToJs(Sk.misceval.call(mod.$d.earsketch.$d._getResult))
-    } else if (mod.$d._getResult) {
-        // case: from earsketch import *
-        result = Sk.ffi.remapToJs(Sk.misceval.call(mod.$d._getResult))
-    } else {
-        throw new ReferenceError("Something went wrong. Skulpt did not provide the expected output.")
-    }
+    let result = Sk.ffi.remapToJs(pythonAPI.dawData)
     // STEP 4: Perform post-execution steps on the result object
     esconsole("Performing post-execution steps.", ["debug", "runner"])
     result = await postRun(result)
@@ -238,7 +229,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 function createJsInterpreter(code: string) {
     let interpreter
     try {
-        interpreter = new Interpreter(code, setupJavascriptAPI)
+        interpreter = new Interpreter(code, javascriptAPI.setup)
     } catch (e) {
         if (e.loc !== undefined) {
             // acorn provides line numbers for syntax errors
@@ -287,12 +278,9 @@ async function runJsInterpreter(interpreter: any) {
     while (interpreter.run()) {
         await sleep(200)
     }
-    const result = interpreter.getProperty(interpreter.scope, "__ES_RESULT")
-    if (result === undefined) {
-        throw new EvalError("Missing call to init() or something went wrong.")
-    }
+    const result = javascriptAPI.dawData
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
-    return remapToNativeJs(result)
+    return javascriptAPI.remapToNativeJs(result)
 }
 
 // Gets the current line number from the top of the JS-interpreter

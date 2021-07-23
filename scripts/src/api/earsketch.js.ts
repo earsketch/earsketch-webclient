@@ -1,6 +1,12 @@
 // EarSketch API: Javascript
-import * as ES_PASSTHROUGH from "./passthrough"
+import * as passthrough from "./passthrough"
 import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
+import { DAWData } from "../app/player"
+
+const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
+
+// The result of running the script (DAW state).
+export let dawData: DAWData
 
 // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
 // variable into a native javascript variable.
@@ -30,7 +36,7 @@ export function remapToNativeJs(v: any): any {
 
 // This defines an init function for JS-Interpreter.
 // These functions will be injected into the interpreter by the runner.
-export default function setupAPI(interpreter: any, scope: any) {
+export function setup(interpreter: any, scope: any) {
     interpreter.setProperty(scope, "MIX_TRACK", (0))
     // Deprecated MASTER_TRACK alias for MIX_TRACK
     interpreter.setProperty(scope, "MASTER_TRACK", (0))
@@ -38,24 +44,19 @@ export default function setupAPI(interpreter: any, scope: any) {
     const register = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createNativeFunction(fn))
     const registerAsync = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createAsyncFunction(fn))
 
-    // Function to initialize a new script in EarSketch.
-    // Resets the global result variable to the default value.
-    register("init", () => {
-        const result = callPassthrough("init", interpreter.getProperty(scope, "__AUDIO_QUALITY"))
-        interpreter.setProperty(scope, "__ES_RESULT", result)
-        interpreter.scope = scope
-    })
+    // Initialize DAW data.
+    dawData = remapToPseudoJs(passthrough.init())
 
     // Finish the script.
-    // Formerly set __ES_FINISHED = _ES_RESULT property on the interpreter object.
-    // Now we just use _ES_RESULT directly, and finish is not required.
+    // Formerly set __ES_FINISHED = __ES_RESULT property on the interpreter object.
+    // Now we just use dawData (formerly __ES_RESULT) directly, and finish is not required.
     register("finish", () => {})
 
-    const passthroughList = ["setTempo", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
+    const passthroughList = ["init", "setTempo", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
 
     for (const name of passthroughList) {
         register(name, (...args: any[]) => {
-            interpreter.setProperty(scope, "__ES_RESULT", callPassthrough(name, ...args))
+            dawData = callPassthrough(name, ...args)
         })
     }
 
@@ -70,7 +71,7 @@ export default function setupAPI(interpreter: any, scope: any) {
     for (const name of modAndReturnPassthroughList) {
         register(name, (...args: any[]) => {
             const resultAndReturnVal = callModAndReturnPassthrough(name, ...args)
-            interpreter.setProperty(scope, "__ES_RESULT", resultAndReturnVal.result)
+            dawData = resultAndReturnVal.result
             return resultAndReturnVal.returnVal
         })
     }
@@ -103,19 +104,17 @@ export default function setupAPI(interpreter: any, scope: any) {
     registerAsync("prompt", (msg: string, callback: any) => suspendPassthrough("readInput", callback, msg))
 
     // Convert arguments to JavaScript types.
-    const convertArgs = (args: any[]) => (
-        [interpreter.getProperty(scope, "__ES_RESULT"), ...args]
-            .map(arg => arg === undefined ? arg : remapToNativeJs(arg))
-    )
+    const convertArgs = (args: any[]) =>
+        [dawData, ...args].map(arg => arg === undefined ? arg : remapToNativeJs(arg))
 
     // Helper function for easily wrapping a function around the passthrough.
     function callPassthrough(name: string, ...args: any[]) {
-        return remapToPseudoJs((ES_PASSTHROUGH as any)[name](...convertArgs(args)))
+        return remapToPseudoJs(ES_PASSTHROUGH[name](...convertArgs(args)))
     }
 
     // Helper function for easily wrapping a function around the passthrough.
     function callModAndReturnPassthrough(name: string, ...args: any) {
-        const jsResultReturn = (ES_PASSTHROUGH as any)[name](...convertArgs(args))
+        const jsResultReturn = ES_PASSTHROUGH[name](...convertArgs(args))
         return {
             result: remapToPseudoJs(jsResultReturn.result),
             returnVal: remapToPseudoJs(jsResultReturn.returnVal),
@@ -127,7 +126,7 @@ export default function setupAPI(interpreter: any, scope: any) {
     //   callback: The callback function for asynchronous execution using JS-Interpreter.
     // See dur() or analyze() for examples on how to use this function.
     async function suspendPassthrough(name: string, callback: any, ...args: any[]) {
-        const result = await (ES_PASSTHROUGH as any)[name](...convertArgs(args))
+        const result = await ES_PASSTHROUGH[name](...convertArgs(args))
         callback(remapToPseudoJs(result))
     }
 
