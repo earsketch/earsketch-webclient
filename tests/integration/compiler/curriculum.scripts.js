@@ -367,7 +367,7 @@ export const CURRICULUM_SCRIPTS = {
     "fitMedia(guitar, 3, 1, 9)\n" +
     "fitMedia(synth, 4, 5, 9)\n" +
     "for track in range(1, 5):\n" +
-    "  panAmount = 200 * (track - 1) / 3 - 100\n" +
+    "  panAmount = 200 * (track - 1) / 3.0 - 100\n" +
     "  setEffect(track, PAN, LEFT_RIGHT, panAmount)\n" +
     "finish()\n",
 
@@ -413,18 +413,18 @@ export const CURRICULUM_SCRIPTS = {
     "fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5) # main\n" +
     "fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5) # drums\n" +
     "for measure in range(1, 5):\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1) # bassline, repeatedly fitting first measure of clip\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1) # bassline, repeatedly fitting first measure of clip\n" +
     "for measure in range(1, 6, 2):\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1) # backing\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1) # backing\n" +
     "setEffect(4, DELAY, DELAY_TIME, 500) # delay on track 4\n" +
     "fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9) # sparse drums\n" +
     "fitMedia(RD_WORLD_PERCUSSION_SEEDSRATTLE_1, 3, 5, 9) # rattling\n" +
     "fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13) # main\n" +
     "fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13) # drums\n" +
     "for measure in range(9, 13):\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1) # bassline, repeatedly fitting first measure of clip\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1) # bassline, repeatedly fitting first measure of clip\n" +
     "for measure in range(9, 13, 2):\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1) # backing\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1) # backing\n" +
     "setEffect(4, DELAY, DELAY_TIME, 500) # delay on track 4\n" +
     "finish()\n",
 
@@ -433,10 +433,10 @@ export const CURRICULUM_SCRIPTS = {
     "fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 1, 5); // main\n" +
     "fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 1, 5); // drums\n" +
     "for (var measure = 1; measure < 5; measure++){\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1); // bassline, repeatedly fitting first measure of clip\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1); // bassline, repeatedly fitting first measure of clip\n" +
     "}\n" +
     "for (var measure = 1; measure < 6; measure += 2){\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1); // backing\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1); // backing\n" +
     "}\n" +
     "setEffect(4, DELAY, DELAY_TIME, 500); // delay on track 4\n" +
     "fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, 5, 9); // sparse drums\n" +
@@ -444,10 +444,10 @@ export const CURRICULUM_SCRIPTS = {
     "fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, 9, 13); // main\n" +
     "fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, 9, 13); // drums\n" +
     "for (var measure = 9; measure < 13; measure++){\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1); // bassline, repeatedly fitting first measure of clip\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1); // bassline, repeatedly fitting first measure of clip\n" +
     "}\n" +
     "for (var measure = 9; measure < 13; measure += 2){\n" +
-    "	fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1); // backing\n" +
+    "    fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1); // backing\n" +
     "}\n" +
     "setEffect(4, DELAY, DELAY_TIME, 500); // delay on track 4\n" +
     "finish();\n",
@@ -478,9 +478,9 @@ export const CURRICULUM_SCRIPTS = {
     "  fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure) # main\n" +
     "  fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure) # drums\n" +
     "  for measure in range(startMeasure, endMeasure):\n" +
-    "	  fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1) # repeated bassline\n" +
+    "      fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1) # repeated bassline\n" +
     "  for measure in range(startMeasure, endMeasure, 2): # every other measure\n" +
-    "	  fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1) # backing\n" +
+    "      fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1) # backing\n" +
     "  setEffect(4, DELAY, DELAY_TIME, 500) # delay on track 4\n" +
     "def sectionB(startMeasure, endMeasure):\n" +
     "  fitMedia(RD_WORLD_PERCUSSION_DRUMPART_3, 1, startMeasure, endMeasure) # sparse drums\n" +
@@ -497,10 +497,10 @@ export const CURRICULUM_SCRIPTS = {
     "  fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_1, 1, startMeasure, endMeasure); // main\n" +
     "  fitMedia(RD_WORLD_PERCUSSION_DRUMPART_24, 2, startMeasure, endMeasure); // drums\n" +
     "  for (var measure = startMeasure; measure < endMeasure; measure++){\n" +
-    "	  fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1); // repeated bassline\n" +
+    "      fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_7, 3, measure, measure + 1); // repeated bassline\n" +
     "  }\n" +
     "  for (var measure = startMeasure; measure < endMeasure; measure += 2){ // every other measure\n" +
-    "	  fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1); // backing\n" +
+    "      fitMedia(RD_WORLD_PERCUSSION_KALIMBA_PIANO_3, 4, measure, measure + 1); // backing\n" +
     "  }\n" +
     "  setEffect(4, DELAY, DELAY_TIME, 500); // delay on track 4\n" +
     "}\n" +
@@ -703,17 +703,17 @@ export const CURRICULUM_SCRIPTS = {
     "def section2(startMeasure, endMeasure):\n" +
     "  # drums\n" +
     "  for measure in range (startMeasure, endMeasure):\n" +
-    "	  makeBeat(drum, 2, measure, beat1)\n" +
+    "      makeBeat(drum, 2, measure, beat1)\n" +
     "  # bass\n" +
     "  fitMedia(subBass, 4, startMeasure, endMeasure)\n" +
     "  # lead\n" +
     "  fitMedia(lead2, 1, startMeasure, 21)\n" +
     "  for measure in range(21, 23):\n" +
-    '	  makeBeat(lead2, 1, measure, "0-000+++++++++++")\n' +
+    '      makeBeat(lead2, 1, measure, "0-000+++++++++++")\n' +
     '  makeBeat(lead2, 1, 23, "0-000+++++++++++++++++++++++++++")\n' +
     "  fitMedia(lead2, 1, 25, 29)\n" +
     "  for measure in range(29, endMeasure):\n" +
-    "  	makeBeat(lead2, 1, measure, beat1) # switch with drum beat for last phrase\n" +
+    "      makeBeat(lead2, 1, measure, beat1) # switch with drum beat for last phrase\n" +
     "  # placing dubstep wobbles\n" +
     "  fitMedia(wobble1, 5, 20.5, 21)\n" +
     "  fitMedia(wobble1, 5, 24.5, 25)\n" +
@@ -762,19 +762,19 @@ export const CURRICULUM_SCRIPTS = {
     "function section2(startMeasure, endMeasure){\n" +
     "  // drums\n" +
     "  for (var measure = startMeasure; measure < endMeasure; measure++){\n" +
-    "	  makeBeat(drum, 2, measure, beat1);\n" +
+    "      makeBeat(drum, 2, measure, beat1);\n" +
     "  }\n" +
     "  // bass\n" +
     "  fitMedia(subBass, 4, startMeasure, endMeasure);\n" +
     "  // lead\n" +
     "  fitMedia(lead2, 1, startMeasure, 21);\n" +
     "  for (var measure = 21; measure < 23; measure++){\n" +
-    '	  makeBeat(lead2, 1, measure, "0-000+++++++++++");\n' +
+    '      makeBeat(lead2, 1, measure, "0-000+++++++++++");\n' +
     "  }\n" +
     '  makeBeat(lead2, 1, 23, "0-000+++++++++++++++++++++++++++");\n' +
     "  fitMedia(lead2, 1, 25, 29);\n" +
     "  for (var measure = 29; measure < endMeasure; measure++){\n" +
-    "  	makeBeat(lead2, 1, measure, beat1); // switch with drum beat for last phrase\n" +
+    "      makeBeat(lead2, 1, measure, beat1); // switch with drum beat for last phrase\n" +
     "  }\n" +
     "  // wobbles\n" +
     "  for (var measure = 20.5; measure < 29; measure += 4){\n" +
@@ -983,7 +983,7 @@ export const CURRICULUM_SCRIPTS = {
     '    print "Hip-hop it is!"\n' +
     "    fitMedia(YG_NEW_HIP_HOP_ARP_1, 1, 1, 9)\n" +
     "    fitMedia(RD_TRAP_MAIN808_BEAT_1, 2, 1, 9)\n" +
-    'else:	# an answer other than "Yes" or "yes" was entered\n' +
+    'else:    # an answer other than "Yes" or "yes" was entered\n' +
     '    print "Ok, here is some funk."\n' +
     "    fitMedia(YG_NEW_FUNK_ELECTRIC_PIANO_4, 1, 1, 9)\n" +
     "    fitMedia(YG_NEW_FUNK_DRUMS_4, 2, 1, 9)\n" +
@@ -1009,10 +1009,10 @@ export const CURRICULUM_SCRIPTS = {
     'input = readInput("Which instrument comes first? Type Guitar, Bass, or Drums.")\n' +
     "first_inst = str(input)\n" +
     'if (first_inst == "guitar") or (first_inst == "Guitar") or (first_inst == "GUITAR"):\n' +
-    '	print "Guitar comes first"\n' +
-    "	fitMedia(Y02_GUITAR_1, 1, 1, 9)\n" +
-    "	fitMedia(Y01_BASS_1, 2, 3, 9)\n" +
-    "	fitMedia(Y02_DRUM_SAMPLES_1, 3, 3, 9)\n" +
+    '    print "Guitar comes first"\n' +
+    "    fitMedia(Y02_GUITAR_1, 1, 1, 9)\n" +
+    "    fitMedia(Y01_BASS_1, 2, 3, 9)\n" +
+    "    fitMedia(Y02_DRUM_SAMPLES_1, 3, 3, 9)\n" +
     'elif (first_inst == "bass") or (first_inst == "Bass") or (first_inst == "BASS"):\n' +
     '  print "Bass comes first"\n' +
     "  fitMedia(Y01_BASS_1, 1, 1, 9)\n" +
@@ -1032,21 +1032,21 @@ export const CURRICULUM_SCRIPTS = {
     'var first_inst = readInput("Which instrument comes first? Type Guitar, Bass, or Drums.");\n' +
     'if (first_inst == "guitar" || first_inst == "Guitar" || first_inst == "GUITAR"){\n' +
     '  println("Guitar comes first");\n' +
-    "	fitMedia(Y02_GUITAR_1, 1, 1, 9);\n" +
-    "	fitMedia(Y01_BASS_1, 2, 3, 9);\n" +
-    "	fitMedia(Y02_DRUM_SAMPLES_1, 3, 3, 9);\n" +
+    "    fitMedia(Y02_GUITAR_1, 1, 1, 9);\n" +
+    "    fitMedia(Y01_BASS_1, 2, 3, 9);\n" +
+    "    fitMedia(Y02_DRUM_SAMPLES_1, 3, 3, 9);\n" +
     "}\n" +
     'else if (first_inst == "bass" || first_inst == "Bass" || first_inst == "BASS"){\n' +
     '  println("Bass comes first");\n' +
-    "	fitMedia(Y01_BASS_1, 1, 1, 9);\n" +
-    "	fitMedia(Y02_GUITAR_1, 2, 3, 9);\n" +
-    "	fitMedia(Y02_DRUM_SAMPLES_1, 3, 3, 9);\n" +
+    "    fitMedia(Y01_BASS_1, 1, 1, 9);\n" +
+    "    fitMedia(Y02_GUITAR_1, 2, 3, 9);\n" +
+    "    fitMedia(Y02_DRUM_SAMPLES_1, 3, 3, 9);\n" +
     "}\n" +
     'else if (first_inst == "drums" || first_inst == "Drums" || first_inst == "DRUMS"){\n' +
     '  println("Drums come first");\n' +
-    "	fitMedia(Y02_DRUM_SAMPLES_1, 1, 1, 9);\n" +
-    "	fitMedia(Y02_GUITAR_1, 2, 3, 9);\n" +
-    "	fitMedia(Y01_BASS_1, 3, 3, 9);\n" +
+    "    fitMedia(Y02_DRUM_SAMPLES_1, 1, 1, 9);\n" +
+    "    fitMedia(Y02_GUITAR_1, 2, 3, 9);\n" +
+    "    fitMedia(Y01_BASS_1, 3, 3, 9);\n" +
     "}\n" +
     "else {\n" +
     '  println("Please select Guitar, Bass, or Drums.");\n' +
@@ -1091,18 +1091,18 @@ export const CURRICULUM_SCRIPTS = {
     "setTempo(120)\n" +
     "introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]\n" +
     "for measure in range (1, 5):\n" +
-    "	mediaIndex = measure - 1 # zero-based list index\n" +
-    "	track = measure # change track with measure\n" +
-    "	fitMedia(introArray[mediaIndex], track, measure, 9)\n" +
+    "    mediaIndex = measure - 1 # zero-based list index\n" +
+    "    track = measure # change track with measure\n" +
+    "    fitMedia(introArray[mediaIndex], track, measure, 9)\n" +
     "finish()\n",
 
     "Additive Introduction.js": "init();\n" +
     "setTempo(120);\n" +
     "var introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];\n" +
     "for (var measure = 1; measure < 5; measure++) {\n" +
-    "	var mediaIndex = measure - 1; // zero-based array index\n" +
-    "	var track = measure; // change track with measure\n" +
-    "	fitMedia(introArray[mediaIndex], track, measure, 9);\n" +
+    "    var mediaIndex = measure - 1; // zero-based array index\n" +
+    "    var track = measure; // change track with measure\n" +
+    "    fitMedia(introArray[mediaIndex], track, measure, 9);\n" +
     "}\n" +
     "finish();\n",
 
@@ -1110,9 +1110,9 @@ export const CURRICULUM_SCRIPTS = {
     "init()\n" +
     "setTempo(100)\n" +
     "drums = [ELECTRO_DRUM_MAIN_BEAT_001, # an list of drum clips\n" +
-    "		 ELECTRO_DRUM_MAIN_BEAT_002,\n" +
-    "		 ELECTRO_DRUM_MAIN_BEAT_003,\n" +
-    "		 ELECTRO_DRUM_MAIN_BEAT_004]\n" +
+    "         ELECTRO_DRUM_MAIN_BEAT_002,\n" +
+    "         ELECTRO_DRUM_MAIN_BEAT_003,\n" +
+    "         ELECTRO_DRUM_MAIN_BEAT_004]\n" +
     'drumPattern = "0+0+11112+2+3+++" # each number is actually an index into the drums list\n' +
     "makeBeat(drums, 1, 1, drumPattern)\n" +
     "finish()\n",
@@ -1120,9 +1120,9 @@ export const CURRICULUM_SCRIPTS = {
     "Making a drum set.js": "init();\n" +
     "setTempo(100);\n" +
     "var drums = [ELECTRO_DRUM_MAIN_BEAT_001,  // an array of drum clips\n" +
-    "		 ELECTRO_DRUM_MAIN_BEAT_002,\n" +
-    "		 ELECTRO_DRUM_MAIN_BEAT_003,\n" +
-    "		 ELECTRO_DRUM_MAIN_BEAT_004];\n" +
+    "         ELECTRO_DRUM_MAIN_BEAT_002,\n" +
+    "         ELECTRO_DRUM_MAIN_BEAT_003,\n" +
+    "         ELECTRO_DRUM_MAIN_BEAT_004];\n" +
     'var drumPattern = "0+0+11112+2+3+++";   // each number is actually an index into the drums array\n' +
     "makeBeat(drums, 1, 1, drumPattern);\n" +
     "finish();\n",
@@ -1133,13 +1133,13 @@ export const CURRICULUM_SCRIPTS = {
     "drumSounds = [OS_CLAP01, OS_CLOSEDHAT01, OS_COWBELL01, OS_KICK01, OS_LOWTOM01, OS_SNARE01]\n" +
     'beatString = "5-5132-034550011"\n' +
     "for measure in range(1, 33):\n" +
-    "	makeBeat(drumSounds, 1, measure, beatString)\n" +
-    "	if (measure % 4 == 0): # Only True at every fourth measure\n" +
-    "		# rotate list items so last item moves to first slot\n" +
-    "		listLength = len(drumSounds)\n" +
-    "		lastSound = drumSounds[listLength-1:listLength]\n" +
-    "		allButLastSound = drumSounds[0:listLength-1]\n" +
-    "		drumSounds = lastSound + allButLastSound\n" +
+    "    makeBeat(drumSounds, 1, measure, beatString)\n" +
+    "    if (measure % 4 == 0): # Only True at every fourth measure\n" +
+    "        # rotate list items so last item moves to first slot\n" +
+    "        listLength = len(drumSounds)\n" +
+    "        lastSound = drumSounds[listLength-1:listLength]\n" +
+    "        allButLastSound = drumSounds[0:listLength-1]\n" +
+    "        drumSounds = lastSound + allButLastSound\n" +
     "finish()\n",
 
     "Array Operations.js": "init();\n" +
@@ -1147,14 +1147,14 @@ export const CURRICULUM_SCRIPTS = {
     "var drumSounds = [OS_CLAP01, OS_CLOSEDHAT01, OS_COWBELL01, OS_KICK01, OS_LOWTOM01, OS_SNARE01];\n" +
     'var beatString = "5-5132-034550011";\n' +
     "for (var measure = 1; measure < 33; measure++) {\n" +
-    "	makeBeat(drumSounds, 1, measure, beatString);\n" +
-    "	if (measure % 4 == 0) { // Only true at every 4th measure\n" +
-    "		// rotate array items so last item moves to first slot\n" +
-    "		var arrLength = drumSounds.length;\n" +
-    "		var lastSound = drumSounds.slice(arrLength - 1, arrLength);\n" +
-    "		var allButLastSound = drumSounds.slice(0, arrLength - 1);\n" +
-    "		drumSounds = lastSound.concat(allButLastSound);\n" +
-    "	}\n" +
+    "    makeBeat(drumSounds, 1, measure, beatString);\n" +
+    "    if (measure % 4 == 0) { // Only true at every 4th measure\n" +
+    "        // rotate array items so last item moves to first slot\n" +
+    "        var arrLength = drumSounds.length;\n" +
+    "        var lastSound = drumSounds.slice(arrLength - 1, arrLength);\n" +
+    "        var allButLastSound = drumSounds.slice(0, arrLength - 1);\n" +
+    "        drumSounds = lastSound.concat(allButLastSound);\n" +
+    "    }\n" +
     "}\n" +
     "finish();\n",
 
@@ -1163,14 +1163,14 @@ export const CURRICULUM_SCRIPTS = {
     "init()\n" +
     "setTempo(100)\n" +
     "sampleBank = [YG_TRAP_SYNTH_BELL_1,\n" +
-    "			  YG_TRAP_STRINGS_1,\n" +
-    "			  YG_TRAP_SHORT_SYNTH_1,\n" +
-    "			  YG_TRAP_HIT_1,\n" +
-    "			  YG_TRAP_SYNTH_LEAD_6,\n" +
-    "			  YG_TRAP_BELLS_1]\n" +
+    "              YG_TRAP_STRINGS_1,\n" +
+    "              YG_TRAP_SHORT_SYNTH_1,\n" +
+    "              YG_TRAP_HIT_1,\n" +
+    "              YG_TRAP_SYNTH_LEAD_6,\n" +
+    "              YG_TRAP_BELLS_1]\n" +
     "for i in range(1, 9):\n" +
-    "	index = randint(0, 5) # Generate a random index number between 0 and 5\n" +
-    "	fitMedia(sampleBank[index], 1, i, i+1) # Use the random index to get a list element\n" +
+    "    index = randint(0, 5) # Generate a random index number between 0 and 5\n" +
+    "    fitMedia(sampleBank[index], 1, i, i+1) # Use the random index to get a list element\n" +
     "fitMedia(YG_TRAP_KICK_4, 2, 1, 9)\n" +
     "fitMedia(YG_TRAP_BASS_1, 3, 1, 9)\n" +
     "fitMedia(YG_TRAP_SNARE_5, 4, 1, 9)\n" +
@@ -1179,16 +1179,16 @@ export const CURRICULUM_SCRIPTS = {
     "Random Clip.js": "init();\n" +
     "setTempo(100);\n" +
     "var sampleBank = [YG_TRAP_SYNTH_BELL_1,\n" +
-    "			  YG_TRAP_STRINGS_1,\n" +
-    "			  YG_TRAP_SHORT_SYNTH_1,\n" +
-    "			  YG_TRAP_HIT_1,\n" +
-    "			  YG_TRAP_SYNTH_LEAD_6,\n" +
-    "			  YG_TRAP_BELLS_1];\n" +
+    "              YG_TRAP_STRINGS_1,\n" +
+    "              YG_TRAP_SHORT_SYNTH_1,\n" +
+    "              YG_TRAP_HIT_1,\n" +
+    "              YG_TRAP_SYNTH_LEAD_6,\n" +
+    "              YG_TRAP_BELLS_1];\n" +
     "for(var i = 1; i < 9; i++) {\n" +
     " // Generate a random index number\n" +
-    "	var index = Math.floor(Math.random() * 6); // generates a random index number between 0 and 5\n" +
-    "	// Use the random index to pick a sample\n" +
-    "	fitMedia(sampleBank[index], 1, i, i+1);\n" +
+    "    var index = Math.floor(Math.random() * 6); // generates a random index number between 0 and 5\n" +
+    "    // Use the random index to pick a sample\n" +
+    "    fitMedia(sampleBank[index], 1, i, i+1);\n" +
     "}\n" +
     "fitMedia(YG_TRAP_KICK_4, 2, 1, 9);\n" +
     "fitMedia(YG_TRAP_BASS_1, 3, 1, 9);\n" +
@@ -1241,7 +1241,7 @@ export const CURRICULUM_SCRIPTS = {
     "amenCymbals = cym1 + cym1 + cym2 + cym3\n" +
     'insertSection = ""\n' +
     "for i in range(8):\n" +
-    "	insertSection += str( randint(0, 4) )  # building the random beat string, 8 characters long\n" +
+    "    insertSection += str( randint(0, 4) )  # building the random beat string, 8 characters long\n" +
     "newA = insertSection + a[8:16]\n" +
     "newBeat = a + newA + b + c\n" +
     "makeBeat(drums, 1, 1, newBeat)\n" +
@@ -1261,7 +1261,7 @@ export const CURRICULUM_SCRIPTS = {
     "var amenCymbals = cym1 + cym1 + cym2 + cym3;\n" +
     'var insertSection = "";\n' +
     "for(var i = 0; i < 8; i++) {\n" +
-    "	insertSection += Math.floor(Math.random() * 5);  // building the random beat string, 8 characters long\n" +
+    "    insertSection += Math.floor(Math.random() * 5);  // building the random beat string, 8 characters long\n" +
     "}\n" +
     "var newA = insertSection + a.substring(8,16);\n" +
     "var newBeat = a + newA + b + c;\n" +
