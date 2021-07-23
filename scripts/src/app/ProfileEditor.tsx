@@ -66,44 +66,20 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="form-group">
-                            <input type="email" className="form-control" placeholder={t("formFieldPlaceholder.emailOptional")}
-                                value={email} onChange={e => setEmail(e.target.value.trim())} />
-                        </div>
-                    </div>
-                </div>
+                <input type="email" className="form-control mb-4" placeholder={t("formFieldPlaceholder.emailOptional")}
+                    value={email} onChange={e => setEmail(e.target.value.trim())} />
 
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.currentPassword")}
-                                value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
-                        </div>
-                    </div>
-                </div>
+                <input type="password" className="form-control mb-4" placeholder={t("formFieldPlaceholder.currentPassword")}
+                    value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
 
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder="New password (Optional)"
-                                value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
-                        </div>
-                    </div>
-                </div>
+                <input type="password" className="form-control mb-4" placeholder="New password (Optional)"
+                    value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
 
                 {newPassword &&
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
-                                e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
-                                setConfirmPassword(e.target.value)
-                            }} value={confirmPassword} required />
-                        </div>
-                    </div>
-                </div>}
+                <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
+                    e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
+                    setConfirmPassword(e.target.value)
+                }} value={confirmPassword} required />}
             </div>
 
             <div className="modal-footer">
