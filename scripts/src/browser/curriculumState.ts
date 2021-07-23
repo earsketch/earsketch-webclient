@@ -137,6 +137,51 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         script.replaceWith(copy)
     })
 
+    root.querySelectorAll('div[class*="openblock question"]').forEach((questionDiv: HTMLDivElement, qId) => {
+        const icon = document.createElement("i")
+        icon.classList.add("icon", "icon-checkmark")
+        // add icon to questions
+        questionDiv.querySelectorAll("div.paragraph > p").forEach(question => question.prepend(icon))
+
+        questionDiv.querySelectorAll("ul.answers > li > p").forEach((answerParagraph: HTMLParagraphElement, i) => {
+            const label = document.createElement("label")
+            const input = document.createElement("input")
+            const control = document.createElement("span")
+            const span = document.createElement("span")
+
+            answerParagraph.innerText = answerParagraph.innerText + " " // space included for wrapping ::after
+            answerParagraph.prepend(label)
+            answerParagraph.append(span)
+            label.appendChild(input)
+            label.appendChild(control)
+
+            input.type = "radio"
+            input.name = "q" + qId
+            input.onclick = () => {
+                if (i === 0) {
+                    answerParagraph.classList.add("correct")
+                    questionDiv.classList.add("complete")
+                    questionDiv.querySelectorAll("input").forEach((el) => { el.disabled = true })
+                    questionDiv.querySelectorAll(".incorrect").forEach(el => el.classList.remove("incorrect"))
+                } else {
+                    answerParagraph.classList.add("incorrect")
+                    questionDiv.querySelectorAll(".try-again").forEach(el => el.classList.remove("try-again"))
+                    span.classList.add("try-again")
+                }
+            }
+            control.classList.add("control")
+        })
+
+        const answers = Array.from(questionDiv.querySelectorAll("ul.answers > li"))
+        const answerList = questionDiv.querySelector("ul.answers")
+        answers.forEach(a => a.remove())
+        while (answers.length) {
+            const index = Math.floor(Math.random() * answers.length)
+            answerList!.appendChild(answers[index])
+            answers.splice(index, 1)
+        }
+    })
+
     if (/WebKit/.test(navigator.userAgent)) {
         // Apparent WebKit (including Safari) bug: adopted <video> and <audio> elements are missing their controls.
         // (This does not occur in Chrome or Firefox.)

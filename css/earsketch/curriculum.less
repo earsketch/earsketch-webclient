@@ -156,27 +156,7 @@
   color: white;
 }
 
-#curriculum ul.answers {
-  font-size: 1.3rem;
-}
 
-#curriculum ul.answers input[type="radio"] {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  appearance: none;
-}
-
-#curriculum ul.answers .control {
-  margin-top: 5px;
-  display: inline-block;
-  border: 1px solid lightgrey;
-  min-width: 11px;
-  min-height: 11px;
-  border-radius: 50%;
-  margin-right: .7em;
-  background-color: white;
-}
 
 #curriculum ul.answers li.correct input:checked + .control {
   background-color: @correct-color;
@@ -197,6 +177,103 @@
 }
 
 #curriculum ul.answers li.incorrect input[type="radio"]:checked + .control + ::after {
+  font-weight: normal;
+  margin-left: 1em;
+  margin-right: 1em;
+  font-size: smaller;
+  white-space: nowrap;
+  text-align: right;
+  content: " Try Again!"
+}
+
+// new questions asciidoc format
+#curriculum div.question {
+  list-style: none;
+  list-style-position: outside;
+  font-weight: bold;
+}
+
+// Undo some Tailwind Typography list styling.
+#curriculum div.question li {
+  padding-left: 0;
+}
+#curriculum div.question li::before {
+  content: none;
+}
+
+#curriculum div.question p {
+  font-weight: bold;
+  display: flex;
+  align-items: flex-start;
+}
+
+#curriculum div.question > div.content > div.paragraph > p {
+  padding-top: .5em;
+  position: relative;
+  margin-left: @bullet-spacing;
+  padding-top: .5em;
+}
+
+#curriculum div.question i {
+  position: absolute;
+  left: -@bullet-spacing;
+  top: 9px;
+  font-size: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 1em;
+  padding: 4px;
+  background-color: #CCCCCC;
+  color: #CCCCCC;
+}
+
+#curriculum div.question.complete i {
+  background-color: @correct-color;
+  color: white;
+}
+
+#curriculum ul.answers {
+  font-size: 1.3rem;
+  margin-left: @bullet-spacing;
+}
+
+#curriculum ul.answers input[type="radio"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  appearance: none;
+}
+
+#curriculum ul.answers .control {
+  margin-top: 5px;
+  display: inline-block;
+  border: 1px solid lightgrey;
+  min-width: 11px;
+  min-height: 11px;
+  border-radius: 50%;
+  margin-right: .7em;
+  background-color: white;
+}
+
+#curriculum ul.answers p.correct input:checked + .control {
+  background-color: @correct-color;
+  border-color: @correct-color;
+}
+
+#curriculum ul.answers p.incorrect input:checked + .control {
+  background-color: @incorrect-color;
+  border-color: @incorrect-color;
+}
+
+#curriculum ul.answers p.correct {
+  color: @correct-color;
+}
+
+#curriculum ul.answers p.incorrect {
+  color: @incorrect-color;
+}
+
+#curriculum ul.answers p.incorrect .try-again::after {
   font-weight: normal;
   margin-left: 1em;
   margin-right: 1em;
