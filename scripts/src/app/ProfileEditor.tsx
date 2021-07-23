@@ -5,7 +5,7 @@ import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 
-export const ProfileEditor = ({ username, email: _email, close }: { username: string, email: string, close: (info?: any) => void }) => {
+export const ProfileEditor = ({ username, email: _email, close }: { username: string, email: string, close: (email?: string) => void }) => {
     const { t } = useTranslation()
     const [error, setError] = useState("")
     const [password, setPassword] = useState("")
@@ -83,7 +83,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
             </div>
 
             <div className="modal-footer">
-                <input type="button" className="btn btn-default" onClick={close} value={t("cancel").toLocaleUpperCase()} />
+                <input type="button" className="btn btn-default" onClick={() => close()} value={t("cancel").toLocaleUpperCase()} />
                 <input type="submit" className="btn btn-primary" value={t("update").toLocaleUpperCase()} disabled={!newPassword && email === _email} />
             </div>
         </form>
