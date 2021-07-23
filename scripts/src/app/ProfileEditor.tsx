@@ -14,25 +14,16 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
     const [email, setEmail] = useState(_email)
 
     const submitPassword = async () => {
-        let response
         try {
-            response = await userProject.postAuth("/users/modifypwd", { password: btoa(password), newpassword: btoa(newPassword) })
+            await userProject.postAuth("/users/modifypwd", { password: btoa(password), newpassword: btoa(newPassword) })
         } catch (error) {
             esconsole(error, "error")
-            setError(t("messages:changepassword.commerror2"))
+            setError(t("messages:changepassword.pwdauth"))
             return false
         }
 
-        if (response.ok) {
-            userNotification.show(t("changePassword.success"), "success")
-            return true
-        } else if (response.status === 401) {
-            setError(t("messages:changepassword.pwdauth"))
-        } else {
-            esconsole(`Error changing password: ${response.status} ${response.statusText}`, "error")
-            setError(t("messages:changepassword.commerror"))
-        }
-        return false
+        userNotification.show(t("changePassword.success"), "success")
+        return true
     }
 
     const submitEmail = async () => {
