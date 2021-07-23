@@ -53,8 +53,9 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
     }
 
     const submit = async () => {
-        let emailSuccess = true; let passwordSuccess = true
-        if (email && email !== _email) {
+        let emailSuccess = true
+        let passwordSuccess = true
+        if (email !== _email) {
             emailSuccess = await submitEmail()
         }
         if (emailSuccess) {
@@ -62,7 +63,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
                 passwordSuccess = await submitPassword()
             }
             if (passwordSuccess) {
-                close()
+                close(email)
             }
         }
     }
@@ -116,7 +117,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
             <div className="modal-footer">
                 <input type="button" className="btn btn-default" onClick={close} value={t("cancel").toLocaleUpperCase()} />
-                <input type="submit" className="btn btn-primary" value={t("update").toLocaleUpperCase()} disabled={!(newPassword || email)} />
+                <input type="submit" className="btn btn-primary" value={t("update").toLocaleUpperCase()} disabled={!newPassword && email === _email} />
             </div>
         </form>
     </>

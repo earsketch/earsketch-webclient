@@ -502,9 +502,9 @@ export const App = () => {
 
     const editProfile = async () => {
         setShowNotifications(false)
-        const result = await openModal(ProfileEditor, { username, email })
-        if (result !== undefined) {
-            email = result.email
+        const newEmail = await openModal(ProfileEditor, { username, email })
+        if (newEmail !== undefined) {
+            email = newEmail
         }
     }
 
