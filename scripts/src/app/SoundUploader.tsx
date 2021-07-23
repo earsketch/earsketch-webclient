@@ -14,6 +14,7 @@ import { encodeWAV } from "./renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import { ModalFooter } from "../Utils"
 
 function cleanKey(key: string) {
     return key.replace(/\W/g, "").toUpperCase()
@@ -83,28 +84,12 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
     return promise
 }
 
-const ProgressBar = ({ progress }: { progress: number }) => {
-    const percent = Math.floor(progress * 100) + "%"
-    return <div className="progress flex-grow mb-0 mr-3">
-        <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
-    </div>
-}
-
-const Footer = ({ ready, progress, close }: { ready: boolean, progress?: number | null, close: () => void }) => {
-    const { t } = useTranslation()
-    return <div className="modal-footer flex items-center justify-end">
-        {progress !== undefined && progress !== null && <ProgressBar progress={progress} />}
-        <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d" }} />
-        <input type="submit" value={t("upload").toLocaleUpperCase()} className="btn btn-primary text-white" disabled={!ready} />
-    </div>
-}
-
 const FileTab = ({ close }: { close: () => void }) => {
     const [file, setFile] = useState(null as File | null)
     const [key, setKey] = useState("")
     const [tempo, setTempo] = useState("")
     const [error, setError] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [progress, setProgress] = useState<number>()
     const { t } = useTranslation()
 
     const name = file ? ESUtils.parseName(file.name) : ""
@@ -146,14 +131,14 @@ const FileTab = ({ close }: { close: () => void }) => {
                 </div>
             </div>
         </div>
-        <Footer ready={file !== null} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={file !== null} progress={progress} close={close} />
     </form>
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
     const [key, setKey] = useState("")
     const [error, setError] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [progress, setProgress] = useState<number>()
     const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
     const [tempo, setTempo] = useState(120)
@@ -252,7 +237,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                 </div>
             </div>}
         </div>
-        <Footer ready={buffer !== null} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={buffer !== null} progress={progress} close={close} />
     </form>
 }
 
@@ -360,7 +345,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             <div className="modal-section-header"><span>{t("soundUploader.constantRequired")}</span></div>
             <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
         </div>
-        <Footer ready={selected !== null} close={close} />
+        <ModalFooter submit="upload" ready={selected !== null} close={close} />
     </form>
 }
 
@@ -371,7 +356,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     const [ready, setReady] = useState(false)
     const [error, setError] = useState(isSafari ? "Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or Firefox." : "")
     const [key, setKey] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [progress, setProgress] = useState<number>()
 
     const login = useCallback(iframe => {
         if (!iframe) return
@@ -414,7 +399,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
                 <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
             </>}
         </div>
-        <Footer ready={ready} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
     </form>
 }
 
@@ -422,7 +407,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
     const GROOVEMACHINE_URL = "https://groovemachine.lmc.gatech.edu"
     const [error, setError] = useState("")
     const [key, setKey] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [progress, setProgress] = useState<number>()
     const [ready, setReady] = useState(false)
     const gmWindow = useRef<Window>()
 
@@ -453,7 +438,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
             <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
         </div>
-        <Footer ready={ready} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
     </form>
 }
 

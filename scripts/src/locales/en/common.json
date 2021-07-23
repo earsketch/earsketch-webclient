@@ -187,7 +187,7 @@
     "scriptShare.tab.soundcloud.sharePrompt": "What can others do with your song on SoundCloud?",
     "scriptShare.tab.soundcloud.songName": "Song Name",
     "scriptShare.tab.soundcloud.view": "View on SoundCloud",
-    "scriptShare.moreDetails": "More Details (Description, License)...",
+    "scriptShare.moreDetails": "More Details (Description, License)",
     "scriptShare.descriptionOptional": "Description (optional)",
     "scriptShare.licenseType": "License Type",
     "scriptShare.copyClipboard": "Copy to clipboard",

@@ -7,6 +7,7 @@ import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import { ModalFooter } from "../Utils"
 
 async function postJSON(endpoint: string, data: any) {
     const url = URL_DOMAIN + endpoint
@@ -84,10 +85,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
                     <textarea id="description" className="form-control" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
                 </div>
             </div>
-            <div className="modal-footer">
-                <input type="button" className="btn btn-default" style={{ color: "rgb(208, 79, 77)" }} onClick={close} value="CANCEL" />
-                <input type="submit" className="btn btn-primary" value="SUBMIT" disabled={description === ""} />
-            </div>
+            <ModalFooter submit="submit" ready={description !== ""} close={close} />
         </form>
     </div>
 }

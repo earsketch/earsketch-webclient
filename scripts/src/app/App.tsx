@@ -1,6 +1,7 @@
 import i18n from "i18next"
 import { Dialog, Menu, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AccountCreator } from "./AccountCreator"
@@ -24,7 +25,6 @@ import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
-import { Prompt } from "./Prompt"
 import * as recommenderState from "../browser/recommenderState"
 import * as recommender from "./recommender"
 import { RenameScript, RenameSound } from "./Rename"
@@ -41,7 +41,7 @@ import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { useTranslation } from "react-i18next"
+import { ModalFooter, Prompt } from "../Utils"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -111,11 +111,10 @@ const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: {
         <div className="modal-header">
             <h3 className="modal-title">{t("confirm")}</h3>
         </div>
-        { textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div> }
-        <div className="modal-footer">
-            <button className="btn btn-default" onClick={() => close(false)}>{cancelKey ? t(cancelKey) : t("cancel")}</button>
-            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{okKey ? t(okKey) : t("ok")}</button>
-        </div>
+        <form onSubmit={e => { e.preventDefault(); close(true) }}>
+            {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
+        </form>
     </>
 }
 

@@ -4,6 +4,7 @@ import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import { post } from "./userProject"
 import { useTranslation } from "react-i18next"
+import { ModalFooter } from "../Utils"
 
 export const AccountCreator = ({ close }: { close: (value?: { username: string, password: string }) => void }) => {
     const [error, setError] = useState("")
@@ -55,11 +56,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
 
                 <input type="email" className="form-control" name="email" placeholder={t("formFieldPlaceholder.emailOptional")} value={email} onChange={e => setEmail(e.target.value)} />
             </div>
-
-            <div className="modal-footer">
-                <input type="button" className="btn btn-default" onClick={() => close()} value={t("cancel").toLocaleUpperCase()} />
-                <input type="submit" className="btn btn-primary" value={t("accountCreator.submit").toLocaleUpperCase()} />
-            </div>
+            <ModalFooter submit="accountCreator.submit" close={close} />
         </form>
     </>
 }
