@@ -11,7 +11,7 @@ import { Script } from "common"
 import { compile } from "./Autograder"
 import * as exporter from "./exporter"
 
-const generateCSV = (results: Result[]) => {
+export const generateCSV = (results: Result[]) => {
     const headers = ["username", "script_name", "shareid", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
@@ -60,7 +60,7 @@ const generateCSV = (results: Result[]) => {
     return headers.join(",") + "\n" + rows.join("\n")
 }
 
-const download = (results: Result[]) => {
+export const download = (results: Result[]) => {
     const file = generateCSV(results)
     const blob = new Blob([file], { type: "text/plain" })
     exporter.download("code_analyzer_report.csv", blob)
@@ -158,6 +158,9 @@ const ResultPanel = ({ result }: { result: Result }) => {
                 {result.script.name &&
                     <b> {result.script.username} ({result.script.name}) </b>
                 }
+                {result.version &&
+                    <b> (version {result.version}) </b>
+                }
                 <div className="pull-right">{result.script.shareid}</div>
             </div>
             }
@@ -192,7 +195,7 @@ const ResultPanel = ({ result }: { result: Result }) => {
     </div>
 }
 
-const Results = ({ results, processing }: { results: Result[], processing: string | null }) => {
+export const Results = ({ results, processing }: { results: Result[], processing: string | null }) => {
     return <div>
         {results.length > 0 &&
           <ul>
@@ -223,12 +226,13 @@ const Results = ({ results, processing }: { results: Result[], processing: strin
     </div>
 }
 
-interface Result {
+export interface Result {
   script: Script
   reports?: {
     [key: string]: { [key: string]: string|number }
   }
   error?: string
+  version?: number | null
 }
 
 export const CodeAnalyzer = () => {

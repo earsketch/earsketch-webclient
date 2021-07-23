@@ -41,8 +41,6 @@ module.exports = {
 
             // Controllers
             chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-            codeAnalyzerContestController: path.resolve(__dirname,`${appDir}/codeAnalyzerContestController.js`),
-            codeAnalyzerCAIController: path.resolve(__dirname,`${appDir}/codeAnalyzerCAIController.js`),
         }
     },
     module: {
@@ -146,11 +144,11 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'codeAnalyzerCAI/index.html'),
-            template: 'codeAnalyzerCAI/index.template.html'
+            template: 'public/index.html'
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname,'codeAnalyzerContest/index.html'),
-            template: 'codeAnalyzerContest/index.template.html'
+            template: 'public/index.html'
         }),
         new TsconfigPathsPlugin({
             configFile: "tsconfig.json"

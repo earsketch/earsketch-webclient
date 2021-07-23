@@ -176,7 +176,3 @@ window.app = angular.module("EarSketchApp", ["ngFileUpload"]).config($locationPr
     // Prevent legacy hash-bang URL being overwritten by $location.
     $locationProvider.html5Mode(false).hashPrefix("")
 })
-
-// Controllers
-require("codeAnalyzerContestController")
-require("codeAnalyzerCAIController")
