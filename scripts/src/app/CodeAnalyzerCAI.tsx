@@ -13,6 +13,7 @@ import * as caiAnalysisModule from "../cai/analysis"
 import { Result, Results } from "./CodeAnalyzer"
 import { compile, randomSeed } from "./Autograder"
 
+
 const Options = ({ options, seed, useSeed, setOptions, setSeed, setUseSeed }:
     { options: ReportOptions, seed: number, useSeed: boolean, setOptions: (o: ReportOptions) => void, setSeed: (s: number) => void, setUseSeed: (s: boolean) => void }) => {
 
@@ -188,11 +189,11 @@ interface ReportOptions {
     COMPLEXITY: boolean,
     EFFECTS: boolean,
     // MEASUREVIEW: boolean,
-    GENRE: boolean,
-    SOUNDPROFILE: boolean,
+    // GENRE: boolean,
+    // SOUNDPROFILE: boolean,
     MIXING: boolean,
     HISTORY: boolean,
-    APICALLS: boolean,
+    // APICALLS: boolean,
 }
 
 export const CodeAnalyzerCAI = () => {
@@ -206,11 +207,11 @@ export const CodeAnalyzerCAI = () => {
         COMPLEXITY: true,
         EFFECTS: false,
         // MEASUREVIEW: false,
-        GENRE: false,
-        SOUNDPROFILE: false,
+        // GENRE: false,
+        // SOUNDPROFILE: false,
         MIXING: false,
         HISTORY: false,
-        APICALLS: false,
+        // APICALLS: false,
     } as ReportOptions)
 
     const [useSeed, setUseSeed] = useState(false)
@@ -239,3 +240,4 @@ export const CodeAnalyzerCAI = () => {
         <ModalContainer />
     </div>
 }
+
