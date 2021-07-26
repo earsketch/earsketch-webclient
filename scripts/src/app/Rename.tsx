@@ -27,7 +27,7 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
             }
             close(fullname)
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 

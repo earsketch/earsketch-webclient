@@ -36,7 +36,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
         try {
             close(validateScriptName(name, extension))
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 

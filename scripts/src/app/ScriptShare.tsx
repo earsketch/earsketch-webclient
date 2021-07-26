@@ -23,16 +23,16 @@ async function queryID(query: any) {
     if (query === "") {
         return null
     } else if (ESUtils.checkIllegalCharacters(query)) {
-        throw i18n.t("messages:general.illegalCharacterInUserID")
+        throw new Error("messages:general.illegalCharacterInUserID")
     } else if (query === userProject.getUsername().toLowerCase()) {
-        throw i18n.t("messages:general.noSelfShare")
+        throw new Error("messages:general.noSelfShare")
     }
 
     const data = await userProject.get("/users/search", { query })
     if (data) {
         return data.username
     }
-    throw i18n.t("messages:general.userDoesNotExist")
+    throw new Error("messages:general.userDoesNotExist")
 }
 
 const UserListInput = ({ users, setUsers, setFinalize }:
@@ -80,7 +80,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
             setQuery("")
             return newUsers
         } catch (error) {
-            setError(error)
+            setError(error.message)
             return null
         }
     }
@@ -100,7 +100,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
-        {error && <div className="share-people-error">{error}</div>}
+        {error && <div className="share-people-error">{t(error)}</div>}
     </>
 }
 

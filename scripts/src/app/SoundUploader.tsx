@@ -103,7 +103,7 @@ const FileTab = ({ close }: { close: () => void }) => {
             await uploadFile(file!, key, extension, tempo === "" ? -1 : +tempo, setProgress)
             close()
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 
@@ -172,7 +172,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
             await uploadFile(blob, key, ".wav", metronome ? tempo : 120, setProgress)
             close()
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 
@@ -302,7 +302,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             store.dispatch(sounds.getUserSounds(username))
             close()
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 
@@ -383,7 +383,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
                     await uploadFile(file, key, ".wav", tempo, setProgress)
                     close()
                 } catch (error) {
-                    setError(error.toString())
+                    setError(error.message)
                 }
             }
         }
@@ -424,7 +424,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
                     await uploadFile(file, key, ".wav", message.data.tempo, setProgress)
                     close()
                 } catch (error) {
-                    setError(error.toString())
+                    setError(error.message)
                 }
             }
         }
