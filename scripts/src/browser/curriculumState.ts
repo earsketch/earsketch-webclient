@@ -137,7 +137,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         script.replaceWith(copy)
     })
 
-    root.querySelectorAll('div[class*="openblock question"]').forEach((questionDiv: HTMLDivElement, qId) => {
+    root.querySelectorAll('div[class*="openblock question"]').forEach((questionDiv: HTMLDivElement, questionIndex) => {
         const icon = document.createElement("i")
         icon.classList.add("icon", "icon-checkmark")
         // add icon to questions
@@ -156,7 +156,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
             label.appendChild(control)
 
             input.type = "radio"
-            input.name = "q" + qId
+            input.name = "q" + questionIndex
             input.onclick = () => {
                 if (i === 0) {
                     answerParagraph.classList.add("correct")

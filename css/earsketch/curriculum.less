@@ -109,6 +109,10 @@
 @correct-color: #2CBF70;
 @incorrect-color: #FF3448;
 
+#curriculum div.sect2 {
+  counter-reset: question-number; // reset question numbers for each section
+}
+
 #curriculum div.question {
   list-style: none;
   list-style-position: outside;
@@ -125,8 +129,6 @@
 
 #curriculum div.question p {
   font-weight: bold;
-  display: flex;
-  align-items: flex-start;
 }
 
 #curriculum div.question > div.content > div.paragraph > p {
@@ -134,6 +136,11 @@
   position: relative;
   margin-left: @bullet-spacing;
   padding-top: .5em;
+  counter-increment: question-number;
+}
+
+#curriculum div.question > div.content > div.paragraph > p::before {
+  content: counter(question-number) ". ";
 }
 
 #curriculum div.question i {
