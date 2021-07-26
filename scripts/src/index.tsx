@@ -13,8 +13,6 @@ import "kali"
 import "skulpt"
 import "skulptStdLib"
 
-import { Question } from "./browser/questions" // Used inside curriculum.
-
 import "../../fonts/icomoon_ultimate/style.css"
 
 import * as ace from "ace-builds"
@@ -48,7 +46,6 @@ import store, { persistor } from "./reducers"
 
 import { Autograder } from "./app/Autograder"
 import { CodeAnalyzer } from "./app/CodeAnalyzer"
-(window as any).Question = Question // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
 ;(window as any).droplet = droplet

@@ -105,88 +105,10 @@
 }
 
 // Question styling:
-#curriculum #questionsContainer {
-  list-style: none;
-  list-style-position: outside;
-  font-weight: bold;
-}
-
-// Undo some Tailwind Typography list styling.
-#curriculum #questionsContainer li {
-  padding-left: 0;
-}
-#curriculum #questionsContainer li::before {
-  content: none;
-}
-
-#curriculum #questionsContainer label {
-  font-weight: bold;
-  display: flex;
-  align-items: flex-start;
-  padding-top: .5em;
-  padding-bottom: .5em;
-}
-
 @bullet-spacing: 32px;
-
-#curriculum li.question {
-  padding-top: .5em;
-  position: relative;
-  margin-left: @bullet-spacing;
-}
-
-#curriculum li.question > i {
-  position: absolute;
-  left: -@bullet-spacing;
-  top: 9px;
-  font-size: 9px;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 1em;
-  padding: 4px;
-  background-color: #CCCCCC;
-  color: #CCCCCC;
-}
-
 @correct-color: #2CBF70;
 @incorrect-color: #FF3448;
 
-#curriculum li.question.complete > i {
-  background-color: @correct-color;
-  color: white;
-}
-
-
-
-#curriculum ul.answers li.correct input:checked + .control {
-  background-color: @correct-color;
-  border-color: @correct-color;
-}
-
-#curriculum ul.answers li.incorrect input:checked + .control {
-  background-color: @incorrect-color;
-  border-color: @incorrect-color;
-}
-
-#curriculum ul.answers li.correct {
-  color: @correct-color;
-}
-
-#curriculum ul.answers li.incorrect {
-  color: @incorrect-color;
-}
-
-#curriculum ul.answers li.incorrect input[type="radio"]:checked + .control + ::after {
-  font-weight: normal;
-  margin-left: 1em;
-  margin-right: 1em;
-  font-size: smaller;
-  white-space: nowrap;
-  text-align: right;
-  content: " Try Again!"
-}
-
-// new questions asciidoc format
 #curriculum div.question {
   list-style: none;
   list-style-position: outside;
