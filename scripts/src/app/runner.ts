@@ -329,22 +329,26 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
 
 function getClipTempo(result: DAWData) {
     const metadata = audioLibrary.cache.defaultTags ?? []
-    const tempoCache: { [key: string]: number } = {}
+    const tempoCache: { [key: string]: number | undefined } = {}
 
-    result.tracks.forEach(track => {
-        track.clips.forEach(clip => {
-            clip.tempo = tempoCache[clip.filekey]
-            if (clip.tempo !== undefined) {
-                const match = metadata.find(item => item.file_key === clip.filekey)
-                if (match !== undefined) {
-                    let tempo = +match.tempo
-                    tempo = isNaN(tempo) ? -1 : tempo
-                    clip.tempo = tempo
-                    tempoCache[clip.filekey] = tempo
-                }
+    const lookupTempo = (key: string) => {
+        // Return cached tempo for given key, or search audio sample metadata and cache result.
+        if (key in tempoCache) return tempoCache[key]
+        const tempo = metadata.find(item => item.file_key === key)?.tempo
+        if (tempo !== undefined) {
+            tempoCache[key] = isNaN(tempo) ? -1 : tempo
+        }
+        return tempo
+    }
+
+    for (const track of result.tracks) {
+        for (const clip of track.clips) {
+            const tempo = lookupTempo(clip.filekey)
+            if (tempo !== undefined) {
+                clip.tempo = tempo
             }
-        })
-    })
+        }
+    }
 
     return result
 }
