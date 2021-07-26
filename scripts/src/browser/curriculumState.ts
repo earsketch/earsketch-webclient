@@ -125,18 +125,6 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         }
     })
 
-    // Run scripts.
-    root.querySelectorAll("script").forEach(script => {
-        // Adopting the <script> node marks it as "already started", such that it will not execute.
-        // (See https://html.spec.whatwg.org/multipage/scripting.html#script-processing-model.)
-        // To get around this, we create a new <script> element and copy over the details.
-        const copy = document.createElement("script")
-        if (script.src) copy.src = script.src
-        copy.async = script.async
-        copy.innerText = script.innerText
-        script.replaceWith(copy)
-    })
-
     root.querySelectorAll('div[class*="openblock question"]').forEach((questionDiv: HTMLDivElement, questionIndex) => {
         const icon = document.createElement("i")
         icon.classList.add("icon", "icon-checkmark")
