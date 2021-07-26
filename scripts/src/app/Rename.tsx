@@ -45,7 +45,8 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
                     <span className="input-group-addon">{extension}</span>
                 </div>
             </div>
-            <ModalFooter submit="rename.submit" cancel={conflict ? "renameScript.appendSuffix" : "cancel"} close={() => close(userProject.nextName(script.name))} />
+            <ModalFooter submit="rename.submit" cancel={conflict ? "renameScript.appendSuffix" : "cancel"}
+                close={() => close(conflict ? userProject.nextName(script.name) : undefined)} />
         </form>
     </>
 }
