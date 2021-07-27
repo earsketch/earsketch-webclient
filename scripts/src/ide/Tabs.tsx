@@ -220,13 +220,24 @@ export const Tabs = () => {
     const dropdownWidth = 95;
     const containerRef = useRef<HTMLDivElement>(null);
 
+    let tabResizeAnimationFrame: number | undefined
+
     // Note: Manually compute the visible tabs from the content width.
     // IntersectionObserver API would be more desirable but it is hard to accommodate the appended createButton and dropdown menu.
     const observer = new ResizeObserver(entries => {
-        const containerWidth = entries[0].contentRect.width;
-        const cutoff = ~~((containerWidth-createButtonWidth-dropdownWidth*truncated)/tabWidth);
-        dispatch(tabs.setNumVisibleTabs(cutoff));
+        tabResizeAnimationFrame = window.requestAnimationFrame(() => {
+            const containerWidth = entries[0].contentRect.width;
+            const cutoff = ~~((containerWidth-createButtonWidth-dropdownWidth*truncated)/tabWidth);
+            dispatch(tabs.setNumVisibleTabs(cutoff));
+        })
     });
+
+    useEffect(() => {
+        return () => {
+            if (tabResizeAnimationFrame) window.cancelAnimationFrame(tabResizeAnimationFrame)
+        }
+    })
+
     useEffect(() => {
         containerRef.current && observer.observe(containerRef.current);
 
