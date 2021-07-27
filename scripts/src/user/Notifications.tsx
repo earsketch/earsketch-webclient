@@ -17,9 +17,9 @@ const colors: { [key: string]: { [key: string]: string } } = {
     },
     light: {
         normal: "#40463e",
-        success: "#64dc35",
-        failure1: "#d73636",
-        failure2: "#d73636",
+        success: "#065f46",
+        failure1: "#b91c1c",
+        failure2: "#b91c1c",
         fallback: "black",
     },
 }
