@@ -397,7 +397,7 @@ export const App = () => {
 
         let token
         try {
-            token = await userProject.authenticate(username, password)
+            token = await userProject.getBasicAuth("/users/token", username, password)
         } catch (error) {
             userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
             esconsole(error, ["main", "login"])

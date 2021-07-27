@@ -30,41 +30,18 @@ export function form(obj: { [key: string]: string | Blob } = {}) {
     return data
 }
 
-// Our API is pretty inconsistent in terms of what endpoints consume/produce.
-// Each helper deals with a different type of endpoint.
-// (The helpers with "auth" and "admin" prepopulate some parameters for convenience.)
+// Our API has the following kinds of endpoints:
+// - GETs that take query params and return JSON or plain text.
+// - POSTs that take x-www-form-urlencoded and return JSON, plain text, or nothing.
+// - POSTs that take multipart/form-data and return JSON or nothing.
+// Some endpoints return nothing on success, in which case their response code is 204.
+// Many endpoints require authentication. These all accept Basic authentication (username + password),
+// and most of them also accept Bearer authentication (token). This allows us to avoid storing the user's
+// password in the client.
 
-// Expects query parameters, returns JSON.
-export async function get(endpoint: string, params?: { [key: string]: string }, headers?: HeadersInit) {
-    const url = URL_DOMAIN + endpoint + (params ? "?" + new URLSearchParams(params) : "")
+async function fetchAPI(endpoint: string, init?: RequestInit) {
     try {
-        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const response = await fetch(url, { headers })
-        if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
-        }
-        return response.status === 204 ? undefined : response.json()
-    } catch (err) {
-        esconsole(`get failed: ${url}`, ["error", "user"])
-        esconsole(err, ["error", "user"])
-        throw err
-    }
-}
-
-export async function getAuth(endpoint: string, params?: { [key: string]: string }) {
-    return get(endpoint, params, { Authorization: "Bearer " + getToken() })
-}
-
-// Expects form data, returns JSON or a string depending on response content type.
-export async function post(endpoint: string, data?: { [key: string]: string }, headers?: HeadersInit) {
-    const url = URL_DOMAIN + endpoint
-    try {
-        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const response = await fetch(url, {
-            method: "POST",
-            body: new URLSearchParams(data),
-            headers: { "Content-Type": "application/x-www-form-urlencoded", ...headers },
-        })
+        const response = await fetch(URL_DOMAIN + endpoint, init)
         if (!response.ok) {
             throw new Error(`error code: ${response.status}`)
         } else if (response.status === 204) {
@@ -75,53 +52,51 @@ export async function post(endpoint: string, data?: { [key: string]: string }, h
             return response.text()
         }
     } catch (err) {
-        esconsole(`postForm failed: ${url}`, ["error", "user"])
+        esconsole(`request failed: ${endpoint}`, ["error", "user"])
         esconsole(err, ["error", "user"])
         throw err
     }
+}
+
+// Expects query parameters, returns JSON.
+export function get(endpoint: string, params?: { [key: string]: string }, headers?: HeadersInit) {
+    return fetchAPI(endpoint + (params ? "?" + new URLSearchParams(params) : ""), { headers })
+}
+
+export async function getAuth(endpoint: string, params?: { [key: string]: string }) {
+    return get(endpoint, params, { Authorization: "Bearer " + getToken() })
+}
+
+export async function getBasicAuth(endpoint: string, username: string, password: string, params?: { [key: string]: string }) {
+    return get(endpoint, params, { Authorization: "Basic " + btoa(username + ":" + password) })
+}
+
+// Expects form data, returns JSON or a string depending on response content type.
+export async function post(endpoint: string, data?: { [key: string]: string }, headers?: HeadersInit) {
+    return fetchAPI(endpoint, {
+        method: "POST",
+        body: new URLSearchParams(data),
+        headers: { "Content-Type": "application/x-www-form-urlencoded", ...headers },
+    })
 }
 
 export async function postAuth(endpoint: string, data: { [key: string]: string } = {}) {
     return post(endpoint, data, { Authorization: "Bearer " + getToken() })
 }
 
-export async function postForm(endpoint: string, data: { [key: string]: string | Blob }) {
-    const url = URL_DOMAIN + endpoint
-    try {
-        // TODO: Server endpoints should always return a valid JSON object or an error - not an empty response.
-        const response = await fetch(url, {
-            method: "POST",
-            body: form(data),
-            headers: {
-                Authorization: "Bearer " + getToken(),
-                "Content-Type": "multipart/form-data",
-            },
-        })
-        if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
-        }
-        return response.status === 204 ? undefined : response.json()
-    } catch (err) {
-        esconsole(`postForm failed: ${url}`, ["error", "user"])
-        esconsole(err, ["error", "user"])
-        throw err
-    }
+export async function postBasicAuth(endpoint: string, username: string, password: string, data: { [key: string]: string } = {}) {
+    return post(endpoint, data, { Authorization: "Basic " + btoa(username + ":" + password) })
 }
 
-export async function authenticate(username: string, password: string) {
-    try {
-        const response = await fetch(URL_DOMAIN + "/users/authenticate", {
-            method: "POST",
-            body: new URLSearchParams({ username, password: btoa(password) }),
-        })
-        if (!response.ok) {
-            throw new Error(`error code: ${response.status}`)
-        }
-        return response.text()
-    } catch (error) {
-        console.log(error)
-        throw error
-    }
+export async function postForm(endpoint: string, data: { [key: string]: string | Blob }) {
+    return fetchAPI(endpoint, {
+        method: "POST",
+        body: form(data),
+        headers: {
+            Authorization: "Bearer " + getToken(),
+            "Content-Type": "multipart/form-data",
+        },
+    })
 }
 
 export function loadLocalScripts() {
@@ -621,9 +596,9 @@ export async function setPasswordForUser(username: string, password: string, adm
 
     esconsole("Admin setting a new password for user")
     const data = {
-        adminpp: btoa(adminPassphrase),
+        adminpp: adminPassphrase,
         username,
-        newpassword: btoa(password),
+        password,
     }
     await postAuth("/users/modifypwdadmin", data)
     userNotification.show("Successfully set a new password for " + username, "history", 3)
