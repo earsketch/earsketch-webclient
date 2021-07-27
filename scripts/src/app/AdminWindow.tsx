@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import esconsole from "../esconsole"
 import * as userProject from "./userProject"
+import { ModalFooter } from "../Utils"
 import * as websocket from "./websocket"
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
@@ -15,9 +16,7 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
             <AdminResetUserPassword />
         </div>
 
-        <div className="modal-footer">
-            <input type="button" className="btn btn-default" onClick={close} value="CLOSE" />
-        </div>
+        <ModalFooter cancel="close" close={close} />
     </>
 }
 

@@ -4,8 +4,8 @@ import * as walk from "acorn-walk"
 
 import audioContext from "./audiocontext"
 import * as audioLibrary from "./audiolibrary"
-import setupJavascriptAPI, { remapToNativeJs } from "../api/earsketch.js"
-import setupPythonAPI from "../api/earsketch.py"
+import * as javascriptAPI from "../api/earsketch.js"
+import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as pitchshift from "./pitchshifter"
@@ -127,7 +127,10 @@ class SoundConstantFinder extends NodeVisitor {
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsPY(code: string) {
-    esconsole("Iterating through undefined variable names.")
+    // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
+    for (const constant of await audioLibrary.getAllFolders()) {
+        Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
+    }
 
     const finder = new SoundConstantFinder()
     const parse = Sk.parse("<analyzer>", code)
@@ -152,7 +155,7 @@ export async function runPython(code: string) {
     Sk.realsyspath = undefined
 
     Sk.resetCompiler()
-    setupPythonAPI()
+    pythonAPI.setup()
 
     // special cases with these key functions when import ES module is missing
     // this hack is only for the user guidance
@@ -175,7 +178,7 @@ export async function runPython(code: string) {
 
     // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
-    const mod = await Sk.misceval.asyncToPromise(() => {
+    await Sk.misceval.asyncToPromise(() => {
         try {
             return Sk.importModuleInternal_("<stdin>", false, "__main__", code, true, undefined)
         } catch (err) {
@@ -186,16 +189,7 @@ export async function runPython(code: string) {
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
 
     // STEP 3: Extract result.
-    let result
-    if (mod.$d.earsketch && mod.$d.earsketch.$d._getResult) {
-        // case: import earsketch
-        result = Sk.ffi.remapToJs(Sk.misceval.call(mod.$d.earsketch.$d._getResult))
-    } else if (mod.$d._getResult) {
-        // case: from earsketch import *
-        result = Sk.ffi.remapToJs(Sk.misceval.call(mod.$d._getResult))
-    } else {
-        throw new ReferenceError("Something went wrong. Skulpt did not provide the expected output.")
-    }
+    let result = Sk.ffi.remapToJs(pythonAPI.dawData)
     // STEP 4: Perform post-execution steps on the result object
     esconsole("Performing post-execution steps.", ["debug", "runner"])
     result = await postRun(result)
@@ -206,6 +200,12 @@ export async function runPython(code: string) {
 
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsJS(code: string, interpreter: any) {
+    // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
+    const scope = interpreter.getScope().object
+    for (const constant of await audioLibrary.getAllFolders()) {
+        interpreter.setProperty(scope, constant, constant)
+    }
+
     const constants: string[] = []
 
     walk.simple(acorn.parse(code), {
@@ -216,12 +216,12 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
         },
     })
 
-    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(interpreter.getScope().object, c) === undefined)
+    const possibleSoundConstants = constants.filter(c => interpreter.getProperty(scope, c) === undefined)
 
     const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
     for (const clip of clipData) {
         if (clip) {
-            interpreter.setProperty(interpreter.getScope().object, clip.file_key, clip.file_key)
+            interpreter.setProperty(scope, clip.file_key, clip.file_key)
         }
     }
 }
@@ -229,7 +229,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 function createJsInterpreter(code: string) {
     let interpreter
     try {
-        interpreter = new Interpreter(code, setupJavascriptAPI)
+        interpreter = new Interpreter(code, javascriptAPI.setup)
     } catch (e) {
         if (e.loc !== undefined) {
             // acorn provides line numbers for syntax errors
@@ -278,12 +278,9 @@ async function runJsInterpreter(interpreter: any) {
     while (interpreter.run()) {
         await sleep(200)
     }
-    const result = interpreter.getProperty(interpreter.scope, "__ES_RESULT")
-    if (result === undefined) {
-        throw new EvalError("Missing call to init() or something went wrong.")
-    }
+    const result = javascriptAPI.dawData
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
-    return remapToNativeJs(result)
+    return javascriptAPI.remapToNativeJs(result)
 }
 
 // Gets the current line number from the top of the JS-interpreter
@@ -331,23 +328,27 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
 }
 
 function getClipTempo(result: DAWData) {
-    const metadata = audioLibrary.cache.sounds
-    const tempoCache: { [key: string]: number } = {}
+    const metadata = audioLibrary.cache.defaultTags ?? []
+    const tempoCache: { [key: string]: number | undefined } = {}
 
-    result.tracks.forEach(track => {
-        track.clips.forEach(clip => {
-            clip.tempo = tempoCache[clip.filekey]
-            if (clip.tempo !== undefined) {
-                const match = metadata.find(item => item.file_key === clip.filekey)
-                if (match !== undefined) {
-                    let tempo = +match.tempo
-                    tempo = isNaN(tempo) ? -1 : tempo
-                    clip.tempo = tempo
-                    tempoCache[clip.filekey] = tempo
-                }
+    const lookupTempo = (key: string) => {
+        // Return cached tempo for given key, or search audio sample metadata and cache result.
+        if (key in tempoCache) return tempoCache[key]
+        const tempo = metadata.find(item => item.file_key === key)?.tempo
+        if (tempo !== undefined) {
+            tempoCache[key] = isNaN(tempo) ? -1 : tempo
+        }
+        return tempo
+    }
+
+    for (const track of result.tracks) {
+        for (const clip of track.clips) {
+            const tempo = lookupTempo(clip.filekey)
+            if (tempo !== undefined) {
+                clip.tempo = tempo
             }
-        })
-    })
+        }
+    }
 
     return result
 }

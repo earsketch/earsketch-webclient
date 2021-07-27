@@ -163,11 +163,8 @@ export async function openShare(shareid: string) {
 
         if (result) {
             // user has already opened this shared link before
-            if (userProject.isLoggedIn()) {
-                await userProject.getSharedScripts()
-                if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
-                store.dispatch(tabs.setActiveTabAndEditor(shareid))
-            }
+            if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
+            store.dispatch(tabs.setActiveTabAndEditor(shareid))
             switchToShareMode()
         } else {
             // user has not opened this shared link before
@@ -176,17 +173,13 @@ export async function openShare(shareid: string) {
                 userNotification.show("This share script link is invalid.")
                 return
             }
+
             if (isEmbedded) embeddedScriptLoaded(result.username, result.name, result.shareid)
 
-            if (result.username !== userProject.getUsername()) {
-                // the shared script doesn't belong to the logged-in user
-                switchToShareMode()
+            const regularScripts = scripts.selectRegularScripts(store.getState())
 
-                await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
-                await userProject.getSharedScripts()
-                store.dispatch(tabs.setActiveTabAndEditor(shareid))
-            } else {
-                // the shared script belongs to the logged-in user
+            if (result.username === userProject.getUsername() && shareid in regularScripts) {
+                // The shared script belongs to the logged-in user and exists in their scripts.
                 // TODO: use broadcast or service
                 editor.ace.focus()
 
@@ -200,6 +193,12 @@ export async function openShare(shareid: string) {
                 // Manually remove the user-owned shared script from the browser.
                 const { [shareid]: _, ...sharedScripts } = scripts.selectSharedScripts(store.getState())
                 store.dispatch(scripts.setSharedScripts(sharedScripts))
+            } else {
+                // The shared script doesn't belong to the logged-in user (or is a locked version from the past).
+                switchToShareMode()
+                await userProject.saveSharedScript(shareid, result.name, result.source_code, result.username)
+                await userProject.getSharedScripts()
+                store.dispatch(tabs.setActiveTabAndEditor(shareid))
             }
         }
     } else {
