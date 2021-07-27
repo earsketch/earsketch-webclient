@@ -692,7 +692,6 @@ export const App = () => {
 export const ModalContainer = () => {
     const dispatch = useDispatch()
     const Modal = useSelector(appState.selectModal)!
-    const theme = useSelector(appState.selectColorTheme)
 
     useEffect(() => {
         setClosing(false)
