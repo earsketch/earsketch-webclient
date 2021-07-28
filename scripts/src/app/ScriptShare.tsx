@@ -1,6 +1,6 @@
 import i18n from "i18next"
 import { Transition } from "@headlessui/react"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { usePopper } from "react-popper"
 import { useDispatch, useSelector } from "react-redux"
@@ -104,11 +104,18 @@ const UserListInput = ({ users, setUsers, setFinalize }:
     </>
 }
 
+interface Licenses {
+    [key: string]: {
+        license: string
+        licenseDesc: string
+    }
+}
+
 interface TabParameters {
     script: Script
-    licenses: { [key: string]: any }
-    licenseID: string
-    setLicenseID: (id: string) => void
+    licenses: Licenses
+    licenseID: number
+    setLicenseID: (id: number) => void
     description: string
     setDescription: (description: string) => void
     save: () => void
@@ -162,7 +169,9 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     const lockedShareLink = location.origin + location.pathname + "?sharing=" + lockedShareID
     const link = lock ? lockedShareLink : sharelink
 
-    userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
+    useEffect(() => {
+        userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
+    }, [])
 
     const downloadShareUrl = () => {
         const textContent = "[InternetShortcut]\n" + "URL=" + link + "\n" + "IconIndex=0"
@@ -175,11 +184,13 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
 
     const submit = async () => {
         const users = await finalize.current?.()
-        if (!users) return
+        if (!users) return // Bad username in the list.
         save()
-        reporter.share("link", licenses[licenseID].license)
-        userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
-        userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
+        if (users.length) {
+            reporter.share("link", licenses[licenseID].license)
+            userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
+            userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
+        }
         close()
     }
 
@@ -418,7 +429,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
 }
 
 const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }:
-    { licenses: { [key: string]: any }, licenseID: string, setLicenseID: (id: string) => void, description: string, setDescription: (ds: string) => void }
+    { licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void }
 ) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
@@ -449,10 +460,10 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
 
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
-                        {Object.entries(licenses).map(([id, license]: any) =>
+                        {Object.entries(licenses).map(([id, license]) =>
                             <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
                                 <label>
-                                    <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
+                                    <input type="radio" name="optradio" value={id} checked={+id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(+id) }} />
                                     <span></span>{license.license}
                                 </label>
                             </div>)}
@@ -474,15 +485,15 @@ const Tabs = [
     { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: "messages:shareScript.menuDescriptions.soundCloud" },
 ]
 
-export const ScriptShare = ({ script, licenses, close }: any) => {
+export const ScriptShare = ({ script, licenses, close }: { script: Script, licenses: Licenses, close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
-    const [description, setDescription] = useState(script.description)
-    const [licenseID, setLicenseID] = useState(script.license_id || "1")
+    const [description, setDescription] = useState(script.description ?? "")
+    const [licenseID, setLicenseID] = useState(script.license_id ?? 1)
     const { t } = useTranslation()
 
     const save = () => {
-        userProject.setScriptDesc(script.name, script.shareid, description)
-        userProject.setLicense(script.name, script.shareid, licenseID)
+        userProject.setScriptDescription(script.shareid, description)
+        userProject.setScriptLicense(script.shareid, licenseID)
     }
 
     const ShareBody = Tabs[activeTab].component
