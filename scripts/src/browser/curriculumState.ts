@@ -137,7 +137,6 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
             const control = document.createElement("span")
             const span = document.createElement("span")
 
-            answerParagraph.innerText = answerParagraph.innerText + " " // space included for wrapping ::after
             answerParagraph.prepend(label)
             answerParagraph.append(span)
             label.appendChild(input)
