@@ -29,7 +29,7 @@ function validateUpload(key: string, tempo: number) {
     const fullKey = username.toUpperCase() + "_" + key
     if (keys.some(k => k === fullKey)) {
         throw new Error(`${key} (${fullKey})${i18n.t("messages:uploadcontroller.alreadyused")}`)
-    } else if (tempo > 200 || (tempo > -1 && tempo < 45)) {
+    } else if (tempo > 220 || (tempo > -1 && tempo < 45)) {
         throw new Error(i18n.t("messages:esaudio.tempoRange"))
     }
 }
