@@ -40,6 +40,11 @@ module.exports = {
         }],
         indent: ["error", 4, { SwitchCase: 1 }],
         quotes: ["error", "double", { avoidEscape: true }],
+        "react/jsx-indent": ["error"],
+        "react/jsx-indent-props": ["error"],
+        "react/jsx-curly-brace-presence": ["error"],
+        "react/jsx-curly-newline": ["error", "never"],
+        "react/jsx-curly-spacing": ["error", { children: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "no-restricted-syntax": ["error", {
             selector: "BinaryExpression[operator = /[=<>!]+/] > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
@@ -55,4 +60,9 @@ module.exports = {
             },
         },
     ],
+    settings: {
+        react: {
+            version: "detect",
+        },
+    },
 }

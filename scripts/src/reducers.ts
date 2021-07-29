@@ -1,22 +1,22 @@
-import { combineReducers } from 'redux';
-import { configureStore } from '@reduxjs/toolkit';
-import { persistStore } from 'redux-persist';
-import persistReducer from 'redux-persist/es/persistReducer';
-import storage from 'redux-persist/es/storage';
+import { combineReducers } from "redux"
+import { configureStore } from "@reduxjs/toolkit"
+import { persistStore } from "redux-persist"
+import persistReducer from "redux-persist/es/persistReducer"
+import storage from "redux-persist/es/storage"
 
-import app from './app/appState';
-import user from './user/userState';
-import ide from './ide/ideState';
-import tabs from './ide/tabState';
-import layout from './ide/layoutState';
-import bubble from './bubble/bubbleState';
-import sounds from './browser/soundsState';
-import scripts from './browser/scriptsState';
-import api from './browser/apiState';
-import daw from './daw/dawState';
-import curriculum from './browser/curriculumState';
-import recommender from './browser/recommenderState';
-import cai from './cai/caiState';
+import app from "./app/appState"
+import user from "./user/userState"
+import ide from "./ide/ideState"
+import tabs from "./ide/tabState"
+import layout from "./ide/layoutState"
+import bubble from "./bubble/bubbleState"
+import sounds from "./browser/soundsState"
+import scripts from "./browser/scriptsState"
+import api from "./browser/apiState"
+import daw from "./daw/dawState"
+import curriculum from "./browser/curriculumState"
+import recommender from "./browser/recommenderState"
+import cai from "./cai/caiState"
 
 const rootReducer = combineReducers({
     app,
@@ -32,13 +32,13 @@ const rootReducer = combineReducers({
     curriculum,
     recommender,
     cai,
-});
+})
 
 const persistConfig = {
-    key: 'root',
-    whitelist: ['layout'],
+    key: "root",
+    whitelist: ["layout"],
     storage,
-};
+}
 
 const store = configureStore({
     reducer: persistReducer(persistConfig, rootReducer),
@@ -47,13 +47,13 @@ const store = configureStore({
             // Toggle these on for sanity checks.
             // See: https://redux-toolkit.js.org/api/getDefaultMiddleware#included-default-middleware
             immutableCheck: false,
-            serializableCheck: false
-        });
-    }
-});
+            serializableCheck: false,
+        })
+    },
+})
 
-export const persistor = persistStore(store);
-export default store;
+export const persistor = persistStore(store)
+export default store
 
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

@@ -86,7 +86,7 @@ const TableOfContents = () => {
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className="toc-item">
                             {unit.chapters && unit.chapters.length > 0 &&
-                        <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
@@ -109,7 +109,7 @@ const CurriculumHeader = () => {
             <NavigationBar />
 
             <div onFocus={() => dispatch(curriculum.showResults(true))}
-                onBlur={(e: React.FocusEvent<HTMLDivElement>) => (!e.currentTarget.contains(e.relatedTarget as Node)) && dispatch(curriculum.showResults(false)) }>
+                onBlur={(e: React.FocusEvent<HTMLDivElement>) => (!e.currentTarget.contains(e.relatedTarget as Node)) && dispatch(curriculum.showResults(false))}>
                 <CurriculumSearchBar />
                 <CurriculumSearchResults />
             </div>
@@ -154,7 +154,7 @@ export const TitleBar = () => {
     return (
         <div className="flex items-center p-3 text-2xl">
             <div className="pl-3 pr-4 font-semibold truncate">
-                { t("curriculum.title").toLocaleUpperCase() }
+                {t("curriculum.title").toLocaleUpperCase()}
             </div>
             <div>
                 <div
@@ -165,11 +165,11 @@ export const TitleBar = () => {
                 </div>
             </div>
             <div className="ml-auto">
-                <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={ t("curriculum.copyURL") }>
+                <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                     <i className="icon icon-link" />
                 </button>
                 <button className={`border-2 -my-1 ${theme === "light" ? "border-black" : "border-white"} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
-                    title={ t("curriculum.switchScriptLanguage") }
+                    title={t("curriculum.switchScriptLanguage")}
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
                         dispatch(appState.setScriptLanguage(newLanguage))
@@ -264,7 +264,7 @@ const CurriculumPane = () => {
                 </div>
             </div>
         )
-        : <Collapsed title={ t("curriculum.title").toLocaleUpperCase() } position="east" />
+        : <Collapsed title={t("curriculum.title").toLocaleUpperCase()} position="east" />
 }
 
 const NavigationBar = () => {
@@ -301,16 +301,16 @@ const NavigationBar = () => {
                 onMouseLeave={() => setHighlight(false)}>
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={ t("curriculum.previousPage") }>
+                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
                         <i className="icon icon-arrow-left2" />
                     </button>}
-                <button ref={triggerRef} className="w-full" title={ t("curriculum.showTOC") } onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
+                <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
                     {pageTitle}
                     <i className="icon icon-arrow-down2 text-lg p-2" />
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={ t("curriculum.nextPage") }>
+                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
                         <i className="icon icon-arrow-right2" />
                     </button>}
             </div>

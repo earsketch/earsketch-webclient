@@ -65,23 +65,23 @@ function elaborate(error: string | Error) {
             parts[0] = "ValueError: A provided argument is not within the set or range of acceptable values for a function"
             break
         // JS-specific errors
-        case "RangeError": 
+        case "RangeError":
             parts[0] = "RangeError: A provided argument is not within the set or range of acceptable values for a function"
-            break 
-        case "ReferenceError": 
+            break
+        case "ReferenceError":
             parts[0] = "ReferenceError: There is an error with a variable or function name that is not defined"
-            break 
-        case "Unknown identifier": 
+            break
+        case "Unknown identifier":
             parts[0] = "ReferenceError: There is an error with a variable or function name that is not defined"
-            break    
+            break
         // HTTP errors while communicating with server
-        case "NetworkError":  
+        case "NetworkError":
             parts[0] = msg
             parts[1] = " please try running the code again. If the issue persists, check your internet connection or contact network administrator."
             break
-        case "ServerError": 
+        case "ServerError":
             parts[0] = msg
-            parts[1] = " please try running the code again. If the issue persists, please report the issue using 'Report Error' in the options menu."        
+            parts[1] = " please try running the code again. If the issue persists, please report the issue using 'Report Error' in the options menu."
             break
         default:
             return msg

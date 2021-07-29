@@ -1,9 +1,8 @@
 let ESConsoleTraceLevel = 2
-const ESConsoleExcludedTags = ['DEBUG']
-const ESConsoleIncludedTags = ['WARNING', 'ERROR', 'FATAL']
-const ESLogExcludedTags = ['TEMP', 'EXCLUDE', 'NOLOG', 'META']
-const ESLogIncludedTags = ['INFO', 'USER', 'WARNING', 'ERROR', 'FATAL']
-
+const ESConsoleExcludedTags = ["DEBUG"]
+const ESConsoleIncludedTags = ["WARNING", "ERROR", "FATAL"]
+const ESLogExcludedTags = ["TEMP", "EXCLUDE", "NOLOG", "META"]
+const ESLogIncludedTags = ["INFO", "USER", "WARNING", "ERROR", "FATAL"]
 
 const parseArrayish = (arrayish: string | undefined) => {
     if (arrayish === undefined) {
@@ -11,14 +10,14 @@ const parseArrayish = (arrayish: string | undefined) => {
     }
 
     // remove all quotes
-    arrayish = arrayish.replace(/['"]+/g, '')
+    arrayish = arrayish.replace(/['"]+/g, "")
 
     const array = arrayish.match(/\[.*\]/)
 
     if (array) {
-        return array[0].substring(1, array[0].length - 1).split(',')
+        return array[0].substring(1, array[0].length - 1).split(",")
     } else {
-        return arrayish.split(',')
+        return arrayish.split(",")
     }
 }
 
@@ -33,29 +32,29 @@ const parseArrayish = (arrayish: string | undefined) => {
  */
 const getURLParameters = () => {
     const query = window.location.hash.substring(2) // replaced with location.search considering # always being used in other URL queries
-    const params = query.split('&')
+    const params = query.split("&")
 
     for (const param of params) {
-        const keyVal = param.split('=')
+        const keyVal = param.split("=")
         if (keyVal.length >= 2) {
             const key = keyVal[0].toLowerCase()
             const val = keyVal[1]
 
             switch (key) {
-                case 'trace':
+                case "trace":
                     setESConsoleTraceLevel(decodeURIComponent(val))
                     break
-                case 'print':
-                case 'show':
+                case "print":
+                case "show":
                     addESTagToPrint(parseArrayish(decodeURIComponent(val)))
                     break
-                case 'hide':
+                case "hide":
                     addESTagToNotPrint(parseArrayish(decodeURIComponent(val)))
                     break
-                case 'include':
+                case "include":
                     addESTagToLog(parseArrayish(decodeURIComponent(val)))
                     break
-                case 'exclude':
+                case "exclude":
                     addESTagToNotLog(parseArrayish(decodeURIComponent(val)))
                     break
                 default:
@@ -75,16 +74,16 @@ const getURLParameters = () => {
  * addESTagToPrint(['this', 'that'])
  */
 const addESTagToPrint = (tags: string | string[]) => {
-    if (typeof(tags) === 'string') {
+    if (typeof (tags) === "string") {
         ESConsoleIncludedTags.push(tags.toUpperCase())
     } else if (tags instanceof Array) {
         for (const tag of tags) {
-            if (typeof(tag) === 'string') {
+            if (typeof (tag) === "string") {
                 ESConsoleIncludedTags.push(tag.toUpperCase())
             }
         }
     }
-    esconsole('Setting the tags to always show in the esconsole printing: ' + ESConsoleIncludedTags.toString(), 'meta', 0)
+    esconsole("Setting the tags to always show in the esconsole printing: " + ESConsoleIncludedTags.toString(), "meta", 0)
     return ESConsoleIncludedTags
 }
 
@@ -98,19 +97,18 @@ const addESTagToPrint = (tags: string | string[]) => {
  * addESTagToNotPrint(['this', 'that'])
  */
 const addESTagToNotPrint = (tags: string | string[]) => {
-    if (typeof(tags) === 'string') {
+    if (typeof (tags) === "string") {
         ESConsoleExcludedTags.push(tags.toUpperCase())
     } else if (tags instanceof Array) {
         for (const tag of tags) {
-            if (typeof(tag) === 'string') {
+            if (typeof (tag) === "string") {
                 ESConsoleExcludedTags.push(tag.toUpperCase())
             }
         }
     }
-    esconsole('Setting the tags to be hidden in the esconsole printing: ' + ESConsoleExcludedTags.toString(), 'meta', 0)
+    esconsole("Setting the tags to be hidden in the esconsole printing: " + ESConsoleExcludedTags.toString(), "meta", 0)
     return ESConsoleExcludedTags
 }
-
 
 /**
  * Sets the global trace level for the esconsole function. If esconsole() locally specifies a trace level, the global level is ignored.
@@ -119,14 +117,13 @@ const addESTagToNotPrint = (tags: string | string[]) => {
  * @returns {string}
  */
 const setESConsoleTraceLevel = (traceLevel: number | string) => {
-    if (typeof(traceLevel) === 'number') {
+    if (typeof (traceLevel) === "number") {
         ESConsoleTraceLevel = traceLevel
     } else if (!isNaN(parseInt(traceLevel))) {
         ESConsoleTraceLevel = parseInt(traceLevel)
     }
-    return esconsole('Setting the esconsole trace level: ' + traceLevel, 'meta', 0)
+    return esconsole("Setting the esconsole trace level: " + traceLevel, "meta", 0)
 }
-
 
 /**
  * A custom console.log function for ES developers. Tags can be set and filtered from being printed as well as being recorded to the developer log.
@@ -163,18 +160,18 @@ const setESConsoleTraceLevel = (traceLevel: number | string) => {
  * esconsole('multiple tags', ['debug', 'util'])
  * -> no output (still logged)
  */
-const esconsole = (message: any, tag: string | string[] | null=null, traceLevel: number | null=null, logLevel=1) => {
+const esconsole = (message: any, tag: string | string[] | null = null, traceLevel: number | null = null, logLevel = 1) => {
     const date = new Date()
-    let log = date.toLocaleTimeString('en-GB') + '.' + ('000'+date.getMilliseconds()).slice(-3) + ' '
+    let log = date.toLocaleTimeString("en-GB") + "." + ("000" + date.getMilliseconds()).slice(-3) + " "
     let output
-    let TAG: string | string[] = ''
+    let TAG: string | string[] = ""
     const defaultTraceLevel = 3
     const defaultIndentation = 4
     let messageIsError = false
 
     const stack = new Error().stack!
     const trace = stack.toString().split(/\r\n|\n/)
-    const location = (trace[0] === 'Error') ? trace[2] : trace[1]
+    const location = (trace[0] === "Error") ? trace[2] : trace[1]
 
     // This is intended to get the name of the second function in the stack trace (after esconsole) across browsers.
     // (Different browsers have different formats for error.stack.)
@@ -190,74 +187,73 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
 
     if (tag instanceof Array) {
         if (tag.length === 1) {
-            if ([null, ''].indexOf(tag[0]) >= 0) {
-                TAG = ''
+            if ([null, ""].indexOf(tag[0]) >= 0) {
+                TAG = ""
             } else {
-                if (typeof(tag[0]) === 'string') {
+                if (typeof (tag[0]) === "string") {
                     TAG = tag[0].toUpperCase()
                 } else {
-                    TAG = 'DEV'
+                    TAG = "DEV"
                 }
-                log += '[' + TAG + '] '
+                log += "[" + TAG + "] "
             }
         } else if (tag.length > 1) {
             TAG = []
             for (const t of tag) {
-                if (typeof(t) === 'string') {
-                    log += '[' + t.toUpperCase() + ']';
+                if (typeof (t) === "string") {
+                    log += "[" + t.toUpperCase() + "]";
                     (TAG as string[]).push(t.toUpperCase())
                 }
             }
-            log += ' '
+            log += " "
         }
     } else {
-        if ([null, ''].indexOf(tag) >= 0) {
-            TAG = ''
+        if ([null, ""].indexOf(tag) >= 0) {
+            TAG = ""
         } else {
-            if (typeof(tag) === 'string') {
+            if (typeof (tag) === "string") {
                 TAG = tag.toUpperCase()
             } else {
-                TAG = 'DEV'
+                TAG = "DEV"
             }
-            log += '[' + TAG + '] '
+            log += "[" + TAG + "] "
         }
     }
 
-    if (typeof(message) === 'object') {
+    if (typeof (message) === "object") {
         if (messageIsError) {
             log += message
-
         } else {
             log += JSON.stringify(message, null, defaultIndentation)
         }
-    } else if (typeof(message) === 'function') {
+    } else if (typeof (message) === "function") {
         log += message.toString(defaultIndentation)
     } else {
         log += message
     }
 
     if (traceLevel === undefined || traceLevel === null) {
-        if (typeof(ESConsoleTraceLevel) === 'number') {
+        if (typeof (ESConsoleTraceLevel) === "number") {
             traceLevel = ESConsoleTraceLevel
         } else {
             traceLevel = defaultTraceLevel
         }
-    } else if (typeof traceLevel === 'string' && !isNaN(parseInt(traceLevel))) {
+    } else if (typeof traceLevel === "string" && !isNaN(parseInt(traceLevel))) {
         traceLevel = parseInt(traceLevel)
-    } else if (typeof traceLevel !== 'number') {
+    } else if (typeof traceLevel !== "number") {
         traceLevel = defaultTraceLevel
     }
 
-    if (typeof logLevel === 'string' && !isNaN(parseInt(logLevel))) {
+    if (typeof logLevel === "string" && !isNaN(parseInt(logLevel))) {
         logLevel = parseInt(logLevel)
     }
 
     if (traceLevel === 1) {
         try {
             if (caller) {
-                log += ' @ ' + caller + '()'
+                log += " @ " + caller + "()"
             } else {
-                log += ' @ ' + '<anonymous>'
+                log += " @ " + "<anonymous>"
             }
         } catch (e) {
             console.log(e)
@@ -265,9 +261,9 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
     } else if (traceLevel === 2) {
         try {
             if (caller) {
-                log += ' @ ' + caller + '()'
+                log += " @ " + caller + "()"
             } else {
-                log += ' @ ' + '<anonymous>'
+                log += " @ " + "<anonymous>"
             }
         } catch (e) {
             console.log(e)
@@ -275,15 +271,15 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
 
         const match = location.match(/\/\w+\.js\:\d+\:\d+/)
         if (match) {
-            log += ' @ ' + match[0].substring(1)
+            log += " @ " + match[0].substring(1)
         }
     } else if (traceLevel === 3) {
-        log += ' ' + location
+        log += " " + location
     } else if (traceLevel === 4) {
         if (messageIsError) {
-            log += ' ' + message.stack.toString()
+            log += " " + message.stack.toString()
         } else {
-            log += ' ' + stack.toString()
+            log += " " + stack.toString()
         }
     }
 
@@ -338,11 +334,11 @@ const esconsole = (message: any, tag: string | string[] | null=null, traceLevel:
  */
 export const REPORT_LOG: string[] = []
 
-const ESLog = (logText: string, tag: string | string[] | undefined=undefined) => {
+const ESLog = (logText: string, tag: string | string[] | undefined = undefined) => {
     let TAG
     if (tag === undefined) {
         REPORT_LOG.push(logText)
-    } else if (typeof(tag) === 'string') {
+    } else if (typeof (tag) === "string") {
         TAG = tag.toUpperCase()
         if ((ESLogExcludedTags.indexOf(TAG) === -1) || (ESLogIncludedTags.indexOf(TAG) >= 0)) {
             REPORT_LOG.push(logText)
@@ -374,17 +370,17 @@ const ESLog = (logText: string, tag: string | string[] | undefined=undefined) =>
  * addESTagToLog(['this', 'that'])
  */
 const addESTagToLog = (tags: string | string[]) => {
-    if (typeof(tags) === 'string') {
+    if (typeof (tags) === "string") {
         ESLogIncludedTags.push(tags.toUpperCase())
     } else if (tags instanceof Array) {
         for (const tag of tags) {
-            if (typeof(tag) === 'string') {
+            if (typeof (tag) === "string") {
                 ESLogIncludedTags.push(tag.toUpperCase())
             }
         }
     }
 
-    return esconsole('Setting the tags to be always logged: ' + ESLogIncludedTags, 'meta', 0)
+    return esconsole("Setting the tags to be always logged: " + ESLogIncludedTags, "meta", 0)
 }
 
 /**
@@ -397,17 +393,17 @@ const addESTagToLog = (tags: string | string[]) => {
  * addESTagToNotLog(['this', 'that'])
  */
 const addESTagToNotLog = (tags: string | string[]) => {
-    if (typeof(tags) === 'string') {
+    if (typeof (tags) === "string") {
         ESLogExcludedTags.push(tags.toUpperCase())
     } else if (tags instanceof Array) {
         for (const tag of tags) {
-            if (typeof(tag) === 'string') {
+            if (typeof (tag) === "string") {
                 ESLogExcludedTags.push(tag.toUpperCase())
             }
         }
     }
 
-    return esconsole('Setting the tags to be excluded from loggin: ' + ESLogExcludedTags, 'meta', 0)
+    return esconsole("Setting the tags to be excluded from loggin: " + ESLogExcludedTags, "meta", 0)
 }
 
 esconsole.getURLParameters = getURLParameters

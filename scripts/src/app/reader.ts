@@ -1,4 +1,4 @@
-﻿// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
+// Parse and analyze abstract syntax trees without compiling the script, e.g. to measure code complexity.
 import * as acorn from "acorn"
 
 interface CodeFeatures {
@@ -129,82 +129,82 @@ function recursiveAnalyzeJavascript(tree: any, result: CodeFeatures) {
         }
     } else {
         switch (tree.type) {
-        case "FunctionDeclaration":
-            result.userFunc++
-            recursiveAnalyzeJavascript(tree.body, result)
-            break
-        case "ForStatement":
-        case "ForInStatement":
-        case "WhileStatement":
-        case "DoWhileStatement":
-            result.loops++
-            recursiveAnalyzeJavascript(tree.body, result)
-            break
-        case "IfStatement":
-            if (tree.test.type === "LogicalExpression") {
-                result.booleanConditionals++
-            } else {
+            case "FunctionDeclaration":
+                result.userFunc++
+                recursiveAnalyzeJavascript(tree.body, result)
+                break
+            case "ForStatement":
+            case "ForInStatement":
+            case "WhileStatement":
+            case "DoWhileStatement":
+                result.loops++
+                recursiveAnalyzeJavascript(tree.body, result)
+                break
+            case "IfStatement":
+                if (tree.test.type === "LogicalExpression") {
+                    result.booleanConditionals++
+                } else {
+                    result.conditionals++
+                }
+                recursiveAnalyzeJavascript(tree.consequent, result)
+                recursiveAnalyzeJavascript(tree.alternate, result)
+                break
+            case "SwitchStatement":
                 result.conditionals++
-            }
-            recursiveAnalyzeJavascript(tree.consequent, result)
-            recursiveAnalyzeJavascript(tree.alternate, result)
-            break
-        case "SwitchStatement":
-            result.conditionals++
-            recursiveAnalyzeJavascript(tree.cases, result)
-            break
-        case "SwitchCase":
-            recursiveAnalyzeJavascript(tree.consequent, result)
-            break
-        case "ArrayExpression":
-            result.lists++
-            recursiveAnalyzeJavascript(tree.elements, result)
-            break
+                recursiveAnalyzeJavascript(tree.cases, result)
+                break
+            case "SwitchCase":
+                recursiveAnalyzeJavascript(tree.consequent, result)
+                break
+            case "ArrayExpression":
+                result.lists++
+                recursiveAnalyzeJavascript(tree.elements, result)
+                break
 
-        case "Program":
-        case "BlockStatement":
-        case "FunctionExpression":
-            recursiveAnalyzeJavascript(tree.body, result)
-            break
-        case "ExpressionStatement":
-            recursiveAnalyzeJavascript(tree.expression, result)
-            break
-        case "AssignmentExpression":
-            recursiveAnalyzeJavascript(tree.right, result)
-            break
-        case "VariableDeclaration":
-            recursiveAnalyzeJavascript(tree.declarations, result)
-            break
-        case "VariableDeclarator":
-            recursiveAnalyzeJavascript(tree.init, result)
-            break
+            case "Program":
+            case "BlockStatement":
+            case "FunctionExpression":
+                recursiveAnalyzeJavascript(tree.body, result)
+                break
+            case "ExpressionStatement":
+                recursiveAnalyzeJavascript(tree.expression, result)
+                break
+            case "AssignmentExpression":
+                recursiveAnalyzeJavascript(tree.right, result)
+                break
+            case "VariableDeclaration":
+                recursiveAnalyzeJavascript(tree.declarations, result)
+                break
+            case "VariableDeclarator":
+                recursiveAnalyzeJavascript(tree.init, result)
+                break
 
-        case "CallExpression":
-            recursiveAnalyzeJavascript(tree.callee, result)
-            recursiveAnalyzeJavascript(tree.arguments, result)
-            break
-        case "MemberExpression":
-            recursiveAnalyzeJavascript(tree.object, result)
-            recursiveAnalyzeJavascript(tree.property, result)
-            break
-        case "ObjectExpression":
-            recursiveAnalyzeJavascript(tree.properties, result)
-            break
-        case "Identifier":
-            if (JS_LIST_FUNCS.includes(tree.name)) {
-                result.listOps++
-            } else if (JS_STR_FUNCS.includes(tree.name)) {
-                result.strOps++
-            }
-            break
-        default:
-            if (tree.kind === "init") {
-                recursiveAnalyzeJavascript(tree.value, result)
-            }
-            if (tree.arguments !== undefined) {
+            case "CallExpression":
+                recursiveAnalyzeJavascript(tree.callee, result)
                 recursiveAnalyzeJavascript(tree.arguments, result)
-            }
-            break
+                break
+            case "MemberExpression":
+                recursiveAnalyzeJavascript(tree.object, result)
+                recursiveAnalyzeJavascript(tree.property, result)
+                break
+            case "ObjectExpression":
+                recursiveAnalyzeJavascript(tree.properties, result)
+                break
+            case "Identifier":
+                if (JS_LIST_FUNCS.includes(tree.name)) {
+                    result.listOps++
+                } else if (JS_STR_FUNCS.includes(tree.name)) {
+                    result.strOps++
+                }
+                break
+            default:
+                if (tree.kind === "init") {
+                    recursiveAnalyzeJavascript(tree.value, result)
+                }
+                if (tree.arguments !== undefined) {
+                    recursiveAnalyzeJavascript(tree.arguments, result)
+                }
+                break
         }
     }
     return result

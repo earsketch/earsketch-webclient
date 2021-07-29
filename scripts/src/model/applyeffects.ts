@@ -1,13 +1,12 @@
 // Web Audio effect chain constructors
-import { Track } from '../app/player'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
+import { Track } from "../app/player"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
 import {
     Effect, BandpassEffect, ChorusEffect, CompressorEffect, DelayEffect, DistortionEffect,
     Eq3BandEffect, FilterEffect, FlangerEffect, PanEffect, PhaserEffect, PitchshiftEffect,
-    ReverbEffect, RingmodEffect, TremoloEffect, VolumeEffect, WahEffect
-} from './audioeffects'
-
+    ReverbEffect, RingmodEffect, TremoloEffect, VolumeEffect, WahEffect,
+} from "./audioeffects"
 
 export const EFFECT_MAP: { [key: string]: typeof Effect } = {
     VOLUME: VolumeEffect,
@@ -40,7 +39,7 @@ export const buildAudioNodeGraph = (
     const effectNodes: { [key: string]: any } = {}
 
     // Audio node graph can be constructed like a linked list
-    let firstNode: AudioNode | undefined = undefined
+    let firstNode: AudioNode | undefined
     // Shim to avoid special flags & cases in first iteration.
     let lastNode = { connect(target: AudioNode) { firstNode = target } }
 
@@ -86,8 +85,8 @@ export const buildAudioNodeGraph = (
         const startValue = effectType.scale(effect.parameter, effect.startValue ?? effectType.DEFAULTS[effect.parameter].value)
         const endValue = (effect.endValue === undefined) ? startValue : effectType.scale(effect.parameter, effect.endValue)
         // NOTE: Weird exception here for CHORUS_NUMVOICES.
-        const value = effect.parameter === "CHORUS_NUMVOICES" ? endValue  : (pastEndLocation ? endValue  : startValue)
-    
+        const value = effect.parameter === "CHORUS_NUMVOICES" ? endValue : (pastEndLocation ? endValue : startValue)
+
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
 
         const createNewNode = effectNodes[effect.name] === undefined
@@ -101,8 +100,8 @@ export const buildAudioNodeGraph = (
                 // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
                 // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
                 for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                    if (!["BYPASS", "EQ3BAND_HIGHFREQ"].includes(parameter)
-                        && !(effect.name === "DISTORTION" && parameter === "MIX")) {
+                    if (!["BYPASS", "EQ3BAND_HIGHFREQ"].includes(parameter) &&
+                        !(effect.name === "DISTORTION" && parameter === "MIX")) {
                         const value = effectType.scale(parameter, (info as any).value)
                         effectType.getParameters(node)[parameter].setValueAtTime(value, context.currentTime)
                     }
@@ -127,15 +126,14 @@ export const buildAudioNodeGraph = (
             if (!pastEndLocation && effect.endMeasure !== 0) {
                 param.linearRampToValueAtTime(endValue, endTime)
             }
-
         }
         // Apply defaults (to all the other parameters) only the first time this kind of node is created
         // NOTE: Collection of weird pre-Refactoring exceptions in the inner and outer `if` conditions.
         if (createNewNode && effect.parameter !== "BYPASS") {
             for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
-                if (!["BYPASS", "EQ3BAND_HIGHFREQ", effect.parameter].includes(parameter)
-                    && !(effect.name === "DISTORTION" && parameter === "MIX")
-                    && !(effect.parameter === "MIX" && parameter === "DISTO_GAIN")) {
+                if (!["BYPASS", "EQ3BAND_HIGHFREQ", effect.parameter].includes(parameter) &&
+                    !(effect.name === "DISTORTION" && parameter === "MIX") &&
+                    !(effect.parameter === "MIX" && parameter === "DISTO_GAIN")) {
                     const value = effectType.scale(parameter, (info as any).value)
                     effectType.getParameters(node)[parameter].setValueAtTime(value, time)
                 }

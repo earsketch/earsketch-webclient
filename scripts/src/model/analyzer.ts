@@ -2,7 +2,7 @@
 // The reason being, the audio buffers would not have been loaded before that and the analysis would fail.
 import { DSP, FFT, WindowFunction } from "dsp"
 
-import * as ESUtils from '../esutils'
+import * as ESUtils from "../esutils"
 
 const FEATURE_FUNCTIONS: { [key: string]: (data: Float32Array, blockSize: number, sampleRate: number) => number[] } = {
     rms_amplitude: computeRMSAmplitude,
@@ -14,7 +14,7 @@ export function computeFeatureForBuffer(buffer: AudioBuffer, feature: string, te
     const endIndex = endTime === undefined ? undefined : Math.round(buffer.sampleRate * ESUtils.measureToTime(endTime, tempo))
     const data = buffer.getChannelData(0).slice(startIndex, endIndex)
 
-    let featureVector = FEATURE_FUNCTIONS[feature.toLowerCase()](data, 2048, buffer.sampleRate)
+    const featureVector = FEATURE_FUNCTIONS[feature.toLowerCase()](data, 2048, buffer.sampleRate)
     // Return the median.
     featureVector.sort()
     return (featureVector[Math.floor(featureVector.length / 2)])

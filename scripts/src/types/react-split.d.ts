@@ -1,7 +1,7 @@
 // TODO: Temporarily including these types from https://github.com/nathancahill/split/blob/master/packages/react-split/index.d.ts
 //       because they don't seem to be included correctly in the NPM package.
-import React from 'react'
-import { Options } from 'split.js'
+import React from "react"
+import { Options } from "split.js"
 
 export interface SplitProps {
     sizes?: Options["sizes"]

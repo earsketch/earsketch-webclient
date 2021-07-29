@@ -7,13 +7,13 @@ export const LevelMeter = () => {
     const HEIGHT = 15
     const WIDTH = 250
     const STROKE_WIDTH = 2
-    const RADIUS =  3
+    const RADIUS = 3
 
     const RECT_ATTRIBUTES = {
         x: STROKE_WIDTH,
         y: STROKE_WIDTH,
-        width: WIDTH - STROKE_WIDTH*2,
-        height: HEIGHT - STROKE_WIDTH*2,
+        width: WIDTH - STROKE_WIDTH * 2,
+        height: HEIGHT - STROKE_WIDTH * 2,
         rx: RADIUS,
     }
 
@@ -22,10 +22,10 @@ export const LevelMeter = () => {
     useEffect(() => {
         const draw = () => {
             const dbMin = -36
-            let db = Math.max(dbMin, 20 * Math.log10(recorder.meterVal))
+            const db = Math.max(dbMin, 20 * Math.log10(recorder.meterVal))
             const val = (db - dbMin) / (-dbMin)
             const rVal = Math.max(0, (1 - val * 1.3))
-            setWidth((WIDTH - STROKE_WIDTH*2) * rVal)
+            setWidth((WIDTH - STROKE_WIDTH * 2) * rVal)
             handle = requestAnimationFrame(draw)
         }
         let handle = requestAnimationFrame(draw)
@@ -64,7 +64,7 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
     const IndicatorButton = () => {
         if (state === "record") {
             if (useMetro) {
-                return measure > 0 ? <span className="text-7xl">{measure}</span> : <span className="text-2xl font-bold">{t('soundUploader.record.getReady')}</span>
+                return measure > 0 ? <span className="text-7xl">{measure}</span> : <span className="text-2xl font-bold">{t("soundUploader.record.getReady")}</span>
             } else {
                 return <i className="cursor-pointer text-5xl icon icon-recording blink recording" onClick={() => { recorder.stopRecording(); setState("") }} />
             }
@@ -83,7 +83,6 @@ export const Metronome = ({ beat, hasBuffer, useMetro, startRecording }: { beat:
     </div>
 }
 
-
 const WIDTH = 420
 const HEIGHT = 80
 const SPACING = 3
@@ -100,7 +99,7 @@ function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp:
         let min = 1.0
 
         for (let j = 0; j < step; j++) {
-            const sample = buf[i*step + j]
+            const sample = buf[i * step + j]
             if (sample < min) {
                 min = sample
             }
@@ -108,7 +107,7 @@ function drawWaveform(context: CanvasRenderingContext2D, buf: Float32Array, amp:
                 max = sample
             }
         }
-        context.fillRect(i, (min+1) * amp, 1, Math.max(1, (max-min) * amp))
+        context.fillRect(i, (min + 1) * amp, 1, Math.max(1, (max - min) * amp))
     }
 }
 
@@ -130,8 +129,8 @@ const drawSpectrogram = (context: CanvasRenderingContext2D) => {
             magnitude += freqByteData[offset + j]
         }
         magnitude = magnitude / multiplier
-        context.fillStyle = `hsl(${Math.round((i*360) / NUM_BARS)}, 100%, 50%)`
-        context.fillRect(i * SPACING, HEIGHT * 3/2, BAR_WIDTH, -magnitude * 3/5)
+        context.fillStyle = `hsl(${Math.round((i * 360) / NUM_BARS)}, 100%, 50%)`
+        context.fillRect(i * SPACING, HEIGHT * 3 / 2, BAR_WIDTH, -magnitude * 3 / 5)
     }
 }
 
@@ -149,7 +148,7 @@ export const Waveform = ({ buffer }: { buffer: AudioBuffer | null }) => {
         } else if (!handle.current) {
             context.clearRect(0, 0, WIDTH, HEIGHT)
             const loop = () => {
-                drawSpectrogram(context);
+                drawSpectrogram(context)
                 handle.current = requestAnimationFrame(loop)
             }
             loop()

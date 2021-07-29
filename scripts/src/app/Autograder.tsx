@@ -149,13 +149,11 @@ const ReferenceFile = ({ referenceScript, compilingReference }:
         <div className="panel panel-default">
             <div className="panel-heading">
                 {compilingReference &&
-                    <i className="es-spinner animate-spin mr-3"></i>
-                }
+                    <i className="es-spinner animate-spin mr-3"></i>}
                 {referenceScript.name}
                 {collapse
                     ? <a className="pull-right" onClick={() => setCollapse(false)}>Expand</a>
-                    : <a className="pull-right" onClick={() => setCollapse(true)}>Collapse</a>
-                }
+                    : <a className="pull-right" onClick={() => setCollapse(true)}>Collapse</a>}
             </div>
             <div style={{ display: collapse ? "none" : "block" }}>
                 <CodeEmbed sourceCode={referenceScript.sourceCode} language={ESUtils.parseLanguage(referenceScript.name)}/>
@@ -219,7 +217,7 @@ const ReferenceScriptUpload = ({ compileError, prompts, setReferenceResult, setC
         <div className="container">
             <h1>EarSketch Autograder</h1>
             {compileError &&
-            <div className="alert alert-danger" role="alert">{ compileError }</div>}
+            <div className="alert alert-danger" role="alert">{compileError}</div>}
             <div className="panel panel-primary">
                 <div className="panel-heading">
                     Step 1: Upload a Reference Script
@@ -271,8 +269,7 @@ const ConfigureTest = ({
                                     Test all tracks.
                                 </label>
                             </div>
-                            : <div> Available after uploading a reference script. </div>
-                        }
+                            : <div> Available after uploading a reference script. </div>}
                         <br></br>
                         <ul>
                             {referenceResult && !compileError && !testAllTracks &&
@@ -282,8 +279,7 @@ const ConfigureTest = ({
                                         <input type="checkbox" onChange={e => updateTestTracks(index, e.target.checked)}></input>
                                         {index === 0
                                             ? <span>Main</span>
-                                            : <span>Track {index}</span>
-                                        }
+                                            : <span>Track {index}</span>}
                                     </label>
                                 </li>
                             )}
@@ -300,13 +296,12 @@ const ConfigureTest = ({
                                     </label>
                                     <ol>
                                         {prompts.map((prompt, index) =>
-                                            <li key={index}><b>{ prompt }</b></li>
+                                            <li key={index}><b>{prompt}</b></li>
                                         )}
                                     </ol>
                                 </div>
                                 : <div> No user input detected. </div>
-                            : <div> Available after uploading a reference script. </div>
-                        }
+                            : <div> Available after uploading a reference script. </div>}
                     </div>
                     <div className="col-md-4">
                         <h4>Random Seed</h4>
@@ -334,34 +329,29 @@ const TestResult = ({ upload, index }: { upload: Upload, index: number }) => {
     return <div className="panel panel-default">
         <div className="panel-heading">
             {!upload.compiled &&
-            <i className="es-spinner animate-spin mr-3"></i>
-            }
+            <i className="es-spinner animate-spin mr-3"></i>}
             <b> {index + 1} </b> {upload.file.name}
             {upload.file.name.length > 50 &&
-            <span>...</span>
-            }
+            <span>...</span>}
             {upload.compiled &&
             !upload.error
                 ? upload.pass
                     ? <span className="label label-success" style={{ margin: "1%" }}>
-                    Perfect match!
+                        Perfect match!
                     </span>
                     : <span className="label label-warning" style={{ margin: "1%" }}>
-                    Does not match.
+                        Does not match.
                     </span>
                 : <span className="label label-danger" style={{ margin: "1%" }}>
                     {upload.error}
-                </span>
-            }
+                </span>}
             {showCode
                 ? <a className="pull-right" onClick={() => setShowCode(false)}>Collapse</a>
-                : <a className="pull-right" onClick={() => setShowCode(true)}>Expand</a>
-            }
+                : <a className="pull-right" onClick={() => setShowCode(true)}>Expand</a>}
         </div>
         <div>
             {upload.compiled && showCode &&
-                <CodeEmbed sourceCode={upload.script} language={ESUtils.parseLanguage(upload.file.name)}/>
-            }
+                <CodeEmbed sourceCode={upload.script} language={ESUtils.parseLanguage(upload.file.name)}/>}
         </div>
     </div>
 }
@@ -439,10 +429,8 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
                 </div>
                 : <div className="alert alert-info">
                     Testing script {uploads.length} / {files.length}
-                </div>
-            }
-        </div>
-        }
+                </div>}
+        </div>}
     </div>
 }
 
