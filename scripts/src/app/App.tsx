@@ -405,7 +405,7 @@ export const App = () => {
 
         let token
         try {
-            token = await userProject.authenticate(username, password)
+            token = await userProject.getBasicAuth("/users/token", username, password)
         } catch (error) {
             userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
             esconsole(error, ["main", "login"])
@@ -433,19 +433,8 @@ export const App = () => {
 
         // Always override with the returned username in case the letter cases mismatch.
         setUsername(username)
-
-        // get user role (can verify the admin / teacher role here?)
-        if (userInfo.isAdmin) {
-            setIsAdmin(true)
-            if (userInfo.email === "") {
-                userNotification.show(i18n.t("messages:user.teachersLink"), "editProfile")
-            }
-        } else {
-            setIsAdmin(false)
-        }
-
+        setIsAdmin(userInfo.isAdmin)
         email = userInfo.email
-
         userNotification.user.isAdmin = userInfo.isAdmin
 
         // Retrieve the user scripts.

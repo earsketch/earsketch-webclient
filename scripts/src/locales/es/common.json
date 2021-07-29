@@ -288,12 +288,7 @@
       "allscriptscloud": "Todos los scripts no guardados se han guardado exitosamente en la nube.",
       "badsharelink": "Hubo un error al abrir un script. El enlace compartido en la URL puede ser incorrecto.",
       "scriptcopied": "El script se copió exitosamente.",
-      "teachersLink": "La cuenta de instructor/a requiere que proporciones tu nombre completo y una dirección de correo electrónico única para iniciar una sesión en la página web de INSTRUCTORES. Por favor, provéelos en el menu \"Editar perfil\" en las opciones de la cuenta.",
-      "infoRequired": "Hay que dar su primer nombre, apellido, y dirección de correo electrónico para crear una cuenta de instructor/a.",
-      "emailConflict": "El perfil de usuario no se actualizó. Por favor, asegúrate de que se haya usado esta dirección de correo electrónico en otras cuentas de EarSketch. (Una pista: Si no reconoces los detalles de la cuenta de usuario, intenta salir de la sesión y escoge Reiniciar la cuenta -> opción ¿Olvidaste tu contraseña?. Esto permite que recuperes la cuenta vinculada a la dirección de correo electrónico.",
-      "teacherSiteLoginError": "¡Hubo un error al iniciar una sesión en la página web de INSTRUCTORES! ",
-      "promptFixAtTeacherSite": ". Por favor, trata de cambiar la información de usuario en Editar perfil.",
-      "teachersPageNoAccess": "Tienes que tener una cuenta de instructor/a para acceder a esta página. Puede pedir una en la página de CONTACTAR."
+      "emailConflict": "El perfil de usuario no se actualizó. Por favor, asegúrate de que se haya usado esta dirección de correo electrónico en otras cuentas de EarSketch. (Una pista: Si no reconoces los detalles de la cuenta de usuario, intenta salir de la sesión y escoge Reiniciar la cuenta -> opción ¿Olvidaste tu contraseña?. Esto permite que recuperes la cuenta vinculada a la dirección de correo electrónico."
     },
     "download": {
       "script": "Guardar tu código en un achivo de texto en tu computadora.",

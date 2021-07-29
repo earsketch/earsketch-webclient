@@ -16,7 +16,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
     const submitPassword = async () => {
         try {
-            await userProject.postAuth("/users/modifypwd", { password: btoa(password), newpassword: btoa(newPassword) })
+            await userProject.postBasicAuth("/users/modifypwd", username, password, { password: newPassword })
         } catch (error) {
             esconsole(error, "error")
             setError(t("messages:changepassword.pwdauth"))
@@ -32,7 +32,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
         // Maybe this should go in userProject.
         try {
-            await userProject.postAuth("/users/edit", { email, password: btoa(password) })
+            await userProject.postBasicAuth("/users/edit", username, password, { email })
         } catch {
             esconsole("Error updating profile", ["editProfile", "error"])
             setError(t("profileEditor.error"))

@@ -4,45 +4,31 @@
 
 These tests differ from unit tests because they connect the entire chain of components from the server backend to the client frontend. Nothing is mocked.
 
-Integration tests are meant to ensure groups of components are working together
-correctly.
+Integration tests are meant to ensure groups of components are working together correctly.
 
 ### Requirements
 
-To use these integration tests, you must install karma, jasmine, ngMidwayTester, and one or more browser launchers for karma. All available through npm:
+To use these integration tests, you must install karma, jasmine, and one or more browser launchers for karma. All available through npm:
 
-    $ npm install -g karma-cli
+    $ npm install -g karma
     $ npm install -g karma-jasmine
-    $ npm install ng-midway-tester
     $ npm install -g karma-firefox-launcher
     $ npm install -g karma-chrome-launcher
     $ npm install -g karma-safari-launcher
 
-**Note that ng-midway-tester should not be installed globally.**
+### Script Integration Tests
 
-### Modifying Test Configs as You Develop
+The Script integration tests are meant to verify the integrity of published EarSketch scripts. They verify that all EarSketch scripts in the curriculum and Coursera produce the expected output.
 
-When we add a new angular module or create a new service, the existing tests are likely to fail before fixing the config config and spec files.
+Currently the script integration tests cover the curriculum up to the end of Unit 2 and selected Coursera scripts.
 
-When you add a new angular module that is listed in `angular.module('EarSketchApp', ['__here__'])` in `scripts/src/index.js`, you should also include it in each of the spec files (such as `api.spc.js`) with `angular.module('__name__', [])`.
+#### Running the Script Integration Tests
 
-When you create a new angular service or factory used in various places in the EarSketch app, you should also include it in the list of loaded files in `compiler.conf.js`. 
+From within the integration/scripts directory:
 
+    $ npx karma start scripts.conf.js
 
-### Compiler Integration Tests
-
-The compiler integration tests are meant to verify the integrity of published EarSketch scripts. They verify that all EarSketch scripts in the curriculum and Coursera produce the expected output before we release 
-
-Currently the compiler integration tests cover the curriculum up to the end of Unit 2 and selected Coursera scripts.
-
-
-#### Running the Compiler Integration Tests
-
-From within the integration/compiler directory:
-
-    $ karma start compiler.conf.js
-
-#### Adding Compiler Integration Tests
+#### Adding Script Integration Tests
 
 Each test suite is made up of 3 files:
 
@@ -59,5 +45,3 @@ For convenience, EarSketch has logs that output human-friendly versions of scrip
 These tests are meant to verify that certain errors are output under certain conditions.
 
 These tests are unfinished.
-
-
