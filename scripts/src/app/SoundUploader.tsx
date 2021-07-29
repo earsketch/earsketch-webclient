@@ -319,9 +319,9 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             </div>
             {searched && <div className="modal-section-header justify-start mb-3">{t("results")}</div>}
             {results && results.length > 0 &&
-                <div className="overflow-y-auto border px-3 border-gray-300 dark:border-gray-500" style={{ maxHeight: "300px" }}>
+                <div className="overflow-y-auto border border-gray-300 dark:border-gray-500" style={{ maxHeight: "300px" }}>
                     {results.map((result, index) => <div key={index} className={index === selected ? "bg-blue-200 dark:bg-blue-900" : ""}>
-                        <div className="grid grid-flow-col items-center pt-3">
+                        <div className="grid grid-flow-col items-center pt-3 px-3">
                             <input id={"fs" + index} type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
                                 onChange={e => {
                                     if (e.target.checked) {
