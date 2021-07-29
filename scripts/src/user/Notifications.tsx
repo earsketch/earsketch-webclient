@@ -1,28 +1,10 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
 
-import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
 import { useTranslation } from "react-i18next"
-
-const colors: { [key: string]: { [key: string]: string } } = {
-    dark: {
-        normal: "#dff0d8",
-        success: "#9ffa00",
-        failure1: "#f2dede",
-        failure2: "#ff8080",
-        fallback: "white",
-    },
-    light: {
-        normal: "#40463e",
-        success: "#065f46",
-        failure1: "#b91c1c",
-        failure2: "#b91c1c",
-        fallback: "black",
-    },
-}
 
 interface Message {
     text: string
@@ -54,14 +36,13 @@ export const NotificationBar = () => {
         }
     }
 
-    return message && <div className="notificationBar" style={{ color: colors.dark[message.type] }}>{message.text}</div>
+    return message && <div className={"notificationBar " + message.type}>{message.text}</div>
 }
 
 const popupQueue: Message[] = []
 let popupTimeout = 0
 
 export const NotificationPopup = () => {
-    const theme = useSelector(appState.selectColorTheme)
     const [message, setMessage] = useState(null as Message | null)
 
     if (message === null && popupTimeout === 0 && popupQueue.length > 0) {
@@ -86,7 +67,7 @@ export const NotificationPopup = () => {
         }
     }
 
-    return message && <div className="notificationPopup" style={{ color: colors[theme][message.type] ?? colors[theme].fallback }}>
+    return message && <div className={"notificationPopup " + message.type}>
         <div className="arrow" style={{
             position: "absolute",
             top: "-11px",
