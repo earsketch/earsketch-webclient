@@ -164,7 +164,7 @@ const ShowDeletedScripts = () => {
     )
 }
 
-const PillButton: React.FC<{ onClick: Function }> = ({ onClick, children }) => {
+const PillButton = ({ onClick, children }: { onClick: Function, children: React.ReactNode }) => {
     const [highlight, setHighlight] = useState(false)
     const theme = useSelector(appState.selectColorTheme)
     let bgColor
@@ -225,7 +225,6 @@ const SharedScriptInfoItem = ({ title, body }: { title: string, body: string }) 
 
 const SingletonSharedScriptInfo = () => {
     const { t } = useTranslation()
-    const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
     const showSharedScriptInfo = useSelector(scripts.selectShowSharedScriptInfo)
     const script = useSelector(scripts.selectSharedInfoScript)
@@ -312,13 +311,7 @@ const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
     )
 }
 
-interface ScriptProps {
-    script: Script
-    bgTint: boolean
-    type: ScriptType
-}
-
-const Script: React.FC<ScriptProps> = ({ script, bgTint, type }) => {
+const ScriptEntry = ({ script, bgTint, type }: { script: Script, bgTint: boolean, type: ScriptType }) => {
     const dispatch = useDispatch()
     const [highlight, setHighlight] = useState(false)
     const theme = useSelector(appState.selectColorTheme)
@@ -415,7 +408,7 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
                         const ID = scriptIDs[index]
                         return (
                             <div style={style}>
-                                <Script key={ID} script={entities[ID]} bgTint={index % 2 === 0} type={type} />
+                                <ScriptEntry key={ID} script={entities[ID]} bgTint={index % 2 === 0} type={type} />
                             </div>
                         )
                     }}

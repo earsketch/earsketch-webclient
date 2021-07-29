@@ -9,6 +9,7 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 interface Message {
+    // eslint-disable-next-line camelcase
     notification_type: string
     scriptID: string
     sender: string
@@ -85,12 +86,12 @@ let history: { [key: number]: EditOperation } = {}
 
 export let otherMembers: {
     [key: string]: { canEdit: boolean; active: boolean }
-} = {}
-const markers: { [key: string]: number } = {}
+} = Object.create(null)
+const markers: { [key: string]: number } = Object.create(null)
 
 export const chat: {
     [key: string]: { text: string; popover: boolean }
-} = {}
+} = Object.create(null)
 export let tutoring = false
 
 // This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
@@ -312,7 +313,7 @@ export function leaveSession(shareID: string) {
 function onMemberJoinedSession(data: Message) {
     userNotification.show(data.sender + " has joined the collaboration session.")
 
-    if (otherMembers.hasOwnProperty(data.sender)) {
+    if (data.sender in otherMembers) {
         otherMembers[data.sender].active = true
     } else {
         otherMembers[data.sender] = {
@@ -325,7 +326,7 @@ function onMemberJoinedSession(data: Message) {
 function onMemberLeftSession(data: Message) {
     userNotification.show(data.sender + " has left the collaboration session.")
 
-    if (markers.hasOwnProperty(data.sender)) {
+    if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
     }
 
@@ -566,7 +567,7 @@ function rejoinSession() {
         websocket.send({ action: "rejoinSession", state, tutoring, ...makeWebsocketMessage() })
     }
 
-    return new Promise(resolve => continuations.joinSession = resolve)
+    return new Promise(resolve => (continuations.joinSession = resolve))
 }
 
 export function saveScript(_scriptID?: string) {
@@ -606,7 +607,7 @@ function onCursorPosMessage(data: Message) {
     const cursorPos = document.indexToPosition(data.position!, 0)
     const range = new Range(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column + 1)
 
-    if (markers.hasOwnProperty(data.sender)) {
+    if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
     }
 
@@ -622,7 +623,7 @@ function onSelectMessage(data: Message) {
     const start = document.indexToPosition(data.start!, 0)
     const end = document.indexToPosition(data.end!, 0)
 
-    if (markers.hasOwnProperty(data.sender)) {
+    if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
     }
 
@@ -639,7 +640,7 @@ function onSelectMessage(data: Message) {
 
 function removeOtherCursors() {
     for (const m in otherMembers) {
-        if (markers.hasOwnProperty(m)) {
+        if (m in markers) {
             editSession!.removeMarker(markers[m])
         }
         delete markers[m]
@@ -661,7 +662,7 @@ function onChangeWriteAccess(data: Message) {
 }
 
 // After certain period of inactivity, the session closes automatically, sending message. It should flag for startSession to be sent before the next action.
-function onSessionClosed(data: Message) {
+function onSessionClosed() {
     esconsole("remote session closed", "collab")
 
     sessionActive = false
@@ -671,7 +672,7 @@ function onSessionClosed(data: Message) {
     }
 }
 
-function onSessionClosedForInactivity(data: Message) {
+function onSessionClosedForInactivity() {
     userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.")
 }
 
@@ -979,7 +980,7 @@ async function onScriptRenamed(data: Message) {
 export function getScriptText(scriptID: string): Promise<string> {
     esconsole("requesting the script text for " + scriptID, "collab")
     websocket.send({ ...makeWebsocketMessage(), action: "getScriptText", scriptID })
-    return new Promise(resolve => continuations.getScriptText = resolve)
+    return new Promise(resolve => (continuations.getScriptText = resolve))
 }
 
 function onScriptText(data: Message) {

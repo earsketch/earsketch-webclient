@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 // Dialogue module for CAI (Co-creative Artificial Intelligence) Project.
 import * as caiErrorHandling from "./errorHandling"
 import * as caiStudentPreferenceModule from "./studentPreferences"

@@ -22,9 +22,9 @@ export let analyserNode: AnalyserNode | null
 export let meterVal = 0
 
 export const callbacks = {
-    bufferReady: (buffer: AudioBuffer) => {},
+    bufferReady: (() => {}) as (buffer: AudioBuffer) => void,
     micReady: () => {},
-    micAccessBlocked: (type: string) => {},
+    micAccessBlocked: (() => {}) as (type: string) => void,
     beat: () => {},
 }
 

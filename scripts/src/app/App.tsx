@@ -584,13 +584,7 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    {/* TODO: Bring back keyboard shortcuts. */}
-                    {/* <div>
-                        <button id="keyboard-shortcuts" type="button" className="top-header-nav-button btn btn-xs btn-clear" ng-click="toggleShortcutHelper()" ng-className="showKeyShortcuts ? "grow-in-size":""" title="Show/Hide Keyboard Shortcuts">
-                            <i className="icon icon-keyboard"></i>
-                                <span className="sr-only">Keyboard Shortcuts</span>
-                        </button>
-                    </div> */}
+                    {/* TODO: Bring back keyboard shortcut button & popover. */}
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
 
                     {/* Font Size */}

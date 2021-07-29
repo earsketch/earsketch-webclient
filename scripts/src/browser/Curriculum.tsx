@@ -9,7 +9,7 @@ import * as ESUtils from "../esutils"
 import { importScript } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import * as userNotification from "../user/notification"
-import { ESCurr_OLD_LOCATIONS } from "../data/old_curriculum"
+import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
 
@@ -54,7 +54,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 </a>
             </div>
             <ul>
-                {focus[1] == chIdx && ch.sections &&
+                {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li key={secIdx} className="toc-sections py-1">
                         <div className="toc-item">
@@ -338,7 +338,7 @@ const HotCurriculum = hot(() => {
 
         if (curriculumParam !== null) {
             // check if this value exists in our old locations file first
-            const url = ESCurr_OLD_LOCATIONS[curriculumParam]
+            const url = OLD_CURRICULUM_LOCATIONS[curriculumParam]
             if (url !== undefined) {
                 dispatch(curriculum.fetchContent({ url }))
             } else {

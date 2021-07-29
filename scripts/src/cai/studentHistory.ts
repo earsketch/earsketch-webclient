@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 // Student History module for CAI (Co-creative Artificial Intelligence) Project.
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"

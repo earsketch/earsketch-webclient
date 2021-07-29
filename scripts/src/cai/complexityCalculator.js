@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 import * as ccState from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 

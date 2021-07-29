@@ -102,7 +102,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const changeVolume = (value: number) => {
         setVolume(value)
-        if (value == minVolume) {
+        if (value === minVolume) {
             mute(true)
         } else {
             setVolumeMuted(false)
@@ -193,9 +193,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 </button>
             </span>
 
-            {/* Follow through
-                NOTE: In Angular implementation, this was conditional on `horzOverflow`, but it was 'always on for now'.
-                Hence, I have simply made it unconditional here. */}
+            {/* Autoscroll */}
             <span className="daw-transport-button follow-icon">
                 <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
@@ -993,6 +991,7 @@ export const DAW = () => {
                                             bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
                                     }
                                 }
+                                return null
                             })}
                         </div>
 
@@ -1000,7 +999,7 @@ export const DAW = () => {
                             <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
-                            {(dragStart !== null || loop.selection && loop.on) && loop.end != loop.start &&
+                            {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
                             <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
                         </div>
                     </div>

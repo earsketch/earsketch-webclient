@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 import AUDIOKEYS_RECOMMENDATIONS from "../data/audiokeys_recommendations.json"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.

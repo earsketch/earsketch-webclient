@@ -56,7 +56,7 @@ CodeHighlight.propTypes = {
 // Hack from https://stackoverflow.com/questions/46240647/react-how-to-force-a-function-component-to-render
 // TODO: Get rid of this by moving obj.details into Redux state.
 function useForceUpdate() {
-    const [value, setValue] = useState(0) // integer state
+    const [_, setValue] = useState(0) // integer state
     return () => setValue(value => ++value) // update the state to force render
 }
 
@@ -64,7 +64,7 @@ const paste = (name: string, obj: APIItem) => {
     const args: string[] = []
     for (const param in obj.parameters) {
         args.push(param)
-        if (obj.parameters[param].hasOwnProperty("default")) {
+        if (obj.parameters[param].default !== undefined) {
             args[args.length - 1] = args[args.length - 1].concat("=" + obj.parameters[param].default)
         }
     }
@@ -77,17 +77,12 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
     // TODO don't mutate obj.details
     const { t } = useTranslation()
     const forceUpdate = useForceUpdate()
-    const [highlight, setHighlight] = useState(false)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     const theme = useSelector(appState.selectColorTheme)
 
     const returnText = "Returns: " + (obj.returns ? `(${t(obj.returns.typeKey)}) - ${t(obj.returns.descriptionKey)}` : "undefined")
     return (
-        <div
-            className={`p-5 border-b border-r border-black ${theme === "light" ? "border-gray-500" : "border-gray-700"}`}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
-        >
+        <div className={`p-5 border-b border-r border-black ${theme === "light" ? "border-gray-500" : "border-gray-700"}`}>
             <div className="flex justify-between mb-4">
                 <span
                     className="text-2xl font-bold cursor-pointer truncate" title={returnText}
@@ -114,7 +109,7 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter ]) => (
                         <span key={param}>
                             <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
-                            {paramVal.hasOwnProperty("default") &&
+                            {paramVal.default !== undefined &&
                             <span>
                                 <span className="text-gray-600 px-1">=</span>
                                 <span className="text-blue-600">{paramVal.default}</span>

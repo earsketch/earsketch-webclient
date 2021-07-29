@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 import { CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI } from "./codeRecommendations"
 import * as caiProjectModel from "./projectModel"
 import * as complexityCalculatorHelperFunctions from "./complexityCalculatorHelperFunctions"

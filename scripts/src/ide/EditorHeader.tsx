@@ -57,7 +57,7 @@ export const EditorHeader = () => {
     const theme = useSelector(appState.selectColorTheme)
     const loggedIn = useSelector(user.selectLoggedIn)
     const script = allScripts[activeTab]
-    const scriptType = (!script || script.readonly) && "readonly" || script.isShared && "shared" || "regular"
+    const scriptType = ((!script || script.readonly) && "readonly") || (script.isShared && "shared") || "regular"
     const { t } = useTranslation()
 
     return (

@@ -37,13 +37,12 @@ export function getKeyDict(type: string) {
 export function addRecInput(recInput: string[], script: Script) {
     // Generate list of input samples
     const lines = script.source_code.split("\n")
-    for (let line = 0; line < lines.length; line++) {
-        for (let idx = 0; idx < AUDIOKEYS.length; idx++) {
-            const name = AUDIOKEYS[idx]
+    for (const line of lines) {
+        for (const name of AUDIOKEYS) {
             // exclude makebeat
-            if (name.slice(0, 3) !== "OS_" && lines[line].includes(name) && !recInput.includes(name)) {
+            if (name.slice(0, 3) !== "OS_" && line.includes(name) && !recInput.includes(name)) {
                 // exclude comments
-                if (lines[line].indexOf("#") === -1 || lines[line].indexOf(name) < lines[line].indexOf("#")) {
+                if (line.indexOf(name) < line.indexOf("#")) {
                     recInput.push(name)
                 }
             }
@@ -142,22 +141,18 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     similarity = Math.sign(similarity)
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = {}
-    for (let idx = 0; idx < inputSamples.length; idx++) {
-        const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSamples[idx])
+    for (const inputSample of inputSamples) {
+        const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         if (audioNumber !== undefined) {
             const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
-            for (const num in audioRec) {
-                if (!audioRec.hasOwnProperty(num)) {
-                    throw new Error("Error enumerating the recommendation audioKeys")
-                }
-                const value = audioRec[num]
-                const full_val = value[0] + coUsage * value[1] + similarity * value[2]
+            for (const [num, value] of Object.entries(audioRec)) {
+                const fullVal = value[0] + coUsage * value[1] + similarity * value[2]
                 const key = NUMBERS_AUDIOKEYS[num]
 
                 if (Object.keys(recs).includes(key)) {
-                    recs[key] = (full_val + recs[key]) / 1.41
+                    recs[key] = (fullVal + recs[key]) / 1.41
                 } else {
-                    recs[key] = full_val
+                    recs[key] = fullVal
                 }
             }
         }
@@ -206,8 +201,7 @@ function filterRecommendations(inputRecs: { [key: string]: number }, recommended
 
 export function availableGenres() {
     const genres: string[] = []
-    for (let idx = 0; idx < AUDIOKEYS.length; idx++) {
-        const name = AUDIOKEYS[idx]
+    for (const name of AUDIOKEYS) {
         const genre = keyGenreDict[name]
         if (!genres.includes(genre) && genre !== undefined && genre !== "MAKEBEAT") {
             genres.push(genre)
@@ -218,8 +212,7 @@ export function availableGenres() {
 
 export function availableInstruments() {
     const instruments: string[] = []
-    for (let idx = 0; idx < AUDIOKEYS.length; idx++) {
-        const name = AUDIOKEYS[idx]
+    for (const name of AUDIOKEYS) {
         const instrument = keyInstrumentDict[name]
         if (!instruments.includes(instrument) && instrument !== undefined) {
             instruments.push(instrument)

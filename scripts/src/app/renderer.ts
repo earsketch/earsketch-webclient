@@ -72,7 +72,6 @@ export async function renderBuffer(result: DAWData) {
             )
 
             // the clip duration may be shorter than the buffer duration
-            const bufferDuration = source.buffer.duration
             let clipDuration = end - start
 
             if (origin > location && origin > location + end) {

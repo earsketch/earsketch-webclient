@@ -252,13 +252,9 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
     )
 }
 
-interface DropdownContextMenuCallerType {
-    script: Script
-    type: ScriptType
-    className: string
-}
-
-export const DropdownContextMenuCaller: React.FC<DropdownContextMenuCallerType> = ({ script, type, children, className }) => {
+export const DropdownContextMenuCaller = ({ script, type, className, children }: {
+    script: Script, type: ScriptType, className: string, children: React.ReactNode
+}) => {
     const dispatch = useDispatch()
     return (
         <div

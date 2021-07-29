@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import * as caiStudent from "./student"
 

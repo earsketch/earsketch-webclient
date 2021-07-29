@@ -163,7 +163,6 @@ const setESConsoleTraceLevel = (traceLevel: number | string) => {
 const esconsole = (message: any, tag: string | string[] | null = null, traceLevel: number | null = null, logLevel = 1) => {
     const date = new Date()
     let log = date.toLocaleTimeString("en-GB") + "." + ("000" + date.getMilliseconds()).slice(-3) + " "
-    let output
     let TAG: string | string[] = ""
     const defaultTraceLevel = 3
     const defaultIndentation = 4
@@ -187,7 +186,7 @@ const esconsole = (message: any, tag: string | string[] | null = null, traceLeve
 
     if (tag instanceof Array) {
         if (tag.length === 1) {
-            if ([null, ""].indexOf(tag[0]) >= 0) {
+            if ([null, ""].includes(tag[0])) {
                 TAG = ""
             } else {
                 if (typeof (tag[0]) === "string") {
@@ -208,7 +207,7 @@ const esconsole = (message: any, tag: string | string[] | null = null, traceLeve
             log += " "
         }
     } else {
-        if ([null, ""].indexOf(tag) >= 0) {
+        if ([null, ""].includes(tag)) {
             TAG = ""
         } else {
             if (typeof (tag) === "string") {
@@ -269,7 +268,7 @@ const esconsole = (message: any, tag: string | string[] | null = null, traceLeve
             console.log(e)
         }
 
-        const match = location.match(/\/\w+\.js\:\d+\:\d+/)
+        const match = location.match(/\/\w+\.js:\d+:\d+/)
         if (match) {
             log += " @ " + match[0].substring(1)
         }
@@ -283,15 +282,15 @@ const esconsole = (message: any, tag: string | string[] | null = null, traceLeve
         }
     }
 
-    output = log
+    const output = log
 
     if (TAG instanceof Array) {
         let willShow = true
         for (const t of TAG) {
-            if (ESConsoleExcludedTags.indexOf(t) > -1) {
+            if (ESConsoleExcludedTags.includes(t)) {
                 willShow = false
             }
-            if (ESConsoleIncludedTags.indexOf(t) >= 0) {
+            if (ESConsoleIncludedTags.includes(t)) {
                 willShow = true
             }
         }
@@ -300,7 +299,7 @@ const esconsole = (message: any, tag: string | string[] | null = null, traceLeve
             console.log(output)
         }
     } else {
-        if ((ESConsoleExcludedTags.indexOf(TAG) === -1) || (ESConsoleIncludedTags.indexOf(TAG) >= 0)) {
+        if (ESLogIncludedTags.includes(TAG) || !ESLogExcludedTags.indexOf(TAG)) {
             console.log(output)
         }
     }
@@ -308,12 +307,12 @@ const esconsole = (message: any, tag: string | string[] | null = null, traceLeve
     switch (logLevel) {
         case 0:
             break
+        case 2:
+            ESLog(log)
+            break
         case 1:
         default:
             ESLog(log, TAG)
-            break
-        case 2:
-            ESLog(log)
             break
     }
 
@@ -340,17 +339,17 @@ const ESLog = (logText: string, tag: string | string[] | undefined = undefined) 
         REPORT_LOG.push(logText)
     } else if (typeof (tag) === "string") {
         TAG = tag.toUpperCase()
-        if ((ESLogExcludedTags.indexOf(TAG) === -1) || (ESLogIncludedTags.indexOf(TAG) >= 0)) {
+        if (ESLogIncludedTags.includes(TAG) || !ESLogExcludedTags.indexOf(TAG)) {
             REPORT_LOG.push(logText)
         }
     } else if (tag instanceof Array) {
         let willLog = true
         for (const t of tag) {
             TAG = t.toUpperCase()
-            if (ESLogExcludedTags.indexOf(TAG) > -1) {
+            if (ESLogExcludedTags.includes(TAG)) {
                 willLog = false
             }
-            if (ESLogIncludedTags.indexOf(TAG) >= 0) {
+            if (ESLogIncludedTags.includes(TAG)) {
                 willLog = true
             }
         }

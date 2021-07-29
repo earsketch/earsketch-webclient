@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
 import * as recommender from "../app/recommender"
 

@@ -68,13 +68,13 @@ const caiSlice = createSlice({
             state.dropupLabel = payload
         },
         resetState(state) {
-            state = {
+            Object.assign(state, {
                 activeProject: "",
                 messageList: { "": [] },
                 inputOptions: [],
                 errorOptions: [],
                 dropupLabel: "",
-            } as caiState
+            })
         },
     },
 })
@@ -101,7 +101,7 @@ function newCAIMessage() {
 
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     "cai/introduceCAI",
-    (_, { getState, dispatch }) => {
+    (_, { dispatch }) => {
         // reinitialize recommendation dictionary
         analysis.fillDict().then(() => {
             const msgText = dialogue.generateOutput("Chat with CAI")
@@ -212,13 +212,13 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileCAI",
-    (data, { getState, dispatch }) => {
+    (data, { dispatch }) => {
         if (dialogue.isDone()) {
             return
         }
 
         // call cai analysis here
-        const result = data[0]
+        // const result = data[0]
         const language = data[1]
         const code = data[2]
 
@@ -256,7 +256,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
 export const compileError = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileError",
-    (data, { getState, dispatch }) => {
+    (data, { dispatch }) => {
         const errorReturn = dialogue.handleError(data)
 
         if (dialogue.isDone()) {
@@ -276,7 +276,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
 
 export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], ThunkAPI>(
     "cai/openCurriculum",
-    ([message, location], { getState, dispatch }) => {
+    ([message, location], { dispatch }) => {
         dispatch(curriculum.fetchContent({ location: message.keyword[location][1].split("-") }))
         dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
     }
@@ -284,7 +284,7 @@ export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], Thunk
 
 export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
     "cai/autoScrollCAI",
-    (_, { getState, dispatch }) => {
+    () => {
         // Auto scroll to the bottom (set on a timer to happen after message updates).
         const caiBody = document.getElementById("cai-body")
         setTimeout(() => {
@@ -297,42 +297,42 @@ export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
 
 export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
     "cai/curriculumPage",
-    (location, { getState, dispatch }) => {
+    (location) => {
         dialogue.addCurriculumPageToHistory(location)
     }
 )
 
 export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
-    (_, { getState, dispatch }) => {
+    () => {
         dialogue.checkForCodeUpdates(editor.ace.getValue())
     }
 )
 
 export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
     "cai/userOnPage",
-    (time: number, { getState, dispatch }) => {
+    (time: number) => {
         studentPreferences.addOnPageStatus(1, time)
     }
 )
 
 export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
     "cai/userOffPage",
-    (time: number, { getState, dispatch }) => {
+    (time: number) => {
         studentPreferences.addOnPageStatus(0, time)
     }
 )
 
 export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
     "cai/keyStroke",
-    ([action, content, time], { getState, dispatch }) => {
+    ([action, content, time]) => {
         studentPreferences.addKeystroke(action, content, time)
     }
 )
 
 export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
     "cai/mousePosition",
-    ([x, y], { getState, dispatch }) => {
+    ([x, y]) => {
         studentPreferences.addMousePos({ x, y })
     }
 )

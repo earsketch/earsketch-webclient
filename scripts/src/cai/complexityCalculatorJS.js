@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 import * as acorn from "acorn"
 
 import * as ccState from "./complexityCalculatorState"

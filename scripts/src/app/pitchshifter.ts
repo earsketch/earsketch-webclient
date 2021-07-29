@@ -17,7 +17,7 @@ interface Point {
 }
 
 const QFRAMES = 16
-let BUFFER_CACHE: { [key: string]: AudioBuffer } = {}
+let BUFFER_CACHE: { [key: string]: AudioBuffer } = Object.create(null)
 const MAX_CACHE = 64 // increased from 16 since we now process by clips instead of tracks
 
 // Interpolate a list of automation points into an audio-rate array of semitones to shift by at each sample.
@@ -52,7 +52,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
         points[points.length - 1].sampletime = points[points.length - 1].sampletime - QFRAMES
     }
 
-    if ((points.length == 0) && (startPoint.sampletime > 0)) {
+    if ((points.length === 0) && (startPoint.sampletime > 0)) {
         if (startPoint.sampletime > 0) {
             points.push({
                 sampletime: 0,
@@ -91,7 +91,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
         type: "end",
     } as Point
 
-    if (endPoint.sampletime == 0) {
+    if (endPoint.sampletime === 0) {
         endPoint.sampletime = -1
         endPoint.semitone = startPoint.semitone
     }
@@ -114,7 +114,7 @@ const getEnvelopeForTrack = (track: Track, tempo: number) => {
 // Pitchshift an audio buffer according to the points in bendinfo.
 const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
     esconsole("PitchBend bendinfo from " + JSON.stringify(bendinfo), ["debug", "pitchshift"])
-    const bypass = (bendinfo.length == 1) && (bendinfo[0].semitone == 0)
+    const bypass = (bendinfo.length === 1) && (bendinfo[0].semitone === 0)
     if (bypass) {
         esconsole("Bypassing pitchshift", ["debug", "pitchshift"])
         // TODO: Is this copy necessary?
@@ -253,7 +253,7 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
 
 // TODO: Is there any reason for this to be async? It doesn't actually do anything async inside, and it's CPU-bound rather than IO-bound.
 export async function pitchshiftClips(track: Track, tempo: number) {
-    if (track.clips.length == 0) {
+    if (track.clips.length === 0) {
         throw new RangeError("Cannot pitchshift an empty track")
     }
 
@@ -261,7 +261,7 @@ export async function pitchshiftClips(track: Track, tempo: number) {
     const trackEnvelope = getEnvelopeForTrack(track, tempo)
 
     if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
-        BUFFER_CACHE = {}
+        BUFFER_CACHE = Object.create(null)
     }
 
     for (const clip of track.clips) {
@@ -272,7 +272,7 @@ export async function pitchshiftClips(track: Track, tempo: number) {
             bendinfo: bendinfo,
         })
 
-        if (BUFFER_CACHE.hasOwnProperty(hashKey)) {
+        if (hashKey in BUFFER_CACHE) {
             esconsole("Using Cache ", ["debug", "pitchshift"])
             shiftedBuffer = BUFFER_CACHE[hashKey]
         } else {

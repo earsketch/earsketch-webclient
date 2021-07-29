@@ -40,7 +40,7 @@ export const TitleBar = () => {
     )
 }
 
-const BrowserTab: React.FC<{ name: string, type: BrowserTabType }> = ({ name, type, children }) => {
+const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
 
@@ -133,7 +133,7 @@ interface DropdownMultiSelectorProps {
     FilterItem: React.FC<any>
 }
 
-export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ title, category, items, position, numSelected, FilterItem }) => {
+export const DropdownMultiSelector = ({ title, category, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const [showTooltip, setShowTooltip] = useState(false)
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null)
@@ -207,13 +207,9 @@ export const DropdownMultiSelector: React.FC<DropdownMultiSelectorProps> = ({ ti
     </>)
 }
 
-interface CollectionType {
-    title: string
-    visible: boolean
-    initExpanded: boolean
-    className?: string
-}
-export const Collection: React.FC<CollectionType> = ({ title, visible = true, initExpanded = true, children, className = "" }) => {
+export const Collection = ({ title, visible = true, initExpanded = true, className = "", children }: {
+    title: string, visible: boolean, initExpanded: boolean, className?: string, children: React.ReactNode
+}) => {
     const [expanded, setExpanded] = useState(initExpanded)
     const [highlight, setHighlight] = useState(false)
 
@@ -251,7 +247,7 @@ export const Collection: React.FC<CollectionType> = ({ title, visible = true, in
     )
 }
 
-export const Collapsed: React.FC<{ position: "west"|"east", title: string }> = ({ position = "west", title = null }) => {
+export const Collapsed = ({ position = "west", title = null }: { position: "west" | "east", title: string | null }) => {
     const theme = useSelector(appState.selectColorTheme)
     const embedMode = useSelector(appState.selectEmbedMode)
     const dispatch = useDispatch()
@@ -304,8 +300,6 @@ export const Browser = () => {
     if (!Object.values(BrowserTabType).includes(kind)) {
         kind = BrowserTabType.Sound
     }
-
-    const BrowserBody = BrowserComponents[kind]
 
     return <div
         className={`flex flex-col h-full w-full text-left font-sans ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}

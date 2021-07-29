@@ -164,16 +164,16 @@ if (FLAGS.SHOW_CAI) {
     window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
     window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
 
-    let mouse_x: number | undefined, mouse_y: number | undefined
+    let x: number | undefined, y: number | undefined
 
     window.addEventListener("mousemove", e => {
-        mouse_x = e.x
-        mouse_y = e.y
+        x = e.x
+        y = e.y
     })
 
     window.setInterval(() => {
-        if (mouse_x && mouse_y) {
-            store.dispatch(cai.mousePosition([mouse_x, mouse_y]))
+        if (x && y) {
+            store.dispatch(cai.mousePosition([x, y]))
         }
     }, 5000)
 }

@@ -144,7 +144,7 @@ const AddSound = () => {
     )
 }
 
-const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
+const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
     const previewFileKey = useSelector(sounds.selectPreviewFileKey)
     const previewNode = useSelector(sounds.selectPreviewNode)
@@ -246,7 +246,7 @@ const ClipList = ({ fileKeys }: { fileKeys: string[] }) => {
     )
 }
 
-interface Folder {
+interface FolderProps {
     folder: string,
     fileKeys: string[],
     bgTint: boolean,
@@ -256,7 +256,7 @@ interface Folder {
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }: Folder) => {
+const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }: FolderProps) => {
     const [highlight, setHighlight] = useState(false)
     const theme = useSelector(appState.selectColorTheme)
 
@@ -338,15 +338,9 @@ const WindowedRecommendations = () => {
     )
 }
 
-interface WindowedSoundCollection {
-    title: string
-    folders: string[]
-    fileKeysByFolders: any
-    visible?: boolean
-    initExpanded?: boolean
-}
-
-const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, visible = true, initExpanded = true }) => {
+const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, visible = true, initExpanded = true }: {
+    title: string, folders: string[], fileKeysByFolders: any, visible?: boolean, initExpanded?: boolean,
+}) => {
     const [expanded, setExpanded] = useState(new Set())
     const listRef = useRef<List>(null)
 

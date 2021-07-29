@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"

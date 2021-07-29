@@ -30,7 +30,7 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 // Build audio node graph and schedule automation.
 export const buildAudioNodeGraph = (
     context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempo: number,
-    offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wav_export: boolean
+    offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
 ) => {
     esconsole("Building audio node graph", "debug")
 
@@ -53,7 +53,7 @@ export const buildAudioNodeGraph = (
 
     for (const effect of effectRanges) {
         const fullName = effect.name + "-" + effect.parameter
-        if (!wav_export && (bypassedEffects.indexOf(fullName) > -1)) {
+        if (!wavExport && bypassedEffects.includes(fullName)) {
             esconsole("Bypassed effect: " + fullName, "debug")
             continue
         }

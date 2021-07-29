@@ -26,7 +26,7 @@ export const selectSearchText = (state: RootState) => state.api.searchText
 
 export const selectFilteredEntries = createSelector(
     [selectSearchText, selectScriptLanguage, selectLocale],
-    (searchText, language, locale) => {
+    (searchText, language, _) => {
         searchText = searchText.toLowerCase()
         return Object.entries(ESApiDoc).filter(([name, data]: [name: string, data: APIItem | APIItem[]]) => {
             const entries = Array.isArray(data) ? data : [data]

@@ -1,4 +1,4 @@
-export const ESCurr_OLD_LOCATIONS: { [index: string]: string } = {
+export const OLD_CURRICULUM_LOCATIONS: { [index: string]: string } = {
     0: "/en/v1/welcome.html",
     1: "/en/v1/ch_u1_intro.html",
     2: "/en/v1/ch_u2_intro.html",

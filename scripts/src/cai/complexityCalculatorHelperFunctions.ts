@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 // A library of helper functions for the CAI Code Complexity Calculator
 import * as ccState from "./complexityCalculatorState"
 

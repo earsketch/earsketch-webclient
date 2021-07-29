@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
 import * as compiler from "./runner"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"

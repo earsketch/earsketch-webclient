@@ -47,7 +47,7 @@ module.exports = {
         "react/jsx-curly-spacing": ["error", { children: true }],
         "jsx-quotes": ["error", "prefer-double"],
         "no-restricted-syntax": ["error", {
-            selector: "BinaryExpression[operator = /[=<>!]+/] > CallExpression > MemberExpression > Identifier[name = 'indexOf']",
+            selector: "!BinaryExpression[operator = /[=<>!]+/][left.callee.property.name = 'indexOf'][right.type=/Literal|UnaryExpression/]",
             message: "Use .includes() instead of comparing the result of .indexOf()",
         }],
         "prefer-arrow-callback": ["error"],
