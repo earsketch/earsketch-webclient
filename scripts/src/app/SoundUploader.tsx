@@ -321,21 +321,21 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             {results && results.length > 0 &&
                 <div className="overflow-y-auto border border-gray-300 dark:border-gray-500" style={{ maxHeight: "300px" }}>
                     {results.map((result, index) => <div key={index} className={index === selected ? "bg-blue-200 dark:bg-blue-900" : ""}>
-                        <div className="inline-flex items-center pt-3 px-3">
-                            <input id={"fs" + index} type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
-                                onChange={e => {
-                                    if (e.target.checked) {
-                                        setSelected(index)
-                                        setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
-                                        setError("")
-                                    }
-                                }} />
-                            <audio controls controlsList="nodownload" preload="none">
-                                <source src={result.previewURL} type="audio/mpeg" />
-                                Your browser does not support the audio element.
-                            </audio>
-                            <label htmlFor={"fs" + index} className="ml-4 flex-1">
-                                {result.name}: {result.bpm} bpm. {t("soundUploader.freesound.uploadedBy", { userName: result.creator })}
+                        <div className="pt-3 px-3">
+                            <label className="inline-flex items-center">
+                                <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
+                                       onChange={e => {
+                                           if (e.target.checked) {
+                                               setSelected(index)
+                                               setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
+                                               setError("")
+                                           }
+                                       }} />
+                                <audio className="ml-2" controls controlsList="nodownload" preload="none">
+                                    <source src={result.previewURL} type="audio/mpeg" />
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <span className="ml-4 flex-1">{result.name}: {result.bpm} bpm. {t("soundUploader.freesound.uploadedBy", { userName: result.creator })}</span>
                             </label>
                         </div>
                         <hr className="mt-3 border-gray-300" />
