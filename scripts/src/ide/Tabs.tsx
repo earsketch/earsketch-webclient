@@ -228,26 +228,20 @@ export const Tabs = () => {
     // which triggers the ResizeObserver loop limit (a silent error, but one which still pollutes new relic).
     // You can read more about the issue in these places: https://github.com/WICG/resize-observer/issues/38,
     // https://github.com/cerner/terra-clinical/pull/551, https://github.com/cerner/terra-core/pull/1647
-    const observer = new ResizeObserver(entries => {
-        tabResizeAnimationFrame = window.requestAnimationFrame(() => {
-            const containerWidth = entries[0].contentRect.width;
-            const cutoff = ~~((containerWidth-createButtonWidth-dropdownWidth*truncated)/tabWidth);
-            dispatch(tabs.setNumVisibleTabs(cutoff));
-        })
-    });
-
-    // cleaning an oustanding animation frame request if it exists
     useEffect(() => {
-        return () => {
-            if (tabResizeAnimationFrame) window.cancelAnimationFrame(tabResizeAnimationFrame)
-        }
-    })
-
-    useEffect(() => {
+        const observer = new ResizeObserver(entries => {
+            tabResizeAnimationFrame = window.requestAnimationFrame(() => {
+                const containerWidth = entries[0].contentRect.width;
+                const cutoff = ~~((containerWidth-createButtonWidth-dropdownWidth*truncated)/tabWidth);
+                dispatch(tabs.setNumVisibleTabs(cutoff));
+            })
+        });
         containerRef.current && observer.observe(containerRef.current);
 
         return () => {
             containerRef.current && observer.unobserve(containerRef.current);
+            // clean up an oustanding animation frame request if it exists
+            if (tabResizeAnimationFrame) window.cancelAnimationFrame(tabResizeAnimationFrame)
         }
     }, [containerRef, openTabs, truncated]);
 
