@@ -33,7 +33,7 @@ phases:
       - export LOCAL_STAGING_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_DIR_NAME"
       - export LOCAL_STAGING_CACHED_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}-NOCACHE"
       - export LOCAL_STAGING_CACHED_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_CACHED_DIR_NAME"
-      - export ES_VERSION="${ES_VERSION_LIST//,/.}"-$CODEBUILD_BUILD_NUMBER
+      - export ES_VERSION="${ES_VERSION_LIST//,/.}-$CODEBUILD_BUILD_NUMBER"
       - if [ "$ES_BASE_URI" == "review" ]; then echo "ES_BASE_URI review mode" && export ES_BASE_URI=https://earsketch-test.ersktch.gatech.edu/$LOCAL_STAGING_DIR_NAME; fi
       - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
   build:
