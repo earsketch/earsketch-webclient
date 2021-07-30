@@ -1,4 +1,4 @@
-﻿// Analysis module for CAI (Co-creative Artificial Intelligence) Project.
+// Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 
 export const studentModel = {
     codeKnowledge: {},

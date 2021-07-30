@@ -23,7 +23,7 @@ const SoundSearchBar = () => {
     const dispatchReset = () => dispatch(sounds.setSearchText(""))
     const props = { searchText, dispatchSearch, dispatchReset }
 
-    return <SearchBar { ...props } />
+    return <SearchBar {...props} />
 }
 
 const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
@@ -41,8 +41,8 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
                     } else {
-                        if (selected) dispatch(sounds.removeFilterItem({category, value}))
-                        else dispatch(sounds.addFilterItem({category, value}))
+                        if (selected) dispatch(sounds.removeFilterItem({ category, value }))
+                        else dispatch(sounds.addFilterItem({ category, value }))
                     }
                 }}
                 onMouseEnter={() => setHighlight(true)}
@@ -61,13 +61,13 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
 }
 
 const Filters = () => {
-    const { t } = useTranslation();
-    const artists = useSelector(sounds.selectFilteredArtists);
-    const genres = useSelector(sounds.selectFilteredGenres);
-    const instruments = useSelector(sounds.selectFilteredInstruments);
-    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected);
-    const numGenresSelected = useSelector(sounds.selectNumGenresSelected);
-    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected);
+    const { t } = useTranslation()
+    const artists = useSelector(sounds.selectFilteredArtists)
+    const genres = useSelector(sounds.selectFilteredGenres)
+    const instruments = useSelector(sounds.selectFilteredInstruments)
+    const numArtistsSelected = useSelector(sounds.selectNumArtistsSelected)
+    const numGenresSelected = useSelector(sounds.selectNumGenresSelected)
+    const numInstrumentsSelected = useSelector(sounds.selectNumInstrumentsSelected)
 
     return (
         <div className="p-3">
@@ -144,7 +144,7 @@ const AddSound = () => {
     )
 }
 
-const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor }) => {
+const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const dispatch = useDispatch()
     const previewFileKey = useSelector(sounds.selectPreviewFileKey)
     const previewNode = useSelector(sounds.selectPreviewNode)
@@ -180,27 +180,22 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileKey === fileKey
-                        ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
-                        : <i className="icon icon-play4" />
-                        }
+                            ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
+                            : <i className="icon icon-play4" />}
                     </button>
-                    {
-                        loggedIn &&
+                    {loggedIn &&
                         (
                             <button
                                 className="btn btn-xs btn-action"
                                 onClick={() => dispatch(sounds.markFavorite({ fileKey, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
-                                { isFavorite
+                                {isFavorite
                                     ? <i className="icon icon-star-full2 fav-icon" />
-                                    : <i className="icon icon-star-empty3 fav-icon" />
-                                }
+                                    : <i className="icon icon-star-empty3 fav-icon" />}
                             </button>
-                        )
-                    }
-                    {
-                        tabsOpen &&
+                        )}
+                    {tabsOpen &&
                         (
                             <button
                                 className="btn btn-xs btn-action"
@@ -209,10 +204,8 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                             >
                                 <i className="icon icon-paste2" />
                             </button>
-                        )
-                    }
-                    {
-                        (loggedIn && isUserOwned) &&
+                        )}
+                    {(loggedIn && isUserOwned) &&
                         (
                             <>
                                 <button
@@ -230,8 +223,7 @@ const Clip: React.FC<{ clip: SoundEntity, bgcolor: string }> = ({ clip, bgcolor 
                                     <i className="icon icon-backspace" />
                                 </button>
                             </>
-                        )
-                    }
+                        )}
                 </div>
             </div>
         </div>
@@ -244,19 +236,17 @@ const ClipList = ({ fileKeys }: { fileKeys: string[] }) => {
 
     return (
         <div className="flex flex-col">
-            {
-                fileKeys?.map((v: string) =>
-                    <Clip
-                        key={v} clip={entities[v]}
-                        bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
-                    />,
-                )
-            }
+            {fileKeys?.map((v: string) =>
+                <Clip
+                    key={v} clip={entities[v]}
+                    bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
+                />
+            )}
         </div>
     )
 }
 
-interface Folder {
+interface FolderProps {
     folder: string,
     fileKeys: string[],
     bgTint: boolean,
@@ -266,7 +256,7 @@ interface Folder {
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }: Folder) => {
+const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRef }: FolderProps) => {
     const [highlight, setHighlight] = useState(false)
     const theme = useSelector(appState.selectColorTheme)
 
@@ -282,11 +272,9 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
     }
 
     return (<>
-        <div className={"flex flex-row justify-start"}>
-            {
-                expanded &&
-                (<div className="h-auto border-l-4 border-blue-500" />)
-            }
+        <div className="flex flex-row justify-start">
+            {expanded &&
+                (<div className="h-auto border-l-4 border-blue-500" />)}
             <div
                 className={`flex flex-grow truncate justify-between items-center p-3 text-2xl ${bgColor} cursor-pointer border-b border-r ${theme === "light" ? "border-gray-500" : "border-gray-700"}`}
                 title={folder}
@@ -306,15 +294,13 @@ const Folder = ({ folder, fileKeys, bgTint, index, expanded, setExpanded, listRe
             >
                 <div className="truncate">{folder}</div>
                 <span className="btn btn-xs w-1/12 text-2xl">
-                    {
-                        expanded
-                            ? <i className="icon icon-arrow-down2" />
-                            : <i className="icon icon-arrow-right2" />
-                    }
+                    {expanded
+                        ? <i className="icon icon-arrow-down2" />
+                        : <i className="icon icon-arrow-right2" />}
                 </span>
             </div>
         </div>
-        { expanded && <ClipList fileKeys={fileKeys} /> }
+        {expanded && <ClipList fileKeys={fileKeys} />}
     </>)
 }
 
@@ -352,15 +338,9 @@ const WindowedRecommendations = () => {
     )
 }
 
-interface WindowedSoundCollection {
-    title: string
-    folders: string[]
-    fileKeysByFolders: any
-    visible?: boolean
-    initExpanded?: boolean
-}
-
-const WindowedSoundCollection: React.FC<WindowedSoundCollection> = ({ title, folders, fileKeysByFolders, visible = true, initExpanded = true }) => {
+const WindowedSoundCollection = ({ title, folders, fileKeysByFolders, visible = true, initExpanded = true }: {
+    title: string, folders: string[], fileKeysByFolders: any, visible?: boolean, initExpanded?: boolean,
+}) => {
     const [expanded, setExpanded] = useState(new Set())
     const listRef = useRef<List>(null)
 
@@ -425,7 +405,7 @@ const DefaultSoundCollection = () => {
     const filtered = numFilteredFileKeys !== numFileKeys
     const title = `${t("soundBrowser.title.collection").toLocaleUpperCase()} (${filtered ? numFilteredFileKeys + "/" : ""}${numFileKeys})`
     const props = { title, folders, fileKeysByFolders }
-    return <WindowedSoundCollection { ...props } />
+    return <WindowedSoundCollection {...props} />
 }
 
 const FeaturedArtistCollection = () => {
@@ -441,7 +421,7 @@ const FeaturedArtistCollection = () => {
     const artists = useSelector(sounds.selectFeaturedArtists)
     const title = `${t("soundBrowser.title.featuredArtist").toLocaleUpperCase()}${artists.length > 1 ? "S" : ""} (${filtered ? numFilteredFileKeys + "/" : ""}${numFileKeys})`
     const props = { title, folders, fileKeysByFolders, filteredListChanged, visible, initExpanded }
-    return <WindowedSoundCollection { ...props } />
+    return <WindowedSoundCollection {...props} />
 }
 
 export const SoundBrowser = () => {

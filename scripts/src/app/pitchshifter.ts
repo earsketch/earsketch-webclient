@@ -17,27 +17,26 @@ interface Point {
 }
 
 const QFRAMES = 16
-let BUFFER_CACHE: { [key: string]: AudioBuffer } = {}
-const MAX_CACHE = 64  // increased from 16 since we now process by clips instead of tracks
+let BUFFER_CACHE: { [key: string]: AudioBuffer } = Object.create(null)
+const MAX_CACHE = 64 // increased from 16 since we now process by clips instead of tracks
 
 // Interpolate a list of automation points into an audio-rate array of semitones to shift by at each sample.
 const computeFrameEnvelope = (bendinfo: Point[], numFrames: number) => {
     let findex = 1
     const envelope = new Float32Array(numFrames)
     let deltaY, deltaX
-    for(let f = 0; f < numFrames; f++) {
+    for (let f = 0; f < numFrames; f++) {
         if ((findex < bendinfo.length) && (f > bendinfo[findex].sampletime)) {
             findex++
         }
 
         if (findex === bendinfo.length) {
-            envelope[f] = bendinfo[bendinfo.length-1].semitone
+            envelope[f] = bendinfo[bendinfo.length - 1].semitone
         } else {
-            deltaY = bendinfo[findex].semitone - bendinfo[findex-1].semitone
-            deltaX = bendinfo[findex].sampletime - bendinfo[findex-1].sampletime
-            envelope[f] = bendinfo[findex-1].semitone + deltaY * (f - bendinfo[findex-1].sampletime)/deltaX
+            deltaY = bendinfo[findex].semitone - bendinfo[findex - 1].semitone
+            deltaX = bendinfo[findex].sampletime - bendinfo[findex - 1].sampletime
+            envelope[f] = bendinfo[findex - 1].semitone + deltaY * (f - bendinfo[findex - 1].sampletime) / deltaX
         }
-
     }
     return envelope
 }
@@ -53,7 +52,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
         points[points.length - 1].sampletime = points[points.length - 1].sampletime - QFRAMES
     }
 
-    if ((points.length == 0) && (startPoint.sampletime > 0)) {
+    if ((points.length === 0) && (startPoint.sampletime > 0)) {
         if (startPoint.sampletime > 0) {
             points.push({
                 sampletime: 0,
@@ -92,7 +91,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
         type: "end",
     } as Point
 
-    if (endPoint.sampletime == 0) {
+    if (endPoint.sampletime === 0) {
         endPoint.sampletime = -1
         endPoint.semitone = startPoint.semitone
     }
@@ -115,7 +114,7 @@ const getEnvelopeForTrack = (track: Track, tempo: number) => {
 // Pitchshift an audio buffer according to the points in bendinfo.
 const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
     esconsole("PitchBend bendinfo from " + JSON.stringify(bendinfo), ["debug", "pitchshift"])
-    const bypass = (bendinfo.length == 1) && (bendinfo[0].semitone == 0)
+    const bypass = (bendinfo.length === 1) && (bendinfo[0].semitone === 0)
     if (bypass) {
         esconsole("Bypassing pitchshift", ["debug", "pitchshift"])
         // TODO: Is this copy necessary?
@@ -132,7 +131,7 @@ const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
 
 const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) => {
     const clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / dsp.HOP_SIZE)
-    const clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end-clip.start), tempo) * 44100 / dsp.HOP_SIZE)
+    const clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end - clip.start), tempo) * 44100 / dsp.HOP_SIZE)
     const clipLenInSamps = clipEndInSamps - clipStartInSamps
 
     // clone the env-point-object array
@@ -141,14 +140,14 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         .filter(point => point.type !== "add")
 
     // TODO: What is the point of this `if` and the `for` loop after?
-    if (env[env.length-2].sampletime === env[env.length-1].sampletime) {
-        env[env.length-2].sampletime = env[env.length-3].sampletime
-        env[env.length-2].semitone = env[env.length-3].semitone
+    if (env[env.length - 2].sampletime === env[env.length - 1].sampletime) {
+        env[env.length - 2].sampletime = env[env.length - 3].sampletime
+        env[env.length - 2].semitone = env[env.length - 3].semitone
     }
 
     for (let i = 1; i < env.length; i++) {
-        if (env[i].sampletime <= env[i-1].sampletime) {
-            env[i].sampletime = env[i-1].sampletime + 1
+        if (env[i].sampletime <= env[i - 1].sampletime) {
+            env[i].sampletime = env[i - 1].sampletime + 1
         }
     }
 
@@ -161,11 +160,11 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         const point = pointsOrNullWithinClip[i]
         if (!point) continue
         if (point.sampletime !== clipStartInSamps) {
-            if (i % 2 === 1) {  // TODO: what is the point of this condition?
-                pointsOrNullWithinClip[i-1] = {
+            if (i % 2 === 1) { // TODO: what is the point of this condition?
+                pointsOrNullWithinClip[i - 1] = {
                     sampletime: clipStartInSamps,
-                    semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipStartInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
-                    type: "start"
+                    semitone: env[i - 1].semitone + (env[i].semitone - env[i - 1].semitone) * (clipStartInSamps - env[i - 1].sampletime) / (env[i].sampletime - env[i - 1].sampletime),
+                    type: "start",
                 }
             }
         }
@@ -177,10 +176,10 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         const point = pointsOrNullWithinClip[i]
         if (point) continue
         if (i % 2 === 1) {
-            pointsOrNullWithinClip[i] = {  // TODO: what is the point of this condition?
+            pointsOrNullWithinClip[i] = { // TODO: what is the point of this condition?
                 sampletime: clipEndInSamps,
-                semitone: env[i-1].semitone + (env[i].semitone-env[i-1].semitone) * (clipEndInSamps-env[i-1].sampletime) / (env[i].sampletime-env[i-1].sampletime),
-                type: "end"
+                semitone: env[i - 1].semitone + (env[i].semitone - env[i - 1].semitone) * (clipEndInSamps - env[i - 1].sampletime) / (env[i].sampletime - env[i - 1].sampletime),
+                type: "end",
             }
         }
         break
@@ -197,25 +196,25 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         clipPoints.unshift({
             sampletime: 0,
             semitone: clipPoints[0].semitone,
-            type: "start"
+            type: "start",
         })
         clipPoints.unshift({
-            sampletime: clipPoints[0].sampletime-1,
+            sampletime: clipPoints[0].sampletime - 1,
             semitone: clipPoints[0].semitone,
-            type: "end"
+            type: "end",
         })
     }
 
-    if (clipPoints.length > 0 && clipPoints[clipPoints.length-1].sampletime < clipLenInSamps) {
+    if (clipPoints.length > 0 && clipPoints[clipPoints.length - 1].sampletime < clipLenInSamps) {
         clipPoints.push({
-            sampletime: clipPoints[clipPoints.length-1].sampletime+1,
-            semitone: clipPoints[clipPoints.length-1].semitone,
-            type: "start"
+            sampletime: clipPoints[clipPoints.length - 1].sampletime + 1,
+            semitone: clipPoints[clipPoints.length - 1].semitone,
+            type: "start",
         })
         clipPoints.push({
             sampletime: clipLenInSamps,
-            semitone: clipPoints[clipPoints.length-1].semitone,
-            type: "end"
+            semitone: clipPoints[clipPoints.length - 1].semitone,
+            type: "end",
         })
     }
 
@@ -225,27 +224,27 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
         for (let i = 0; i < env.length; i += 2) {
             if (i === 0 && clipEndInSamps < env[i].sampletime) {
                 startSemitone = endSemitone = env[i].semitone
-            } else if (clipStartInSamps > env[i].sampletime && clipEndInSamps < env[i+1].sampletime) {
+            } else if (clipStartInSamps > env[i].sampletime && clipEndInSamps < env[i + 1].sampletime) {
                 // linear interpolation
-                startSemitone = (env[i+1].semitone - env[i].semitone) * (clipStartInSamps - env[i].sampletime) / (env[i+1].sampletime - env[i].sampletime) + env[i].semitone
-                endSemitone = (env[i+1].semitone - env[i].semitone) * (clipEndInSamps - env[i].sampletime) / (env[i+1].sampletime - env[i].sampletime) + env[i].semitone
-            } else if (i === env.length-2 && clipStartInSamps > env[i+1].sampletime) {
-                startSemitone = endSemitone = env[i+1].semitone
+                startSemitone = (env[i + 1].semitone - env[i].semitone) * (clipStartInSamps - env[i].sampletime) / (env[i + 1].sampletime - env[i].sampletime) + env[i].semitone
+                endSemitone = (env[i + 1].semitone - env[i].semitone) * (clipEndInSamps - env[i].sampletime) / (env[i + 1].sampletime - env[i].sampletime) + env[i].semitone
+            } else if (i === env.length - 2 && clipStartInSamps > env[i + 1].sampletime) {
+                startSemitone = endSemitone = env[i + 1].semitone
             }
         }
         clipPoints.push({
             sampletime: 0,
             semitone: startSemitone!,
-            type: "start"
+            type: "start",
         })
         clipPoints.push({
             sampletime: clipLenInSamps,
             semitone: endSemitone!,
-            type: "end"
+            type: "end",
         })
     }
 
-    if (clipPoints[clipPoints.length-1].sampletime === clipPoints[clipPoints.length-2].sampletime) {
+    if (clipPoints[clipPoints.length - 1].sampletime === clipPoints[clipPoints.length - 2].sampletime) {
         clipPoints.length -= 2
     }
 
@@ -254,7 +253,7 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
 
 // TODO: Is there any reason for this to be async? It doesn't actually do anything async inside, and it's CPU-bound rather than IO-bound.
 export async function pitchshiftClips(track: Track, tempo: number) {
-    if (track.clips.length == 0) {
+    if (track.clips.length === 0) {
         throw new RangeError("Cannot pitchshift an empty track")
     }
 
@@ -262,7 +261,7 @@ export async function pitchshiftClips(track: Track, tempo: number) {
     const trackEnvelope = getEnvelopeForTrack(track, tempo)
 
     if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
-        BUFFER_CACHE = {}
+        BUFFER_CACHE = Object.create(null)
     }
 
     for (const clip of track.clips) {
@@ -270,10 +269,10 @@ export async function pitchshiftClips(track: Track, tempo: number) {
         const bendinfo = getEnvelopeForClip(clip, tempo, trackEnvelope)
         const hashKey = JSON.stringify({
             clip: [clip.filekey, clip.start, clip.end],
-            bendinfo: bendinfo
+            bendinfo: bendinfo,
         })
 
-        if (BUFFER_CACHE.hasOwnProperty(hashKey)) {
+        if (hashKey in BUFFER_CACHE) {
             esconsole("Using Cache ", ["debug", "pitchshift"])
             shiftedBuffer = BUFFER_CACHE[hashKey]
         } else {
@@ -289,10 +288,10 @@ export async function pitchshiftClips(track: Track, tempo: number) {
             BUFFER_CACHE[hashKey] = shiftedBuffer
         }
 
-        clip.pitchshift =  {
+        clip.pitchshift = {
             audio: shiftedBuffer,
             start: clip.start,
-            end: clip.end
+            end: clip.end,
         }
     }
 

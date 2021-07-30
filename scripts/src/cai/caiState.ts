@@ -1,62 +1,62 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import store, { RootState, ThunkAPI } from '../reducers'
-import * as layout from '../ide/layoutState'
-import * as curriculum from '../browser/curriculumState'
-import * as editor from '../ide/Editor'
-import * as userProject from '../app/userProject'
-import * as analysis from './analysis'
-import * as codeSuggestion from './codeSuggestion'
-import * as dialogue from './dialogue'
-import * as studentPreferences from './studentPreferences'
-import * as studentHistory from './studentHistory'
-import { getUserFunctionReturns, getAllVariables } from './complexityCalculator'
-import { analyzePython } from './complexityCalculatorPY'
-import { analyzeJavascript } from './complexityCalculatorJS'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
+import store, { RootState, ThunkAPI } from "../reducers"
+import * as layout from "../ide/layoutState"
+import * as curriculum from "../browser/curriculumState"
+import * as editor from "../ide/Editor"
+import * as userProject from "../app/userProject"
+import * as analysis from "./analysis"
+import * as codeSuggestion from "./codeSuggestion"
+import * as dialogue from "./dialogue"
+import * as studentPreferences from "./studentPreferences"
+import * as studentHistory from "./studentHistory"
+import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
+import { analyzePython } from "./complexityCalculatorPY"
+import { analyzeJavascript } from "./complexityCalculatorJS"
 
 interface caiState {
     activeProject: string
-    messageList: { [key:string]: CAIMessage[] }
-    inputOptions: {label: string; value: string}[]
-    errorOptions: {label: string; value: string}[]
+    messageList: { [key: string]: CAIMessage[] }
+    inputOptions: { label: string; value: string }[]
+    errorOptions: { label: string; value: string }[]
     dropupLabel: string
 }
 
 const caiSlice = createSlice({
-    name: 'cai',
+    name: "cai",
     initialState: {
         activeProject: "",
-        messageList: {"": []},
+        messageList: { "": [] },
         inputOptions: [],
         errorOptions: [],
         dropupLabel: "",
     } as caiState,
     reducers: {
-        setActiveProject(state, {payload}) {
+        setActiveProject(state, { payload }) {
             state.activeProject = payload
         },
-        setInputOptions(state, {payload}) {
+        setInputOptions(state, { payload }) {
             state.inputOptions = payload
         },
         setDefaultInputOptions(state) {
             if (state.inputOptions.length === 0 && !dialogue.isDone()) {
                 state.inputOptions = [
-                    { label: "what do you think we should do next?", value: "suggest" }, 
-                    { label: "do you want to come up with some sound ideas?", value: "sound_select" }, 
-                    { label: "i think we're close to done", value: 'wrapup' }, 
-                    { label: "i have some ideas about our project", value: "properties"}
+                    { label: "what do you think we should do next?", value: "suggest" },
+                    { label: "do you want to come up with some sound ideas?", value: "sound_select" },
+                    { label: "i think we're close to done", value: "wrapup" },
+                    { label: "i have some ideas about our project", value: "properties" },
                 ]
             }
         },
-        setErrorOptions(state, {payload}) {
+        setErrorOptions(state, { payload }) {
             state.errorOptions = payload
         },
-        setMessageList(state, {payload}) {
+        setMessageList(state, { payload }) {
             if (!state.messageList[state.activeProject]) {
                 state.messageList[state.activeProject] = []
             }
             state.messageList[state.activeProject] = payload
         },
-        addToMessageList(state, {payload}) {
+        addToMessageList(state, { payload }) {
             if (state.activeProject) {
                 state.messageList[state.activeProject].push(payload)
             }
@@ -64,19 +64,19 @@ const caiSlice = createSlice({
         clearMessageList(state) {
             state.messageList = {}
         },
-        setDropupLabel(state, {payload}) {
+        setDropupLabel(state, { payload }) {
             state.dropupLabel = payload
         },
         resetState(state) {
-            state = {
+            Object.assign(state, {
                 activeProject: "",
-                messageList: {"": []},
+                messageList: { "": [] },
                 inputOptions: [],
                 errorOptions: [],
                 dropupLabel: "",
-            } as caiState
-        }
-    }
+            })
+        },
+    },
 })
 
 export interface CAIButton {
@@ -100,22 +100,22 @@ function newCAIMessage() {
 }
 
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
-    'cai/introduceCAI',
-    (_, { getState, dispatch }) => {
+    "cai/introduceCAI",
+    (_, { dispatch }) => {
         // reinitialize recommendation dictionary
-        analysis.fillDict().then(function() {
-            const msgText = dialogue.generateOutput("Chat with CAI");
-            dialogue.studentInteract(false);
+        analysis.fillDict().then(() => {
+            const msgText = dialogue.generateOutput("Chat with CAI")
+            dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
             if (msgText !== "") {
-                const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
-                for (let msg in messages) {
+                const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
+                for (const msg in messages) {
                     const outputMessage = {
                         text: messages[msg][0],
                         keyword: messages[msg][1],
                         date: Date.now(),
-                        sender: "CAI"
+                        sender: "CAI",
                     } as CAIMessage
 
                     dispatch(addToMessageList(outputMessage))
@@ -125,30 +125,30 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
             }
         })
     }
-);
+)
 
 export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
-    'cai/sendCAIMessage',
+    "cai/sendCAIMessage",
     (input, { getState, dispatch }) => {
         dialogue.studentInteract()
-        if (input.label.trim().replace(/(\r\n|\n|\r)/gm, '') === '') {
+        if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
         }
         const message = {
-            text: [input.label,"","","",""], 
-            keyword: ["","","","",""], 
-            date: Date.now(), 
-            sender: userProject.getUsername()
+            text: [input.label, "", "", "", ""],
+            keyword: ["", "", "", "", ""],
+            date: Date.now(),
+            sender: userProject.getUsername(),
         } as CAIMessage
 
-        const text = editor.ace.getValue();
+        const text = editor.ace.getValue()
         const lang = getState().app.scriptLanguage
         codeSuggestion.generateResults(text, lang)
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList(message))
         let msgText = dialogue.generateOutput(input.value)
 
-        if (input.value === 'error') {
+        if (input.value === "error") {
             dispatch(setErrorOptions([]))
         }
         if (msgText.includes("[ERRORFIX")) {
@@ -161,31 +161,30 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         }
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText !== "") {
-            const messages = msgText.includes('|') ? msgText.split('|') : [msgText]
-            for (let msg in messages) {
+            const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
+            for (const msg in messages) {
                 if (messages[msg] !== "") {
                     const outputMessage = {
-                        text: messages[msg][0], 
-                        keyword: messages[msg][1], 
-                        date: Date.now(), 
-                        sender: "CAI"
+                        text: messages[msg][0],
+                        keyword: messages[msg][1],
+                        date: Date.now(),
+                        sender: "CAI",
                     } as CAIMessage
                     dispatch(addToMessageList(outputMessage))
                     dispatch(autoScrollCAI())
                     newCAIMessage()
                 }
             }
-        }            
+        }
         // With no options available to user, default to tree selection.
         dispatch(setDefaultInputOptions())
         dispatch(setDropupLabel(dialogue.getDropup()))
     }
-);
+)
 
 export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
-    'cai/caiSwapTab',
+    "cai/caiSwapTab",
     (activeProject, { getState, dispatch }) => {
-
         if (activeProject === "" || activeProject === null || activeProject === undefined) {
             dispatch(setActiveProject(""))
             dispatch(clearMessageList())
@@ -209,17 +208,17 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
         }
         dispatch(autoScrollCAI())
     }
-);
+)
 
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
-    'cai/compileCAI',
-    (data, { getState, dispatch }) => {
+    "cai/compileCAI",
+    (data, { dispatch }) => {
         if (dialogue.isDone()) {
             return
         }
 
-        //call cai analysis here
-        const result = data[0]
+        // call cai analysis here
+        // const result = data[0]
         const language = data[1]
         const code = data[2]
 
@@ -230,13 +229,13 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
         dispatch(setErrorOptions([]))
 
-        const output : any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
+        const output: any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
         if (output !== null && output !== "" && output[0][0] !== "") {
             const message = {
-                text: output[0], 
-                keyword: output[1], 
-                date: Date.now(), 
-                sender: "CAI"
+                text: output[0],
+                keyword: output[1],
+                date: Date.now(),
+                sender: "CAI",
             } as CAIMessage
             dispatch(addToMessageList(message))
             dispatch(setInputOptions(dialogue.createButtons()))
@@ -249,15 +248,15 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         dispatch(autoScrollCAI())
         newCAIMessage()
 
-        var t = Date.now()
+        const t = Date.now()
         studentPreferences.addCompileTS(t)
     }
 
-);
+)
 
 export const compileError = createAsyncThunk<void, any, ThunkAPI>(
-    'cai/compileError',
-    (data, { getState, dispatch }) => {
+    "cai/compileError",
+    (data, { dispatch }) => {
         const errorReturn = dialogue.handleError(data)
 
         if (dialogue.isDone()) {
@@ -273,21 +272,21 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
             dispatch(setErrorOptions([]))
         }
     }
-);
+)
 
 export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], ThunkAPI>(
-    'cai/openCurriculum',
-    ([message, location], { getState, dispatch }) => {
-        dispatch(curriculum.fetchContent({location: message.keyword[location][1].split('-')}))
+    "cai/openCurriculum",
+    ([message, location], { dispatch }) => {
+        dispatch(curriculum.fetchContent({ location: message.keyword[location][1].split("-") }))
         dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
     }
-);
+)
 
 export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
-    'cai/autoScrollCAI',
-    (_, { getState, dispatch }) => {
+    "cai/autoScrollCAI",
+    () => {
         // Auto scroll to the bottom (set on a timer to happen after message updates).
-        const caiBody = document.getElementById('cai-body')
+        const caiBody = document.getElementById("cai-body")
         setTimeout(() => {
             if (caiBody) {
                 caiBody.scrollTop = caiBody.scrollHeight
@@ -297,46 +296,46 @@ export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
 )
 
 export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
-    'cai/curriculumPage',
-    (location, { getState, dispatch }) => {
+    "cai/curriculumPage",
+    (location) => {
         dialogue.addCurriculumPageToHistory(location)
     }
-);
+)
 
 export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
-    'cai/checkForCodeUpdates',
-    (_, { getState, dispatch }) => {
+    "cai/checkForCodeUpdates",
+    () => {
         dialogue.checkForCodeUpdates(editor.ace.getValue())
     }
-);
+)
 
 export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
-    'cai/userOnPage',
-    (time: number, {getState, dispatch}) => {
-        studentPreferences.addOnPageStatus(1,time)
+    "cai/userOnPage",
+    (time: number) => {
+        studentPreferences.addOnPageStatus(1, time)
     }
-);
+)
 
 export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
-    'cai/userOffPage',
-    (time: number, {getState, dispatch}) => {
-        studentPreferences.addOnPageStatus(0,time)
+    "cai/userOffPage",
+    (time: number) => {
+        studentPreferences.addOnPageStatus(0, time)
     }
-);
+)
 
 export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
-    'cai/keyStroke',
-    ([action, content, time], {getState, dispatch}) => {
+    "cai/keyStroke",
+    ([action, content, time]) => {
         studentPreferences.addKeystroke(action, content, time)
     }
-);
+)
 
 export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
-    'cai/mousePosition',
-    ([x,y], {getState, dispatch}) => {
-        studentPreferences.addMousePos({x,y})
+    "cai/mousePosition",
+    ([x, y]) => {
+        studentPreferences.addMousePos({ x, y })
     }
-);
+)
 
 export default caiSlice.reducer
 export const {
@@ -348,7 +347,7 @@ export const {
     addToMessageList,
     clearMessageList,
     setDropupLabel,
-    resetState
+    resetState,
 } = caiSlice.actions
 
 export const selectActiveProject = (state: RootState) => state.cai.activeProject

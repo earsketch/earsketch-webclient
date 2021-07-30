@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useEffect, useState, useRef } from "react"
+import { useSelector, useDispatch } from "react-redux"
 
-import * as appState from '../app/appState'
-import * as applyEffects from '../model/applyeffects'
-import { setReady } from '../bubble/bubbleState'
+import * as appState from "../app/appState"
+import * as applyEffects from "../model/applyeffects"
+import { setReady } from "../bubble/bubbleState"
 import { compileCode } from "../ide/IDE"
-import * as player from '../app/player'
-import esconsole from '../esconsole'
-import * as ESUtils from '../esutils'
-import store, { RootState } from '../reducers'
-import * as WaveformCache from '../app/waveformcache'
+import * as player from "../app/player"
+import esconsole from "../esconsole"
+import * as ESUtils from "../esutils"
+import store, { RootState } from "../reducers"
+import * as WaveformCache from "../app/waveformcache"
 
-import * as daw from './dawState'
+import * as daw from "./dawState"
 import { useTranslation } from "react-i18next"
 
 // Width of track control box
@@ -20,7 +20,7 @@ const X_OFFSET = 100
 // Hack because local state gets cleared when the DAW is replaced by a loading screen...
 let _embedCompiled = false
 
-const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void}) => {
+const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
     const hideDAW = useSelector(appState.selectHideDAW)
     const playLength = useSelector(daw.selectPlayLength)
@@ -64,7 +64,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         if (playPosition >= playLength) {
             setPlayPosition(loop.selection ? loop.start : 1)
         }
-    
+
         player.callbacks.onStartedCallback = playbackStartedCallback
         player.callbacks.onFinishedCallback = playbackEndedCallback
         player.play(playPosition, playLength)
@@ -84,14 +84,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const toggleLoop = () => {
-        const newLoop = {...loop, on: !loop.on, selection: false}
+        const newLoop = { ...loop, on: !loop.on, selection: false }
         dispatch(daw.setLoop(newLoop))
         player.setLoop(newLoop)
     }
 
     const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(appState.selectEmbeddedShareID)}`
 
-    const [volume, setVolume] = useState(0)  // in dB
+    const [volume, setVolume] = useState(0) // in dB
     const [volumeMuted, setVolumeMuted] = useState(false)
     const minVolume = -20
 
@@ -102,7 +102,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const changeVolume = (value: number) => {
         setVolume(value)
-        if (value == minVolume) {
+        if (value === minVolume) {
             mute(true)
         } else {
             setVolumeMuted(false)
@@ -154,18 +154,18 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
-                {titleKey
-                && <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
+                {titleKey &&
+                <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
             </span>
         </div>
         {embedMode && <div>
-            <a target="_blank" href={shareScriptLink}> Click here to view in EarSketch </a>
+            <a target="_blank" href={shareScriptLink} rel="noreferrer"> Click here to view in EarSketch </a>
         </div>}
         {/* Transport Buttons */}
         <div className="daw-transport-container">
             {/* Beginning */}
             <span className="daw-transport-button">
-                <button type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t('daw.tooltip.reset')} onClick={reset}>
+                <button type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
                     <span className="icon icon-first"></span>
                 </button>
             </span>
@@ -173,14 +173,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t('daw.tooltip.play')} onClick={play}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={play}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t('daw.tooltip.pause')} onClick={pause}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={pause}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -188,23 +188,21 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t('daw.tooltip.loopProject')} onClick={toggleLoop}>
+                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
 
-            {/* Follow through 
-                NOTE: In Angular implementation, this was conditional on `horzOverflow`, but it was 'always on for now'.
-                Hence, I have simply made it unconditional here. */}
+            {/* Autoscroll */}
             <span className="daw-transport-button follow-icon">
-                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t('daw.tooltip.autoScroll')} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
                 </button>
             </span>
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t('daw.tooltip.toggleMetronome')} data-placement="bottom" onClick={toggleMetronome}>
+                <button id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -212,7 +210,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
-                    <button id="muteButton" className="btn dark:text-white hover:opacity-70" style={{width: "40px"}} title={t('daw.tooltip.toggleVolume')} data-toggle="tooltip" data-placement="bottom">
+                    <button id="muteButton" className="btn dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
                         <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
                     </button>
                 </span>
@@ -233,14 +231,14 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     const showEffects = useSelector(daw.selectShowEffects)
     const { t } = useTranslation()
 
-    return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
-        <div className="dawTrackContainer" style={{height: trackHeight + 'px'}}>
-            <div className="dawTrackCtrl" style={{left: xScroll + 'px'}}>
+    return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
+        <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
+            <div className="dawTrackCtrl" style={{ left: xScroll + "px" }}>
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
-                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t('daw.tooltip.solo')}>{t('daw.abbreviation.solo')}</button>
-                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t('daw.tooltip.mute')}>{t('daw.abbreviation.mute')}</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
+                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
@@ -248,36 +246,35 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) => 
-        <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
-            <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
-                <div className="dawTrackName"></div>
-                <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
-                <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? ' active' : '')} onClick={() => toggleBypass(key)} disabled={mute}>
-                    {t('daw.bypass')}
-                </button>
-            </div>
-            <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
-        </div>)}
+        Object.entries(track.effects).map(([key, effect], index) =>
+            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                    <div className="dawTrackName"></div>
+                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                    <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
+                        {t("daw.bypass")}
+                    </button>
+                </div>
+                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
+            </div>)}
     </div>
 }
 
-
 const drawWaveform = (element: HTMLElement, waveform: number[], width: number, height: number) => {
-    const cvs = d3.select(element).select('canvas')
-        .attr('width', width)
-        .attr('height', height)
+    const cvs = d3.select(element).select("canvas")
+        .attr("width", width)
+        .attr("height", height)
         .node() as HTMLCanvasElement
 
     const interval = width / waveform.length
     const zero = height / 2
 
-    const ctx = cvs.getContext('2d')!
-    ctx.strokeStyle = '#427EB0'
+    const ctx = cvs.getContext("2d")!
+    ctx.strokeStyle = "#427EB0"
     ctx.fillStyle = "#181818"
     ctx.lineWidth = interval > 1 ? interval * 0.9 : interval // give some space between bins
     ctx.beginPath()
-    for (var i = 0; i < waveform.length; i++) {
+    for (let i = 0; i < waveform.length; i++) {
         const pos = i * interval + 0.5 // pixel offset needed to avoid canvas blurriness
         // TODO: include this scaling in the preprocessing if possible
         const magScaled = waveform[i] * height / 2
@@ -303,9 +300,9 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
         }
     }, [clip, xScale, trackHeight])
 
-    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? ' loop' : ''}`} style={{background: color, width: width + 'px', left: offset + 'px'}}>
+    return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`} style={{ background: color, width: width + "px", left: offset + "px" }}>
         <div className="clipWrapper">
-            <div style={{width: width + 'px'}} className="clipName prevent-selection">{clip.filekey}</div>
+            <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
             <canvas></canvas>
         </div>
     </div>
@@ -320,16 +317,16 @@ const Effect = ({ name, color, effect, bypass, mute }:
 
     // helper function to build a d3 plot of the effect
     const drawEffectWaveform = () => {
-        type Point = {x: number, y: number}
+        type Point = { x: number, y: number }
         const points: Point[] = []
 
         effect.forEach(range => {
-            points.push({x: range.startMeasure, y: range.startValue})
-            points.push({x: range.endMeasure, y: range.endValue})
+            points.push({ x: range.startMeasure, y: range.startValue })
+            points.push({ x: range.endMeasure, y: range.endValue })
         })
 
         // draw a line to the end
-        points.push({x: playLength + 1, y: points[points.length - 1].y})
+        points.push({ x: playLength + 1, y: points[points.length - 1].y })
 
         const defaults = applyEffects.EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
 
@@ -349,17 +346,17 @@ const Effect = ({ name, color, effect, bypass, mute }:
     useEffect(() => {
         // update SVG waveform
         d3.select(element.current)
-          .select("svg.effectSvg")
-          .select("path")
-          .attr("d", drawEffectWaveform())
+            .select("svg.effectSvg")
+            .select("path")
+            .attr("d", drawEffectWaveform())
     })
 
     useEffect(() => {
         // update SVG waveform
         d3.select(element.current)
-          .select("svg.effectSvg")
-          .select("path")
-          .attr("d", drawEffectWaveform())
+            .select("svg.effectSvg")
+            .select("path")
+            .attr("d", drawEffectWaveform())
 
         const parameter = applyEffects.EFFECT_MAP[effect[0].name].DEFAULTS[effect[0].parameter]
 
@@ -369,20 +366,20 @@ const Effect = ({ name, color, effect, bypass, mute }:
 
         const axis = d3.svg.axis()
             .scale(yScale)
-            .orient('right')
+            .orient("right")
             .tickValues([parameter.max, parameter.min])
             .tickFormat(d3.format("1.1f"))
 
-        d3.select(element.current).select('svg.effectAxis g')
-          .call(axis)
-          .select('text').attr('transform', 'translate(0,10)')
+        d3.select(element.current).select("svg.effectAxis g")
+            .call(axis)
+            .select("text").attr("transform", "translate(0,10)")
 
         // move the bottom label with this atrocious mess
-        d3.select(d3.select(element.current).select('svg.effectAxis g')
-          .selectAll('text')[0][1]).attr('transform', 'translate(0,-10)')
+        d3.select(d3.select(element.current).select("svg.effectAxis g")
+            .selectAll("text")[0][1]).attr("transform", "translate(0,-10)")
     })
 
-    return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? ' bypassed' : '')} style={{background: color, width: xScale(playLength) + 'px'}}>
+    return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
         <div className="clipName">{name}</div>
         <svg className="effectAxis">
             <g></g>
@@ -404,44 +401,44 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
     const hideMixTrackLabel = trackWidth < 950
     const { t } = useTranslation()
 
-    return <div style={{width: X_OFFSET + xScale(playLength) + 'px'}}>
-        <div className="dawTrackContainer" style={{height: mixTrackHeight + 'px'}}>
-            <div className="dawTrackCtrl" style={{left: xScroll + 'px'}}>
+    return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
+        <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
+            <div className="dawTrackCtrl" style={{ left: xScroll + "px" }}>
                 <div className="mixTrackFiller">{track.label}</div>
             </div>
             <div className="daw-track">
-                <div className="mixTrackFiller" style={{background: color}}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
+                <div className="mixTrackFiller" style={{ background: color }}>{!hideMixTrackLabel && <span>MIX TRACK</span>}</div>
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) => 
-        <div key={key} id="dawTrackEffectContainer" style={{height: trackHeight + 'px'}}>
-            <div className="dawEffectCtrl" style={{left: xScroll + 'px'}}>
-                <div className="dawTrackName"></div>
-                <div className="dawTrackEffectName">{t('daw.effect')} {index+1}</div>
-                <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
-                    {t('daw.bypass')}
-                </button>
-            </div>
-            <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
-        </div>)}
+        Object.entries(track.effects).map(([key, effect], index) =>
+            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                    <div className="dawTrackName"></div>
+                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                    <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
+                        {t("daw.bypass")}
+                    </button>
+                </div>
+                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
+            </div>)}
     </div>
 }
 
 const Cursor = ({ position }: { position: number }) => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
-    return pendingPosition === null ? <div className="daw-cursor" style={{left: position + 'px'}}></div> : null
+    return pendingPosition === null ? <div className="daw-cursor" style={{ left: position + "px" }}></div> : null
 }
 
 const Playhead = ({ playPosition }: { playPosition: number }) => {
     const xScale = useSelector(daw.selectXScale)
-    return <div className="daw-marker" style={{left: xScale(playPosition) + 'px'}}></div>
+    return <div className="daw-marker" style={{ left: xScale(playPosition) + "px" }}></div>
 }
 
 const SchedPlayhead = () => {
     const pendingPosition = useSelector(daw.selectPendingPosition)
     const xScale = useSelector(daw.selectXScale)
-    return pendingPosition === null ? null : <div className="daw-sched-marker" style={{left: xScale(pendingPosition)}}></div>
+    return pendingPosition === null ? null : <div className="daw-sched-marker" style={{ left: xScale(pendingPosition) }}></div>
 }
 
 const Measureline = () => {
@@ -470,21 +467,21 @@ const Measureline = () => {
                         return d
                     }
                 }
-                return ''
+                return ""
             })
 
         // append axis to timeline dom element
-        d3.select(element.current).select('svg.axis g')
+        d3.select(element.current).select("svg.axis g")
             .call(measureline)
             .selectAll("text")
             // move the first text element to fit inside the view
             .style("text-anchor", "start")
-            .attr('y', 2)
-            .attr('x', 3)
+            .attr("y", 2)
+            .attr("x", 3)
 
         if (intervals.tickDivision > 1) {
             let n = 1
-            d3.select(element.current).selectAll('svg .tick')
+            d3.select(element.current).selectAll("svg .tick")
                 .filter((d: any) => {
                     if (n === 1) {
                         n = intervals.tickDivision + d
@@ -497,26 +494,25 @@ const Measureline = () => {
                     }
                     return true
                 })
-                .select('line')
-                .attr('y1', 8)
-                .attr('y2', 15)
-
+                .select("line")
+                .attr("y1", 8)
+                .attr("y2", 15)
         } else {
-            d3.select(element.current).selectAll('svg .tick')
+            d3.select(element.current).selectAll("svg .tick")
                 .filter((d: number) => d % 1 !== 0)
-                .select('line')
-                .attr('y1', 8)
-                .attr('y2', 15)
+                .select("line")
+                .attr("y1", 8)
+                .attr("y2", 15)
 
-            d3.select(element.current).selectAll('svg .tick')
+            d3.select(element.current).selectAll("svg .tick")
                 .filter((d: number) => d % 1 === 0)
-                .select('line')
-                .attr('y1', 0)
-                .attr('y2', 15)
+                .select("line")
+                .attr("y1", 0)
+                .attr("y2", 15)
         }
     })
 
-    return <div ref={element} id="daw-measureline" className="relative w-full" style={{top: '-1px', minWidth: X_OFFSET + xScale(playLength + 1) + 'px'}}>
+    return <div ref={element} id="daw-measureline" className="relative w-full" style={{ top: "-1px", minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -541,16 +537,16 @@ const Timeline = () => {
             .tickFormat((d: any) => (d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, d))))
 
         // append axis to timeline dom element
-        d3.select(element.current).select('svg.axis g')
+        d3.select(element.current).select("svg.axis g")
             .call(timeline)
             .selectAll("text")
             // move the first text element to fit inside the view
             .style("text-anchor", "start")
-            .attr('y', 6)
-            .attr('x', 2)
+            .attr("y", 6)
+            .attr("x", 2)
     })
 
-    return <div ref={element} id="daw-timeline" className="relative w-full" style={{minWidth: X_OFFSET + xScale(playLength + 1) + 'px'}}>
+    return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
         <svg className="axis">
             <g></g>
         </svg>
@@ -558,14 +554,14 @@ const Timeline = () => {
 }
 
 const rms = (array: Float32Array) => {
-    return Math.sqrt(array.map(v => v**2).reduce((a, b) => a + b) / array.length)
+    return Math.sqrt(array.map(v => v ** 2).reduce((a, b) => a + b) / array.length)
 }
 
 const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
-    esconsole('preparing a waveform to draw', 'daw')
+    esconsole("preparing a waveform to draw", "daw")
 
     // ignore the mix track (0) and metronome track (len-1)
-    for (var i = 1; i < tracks.length - 1; i++) {
+    for (let i = 1; i < tracks.length - 1; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
                 const waveform = clip.audio.getChannelData(0)
@@ -574,8 +570,8 @@ const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
                 const wfDurInMeasure = ESUtils.timeToMeasure(clip.audio.duration, tempo)
 
                 // clip start in samples
-                const sfStart = (clip.start-1) / wfDurInMeasure  * waveform.length
-                const sfEnd = (clip.end-1) / wfDurInMeasure  * waveform.length
+                const sfStart = (clip.start - 1) / wfDurInMeasure * waveform.length
+                const sfEnd = (clip.end - 1) / wfDurInMeasure * waveform.length
 
                 // suppress error when clips are overlapped
                 if (sfEnd <= sfStart) {
@@ -589,10 +585,10 @@ const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
                 const N = 30 // resolution; total samples to draw per measure
 
                 // downsample to N values using block-wise RMS
-                const outNumSamps = (clip.end-clip.start) * N
+                const outNumSamps = (clip.end - clip.start) * N
                 for (let i = 0; i < outNumSamps; i++) {
-                    const blStart = i/outNumSamps * subFrames.length
-                    const blEnd = (i+1)/outNumSamps * subFrames.length
+                    const blStart = i / outNumSamps * subFrames.length
+                    const blEnd = (i + 1) / outNumSamps * subFrames.length
                     out[i] = rms(subFrames.subarray(blStart, blEnd))
                 }
 
@@ -635,13 +631,13 @@ export function setDAWData(result: player.DAWData) {
     })
 
     const mix = tracks[0]
-    const metronome = tracks[tracks.length-1]
+    const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
         mix.visible = Object.keys(mix.effects).length > 0
         mix.mute = false
         // the mix track is special
-        mix.label = 'MIX'
+        mix.label = "MIX"
         mix.buttons = false
     }
 
@@ -732,13 +728,13 @@ export const DAW = () => {
         } else {
             effects = [effectKey, ...effects]
         }
-        const updated = {...bypass, [trackIndex]: effects}
+        const updated = { ...bypass, [trackIndex]: effects }
         dispatch(daw.setBypass(updated))
         player.setBypassedEffects(updated)
     }
 
     const toggleSoloMute = (trackIndex: number, kind: daw.SoloMute) => {
-        const updated = {...soloMute, [trackIndex]: soloMute[trackIndex] === kind ? undefined : kind}
+        const updated = { ...soloMute, [trackIndex]: soloMute[trackIndex] === kind ? undefined : kind }
         dispatch(daw.setSoloMute(updated))
         player.setMutedTracks(daw.getMuted(tracks, updated, metronome))
     }
@@ -770,7 +766,7 @@ export const DAW = () => {
         } else {
             setDragStart(measure)
             // keep track of what state to revert to if looping is canceled
-            setLoop({...loop, reset: loop.on, start: measure, end: measure})
+            setLoop({ ...loop, reset: loop.on, start: measure, end: measure })
         }
     }
 
@@ -789,12 +785,12 @@ export const DAW = () => {
 
         setDragStart(null)
 
-        let newLoop;
+        let newLoop
         if (loop.start === loop.end) {
             // turn looping off if the loop range is 0 (i.e., no drag)
-            newLoop = {...loop, selection: false, on: loop.reset}
+            newLoop = { ...loop, selection: false, on: loop.reset }
         } else {
-            newLoop = {...loop, selection: true, on: true}
+            newLoop = { ...loop, selection: true, on: true }
             // NOTE: In the Angular implementation, dawController implicitly relied on player sharing a reference to the mutable `loop` object.
             // Hence, there was only one call to player.setLoop(), which occurred here.
         }
@@ -833,11 +829,11 @@ export const DAW = () => {
         }
 
         if (measure > dragStart) {
-            setLoop({...loop, selection: true, start: dragStart, end: measure})
+            setLoop({ ...loop, selection: true, start: dragStart, end: measure })
         } else if (measure < dragStart) {
-            setLoop({...loop, selection: true, start: measure, end: dragStart})
+            setLoop({ ...loop, selection: true, start: measure, end: dragStart })
         } else {
-            setLoop({...loop, selection: false, start: measure, end: measure})
+            setLoop({ ...loop, selection: false, start: measure, end: measure })
         }
     }
 
@@ -855,29 +851,29 @@ export const DAW = () => {
             if (event.shiftKey) {
                 zoomY(-Math.sign(event.deltaY))
             } else {
-                zoomX(-Math.sign(event.deltaY)*5)
+                zoomX(-Math.sign(event.deltaY) * 5)
             }
         } else if (yScrollEl.current) {
             // Would prefer to forward the wheel event to the correct element, by experiments with this (dispatchEvent) proved fruitless.
             // (The element received the event but did not scroll.)
-            yScrollEl.current.scrollBy({top: Math.sign(event.deltaY) * 100, behavior: 'smooth'})
+            yScrollEl.current.scrollBy({ top: Math.sign(event.deltaY) * 100, behavior: "smooth" })
         }
     }
 
     // This is regrettably necessary for reasons describe here: https://github.com/facebook/react/issues/14856
     useEffect(() => {
         if (!el.current) return
-        el.current.addEventListener('wheel', onWheel)
-        return () => { if (el.current) el.current.removeEventListener('wheel', onWheel) }
+        el.current.addEventListener("wheel", onWheel)
+        return () => { if (el.current) el.current.removeEventListener("wheel", onWheel) }
     }, [onWheel])
 
     // Keep triggering an action while the mouse button is held.
-    const repeatClick = (action: () => void, interval=125) => {
-        let timer = useRef(0)
+    const repeatClick = (action: () => void, interval = 125) => {
+        const timer = useRef(0)
         const up = (event: MouseEvent) => {
             if (event.button !== 0) return
             clearInterval(timer.current)
-            document.removeEventListener('mouseup', up)
+            document.removeEventListener("mouseup", up)
         }
         const down = (event: React.MouseEvent<HTMLButtonElement>) => {
             // Only respond to left-click. (Right-click does weird things in some browsers, maybe because of the context menu.)
@@ -887,13 +883,13 @@ export const DAW = () => {
             action()
             // NOTE: We bind this to the document (instead of the same element `down` gets bound to)
             //   in case the user releases the mouse somewhere else.
-            document.addEventListener('mouseup', up)
+            document.addEventListener("mouseup", up)
         }
         return down
     }
 
     // A bit hacky; this allows the interval to continue working after a re-render.
-    const zoomXRef = useRef(zoomX), zoomYRef = useRef(zoomY)
+    const zoomXRef = useRef(zoomX); const zoomYRef = useRef(zoomY)
     // Update on re-render:
     zoomXRef.current = zoomX
     zoomYRef.current = zoomY
@@ -916,7 +912,7 @@ export const DAW = () => {
         setPlayPosition(position)
 
         if (!(el.current && xScrollEl.current)) return
-    
+
         const xScroll = el.current.scrollLeft
         const viewMin = xScale.invert(xScroll)
         const viewMax = xScale.invert(xScroll + el.current.clientWidth - X_OFFSET)
@@ -930,8 +926,8 @@ export const DAW = () => {
         }
 
         // Follow playback continuously if autoscroll is enabled
-        if (autoScroll && (xScale(position) - xScroll) > (el.current.clientWidth-115)/2) {
-            const fracX = (xScale(position) - (el.current.clientWidth-115)/2) / (el.current.scrollWidth - el.current.clientWidth)
+        if (autoScroll && (xScale(position) - xScroll) > (el.current.clientWidth - 115) / 2) {
+            const fracX = (xScale(position) - (el.current.clientWidth - 115) / 2) / (el.current.scrollWidth - el.current.clientWidth)
             xScrollEl.current.scrollLeft = fracX * (xScrollEl.current.scrollWidth - xScrollEl.current.clientWidth)
         }
     }
@@ -942,7 +938,7 @@ export const DAW = () => {
         if (!el.current) return
         if (yScrollEl.current) {
             const fracY = yScrollEl.current.scrollTop / (yScrollEl.current.scrollHeight - yScrollEl.current.clientHeight)
-            el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)                        
+            el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
             setYScroll(el.current.scrollTop)
         }
         if (xScrollEl.current) {
@@ -961,84 +957,85 @@ export const DAW = () => {
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
         {hideEditor &&
-        <div style={{display: "block"}} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
+        <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {!hideDAW &&
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
-                    title={t('daw.tooltip.toggleEffects')} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span className="mr-1">{t('daw.effect', { count: 0 }).toLocaleUpperCase()}</span>
+                title={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                <span className="mr-1">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
 
             <div className="flex-grow flex h-full relative">
                 {/* DAW Container */}
                 <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
-                     onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
+                    onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     <div className="relative">
-                        <div id="daw-clickable" style={{position: 'relative', top: yScroll + 'px'}}>
+                        <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>
                             <Timeline />
                             <Measureline />
                         </div>
 
-                        <div className="daw-track-group-container" style={{marginBottom: '14px'}}>
+                        <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>
                             {tracks.map((track, index) => {
                                 if (track.visible) {
                                     if (index === 0) {
                                         return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
-                                                         bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
+                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
                                     } else if (index < tracks.length - 1) {
                                         return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
-                                                      mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
-                                                      bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
+                                            mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
+                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
                                     }
                                 }
+                                return null
                             })}
                         </div>
 
-                        <div className="absolute left-0 h-full" style={{top: 0}}>
+                        <div className="absolute left-0 h-full" style={{ top: 0 }}>
                             <Playhead playPosition={playPosition} />
                             <SchedPlayhead />
                             <Cursor position={cursorPosition} />
-                            {(dragStart !== null || loop.selection && loop.on) && loop.end != loop.start &&
-                            <div className="daw-highlight" style={{width: xScale(Math.abs(loop.end - loop.start) + 1) + 'px', 'left': xScale(Math.min(loop.start, loop.end))}} />}
+                            {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
+                            <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
                         </div>
                     </div>
                 </div>
 
-                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{boxShadow: "0 -6px 3px -6px black"}}>
+                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
                     <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
                     <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
 
-                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black"}}>
+                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
                     <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutY}  className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomOutY} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
-                     style={{width: "15px", top: "32px", right: "2px", bottom: "40px"}}
-                     onScroll={e => {
-                         if (!el.current) return
-                         const target = e.target as Element
-                         const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
-                         el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)                        
-                         setYScroll(el.current.scrollTop)
+                    style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
+                    onScroll={e => {
+                        if (!el.current) return
+                        const target = e.target as Element
+                        const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
+                        el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
+                        setYScroll(el.current.scrollTop)
                     }}>
-                    <div style={{width: "1px", height: `max(${totalTrackHeight}px, 100.5%)`}}></div>
+                    <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
                 </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{height: "15px", left: "100px", right: "45px", bottom: "2px"}}
-                     onScroll={e => {
-                         if (!el.current) return
-                         const target = e.target as Element
-                         const fracX = target.scrollLeft / (target.scrollWidth - target.clientWidth)
-                         el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
-                         setXScroll(el.current.scrollLeft)
+                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
+                    onScroll={e => {
+                        if (!el.current) return
+                        const target = e.target as Element
+                        const fracX = target.scrollLeft / (target.scrollWidth - target.clientWidth)
+                        el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
+                        setXScroll(el.current.scrollLeft)
                     }}>
-                    <div style={{width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px"}}></div>
+                    <div style={{ width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px" }}></div>
                 </div>
             </div>
         </div>}

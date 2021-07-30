@@ -1,10 +1,13 @@
-﻿// Student History module for CAI (Co-creative Artificial Intelligence) Project.
-import { analyzePython } from "./complexityCalculatorPY";
-import { analyzeJavascript } from "./complexityCalculatorJS";
-import store from "../reducers";
-import * as scriptsState from "../browser/scriptsState";
-import * as caiStudent from "./student";
-import * as caiStudentPreferenceModule from "./studentPreferences";
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
+// Student History module for CAI (Co-creative Artificial Intelligence) Project.
+import { analyzePython } from "./complexityCalculatorPY"
+import { analyzeJavascript } from "./complexityCalculatorJS"
+import store from "../reducers"
+import * as scriptsState from "../browser/scriptsState"
+import * as caiStudent from "./student"
+import * as caiStudentPreferenceModule from "./studentPreferences"
 
 let aggregateScore: { [key: string]: number } = {}
 let curriculumPagesViewed: string[] = []
@@ -12,10 +15,10 @@ let codeRequests = 0
 let soundRequests = 0
 let errorRequests = 0
 
-const events : { [key: string]: () => void } = { 
+const events: { [key: string]: () => void } = {
     codeRequest: incrementCodeRequest,
-    soundRequest: incrementSoundRequest, 
-    errorRequest: incrementErrorRequest 
+    soundRequest: incrementSoundRequest,
+    errorRequest: incrementErrorRequest,
 }
 
 export function trackEvent(eventName: string) {
@@ -41,12 +44,12 @@ function incrementErrorRequest() {
 
 export function calculateAggregateCodeScore() {
     if (aggregateScore == null) {
-        let savedScripts : string[] = []
-        let scriptTypes : string[] = []
-        let savedNames : string[] = []
+        const savedScripts: string[] = []
+        const scriptTypes: string[] = []
+        const savedNames: string[] = []
         const scripts = scriptsState.selectRegularScripts(store.getState())
         const keys = Object.keys(scripts)
-        //if needed, initialize aggregate score variable
+        // if needed, initialize aggregate score variable
         if (aggregateScore == null) {
             aggregateScore = {
                 userFunc: 0,
@@ -63,7 +66,7 @@ export function calculateAggregateCodeScore() {
                 boolOps: 0,
                 comparisons: 0,
                 mathematicalOperators: 0,
-                consoleInput: 0
+                consoleInput: 0,
             }
         }
         for (let i = 0; i < keys.length; i++) {
@@ -86,23 +89,22 @@ export function calculateAggregateCodeScore() {
                 } else {
                     output = Object.assign({}, analyzeJavascript(sc))
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 output = null
             }
             if (output != null) {
-                if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
-                    output["userFunc"] = 4
-                } else if (output["userFunc"] === "ReturnAndArgs") {
-                    output["userFunc"] = 5
+                if (output.userFunc === "Args" || output.userFunc === "Returns") {
+                    output.userFunc = 4
+                } else if (output.userFunc === "ReturnAndArgs") {
+                    output.userFunc = 5
                 }
 
-                if (output["userFunc"] === "Args" || output["userFunc"] === "Returns") {
-                    output["userFunc"] = 4
-                } else if (output["userFunc"] === "ReturnAndArgs") {
-                    output["userFunc"] = 5
+                if (output.userFunc === "Args" || output.userFunc === "Returns") {
+                    output.userFunc = 4
+                } else if (output.userFunc === "ReturnAndArgs") {
+                    output.userFunc = 5
                 }
-                for (let j in aggregateScore) {
+                for (const j in aggregateScore) {
                     if (output[j] > aggregateScore[j]) {
                         aggregateScore[j] = output[j]
                     }
@@ -117,45 +119,45 @@ export function addScoreToAggregate(script: string, scriptType: string) {
         calculateAggregateCodeScore()
     }
     let newOutput
-    //analyze new code
+    // analyze new code
     if (scriptType == "python") {
         newOutput = Object.assign({}, analyzePython(script))
     } else {
         newOutput = Object.assign({}, analyzeJavascript(script))
     }
-    //numeric replacement
-    if (newOutput["userFunc"] === "Args" || newOutput["userFunc"] === "Returns") {
-        newOutput["userFunc"] = 3
-    } else if (newOutput["userFunc"] === "ReturnAndArgs") {
-        newOutput["userFunc"] = 4
+    // numeric replacement
+    if (newOutput.userFunc === "Args" || newOutput.userFunc === "Returns") {
+        newOutput.userFunc = 3
+    } else if (newOutput.userFunc === "ReturnAndArgs") {
+        newOutput.userFunc = 4
     }
-    if (newOutput["userFunc"] === "Args" || newOutput["userFunc"] === "Returns") {
-        newOutput["userFunc"] = 3
-    } else if (newOutput["userFunc"] === "ReturnAndArgs") {
-        newOutput["userFunc"] = 4
+    if (newOutput.userFunc === "Args" || newOutput.userFunc === "Returns") {
+        newOutput.userFunc = 3
+    } else if (newOutput.userFunc === "ReturnAndArgs") {
+        newOutput.userFunc = 4
     }
     caiStudentPreferenceModule.runCode(newOutput)
-    //update aggregateScore
-    for (let i in aggregateScore) {
+    // update aggregateScore
+    for (const i in aggregateScore) {
         if (newOutput[i] > aggregateScore[i]) {
             aggregateScore[i] = newOutput[i]
         }
     }
-    caiStudent.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput})
+    caiStudent.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput })
 }
 
-//called when the student accesses a curriculum page from broadcast listener in caiWindowDirective
+// called when the student accesses a curriculum page from broadcast listener in caiWindowDirective
 export function addCurriculumPage(page: any) {
     if (curriculumPagesViewed == null) {
         curriculumPagesViewed = []
     }
     if (!curriculumPagesViewed.includes(page)) {
         curriculumPagesViewed.push(page)
-        caiStudent.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed})
+        caiStudent.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed })
     }
 }
 
-//returns array of all curriculum pages viewed
+// returns array of all curriculum pages viewed
 function retrievePagesViewed() {
     return curriculumPagesViewed
 }

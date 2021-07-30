@@ -1,1 +1,1 @@
-export function analyzeJavascript(script: string) : any
+export function analyzeJavascript(script: string): any

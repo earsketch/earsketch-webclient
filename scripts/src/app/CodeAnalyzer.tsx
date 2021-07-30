@@ -133,7 +133,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     return <div className="container">
         <div className="panel panel-primary">
             <div className="panel-heading">
-          Paste share URLs
+                Paste share URLs
             </div>
             <div className="panel-body">
                 <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
@@ -143,8 +143,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
                     ? <button className="btn btn-primary" onClick={() => run()} disabled>
                         <i className="es-spinner animate-spin mr-3"></i> Run
                     </button>
-                    : <button className="btn btn-primary" onClick={() => run()}> Run </button>
-                }
+                    : <button className="btn btn-primary" onClick={() => run()}> Run </button>}
             </div>
         </div>
     </div>
@@ -156,16 +155,13 @@ const ResultPanel = ({ result }: { result: Result }) => {
             {result.script &&
             <div className="panel-heading" style={{ overflow: "auto" }}>
                 {result.script.name &&
-                    <b> {result.script.username} ({result.script.name}) </b>
-                }
+                    <b> {result.script.username} ({result.script.name}) </b>}
                 <div className="pull-right">{result.script.shareid}</div>
-            </div>
-            }
+            </div>}
             {result.error &&
-              <div className="panel-body text-danger">
-                  <b>{result.error}</b>
-              </div>
-            }
+            <div className="panel-body text-danger">
+                <b>{result.error}</b>
+            </div>}
             {result.reports &&
             <div className="row" >
                 <div className="col-md-6">
@@ -186,8 +182,7 @@ const ResultPanel = ({ result }: { result: Result }) => {
                         )}
                     </ul>
                 </div>
-            </div>
-            }
+            </div>}
         </div>
     </div>
 }
@@ -195,31 +190,27 @@ const ResultPanel = ({ result }: { result: Result }) => {
 const Results = ({ results, processing }: { results: Result[], processing: string | null }) => {
     return <div>
         {results.length > 0 &&
-          <ul>
-              {results.map((result, index) =>
-                  <li key={index}>
-                      <ResultPanel result={result}/>
-                  </li>
-              )}
-          </ul>
-        }
+        <ul>
+            {results.map((result, index) =>
+                <li key={index}>
+                    <ResultPanel result={result}/>
+                </li>
+            )}
+        </ul>}
         {results.length > 0 &&
         <div className="container">
             {processing
                 ? <div className="alert alert-info">
-                Processing script id: {processing}
+                    Processing script id: {processing}
                 </div>
                 : <div className="alert alert-success">
-                No scripts being processed!
-                </div>
-            }
-        </div>
-        }
+                    No scripts being processed!
+                </div>}
+        </div>}
         {results.length > 0 &&
         <div className="container" style={{ textAlign: "center" }}>
             <button className="btn btn-lg btn-primary" onClick={() => download(results)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
-        </div>
-        }
+        </div>}
     </div>
 }
 

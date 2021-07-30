@@ -1,1 +1,1 @@
-export function analyzePython(script: string) : any
+export function analyzePython(script: string): any

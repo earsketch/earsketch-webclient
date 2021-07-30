@@ -24,7 +24,7 @@ export const Diff = ({ original, modified }: { original: string, modified: strin
             baseTextName: "Base Text",
             newTextName: "New Text",
             contextSize: null,
-            viewType: 1
+            viewType: 1,
         }))
 
         // Add syntax highlighting.

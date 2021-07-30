@@ -5,16 +5,15 @@ import * as ESUtils from "../esutils"
 import { Clip, DAWData } from "./player"
 import { OfflineAudioContext } from "./audiocontext"
 
-
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
- 
+
 // Render a result for offline playback.
 export async function renderBuffer(result: DAWData) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const origin = 0
-    const duration = ESUtils.measureToTime(result.length+1, result.tempo)  // need +1 to render to end of last measure
+    const duration = ESUtils.measureToTime(result.length + 1, result.tempo) // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     const mix = context.createGain()
 
@@ -24,7 +23,7 @@ export async function renderBuffer(result: DAWData) {
     // them to the audio context and start them at the right time
     // don't include the last track because we assume that's the metronome
     // track
-    for (let i = 0; i < result.tracks.length-1; i++) {
+    for (let i = 0; i < result.tracks.length - 1; i++) {
         const track = result.tracks[i]
 
         // dummy node
@@ -73,7 +72,6 @@ export async function renderBuffer(result: DAWData) {
             )
 
             // the clip duration may be shorter than the buffer duration
-            const bufferDuration = source.buffer.duration
             let clipDuration = end - start
 
             if (origin > location && origin > location + end) {
@@ -105,7 +103,7 @@ export async function renderBuffer(result: DAWData) {
 
             // keep a reference to this audio source so we can pause it
             clip.source = source
-            clip.gain = trackGain  // used to mute the track/clip
+            clip.gain = trackGain // used to mute the track/clip
         }
 
         // if master track
@@ -114,9 +112,9 @@ export async function renderBuffer(result: DAWData) {
             const limiter = context.createDynamicsCompressor()
             limiter.threshold.value = -1
             limiter.knee.value = 0
-            limiter.ratio.value = 10000  // high compression ratio
-            limiter.attack.value = 0  // as fast as possible
-            limiter.release.value = 0.1  // could be a bit shorter
+            limiter.ratio.value = 10000 // high compression ratio
+            limiter.attack.value = 0 // as fast as possible
+            limiter.release.value = 0.1 // could be a bit shorter
 
             result.master.connect(limiter)
             limiter.connect(trackGain)
@@ -145,7 +143,7 @@ export async function renderBuffer(result: DAWData) {
     esconsole("Render to buffer completed.", ["debug", "renderer"])
     return buffer
 }
- 
+
 // Render a result for offline playback. Returns a Blob.
 export async function renderWav(result: DAWData) {
     const buffer = await renderBuffer(result)
@@ -235,7 +233,7 @@ const interleave = (inputL: Float32Array, inputR: Float32Array) => {
     const length = inputL.length + inputR.length
     const result = new Float32Array(length)
 
-    let index = 0, inputIndex = 0
+    let index = 0; let inputIndex = 0
 
     while (index < length) {
         result[index++] = inputL[inputIndex]

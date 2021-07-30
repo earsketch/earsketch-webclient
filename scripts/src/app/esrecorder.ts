@@ -4,11 +4,11 @@ import "recorder"
 
 const RECORDER_OPTIONS = {
     bufferLen: 2048,
-    numChannels: 1
+    numChannels: 1,
 } as const
 
-let audioRecorder: any  // Recorder from lib/recorderjs/recorder.js
-let meter: any  // AudioMeter from lib/volume-meter.js
+let audioRecorder: any // Recorder from lib/recorderjs/recorder.js
+let meter: any // AudioMeter from lib/volume-meter.js
 let micGain: GainNode | null
 let previewSource: AudioBufferSourceNode | null
 let startTime = 0
@@ -22,9 +22,9 @@ export let analyserNode: AnalyserNode | null
 export let meterVal = 0
 
 export const callbacks = {
-    bufferReady: (buffer: AudioBuffer) => {},
+    bufferReady: (() => {}) as (buffer: AudioBuffer) => void,
     micReady: () => {},
-    micAccessBlocked: (type: string) => {},
+    micAccessBlocked: (() => {}) as (type: string) => void,
     beat: () => {},
 }
 
@@ -48,7 +48,7 @@ export async function init() {
     clear()
 
     meter = createAudioMeter(audioContext, 1, 0.95, 500)
-    micGain = audioContext.createGain()  // to feed to the recorder
+    micGain = audioContext.createGain() // to feed to the recorder
     micGain.gain.value = 1
     startTime = 0
     metroOsc = []
@@ -60,7 +60,7 @@ export async function init() {
             echoCancellation: false,
             autoGainControl: false,
             noiseSuppression: false,
-        }
+        },
     }
 
     const micErrorForBrowser = (browser: string) => {
@@ -84,20 +84,20 @@ export async function init() {
 }
 
 function setupAudio(stream: any) {
-    callbacks.micReady()  // proceed to open the record menu UI
+    callbacks.micReady() // proceed to open the record menu UI
 
     const mic = audioContext.createMediaStreamSource(stream)
     mic.connect(meter)
     mic.connect(micGain!)
 
-    //For drawing spectrogram
+    // For drawing spectrogram
     analyserNode = audioContext.createAnalyser()
-    analyserNode.fftSize = RECORDER_OPTIONS.bufferLen/2
+    analyserNode.fftSize = RECORDER_OPTIONS.bufferLen / 2
     mic.connect(analyserNode)
 
     audioRecorder = new Recorder(micGain, RECORDER_OPTIONS)
 
-    const zeroGain = audioContext.createGain()  // disable monitoring
+    const zeroGain = audioContext.createGain() // disable monitoring
     zeroGain.gain.value = 0
     micGain!.connect(zeroGain)
     zeroGain.connect(audioContext.destination)
@@ -248,7 +248,7 @@ function gotBuffer(buf: Float32Array[]) {
         for (let ch = 0; ch < buf.length; ch++) {
             const chdata = buffer.getChannelData(ch)
             for (let i = 0; i < targetLen; i++) {
-                chdata[i] = buf[ch][i+startTimeDiff]
+                chdata[i] = buf[ch][i + startTimeDiff]
             }
         }
     } else {
