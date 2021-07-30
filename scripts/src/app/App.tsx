@@ -1,6 +1,7 @@
 import i18n from "i18next"
 import { Dialog, Menu, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
 
 import { AccountCreator } from "./AccountCreator"
@@ -24,7 +25,6 @@ import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
-import { Prompt } from "./Prompt"
 import * as recommenderState from "../browser/recommenderState"
 import * as recommender from "./recommender"
 import { RenameScript, RenameSound } from "./Rename"
@@ -41,7 +41,7 @@ import * as tabs from "../ide/tabState"
 import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { useTranslation } from "react-i18next"
+import { ModalFooter, Prompt } from "../Utils"
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -111,11 +111,10 @@ const Confirm = ({ textKey, textReplacements, okKey, cancelKey, type, close }: {
         <div className="modal-header">
             <h3 className="modal-title">{t("confirm")}</h3>
         </div>
-        { textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div> }
-        <div className="modal-footer">
-            <button className="btn btn-default" onClick={() => close(false)}>{cancelKey ? t(cancelKey) : t("cancel")}</button>
-            <button className={`btn btn-${type ?? "primary"}`} onClick={() => close(true)}>{okKey ? t(okKey) : t("ok")}</button>
-        </div>
+        <form onSubmit={e => { e.preventDefault(); close(true) }}>
+            {textKey && <div className="modal-body">{textReplacements ? t(textKey, textReplacements) : t(textKey)}</div>}
+            <ModalFooter submit={okKey ?? "ok"} cancel={cancelKey} type={type} close={() => close(false)} />
+        </form>
     </>
 }
 
@@ -392,13 +391,21 @@ export const App = () => {
         })()
     }, [])
 
+    useEffect(() => {
+        if (theme === "dark") {
+            document.body.classList.add("dark")
+        } else {
+            document.body.classList.remove(("dark"))
+        }
+    }, [theme])
+
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
         saveAll()
 
         let token
         try {
-            token = await userProject.authenticate(username, password)
+            token = await userProject.getBasicAuth("/users/token", username, password)
         } catch (error) {
             userNotification.show(i18n.t("messages:general.loginfailure"), "failure1", 3.5)
             esconsole(error, ["main", "login"])
@@ -426,19 +433,8 @@ export const App = () => {
 
         // Always override with the returned username in case the letter cases mismatch.
         setUsername(username)
-
-        // get user role (can verify the admin / teacher role here?)
-        if (userInfo.isAdmin) {
-            setIsAdmin(true)
-            if (userInfo.email === "") {
-                userNotification.show(i18n.t("messages:user.teachersLink"), "editProfile")
-            }
-        } else {
-            setIsAdmin(false)
-        }
-
+        setIsAdmin(userInfo.isAdmin)
         email = userInfo.email
-
         userNotification.user.isAdmin = userInfo.isAdmin
 
         // Retrieve the user scripts.
@@ -550,7 +546,7 @@ export const App = () => {
         }
     }
 
-    return <div className={theme === "dark" ? "dark" : ""}>
+    return <div>
         {/* dynamically set the color theme */}
         <link rel="stylesheet" type="text/css" href={`css/earsketch/theme_${theme}.css`} />
 

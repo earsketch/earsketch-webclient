@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import esconsole from "../esconsole"
 import * as userProject from "./userProject"
+import { ModalFooter } from "../Utils"
 import * as websocket from "./websocket"
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
@@ -15,9 +16,7 @@ export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
             <AdminResetUserPassword />
         </div>
 
-        <div className="modal-footer">
-            <input type="button" className="btn btn-default" onClick={close} value="CLOSE" />
-        </div>
+        <ModalFooter cancel="close" close={close} />
     </>
 }
 
@@ -80,7 +79,7 @@ const AdminManageRoles = () => {
                     {admins.map(username =>
                         <div key={username} className="my-px mx-2 flex items-center">
                             <button className="flex" title="Remove admin" onClick={() => removeAdmin(username)}><i className="icon icon-cross2" /></button>
-                            <td className="my-px mx-2">{username}</td>
+                            <div className="my-px mx-2">{username}</div>
                         </div>
                     )}
                 </div>

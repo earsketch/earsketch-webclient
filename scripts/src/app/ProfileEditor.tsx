@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { ModalFooter } from "../Utils"
 
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
@@ -15,7 +16,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
     const submitPassword = async () => {
         try {
-            await userProject.postAuth("/users/modifypwd", { password: btoa(password), newpassword: btoa(newPassword) })
+            await userProject.postBasicAuth("/users/modifypwd", username, password, { password: newPassword })
         } catch (error) {
             esconsole(error, "error")
             setError(t("messages:changepassword.pwdauth"))
@@ -31,7 +32,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
         // Maybe this should go in userProject.
         try {
-            await userProject.postAuth("/users/edit", { email, password: btoa(password) })
+            await userProject.postBasicAuth("/users/edit", username, password, { email })
         } catch {
             esconsole("Error updating profile", ["editProfile", "error"])
             setError(t("profileEditor.error"))
@@ -82,10 +83,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
                 }} value={confirmPassword} required />}
             </div>
 
-            <div className="modal-footer">
-                <input type="button" className="btn btn-default" onClick={() => close()} value={t("cancel").toLocaleUpperCase()} />
-                <input type="submit" className="btn btn-primary" value={t("update").toLocaleUpperCase()} disabled={!newPassword && email === _email} />
-            </div>
+            <ModalFooter submit="update" ready={newPassword !== "" || email !== _email} close={close} />
         </form>
     </>
 }

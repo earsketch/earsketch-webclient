@@ -1,5 +1,7 @@
+import i18n from "i18next"
 import { Transition } from "@headlessui/react"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { usePopper } from "react-popper"
 import { useDispatch, useSelector } from "react-redux"
 
@@ -13,8 +15,7 @@ import * as scripts from "../browser/scriptsState"
 import * as tabs from "../ide/tabState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
-import { useTranslation } from "react-i18next"
-import i18n from "i18next"
+import { ModalFooter } from "../Utils"
 
 // stuff for view-only and collaborative share
 async function queryID(query: any) {
@@ -22,16 +23,16 @@ async function queryID(query: any) {
     if (query === "") {
         return null
     } else if (ESUtils.checkIllegalCharacters(query)) {
-        throw i18n.t("messages:general.illegalCharacterInUserID")
+        throw new Error("messages:general.illegalCharacterInUserID")
     } else if (query === userProject.getUsername().toLowerCase()) {
-        throw i18n.t("messages:general.noSelfShare")
+        throw new Error("messages:general.noSelfShare")
     }
 
     const data = await userProject.get("/users/search", { query })
     if (data) {
         return data.username
     }
-    throw i18n.t("messages:general.userDoesNotExist")
+    throw new Error("messages:general.userDoesNotExist")
 }
 
 const UserListInput = ({ users, setUsers, setFinalize }:
@@ -79,7 +80,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
             setQuery("")
             return newUsers
         } catch (error) {
-            setError(error)
+            setError(error.message)
             return null
         }
     }
@@ -99,15 +100,22 @@ const UserListInput = ({ users, setUsers, setFinalize }:
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
-        {error && <div className="share-people-error">{error}</div>}
+        {error && <div className="share-people-error">{t(error)}</div>}
     </>
+}
+
+interface Licenses {
+    [key: string]: {
+        license: string
+        licenseDesc: string
+    }
 }
 
 interface TabParameters {
     script: Script
-    licenses: { [key: string]: any }
-    licenseID: string
-    setLicenseID: (id: string) => void
+    licenses: Licenses
+    licenseID: number
+    setLicenseID: (id: number) => void
     description: string
     setDescription: (description: string) => void
     save: () => void
@@ -161,7 +169,9 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
     const lockedShareLink = location.origin + location.pathname + "?sharing=" + lockedShareID
     const link = lock ? lockedShareLink : sharelink
 
-    userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
+    useEffect(() => {
+        userProject.getLockedSharedScriptId(script.shareid).then(setLockedShareID)
+    }, [])
 
     const downloadShareUrl = () => {
         const textContent = "[InternetShortcut]\n" + "URL=" + link + "\n" + "IconIndex=0"
@@ -174,11 +184,13 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
 
     const submit = async () => {
         const users = await finalize.current?.()
-        if (!users) return
+        if (!users) return // Bad username in the list.
         save()
-        reporter.share("link", licenses[licenseID].license)
-        userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
-        userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
+        if (users.length) {
+            reporter.share("link", licenses[licenseID].license)
+            userProject.shareWithPeople(lock ? lockedShareID : script.shareid, users)
+            userNotification.show(t("messages:shareScript.sharedViewOnly", { scriptName: script.name }) + users.join(", "))
+        }
         close()
     }
 
@@ -221,13 +233,8 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 </div>
             </div>
         </div>
-        <div className="modal-footer border-t-0">
-            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
-            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={viewers.length ? t("saveAndSend").toLocaleUpperCase() : t("save").toLocaleUpperCase()} className="btn btn-primary text-white" />
-            </div>
-        </div>
+        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
+        <ModalFooter submit={viewers.length ? "saveAndSend" : "save"} close={close} />
     </form>
 }
 
@@ -276,13 +283,8 @@ const CollaborationTab = ({ script, licenses, licenseID, setLicenseID, descripti
             </div>
             <UserListInput users={collaborators} setUsers={setCollaborators} setFinalize={f => { finalize.current = f }} />
         </div>
-        <div className="modal-footer border-t-0">
-            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
-            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={t("save").toLocaleUpperCase()} className="btn btn-primary text-white" />
-            </div>
-        </div>
+        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
+        <ModalFooter submit="save" close={close} />
     </form>
 }
 
@@ -314,13 +316,8 @@ const EmbedTab = ({ script, licenses, licenseID, setLicenseID, description, setD
                 <hr className="mt-3" />
             </div>
         </div>
-        <div className="modal-footer border-t-0">
-            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
-            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={t("save").toLocaleUpperCase()} className="btn btn-primary text-white" />
-            </div>
-        </div>
+        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
+        <ModalFooter submit="save" close={close} />
     </form>
 }
 
@@ -420,36 +417,35 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
                 </div>
             </div>
         </div>
-        <div className="modal-footer border-t-0">
-            <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
 
-            {message && <div className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: "rgb(170,255,255,0.5)" }}>
-                {message.startsWith("UPLOADING") && <i className="animate-spin es-spinner"></i>} {message}
-            </div>}
+        <MoreDetails {...{ licenses, licenseID, setLicenseID, description, setDescription }} />
 
-            <div className="text-right" style={{ height: "3em", lineHeight: "3em" }}>
-                <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d", marginRight: "14px" }} />
-                <input type="submit" value={url ? t("scriptShare.tab.soundcloud.view").toLocaleUpperCase() : t("upload").toLocaleUpperCase()} className="btn btn-primary text-white" />
-            </div>
-        </div>
+        {message && <div className="text-center" style={{ height: "3em", lineHeight: "3em", textAlign: "center", backgroundColor: "rgb(170,255,255,0.5)" }}>
+            {message.startsWith("UPLOADING") && <i className="animate-spin es-spinner mr-3"></i>}{message}
+        </div>}
+
+        <ModalFooter submit={url ? "scriptShare.tab.soundcloud.view" : "upload"} close={close} />
     </form>
 }
 
 const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }:
-    { licenses: { [key: string]: any }, licenseID: string, setLicenseID: (id: string) => void, description: string, setDescription: (ds: string) => void }
+    { licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void }
 ) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
     const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
 
-    return <div className="panel panel-default">
-        <div className="panel-heading">
-            <h4 className="panel-title">
-                <a role="button" className="accordion-toggle" onClick={() => setCollapsed(!collapsed)}><span>{t("scriptShare.moreDetails")}</span></a>
+    return <div>
+        <div className="bg-blue-200 px-6 py-4">
+            <h4>
+                <a role="button" className="text-black" onClick={() => setCollapsed(!collapsed)}>
+                    {t("scriptShare.moreDetails")}
+                    <i className={`ml-3 icon icon-arrow-${collapsed ? "right" : "down"}2`} />
+                </a>
             </h4>
         </div>
         {!collapsed &&
-        <div className="panel-body">
+        <div className="px-6 bg-gray-200">
             <div className="form-group text-left">
                 <div className="modal-section-header">
                     <span>{t("scriptShare.descriptionOptional")}</span>
@@ -464,17 +460,17 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
 
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
-                        {Object.entries(licenses).map(([id, license]: any) =>
+                        {Object.entries(licenses).map(([id, license]) =>
                             <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
                                 <label>
-                                    <input type="radio" name="optradio" value={id} checked={id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(id) }} />
+                                    <input type="radio" name="optradio" value={id} checked={+id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(+id) }} />
                                     <span></span>{license.license}
                                 </label>
                             </div>)}
                     </div>
                 </div>
 
-                <div className="description my-3 p-3">
+                <div className="description p-3 text-black">
                     {licenses[licenseID].licenseDesc} Click <a href={licenseLink} target="_blank" rel="noreferrer">here</a> to see more.
                 </div>
             </div>
@@ -489,15 +485,15 @@ const Tabs = [
     { component: SoundCloudTab, titleKey: "scriptShare.tab.soundcloud.title", descriptionKey: "messages:shareScript.menuDescriptions.soundCloud" },
 ]
 
-export const ScriptShare = ({ script, licenses, close }: any) => {
+export const ScriptShare = ({ script, licenses, close }: { script: Script, licenses: Licenses, close: () => void }) => {
     const [activeTab, setActiveTab] = useState(0)
-    const [description, setDescription] = useState(script.description)
-    const [licenseID, setLicenseID] = useState(script.license_id || "1")
+    const [description, setDescription] = useState(script.description ?? "")
+    const [licenseID, setLicenseID] = useState(script.license_id ?? 1)
     const { t } = useTranslation()
 
     const save = () => {
-        userProject.setScriptDesc(script.name, script.shareid, description)
-        userProject.setLicense(script.name, script.shareid, licenseID)
+        userProject.setScriptDescription(script.shareid, description)
+        userProject.setScriptLicense(script.shareid, licenseID)
     }
 
     const ShareBody = Tabs[activeTab].component
