@@ -52,16 +52,7 @@ phases:
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
       - cp -r sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
-  post_build:
-    commands:
-#      - |
-#        if [ "$ES_BUILD_ENVIRONMENT" = "production" ];
-#        then
-#          echo "Tagging production build with version $ES_VERSION"
-#          python "$ES_SCRIPT_HOME/github_create_release.py" $GITHUB_USER $GITHUB_TOKEN $CODEBUILD_RESOLVED_SOURCE_VERSION "${ES_VERSION_LIST//,/.}"
-#        else
-#          echo "Not applying git tag. Non-production environment: $ES_BUILD_ENVIRONMENT"
-#        fi
+
 artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME
   files:
