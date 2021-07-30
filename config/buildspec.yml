@@ -38,7 +38,7 @@ phases:
       - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
   build:
     commands:
-      - echo "ES_VERSION_LIST: $ES_VERSION_LIST"
+      - echo "ES_VERSION_LIST $ES_VERSION_LIST"
       - start_time="$(date -u +%s)"
       - du -sh $CODEBUILD_SRC_DIR
       - echo "Entered the build phase..."
