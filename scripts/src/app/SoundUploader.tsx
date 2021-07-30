@@ -29,7 +29,7 @@ function validateUpload(key: string, tempo: number) {
     const fullKey = username.toUpperCase() + "_" + key
     if (keys.some(k => k === fullKey)) {
         throw new Error(`${key} (${fullKey})${i18n.t("messages:uploadcontroller.alreadyused")}`)
-    } else if (tempo > 200 || (tempo > -1 && tempo < 45)) {
+    } else if (tempo > 220 || (tempo > -1 && tempo < 45)) {
         throw new Error(i18n.t("messages:esaudio.tempoRange"))
     }
 }
@@ -319,24 +319,25 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             </div>
             {searched && <div className="modal-section-header justify-start mb-3">{t("results")}</div>}
             {results && results.length > 0 &&
-                <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
-                    {results.map((result, index) => <div key={index}>
-                        <label>
-                            <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
-                                onChange={e => {
-                                    if (e.target.checked) {
-                                        setSelected(index)
-                                        setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
-                                        setError("")
-                                    }
-                                }} />
-                            {result.name}: {result.bpm} bpm. {t("soundUploader.freesound.uploadedBy", { userName: result.creator })}
-                        </label>
-                        <audio controls controlsList="nodownload" preload="none">
-                            <source src={result.previewURL} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
-                        <hr className="my-3 border-gray-300" />
+                <div className="overflow-y-auto border border-gray-300 dark:border-gray-500" style={{ maxHeight: "300px" }}>
+                    {results.map((result, index) => <div key={index} className={"border-b border-gray-300 " + (index === selected ? "bg-blue-200 dark:bg-blue-900" : "")}>
+                        <div className="pt-2 px-3">
+                            <label className="mb-2 inline-flex items-center">
+                                <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
+                                    onChange={e => {
+                                        if (e.target.checked) {
+                                            setSelected(index)
+                                            setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
+                                            setError("")
+                                        }
+                                    }} />
+                                <audio className="ml-2" controls controlsList="nodownload" preload="none">
+                                    <source src={result.previewURL} type="audio/mpeg" />
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <span className="ml-4 flex-1">{result.name}: {result.bpm} bpm. {t("soundUploader.freesound.uploadedBy", { userName: result.creator })}</span>
+                            </label>
+                        </div>
                     </div>)}
                 </div>}
             {searched &&

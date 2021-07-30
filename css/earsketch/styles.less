@@ -263,29 +263,6 @@ button:focus {
     align-items: center;
     width: 100%;
 
-    //#notification-bar-container {
-    //}
-
-    /* status messages */
-    .notificationBar {
-      margin: auto;
-      //position: absolute;
-      z-index: 999;
-      //top: 40px;
-      //right: 10px;
-      -webkit-border-radius: 5px;
-      -moz-border-radius: 5px;
-      border-radius: 0;
-      //padding: 8px 10px;
-      background-color: #dff0d8;
-      -webkit-transition: all linear 0.3s;
-      transition: all linear 0.3s;
-
-      &.ng-hide {
-        opacity: 0;
-      }
-    }
-
     #top-header-nav-links {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -305,6 +282,38 @@ button:focus {
       }
     }
   }
+}
+
+/* status messages */
+.notificationBar {
+  margin: auto;
+  z-index: 999;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 0;
+  //background-color: #dff0d8;
+  -webkit-transition: all linear 0.3s;
+  transition: all linear 0.3s;
+
+  &.ng-hide {
+    opacity: 0;
+  }
+}
+
+.notificationBar.normal {
+  color: #dff0d8;
+}
+
+.notificationBar.success {
+  color: #9ffa00;
+}
+
+.notificationBar.failure1 {
+  color: #f2dede;
+}
+
+.notificationBar.failure2 {
+  color: #ff8080;
 }
 
 .notificationPopup {

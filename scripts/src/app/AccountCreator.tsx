@@ -16,11 +16,7 @@ export const AccountCreator = ({ close }: { close: (value?: { username: string, 
 
     const submit = async () => {
         try {
-            const data = await post("/users/create", {
-                username,
-                email,
-                password: btoa(password),
-            })
+            const data = await post("/users/create", { username, password, email })
             if (data.state !== 0) {
                 esconsole("Error creating user: " + data.description, "error")
                 if (data.description === "useralreadyexists") {

@@ -79,7 +79,7 @@ const AdminManageRoles = () => {
                     {admins.map(username =>
                         <div key={username} className="my-px mx-2 flex items-center">
                             <button className="flex" title="Remove admin" onClick={() => removeAdmin(username)}><i className="icon icon-cross2" /></button>
-                            <td className="my-px mx-2">{username}</td>
+                            <div className="my-px mx-2">{username}</div>
                         </div>
                     )}
                 </div>
