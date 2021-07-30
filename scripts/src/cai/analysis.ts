@@ -494,6 +494,7 @@ function kMeansGenre(measureView: any) {
       }
     }
   }
+  
   let genreSampleList : any = []
   for (let measure in measureView) {
     genreSampleList.push([])

@@ -10,13 +10,12 @@ import { Script } from "common"
 
 import * as caiAnalysisModule from "../cai/analysis"
 
-import { Result, Results } from "./CodeAnalyzer"
-import { compile, randomSeed } from "./Autograder"
+import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
+import { compile, randomSeed, readFile } from "./Autograder"
+import { ContestOptions } from "./CodeAnalyzerContest"
 
-
-const Options = ({ options, seed, useSeed, setOptions, setSeed, setUseSeed }:
-    { options: ReportOptions, seed: number, useSeed: boolean, setOptions: (o: ReportOptions) => void, setSeed: (s: number) => void, setUseSeed: (s: boolean) => void }) => {
-
+export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed, setUseSeed }:
+    { options: ReportOptions | ContestOptions, seed: number, useSeed: boolean, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s: number) => void, setUseSeed: (s: boolean) => void }) => {
     const updateSeed = (seed: number, useSeed: boolean) => {
         setUseSeed(useSeed)
         if (useSeed) {
@@ -38,41 +37,72 @@ const Options = ({ options, seed, useSeed, setOptions, setSeed, setUseSeed }:
                     <ul>
                         {Object.entries(options).map(([option, value]) =>
                             <label key={option}>
-                                <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>
-                                {option}
+                                {typeof (value) === "boolean" &&
+                                    <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>
+                                }
+                                {option}{" "}
+                                {(typeof (value) === "string" || typeof (value) === "number") &&
+                                    <input type="text" value={value} onChange={e => setOptions({ ...options, [option]: e.target.value })} style={{ backgroundColor: "lightgray" }}></input>
+                                }
                             </label>
                         )}
                     </ul>
                 </div>
-                <div className="col-md-4">
-                    <h4>Random Seed</h4>
-                    <label>
-                        <input type="checkbox" checked={useSeed} onChange={e => updateSeed(seed, e.target.checked)}></input>
-                        Use the following random seed:
-                    </label>
-                    <input type="text" value={seed} onChange={e => updateSeed(Number(e.target.value), useSeed)}></input>
-                    <p className="small">
-                        This will automatically seed every random function in Python and JavaScript.
-                    </p>
-                    <p className="small">
-                        Disclaimer: Testing randomness is inherently difficult. Only use this in the most trivial of cases.
-                    </p>
-                </div>
-                <div className="col-md-4">
-                    <label>
-                        Warning:
-                    </label>
-                    This site uses login information from EarSketch, so make sure you are logged in on another tab or window.
-                </div>
+                {showSeed &&
+                    <div className="col-md-4">
+                        <h4>Random Seed</h4>
+                        <label>
+                            <input type="checkbox" checked={useSeed} onChange={e => updateSeed(seed, e.target.checked)}></input>
+                            Use the following random seed:
+                        </label>
+                        <input type="text" value={seed} onChange={e => updateSeed(Number(e.target.value), useSeed)}></input>
+                        <p className="small">
+                            This will automatically seed every random function in Python and JavaScript.
+                        </p>
+                        <p className="small">
+                            Disclaimer: Testing randomness is inherently difficult. Only use this in the most trivial of cases.
+                        </p>
+                    </div>
+                }
             </div>
         </div>
     </div>
 }
 
-const Upload = ({ processing, options, setResults, setProcessing }:
-    { processing: string | null, options: ReportOptions, setResults: (r: Result[]) => void, setProcessing: (p: string | null) => void }) => {
+export const Upload = ({ processing, options, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
+    { processing: string | null, options: ReportOptions, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
     const [urls, setUrls] = useState("")
-    // const [csvInput, setCsvInput] = useState(false)
+    const [csvInput, setCsvInput] = useState(false)
+    const [contestIDColumn, setContestIDColumn] = useState(0)
+    const [shareIDColumn, setShareIDColumn] = useState(1)
+
+    const updateCSVFile = async (file: File) => {
+        if (file) {
+            let script
+            const i: { [key: string]: { id: number, finished: boolean } } = {}
+            const u = []
+            try {
+                script = await readFile(file)
+                console.log("script", script)
+                for (const row of script.split("\n")) {
+                    const values = row.split(",")
+                    if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                        let shareid = values[shareIDColumn]
+                        if (shareid.includes("?sharing=")) {
+                            shareid = shareid.split("?sharing=")[shareid.split("?sharing=").length - 1]
+                        }
+                        i[shareid] = { id: Number(values[contestIDColumn]), finished: false }
+                        u.push(values[shareIDColumn])
+                    }
+                }
+            } catch (err) {
+                console.error(err)
+                return
+            }
+            setUrls(u.join("\n"))
+            setContestDict?.(i)
+        }
+    }
 
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script, version: number | null = null) => {
@@ -92,9 +122,10 @@ const Upload = ({ processing, options, setResults, setProcessing }:
                 reports: reports,
             }
         } catch (err) {
+            console.log("log error", err)
             result = {
                 script: script,
-                error: err.args.v[0].v + " on line " + err.traceback[0].lineno,
+                error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
             }
         }
         if (options.HISTORY) {
@@ -125,11 +156,30 @@ const Upload = ({ processing, options, setResults, setProcessing }:
     // Read all script urls, parse their shareid, and then load and run every script adding the results to the results list.
     const run = async () => {
         setResults([])
+        setContestResults?.([])
+        const contestDictRefresh: { [key: string]: { id: number, finished: boolean } } = {}
+        if (contestDict) {
+            for (const shareid of Object.keys(contestDict)) {
+                contestDictRefresh[shareid] = { id: contestDict[shareid].id, finished: false }
+            }
+            setContestDict?.({ ...contestDictRefresh })
+        }
         setProcessing(null)
 
-        esconsole("Running code analyzer.", ["DEBUG"])
+        let matches: string[] | null = []
         const re = /\?sharing=([^\s.,])+/g
-        const matches = urls.match(re)
+        esconsole("Running code analyzer.", ["DEBUG"])
+        if (csvInput) {
+            matches = []
+            for (let url of urls.split("\n")) {
+                if (url.includes("?sharing=")) {
+                    url = url.split("?sharing=")[url.split("?sharing=").length - 1]
+                }
+                matches.push("?sharing=" + url)
+            }
+        } else {
+            matches = urls.match(re)
+        }
 
         const results: Result[] = []
 
@@ -149,29 +199,51 @@ const Upload = ({ processing, options, setResults, setProcessing }:
                 const result = {
                     script: { username: "", shareid: shareId } as Script,
                     error: "Script not found.",
+                } as Result
+                if (contestDict?.[shareId]) {
+                    result.contestID = contestDict[shareId].id
                 }
                 results.push(result)
-                setResults(results)
+                setResults([...results])
                 setProcessing(null)
             } else {
                 setResults([...results, { script }])
                 const result = await runScriptHistory(script)
                 for (const r of result) {
+                    if (contestDict?.[shareId]) {
+                        r.contestID = contestDict[shareId].id
+                    }
                     results.push(r)
                 }
-                setResults(results)
+                setResults([...results])
             }
         }
     }
 
     return <div className="container">
         <div className="panel panel-primary">
-            <div className="panel-heading">
-                Paste share URLs
-            </div>
-            <div className="panel-body">
-                <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
-            </div>
+            {csvInput
+                ? <div className="panel-heading">
+                    Upload CSV File
+                    <button className="btn btn-primary" onClick={() => setCsvInput(false)}>Switch to Text Input</button>
+                </div>
+                : <div className="panel-heading">
+                    Paste share URLs
+                    <button className="btn btn-primary" onClick={() => setCsvInput(true)}>Switch to CSV Input</button>
+                </div>
+            }
+            {csvInput
+                ? <div className="panel-body">
+                    <input type="file" onChange={file => {
+                        if (file.target.files) { updateCSVFile(file.target.files[0]) }
+                    }} />
+                    <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Contest ID Column
+                    <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Share ID Column
+                </div>
+                : <div className="panel-body">
+                    <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
+                </div>
+            }
             <div className="panel-footer">
                 {processing
                     ? <button className="btn btn-primary" onClick={() => run()} disabled>
@@ -184,16 +256,16 @@ const Upload = ({ processing, options, setResults, setProcessing }:
     </div>
 }
 
-interface ReportOptions {
+export interface ReportOptions {
     OVERVIEW: boolean,
     COMPLEXITY: boolean,
     EFFECTS: boolean,
-    // MEASUREVIEW: boolean,
-    // GENRE: boolean,
-    // SOUNDPROFILE: boolean,
+    MEASUREVIEW: boolean,
+    GENRE: boolean,
+    SOUNDPROFILE: boolean,
     MIXING: boolean,
     HISTORY: boolean,
-    // APICALLS: boolean,
+    APICALLS: boolean,
 }
 
 export const CodeAnalyzerCAI = () => {
@@ -206,23 +278,26 @@ export const CodeAnalyzerCAI = () => {
         OVERVIEW: true,
         COMPLEXITY: true,
         EFFECTS: false,
-        // MEASUREVIEW: false,
-        // GENRE: false,
-        // SOUNDPROFILE: false,
+        MEASUREVIEW: false,
+        GENRE: false,
+        SOUNDPROFILE: false,
         MIXING: false,
         HISTORY: false,
-        // APICALLS: false,
+        APICALLS: false,
     } as ReportOptions)
 
     const [useSeed, setUseSeed] = useState(false)
     const [seed, setSeed] = useState(Date.now())
 
     return <div>
-        <h1>Code Analyzer - CAI</h1>
+        <div className="container">
+            <h1>EarSketch Code Analyzer - CAI Version</h1>
+        </div>
         <Options
             options={options}
             seed={seed}
             useSeed={useSeed}
+            showSeed={true}
             setOptions={setOptions}
             setSeed={setSeed}
             setUseSeed={setUseSeed}
@@ -236,8 +311,8 @@ export const CodeAnalyzerCAI = () => {
         <Results
             results={results}
             processing={processing}
+            options={{ useContestID: false, allowedKeys: ["OVERVIEW", "COMPLEXITY", "EFFECTS"], showIndividualResults: true } as DownloadOptions}
         />
         <ModalContainer />
     </div>
 }
-

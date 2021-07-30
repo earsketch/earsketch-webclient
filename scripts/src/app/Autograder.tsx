@@ -31,7 +31,7 @@ export const compile = async (script: string, filename: string) => {
 }
 
 // Read a File object and return a promise that will resolve to the file text contents.
-const readFile = (file: File) => {
+export const readFile = (file: File) => {
     const p = new Promise<string>((resolve, reject) => {
         const r = new FileReader()
         r.onload = (evt) => {

@@ -11,14 +11,18 @@ import { Script } from "common"
 import { compile } from "./Autograder"
 import * as exporter from "./exporter"
 
-export const generateCSV = (results: Result[]) => {
-    const headers = ["username", "script_name", "shareid", "error"]
+export const generateCSV = (results: Result[], options: DownloadOptions) => {
+    const headers = [options.useContestID ? "contestID" : "username", "script_name", "shareid", "error"]
     const rows: string[] = []
     const colMap: { [key: string]: { [key: string]: number } } = {}
 
     for (const result of results) {
         if (result.reports) {
             for (const name of Object.keys(result.reports)) {
+                if (options.allowedKeys && !options.allowedKeys.includes(name)) {
+                    delete result.reports[name]
+                    continue
+                }
                 const report = result.reports[name]
                 if (colMap[name] === undefined) {
                     colMap[name] = {}
@@ -39,7 +43,7 @@ export const generateCSV = (results: Result[]) => {
             row[i] = ""
         }
         if (result.script) {
-            row[0] = result.script.username
+            row[0] = options.useContestID ? result.contestID : result.script.username
             row[1] = result.script.name
             row[2] = result.script.shareid
         }
@@ -49,8 +53,14 @@ export const generateCSV = (results: Result[]) => {
         if (result.reports) {
             for (const name of Object.keys(result.reports)) {
                 const report = result.reports[name]
-                for (const key of Object.keys(report)) {
-                    row[colMap[name][key]] = report[key]
+                if (Array.isArray(report)) {
+                    for (const key in report) {
+                        row[colMap[name][key]] = report[key]
+                    }
+                } else {
+                    for (const key of Object.keys(report)) {
+                        row[colMap[name][key]] = report[key]
+                    }
                 }
             }
         }
@@ -60,8 +70,8 @@ export const generateCSV = (results: Result[]) => {
     return headers.join(",") + "\n" + rows.join("\n")
 }
 
-export const download = (results: Result[]) => {
-    const file = generateCSV(results)
+export const download = (results: Result[], options: DownloadOptions) => {
+    const file = generateCSV(results, options)
     const blob = new Blob([file], { type: "text/plain" })
     exporter.download("code_analyzer_report.csv", blob)
 }
@@ -133,7 +143,7 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     return <div className="container">
         <div className="panel panel-primary">
             <div className="panel-heading">
-          Paste share URLs
+                Paste share URLs
             </div>
             <div className="panel-body">
                 <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
@@ -150,89 +160,107 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     </div>
 }
 
+const ReportDisplay = ({ report }: { report: { [key: string]: string | number } | { [key: string]: string | number }[] }) => {
+    return <table className="table">
+        <tbody>
+            {Array.isArray(report)
+                ? report.map((value: any, key: number) =>
+                    <tr key={key}>
+                        <th>{key}</th><td>{JSON.stringify(value)}</td>
+                    </tr>
+                )
+                : Object.entries(report).map(([key, value]) =>
+                    <tr key={key}>
+                        <th>{key}</th><td>{JSON.stringify(value)}</td>
+                    </tr>
+                )
+            }
+        </tbody>
+    </table>
+}
+
 const ResultPanel = ({ result }: { result: Result }) => {
     return <div className="container">
         <div className="panel panel-primary">
             {result.script &&
-            <div className="panel-heading" style={{ overflow: "auto" }}>
-                {result.script.name &&
-                    <b> {result.script.username} ({result.script.name}) </b>
-                }
-                {result.version &&
-                    <b> (version {result.version}) </b>
-                }
-                <div className="pull-right">{result.script.shareid}</div>
-            </div>
+                <div className="panel-heading" style={{ overflow: "auto" }}>
+                    {result.script.name &&
+                        <b> {result.script.username} ({result.script.name}) </b>
+                    }
+                    {result.version &&
+                        <b> (version {result.version}) </b>
+                    }
+                    <div className="pull-right">{result.script.shareid}</div>
+                </div>
             }
             {result.error &&
-              <div className="panel-body text-danger">
-                  <b>{result.error}</b>
-              </div>
+                <div className="panel-body text-danger">
+                    <b>{result.error}</b>
+                </div>
             }
             {result.reports &&
-            <div className="row" >
-                <div className="col-md-6">
-                    <ul>
-                        {Object.entries(result.reports).map(([name, report]) =>
-                            <li key={name}>
-                                {name}
-                                <table className="table">
-                                    <tbody>
-                                        {Object.entries(report).map(([key, value]) =>
-                                            <tr key={key}>
-                                                <th>{key}</th><td>{value}</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </li>
-                        )}
-                    </ul>
+                <div className="row" >
+                    <div className="col-md-6">
+                        <ul>
+                            {Object.entries(result.reports).map(([name, report]) =>
+                                <li key={name}>
+                                    {name}
+                                    <ReportDisplay report={report} />
+                                </li>
+                            )}
+                        </ul>
+                    </div>
                 </div>
-            </div>
             }
         </div>
     </div>
 }
 
-export const Results = ({ results, processing }: { results: Result[], processing: string | null }) => {
+export const Results = ({ results, processing, options }: { results: Result[], processing: string | null, options: DownloadOptions }) => {
     return <div>
-        {results.length > 0 &&
-          <ul>
-              {results.map((result, index) =>
-                  <li key={index}>
-                      <ResultPanel result={result}/>
-                  </li>
-              )}
-          </ul>
+        {results.length > 0 && options.showIndividualResults &&
+            <ul>
+                {results.map((result, index) =>
+                    <li key={index}>
+                        <ResultPanel result={result} />
+                    </li>
+                )}
+            </ul>
         }
         {results.length > 0 &&
-        <div className="container">
-            {processing
-                ? <div className="alert alert-info">
-                Processing script id: {processing}
-                </div>
-                : <div className="alert alert-success">
-                No scripts being processed!
-                </div>
-            }
-        </div>
+            <div className="container">
+                {processing
+                    ? <div className="alert alert-info">
+                        Processing script id: {processing}
+                    </div>
+                    : <div className="alert alert-success">
+                        No scripts being processed!
+                    </div>
+                }
+            </div>
         }
         {results.length > 0 &&
-        <div className="container" style={{ textAlign: "center" }}>
-            <button className="btn btn-lg btn-primary" onClick={() => download(results)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
-        </div>
+            <div className="container" style={{ textAlign: "center" }}>
+                <button className="btn btn-lg btn-primary" onClick={() => download(results, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
+            </div>
         }
     </div>
 }
 
 export interface Result {
-  script: Script
-  reports?: {
-    [key: string]: { [key: string]: string|number }
-  }
-  error?: string
-  version?: number | null
+    script: Script
+    reports?: {
+        [key: string]: { [key: string]: string | number } | { [key: string]: string | number }[]
+    }
+    error?: string
+    version?: number | null
+    contestID?: number
+}
+
+export interface DownloadOptions {
+    useContestID: boolean,
+    allowedKeys?: string[],
+    showIndividualResults?: boolean,
 }
 
 export const CodeAnalyzer = () => {
@@ -240,6 +268,7 @@ export const CodeAnalyzer = () => {
 
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])
+    const downloadOptions = { useContestID: false, showIndividualResults: true } as DownloadOptions
 
     return <div>
         <div className="container">
@@ -253,6 +282,7 @@ export const CodeAnalyzer = () => {
         <Results
             results={results}
             processing={processing}
+            options={downloadOptions}
         />
         <ModalContainer />
     </div>
