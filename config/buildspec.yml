@@ -4,8 +4,7 @@ env:
   parameter-store:
     ES_API_HOST: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/api-host
     ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/npm-env-flags-file
-    ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
-    ES_VERSION_MINOR: /earsketch-webclient/version_number/minor
+    ES_VERSION_LIST: /earsketch-webclient/version_number
     ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
     ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
   secrets-manager:
@@ -34,11 +33,12 @@ phases:
       - export LOCAL_STAGING_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_DIR_NAME"
       - export LOCAL_STAGING_CACHED_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}-NOCACHE"
       - export LOCAL_STAGING_CACHED_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_CACHED_DIR_NAME"
-      - export ES_VERSION="$ES_VERSION_MAJOR.$ES_VERSION_MINOR.$CODEBUILD_BUILD_NUMBER"
+#      - export ES_VERSION="$ES_VERSION_MAJOR.$ES_VERSION_MINOR.$CODEBUILD_BUILD_NUMBER"
       - if [ "$ES_BASE_URI" == "review" ]; then echo "ES_BASE_URI review mode" && export ES_BASE_URI=https://earsketch-test.ersktch.gatech.edu/$LOCAL_STAGING_DIR_NAME; fi
       - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
   build:
     commands:
+      - echo "ES_VERSION_LIST: $ES_VERSION_LIST"
       - start_time="$(date -u +%s)"
       - du -sh $CODEBUILD_SRC_DIR
       - echo "Entered the build phase..."
