@@ -148,7 +148,7 @@ const TabDropdown = () => {
                 flex justify-around items-center flex-shrink-0 
                 h-12 p-3 cursor-pointer select-none
                 text-gray-800 dark:text-gray-200
-                ${highlight ? "bg-gray-100 dark:bg-gray-500" : "bg-gray-200 dark: bg-gray-800"}
+                ${highlight ? "bg-gray-100 dark:bg-gray-500" : "bg-gray-200 dark:bg-gray-800"}
             `}
             onClick={() => {
                 setShowDropdown(show => {
