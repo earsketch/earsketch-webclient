@@ -243,6 +243,9 @@ export function reloadRecommendations() {
             }
         }
     }
+    if (input.length === 0) {
+        input = recommender.addRandomRecInput(input)
+    }
     [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
         res = recommender.recommend(res, input, ...v)
     })
