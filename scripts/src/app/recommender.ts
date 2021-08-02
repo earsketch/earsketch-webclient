@@ -40,10 +40,12 @@ export function addRecInput(recInput: string[], script: Script) {
     for (const line of lines) {
         for (const name of AUDIOKEYS) {
             // exclude makebeat
-            if (name.slice(0, 3) !== "OS_" && line.includes(name) && !recInput.includes(name)) {
-                // exclude comments
-                if (line.indexOf(name) < line.indexOf("#")) {
-                    recInput.push(name)
+            if (name.length > 0 && name.slice(0, 3) !== "OS_") {
+                if (line.includes(name) && !recInput.includes(name)) {
+                    // exclude comments
+                    if (!line.includes("#") || line.indexOf(name) < line.indexOf("#")) {
+                        recInput.push(name)
+                    }
                 }
             }
         }
