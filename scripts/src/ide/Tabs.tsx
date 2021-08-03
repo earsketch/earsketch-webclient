@@ -1,8 +1,8 @@
 import * as classNames from "classnames"
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { usePopper } from "react-popper"
 import { useTranslation } from "react-i18next"
+import { Menu } from "@headlessui/react"
 
 import { closeAllTabs } from "../app/App"
 import * as appState from "../app/appState"
@@ -11,7 +11,7 @@ import { createScript } from "./IDE"
 import { DropdownContextMenuCaller } from "../browser/ScriptsMenus"
 import * as scripts from "../browser/scriptsState"
 import * as tabs from "./tabState"
-import { useHeightLimiter } from "../Utils"
+import * as layout from "../ide/layoutState"
 
 const CreateScriptButton = () => {
     return <div
@@ -28,7 +28,7 @@ const CreateScriptButton = () => {
     </div>
 }
 
-const Tab = ({ scriptID, scriptName }: { scriptID: string, scriptName: string }) => {
+const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: string, inMenu: boolean }) => {
     const dispatch = useDispatch()
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID)
 
@@ -45,8 +45,9 @@ const Tab = ({ scriptID, scriptName }: { scriptID: string, scriptName: string })
         }
     }, [activeTabID])
 
-    const tabClass = classNames("w-48 flex-shrink-0 h-14 cursor-pointer border",
+    const tabClass = classNames("flex-shrink-0 h-14 cursor-pointer border",
         {
+            "w-48": !inMenu,
             "bg-blue border-blue": active,
             "bg-gray-200 hover:bg-gray-700 dark:bg-gray-900 dark:hover:bg-gray-800": !active, // background
             "border-gray-300 hover:border-gray-200 dark:border-gray-800 dark:hover:border-gray-900": !active, // border
@@ -105,7 +106,7 @@ const CloseAllTab = () => {
     const { t } = useTranslation()
     return <div
         className={`
-            w-48 flex-shrink-0 h-12 p-3 cursor-pointer
+            flex-shrink-0 h-12 p-3 cursor-pointer
             flex items-center
             text-white bg-gray-800 border border-gray-800    
         `}
@@ -121,7 +122,7 @@ const MainTabGroup = () => {
 
     return <div className="flex items-center truncate">
         {visibleTabs.map((ID: string) => allScripts[ID] &&
-            <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} />
+            <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} inMenu={false} />
         )}
         <CreateScriptButton />
     </div>
@@ -131,49 +132,34 @@ const TabDropdown = () => {
     const openTabs = useSelector(tabs.selectOpenTabs)
     const hiddenTabs = useSelector(tabs.selectHiddenTabs)
     const allScripts = useSelector(scripts.selectAllScripts)
-    const [highlight, setHighlight] = useState(false)
     const { t } = useTranslation()
 
-    const [showDropdown, setShowDropdown] = useState(false)
-    const [referenceElement, heightLimiterStyle] = useHeightLimiter(showDropdown, "4rem")
-    const popperElement = useRef(null)
-    const { styles, attributes, update } = usePopper(referenceElement.current, popperElement.current, {
-        modifiers: [{ name: "offset", options: { offset: [0, 5] } }],
-    })
+    const otherTabsHeight = useSelector(layout.selectOtherTabsHeight)
+    const otherTabsStyle: React.CSSProperties = { maxHeight: otherTabsHeight, overflowY: "scroll" }
 
-    return <>
-        <div
-            ref={referenceElement}
-            className={`
-                flex justify-around items-center flex-shrink-0 
-                h-12 p-3 cursor-pointer select-none
-                text-gray-800 dark:text-gray-200
-                ${highlight ? "bg-gray-100 dark:bg-gray-500" : "bg-gray-200 dark:bg-gray-800"}
-            `}
-            onClick={() => {
-                setShowDropdown(show => {
-                    update?.()
-                    return !show
-                })
-            }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
-        >
-            {openTabs.length === hiddenTabs.length ? "All Tabs" : t("tabs.otherTabs")}
-            <i className="icon icon-arrow-down2 text-lg p-2" />
-        </div>
-        <div
-            ref={popperElement}
-            style={showDropdown ? { ...styles.popper, ...heightLimiterStyle } : { display: "none" }}
-            {...attributes.popper}
-            className="border border-black z-20 bg-white"
-        >
-            {hiddenTabs.map((ID: string) => allScripts[ID] && (
-                <Tab key={ID} scriptID={ID} scriptName={allScripts[ID].name} />
-            ))}
-            <CloseAllTab />
-        </div>
-    </>
+    return <div className="">
+        <Menu as="div" className="relative inline-block text-left p-3 bg-gray-200 dark:bg-gray-800
+        hover:bg-gray-100 dark:hover:bg-gray-500">
+            <Menu.Button className="text-gray-800 dark:text-gray-200">
+                <div className="flex flex-row items-center">
+                    {openTabs.length === hiddenTabs.length ? "All Tabs" : t("tabs.otherTabs")}
+                    <i className="icon icon-arrow-down2 text-lg p-2"/>
+                </div>
+            </Menu.Button>
+            <Menu.Items style={otherTabsStyle} className={"absolute z-50 right-0 mt-1 origin-top-right " +
+                "border border-black bg-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none " +
+                "divide-y divide-gray-300 dark:divide-gray-800"}>
+                {hiddenTabs.map((ID: string) => allScripts[ID] && (
+                    <Menu.Item key={ID}>
+                        <Tab scriptID={ID} scriptName={allScripts[ID].name} inMenu={true}/>
+                    </Menu.Item>
+                ))}
+                <Menu.Item>
+                    <CloseAllTab/>
+                </Menu.Item>
+            </Menu.Items>
+        </Menu>
+    </div>
 }
 
 export const Tabs = () => {

@@ -110,5 +110,13 @@ export const selectVerticalRatio = createSelector(
     }
 )
 
+export const selectOtherTabsHeight = createSelector(
+    [selectNorthSize, selectSouthSize],
+    (north, south) => {
+        const height = windowHeight()
+        return height - north - south - 150
+    }
+)
+
 export const selectWestKind = (state: RootState) => state.layout.west.kind
 export const selectEastKind = (state: RootState) => state.layout.east.kind
