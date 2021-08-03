@@ -53,7 +53,7 @@ import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
 (window as any).Question = Question // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
-;(window as any).droplet = droplet
+    ; (window as any).droplet = droplet
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?
@@ -108,5 +108,5 @@ ReactDOM.render(
             </PersistGate>
         </Provider>
     </React.StrictMode>,
-    document.getElementById("root"))
-
+    document.getElementById("root")
+)

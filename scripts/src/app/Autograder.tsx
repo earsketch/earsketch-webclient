@@ -137,7 +137,7 @@ const CodeEmbed = ({ sourceCode, language }: { sourceCode: string, language: str
 }
 
 interface ReferenceScript {
-    name: string,
+    name: string
     sourceCode: string
 }
 

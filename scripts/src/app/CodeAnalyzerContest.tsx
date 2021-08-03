@@ -184,12 +184,12 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
 }
 
 export interface ContestOptions {
-    artistName: string,
-    complexityThreshold: number,
-    uniqueStems: number,
-    lengthRequirement: number,
-    showIndividualGrades: boolean,
-    startingID: number,
+    artistName: string
+    complexityThreshold: number
+    uniqueStems: number
+    lengthRequirement: number
+    showIndividualGrades: boolean
+    startingID: number
 }
 
 export const CodeAnalyzerContest = () => {

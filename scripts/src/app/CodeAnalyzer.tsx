@@ -163,18 +163,11 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
 const ReportDisplay = ({ report }: { report: { [key: string]: string | number } | { [key: string]: string | number }[] }) => {
     return <table className="table">
         <tbody>
-            {Array.isArray(report)
-                ? report.map((value: any, key: number) =>
-                    <tr key={key}>
-                        <th>{key}</th><td>{JSON.stringify(value)}</td>
-                    </tr>
-                )
-                : Object.entries(report).map(([key, value]) =>
-                    <tr key={key}>
-                        <th>{key}</th><td>{JSON.stringify(value)}</td>
-                    </tr>
-                )
-            }
+            {Object.entries(report).map(([key, value]) =>
+                <tr key={key}>
+                    <th>{key}</th><td>{JSON.stringify(value)}</td>
+                </tr>
+            )}
         </tbody>
     </table>
 }
@@ -258,9 +251,9 @@ export interface Result {
 }
 
 export interface DownloadOptions {
-    useContestID: boolean,
-    allowedKeys?: string[],
-    showIndividualResults?: boolean,
+    useContestID: boolean
+    allowedKeys?: string[]
+    showIndividualResults?: boolean
 }
 
 export const CodeAnalyzer = () => {

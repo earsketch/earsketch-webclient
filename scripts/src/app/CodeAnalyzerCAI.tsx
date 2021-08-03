@@ -71,7 +71,7 @@ export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed,
 
 export const Upload = ({ processing, options, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
     { processing: string | null, options: ReportOptions, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
-    const [urls, setUrls] = useState("")
+    const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
     const [shareIDColumn, setShareIDColumn] = useState(1)
@@ -79,28 +79,26 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const i: { [key: string]: { id: number, finished: boolean } } = {}
-            const u = []
+            const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
+            const urlList = []
             try {
                 script = await readFile(file)
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
                     if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
-                        let shareid = values[shareIDColumn]
-                        if (shareid.includes("?sharing=")) {
-                            shareid = shareid.split("?sharing=")[shareid.split("?sharing=").length - 1]
-                        }
-                        i[shareid] = { id: Number(values[contestIDColumn]), finished: false }
-                        u.push(values[shareIDColumn])
+                        const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
+                        const shareid = match ? match[0].substring(9) : values[shareIDColumn]
+                        contestEntries[shareid] = { id: Number(values[contestIDColumn]), finished: false }
+                        urlList.push("?sharing=" + shareid)
                     }
                 }
             } catch (err) {
                 console.error(err)
                 return
             }
-            setUrls(u.join("\n"))
-            setContestDict?.(i)
+            setUrls(urlList)
+            setContestDict?.(contestEntries)
         }
     }
 
@@ -166,22 +164,20 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
         }
         setProcessing(null)
 
-        let matches: string[] | null = []
+        const matches: RegExpMatchArray | null = []
         const re = /\?sharing=([^\s.,])+/g
         esconsole("Running code analyzer.", ["DEBUG"])
-        if (csvInput) {
-            matches = []
-            for (let url of urls.split("\n")) {
-                if (url.includes("?sharing=")) {
-                    url = url.split("?sharing=")[url.split("?sharing=").length - 1]
+
+        for (const url of urls) {
+            const match = url.match(re)
+            if (match) {
+                for (const m of match) {
+                    matches.push(m)
                 }
-                matches.push("?sharing=" + url)
             }
-        } else {
-            matches = urls.match(re)
         }
 
-        const results: Result[] = []
+        let results: Result[] = []
 
         if (!matches) { return }
         for (const match of matches) {
@@ -203,8 +199,8 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
                 if (contestDict?.[shareId]) {
                     result.contestID = contestDict[shareId].id
                 }
-                results.push(result)
-                setResults([...results])
+                results = [...results, result]
+                setResults(results)
                 setProcessing(null)
             } else {
                 setResults([...results, { script }])
@@ -213,9 +209,9 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
                     if (contestDict?.[shareId]) {
                         r.contestID = contestDict[shareId].id
                     }
-                    results.push(r)
+                    results = [...results, r]
                 }
-                setResults([...results])
+                setResults(results)
             }
         }
     }
@@ -241,15 +237,15 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
                     <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Share ID Column
                 </div>
                 : <div className="panel-body">
-                    <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value)}></textarea>
+                    <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
                 </div>
             }
             <div className="panel-footer">
                 {processing
-                    ? <button className="btn btn-primary" onClick={() => run()} disabled>
+                    ? <button className="btn btn-primary" onClick={run} disabled>
                         <i className="es-spinner animate-spin mr-3"></i> Run
                     </button>
-                    : <button className="btn btn-primary" onClick={() => run()}> Run </button>
+                    : <button className="btn btn-primary" onClick={run}> Run </button>
                 }
             </div>
         </div>
@@ -257,15 +253,15 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
 }
 
 export interface ReportOptions {
-    OVERVIEW: boolean,
-    COMPLEXITY: boolean,
-    EFFECTS: boolean,
-    MEASUREVIEW: boolean,
-    GENRE: boolean,
-    SOUNDPROFILE: boolean,
-    MIXING: boolean,
-    HISTORY: boolean,
-    APICALLS: boolean,
+    OVERVIEW: boolean
+    COMPLEXITY: boolean
+    EFFECTS: boolean
+    MEASUREVIEW: boolean
+    GENRE: boolean
+    SOUNDPROFILE: boolean
+    MIXING: boolean
+    HISTORY: boolean
+    APICALLS: boolean
 }
 
 export const CodeAnalyzerCAI = () => {
