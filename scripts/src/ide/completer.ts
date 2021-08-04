@@ -43,7 +43,7 @@ const earsketchCompleter: Ace.Completer = {
 
         completions.push(...constants)
         callback(null, completions)
-    }
+    },
 }
 
 // Reset completers to remove Python keyword completer that we don't want to show students.

@@ -16,12 +16,12 @@ export const checkIfExists = (clip: Clip) => {
 
 const logCurve = (val: number, factor: number) => {
     factor = factor <= 1 ? 1.000001 : factor
-    return (Math.log(val * (factor - 1.) + 1.)) / (Math.log(factor))
+    return (Math.log(val * (factor - 1.0) + 1.0)) / (Math.log(factor))
 }
 
 const normalize = (waveform: number[]) => {
-    var max = waveform.reduce((a, b) => Math.max(a, b))
-    var maxLog = logCurve(max, 5)
+    const max = waveform.reduce((a, b) => Math.max(a, b))
+    const maxLog = logCurve(max, 5)
     return waveform.map(v => v / maxLog * 0.8)
 }
 

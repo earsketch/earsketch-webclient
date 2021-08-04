@@ -1,47 +1,50 @@
-﻿//Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
-import * as recommender from '../app/recommender'
+/* eslint-disable */
+// TODO: Resolve lint issues.
 
-let activeProject : string = ""
-let availableGenres : string[] = []
-let availableInstruments : string[] = []
+// Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
+import * as recommender from "../app/recommender"
+
+let activeProject: string = ""
+let availableGenres: string[] = []
+const availableInstruments: string[] = []
 
 // Initialize empty model.
-const defaultProjectModel = { 'genre': [], 'instrument': [], 'form': [], 'code structure': [] }
+const defaultProjectModel = { genre: [], instrument: [], form: [], "code structure": [] }
 
-let propertyOptions : { [key: string]: any } = {
-    'genre': availableGenres,
+const propertyOptions: { [key: string]: any } = {
+    genre: availableGenres,
     // 'instrument': availableInstruments,
-    'form': ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
-    'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
+    form: ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
+    "code structure": ["forLoop", "function", "consoleInput", "conditional"],
 }
 
-let suggestablePropertyOptions : { [key: string]: any } =  {
-    'genre': availableGenres,
+const suggestablePropertyOptions: { [key: string]: any } = {
+    genre: availableGenres,
     // 'instrument': availableInstruments,
-    'form': ["[FORM]"],
-    'code structure': ['forLoop', 'function', 'consoleInput', 'conditional']
+    form: ["[FORM]"],
+    "code structure": ["forLoop", "function", "consoleInput", "conditional"],
 }
 
-let propertyButtons : { [key: string]: string } = {
-    'genre': "i have a genre I want to include",
+const propertyButtons: { [key: string]: string } = {
+    genre: "i have a genre I want to include",
     // 'instrument': "there's an instrument i want to make sure is in the project",
-    'form': "i have a form in mind",
-    'code structure': "i need to use a specific code structure"
+    form: "i have a form in mind",
+    "code structure": "i need to use a specific code structure",
 }
 
-let suggestableProperties : { [key: string]: { [key: string]: any} } = {
-    'multiple': {
-        'genre': availableGenres,
+const suggestableProperties: { [key: string]: { [key: string]: any } } = {
+    multiple: {
+        genre: availableGenres,
         // 'instrument': availableInstruments,
     },
-    'one': {
-        'form': ["[FORM]"]
-    }
+    one: {
+        form: ["[FORM]"],
+    },
 }
 
-let projectModel : { [key: string]: any } = {}
+const projectModel: { [key: string]: any } = {}
 
-//returns a list of all properties that can be set/adjusted
+// returns a list of all properties that can be set/adjusted
 export function getProperties() {
     return Object.keys(propertyOptions)
 }
@@ -55,11 +58,11 @@ export function getOptions(propertyString: string) {
 }
 
 export function randomPropertySuggestion() {
-    let add : boolean = false
+    let add: boolean = false
     let selectedProperty = null
     let selectedValue = null
-    //gather all properties that can be suggested at the moment (all with multiple options, plus those one-offs that have not yet been filled)
-    let possibleProperties = []
+    // gather all properties that can be suggested at the moment (all with multiple options, plus those one-offs that have not yet been filled)
+    const possibleProperties = []
     const multiples = Object.keys(suggestableProperties.multiple)
     const singles = Object.keys(suggestableProperties.one)
     for (let i = 0; i < multiples.length; i++) {
@@ -75,22 +78,22 @@ export function randomPropertySuggestion() {
     if (possibleProperties.length == 0) {
         return {}
     }
-    //select a property at random
+    // select a property at random
     const propertyIndex = getRandomInt(0, possibleProperties.length - 1)
     selectedProperty = possibleProperties[propertyIndex]
-    //if this is a property that can hold multiple values, mark if we are adding to an extant list or providing a first value
+    // if this is a property that can hold multiple values, mark if we are adding to an extant list or providing a first value
     if (multiples.includes(selectedProperty) && projectModel[activeProject][selectedProperty].length > 0) {
         add = true
     }
-    //list possible values, avoiding repeating existing values in the model
-    let possibleValues = []
+    // list possible values, avoiding repeating existing values in the model
+    const possibleValues = []
     for (let i = 0; i < suggestablePropertyOptions[selectedProperty].length; i++) {
         const valueOption = suggestablePropertyOptions[selectedProperty][i]
         if (!projectModel[activeProject][selectedProperty].includes(valueOption)) {
             possibleValues.push(valueOption)
         }
     }
-    //select one at random
+    // select one at random
     if (possibleValues.length > 0) {
         const valueIndex = getRandomInt(0, possibleValues.length - 1)
         selectedValue = possibleValues[valueIndex]
@@ -104,7 +107,7 @@ export function setActiveProject(projectName: string) {
     if (projectName in projectModel) {
         activeProject = projectName
     } else {
-        //create empty, default project model
+        // create empty, default project model
         activeProject = projectName
         clearModel()
     }
@@ -122,19 +125,19 @@ export function getPropertyButtons() {
 // Update model with key/value pair.
 export function updateModel(property: string, value: string) {
     switch (property) {
-        case 'genre':
-        case 'code structure':
-        case 'instrument':
+        case "genre":
+        case "code structure":
+        case "instrument":
             const index = projectModel[activeProject][property].indexOf(value)
             if (index === -1) {
                 projectModel[activeProject][property].push(value) // Unlimited number of genres/instruments.
             }
             break
-        case 'form':
-            projectModel[activeProject]['form'][0] = value // Only one form at a time.
+        case "form":
+            projectModel[activeProject].form[0] = value // Only one form at a time.
             break
         default:
-            console.log('Invalid project model entry.')
+            console.log("Invalid project model entry.")
     }
     console.log(projectModel)
 }
@@ -142,7 +145,7 @@ export function updateModel(property: string, value: string) {
 // Return to empty/default model.
 export function clearModel() {
     projectModel[activeProject] = {}
-    for (let i in defaultProjectModel) {
+    for (const i in defaultProjectModel) {
         projectModel[activeProject][i] = []
     }
 }
@@ -155,7 +158,7 @@ export function clearProperty(property: string) {
 // Remove single property from array.
 export function removeProperty(property: string, propertyValue: any) {
     if (projectModel[activeProject][property]) {
-        let index = projectModel[activeProject][property].indexOf(propertyValue)
+        const index = projectModel[activeProject][property].indexOf(propertyValue)
         if (index > -1) {
             projectModel[activeProject][property].splice(index, 1)
         }
@@ -167,7 +170,7 @@ export function getRandomInt(min: number, max: number) {
 }
 
 export function isEmpty() {
-    for(let key in projectModel[activeProject]) {
+    for (const key in projectModel[activeProject]) {
         if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
             return false
         }
@@ -176,8 +179,8 @@ export function isEmpty() {
 }
 
 export function getNonEmptyFeatures() {
-    let features = []
-    for(let key in projectModel[activeProject]) {
+    const features = []
+    for (const key in projectModel[activeProject]) {
         if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
             features.push(key)
         }
@@ -186,11 +189,11 @@ export function getNonEmptyFeatures() {
 }
 
 export function getAllProperties() {
-    let properties = []
-    for (let key in projectModel[activeProject]) {
+    const properties = []
+    for (const key in projectModel[activeProject]) {
         if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
-            for (let pVal in projectModel[activeProject][key]) {
-                properties.push([key,projectModel[activeProject][key][pVal]])
+            for (const pVal in projectModel[activeProject][key]) {
+                properties.push([key, projectModel[activeProject][key][pVal]])
             }
         }
     }
@@ -198,9 +201,9 @@ export function getAllProperties() {
 }
 
 export function hasProperty(property: string) {
-    for (let key in projectModel[activeProject]) {
+    for (const key in projectModel[activeProject]) {
         if (projectModel[activeProject][key] !== undefined && projectModel[activeProject][key].length !== 0) {
-            for (let pVal in projectModel[activeProject][key]) {
+            for (const pVal in projectModel[activeProject][key]) {
                 if (projectModel[activeProject][key][pVal] === property) {
                     return true
                 }
@@ -212,9 +215,9 @@ export function hasProperty(property: string) {
 
 export function setOptions() {
     availableGenres = recommender.availableGenres()
-    propertyOptions['genre'] = availableGenres
-    suggestablePropertyOptions['genre'] = availableGenres
-    suggestableProperties['multiple']['genre'] = availableGenres
+    propertyOptions.genre = availableGenres
+    suggestablePropertyOptions.genre = availableGenres
+    suggestableProperties.multiple.genre = availableGenres
     // availableInstruments = recommender.availableInstruments()
     // propertyOptions['instrument'] = availableInstruments
     // suggestablePropertyOptions['instrument'] = availableInstruments

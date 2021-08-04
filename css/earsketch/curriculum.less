@@ -105,37 +105,49 @@
 }
 
 // Question styling:
-#curriculum #questionsContainer {
+@bullet-spacing: 32px;
+@correct-color: #2CBF70;
+@incorrect-color: #FF3448;
+
+#curriculum div.sect2 {
+  counter-reset: question-number; // reset question numbers for each section
+}
+
+#curriculum div.question {
   list-style: none;
   list-style-position: outside;
   font-weight: bold;
 }
 
 // Undo some Tailwind Typography list styling.
-#curriculum #questionsContainer li {
+#curriculum div.question li {
   padding-left: 0;
 }
-#curriculum #questionsContainer li::before {
+#curriculum div.question li::before {
   content: none;
 }
 
-#curriculum #questionsContainer label {
+#curriculum div.question p {
   font-weight: bold;
-  display: flex;
-  align-items: flex-start;
-  padding-top: .5em;
-  padding-bottom: .5em;
 }
 
-@bullet-spacing: 32px;
+#curriculum div.question p code {
+  font-weight: normal;
+}
 
-#curriculum li.question {
+#curriculum div.question > div.content > div.paragraph > p {
   padding-top: .5em;
   position: relative;
   margin-left: @bullet-spacing;
+  padding-top: .5em;
+  counter-increment: question-number;
 }
 
-#curriculum li.question > i {
+#curriculum div.question > div.content > div.paragraph > p::before {
+  content: counter(question-number) ". ";
+}
+
+#curriculum div.question i {
   position: absolute;
   left: -@bullet-spacing;
   top: 9px;
@@ -148,16 +160,14 @@
   color: #CCCCCC;
 }
 
-@correct-color: #2CBF70;
-@incorrect-color: #FF3448;
-
-#curriculum li.question.complete > i {
+#curriculum div.question.complete i {
   background-color: @correct-color;
   color: white;
 }
 
 #curriculum ul.answers {
   font-size: 1.3rem;
+  margin-left: @bullet-spacing;
 }
 
 #curriculum ul.answers input[type="radio"] {
@@ -178,25 +188,25 @@
   background-color: white;
 }
 
-#curriculum ul.answers li.correct input:checked + .control {
+#curriculum ul.answers p.correct input:checked + .control {
   background-color: @correct-color;
   border-color: @correct-color;
 }
 
-#curriculum ul.answers li.incorrect input:checked + .control {
+#curriculum ul.answers p.incorrect input:checked + .control {
   background-color: @incorrect-color;
   border-color: @incorrect-color;
 }
 
-#curriculum ul.answers li.correct {
+#curriculum ul.answers p.correct {
   color: @correct-color;
 }
 
-#curriculum ul.answers li.incorrect {
+#curriculum ul.answers p.incorrect {
   color: @incorrect-color;
 }
 
-#curriculum ul.answers li.incorrect input[type="radio"]:checked + .control + ::after {
+#curriculum ul.answers p.incorrect .try-again::after {
   font-weight: normal;
   margin-left: 1em;
   margin-right: 1em;

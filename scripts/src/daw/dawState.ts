@@ -1,9 +1,9 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit'
+import { createSlice, createSelector } from "@reduxjs/toolkit"
 
-import { RootState } from '../reducers'
-import { Track } from '../app/player'
+import { RootState } from "../reducers"
+import { Track } from "../app/player"
 
-const shuffle = (array : any[]) => {
+const shuffle = (array: any[]) => {
     let i = array.length
     while (i) {
         const r = Math.floor(Math.random() * i--)
@@ -14,32 +14,32 @@ const shuffle = (array : any[]) => {
     return array
 }
 
-const TRACK_COLORS = ['#f2fdbf','#f3d8b2','#ff8080','#9fa2fd','#9fb2fd','#9fc2fd','#9fd2fd','#9fe2fd',
-                      '#9ff2fd','#9fe29d','#9fe2bd','#bfe2bf','#dfe2bf','#ffe2bf','#ffff00','#ffc0cb']
+const TRACK_COLORS = ["#f2fdbf", "#f3d8b2", "#ff8080", "#9fa2fd", "#9fb2fd", "#9fc2fd", "#9fd2fd", "#9fe2fd",
+    "#9ff2fd", "#9fe29d", "#9fe2bd", "#bfe2bf", "#dfe2bf", "#ffe2bf", "#ffff00", "#ffc0cb"]
 
 const BEATS_PER_MEASURE = 4
 
 // Intervals of measure line based on zoom levels
 // This list is referred during zoom in/out
 const MEASURELINE_ZOOM_INTERVALS = [
-    {end: 750, tickInterval: 4, labelInterval: 4, tickDivision: 1},
-    {end: 1350, tickInterval: 1, labelInterval: 4, tickDivision: 4},
-    {end: 1950, tickInterval: 0.5, labelInterval: 4, tickDivision: 1},
-    {end: 2850, tickInterval: 0.5, labelInterval: 1, tickDivision: 1},
-    {end: Infinity, tickInterval: 0.25, labelInterval: 1, tickDivision: 1}
+    { end: 750, tickInterval: 4, labelInterval: 4, tickDivision: 1 },
+    { end: 1350, tickInterval: 1, labelInterval: 4, tickDivision: 4 },
+    { end: 1950, tickInterval: 0.5, labelInterval: 4, tickDivision: 1 },
+    { end: 2850, tickInterval: 0.5, labelInterval: 1, tickDivision: 1 },
+    { end: Infinity, tickInterval: 0.25, labelInterval: 1, tickDivision: 1 },
 ]
 
 // Intervals of timeline based on zoom levels
 // This list is referred during zoom in/out
 const TIMELINE_ZOOM_INTERVALS = [
-    {end: 950, tickInterval: 15},
-    {end: 1550, tickInterval: 10},
-    {end: 2650, tickInterval: 5},
-    {end: 2950, tickInterval: 5},
-    {end: 3950, tickInterval: 4},
-    {end: 7850, tickInterval: 2},
-    {end: 9150, tickInterval: 1},
-    {end: Infinity, tickInterval: 1}
+    { end: 950, tickInterval: 15 },
+    { end: 1550, tickInterval: 10 },
+    { end: 2650, tickInterval: 5 },
+    { end: 2950, tickInterval: 5 },
+    { end: 3950, tickInterval: 4 },
+    { end: 7850, tickInterval: 2 },
+    { end: 9150, tickInterval: 1 },
+    { end: Infinity, tickInterval: 1 },
 ]
 
 // We want to keep the length of a bar proportional to number of pixels on the screen.
@@ -67,7 +67,7 @@ interface DAWState {
     playing: boolean
     pendingPosition: number | null
     soloMute: SoloMuteConfig
-    bypass: {[key: number]: string[]}
+    bypass: { [key: number]: string[] }
     loop: {
         selection: boolean,
         start: number,
@@ -79,20 +79,20 @@ interface DAWState {
 }
 
 const dawSlice = createSlice({
-    name: 'daw',
+    name: "daw",
     initialState: {
         tracks: [],
         playLength: 0,
-        trackWidth: 2750,  // TODO: Not sure why this changes from its initial value (650).
+        trackWidth: 2750, // TODO: Not sure why this changes from its initial value (650).
         trackHeight: 45,
         trackColors: shuffle(TRACK_COLORS.slice()),
         showEffects: true,
         metronome: false,
         tempo: 120,
         playing: false,
-        pendingPosition: null,  // null indicates no position pending.
-        soloMute: {},  // Track index -> "mute" or "solo"
-        bypass: {},  // Track index -> [bypassed effect keys]
+        pendingPosition: null, // null indicates no position pending.
+        soloMute: {}, // Track index -> "mute" or "solo"
+        bypass: {}, // Track index -> [bypassed effect keys]
         loop: {
             selection: false, // false = loop whole track
             start: 1,
@@ -148,7 +148,7 @@ const dawSlice = createSlice({
         setAutoScroll(state, { payload }) {
             state.autoScroll = payload
         },
-    }
+    },
 })
 
 export default dawSlice.reducer
@@ -206,7 +206,7 @@ export const selectXScale = createSelector(
 export const selectTimeScale = createSelector(
     [selectTrackWidth, selectTempo],
     (trackWidth, tempo) => {
-        const secondsFitToScreen = MEASURES_FIT_TO_SCREEN*BEATS_PER_MEASURE/(tempo/60)
+        const secondsFitToScreen = MEASURES_FIT_TO_SCREEN * BEATS_PER_MEASURE / (tempo / 60)
         return d3.scale.linear()
             .domain([0, secondsFitToScreen])
             .range([0, trackWidth])
@@ -215,17 +215,17 @@ export const selectTimeScale = createSelector(
 
 export const selectSongDuration = createSelector(
     [selectPlayLength, selectTempo],
-    (playLength, tempo) => playLength*BEATS_PER_MEASURE/(tempo/60)
+    (playLength, tempo) => playLength * BEATS_PER_MEASURE / (tempo / 60)
 )
 
-const getZoomIntervals = (intervals: ({end: number} & any)[], width: number) => {
+const getZoomIntervals = (intervals: ({ end: number } & any)[], width: number) => {
     // Assumes intervals are sorted in increasing order.
     for (const zoomIntervals of intervals) {
         if (width <= zoomIntervals.end) {
             return zoomIntervals
         }
     }
-    return intervals[intervals.length-1]
+    return intervals[intervals.length - 1]
 }
 
 export const selectMeasurelineZoomIntervals = createSelector(

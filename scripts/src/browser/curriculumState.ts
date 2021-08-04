@@ -125,16 +125,48 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         }
     })
 
-    // Run scripts.
-    root.querySelectorAll("script").forEach(script => {
-        // Adopting the <script> node marks it as "already started", such that it will not execute.
-        // (See https://html.spec.whatwg.org/multipage/scripting.html#script-processing-model.)
-        // To get around this, we create a new <script> element and copy over the details.
-        const copy = document.createElement("script")
-        if (script.src) copy.src = script.src
-        copy.async = script.async
-        copy.innerText = script.innerText
-        script.replaceWith(copy)
+    root.querySelectorAll('div[class*="openblock question"]').forEach((questionDiv: HTMLDivElement, questionIndex) => {
+        const icon = document.createElement("i")
+        icon.classList.add("icon", "icon-checkmark")
+        // add icon to questions
+        questionDiv.querySelectorAll("div.paragraph > p").forEach(question => question.prepend(icon))
+
+        questionDiv.querySelectorAll("ul.answers > li > p").forEach((answerParagraph: HTMLParagraphElement, i) => {
+            const label = document.createElement("label")
+            const input = document.createElement("input")
+            const control = document.createElement("span")
+            const span = document.createElement("span")
+
+            answerParagraph.prepend(label)
+            answerParagraph.append(span)
+            label.appendChild(input)
+            label.appendChild(control)
+
+            input.type = "radio"
+            input.name = "q" + questionIndex
+            input.onclick = () => {
+                if (i === 0) {
+                    answerParagraph.classList.add("correct")
+                    questionDiv.classList.add("complete")
+                    questionDiv.querySelectorAll("input").forEach((el) => { el.disabled = true })
+                    questionDiv.querySelectorAll(".incorrect").forEach(el => el.classList.remove("incorrect"))
+                } else {
+                    answerParagraph.classList.add("incorrect")
+                    questionDiv.querySelectorAll(".try-again").forEach(el => el.classList.remove("try-again"))
+                    span.classList.add("try-again")
+                }
+            }
+            control.classList.add("control")
+        })
+
+        const answers = Array.from(questionDiv.querySelectorAll("ul.answers > li"))
+        const answerList = questionDiv.querySelector("ul.answers")
+        answers.forEach(a => a.remove())
+        while (answers.length) {
+            const index = Math.floor(Math.random() * answers.length)
+            answerList!.appendChild(answers[index])
+            answers.splice(index, 1)
+        }
     })
 
     if (/WebKit/.test(navigator.userAgent)) {

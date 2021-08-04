@@ -210,7 +210,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                     </div>
                 </div>
                 {index < notifications.length - 1 &&
-            <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
+                <hr style={{ margin: "10px 20px", border: "solid 1px dimgrey" }} />}
             </div>)}
 
         <div className="notification-type-header flex justify-between">

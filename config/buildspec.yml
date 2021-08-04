@@ -4,8 +4,7 @@ env:
   parameter-store:
     ES_API_HOST: /earsketch-webclient/BuildConfig/$ES_API_TARGET_ENVIRONMENT/api-host
     ENV_FLAGS_FILE: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/npm-env-flags-file
-    ES_VERSION_MAJOR: /earsketch-webclient/version_number/major
-    ES_VERSION_MINOR: /earsketch-webclient/version_number/minor
+    ES_VERSION_LIST: /earsketch-webclient/version_number
     ES_BASE_URI: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_uri
     ES_BASE_URL: /earsketch-webclient/BuildConfig/$ES_BUILD_ENVIRONMENT$ES_BUILD_SUFFIX/client_base_url
   secrets-manager:
@@ -34,7 +33,7 @@ phases:
       - export LOCAL_STAGING_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_DIR_NAME"
       - export LOCAL_STAGING_CACHED_DIR_NAME="${CODEBUILD_SOURCE_VERSION//\//-}-NOCACHE"
       - export LOCAL_STAGING_CACHED_DIR="$CODEBUILD_SRC_DIR/$LOCAL_STAGING_CACHED_DIR_NAME"
-      - export ES_VERSION="$ES_VERSION_MAJOR.$ES_VERSION_MINOR.$CODEBUILD_BUILD_NUMBER"
+      - export ES_VERSION="${ES_VERSION_LIST//,/.}-$CODEBUILD_BUILD_NUMBER"
       - if [ "$ES_BASE_URI" == "review" ]; then echo "ES_BASE_URI review mode" && export ES_BASE_URI=https://earsketch-test.ersktch.gatech.edu/$LOCAL_STAGING_DIR_NAME; fi
       - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
   build:
@@ -53,16 +52,7 @@ phases:
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
       - cp -r sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
-  post_build:
-    commands:
-      - |
-        if [ "$ES_BUILD_ENVIRONMENT" = "production" ]; 
-        then
-          echo "Tagging production build with version $ES_VERSION"
-          python "$ES_SCRIPT_HOME/github_create_release.py" $GITHUB_USER $GITHUB_TOKEN $CODEBUILD_RESOLVED_SOURCE_VERSION $ES_VERSION
-        else
-          echo "Not applying git tag. Non-production environment: $ES_BUILD_ENVIRONMENT"
-        fi
+
 artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME
   files:

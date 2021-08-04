@@ -243,6 +243,9 @@ export function reloadRecommendations() {
             }
         }
     }
+    if (input.length === 0) {
+        input = recommender.addRandomRecInput(input)
+    }
     [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
         res = recommender.recommend(res, input, ...v)
     })
@@ -272,7 +275,7 @@ const Footer = () => {
     const { t } = useTranslation()
 
     return <div className={`${embedMode ? "hidden" : "flex"} justify-between bg-black text-white p-3`} style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-        <div>V{BUILD_NUM}</div>
+        <div title={BUILD_NUM}>V{`${BUILD_NUM}`.split("-")[0]}</div>
         <div className="space-x-6">
             <a className="text-white" href="https://www.teachers.earsketch.org" target="_blank" rel="noreferrer">{t("footer.teachers").toLocaleUpperCase()}</a>
             <a className="text-white" href="https://earsketch.gatech.edu/landing/#/contact" target="_blank" rel="noreferrer">{t("footer.help").toLocaleUpperCase()}</a>
@@ -584,13 +587,7 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    {/* TODO: Bring back keyboard shortcuts. */}
-                    {/* <div>
-                        <button id="keyboard-shortcuts" type="button" className="top-header-nav-button btn btn-xs btn-clear" ng-click="toggleShortcutHelper()" ng-className="showKeyShortcuts ? "grow-in-size":""" title="Show/Hide Keyboard Shortcuts">
-                            <i className="icon icon-keyboard"></i>
-                                <span className="sr-only">Keyboard Shortcuts</span>
-                        </button>
-                    </div> */}
+                    {/* TODO: Bring back keyboard shortcut button & popover. */}
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
 
                     {/* Font Size */}
