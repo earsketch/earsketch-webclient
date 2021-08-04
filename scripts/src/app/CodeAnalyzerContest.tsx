@@ -109,7 +109,11 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                     },
                 })
                 setContestResults([...contestResults])
-                contestDict[result.script.shareid].finished = true
+                if (contestDict[result.script.shareid]) { 
+                    contestDict[result.script.shareid].finished = true 
+                } else {
+                    contestDict[result.script.shareid] = { id: 0, finished: true }
+                }
                 continue
             }
 
@@ -140,7 +144,11 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                     },
                 })
                 setContestResults([...contestResults])
-                contestDict[result.script.shareid].finished = true
+                if (contestDict[result.script.shareid]) { 
+                    contestDict[result.script.shareid].finished = true 
+                } else {
+                    contestDict[result.script.shareid] = { id: 0, finished: true }
+                }
                 continue
             }
 
@@ -173,7 +181,12 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 result.reports = reports
                 contestResults.push(result)
                 setContestResults([...contestResults])
-                contestDict[result.script.shareid].finished = true
+
+                if (contestDict[result.script.shareid]) { 
+                    contestDict[result.script.shareid].finished = true 
+                } else {
+                    contestDict[result.script.shareid] = { id: 0, finished: true }
+                }
             }
         }
     }, [results])
