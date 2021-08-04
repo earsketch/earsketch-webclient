@@ -6,6 +6,7 @@ module.exports = {
     extends: [
         "plugin:react/recommended",
         "standard",
+        "plugin:json/recommended",
     ],
     parser: "@typescript-eslint/parser",
     parserOptions: {
