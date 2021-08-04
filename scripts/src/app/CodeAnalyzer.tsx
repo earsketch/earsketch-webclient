@@ -212,8 +212,7 @@ export const Results = ({ results, processing, options }: { results: Result[], p
                         <ResultPanel result={result} />
                     </li>
                 )}
-            </ul>
-        }
+            </ul>}
         {results.length > 0 &&
             <div className="container">
                 {processing
@@ -224,8 +223,7 @@ export const Results = ({ results, processing, options }: { results: Result[], p
                         No scripts being processed!
                     </div>}
 
-            </div>
-        }
+            </div>}
         {results.length > 0 &&
             <div className="container" style={{ textAlign: "center" }}>
                 <button className="btn btn-lg btn-primary" onClick={() => download(results, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>

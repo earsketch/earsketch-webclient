@@ -40,8 +40,8 @@ module.exports = {
             esDSP: path.resolve(__dirname, `${libDir}/earsketch-dsp.js`),
 
             // Controllers
-            chatWindowDirective: path.resolve(__dirname,`${appDir}/chatWindowDirective.js`),
-        }
+            chatWindowDirective: path.resolve(__dirname, `${appDir}/chatWindowDirective.js`),
+        },
     },
     module: {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
@@ -141,11 +141,11 @@ module.exports = {
             template: "public/index.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname,"codeAnalyzerCAI/index.html"),
+            filename: path.resolve(__dirname, "codeAnalyzerCAI/index.html"),
             template: "public/index.html",
         }),
         new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname,"codeAnalyzerContest/index.html"),
+            filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
             template: "public/index.html",
         }),
         new TsconfigPathsPlugin({

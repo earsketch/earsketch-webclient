@@ -38,12 +38,10 @@ export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed,
                         {Object.entries(options).map(([option, value]) =>
                             <label key={option}>
                                 {typeof (value) === "boolean" &&
-                                    <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>
-                                }
+                                    <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>}
                                 {option}{" "}
                                 {(typeof (value) === "string" || typeof (value) === "number") &&
-                                    <input type="text" value={value} onChange={e => setOptions({ ...options, [option]: e.target.value })} style={{ backgroundColor: "lightgray" }}></input>
-                                }
+                                    <input type="text" value={value} onChange={e => setOptions({ ...options, [option]: e.target.value })} style={{ backgroundColor: "lightgray" }}></input>}
                             </label>
                         )}
                     </ul>
@@ -62,8 +60,7 @@ export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed,
                         <p className="small">
                             Disclaimer: Testing randomness is inherently difficult. Only use this in the most trivial of cases.
                         </p>
-                    </div>
-                }
+                    </div>}
             </div>
         </div>
     </div>
@@ -226,8 +223,7 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
                 : <div className="panel-heading">
                     Paste share URLs
                     <button className="btn btn-primary" onClick={() => setCsvInput(true)}>Switch to CSV Input</button>
-                </div>
-            }
+                </div>}
             {csvInput
                 ? <div className="panel-body">
                     <input type="file" onChange={file => {
@@ -238,15 +234,13 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
                 </div>
                 : <div className="panel-body">
                     <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
-                </div>
-            }
+                </div>}
             <div className="panel-footer">
                 {processing
                     ? <button className="btn btn-primary" onClick={run} disabled>
                         <i className="es-spinner animate-spin mr-3"></i> Run
                     </button>
-                    : <button className="btn btn-primary" onClick={run}> Run </button>
-                }
+                    : <button className="btn btn-primary" onClick={run}> Run </button>}
             </div>
         </div>
     </div>
