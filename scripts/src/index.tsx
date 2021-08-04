@@ -3,8 +3,6 @@ import "../../css/earsketch/allstyles.less"
 import "./tailwind.css"
 import "./i18n"
 
-import angular from "angular"
-
 // TODO: These import globals for now.
 import "highlight"
 import "jsDiffLib"
@@ -31,9 +29,7 @@ import "ace-builds/src-noconflict/ext-language_tools"
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import jsWorkerUrl from "file-loader!aceJsWorker"
 
-import esconsole from "./esconsole"
 import * as ESUtils from "./esutils"
-import reporter from "./app/reporter"
 
 // NOTE: We import this purely for its side-effects (registering a completer with Ace).
 import "./ide/completer"
@@ -53,7 +49,7 @@ import { CodeAnalyzerContest } from "./app/CodeAnalyzerContest"
 (window as any).Question = Question // Includes ES APIs.
 ace.config.setModuleUrl("ace/mode/javascript_worker", jsWorkerUrl)
 
-    ; (window as any).droplet = droplet
+; (window as any).droplet = droplet
 
 // Initialize SoundCloud.
 // TODO: Make these environment variables. And maybe add an entry for default `npm run serve` port of 8080?

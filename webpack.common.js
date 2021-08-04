@@ -110,8 +110,6 @@ module.exports = {
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery',
-            // AngularJS depends on the global jQuery variable
-            'window.jQuery': 'jquery',
 
             SC: 'soundcloud',
             lunr: 'lunr',
