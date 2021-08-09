@@ -1,8 +1,8 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Browser"
 
-import * as chat from "./chatState"
+import * as cai from "./caiState"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
@@ -11,17 +11,16 @@ import * as curriculum from "../browser/curriculumState"
 import store from "../reducers"
 
 const ChatHeader = () => {
-    const activeProject = useSelector(chat.selectActiveProject)
+    const activeProject = useSelector(cai.selectActiveProject)
 
     return (
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about { }
+                    Talk to CAI about {}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
-                        : <span>a project, when one is open</span>
-                    }
+                        : <span>a project, when one is open</span>}
                     .
                 </div>
             </div>
@@ -29,7 +28,7 @@ const ChatHeader = () => {
     )
 }
 
-const ChatMessageView = (message: chat.ChatMessage) => {
+const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
 
     return (
@@ -43,15 +42,15 @@ const ChatMessageView = (message: chat.ChatMessage) => {
                 <div id="text" className="chat-message-text">
                     {/* TODO: Refactor using map. */}
                     {message.text[0]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(chat.openCurriculum([message, 0])) }} style={{ color: "blue" }}>{message.keyword[0][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 0])) }} style={{ color: "blue" }}>{message.keyword[0][0]}</a>
                     {message.text[1]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(chat.openCurriculum([message, 1])) }} style={{ color: "blue" }}>{message.keyword[1][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 1])) }} style={{ color: "blue" }}>{message.keyword[1][0]}</a>
                     {message.text[2]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(chat.openCurriculum([message, 2])) }} style={{ color: "blue" }}>{message.keyword[2][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 2])) }} style={{ color: "blue" }}>{message.keyword[2][0]}</a>
                     {message.text[3]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(chat.openCurriculum([message, 3])) }} style={{ color: "blue" }}>{message.keyword[3][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 3])) }} style={{ color: "blue" }}>{message.keyword[3][0]}</a>
                     {message.text[4]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(chat.openCurriculum([message, 4])) }} style={{ color: "blue" }}>{message.keyword[4][0]}</a>
+                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 4])) }} style={{ color: "blue" }}>{message.keyword[4][0]}</a>
                     {message.text[5]}
                 </div>
             </div>
@@ -63,8 +62,8 @@ const ChatMessageView = (message: chat.ChatMessage) => {
 }
 
 const ChatBody = () => {
-    const activeProject = useSelector(chat.selectActiveProject)
-    const messageList = useSelector(chat.selectMessageList)
+    const activeProject = useSelector(cai.selectActiveProject)
+    const messageList = useSelector(cai.selectMessageList)
 
     return (
         <div id="cai-body">
@@ -74,9 +73,9 @@ const ChatBody = () => {
             <div className="chat-message-container">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, chat.ChatMessage]) =>
+                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
                         <li key={idx}>
-                            <ChatMessageView {...message}/>
+                            <CAIMessageView {...message}/>
                         </li>
                     )}
                 </ul>
@@ -87,10 +86,12 @@ const ChatBody = () => {
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
-    const inputOptions = useSelector(chat.selectInputOptions)
-    const errorOptions = useSelector(chat.selectErrorOptions)
-    const dropupLabel = useSelector(chat.selectDropupLabel)
+    const inputOptions = useSelector(cai.selectInputOptions)
+    const errorOptions = useSelector(cai.selectErrorOptions)
+    const dropupLabel = useSelector(cai.selectDropupLabel)
     const buttonLimit = 6
+
+    const [inputText, setInputText] = useState("")
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
@@ -98,9 +99,9 @@ const ChatFooter = () => {
                 {inputOptions.length < buttonLimit
                     ? <ul>
                         {inputOptions.length < buttonLimit &&
-                        Object.entries(inputOptions).map(([inputIdx, input]: [string, chat.ChatButton]) =>
+                        Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>
-                                <button type ="button" className="btn btn-cai" onClick={() => dispatch(chat.sendChatMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                     {input.label}
                                 </button>
                             </li>
@@ -112,22 +113,25 @@ const ChatFooter = () => {
                         </button>
                         <div className="dropup-cai-content" style={{ left: "50%", height: "fit-content" }}>
                             <ul>
-                                {Object.entries(inputOptions).map(([inputIdx, input]: [string, chat.ChatButton]) =>
+                                {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
-                                        <option onClick={() => dispatch(chat.sendChatMessage(input))}>{input.label}</option>
+                                        <option onClick={() => dispatch(cai.sendCAIMessage(input))}>{input.label}</option>
                                     </li>
                                 )}
                             </ul>
                         </div>
-                    </div>
-                }
+                    </div>}
+            </div>
+            <div style={{ flex: "auto" }}>
+                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} style={{ backgroundColor: "lightgray" }}></input>
+                <button onClick={() => dispatch(cai.sendCAIMessage({ label: inputText, value: inputText }))}> </button>
             </div>
             <div style={{ flex: "auto" }}>
                 <ul>
                     {errorOptions.length > 0 &&
-                    Object.entries(errorOptions).map(([errIdx, input]: [string, chat.ChatButton]) =>
+                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
                         <li key={errIdx}>
-                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(chat.sendChatMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                 {input.label}
                             </button>
                         </li>
@@ -146,8 +150,8 @@ export const Chat = () => {
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
 
     useEffect(() => {
-        dispatch(chat.chatSwapTab(activeScript ? activeScript.name : ""))
-        dispatch(chat.curriculumPage(curriculumLocation))
+        dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
+        dispatch(cai.curriculumPage(curriculumLocation))
     })
 
     return paneIsOpen
@@ -158,24 +162,24 @@ export const Chat = () => {
                 <ChatFooter />
             </div>
         )
-        : <Collapsed title="Chat" position="east" />
+        : <Collapsed title="CAI" position="east" />
 }
 
-if (FLAGS.SHOW_CHAT) {
-    // TODO: Moved out of userProject, should probably go in a useEffect.
-    window.onfocus = () => store.dispatch(chat.userOnPage(Date.now()))
-    window.onblur = () => store.dispatch(chat.userOnPage(Date.now()))
+// if (FLAGS.SHOW_CHAT) {
+//     // TODO: Moved out of userProject, should probably go in a useEffect.
+//     window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
+//     window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
 
-    let mouseX: number | undefined, mouseY: number | undefined
+//     let mouseX: number | undefined, mouseY: number | undefined
 
-    window.addEventListener("mousemove", e => {
-        mouseX = e.x
-        mouseY = e.y
-    })
+//     window.addEventListener("mousemove", e => {
+//         mouseX = e.x
+//         mouseY = e.y
+//     })
 
-    window.setInterval(() => {
-        if (mouseX && mouseY) {
-            store.dispatch(chat.mousePosition([mouseX, mouseY]))
-        }
-    }, 5000)
-}
+//     window.setInterval(() => {
+//         if (mouseX && mouseY) {
+//             store.dispatch(cai.mousePosition([mouseX, mouseY]))
+//         }
+//     }, 5000)
+// }
