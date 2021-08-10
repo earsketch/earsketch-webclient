@@ -209,8 +209,10 @@ export const compareObjStructure = (a: any, b: any): boolean => {
 // Returns the matching value or a null value if the parameter does not exist.
 export const getURLParameter = (key: string) => {
     let searchParams = window.location.search + window.location.hash
-    // remove hash from legacy curriculum share URLs
-    searchParams = searchParams.replace("#?curriculum=","?curriculum=")
+    // remove hash from legacy angular URLs
+    if (window.location.search === "" && window.location.hash.startsWith("#?")) {
+        searchParams = searchParams.replace("#?", "?")
+    }
     const params = new URLSearchParams(searchParams)
     return params.get(key)
 }
