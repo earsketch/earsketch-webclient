@@ -2,6 +2,7 @@ import { createSlice, createSelector } from "@reduxjs/toolkit"
 
 import { RootState } from "../reducers"
 import { Track } from "../app/player"
+import { TempoMap } from "../app/tempo"
 
 const shuffle = (array: any[]) => {
     let i = array.length
@@ -63,7 +64,7 @@ interface DAWState {
     trackColors: Color[]
     showEffects: boolean
     metronome: boolean
-    tempo: number
+    tempoMap: TempoMap
     playing: boolean
     pendingPosition: number | null
     soloMute: SoloMuteConfig
@@ -88,7 +89,7 @@ const dawSlice = createSlice({
         trackColors: shuffle(TRACK_COLORS.slice()),
         showEffects: true,
         metronome: false,
-        tempo: 120,
+        tempoMap: new TempoMap(),
         playing: false,
         pendingPosition: null, // null indicates no position pending.
         soloMute: {}, // Track index -> "mute" or "solo"
@@ -127,8 +128,8 @@ const dawSlice = createSlice({
         setMetronome(state, { payload }) {
             state.metronome = payload
         },
-        setTempo(state, { payload }) {
-            state.tempo = payload
+        setTempoMap(state, { payload }) {
+            state.tempoMap = payload
         },
         setPlaying(state, { payload }) {
             state.playing = payload
@@ -161,7 +162,7 @@ export const {
     setShowEffects,
     toggleEffects,
     setMetronome,
-    setTempo,
+    setTempoMap,
     setPlaying,
     setPendingPosition,
     setSoloMute,
@@ -177,7 +178,7 @@ export const selectTrackHeight = (state: RootState) => state.daw.trackHeight
 export const selectTrackColors = (state: RootState) => state.daw.trackColors
 export const selectShowEffects = (state: RootState) => state.daw.showEffects
 export const selectMetronome = (state: RootState) => state.daw.metronome
-export const selectTempo = (state: RootState) => state.daw.tempo
+export const selectTempoMap = (state: RootState) => state.daw.tempoMap
 export const selectPlaying = (state: RootState) => state.daw.playing
 export const selectPendingPosition = (state: RootState) => state.daw.pendingPosition
 export const selectSoloMute = (state: RootState) => state.daw.soloMute
@@ -204,9 +205,9 @@ export const selectXScale = createSelector(
 )
 
 export const selectTimeScale = createSelector(
-    [selectTrackWidth, selectTempo],
-    (trackWidth, tempo) => {
-        const secondsFitToScreen = MEASURES_FIT_TO_SCREEN * BEATS_PER_MEASURE / (tempo / 60)
+    [selectTrackWidth, selectTempoMap],
+    (trackWidth, tempoMap) => {
+        const secondsFitToScreen = tempoMap.measureToTime(MEASURES_FIT_TO_SCREEN)
         return d3.scale.linear()
             .domain([0, secondsFitToScreen])
             .range([0, trackWidth])
@@ -214,8 +215,8 @@ export const selectTimeScale = createSelector(
 )
 
 export const selectSongDuration = createSelector(
-    [selectPlayLength, selectTempo],
-    (playLength, tempo) => playLength * BEATS_PER_MEASURE / (tempo / 60)
+    [selectPlayLength, selectTempoMap],
+    (playLength, tempoMap) => tempoMap.measureToTime(playLength)
 )
 
 const getZoomIntervals = (intervals: ({ end: number } & any)[], width: number) => {

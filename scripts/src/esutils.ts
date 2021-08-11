@@ -120,7 +120,6 @@ export const formatScriptForTests = (script: string) => {
 // of the result object.
 export const formatResultForTests = (result: DAWData) => {
     let s = "\n{\n"
-    s += "    tempo: " + result.tempo + ",\n"
     s += "    length: " + result.length + ",\n"
     s += "    tracks: [\n"
     for (const track of result.tracks.slice(0, -1)) {
@@ -134,12 +133,6 @@ export const formatResultForTests = (result: DAWData) => {
                 measure: clip.measure,
                 start: clip.start,
                 end: clip.end,
-                pitchshift: undefined as any,
-            }
-            if (clip.pitchshift !== undefined) {
-                temp.pitchshift = {}
-                temp.pitchshift.start = clip.pitchshift.start
-                temp.pitchshift.end = clip.pitchshift.end
             }
             s += "            " + JSON.stringify(temp) + ",\n"
         }
@@ -242,6 +235,14 @@ export const formatTime = (milliseconds: number) => {
         case years < 1: return i18n.t("formattedTime.monthsAgo", { count: months })
         default: return i18n.t("formattedTime.yearsAgo", { count: years })
     }
+}
+
+// TODO: Update our target to more recent ES, or use a polyfill.
+export function fromEntries<V>(iterable: [string, V][]) {
+    return [...iterable].reduce((obj, [key, val]) => {
+        obj[key] = val
+        return obj
+    }, {} as { [key: string]: V })
 }
 
 const defaultTo = (value: number, defaultValue: number) => {

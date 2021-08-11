@@ -28,15 +28,16 @@ export interface Script {
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
 export interface SoundEntity {
-    file_key: string,
-    genregroup: string,
-    file_location: string,
-    folder: string,
-    artist: string,
-    year: string,
-    scope: number,
-    genre: string,
-    tempo: number,
-    instrument: string,
+    artist: string
+    file_key: string
+    file_location: string
+    genre?: string
+    genregroup?: string
+    instrument?: string
+    folder: string
+    scope: number
+    year?: string
     tags: string
+    // TODO: Server should omit or set to null to indicate no tempo, rather than -1.
+    tempo?: number
 }

@@ -37,11 +37,11 @@ function populateLibrarySounds() {
     return audioLibrary.getDefaultTagsMetadata().then((audioTags: SoundEntity[]) => {
         librarySounds = audioTags
         librarySounds.forEach((sound: SoundEntity) => {
-            keyGenreDict[sound.file_key] = sound.genre
-            if (!librarySoundGenres.includes(sound.genre)) {
-                librarySoundGenres.push(sound.genre)
+            keyGenreDict[sound.file_key] = sound.genre!
+            if (!librarySoundGenres.includes(sound.genre!)) {
+                librarySoundGenres.push(sound.genre!)
             }
-            keyInstrumentDict[sound.file_key] = sound.instrument
+            keyInstrumentDict[sound.file_key] = sound.instrument!
         })
     }).then(() => {
         esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])

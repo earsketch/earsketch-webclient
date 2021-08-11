@@ -7,6 +7,7 @@ import { Script, ScriptType } from "common"
 import { selectUserName } from "../user/userState"
 import { RootState, ThunkAPI } from "../reducers"
 import * as userProject from "../app/userProject"
+import { fromEntries } from "../esutils"
 
 export interface Scripts {
     [scriptID: string]: Script
@@ -359,14 +360,6 @@ export const resetSharedScriptInfoAsync = createAsyncThunk<void, void, ThunkAPI>
 export const selectRegularScripts = (state: RootState) => state.scripts.regularScripts
 export const selectSharedScripts = (state: RootState) => state.scripts.sharedScripts
 export const selectReadOnlyScripts = (state: RootState) => state.scripts.readOnlyScripts
-
-// TODO: Move to ESUtils or use a polyfill... this is duplicated inline in various other modules.
-function fromEntries<V>(iterable: [string, V][]) {
-    return [...iterable].reduce((obj, [key, val]) => {
-        obj[key] = val
-        return obj
-    }, {} as { [key: string]: V })
-}
 
 export const selectActiveScripts = createSelector(
     [selectRegularScripts],

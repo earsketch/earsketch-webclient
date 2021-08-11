@@ -10,9 +10,9 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
-import { Clip, DAWData, Track } from "./player"
-import { AugmentedBuffer } from "./audiolibrary"
+import { Clip, ClipSlice, DAWData, Track } from "./player"
 import i18n from "i18next"
+import { TempoMap, timestretch } from "./tempo"
 
 // After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know
@@ -25,27 +25,37 @@ export async function postRun(result: DAWData) {
     // However, since `finish()` doesn't actually do anything (other than set this flag), we no longer check.
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
+    // STEP 0: Set initial tempo, if none was specified.
+    if (!("TEMPO-TEMPO" in result.tracks[0].effects)) {
+        result.tracks[0].effects["TEMPO-TEMPO"] = []
+    }
+    if (!result.tracks[0].effects["TEMPO-TEMPO"].some(r => r.startMeasure === 1)) {
+        result.tracks[0].effects["TEMPO-TEMPO"].unshift({
+            track: 0, name: "TEMPO", parameter: "TEMPO",
+            startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120,
+        })
+    }
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
-    result = await loadBuffersForSampleSlicing(result)
+    await loadBuffersForSampleSlicing(result)
     // STEP 2: Load audio buffers needed for the result.
     const buffers = await loadBuffers(result)
     esconsole("Filling in looped sounds.", ["debug", "runner"])
-    // STEP 3: Insert buffers into clips and fix clip loops/effect lengths.
-    // before fixing the clips, retrieve the clip tempo info from the metadata cache for a special treatment for the MAKEBEAT clips
-    result = fixClips(getClipTempo(result), buffers)
+    // STEP 3: Insert buffers into clips, fix clip loops/effect lengths, and timestretch clips to fit the tempo map.
+    // Before fixing the clips, retrieve the clip tempo info from the metadata cache for a special treatment for the MAKEBEAT clips.
+    getClipTempo(result)
+    fixClips(result, buffers)
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
     checkEffects(result)
     // STEP 5: Pitchshift tracks that need it.
     esconsole("Handling pitchshifted tracks.", ["debug", "runner"])
-    result = await handlePitchshift(result)
+    await handlePitchshift(result)
     // STEP 6: Insert metronome as the last track.
     esconsole("Adding metronome track.", ["debug", "runner"])
-    result = await addMetronome(result)
+    await addMetronome(result)
     // STEP 7: Print out string for unit tests, return the result.
     esconsole(ESUtils.formatResultForTests(result), ["nolog", "runner"])
-    return result
 }
 
 // Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
@@ -56,16 +66,17 @@ async function handlePitchshift(result: DAWData) {
         userConsole.status("Applying PITCHSHIFT on audio clips")
     }
 
+    const tempoMap = new TempoMap(result)
+
     // Synchronize the userConsole print out with the asyncPitchShift processing.
     try {
         for (const track of result.tracks.slice(1)) {
             if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
-                await pitchshift.pitchshiftClips(track, result.tempo)
+                pitchshift.pitchshiftClips(track, tempoMap)
                 userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
             }
         }
         esconsole("Pitchshifting promise resolved.", ["debug", "runner"])
-        return result
     } catch (err) {
         esconsole(err, ["error", "runner"])
         throw err
@@ -137,10 +148,10 @@ async function handleSoundConstantsPY(code: string) {
     finder.visit(Sk.astFromParse(parse.cst, "<analyzer>", parse.flags))
     const possibleSoundConstants = finder.constants.filter(c => Sk.builtins[c] === undefined)
 
-    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
-    for (const clip of clipData) {
-        if (clip) {
-            Sk.builtins[clip.file_key] = Sk.ffi.remapToPy(clip.file_key)
+    const sounds = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
+    for (const sound of sounds) {
+        if (sound) {
+            Sk.builtins[sound.file_key] = Sk.ffi.remapToPy(sound.file_key)
         }
     }
 }
@@ -192,7 +203,7 @@ export async function runPython(code: string) {
     let result = Sk.ffi.remapToJs(pythonAPI.dawData)
     // STEP 4: Perform post-execution steps on the result object
     esconsole("Performing post-execution steps.", ["debug", "runner"])
-    result = await postRun(result)
+    await postRun(result)
     // STEP 5: finally return the result
     esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
     return result
@@ -218,10 +229,10 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 
     const possibleSoundConstants = constants.filter(c => interpreter.getProperty(scope, c) === undefined)
 
-    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
-    for (const clip of clipData) {
-        if (clip) {
-            interpreter.setProperty(scope, clip.file_key, clip.file_key)
+    const sounds = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
+    for (const sound of sounds) {
+        if (sound) {
+            interpreter.setProperty(scope, sound.file_key, sound.file_key)
         }
     }
 }
@@ -259,9 +270,9 @@ export async function runJavaScript(code: string) {
         throwErrorWithLineNumber(err, lineNumber as number)
     }
     esconsole("Performing post-execution steps.", ["debug", "runner"])
-    const finalResult = postRun(result)
+    await postRun(result)
     esconsole("Post-execution steps finished. Return result.", ["debug", "runner"])
-    return finalResult
+    return result
 }
 
 function sleep(ms: number) {
@@ -329,73 +340,59 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
 
 function getClipTempo(result: DAWData) {
     const metadata = audioLibrary.cache.defaultTags ?? []
-    const tempoCache: { [key: string]: number | undefined } = {}
+    const tempoCache: { [key: string]: number | undefined } = Object.create(null)
 
     const lookupTempo = (key: string) => {
         // Return cached tempo for given key, or search audio sample metadata and cache result.
         if (key in tempoCache) return tempoCache[key]
         const tempo = metadata.find(item => item.file_key === key)?.tempo
-        if (tempo !== undefined) {
-            tempoCache[key] = isNaN(tempo) ? -1 : tempo
-        }
-        return tempo
+        return (tempoCache[key] = (tempo === undefined || tempo < 0 || isNaN(tempo)) ? undefined : tempo)
     }
 
     for (const track of result.tracks) {
         for (const clip of track.clips) {
             const tempo = lookupTempo(clip.filekey)
-            if (tempo !== undefined) {
-                clip.tempo = tempo
-            }
+            clip.tempo = tempo
         }
     }
-
-    return result
 }
 
 async function loadBuffers(result: DAWData) {
     const promises = []
     for (const track of result.tracks) {
         for (const clip of track.clips) {
-            const tempo = result.tempo
-            const promise = audioLibrary.getAudioClip(clip.filekey, tempo)
+            const promise: Promise<[string, AudioBuffer]> = audioLibrary.getSound(clip.filekey).then(
+                sound => [clip.filekey, sound.buffer])
             promises.push(promise)
         }
     }
 
     const buffers = await Promise.all(promises)
-    const map: { [key: string]: AudioBuffer } = {}
-    for (const buffer of buffers) {
-        map[buffer.filekey] = buffer
-    }
-    return map
+    return ESUtils.fromEntries(buffers)
 }
 
 export async function loadBuffersForSampleSlicing(result: DAWData) {
     const promises = []
-    const sliceKeys: string[] = []
+    const tempoMap = new TempoMap(result)
 
     for (const [sliceKey, sliceDef] of Object.entries(result.slicedClips)) {
-        sliceKeys.push(sliceKey)
-
-        const promise = audioLibrary.getAudioClip(sliceDef.sourceFile, result.tempo)
+        const promise: Promise<[string, ClipSlice, audioLibrary.Sound]> =
+            audioLibrary.getSound(sliceDef.sourceFile).then(sound => [sliceKey, sliceDef, sound])
         promises.push(promise)
     }
 
-    const buffers = await Promise.all(promises)
-    for (let i = 0; i < buffers.length; i++) {
-        const sliceKey = sliceKeys[i]
-        const def = result.slicedClips[sliceKey]
-        const buffer = sliceAudioBufferByMeasure(buffers[i], def.start, def.end, result.tempo)
-        audioLibrary.cacheSlicedClip(sliceKey, result.tempo, buffer as AugmentedBuffer)
+    for (const [key, def, sound] of await Promise.all(promises)) {
+        // For consistency with old behavior, use clip tempo if available and initial tempo if not.
+        const tempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
+        const buffer = sliceAudioBufferByMeasure(sound.file_key, sound.buffer, def.start, def.end, tempo)
+        audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
     }
-    return result
 }
 
 // Slice a buffer to create a new temporary sound constant.
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
-function sliceAudioBufferByMeasure(buffer: AugmentedBuffer, start: number, end: number, tempo: number) {
+function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
     const lengthInBeats = (end - start) * 4 // 4 beats per measure
     const lengthInSeconds = lengthInBeats * (60.0 / tempo)
     const lengthInSamples = lengthInSeconds * buffer.sampleRate
@@ -408,7 +405,7 @@ function sliceAudioBufferByMeasure(buffer: AugmentedBuffer, start: number, end: 
     const endSamp = (end - 1) * 4 * (60.0 / tempo) * buffer.sampleRate
 
     if (endSamp > buffer.length) {
-        throw new RangeError(`End of slice at ${end} reaches past end of sample ${buffer.filekey}`)
+        throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
     }
 
     for (let i = 0; i < buffer.numberOfChannels; i++) {
@@ -423,32 +420,37 @@ function sliceAudioBufferByMeasure(buffer: AugmentedBuffer, start: number, end: 
     return slicedBuffer
 }
 
+function roundUpToDivision(seconds: number, tempo: number) {
+    const duration = ESUtils.timeToMeasure(seconds, tempo)
+    let posIncrement = duration
+    let exp = -2
+
+    // stop adjusting at exp=4 -> 16 measures
+    while (duration > Math.pow(2, exp) && exp < 4) {
+        exp++
+    }
+
+    if (duration <= Math.pow(2, exp)) {
+        posIncrement = Math.pow(2, exp)
+    }
+
+    return [posIncrement, duration]
+}
+
 // Fill in looped clips with multiple clips, and adjust effects with end == 0.
 function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
+    const tempoMap = new TempoMap(result)
     // step 1: fill in looped clips
     result.length = 0
     for (const track of result.tracks) {
         track.analyser = audioContext.createAnalyser()
-        // NOTE: This loop pushes onto the array. We don't want to iterate over the new elements, so we slice() here.
-        for (const clip of track.clips.slice()) {
-            const buffer = buffers[clip.filekey]
-            clip.audio = buffer
-            let duration, posIncr
+        const newClips: Clip[] = []
+        for (const clip of track.clips) {
+            const sourceBuffer = buffers[clip.filekey]
+            let duration, posIncrement = 0
 
-            // if the clip does not have the original tempo, override the incremental size to be a quarter note, half note, a measure, etc.
-            if (clip.tempo === -1) {
-                // by default, increment the repeating clip position by the clip duration
-                posIncr = duration = ESUtils.timeToMeasure(buffer.duration, result.tempo)
-                let exp = -2
-
-                // stop adjusting at exp=4 -> 16 measures
-                while (duration > Math.pow(2, exp) && exp < 4) {
-                    exp++
-                }
-
-                if (duration <= Math.pow(2, exp)) {
-                    posIncr = Math.pow(2, exp)
-                }
+            if (clip.tempo === undefined) {
+                duration = ESUtils.timeToMeasure(sourceBuffer.duration, tempoMap.getTempoAtMeasure(clip.measure))
             } else {
                 // Tempo specified: round to the nearest sixteenth note.
                 // This corrects for imprecision in dealing with integer numbers of samples,
@@ -456,56 +458,53 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 // E.g.: A wave file of one measure at 88 bpm, 44.1kHz has 120273 samples;
                 // converting it to a mp3 and decoding yields 119808 samples,
                 // meaning it falls behind by ~0.01 seconds per loop.
-                const actualLengthInQuarters = buffer.duration / 60 * result.tempo
+                const actualLengthInQuarters = sourceBuffer.duration / 60 * clip.tempo
                 const actualLengthInSixteenths = actualLengthInQuarters * 4
                 // NOTE: This prevents users from using samples which have intentionally weird lenghts,
                 // like 33 32nd notes, as they will be rounded to the nearest 16th.
                 // This has been deemed an acceptable tradeoff for fixing unintentional loop drift.
                 const targetLengthInSixteenths = Math.round(actualLengthInSixteenths)
                 const targetLengthInQuarters = targetLengthInSixteenths / 4
-                duration = posIncr = targetLengthInQuarters / 4
+                duration = posIncrement = targetLengthInQuarters / 4
             }
 
-            // if the clip end value is 0, set it to the duration
-            // this fixes API calls insertMedia, etc. that don't
-            // know the clip length ahead of time
-            if (clip.end === 0) {
-                clip.end = duration + 1
-            }
+            // if the clip end value is 0, set it to the duration (one repeat)
+            // this fixes API calls insertMedia, etc. that don't know the clip length ahead of time
+            clip.end ||= duration + 1
 
-            // calculate the remaining amount of time to fill
-            let leftover = clip.end - clip.start - posIncr
+            // update result length
+            const endMeasure = clip.measure + (clip.end - clip.start)
+            result.length = Math.max(result.length, endMeasure + clip.silence - 1)
 
-            // figure out how long the result is
-            result.length = Math.max(
-                result.length,
-                clip.measure + (clip.end - clip.start) + clip.silence - 1
-            )
-
-            // update the source clip to reflect the new length
-            clip.end = Math.min(duration + 1, clip.end)
-            clip.loopChild = false
-
-            // add clips to fill in empty space
-            let k = 1
             // the minimum measure length for which extra clips will be added to fill in the gap
             const fillableGapMinimum = 0.01
-            while (leftover > fillableGapMinimum && clip.loop) {
-                track.clips.push({
-                    filekey: clip.filekey,
-                    audio: clip.audio,
-                    track: clip.track,
-                    measure: clip.measure + (k * posIncr),
-                    start: 1,
-                    end: 1 + Math.min(duration, leftover),
-                    scale: clip.scale,
-                    loop: clip.loop,
-                    loopChild: true,
-                } as unknown as Clip)
-                leftover -= Math.min(posIncr, leftover)
-                k++
+            // add clips to fill in empty space
+            let measure = clip.measure
+            let buffer = sourceBuffer
+            let first = true
+            while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
+                if (clip.tempo === undefined) {
+                    // If the clip doesn't have a tempo, use an even increment such as a quarter note, half note, whole note, etc.
+                    [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
+                } else {
+                    // Timestretch to match the tempo map at this point in the track.
+                    // TODO: Do some caching, at least for the simple case of constant tempo.
+                    buffer = timestretch(sourceBuffer, clip.tempo, tempoMap, measure - (clip.start - 1))
+                }
+                newClips.push({
+                    ...clip,
+                    audio: buffer,
+                    measure,
+                    start: first ? clip.start : 1,
+                    end: first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure),
+                    loopChild: !first,
+                })
+                measure += posIncrement
+                first = false
             }
         }
+
+        track.clips = newClips
 
         // fix effect lengths
         for (const effects of Object.values(track.effects)) {
@@ -546,8 +545,6 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             }
         }
     }
-
-    return result
 }
 
 // Warn users when a clips overlap each other. Done after execution because
@@ -584,9 +581,9 @@ function checkOverlaps(result: DAWData) {
 
 // Warn users when a track contains effects, but no audio. Done after execution
 // because we don't know if there are audio samples on the entire track
-// until then. (Moved from passthrough.js)
+// until then. (Doesn't apply to mix track, which can't contain clips.)
 function checkEffects(result: DAWData) {
-    for (const [i, track] of Object.entries(result.tracks)) {
+    for (const [i, track] of Object.entries(result.tracks).slice(1)) {
         const clipCount = track.clips.length
         const effectCount = Object.keys(track.effects).length
 
@@ -599,8 +596,8 @@ function checkEffects(result: DAWData) {
 // Adds a metronome as the last track of a result.
 async function addMetronome(result: DAWData) {
     const [stressed, unstressed] = await Promise.all([
-        audioLibrary.getAudioClip("METRONOME01", -1),
-        audioLibrary.getAudioClip("METRONOME02", -1),
+        audioLibrary.getSound("METRONOME01"),
+        audioLibrary.getSound("METRONOME02"),
     ])
     const track = {
         clips: [] as Clip[],
@@ -625,5 +622,4 @@ async function addMetronome(result: DAWData) {
     // The metronome needs an analyzer to prevent errors in player
     track.analyser = audioContext.createAnalyser()
     result.tracks.push(track as unknown as Track)
-    return result
 }

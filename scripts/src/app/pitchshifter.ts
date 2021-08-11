@@ -6,9 +6,9 @@
 import ctx from "./audiocontext"
 import * as dsp from "../../lib/earsketch-appdsp"
 import esconsole from "../esconsole"
-import * as ESUtils from "../esutils"
 import * as userConsole from "../ide/console"
 import { Clip, EffectRange, Track } from "./player"
+import { TempoMap } from "./tempo"
 
 interface Point {
     sampletime: number
@@ -41,9 +41,9 @@ const computeFrameEnvelope = (bendinfo: Point[], numFrames: number) => {
     return envelope
 }
 
-const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) => {
+const addEnvelopePoint = (points: Point[], effect: EffectRange, tempoMap: TempoMap) => {
     const startPoint = {
-        sampletime: Math.round(ESUtils.measureToTime(effect.startMeasure, tempo) * 44100 / dsp.HOP_SIZE),
+        sampletime: Math.round(tempoMap.measureToTime(effect.startMeasure) * 44100 / dsp.HOP_SIZE),
         semitone: effect.startValue,
         type: "start",
     } as Point
@@ -86,7 +86,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
     points.push(startPoint)
 
     const endPoint = {
-        sampletime: Math.round(ESUtils.measureToTime(effect.endMeasure, tempo) * 44100 / dsp.HOP_SIZE),
+        sampletime: Math.round(tempoMap.measureToTime(effect.endMeasure) * 44100 / dsp.HOP_SIZE),
         semitone: effect.endValue,
         type: "end",
     } as Point
@@ -100,12 +100,12 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempo: number) =
     }
 }
 
-const getEnvelopeForTrack = (track: Track, tempo: number) => {
+const getEnvelopeForTrack = (track: Track, tempoMap: TempoMap) => {
     const points: Point[] = []
     if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
         // Compute envelope information
         for (const effect of track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]) {
-            addEnvelopePoint(points, effect, tempo)
+            addEnvelopePoint(points, effect, tempoMap)
         }
     }
     return points
@@ -129,9 +129,9 @@ const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
     return outBuffer
 }
 
-const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) => {
-    const clipStartInSamps = Math.round(ESUtils.measureToTime(clip.measure, tempo) * 44100 / dsp.HOP_SIZE)
-    const clipEndInSamps = Math.round(ESUtils.measureToTime(clip.measure + (clip.end - clip.start), tempo) * 44100 / dsp.HOP_SIZE)
+const getEnvelopeForClip = (clip: Clip, tempoMap: TempoMap, trackEnvelope: Point[]) => {
+    const clipStartInSamps = Math.round(tempoMap.measureToTime(clip.measure) * 44100 / dsp.HOP_SIZE)
+    const clipEndInSamps = Math.round(tempoMap.measureToTime(clip.measure + (clip.end - clip.start)) * 44100 / dsp.HOP_SIZE)
     const clipLenInSamps = clipEndInSamps - clipStartInSamps
 
     // clone the env-point-object array
@@ -251,14 +251,13 @@ const getEnvelopeForClip = (clip: Clip, tempo: number, trackEnvelope: Point[]) =
     return clipPoints
 }
 
-// TODO: Is there any reason for this to be async? It doesn't actually do anything async inside, and it's CPU-bound rather than IO-bound.
-export async function pitchshiftClips(track: Track, tempo: number) {
+export function pitchshiftClips(track: Track, tempoMap: TempoMap) {
     if (track.clips.length === 0) {
         throw new RangeError("Cannot pitchshift an empty track")
     }
 
     // TODO: This looks broken with high-density automation
-    const trackEnvelope = getEnvelopeForTrack(track, tempo)
+    const trackEnvelope = getEnvelopeForTrack(track, tempoMap)
 
     if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
         BUFFER_CACHE = Object.create(null)
@@ -266,10 +265,10 @@ export async function pitchshiftClips(track: Track, tempo: number) {
 
     for (const clip of track.clips) {
         let shiftedBuffer
-        const bendinfo = getEnvelopeForClip(clip, tempo, trackEnvelope)
+        const bendinfo = getEnvelopeForClip(clip, tempoMap, trackEnvelope)
         const hashKey = JSON.stringify({
             clip: [clip.filekey, clip.start, clip.end],
-            bendinfo: bendinfo,
+            bendinfo,
         })
 
         if (hashKey in BUFFER_CACHE) {
@@ -288,11 +287,7 @@ export async function pitchshiftClips(track: Track, tempo: number) {
             BUFFER_CACHE[hashKey] = shiftedBuffer
         }
 
-        clip.pitchshift = {
-            audio: shiftedBuffer,
-            start: clip.start,
-            end: clip.end,
-        }
+        clip.audio = shiftedBuffer
     }
 
     return track

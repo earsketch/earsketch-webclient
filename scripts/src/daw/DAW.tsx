@@ -1,18 +1,19 @@
+// TODO: Either time or measures should be fixed as a linear scale,
+//       and the other should vary nonlinearly according to the tempo map.
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
+import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as applyEffects from "../model/applyeffects"
 import { setReady } from "../bubble/bubbleState"
+import * as daw from "./dawState"
 import { compileCode } from "../ide/IDE"
 import * as player from "../app/player"
 import esconsole from "../esconsole"
-import * as ESUtils from "../esutils"
 import store, { RootState } from "../reducers"
+import { TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
-
-import * as daw from "./dawState"
-import { useTranslation } from "react-i18next"
 
 // Width of track control box
 const X_OFFSET = 100
@@ -557,7 +558,7 @@ const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v ** 2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
+const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
     // ignore the mix track (0) and metronome track (len-1)
@@ -566,12 +567,13 @@ const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
             if (!WaveformCache.checkIfExists(clip)) {
                 const waveform = clip.audio.getChannelData(0)
 
-                // uncut clip duration
-                const wfDurInMeasure = ESUtils.timeToMeasure(clip.audio.duration, tempo)
-
-                // clip start in samples
-                const sfStart = (clip.start - 1) / wfDurInMeasure * waveform.length
-                const sfEnd = (clip.end - 1) / wfDurInMeasure * waveform.length
+                const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
+                const clipStartTime = tempoMap.measureToTime(clip.measure)
+                const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
+            
+                // Start/end locations within the clip's audio buffer, in samples.
+                const sfStart = (clipStartTime - clipBufferStartTime) * clip.audio.sampleRate
+                const sfEnd = sfStart + (clipEndTime - clipStartTime) * clip.audio.sampleRate
 
                 // suppress error when clips are overlapped
                 if (sfEnd <= sfStart) {
@@ -607,9 +609,9 @@ export function setDAWData(result: player.DAWData) {
     const { dispatch, getState } = store
     let state = getState()
 
-    prepareWaveforms(result.tracks, result.tempo)
-
-    dispatch(daw.setTempo(result.tempo))
+    const tempoMap = new TempoMap(result)
+    prepareWaveforms(result.tracks, tempoMap)
+    dispatch(daw.setTempoMap(tempoMap))
 
     const playLength = result.length + 1
     dispatch(daw.setPlayLength(playLength))
