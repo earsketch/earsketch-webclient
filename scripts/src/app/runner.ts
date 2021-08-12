@@ -427,11 +427,20 @@ function roundUpToDivision(seconds: number, tempo: number) {
     return [posIncrement, duration]
 }
 
+const timestretchCache = new Map<AudioBuffer, AudioBuffer>()
+let cachedTempo: number
+
 // Fill in looped clips with multiple clips, and adjust effects with end == 0.
 function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
     const tempoMap = new TempoMap(result)
     // step 1: fill in looped clips
     result.length = 0
+
+    if (FLAGS.CACHE_TS_RESULTS && tempoMap.points.length === 1 && tempoMap.points[0].tempo !== cachedTempo) {
+        timestretchCache.clear()
+        cachedTempo = tempoMap.points[0].tempo
+    }
+
     for (const track of result.tracks) {
         track.analyser = audioContext.createAnalyser()
         const newClips: Clip[] = []
@@ -479,8 +488,17 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                     [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
                 } else {
                     // Timestretch to match the tempo map at this point in the track.
-                    // TODO: Do some caching, at least for the simple case of constant tempo.
-                    buffer = timestretch(clip.sourceAudio, clip.tempo, tempoMap, measure - (clip.start - 1))
+                    if (FLAGS.CACHE_TS_RESULTS && tempoMap.points.length === 1) {
+                        // For constant-tempo scripts, use a cache.
+                        let cached = timestretchCache.get(clip.sourceAudio)
+                        if (cached === undefined) {
+                            cached = timestretch(clip.sourceAudio, clip.tempo, tempoMap, measure - (clip.start - 1))
+                            timestretchCache.set(clip.sourceAudio, cached)
+                        }
+                        buffer = cached
+                    } else {
+                        buffer = timestretch(clip.sourceAudio, clip.tempo, tempoMap, measure - (clip.start - 1))
+                    }
                 }
                 newClips.push({
                     ...clip,

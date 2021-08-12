@@ -48,7 +48,9 @@ export class TempoMap {
         if (result === undefined) return
         // Compute envelope information
         for (const range of result.tracks[0].effects["TEMPO-TEMPO"]) {
-            this.points.push({ measure: range.startMeasure, tempo: range.startValue })
+            if (range.startMeasure !== range.endMeasure) {
+                this.points.push({ measure: range.startMeasure, tempo: range.startValue })
+            }
             this.points.push({ measure: range.endMeasure, tempo: range.endValue })
         }
     }
