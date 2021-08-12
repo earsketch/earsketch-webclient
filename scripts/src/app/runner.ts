@@ -436,12 +436,12 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
         track.analyser = audioContext.createAnalyser()
         const newClips: Clip[] = []
         for (const clip of track.clips) {
-            const sourceBuffer = buffers[clip.filekey]
+            clip.sourceAudio = buffers[clip.filekey]
             let duration
             let posIncrement = 0
 
             if (clip.tempo === undefined) {
-                duration = ESUtils.timeToMeasure(sourceBuffer.duration, tempoMap.getTempoAtMeasure(clip.measure))
+                duration = ESUtils.timeToMeasure(clip.sourceAudio.duration, tempoMap.getTempoAtMeasure(clip.measure))
             } else {
                 // Tempo specified: round to the nearest sixteenth note.
                 // This corrects for imprecision in dealing with integer numbers of samples,
@@ -449,7 +449,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 // E.g.: A wave file of one measure at 88 bpm, 44.1kHz has 120273 samples;
                 // converting it to a mp3 and decoding yields 119808 samples,
                 // meaning it falls behind by ~0.01 seconds per loop.
-                const actualLengthInQuarters = sourceBuffer.duration / 60 * clip.tempo
+                const actualLengthInQuarters = clip.sourceAudio.duration / 60 * clip.tempo
                 const actualLengthInSixteenths = actualLengthInQuarters * 4
                 // NOTE: This prevents users from using samples which have intentionally weird lenghts,
                 // like 33 32nd notes, as they will be rounded to the nearest 16th.
@@ -471,7 +471,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             const fillableGapMinimum = 0.01
             // add clips to fill in empty space
             let measure = clip.measure
-            let buffer = sourceBuffer
+            let buffer = clip.sourceAudio
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
                 if (clip.tempo === undefined) {
@@ -480,7 +480,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 } else {
                     // Timestretch to match the tempo map at this point in the track.
                     // TODO: Do some caching, at least for the simple case of constant tempo.
-                    buffer = timestretch(sourceBuffer, clip.tempo, tempoMap, measure - (clip.start - 1))
+                    buffer = timestretch(clip.sourceAudio, clip.tempo, tempoMap, measure - (clip.start - 1))
                 }
                 newClips.push({
                     ...clip,

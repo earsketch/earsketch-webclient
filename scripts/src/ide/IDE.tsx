@@ -1,3 +1,5 @@
+import i18n from "i18next"
+import parse from "html-react-parser"
 import React, { useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -33,10 +35,7 @@ import * as tabs from "./tabState"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
-import * as WaveformCache from "../app/waveformcache"
-import i18n from "i18next"
 import { DAWData } from "../app/player"
-import parse from "html-react-parser"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -296,7 +295,6 @@ export async function compileCode() {
     setLoading(false)
     if (result) {
         esconsole("Code compiled, updating DAW.", "ide")
-        WaveformCache.clear()
         setDAWData(result)
     }
     reporter.compile(language, true, undefined, duration)

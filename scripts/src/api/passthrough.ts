@@ -522,7 +522,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
         .then(() => audioLibrary.getSound(audioFile))
         .then(sound => {
             // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-            const tempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
+            const tempo = sound.tempo ?? tempoMap.points[0].tempo
             const sampleRate = audioContext.sampleRate
             const startSecond = ESUtils.measureToTime(startTime, tempo)
             const endSecond = ESUtils.measureToTime(endTime, tempo)
@@ -652,7 +652,7 @@ export function dur(result: DAWData, fileKey: string) {
     const tempoMap = new TempoMap(result)
     return audioLibrary.getSound(fileKey).then(sound => {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
-        const tempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
+        const tempo = sound.tempo ?? tempoMap.points[0].tempo
         // Round to nearest hundredth.
         return Math.round(ESUtils.timeToMeasure(sound.buffer.duration, tempo) * 100) / 100
     })

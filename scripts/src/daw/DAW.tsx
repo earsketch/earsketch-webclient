@@ -8,6 +8,7 @@ import * as appState from "../app/appState"
 import * as applyEffects from "../model/applyeffects"
 import { setReady } from "../bubble/bubbleState"
 import * as daw from "./dawState"
+import * as ESUtils from "../esutils"
 import { compileCode } from "../ide/IDE"
 import * as player from "../app/player"
 import esconsole from "../esconsole"
@@ -567,15 +568,13 @@ const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
     for (let i = 1; i < tracks.length - 1; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
-                const waveform = clip.audio.getChannelData(0)
-
-                const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
-                const clipStartTime = tempoMap.measureToTime(clip.measure)
-                const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
+                // Use pre-timestretching/pitchshifting audio, since measures pass linearly in the DAW.
+                const waveform = clip.sourceAudio.getChannelData(0)
 
                 // Start/end locations within the clip's audio buffer, in samples.
-                const sfStart = (clipStartTime - clipBufferStartTime) * clip.audio.sampleRate
-                const sfEnd = sfStart + (clipEndTime - clipStartTime) * clip.audio.sampleRate
+                const tempo = clip.tempo ?? tempoMap.points[0].tempo
+                const sfStart = ESUtils.measureToTime(clip.start, tempo) * clip.sourceAudio.sampleRate
+                const sfEnd = ESUtils.measureToTime(clip.end, tempo) * clip.sourceAudio.sampleRate
 
                 // suppress error when clips are overlapped
                 if (sfEnd <= sfStart) {
@@ -612,6 +611,7 @@ export function setDAWData(result: player.DAWData) {
     let state = getState()
 
     const tempoMap = new TempoMap(result)
+    WaveformCache.clear()
     prepareWaveforms(result.tracks, tempoMap)
     dispatch(daw.setTempoMap(tempoMap))
 
