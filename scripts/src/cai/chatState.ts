@@ -104,7 +104,7 @@ const introduceChat = createAsyncThunk<void, void, ThunkAPI>(
     "chat/introduceChat",
     (_, { getState, dispatch }) => {
         // reinitialize recommendation dictionary
-        analysis.fillDict().then( ()  {
+        analysis.fillDict().then( () => {
             const msgText = dialogue.generateOutput("Chat with CAI")
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))

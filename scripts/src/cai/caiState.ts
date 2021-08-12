@@ -19,6 +19,8 @@ interface caiState {
     inputOptions: { label: string; value: string }[]
     errorOptions: { label: string; value: string }[]
     dropupLabel: string
+    wizard: false
+    responseOptions: CAIMessage[]
 }
 
 const caiSlice = createSlice({
@@ -29,6 +31,8 @@ const caiSlice = createSlice({
         inputOptions: [],
         errorOptions: [],
         dropupLabel: "",
+        wizard: location.href.includes("wizard"),
+        responseOptions: [],
     } as caiState,
     reducers: {
         setActiveProject(state, { payload }) {
@@ -67,6 +71,9 @@ const caiSlice = createSlice({
         setDropupLabel(state, { payload }) {
             state.dropupLabel = payload
         },
+        setResponseOptions(state, { payload }) {
+            state.responseOptions = payload
+        },
         resetState(state) {
             Object.assign(state, {
                 activeProject: "",
@@ -74,6 +81,7 @@ const caiSlice = createSlice({
                 inputOptions: [],
                 errorOptions: [],
                 dropupLabel: "",
+                wizard: location.href.includes("wizard"),
             })
         },
     },
@@ -92,7 +100,7 @@ export interface CAIMessage {
 }
 
 // TODO: Avoid DOM manipulation.
-function newCAIMessage() {
+export const newCAIMessage = () => {
     const east = store.getState().layout.east
     if (!(east.open && east.kind === "CAI")) {
         document.getElementById("caiButton")!.classList.add("flashNavButton")
@@ -101,13 +109,14 @@ function newCAIMessage() {
 
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     "cai/introduceCAI",
-    (_, { dispatch }) => {
+    (_, { getState, dispatch }) => {
         // reinitialize recommendation dictionary
         analysis.fillDict().then(() => {
             const msgText = dialogue.generateOutput("Chat with CAI")
             dialogue.studentInteract(false)
             dispatch(setInputOptions(dialogue.createButtons()))
             dispatch(setErrorOptions([]))
+            dispatch(setResponseOptions([]))
             if (msgText !== "") {
                 const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
                 for (const msg in messages) {
@@ -118,9 +127,13 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
                         sender: "CAI",
                     } as CAIMessage
 
-                    dispatch(addToMessageList(outputMessage))
-                    dispatch(autoScrollCAI())
-                    newCAIMessage()
+                    if (selectWizard(getState())) {
+                        dispatch(setResponseOptions([...selectResponseOptions(getState()), outputMessage]))
+                    } else {
+                        dispatch(addToMessageList(outputMessage))
+                        dispatch(autoScrollCAI())
+                        newCAIMessage()
+                    }
                 }
             }
         })
@@ -162,6 +175,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText !== "") {
             const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
+            dispatch(setResponseOptions([]))
             for (const msg in messages) {
                 if (messages[msg] !== "") {
                     const outputMessage = {
@@ -170,9 +184,14 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
                         date: Date.now(),
                         sender: "CAI",
                     } as CAIMessage
-                    dispatch(addToMessageList(outputMessage))
-                    dispatch(autoScrollCAI())
-                    newCAIMessage()
+
+                    if (selectWizard(getState())) {
+                        dispatch(setResponseOptions([...selectResponseOptions(getState()), outputMessage]))
+                    } else {
+                        dispatch(addToMessageList(outputMessage))
+                        dispatch(autoScrollCAI())
+                        newCAIMessage()
+                    }
                 }
             }
         }
@@ -212,7 +231,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileCAI",
-    (data, { dispatch }) => {
+    (data, { getState, dispatch }) => {
         if (dialogue.isDone()) {
             return
         }
@@ -237,9 +256,13 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage
-            dispatch(addToMessageList(message))
-            dispatch(setInputOptions(dialogue.createButtons()))
-            dispatch(setDefaultInputOptions())
+            if (selectWizard(getState())) {
+                dispatch(setResponseOptions([...selectResponseOptions(getState()), message]))
+            } else {
+                dispatch(addToMessageList(message))
+                dispatch(autoScrollCAI())
+                newCAIMessage()
+            }
         }
         if (output !== null && output === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
             dispatch(setDefaultInputOptions())
@@ -347,6 +370,7 @@ export const {
     addToMessageList,
     clearMessageList,
     setDropupLabel,
+    setResponseOptions,
     resetState,
 } = caiSlice.actions
 
@@ -359,3 +383,7 @@ export const selectErrorOptions = (state: RootState) => state.cai.errorOptions
 export const selectDropupLabel = (state: RootState) => state.cai.dropupLabel
 
 export const selectMessageList = (state: RootState) => state.cai.messageList
+
+export const selectWizard = (state: RootState) => state.cai.wizard
+
+export const selectResponseOptions = (state: RootState) => state.cai.responseOptions

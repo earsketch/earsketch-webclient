@@ -10,7 +10,7 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import store from "../reducers"
 
-const CaiHeader = () => {
+export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
 
     return (
@@ -62,7 +62,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     )
 }
 
-const CaiBody = () => {
+export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
 
