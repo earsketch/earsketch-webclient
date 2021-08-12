@@ -43,16 +43,38 @@ function deltaTimeToMeasure(start: Point, end: Point, deltaTime: number, beatsPe
 export class TempoMap {
     points: Point[] = []
 
-    // TODO: How does this (and our other effects) handle overlapping effect ranges?
-    constructor(result?: DAWData) {
-        if (result === undefined) return
-        // Compute envelope information
-        for (const range of result.tracks[0].effects["TEMPO-TEMPO"]) {
-            if (range.startMeasure !== range.endMeasure) {
+    constructor()
+    constructor(points: Point[])
+    constructor(result: DAWData)
+    constructor(thing?: Point[] | DAWData) {
+        if (thing === undefined) return
+        if (Array.isArray(thing)) {
+            this.points = thing
+        } else {
+            // Compute envelope information
+            for (const range of thing.tracks[0].effects["TEMPO-TEMPO"]) {
                 this.points.push({ measure: range.startMeasure, tempo: range.startValue })
+                this.points.push({ measure: range.endMeasure, tempo: range.endValue })
             }
-            this.points.push({ measure: range.endMeasure, tempo: range.endValue })
         }
+
+        // Canonicalize representation: remove initial points that have no effect on the tempo curve.
+        while (this.points.length > 1 && this.points[0].measure === this.points[1].measure) {
+            this.points.shift()
+        }
+        // TODO: May want to do additional canonicalization, like removing points that already fit on lines between neighbors,
+        //       or dealing with overlapping effect ranges (probably recency should determine precedence).
+    }
+
+    /** Extract a TempoMap that describes the curve from `startMeasure` to `endMeasure`, starting from measure 1. */
+    slice(startMeasure: number, endMeasure: number) {
+        const startTempo = this.getTempoAtMeasure(startMeasure)
+        const endTempo = this.getTempoAtMeasure(endMeasure)
+        const startIndex = this.points.findIndex(point => point.measure >= startMeasure)
+        const endIndex = this.points.findIndex(point => point.measure >= endMeasure)
+        const slice = this.points.slice(startIndex === -1 ? this.points.length : -1, endIndex === -1 ? this.points.length : -1)
+        const transformed = slice.map(({ measure, tempo }) => ({ measure: measure - startMeasure + 1, tempo }))
+        return new TempoMap([{ measure: 1, tempo: startTempo }, ...transformed, { measure: endMeasure - startMeasure + 1, tempo: endTempo }])
     }
 
     getPointAtMeasure(measure: number, timeSignature = 4) {
@@ -122,11 +144,10 @@ export class TempoMap {
     }
 }
 
-export function timestretch(buffer: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, startMeasure: number) {
+export function timestretch(input: Float32Array, sourceTempo: number, targetTempoMap: TempoMap, startMeasure: number) {
     // Use Kali, a JS implementation of the WSOLA time-stretching algorithm, to time-stretch an audio buffer.
     const kali = new Kali(1)
     kali.setup(audioContext.sampleRate, 1, FLAGS.TS_QUICK_SEARCH)
-    const input = buffer.getChannelData(0)
 
     // Feed the input buffer to Kali a little bit at a time,
     // calling `kali.setTempo` over the duration of the buffer to respond to tempo changes.
