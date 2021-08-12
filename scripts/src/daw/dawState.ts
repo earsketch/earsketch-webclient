@@ -19,7 +19,6 @@ const TRACK_COLORS = ["#f2fdbf", "#f3d8b2", "#ff8080", "#9fa2fd", "#9fb2fd", "#9
     "#9ff2fd", "#9fe29d", "#9fe2bd", "#bfe2bf", "#dfe2bf", "#ffe2bf", "#ffff00", "#ffc0cb"]
 
 // Intervals of measure line based on zoom levels
-// This list is referred during zoom in/out
 const MEASURELINE_ZOOM_INTERVALS = [
     { end: 750, tickInterval: 4, labelInterval: 4, tickDivision: 1 },
     { end: 1350, tickInterval: 1, labelInterval: 4, tickDivision: 4 },
@@ -29,16 +28,16 @@ const MEASURELINE_ZOOM_INTERVALS = [
 ]
 
 // Intervals of timeline based on zoom levels
-// This list is referred during zoom in/out
 const TIMELINE_ZOOM_INTERVALS = [
-    { end: 950, tickInterval: 15 },
-    { end: 1550, tickInterval: 10 },
-    { end: 2650, tickInterval: 5 },
-    { end: 2950, tickInterval: 5 },
-    { end: 3950, tickInterval: 4 },
-    { end: 7850, tickInterval: 2 },
-    { end: 9150, tickInterval: 1 },
-    { end: Infinity, tickInterval: 1 },
+    { end: 950, tickInterval: 1, labelInterval: 15 },
+    { end: 1550, tickInterval: 1, labelInterval: 10 },
+    { end: 2650, tickInterval: 1, labelInterval: 5 },
+    { end: 2950, tickInterval: 1, labelInterval: 5 },
+    { end: 3950, tickInterval: 1, labelInterval: 4 },
+    { end: 7850, tickInterval: 1, labelInterval: 2 },
+    { end: 9150, tickInterval: 0.5, labelInterval: 1 },
+    { end: 12850, tickInterval: 0.25, labelInterval: 1 },
+    { end: Infinity, tickInterval: 0.125, labelInterval: 1 },
 ]
 
 // We want to keep the length of a bar proportional to number of pixels on the screen.

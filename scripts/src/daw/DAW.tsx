@@ -521,35 +521,29 @@ const Measureline = () => {
 }
 
 const Timeline = () => {
+    const tempoMap = useSelector(daw.selectTempoMap)
     const xScale = useSelector(daw.selectXScale)
     const playLength = useSelector(daw.selectPlayLength)
-    const timeScale = useSelector(daw.selectTimeScale)
     const songDuration = useSelector(daw.selectSongDuration)
     const intervals = useSelector(daw.selectTimelineZoomIntervals)
     const element = useRef<HTMLDivElement>(null)
 
-    // redraw the timeline when the track width changes
-    useEffect(() => {
-        // create d3 axis
-        const timeline = d3.svg.axis()
-            .scale(timeScale) // scale ticks according to zoom
-            .orient("bottom")
-            .tickValues(d3.range(0, songDuration + 1, intervals.tickInterval))
-            .tickFormat((d: any) => (d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, d))))
-
-        // append axis to timeline dom element
-        d3.select(element.current).select("svg.axis g")
-            .call(timeline)
-            .selectAll("text")
-            // move the first text element to fit inside the view
-            .style("text-anchor", "start")
-            .attr("y", 6)
-            .attr("x", 2)
-    })
+    const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
     return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
         <svg className="axis">
-            <g></g>
+            <g>
+                {ticks.map(t => {
+                    const measure = tempoMap.timeToMeasure(t)
+                    return <g key={t} className="tick" transform={`translate(${xScale(measure)},0)`}>
+                        <line y2={t % intervals.labelInterval === 0 ? 6 : 2} x2={0} />
+                        {t % intervals.labelInterval === 0 &&
+                        <text dy=".71em" y={6} x={2}>
+                            {d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
+                        </text>}
+                    </g>
+                })}
+            </g>
         </svg>
     </div>
 }
