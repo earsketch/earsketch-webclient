@@ -25,21 +25,6 @@ export async function postRun(result: DAWData) {
     // However, since `finish()` doesn't actually do anything (other than set this flag), we no longer check.
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
-    // STEP 0: Set initial tempo, if none was specified.
-    if (!("TEMPO-TEMPO" in result.tracks[0].effects)) {
-        result.tracks[0].effects["TEMPO-TEMPO"] = []
-    }
-    if (!result.tracks[0].effects["TEMPO-TEMPO"].some(r => r.startMeasure === 1)) {
-        result.tracks[0].effects["TEMPO-TEMPO"].unshift({
-            track: 0,
-            name: "TEMPO",
-            parameter: "TEMPO",
-            startMeasure: 1,
-            endMeasure: 1,
-            startValue: 120,
-            endValue: 120,
-        })
-    }
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
     await loadBuffersForSampleSlicing(result)

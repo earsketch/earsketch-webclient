@@ -381,7 +381,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
     })
 
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
-        <div className="clipName">{name}</div>
+        {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
         <svg className="effectAxis">
             <g></g>
         </svg>
@@ -412,17 +412,25 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) =>
-            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+        Object.entries(track.effects).map(([key, effect], index) => {
+            if (key === "TEMPO-TEMPO" && effect.length === 1) {
+                // Constant tempo: don't show the tempo curve.
+                return null
+            }
+            return <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
                     <div className="dawTrackName"></div>
-                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                    {key === "TEMPO-TEMPO"
+                        ? <div className="flex-grow text-center">TEMPO</div>
+                        : <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>}
+                    {key !== "TEMPO-TEMPO" &&
                     <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
                         {t("daw.bypass")}
-                    </button>
+                    </button>}
                 </div>
                 <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
-            </div>)}
+            </div>
+        })}
     </div>
 }
 
@@ -630,7 +638,7 @@ export function setDAWData(result: player.DAWData) {
     const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
-        mix.visible = Object.keys(mix.effects).length > 0
+        mix.visible = Object.keys(mix.effects).length > 1 || mix.effects["TEMPO-TEMPO"].length > 1
         mix.mute = false
         // the mix track is special
         mix.label = "MIX"

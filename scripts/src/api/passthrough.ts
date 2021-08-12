@@ -42,7 +42,20 @@ export const init = () => {
         finish: false,
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [{
+            effects: {
+                "TEMPO-TEMPO": [{
+                    track: 0,
+                    name: "TEMPO",
+                    parameter: "TEMPO",
+                    startMeasure: 1,
+                    endMeasure: 1,
+                    startValue: 120,
+                    endValue: 120,
+                }],
+            },
+            clips: [],
+        }],
         slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
     }
 }
@@ -60,32 +73,30 @@ export function setTempo(result: DAWData, tempo: number, startMeasure?: number, 
 
     if (startMeasure === undefined) {
         ptCheckType("tempo", "number", tempo)
-        ptCheckRange("setTempo", tempo, 45, 220)
+        ptCheckRange("tempo", tempo, 45, 220)
 
-        startMeasure = 1
-        endMeasure = 1
-        endTempo = tempo
+        result.tracks[0].effects["TEMPO-TEMPO"][0].startValue = tempo
+        result.tracks[0].effects["TEMPO-TEMPO"][0].endValue = tempo
     } else {
         ptCheckType("startTempo", "number", tempo)
         ptCheckType("startMeasure", "number", startMeasure)
         ptCheckType("endTempo", "number", endTempo)
         ptCheckType("endMeasure", "number", endMeasure)
+        ptCheckRange("startTempo", tempo, 45, 220)
+        ptCheckRange("endTempo", endTempo!, 45, 220)
 
-        ptCheckRange("setTempo", tempo, 45, 220)
-        ptCheckRange("setTempo", endTempo!, 45, 220)
+        const _effect = {
+            track: 0,
+            name: "TEMPO",
+            parameter: "TEMPO",
+            startValue: tempo,
+            endValue: endTempo!,
+            startMeasure: startMeasure,
+            endMeasure: endMeasure!,
+        }
+
+        addEffect(result, _effect)
     }
-
-    const _effect = {
-        track: 0,
-        name: "TEMPO",
-        parameter: "TEMPO",
-        startValue: tempo,
-        endValue: endTempo!,
-        startMeasure: startMeasure,
-        endMeasure: endMeasure!,
-    }
-
-    addEffect(result, _effect)
 
     return result
 }
