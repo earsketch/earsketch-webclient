@@ -53,7 +53,6 @@ export async function renderBuffer(result: DAWData) {
             // the clip duration may be shorter than the buffer duration
             let clipDuration = clipEndTime - clipStartTime
 
-
             if (origin > clipEndTime) {
                 // case: clip is playing in the past: skip the clip
                 continue

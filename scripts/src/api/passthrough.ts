@@ -58,7 +58,6 @@ export function setTempo(result: DAWData, tempo: number, startMeasure?: number, 
         throw new TypeError("tempo must be an integer")
     }
 
-    let _effect: EffectRange
     if (startMeasure === undefined) {
         ptCheckType("tempo", "number", tempo)
         ptCheckRange("setTempo", tempo, 45, 220)
@@ -76,7 +75,7 @@ export function setTempo(result: DAWData, tempo: number, startMeasure?: number, 
         ptCheckRange("setTempo", endTempo!, 45, 220)
     }
 
-    _effect = {
+    const _effect = {
         track: 0,
         name: "TEMPO",
         parameter: "TEMPO",
@@ -463,7 +462,6 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
-
 
     return runner.loadBuffersForSampleSlicing(result)
         .then(() => audioLibrary.getSound(audioFile))

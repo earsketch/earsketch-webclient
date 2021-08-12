@@ -18,8 +18,6 @@ const shuffle = (array: any[]) => {
 const TRACK_COLORS = ["#f2fdbf", "#f3d8b2", "#ff8080", "#9fa2fd", "#9fb2fd", "#9fc2fd", "#9fd2fd", "#9fe2fd",
     "#9ff2fd", "#9fe29d", "#9fe2bd", "#bfe2bf", "#dfe2bf", "#ffe2bf", "#ffff00", "#ffc0cb"]
 
-const BEATS_PER_MEASURE = 4
-
 // Intervals of measure line based on zoom levels
 // This list is referred during zoom in/out
 const MEASURELINE_ZOOM_INTERVALS = [

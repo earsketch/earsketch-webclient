@@ -31,8 +31,13 @@ export async function postRun(result: DAWData) {
     }
     if (!result.tracks[0].effects["TEMPO-TEMPO"].some(r => r.startMeasure === 1)) {
         result.tracks[0].effects["TEMPO-TEMPO"].unshift({
-            track: 0, name: "TEMPO", parameter: "TEMPO",
-            startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120,
+            track: 0,
+            name: "TEMPO",
+            parameter: "TEMPO",
+            startMeasure: 1,
+            endMeasure: 1,
+            startValue: 120,
+            endValue: 120,
         })
     }
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
@@ -200,7 +205,7 @@ export async function runPython(code: string) {
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
 
     // STEP 3: Extract result.
-    let result = Sk.ffi.remapToJs(pythonAPI.dawData)
+    const result = Sk.ffi.remapToJs(pythonAPI.dawData)
     // STEP 4: Perform post-execution steps on the result object
     esconsole("Performing post-execution steps.", ["debug", "runner"])
     await postRun(result)
@@ -447,7 +452,8 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
         const newClips: Clip[] = []
         for (const clip of track.clips) {
             const sourceBuffer = buffers[clip.filekey]
-            let duration, posIncrement = 0
+            let duration
+            let posIncrement = 0
 
             if (clip.tempo === undefined) {
                 duration = ESUtils.timeToMeasure(sourceBuffer.duration, tempoMap.getTempoAtMeasure(clip.measure))

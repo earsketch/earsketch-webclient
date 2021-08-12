@@ -570,7 +570,7 @@ const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
                 const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
                 const clipStartTime = tempoMap.measureToTime(clip.measure)
                 const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
-            
+
                 // Start/end locations within the clip's audio buffer, in samples.
                 const sfStart = (clipStartTime - clipBufferStartTime) * clip.audio.sampleRate
                 const sfEnd = sfStart + (clipEndTime - clipStartTime) * clip.audio.sampleRate

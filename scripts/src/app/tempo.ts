@@ -120,10 +120,8 @@ export class TempoMap {
     }
 }
 
-
 export function timestretch(buffer: AudioBuffer, sourceTempo: number, targetTempoMap: TempoMap, startMeasure: number) {
     // Use Kali, a JS implementation of the WSOLA time-stretching algorithm, to time-stretch an audio buffer.
-    console.log("timestretch", buffer.duration, sourceTempo)
     const kali = new Kali(1)
     kali.setup(audioContext.sampleRate, 1, FLAGS.TS_QUICK_SEARCH)
     const input = buffer.getChannelData(0)
@@ -135,7 +133,6 @@ export function timestretch(buffer: AudioBuffer, sourceTempo: number, targetTemp
     let samples = 0
     for (let i = 0; i < input.length; i += CHUNK_SIZE) {
         const factor = targetTempoMap.getTempoAtTime(startTime + samples / audioContext.sampleRate) / sourceTempo
-        // console.log(i, factor)
         kali.setTempo(factor)
         // May be shorter than CHUNK_SIZE if this is the last chunk.
         const chunk = input.subarray(i, i + CHUNK_SIZE)
@@ -143,7 +140,6 @@ export function timestretch(buffer: AudioBuffer, sourceTempo: number, targetTemp
         kali.process()
         samples += chunk.length / factor
     }
-    console.log("done", input.length, samples)
     const output = audioContext.createBuffer(1, Math.round(samples), audioContext.sampleRate)
     kali.flush()
     kali.output(output.getChannelData(0))
