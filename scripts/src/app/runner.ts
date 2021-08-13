@@ -25,6 +25,8 @@ export async function postRun(result: DAWData) {
     // However, since `finish()` doesn't actually do anything (other than set this flag), we no longer check.
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
+    // STEP 0: Fix effects. (This goes first because it may affect the tempo map, which is used in subsequent steps.)
+    fixEffects(result)
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
     await loadBuffersForSampleSlicing(result)
@@ -410,6 +412,49 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
     return slicedBuffer
 }
 
+// Sort effects, fill in effects with end = 0.
+function fixEffects(result: DAWData) {
+    for (const track of result.tracks) {
+        for (const effects of Object.values(track.effects)) {
+            effects.sort((a, b) => {
+                if (a.startMeasure < b.startMeasure) {
+                    return -1
+                } else if (a.startMeasure > b.startMeasure) {
+                    return 1
+                } else {
+                    return 0
+                }
+            })
+            let endMeasureIfEmpty = result.length + 1
+            for (let j = effects.length - 1; j >= 0; j--) {
+                const effect = effects[j]
+                if (effect.endMeasure === 0) {
+                    if (effect.startMeasure > endMeasureIfEmpty) {
+                        effect.endMeasure = effect.startMeasure
+                    } else {
+                        if (effects[j + 1]) {
+                            effect.endMeasure = effects[j + 1].startMeasure
+                        } else {
+                            effect.endMeasure = endMeasureIfEmpty
+                        }
+                    }
+                    endMeasureIfEmpty = effect.startMeasure
+                }
+            }
+
+            // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
+            if (effects[0].startMeasure > 1) {
+                const fillEmptyStart = Object.assign({}, effects[0]) // clone the earliest effect automation
+                fillEmptyStart.startMeasure = 1
+                fillEmptyStart.endMeasure = effects[0].startMeasure
+                fillEmptyStart.startValue = effects[0].startValue
+                fillEmptyStart.endValue = effects[0].startValue
+                effects.unshift(fillEmptyStart)
+            }
+        }
+    }
+}
+
 function roundUpToDivision(seconds: number, tempo: number) {
     const duration = ESUtils.timeToMeasure(seconds, tempo)
     let posIncrement = duration
@@ -429,7 +474,7 @@ function roundUpToDivision(seconds: number, tempo: number) {
 
 const timestretchCache = new Map<string, AudioBuffer>()
 
-// Fill in looped clips with multiple clips, and adjust effects with end == 0.
+// Fill in looped clips with multiple clips.
 function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
     const tempoMap = new TempoMap(result)
     // step 1: fill in looped clips
@@ -522,45 +567,6 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
         }
 
         track.clips = newClips
-
-        // fix effect lengths
-        for (const effects of Object.values(track.effects)) {
-            effects.sort((a, b) => {
-                if (a.startMeasure < b.startMeasure) {
-                    return -1
-                } else if (a.startMeasure > b.startMeasure) {
-                    return 1
-                } else {
-                    return 0
-                }
-            })
-            let endMeasureIfEmpty = result.length + 1
-            for (let j = effects.length - 1; j >= 0; j--) {
-                const effect = effects[j]
-                if (effect.endMeasure === 0) {
-                    if (effect.startMeasure > endMeasureIfEmpty) {
-                        effect.endMeasure = effect.startMeasure
-                    } else {
-                        if (effects[j + 1]) {
-                            effect.endMeasure = effects[j + 1].startMeasure
-                        } else {
-                            effect.endMeasure = endMeasureIfEmpty
-                        }
-                    }
-                    endMeasureIfEmpty = effect.startMeasure
-                }
-            }
-
-            // if the automation start in the middle, it should fill the time before with the startValue of the earliest automation
-            if (effects[0].startMeasure > 1) {
-                const fillEmptyStart = Object.assign({}, effects[0]) // clone the earliest effect automation
-                fillEmptyStart.startMeasure = 1
-                fillEmptyStart.endMeasure = effects[0].startMeasure
-                fillEmptyStart.startValue = effects[0].startValue
-                fillEmptyStart.endValue = effects[0].startValue
-                effects.unshift(fillEmptyStart)
-            }
-        }
     }
 }
 

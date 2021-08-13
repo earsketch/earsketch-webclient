@@ -36,7 +36,7 @@ class InternalError extends Error {
 }
 
 // Generate initial result object.
-export const init = () => {
+export function init() {
     return {
         init: true,
         finish: false,
@@ -49,7 +49,7 @@ export const init = () => {
                     name: "TEMPO",
                     parameter: "TEMPO",
                     startMeasure: 1,
-                    endMeasure: 1,
+                    endMeasure: 0,
                     startValue: 120,
                     endValue: 120,
                 }],
@@ -61,42 +61,46 @@ export const init = () => {
 }
 
 // Set the tempo on the result object.
-export function setTempo(result: DAWData, tempo: number, startMeasure?: number, endTempo?: number, endMeasure?: number) {
-    esconsole("Calling pt_setTempo from passthrough with parameter " + tempo, ["DEBUG", "PT"])
+export function setTempo(result: DAWData, startTempo: number, startMeasure?: number, endTempo?: number, endMeasure?: number) {
+    esconsole("Calling pt_setTempo from passthrough with parameter " + startTempo, ["DEBUG", "PT"])
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("setTempo", args, 1, 4)
-
-    if (Math.floor(tempo) !== tempo) {
-        throw new TypeError("tempo must be an integer")
-    }
+    ptCheckType("startTempo", "number", startTempo)
+    ptCheckRange("startTempo", startTempo, 45, 220)
 
     if (startMeasure === undefined) {
-        ptCheckType("tempo", "number", tempo)
-        ptCheckRange("tempo", tempo, 45, 220)
-
-        result.tracks[0].effects["TEMPO-TEMPO"][0].startValue = tempo
-        result.tracks[0].effects["TEMPO-TEMPO"][0].endValue = tempo
+        startMeasure = 1
     } else {
-        ptCheckType("startTempo", "number", tempo)
         ptCheckType("startMeasure", "number", startMeasure)
-        ptCheckType("endTempo", "number", endTempo)
-        ptCheckType("endMeasure", "number", endMeasure)
-        ptCheckRange("startTempo", tempo, 45, 220)
-        ptCheckRange("endTempo", endTempo!, 45, 220)
-
-        const _effect = {
-            track: 0,
-            name: "TEMPO",
-            parameter: "TEMPO",
-            startValue: tempo,
-            endValue: endTempo!,
-            startMeasure: startMeasure,
-            endMeasure: endMeasure!,
-        }
-
-        addEffect(result, _effect)
+        ptCheckRange("startMeasure", startMeasure, { min: 1 })
     }
+
+    if (endTempo === undefined) {
+        endTempo = startTempo
+    } else {
+        ptCheckType("endTempo", "number", endTempo)
+        ptCheckRange("endTempo", endTempo, 45, 220)
+    }
+
+    if (endMeasure === undefined) {
+        endMeasure = 0
+    } else {
+        ptCheckType("endMeasure", "number", endMeasure)
+        ptCheckRange("endMeasure", endMeasure, { min: 1 })
+    }
+
+    const _effect = {
+        track: 0,
+        name: "TEMPO",
+        parameter: "TEMPO",
+        startValue: startTempo,
+        endValue: endTempo,
+        startMeasure: startMeasure,
+        endMeasure,
+    }
+
+    addEffect(result, _effect)
 
     return result
 }

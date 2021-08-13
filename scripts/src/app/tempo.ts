@@ -35,6 +35,9 @@ function deltaTimeToMeasure(start: Point, end: Point, deltaTime: number, beatsPe
     if (start.measure === end.measure) {
         // After the end point, the tempo is held constant.
         return end.measure + deltaTime / tempoToDeltaTime(end.tempo, beatsPerMeasure)
+    } else if (start.tempo === end.tempo) {
+        // Special case: constant tempo; avoid dividing by tempoSlope (which would be 0) below.
+        return start.measure + deltaTime / beatsPerMeasure / 60 * start.tempo
     }
     const tempoSlope = (end.tempo - start.tempo) / (end.measure - start.measure)
     return start.measure + (Math.exp(deltaTime / beatsPerMeasure / 60 * tempoSlope) * start.tempo - start.tempo) / tempoSlope
