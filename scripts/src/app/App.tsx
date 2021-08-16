@@ -1,5 +1,5 @@
 import i18n from "i18next"
-import { Dialog, Menu, Transition } from "@headlessui/react"
+import { Dialog, Menu, Popover, Transition } from "@headlessui/react"
 import React, { Fragment, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useDispatch, useSelector } from "react-redux"
@@ -269,6 +269,41 @@ function reportError() {
 
 function forgotPass() {
     openModal(ForgotPassword)
+}
+
+const KeyboardShortcuts = () => {
+    const isMac = ESUtils.whichOS() === "MacOS"
+    const modifier = isMac ? "Cmd" : "Ctrl"
+    const shortcuts = {
+        "Run script": [modifier, "Enter"],
+        "Save script": [modifier, "S"],
+        Undo: [modifier, "Z"],
+        Redo: [modifier, "Shift", "Z"],
+        "Comment code": [modifier, "/"],
+        Autocomplete: [isMac ? "Option" : "Ctrl", "Space"],
+        "Zoom (Horizontal)": <>
+            <kbd>{modifier}</kbd>+<kbd>Mouse Wheel</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
+        </>,
+        "Zoom (Vertical)": [modifier, "Shift", "Mouse Wheel"],
+    }
+
+    return <Popover>
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts">
+            <i className="icon icon-keyboard" />
+        </Popover.Button>
+        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/4 w-max">
+            <table>
+                {Object.entries(shortcuts).map(([action, keys], index, arr) =>
+                    <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
+                        <td className="p-2 pr-4">{action}</td>
+                        <td>{Array.isArray(keys)
+                            ? keys.map(key => <kbd key={key}>{key}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+                            : keys}
+                        </td>
+                    </tr>)}
+            </table>
+        </Popover.Panel>
+    </Popover>
 }
 
 const Footer = () => {
@@ -588,7 +623,8 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    {/* TODO: Bring back keyboard shortcut button & popover. */}
+                    <KeyboardShortcuts />
+
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
 
                     {/* Font Size */}
