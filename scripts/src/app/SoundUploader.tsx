@@ -117,8 +117,8 @@ const FileTab = ({ close }: { close: () => void }) => {
                         <span><i className="icon icon-cloud-upload"></i></span>
                         <span>{name || t("soundUploader.file.prompt")}</span>
                         {extension
-                            ? <kbd className="kbd">{extension}</kbd>
-                            : <><kbd className="kbd">.wav</kbd><kbd className="kbd">.aiff</kbd><kbd className="kbd">.mp3</kbd></>}
+                            ? <kbd>{extension}</kbd>
+                            : <><kbd>.wav</kbd><kbd>.aiff</kbd><kbd>.mp3</kbd></>}
                     </label>
                 </div>
                 <div className="modal-section-header">
