@@ -137,7 +137,7 @@ async function handleSoundConstantsPY(code: string) {
     finder.visit(Sk.astFromParse(parse.cst, "<analyzer>", parse.flags))
     const possibleSoundConstants = finder.constants.filter(c => Sk.builtins[c] === undefined)
 
-    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
+    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
     for (const clip of clipData) {
         if (clip) {
             Sk.builtins[clip.file_key] = Sk.ffi.remapToPy(clip.file_key)
@@ -218,7 +218,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
 
     const possibleSoundConstants = constants.filter(c => interpreter.getProperty(scope, c) === undefined)
 
-    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.verifyClip))
+    const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
     for (const clip of clipData) {
         if (clip) {
             interpreter.setProperty(scope, clip.file_key, clip.file_key)

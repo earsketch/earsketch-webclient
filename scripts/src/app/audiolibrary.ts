@@ -76,47 +76,46 @@ const timestretch = (buffer: AudioBuffer, sourceTempo: number, targetTempo: numb
     return newBuffer
 }
 
-async function _getAudioClip(filekey: string, tempo: number) {
-    const cacheKey = [filekey, tempo].toString()
+async function _getAudioClip(name: string, tempo: number) {
+    const cacheKey = [name, tempo].toString()
 
     if (cacheKey in cache.clips) {
         return cache.clips[cacheKey]
     } else if (cacheKey in cache.slicedClips) {
         const slicedBuffer = cache.slicedClips[cacheKey]
-        slicedBuffer.filekey = filekey
+        slicedBuffer.filekey = name
         return slicedBuffer
     }
 
-    esconsole("Loading audio clip with filekey: " + filekey, ["debug", "audiolibrary"])
-    const params = { key: filekey }
-    const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams(params)
+    esconsole("Loading audio clip: " + name, ["debug", "audiolibrary"])
+    const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
 
     // STEP 1: check if audio key exists
     // TODO: Sample download includes clip verification on server side, so probably we can skip the first part.
     let result
     try {
-        result = await verifyClip(filekey)
+        result = await getMetadata(name)
     } catch (err) {
-        esconsole("Error getting audio keys: " + filekey, ["error", "audiolibrary"])
+        esconsole("Error getting audio: " + name, ["error", "audiolibrary"])
         throw err
     }
     if (!result) {
-        throw new ReferenceError(`File key ${filekey} does not exist`)
+        throw new ReferenceError(`Clip ${name} does not exist`)
     }
     const originalTempo = parseFloat(result.tempo)
 
     // STEP 2: Ask the server for the audio file
-    esconsole(`Getting ${filekey} buffer from server`, ["debug", "audiolibrary"])
+    esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
     let data: ArrayBuffer
     try {
         data = await (await fetch(url)).arrayBuffer()
     } catch (err) {
-        esconsole("Error getting " + filekey + " from the server", ["error", "audiolibrary"])
+        esconsole("Error getting " + name + " from the server", ["error", "audiolibrary"])
         const status = err.status
         if (status <= 0) {
-            throw new Error(`NetworkError: Could not retreive sound file ${filekey} due to network error`)
+            throw new Error(`NetworkError: Could not retreive sound file ${name} due to network error`)
         } else if (status >= 500 && status < 600) {
-            throw new Error(`ServerError: Could not retreive sound file ${filekey} due to server error`)
+            throw new Error(`ServerError: Could not retreive sound file ${name} due to server error`)
         } else {
             throw err
         }
@@ -128,17 +127,17 @@ async function _getAudioClip(filekey: string, tempo: number) {
     const isMP3 = (bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) || (bytes[0] === 0xff || bytes[1] === 0xfb)
 
     // STEP 3: decode the audio data.
-    esconsole(`Decoding ${filekey} buffer`, ["debug", "audiolibrary"])
+    esconsole(`Decoding ${name} buffer`, ["debug", "audiolibrary"])
     let buffer: AugmentedBuffer
     try {
         // decodeAudioData has a newer promise-based syntax, but unfortunately Safari does not support it.
         // See https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData#browser_compatibility
         buffer = await new Promise((resolve, reject) => ctx.decodeAudioData(data, buffer => resolve(buffer as AugmentedBuffer), reject))
     } catch (err) {
-        esconsole("Error decoding audio clip: " + filekey, ["error", "audiolibrary"])
+        esconsole("Error decoding audio clip: " + name, ["error", "audiolibrary"])
         throw err
     }
-    esconsole(filekey + " buffer decoded", ["debug", "audiolibrary"])
+    esconsole(name + " buffer decoded", ["debug", "audiolibrary"])
 
     if (isMP3) {
         // MP3-specific offset fix
@@ -151,13 +150,13 @@ async function _getAudioClip(filekey: string, tempo: number) {
     if (originalTempo === -1 || tempo === -1) {
         esconsole("No time stretching required.", ["debug", "audiolibrary"])
     } else {
-        esconsole("Time-stretching " + filekey, ["debug", "audiolibrary"])
+        esconsole("Time-stretching " + name, ["debug", "audiolibrary"])
         buffer = timestretch(buffer, originalTempo, tempo) as AugmentedBuffer
     }
 
     // STEP 4: Return the decoded audio buffer.
     // Add a filekey property to the buffer so we can figure out where it came from later.
-    buffer.filekey = filekey
+    buffer.filekey = name
     if (FLAGS.CACHE_TS_RESULTS) {
         cache.clips[cacheKey] = buffer
     }
@@ -210,9 +209,9 @@ export async function getStandardLibrary() {
     }
 }
 
-export async function verifyClip(name: string) {
+export async function getMetadata(name: string) {
     esconsole("Verifying the presence of audio clip for " + name, ["debug", "audiolibrary"])
-    const url = URL_DOMAIN + "/audio/metadata?" + new URLSearchParams({ key: name })
+    const url = URL_DOMAIN + "/audio/metadata?" + new URLSearchParams({ name })
     const response = await fetch(url)
     const text = await response.text()
     if (!text) {
