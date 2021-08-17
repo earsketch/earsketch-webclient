@@ -989,7 +989,7 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
         extension = ".wav"
     }
 
-    let url = URL_DOMAIN + "/audio/randomkey?tag=" + folder
+    let url = URL_DOMAIN + "/audio/random?folder=" + folder
 
     if (userProject.isLoggedIn()) {
         url += "&username=" + userProject.getUsername()
