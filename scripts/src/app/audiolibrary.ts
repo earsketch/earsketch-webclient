@@ -9,9 +9,7 @@ export type AugmentedBuffer = AudioBuffer & { filekey: string }
 
 export const cache = {
     // Metadata from server:
-    audioFolders: null as string[] | null,
-    defaultAudioFolders: null as string[] | null,
-    userAudioFolders: null as string[] | null,
+    folders: null as string[] | null,
     standardLibrary: null as SoundEntity[] | null,
     // Buffers of audio data, post-timestretching:
     clips: {} as { [key: string]: AugmentedBuffer },
@@ -177,76 +175,20 @@ export function cacheSlicedClip(filekey: string, tempo: number, buffer: Augmente
 // Clears the audio tag cache.
 export function clearAudioTagCache() {
     esconsole("Clearing the audio tag cache", ["debug", "audiolibrary"])
-    cache.audioFolders = null
-    cache.defaultAudioFolders = null
-    cache.userAudioFolders = null
+    cache.folders = null
     cache.standardLibrary = null
     cache.clips = {} // this might be overkill, but otherwise deleted / renamed clip cache is still accessible
 }
 
-// Get a list of folder keys. NOTE: This is very inefficient. Prefer using getDefaultAudioFolders and getUserAudioFolders WS.
-export async function getAudioFolders() {
-    if (cache.audioFolders !== null) {
-        return cache.audioFolders
-    }
-    esconsole("Fetching audio folders", ["debug", "audiolibrary"])
-    try {
-        const data = await (await fetch(URL_DOMAIN + "/audio/keys?tag=")).json()
-        // return only a list of file keys
-        const output = []
-        for (const file of Object.values(data) as any[]) {
-            if (file.scope === 0) continue
-            const str = file.tags.toUpperCase()
-            const tokens = str.split("__")
-            // TODO: this token business is confusing
-            output.push(tokens[0])
-            output.push(tokens[tokens.length - 1])
-            output.push(str.substr(str.indexOf("__") + 2, str.length))
-        }
-        esconsole("Found audio folders", ["debug", "audiolibrary"])
-        return (cache.audioFolders = output)
-    } catch (err) {
-        esconsole(err, ["error", "audiolibrary"])
-        throw err
-    }
-}
-
-async function getDefaultAudioFolders() {
-    if (cache.defaultAudioFolders !== null) {
-        return cache.defaultAudioFolders
+export async function getFolders() {
+    if (cache.folders !== null) {
+        return cache.folders
     }
     esconsole("Fetching default audio folders", ["debug", "audiolibrary"])
     try {
-        const data: string[] = await (await fetch(URL_DOMAIN + "/audio/defaultfolders")).json()
+        const data: string[] = await (await fetch(URL_DOMAIN + "/audio/folders")).json()
         esconsole("Found default audio folders", ["debug", "audiolibrary"])
-        return (cache.defaultAudioFolders = data)
-    } catch (err) {
-        esconsole(err, ["error", "audiolibrary"])
-        throw err
-    }
-}
-
-async function getUserAudioFolders() {
-    if (cache.userAudioFolders !== null) {
-        return cache.userAudioFolders
-    }
-    esconsole("Fetching all the user audio folders", ["debug", "audiolibrary"])
-    try {
-        const data: string[] = await (await fetch(URL_DOMAIN + "/audio/userfolders")).json()
-        esconsole("Found user audio folders", ["debug", "audiolibrary"])
-        return (cache.userAudioFolders = data)
-    } catch (err) {
-        esconsole(err, ["error", "audiolibrary"])
-        throw err
-    }
-}
-
-export async function getAllFolders() {
-    esconsole("Fetching all folders", ["debug", "audiolibrary"])
-    try {
-        const result = await Promise.all([getDefaultAudioFolders(), getUserAudioFolders()])
-        esconsole("Fetched all folders.", ["debug", "audiolibrary"])
-        return result[0].concat(result[1])
+        return (cache.folders = data)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
