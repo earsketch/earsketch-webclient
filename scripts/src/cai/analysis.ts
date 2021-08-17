@@ -34,7 +34,7 @@ const AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS)
 // Populate the sound-browser items
 function populateLibrarySounds() {
     librarySounds = []
-    return audioLibrary.getDefaultTagsMetadata().then((audioTags: SoundEntity[]) => {
+    return audioLibrary.getStandardLibrary().then((audioTags: SoundEntity[]) => {
         librarySounds = audioTags
         librarySounds.forEach((sound: SoundEntity) => {
             keyGenreDict[sound.file_key] = sound.genre

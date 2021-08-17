@@ -26,8 +26,8 @@ const earsketchCompleter: Ace.Completer = {
         }))
 
         // Include audio constants. If they haven't been fetched yet, go ahead and provide whatever completions we can.
-        if (audioLibrary.cache.audioTags === null) {
-            audioLibrary.getAudioTags()
+        if (audioLibrary.cache.standardLibrary === null) {
+            audioLibrary.getStandardLibrary()
         }
 
         if (audioLibrary.cache.audioFolders === null) {
@@ -35,7 +35,8 @@ const earsketchCompleter: Ace.Completer = {
         }
 
         // Combine constants.
-        const merged = new Set((audioLibrary.cache.audioTags ?? []).concat(audioLibrary.EFFECT_TAGS, audioLibrary.ANALYSIS_TAGS, audioLibrary.cache.audioFolders ?? []))
+        const standardConstants = audioLibrary.cache.standardLibrary?.map(sound => sound.file_key)
+        const merged = new Set((standardConstants ?? []).concat(audioLibrary.EFFECT_TAGS, audioLibrary.ANALYSIS_TAGS, audioLibrary.cache.audioFolders ?? []))
         const sorted = Array.from(merged).sort().reverse()
         const constants = sorted
             .filter(tag => tag !== undefined && tag.includes(prefix))
