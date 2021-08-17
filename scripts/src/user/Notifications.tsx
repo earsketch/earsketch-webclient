@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { useSelector } from "react-redux"
 
+import { openCollaborativeScript, openSharedScript } from "../app/App"
 import * as ESUtils from "../esutils"
 import * as userNotification from "./notification"
 import * as user from "./userState"
@@ -90,9 +91,7 @@ export const NotificationPopup = () => {
     </div>
 }
 
-const Notification = ({ item, openSharedScript, openCollaborativeScript }: {
-    item: user.Notification, openSharedScript: (shareid: string) => void, openCollaborativeScript: (shareid: string) => void
-}) => {
+const Notification = ({ item, close }: { item: user.Notification, close: () => void }) => {
     const { t } = useTranslation()
 
     return <div>
@@ -123,12 +122,12 @@ const Notification = ({ item, openSharedScript, openCollaborativeScript }: {
                         </div>}
                         {item.notification_type === "share_script" &&
                         <div>
-                            <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>
+                            <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
                         </div>}
                         {item.notification_type === "collaborate_script" &&
                         <div>
-                            {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>}
-                            {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>}
+                            {item.message.action === "userAddedToCollaboration" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>}
+                            {item.message.action === "scriptRenamed" && <a href="#" onClick={e => { e.preventDefault(); openCollaborativeScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>}
                         </div>}
                     </div>
                 </div>
@@ -138,13 +137,11 @@ const Notification = ({ item, openSharedScript, openCollaborativeScript }: {
     </div>
 }
 
-export const NotificationList = ({ openSharedScript, openCollaborativeScript, toggleNotificationHistory }:
-    { openSharedScript: (shareid: string) => void, openCollaborativeScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }
-) => {
+export const NotificationList = ({ showHistory, close }: { showHistory: (b: boolean) => void, close: () => void }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
 
-    return <div style={{ padding: "10px", minWidth: "15em" }}>
+    return <div style={{ minWidth: "15em" }}>
         {notifications.length === 0
             ? <div>
                 <div className="flex justify-between items-center">
@@ -158,21 +155,21 @@ export const NotificationList = ({ openSharedScript, openCollaborativeScript, to
                         {t("notifications.title")}
                     </div>
                     <div className="float-right">
-                        <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(true) }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
+                        <a href="#" onClick={e => { e.preventDefault(); showHistory(true); close() }}>{t("notifications.viewAll").toLocaleUpperCase()}</a>
                     </div>
                 </div>
                 <hr style={{ border: "solid 1px dimgrey", marginTop: "10px" }} />
                 {notifications.slice(0, 5).map((item, index) =>
-                    <Notification key={index} item={item} openSharedScript={openSharedScript} openCollaborativeScript={openCollaborativeScript} />)}
+                    <Notification key={index} item={item} close={close} />)}
                 {notifications.length > 5 &&
-                <div onClick={() => toggleNotificationHistory(true)} className="text-center" style={{ fontSize: "20px", marginTop: "-10px" }}>
+                <div onClick={() => showHistory(true)} className="text-center" style={{ fontSize: "20px", marginTop: "-10px" }}>
                     .....
                 </div>}
             </div>}
     </div>
 }
 
-export const NotificationHistory = ({ openSharedScript, toggleNotificationHistory }: { openSharedScript: (shareid: string) => void, toggleNotificationHistory: (b: boolean) => void }) => {
+export const NotificationHistory = ({ close }: { close: () => void }) => {
     const notifications = useSelector(user.selectNotifications)
     const { t } = useTranslation()
     const now = Date.now()
@@ -180,7 +177,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
     return <div id="notification-history">
         <div className="flex justify-between" style={{ padding: "1em" }}>
             <div>
-                <a href="#" onClick={e => { e.preventDefault(); toggleNotificationHistory(false) }}>
+                <a href="#" onClick={e => { e.preventDefault(); close() }}>
                     <i id="back-button" className="icon icon-arrow-right22"></i>
                 </a>
                 <span style={{ color: "grey" }}>
@@ -188,7 +185,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                 </span>
             </div>
             <div>
-                <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={() => toggleNotificationHistory(false)}><span><i className="icon icon-cross2" /></span>{t("thing.close").toLocaleUpperCase()}</a>
+                <a className="closemodal buttonmodal cursor-pointer" style={{ color: "#d04f4d" }} onClick={close}><span><i className="icon icon-cross2" /></span>{t("thing.close").toLocaleUpperCase()}</a>
             </div>
         </div>
 
@@ -233,7 +230,7 @@ export const NotificationHistory = ({ openSharedScript, toggleNotificationHistor
                             </div>
                         </div>
                         {item.notification_type === "share_script" && <div>
-                            <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!) }}>{t("thing.open").toLocaleUpperCase()}</a>
+                            <a href="#" onClick={e => { e.preventDefault(); openSharedScript(item.shareid!); close() }}>{t("thing.open").toLocaleUpperCase()}</a>
                         </div>}
                     </div>
                 </div>
