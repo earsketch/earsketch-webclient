@@ -220,24 +220,24 @@ export const getFavorites = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const markFavorite = createAsyncThunk<void, { fileKey: string, isFavorite: boolean }, ThunkAPI>(
+export const markFavorite = createAsyncThunk<void, { name: string, isFavorite: boolean }, ThunkAPI>(
     "sounds/markFavorite",
-    async ({ fileKey, isFavorite }, { getState, dispatch }) => {
+    async ({ name, isFavorite }, { getState, dispatch }) => {
         const state = getState()
         const { user } = state
         const { username } = user
         if (user.loggedIn && username) {
             const entities = selectAllEntities(state)
-            const isUserOwned = entities[fileKey].folder === username.toUpperCase()
+            const isUserOwned = entities[name].folder === username.toUpperCase()
             const markAsFavorite = !isFavorite
-            const params = { audio_file_key: fileKey, userowned: isUserOwned.toString() }
+            const params = { name, userowned: isUserOwned.toString() }
 
             if (markAsFavorite) {
-                await postAuth("/audio/addfavorite", params)
-                dispatch(addFavorite(fileKey))
+                await postAuth("/audio/favorites/add", params)
+                dispatch(addFavorite(name))
             } else {
-                await postAuth("/audio/removefavorite", params)
-                dispatch(removeFavorite(fileKey))
+                await postAuth("/audio/favorites/remove", params)
+                dispatch(removeFavorite(name))
             }
         }
     }

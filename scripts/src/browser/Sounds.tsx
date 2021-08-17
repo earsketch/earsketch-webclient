@@ -187,7 +187,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => dispatch(sounds.markFavorite({ fileKey, isFavorite }))}
+                                onClick={() => dispatch(sounds.markFavorite({ name: fileKey, isFavorite }))}
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite
