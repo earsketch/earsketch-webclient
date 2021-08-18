@@ -1,4 +1,5 @@
 /* eslint-disable */
+// jscpd:ignore-start
 // TODO: Resolve lint issues.
 
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
@@ -652,3 +653,4 @@ function linesForItem(section: any, inputType: string, inputValue: any) {
     }
     return ret
 }
+// jscpd:ignore-end
