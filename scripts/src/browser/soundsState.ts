@@ -192,7 +192,7 @@ export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
 export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/getUserSounds",
     async (username, { dispatch }) => {
-        const endPoint = URL_DOMAIN + "/audio/usertags"
+        const endPoint = URL_DOMAIN + "/audio/user"
         const params = new URLSearchParams({ username })
         const response = await fetch(`${endPoint}?${params}`, {
             method: "GET",
