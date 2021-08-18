@@ -34,7 +34,7 @@ export interface SoundEntity {
     folder: string
     artist: string
     year: string
-    scope: number
+    public: number
     genre: string
     tempo: number
     instrument: string
