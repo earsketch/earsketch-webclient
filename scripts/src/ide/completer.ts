@@ -35,7 +35,7 @@ const earsketchCompleter: Ace.Completer = {
         }
 
         // Combine constants.
-        const standardConstants = audioLibrary.cache.standardLibrary?.map(sound => sound.file_key)
+        const standardConstants = audioLibrary.cache.standardLibrary?.map(sound => sound.name)
         const merged = new Set((standardConstants ?? []).concat(audioLibrary.EFFECT_TAGS, audioLibrary.ANALYSIS_TAGS, audioLibrary.cache.folders ?? []))
         const sorted = Array.from(merged).sort().reverse()
         const constants = sorted

@@ -322,22 +322,22 @@ export async function loadScript(id: string, sharing: boolean) {
     }
 }
 
-// Deletes an audio key if owned by the user.
-export async function deleteAudio(name: string) {
+// Deletes a sound if owned by the user.
+export async function deleteSound(name: string) {
     try {
         await postAuth("/audio/delete", { name })
-        esconsole("Deleted audio: " + name, ["debug", "user"])
+        esconsole("Deleted sound: " + name, ["debug", "user"])
         audioLibrary.clearAudioTagCache() // otherwise the deleted audio key is still usable by the user
     } catch (err) {
         esconsole(err, ["error", "userproject"])
     }
 }
 
-// Rename an audio key if owned by the user.
-export async function renameAudio(name: string, newName: string) {
+// Rename a sound if owned by the user.
+export async function renameSound(name: string, newName: string) {
     try {
         await postAuth("/audio/rename", { name, newName })
-        esconsole(`Successfully renamed audiokey: ${name} to ${newName}`, ["debug", "user"])
+        esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
         audioLibrary.clearAudioTagCache() // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)

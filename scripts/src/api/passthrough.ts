@@ -10,6 +10,7 @@ import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
+import { SoundEntity } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
@@ -1000,9 +1001,9 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
     request.send(null)
 
     if (request.status === 200) {
-        const jsobj = JSON.parse(request.responseText)
-        if ("file_key" in jsobj) {
-            return jsobj.file_key
+        const jsobj: SoundEntity = JSON.parse(request.responseText)
+        if ("name" in jsobj) {
+            return jsobj.name
         } else {
             throw new ValueError("Please use folder names available in your sound browser.")
         }

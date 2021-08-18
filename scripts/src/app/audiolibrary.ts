@@ -102,7 +102,7 @@ async function _getAudioClip(name: string, tempo: number) {
     if (!result) {
         throw new ReferenceError(`Clip ${name} does not exist`)
     }
-    const originalTempo = parseFloat(result.tempo)
+    const originalTempo = result.tempo
 
     // STEP 2: Ask the server for the audio file
     esconsole(`Getting ${name} buffer from server`, ["debug", "audiolibrary"])
@@ -219,6 +219,6 @@ export async function getMetadata(name: string) {
         // TODO: Server should return a more reasonable response. (Either an HTTP error code or a valid JSON object such as `null`.)
         return null
     }
-    const data = JSON.parse(text)
-    return "file_key" in data ? data : null
+    const data: SoundEntity = JSON.parse(text)
+    return "name" in data ? data : null
 }

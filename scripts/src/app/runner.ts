@@ -140,7 +140,7 @@ async function handleSoundConstantsPY(code: string) {
     const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
     for (const clip of clipData) {
         if (clip) {
-            Sk.builtins[clip.file_key] = Sk.ffi.remapToPy(clip.file_key)
+            Sk.builtins[clip.name] = Sk.ffi.remapToPy(clip.name)
         }
     }
 }
@@ -221,7 +221,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
     const clipData = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
     for (const clip of clipData) {
         if (clip) {
-            interpreter.setProperty(scope, clip.file_key, clip.file_key)
+            interpreter.setProperty(scope, clip.name, clip.name)
         }
     }
 }
@@ -334,7 +334,7 @@ function getClipTempo(result: DAWData) {
     const lookupTempo = (key: string) => {
         // Return cached tempo for given key, or search audio sample metadata and cache result.
         if (key in tempoCache) return tempoCache[key]
-        const tempo = metadata.find(item => item.file_key === key)?.tempo
+        const tempo = metadata.find(item => item.name === key)?.tempo
         if (tempo !== undefined) {
             tempoCache[key] = isNaN(tempo) ? -1 : tempo
         }

@@ -38,11 +38,11 @@ function populateLibrarySounds() {
     return audioLibrary.getStandardLibrary().then((audioTags: SoundEntity[]) => {
         librarySounds = audioTags
         librarySounds.forEach((sound: SoundEntity) => {
-            keyGenreDict[sound.file_key] = sound.genre
+            keyGenreDict[sound.name] = sound.genre
             if (!librarySoundGenres.includes(sound.genre)) {
                 librarySoundGenres.push(sound.genre)
             }
-            keyInstrumentDict[sound.file_key] = sound.instrument
+            keyInstrumentDict[sound.name] = sound.instrument
         })
     }).then(() => {
         esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
@@ -427,7 +427,7 @@ function findGenre(measureView: any) {
         for (const item in measureView[measure]) {
             if (measureView[measure][item].type === "sound") {
                 const sounds: SoundEntity[] = librarySounds.filter(sound => {
-                    return sound.file_key === measureView[measure][item].name
+                    return sound.name === measureView[measure][item].name
                 })
                 sounds.forEach((sound) => {
                     genres[genres.length - 1].push(sound.genre)
