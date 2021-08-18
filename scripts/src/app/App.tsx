@@ -700,8 +700,8 @@ export const App = () => {
                         <i id="caiButton" className="icon icon-bubbles"></i>
                     </button>}
 
-                    <KeyboardShortcuts />
                     {FLAGS.SHOW_LOCALE_SWITCHER && <LocaleSelector />}
+                    <KeyboardShortcuts />
                     <FontSizeMenu />
                     <MiscActionMenu />
                     <NotificationMenu />
