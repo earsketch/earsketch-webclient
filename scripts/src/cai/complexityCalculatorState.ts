@@ -1,31 +1,31 @@
 ﻿// Manages the state of the complexity calculator service.
 
-let state : { [key:string]: any } = {
+let state: { [key: string]: any } = {
     allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
     loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
-    functionRenames: [],  parentLineNumber: 0, studentCode: [],
+    functionRenames: [], parentLineNumber: 0, studentCode: [],
     takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: [], functionLines: []
-}
+};
 
 export function resetState() {
     state = {
         allVariables: [], apiCalls: [], allCalls: [], allConditionals: [], variableAssignments: [],
         loopLocations: [], uncalledFunctionLines: [], userFunctions: [],
-        functionRenames: [],  parentLineNumber: 0, studentCode: [],
+        functionRenames: [], parentLineNumber: 0, studentCode: [],
         takesArgs: false, returns: false, isJavascript: false, listFuncs: [], strFuncs: [], functionLines: []
-    }
+    };
 }
 
 export function getState() {
-    return {}
+    return {};
 }
 
 export function getProperty(propertyName: string) {
-    return (propertyName in state) ? state[propertyName] : []
+    return (Object.keys(state).includes(propertyName)) ? state[propertyName] : []
 }
 
 export function setProperty(propertyName: string, value: any) {
-    state[propertyName] = value
+    state[propertyName] = value;
 }
 
 export function setIsJavascript(value: boolean) {

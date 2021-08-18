@@ -22,7 +22,7 @@ function getState() {
 }
 exports.getState = getState;
 function getProperty(propertyName) {
-    return (propertyName in state) ? state[propertyName] : [];
+    return (Object.keys(state).includes(propertyName)) ? state[propertyName] : [];
 }
 exports.getProperty = getProperty;
 function setProperty(propertyName, value) {

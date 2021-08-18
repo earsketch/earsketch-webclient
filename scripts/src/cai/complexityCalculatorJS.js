@@ -7,60 +7,100 @@ import * as cc from './complexityCalculator';
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source) {
-    ccState.resetState();
-    ccState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
-    var ast = acorn.parse(source, {
-        locations: true
-    });
-    ccState.setProperty('studentCode', source.split("\n"));
-    //handle this like you'd handle python.
-    var newAST = convertASTTree(ast);
-    //initialize list of function return objects with all functions from the API that return something (includes casting)
-    var allVariables = [];
-    //initialize the results object
-    var resultsObject = {
-        codeFeatures: {
-            errors: 0,
-            variables: 0,
-            makeBeat: 0,
-            iteration: {
-                whileLoops: 0,
-                forLoopsPY: 0,
-                forLoopsJS: 0,
-                iterables: 0,
-                nesting: 0
+    try {
+        ccState.resetState();
+        ccState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
+        var ast = acorn.parse(source, {
+            locations: true
+        });
+        ccState.setProperty('studentCode', source.split("\n"));
+        //handle this like you'd handle python.
+        var newAST = convertASTTree(ast);
+        //initialize list of function return objects with all functions from the API that return something (includes casting)
+        var allVariables = [];
+        //initialize the results object
+        var resultsObject = {
+            codeFeatures: {
+                errors: 0,
+                variables: 0,
+                makeBeat: 0,
+                iteration: {
+                    whileLoops: 0,
+                    forLoopsPY: 0,
+                    forLoopsJS: 0,
+                    iterables: 0,
+                    nesting: 0
+                },
+                conditionals: {
+                    conditionals: 0,
+                    usedInConditionals: []
+                },
+                functions: {
+                    repeatExecution: 0,
+                    manipulateValue: 0
+                },
+                features: {
+                    indexing: 0,
+                    consoleInput: 0,
+                    listOps: 0,
+                    strOps: 0,
+                    binOps: 0,
+                    comparisons: 0
+                }
             },
-            conditionals: {
-                conditionals: 0,
-                usedInConditionals: []
-            },
-            functions: {
-                repeatExecution: 0,
-                manipulateValue: 0
-            },
-            features: {
-                indexing: 0,
-                consoleInput: 0,
-                listOps: 0,
-                strOps: 0,
-                binOps: 0,
-                comparisons: 0
+            codeStructure: {},
+            inputsOutputs: {
+                sections: {},
+                effects: {},
+                sounds: {}
             }
-        },
-        codeStructure: {},
-        inputsOutputs: {
-            sections: {},
-            effects: {},
-            sounds: {}
-        }
-    };
-    ccState.setIsJavascript(true);
-    cc.doAnalysis(newAST, resultsObject);
-    //translate the calculated values
-    // translateIntegerValues(resultsObject);
-    ccHelpers.lineDict();
-    caiErrorHandling.updateNames(ccState.getProperty('allVariables'), ccState.getProperty('userFunctionParameters'));
-    return resultsObject;
+        };
+        ccState.setIsJavascript(true);
+        cc.doAnalysis(newAST, resultsObject);
+        //translate the calculated values
+        // translateIntegerValues(resultsObject);
+        ccHelpers.lineDict();
+        caiErrorHandling.updateNames(ccState.getProperty('allVariables'), ccState.getProperty('userFunctions'));
+        return resultsObject;
+    }
+    catch (error) {
+        return {
+            codeFeatures: {
+                errors: 1,
+                variables: 0,
+                makeBeat: 0,
+                iteration: {
+                    whileLoops: 0,
+                    forLoopsPY: 0,
+                    forLoopsJS: 0,
+                    iterables: 0,
+                    nesting: 0
+                },
+                conditionals: {
+                    conditionals: 0,
+                    usedInConditionals: []
+                },
+                functions: {
+                    repeatExecution: 0,
+                    manipulateValue: 0
+                },
+                features: {
+                    indexing: 0,
+                    consoleInput: 0,
+                    listOps: 0,
+                    strOps: 0,
+                    binOps: 0,
+                    comparisons: 0
+                }
+            },
+            codeStructure: {},
+            inputsOutputs: {
+                sections: {},
+                effects: {},
+                sounds: {}
+            }
+        };
+    }
 }
 
 //fun javascript conversion times
