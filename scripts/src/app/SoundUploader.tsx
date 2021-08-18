@@ -64,7 +64,7 @@ async function uploadFile(file: Blob, name: string, extension: string, tempo: nu
                 if (request.status === 204) {
                     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
                     // Clear the cache so it gets reloaded.
-                    audioLibrary.clearAudioTagCache()
+                    audioLibrary.clearCache()
                     store.dispatch(sounds.resetUserSounds())
                     store.dispatch(sounds.getUserSounds(userProject.getUsername()))
                     resolve()
@@ -297,7 +297,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             }
             userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
             // Clear the cache so it gets reloaded.
-            audioLibrary.clearAudioTagCache()
+            audioLibrary.clearCache()
             store.dispatch(sounds.resetUserSounds())
             store.dispatch(sounds.getUserSounds(username))
             close()

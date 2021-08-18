@@ -192,7 +192,7 @@ export async function deleteSound(sound: SoundEntity) {
     if (await confirm({ textKey: "messages:confirm.deleteSound", textReplacements: { soundName: sound.name }, okKey: "script.delete", type: "danger" })) {
         await userProject.deleteSound(sound.name)
         store.dispatch(sounds.deleteLocalUserSound(sound.name))
-        audioLibrary.clearAudioTagCache()
+        audioLibrary.clearCache()
     }
 }
 

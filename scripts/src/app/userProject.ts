@@ -327,7 +327,7 @@ export async function deleteSound(name: string) {
     try {
         await postAuth("/audio/delete", { name })
         esconsole("Deleted sound: " + name, ["debug", "user"])
-        audioLibrary.clearAudioTagCache() // otherwise the deleted audio key is still usable by the user
+        audioLibrary.clearCache() // TODO: This is probably overkill.
     } catch (err) {
         esconsole(err, ["error", "userproject"])
     }
@@ -338,7 +338,7 @@ export async function renameSound(name: string, newName: string) {
     try {
         await postAuth("/audio/rename", { name, newName })
         esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
-        audioLibrary.clearAudioTagCache() // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
+        audioLibrary.clearCache() // TODO: This is probably overkill.
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)
         esconsole(err, ["error", "userproject"])

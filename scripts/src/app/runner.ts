@@ -328,7 +328,7 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
 }
 
 function getClipTempo(result: DAWData) {
-    const metadata = audioLibrary.cache.standardLibrary ?? []
+    const metadata = audioLibrary.cache.standardSounds ?? []
     const tempoCache: { [key: string]: number | undefined } = {}
 
     const lookupTempo = (key: string) => {

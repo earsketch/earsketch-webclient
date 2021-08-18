@@ -181,7 +181,7 @@ export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
     async (_, { getState, dispatch }) => {
         const { sounds } = getState()
         if (!sounds.defaultSounds.names.length) {
-            const data = await audioLibrary.getStandardLibrary()
+            const data = await audioLibrary.getStandardSounds()
             const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.name]: sound })))
             const names = data.map(sound => sound.name)
             dispatch(setDefaultSounds({ entities, names }))

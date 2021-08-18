@@ -38,5 +38,4 @@ export interface SoundEntity {
     genre: string
     tempo: number
     instrument: string
-    tags: string
 }

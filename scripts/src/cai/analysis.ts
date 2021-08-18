@@ -35,15 +35,15 @@ const AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS)
 // Populate the sound-browser items
 function populateLibrarySounds() {
     librarySounds = []
-    return audioLibrary.getStandardLibrary().then((audioTags: SoundEntity[]) => {
-        librarySounds = audioTags
-        librarySounds.forEach((sound: SoundEntity) => {
+    return audioLibrary.getStandardSounds().then(sounds => {
+        librarySounds = sounds
+        for (const sound of librarySounds) {
             keyGenreDict[sound.name] = sound.genre
             if (!librarySoundGenres.includes(sound.genre)) {
                 librarySoundGenres.push(sound.genre)
             }
             keyInstrumentDict[sound.name] = sound.instrument
-        })
+        }
     }).then(() => {
         esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
         esconsole("Reported load time from this point.", ["info", "init"])
