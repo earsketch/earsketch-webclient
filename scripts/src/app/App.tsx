@@ -296,6 +296,9 @@ const KeyboardShortcuts = () => {
     const { t } = useTranslation()
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
+
+    const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
+
     const shortcuts = {
         run: [modifier, "Enter"],
         save: [modifier, "S"],
@@ -304,9 +307,9 @@ const KeyboardShortcuts = () => {
         comment: [modifier, "/"],
         autocomplete: [isMac ? "Option" : "Ctrl", "Space"],
         zoomHorizontal: <>
-            <kbd>{modifier}</kbd>+<kbd>Mouse Wheel</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
+            <kbd>{modifier}</kbd>+<kbd>{localize("Wheel")}</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
-        zoomVertical: [modifier, "Shift", "Mouse Wheel"],
+        zoomVertical: [modifier, "Shift", "Wheel"],
     }
 
     return <Popover>
@@ -319,7 +322,7 @@ const KeyboardShortcuts = () => {
                     <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
                         <td className="p-2 pr-4">{t(`shortcuts.${action}`)}</td>
                         <td>{Array.isArray(keys)
-                            ? keys.map(key => <kbd key={key}>{key}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+                            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
                             : keys}
                         </td>
                     </tr>)}
