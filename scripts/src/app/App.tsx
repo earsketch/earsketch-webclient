@@ -293,30 +293,31 @@ function forgotPass() {
 }
 
 const KeyboardShortcuts = () => {
+    const { t } = useTranslation()
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
     const shortcuts = {
-        "Run script": [modifier, "Enter"],
-        "Save script": [modifier, "S"],
-        Undo: [modifier, "Z"],
-        Redo: [modifier, "Shift", "Z"],
-        "Comment code": [modifier, "/"],
-        Autocomplete: [isMac ? "Option" : "Ctrl", "Space"],
-        "Zoom (Horizontal)": <>
+        run: [modifier, "Enter"],
+        save: [modifier, "S"],
+        undo: [modifier, "Z"],
+        redo: [modifier, "Shift", "Z"],
+        comment: [modifier, "/"],
+        autocomplete: [isMac ? "Option" : "Ctrl", "Space"],
+        zoomHorizontal: <>
             <kbd>{modifier}</kbd>+<kbd>Mouse Wheel</kbd> or <kbd>+</kbd>/<kbd>-</kbd>
         </>,
-        "Zoom (Vertical)": [modifier, "Shift", "Mouse Wheel"],
+        zoomVertical: [modifier, "Shift", "Mouse Wheel"],
     }
 
     return <Popover>
         <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts">
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/4 w-max">
+        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 right-0 w-max">
             <table>
                 {Object.entries(shortcuts).map(([action, keys], index, arr) =>
                     <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                        <td className="p-2 pr-4">{action}</td>
+                        <td className="p-2 pr-4">{t(`shortcuts.${action}`)}</td>
                         <td>{Array.isArray(keys)
                             ? keys.map(key => <kbd key={key}>{key}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
                             : keys}
