@@ -199,7 +199,7 @@ function collectFunctionInfo(node, args) {
 
                     }
                 }
-
+                
                 //
             }
 
@@ -235,7 +235,7 @@ function collectFunctionInfo(node, args) {
             }
 
             var callCurrentFuncs = ccState.getProperty("userFunctions");
-
+            
             if (calledName == "readInput") {
                 args[0].codeFeatures.features.consoleInput = 1;
             }
@@ -370,9 +370,9 @@ function collectVariableInfo(node) {
                     let isRename = false;
                     //is it a built in or api func?
                     isRename = (ccState.apiFunctions.includes(assignedAlias) || ccState.builtInNames.includes(assignedAlias));
+                        
 
-
-                    if (!assignmentExists && isRename) {
+                    if (!assignmentExists && isRename) { 
 
                         ccState.getProperty("userFunctions").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 });
                     }
@@ -664,7 +664,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                 return getTypeFromASTNode(funcObj.returnVals[0]);
             }
         }
-
+        
     }
     return "";
 
@@ -1222,7 +1222,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode) {
         for (let i = 0; i < funcObj.functionBody.length; i++) {
             returnObject.children.push(buildStructuralRepresentation(funcObj.functionBody[i], returnObject));
         }
-
+        
     }
     else if (node._astname == "If") {
         //returnObject.id = "If";
@@ -1236,7 +1236,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode) {
 
         let orElses = [];
 
-
+        
         appendOrElses(node, orElses);
 
         if (orElses.length > 0) {
