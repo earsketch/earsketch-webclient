@@ -109,8 +109,8 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                     },
                 })
                 setContestResults([...contestResults])
-                if (contestDict[result.script.shareid]) { 
-                    contestDict[result.script.shareid].finished = true 
+                if (contestDict[result.script.shareid]) {
+                    contestDict[result.script.shareid].finished = true
                 } else {
                     contestDict[result.script.shareid] = { id: 0, finished: true }
                 }
@@ -144,8 +144,8 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                     },
                 })
                 setContestResults([...contestResults])
-                if (contestDict[result.script.shareid]) { 
-                    contestDict[result.script.shareid].finished = true 
+                if (contestDict[result.script.shareid]) {
+                    contestDict[result.script.shareid].finished = true
                 } else {
                     contestDict[result.script.shareid] = { id: 0, finished: true }
                 }
@@ -182,8 +182,8 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 contestResults.push(result)
                 setContestResults([...contestResults])
 
-                if (contestDict[result.script.shareid]) { 
-                    contestDict[result.script.shareid].finished = true 
+                if (contestDict[result.script.shareid]) {
+                    contestDict[result.script.shareid].finished = true
                 } else {
                     contestDict[result.script.shareid] = { id: 0, finished: true }
                 }
@@ -229,12 +229,9 @@ export const CodeAnalyzerContest = () => {
         </div>
         <Options
             options={options}
-            seed={0}
-            useSeed={false}
             showSeed={false}
             setOptions={setOptions}
             setSeed={() => null}
-            setUseSeed={() => null}
         />
         <Upload
             processing={processing}
