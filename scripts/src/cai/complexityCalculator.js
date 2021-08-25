@@ -19,7 +19,17 @@ function recursiveCallOnNodes(funcToCall, args, ast) {
             funcToCall(node, args);
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    } else if (ast != null && (ast._astname != null || (ast[0] != null && ast[0]._astname != null)) && Object.keys(ast) != null) {
+    }
+    else if (ast != null && ast._astname != null && ast._astname == "BoolOp") {
+        var valueKeys = Object.keys(ast.values);
+        for (var r = 0; r < valueKeys.length; r++) {
+            var node = ast.values[valueKeys[r]];
+            funcToCall(node, args);
+            recursiveCallOnNodes(funcToCall, args, node)
+        }
+
+    }
+    else if (ast != null && (ast._astname != null || (ast[0] != null && ast[0]._astname != null)) && Object.keys(ast) != null) {
         var astKeys = Object.keys(ast);
         for (var r = 0; r < astKeys.length; r++) {
             var node = ast[astKeys[r]];
@@ -41,6 +51,44 @@ function recursiveCallOnNodes(funcToCall, args, ast) {
         funcToCall(ast.iter, args);
         recursiveCallOnNodes(funcToCall, args, ast.iter)
     }
+}
+
+function analyzeConditionalTest(testNode, tallyList) {
+    recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode);
+}
+
+function tallyObjectsInConditional(node, tallyList) {
+    if (node == null) {
+        return;
+    }
+    if (node._astname == "Name") {
+        //boolval or variable
+        if ((node.id.v == "True" || node.id.v == "False") && !tallyList.includes("Bool")) {
+            tallyList.push("Bool");
+        }
+        else {
+            //is it a variable
+            let varList = ccState.getProperty("allVariables");
+            for (let i = 0; i < varList.length; i++) {
+                if (varList[i].name == node.id.v) {
+                    tallyList.push("Variable");
+                    break;
+                }
+            }
+        }
+    }
+    else if ((node._astname == "Compare" || node._astname == "BoolOp" || node._astname == "Call" || node._astname == "BinOp") && !tallyList.includes(node._astname)){
+        tallyList.push(node._astname);
+    }
+
+    //extra handling for mod
+    if (node._astname == "BinOp") {
+        if (node.op.name == "Mod" && !tallyList.includes("Mod")) {
+            tallyList.push("Mod");
+        }
+       // console.log(node.op.name);
+    }
+
 }
 
 //recurses through AST and calls function info function on each node
@@ -172,7 +220,7 @@ function collectFunctionInfo(node, args) {
 
         }
 
-        //or a function call?
+            //or a function call?
         else if (node._astname == "Call") {
             //add it to function calls directory in ccstate
             let calledName = ""
@@ -669,10 +717,7 @@ function getTypeFromASTNode(node) {
     return "";
 }
 
-function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLine = []) {
-
-
-
+function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLine = []) { // = []
     if (ast != null && ast.body != null) {
         var astKeys = Object.keys(ast.body);
         for (var r = 0; r < astKeys.length; r++) {
@@ -742,7 +787,7 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
 
 }
 
-function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, subscriptValue = -1) {
+function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, subscriptValue = -1) { //
 
     if (node != null && node._astname != null) {
         //get linenumber info
@@ -807,7 +852,18 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
             //remove last item in nodeParents
             parentNodes = parentNodes.slice(0, parentNodes.length - 1);
         }
+        if (parentNodes.length > 1) {
+            while (parentNodes[parentNodes.length - 2][0]._astname == "BinOp" || parentNodes[parentNodes.length - 2][0]._astname == "Compare" || (parentNodes.length > 2 && parentNodes[parentNodes.length - 3][0]._astname == "BoolOp")) {
+                if (parentNodes[parentNodes.length - 2][0]._astname == "BinOp" || parentNodes[parentNodes.length - 2][0]._astname == "Compare") {
+                    parentNodes = parentNodes.slice(0, parentNodes.length - 1);
+                }
+                else {
+                    parentNodes = parentNodes.slice(0, parentNodes.length - 2);
+                }
+            }
+        }
 
+        //if it's in a binop or boolop, replace it with its parent node too.
 
         //if we found it, what's the parent situation?
         //1. is the parent a use?
@@ -1063,6 +1119,10 @@ function analyzeASTNode(node, results) {
 
                     recursiveAnalyzeAST(node.orelse, results);
                 }
+
+                let conditionalsList = [];
+                analyzeConditionalTest(node.test, conditionalsList);
+                console.log(conditionalsList);
             }
             else if (node._astname === "UnaryOp") {
                 recursiveAnalyzeAST(node.operand, results, loopParent);
@@ -1219,9 +1279,9 @@ function buildStructuralRepresentation(nodeToUse, parentNode) {
 }
 
 //handles sequential calls to complexity passes and creation of output
-export function doAnalysis(ast, results) {
-    functionPass(ast, results, ast);
-    recursiveCallOnNodes(collectVariableInfo, [], ast);
-    recursiveAnalyzeAST(ast, results);
-    doComplexityOutput(results, ast);
-}
+    export function doAnalysis(ast, results) {
+        functionPass(ast, results, ast);
+        recursiveCallOnNodes(collectVariableInfo, [], ast);
+        recursiveAnalyzeAST(ast, results);
+        doComplexityOutput(results, ast);
+    }
