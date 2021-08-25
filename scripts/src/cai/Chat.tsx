@@ -6,9 +6,9 @@ import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
-import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
+import * as collaboration from "../app/collaboration"
 // import store from "../reducers"
 
 const ChatFooter = () => {
@@ -23,81 +23,83 @@ const ChatFooter = () => {
 
     const [inputText, setInputText] = useState("")
 
-    const parseInput = (label: string) => {
-        let option = inputOptions.filter(option => { return option.label === inputText } )[0]
-        let value
-        value = option ? option.value : inputOptions[0].value
-        const message = { 
-            label: label, 
-            value: value
+    const parseStudentInput = (label: string) => {
+        const option = inputOptions.filter(option => { return option.label === inputText })[0]
+        const value = option ? option.value : inputOptions[0].value
+        const message = {
+            label: label,
+            value: value,
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(message))
+        collaboration.sendChatMessage(message.label)
     }
 
     const parseCAIInput = (label: string) => {
         const outputMessage = {
             text: [label],
-            keyword: ["","","","",""],
+            keyword: ["", "", "", "", ""],
             date: Date.now(),
             sender: "CAI",
         } as cai.CAIMessage
+        dispatch(cai.setResponseOptions([]))
         dispatch(cai.addToMessageList(outputMessage))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
+        collaboration.sendChatMessage(outputMessage.text[0], "CAI")
     }
 
-    const buttonInput = (input: cai.CAIMessage) => {
+    const caiResponseInput = (input: cai.CAIMessage) => {
         dispatch(cai.setResponseOptions([]))
         dispatch(cai.addToMessageList(input))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
+        collaboration.sendChatMessage(input.text[0], "CAI")
     }
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
-            {wizard && 
-            <div style={{ flex: "auto" }}>
-                {responseOptions.length < buttonLimit
-                    ? <ul>
-                        {responseOptions.length < buttonLimit &&
-                        Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
-                            <li key={inputIdx}>
-                                <button type ="button" className="btn btn-cai" onClick={() => buttonInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {input.text}
-                                </button>
-                            </li>
-                        )}
-                    </ul>
-                    : <div className="dropup-cai" style={{ width: "100%" }}>
-                        <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                            {dropupLabel}
-                        </button>
-                        <div className="dropup-cai-content" style={{ left: "50%", height: "fit-content" }}>
-                            <ul>
-                                {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+            {wizard &&
+                <div style={{ flex: "auto" }}>
+                    {responseOptions.length < buttonLimit
+                        ? <ul>
+                            {responseOptions.length < buttonLimit &&
+                                Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                                     <li key={inputIdx}>
-                                        <option onClick={() => buttonInput(input)}>{input.text}</option>
+                                        <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                            {input.text}
+                                        </button>
                                     </li>
                                 )}
-                            </ul>
-                        </div>
-                    </div>}
-            </div>
-            }
+                        </ul>
+                        : <div className="dropup-cai" style={{ width: "100%" }}>
+                            <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
+                                {dropupLabel}
+                            </button>
+                            <div className="dropup-cai-content" style={{ left: "50%", height: "fit-content" }}>
+                                <ul>
+                                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+                                        <li key={inputIdx}>
+                                            <option onClick={() => caiResponseInput(input)}>{input.text}</option>
+                                        </li>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>}
+                </div>}
             <div style={{ flex: "auto" }}>
                 <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} style={{ backgroundColor: "lightgray" }}></input>
-                <button className="btn btn-cai" onClick={() => wizard ? parseCAIInput(inputText) : parseInput(inputText)} style={{ float: "right" }}> Send </button>
+                <button className="btn btn-cai" onClick={() => wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)} style={{ float: "right" }}> Send </button>
             </div>
             <div style={{ flex: "auto" }}>
                 <ul>
                     {errorOptions.length > 0 &&
-                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                        <li key={errIdx}>
-                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                {input.label}
-                            </button>
-                        </li>
-                    )}
+                        Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
+                            <li key={errIdx}>
+                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {input.label}
+                                </button>
+                            </li>
+                        )}
                 </ul>
             </div>
         </div>

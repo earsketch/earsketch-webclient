@@ -8,6 +8,9 @@ import reporter from "./reporter"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
+import * as cai from "../cai/caiState"
+import store from "../reducers"
+
 interface Message {
     // eslint-disable-next-line camelcase
     notification_type: string
@@ -89,9 +92,9 @@ export let otherMembers: {
 } = Object.create(null)
 const markers: { [key: string]: number } = Object.create(null)
 
-export const chat: {
-    [key: string]: { text: string; popover: boolean }
-} = Object.create(null)
+// export const chat: {
+//     [key: string]: { text: string; popover: boolean }
+// } = Object.create(null)
 export let tutoring = false
 
 // This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
@@ -160,10 +163,10 @@ export function openScript(script_: Script, userName: string) {
             }
 
             // TODO: combine with other-members state object?
-            chat[script.username] = {
-                text: "",
-                popover: false,
-            }
+            // chat[script.username] = {
+            //     text: "",
+            //     popover: false,
+            // }
         }
 
         for (let member of script.collaborators) {
@@ -174,17 +177,17 @@ export function openScript(script_: Script, userName: string) {
                     canEdit: true,
                 }
 
-                chat[member] = {
-                    text: "",
-                    popover: false,
-                }
+                // chat[member] = {
+                //     text: "",
+                //     popover: false,
+                // }
             }
         }
 
-        chat[userName] = {
-            text: "",
-            popover: false,
-        }
+        // chat[userName] = {
+        //     text: "",
+        //     popover: false,
+        // }
     }
     reporter.openSharedScript()
 }
@@ -1011,10 +1014,45 @@ export function leaveTutoring() {
     tutoring = false
 }
 
-export function sendChatMessage(text: string) {
-    const message = { action: "chat", text, date: Date.now(), ...makeWebsocketMessage() }
-    websocket.send(message)
-    return message
+export function sendChatMessage(text: string, sender: string = userName) {
+    const message = {
+        action: "chat",
+        ID: generateRandomID(),
+        state,
+        text: text,
+        ...makeWebsocketMessage(),
+    }
+
+    message.sender = sender
+
+    if (synchronized) {
+        buffer.push(message)
+        synchronized = false
+        awaiting = message.ID
+
+        if (!sessionActive) {
+            rejoinSession()
+        } else {
+            websocket.send(message)
+            timeoutSync(message.ID)
+        }
+    } else {
+        // buffered messages get temporary incremental state nums
+        message.state += buffer.length
+        buffer.push(message)
+    }
+}
+
+function onChatMessage(data: Message) {
+    console.log(data)
+    const outputMessage = {
+        text: [data.text, "", "", "", ""],
+        keyword: ["", "", "", "", ""],
+        date: Date.now(),
+        sender: data.sender,
+    } as cai.CAIMessage
+
+    store.dispatch(cai.addCAIMessage([outputMessage, true]))
 }
 
 export function sendCompilationRecord(type: string) {
@@ -1045,13 +1083,14 @@ const SCRIPT_HANDLERS: { [key: string]: (data: Message) => void } = {
     onMemberLeftSession,
     onMiscMessage,
     onWriteAccess: onChangeWriteAccess,
-    onChat: (data: Message) => callbacks.chat?.(data),
+    onChat: onChatMessage,
     onCompile: (data: Message) => callbacks.chat?.(data),
     onSessionClosedForInactivity,
 }
 
 // websocket callbacks
 function triggerByNotification(data: Message) {
+    console.log(data.action!)
     if (data.notification_type === "collaboration") {
         // Convert e.g. "joinedSession" to "onJoinedSession"
         const action = "on" + data.action!.charAt(0).toUpperCase() + data.action!.slice(1)

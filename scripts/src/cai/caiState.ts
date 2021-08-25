@@ -12,6 +12,7 @@ import * as studentHistory from "./studentHistory"
 import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
+import * as collaboration from "../app/collaboration"
 
 interface caiState {
     activeProject: string
@@ -107,9 +108,40 @@ export const newCAIMessage = () => {
     }
 }
 
+export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean], ThunkAPI>(
+    "cai/addCAIMessage",
+    ([message, remote = false], { getState, dispatch }) => {
+        // if (remote && selectWizard(getState()) && message.sender === "CAI") {
+        //     dispatch(setResponseOptions([...selectResponseOptions(getState()), message]))
+        // } else if (!remote && message.sender === "CAI") {
+        //     collaboration.sendChatMessage(message.text[0], "CAI")
+        // } else {
+        //     dispatch(addToMessageList(message))
+        //     dispatch(autoScrollCAI())
+        //     newCAIMessage()
+        // }
+
+        if (message.sender !== "CAI") {
+            dispatch(addToMessageList(message))
+            dispatch(autoScrollCAI())
+            newCAIMessage()
+        } else if (remote) {
+            if (selectWizard(getState())) {
+                dispatch(setResponseOptions([...selectResponseOptions(getState()), message]))
+            } else {
+                dispatch(addToMessageList(message))
+                dispatch(autoScrollCAI())
+                newCAIMessage()
+            }
+        } else {
+            collaboration.sendChatMessage(message.text[0], "CAI")
+        }
+    }
+)
+
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     "cai/introduceCAI",
-    (_, { getState, dispatch }) => {
+    (_, { dispatch }) => {
         // reinitialize recommendation dictionary
         analysis.fillDict().then(() => {
             const msgText = dialogue.generateOutput("Chat with CAI")
@@ -127,13 +159,7 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
                         sender: "CAI",
                     } as CAIMessage
 
-                    if (selectWizard(getState())) {
-                        dispatch(setResponseOptions([...selectResponseOptions(getState()), outputMessage]))
-                    } else {
-                        dispatch(addToMessageList(outputMessage))
-                        dispatch(autoScrollCAI())
-                        newCAIMessage()
-                    }
+                    dispatch(addCAIMessage([outputMessage, false]))
                 }
             }
         })
@@ -165,10 +191,10 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
             dispatch(setErrorOptions([]))
         }
         if (msgText.includes("[ERRORFIX")) {
-            const errorS = msgText.substring(msgText.includes("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
-            const errorF = msgText.substring(msgText.lastIndexOf("|") + 1, msgText.length - 1)
+            const errorSuccess = msgText.substring(msgText.includes("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
+            const errorFail = msgText.substring(msgText.lastIndexOf("|") + 1, msgText.length - 1)
             msgText = msgText.substring(0, msgText.indexOf("[ERRORFIX"))
-            dialogue.setSuccessFail(parseInt(errorS), parseInt(errorF))
+            dialogue.setSuccessFail(parseInt(errorSuccess), parseInt(errorFail))
             const actionOutput = dialogue.attemptErrorFix()
             msgText += "|" + actionOutput ? dialogue.errorFixSuccess() : dialogue.errorFixFail()
         }
@@ -185,13 +211,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
                         sender: "CAI",
                     } as CAIMessage
 
-                    if (selectWizard(getState())) {
-                        dispatch(setResponseOptions([...selectResponseOptions(getState()), outputMessage]))
-                    } else {
-                        dispatch(addToMessageList(outputMessage))
-                        dispatch(autoScrollCAI())
-                        newCAIMessage()
-                    }
+                    dispatch(addCAIMessage([outputMessage, false]))
                 }
             }
         }
@@ -231,7 +251,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileCAI",
-    (data, { getState, dispatch }) => {
+    (data, { dispatch }) => {
         if (dialogue.isDone()) {
             return
         }
@@ -256,13 +276,8 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage
-            if (selectWizard(getState())) {
-                dispatch(setResponseOptions([...selectResponseOptions(getState()), message]))
-            } else {
-                dispatch(addToMessageList(message))
-                dispatch(autoScrollCAI())
-                newCAIMessage()
-            }
+
+            dispatch(addCAIMessage([message, false]))
         }
         if (output !== null && output === "" && !dialogue.activeWaits() && dialogue.studentInteractedValue()) {
             dispatch(setDefaultInputOptions())
@@ -334,19 +349,19 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
 
 export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
     "cai/userOnPage",
-    (time: number) => {
+    (time) => {
         studentPreferences.addOnPageStatus(1, time)
     }
 )
 
 export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
     "cai/userOffPage",
-    (time: number) => {
+    (time) => {
         studentPreferences.addOnPageStatus(0, time)
     }
 )
 
-export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
+export const keyStroke = createAsyncThunk<void, [string, any, number], ThunkAPI>(
     "cai/keyStroke",
     ([action, content, time]) => {
         studentPreferences.addKeystroke(action, content, time)
