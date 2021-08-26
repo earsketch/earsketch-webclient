@@ -1122,7 +1122,11 @@ function analyzeASTNode(node, results) {
 
                 let conditionalsList = [];
                 analyzeConditionalTest(node.test, conditionalsList);
-                console.log(conditionalsList);
+                for (let k = 0; k < conditionalsList.length; k++) {
+                    if (!results.codeFeatures.conditionals.usedInConditionals.includes(conditionalsList[k])) {
+                        results.codeFeatures.conditionals.usedInConditionals.push(conditionalsList[k]);
+                    }
+                }
             }
             else if (node._astname === "UnaryOp") {
                 recursiveAnalyzeAST(node.operand, results, loopParent);

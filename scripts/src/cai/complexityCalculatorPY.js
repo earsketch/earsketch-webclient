@@ -27,6 +27,7 @@ export function analyzePython(source_code) {
         ccHelpers.replaceNumericUnaryOps(ast.body);
         //initialize the results object
         var resultsObject = {
+            ast: ast,
             codeFeatures: {
                 errors: 0,
                 variables: 0,
@@ -70,11 +71,11 @@ export function analyzePython(source_code) {
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
         ccHelpers.lineDict();
-        caiErrorHandling.updateNames(ccState.getProperty('allVariables'), ccState.getProperty('userFunctions'));
         return resultsObject;
     }
     catch (error) {
         return {
+            ast: {},
             codeFeatures: {
                 errors: 1,
                 variables: 0,

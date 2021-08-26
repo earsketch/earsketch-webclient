@@ -20,6 +20,7 @@ export function analyzeJavascript(source) {
         var allVariables = [];
         //initialize the results object
         var resultsObject = {
+            ast: ast,
             codeFeatures: {
                 errors: 0,
                 variables: 0,
@@ -60,12 +61,13 @@ export function analyzeJavascript(source) {
         //translate the calculated values
         // translateIntegerValues(resultsObject);
         ccHelpers.lineDict();
-        caiErrorHandling.updateNames(ccState.getProperty('allVariables'), ccState.getProperty('userFunctions'));
         return resultsObject;
     }
     catch (error) {
         return {
+            ast: {},
             codeFeatures: {
+
                 errors: 1,
                 variables: 0,
                 makeBeat: 0,

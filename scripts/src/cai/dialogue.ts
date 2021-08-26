@@ -207,10 +207,6 @@ export function handleError(error: any) {
     }
 }
 
-export function attemptErrorFix() {
-    return caiErrorHandling.handleError(currentError, studentCodeObj)
-}
-
 export function setSuccessFail(s: number, f: number) {
     errorSuccess = s
     errorFail = f
@@ -229,7 +225,7 @@ function explainError() {
 }
 
 export function processCodeRun(studentCode: string, functions: any[], variables: any[], complexityResults: any, musicResults: any) {
-    caiErrorHandling.updateNames(variables, functions)
+    //caiErrorHandling.updateNames(variables, functions)
     studentCodeObj = studentCode
     const allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
     caiStudentPreferenceModule.runSound(allSamples)
@@ -249,6 +245,9 @@ export function processCodeRun(studentCode: string, functions: any[], variables:
         codeSuggestionsUsed[activeProject] += codeSuggestionRecord.length - codeSuggestionsUsed[activeProject]
     }
     if (complexityResults != null) {
+
+        caiErrorHandling.storeWorkingCodeInfo(complexityResults.ast, complexityResults.codeStructure, musicResults);
+
         currentComplexity = Object.assign({}, complexityResults)
         if (currentComplexity.userFunc == "Args" || currentComplexity.userFunc == "Returns") {
             currentComplexity.userFunc = 3
