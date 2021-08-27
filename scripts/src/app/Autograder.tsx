@@ -14,8 +14,7 @@ const nativePrompt = (window as any).esPrompt
 export const randomSeed = (seed?: number) => {
     const rng = new Chance(seed ?? Date.now())
     Math.random = () => {
-        const rand = rng.random()
-        return rand
+        return rng.random()
     }
 }
 
@@ -302,12 +301,12 @@ const ConfigureTest = ({
                     </div>
                     <div className="col-md-4">
                         <h4>Random Seed</h4>
-                        <label>
-                            <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
-                            Use the following random seed:
-                        </label>
-                        {seed !== undefined &&
-                            <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>}
+                        <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
+                        {seed !== undefined
+                            ? <div>Use the following random seed:
+                                <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>
+                            </div>
+                            : <div>Use a random seed</div>}
                         <p className="small">
                             This will automatically seed every random function in Python and JavaScript.
                         </p>
