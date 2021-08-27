@@ -64,18 +64,18 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
         setMusicCodePassed(0)
     }, [contestDict])
 
-    useEffect(() => {
-        const addResult = (result: Result) => {
-            contestResults.push(result)
-            setContestResults([...contestResults])
+    const addResult = (result: Result) => {
+        contestResults.push(result)
+        setContestResults([...contestResults])
 
-            if (contestDict[result.script.shareid]) {
-                contestDict[result.script.shareid].finished = true
-            } else {
-                contestDict[result.script.shareid] = { id: 0, finished: true }
-            }
+        if (contestDict[result.script.shareid]) {
+            contestDict[result.script.shareid].finished = true
+        } else {
+            contestDict[result.script.shareid] = { id: 0, finished: true }
         }
+    }
 
+    useEffect(() => {
         for (const result of results) {
             if (Array.isArray(result.reports?.OVERVIEW) || contestDict[result.script.shareid]?.finished) {
                 continue

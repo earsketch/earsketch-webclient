@@ -12,11 +12,9 @@ const nativePrompt = (window as any).esPrompt
 
 // overwrite JavaScript random implementation with seedable one
 export const randomSeed = (seed?: number) => {
-    console.log("randomSeed", seed)
     const rng = new Chance(seed ?? Date.now())
     Math.random = () => {
         const rand = rng.random()
-        console.log("random", rand, rng)
         return rand
     }
 }
