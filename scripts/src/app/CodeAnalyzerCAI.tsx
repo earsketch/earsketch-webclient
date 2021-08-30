@@ -234,7 +234,8 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                         <i className="es-spinner animate-spin mr-3"></i> Run
                     </button>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
-                <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>
+                {!userProject.getToken() &&
+                <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
             </div>
         </div>
     </div>
