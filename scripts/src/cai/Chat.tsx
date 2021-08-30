@@ -30,8 +30,8 @@ const ChatFooter = () => {
             label: label,
             value: value,
         } as cai.CAIButton
-        dispatch(cai.sendCAIMessage(message))
         collaboration.sendChatMessage(message.label)
+        setTimeout(dispatch(cai.sendCAIMessage(message)), 1000)
     }
 
     const parseCAIInput = (label: string) => {
@@ -45,7 +45,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(outputMessage))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(outputMessage.text[0], "CAI")
+        collaboration.sendChatMessage(outputMessage.text[0], true)
     }
 
     const caiResponseInput = (input: cai.CAIMessage) => {
@@ -53,7 +53,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(input))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(input.text[0], "CAI")
+        collaboration.sendChatMessage(input.text[0], true)
     }
 
     return (

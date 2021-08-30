@@ -35,6 +35,7 @@ interface Message {
     state?: number
     text?: string
     tutoring?: boolean
+    cai?: boolean
 }
 
 interface InsertOperation {
@@ -1014,42 +1015,49 @@ export function leaveTutoring() {
     tutoring = false
 }
 
-export function sendChatMessage(text: string, sender: string = userName) {
+export function sendChatMessage(text: string, cai: boolean = false) {
     const message = {
         action: "chat",
         ID: generateRandomID(),
         state,
         text: text,
+        cai: cai,
         ...makeWebsocketMessage(),
     }
 
-    message.sender = sender
+    websocket.send(message)
 
-    if (synchronized) {
-        buffer.push(message)
-        synchronized = false
-        awaiting = message.ID
+    // if (synchronized) {
+    //     buffer.push(message)
+    //     synchronized = false
+    //     awaiting = message.ID
 
-        if (!sessionActive) {
-            rejoinSession()
-        } else {
-            websocket.send(message)
-            timeoutSync(message.ID)
-        }
-    } else {
-        // buffered messages get temporary incremental state nums
-        message.state += buffer.length
-        buffer.push(message)
-    }
+    //     if (!sessionActive) {
+    //         rejoinSession()
+    //     } else {
+    //         websocket.send(message)
+    //         timeoutSync(message.ID)
+    //     }
+    // } else {
+    //     // buffered messages get temporary incremental state nums
+    //     message.state += buffer.length
+    //     buffer.push(message)
+    // }
 }
 
 function onChatMessage(data: Message) {
     console.log(data)
+
+    // do nothing on own message
+    if (data.sender === userName) {
+        return
+    }
+
     const outputMessage = {
         text: [data.text, "", "", "", ""],
         keyword: ["", "", "", "", ""],
         date: Date.now(),
-        sender: data.sender,
+        sender: data.cai ? "CAI" : data.sender,
     } as cai.CAIMessage
 
     store.dispatch(cai.addCAIMessage([outputMessage, true]))

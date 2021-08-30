@@ -111,16 +111,6 @@ export const newCAIMessage = () => {
 export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean], ThunkAPI>(
     "cai/addCAIMessage",
     ([message, remote = false], { getState, dispatch }) => {
-        // if (remote && selectWizard(getState()) && message.sender === "CAI") {
-        //     dispatch(setResponseOptions([...selectResponseOptions(getState()), message]))
-        // } else if (!remote && message.sender === "CAI") {
-        //     collaboration.sendChatMessage(message.text[0], "CAI")
-        // } else {
-        //     dispatch(addToMessageList(message))
-        //     dispatch(autoScrollCAI())
-        //     newCAIMessage()
-        // }
-
         if (message.sender !== "CAI") {
             dispatch(addToMessageList(message))
             dispatch(autoScrollCAI())
@@ -134,7 +124,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean], Thunk
                 newCAIMessage()
             }
         } else {
-            collaboration.sendChatMessage(message.text[0], "CAI")
+            collaboration.sendChatMessage(message.text[0], true)
         }
     }
 )
