@@ -93,9 +93,6 @@ export let otherMembers: {
 } = Object.create(null)
 const markers: { [key: string]: number } = Object.create(null)
 
-// export const chat: {
-//     [key: string]: { text: string; popover: boolean }
-// } = Object.create(null)
 export let tutoring = false
 
 // This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
@@ -162,12 +159,6 @@ export function openScript(script_: Script, userName: string) {
                 active: false,
                 canEdit: true,
             }
-
-            // TODO: combine with other-members state object?
-            // chat[script.username] = {
-            //     text: "",
-            //     popover: false,
-            // }
         }
 
         for (let member of script.collaborators) {
@@ -177,18 +168,8 @@ export function openScript(script_: Script, userName: string) {
                     active: false,
                     canEdit: true,
                 }
-
-                // chat[member] = {
-                //     text: "",
-                //     popover: false,
-                // }
             }
         }
-
-        // chat[userName] = {
-        //     text: "",
-        //     popover: false,
-        // }
     }
     reporter.openSharedScript()
 }
@@ -1026,23 +1007,6 @@ export function sendChatMessage(text: string, cai: boolean = false) {
     }
 
     websocket.send(message)
-
-    // if (synchronized) {
-    //     buffer.push(message)
-    //     synchronized = false
-    //     awaiting = message.ID
-
-    //     if (!sessionActive) {
-    //         rejoinSession()
-    //     } else {
-    //         websocket.send(message)
-    //         timeoutSync(message.ID)
-    //     }
-    // } else {
-    //     // buffered messages get temporary incremental state nums
-    //     message.state += buffer.length
-    //     buffer.push(message)
-    // }
 }
 
 function onChatMessage(data: Message) {

@@ -11,7 +11,6 @@ import { CAI } from "../cai/CAI"
 import * as cai from "../cai/caiState"
 import * as caiAnalysis from "../cai/analysis"
 import { Chat } from "../cai/Chat"
-import * as chat from "../cai/chatState"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
@@ -469,9 +468,9 @@ export const IDE = () => {
                                         <span className={"console-" + msg.level.replace("status", "info")}>
                                             {msg.text}{" "}
                                             {msg.level === "error" &&
-                                            <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
-                                                Click here for more information.
-                                            </a>}
+                                                <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
+                                                    Click here for more information.
+                                                </a>}
                                         </span>
                                     </div>)}
                             </div>
@@ -481,10 +480,10 @@ export const IDE = () => {
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI
-                    ? FLAGS.SHOW_CHAT 
-                        ? <Chat />
-                        : <CAI />
-                    : <Curriculum />}
+                        ? FLAGS.SHOW_CHAT
+                            ? <Chat />
+                            : <CAI />
+                        : <Curriculum />}
                     {/* NOTE: The chat window might come back here at some point. */}
                 </div>
             </Split>
