@@ -173,7 +173,7 @@ const processContent = (location: number[], html: string, dispatch: AppDispatch)
         // Apparent WebKit (including Safari) bug: adopted <video> and <audio> elements are missing their controls.
         // (This does not occur in Chrome or Firefox.)
         // Workaround: clone the element.
-        root.querySelectorAll("video").forEach(video => video.replaceWith(video.cloneNode()))
+        root.querySelectorAll("video").forEach(video => video.replaceWith(video.cloneNode(true)))
         root.querySelectorAll("audio").forEach(audio => audio.replaceWith(audio.cloneNode()))
     }
 

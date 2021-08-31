@@ -64,6 +64,17 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
         setMusicCodePassed(0)
     }, [contestDict])
 
+    const addResult = (result: Result) => {
+        contestResults.push(result)
+        setContestResults([...contestResults])
+
+        if (contestDict[result.script.shareid]) {
+            contestDict[result.script.shareid].finished = true
+        } else {
+            contestDict[result.script.shareid] = { id: 0, finished: true }
+        }
+    }
+
     useEffect(() => {
         for (const result of results) {
             if (Array.isArray(result.reports?.OVERVIEW) || contestDict[result.script.shareid]?.finished) {
@@ -93,7 +104,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
             }
 
             if (result.error) {
-                contestResults.push({
+                addResult({
                     script: result.script,
                     contestID: result.contestID,
                     error: result.error,
@@ -108,12 +119,6 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                         },
                     },
                 })
-                setContestResults([...contestResults])
-                if (contestDict[result.script.shareid]) { 
-                    contestDict[result.script.shareid].finished = true 
-                } else {
-                    contestDict[result.script.shareid] = { id: 0, finished: true }
-                }
                 continue
             }
 
@@ -128,7 +133,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
             sourceCode = sourceCode.join("\n")
 
             if (!sourceCode.includes(options.artistName)) {
-                contestResults.push({
+                addResult({
                     script: result.script,
                     contestID: result.contestID,
                     error: "No Contest Samples",
@@ -143,12 +148,6 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                         },
                     },
                 })
-                setContestResults([...contestResults])
-                if (contestDict[result.script.shareid]) { 
-                    contestDict[result.script.shareid].finished = true 
-                } else {
-                    contestDict[result.script.shareid] = { id: 0, finished: true }
-                }
                 continue
             }
 
@@ -179,14 +178,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 }
 
                 result.reports = reports
-                contestResults.push(result)
-                setContestResults([...contestResults])
-
-                if (contestDict[result.script.shareid]) { 
-                    contestDict[result.script.shareid].finished = true 
-                } else {
-                    contestDict[result.script.shareid] = { id: 0, finished: true }
-                }
+                addResult(result)
             }
         }
     }, [results])
@@ -229,12 +221,9 @@ export const CodeAnalyzerContest = () => {
         </div>
         <Options
             options={options}
-            seed={0}
-            useSeed={false}
             showSeed={false}
             setOptions={setOptions}
             setSeed={() => null}
-            setUseSeed={() => null}
         />
         <Upload
             processing={processing}

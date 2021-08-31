@@ -39,14 +39,13 @@ export function addRecInput(recInput: string[], script: Script) {
     const lines = script.source_code.split("\n")
     for (const line of lines) {
         for (const name of AUDIOKEYS) {
-            // exclude makebeat
-            if (name.length > 0 && name.slice(0, 3) !== "OS_") {
-                if (line.includes(name) && !recInput.includes(name)) {
-                    // exclude comments
-                    if (!line.includes("#") || line.indexOf(name) < line.indexOf("#")) {
-                        recInput.push(name)
-                    }
-                }
+            // Exclude makeBeat, comments, and samples included in the input list.
+            // TODO: This comment check only works for Python, and excludes other scenarios that should be ignored.
+            //       This should extract identifiers from the AST (like runner) rather than searching through text.
+            const commented = line.includes("#") && line.indexOf(name) > line.indexOf("#")
+            const excluded = name.startsWith("OS_") || commented || recInput.includes(name)
+            if (!excluded && line.includes(name)) {
+                recInput.push(name)
             }
         }
     }
@@ -142,7 +141,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
     // Generate recommendations for each input sample and add together
-    const recs: { [key: string]: number } = {}
+    const recs: { [key: string]: number } = Object.create(null)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         if (audioNumber !== undefined) {
@@ -151,7 +150,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2]
                 const key = NUMBERS_AUDIOKEYS[num]
 
-                if (Object.keys(recs).includes(key)) {
+                if (key in recs) {
                     recs[key] = (fullVal + recs[key]) / 1.41
                 } else {
                     recs[key] = fullVal
