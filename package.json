@@ -16,7 +16,7 @@
   "author": "GTCMT",
   "license": "NA",
   "dependencies": {
-    "@headlessui/react": "^1.2.0",
+    "@headlessui/react": "^1.4.0",
     "@popperjs/core": "^2.4.4",
     "@reduxjs/toolkit": "^1.4.0",
     "@tailwindcss/typography": "^0.3.1",
