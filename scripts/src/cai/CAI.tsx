@@ -160,9 +160,20 @@ export const CAI = () => {
 }
 
 if (FLAGS.SHOW_CAI) {
+    console.log("check flags once");
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
-    window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
+    window.onblur = () => store.dispatch(cai.userOffPage(Date.now()))
+
+
+    window.addEventListener('load', function (e) {
+        store.dispatch(cai.userLoadPage(Date.now()));
+      });
+
+    window.addEventListener('beforeunload', function (e) {
+        // the absence of a returnValue property on the event will guarantee the browser unload happens
+        store.dispatch(cai.userUnloadPage(Date.now()))
+      });
 
     let x: number | undefined, y: number | undefined
 

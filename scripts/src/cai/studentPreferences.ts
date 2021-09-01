@@ -1,4 +1,4 @@
-/* eslint-disable */
+﻿/* eslint-disable */
 // TODO: Resolve lint issues.
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
@@ -26,6 +26,8 @@ const soundSuggestionTracker: { [key: string]: SoundSuggestion[] } = {}
 
 const acceptanceRatio: { [key: string]: number } = {}
 let activeProject = ""
+
+const projectViews: any[] = []
 
 function setActiveProject(projectName: string) {
     activeProject = projectName
@@ -66,6 +68,9 @@ function setActiveProject(projectName: string) {
         soundSuggestionTracker[activeProject] = []
     }
     activeProject = projectName
+
+    projectViews.push({projectName})
+    caiStudent.updateModel("preferences", { projectViews: projectViews })
 }
 
 function getSoundSuggestionsUsed() {
@@ -211,11 +216,12 @@ const recentCompiles = 3
 const compileTS: any[] = []
 const compileErrors: any[] = []
 const mousePos: any[] = []
+const uiClickHistory: any[] = []
+const pageLoadHistory: any[] = []
 
 function addOnPageStatus(status: any, time: any) {
     onPageHistory.push({ status, time })
     caiStudent.updateModel("preferences", { onPageHistory: onPageHistory })
-    // console.log("history", onPageHistory)
 }
 
 function returnPageStatus() {
@@ -257,6 +263,16 @@ function addMousePos(pos: any) {
     caiStudent.updateModel("preferences", { mousePos: mousePos })
 }
 
+function addUIClick(ui: string, time: number) {
+    uiClickHistory.push({ui, time})
+    caiStudent.updateModel("preferences", {uiClickHistory: uiClickHistory})
+}
+
+function addPageLoad(status: any, time:any) {
+    pageLoadHistory.push({status, time});
+    caiStudent.updateModel("preferences", {pageLoadHistory: pageLoadHistory})
+}
+
 // what are the measures to understand how off or on task one is?
 
 // other options: caiClose, pageChanged, caiSwapTab
@@ -280,4 +296,6 @@ export {
     runSound,
     setActiveProject,
     stuckOnError, // Currently unused
+    addUIClick,
+    addPageLoad,
 }

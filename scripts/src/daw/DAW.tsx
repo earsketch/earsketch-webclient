@@ -14,6 +14,8 @@ import * as WaveformCache from "../app/waveformcache"
 import * as daw from "./dawState"
 import { useTranslation } from "react-i18next"
 
+import {userUIClick} from "../cai/caiState"
+
 // Width of track control box
 const X_OFFSET = 100
 
@@ -71,6 +73,10 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
         // player does not preserve volume state between plays
         player.setVolume(volumeMuted ? -60 : volume)
+    }
+
+    const recordClick = (ui: string) => {
+        store.dispatch(userUIClick([ui, Date.now() ]));
     }
 
     const pause = () => {
@@ -173,14 +179,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={play}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={ () => { play(); recordClick("play");} }>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={pause}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={ () => { pause(); recordClick("pause");} }>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
