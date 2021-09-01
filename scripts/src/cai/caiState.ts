@@ -124,7 +124,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean], Thunk
                 newCAIMessage()
             }
         } else {
-            collaboration.sendChatMessage(message.text[0], true)
+            collaboration.sendChatMessage(message, true)
         }
     }
 )

@@ -36,6 +36,7 @@ interface Message {
     text?: string
     tutoring?: boolean
     cai?: boolean
+    caiMessage?: cai.CAIMessage
 }
 
 interface InsertOperation {
@@ -996,15 +997,13 @@ export function leaveTutoring() {
     tutoring = false
 }
 
-export function sendChatMessage(text: string, cai: boolean = false) {
+export function sendChatMessage(caiMessage: cai.CAIMessage, cai: boolean = false) {
     const message = {
         action: "chat",
-        ID: generateRandomID(),
-        state,
-        text: text,
+        caiMessage: caiMessage,
         cai: cai,
         ...makeWebsocketMessage(),
-    }
+    } as Message
 
     websocket.send(message)
 }
@@ -1017,12 +1016,8 @@ function onChatMessage(data: Message) {
         return
     }
 
-    const outputMessage = {
-        text: [data.text, "", "", "", ""],
-        keyword: ["", "", "", "", ""],
-        date: Date.now(),
-        sender: data.cai ? "CAI" : data.sender,
-    } as cai.CAIMessage
+    const outputMessage = data.caiMessage!
+    outputMessage.sender = data.cai ? "CAI" : data.sender
 
     store.dispatch(cai.addCAIMessage([outputMessage, true]))
 }

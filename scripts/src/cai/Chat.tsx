@@ -4,12 +4,12 @@ import { Collapsed } from "../browser/Browser"
 
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
+import * as dialogue from "../cai/dialogue"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
-// import store from "../reducers"
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
@@ -26,18 +26,25 @@ const ChatFooter = () => {
     const parseStudentInput = (label: string) => {
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const value = option ? option.value : inputOptions[0].value
-        const message = {
+        const button = {
             label: label,
             value: value,
         } as cai.CAIButton
-        collaboration.sendChatMessage(message.label)
-        setTimeout(dispatch(cai.sendCAIMessage(message)), 1000)
-    }
-
-    const parseCAIInput = (label: string) => {
-        const outputMessage = {
+        const message = {
             text: [label],
             keyword: ["", "", "", "", ""],
+            date: Date.now(),
+            sender: collaboration.userName,
+        } as cai.CAIMessage
+        collaboration.sendChatMessage(message)
+        setTimeout(dispatch(cai.sendCAIMessage(button)), 1000)
+    }
+
+    const parseCAIInput = (input: string) => {
+        const labels = dialogue.getLinks(input)
+        const outputMessage = {
+            text: labels[0],
+            keyword: labels[1],
             date: Date.now(),
             sender: "CAI",
         } as cai.CAIMessage
@@ -45,7 +52,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(outputMessage))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(outputMessage.text[0], true)
+        collaboration.sendChatMessage(outputMessage, true)
     }
 
     const caiResponseInput = (input: cai.CAIMessage) => {
@@ -53,11 +60,23 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(input))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(input.text[0], true)
+        collaboration.sendChatMessage(input, true)
     }
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+            {wizard &&
+            <div style={{ flex: "auto" }}>
+                <ul>
+                    {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                        <li key={inputIdx}>
+                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "gray" }}>
+                                {input.label}
+                            </button>
+                        </li>
+                    )}
+                </ul>
+            </div>}
             {wizard &&
                 <div style={{ flex: "auto" }}>
                     {responseOptions.length < buttonLimit
@@ -128,22 +147,3 @@ export const Chat = () => {
         )
         : <Collapsed title="CAI" position="east" />
 }
-
-// if (FLAGS.SHOW_CHAT) {
-//     // TODO: Moved out of userProject, should probably go in a useEffect.
-//     window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
-//     window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
-
-//     let mouseX: number | undefined, mouseY: number | undefined
-
-//     window.addEventListener("mousemove", e => {
-//         mouseX = e.x
-//         mouseY = e.y
-//     })
-
-//     window.setInterval(() => {
-//         if (mouseX && mouseY) {
-//             store.dispatch(cai.mousePosition([mouseX, mouseY]))
-//         }
-//     }, 5000)
-// }
