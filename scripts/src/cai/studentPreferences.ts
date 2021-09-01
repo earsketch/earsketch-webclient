@@ -27,7 +27,7 @@ const soundSuggestionTracker: { [key: string]: SoundSuggestion[] } = {}
 const acceptanceRatio: { [key: string]: number } = {}
 let activeProject = ""
 
-const projectViews: any[] = []
+const projectViews: string[] = []
 
 function setActiveProject(projectName: string) {
     activeProject = projectName
@@ -69,7 +69,7 @@ function setActiveProject(projectName: string) {
     }
     activeProject = projectName
 
-    projectViews.push({projectName})
+    projectViews.push(projectName)
     caiStudent.updateModel("preferences", { projectViews: projectViews })
 }
 
@@ -157,8 +157,8 @@ function runSound(soundsUsedArray: string[]) {
             updateAcceptanceRatio()
         } else {
             if (suggestion[0] == 0) {
-            //    suggestionsRejected[activeProject] += 1
-            //    updateAcceptanceRatio()
+                //    suggestionsRejected[activeProject] += 1
+                //    updateAcceptanceRatio()
             } else {
                 newArray.push([...suggestion])
             }
@@ -205,10 +205,6 @@ function updateAcceptanceRatio() {
     caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
 }
 
-const bucketSize = 30 // options range from 10s - 120s
-// for experimenting
-// const bucketOptions = [10,20,30,40,50,60,90,120]
-
 const onPageHistory: any[] = []
 let lastEditTS = 0
 const deleteKeyTS = []
@@ -225,7 +221,7 @@ function addOnPageStatus(status: any, time: any) {
 }
 
 function returnPageStatus() {
-    return onPageHistory[-1]
+    return onPageHistory[onPageHistory.length - 1]
 }
 
 function addCompileTS(time: any) {
@@ -235,7 +231,7 @@ function addCompileTS(time: any) {
 }
 
 function addKeystroke(action: string, content: any, time: any) {
-    if (action == "remove") {
+    if (action === "remove") {
         deleteKeyTS.push(time)
     }
 }
@@ -255,7 +251,7 @@ function stuckOnError() {
 }
 
 function allEqual(arr: any[]) {
-    return new Set(arr).size == 1
+    return new Set(arr).size === 1
 }
 
 function addMousePos(pos: any) {
@@ -264,13 +260,13 @@ function addMousePos(pos: any) {
 }
 
 function addUIClick(ui: string, time: number) {
-    uiClickHistory.push({ui, time})
-    caiStudent.updateModel("preferences", {uiClickHistory: uiClickHistory})
+    uiClickHistory.push({ ui, time })
+    caiStudent.updateModel("preferences", { uiClickHistory: uiClickHistory })
 }
 
-function addPageLoad(status: any, time:any) {
-    pageLoadHistory.push({status, time});
-    caiStudent.updateModel("preferences", {pageLoadHistory: pageLoadHistory})
+function addPageLoad(status: any, time: number) {
+    pageLoadHistory.push({ status, time })
+    caiStudent.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
 }
 
 // what are the measures to understand how off or on task one is?

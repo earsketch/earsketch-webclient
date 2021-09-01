@@ -73,11 +73,11 @@ const CaiBody = () => {
             <div className="chat-message-container">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
-                        <li key={idx}>
-                            <CAIMessageView {...message}/>
-                        </li>
-                    )}
+                        Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
+                            <li key={idx}>
+                                <CAIMessageView {...message} />
+                            </li>
+                        )}
                 </ul>
             </div>
         </div>
@@ -97,13 +97,13 @@ const CaiFooter = () => {
                 {inputOptions.length < buttonLimit
                     ? <ul>
                         {inputOptions.length < buttonLimit &&
-                        Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
-                            <li key={inputIdx}>
-                                <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {input.label}
-                                </button>
-                            </li>
-                        )}
+                            Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                                <li key={inputIdx}>
+                                    <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                        {input.label}
+                                    </button>
+                                </li>
+                            )}
                     </ul>
                     : <div className="dropup-cai" style={{ width: "100%" }}>
                         <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
@@ -123,13 +123,13 @@ const CaiFooter = () => {
             <div style={{ flex: "auto" }}>
                 <ul>
                     {errorOptions.length > 0 &&
-                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                        <li key={errIdx}>
-                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                {input.label}
-                            </button>
-                        </li>
-                    )}
+                        Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
+                            <li key={errIdx}>
+                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {input.label}
+                                </button>
+                            </li>
+                        )}
                 </ul>
             </div>
         </div>
@@ -160,20 +160,18 @@ export const CAI = () => {
 }
 
 if (FLAGS.SHOW_CAI) {
-    console.log("check flags once");
     // TODO: Moved out of userProject, should probably go in a useEffect.
     window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
     window.onblur = () => store.dispatch(cai.userOffPage(Date.now()))
 
+    window.addEventListener("load", () => {
+        store.dispatch(cai.userLoadPage(Date.now()))
+    })
 
-    window.addEventListener('load', function (e) {
-        store.dispatch(cai.userLoadPage(Date.now()));
-      });
-
-    window.addEventListener('beforeunload', function (e) {
+    window.addEventListener("beforeunload", () => {
         // the absence of a returnValue property on the event will guarantee the browser unload happens
         store.dispatch(cai.userUnloadPage(Date.now()))
-      });
+    })
 
     let x: number | undefined, y: number | undefined
 

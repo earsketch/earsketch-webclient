@@ -14,7 +14,7 @@ import * as WaveformCache from "../app/waveformcache"
 import * as daw from "./dawState"
 import { useTranslation } from "react-i18next"
 
-import {userUIClick} from "../cai/caiState"
+import { userUIClick } from "../cai/caiState"
 
 // Width of track control box
 const X_OFFSET = 100
@@ -76,7 +76,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     }
 
     const recordClick = (ui: string) => {
-        store.dispatch(userUIClick([ui, Date.now() ]));
+        store.dispatch(userUIClick([ui, Date.now()]))
     }
 
     const pause = () => {
@@ -161,7 +161,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
                 {titleKey &&
-                <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
+                    <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
             </span>
         </div>
         {embedMode && <div>
@@ -179,14 +179,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={ () => { play(); recordClick("play");} }>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); recordClick("play") }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={ () => { pause(); recordClick("pause");} }>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); recordClick("pause") }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -229,8 +229,10 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 }
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
-               { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                 toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+    {
+        color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
+        toggleBypass: (a: string) => void, track: player.Track, xScroll: number
+    }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -242,27 +244,27 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             <div className="dawTrackCtrl" style={{ left: xScroll + "px" }}>
                 <div className="dawTrackName prevent-selection">{track.label}</div>
                 {track.buttons &&
-                <>
-                    <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
-                    <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
-                </>}
+                    <>
+                        <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
+                        <button className={"btn dark:text-white btn-default btn-xs dawMuteButton" + (soloMute === "mute" ? " active" : "")} onClick={() => toggleSoloMute("mute")} title={t("daw.tooltip.mute")}>{t("daw.abbreviation.mute")}</button>
+                    </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
                 {track.clips.map((clip: player.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) =>
-            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
-                    <div className="dawTrackName"></div>
-                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
-                    <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
-                        {t("daw.bypass")}
-                    </button>
-                </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
-            </div>)}
+            Object.entries(track.effects).map(([key, effect], index) =>
+                <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                    <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                        <div className="dawTrackName"></div>
+                        <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                        <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
+                            {t("daw.bypass")}
+                        </button>
+                    </div>
+                    <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
+                </div>)}
     </div>
 }
 
@@ -315,7 +317,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }:
-                { name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean }) => {
+    { name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -397,7 +399,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
-                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+    { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -417,17 +419,17 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) =>
-            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
-                    <div className="dawTrackName"></div>
-                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
-                    <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
-                        {t("daw.bypass")}
-                    </button>
-                </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
-            </div>)}
+            Object.entries(track.effects).map(([key, effect], index) =>
+                <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                    <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+                        <div className="dawTrackName"></div>
+                        <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                        <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
+                            {t("daw.bypass")}
+                        </button>
+                    </div>
+                    <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
+                </div>)}
     </div>
 }
 
@@ -963,87 +965,87 @@ export const DAW = () => {
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
         {hideEditor &&
-        <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
+            <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {!hideDAW &&
-        <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
-            {/* Effects Toggle */}
-            <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
-                title={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
-                <span className="mr-1">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
-                <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
-            </button>
+            <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
+                {/* Effects Toggle */}
+                <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
+                    title={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                    <span className="mr-1">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
+                    <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
+                </button>
 
-            <div className="flex-grow flex h-full relative">
-                {/* DAW Container */}
-                <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
-                    onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
-                    <div className="relative">
-                        <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>
-                            <Timeline />
-                            <Measureline />
-                        </div>
+                <div className="flex-grow flex h-full relative">
+                    {/* DAW Container */}
+                    <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
+                        onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
+                        <div className="relative">
+                            <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>
+                                <Timeline />
+                                <Measureline />
+                            </div>
 
-                        <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>
-                            {tracks.map((track, index) => {
-                                if (track.visible) {
-                                    if (index === 0) {
-                                        return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
-                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
-                                    } else if (index < tracks.length - 1) {
-                                        return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
-                                            mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
-                                            bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
+                            <div className="daw-track-group-container" style={{ marginBottom: "14px" }}>
+                                {tracks.map((track, index) => {
+                                    if (track.visible) {
+                                        if (index === 0) {
+                                            return <MixTrack key={index} color={trackColors[index % trackColors.length]} track={track}
+                                                bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
+                                        } else if (index < tracks.length - 1) {
+                                            return <Track key={index} color={trackColors[index % trackColors.length]} track={track}
+                                                mute={muted.includes(index)} soloMute={soloMute[index]} toggleSoloMute={kind => toggleSoloMute(index, kind)}
+                                                bypass={bypass[index] ?? []} toggleBypass={key => toggleBypass(index, key)} xScroll={xScroll} />
+                                        }
                                     }
-                                }
-                                return null
-                            })}
-                        </div>
+                                    return null
+                                })}
+                            </div>
 
-                        <div className="absolute left-0 h-full" style={{ top: 0 }}>
-                            <Playhead playPosition={playPosition} />
-                            <SchedPlayhead />
-                            <Cursor position={cursorPosition} />
-                            {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
-                            <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
+                            <div className="absolute left-0 h-full" style={{ top: 0 }}>
+                                <Playhead playPosition={playPosition} />
+                                <SchedPlayhead />
+                                <Cursor position={cursorPosition} />
+                                {(dragStart !== null || (loop.selection && loop.on)) && loop.end !== loop.start &&
+                                    <div className="daw-highlight" style={{ width: xScale(Math.abs(loop.end - loop.start) + 1) + "px", left: xScale(Math.min(loop.start, loop.end)) }} />}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
-                </div>
+                    <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
+                        <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
+                        <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
+                    </div>
 
-                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
-                </div>
+                    <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
+                        <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
+                        <button onMouseDown={zoomOutY} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
+                    </div>
 
-                <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
-                    style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
-                    onScroll={e => {
-                        if (!el.current) return
-                        const target = e.target as Element
-                        const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
-                        el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
-                        setYScroll(el.current.scrollTop)
-                    }}>
-                    <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
-                </div>
+                    <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
+                        style={{ width: "15px", top: "32px", right: "2px", bottom: "40px" }}
+                        onScroll={e => {
+                            if (!el.current) return
+                            const target = e.target as Element
+                            const fracY = target.scrollTop / (target.scrollHeight - target.clientHeight)
+                            el.current.scrollTop = fracY * (el.current.scrollHeight - el.current.clientHeight)
+                            setYScroll(el.current.scrollTop)
+                        }}>
+                        <div style={{ width: "1px", height: `max(${totalTrackHeight}px, 100.5%)` }}></div>
+                    </div>
 
-                <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
-                    onScroll={e => {
-                        if (!el.current) return
-                        const target = e.target as Element
-                        const fracX = target.scrollLeft / (target.scrollWidth - target.clientWidth)
-                        el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
-                        setXScroll(el.current.scrollLeft)
-                    }}>
-                    <div style={{ width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px" }}></div>
+                    <div ref={xScrollEl} className="absolute overflow-x-scroll z-20" style={{ height: "15px", left: "100px", right: "45px", bottom: "2px" }}
+                        onScroll={e => {
+                            if (!el.current) return
+                            const target = e.target as Element
+                            const fracX = target.scrollLeft / (target.scrollWidth - target.clientWidth)
+                            el.current.scrollLeft = fracX * (el.current.scrollWidth - el.current.clientWidth)
+                            setXScroll(el.current.scrollLeft)
+                        }}>
+                        <div style={{ width: `max(${xScale(playLength + 1)}px, 100.5%)`, height: "1px" }}></div>
+                    </div>
                 </div>
-            </div>
-        </div>}
+            </div>}
     </div>
 }

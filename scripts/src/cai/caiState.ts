@@ -324,26 +324,25 @@ export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
 )
 
 export const userUnloadPage = createAsyncThunk<void, number, ThunkAPI>(
-    'cai/userRefreshPage',
-    (time: number, {getState, dispatch}) => {
-        studentPreferences.addPageLoad(0,time);
+    "cai/userRefreshPage",
+    (time: number) => {
+        studentPreferences.addPageLoad(0, time)
     }
-);
+)
 
 export const userLoadPage = createAsyncThunk<void, number, ThunkAPI>(
-    'cai/userLoadPage',
-    (time: number, {getState, dispatch}) => {
-        studentPreferences.addPageLoad(1,time);
+    "cai/userLoadPage",
+    (time: number) => {
+        studentPreferences.addPageLoad(1, time)
     }
-
-);
+)
 
 export const userUIClick = createAsyncThunk<void, [string, number], ThunkAPI>(
-  'cai/userUIClick',
-  ([ui,time]) => {
-      studentPreferences.addUIClick(ui, time);
-  }
-);
+    "cai/userUIClick",
+    ([ui, time]) => {
+        studentPreferences.addUIClick(ui, time)
+    }
+)
 
 export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
     "cai/keyStroke",
