@@ -54,6 +54,7 @@ function recursiveCallOnNodes(funcToCall, args, ast) {
 }
 
 function analyzeConditionalTest(testNode, tallyList) {
+    tallyObjectsInConditional(testNode, tallyList);
     recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode);
 }
 
@@ -160,7 +161,7 @@ function collectFunctionInfo(node, args) {
         }
         //does the node contain a function def?
         if (node._astname == "FunctionDef") {
-            let functionObj = { name: node.name.v, returns: false, params: false, aliases: [], calls: [], start: lineNumber, end: lineNumber, returnVals: [] , functionBody: node.body};
+            let functionObj = { name: node.name.v, returns: null, params: false, aliases: [], calls: [], start: lineNumber, end: lineNumber, returnVals: [] , functionBody: node.body};
 
             functionObj.end = ccHelpers.getLastLine(node);
 
@@ -267,7 +268,37 @@ function collectFunctionInfo(node, args) {
             }
 
         }
+        else if (node._astname == "Assign" && node.targets.length == 1) {
 
+            //function alias tracking
+            let currentFuncs = ccState.getProperty("userFunctions");
+
+            if (node.value._astname == "Name") {
+                let assignedName = node.targets[0].id.v;
+                let assignedAlias = node.value.id.v;
+                let assignmentExists = false;
+                for (let i = 0; i < currentFuncs.length; i++) {
+                    if ((currentFuncs[i].name == assignedAlias && !currentFuncs[i].aliases.includes(assignedName)) || (currentFuncs[i].aliases.includes(assignedAlias) && !currentFuncs[i].aliases.includes(assignedName))) {
+                        assignmentExists = true;
+                        currentFuncs[i].aliases.push(assignedName);
+                    }
+                }
+
+                let isRename = false;
+                //is it a built in or api func?
+                isRename = (ccState.apiFunctions.includes(assignedAlias) || ccState.builtInNames.includes(assignedAlias));
+
+
+                if (!assignmentExists && isRename) {
+
+                    ccState.getProperty("userFunctions").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 });
+                }
+            }
+
+
+        }
+
+    
     }
 }
 
@@ -286,7 +317,61 @@ function markMakeBeat(callNode, results) {
     }
     else if (getTypeFromASTNode(firstArg) == "List") {
         results.codeFeatures.makeBeat = 2;
+        results.codeFeatures.features.indexing = 1;
     }
+}
+
+function isBinopString(binOpNode) {
+    if (binOpNode == null || binOpNode._astname != "BinOp") {
+        return false;
+    }
+
+    let leftNode = binOpNode.left;
+    let rightNode = binOpNode.right;
+    let op = binOpNode.op.name;
+
+    if (op != "Add") {
+        return false;
+    }
+
+    let left = false;
+    let right = false;
+
+    if (leftNode._astname == "BinOp") {
+        if (!isBinopString(leftNode)) {
+            return false;
+        }
+        else {
+            left = true;
+        }
+    }
+    else {
+        if (getTypeFromASTNode(leftNode) != "Str") {
+            return false;
+        }
+        else {
+            left = true;
+        }
+    }
+
+    if (rightNode._astname == "BinOp") {
+        if (!isBinopString(rightNode)) {
+            return false;
+        }
+        else {
+            right = true;
+        }
+    }
+    else {
+        if (getTypeFromASTNode(rightNode) != "Str") {
+            return false;
+        }
+        else {
+            right = true;
+        }
+    }
+
+    return (left && right);
 }
 
 //recursively searches for a "return" within an ast node
@@ -304,7 +389,7 @@ function searchForReturn(astNode) {
                     return ret;
                 }
             }
-            return false;
+            return null;
         } else if (astNode != null && (astNode[0] != null && Object.keys(astNode[0]) != null)) {
             var astNodeKeys = Object.keys(astNode);
             for (var r = 0; r < astNodeKeys.length; r++) {
@@ -385,8 +470,7 @@ function collectVariableInfo(node) {
             }
 
         }
-        //TODO augassign
-
+        
         if (node._astname == "AugAssign" && node.target._astname == "Name") {
             let assignedName = node.target.id.v;
 
@@ -409,6 +493,26 @@ function collectVariableInfo(node) {
                 ccState.getProperty("allVariables").push(varObject);
             }
 
+        }
+
+        if (node._astname == "For") {
+            //check and add the iterator
+            let assignedName = node.target.id.v;
+            let varObject = { name: assignedName, assignments: [] };
+            let alreadyExists = false;
+
+            let currentVars = ccState.getProperty("allVariables");
+            for (let i = 0; i < currentVars.length; i++) {
+                if (currentVars[i].name == assignedName) {
+                    varObject = currentVars[i];
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            //this is done twice intentionally
+            varObject.assignments.push({ line: lineNumber, value: node.value });
+            varObject.assignments.push({ line: lineNumber, value: node.value });
         }
     }
 }
@@ -880,7 +984,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         //do uses
 
 
-        console.log(name, nodeParent, secondParent);
+       // console.log(name, nodeParent, secondParent);
 
 
         //is it in a func arg
@@ -1006,6 +1110,7 @@ function doComplexityOutput(results, rootAst) {
     countStructuralDepth(structure, depthObj, null);
 
     results.codeStructure["depth"] = depthObj.depth;
+    results.codeStructure["structure"] = structure;
 
     if (results.codeStructure["depth"] > 3) {
         results.codeStructure["depth"] = 3;
@@ -1139,6 +1244,9 @@ function analyzeASTNode(node, results) {
             }
             else if (node._astname === "BinOp") {
                 results.codeFeatures.features.binOps = 1;
+                if (isBinopString(node)) {
+                    results.codeFeatures.features.strOps = 1;
+                }
             }
             else if (node._astname === "While") {
                 results.codeFeatures.iteration.whileLoops = 1;
@@ -1286,6 +1394,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode) {
     export function doAnalysis(ast, results) {
         functionPass(ast, results, ast);
         recursiveCallOnNodes(collectVariableInfo, [], ast);
+        console.log(ccState.getProperty("allVariables"));
         recursiveAnalyzeAST(ast, results);
         doComplexityOutput(results, ast);
     }
