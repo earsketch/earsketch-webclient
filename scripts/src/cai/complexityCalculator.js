@@ -122,7 +122,7 @@ function functionPass(ast, results, rootAst) {
         if (allFuncs[i].calls.length > 0 && allFuncs[i].returns && results.codeFeatures.functions.manipulateValue < 1) {
             results.codeFeatures.functions.manipulateValue = 1;
         }
-        else if (allFuncs[i].calls.length > 1 && allFuncs[i].returns && results.codeFeatures.functions.manipulateValue < 2) {
+        if (allFuncs[i].calls.length > 1 && allFuncs[i].returns && results.codeFeatures.functions.manipulateValue < 2) {
             results.codeFeatures.functions.manipulateValue = 2;
         }
     }
@@ -1099,7 +1099,7 @@ function doComplexityOutput(results, rootAst) {
         }
     }
 
-    let structure = { id: "body", children: [] };
+    let structure = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body) };
     for (let i = 0; i < rootAst.body.length; i++) {
         structure.children.push(buildStructuralRepresentation(rootAst.body[i], structure));
     }
@@ -1207,14 +1207,14 @@ function analyzeASTNode(node, results) {
                 //mark loop
                 let firstLine = lineNumber;
                 let lastLine = ccHelpers.getLastLine(node);
-
+                results.codeFeatures.iteration.forLoopsJS = 1;
                 ccState.getProperty("loopLocations").push([firstLine, lastLine]);
             }
             else if (node._astname === "If") {
                 if (results.codeFeatures.conditionals.conditionals < 1) {
                     results.codeFeatures.conditionals.conditionals = 1;
                 }
-                if (node.orelse.length > 0) {
+                if ("orelse" in node && node.orelse.length > 0) {
                     if (results.codeFeatures.conditionals.conditionals < 2) {
                         results.codeFeatures.conditionals.conditionals = 2;
                     }
@@ -1309,7 +1309,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode) {
         node = nodeToUse.value;
     }
 
-    let returnObject = { id: "", children: [] };
+    let returnObject = { id: "", children: [], startLine: node.lineno, endline: ccHelpers.getLastLine(node) };
     if (node._astname == "Call") {
         //find the function
         if (node.func._astname != "Name") {

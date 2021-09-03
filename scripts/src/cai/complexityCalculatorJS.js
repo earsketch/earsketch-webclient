@@ -20,7 +20,7 @@ export function analyzeJavascript(source) {
         var allVariables = [];
         //initialize the results object
         var resultsObject = {
-            ast: ast,
+            ast: newAST,
             codeFeatures: {
                 errors: 0,
                 variables: 0,
