@@ -392,9 +392,9 @@ const NotificationMenu = () => {
     return <>
         {showHistory && <NotificationHistory close={() => setShowHistory(false)} />}
         <Popover>
-            <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-3" title="Show/Hide Notifications">
+            <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-3 relative" title="Show/Hide Notifications">
                 <i className="icon icon-bell" />
-                {numUnread > 0 && <div id="badge" className="text-2xl">{numUnread}</div>}
+                {numUnread > 0 && <div className="text-2xl text-white bg-red-600 rounded-2xl absolute h-6 w-6 top-0 -right-1 leading-none">{numUnread}</div>}
             </Popover.Button>
             <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-3/4">
                 {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
