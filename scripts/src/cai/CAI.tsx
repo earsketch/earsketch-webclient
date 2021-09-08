@@ -180,9 +180,36 @@ if (FLAGS.SHOW_CAI) {
         y = e.y
     })
 
+    document.addEventListener('copy' || 'cut', function(e){
+        //TODO: save to history
+        console.log(e.clipboardData!.getData("Text"));
+      });
+
+    window.addEventListener('paste', e => {
+        //TODO: save to history
+      });
+
     window.setInterval(() => {
         if (x && y) {
             store.dispatch(cai.mousePosition([x, y]))
         }
     }, 5000)
+
+
+    window.addEventListener('keydown',e => {
+        e = e||window.event // IE support
+        var c = e.key || e.keyCode
+        console.log(c)
+        var ctrlDown = e.ctrlKey||e.metaKey // Mac support
+        console.log(ctrlDown);
+
+        // Check for Alt+Gr (http://en.wikipedia.org/wiki/AltGr_key)
+        if (ctrlDown && e.altKey) console.log("other")
+
+        // Check for ctrl+c, v and x
+        else if (ctrlDown && c=='c') console.log("copy") // c
+        else if (ctrlDown && c=='x') console.log("cut")  // v
+        else if (ctrlDown && c=='v') console.log("paste")  // x  //TODO: save to history
+
+    });
 }

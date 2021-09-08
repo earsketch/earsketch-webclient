@@ -341,6 +341,7 @@ export const userUIClick = createAsyncThunk<void, [string, number], ThunkAPI>(
     "cai/userUIClick",
     ([ui, time]) => {
         studentPreferences.addUIClick(ui, time)
+        console.log("userUIClick called", ui);
     }
 )
 
@@ -355,6 +356,13 @@ export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
     "cai/mousePosition",
     ([x, y]) => {
         studentPreferences.addMousePos({ x, y })
+    }
+)
+
+export const editTime = createAsyncThunk<void, [any, number], ThunkAPI>(
+    "cai/editTime",
+    ([startTime, endTime]) => {
+        studentPreferences.addEditPeriod(startTime, endTime);
     }
 )
 

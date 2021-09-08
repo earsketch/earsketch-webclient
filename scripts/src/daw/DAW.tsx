@@ -75,9 +75,9 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         player.setVolume(volumeMuted ? -60 : volume)
     }
 
-    const recordClick = (ui: string) => {
-        store.dispatch(userUIClick([ui, Date.now()]))
-    }
+    // const recordClick = (ui: string) => {
+    //     store.dispatch(userUIClick([ui, Date.now()]))
+    // }
 
     const pause = () => {
         player.pause()
@@ -179,14 +179,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); recordClick("play") }}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); store.dispatch(userUIClick(["project - play", Date.now()])); }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); recordClick("pause") }}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); store.dispatch(userUIClick(["project - pause", Date.now()])); }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}

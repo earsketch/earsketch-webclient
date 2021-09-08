@@ -214,6 +214,7 @@ const compileErrors: any[] = []
 const mousePos: any[] = []
 const uiClickHistory: any[] = []
 const pageLoadHistory: any[] = []
+const editPeriod: any[] = []
 
 function addOnPageStatus(status: any, time: any) {
     onPageHistory.push({ status, time })
@@ -269,6 +270,11 @@ function addPageLoad(status: any, time: number) {
     caiStudent.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
 }
 
+function addEditPeriod(startTime: any, endTime: any) {
+    editPeriod.push({startTime, endTime});
+    caiStudent.updateModel("preferences", { editPeriod: editPeriod })
+}
+
 // what are the measures to understand how off or on task one is?
 
 // other options: caiClose, pageChanged, caiSwapTab
@@ -294,4 +300,5 @@ export {
     stuckOnError, // Currently unused
     addUIClick,
     addPageLoad,
+    addEditPeriod
 }
