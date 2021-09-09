@@ -902,7 +902,7 @@ function showNextDialogue() {
     return structure
 }
 
-function getLinks(utterance: string) {
+export function getLinks(utterance: string) {
     let utteranceFirstHalf = utterance
     let utteranceSecondHalf = ""
     let keyword = ""
@@ -917,8 +917,8 @@ function getLinks(utterance: string) {
             utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"))
             utteranceSecondHalf = utterance.substring(utterance.indexOf("]") + 1, utterance.length)
             utterance = utteranceSecondHalf
-            textPieces.push(utteranceFirstHalf)
-            keywordLinks.push([keyword, link])
+            textPieces.push(link ? utteranceFirstHalf : utteranceFirstHalf + keyword)
+            keywordLinks.push(link ? [keyword, link] : ["", ""])
         }
     } else {
         keywordLinks.push(["", ""])

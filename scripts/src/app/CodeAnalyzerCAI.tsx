@@ -11,19 +11,11 @@ import { Script } from "common"
 import * as caiAnalysisModule from "../cai/analysis"
 
 import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
-import { compile, randomSeed, readFile } from "./Autograder"
+import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
-export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed, setUseSeed }:
-    { options: ReportOptions | ContestOptions, seed: number, useSeed: boolean, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s: number) => void, setUseSeed: (s: boolean) => void }) => {
-    const updateSeed = (seed: number, useSeed: boolean) => {
-        setUseSeed(useSeed)
-        if (useSeed) {
-            setSeed(seed)
-        }
-        randomSeed(seed, useSeed)
-    }
-
+export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
+    { options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
     return <div className="container">
         <div className="panel panel-primary">
             <div className="panel-heading">
@@ -49,11 +41,12 @@ export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed,
                 {showSeed &&
                     <div className="col-md-4">
                         <h4>Random Seed</h4>
-                        <label>
-                            <input type="checkbox" checked={useSeed} onChange={e => updateSeed(seed, e.target.checked)}></input>
-                            Use the following random seed:
-                        </label>
-                        <input type="text" value={seed} onChange={e => updateSeed(Number(e.target.value), useSeed)}></input>
+                        <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
+                        {seed !== undefined
+                            ? <div>Use the following random seed:
+                                <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>
+                            </div>
+                            : <div>Use a random seed</div>}
                         <p className="small">
                             This will automatically seed every random function in Python and JavaScript.
                         </p>
@@ -66,8 +59,8 @@ export const Options = ({ options, seed, useSeed, showSeed, setOptions, setSeed,
     </div>
 }
 
-export const Upload = ({ processing, options, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
-    { processing: string | null, options: ReportOptions, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
+export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
+    { processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
@@ -103,7 +96,7 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
         try {
-            const compilerOuptut = await compile(script.source_code, script.name)
+            const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
             reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
 
@@ -241,6 +234,8 @@ export const Upload = ({ processing, options, contestDict, setResults, setContes
                         <i className="es-spinner animate-spin mr-3"></i> Run
                     </button>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
+                {!userProject.getToken() &&
+                <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
             </div>
         </div>
     </div>
@@ -276,8 +271,7 @@ export const CodeAnalyzerCAI = () => {
         APICALLS: false,
     } as ReportOptions)
 
-    const [useSeed, setUseSeed] = useState(false)
-    const [seed, setSeed] = useState(Date.now())
+    const [seed, setSeed] = useState(Date.now() as number | undefined)
 
     return <div>
         <div className="container">
@@ -286,15 +280,14 @@ export const CodeAnalyzerCAI = () => {
         <Options
             options={options}
             seed={seed}
-            useSeed={useSeed}
             showSeed={true}
             setOptions={setOptions}
             setSeed={setSeed}
-            setUseSeed={setUseSeed}
         />
         <Upload
             processing={processing}
             options={options}
+            seed={seed}
             setProcessing={setProcessing}
             setResults={setResults}
         />
