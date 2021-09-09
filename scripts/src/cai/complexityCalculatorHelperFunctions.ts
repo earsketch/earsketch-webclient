@@ -290,6 +290,20 @@ export function getFunctionObject(funcName: string) {
     return null
 }
 
+export function numberOfLeadingSpaces(stringToCheck: string) {
+    let number = 0
+
+    for (let i = 0; i < stringToCheck.length; i++) {
+        if (stringToCheck[i] !== " ") {
+            break
+        } else {
+            number += 1
+        }
+    }
+
+    return number
+}
+
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
 export function replaceNumericUnaryOps(ast: any) {
     for (let i in ast) {
