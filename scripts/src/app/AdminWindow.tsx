@@ -133,6 +133,7 @@ const AdminSendBroadcast = () => {
 
 const AdminResetUserPassword = () => {
     const [username, setUsername] = useState("")
+    const [email, setEmail] = useState("")
     const [adminPassphrase, setAdminPassphrase] = useState("")
     const [newUserPassword, setNewUserPassword] = useState("")
     const [userDetails, setUserDetails] = useState({ username: "", email: "" })
@@ -141,7 +142,8 @@ const AdminResetUserPassword = () => {
     const searchUsers = async () => {
         try {
             const data = await userProject.searchUsers(username)
-            if (data !== null) {
+            const temp = await userProject.searchUsers(email)// delete temp and temp on the next line
+            if (data !== null && temp !== null) {
                 setUserDetails({ username: data.username, email: data.email })
                 setPasswordStatus({ message: "", style: "" })
                 return
@@ -177,7 +179,7 @@ const AdminResetUserPassword = () => {
                     <input type="text" className="m-2 w-1/4 form-control"
                         placeholder="Username" required onChange={e => setUsername(e.target.value)} />
                     <input type="text" className="m-2 w-1/4 form-control"
-                        placeholder="Email"/* required onChange??? *//>
+                        placeholder="Email" required onChange={e => setEmail(e.target.value)}/>
                     <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
                 </form>
                 {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>
