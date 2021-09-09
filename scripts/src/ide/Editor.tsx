@@ -184,17 +184,17 @@ function setupAceHandlers(ace: Ace.Editor) {
             clearTimeout(recommendationTimer)
         }
 
-        if (firstEdit ===   null) {
-            firstEdit = Date.now();
-            //TODO: save event
+        if (firstEdit === null) {
+            firstEdit = Date.now()
+            // TODO: save event
         }
         recommendationTimer = window.setTimeout(() => {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
-                store.dispatch(cai.editTime([firstEdit, Date.now()]));
+                store.dispatch(cai.editTime([firstEdit, Date.now()]))
             }
-            firstEdit = null;
+            firstEdit = null
         }, 1000)
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.

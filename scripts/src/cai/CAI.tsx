@@ -17,7 +17,7 @@ const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about {}
+                    Talk to CAI about { }
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
                         : <span>a project, when one is open</span>}
@@ -180,14 +180,15 @@ if (FLAGS.SHOW_CAI) {
         y = e.y
     })
 
-    document.addEventListener('copy' || 'cut', function(e){
-        //TODO: save to history
-        console.log(e.clipboardData!.getData("Text"));
-      });
+    document.addEventListener("copy" || "cut", e => {
+        // TODO: save to history
+        console.log(e.clipboardData!.getData("Text"))
+    })
 
-    window.addEventListener('paste', e => {
-        //TODO: save to history
-      });
+    window.addEventListener("paste", e => {
+        // TODO: save to history
+        console.log(e)
+    })
 
     window.setInterval(() => {
         if (x && y) {
@@ -196,20 +197,28 @@ if (FLAGS.SHOW_CAI) {
     }, 5000)
 
 
-    window.addEventListener('keydown',e => {
-        e = e||window.event // IE support
-        var c = e.key || e.keyCode
-        console.log(c)
-        var ctrlDown = e.ctrlKey||e.metaKey // Mac support
-        console.log(ctrlDown);
+    window.addEventListener("keydown", e => {
+        e = e || window.event // IE support
+        const c = e.key
+        const ctrlDown = e.ctrlKey || e.metaKey // Mac support
 
         // Check for Alt+Gr (http://en.wikipedia.org/wiki/AltGr_key)
-        if (ctrlDown && e.altKey) console.log("other")
-
-        // Check for ctrl+c, v and x
-        else if (ctrlDown && c=='c') console.log("copy") // c
-        else if (ctrlDown && c=='x') console.log("cut")  // v
-        else if (ctrlDown && c=='v') console.log("paste")  // x  //TODO: save to history
-
-    });
+        if (ctrlDown) {
+            if (e.altKey) {
+                console.log("other")
+            } else {
+                switch (c) {
+                    case "c":
+                        console.log("copy") // TODO: save to history
+                        break
+                    case "x":
+                        console.log("cut")
+                        break
+                    case "v":
+                        console.log("paste")
+                        break
+                }
+            }
+        }
+    })
 }

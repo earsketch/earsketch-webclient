@@ -271,7 +271,7 @@ function addPageLoad(status: any, time: number) {
 }
 
 function addEditPeriod(startTime: any, endTime: any) {
-    editPeriod.push({startTime, endTime});
+    editPeriod.push({startTime, endTime})
     caiStudent.updateModel("preferences", { editPeriod: editPeriod })
 }
 

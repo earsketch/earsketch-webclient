@@ -18,7 +18,6 @@ import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
 import { userUIClick } from "../cai/caiState"
 
-
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(sounds.selectSearchText)
@@ -52,7 +51,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                 onMouseLeave={() => setHighlight(false)}
             >
                 <div className="w-8">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
+                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
                 </div>
                 <div className="select-none">
                     {isClearItem ? t("clear") : value}
@@ -179,7 +178,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={() => {{dispatch(sounds.previewSound(fileKey)); store.dispatch(userUIClick(["sound - preview", Date.now()]));}}}
+                        onClick={() => { dispatch(sounds.previewSound(fileKey)); store.dispatch(userUIClick(["sound - preview", Date.now()])) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileKey === fileKey
@@ -202,7 +201,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => {editor.pasteCode(fileKey); store.dispatch(userUIClick(["sample - copy", Date.now()]));}}
+                                onClick={() => { editor.pasteCode(fileKey); store.dispatch(userUIClick(["sample - copy", Date.now()])) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />
@@ -452,8 +451,3 @@ export const SoundBrowser = () => {
         </>
     )
 }
-
-// const recordClick = (ui: string) => {
-//     store.dispatch(userUIClick([ui, Date.now()]))
-//     console.log("playing sound!")
-// }

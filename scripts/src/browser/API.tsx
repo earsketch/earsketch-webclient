@@ -15,7 +15,6 @@ import { useTranslation } from "react-i18next"
 import { userUIClick } from "../cai/caiState"
 import store from "../reducers"
 
-
 interface CodeHighlightProps {
     language: string
     children: React.ReactChild | React.ReactChildren
@@ -97,11 +96,11 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                 <div className="h-8 flex">
                     <button
                         className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
-                        onClick={() => {paste(name, obj); store.dispatch(userUIClick(["api - copy - " + name, Date.now()]));}}
+                        onClick={() => { paste(name, obj); store.dispatch(userUIClick(["api - copy - " + name, Date.now()])) }}
                     >
                         <i className="icon icon-paste2" />
                     </button>
-                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap" onClick={() => { obj.details = !obj.details; forceUpdate(); store.dispatch(userUIClick(["api - read - " + obj, Date.now()]));}}>
+                    <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap" onClick={() => { obj.details = !obj.details; forceUpdate(); store.dispatch(userUIClick(["api - read - " + obj, Date.now()])) }}>
                         <div className="inline-block w-12">{obj.details ? t("api:close") : t("api:open")}</div>
                         <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
                     </button>
@@ -110,14 +109,14 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
             {obj.parameters
                 ? (<div className="text-lg font-light break-word">
                     <span className="px-1">(</span>
-                    {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter ]) => (
+                    {Object.entries(obj.parameters).map(([param, paramVal]: [string, APIParameter]) => (
                         <span key={param}>
                             <span title={`${param} (${t(paramVal.typeKey)}) - ${t(paramVal.descriptionKey)}`}>{param}</span>
                             {paramVal.default !== undefined &&
-                            <span>
-                                <span className="text-gray-600 px-1">=</span>
-                                <span className="text-blue-600">{paramVal.default}</span>
-                            </span>}
+                                <span>
+                                    <span className="text-gray-600 px-1">=</span>
+                                    <span className="text-blue-600">{paramVal.default}</span>
+                                </span>}
                         </span>
                     )).reduce((prev: any, curr: any): any => [prev, <span key={prev.key + "-comma"}> , </span>, curr])}
                     <span className="px-1">)</span>
@@ -137,31 +136,31 @@ const Details = ({ obj }: { obj: APIItem }) => {
         <div className="border-t border-gray-500 mt-4 pt-2">
             <span dangerouslySetInnerHTML={{ __html: t(obj.descriptionKey) }} />
             {obj.parameters &&
-            <div className="mt-4">
-                <div className="text-2xl font-bold">{t("api:parameters")}</div>
-                {Object.entries(obj.parameters).map(([param, paramVal]) => (
-                    <div key={param}>
-                        <div className="ml-6 mt-4">
-                            <span className="font-bold">{param}</span>:&nbsp;
-                            <span className="text-gray-600">{t(paramVal.typeKey)}</span>
+                <div className="mt-4">
+                    <div className="text-2xl font-bold">{t("api:parameters")}</div>
+                    {Object.entries(obj.parameters).map(([param, paramVal]) => (
+                        <div key={param}>
+                            <div className="ml-6 mt-4">
+                                <span className="font-bold">{param}</span>:&nbsp;
+                                <span className="text-gray-600">{t(paramVal.typeKey)}</span>
 
-                            {/* rhythmEffects parameter description has a link to curriculum */}
-                            <div className="text-xl"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
+                                {/* rhythmEffects parameter description has a link to curriculum */}
+                                <div className="text-xl"><span dangerouslySetInnerHTML={{ __html: t(paramVal.descriptionKey) }} /></div>
 
-                            {paramVal.default &&
-                            <div>
-                                <span className={`${theme === "dark" ? "text-white" : "text-black"}`}>{t("api:defaultValue")}</span>:&nbsp;
-                                <span className="text-blue-600">{paramVal.default}</span>
-                            </div>}
+                                {paramVal.default &&
+                                    <div>
+                                        <span className={`${theme === "dark" ? "text-white" : "text-black"}`}>{t("api:defaultValue")}</span>:&nbsp;
+                                        <span className="text-blue-600">{paramVal.default}</span>
+                                    </div>}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>}
+                    ))}
+                </div>}
             {obj.returns &&
-            <div className="mt-8">
-                <span className="text-2xl font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
-                <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
-            </div>}
+                <div className="mt-8">
+                    <span className="text-2xl font-bold">{t("api:returnValue")}</span>: <span className="text-gray-600">{t(obj.returns.typeKey)}</span>
+                    <div className="ml-6">{t(obj.returns.descriptionKey)}</div>
+                </div>}
             <div className="mt-8">
                 <div className="text-2xl font-bold mb-1">{t("api:example")}</div>
                 <div>
@@ -173,16 +172,16 @@ const Details = ({ obj }: { obj: APIItem }) => {
             </div>
 
             {obj.expert &&
-            <div>
-                <div>Expert Description:</div>
-                <div className="api-browser description">{obj.expert}</div>
-            </div>}
+                <div>
+                    <div>Expert Description:</div>
+                    <div className="api-browser description">{obj.expert}</div>
+                </div>}
 
             {obj.caveats &&
-            <div>
-                <div>Caveats:</div>
-                <div className="api-browser description">{obj.caveats}</div>
-            </div>}
+                <div>
+                    <div>Caveats:</div>
+                    <div className="api-browser description">{obj.caveats}</div>
+                </div>}
         </div>
     )
 }
@@ -190,7 +189,7 @@ const Details = ({ obj }: { obj: APIItem }) => {
 const EntryList = () => {
     const entries = useSelector(api.selectFilteredEntries)
     return (<>
-        {entries.map(([name, obj]: [string, APIItem ]) => {
+        {entries.map(([name, obj]: [string, APIItem]) => {
             const arr = Array.isArray(obj) ? obj : [obj]
             return arr.map((o: APIItem, index: number) => <Entry key={name + index} name={name} obj={o} />)
         })}

@@ -16,8 +16,8 @@ import { analyzeJavascript } from "./complexityCalculatorJS"
 interface caiState {
     activeProject: string
     messageList: { [key: string]: CAIMessage[] }
-    inputOptions: { label: string; value: string }[]
-    errorOptions: { label: string; value: string }[]
+    inputOptions: { label: string, value: string }[]
+    errorOptions: { label: string, value: string }[]
     dropupLabel: string
 }
 
@@ -340,12 +340,13 @@ export const userLoadPage = createAsyncThunk<void, number, ThunkAPI>(
 export const userUIClick = createAsyncThunk<void, [string, number], ThunkAPI>(
     "cai/userUIClick",
     ([ui, time]) => {
-        studentPreferences.addUIClick(ui, time)
-        console.log("userUIClick called", ui);
+        if (FLAGS.SHOW_CAI) {
+            studentPreferences.addUIClick(ui, time)
+        }
     }
 )
 
-export const keyStroke = createAsyncThunk<void, [any, any, number], ThunkAPI>(
+export const keyStroke = createAsyncThunk<void, [string, string[], number], ThunkAPI>(
     "cai/keyStroke",
     ([action, content, time]) => {
         studentPreferences.addKeystroke(action, content, time)
@@ -359,10 +360,10 @@ export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
     }
 )
 
-export const editTime = createAsyncThunk<void, [any, number], ThunkAPI>(
+export const editTime = createAsyncThunk<void, [number | null, number], ThunkAPI>(
     "cai/editTime",
     ([startTime, endTime]) => {
-        studentPreferences.addEditPeriod(startTime, endTime);
+        studentPreferences.addEditPeriod(startTime, endTime)
     }
 )
 
