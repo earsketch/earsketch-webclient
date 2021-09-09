@@ -176,6 +176,8 @@ const AdminResetUserPassword = () => {
                 <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
                         placeholder="Username" required onChange={e => setUsername(e.target.value)} />
+                    <input type="text" className="m-2 w-1/4 form-control"
+                        placeholder="Email"/* required onChange??? *//>
                     <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
                 </form>
                 {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>
