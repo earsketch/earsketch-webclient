@@ -11,7 +11,7 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import store from "../reducers"
 
-const CaiHeader = () => {
+export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
 
     return (
@@ -21,7 +21,8 @@ const CaiHeader = () => {
                     Talk to CAI about {}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
-                        : <span>a project, when one is open</span>}
+                        : <span>a project, when one is open</span>
+                    }
                     .
                 </div>
             </div>
@@ -62,7 +63,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
     )
 }
 
-const CaiBody = () => {
+export const CaiBody = () => {
     const activeProject = useSelector(cai.selectActiveProject)
     const messageList = useSelector(cai.selectMessageList)
 
@@ -174,11 +175,11 @@ if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.userUnloadPage(Date.now()))
     })
 
-    let x: number | undefined, y: number | undefined
+    let mouseX: number | undefined, mouseY: number | undefined
 
     window.addEventListener("mousemove", e => {
-        x = e.x
-        y = e.y
+        mouseX = e.x
+        mouseY = e.y
     })
 
     document.addEventListener("copy" || "cut", e => {
@@ -190,8 +191,8 @@ if (FLAGS.SHOW_CAI) {
     })
 
     window.setInterval(() => {
-        if (x && y) {
-            store.dispatch(cai.mousePosition([x, y]))
+        if (mouseX && mouseY) {
+            store.dispatch(cai.mousePosition([mouseX, mouseY]))
         }
     }, 5000)
 

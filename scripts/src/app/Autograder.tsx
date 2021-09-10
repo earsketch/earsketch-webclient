@@ -11,19 +11,28 @@ import * as runner from "./runner"
 const nativePrompt = (window as any).esPrompt
 
 // overwrite JavaScript random implementation with seedable one
-export const randomSeed = (seed: number, useSeed: boolean) => {
+export const randomSeed = (seed?: number) => {
+    const rng = new Chance(seed ?? Date.now())
     Math.random = () => {
-        const rng = new Chance(useSeed ? seed : Date.now())
         return rng.random()
     }
 }
 
 // Compile a script as python or javascript based on the extension and return the compilation promise.
-export const compile = async (script: string, filename: string) => {
+export const compile = async (script: string, filename: string, seed?: number) => {
     const ext = ESUtils.parseExt(filename)
     if (ext === ".py") {
+        Sk.onAfterImport = (library: string) => {
+            if (library === "random") {
+                // Use the given seed for Skulpt
+                const seedfunc = Sk.sysmodules["string random"].items[0].rhs.$d.seed
+                // Seed Skulpt's RNG implementation
+                Sk.misceval.callsim(seedfunc, seed ?? Date.now())
+            }
+        }
         return runner.runPython(script)
     } else if (ext === ".js") {
+        randomSeed(seed)
         return runner.runJavaScript(script)
     } else {
         throw new Error("Invalid file extension " + ext)
@@ -94,7 +103,7 @@ interface Upload {
 
 // Compile a test script and compare it to the reference script.
 // Returns a promise that resolves to an object describing the test results.
-const compileAndCompare = (referenceResult: DAWData, file: File, testScript: string, testAllTracks: boolean, testTracks: boolean[]) => {
+const compileAndCompare = (referenceResult: DAWData, file: File, testScript: string, testAllTracks: boolean, testTracks: boolean[], seed?: number) => {
     const results: Upload = {
         file,
         script: testScript,
@@ -102,7 +111,7 @@ const compileAndCompare = (referenceResult: DAWData, file: File, testScript: str
         error: "",
         pass: false,
     }
-    return compile(testScript, file.name).then((result: DAWData) => {
+    return compile(testScript, file.name, seed).then((result: DAWData) => {
         results.result = result
         results.compiled = true
         // check against reference script
@@ -162,9 +171,9 @@ const ReferenceFile = ({ referenceScript, compilingReference }:
     </div>
 }
 
-const ReferenceScriptUpload = ({ compileError, prompts, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles, setPrompts }:
+const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles, setPrompts }:
     {
-        compileError: string, prompts: string[], setReferenceResult: (r: DAWData | null) => void, setCompileError: (e: string) => void,
+        compileError: string, prompts: string[], seed?: number, setReferenceResult: (r: DAWData | null) => void, setCompileError: (e: string) => void,
         setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void,
         setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void, setPrompts: (p: string[]) => void
     }) => {
@@ -201,7 +210,7 @@ const ReferenceScriptUpload = ({ compileError, prompts, setReferenceResult, setC
             setCompilingReference(true)
             let result
             try {
-                result = await compile(script, file.name)
+                result = await compile(script, file.name, seed)
                 setTestAllTracks(true)
                 setTestTracks(new Array(result.tracks.length).fill(false))
                 setCompilingReference(false)
@@ -234,22 +243,12 @@ const ReferenceScriptUpload = ({ compileError, prompts, setReferenceResult, setC
 }
 
 const ConfigureTest = ({
-    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, prompts, setTestAllTracks, setTestTracks, setAllowPrompts,
+    referenceResult, compileError, testAllTracks, testTracks, allowPrompts, prompts, seed,
+    setTestAllTracks, setTestTracks, setAllowPrompts, setSeed,
 }: {
-    referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, prompts: string[],
-    setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void, setAllowPrompts: (a: boolean) => void
+    referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, prompts: string[], seed?: number,
+    setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void, setAllowPrompts: (a: boolean) => void, setSeed: (s?: number) => void
 }) => {
-    const [useSeed, setUseSeed] = useState(true)
-    const [seed, setSeed] = useState(Date.now())
-
-    const updateSeed = (seed: number, useSeed: boolean) => {
-        setUseSeed(useSeed)
-        if (useSeed) {
-            setSeed(seed)
-        }
-        randomSeed(seed, useSeed)
-    }
-
     return <div className="container">
         <div className="panel panel-primary">
             <div className="panel-heading">
@@ -302,11 +301,12 @@ const ConfigureTest = ({
                     </div>
                     <div className="col-md-4">
                         <h4>Random Seed</h4>
-                        <label>
-                            <input type="checkbox" checked={useSeed} onChange={e => updateSeed(seed, e.target.checked)}></input>
-                            Use the following random seed:
-                        </label>
-                        <input type="text" value={seed} onChange={e => updateSeed(Number(e.target.value), useSeed)}></input>
+                        <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
+                        {seed !== undefined
+                            ? <div>Use the following random seed:
+                                <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>
+                            </div>
+                            : <div>Use a random seed</div>}
                         <p className="small">
                             This will automatically seed every random function in Python and JavaScript.
                         </p>
@@ -353,9 +353,9 @@ const TestResult = ({ upload, index }: { upload: Upload, index: number }) => {
     </div>
 }
 
-const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTracks, allowPrompts, prompts, setUploads, setFiles }: {
+const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTracks, allowPrompts, prompts, seed, setUploads, setFiles }: {
     uploads: Upload[], files: File[], referenceResult: DAWData, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean,
-    prompts: string[], setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void
+    prompts: string[], seed?: number, setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void
 }) => {
     const updateFiles = async (files: File[]) => {
         // use the hijacked prompt function to input user input
@@ -389,7 +389,7 @@ const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTrack
                 continue
             }
             setUploads([...results, { file, script, compiled: false }])
-            const result = await compileAndCompare(referenceResult, file, script, testAllTracks, testTracks)
+            const result = await compileAndCompare(referenceResult, file, script, testAllTracks, testTracks, seed)
             results.push(result)
             setUploads(results)
         }
@@ -440,6 +440,7 @@ export const Autograder = () => {
     const [testTracks, setTestTracks] = useState([] as boolean[])
     const [allowPrompts, setAllowPrompts] = useState(false)
     const [prompts, setPrompts] = useState([] as string[])
+    const [seed, setSeed] = useState(Date.now() as number | undefined)
     const [uploads, setUploads] = useState([] as Upload[])
     const [files, setFiles] = useState([] as File[])
 
@@ -447,6 +448,7 @@ export const Autograder = () => {
         <ReferenceScriptUpload
             compileError={compileError}
             prompts={prompts}
+            seed={seed}
             setReferenceResult={setReferenceResult}
             setCompileError={setCompileError}
             setTestAllTracks={setTestAllTracks}
@@ -462,9 +464,11 @@ export const Autograder = () => {
             testTracks={testTracks}
             allowPrompts={allowPrompts}
             prompts={prompts}
+            seed={seed}
             setTestAllTracks={setTestAllTracks}
             setTestTracks={setTestTracks}
             setAllowPrompts={setAllowPrompts}
+            setSeed={setSeed}
         />
         {referenceResult && !compileError &&
             <TestResults
@@ -475,6 +479,7 @@ export const Autograder = () => {
                 testTracks={testTracks}
                 allowPrompts={allowPrompts}
                 prompts={prompts}
+                seed={seed}
                 setUploads={setUploads}
                 setFiles={setFiles}
             />}
