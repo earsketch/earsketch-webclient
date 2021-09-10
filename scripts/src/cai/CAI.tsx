@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Browser"
 
 import * as cai from "./caiState"
+import * as caiDialogue from "./dialogue"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
@@ -17,7 +18,7 @@ const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about { }
+                    Talk to CAI about {}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
                         : <span>a project, when one is open</span>}
@@ -181,13 +182,11 @@ if (FLAGS.SHOW_CAI) {
     })
 
     document.addEventListener("copy" || "cut", e => {
-        // TODO: save to history
-        console.log(e.clipboardData!.getData("Text"))
+        caiDialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
     })
 
     window.addEventListener("paste", e => {
-        // TODO: save to history
-        console.log(e)
+        caiDialogue.addToNodeHistory([e.type, []])
     })
 
     window.setInterval(() => {
@@ -195,7 +194,6 @@ if (FLAGS.SHOW_CAI) {
             store.dispatch(cai.mousePosition([x, y]))
         }
     }, 5000)
-
 
     window.addEventListener("keydown", e => {
         e = e || window.event // IE support
@@ -205,20 +203,22 @@ if (FLAGS.SHOW_CAI) {
         // Check for Alt+Gr (http://en.wikipedia.org/wiki/AltGr_key)
         if (ctrlDown) {
             if (e.altKey) {
-                console.log("other")
+                caiDialogue.addToNodeHistory(["other", []])
             } else {
                 switch (c) {
                     case "c":
-                        console.log("copy") // TODO: save to history
+                        caiDialogue.addToNodeHistory(["copy", []])
                         break
                     case "x":
-                        console.log("cut")
+                        caiDialogue.addToNodeHistory(["cut", []])
                         break
                     case "v":
-                        console.log("paste")
+                        caiDialogue.addToNodeHistory(["paste", []])
                         break
                 }
             }
+        } else {
+            caiDialogue.addToNodeHistory(["keydown", [c]])
         }
     })
 }

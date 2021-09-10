@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
+import * as caiDialogue from "../cai/dialogue"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -186,7 +187,7 @@ function setupAceHandlers(ace: Ace.Editor) {
 
         if (firstEdit === null) {
             firstEdit = Date.now()
-            // TODO: save event
+            caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
         }
         recommendationTimer = window.setTimeout(() => {
             reloadRecommendations()
