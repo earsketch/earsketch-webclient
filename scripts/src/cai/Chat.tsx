@@ -16,8 +16,6 @@ const ChatFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
-    const dropupLabel = useSelector(cai.selectDropupLabel)
-    const buttonLimit = 6
 
     const wizard = useSelector(cai.selectWizard)
 
@@ -25,11 +23,13 @@ const ChatFooter = () => {
 
     const parseStudentInput = (label: string) => {
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
-        const value = option ? option.value : inputOptions[0].value
-        const button = {
-            label: label,
-            value: value,
-        } as cai.CAIButton
+        if (option) {
+            const button = {
+                label: label,
+                value: option.value,
+            } as cai.CAIButton
+            dispatch(cai.sendCAIMessage(button))
+        }
         const message = {
             text: [label],
             keyword: ["", "", "", "", ""],
@@ -37,7 +37,6 @@ const ChatFooter = () => {
             sender: collaboration.userName,
         } as cai.CAIMessage
         collaboration.sendChatMessage(message)
-        setTimeout(dispatch(cai.sendCAIMessage(button)), 1000)
     }
 
     const parseCAIInput = (input: string) => {
@@ -66,44 +65,16 @@ const ChatFooter = () => {
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
-            <div style={{ flex: "auto" }}>
-                <ul>
-                    {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
-                        <li key={inputIdx}>
-                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left", backgroundColor: "gray" }}>
-                                {input.label}
-                            </button>
-                        </li>
-                    )}
-                </ul>
-            </div>}
-            {wizard &&
                 <div style={{ flex: "auto" }}>
-                    {responseOptions.length < buttonLimit
-                        ? <ul>
-                            {responseOptions.length < buttonLimit &&
-                                Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
-                                    <li key={inputIdx}>
-                                        <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                            {input.text}
-                                        </button>
-                                    </li>
-                                )}
-                        </ul>
-                        : <div className="dropup-cai" style={{ width: "100%" }}>
-                            <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
-                                {dropupLabel}
-                            </button>
-                            <div className="dropup-cai-content" style={{ left: "50%", height: "fit-content" }}>
-                                <ul>
-                                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
-                                        <li key={inputIdx}>
-                                            <option onClick={() => caiResponseInput(input)}>{input.text}</option>
-                                        </li>
-                                    )}
-                                </ul>
-                            </div>
-                        </div>}
+                    <ul>
+                        {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+                            <li key={inputIdx}>
+                                <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {input.text}
+                                </button>
+                            </li>
+                        )}
+                    </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
                 <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} style={{ backgroundColor: "lightgray" }}></input>
