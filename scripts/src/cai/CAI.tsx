@@ -9,7 +9,6 @@ import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
-import store from "../reducers"
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -18,11 +17,10 @@ export const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    Talk to CAI about {}
+                    Talk to CAI about { }
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
-                        : <span>a project, when one is open</span>
-                    }
+                        : <span>a project, when one is open</span>}
                     .
                 </div>
             </div>
@@ -163,16 +161,16 @@ export const CAI = () => {
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
-    window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
-    window.onblur = () => store.dispatch(cai.userOffPage(Date.now()))
+    window.onfocus = () => cai.userOnPage(Date.now())
+    window.onblur = () => cai.userOffPage(Date.now())
 
     window.addEventListener("load", () => {
-        store.dispatch(cai.userLoadPage(Date.now()))
+        cai.userLoadPage(Date.now())
     })
 
     window.addEventListener("beforeunload", () => {
         // the absence of a returnValue property on the event will guarantee the browser unload happens
-        store.dispatch(cai.userUnloadPage(Date.now()))
+        cai.userUnloadPage(Date.now())
     })
 
     let mouseX: number | undefined, mouseY: number | undefined
@@ -192,7 +190,7 @@ if (FLAGS.SHOW_CAI) {
 
     window.setInterval(() => {
         if (mouseX && mouseY) {
-            store.dispatch(cai.mousePosition([mouseX, mouseY]))
+            cai.mousePosition(mouseX, mouseY)
         }
     }, 5000)
 

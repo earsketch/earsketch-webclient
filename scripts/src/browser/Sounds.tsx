@@ -11,7 +11,7 @@ import * as appState from "../app/appState"
 import * as editor from "../ide/Editor"
 import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
-import store, { RootState } from "../reducers"
+import { RootState } from "../reducers"
 import { SoundEntity } from "common"
 
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
@@ -178,7 +178,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={() => { dispatch(sounds.previewSound(fileKey)); store.dispatch(userUIClick(["sound - preview", Date.now()])) }}
+                        onClick={() => { dispatch(sounds.previewSound(fileKey)); userUIClick("sound - preview", Date.now()) }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileKey === fileKey
@@ -201,7 +201,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => { editor.pasteCode(fileKey); store.dispatch(userUIClick(["sample - copy", Date.now()])) }}
+                                onClick={() => { editor.pasteCode(fileKey); userUIClick("sample - copy", Date.now()) }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />

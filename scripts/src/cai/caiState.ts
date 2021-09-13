@@ -337,63 +337,37 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     }
 )
 
-export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
-    "cai/userOnPage",
-    (time) => {
-        studentPreferences.addOnPageStatus(1, time)
-    }
-)
+export const userOnPage = (time: number) => {
+    studentPreferences.addOnPageStatus(1, time)
+}
 
-export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
-    "cai/userOffPage",
-    (time) => {
-        studentPreferences.addOnPageStatus(0, time)
-    }
-)
+export const userOffPage = (time: number) => {
+    studentPreferences.addOnPageStatus(0, time)
+}
 
-export const userUnloadPage = createAsyncThunk<void, number, ThunkAPI>(
-    "cai/userRefreshPage",
-    (time: number) => {
-        studentPreferences.addPageLoad(0, time)
-    }
-)
+export const userUnloadPage = (time: number) => {
+    studentPreferences.addPageLoad(0, time)
+}
 
-export const userLoadPage = createAsyncThunk<void, number, ThunkAPI>(
-    "cai/userLoadPage",
-    (time: number) => {
-        studentPreferences.addPageLoad(1, time)
-    }
-)
+export const userLoadPage = (time: number) => {
+    studentPreferences.addPageLoad(1, time)
+}
 
-export const userUIClick = createAsyncThunk<void, [string, number], ThunkAPI>(
-    "cai/userUIClick",
-    ([ui, time]) => {
-        if (FLAGS.SHOW_CAI) {
-            studentPreferences.addUIClick(ui, time)
-        }
-    }
-)
+export const userUIClick = (ui: string, time: number) => {
+    studentPreferences.addUIClick(ui, time)
+}
 
-export const keyStroke = createAsyncThunk<void, [string, string[], number], ThunkAPI>(
-    "cai/keyStroke",
-    ([action, content, time]) => {
-        studentPreferences.addKeystroke(action, content, time)
-    }
-)
+export const keyStroke = (action: string, content: any, time: number) => {
+    studentPreferences.addKeystroke(action, content, time)
+}
 
-export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
-    "cai/mousePosition",
-    ([x, y]) => {
-        studentPreferences.addMousePos({ x, y })
-    }
-)
+export const mousePosition = (x: number, y: number) => {
+    studentPreferences.addMousePos({ x, y })
+}
 
-export const editTime = createAsyncThunk<void, [number | null, number], ThunkAPI>(
-    "cai/editTime",
-    ([startTime, endTime]) => {
-        studentPreferences.addEditPeriod(startTime, endTime)
-    }
-)
+export const editTime = (startTime: number | null, endTime: number) => {
+    studentPreferences.addEditPeriod(startTime, endTime)
+}
 
 export default caiSlice.reducer
 export const {

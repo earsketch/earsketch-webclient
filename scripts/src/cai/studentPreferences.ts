@@ -1,11 +1,8 @@
-﻿/* eslint-disable */
-// TODO: Resolve lint issues.
-
-// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
+﻿// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import * as caiStudent from "./student"
 
 // TODO: All of these objects have one entry per project, so project state is spread across all of them.
-// Instead, refactor to group all the state into one object per project, so the functions can just deal with one object
+// Instead, refactor to group all the state into one object per project, so the consts can just deal with one object
 // (and avoid having to index with `[projectName]` everywhere).
 const suggestionsAccepted: { [key: string]: number } = {}
 const suggestionsRejected: { [key: string]: number } = {}
@@ -29,7 +26,7 @@ let activeProject = ""
 
 const projectViews: string[] = []
 
-function setActiveProject(projectName: string) {
+export const setActiveProject = (projectName: string) => {
     activeProject = projectName
     if (!allSoundsSuggested[projectName]) {
         allSoundsSuggested[projectName] = []
@@ -73,15 +70,15 @@ function setActiveProject(projectName: string) {
     caiStudent.updateModel("preferences", { projectViews: projectViews })
 }
 
-function getSoundSuggestionsUsed() {
+export const getSoundSuggestionsUsed = () => {
     return soundSuggestionTracker[activeProject].slice(0)
 }
 
-function getCodeSuggestionsUsed() {
+export const getCodeSuggestionsUsed = () => {
     return codeSuggestionsUsed[activeProject].slice(0)
 }
 
-function updateHistoricalArrays(currentSounds?: string[]) {
+const updateHistoricalArrays = (currentSounds?: string[]) => {
     // update historical list of all sound suggestions
     for (const suggestion of sampleSuggestionsMade[activeProject]) {
         for (const sound of suggestion[1]) {
@@ -131,12 +128,12 @@ function updateHistoricalArrays(currentSounds?: string[]) {
     caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker })
 }
 
-function addSoundSuggestion(suggestionArray: string[]) {
+export const addSoundSuggestion = (suggestionArray: string[]) => {
     sampleSuggestionsMade[activeProject].push([0, suggestionArray])
     updateHistoricalArrays()
 }
 
-function runSound(soundsUsedArray: string[]) {
+export const runSound = (soundsUsedArray: string[]) => {
     updateHistoricalArrays(soundsUsedArray)
     const newArray: SoundSuggestion[] = []
     for (const suggestion of sampleSuggestionsMade[activeProject]) {
@@ -156,9 +153,9 @@ function runSound(soundsUsedArray: string[]) {
             soundSuggestionTracker[activeProject].push(suggestion)
             updateAcceptanceRatio()
         } else {
-            if (suggestion[0] == 0) {
-                //    suggestionsRejected[activeProject] += 1
-                //    updateAcceptanceRatio()
+            if (suggestion[0] === 0) {
+                // suggestionsRejected[activeProject] += 1
+                // updateAcceptanceRatio()
             } else {
                 newArray.push([...suggestion])
             }
@@ -167,11 +164,11 @@ function runSound(soundsUsedArray: string[]) {
     sampleSuggestionsMade[activeProject] = [...newArray]
 }
 
-function addCodeSuggestion(complexityObj: any, utterance: string) {
+export const addCodeSuggestion = (complexityObj: any, utterance: string) => {
     codeSuggestionsMade[activeProject].push([0, complexityObj, utterance])
 }
 
-function runCode(complexityOutput: any) {
+export const runCode = (complexityOutput: any) => {
     const newArray: CodeSuggestion[] = []
     for (const suggestion of codeSuggestionsMade[activeProject]) {
         let wasUsed = true
@@ -189,7 +186,7 @@ function runCode(complexityOutput: any) {
             updateAcceptanceRatio()
             codeSuggestionsUsed[activeProject].push(suggestion)
         } else {
-            if (suggestion[0] == 0) {
+            if (suggestion[0] !== 0) {
                 // suggestionsRejected[activeProject] += 1
                 // updateAcceptanceRatio()
             } else {
@@ -200,49 +197,47 @@ function runCode(complexityOutput: any) {
     codeSuggestionsMade[activeProject] = [...newArray]
 }
 
-function updateAcceptanceRatio() {
+const updateAcceptanceRatio = () => {
     acceptanceRatio[activeProject] = suggestionsAccepted[activeProject] / (suggestionsAccepted[activeProject] + suggestionsRejected[activeProject])
     caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
 }
 
-const onPageHistory: any[] = []
-let lastEditTS = 0
+const onPageHistory: { status: number, time: number }[] = []
 const deleteKeyTS = []
 const recentCompiles = 3
-const compileTS: any[] = []
-const compileErrors: any[] = []
-const mousePos: any[] = []
-const uiClickHistory: any[] = []
-const pageLoadHistory: any[] = []
-const editPeriod: any[] = []
+const compileTS: number[] = []
+const compileErrors: { error: any, time: number }[] = []
+const mousePos: { x: number, y: number }[] = []
+const uiClickHistory: { ui: string, time: number }[] = []
+const pageLoadHistory: { status: number, time: number }[] = []
+const editPeriod: { startTime: number | null, endTime: number }[] = []
 
-function addOnPageStatus(status: any, time: any) {
+export const addOnPageStatus = (status: number, time: number) => {
     onPageHistory.push({ status, time })
     caiStudent.updateModel("preferences", { onPageHistory: onPageHistory })
 }
 
-function returnPageStatus() {
+export const returnPageStatus = () => {
     return onPageHistory[onPageHistory.length - 1]
 }
 
-function addCompileTS(time: any) {
+export const addCompileTS = (time: number) => {
     compileTS.push(time)
-    lastEditTS = time
     caiStudent.updateModel("preferences", { compileTS: compileTS })
 }
 
-function addKeystroke(action: string, content: any, time: any) {
+export const addKeystroke = (action: string, content: any, time: number) => {
     if (action === "remove") {
         deleteKeyTS.push(time)
     }
 }
 
-function addCompileError(error: any, time: any) {
+export const addCompileError = (error: any, time: number) => {
     compileErrors.push({ error, time })
     caiStudent.updateModel("preferences", { compileErrors: compileErrors })
 }
 
-function stuckOnError() {
+export const stuckOnError = () => {
     const recentHistory = compileErrors.slice(compileErrors.length - recentCompiles, compileErrors.length)
     const errors = recentHistory.map(a => a.error[0].args.v[0].v)
     if (compileErrors.length >= recentCompiles && allEqual(errors)) {
@@ -251,54 +246,26 @@ function stuckOnError() {
     return false
 }
 
-function allEqual(arr: any[]) {
+const allEqual = (arr: any[]) => {
     return new Set(arr).size === 1
 }
 
-function addMousePos(pos: any) {
+export const addMousePos = (pos: { x: number, y: number }) => {
     mousePos.push(pos)
     caiStudent.updateModel("preferences", { mousePos: mousePos })
 }
 
-function addUIClick(ui: string, time: number) {
+export const addUIClick = (ui: string, time: number) => {
     uiClickHistory.push({ ui, time })
     caiStudent.updateModel("preferences", { uiClickHistory: uiClickHistory })
 }
 
-function addPageLoad(status: any, time: number) {
+export const addPageLoad = (status: number, time: number) => {
     pageLoadHistory.push({ status, time })
     caiStudent.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
 }
 
-function addEditPeriod(startTime: any, endTime: any) {
-    editPeriod.push({startTime, endTime})
+export const addEditPeriod = (startTime: number | null, endTime: number) => {
+    editPeriod.push({ startTime, endTime })
     caiStudent.updateModel("preferences", { editPeriod: editPeriod })
-}
-
-// what are the measures to understand how off or on task one is?
-
-// other options: caiClose, pageChanged, caiSwapTab
-// time spent on each project
-// start/end of key presses [bursts]
-// mouse clicks
-
-// TODO: Export functions directly.
-export {
-    addCodeSuggestion,
-    addCompileError,
-    addCompileTS,
-    addKeystroke,
-    addMousePos,
-    addOnPageStatus,
-    addSoundSuggestion,
-    getCodeSuggestionsUsed,
-    getSoundSuggestionsUsed,
-    returnPageStatus, // Currently unused
-    runCode,
-    runSound,
-    setActiveProject,
-    stuckOnError, // Currently unused
-    addUIClick,
-    addPageLoad,
-    addEditPeriod
 }
