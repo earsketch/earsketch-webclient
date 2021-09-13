@@ -276,8 +276,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         dispatch(autoScrollCAI())
         newCAIMessage()
 
-        const t = Date.now()
-        studentPreferences.addCompileTS(t)
+        studentPreferences.addCompileTS()
     }
 
 )
@@ -337,28 +336,28 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     }
 )
 
-export const userOnPage = (time: number) => {
-    studentPreferences.addOnPageStatus(1, time)
+export const userOnPage = () => {
+    studentPreferences.addOnPageStatus(1)
 }
 
-export const userOffPage = (time: number) => {
-    studentPreferences.addOnPageStatus(0, time)
+export const userOffPage = () => {
+    studentPreferences.addOnPageStatus(0)
 }
 
-export const userUnloadPage = (time: number) => {
-    studentPreferences.addPageLoad(0, time)
+export const userUnloadPage = () => {
+    studentPreferences.addPageLoad(0)
 }
 
-export const userLoadPage = (time: number) => {
-    studentPreferences.addPageLoad(1, time)
+export const userLoadPage = () => {
+    studentPreferences.addPageLoad(1)
 }
 
-export const userUIClick = (ui: string, time: number) => {
-    studentPreferences.addUIClick(ui, time)
+export const userUIClick = (ui: string) => {
+    studentPreferences.addUIClick(ui)
 }
 
-export const keyStroke = (action: string, content: any, time: number) => {
-    studentPreferences.addKeystroke(action, content, time)
+export const keyStroke = (action: string, content: any) => {
+    studentPreferences.addKeystroke(action, content)
 }
 
 export const mousePosition = (x: number, y: number) => {

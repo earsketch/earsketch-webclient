@@ -212,8 +212,8 @@ const uiClickHistory: { ui: string, time: number }[] = []
 const pageLoadHistory: { status: number, time: number }[] = []
 const editPeriod: { startTime: number | null, endTime: number }[] = []
 
-export const addOnPageStatus = (status: number, time: number) => {
-    onPageHistory.push({ status, time })
+export const addOnPageStatus = (status: number) => {
+    onPageHistory.push({ status, time: Date.now() })
     caiStudent.updateModel("preferences", { onPageHistory: onPageHistory })
 }
 
@@ -221,19 +221,19 @@ export const returnPageStatus = () => {
     return onPageHistory[onPageHistory.length - 1]
 }
 
-export const addCompileTS = (time: number) => {
-    compileTS.push(time)
+export const addCompileTS = () => {
+    compileTS.push(Date.now())
     caiStudent.updateModel("preferences", { compileTS: compileTS })
 }
 
-export const addKeystroke = (action: string, content: any, time: number) => {
+export const addKeystroke = (action: string, content: any) => {
     if (action === "remove") {
-        deleteKeyTS.push(time)
+        deleteKeyTS.push(Date.now())
     }
 }
 
-export const addCompileError = (error: any, time: number) => {
-    compileErrors.push({ error, time })
+export const addCompileError = (error: any) => {
+    compileErrors.push({ error, time: Date.now() })
     caiStudent.updateModel("preferences", { compileErrors: compileErrors })
 }
 
@@ -255,13 +255,13 @@ export const addMousePos = (pos: { x: number, y: number }) => {
     caiStudent.updateModel("preferences", { mousePos: mousePos })
 }
 
-export const addUIClick = (ui: string, time: number) => {
-    uiClickHistory.push({ ui, time })
+export const addUIClick = (ui: string) => {
+    uiClickHistory.push({ ui, time: Date.now() })
     caiStudent.updateModel("preferences", { uiClickHistory: uiClickHistory })
 }
 
-export const addPageLoad = (status: number, time: number) => {
-    pageLoadHistory.push({ status, time })
+export const addPageLoad = (status: number) => {
+    pageLoadHistory.push({ status, time: Date.now() })
     caiStudent.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
 }
 

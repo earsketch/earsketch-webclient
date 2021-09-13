@@ -158,7 +158,7 @@ function setupAceHandlers(ace: Ace.Editor) {
 
         const t = Date.now()
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.keyStroke([event.action, event.lines, t]))
+            cai.keyStroke(event.action, event.lines)
         }
 
         if (collaboration.active && !collaboration.lockEditor) {
@@ -193,7 +193,7 @@ function setupAceHandlers(ace: Ace.Editor) {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
-                store.dispatch(cai.editTime([firstEdit, Date.now()]))
+                cai.editTime(firstEdit, Date.now())
             }
             firstEdit = null
         }, 1000)

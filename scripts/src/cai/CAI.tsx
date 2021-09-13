@@ -161,16 +161,16 @@ export const CAI = () => {
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
-    window.onfocus = () => cai.userOnPage(Date.now())
-    window.onblur = () => cai.userOffPage(Date.now())
+    window.onfocus = () => cai.userOnPage()
+    window.onblur = () => cai.userOffPage()
 
     window.addEventListener("load", () => {
-        cai.userLoadPage(Date.now())
+        cai.userLoadPage()
     })
 
     window.addEventListener("beforeunload", () => {
         // the absence of a returnValue property on the event will guarantee the browser unload happens
-        cai.userUnloadPage(Date.now())
+        cai.userUnloadPage()
     })
 
     let mouseX: number | undefined, mouseY: number | undefined
