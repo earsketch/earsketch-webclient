@@ -62,6 +62,11 @@ const ChatFooter = () => {
         collaboration.sendChatMessage(input, true)
     }
 
+    const sendMessage = () => {
+        wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)
+        setInputText("")
+    }
+
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
@@ -77,8 +82,8 @@ const ChatFooter = () => {
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
-                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} style={{ backgroundColor: "lightgray" }}></input>
-                <button className="btn btn-cai" onClick={() => wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)} style={{ float: "right" }}> Send </button>
+                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { sendMessage() } }} style={{ backgroundColor: "lightgray" }}></input>
+                <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
             <div style={{ flex: "auto" }}>
                 <ul>
