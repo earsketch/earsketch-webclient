@@ -156,9 +156,8 @@ function setupAceHandlers(ace: Ace.Editor) {
     ace.on("change", (event) => {
         callbacks.onChange?.()
 
-        const t = Date.now()
         if (FLAGS.SHOW_CAI) {
-            cai.keyStroke(event.action, event.lines)
+            cai.keyStroke(event.action)
         }
 
         if (collaboration.active && !collaboration.lockEditor) {

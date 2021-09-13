@@ -1,7 +1,5 @@
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
 
-import * as dialogue from "./dialogue"
-
 export const studentModel = {
     codeKnowledge: {},
     musicAttributes: { soundProfile: undefined },
@@ -16,5 +14,4 @@ export function updateModel(property: string, value: any) {
     } else if (property === "preferences") {
         Object.assign(studentModel.preferences, value)
     }
-    dialogue.addToNodeHistory(["Student Model Update", [property, value]])
 }

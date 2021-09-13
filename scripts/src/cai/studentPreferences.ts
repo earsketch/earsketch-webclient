@@ -226,7 +226,7 @@ export const addCompileTS = () => {
     caiStudent.updateModel("preferences", { compileTS: compileTS })
 }
 
-export const addKeystroke = (action: string, content: any) => {
+export const addKeystroke = (action: string) => {
     if (action === "remove") {
         deleteKeyTS.push(Date.now())
     }

@@ -356,8 +356,8 @@ export const userUIClick = (ui: string) => {
     studentPreferences.addUIClick(ui)
 }
 
-export const keyStroke = (action: string, content: any) => {
-    studentPreferences.addKeystroke(action, content)
+export const keyStroke = (action: string) => {
+    studentPreferences.addKeystroke(action)
 }
 
 export const mousePosition = (x: number, y: number) => {
