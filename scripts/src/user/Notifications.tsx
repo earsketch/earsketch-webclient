@@ -68,7 +68,7 @@ export const NotificationPopup = () => {
         }
     }
 
-    return message && <div className={"notificationPopup " + message.type}>
+    return message && <div className={"absolute notificationPopup " + message.type}>
         <div className="arrow" style={{
             position: "absolute",
             top: "-11px",
