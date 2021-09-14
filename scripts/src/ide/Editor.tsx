@@ -8,6 +8,7 @@ import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as caiDialogue from "../cai/dialogue"
+import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -146,7 +147,7 @@ export function clearErrors() {
     }
 }
 
-let firstEdit: any = null
+let firstEdit: number | null = null
 
 function setupAceHandlers(ace: Ace.Editor) {
     ace.on("changeSession", () => callbacks.onChange?.())
@@ -157,7 +158,7 @@ function setupAceHandlers(ace: Ace.Editor) {
         callbacks.onChange?.()
 
         if (FLAGS.SHOW_CAI) {
-            cai.keyStroke(event.action)
+            caiStudentPreferences.addKeystroke(event.action)
         }
 
         if (collaboration.active && !collaboration.lockEditor) {
@@ -192,7 +193,7 @@ function setupAceHandlers(ace: Ace.Editor) {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
-                cai.editTime(firstEdit, Date.now())
+                caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
             }
             firstEdit = null
         }, 1000)

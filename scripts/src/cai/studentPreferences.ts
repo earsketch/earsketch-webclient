@@ -1,5 +1,5 @@
 ﻿// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
-import * as caiStudent from "./student"
+import * as student from "./student"
 
 // TODO: All of these objects have one entry per project, so project state is spread across all of them.
 // Instead, refactor to group all the state into one object per project, so the consts can just deal with one object
@@ -67,7 +67,7 @@ export const setActiveProject = (projectName: string) => {
     activeProject = projectName
 
     projectViews.push(projectName)
-    caiStudent.updateModel("preferences", { projectViews: projectViews })
+    student.updateModel("preferences", { projectViews: projectViews })
 }
 
 export const getSoundSuggestionsUsed = () => {
@@ -125,7 +125,7 @@ const updateHistoricalArrays = (currentSounds?: string[]) => {
     }
     // push this set of lists to the student model
     const suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent, soundsContributedByStudent: soundsContributedByStudent }
-    caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker })
+    student.updateModel("preferences", { suggestionUse: suggestionTracker })
 }
 
 export const addSoundSuggestion = (suggestionArray: string[]) => {
@@ -199,7 +199,7 @@ export const runCode = (complexityOutput: any) => {
 
 const updateAcceptanceRatio = () => {
     acceptanceRatio[activeProject] = suggestionsAccepted[activeProject] / (suggestionsAccepted[activeProject] + suggestionsRejected[activeProject])
-    caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
+    student.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
 }
 
 const onPageHistory: { status: number, time: number }[] = []
@@ -214,7 +214,7 @@ const editPeriod: { startTime: number | null, endTime: number }[] = []
 
 export const addOnPageStatus = (status: number) => {
     onPageHistory.push({ status, time: Date.now() })
-    caiStudent.updateModel("preferences", { onPageHistory: onPageHistory })
+    student.updateModel("preferences", { onPageHistory: onPageHistory })
 }
 
 export const returnPageStatus = () => {
@@ -223,7 +223,7 @@ export const returnPageStatus = () => {
 
 export const addCompileTS = () => {
     compileTS.push(Date.now())
-    caiStudent.updateModel("preferences", { compileTS: compileTS })
+    student.updateModel("preferences", { compileTS: compileTS })
 }
 
 export const addKeystroke = (action: string) => {
@@ -234,7 +234,7 @@ export const addKeystroke = (action: string) => {
 
 export const addCompileError = (error: any) => {
     compileErrors.push({ error, time: Date.now() })
-    caiStudent.updateModel("preferences", { compileErrors: compileErrors })
+    student.updateModel("preferences", { compileErrors: compileErrors })
 }
 
 export const stuckOnError = () => {
@@ -252,20 +252,20 @@ const allEqual = (arr: any[]) => {
 
 export const addMousePos = (pos: { x: number, y: number }) => {
     mousePos.push(pos)
-    caiStudent.updateModel("preferences", { mousePos: mousePos })
+    student.updateModel("preferences", { mousePos: mousePos })
 }
 
 export const addUIClick = (ui: string) => {
     uiClickHistory.push({ ui, time: Date.now() })
-    caiStudent.updateModel("preferences", { uiClickHistory: uiClickHistory })
+    student.updateModel("preferences", { uiClickHistory: uiClickHistory })
 }
 
 export const addPageLoad = (status: number) => {
     pageLoadHistory.push({ status, time: Date.now() })
-    caiStudent.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
+    student.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
 }
 
 export const addEditPeriod = (startTime: number | null, endTime: number) => {
     editPeriod.push({ startTime, endTime })
-    caiStudent.updateModel("preferences", { editPeriod: editPeriod })
+    student.updateModel("preferences", { editPeriod: editPeriod })
 }

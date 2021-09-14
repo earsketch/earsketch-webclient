@@ -336,38 +336,6 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     }
 )
 
-export const userOnPage = () => {
-    studentPreferences.addOnPageStatus(1)
-}
-
-export const userOffPage = () => {
-    studentPreferences.addOnPageStatus(0)
-}
-
-export const userUnloadPage = () => {
-    studentPreferences.addPageLoad(0)
-}
-
-export const userLoadPage = () => {
-    studentPreferences.addPageLoad(1)
-}
-
-export const userUIClick = (ui: string) => {
-    studentPreferences.addUIClick(ui)
-}
-
-export const keyStroke = (action: string) => {
-    studentPreferences.addKeystroke(action)
-}
-
-export const mousePosition = (x: number, y: number) => {
-    studentPreferences.addMousePos({ x, y })
-}
-
-export const editTime = (startTime: number | null, endTime: number) => {
-    studentPreferences.addEditPeriod(startTime, endTime)
-}
-
 export default caiSlice.reducer
 export const {
     setActiveProject,

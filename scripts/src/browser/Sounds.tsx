@@ -16,7 +16,7 @@ import { SoundEntity } from "common"
 
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
-import { userUIClick } from "../cai/caiState"
+import { addUIClick } from "../cai/studentPreferences"
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
@@ -178,7 +178,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={() => { dispatch(sounds.previewSound(fileKey)); userUIClick("sound - preview") }}
+                        onClick={() => { dispatch(sounds.previewSound(fileKey)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileKey === fileKey
@@ -201,7 +201,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => { editor.pasteCode(fileKey); userUIClick("sample - copy") }}
+                                onClick={() => { editor.pasteCode(fileKey); addUIClick("sample - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />

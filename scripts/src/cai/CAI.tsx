@@ -4,6 +4,7 @@ import { Collapsed } from "../browser/Browser"
 
 import * as cai from "./caiState"
 import * as caiDialogue from "./dialogue"
+import * as caiStudentPreferences from "./studentPreferences"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
@@ -161,16 +162,16 @@ export const CAI = () => {
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
-    window.onfocus = () => cai.userOnPage()
-    window.onblur = () => cai.userOffPage()
+    window.onfocus = () => caiStudentPreferences.addOnPageStatus(1)
+    window.onblur = () => caiStudentPreferences.addOnPageStatus(0)
 
     window.addEventListener("load", () => {
-        cai.userLoadPage()
+        caiStudentPreferences.addPageLoad(1)
     })
 
     window.addEventListener("beforeunload", () => {
         // the absence of a returnValue property on the event will guarantee the browser unload happens
-        cai.userUnloadPage()
+        caiStudentPreferences.addPageLoad(0)
     })
 
     let mouseX: number | undefined, mouseY: number | undefined
@@ -190,7 +191,7 @@ if (FLAGS.SHOW_CAI) {
 
     window.setInterval(() => {
         if (mouseX && mouseY) {
-            cai.mousePosition(mouseX, mouseY)
+            caiStudentPreferences.addMousePos({ x: mouseX, y: mouseY })
         }
     }, 5000)
 
