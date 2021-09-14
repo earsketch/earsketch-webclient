@@ -587,9 +587,10 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         selectRandomFile: {
             descriptionKey: "api:selectRandomFile.description",
             parameters: {
-                folder: {
-                    typeKey: "api:types.folderConstant",
-                    descriptionKey: "api:selectRandomFile.parameters.folder.description",
+                folderSubstring: {
+                    typeKey: "api:types.string",
+                    default: "\"\"",
+                    descriptionKey: "api:selectRandomFile.parameters.folderSubstring.description",
                 },
             },
             returns: {
@@ -597,11 +598,11 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                 descriptionKey: "api:selectRandomFile.returns.description",
             },
             example: {
-                python: "# Get random audio file from the ALT_POP_GUITAR folder and assign to randomAudio\nrandomAudio = selectRandomFile(ALT_POP_GUITAR)",
+                python: "# Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nrandomSound = selectRandomFile(ALT_POP_GUITAR)",
 
-                javascript: "// Get random audio file from the ALT_POP_GUITAR folder and assign to randomAudio\nvar randomAudio = selectRandomFile(ALT_POP_GUITAR);",
+                javascript: "// Get random sound from the ALT_POP_GUITAR folder and assign to randomSound\nvar randomSound = selectRandomFile(ALT_POP_GUITAR);",
             },
-            autocomplete: "selectRandomFile(folder)",
+            autocomplete: "selectRandomFile(folderSubstring)",
         },
 
         setEffect: [

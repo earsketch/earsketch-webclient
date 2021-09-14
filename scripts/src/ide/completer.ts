@@ -31,7 +31,7 @@ const earsketchCompleter: Ace.Completer = {
         }
 
         if (audioLibrary.cache.folders === null) {
-            audioLibrary.getFolders()
+            audioLibrary.getStandardFolders()
         }
 
         // Combine constants.

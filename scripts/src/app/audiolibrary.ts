@@ -177,15 +177,16 @@ export function clearCache() {
     cache.clips = {} // this might be overkill, but otherwise deleted / renamed clip cache is still accessible
 }
 
-export async function getFolders() {
+export async function getStandardFolders() {
     if (cache.folders !== null) {
         return cache.folders
     }
-    esconsole("Fetching default audio folders", ["debug", "audiolibrary"])
+    esconsole("Extracting standard audio folders", ["debug", "audiolibrary"])
     try {
-        const data: string[] = await (await fetch(URL_DOMAIN + "/audio/folders")).json()
-        esconsole("Found default audio folders", ["debug", "audiolibrary"])
-        return (cache.folders = data)
+        const sounds = await getStandardSounds()
+        const folders = [...new Set(sounds.map(entity => entity.folder))]
+        esconsole(`Extracted ${folders.length} standard folders`, ["debug", "audiolibrary"])
+        return (cache.folders = folders)
     } catch (err) {
         esconsole(err, ["error", "audiolibrary"])
         throw err
@@ -196,10 +197,10 @@ export async function getStandardSounds() {
     if (cache.standardSounds !== null) {
         return cache.standardSounds
     }
-    esconsole("Fetching default sounds tag metadata", ["debug", "audiolibrary"])
+    esconsole("Fetching standard sound metadata", ["debug", "audiolibrary"])
     try {
         const data: SoundEntity[] = await (await fetch(URL_DOMAIN + "/audio/standard")).json()
-        esconsole("Found audio tags", ["debug", "audiolibrary"])
+        esconsole(`Fetched ${Object.keys(data).length} sounds`, ["debug", "audiolibrary"])
         return (cache.standardSounds = data)
     } catch (err) {
         esconsole("HTTP status: " + err.status, ["error", "audiolibrary"])

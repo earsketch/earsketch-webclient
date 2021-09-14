@@ -977,12 +977,12 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 // Select a random file.
-export function selectRandomFile(result: DAWData, folder: string, extension: undefined | string = undefined) {
-    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folder}, ${extension}`, "PT")
+export function selectRandomFile(result: DAWData, folderSubstring: string, extension: undefined | string = undefined) {
+    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}, ${extension}`, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("selectRandomFile", args, 1, 2)
-    ptCheckType("folder", "string", folder)
+    ptCheckType("folderSubstring", "string", folderSubstring)
 
     if (extension !== undefined) {
         ptCheckType("extension", "string", extension)
@@ -990,7 +990,7 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
         extension = ".wav"
     }
 
-    let url = URL_DOMAIN + "/audio/random?folder=" + folder
+    let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
 
     if (userProject.isLoggedIn()) {
         url += "&username=" + userProject.getUsername()
@@ -1001,16 +1001,9 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
     request.send(null)
 
     if (request.status === 200) {
-        const jsobj: SoundEntity = JSON.parse(request.responseText)
-        if ("name" in jsobj) {
-            return jsobj.name
-        } else {
-            throw new ValueError("Please use folder names available in your sound browser.")
-        }
+        return (JSON.parse(request.responseText) as SoundEntity).name
     } else {
-        throw new InternalError(
-            "Internal server error. " +
-            "Could not respond to the following tag: " + folder)
+        throw new InternalError("Internal server error. " + request.responseText)
     }
 }
 
