@@ -244,7 +244,13 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     (data, { getState, dispatch }) => {
         if (FLAGS.SHOW_CHAT) {
             if (!selectWizard(getState())) {
-                collaboration.sendChatMessage({ text: ["Compiled the script!"] } as CAIMessage, false)
+                const message = {
+                    text: ["Compiled the script!", "", "", "", ""],
+                    keyword: ["", "", "", "", ""],
+                    date: Date.now(),
+                    sender: userProject.getUsername(),
+                } as CAIMessage
+                collaboration.sendChatMessage(message, false)
             }
         } else if (dialogue.isDone()) {
             return
