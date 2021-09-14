@@ -74,11 +74,10 @@ export const CaiBody = () => {
             <div className="chat-message-container">
                 <ul>
                     {messageList[activeProject] &&
-                        Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
-                            <li key={idx}>
-                                <CAIMessageView {...message} />
-                            </li>
-                        )}
+                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
+                        <li key={idx}>
+                            <CAIMessageView {...message} />
+                        </li>)}
                 </ul>
             </div>
         </div>
@@ -98,13 +97,12 @@ const CaiFooter = () => {
                 {inputOptions.length < buttonLimit
                     ? <ul>
                         {inputOptions.length < buttonLimit &&
-                            Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
-                                <li key={inputIdx}>
-                                    <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                        {input.label}
-                                    </button>
-                                </li>
-                            )}
+                        Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                            <li key={inputIdx}>
+                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {input.label}
+                                </button>
+                            </li>)}
                     </ul>
                     : <div className="dropup-cai" style={{ width: "100%" }}>
                         <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
@@ -115,8 +113,7 @@ const CaiFooter = () => {
                                 {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
                                         <option onClick={() => dispatch(cai.sendCAIMessage(input))}>{input.label}</option>
-                                    </li>
-                                )}
+                                    </li>)}
                             </ul>
                         </div>
                     </div>}
@@ -124,13 +121,12 @@ const CaiFooter = () => {
             <div style={{ flex: "auto" }}>
                 <ul>
                     {errorOptions.length > 0 &&
-                        Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                            <li key={errIdx}>
-                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {input.label}
-                                </button>
-                            </li>
-                        )}
+                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
+                        <li key={errIdx}>
+                            <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                {input.label}
+                            </button>
+                        </li>)}
                 </ul>
             </div>
         </div>
