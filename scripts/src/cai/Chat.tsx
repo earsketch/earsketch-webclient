@@ -85,18 +85,6 @@ const ChatFooter = () => {
                 <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { sendMessage() } }} style={{ backgroundColor: "lightgray" }}></input>
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
-            <div style={{ flex: "auto" }}>
-                <ul>
-                    {errorOptions.length > 0 &&
-                        Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                            <li key={errIdx}>
-                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {input.label}
-                                </button>
-                            </li>
-                        )}
-                </ul>
-            </div>
         </div>
     )
 }

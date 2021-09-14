@@ -129,6 +129,22 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean], Thunk
     }
 )
 
+const caiOutput = createAsyncThunk<void, any, ThunkAPI>(
+    "cai/caiOutput",
+    (messages, { dispatch }) => {
+        for (const msg in messages) {
+            const outputMessage = {
+                text: messages[msg][0],
+                keyword: messages[msg][1],
+                date: Date.now(),
+                sender: "CAI",
+            } as CAIMessage
+
+            dispatch(addCAIMessage([outputMessage, false]))
+        }
+    }
+)
+
 const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
     "cai/introduceCAI",
     (_, { dispatch }) => {
@@ -141,16 +157,7 @@ const introduceCAI = createAsyncThunk<void, void, ThunkAPI>(
             dispatch(setResponseOptions([]))
             if (msgText !== "") {
                 const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
-                for (const msg in messages) {
-                    const outputMessage = {
-                        text: messages[msg][0],
-                        keyword: messages[msg][1],
-                        date: Date.now(),
-                        sender: "CAI",
-                    } as CAIMessage
-
-                    dispatch(addCAIMessage([outputMessage, false]))
-                }
+                dispatch(caiOutput(messages))
             }
         })
     }
@@ -191,19 +198,8 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText !== "") {
             const messages = msgText.includes("|") ? msgText.split("|") : [msgText]
+            dispatch(caiOutput(messages))
             dispatch(setResponseOptions([]))
-            for (const msg in messages) {
-                if (messages[msg] !== "") {
-                    const outputMessage = {
-                        text: messages[msg][0],
-                        keyword: messages[msg][1],
-                        date: Date.now(),
-                        sender: "CAI",
-                    } as CAIMessage
-
-                    dispatch(addCAIMessage([outputMessage, false]))
-                }
-            }
         }
         // With no options available to user, default to tree selection.
         dispatch(setDefaultInputOptions())
@@ -241,8 +237,12 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
 export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileCAI",
-    (data, { dispatch }) => {
-        if (dialogue.isDone()) {
+    (data, { getState, dispatch }) => {
+        if (FLAGS.SHOW_CHAT) {
+            if (!selectWizard(getState())) {
+                collaboration.sendChatMessage({ text: ["Compiled the script!"] } as CAIMessage, false)
+            }
+        } else if (dialogue.isDone()) {
             return
         }
 

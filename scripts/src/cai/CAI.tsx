@@ -20,8 +20,7 @@ export const CaiHeader = () => {
                     Talk to CAI about { }
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
-                        : <span>a project, when one is open</span>
-                    }
+                        : <span>a project, when one is open</span>}
                     .
                 </div>
             </div>
