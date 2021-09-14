@@ -96,8 +96,7 @@ const CaiFooter = () => {
             <div style={{ flex: "auto" }}>
                 {inputOptions.length < buttonLimit
                     ? <ul>
-                        {inputOptions.length < buttonLimit &&
-                        Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
+                        {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>
                                 <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                     {input.label}

@@ -117,7 +117,11 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean], Thunk
             newCAIMessage()
         } else if (remote) {
             if (selectWizard(getState())) {
-                dispatch(setResponseOptions([...selectResponseOptions(getState()), message]))
+                let responseOptions = selectResponseOptions(getState())
+                while (responseOptions.length > 2) {
+                    responseOptions = responseOptions.slice(1)
+                }
+                dispatch(setResponseOptions([...responseOptions, message]))
             } else {
                 dispatch(addToMessageList(message))
                 dispatch(autoScrollCAI())

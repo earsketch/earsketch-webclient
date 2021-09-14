@@ -15,7 +15,6 @@ const ChatFooter = () => {
     const dispatch = useDispatch()
     const inputOptions = useSelector(cai.selectInputOptions)
     const responseOptions = useSelector(cai.selectResponseOptions)
-    const errorOptions = useSelector(cai.selectErrorOptions)
 
     const wizard = useSelector(cai.selectWizard)
 
@@ -23,13 +22,11 @@ const ChatFooter = () => {
 
     const parseStudentInput = (label: string) => {
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
-        if (option) {
-            const button = {
-                label: label,
-                value: option.value,
-            } as cai.CAIButton
-            dispatch(cai.sendCAIMessage(button))
-        }
+        const button = {
+            label: label,
+            value: option ? option.value : "suggest",
+        } as cai.CAIButton
+        dispatch(cai.sendCAIMessage(button))
         const message = {
             text: [label],
             keyword: ["", "", "", "", ""],
@@ -63,8 +60,10 @@ const ChatFooter = () => {
     }
 
     const sendMessage = () => {
-        wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)
-        setInputText("")
+        if (inputText.length > 0) {
+            wizard ? parseCAIInput(inputText) : parseStudentInput(inputText)
+            setInputText("")
+        }
     }
 
     return (
@@ -77,8 +76,7 @@ const ChatFooter = () => {
                                 <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                     {input.text}
                                 </button>
-                            </li>
-                        )}
+                            </li>)}
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
