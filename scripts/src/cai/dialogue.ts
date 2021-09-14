@@ -199,7 +199,7 @@ export function clearNodeHistory() {
 
 export function handleError(error: any) {
     const t = Date.now()
-    caiStudentPreferenceModule.addCompileError(error, t)
+    caiStudentPreferenceModule.addCompileError(error)
     addToNodeHistory(["Compilation With Error", error])
     if (String(error[0]) === String(currentError[0]) && errorWait != -1) {
         // then it's the same error. do nothing. we still wait

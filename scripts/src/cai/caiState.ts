@@ -17,8 +17,8 @@ import * as collaboration from "../app/collaboration"
 interface caiState {
     activeProject: string
     messageList: { [key: string]: CAIMessage[] }
-    inputOptions: { label: string; value: string }[]
-    errorOptions: { label: string; value: string }[]
+    inputOptions: { label: string, value: string }[]
+    errorOptions: { label: string, value: string }[]
     dropupLabel: string
     wizard: false
     responseOptions: CAIMessage[]
@@ -276,8 +276,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         dispatch(autoScrollCAI())
         newCAIMessage()
 
-        const t = Date.now()
-        studentPreferences.addCompileTS(t)
+        studentPreferences.addCompileTS()
     }
 
 )
@@ -334,34 +333,6 @@ export const checkForCodeUpdates = createAsyncThunk<void, void, ThunkAPI>(
     "cai/checkForCodeUpdates",
     () => {
         dialogue.checkForCodeUpdates(editor.ace.getValue())
-    }
-)
-
-export const userOnPage = createAsyncThunk<void, number, ThunkAPI>(
-    "cai/userOnPage",
-    (time) => {
-        studentPreferences.addOnPageStatus(1, time)
-    }
-)
-
-export const userOffPage = createAsyncThunk<void, number, ThunkAPI>(
-    "cai/userOffPage",
-    (time) => {
-        studentPreferences.addOnPageStatus(0, time)
-    }
-)
-
-export const keyStroke = createAsyncThunk<void, [string, any, number], ThunkAPI>(
-    "cai/keyStroke",
-    ([action, content, time]) => {
-        studentPreferences.addKeystroke(action, content, time)
-    }
-)
-
-export const mousePosition = createAsyncThunk<void, [number, number], ThunkAPI>(
-    "cai/mousePosition",
-    ([x, y]) => {
-        studentPreferences.addMousePos({ x, y })
     }
 )
 

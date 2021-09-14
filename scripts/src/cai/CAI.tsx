@@ -3,12 +3,13 @@ import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Browser"
 
 import * as cai from "./caiState"
+import * as caiDialogue from "./dialogue"
+import * as caiStudentPreferences from "./studentPreferences"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
-import store from "../reducers"
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -75,9 +76,8 @@ export const CaiBody = () => {
                     {messageList[activeProject] &&
                     Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
                         <li key={idx}>
-                            <CAIMessageView {...message}/>
-                        </li>
-                    )}
+                            <CAIMessageView {...message} />
+                        </li>)}
                 </ul>
             </div>
         </div>
@@ -99,11 +99,10 @@ const CaiFooter = () => {
                         {inputOptions.length < buttonLimit &&
                         Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>
-                                <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                     {input.label}
                                 </button>
-                            </li>
-                        )}
+                            </li>)}
                     </ul>
                     : <div className="dropup-cai" style={{ width: "100%" }}>
                         <button className="dropbtn-cai" style={{ marginLeft: "auto", display: "block", marginRight: "auto" }}>
@@ -114,8 +113,7 @@ const CaiFooter = () => {
                                 {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                                     <li key={inputIdx}>
                                         <option onClick={() => dispatch(cai.sendCAIMessage(input))}>{input.label}</option>
-                                    </li>
-                                )}
+                                    </li>)}
                             </ul>
                         </div>
                     </div>}
@@ -125,11 +123,10 @@ const CaiFooter = () => {
                     {errorOptions.length > 0 &&
                     Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
                         <li key={errIdx}>
-                            <button type ="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                            <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
                                 {input.label}
                             </button>
-                        </li>
-                    )}
+                        </li>)}
                 </ul>
             </div>
         </div>
@@ -161,8 +158,17 @@ export const CAI = () => {
 
 if (FLAGS.SHOW_CAI) {
     // TODO: Moved out of userProject, should probably go in a useEffect.
-    window.onfocus = () => store.dispatch(cai.userOnPage(Date.now()))
-    window.onblur = () => store.dispatch(cai.userOnPage(Date.now()))
+    window.onfocus = () => caiStudentPreferences.addOnPageStatus(1)
+    window.onblur = () => caiStudentPreferences.addOnPageStatus(0)
+
+    window.addEventListener("load", () => {
+        caiStudentPreferences.addPageLoad(1)
+    })
+
+    window.addEventListener("beforeunload", () => {
+        // the absence of a returnValue property on the event will guarantee the browser unload happens
+        caiStudentPreferences.addPageLoad(0)
+    })
 
     let mouseX: number | undefined, mouseY: number | undefined
 
@@ -171,9 +177,44 @@ if (FLAGS.SHOW_CAI) {
         mouseY = e.y
     })
 
+    document.addEventListener("copy" || "cut", e => {
+        caiDialogue.addToNodeHistory([e.type, e.clipboardData!.getData("Text")])
+    })
+
+    window.addEventListener("paste", e => {
+        caiDialogue.addToNodeHistory([e.type, []])
+    })
+
     window.setInterval(() => {
         if (mouseX && mouseY) {
-            store.dispatch(cai.mousePosition([mouseX, mouseY]))
+            caiStudentPreferences.addMousePos({ x: mouseX, y: mouseY })
         }
     }, 5000)
+
+    window.addEventListener("keydown", e => {
+        e = e || window.event // IE support
+        const c = e.key
+        const ctrlDown = e.ctrlKey || e.metaKey // Mac support
+
+        // Check for Alt+Gr (http://en.wikipedia.org/wiki/AltGr_key)
+        if (ctrlDown) {
+            if (e.altKey) {
+                caiDialogue.addToNodeHistory(["other", []])
+            } else {
+                switch (c) {
+                    case "c":
+                        caiDialogue.addToNodeHistory(["copy", []])
+                        break
+                    case "x":
+                        caiDialogue.addToNodeHistory(["cut", []])
+                        break
+                    case "v":
+                        caiDialogue.addToNodeHistory(["paste", []])
+                        break
+                }
+            }
+        } else {
+            caiDialogue.addToNodeHistory(["keydown", [c]])
+        }
+    })
 }
