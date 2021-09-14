@@ -157,7 +157,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
                 {titleKey &&
-                    <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
+                <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
             </span>
         </div>
         {embedMode && <div>
@@ -226,7 +226,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
                { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                  toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+                 toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -959,7 +959,7 @@ export const DAW = () => {
 
     return <div className={`flex flex-col w-full h-full relative overflow-hidden ${theme === "light" ? "theme-light" : "dark"}`}>
         {hideEditor &&
-            <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
+        <div style={{ display: "block" }} className="embedded-script-info"> Script {embeddedScriptName} by {embeddedScriptUsername}</div>}
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {!hideDAW &&
