@@ -9,12 +9,12 @@ import * as audioLibrary from "../app/audiolibrary"
 import { get, postAuth } from "../app/userProject"
 
 interface SoundEntities {
-    [fileKey: string]: SoundEntity
+    [name: string]: SoundEntity
 }
 
 interface Sounds {
     entities: SoundEntities
-    fileKeys: string[]
+    names: string[]
 }
 
 export interface Filters {
@@ -36,7 +36,7 @@ interface SoundsState {
         artists: string[]
     }
     preview: {
-        fileKey: string | null
+        name: string | null
         bsNode: AudioBufferSourceNode | null
     }
 }
@@ -46,11 +46,11 @@ const soundsSlice = createSlice({
     initialState: {
         defaultSounds: {
             entities: {},
-            fileKeys: [],
+            names: [],
         },
         userSounds: {
             entities: {},
-            fileKeys: [],
+            names: [],
         },
         filters: {
             searchText: "",
@@ -65,37 +65,37 @@ const soundsSlice = createSlice({
             artists: [],
         },
         preview: {
-            fileKey: null,
+            name: null,
             bsNode: null,
         },
     } as SoundsState,
     reducers: {
         setDefaultSounds(state, { payload }) {
-            ["entities", "fileKeys"].forEach(v => {
+            ["entities", "names"].forEach(v => {
                 state.defaultSounds[v as keyof Sounds] = payload[v]
             })
         },
         setUserSounds(state, { payload }) {
-            ["entities", "fileKeys"].forEach(v => {
+            ["entities", "names"].forEach(v => {
                 state.userSounds[v as keyof Sounds] = payload[v]
             })
         },
         resetUserSounds(state) {
             state.userSounds.entities = {}
-            state.userSounds.fileKeys = []
+            state.userSounds.names = []
         },
         renameUserSound(state, { payload }) {
             const { oldName, newName } = payload
-            const fileKeys = state.userSounds.fileKeys
-            fileKeys[fileKeys.indexOf(oldName)] = newName
+            const names = state.userSounds.names
+            names[names.indexOf(oldName)] = newName
             const entity = state.userSounds.entities[oldName]
             delete state.userSounds.entities[oldName]
-            entity.file_key = newName
+            entity.name = newName
             state.userSounds.entities[newName] = entity
         },
         deleteUserSound(state, { payload }) {
-            const fileKeys = state.userSounds.fileKeys
-            fileKeys.splice(fileKeys.indexOf(payload), 1)
+            const names = state.userSounds.names
+            names.splice(names.indexOf(payload), 1)
             delete state.userSounds.entities[payload]
         },
         setFavorites(state, { payload }) {
@@ -138,14 +138,14 @@ const soundsSlice = createSlice({
         setFeaturedArtists(state, { payload }) {
             state.featuredSounds.artists = payload
         },
-        setPreviewFileKey(state, { payload }) {
-            state.preview.fileKey = payload
+        setPreviewName(state, { payload }) {
+            state.preview.name = payload
         },
         setPreviewBSNode(state, { payload }) {
             state.preview.bsNode = payload
         },
         resetPreview(state) {
-            state.preview.fileKey = null
+            state.preview.name = null
             state.preview.bsNode = null
         },
     },
@@ -170,7 +170,7 @@ export const {
     resetAllFilters,
     setFeaturedSoundVisibility,
     setFeaturedArtists,
-    setPreviewFileKey,
+    setPreviewName,
     setPreviewBSNode,
     resetPreview,
 } = soundsSlice.actions
@@ -180,11 +180,11 @@ export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
     "sounds/getDefaultSounds",
     async (_, { getState, dispatch }) => {
         const { sounds } = getState()
-        if (!sounds.defaultSounds.fileKeys.length) {
-            const data = await audioLibrary.getDefaultTagsMetadata()
-            const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.file_key]: sound })))
-            const fileKeys = data.map(sound => sound.file_key)
-            dispatch(setDefaultSounds({ entities, fileKeys }))
+        if (!sounds.defaultSounds.names.length) {
+            const data = await audioLibrary.getStandardSounds()
+            const entities = Object.assign({}, ...Array.from(data, (sound) => ({ [sound.name]: sound })))
+            const names = data.map(sound => sound.name)
+            dispatch(setDefaultSounds({ entities, names }))
         }
     }
 )
@@ -192,7 +192,7 @@ export const getDefaultSounds = createAsyncThunk<void, void, ThunkAPI>(
 export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/getUserSounds",
     async (username, { dispatch }) => {
-        const endPoint = URL_DOMAIN + "/audio/usertags"
+        const endPoint = URL_DOMAIN + "/audio/user"
         const params = new URLSearchParams({ username })
         const response = await fetch(`${endPoint}?${params}`, {
             method: "GET",
@@ -201,14 +201,14 @@ export const getUserSounds = createAsyncThunk<void, string, ThunkAPI>(
         const data = await response.json()
 
         const entities: { [key: string]: SoundEntity } = {}
-        const fileKeys = new Array(data.length)
+        const names = new Array(data.length)
 
         data.forEach((sound: SoundEntity, i: number) => {
-            entities[sound.file_key] = sound
-            fileKeys[i] = sound.file_key
+            entities[sound.name] = sound
+            names[i] = sound.name
         })
 
-        dispatch(setUserSounds({ entities, fileKeys }))
+        dispatch(setUserSounds({ entities, names }))
     }
 )
 
@@ -220,24 +220,24 @@ export const getFavorites = createAsyncThunk<void, string, ThunkAPI>(
     }
 )
 
-export const markFavorite = createAsyncThunk<void, { fileKey: string, isFavorite: boolean }, ThunkAPI>(
+export const markFavorite = createAsyncThunk<void, { name: string, isFavorite: boolean }, ThunkAPI>(
     "sounds/markFavorite",
-    async ({ fileKey, isFavorite }, { getState, dispatch }) => {
+    async ({ name, isFavorite }, { getState, dispatch }) => {
         const state = getState()
         const { user } = state
         const { username } = user
         if (user.loggedIn && username) {
             const entities = selectAllEntities(state)
-            const isUserOwned = entities[fileKey].folder === username.toUpperCase()
+            const isUserOwned = entities[name].folder === username.toUpperCase()
             const markAsFavorite = !isFavorite
-            const params = { audio_file_key: fileKey, userowned: isUserOwned.toString() }
+            const params = { name, userowned: isUserOwned.toString() }
 
             if (markAsFavorite) {
-                await postAuth("/audio/addfavorite", params)
-                dispatch(addFavorite(fileKey))
+                await postAuth("/audio/favorites/add", params)
+                dispatch(addFavorite(name))
             } else {
-                await postAuth("/audio/removefavorite", params)
-                dispatch(removeFavorite(fileKey))
+                await postAuth("/audio/favorites/remove", params)
+                dispatch(removeFavorite(name))
             }
         }
     }
@@ -247,7 +247,7 @@ export const renameLocalUserSound = createAsyncThunk<void, { oldName: string, ne
     "sounds/renameLocalUserSound",
     ({ oldName, newName }, { getState, dispatch }) => {
         const userSounds = getState().sounds.userSounds
-        if (userSounds.fileKeys.includes(oldName)) {
+        if (userSounds.names.includes(oldName)) {
             dispatch(renameUserSound({ oldName, newName }))
         }
     }
@@ -257,7 +257,7 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
     "sounds/deleteLocalUserSound",
     (payload, { getState, dispatch }) => {
         const userSounds = getState().sounds.userSounds
-        if (userSounds.fileKeys.includes(payload)) {
+        if (userSounds.names.includes(payload)) {
             dispatch(deleteUserSound(payload))
         }
     }
@@ -265,7 +265,7 @@ export const deleteLocalUserSound = createAsyncThunk<void, string, ThunkAPI>(
 
 export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
     "sounds/previewSound",
-    async (fileKey, { getState, dispatch }) => {
+    async (name, { getState, dispatch }) => {
         const previewState = getState().sounds.preview
 
         if (previewState.bsNode) {
@@ -273,17 +273,17 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
             previewState.bsNode.stop()
         }
 
-        if (previewState.fileKey === fileKey) {
+        if (previewState.name === name) {
             dispatch(resetPreview())
             return null
         }
 
         const bs = context.createBufferSource()
-        dispatch(setPreviewFileKey(fileKey))
+        dispatch(setPreviewName(name))
         dispatch(setPreviewBSNode(null))
 
-        await audioLibrary.getAudioClip(fileKey, -1).then((buffer: AudioBuffer) => {
-            if (fileKey !== selectPreviewFileKey(getState())) {
+        await audioLibrary.getAudioClip(name, -1).then((buffer: AudioBuffer) => {
+            if (name !== selectPreviewName(getState())) {
                 // User started clicked play on something else before this finished loading.
                 return
             }
@@ -300,11 +300,11 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
 
 /* Selectors */
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual)
-const fileKeysByFoldersSelector = (entities: SoundEntities, folders: string[]) => {
+const namesByFoldersSelector = (entities: SoundEntities, folders: string[]) => {
     const result: { [folder: string]: string[] } = {}
     const entitiesList = Object.values(entities)
     folders.forEach(folder => {
-        result[folder] = entitiesList.filter(v => v.folder === folder).map(v => v.file_key).sort((a, b) => a.localeCompare(b, undefined, {
+        result[folder] = entitiesList.filter(v => v.folder === folder).map(v => v.name).sort((a, b) => a.localeCompare(b, undefined, {
             numeric: true,
             sensitivity: "base",
         }))
@@ -314,12 +314,12 @@ const fileKeysByFoldersSelector = (entities: SoundEntities, folders: string[]) =
 
 const selectDefaultEntities = (state: RootState) => state.sounds.defaultSounds.entities
 const selectUserEntities = (state: RootState) => state.sounds.userSounds.entities
-const selectDefaultFileKeys = (state: RootState) => state.sounds.defaultSounds.fileKeys
-const selectUserFileKeys = (state: RootState) => state.sounds.userSounds.fileKeys
+const selectDefaultNames = (state: RootState) => state.sounds.defaultSounds.names
+const selectUserNames = (state: RootState) => state.sounds.userSounds.names
 
-export const selectAllFileKeys = createSelector(
-    [selectDefaultFileKeys, selectUserFileKeys],
-    (defaultFileKeys, userFileKeys) => [...defaultFileKeys, ...userFileKeys]
+export const selectAllNames = createSelector(
+    [selectDefaultNames, selectUserNames],
+    (defaultNames, userNames) => [...defaultNames, ...userNames]
 )
 
 export const selectAllEntities = createSelector(
@@ -337,7 +337,7 @@ const selectFeaturedEntities = createSelector(
     (entities: SoundEntities, featuredArtists) => pickBy(entities, v => featuredArtists.includes(v.artist))
 )
 
-export const selectFeaturedFileKeys = createSelector(
+export const selectFeaturedNames = createSelector(
     [selectFeaturedEntities],
     (entities: SoundEntities) => Object.keys(entities)
 )
@@ -350,9 +350,9 @@ export const selectFeaturedFolders = createSelector(
     }
 )
 
-export const selectFeaturedFileKeysByFolders = createSelector(
+export const selectFeaturedNamesByFolders = createSelector(
     [selectFeaturedEntities, selectFeaturedFolders],
-    fileKeysByFoldersSelector
+    namesByFoldersSelector
 )
 
 const selectNonFeaturedEntities = createSelector(
@@ -360,15 +360,15 @@ const selectNonFeaturedEntities = createSelector(
     (entities, featuredArtists) => pickBy(entities, v => !featuredArtists.includes(v.artist))
 )
 
-export const selectNonFeaturedFileKeys = createSelector(
+export const selectNonFeaturedNames = createSelector(
     [selectNonFeaturedEntities],
     (entities: SoundEntities) => Object.keys(entities)
 )
 
 // Note: All sounds excluding the featured ones.
-export const selectAllRegularFileKeys = createSelector(
-    [selectNonFeaturedFileKeys, selectUserFileKeys],
-    (nonFeaturedFileKeys, userFileKeys) => [...nonFeaturedFileKeys, ...userFileKeys]
+export const selectAllRegularNames = createSelector(
+    [selectNonFeaturedNames, selectUserNames],
+    (nonFeaturedNames, userNames) => [...nonFeaturedNames, ...userNames]
 )
 
 export const selectAllRegularEntities = createSelector(
@@ -386,9 +386,9 @@ export const selectFilters = (state: RootState) => state.sounds.filters
 function filterEntities(entities: SoundEntities, filters: ReturnType<typeof selectFilters>) {
     const term = filters.searchText.toUpperCase()
     return pickBy(entities, v => {
-        const field = `${v.folder}${v.file_key}${v.artist}${v.genre}${v.instrument}${v.tempo}`
+        const field = `${v.folder}${v.name}${v.artist}${v.genre}${v.instrument}${v.tempo}`
         return (term.length ? field.includes(term) : true) &&
-            (filters.byFavorites ? filters.favorites.includes(v.file_key) : true) &&
+            (filters.byFavorites ? filters.favorites.includes(v.name) : true) &&
             (filters.artists.length ? filters.artists.includes(v.artist) : true) &&
             (filters.genres.length ? filters.genres.includes(v.genre) : true) &&
             (filters.instruments.length ? filters.instruments.includes(v.instrument) : true)
@@ -400,7 +400,7 @@ export const selectFilteredRegularEntities = createSelector(
     filterEntities
 )
 
-export const selectFilteredRegularFileKeys = createSelector(
+export const selectFilteredRegularNames = createSelector(
     [selectFilteredRegularEntities],
     (entities: SoundEntities) => Object.keys(entities)
 )
@@ -413,9 +413,9 @@ export const selectFilteredRegularFolders = createSelector(
     }
 )
 
-export const selectFilteredRegularFileKeysByFolders = createSelector(
+export const selectFilteredRegularNamesByFolders = createSelector(
     [selectFilteredRegularEntities, selectFilteredRegularFolders],
-    fileKeysByFoldersSelector
+    namesByFoldersSelector
 )
 
 export const selectFilteredFeaturedEntities = createSelector(
@@ -423,7 +423,7 @@ export const selectFilteredFeaturedEntities = createSelector(
     filterEntities
 )
 
-export const selectFilteredFeaturedFileKeys = createSelector(
+export const selectFilteredFeaturedNames = createSelector(
     [selectFilteredFeaturedEntities],
     (entities: SoundEntities) => Object.keys(entities)
 )
@@ -436,9 +436,9 @@ export const selectFilteredFeaturedFolders = createSelector(
     }
 )
 
-export const selectFilteredFeaturedFileKeysByFolders = createSelector(
+export const selectFilteredFeaturedNamesByFolders = createSelector(
     [selectFilteredFeaturedEntities, selectFilteredFeaturedFolders],
-    fileKeysByFoldersSelector
+    namesByFoldersSelector
 )
 
 const selectEntities = createSelector(
@@ -446,41 +446,41 @@ const selectEntities = createSelector(
     (includeFeaturedArtists, allEntities, regularEntities) => includeFeaturedArtists ? allEntities : regularEntities
 )
 
-// TODO: Possibly redundant -- filteredFileKeys could be checked for equality.
+// TODO: Possibly redundant -- filteredNames could be checked for equality.
 export const selectFilteredListChanged = createDeepEqualSelector(
-    [selectFilteredRegularFileKeys, selectFilteredFeaturedFileKeys], () => {
+    [selectFilteredRegularNames, selectFilteredFeaturedNames], () => {
         return Math.random() // Return a new value on change.
     }
 )
 
 export const selectAllArtists = createSelector(
-    [selectAllEntities, selectAllFileKeys],
-    (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].artist)))
+    [selectAllEntities, selectAllNames],
+    (entities: SoundEntities, names) => Array.from(new Set(names.map(v => entities[v].artist)))
 )
 
 export const selectAllGenres = createSelector(
-    [selectAllEntities, selectAllFileKeys],
-    (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].genre)))
+    [selectAllEntities, selectAllNames],
+    (entities: SoundEntities, names) => Array.from(new Set(names.map(v => entities[v].genre)))
 )
 
 export const selectAllInstruments = createSelector(
-    [selectAllEntities, selectAllFileKeys],
-    (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].instrument)))
+    [selectAllEntities, selectAllNames],
+    (entities: SoundEntities, names) => Array.from(new Set(names.map(v => entities[v].instrument)))
 )
 
 export const selectAllRegularArtists = createSelector(
-    [selectAllRegularEntities, selectAllRegularFileKeys],
-    (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].artist)))
+    [selectAllRegularEntities, selectAllRegularNames],
+    (entities: SoundEntities, names) => Array.from(new Set(names.map(v => entities[v].artist)))
 )
 
 export const selectAllRegularGenres = createSelector(
-    [selectAllRegularEntities, selectAllRegularFileKeys],
-    (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].genre)))
+    [selectAllRegularEntities, selectAllRegularNames],
+    (entities: SoundEntities, names) => Array.from(new Set(names.map(v => entities[v].genre)))
 )
 
 export const selectAllRegularInstruments = createSelector(
-    [selectAllRegularEntities, selectAllRegularFileKeys],
-    (entities: SoundEntities, fileKeys) => Array.from(new Set(fileKeys.map(v => entities[v].instrument)))
+    [selectAllRegularEntities, selectAllRegularNames],
+    (entities: SoundEntities, names) => Array.from(new Set(names.map(v => entities[v].instrument)))
 )
 
 export const selectFilteredArtists = createSelector(
@@ -511,5 +511,5 @@ export const selectNumArtistsSelected = (state: RootState) => state.sounds.filte
 export const selectNumGenresSelected = (state: RootState) => state.sounds.filters.genres.length
 export const selectNumInstrumentsSelected = (state: RootState) => state.sounds.filters.instruments.length
 
-export const selectPreviewFileKey = (state: RootState) => state.sounds.preview.fileKey
+export const selectPreviewName = (state: RootState) => state.sounds.preview.name
 export const selectPreviewNode = (state: RootState) => state.sounds.preview.bsNode

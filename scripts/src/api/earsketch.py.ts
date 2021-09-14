@@ -1,7 +1,7 @@
 /* eslint-disable new-cap */
 // EarSketch API: Python
 import * as passthrough from "./passthrough"
-import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
+import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
 import { DAWData } from "../app/player"
 
 const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
@@ -127,7 +127,7 @@ export function setup() {
     Sk.configure({ output: outf, read: builtinRead })
 
     // For legacy reasons, these constants are added directly to the globals rather to the earsketch module.
-    for (const constant of EFFECT_TAGS.concat(ANALYSIS_TAGS)) {
+    for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
         Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
     }
 }

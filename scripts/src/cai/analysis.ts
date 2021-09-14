@@ -1,4 +1,5 @@
 /* eslint-disable */
+// jscpd:ignore-start
 // TODO: Resolve lint issues.
 
 // Analysis module for CAI (Co-creative Artificial Intelligence) Project.
@@ -34,15 +35,15 @@ const AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS)
 // Populate the sound-browser items
 function populateLibrarySounds() {
     librarySounds = []
-    return audioLibrary.getDefaultTagsMetadata().then((audioTags: SoundEntity[]) => {
-        librarySounds = audioTags
-        librarySounds.forEach((sound: SoundEntity) => {
-            keyGenreDict[sound.file_key] = sound.genre
+    return audioLibrary.getStandardSounds().then(sounds => {
+        librarySounds = sounds
+        for (const sound of librarySounds) {
+            keyGenreDict[sound.name] = sound.genre
             if (!librarySoundGenres.includes(sound.genre)) {
                 librarySoundGenres.push(sound.genre)
             }
-            keyInstrumentDict[sound.file_key] = sound.instrument
-        })
+            keyInstrumentDict[sound.name] = sound.instrument
+        }
     }).then(() => {
         esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
         esconsole("Reported load time from this point.", ["info", "init"])
@@ -426,7 +427,7 @@ function findGenre(measureView: any) {
         for (const item in measureView[measure]) {
             if (measureView[measure][item].type === "sound") {
                 const sounds: SoundEntity[] = librarySounds.filter(sound => {
-                    return sound.file_key === measureView[measure][item].name
+                    return sound.name === measureView[measure][item].name
                 })
                 sounds.forEach((sound) => {
                     genres[genres.length - 1].push(sound.genre)
@@ -652,3 +653,4 @@ function linesForItem(section: any, inputType: string, inputValue: any) {
     }
     return ret
 }
+// jscpd:ignore-end

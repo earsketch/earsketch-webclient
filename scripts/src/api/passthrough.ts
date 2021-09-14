@@ -10,6 +10,7 @@ import * as analyzer from "../model/analyzer"
 import * as applyEffects from "../model/applyeffects"
 import audioContext from "../app/audiocontext"
 import * as audioLibrary from "../app/audiolibrary"
+import { SoundEntity } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
@@ -976,12 +977,12 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 // Select a random file.
-export function selectRandomFile(result: DAWData, folder: string, extension: undefined | string = undefined) {
-    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folder}, ${extension}`, "PT")
+export function selectRandomFile(result: DAWData, folderSubstring: string, extension: undefined | string = undefined) {
+    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}, ${extension}`, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("selectRandomFile", args, 1, 2)
-    ptCheckType("folder", "string", folder)
+    ptCheckType("folderSubstring", "string", folderSubstring)
 
     if (extension !== undefined) {
         ptCheckType("extension", "string", extension)
@@ -989,7 +990,7 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
         extension = ".wav"
     }
 
-    let url = URL_DOMAIN + "/audio/randomkey?tag=" + folder
+    let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
 
     if (userProject.isLoggedIn()) {
         url += "&username=" + userProject.getUsername()
@@ -1000,16 +1001,9 @@ export function selectRandomFile(result: DAWData, folder: string, extension: und
     request.send(null)
 
     if (request.status === 200) {
-        const jsobj = JSON.parse(request.responseText)
-        if ("file_key" in jsobj) {
-            return jsobj.file_key
-        } else {
-            throw new ValueError("Please use folder names available in your sound browser.")
-        }
+        return (JSON.parse(request.responseText) as SoundEntity).name
     } else {
-        throw new InternalError(
-            "Internal server error. " +
-            "Could not respond to the following tag: " + folder)
+        throw new InternalError("Internal server error. " + request.responseText)
     }
 }
 

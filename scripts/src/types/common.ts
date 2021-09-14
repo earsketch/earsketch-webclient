@@ -28,15 +28,14 @@ export interface Script {
 export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
 export interface SoundEntity {
-    file_key: string,
-    genregroup: string,
-    file_location: string,
-    folder: string,
-    artist: string,
-    year: string,
-    scope: number,
-    genre: string,
-    tempo: number,
-    instrument: string,
-    tags: string
+    name: string
+    genreGroup: string
+    path: string
+    folder: string
+    artist: string
+    year: string
+    public: number
+    genre: string
+    tempo: number
+    instrument: string
 }
