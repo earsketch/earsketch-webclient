@@ -536,12 +536,12 @@ export function createButtons() {
     return buttons
 }
 
-export function addToNodeHistory(nodeObj: any) {
+export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
     if (FLAGS.SHOW_CAI && nodeHistory[activeProject]) {
         nodeHistory[activeProject].push(nodeObj)
         codeSuggestion.storeHistory(nodeHistory[activeProject])
         if (FLAGS.UPLOAD_CAI_HISTORY && nodeObj[0] != 0) {
-            userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1])
+            userProject.uploadCAIHistory(activeProject, nodeHistory[activeProject][nodeHistory[activeProject].length - 1], sourceCode)
         }
         console.log("node history", nodeHistory)
     }
@@ -1125,18 +1125,13 @@ function randomIntFromInterval(min: number, max: number) { // min and max includ
 }
 
 export function checkForCodeUpdates(code: string) {
-    console.log(activeProject)
-    console.log("student code", code)
     if (code.length > 0) {
         if (activeProject in recentScripts) {
             if (recentScripts[activeProject] != code) {
-                console.log("previous code state, which is different from the current one")
-                userProject.saveScript(activeProject, code)
                 recentScripts[activeProject] = code
-                addToNodeHistory(["Code Updates"])
+                addToNodeHistory(["Code Updates"], code)
             }
         } else {
-            console.log("new project added to history")
             recentScripts[activeProject] = code
         }
     }
