@@ -977,18 +977,12 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 // Select a random file.
-export function selectRandomFile(result: DAWData, folderSubstring: string, extension: undefined | string = undefined) {
-    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}, ${extension}`, "PT")
+export function selectRandomFile(result: DAWData, folderSubstring: string = "") {
+    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}`, "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("selectRandomFile", args, 1, 2)
+    ptCheckArgs("selectRandomFile", args, 0, 1)
     ptCheckType("folderSubstring", "string", folderSubstring)
-
-    if (extension !== undefined) {
-        ptCheckType("extension", "string", extension)
-    } else {
-        extension = ".wav"
-    }
 
     let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
 
