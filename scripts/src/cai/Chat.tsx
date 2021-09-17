@@ -4,6 +4,7 @@ import { Collapsed } from "../browser/Browser"
 
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
+import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -19,6 +20,8 @@ const ChatFooter = () => {
     const wizard = useSelector(cai.selectWizard)
 
     const [inputText, setInputText] = useState("")
+
+    const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
@@ -66,6 +69,23 @@ const ChatFooter = () => {
         }
     }
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            sendMessage()
+        }  else if (event.key == " ") {
+            // Handle slash command
+            if (inputText.startsWith("/")) {
+                let slashCommandRefNodeId: any = inputText.substring(1)
+                if (Number.isInteger(slashCommandRefNodeId)) {
+                    if (slashCommandRefNodeId < caiTree.length) {
+                        let slashCommandRefUtterance = caiTree[slashCommandRefNodeId].utterance
+                        setInputText(slashCommandRefUtterance)
+                    }
+                }
+            }
+        }
+    }
+
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
@@ -80,7 +100,7 @@ const ChatFooter = () => {
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
-                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { sendMessage() } }} style={{ backgroundColor: "lightgray" }}></input>
+                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
