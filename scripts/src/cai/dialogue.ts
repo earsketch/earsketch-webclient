@@ -920,6 +920,12 @@ export function getLinks(utterance: string) {
             textPieces.push(link ? utteranceFirstHalf : utteranceFirstHalf + keyword)
             keywordLinks.push(link ? [keyword, link] : ["", ""])
         }
+    } else if (utterance.startsWith("/")) {
+        let slashCommandRefNodeId = utterance.substring(1)
+        if (!isNaN(+slashCommandRefNodeId)) {
+            let slashCommandRefUtterance = caiTree[Number(slashCommandRefNodeId)].utterance
+            utterance = slashCommandRefUtterance
+        }
     } else {
         keywordLinks.push(["", ""])
     }
