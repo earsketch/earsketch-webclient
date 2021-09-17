@@ -70,18 +70,24 @@ const ChatFooter = () => {
     }
 
     const handleKeyDown = (event: any) => {
+        const findUtteranceBySlashCommand = (slashCommand: string) => {
+            for (let i = 0; i < caiTree.length; i++) {
+                if ("slashCommand" in caiTree[i] && caiTree[i].slashCommand == slashCommand) {
+                    return caiTree[i].utterance
+                }
+            }
+        }
         if (event.key === "Enter") {
             sendMessage()
         }  else if (event.key == " ") {
-            // Handle slash command
+            // Handle slash command. Typing "/3" followed by a space would replace the text in the
+            // text-area with the utterance from node 3 in the CAITree.
             if (inputText.startsWith("/")) {
-                let slashCommandRefNodeId: any = inputText.substring(1)
-                if (!isNaN(+slashCommandRefNodeId)) {
-                    if (slashCommandRefNodeId < caiTree.length) {
-                        let slashCommandRefUtterance = caiTree[slashCommandRefNodeId].utterance
-                        setInputText(slashCommandRefUtterance)
-                        event.preventDefault()
-                    }
+                let slashCommandIdentifier: any = inputText.substring(1)
+                let utterance: string = findUtteranceBySlashCommand(slashCommandIdentifier)
+                if (utterance !== undefined) {
+                    setInputText(utterance) // replace the text field with the text from the node's utterance
+                    event.preventDefault() // don't insert an additional space at the end
                 }
             }
         }
