@@ -69,17 +69,18 @@ const ChatFooter = () => {
         }
     }
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = (event: any) => {
         if (event.key === "Enter") {
             sendMessage()
         }  else if (event.key == " ") {
             // Handle slash command
             if (inputText.startsWith("/")) {
                 let slashCommandRefNodeId: any = inputText.substring(1)
-                if (Number.isInteger(slashCommandRefNodeId)) {
+                if (!isNaN(+slashCommandRefNodeId)) {
                     if (slashCommandRefNodeId < caiTree.length) {
                         let slashCommandRefUtterance = caiTree[slashCommandRefNodeId].utterance
                         setInputText(slashCommandRefUtterance)
+                        event.preventDefault()
                     }
                 }
             }
@@ -100,7 +101,7 @@ const ChatFooter = () => {
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
-                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>
+                <textarea id="chat-textarea" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></textarea>
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
