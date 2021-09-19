@@ -186,6 +186,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         codeSuggestion.generateResults(text, lang)
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList(message))
+        dispatch(autoScrollCAI())
         let msgText = dialogue.generateOutput(input.value)
 
         if (input.value === "error") {
@@ -228,7 +229,7 @@ export const caiSwapTab = createAsyncThunk<void, string, ThunkAPI>(
 
             if (!selectMessageList(getState())[activeProject]) {
                 dispatch(setMessageList([]))
-                dispatch(introduceCAI())
+                if (!selectWizard(getState())) { dispatch(introduceCAI()) }
             }
             dispatch(setInputOptions(dialogue.createButtons()))
             if (selectInputOptions(getState()).length === 0) {
@@ -311,10 +312,10 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
     }
 )
 
-export const openCurriculum = createAsyncThunk<void, [CAIMessage, number], ThunkAPI>(
+export const openCurriculum = createAsyncThunk<void, [CAIMessage, any], ThunkAPI>(
     "cai/openCurriculum",
     ([message, location], { dispatch }) => {
-        dispatch(curriculum.fetchContent({ location: message.keyword[location][1].split("-") }))
+        dispatch(curriculum.fetchContent({ url: message.keyword[location][1] }))
         dispatch(layout.setEast({ open: true, kind: "CURRICULUM" }))
     }
 )
@@ -336,6 +337,14 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
     "cai/curriculumPage",
     (location) => {
         dialogue.addCurriculumPageToHistory(location)
+        if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
+            collaboration.sendChatMessage({
+                text: ["Viewing Curriculum Page " + location as string, "", "", "", ""],
+                keyword: ["", "", "", "", ""],
+                sender: userProject.getUsername(),
+                date: Date.now(),
+            } as CAIMessage, false)
+        }
     }
 )
 

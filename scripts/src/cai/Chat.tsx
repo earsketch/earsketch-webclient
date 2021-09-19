@@ -33,7 +33,7 @@ const ChatFooter = () => {
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
-        collaboration.sendChatMessage(message)
+        setTimeout(() => { collaboration.sendChatMessage(message) }, 100)
     }
 
     const parseCAIInput = (input: string) => {
@@ -66,6 +66,14 @@ const ChatFooter = () => {
         }
     }
 
+    const combineText = (input: cai.CAIMessage) => {
+        let output = ""
+        for (let i = 0; i < input.text.length; i++) {
+            output = output + " " + input.text[i] + " " + input.keyword[i][0]
+        }
+        return output
+    }
+
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
@@ -74,7 +82,7 @@ const ChatFooter = () => {
                         {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                             <li key={inputIdx}>
                                 <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {input.text}
+                                    {combineText(input)}
                                 </button>
                             </li>)}
                     </ul>

@@ -933,7 +933,7 @@ export function getLinks(utterance: string) {
 
 const LINKS: { [key: string]: string } = {
     fitMedia: "1-1-9",
-    setEffect: "1-4-0",
+    setEffect: "/en/v1/every-effect-explained-in-detail.html",
     "effect ramp": "1-4-0",
     function: "1-2-2",
     functions: "1-2-2",

@@ -122,7 +122,7 @@ function makeWebsocketMessage() {
     return {
         notification_type: "collaboration",
         scriptID: scriptID,
-        sender: userName,
+        sender: cai.selectWizard(store.getState()) ? "CAI" : userName,
     } as Message
 }
 
@@ -310,7 +310,7 @@ function onMemberJoinedSession(data: Message) {
 }
 
 function onMemberLeftSession(data: Message) {
-    userNotification.show(data.sender + " has left the collaboration session.")
+    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " has left the collaboration session.") }
 
     if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
@@ -1074,5 +1074,5 @@ websocket.subscribe(triggerByNotification)
 // TEMPORARY for Wizard of Oz CAI testing, Spring 2020.
 function userIsCAI(user: string) {
     user = user.toUpperCase()
-    return (user.includes("AI_PARTNER") || user.includes("CAI"))
+    return (user.includes("AI_PARTNER") || user === "CAI")
 }
