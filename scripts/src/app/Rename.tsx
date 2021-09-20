@@ -53,11 +53,11 @@ export const RenameScript = ({ script, conflict, close }: { script: Script, conf
 
 export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () => void }) => {
     const dispatch = useDispatch()
-    const soundNames = useSelector(sounds.selectAllFileKeys)
+    const soundNames = useSelector(sounds.selectAllNames)
     const username = userProject.getUsername().toUpperCase()
     // Remove <username>_ prefix, which is present in all user sounds.
     const prefix = username + "_"
-    const [name, setName] = useState(sound.file_key.slice(prefix.length))
+    const [name, setName] = useState(sound.name.slice(prefix.length))
     const { t } = useTranslation()
 
     const confirm = () => {
@@ -79,8 +79,8 @@ export const RenameSound = ({ sound, close }: { sound: SoundEntity, close: () =>
             if (specialCharReplaced) {
                 userNotification.show(t("messages:general.renameSoundSpecialChar"), "normal")
             }
-            userProject.renameAudio(sound.file_key, prefix + cleanName).then(() => {
-                dispatch(sounds.renameLocalUserSound({ oldName: sound.file_key, newName: prefix + cleanName }))
+            userProject.renameSound(sound.name, prefix + cleanName).then(() => {
+                dispatch(sounds.renameLocalUserSound({ oldName: sound.name, newName: prefix + cleanName }))
                 userNotification.show(t("messages:general.soundrenamed"), "normal")
                 close()
             })

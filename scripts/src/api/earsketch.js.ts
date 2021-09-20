@@ -1,6 +1,6 @@
 // EarSketch API: Javascript
 import * as passthrough from "./passthrough"
-import { ANALYSIS_TAGS, EFFECT_TAGS } from "../app/audiolibrary"
+import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
 import { DAWData } from "../app/player"
 
 const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
@@ -154,7 +154,7 @@ export function setup(interpreter: any, scope: any) {
         }
     }
 
-    for (const constant of EFFECT_TAGS.concat(ANALYSIS_TAGS)) {
+    for (const constant of EFFECT_NAMES.concat(ANALYSIS_NAMES)) {
         interpreter.setProperty(scope, constant, constant)
     }
 }

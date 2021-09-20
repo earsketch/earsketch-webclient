@@ -322,23 +322,23 @@ export async function loadScript(id: string, sharing: boolean) {
     }
 }
 
-// Deletes an audio key if owned by the user.
-export async function deleteAudio(audiokey: string) {
+// Deletes a sound if owned by the user.
+export async function deleteSound(name: string) {
     try {
-        await postAuth("/audio/delete", { audiokey })
-        esconsole("Deleted audiokey: " + audiokey, ["debug", "user"])
-        audioLibrary.clearAudioTagCache() // otherwise the deleted audio key is still usable by the user
+        await postAuth("/audio/delete", { name })
+        esconsole("Deleted sound: " + name, ["debug", "user"])
+        audioLibrary.clearCache() // TODO: This is probably overkill.
     } catch (err) {
         esconsole(err, ["error", "userproject"])
     }
 }
 
-// Rename an audio key if owned by the user.
-export async function renameAudio(audiokey: string, newaudiokey: string) {
+// Rename a sound if owned by the user.
+export async function renameSound(name: string, newName: string) {
     try {
-        await postAuth("/audio/rename", { audiokey, newaudiokey })
-        esconsole(`Successfully renamed audiokey: ${audiokey} to ${newaudiokey}`, ["debug", "user"])
-        audioLibrary.clearAudioTagCache() // otherwise audioLibrary.getUserAudioTags/getAllTags returns the list with old name
+        await postAuth("/audio/rename", { name, newName })
+        esconsole(`Successfully renamed sound: ${name} to ${newName}`, ["debug", "user"])
+        audioLibrary.clearCache() // TODO: This is probably overkill.
     } catch (err) {
         userNotification.show("Error renaming custom sound", "failure1", 2)
         esconsole(err, ["error", "userproject"])

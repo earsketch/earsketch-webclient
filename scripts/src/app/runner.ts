@@ -131,7 +131,7 @@ class SoundConstantFinder extends NodeVisitor {
 // Searches for identifiers that might be sound constants, verifies with the server, and inserts into globals.
 async function handleSoundConstantsPY(code: string) {
     // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
-    for (const constant of await audioLibrary.getAllFolders()) {
+    for (const constant of await audioLibrary.getStandardFolders()) {
         Sk.builtins[constant] = Sk.ffi.remapToPy(constant)
     }
 
@@ -143,7 +143,7 @@ async function handleSoundConstantsPY(code: string) {
     const sounds = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
     for (const sound of sounds) {
         if (sound) {
-            Sk.builtins[sound.file_key] = Sk.ffi.remapToPy(sound.file_key)
+            Sk.builtins[sound.name] = Sk.ffi.remapToPy(sound.name)
         }
     }
 }
@@ -205,7 +205,7 @@ export async function runPython(code: string) {
 async function handleSoundConstantsJS(code: string, interpreter: any) {
     // First, inject sound constants that refer to folders, since the server doesn't handle them on the metadata endpoint.
     const scope = interpreter.getScope().object
-    for (const constant of await audioLibrary.getAllFolders()) {
+    for (const constant of await audioLibrary.getStandardFolders()) {
         interpreter.setProperty(scope, constant, constant)
     }
 
@@ -224,7 +224,7 @@ async function handleSoundConstantsJS(code: string, interpreter: any) {
     const sounds = await Promise.all(possibleSoundConstants.map(audioLibrary.getMetadata))
     for (const sound of sounds) {
         if (sound) {
-            interpreter.setProperty(scope, sound.file_key, sound.file_key)
+            interpreter.setProperty(scope, sound.name, sound.name)
         }
     }
 }
@@ -331,13 +331,13 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
 }
 
 function getClipTempo(result: DAWData) {
-    const metadata = audioLibrary.cache.defaultTags ?? []
+    const metadata = audioLibrary.cache.standardSounds ?? []
     const tempoCache: { [key: string]: number | undefined } = Object.create(null)
 
     const lookupTempo = (key: string) => {
         // Return cached tempo for given key, or search audio sample metadata and cache result.
         if (key in tempoCache) return tempoCache[key]
-        const tempo = metadata.find(item => item.file_key === key)?.tempo
+        const tempo = metadata.find(item => item.name === key)?.tempo
         return (tempoCache[key] = (tempo === undefined || tempo < 0 || isNaN(tempo)) ? undefined : tempo)
     }
 
@@ -376,7 +376,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
     for (const [key, def, sound] of await Promise.all(promises)) {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const tempo = sound.tempo ?? tempoMap.points?.[0]?.tempo ?? 120
-        const buffer = sliceAudioBufferByMeasure(sound.file_key, sound.buffer, def.start, def.end, tempo)
+        const buffer = sliceAudioBufferByMeasure(sound.name, sound.buffer, def.start, def.end, tempo)
         audioLibrary.cache.promises[key] = Promise.resolve({ ...sound, file_key: key, buffer })
     }
 }
