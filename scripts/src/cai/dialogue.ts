@@ -537,6 +537,7 @@ export function createButtons() {
 }
 
 export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
+    if (location.href.includes("wizard")) { return } // Disabled for Wizard of Oz operators.
     if (FLAGS.SHOW_CAI && nodeHistory[activeProject]) {
         nodeHistory[activeProject].push(nodeObj)
         codeSuggestion.storeHistory(nodeHistory[activeProject])
@@ -924,8 +925,10 @@ export function getLinks(utterance: string) {
         keywordLinks.push(["", ""])
     }
     textPieces.push(utterance)
-    while (textPieces.length < 6) {
+    while (textPieces.length < 5) {
         textPieces.push("")
+    }
+    while (keywordLinks.length < 5) {
         keywordLinks.push(["", ""])
     }
     return [textPieces, keywordLinks]

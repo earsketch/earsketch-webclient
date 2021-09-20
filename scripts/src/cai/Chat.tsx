@@ -17,6 +17,7 @@ const ChatFooter = () => {
     const responseOptions = useSelector(cai.selectResponseOptions)
 
     const wizard = useSelector(cai.selectWizard)
+    const curriculumView = useSelector(cai.selectCurriculumView)
 
     const [inputText, setInputText] = useState("")
 
@@ -28,12 +29,12 @@ const ChatFooter = () => {
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
         const message = {
-            text: [label],
-            keyword: ["", "", "", "", ""],
+            text: [label, "", "", "", ""],
+            keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
-        setTimeout(() => { collaboration.sendChatMessage(message) }, 100)
+        collaboration.sendChatMessage(message, "user")
     }
 
     const parseCAIInput = (input: string) => {
@@ -48,7 +49,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(outputMessage))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(outputMessage, true)
+        collaboration.sendChatMessage(outputMessage, "wizard")
     }
 
     const caiResponseInput = (input: cai.CAIMessage) => {
@@ -56,7 +57,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(input))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(input, true)
+        collaboration.sendChatMessage(input, "cai")
     }
 
     const sendMessage = () => {
@@ -66,23 +67,19 @@ const ChatFooter = () => {
         }
     }
 
-    const combineText = (input: cai.CAIMessage) => {
-        let output = ""
-        for (let i = 0; i < input.text.length; i++) {
-            output = output + " " + input.text[i] + " " + input.keyword[i][0]
-        }
-        return output
-    }
-
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
+            {wizard &&
+                <div style={{ flex: "auto", color: "white" }}>
+                    {curriculumView}
+                </div>}
             {wizard &&
                 <div style={{ flex: "auto" }}>
                     <ul>
                         {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                             <li key={inputIdx}>
                                 <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {combineText(input)}
+                                    {cai.combineMessageText(input)}
                                 </button>
                             </li>)}
                     </ul>

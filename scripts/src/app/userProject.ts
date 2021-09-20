@@ -677,7 +677,9 @@ export async function createScript(scriptname: string) {
 
 export async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
     const data: { [key: string]: string } = { username: getUsername(), project, node: JSON.stringify(node) }
-    if (sourceCode) { data.sourceCode = sourceCode }
+    if (sourceCode) {
+        data.sourceCode = sourceCode
+    }
     await post("/studies/caihistory", data)
     console.log("saved to CAI history:", project, node)
 }

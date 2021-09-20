@@ -664,10 +664,12 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
+            dispatch(cai.closeCurriculum())
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
+            dispatch(cai.curriculumPage(curriculum.selectCurrentLocation(store.getState())))
         }
     }
 

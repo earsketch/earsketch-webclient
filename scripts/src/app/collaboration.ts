@@ -35,8 +35,8 @@ interface Message {
     state?: number
     text?: string
     tutoring?: boolean
-    cai?: boolean
     caiMessage?: cai.CAIMessage
+    caiMessageType?: string
 }
 
 interface InsertOperation {
@@ -122,7 +122,7 @@ function makeWebsocketMessage() {
     return {
         notification_type: "collaboration",
         scriptID: scriptID,
-        sender: cai.selectWizard(store.getState()) ? "CAI" : userName,
+        sender: userName,
     } as Message
 }
 
@@ -297,7 +297,7 @@ export function leaveSession(shareID: string) {
 }
 
 function onMemberJoinedSession(data: Message) {
-    userNotification.show(data.sender + " has joined the collaboration session.")
+    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " has joined the collaboration session.") }
 
     if (data.sender in otherMembers) {
         otherMembers[data.sender].active = true
@@ -557,6 +557,7 @@ function rejoinSession() {
 }
 
 export function saveScript(_scriptID?: string) {
+    if (cai.selectWizard(store.getState())) { return }
     if (!_scriptID || (_scriptID === scriptID)) {
         websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
     }
@@ -634,7 +635,7 @@ function removeOtherCursors() {
 }
 
 function onMiscMessage(data: Message) {
-    userNotification.show(data.text!)
+    if (!userIsCAI(data.sender)) { userNotification.show(data.text!) }
 }
 
 function onChangeWriteAccess(data: Message) {
@@ -997,11 +998,11 @@ export function leaveTutoring() {
     tutoring = false
 }
 
-export function sendChatMessage(caiMessage: cai.CAIMessage, cai: boolean = false) {
+export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: string) {
     const message = {
         action: "chat",
-        caiMessage: caiMessage,
-        cai: cai,
+        caiMessage,
+        caiMessageType,
         ...makeWebsocketMessage(),
     } as Message
 
@@ -1017,9 +1018,23 @@ function onChatMessage(data: Message) {
     }
 
     const outputMessage = data.caiMessage!
-    outputMessage.sender = data.cai ? "CAI" : data.sender
 
-    store.dispatch(cai.addCAIMessage([outputMessage, true]))
+    switch (data.caiMessageType) {
+        case "cai":
+            outputMessage.sender = "CAI"
+            store.dispatch(cai.addCAIMessage([outputMessage, true]))
+            break
+        case "wizard":
+            outputMessage.sender = "CAI"
+            store.dispatch(cai.addCAIMessage([outputMessage, true, true]))
+            break
+        case "user":
+            store.dispatch(cai.addCAIMessage([outputMessage, true]))
+            break
+        case "curriculum":
+            store.dispatch(cai.setCurriculumView(data.sender + " is viewing " + outputMessage.text[0]))
+            break
+    }
 }
 
 export function sendCompilationRecord(type: string) {

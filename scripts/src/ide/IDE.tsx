@@ -283,10 +283,6 @@ export async function compileCode() {
 
         saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
 
-        if (collaboration.active && collaboration.tutoring) {
-            collaboration.sendCompilationRecord(errType)
-        }
-
         if (FLAGS.SHOW_CAI) {
             store.dispatch(cai.compileError(error))
         }
@@ -340,14 +336,11 @@ export async function compileCode() {
             }
 
             console.log("complexityCalculator", report)
+
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.compileCAI([result, language, code]))
             }
         })
-    }
-
-    if (collaboration.active && collaboration.tutoring) {
-        collaboration.sendCompilationRecord("success")
     }
 
     const { bubble } = state
