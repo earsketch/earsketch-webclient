@@ -3,7 +3,6 @@
   "sourceType": "unambiguous",
   "plugins": [
     "react-hot-loader/babel",
-    ["@babel/plugin-transform-runtime", { "regenerator": true }],
-    "angularjs-annotate"
+    ["@babel/plugin-transform-runtime", { "regenerator": true }]
   ]
 }

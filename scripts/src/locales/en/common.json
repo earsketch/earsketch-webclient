@@ -187,7 +187,7 @@
     "scriptShare.tab.soundcloud.sharePrompt": "What can others do with your song on SoundCloud?",
     "scriptShare.tab.soundcloud.songName": "Song Name",
     "scriptShare.tab.soundcloud.view": "View on SoundCloud",
-    "scriptShare.moreDetails": "More Details (Description, License)...",
+    "scriptShare.moreDetails": "More Details (Description, License)",
     "scriptShare.descriptionOptional": "Description (optional)",
     "scriptShare.licenseType": "License Type",
     "scriptShare.copyClipboard": "Copy to clipboard",
@@ -231,7 +231,23 @@
     "curriculum.toc": "Table of Contents",
     "curriculum.previousPage": "Previous Page",
     "curriculum.nextPage": "Next Page",
-    "curriculum.copyURL": "Copy curriculum URL"
+    "curriculum.copyURL": "Copy curriculum URL",
+    "shortcuts.run": "Run script",
+    "shortcuts.save": "Save script",
+    "shortcuts.undo": "Undo",
+    "shortcuts.redo": "Redo",
+    "shortcuts.comment": "Comment code",
+    "shortcuts.autocomplete": "Autocomplete",
+    "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
+    "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "hardware.ctrl": "Ctrl",
+    "hardware.cmd": "Cmd",
+    "hardware.shift": "Shift",
+    "hardware.alt": "Alt",
+    "hardware.option": "Option",
+    "hardware.enter": "Enter",
+    "hardware.space": "Space",
+    "hardware.wheel": "Mouse Wheel"
   },
   "bubble": {
     "userLanguage": "Language",
@@ -295,12 +311,7 @@
       "allscriptscloud": "All unsaved scripts successfully saved to the cloud.",
       "badsharelink": "Error opening a script. The share link in the URL may be wrong.",
       "scriptcopied": "Script successfully copied.",
-      "teachersLink": "Teacher account requires your full name and a unique email address for logging in to the TEACHERS website. Please provide them in the Edit Profile menu in the account options.",
-      "infoRequired": "First Name, Last Name, and E-mail Address are required for a teacher account.",
-      "emailConflict": "Failed to update the user profile. Please check that this E-mail address is not used in other EarSketch accounts. (Hint: If you cannot remember such user account, try logging out and choose Reset Account -> Forgot Your Password? option. This lets you retrieve the account tied to the E-mail address.",
-      "teacherSiteLoginError": "Error logging in to the TEACHERS website! ",
-      "promptFixAtTeacherSite": ". Please try changing the user information in Edit Profile.",
-      "teachersPageNoAccess": "You must have a teacher account to access this page. You can request one at the CONTACT page."
+      "emailConflict": "Failed to update the user profile. Please check that this E-mail address is not used in other EarSketch accounts. (Hint: If you cannot remember such user account, try logging out and choose Reset Account -> Forgot Your Password? option. This lets you retrieve the account tied to the E-mail address."
     },
     "download": {
       "script": "Save your code as a text file on your computer.",
@@ -768,14 +779,14 @@
     },
 
     "selectRandomFile": {
-      "description": "Selects a random soundfile from a specified folder.",
+      "description": "Selects a random sound from standard folders.",
       "parameters": {
-        "folder": {
-          "description": "Folder to get random soundfile from. Typically, this is a constant from the sound browser (a folder name, not a file name)."
+        "folderSubstring": {
+          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
         }
       },
       "returns": {
-        "description": "A random Sound Constant from the specified folder."
+        "description": "A random Sound Constant from matching folders."
       }
     },
 

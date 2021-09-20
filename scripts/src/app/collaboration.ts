@@ -9,6 +9,7 @@ import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
 interface Message {
+    // eslint-disable-next-line camelcase
     notification_type: string
     scriptID: string
     sender: string
@@ -37,15 +38,15 @@ interface InsertOperation {
     action: "insert"
     start: number
     text: string
-    len: number  // TODO: redundant with text?
-    end?: number  // TODO: redunant with start and len?
+    len: number // TODO: redundant with text?
+    end?: number // TODO: redunant with start and len?
 }
 
 interface RemoveOperation {
     action: "remove"
     start: number
     len: number
-    end?: number  // TODO: redunant with start and len?
+    end?: number // TODO: redunant with start and len?
 }
 
 interface MultiOperation {
@@ -55,8 +56,8 @@ interface MultiOperation {
 
 type EditOperation = InsertOperation | RemoveOperation | MultiOperation
 
-export let script: Script | null = null  // script object: only used for the off-line mode
-export let scriptID: string | null = null  // collaboration session identity (both local and remote)
+export let script: Script | null = null // script object: only used for the off-line mode
+export let scriptID: string | null = null // collaboration session identity (both local and remote)
 
 export let userName = ""
 let owner = false
@@ -64,12 +65,12 @@ let owner = false
 let editSession: Ace.EditSession | null = null
 
 let buffer: Message[] = []
-let synchronized = true  // user's own messages against server
-let awaiting = ""  // unique edit ID from self
+let synchronized = true // user's own messages against server
+let awaiting = "" // unique edit ID from self
 
 let scriptText = ""
 export let lockEditor = true
-export let isSynching = false  // TODO: redundant? for storing cursors
+export let isSynching = false // TODO: redundant? for storing cursors
 
 let sessionActive = false
 export let active = false
@@ -85,18 +86,18 @@ let history: { [key: number]: EditOperation } = {}
 
 export let otherMembers: {
     [key: string]: { canEdit: boolean; active: boolean }
-} = {}
-let markers: { [key: string]: number } = {}
+} = Object.create(null)
+const markers: { [key: string]: number } = Object.create(null)
 
-export let chat: {
+export const chat: {
     [key: string]: { text: string; popover: boolean }
-} = {}
+} = Object.create(null)
 export let tutoring = false
 
 // This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
 // We call the continuations (fulfilling the promise) when we receive the corresponding server message.
 // This allows other modules to do things like `await collaboration.getScriptText(scriptID)`.
-let continuations: { [key: string]: (value: unknown) => void } = {}
+const continuations: { [key: string]: (value: unknown) => void } = {}
 let timeouts: { [key: string]: number } = {}
 let scriptCheckTimerID: number = 0
 
@@ -111,8 +112,8 @@ export const callbacks = {
     onJoinTutoring: null as Function | null,
 }
 
-const editTimeout = 5000  // sync (rejoin) session if there is no server response
-const syncTimeout = 5000  // when time out, the websocket connection is likely lost
+const editTimeout = 5000 // sync (rejoin) session if there is no server response
+const syncTimeout = 5000 // when time out, the websocket connection is likely lost
 
 function makeWebsocketMessage() {
     // Note: For the historic mishandling of username letter cases, we treat them as case insensitive (always convert to lowercase) in collaboration and websocket messaging for the time being... Tagging the relevant changes as GH issue #1858.
@@ -131,14 +132,14 @@ function initialize() {
 }
 
 export function setUserName(username_: string) {
-    userName = username_.toLowerCase()  // #1858
+    userName = username_.toLowerCase() // #1858
 }
 
 // Opening a script with collaborators starts a real-time collaboration session.
 export function openScript(script_: Script, userName: string) {
     script = script_
-    script.username = script.username.toLowerCase()  // #1858
-    userName = userName.toLowerCase()  // #1858
+    script.username = script.username.toLowerCase() // #1858
+    userName = userName.toLowerCase() // #1858
 
     const shareID = script.shareid
 
@@ -155,34 +156,34 @@ export function openScript(script_: Script, userName: string) {
         if (!owner) {
             otherMembers[script.username] = {
                 active: false,
-                canEdit: true
+                canEdit: true,
             }
 
             // TODO: combine with other-members state object?
             chat[script.username] = {
                 text: "",
-                popover: false
+                popover: false,
             }
         }
 
         for (let member of script.collaborators) {
-            member = member.toLowerCase()  // #1858
+            member = member.toLowerCase() // #1858
             if (member !== userName) {
                 otherMembers[member] = {
                     active: false,
-                    canEdit: true
+                    canEdit: true,
                 }
 
                 chat[member] = {
                     text: "",
-                    popover: false
+                    popover: false,
                 }
             }
         }
 
         chat[userName] = {
             text: "",
-            popover: false
+            popover: false,
         }
     }
     reporter.openSharedScript()
@@ -236,7 +237,7 @@ function joinSession(shareID: string, username_: string) {
     esconsole("joining collaboration session: " + shareID, "collab")
 
     scriptID = shareID
-    userName = username_.toLowerCase()  // #1858
+    userName = username_.toLowerCase() // #1858
 
     websocket.send({ action: "joinSession", state, ...makeWebsocketMessage() })
 
@@ -250,13 +251,13 @@ function onJoinedSession(data: Message) {
     // clear the websocket connection check
     clearTimeout(timeouts[userName])
     delete timeouts[userName]
-    
+
     // open script in editor
     scriptText = data.scriptText!
     setEditorTextWithoutOutput(scriptText)
 
     state = data.state!
-    history = {}  // TODO: pull all the history? maybe not
+    history = {} // TODO: pull all the history? maybe not
     editor.setReadOnly(false)
     active = true
     sessionActive = true
@@ -289,7 +290,7 @@ function onSessionsFull(data: Message) {
 
 function openScriptOffline(script: Script) {
     esconsole("opening a collaborative script in the off-line mode", "collab")
-    script.username = script.username.toLocaleString()  // #1858
+    script.username = script.username.toLocaleString() // #1858
     script.collaborative = false
     script.readonly = script.username !== userName
 
@@ -312,12 +313,12 @@ export function leaveSession(shareID: string) {
 function onMemberJoinedSession(data: Message) {
     userNotification.show(data.sender + " has joined the collaboration session.")
 
-    if (otherMembers.hasOwnProperty(data.sender)) {
+    if (data.sender in otherMembers) {
         otherMembers[data.sender].active = true
     } else {
         otherMembers[data.sender] = {
             active: true,
-            canEdit: true
+            canEdit: true,
         }
     }
 }
@@ -325,7 +326,7 @@ function onMemberJoinedSession(data: Message) {
 function onMemberLeftSession(data: Message) {
     userNotification.show(data.sender + " has left the collaboration session.")
 
-    if (markers.hasOwnProperty(data.sender)) {
+    if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
     }
 
@@ -339,7 +340,7 @@ export function addCollaborators(shareID: string, userName: string, collaborator
             ...makeWebsocketMessage(),
             action: "addCollaborators",
             scriptID: shareID,
-            sender: userName.toLowerCase(),  // #1858
+            sender: userName.toLowerCase(), // #1858
             collaborators: collaborators,
         })
 
@@ -347,7 +348,7 @@ export function addCollaborators(shareID: string, userName: string, collaborator
             for (const member of collaborators) {
                 otherMembers[member] = {
                     active: false,
-                    canEdit: true
+                    canEdit: true,
                 }
             }
         }
@@ -360,7 +361,7 @@ export function removeCollaborators(shareID: string, userName: string, collabora
             ...makeWebsocketMessage(),
             action: "removeCollaborators",
             scriptID: shareID,
-            sender: userName.toLowerCase(),  // #1858
+            sender: userName.toLowerCase(), // #1858
             collaborators: collaborators,
         })
 
@@ -403,7 +404,7 @@ export function editScript(data: EditOperation) {
         ID: generateRandomID(),
         state,
         editData: data,
-        ...makeWebsocketMessage()
+        ...makeWebsocketMessage(),
     }
 
     if (synchronized) {
@@ -463,7 +464,7 @@ function onEditMessage(data: Message) {
 
         if (data.state === state) {
             esconsole("server -> client in sync: " + data.state, ["collab", "nolog"])
-        } else  {
+        } else {
             esconsole("server -> client out of sync: " + data.state, ["collab", "nolog"])
             requestSync()
         }
@@ -479,7 +480,6 @@ function onEditMessage(data: Message) {
                 esconsole("output: " + JSON.stringify(op.editData), ["collab", "nolog"])
                 return op
             })
-
         }
         esconsole("applying the transformed edit", ["collab", "nolog"])
         apply(serverOp)
@@ -513,7 +513,7 @@ function syncToSession(data: Message) {
     // try to reset the cursor position
     editSession!.selection.moveCursorToPosition(cursorPos)
 
-    if (JSON.stringify(selection!.start) !==  JSON.stringify(selection!.end)) {
+    if (JSON.stringify(selection!.start) !== JSON.stringify(selection!.end)) {
         const start = selection!.start
         const end = selection!.end
         const reverse = JSON.stringify(cursorPos) !== JSON.stringify(selection!.end)
@@ -551,7 +551,7 @@ function rejoinSession() {
         if (!owner) {
             otherMembers[script!.username] = {
                 active: false,
-                canEdit: true
+                canEdit: true,
             }
         }
 
@@ -559,7 +559,7 @@ function rejoinSession() {
             if (member !== userName) {
                 otherMembers[member] = {
                     active: false,
-                    canEdit: true
+                    canEdit: true,
                 }
             }
         }
@@ -567,7 +567,7 @@ function rejoinSession() {
         websocket.send({ action: "rejoinSession", state, tutoring, ...makeWebsocketMessage() })
     }
 
-    return new Promise(resolve => continuations.joinSession = resolve)
+    return new Promise(resolve => (continuations.joinSession = resolve))
 }
 
 export function saveScript(_scriptID?: string) {
@@ -578,8 +578,7 @@ export function saveScript(_scriptID?: string) {
 }
 
 function onScriptSaved(data: Message) {
-    if (!userIsCAI(data.sender))
-        userNotification.show(data.sender + " saved the current version of the script.", "success")
+    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " saved the current version of the script.", "success") }
 }
 
 export function storeCursor(position: Ace.Point) {
@@ -603,35 +602,35 @@ export function storeSelection(selection_: Ace.Range) {
 }
 
 function onCursorPosMessage(data: Message) {
-    data.sender = data.sender.toLowerCase()  // #1858
+    data.sender = data.sender.toLowerCase() // #1858
     const document = editSession!.getDocument()
     const cursorPos = document.indexToPosition(data.position!, 0)
     const range = new Range(cursorPos.row, cursorPos.column, cursorPos.row, cursorPos.column + 1)
 
-    if (markers.hasOwnProperty(data.sender)) {
+    if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
     }
 
     const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
 
-    markers[data.sender] = editSession!.addMarker(range, "generic-cursor-"+num, "text", true)
+    markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
 }
 
 function onSelectMessage(data: Message) {
-    data.sender = data.sender.toLowerCase()  // #1858
+    data.sender = data.sender.toLowerCase() // #1858
 
     const document = editSession!.getDocument()
     const start = document.indexToPosition(data.start!, 0)
     const end = document.indexToPosition(data.end!, 0)
 
-    if (markers.hasOwnProperty(data.sender)) {
+    if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
     }
 
     const num = Object.keys(otherMembers).indexOf(data.sender) % 6 + 1
 
     if (data.start === data.end) {
-        const range = new Range(start.row, start.column, start.row, start.column+1)
+        const range = new Range(start.row, start.column, start.row, start.column + 1)
         markers[data.sender] = editSession!.addMarker(range, "generic-cursor-" + num, "text", true)
     } else {
         const range = new Range(start.row, start.column, end.row, end.column)
@@ -641,7 +640,7 @@ function onSelectMessage(data: Message) {
 
 function removeOtherCursors() {
     for (const m in otherMembers) {
-        if (markers.hasOwnProperty(m)) {
+        if (m in markers) {
             editSession!.removeMarker(markers[m])
         }
         delete markers[m]
@@ -663,7 +662,7 @@ function onChangeWriteAccess(data: Message) {
 }
 
 // After certain period of inactivity, the session closes automatically, sending message. It should flag for startSession to be sent before the next action.
-function onSessionClosed(data: Message) {
+function onSessionClosed() {
     esconsole("remote session closed", "collab")
 
     sessionActive = false
@@ -673,7 +672,7 @@ function onSessionClosed(data: Message) {
     }
 }
 
-function onSessionClosedForInactivity(data: Message) {
+function onSessionClosedForInactivity() {
     userNotification.show("Remote collaboration session was closed because of a prolonged inactivitiy.")
 }
 
@@ -724,7 +723,7 @@ function transform(op1: EditOperation, op2: EditOperation) {
                 op1.start += op2.len
             }
         } else if (op1.action === "insert" && op2.action === "remove") {
-            if (op1.start <= op2.start){
+            if (op1.start <= op2.start) {
                 op2.start += op1.len
             } else if (op2.start < op1.start && op1.start <= op2.end!) {
                 const overlap = op2.end! - op1.start
@@ -735,12 +734,12 @@ function transform(op1: EditOperation, op2: EditOperation) {
                     operations: [{
                         action: "remove",
                         start: op2.start,
-                        len: op2.len - overlap
+                        len: op2.len - overlap,
                     }, {
                         action: "remove",
                         start: op1.end! - (op2.len - overlap),
-                        len: overlap
-                    }]
+                        len: overlap,
+                    }],
                 }
             } else if (op2.end! < op1.start) {
                 op1.start -= op2.len
@@ -758,12 +757,12 @@ function transform(op1: EditOperation, op2: EditOperation) {
                     operations: [{
                         action: "remove",
                         start: op1.start,
-                        len: op1.len - overlap
+                        len: op1.len - overlap,
                     }, {
                         action: "remove",
                         start: op2.end! - (op1.len - overlap),
-                        len: overlap
-                    }]
+                        len: overlap,
+                    }],
                 }
 
                 op2.start = op1.start
@@ -774,12 +773,12 @@ function transform(op1: EditOperation, op2: EditOperation) {
                     operations: [{
                         action: "remove",
                         start: op1.start,
-                        len: op2.start - op1.start
+                        len: op2.start - op1.start,
                     }, {
                         action: "remove",
                         start: op1.start + op2.len,
-                        len: op1.len - (op2.start - op1.start)
-                    }]
+                        len: op1.len - (op2.start - op1.start),
+                    }],
                 }
                 op2.start = op1.start
                 op1 = top1
@@ -809,12 +808,12 @@ function transform(op1: EditOperation, op2: EditOperation) {
                     operations: [{
                         action: "remove",
                         start: op1.start,
-                        len: op2.start - op1.start
+                        len: op2.start - op1.start,
                     }, {
                         action: "remove",
                         start: op2.start - 1,
-                        len: op1.end! - op2.end!
-                    }]
+                        len: op1.end! - op2.end!,
+                    }],
                 }
 
                 op2.len = 0
@@ -826,12 +825,12 @@ function transform(op1: EditOperation, op2: EditOperation) {
                     operations: [{
                         action: "remove",
                         start: op2.start,
-                        len: op1.start - op2.start
+                        len: op1.start - op2.start,
                     }, {
                         action: "remove",
                         start: op1.start - 1,
-                        len: op2.end! - op1.end!
-                    }]
+                        len: op2.end! - op1.end!,
+                    }],
                 }
             } else if (op1.start === op2.start && op1.end === op2.end) {
                 // already covered
@@ -863,7 +862,7 @@ const operations = {
         for (const operation of op.operations) {
             apply(operation)
         }
-    }
+    },
 }
 
 // Applies edit operations on the editor content.
@@ -901,7 +900,7 @@ async function onUserAddedToCollaboration(data: Message) {
         for (const member of data.addedMembers!) {
             otherMembers[member] = {
                 active: false,
-                canEdit: true
+                canEdit: true,
             }
         }
     }
@@ -927,12 +926,12 @@ async function onUserRemovedFromCollaboration(data: Message) {
     }
 }
 
-export function leaveCollaboration(scriptID: string, userName: string, refresh=true) {
-    websocket.send({ 
+export function leaveCollaboration(scriptID: string, userName: string, refresh = true) {
+    websocket.send({
         ...makeWebsocketMessage(),
         action: "leaveCollaboration",
         scriptID,
-        sender: userName.toLowerCase()  // #1858
+        sender: userName.toLowerCase(), // #1858
     })
     if (refresh && callbacks.refreshSharedScriptBrowser) {
         return callbacks.refreshSharedScriptBrowser()
@@ -943,7 +942,7 @@ export function leaveCollaboration(scriptID: string, userName: string, refresh=t
 
 async function onUserLeftCollaboration(data: Message) {
     if (active && scriptID === data.scriptID) {
-        delete otherMembers[data.sender.toLowerCase()]  // #1858
+        delete otherMembers[data.sender.toLowerCase()] // #1858
 
         // close collab session tab if it's active and no more collaborators left
         if (Object.keys(otherMembers).length === 0) {
@@ -966,7 +965,7 @@ export function renameScript(scriptID: string, scriptName: string, userName: str
         action: "renameScript",
         scriptID,
         scriptName,
-        sender: userName.toLowerCase()
+        sender: userName.toLowerCase(),
     })
 }
 
@@ -981,7 +980,7 @@ async function onScriptRenamed(data: Message) {
 export function getScriptText(scriptID: string): Promise<string> {
     esconsole("requesting the script text for " + scriptID, "collab")
     websocket.send({ ...makeWebsocketMessage(), action: "getScriptText", scriptID })
-    return new Promise(resolve => continuations.getScriptText = resolve)
+    return new Promise(resolve => (continuations.getScriptText = resolve))
 }
 
 function onScriptText(data: Message) {
@@ -1021,7 +1020,6 @@ export function sendChatMessage(text: string) {
 export function sendCompilationRecord(type: string) {
     websocket.send({ action: "compile", text: type, ...makeWebsocketMessage() })
 }
-
 
 const GENERAL_HANDLERS: { [key: string]: (data: Message) => void } = {
     onJoinedSession,

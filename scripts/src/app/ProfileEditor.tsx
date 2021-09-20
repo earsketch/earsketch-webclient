@@ -1,11 +1,12 @@
 import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { ModalFooter } from "../Utils"
 
 import esconsole from "../esconsole"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 
-export const ProfileEditor = ({ username, email: _email, close }: { username: string, email: string, close: (info?: any) => void }) => {
+export const ProfileEditor = ({ username, email: _email, close }: { username: string, email: string, close: (email?: string) => void }) => {
     const { t } = useTranslation()
     const [error, setError] = useState("")
     const [password, setPassword] = useState("")
@@ -14,25 +15,16 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
     const [email, setEmail] = useState(_email)
 
     const submitPassword = async () => {
-        let response
         try {
-            response = await userProject.postAuth("/users/modifypwd", { password: btoa(password), newpassword: btoa(newPassword) })
+            await userProject.postBasicAuth("/users/modifypwd", username, password, { password: newPassword })
         } catch (error) {
             esconsole(error, "error")
-            setError(t("messages:changepassword.commerror2"))
+            setError(t("messages:changepassword.pwdauth"))
             return false
         }
 
-        if (response.ok) {
-            userNotification.show(t("changePassword.success"), "success")
-            return true
-        } else if (response.status === 401) {
-            setError(t("messages:changepassword.pwdauth"))
-        } else {
-            esconsole(`Error changing password: ${response.status} ${response.statusText}`, "error")
-            setError(t("messages:changepassword.commerror"))
-        }
-        return false
+        userNotification.show(t("changePassword.success"), "success")
+        return true
     }
 
     const submitEmail = async () => {
@@ -40,7 +32,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
 
         // Maybe this should go in userProject.
         try {
-            await userProject.postAuth("/users/edit", { email, password: btoa(password) })
+            await userProject.postBasicAuth("/users/edit", username, password, { email })
         } catch {
             esconsole("Error updating profile", ["editProfile", "error"])
             setError(t("profileEditor.error"))
@@ -53,8 +45,9 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
     }
 
     const submit = async () => {
-        let emailSuccess = true; let passwordSuccess = true
-        if (email && email !== _email) {
+        let emailSuccess = true
+        let passwordSuccess = true
+        if (email !== _email) {
             emailSuccess = await submitEmail()
         }
         if (emailSuccess) {
@@ -62,7 +55,7 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
                 passwordSuccess = await submitPassword()
             }
             if (passwordSuccess) {
-                close()
+                close(email)
             }
         }
     }
@@ -74,50 +67,23 @@ export const ProfileEditor = ({ username, email: _email, close }: { username: st
         <form onSubmit={e => { e.preventDefault(); submit() }}>
             <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="form-group">
-                            <input type="email" className="form-control" placeholder={t("formFieldPlaceholder.emailOptional")}
-                                value={email} onChange={e => setEmail(e.target.value.trim())} />
-                        </div>
-                    </div>
-                </div>
+                <input type="email" className="form-control mb-4" placeholder={t("formFieldPlaceholder.emailOptional")}
+                    value={email} onChange={e => setEmail(e.target.value.trim())} />
 
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.currentPassword")}
-                                value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
-                        </div>
-                    </div>
-                </div>
+                <input type="password" className="form-control mb-4" placeholder={t("formFieldPlaceholder.currentPassword")}
+                    value={password} onChange={e => setPassword(e.target.value)} required id="current-password" autoComplete="current-password" />
 
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder="New password (Optional)"
-                                value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
-                        </div>
-                    </div>
-                </div>
+                <input type="password" className="form-control mb-4" placeholder="New password (Optional)"
+                    value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength={5} />
 
                 {newPassword &&
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="form-group">
-                            <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
-                                e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
-                                setConfirmPassword(e.target.value)
-                            }} value={confirmPassword} required />
-                        </div>
-                    </div>
-                </div>}
+                <input type="password" className="form-control" placeholder={t("formFieldPlaceholder.confirmNewPassword")} onChange={e => {
+                    e.target.setCustomValidity(e.target.value === newPassword ? "" : t("messages:changepassword.pwdfail"))
+                    setConfirmPassword(e.target.value)
+                }} value={confirmPassword} required />}
             </div>
 
-            <div className="modal-footer">
-                <input type="button" className="btn btn-default" onClick={close} value={t("cancel").toLocaleUpperCase()} />
-                <input type="submit" className="btn btn-primary" value={t("update").toLocaleUpperCase()} disabled={!(newPassword || email)} />
-            </div>
+            <ModalFooter submit="update" ready={newPassword !== "" || email !== _email} close={close} />
         </form>
     </>
 }

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 export interface Script {
     name: string
     shareid: string
@@ -6,7 +7,7 @@ export interface Script {
     created: number | string
     modified: number | string
     licenseInfo: string
-    license_id: string
+    license_id?: number
     saved: boolean
     tooltipText: string
     collaborative: boolean
@@ -24,18 +25,17 @@ export interface Script {
 }
 
 // Note: How about collaborative?
-export type ScriptType = 'regular' | 'shared' | 'readonly' | 'deleted';
+export type ScriptType = "regular" | "shared" | "readonly" | "deleted";
 
 export interface SoundEntity {
-    file_key: string,
-    genregroup: string,
-    file_location: string,
-    folder: string,
-    artist: string,
-    year: string,
-    scope: number,
-    genre: string,
-    tempo: number,
-    instrument: string,
-    tags: string
+    name: string
+    genreGroup: string
+    path: string
+    folder: string
+    artist: string
+    year: string
+    public: number
+    genre: string
+    tempo: number
+    instrument: string
 }

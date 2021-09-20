@@ -23,24 +23,6 @@ export function show(text: string, type: string = "", duration: number | undefin
             unread: false,
             pinned: false,
         }))
-    } else if (type === "editProfile") {
-        const notifications = selectNotifications(store.getState())
-        while (notifications.some(item => item.notification_type === "editProfile")) {
-            const index = notifications.findIndex(item => item.notification_type === "editProfile")
-            if (index !== -1) {
-                notifications.splice(index, 1)
-            }
-        }
-
-        notifications.unshift({
-            message: { text },
-            notification_type: type,
-            time: Date.now(),
-            unread: false,
-            pinned: true,
-        })
-
-        store.dispatch(setNotifications(notifications))
     } else if (type === "collaboration") {
         store.dispatch(pushNotification({
             message: { text },
@@ -61,13 +43,8 @@ export const showBanner = (text: string, type: string = "") => callbacks.show(te
 export function loadHistory(notifications: Notification[]) {
     let text = ""
 
-    // filter out "teacherBroadcast" messages
-    if (!user.isAdmin) {
-        notifications = notifications.filter(v => v.notification_type !== "teacher_broadcast")
-    }
-
     notifications = notifications.map(v => {
-        v.pinned = (v.notification_type === "broadcast" || v.notification_type === "teacher_broadcast")
+        v.pinned = v.notification_type === "broadcast"
 
         // TODO: notification_type is too verbose
         // TODO: send individual messages not the whole history
@@ -85,23 +62,21 @@ export function loadHistory(notifications: Notification[]) {
                 const data = JSON.parse(v.message.json!)
                 // received only by the ones affected
                 switch (data.action) {
-                case "userAddedToCollaboration":
-                    text = data.sender + " added you as a collaborator on " + data.scriptName
-                    break
-                case "userRemovedFromCollaboration":
-                    text = data.sender + " removed you from collaboration on " + data.scriptName
-                    break
-                case "userLeftCollaboration":
-                    text = data.sender + " left the collaboration on " + data.scriptName
-                    break
-                case "scriptRenamed":
-                    text = `Collaborative script "${data.oldName}" was renamed to "${data.newName}"`
-                    break
+                    case "userAddedToCollaboration":
+                        text = data.sender + " added you as a collaborator on " + data.scriptName
+                        break
+                    case "userRemovedFromCollaboration":
+                        text = data.sender + " removed you from collaboration on " + data.scriptName
+                        break
+                    case "userLeftCollaboration":
+                        text = data.sender + " left the collaboration on " + data.scriptName
+                        break
+                    case "scriptRenamed":
+                        text = `Collaborative script "${data.oldName}" was renamed to "${data.newName}"`
+                        break
                 }
                 v.message = { text, action: data.action }
             }
-        } else if (v.notification_type === "teacher_broadcast") {
-            v.message.text = "[Teacher] " + v.message.text
         }
 
         v.time = ESUtils.parseDate(v.created!)

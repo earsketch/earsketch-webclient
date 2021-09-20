@@ -8,8 +8,8 @@ export const BrowserTabType = {
     API: 2,
 } as const
 
-// eslint-disable-next-line no-redeclare
-export type BrowserTabType = typeof BrowserTabType[keyof typeof BrowserTabType];
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type BrowserTabType = typeof BrowserTabType[keyof typeof BrowserTabType]
 
 const layoutSlice = createSlice({
     name: "layout",
@@ -107,6 +107,14 @@ export const selectVerticalRatio = createSelector(
         north = north / height * 100
         south = south / height * 100
         return [north, 100 - (north + south), south]
+    }
+)
+
+export const selectOtherTabsHeight = createSelector(
+    [selectNorthSize, selectSouthSize],
+    (north, south) => {
+        const height = windowHeight()
+        return height - north - south - 150
     }
 )
 

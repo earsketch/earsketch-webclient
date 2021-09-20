@@ -42,22 +42,6 @@ a,
   color: @bg;
 }
 
-.user-notification {
-  color: white;
-
-  .popover {
-    background-color: @medlight-bg;
-  }
-
-  .popover-content {
-    background-color: @medlight-bg;
-  }
-
-  .popover.bottom > .arrow:after {
-    border-bottom-color: @medlight-bg;
-  }
-}
-
 #notification-history {
   background-color: black;
   color: white;
@@ -74,6 +58,22 @@ a,
   & .arrow {
     color: @medlight-bg;
   }
+}
+
+.notificationPopup.normal {
+  color: #dff0d8;
+}
+
+.notificationPopup.success {
+  color: #9ffa00;
+}
+
+.notificationPopup.failure1 {
+  color: #f2dede;
+}
+
+.notificationPopup.failure2 {
+  color: #ff8080;
 }
 
 .ui-layout-column > .ui-splitbar, .ui-layout-row > .ui-splitbar {
@@ -591,10 +591,6 @@ a,
 
 .modal-section-header {
   background: @bg;
-}
-
-textarea.form-control {
-  color: gainsboro;
 }
 
 .counter-meter.topright {

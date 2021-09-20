@@ -46,22 +46,6 @@ a,
   border-color: @gen-bright-blue;
 }
 
-.user-notification {
-  color: black;
-
-  .popover {
-    background-color: @lightest-bg;
-  }
-
-  .popover-content {
-    background-color: @lightest-bg;
-  }
-
-  .popover.bottom > .arrow:after {
-    border-bottom-color: @lightest-bg;
-  }
-}
-
 #notification-history {
   background-color: @lightest-bg;
   color: black;
@@ -78,6 +62,25 @@ a,
   & .arrow {
     color: @lightest-bg;
   }
+}
+
+.notificationPopup.normal {
+
+}
+
+.notificationPopup.success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+}
+
+.notificationPopup.failure1 {
+  color: #842029;
+  background-color: #f8d7da;
+}
+
+.notificationPopup.failure2 {
+  color: #842029;
+  background-color: #f8d7da;
 }
 
 .ui-layout-column > .ui-splitbar, .ui-layout-row > .ui-splitbar {

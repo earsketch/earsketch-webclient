@@ -1,9 +1,10 @@
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import * as exporter from "./exporter"
 import { Script } from "common"
 import * as userNotification from "../user/notification"
-import { useTranslation } from "react-i18next"
+import { ModalFooter } from "../Utils"
 
 // TODO: switch to a "name" property for non-localized types (wav and mp3)
 const EXPORT_TYPES = {
@@ -63,8 +64,6 @@ export const Download = ({ script, close }: { script: Script, close: () => void 
                     </div>
                 </div>)}
         </div>
-        <div className="modal-footer">
-            <button className="btn btn-primary" onClick={close}>{t("thing.close")}</button>
-        </div>
+        <ModalFooter cancel="thing.close" close={close} />
     </>
 }

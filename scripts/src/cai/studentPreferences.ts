@@ -1,4 +1,7 @@
-﻿// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
+// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import * as caiStudent from "./student"
 
 // TODO: All of these objects have one entry per project, so project state is spread across all of them.
@@ -74,7 +77,7 @@ function getCodeSuggestionsUsed() {
 }
 
 function updateHistoricalArrays(currentSounds?: string[]) {
-    //update historical list of all sound suggestions
+    // update historical list of all sound suggestions
     for (const suggestion of sampleSuggestionsMade[activeProject]) {
         for (const sound of suggestion[1]) {
             if (!allSoundsSuggested[activeProject].includes(sound)) {
@@ -82,7 +85,7 @@ function updateHistoricalArrays(currentSounds?: string[]) {
             }
         }
     }
-    //update historical list of all sounds used
+    // update historical list of all sounds used
     if (currentSounds != null) {
         for (const sound of currentSounds) {
             if (!allSoundsUsed[activeProject].includes(sound)) {
@@ -90,13 +93,13 @@ function updateHistoricalArrays(currentSounds?: string[]) {
             }
         }
     }
-    //update historical list of sound suggestions used
+    // update historical list of sound suggestions used
     for (const sound of allSoundsUsed[activeProject]) {
         if (allSoundsSuggested[activeProject].includes(sound) && !soundsSuggestedAndUsed[activeProject].includes(sound) && !soundsContributedByStudent[activeProject].includes(sound)) {
             soundsSuggestedAndUsed[activeProject].push(sound)
         }
     }
-    //if current sounds passed, update "currently used suggestions" list
+    // if current sounds passed, update "currently used suggestions" list
     if (currentSounds != null) {
         const newCurrentSuggs = []
         for (const sound of currentSoundSuggestionsPresent[activeProject]) {
@@ -118,7 +121,7 @@ function updateHistoricalArrays(currentSounds?: string[]) {
             }
         }
     }
-    //push this set of lists to the student model
+    // push this set of lists to the student model
     const suggestionTracker = { allSuggestionsUsed: soundsSuggestedAndUsed, suggestionsCurrentlyUsed: currentSoundSuggestionsPresent, soundsContributedByStudent: soundsContributedByStudent }
     caiStudent.updateModel("preferences", { suggestionUse: suggestionTracker })
 }
@@ -133,16 +136,16 @@ function runSound(soundsUsedArray: string[]) {
     const newArray: SoundSuggestion[] = []
     for (const suggestion of sampleSuggestionsMade[activeProject]) {
         let wasUsed = false
-        //were any of the sounds used?
+        // were any of the sounds used?
         for (const sound of soundsUsedArray) {
             if (suggestion[1].includes(sound)) {
                 wasUsed = true
                 break
             }
         }
-        //decrement
+        // decrement
         suggestion[0] += 1
-        //if 0, add to the rejection category and delete the item
+        // if 0, add to the rejection category and delete the item
         if (wasUsed) {
             suggestionsAccepted[activeProject] += 1
             soundSuggestionTracker[activeProject].push(suggestion)
@@ -167,15 +170,15 @@ function runCode(complexityOutput: any) {
     const newArray: CodeSuggestion[] = []
     for (const suggestion of codeSuggestionsMade[activeProject]) {
         let wasUsed = true
-        //were any reqs readched?
+        // were any reqs readched?
         for (const key of Object.keys(suggestion[1])) {
             if (complexityOutput[key] < suggestion[1][key]) {
                 wasUsed = false
             }
         }
-        //decrement
+        // decrement
         suggestion[0] += 1
-        //if 0, add to the rejection category and delete the item
+        // if 0, add to the rejection category and delete the item
         if (wasUsed) {
             suggestionsAccepted[activeProject] += 1
             updateAcceptanceRatio()
@@ -197,7 +200,7 @@ function updateAcceptanceRatio() {
     caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
 }
 
-const bucketSize = 30  // options range from 10s - 120s
+const bucketSize = 30 // options range from 10s - 120s
 // for experimenting
 // const bucketOptions = [10,20,30,40,50,60,90,120]
 
@@ -210,8 +213,8 @@ const compileErrors: any[] = []
 const mousePos: any[] = []
 
 function addOnPageStatus(status: any, time: any) {
-    onPageHistory.push({status,time})
-    caiStudent.updateModel("preferences", { onPageHistory: onPageHistory})
+    onPageHistory.push({ status, time })
+    caiStudent.updateModel("preferences", { onPageHistory: onPageHistory })
     // console.log("history", onPageHistory)
 }
 
@@ -222,22 +225,22 @@ function returnPageStatus() {
 function addCompileTS(time: any) {
     compileTS.push(time)
     lastEditTS = time
-    caiStudent.updateModel("preferences", { compileTS: compileTS})
+    caiStudent.updateModel("preferences", { compileTS: compileTS })
 }
 
 function addKeystroke(action: string, content: any, time: any) {
-    if (action=='remove') {
+    if (action == "remove") {
         deleteKeyTS.push(time)
     }
 }
 
 function addCompileError(error: any, time: any) {
-    compileErrors.push({error, time})
-    caiStudent.updateModel("preferences", { compileErrors: compileErrors})
+    compileErrors.push({ error, time })
+    caiStudent.updateModel("preferences", { compileErrors: compileErrors })
 }
 
 function stuckOnError() {
-    const recentHistory = compileErrors.slice(compileErrors.length-recentCompiles, compileErrors.length)
+    const recentHistory = compileErrors.slice(compileErrors.length - recentCompiles, compileErrors.length)
     const errors = recentHistory.map(a => a.error[0].args.v[0].v)
     if (compileErrors.length >= recentCompiles && allEqual(errors)) {
         return true
@@ -247,16 +250,16 @@ function stuckOnError() {
 
 function allEqual(arr: any[]) {
     return new Set(arr).size == 1
-    }
+}
 
 function addMousePos(pos: any) {
     mousePos.push(pos)
-    caiStudent.updateModel("preferences", { mousePos: mousePos})
+    caiStudent.updateModel("preferences", { mousePos: mousePos })
 }
 
 // what are the measures to understand how off or on task one is?
 
-// other options: caiClose, pageChanged, caiSwapTab 
+// other options: caiClose, pageChanged, caiSwapTab
 // time spent on each project
 // start/end of key presses [bursts]
 // mouse clicks
@@ -272,9 +275,9 @@ export {
     addSoundSuggestion,
     getCodeSuggestionsUsed,
     getSoundSuggestionsUsed,
-    returnPageStatus,  // Currently unused
+    returnPageStatus, // Currently unused
     runCode,
     runSound,
     setActiveProject,
-    stuckOnError,  // Currently unused
+    stuckOnError, // Currently unused
 }

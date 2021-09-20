@@ -2,7 +2,7 @@
 // The reason being, the audio buffers would not have been loaded before that and the analysis would fail.
 import { DSP, FFT, WindowFunction } from "dsp"
 
-import * as ESUtils from '../esutils'
+import * as ESUtils from "../esutils"
 
 const FEATURE_FUNCTIONS: { [key: string]: (data: Float32Array, blockSize: number, sampleRate: number) => number[] } = {
     rms_amplitude: computeRMSAmplitude,
@@ -14,19 +14,19 @@ export function computeFeatureForBuffer(buffer: AudioBuffer, feature: string, te
     const endIndex = endTime === undefined ? undefined : Math.round(buffer.sampleRate * ESUtils.measureToTime(endTime, tempo))
     const data = buffer.getChannelData(0).slice(startIndex, endIndex)
 
-    let featureVector = FEATURE_FUNCTIONS[feature.toLowerCase()](data, 2048, buffer.sampleRate)
+    const featureVector = FEATURE_FUNCTIONS[feature.toLowerCase()](data, 2048, buffer.sampleRate)
     // Return the median.
     featureVector.sort()
     return (featureVector[Math.floor(featureVector.length / 2)])
 }
 
-function computeRMSAmplitude(data: Float32Array, blockSize: number, sampleRate: number) {
+function computeRMSAmplitude(data: Float32Array, blockSize: number) {
     const out = []
     for (let hop = 0; (hop + blockSize) <= data.length; hop += blockSize) {
         const block = data.slice(hop, hop + blockSize)
         let sumOfSquares = 0
-        for (let index = 0; index < block.length; index++) {
-            sumOfSquares += block[index] * block[index]
+        for (const x of block) {
+            sumOfSquares += x * x
         }
         out.push(Math.sqrt(sumOfSquares / block.length))
     }
@@ -39,15 +39,15 @@ function computeSpectralCentroid(data: Float32Array, blockSize: number, sampleRa
     const hann = new WindowFunction(DSP.HANN)
     for (let hop = 0; (hop + blockSize) <= data.length; hop += blockSize) {
         fft.forward(hann.process(data.slice(hop, hop + blockSize)))
-        let amplitude_sum = 0
-        let weighted_bin_sum = 0
+        let amplitudeSum = 0
+        let weightedBinSum = 0
         for (let index = 0; index < fft.spectrum.length; index++) {
-            weighted_bin_sum += (index + 1) * fft.spectrum[index]
-            amplitude_sum += fft.spectrum[index]
+            weightedBinSum += (index + 1) * fft.spectrum[index]
+            amplitudeSum += fft.spectrum[index]
         }
         // Old comment: "normalize it by fs/2 as that is the maximum frequency that can exist in the spectrum."
         // If this is done, it is done implicitly, due to the weighted bin sum using indices rather than actual frequencies.
-        out.push(amplitude_sum ? (weighted_bin_sum / amplitude_sum / (blockSize / 2)) : 0)
+        out.push(amplitudeSum ? (weightedBinSum / amplitudeSum / (blockSize / 2)) : 0)
     }
     return out
 }

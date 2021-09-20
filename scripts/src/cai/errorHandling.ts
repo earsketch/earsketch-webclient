@@ -4,12 +4,12 @@ import * as ccState from './complexityCalculatorState';
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const PYTHON_AND_API = [
-	"analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", "fitMedia",
-	"importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBealSlice", "print", "readInput",
-	"replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile",
-	"setEffect", "setTempo", "shuffleList", "shuffleString", "and", "as", "assert", "break", "del", "elif",
-	"class", "continue", "def", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "not", "or",
-	"pass", "print", "raise", "return", "try", "while", "with", "yield"
+    "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", "fitMedia",
+    "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBealSlice", "print", "readInput",
+    "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile",
+    "setEffect", "setTempo", "shuffleList", "shuffleString", "and", "as", "assert", "break", "del", "elif",
+    "class", "continue", "def", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "not", "or",
+    "pass", "print", "raise", "return", "try", "while", "with", "yield",
 ] as readonly string[]
 
 var lastWorkingAST: any
@@ -66,7 +66,7 @@ export function handleError() {
         }
     }
 
-	//do the same for for loops, while loops, and conditionals 
+	//do the same for for loops, while loops, and conditionals
 
 	//for loops
 	var forWords: string[] = ["for", "in"]
@@ -118,7 +118,7 @@ function handleFunctionError() {
 
 	else {
 		trimmedErrorLine = trimmedErrorLine.substring(4)
-	} 
+	}
 
 
 	 //we should check that the function anme is there
@@ -146,7 +146,7 @@ function handleFunctionError() {
 	var paramString: string = trimmedErrorLine.substring(parenIndex + 1, trimmedErrorLine.length - 2)
 
 	if (paramString.length > 0) {
-		//param handling. what the heckie do we do here. we can check for numerical or string values, plus we 
+		//param handling. what the heckie do we do here. we can check for numerical or string values, plus we
 
 		//get rid of list commas
 		while (paramString.includes("[")){
@@ -161,7 +161,7 @@ function handleFunctionError() {
 					paramString = replaceAt(paramString, i, "|")
 				}
             }
-			
+
 		}
 
 		var params: string[] = paramString.split(",")

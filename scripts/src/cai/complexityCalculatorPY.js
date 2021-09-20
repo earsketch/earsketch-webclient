@@ -1,18 +1,21 @@
-﻿import * as ccState from './complexityCalculatorState';
-import * as caiErrorHandling from './errorHandling';
-import * as ccHelpers from './complexityCalculatorHelperFunctions';
-import * as cc from './complexityCalculator';
+/* eslint-disable */
+// TODO: Resolve lint issues.
+
+import * as ccState from "./complexityCalculatorState"
+import * as caiErrorHandling from "./errorHandling"
+import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+import * as cc from "./complexityCalculator"
 
 // Process Python code through the complexity calculator service.
 
 // Build the abstract syntax tree for Python.
 function generateAst(source_code) {
     try {
-        var parse = Sk.parse("<analyzer>", source_code);
-    	ccState.setProperty('studentCode',source_code.split("\n"));
-        return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags);
+        const parse = Sk.parse("<analyzer>", source_code)
+    	ccState.setProperty("studentCode", source_code.split("\n"))
+        return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
     } catch (error) {
-        throw error;
+        throw error
     }
 }
 

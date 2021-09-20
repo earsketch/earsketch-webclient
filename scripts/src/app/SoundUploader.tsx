@@ -14,27 +14,28 @@ import { encodeWAV } from "./renderer"
 import * as userConsole from "../ide/console"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import { ModalFooter } from "../Utils"
 
-function cleanKey(key: string) {
-    return key.replace(/\W/g, "").toUpperCase()
+function cleanName(name: string) {
+    return name.replace(/\W/g, "").toUpperCase()
 }
 
-function validateUpload(key: string, tempo: number) {
+function validateUpload(name: string, tempo: number) {
     const username = userProject.getUsername()
     if (username === null) {
         throw new Error(i18n.t("messages:uploadcontroller.userAuth"))
     }
-    const keys = sounds.selectAllFileKeys(store.getState())
-    const fullKey = username.toUpperCase() + "_" + key
-    if (keys.some(k => k === fullKey)) {
-        throw new Error(`${key} (${fullKey})${i18n.t("messages:uploadcontroller.alreadyused")}`)
-    } else if (tempo > 200 || (tempo > -1 && tempo < 45)) {
+    const names = sounds.selectAllNames(store.getState())
+    const fullName = username.toUpperCase() + "_" + name
+    if (names.some(k => k === fullName)) {
+        throw new Error(`${name} (${fullName})${i18n.t("messages:uploadcontroller.alreadyused")}`)
+    } else if (tempo > 220 || (tempo > -1 && tempo < 45)) {
         throw new Error(i18n.t("messages:esaudio.tempoRange"))
     }
 }
 
-async function uploadFile(file: Blob, key: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
-    validateUpload(key, tempo)
+async function uploadFile(file: Blob, name: string, extension: string, tempo: number, onProgress: (frac: number) => void) {
+    validateUpload(name, tempo)
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = await audioContext.decodeAudioData(arrayBuffer)
@@ -45,9 +46,9 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
 
     const data = userProject.form({
         file,
-        file_key: key,
+        name,
         // TODO: I don't think the server should allow arbitrary filenames unrelated to the key. This field should probably be replaced or removed.
-        filename: `${key}${extension}`,
+        filename: `${name}${extension}`,
         tempo: tempo + "",
     })
 
@@ -63,7 +64,7 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
                 if (request.status === 204) {
                     userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
                     // Clear the cache so it gets reloaded.
-                    audioLibrary.clearAudioTagCache()
+                    audioLibrary.clearCache()
                     store.dispatch(sounds.resetUserSounds())
                     store.dispatch(sounds.getUserSounds(userProject.getUsername()))
                     resolve()
@@ -83,42 +84,26 @@ async function uploadFile(file: Blob, key: string, extension: string, tempo: num
     return promise
 }
 
-const ProgressBar = ({ progress }: { progress: number }) => {
-    const percent = Math.floor(progress * 100) + "%"
-    return <div className="progress flex-grow mb-0 mr-3">
-        <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
-    </div>
-}
-
-const Footer = ({ ready, progress, close }: { ready: boolean, progress?: number | null, close: () => void }) => {
-    const { t } = useTranslation()
-    return <div className="modal-footer flex items-center justify-end">
-        {progress !== undefined && progress !== null && <ProgressBar progress={progress} />}
-        <input type="button" value={t("cancel").toLocaleUpperCase()} onClick={close} className="btn btn-default" style={{ color: "#d04f4d" }} />
-        <input type="submit" value={t("upload").toLocaleUpperCase()} className="btn btn-primary text-white" disabled={!ready} />
-    </div>
-}
-
 const FileTab = ({ close }: { close: () => void }) => {
     const [file, setFile] = useState(null as File | null)
-    const [key, setKey] = useState("")
+    const [name, setName] = useState("")
     const [tempo, setTempo] = useState("")
     const [error, setError] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [progress, setProgress] = useState<number>()
     const { t } = useTranslation()
 
-    const name = file ? ESUtils.parseName(file.name) : ""
-    if (key === "" && name !== "") {
-        setKey(name.trim().replace(/\W/g, "_").replace(/_+/g, "_").toUpperCase())
+    const filename = file ? ESUtils.parseName(file.name) : ""
+    if (name === "" && filename !== "") {
+        setName(filename.trim().replace(/\W/g, "_").replace(/_+/g, "_").toUpperCase())
     }
     const extension = file ? ESUtils.parseExt(file.name) : ""
 
     const submit = async () => {
         try {
-            await uploadFile(file!, key, extension, tempo === "" ? -1 : +tempo, setProgress)
+            await uploadFile(file!, name, extension, tempo === "" ? -1 : +tempo, setProgress)
             close()
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 
@@ -130,10 +115,10 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <input id="file" className="inputfile" type="file" onChange={e => setFile(e.target.files![0])} accept=".wav,.aiff,.aif,.mp3,audio/wav,audio/aiff,audio/mpeg" required />
                     <label id="inputlabel" htmlFor="file">
                         <span><i className="icon icon-cloud-upload"></i></span>
-                        <span>{name || t("soundUploader.file.prompt")}</span>
+                        <span>{filename || t("soundUploader.file.prompt")}</span>
                         {extension
-                            ? <kbd className="kbd">{extension}</kbd>
-                            : <><kbd className="kbd">.wav</kbd><kbd className="kbd">.aiff</kbd><kbd className="kbd">.mp3</kbd></>}
+                            ? <kbd>{extension}</kbd>
+                            : <><kbd>.wav</kbd><kbd>.aiff</kbd><kbd>.mp3</kbd></>}
                     </label>
                 </div>
                 <div className="modal-section-header">
@@ -141,19 +126,19 @@ const FileTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.tempoOptional")}</span>
                 </div>
                 <div className="modal-section-body" id="upload-details">
-                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="key" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+                    <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control shake" id="name" value={name} onChange={e => setName(cleanName(e.target.value))} required />
                     <input type="number" placeholder="e.g. 120" className="form-control shake" id="tempo" value={tempo} onChange={e => setTempo(e.target.value)} />
                 </div>
             </div>
         </div>
-        <Footer ready={file !== null} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={file !== null} progress={progress} close={close} />
     </form>
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
-    const [key, setKey] = useState("")
+    const [name, setName] = useState("")
     const [error, setError] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [progress, setProgress] = useState<number>()
     const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
     const [tempo, setTempo] = useState(120)
@@ -184,10 +169,10 @@ const RecordTab = ({ close }: { close: () => void }) => {
         try {
             const view = encodeWAV(buffer!.getChannelData(0), audioContext.sampleRate, 1)
             const blob = new Blob([view], { type: "audio/wav" })
-            await uploadFile(blob, key, ".wav", metronome ? tempo : 120, setProgress)
+            await uploadFile(blob, name, ".wav", metronome ? tempo : 120, setProgress)
             close()
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 
@@ -248,11 +233,11 @@ const RecordTab = ({ close }: { close: () => void }) => {
                     <span>{t("soundUploader.constantRequired")}</span>
                 </div>
                 <div className="modal-section-content">
-                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+                    <input type="text" placeholder="e.g. MYRECORDING_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
                 </div>
             </div>}
         </div>
-        <Footer ready={buffer !== null} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={buffer !== null} progress={progress} close={close} />
     </form>
 }
 
@@ -270,7 +255,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     const [searched, setSearched] = useState(false)
     const [query, setQuery] = useState("")
     const [selected, setSelected] = useState(null as number | null)
-    const [key, setKey] = useState("")
+    const [name, setName] = useState("")
     const { t } = useTranslation()
 
     const username = userProject.getUsername() ?? ""
@@ -297,13 +282,13 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
     const submit = async () => {
         const result = results![selected!]
         try {
-            validateUpload(key, result.bpm)
+            validateUpload(name, result.bpm)
             try {
                 await userProject.postAuth("/audio/uploadfromfreesound", {
                     username,
-                    file_key: key,
+                    name,
                     tempo: result.bpm + "",
-                    filename: key + ".mp3",
+                    filename: name + ".mp3",
                     creator: result.creator,
                     url: result.downloadURL,
                 })
@@ -312,12 +297,12 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             }
             userNotification.show(i18n.t("messages:uploadcontroller.uploadsuccess"), "success")
             // Clear the cache so it gets reloaded.
-            audioLibrary.clearAudioTagCache()
+            audioLibrary.clearCache()
             store.dispatch(sounds.resetUserSounds())
             store.dispatch(sounds.getUserSounds(username))
             close()
         } catch (error) {
-            setError(error.toString())
+            setError(error.message)
         }
     }
 
@@ -334,33 +319,34 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
             </div>
             {searched && <div className="modal-section-header justify-start mb-3">{t("results")}</div>}
             {results && results.length > 0 &&
-                <div className="overflow-y-auto border p-3 border-gray-300" style={{ maxHeight: "300px" }}>
-                    {results.map((result, index) => <div key={index}>
-                        <label>
-                            <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
-                                onChange={e => {
-                                    if (e.target.checked) {
-                                        setSelected(index)
-                                        setKey(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
-                                        setError("")
-                                    }
-                                }} />
-                            {result.name}: {result.bpm} bpm. {t("soundUploader.freesound.uploadedBy", { userName: result.creator })}
-                        </label>
-                        <audio controls controlsList="nodownload" preload="none">
-                            <source src={result.previewURL} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
-                        <hr className="my-3 border-gray-300" />
+                <div className="overflow-y-auto border border-gray-300 dark:border-gray-500" style={{ maxHeight: "300px" }}>
+                    {results.map((result, index) => <div key={index} className={"border-b border-gray-300 " + (index === selected ? "bg-blue-200 dark:bg-blue-900" : "")}>
+                        <div className="pt-2 px-3">
+                            <label className="mb-2 inline-flex items-center">
+                                <input type="radio" style={{ marginRight: "0.75rem" }} checked={index === selected}
+                                    onChange={e => {
+                                        if (e.target.checked) {
+                                            setSelected(index)
+                                            setName(result.name.replace(/[^A-Za-z0-9]/g, "_").toUpperCase())
+                                            setError("")
+                                        }
+                                    }} />
+                                <audio className="ml-2" controls controlsList="nodownload" preload="none">
+                                    <source src={result.previewURL} type="audio/mpeg" />
+                                    Your browser does not support the audio element.
+                                </audio>
+                                <span className="ml-4 flex-1">{result.name}: {result.bpm} bpm. {t("soundUploader.freesound.uploadedBy", { userName: result.creator })}</span>
+                            </label>
+                        </div>
                     </div>)}
                 </div>}
             {searched &&
                 ((results === null && <div><i className="animate-spin es-spinner mr-3" />{t("soundUploader.freesound.searching")}</div>) ||
                     (results!.length === 0 && <div>{t("noResults")}</div>))}
             <div className="modal-section-header"><span>{t("soundUploader.constantRequired")}</span></div>
-            <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+            <input type="text" placeholder="e.g. MYSOUND_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </div>
-        <Footer ready={selected !== null} close={close} />
+        <ModalFooter submit="upload" ready={selected !== null} close={close} />
     </form>
 }
 
@@ -370,8 +356,8 @@ const TunepadTab = ({ close }: { close: () => void }) => {
     const tunepadOrigin = useRef("")
     const [ready, setReady] = useState(false)
     const [error, setError] = useState(isSafari ? "Sorry, TunePad in EarSketch currently does not work in Safari. Please use Chrome or Firefox." : "")
-    const [key, setKey] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [name, setName] = useState("")
+    const [progress, setProgress] = useState<number>()
 
     const login = useCallback(iframe => {
         if (!iframe) return
@@ -395,34 +381,34 @@ const TunepadTab = ({ close }: { close: () => void }) => {
                 const bytes = Uint8Array.from(data)
                 const file = new Blob([bytes], { type: "audio/wav" })
                 try {
-                    await uploadFile(file, key, ".wav", tempo, setProgress)
+                    await uploadFile(file, name, ".wav", tempo, setProgress)
                     close()
                 } catch (error) {
-                    setError(error.toString())
+                    setError(error.message)
                 }
             }
         }
         window.addEventListener("message", handleMessage)
         return () => window.removeEventListener("message", handleMessage)
-    }, [key])
+    }, [name])
 
     return <form onSubmit={e => { e.preventDefault(); tunepadWindow.current!.postMessage("save-wav-data", "*") }}>
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             {!isSafari && <>
                 <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-                <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+                <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
             </>}
         </div>
-        <Footer ready={ready} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
     </form>
 }
 
 const GrooveMachineTab = ({ close }: { close: () => void }) => {
     const GROOVEMACHINE_URL = "https://groovemachine.lmc.gatech.edu"
     const [error, setError] = useState("")
-    const [key, setKey] = useState("")
-    const [progress, setProgress] = useState(null as number | null)
+    const [name, setName] = useState("")
+    const [progress, setProgress] = useState<number>()
     const [ready, setReady] = useState(false)
     const gmWindow = useRef<Window>()
 
@@ -436,24 +422,24 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
             } else {
                 const file = new Blob([message.data.wavData], { type: "audio/wav" })
                 try {
-                    await uploadFile(file, key, ".wav", message.data.tempo, setProgress)
+                    await uploadFile(file, name, ".wav", message.data.tempo, setProgress)
                     close()
                 } catch (error) {
-                    setError(error.toString())
+                    setError(error.message)
                 }
             }
         }
         window.addEventListener("message", handleMessage)
         return () => window.removeEventListener("message", handleMessage)
-    }, [key])
+    }, [name])
 
     return <form onSubmit={e => { e.preventDefault(); gmWindow.current!.postMessage("save-wav-data", "*") }}>
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={key} onChange={e => setKey(cleanKey(e.target.value))} required />
+            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </div>
-        <Footer ready={ready} progress={progress} close={close} />
+        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
     </form>
 }
 

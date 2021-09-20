@@ -12,7 +12,7 @@ export const AudioContext = window.AudioContext || window.webkitAudioContext
 export const OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
 
 export const context = new AudioContext({
-    latencyHint: 'interactive',
+    latencyHint: "interactive",
     sampleRate: 44100,
 })
 

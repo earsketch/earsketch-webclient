@@ -1,11 +1,12 @@
 import i18n from "i18next"
 import React from "react"
+import { useTranslation } from "react-i18next"
 
 import { Script } from "common"
 import { parseLanguage } from "../esutils"
 import * as notification from "../user/notification"
 import * as reader from "./reader"
-import { useTranslation } from "react-i18next"
+import { ModalFooter } from "../Utils"
 
 export const ScriptAnalysis = ({ script, close }: { script: Script, close: () => void }) => {
     let analysis
@@ -15,7 +16,7 @@ export const ScriptAnalysis = ({ script, close }: { script: Script, close: () =>
         // We use `setTimeout` here to avoid calling NotificationPopup's setState during ScriptAnalysis render.
         // TODO: Bring popup state into Redux so this can be a dispatch instead.
         setTimeout(() => {
-            notification.show(i18n.t('messages:general.complexitySyntaxError'), 'failure2', 5)
+            notification.show(i18n.t("messages:general.complexitySyntaxError"), "failure2", 5)
             close()
         })
         return <button>...</button>
@@ -35,34 +36,32 @@ export const ScriptAnalysis = ({ script, close }: { script: Script, close: () =>
     return <>
         <div className="modal-header">
             <h4 className="modal-title">
-                <i className="glyphicon glyphicon-info-sign" ></i> {t('scriptAnalysis.title', { scriptName: script.name })}
+                <i className="glyphicon glyphicon-info-sign" ></i> {t("scriptAnalysis.title", { scriptName: script.name })}
             </h4>
         </div>
         <div className="modal-body">
             <table className="table">
                 <thead>
                     <tr>
-                        <th>{t('category')}</th>
-                        <th>{t('count')}</th>
+                        <th>{t("category")}</th>
+                        <th>{t("count")}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {categories.map(({ nameKey, count, value }) =>
-                    <tr key={nameKey}>
-                        <th>{t('scriptAnalysis.category.' + nameKey)}</th>
-                        <td>{count} &times; {value}</td>
-                    </tr>)}
+                        <tr key={nameKey}>
+                            <th>{t("scriptAnalysis.category." + nameKey)}</th>
+                            <td>{count} &times; {value}</td>
+                        </tr>)}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th>{t('total')}</th>
+                        <th>{t("total")}</th>
                         <td>{score}</td>
                     </tr>
                 </tfoot>
             </table>
         </div>
-        <div className="modal-footer">
-            <button className="btn btn-warning" onClick={close}>{t('exit')}</button>
-        </div>
+        <ModalFooter cancel="exit" close={close} />
     </>
 }

@@ -3,10 +3,12 @@ import { useSelector } from "react-redux"
 import { REPORT_LOG } from "../esconsole"
 
 import * as app from "../app/appState"
+import * as user from "../user/userState"
 import * as editor from "../ide/Editor"
 import * as ESUtils from "../esutils"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
+import { ModalFooter } from "../Utils"
 
 async function postJSON(endpoint: string, data: any) {
     const url = URL_DOMAIN + endpoint
@@ -25,6 +27,7 @@ async function postJSON(endpoint: string, data: any) {
 
 export const ErrorForm = ({ email: storedEmail, close }: { email: string, close: () => void }) => {
     const language = useSelector(app.selectScriptLanguage)
+    const username = useSelector(user.selectUserName)
     const [name, setName] = useState("")
     const [email, setEmail] = useState(storedEmail)
     const [description, setDescription] = useState("")
@@ -33,6 +36,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
         let body = ["@xfreeman", "@heerman", "@manodrum"].join(" ") + "\r\n"
         if (name || email) {
             body += "\r\n**Reported by:** " + (name ? name + " " : "") + (email ? `[${email}]` : "") + "\r\n"
+            body += username ? "\r\n**Logged in username:** " + username + "\r\n" : ""
         }
 
         let localStorageDump = ""
@@ -84,10 +88,7 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
                     <textarea id="description" className="form-control" rows={4} cols={54} value={description} onChange={e => setDescription(e.target.value)} autoFocus required />
                 </div>
             </div>
-            <div className="modal-footer">
-                <input type="button" className="btn btn-default" style={{ color: "rgb(208, 79, 77)" }} onClick={close} value="CANCEL" />
-                <input type="submit" className="btn btn-primary" value="SUBMIT" disabled={description === ""} />
-            </div>
+            <ModalFooter submit="submit" ready={description !== ""} close={close} />
         </form>
     </div>
 }
