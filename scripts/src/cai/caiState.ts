@@ -133,10 +133,12 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
         } else if (remote) {
             if (selectWizard(getState())) {
                 let responseOptions = selectResponseOptions(getState())
-                if (responseOptions.length > 2) {
-                    responseOptions = responseOptions.slice(1)
+                if (!responseOptions.includes(message)) {
+                    if (responseOptions.length > 2) {
+                        responseOptions = responseOptions.slice(1)
+                    }
+                    dispatch(setResponseOptions([...responseOptions, message]))
                 }
-                dispatch(setResponseOptions([...responseOptions, message]))
             } else {
                 dialogue.addToNodeHistory([combineMessageText(message), [wizard ? "Wizard" : "CAI"]])
                 dispatch(addToMessageList(message))
@@ -144,6 +146,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
                 newCAIMessage()
             }
         } else {
+            dialogue.addToNodeHistory([combineMessageText(message), ["CAI Suggestion"]])
             collaboration.sendChatMessage(message, "cai")
         }
     }

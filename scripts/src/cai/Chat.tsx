@@ -10,6 +10,7 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
+import { getUsername } from "../app/userProject"
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
@@ -22,6 +23,7 @@ const ChatFooter = () => {
     const [inputText, setInputText] = useState("")
 
     const parseStudentInput = (label: string) => {
+        dialogue.addToNodeHistory([label, [getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
             label: label,
