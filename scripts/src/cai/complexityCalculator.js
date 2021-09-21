@@ -1,8 +1,5 @@
 import * as ccState from './complexityCalculatorState';
 import * as ccHelpers from './complexityCalculatorHelperFunctions';
-import { func } from 'prop-types';
-import { makeBeat } from '../api/passthrough';
-import { includes } from 'ng-file-upload';
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 

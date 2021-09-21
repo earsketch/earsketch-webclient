@@ -66,6 +66,34 @@ export function handleError() {
         }
     }
 
+	if (!errorLine.includes("if") && !errorLine.includes("elif") && !errorLine.includes("else") && !errorLine.includes("for") && !errorLine.includes("while") && !errorLine.includes("in")) {
+		var colon:boolean = false
+		var openParen: number = -1
+		var closeParen: number = -1
+		if (errorLine[errorLine.length - 1] == ":") {
+			colon = true
+		}
+		openParen = errorLine.lastIndexOf("(")
+		if (errorLine.lastIndexOf(")") > openParen) {
+			closeParen = errorLine.lastIndexOf(")")
+		}
+
+		var trues: number = 0
+		if (colon) {
+			trues += 1
+		}
+		if (openParen > 0) {
+			trues += 1
+		}
+		if (closeParen > 0) {
+			trues += 1
+		}
+
+		if (trues > 1 && handleFunctionError() != null) {
+			return handleFunctionError()
+        }
+		
+    }
 	//do the same for for loops, while loops, and conditionals
 
 	//for loops
@@ -97,7 +125,7 @@ export function handleError() {
 function handleFunctionError() {
 	//find next non-blank line (if there is one). assess indent
 	var nextLine: string = ""
-	for (let i = 0; i < currentError.traceback[0].lineno; i++) {
+	for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
 		nextLine = textArray[i]
 		if (nextLine != "") {
 			break;
@@ -148,6 +176,10 @@ function handleFunctionError() {
 	if (paramString.length > 0) {
 		//param handling. what the heckie do we do here. we can check for numerical or string values, plus we
 
+		if (paramString.includes(" ") && !paramString.includes(",")) {
+			return ["function", "parameters missing commas"]
+        }
+
 		//get rid of list commas
 		while (paramString.includes("[")){
 			var openIndex: number = paramString.indexOf("[")
@@ -190,7 +222,41 @@ function isNumeric(str:string) {
 }
 
 function handleForLoopError() {
+	//find next non-blank line (if there is one). assess indent
+	var nextLine: string = ""
+	for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+		nextLine = textArray[i]
+		if (nextLine != "") {
+			break;
+		}
+	}
 
+	//compare indent on nextLine vs errorLine
+	if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+		return ["for loop", "missing body"]
+	}
+
+	var trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
+
+	if (!trimmedErrorLine.startsWith("for")) {
+		return ["for loop", "missing for"]
+	}
+	else {
+		trimmedErrorLine = trimmedErrorLine.substring(4)
+	}
+
+	//next get iterator name
+	var nextSpace: number = trimmedErrorLine.indexOf(" ")
+
+	var iteratorName: string = trimmedErrorLine.substring(0, nextSpace)
+	trimmedErrorLine = trimmedErrorLine.substring(nextSpace)
+
+	//check for iterator name
+	if (iteratorName == "" || iteratorName == " ") {
+		return["for loop", "missing iterator name"]
+	}
+
+	//next, check for in 
 }
 
 function handleWhileLoopError() {

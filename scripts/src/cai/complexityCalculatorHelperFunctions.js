@@ -267,6 +267,23 @@ function trimCommentsAndWhitespace(stringToTrim) {
     return returnString;
 }
 exports.trimCommentsAndWhitespace = trimCommentsAndWhitespace;
+
+function numberOfLeadingSpaces(stringToCheck) {
+    let number = 0
+
+    for (let i = 0; i < stringToCheck.length; i++) {
+        if (stringToCheck[i] !== " ") {
+            break
+        } else {
+            number += 1
+        }
+    }
+
+    return number
+}
+exports.numberOfLeadingSpaces = numberOfLeadingSpaces;
+
+
 // Gets the last line in a multiline block of code.
 function getLastLine(functionNode) {
     if (!('body' in functionNode) || functionNode.body.length === 0) {
