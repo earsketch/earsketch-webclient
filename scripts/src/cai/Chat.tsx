@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Browser"
 
+import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
+import "@webscopeio/react-textarea-autocomplete/style.css"
+
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
 import { CAI_TREE_NODES } from "./caitree"
@@ -11,6 +14,16 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
+
+
+const AutocompleteSuggestionItem = (text: any) => {
+    return (
+        <div className="autocomplete-item" style={{ zIndex: 1000 }}>
+            <span className="autocomplete-item-slash-command" style={{ fontWeight : "bold" }}>{`${text.entity.slashCommand}`}: </span>
+            <span className="autocomplete-item-utterance">{`${text.entity.utterance}`}</span>
+        </div>
+    )
+}
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
@@ -69,27 +82,22 @@ const ChatFooter = () => {
         }
     }
 
-    const handleKeyDown = (event: any) => {
-        const findUtteranceBySlashCommand = (slashCommand: string) => {
-            for (let i = 0; i < caiTree.length; i++) {
-                if ("slashCommand" in caiTree[i] && caiTree[i].slashCommand == slashCommand) {
-                    return caiTree[i].utterance
-                }
+    const findUtteranceBySlashCommand = (slashCommandPrompt: string) => {
+        const utterances = []
+        for (const node of caiTree) {
+            if ("slashCommand" in node && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
+                utterances.push({
+                    utterance: node.utterance,
+                    slashCommand: node.slashCommand,
+                })
             }
         }
+        return utterances
+    }
+
+    const handleKeyDown = (event: any) => {
         if (event.key === "Enter") {
             sendMessage()
-        }  else if (event.key == " ") {
-            // Handle slash command. Typing "/3" followed by a space would replace the text in the
-            // text-area with the utterance from node 3 in the CAITree.
-            if (inputText.startsWith("/")) {
-                let slashCommandIdentifier: any = inputText.substring(1)
-                let utterance: string = findUtteranceBySlashCommand(slashCommandIdentifier)
-                if (utterance !== undefined) {
-                    setInputText(utterance) // replace the text field with the text from the node's utterance
-                    event.preventDefault() // don't insert an additional space at the end
-                }
-            }
         }
     }
 
@@ -107,7 +115,30 @@ const ChatFooter = () => {
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
-                <textarea id="chat-textarea" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></textarea>
+                <ReactTextareaAutocomplete
+                    id="chat-textarea"
+                    value={inputText}
+                    onChange={(e: any) => setInputText(e.target.value)}
+                    onKeyDown={(e: any) => handleKeyDown(e)}
+                    minChar={1}
+                    loadingComponent={() => <span>Loading</span>}
+                    itemClassName="autocomplete-item"
+                    dropdownClassName="autocomplete-list"
+                    containerClassName="autocomplete-container"
+                    trigger={{
+                        "/": {
+                            dataProvider: (token: string) => {
+                                const utterances = findUtteranceBySlashCommand(token)
+                                return utterances
+                            },
+                            component: AutocompleteSuggestionItem,
+                            output: (item: any, trigger: any) => item.utterance,
+                        },
+                    }}
+                    style={{
+                        backgroundColor: "lightGray",
+                    }}
+                />
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
