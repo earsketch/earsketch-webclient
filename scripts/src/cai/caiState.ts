@@ -126,7 +126,7 @@ export const combineMessageText = (input: CAIMessage) => {
 export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolean?], ThunkAPI>(
     "cai/addCAIMessage",
     ([message, remote = false, wizard = false], { getState, dispatch }) => {
-        if (message.sender !== "CAI") {
+        if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
             dispatch(addToMessageList(message))
             dispatch(autoScrollCAI())
             newCAIMessage()

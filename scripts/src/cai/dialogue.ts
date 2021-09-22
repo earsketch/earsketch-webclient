@@ -944,7 +944,7 @@ const LINKS: { [key: string]: string } = {
     "for loop": "/en/v2/loops-and-layers.html#forloops",
     loops: "/en/v2/loops-and-layers.html#forloops",
     range: "/en/v2/loops-and-layers.html#forloops",
-    setEffect: "/en/v1/every-effect-explained-in-detail.html",
+    setEffect: "/en/v2/effects-and-envelopes.html#effectsinearsketch",
     "effect ramp": "/en/v2/effects-and-envelopes.html#effectsandenvelopes",
     function: "/en/v2/effects-and-envelopes.html#functionsandmoreeffects",
     functions: "/en/v2/effects-and-envelopes.html#functionsandmoreeffects",
