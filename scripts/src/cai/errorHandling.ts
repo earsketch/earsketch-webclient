@@ -61,12 +61,12 @@ export function handleError() {
 	var functionWords: string[] = ["def ", "function "]
 
 	for (let i = 0; i < functionWords.length; i++) {
-		if (errorLine.includes(functionWords[i])) {
+		if (errorLine.toLowerCase().includes(functionWords[i])) {
 			return handleFunctionError()
         }
     }
 
-	if (!errorLine.includes("if") && !errorLine.includes("elif") && !errorLine.includes("else") && !errorLine.includes("for") && !errorLine.includes("while") && !errorLine.includes("in")) {
+	if (!errorLine.toLowerCase().includes("if") && !errorLine.toLowerCase().includes("elif") && !errorLine.toLowerCase().includes("else") && !errorLine.toLowerCase().includes("for") && !errorLine.toLowerCase().includes("while") && !errorLine.toLowerCase().includes("in")) {
 		var colon:boolean = false
 		var openParen: number = -1
 		var closeParen: number = -1
@@ -114,12 +114,14 @@ export function handleError() {
 	var conditionalWords: string[] = ["if", "else", "elif"]
 
 	for (let i = 0; i < conditionalWords.length; i++) {
-		if (errorLine.includes(conditionalWords[i])) {
+		if (errorLine.toLowerCase().includes(conditionalWords[i])) {
 			return handleConditionalError()
 		}
 	}
 
-
+	if (errorLine.toLowerCase().includes("fitmedia")) {
+		handleFitMediaError()
+	}
 }
 
 function handleFunctionError() {
@@ -170,7 +172,7 @@ function handleFunctionError() {
 		return ["function", "missing parentheses"]
 	}
 
-		//do params //TODO erin this is where you left off
+		//do params
 	var paramString: string = trimmedErrorLine.substring(parenIndex + 1, trimmedErrorLine.length - 2)
 
 	if (paramString.length > 0) {
@@ -257,6 +259,112 @@ function handleForLoopError() {
 	}
 
 	//next, check for in 
+	if (!trimmedErrorLine.startsWith("in")) {
+		return["for loop", "missing in"]
+	}
+
+	//this is where paths may diverge a little bit
+	trimmedErrorLine = trimmedErrorLine.substring(3)
+
+
+	//check this here, then cut the colon off
+	if (trimmedErrorLine[trimmedErrorLine.length - 1] != ":") {
+		return ["for loop", "missing colon"]
+	}
+	trimmedErrorLine = trimmedErrorLine.substring(0, trimmedErrorLine.length - 1)
+
+	//now we have our iterable. 
+	if (trimmedErrorLine.startsWith("range")) {
+		if (!trimmedErrorLine.includes("(") || !trimmedErrorLine.includes(")")) {
+			return ["for loop", "range missing parentheses"]
+		}
+		var parenIndex = trimmedErrorLine.indexOf("(")
+		var argString: string = trimmedErrorLine.substring(parenIndex + 1, trimmedErrorLine.length - 1)
+		//check args
+
+		//get rid of list commas
+		while (argString.includes("[")){
+			var openIndex: number = argString.indexOf("[")
+			var closeIndex: number = argString.indexOf("]")
+
+			argString = argString.replace("[", "")
+			argString = argString.replace("]", "")
+
+			for (let i = openIndex; i < closeIndex; i++) {
+				if (argString[i] == ",") {
+					argString = replaceAt(argString, i, "|")
+				}
+            }
+
+		}
+
+		var rangeArgs: string[] = argString.split(",")
+		if (rangeArgs.length > 1 || rangeArgs.length > 3) {
+			return ["for loop", "incorrect number of range arguments"]
+        }
+		//each arg should be a number
+		for (let i = 0; i < rangeArgs.length; i++) {
+			var singleArg: string = ccHelpers.trimCommentsAndWhitespace(rangeArgs[i])
+			//is it a number
+			if (!isNumeric(singleArg)) {
+				return ["for loop", "non-numeric range argument"]
+            }
+        }
+	}
+	else {
+
+		var isValid:boolean = false
+
+		//then this ought to be a string, a list, or a variable containing one of those things, or a function returning one of those things
+		if (trimmedErrorLine.includes("(") && trimmedErrorLine.endsWith(")")) {
+			//then we can assume we have a function call
+
+			//first, let's check if the function called exists
+			var functionName: string = trimmedErrorLine.substring(0, trimmedErrorLine.indexOf("("))
+
+			//handling for built-ins
+			if (functionName.includes(".")) {
+				functionName = functionName.substring(functionName.lastIndexOf(".") + 1)
+            }
+
+			//is it a built-in?
+			if (ccState.builtInNames.includes(functionName)) {
+				//look up return type. if it's not a string or list, it's not valid
+				for (let i = 0; i < ccState.builtInReturns.length; i++) {
+					if (ccState.builtInReturns[i].name == functionName) {
+						if (ccState.builtInReturns[i].returns == "Str" || ccState.builtInReturns[i].returns == "Str" )
+						break;
+                    }
+                }
+				//isValid = true
+            }
+
+			let allFuncs: any = ccState.getProperty("userFunctions")
+
+			//if it does, we should pass this to the function call error handler
+		}
+
+		//is it a list?
+		else if (trimmedErrorLine.includes("[") && trimmedErrorLine.endsWith("]")) {
+			//it's a list
+		}
+
+		else if (trimmedErrorLine.includes("\"") || trimmedErrorLine.includes("'")) {
+			//it's a string
+		}
+		else {
+			//we can probably assume it's a variable
+        }
+
+		if (!isValid) {
+			return ["for loop", "invalid iterable"]
+        }
+    }
+
+}
+
+function handleCallError() {
+
 }
 
 function handleWhileLoopError() {
@@ -268,6 +376,32 @@ function handleConditionalError() {
 }
 
 function handleNameError() {
+
+}
+
+function handleFitMediaError() {
+	var trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
+
+	if (trimmedErrorLine.includes("fitmedia") || trimmedErrorLine.includes("FitMedia") || trimmedErrorLine.includes("Fitmedia")) {
+		return ["fitMedia", "miscapitalization"]
+	}
+
+	//parens
+	//we should check that the function anme is there
+	//this i guess goes hand in hand with the parentheses check
+	var parenIndex: number = trimmedErrorLine.indexOf("(")
+
+	if (parenIndex == -1) {
+		return ["function", "missing parentheses"]
+	}
+
+	if (trimmedErrorLine[trimmedErrorLine.length - 2] != ")") {
+		return ["function", "missing parentheses"]
+	}
+
+	//now check arguments
+	trimmedErrorLine = trimmedErrorLine.substring(trimmedErrorLine.indexOf("("), trimmedErrorLine.lastIndexOf(")"))
+
 
 }
 
