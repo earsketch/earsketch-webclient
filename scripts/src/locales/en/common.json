@@ -779,14 +779,14 @@
     },
 
     "selectRandomFile": {
-      "description": "Selects a random soundfile from a specified folder.",
+      "description": "Selects a random sound from standard folders.",
       "parameters": {
-        "folder": {
-          "description": "Folder to get random soundfile from. Typically, this is a constant from the sound browser (a folder name, not a file name)."
+        "folderSubstring": {
+          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
         }
       },
       "returns": {
-        "description": "A random Sound Constant from the specified folder."
+        "description": "A random Sound Constant from matching folders."
       }
     },
 
