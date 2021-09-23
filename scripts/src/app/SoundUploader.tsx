@@ -265,7 +265,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
         setResults(null)
         setSelected(null)
 
-        const data = await userProject.get("/audio/searchfreesound", { query })
+        const data = await userProject.get("/audio/freesound/search", { query })
         const results = data.results
             .filter((result: any) => result.analysis?.rhythm?.bpm)
             .map((result: any) => ({
@@ -284,7 +284,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
         try {
             validateUpload(name, result.bpm)
             try {
-                await userProject.postAuth("/audio/uploadfromfreesound", {
+                await userProject.postAuth("/audio/freesound/upload", {
                     username,
                     name,
                     tempo: result.bpm + "",
