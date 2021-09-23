@@ -772,7 +772,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
 }
 
 function getTypeFromASTNode(node) {
-    //TODO
+    
     let autoReturns = ["List", "Str"];
     if (autoReturns.includes(node._astname)) {
         return node._astname;

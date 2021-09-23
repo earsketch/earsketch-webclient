@@ -283,6 +283,77 @@ function numberOfLeadingSpaces(stringToCheck) {
 }
 exports.numberOfLeadingSpaces = numberOfLeadingSpaces;
 
+function estimateDataType(node) {
+    let autoReturns = ["List", "Str"];
+    if (autoReturns.includes(node._astname)) {
+        return node._astname;
+    }
+    else if (node._astname == "Num") {
+
+        if (Object.getPrototypeOf(node.n)["tp$name"] == "int") {
+            return "Int";
+        }
+        else {
+            return "Float";
+        }
+        //return "Num";
+    }
+    else if (node._astname == "Call") {
+        //get name
+        let funcName = "";
+        if ("attr" in node.func) {
+            funcName = node.func.attr.v;
+        }
+        else if ("id" in node.func) {
+            funcName = node.func.id.v;
+        }
+        else {
+            return null;
+        }
+        //look up the function name
+        //builtins first
+        if (ccState.builtInNames.includes(funcName)) {
+            for (let i = 0; i < ccState.builtInReturns.length; i++) {
+                if (ccState.builtInReturns[i].name == funcName) {
+                    return ccState.builtInReturns[i].returns;
+                }
+            }
+        }
+        let existingFunctions = ccState.getProperty("userFunctions");
+        for (let i = 0; i < existingFunctions.length; i++) {
+            if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
+                if (existingFunctions[i].returns == true) {
+                    return estimateDataType(existingFunctions[i].returnVals[0]);
+                }
+            }
+        }
+    }
+    else if (node._astname == "Name") {
+        if (node.id.v === "True" || node.id.v === "False") {
+            return "Bool";
+        }
+
+        //either a function alias or var.
+        let funcs = ccState.getProperty("userFunctions");
+        for (let i = 0; i < funcs.length; i++) {
+            if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
+                return "Func";
+            }
+        }
+
+        let allVars = ccState.getProperty("allVariables");
+
+        for (let i = 0; i < allVars.length; i++) {
+            if (allVars[i].name == node.id.v) {
+
+            }
+        }
+        //return reverseValueTrace(true, node.id.v, node.lineno);
+        //look up the variable
+    }
+    return null;
+}
+exports.estimateDataType = estimateDataType;
 
 // Gets the last line in a multiline block of code.
 function getLastLine(functionNode) {
