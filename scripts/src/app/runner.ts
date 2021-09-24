@@ -343,7 +343,7 @@ function getClipTempo(result: DAWData) {
 
     for (const track of result.tracks) {
         for (const clip of track.clips) {
-            const tempo = lookupTempo(clip.filekey)
+            const tempo = lookupTempo(clip.name)
             clip.tempo = tempo
         }
     }
@@ -353,8 +353,8 @@ async function loadBuffers(result: DAWData) {
     const promises = []
     for (const track of result.tracks) {
         for (const clip of track.clips) {
-            const promise: Promise<[string, AudioBuffer]> = audioLibrary.getSound(clip.filekey).then(
-                sound => [clip.filekey, sound.buffer])
+            const promise: Promise<[string, AudioBuffer]> = audioLibrary.getSound(clip.name).then(
+                sound => [clip.name, sound.buffer])
             promises.push(promise)
         }
     }
@@ -384,7 +384,7 @@ export async function loadBuffersForSampleSlicing(result: DAWData) {
 // Slice a buffer to create a new temporary sound constant.
 //   start - the start of the sound, in measures (relative to 1 being the start of the sound)
 //   end - the end of the sound, in measures (relative to 1 being the start of the sound)
-function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
+function sliceAudioBufferByMeasure(name: string, buffer: AudioBuffer, start: number, end: number, tempo: number) {
     const lengthInBeats = (end - start) * 4 // 4 beats per measure
     const lengthInSeconds = lengthInBeats * (60.0 / tempo)
     const lengthInSamples = lengthInSeconds * buffer.sampleRate
@@ -397,7 +397,7 @@ function sliceAudioBufferByMeasure(filekey: string, buffer: AudioBuffer, start: 
     const endSamp = (end - 1) * 4 * (60.0 / tempo) * buffer.sampleRate
 
     if (endSamp > buffer.length) {
-        throw new RangeError(`End of slice at ${end} reaches past end of sample ${filekey}`)
+        throw new RangeError(`End of slice at ${end} reaches past end of sample ${name}`)
     }
 
     for (let i = 0; i < buffer.numberOfChannels; i++) {
@@ -484,7 +484,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
         track.analyser = audioContext.createAnalyser()
         const newClips: Clip[] = []
         for (const clip of track.clips) {
-            clip.sourceAudio = buffers[clip.filekey]
+            clip.sourceAudio = buffers[clip.name]
             let duration
             let posIncrement = 0
 
@@ -530,7 +530,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 } else {
                     // Timestretch to match the tempo map at this point in the track (or retrieve cached buffer).
                     const pointsDuringClip = tempoMap.slice(measure, measure + (end - start)).points
-                    const cacheKey = JSON.stringify([clip.filekey, start, end, pointsDuringClip])
+                    const cacheKey = JSON.stringify([clip.name, start, end, pointsDuringClip])
                     let cached = timestretchCache.get(cacheKey)
 
                     let input = clip.sourceAudio.getChannelData(0)
@@ -588,12 +588,12 @@ function checkOverlaps(result: DAWData) {
                 const siblingRight = sibling.measure + ESUtils.truncate(sibling.end - sibling.start, truncateDigits)
                 if (clipLeft >= siblingLeft && clipLeft < (siblingRight - margin)) {
                     esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
+                    userConsole.warn(`Overlapping clips ${clip.name} and ${sibling.name} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
                     track.clips.splice(j, 1)
                 } else if (clipRight > (siblingLeft + margin) && clipRight <= siblingRight) {
                     esconsole([clip, sibling], "runner")
-                    userConsole.warn(`Overlapping clips ${clip.filekey} and ${sibling.filekey} on track ${clip.track}`)
+                    userConsole.warn(`Overlapping clips ${clip.name} and ${sibling.name} on track ${clip.track}`)
                     userConsole.warn("Removing the right-side overlap")
                     track.clips.splice(k, 1)
                 }
@@ -628,10 +628,10 @@ async function addMetronome(result: DAWData) {
         analyser: audioContext.createAnalyser(),
     }
     for (let i = 1; i < result.length + 1; i += 0.25) {
-        const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
+        const name = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
         track.clips.push({
-            filekey: filekey,
+            name,
             sourceAudio: sound.buffer,
             audio: sound.buffer,
             track: result.tracks.length,

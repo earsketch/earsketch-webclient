@@ -31,19 +31,16 @@ export const EFFECT_NAMES = [
 ]
 export const ANALYSIS_NAMES = ["SPECTRAL_CENTROID", "RMS_AMPLITUDE"]
 
-// Get an audio buffer from a file key.
-//   filekey: The constant associated with the audio clip that users type in EarSketch code.
-//   tempo: Tempo to scale the returned clip to.
-export function getSound(filekey: string) {
-    if (filekey in cache.promises) {
-        return cache.promises[filekey]
+export function getSound(name: string) {
+    if (name in cache.promises) {
+        return cache.promises[name]
     } else {
-        return (cache.promises[filekey] = _getSound(filekey))
+        return (cache.promises[name] = _getSound(name))
     }
 }
 
 async function _getSound(name: string) {
-    esconsole("Loading audio: " + name, ["debug", "audiolibrary"])
+    esconsole("Loading sound: " + name, ["debug", "audiolibrary"])
     const url = URL_DOMAIN + "/audio/sample?" + new URLSearchParams({ name })
 
     // STEP 1: check if sound exists

@@ -7,7 +7,7 @@ export const clear = () => {
 }
 
 const prepKey = (clip: Clip) => {
-    return `${clip.filekey}-${clip.start}-${clip.end}`
+    return `${clip.name}-${clip.start}-${clip.end}`
 }
 
 export const checkIfExists = (clip: Clip) => {

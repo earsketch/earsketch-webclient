@@ -304,7 +304,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
 
     return <div ref={element} className={`dawAudioClipContainer${clip.loopChild ? " loop" : ""}`} style={{ background: color, width: width + "px", left: offset + "px" }}>
         <div className="clipWrapper">
-            <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.filekey}</div>
+            <div style={{ width: width + "px" }} className="clipName prevent-selection">{clip.name}</div>
             <canvas></canvas>
         </div>
     </div>

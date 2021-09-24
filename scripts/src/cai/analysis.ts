@@ -148,13 +148,13 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                     // check for duplicate
                     let isDupe = false
                     for (const p in Object.keys(measureView[k])) {
-                        if (measureView[k][p].name === sample.filekey) {
+                        if (measureView[k][p].name === sample.name) {
                             isDupe = true
                             break
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: i, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey] })
+                        measureView[k].push({ type: "sound", track: i, name: sample.name, genre: keyGenreDict[sample.name], instrument: keyInstrumentDict[sample.name] })
                     }
                 }
             }

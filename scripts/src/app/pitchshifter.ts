@@ -267,7 +267,7 @@ export function pitchshiftClips(track: Track, tempoMap: TempoMap) {
         let shiftedBuffer
         const bendinfo = getEnvelopeForClip(clip, tempoMap, trackEnvelope)
         const hashKey = JSON.stringify({
-            clip: [clip.filekey, clip.start, clip.end],
+            clip: [clip.name, clip.start, clip.end],
             bendinfo,
         })
 
@@ -281,7 +281,7 @@ export function pitchshiftClips(track: Track, tempoMap: TempoMap) {
             } catch (err) {
                 esconsole("PitchShift Buffer not processed ", ["debug", "pitchshift"])
                 esconsole(err, ["ERROR", "PITCHSHIFT"])
-                userConsole.error("Error processing " + clip.filekey)
+                userConsole.error("Error processing " + clip.name)
                 throw err
             }
             BUFFER_CACHE[hashKey] = shiftedBuffer

@@ -9,7 +9,7 @@ import { TempoMap } from "./tempo"
 // Preliminary type declarations
 // TODO: Move some to runner?
 export interface Clip {
-    filekey: string
+    name: string
     loopChild: boolean
     measure: number
     start: number

@@ -129,7 +129,7 @@ export const formatResultForTests = (result: DAWData) => {
         }
         for (const clip of track.clips) {
             const temp = {
-                filekey: clip.filekey,
+                name: clip.name,
                 measure: clip.measure,
                 start: clip.start,
                 end: clip.end,

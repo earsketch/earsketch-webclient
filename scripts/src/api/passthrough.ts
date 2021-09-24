@@ -116,13 +116,13 @@ export const finish = (result: DAWData) => {
 }
 
 // Add a clip to the given result object.
-export function fitMedia(result: DAWData, filekey: string, trackNumber: number, startLocation: number, endLocation: number) {
-    esconsole(`Calling pt_fitMedia from passthrough with parameters ${filekey}, ${trackNumber}, ${startLocation}, ${endLocation}`, "PT")
+export function fitMedia(result: DAWData, name: string, trackNumber: number, startLocation: number, endLocation: number) {
+    esconsole(`Calling pt_fitMedia from passthrough with parameters ${name}, ${trackNumber}, ${startLocation}, ${endLocation}`, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("fitMedia", args, 4, 4)
-    ptCheckType("filekey", "string", filekey)
-    ptCheckFilekeyType(filekey)
+    ptCheckType("name", "string", name)
+    ptCheckName(name)
     ptCheckType("trackNumber", "number", trackNumber)
     ptCheckInt("trackNumber", trackNumber)
     ptCheckType("startLocation", "number", startLocation)
@@ -134,7 +134,7 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
     }
 
     const clip = {
-        filekey: filekey,
+        name,
         track: trackNumber,
         measure: startLocation,
         start: 1,
@@ -159,7 +159,7 @@ export function insertMedia(result: DAWData, fileName: string, trackNumber: numb
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("insertMedia", args, 3, 4)
     ptCheckType("fileName", "string", fileName)
-    ptCheckFilekeyType(fileName)
+    ptCheckName(fileName)
     ptCheckType("trackNumber", "number", trackNumber)
     ptCheckInt("trackNumber", trackNumber)
 
@@ -176,7 +176,7 @@ export function insertMedia(result: DAWData, fileName: string, trackNumber: numb
     }
 
     const clip = {
-        filekey: fileName,
+        name: fileName,
         track: trackNumber,
         measure: trackLocation,
         start: 1,
@@ -210,7 +210,7 @@ export function insertMediaSection(
     const args = [...arguments].slice(1)
     ptCheckArgs("insertMediaSection", args, 3, 6)
     ptCheckType("fileName", "string", fileName)
-    ptCheckFilekeyType(fileName)
+    ptCheckName(fileName)
     ptCheckType("trackNumber", "number", trackNumber)
     ptCheckInt("trackNumber", trackNumber)
     ptCheckType("trackLocation", "number", trackLocation)
@@ -232,7 +232,7 @@ export function insertMediaSection(
     }
 
     const clip = {
-        filekey: fileName,
+        name: fileName,
         track: trackNumber,
         measure: trackLocation,
         start: mediaStartLocation,
@@ -301,7 +301,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                     throw new RangeError(i18n.t("messages:esaudio.stringindex"))
                 }
             }
-            const filekey = mediaList[current]
+            const name = mediaList[current]
             const location = measure + (i * SIXTEENTH)
             const start = 1 // measure + (i * SIXTEENTH)
             let end = start + SIXTEENTH
@@ -335,11 +335,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
             }
 
             const clip = {
-                filekey: filekey,
-                track: track,
+                name,
+                track,
                 measure: location,
-                start: start,
-                end: end,
+                start,
+                end,
                 loop: false,
                 silence,
             } as unknown as Clip
@@ -365,7 +365,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
     const args = [...arguments].slice(1)
     ptCheckArgs("makeBeatSlice", args, 5, 5)
     ptCheckType("media", "string", media)
-    ptCheckFilekeyType(media)
+    ptCheckName(media)
     ptCheckType("track", "number", track)
     ptCheckInt("track", track)
     ptCheckType("measure", "number", measure)
@@ -453,7 +453,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
     ptCheckArgs("analyze", args, 2, 2)
 
     ptCheckType("audioFile", "string", audioFile)
-    ptCheckFilekeyType(audioFile)
+    ptCheckName(audioFile)
     ptCheckType("featureForAnalysis", "string", featureForAnalysis)
 
     if (!~["spectral_centroid", "rms_amplitude"].indexOf(featureForAnalysis.toLowerCase())) {
@@ -487,7 +487,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
 
     ptCheckType("featureForAnalysis", "string", featureForAnalysis)
     ptCheckType("audioFile", "string", audioFile)
-    ptCheckFilekeyType(audioFile)
+    ptCheckName(audioFile)
     // TODO: These should probably be renamed, as they are actually in measures.
     ptCheckType("startTime", "number", startTime)
     ptCheckType("endTime", "number", endTime)
@@ -627,16 +627,15 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
 }
 
 // Get the duration of a clip.
-export function dur(result: DAWData, fileKey: string) {
-    esconsole("Calling pt_dur from passthrough with parameters " +
-                fileKey, "PT")
+export function dur(result: DAWData, name: string) {
+    esconsole("Calling pt_dur from passthrough with parameters " + name, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("dur", args, 1, 1)
-    ptCheckType("fileKey", "string", fileKey)
+    ptCheckType("name", "string", name)
 
     const tempoMap = new TempoMap(result)
-    return audioLibrary.getSound(fileKey).then(sound => {
+    return audioLibrary.getSound(name).then(sound => {
         // For consistency with old behavior, use clip tempo if available and initial tempo if not.
         const tempo = sound.tempo ?? tempoMap.points[0].tempo
         // Round to nearest hundredth.
@@ -978,8 +977,8 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("createAudioSlice", args, 3, 3)
-    ptCheckType("filekey", "string", oldSoundFile)
-    ptCheckFilekeyType(oldSoundFile)
+    ptCheckType("name", "string", oldSoundFile)
+    ptCheckName(oldSoundFile)
     ptCheckType("startLocation", "number", startLocation)
     ptCheckType("endLocation", "number", endLocation)
     ptCheckAudioSliceRange(result, oldSoundFile, startLocation, endLocation)
@@ -1113,10 +1112,10 @@ const ptCheckInt = (name: string, arg: number) => {
     }
 }
 
-const ptCheckFilekeyType = (filekey: string) => {
-    if ((filekey[0] === "'" && filekey[filekey.length - 1] === "'") ||
-        (filekey[0] === "'" && filekey[filekey.length - 1] === "'")) {
-        throw new TypeError("Media constant (" + filekey + ") should not include quotation marks")
+const ptCheckName = (name: string) => {
+    if ((name[0] === "'" && name[name.length - 1] === "'") ||
+        (name[0] === "'" && name[name.length - 1] === "'")) {
+        throw new TypeError("Media constant (" + name + ") should not include quotation marks")
     }
 }
 
@@ -1147,7 +1146,7 @@ const ptCheckRange = (name: string, arg: number, min: number | { min?: number, m
     }
 }
 
-const ptCheckAudioSliceRange = (result: DAWData, fileKey: string, startTime: number, endTime: number) => {
+const ptCheckAudioSliceRange = (result: DAWData, name: string, startTime: number, endTime: number) => {
     if (startTime < 1) {
         throw new RangeError("Cannot start slice before the start of the clip")
     }
@@ -1157,7 +1156,7 @@ const ptCheckAudioSliceRange = (result: DAWData, fileKey: string, startTime: num
     // and the error never gets thrown.
     // Instead the error gets caught in runner's `sliceAudioBufferByMeasure`.
     // (The brokenness was discovered via TypeScript migration of audiolibrary.)
-    const clipDuration = dur(result, fileKey) as unknown as number
+    const clipDuration = dur(result, name) as unknown as number
     if (endTime > clipDuration + 1) {
         throw new RangeError("Cannot end slice after the end of the clip")
     }
@@ -1203,7 +1202,7 @@ const ptCheckEffectRange = (
  *
  * @param {Object} result The result object to add the clip to.
  * @param {Object} clip The clip to add.
- * @param {string} clip.filekey The filekey to load in the clip.
+ * @param {string} clip.name The name of the sound to load in the clip.
  * @param {integer} clip.track The track to add the clip to.
  * @param {integer} clip.measure The measure to begin playing at.
  * @param {number} clip.start The start measure of the clip slice to play.
