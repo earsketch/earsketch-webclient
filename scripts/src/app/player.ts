@@ -379,8 +379,9 @@ const refresh = (clearAllGraphs = false) => {
     if (isPlaying) {
         esconsole("refreshing the rendering data", ["player", "debug"])
         const currentMeasure = getPosition()
-        const nextMeasure = Math.ceil(currentMeasure)
-        const timeTillNextBar = new TempoMap(renderingDataQueue[1]!).measureToTime(nextMeasure - currentMeasure + 1)
+        const nextMeasure = Math.floor(currentMeasure + 1)
+        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
         if (clearAllGraphs) {
             clearAllAudioGraphs(timeTillNextBar)
@@ -507,8 +508,6 @@ export const setPosition = (position: number) => {
     clearAllTimers()
 
     if (isPlaying) {
-        const currentMeasure = getPosition()
-
         if (loop.on) {
             loopScheduledWhilePaused = true
 
@@ -520,9 +519,10 @@ export const setPosition = (position: number) => {
             }
         }
 
+        const currentMeasure = getPosition()
+        const nextMeasure = Math.floor(currentMeasure + 1)
         const tempoMap = new TempoMap(renderingDataQueue[1]!)
-        const timeTillNextBar = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - tempoMap.measureToTime(currentMeasure)
-
+        const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
         clearAllAudioGraphs(timeTillNextBar)
         play(position, playbackData.endMeasure, timeTillNextBar)
     } else {
