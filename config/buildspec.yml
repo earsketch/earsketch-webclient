@@ -29,10 +29,7 @@ phases:
   install:
     commands:
       - echo Entered the install phase...
-      - yum install -y chromium
-      - rpm -q chromium
-      - rpm -ql chromium
-      - export CHROME_BIN='/usr/bin/chromium'
+      - export CHROME_BIN='/usr/bin/chromium-browser'
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
