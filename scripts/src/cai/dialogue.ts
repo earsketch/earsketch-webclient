@@ -568,6 +568,7 @@ function shuffle(array: any[]) {
 }
 
 function showNextDialogue() {
+    let sampleRecs = []
     currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]) // make a copy
     if (currentTreeNode[activeProject].id == 69) {
         done = true
@@ -768,12 +769,14 @@ function showNextDialogue() {
             recommendationHistory[activeProject].push(recs[idx])
         }
         let numLoops = 0
+        
         while (utterance.includes("[sound_rec]")) {
             const recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11]
             const newRecString = recs[recIndex]
+            sampleRecs.push(recs[recIndex])
             usedRecs.push(recs[recIndex])
             if (newRecString !== undefined) {
-                utterance = utterance.substring(0, recBounds[0]) + newRecString + utterance.substring(recBounds[1])
+                utterance = utterance.substring(0, recBounds[0]) + utterance.substring(recBounds[1]).replace(/(\r\n|\n|\r)/gm, "");
                 recIndex++
             }
             numLoops++
@@ -900,6 +903,7 @@ function showNextDialogue() {
             addToNodeHistory([0, utterance, parameters])
         }
     }
+    structure.push(sampleRecs)
     return structure
 }
 

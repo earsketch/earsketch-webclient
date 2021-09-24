@@ -103,6 +103,7 @@ export interface CAIMessage {
     sender: string
     keyword: string[][]
     text: string[]
+    recs: string[]
     date: number
 }
 
@@ -159,6 +160,7 @@ const caiOutput = createAsyncThunk<void, any, ThunkAPI>(
             const outputMessage = {
                 text: messages[msg][0],
                 keyword: messages[msg][1],
+                recs: messages[msg][2],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage
@@ -196,6 +198,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         const message = {
             text: [input.label, "", "", "", ""],
             keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
+            recs: ["","",""],
             date: Date.now(),
             sender: userProject.getUsername(),
         } as CAIMessage
@@ -267,6 +270,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
                 const message = {
                     text: ["Compiled the script!", "", "", "", ""],
                     keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
+                    recs: ["","",""],
                     date: Date.now(),
                     sender: userProject.getUsername(),
                 } as CAIMessage
@@ -293,6 +297,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
             const message = {
                 text: output[0],
                 keyword: output[1],
+                recs: output[2],
                 date: Date.now(),
                 sender: "CAI",
             } as CAIMessage
@@ -320,6 +325,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
             const message = {
                 text: ["Compiled the script with error: " + data[0], "", "", "", ""],
                 keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
+                recs: ["","",""],
                 date: Date.now(),
                 sender: userProject.getUsername(),
             } as CAIMessage
@@ -354,6 +360,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
             collaboration.sendChatMessage({
                 text: ["the CAI Window", "", "", "", ""],
                 keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
+                recs: ["","",""],
                 sender: userProject.getUsername(),
                 date: Date.now(),
             } as CAIMessage, "curriculum")
@@ -384,6 +391,7 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
                 collaboration.sendChatMessage({
                     text: ["Curriculum Page " + location as string, "", "", "", ""],
                     keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
+                    recs: ["","",""],
                     sender: userProject.getUsername(),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")

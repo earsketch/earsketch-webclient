@@ -10,6 +10,8 @@ import * as appState from "../app/appState"
 import * as ESUtils from "../esutils"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
+import * as sounds from "../browser/soundsState"
+
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -41,19 +43,23 @@ const CAIMessageView = (message: cai.CAIMessage) => {
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
-                    {/* TODO: Refactor using map. */}
                     {message.text[0]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 0])) }} style={{ color: "blue" }}>{message.keyword[0][0]}</a>
-                    {message.text[1]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 1])) }} style={{ color: "blue" }}>{message.keyword[1][0]}</a>
-                    {message.text[2]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 2])) }} style={{ color: "blue" }}>{message.keyword[2][0]}</a>
-                    {message.text[3]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 3])) }} style={{ color: "blue" }}>{message.keyword[3][0]}</a>
-                    {message.text[4]}
-                    <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, 4])) }} style={{ color: "blue" }}>{message.keyword[4][0]}</a>
-                    {message.text[5]}
+                    {message.keyword.map((phrase, index) => (
+                        [
+                        <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, index])) }} style={{ color: "blue" }}>{message.keyword[index][0]}</a>,
+                        message.text[index+1]
+                        ]
+                    ))}
+                     {message.recs.map((rec,index) => (
+                        <button
+                        className="btn btn-xs btn-action"
+                        onClick={() => {dispatch(sounds.previewSound(rec)); }}
+                            > {rec}
+                        </button>
+                ))}
                 </div>
+               
+                
             </div>
             <div className="chat-message-date" style={{ float: message.sender !== "CAI" ? "left" : "right" }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
