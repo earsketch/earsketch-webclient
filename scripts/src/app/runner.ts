@@ -629,10 +629,11 @@ async function addMetronome(result: DAWData) {
     }
     for (let i = 1; i < result.length + 1; i += 0.25) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
-        const audio = i % 1 === 0 ? stressed : unstressed
+        const sound = i % 1 === 0 ? stressed : unstressed
         track.clips.push({
             filekey: filekey,
-            audio: audio,
+            sourceAudio: sound.buffer,
+            audio: sound.buffer,
             track: result.tracks.length,
             measure: i,
             start: 1,
