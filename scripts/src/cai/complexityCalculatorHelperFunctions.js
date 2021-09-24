@@ -353,7 +353,6 @@ function estimateDataType(node) {
     }
     return null;
 }
-exports.estimateDataType = estimateDataType;
 
 // Gets the last line in a multiline block of code.
 function getLastLine(functionNode) {

@@ -2,6 +2,11 @@
 import * as ccHelpers from './complexityCalculatorHelperFunctions';
 import * as ccState from './complexityCalculatorState';
 
+import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+// Load lists of numbers and keys
+let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
+
+
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const PYTHON_AND_API = [
     "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", "fitMedia",
@@ -399,9 +404,63 @@ function handleFitMediaError() {
 		return ["function", "missing parentheses"]
 	}
 
-	//now check arguments
-	trimmedErrorLine = trimmedErrorLine.substring(trimmedErrorLine.indexOf("("), trimmedErrorLine.lastIndexOf(")"))
+	//now clean and check arguments
+	var argString:string = trimmedErrorLine.substring(trimmedErrorLine.indexOf("("), trimmedErrorLine.lastIndexOf(")"))
 
+
+	//get rid of list commas
+	while (argString.includes("[")) {
+		var openIndex: number = argString.indexOf("[")
+		var closeIndex: number = argString.indexOf("]")
+
+		argString = argString.replace("[", "")
+		argString = argString.replace("]", "")
+
+		for (let i = openIndex; i < closeIndex; i++) {
+			if (argString[i] == ",") {
+				argString = replaceAt(argString, i, "|")
+			}
+		}
+
+	}
+
+	var argsSplit: string[] = argString.split(",")
+	var argumentTypes: string[] = []
+
+	if (argsSplit.length > 4) {
+		return ["fitMedia", "too many arguments"]
+    }
+	if (argsSplit.length < 4) {
+		return ["fitMedia", "too few arguments"]
+	}
+
+	for (let i = 0; i < argsSplit.length; i++) {
+		argumentTypes.push("")
+		if (isNumeric(argsSplit[i])) {
+			argumentTypes[i] = "Num"
+		}
+		else if (argsSplit[i].includes("\"") || argsSplit[i].includes("'")) {
+			argumentTypes[i] = "Str"
+		}
+		else if (argsSplit[i].includes("+")) {
+			let firstBin: string = argsSplit[i].split("+")[0]
+			if (firstBin.includes("\"") || firstBin.includes("'")) {
+				argumentTypes[i] = "Str"
+			}
+			else if (isNumeric(firstBin)) {
+				argumentTypes[i] = "Num"
+			}
+		}
+		else {
+			//is it the name of a smaple
+			if (AUDIOKEYS.includes(argsSplit[i])) {
+				argumentTypes[i] = "Sample"
+            }
+        }
+	}
+
+	//check values 
+	//if(argumentTypes[0] != "Sample" && argumentTypes[0])
 
 }
 

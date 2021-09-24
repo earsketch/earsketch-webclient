@@ -304,6 +304,126 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
     return number
 }
 
+export function estimateDataType(node:any) {
+    let autoReturns: string[] = ["List", "Str"];
+    if (autoReturns.includes(node._astname)) {
+        return node._astname
+    }
+    else if (node._astname == "Num") {
+
+        if (Object.getPrototypeOf(node.n)["tp$name"] == "int") {
+            return "Int"
+        }
+        else {
+            return "Float"
+        }
+        //return "Num";
+    }
+    else if (node._astname == "Call") {
+        //get name
+        let funcName: string = "";
+        if ("attr" in node.func) {
+            funcName = node.func.attr.v
+        }
+        else if ("id" in node.func) {
+            funcName = node.func.id.v
+        }
+        else {
+            return null;
+        }
+        //look up the function name
+        //builtins first
+        if (ccState.builtInNames.includes(funcName)) {
+            for (let i = 0; i < ccState.builtInReturns.length; i++) {
+                if (ccState.builtInReturns[i].name == funcName) {
+                    return ccState.builtInReturns[i].returns
+                }
+            }
+        }
+        let existingFunctions: any = ccState.getProperty("userFunctions");
+        for (let i = 0; i < existingFunctions.length; i++) {
+            if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
+                if (existingFunctions[i].returns == true) {
+                    return estimateDataType(existingFunctions[i].returnVals[0])
+                }
+            }
+        }
+    }
+    else if (node._astname == "Name") {
+        if (node.id.v === "True" || node.id.v === "False") {
+            return "Bool"
+        }
+
+        //either a function alias or var.
+        let funcs: any = ccState.getProperty("userFunctions")
+        for (let i = 0; i < funcs.length; i++) {
+            if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
+                return "Func"
+            }
+        }
+
+        let allVars: any = ccState.getProperty("allVariables");
+        var lineNo: number = node.lineno
+
+        let latestAssignment: any = null
+
+        let thisVar: any = null
+        let varList: any = ccState.getProperty("allVariables");
+        for (let i = 0; i < varList.length; i++) {
+            if (varList[i].name == name) {
+                thisVar = varList[i]
+            }
+        }
+        if (thisVar == null) {
+            return null
+        }
+
+        //get most recent outside-of-function assignment (or inside-this-function assignment)
+        let funcLines: number[] = ccState.getProperty("functionLines")
+        let funcObjs: any = ccState.getProperty("userFunctions")
+        let highestLine: number = 0
+        if (funcLines.includes(lineNo)) {
+            //what function are we in
+            let startLine: number = 0
+            let endLine: number = 0
+            for (let i = 0; i < funcObjs.length; i++) {
+                if (funcObjs[i].start < lineNo && funcObjs[i].end >= lineNo) {
+                    startLine = funcObjs[i].start
+                    endLine = funcObjs[i].end
+                    break
+                }
+            }
+
+            for (let i = 0; i < thisVar.assignments.length; i++) {
+                if (thisVar.assignments[i].line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && thisVar.assignments[i].line > startLine && thisVar.assignments[i].line <= endLine) {
+                    //then it's valid
+                    if (thisVar.assignments[i].line > highestLine) {
+                        latestAssignment = Object.assign({}, thisVar.assignments[i])
+                        highestLine = latestAssignment.line
+                    }
+                }
+            }
+
+            //get type from assigned node
+            return estimateDataType(latestAssignment)
+        }
+    }
+    else if (node._astname == "BinOp") {
+        //estimate both sides. if the same, return that. else return null
+        let left: string = estimateDataType(node.left)
+        let right: string = estimateDataType(node.right)
+        if (left == right){
+            return left
+        }
+        else return null
+    }
+    else if (node._astname == "BoolOp" || node._astname == "Compare") {
+        return "Bool"
+    }
+
+    return null
+}
+
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
 export function replaceNumericUnaryOps(ast: any) {
     for (let i in ast) {
