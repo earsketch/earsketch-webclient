@@ -23,7 +23,6 @@ export interface Clip {
     track: number
     tempo?: number
     loop: boolean
-    scale: number
 }
 
 export interface EffectRange {

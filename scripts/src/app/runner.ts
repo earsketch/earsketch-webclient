@@ -10,7 +10,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
-import { Clip, ClipSlice, DAWData, Track } from "./player"
+import { Clip, ClipSlice, DAWData } from "./player"
 import i18n from "i18next"
 import { TempoMap, timestretch } from "./tempo"
 
@@ -624,8 +624,8 @@ async function addMetronome(result: DAWData) {
     ])
     const track = {
         clips: [] as Clip[],
-        effects: [],
-        analyser: null as AnalyserNode | null,
+        effects: {},
+        analyser: audioContext.createAnalyser(),
     }
     for (let i = 1; i < result.length + 1; i += 0.25) {
         const filekey = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
@@ -638,12 +638,11 @@ async function addMetronome(result: DAWData) {
             measure: i,
             start: 1,
             end: 1.625,
-            scale: false,
             loop: false,
             loopChild: false,
-        } as unknown as Clip)
+            silence: 0,
+        })
     }
     // The metronome needs an analyzer to prevent errors in player
-    track.analyser = audioContext.createAnalyser()
-    result.tracks.push(track as unknown as Track)
+    result.tracks.push(track)
 }

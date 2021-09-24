@@ -139,8 +139,8 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
         measure: startLocation,
         start: 1,
         end: endLocation - startLocation + 1,
-        scale: false,
         loop: true,
+        silence: 0,
     } as unknown as Clip
 
     addClip(result, clip)
@@ -149,13 +149,12 @@ export function fitMedia(result: DAWData, filekey: string, trackNumber: number, 
 }
 
 // Insert a media clip.
-export function insertMedia(result: DAWData, fileName: string, trackNumber: number, trackLocation: number, scaleAudio: number | undefined) {
+export function insertMedia(result: DAWData, fileName: string, trackNumber: number, trackLocation: number) {
     esconsole(
         "Calling pt_insertMedia from passthrough with parameters " +
         fileName + " , " +
         trackNumber + " , " +
-        trackLocation + " , " +
-        scaleAudio, "PT")
+        trackLocation, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
     ptCheckArgs("insertMedia", args, 3, 4)
@@ -176,22 +175,14 @@ export function insertMedia(result: DAWData, fileName: string, trackNumber: numb
         throw new TypeError("trackLocation needs to be specified")
     }
 
-    if (scaleAudio !== undefined) {
-        if (typeof scaleAudio !== "number") {
-            throw new TypeError("scaleAudio must be a number")
-        }
-    } else {
-        scaleAudio = 1
-    }
-
     const clip = {
         filekey: fileName,
         track: trackNumber,
         measure: trackLocation,
         start: 1,
         end: 0,
-        scale: scaleAudio,
         loop: true,
+        silence: 0,
     } as unknown as Clip
 
     addClip(result, clip)
@@ -206,8 +197,7 @@ export function insertMediaSection(
     trackNumber: number,
     trackLocation: number,
     mediaStartLocation: number,
-    mediaEndLocation: number,
-    scaleAudio: number | undefined = undefined
+    mediaEndLocation: number
 ) {
     esconsole(
         "Calling pt_insertMediaSection from passthrough with parameters " +
@@ -215,8 +205,7 @@ export function insertMediaSection(
         trackNumber + " , " +
         trackLocation + " , " +
         mediaStartLocation + " , " +
-        mediaEndLocation + " , " +
-        scaleAudio, "PT")
+        mediaEndLocation, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("insertMediaSection", args, 3, 6)
@@ -242,22 +231,14 @@ export function insertMediaSection(
         mediaEndLocation = 0
     }
 
-    if (scaleAudio !== undefined) {
-        if (typeof (scaleAudio) !== "number") {
-            throw new TypeError("scaleAudio must be a number")
-        }
-    } else {
-        scaleAudio = 1
-    }
-
     const clip = {
         filekey: fileName,
         track: trackNumber,
         measure: trackLocation,
         start: mediaStartLocation,
         end: mediaEndLocation,
-        scale: scaleAudio,
         loop: true,
+        silence: 0,
     } as unknown as Clip
 
     addClip(result, clip)
@@ -359,11 +340,11 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
                 measure: location,
                 start: start,
                 end: end,
-                scale: false,
                 loop: false,
+                silence,
             } as unknown as Clip
 
-            addClip(result, clip, silence)
+            addClip(result, clip)
         }
     }
 
@@ -1227,17 +1208,13 @@ const ptCheckEffectRange = (
  * @param {integer} clip.measure The measure to begin playing at.
  * @param {number} clip.start The start measure of the clip slice to play.
  * @param {number} clip.end The end measure of the clip slice to play.
- * @param {boolean} clip.scale Whether the clip should be scaled or not to
- * fill the space (not implemented).
  * @param {boolean} clip.loop Whether the clip should be loop or not to
  * fill the space.
  * @param {number} silence The length of silence after the clip used for
  * determining the length of the song (e.g., if makebeat has silence at the
  * end of the song).
  */
-export const addClip = (result: DAWData, clip: Clip, silence: number | undefined = undefined) => {
-    clip.silence = silence ?? 0
-
+export const addClip = (result: DAWData, clip: Clip) => {
     // bounds checking
     if (clip.track === 0) {
         throw new RangeError("Cannot insert media on the master track")
