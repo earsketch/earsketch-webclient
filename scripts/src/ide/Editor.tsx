@@ -346,9 +346,8 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className="floating-bar" onClick={() => importScript(activeScript)}>
-                <div>{/* DO NOT REMOVE: this is an empty div to block the space before the next div */}</div>
-                <div className="btn-action btn-floating shake">
+            <div className="absolute top-4 right-0" onClick={() => importScript(activeScript)}>
+                <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span>{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>
             </div>}
