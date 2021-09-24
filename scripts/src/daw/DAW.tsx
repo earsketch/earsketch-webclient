@@ -606,7 +606,7 @@ let lastTab: string | null = null
 // TODO: Temporary hack:
 let _setPlayPosition: ((a: number) => void) | null = null
 
-export function setDAWData(result: player.DAWData) {
+export function setProject(result: player.Project) {
     const { dispatch, getState } = store
     let state = getState()
 

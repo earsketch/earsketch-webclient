@@ -10,8 +10,8 @@ import * as scripts from "../browser/scriptsState"
 import * as userProject from "./userProject"
 import { useSelector, useDispatch } from "react-redux"
 import { Diff } from "./Diff"
-import { DAWData } from "./player"
-import { DAW, setDAWData } from "../daw/DAW"
+import { Project } from "./player"
+import { DAW, setProject } from "../daw/DAW"
 import { useTranslation } from "react-i18next"
 
 function parseActiveUsers(activeUsers: string | string[]) {
@@ -57,7 +57,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     const [history, setHistory] = useState([] as Script[])
     // These are used for the embedded DAW.
     const [compiling, setCompiling] = useState(false)
-    const [compiledResult, setCompiledResult] = useState(null as DAWData | null)
+    const [compiledResult, setCompiledResult] = useState(null as Project | null)
     // The index (not ID) of the script that is active in the history.
     const [active, setActive] = useState(1)
     // Chronologically adjacent versions of the script for the diff.
@@ -107,7 +107,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
         const result = await (language === "python" ? runner.runPython : runner.runJavaScript)(history[index].source_code)
         // TODO: Looks like the embedded DAW was at some point intended to be independent.
         // For now, we just update the result in the outer DAW (which the embedded DAW mirrors).
-        setDAWData(result)
+        setProject(result)
         setCompiledResult(result)
         setCompiling(false)
         return result

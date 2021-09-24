@@ -1,7 +1,7 @@
 // Render scripts using an offline audio context.
 import * as applyEffects from "../model/applyeffects"
 import esconsole from "../esconsole"
-import { Clip, DAWData } from "./player"
+import { Clip, Project } from "./player"
 import { OfflineAudioContext } from "./audiocontext"
 import { TempoMap } from "./tempo"
 
@@ -9,7 +9,7 @@ const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
 
 // Render a result for offline playback.
-export async function renderBuffer(result: DAWData) {
+export async function renderBuffer(result: Project) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const origin = 0
@@ -118,7 +118,7 @@ export async function renderBuffer(result: DAWData) {
 }
 
 // Render a result for offline playback. Returns a Blob.
-export async function renderWav(result: DAWData) {
+export async function renderWav(result: Project) {
     const buffer = await renderBuffer(result)
     const pcmarrayL = buffer.getChannelData(0)
     const pcmarrayR = buffer.getChannelData(1)
@@ -129,7 +129,7 @@ export async function renderWav(result: DAWData) {
 }
 
 // Render a result to mp3 for offline playback. Returns a Blob.
-export async function renderMp3(result: DAWData) {
+export async function renderMp3(result: Project) {
     const buffer = await renderBuffer(result)
     const mp3encoder = new lamejs.Mp3Encoder(2, 44100, 160)
     const mp3Data = []

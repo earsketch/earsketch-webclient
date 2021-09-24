@@ -1,4 +1,4 @@
-import { DAWData } from "./app/player"
+import { Project } from "./app/player"
 import i18n from "i18next"
 
 export const measureToTime = (measure: number, tempo: number, timeSignature = 4) => {
@@ -118,7 +118,7 @@ export const formatScriptForTests = (script: string) => {
 // Returns a human readable string that is convenient to copy and paste into
 // integration tests. For script outputs. It returns only the relevant parts
 // of the result object.
-export const formatResultForTests = (result: DAWData) => {
+export const formatResultForTests = (result: Project) => {
     let s = "\n{\n"
     s += "    length: " + result.length + ",\n"
     s += "    tracks: [\n"

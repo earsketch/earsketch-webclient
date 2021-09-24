@@ -15,7 +15,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
-import { Clip, DAWData, EffectRange, Track } from "../app/player"
+import { Clip, Project, EffectRange, Track } from "../app/player"
 import * as runner from "../app/runner"
 import { TempoMap } from "../app/tempo"
 import * as userProject from "../app/userProject"
@@ -62,7 +62,7 @@ export function init() {
 }
 
 // Set the tempo on the result object.
-export function setTempo(result: DAWData, startTempo: number, startMeasure?: number, endTempo?: number, endMeasure?: number) {
+export function setTempo(result: Project, startTempo: number, startMeasure?: number, endTempo?: number, endMeasure?: number) {
     esconsole("Calling pt_setTempo from passthrough with parameter " + startTempo, ["DEBUG", "PT"])
 
     const args = [...arguments].slice(1) // remove first argument
@@ -107,7 +107,7 @@ export function setTempo(result: DAWData, startTempo: number, startMeasure?: num
 }
 
 // Run steps to clean up the script.
-export const finish = (result: DAWData) => {
+export const finish = (result: Project) => {
     esconsole("Calling pt_finish from passthrough", "PT")
 
     // We used to set a flag here. But all the flag indicated was whether the user called this function,
@@ -116,7 +116,7 @@ export const finish = (result: DAWData) => {
 }
 
 // Add a clip to the given result object.
-export function fitMedia(result: DAWData, name: string, trackNumber: number, startLocation: number, endLocation: number) {
+export function fitMedia(result: Project, name: string, trackNumber: number, startLocation: number, endLocation: number) {
     esconsole(`Calling pt_fitMedia from passthrough with parameters ${name}, ${trackNumber}, ${startLocation}, ${endLocation}`, "PT")
 
     const args = [...arguments].slice(1) // remove first argument
@@ -149,7 +149,7 @@ export function fitMedia(result: DAWData, name: string, trackNumber: number, sta
 }
 
 // Insert a media clip.
-export function insertMedia(result: DAWData, fileName: string, trackNumber: number, trackLocation: number) {
+export function insertMedia(result: Project, fileName: string, trackNumber: number, trackLocation: number) {
     esconsole(
         "Calling pt_insertMedia from passthrough with parameters " +
         fileName + " , " +
@@ -192,7 +192,7 @@ export function insertMedia(result: DAWData, fileName: string, trackNumber: numb
 
 // Insert a media clip section.
 export function insertMediaSection(
-    result: DAWData,
+    result: Project,
     fileName: string,
     trackNumber: number,
     trackLocation: number,
@@ -247,7 +247,7 @@ export function insertMediaSection(
 }
 
 // Make a beat of audio clips.
-export function makeBeat(result: DAWData, media: any, track: number, measure: number, beatString: string) {
+export function makeBeat(result: Project, media: any, track: number, measure: number, beatString: string) {
     esconsole(
         "Calling pt_makeBeat from passthrough with parameters " +
         media + " , " +
@@ -352,7 +352,7 @@ export function makeBeat(result: DAWData, media: any, track: number, measure: nu
 }
 
 // Make a beat from media clip slices.
-export function makeBeatSlice(result: DAWData, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[]) {
+export function makeBeatSlice(result: Project, media: string, track: number, measure: number, beatString: string, beatNumber: number | number[]) {
     esconsole(
         "Calling pt_makeBeatSlice from passthrough with parameters " +
         media + " , " +
@@ -442,7 +442,7 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
 
 // Analyze a clip.
 // Returns the analyzed value. Does not alter the result (it just takes it as a parameter for consistency).
-export function analyze(result: DAWData, audioFile: string, featureForAnalysis: string) {
+export function analyze(result: Project, audioFile: string, featureForAnalysis: string) {
     esconsole(
         "Calling pt_analyze from passthrough with parameters " +
         audioFile + " , " +
@@ -473,7 +473,7 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
 
 // Analyze a clip for time.
 // Returns the analyzed value. Does not alter the result.
-export function analyzeForTime(result: DAWData, audioFile: string, featureForAnalysis: string, startTime: number, endTime: number) {
+export function analyzeForTime(result: Project, audioFile: string, featureForAnalysis: string, startTime: number, endTime: number) {
     esconsole(
         "Calling pt_analyzeForTime from passthrough with parameters " +
         audioFile + " , " +
@@ -522,7 +522,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
         })
 }
 
-export function analyzeTrack(result: DAWData, trackNumber: number, featureForAnalysis: string) {
+export function analyzeTrack(result: Project, trackNumber: number, featureForAnalysis: string) {
     esconsole(`Calling pt_analyzeTrack from passthrough with parameters ${trackNumber}, ${featureForAnalysis}`, "PT")
 
     const args = [...arguments].slice(1)
@@ -562,7 +562,7 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
     }).then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis))
 }
 
-export function analyzeTrackForTime(result: DAWData, trackNumber: number, featureForAnalysis: string, startTime: number, endTime: number) {
+export function analyzeTrackForTime(result: Project, trackNumber: number, featureForAnalysis: string, startTime: number, endTime: number) {
     esconsole(
         "Calling pt_analyzeTrackForTime from passthrough with parameters " +
         trackNumber + " , " +
@@ -627,7 +627,7 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
 }
 
 // Get the duration of a clip.
-export function dur(result: DAWData, name: string) {
+export function dur(result: Project, name: string) {
     esconsole("Calling pt_dur from passthrough with parameters " + name, "PT")
 
     const args = [...arguments].slice(1)
@@ -644,7 +644,7 @@ export function dur(result: DAWData, name: string) {
 }
 
 // Return a Gaussian distributed random number.
-export function gauss(result: DAWData, mean: number, stddev: number) {
+export function gauss(result: Project, mean: number, stddev: number) {
     esconsole(
         "Calling pt_gauss from passthrough with parameters " +
         mean + " " +
@@ -658,7 +658,7 @@ export function gauss(result: DAWData, mean: number, stddev: number) {
 }
 
 // Import an image as number data.
-export function importImage(result: DAWData, imageURL: string, nrows: number, ncols: number, color: undefined | boolean) {
+export function importImage(result: Project, imageURL: string, nrows: number, ncols: number, color: undefined | boolean) {
     esconsole(
         "Calling pt_importImage from passthrough with parameters " +
         imageURL + " , " +
@@ -699,7 +699,7 @@ export function importImage(result: DAWData, imageURL: string, nrows: number, nc
     })
 }
 
-export function importFile(result: DAWData, fileURL: string) {
+export function importFile(result: Project, fileURL: string) {
     esconsole("Calling pt_importFile from passthrough with parameters " + fileURL, "PT")
 
     const args = [...arguments].slice(1)
@@ -721,7 +721,7 @@ export function importFile(result: DAWData, fileURL: string) {
 }
 
 // Provides a way to print to the EarSketch console.
-export function println(result: DAWData, msg: string) {
+export function println(result: Project, msg: string) {
     esconsole(
         "Calling pt_println from passthrough with parameter " +
         msg,
@@ -737,7 +737,7 @@ export function println(result: DAWData, msg: string) {
 }
 
 // Prompt for user input.
-export function readInput(result: DAWData, msg: string) {
+export function readInput(result: Project, msg: string) {
     esconsole("Calling pt_readInput from passthrough with parameter " + msg, "PT")
 
     const args = [...arguments].slice(1)
@@ -748,7 +748,7 @@ export function readInput(result: DAWData, msg: string) {
 }
 
 // Replace a list element.
-export function replaceListElement(result: DAWData, inputList: any[], elementToReplace: any, withElement: any) {
+export function replaceListElement(result: Project, inputList: any[], elementToReplace: any, withElement: any) {
     esconsole(
         "Calling pt_replaceListElement from passthrough with parameters " +
         inputList + " , " +
@@ -773,7 +773,7 @@ export function replaceListElement(result: DAWData, inputList: any[], elementToR
 }
 
 // Replace a character in a string.
-export function replaceString(result: DAWData, patternString: string, characterToReplace: string, withElement: string) {
+export function replaceString(result: Project, patternString: string, characterToReplace: string, withElement: string) {
     esconsole(
         "Calling pt_replaceString from passthrough with parameters " +
         patternString + " , " +
@@ -797,7 +797,7 @@ export function replaceString(result: DAWData, patternString: string, characterT
 }
 
 // Reverse a list.
-export function reverseList(result: DAWData, inputList: any[]) {
+export function reverseList(result: Project, inputList: any[]) {
     esconsole("Calling pt_reverseList from passthrough with parameters " + inputList, "PT")
 
     const args = [...arguments].slice(1)
@@ -809,7 +809,7 @@ export function reverseList(result: DAWData, inputList: any[]) {
 }
 
 // Reverse a string.
-export function reverseString(result: DAWData, inputString: string) {
+export function reverseString(result: Project, inputString: string) {
     esconsole("Calling pt_reverseString from passthrough with parameters " + inputString, "PT")
 
     const args = [...arguments].slice(1)
@@ -821,7 +821,7 @@ export function reverseString(result: DAWData, inputString: string) {
 
 // Create a rhythmic effect envelope from a string.
 export function rhythmEffects(
-    result: DAWData,
+    result: Project,
     track: number,
     effectType: string,
     effectParameter: string,
@@ -910,7 +910,7 @@ export function rhythmEffects(
 }
 
 export function setEffect(
-    result: DAWData, trackNumber: number, effect: string, parameter: string, effectStartValue: number,
+    result: Project, trackNumber: number, effect: string, parameter: string, effectStartValue: number,
     effectStartLocation: number, effectEndValue: number, effectEndLocation: number
 ) {
     esconsole("Calling pt_setEffect from passthrough with parameters " +
@@ -972,7 +972,7 @@ export function setEffect(
 }
 
 // Slice a part of a soundfile to create a new sound file variable
-export function createAudioSlice(result: DAWData, oldSoundFile: string, startLocation: number, endLocation: number) {
+export function createAudioSlice(result: Project, oldSoundFile: string, startLocation: number, endLocation: number) {
     // TODO AVN: parameter validation - how to determine slice start/end is in correct range?
 
     const args = [...arguments].slice(1) // remove first argument
@@ -995,7 +995,7 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 // Select a random file.
-export function selectRandomFile(result: DAWData, folderSubstring: string, extension: undefined | string = undefined) {
+export function selectRandomFile(result: Project, folderSubstring: string, extension: undefined | string = undefined) {
     esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}, ${extension}`, "PT")
 
     const args = [...arguments].slice(1)
@@ -1026,7 +1026,7 @@ export function selectRandomFile(result: DAWData, folderSubstring: string, exten
 }
 
 // Shuffle a list.
-export function shuffleList(result: DAWData, array: any[]) {
+export function shuffleList(result: Project, array: any[]) {
     esconsole(`Calling pt_shuffleList from passthrough with parameters ${array}`, "PT")
 
     const args = [...arguments].slice(1)
@@ -1048,7 +1048,7 @@ export function shuffleList(result: DAWData, array: any[]) {
 }
 
 // Shuffle a string.
-export function shuffleString(result: DAWData, inputString: string) {
+export function shuffleString(result: Project, inputString: string) {
     esconsole(`Calling pt_shuffleString from passthrough with parameters ${inputString}`, "PT")
 
     const args = [...arguments].slice(1)
@@ -1146,7 +1146,7 @@ const ptCheckRange = (name: string, arg: number, min: number | { min?: number, m
     }
 }
 
-const ptCheckAudioSliceRange = (result: DAWData, name: string, startTime: number, endTime: number) => {
+const ptCheckAudioSliceRange = (result: Project, name: string, startTime: number, endTime: number) => {
     if (startTime < 1) {
         throw new RangeError("Cannot start slice before the start of the clip")
     }
@@ -1213,7 +1213,7 @@ const ptCheckEffectRange = (
  * determining the length of the song (e.g., if makebeat has silence at the
  * end of the song).
  */
-export const addClip = (result: DAWData, clip: Clip) => {
+export const addClip = (result: Project, clip: Clip) => {
     // bounds checking
     if (clip.track === 0) {
         throw new RangeError("Cannot insert media on the master track")
@@ -1251,7 +1251,7 @@ export const addClip = (result: DAWData, clip: Clip) => {
 }
 
 // Helper function to add effects to the result.
-export const addEffect = (result: DAWData, effect: EffectRange) => {
+export const addEffect = (result: Project, effect: EffectRange) => {
     esconsole(effect, "debug")
 
     // bounds checking

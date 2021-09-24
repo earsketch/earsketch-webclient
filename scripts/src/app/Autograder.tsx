@@ -4,7 +4,7 @@ import * as ace from "ace-builds"
 
 import { ModalContainer } from "./App"
 import * as ESUtils from "../esutils"
-import { DAWData, Clip, EffectRange } from "./player"
+import { Project, Clip, EffectRange } from "./player"
 import * as runner from "./runner"
 
 // overwrite userConsole javascript prompt with a hijackable one
@@ -58,14 +58,14 @@ export const readFile = (file: File) => {
 }
 
 // Sort the clips in an object by measure.
-const sortClips = (result: DAWData) => {
+const sortClips = (result: Project) => {
     for (const track of Object.values(result.tracks)) {
         track.clips.sort((a: Clip, b: Clip) => a.measure - b.measure)
     }
 }
 
 // Sort effects by start measure.
-const sortEffects = (result: DAWData) => {
+const sortEffects = (result: Project) => {
     for (const track of Object.values(result.tracks)) {
         for (const effect of Object.values(track.effects)) {
             effect.sort((a: EffectRange, b: EffectRange) => a.startMeasure - b.startMeasure)
@@ -74,7 +74,7 @@ const sortEffects = (result: DAWData) => {
 }
 
 // Function to compare the similarity of two script results.
-const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, testTracks: boolean[]) => {
+const compare = (reference: Project, test: Project, testAllTracks: boolean, testTracks: boolean[]) => {
     // create copies for destructive comparison
     reference = JSON.parse(JSON.stringify(reference))
     test = JSON.parse(JSON.stringify(test))
@@ -96,14 +96,14 @@ interface Upload {
     file: File
     script: string
     compiled: boolean
-    result?: DAWData
+    result?: Project
     error?: string
     pass?: boolean
 }
 
 // Compile a test script and compare it to the reference script.
 // Returns a promise that resolves to an object describing the test results.
-const compileAndCompare = (referenceResult: DAWData, file: File, testScript: string, testAllTracks: boolean, testTracks: boolean[], seed?: number) => {
+const compileAndCompare = (referenceResult: Project, file: File, testScript: string, testAllTracks: boolean, testTracks: boolean[], seed?: number) => {
     const results: Upload = {
         file,
         script: testScript,
@@ -111,7 +111,7 @@ const compileAndCompare = (referenceResult: DAWData, file: File, testScript: str
         error: "",
         pass: false,
     }
-    return compile(testScript, file.name, seed).then((result: DAWData) => {
+    return compile(testScript, file.name, seed).then((result: Project) => {
         results.result = result
         results.compiled = true
         // check against reference script
@@ -173,7 +173,7 @@ const ReferenceFile = ({ referenceScript, compilingReference }:
 
 const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles, setPrompts }:
     {
-        compileError: string, prompts: string[], seed?: number, setReferenceResult: (r: DAWData | null) => void, setCompileError: (e: string) => void,
+        compileError: string, prompts: string[], seed?: number, setReferenceResult: (r: Project | null) => void, setCompileError: (e: string) => void,
         setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void,
         setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void, setPrompts: (p: string[]) => void
     }) => {
@@ -246,7 +246,7 @@ const ConfigureTest = ({
     referenceResult, compileError, testAllTracks, testTracks, allowPrompts, prompts, seed,
     setTestAllTracks, setTestTracks, setAllowPrompts, setSeed,
 }: {
-    referenceResult: DAWData | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, prompts: string[], seed?: number,
+    referenceResult: Project | null, compileError: string, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean, prompts: string[], seed?: number,
     setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void, setAllowPrompts: (a: boolean) => void, setSeed: (s?: number) => void
 }) => {
     return <div className="container">
@@ -354,7 +354,7 @@ const TestResult = ({ upload, index }: { upload: Upload, index: number }) => {
 }
 
 const TestResults = ({ uploads, files, referenceResult, testAllTracks, testTracks, allowPrompts, prompts, seed, setUploads, setFiles }: {
-    uploads: Upload[], files: File[], referenceResult: DAWData, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean,
+    uploads: Upload[], files: File[], referenceResult: Project, testAllTracks: boolean, testTracks: boolean[], allowPrompts: boolean,
     prompts: string[], seed?: number, setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void
 }) => {
     const updateFiles = async (files: File[]) => {
@@ -435,7 +435,7 @@ export const Autograder = () => {
     document.getElementById("loading-screen")!.style.display = "none"
 
     const [compileError, setCompileError] = useState("")
-    const [referenceResult, setReferenceResult] = useState(null as DAWData | null)
+    const [referenceResult, setReferenceResult] = useState(null as Project | null)
     const [testAllTracks, setTestAllTracks] = useState(true)
     const [testTracks, setTestTracks] = useState([] as boolean[])
     const [allowPrompts, setAllowPrompts] = useState(false)

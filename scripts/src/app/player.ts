@@ -53,7 +53,7 @@ export interface ClipSlice {
     end: number
 }
 
-export interface DAWData {
+export interface Project {
     length: number
     tracks: Track[]
     master: GainNode
@@ -83,7 +83,7 @@ let loop = {
 }
 let loopScheduledWhilePaused = false
 
-const renderingDataQueue: (DAWData | null)[] = [null, null]
+const renderingDataQueue: (Project | null)[] = [null, null]
 let mutedTracks: number[] = []
 let bypassedEffects: { [key: number]: string[] } = {}
 
@@ -313,7 +313,7 @@ export const pause = () => {
     clearTimeout(loopSchedTimer)
 }
 
-const stopAllClips = (renderingData: DAWData | null, delay: number) => {
+const stopAllClips = (renderingData: Project | null, delay: number) => {
     if (!renderingData) {
         return
     }
@@ -487,7 +487,7 @@ export const setLoop = (loopObj: typeof loop) => {
     }
 }
 
-export const setRenderingData = (result: DAWData) => {
+export const setRenderingData = (result: Project) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
     clearAudioGraph(0)

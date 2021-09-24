@@ -1,6 +1,6 @@
 // Tempo mapping and time stretching.
 import audioContext from "./audiocontext"
-import { DAWData } from "./player"
+import { Project } from "./player"
 
 // Like all other envelopes, tempo is a piecewise linear function.
 interface Point {
@@ -48,8 +48,8 @@ export class TempoMap {
 
     constructor()
     constructor(points: Point[])
-    constructor(result: DAWData)
-    constructor(thing?: Point[] | DAWData) {
+    constructor(result: Project)
+    constructor(thing?: Point[] | Project) {
         if (thing === undefined) return
         if (Array.isArray(thing)) {
             this.points = thing

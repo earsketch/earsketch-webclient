@@ -1,12 +1,12 @@
 // EarSketch API: Javascript
 import * as passthrough from "./passthrough"
 import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
-import { DAWData } from "../app/player"
+import { Project } from "../app/player"
 
 const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 
 // The result of running the script (DAW state).
-export let dawData: DAWData
+export let project: Project
 
 // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
 // variable into a native javascript variable.
@@ -44,19 +44,19 @@ export function setup(interpreter: any, scope: any) {
     const register = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createNativeFunction(fn))
     const registerAsync = (name: string, fn: Function) => interpreter.setProperty(scope, name, interpreter.createAsyncFunction(fn))
 
-    // Initialize DAW data.
-    dawData = remapToPseudoJs(passthrough.init())
+    // Initialize DAW project data.
+    project = remapToPseudoJs(passthrough.init())
 
     // Finish the script.
     // Formerly set __ES_FINISHED = __ES_RESULT property on the interpreter object.
-    // Now we just use dawData (formerly __ES_RESULT) directly, and finish is not required.
+    // Now we just use project (formerly __ES_RESULT) directly, and finish is not required.
     register("finish", () => {})
 
     const passthroughList = ["init", "setTempo", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
 
     for (const name of passthroughList) {
         register(name, (...args: any[]) => {
-            dawData = callPassthrough(name, ...args)
+            project = callPassthrough(name, ...args)
         })
     }
 
@@ -71,7 +71,7 @@ export function setup(interpreter: any, scope: any) {
     for (const name of modAndReturnPassthroughList) {
         register(name, (...args: any[]) => {
             const resultAndReturnVal = callModAndReturnPassthrough(name, ...args)
-            dawData = resultAndReturnVal.result
+            project = resultAndReturnVal.result
             return resultAndReturnVal.returnVal
         })
     }
@@ -105,7 +105,7 @@ export function setup(interpreter: any, scope: any) {
 
     // Convert arguments to JavaScript types.
     const convertArgs = (args: any[]) =>
-        [dawData, ...args].map(arg => arg === undefined ? arg : remapToNativeJs(arg))
+        [project, ...args].map(arg => arg === undefined ? arg : remapToNativeJs(arg))
 
     // Helper function for easily wrapping a function around the passthrough.
     function callPassthrough(name: string, ...args: any[]) {

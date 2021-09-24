@@ -16,7 +16,7 @@ import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
-import { DAW, setDAWData } from "../daw/DAW"
+import { DAW, setProject } from "../daw/DAW"
 import { Editor } from "./Editor"
 import { EditorHeader } from "./EditorHeader"
 import esconsole from "../esconsole"
@@ -35,7 +35,7 @@ import * as tabs from "./tabState"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
-import { DAWData } from "../app/player"
+import { Project } from "../app/player"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -264,7 +264,7 @@ export async function compileCode() {
     const scriptID = tabs.selectActiveTabID(state)
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
-    let result: DAWData
+    let result: Project
     try {
         result = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
     } catch (error) {
@@ -295,7 +295,7 @@ export async function compileCode() {
     setLoading(false)
     if (result) {
         esconsole("Code compiled, updating DAW.", "ide")
-        setDAWData(result)
+        setProject(result)
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")

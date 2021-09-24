@@ -10,7 +10,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
-import { Clip, ClipSlice, DAWData } from "./player"
+import { Clip, ClipSlice, Project } from "./player"
 import i18n from "i18next"
 import { TempoMap, timestretch } from "./tempo"
 
@@ -19,7 +19,7 @@ import { TempoMap, timestretch } from "./tempo"
 // the length of each audio clip until after running (unless we
 // loaded the clips beforehand and did this at runtime, but that's
 // harder.) Follow up with pitchshifting and setting the result length.
-export async function postRun(result: DAWData) {
+export async function postRun(result: Project) {
     esconsole("Execution finished. Loading audio buffers...", ["debug", "runner"])
     // NOTE: We used to check if `finish()` was called (by looking at result.finish) and throw an error if not.
     // However, since `finish()` doesn't actually do anything (other than set this flag), we no longer check.
@@ -51,7 +51,7 @@ export async function postRun(result: DAWData) {
 }
 
 // Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
-async function handlePitchshift(result: DAWData) {
+async function handlePitchshift(result: Project) {
     esconsole("Begin pitchshifting.", ["debug", "runner"])
 
     if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
@@ -192,7 +192,7 @@ export async function runPython(code: string) {
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
 
     // STEP 3: Extract result.
-    const result = Sk.ffi.remapToJs(pythonAPI.dawData)
+    const result = Sk.ffi.remapToJs(pythonAPI.project)
     // STEP 4: Perform post-execution steps on the result object
     esconsole("Performing post-execution steps.", ["debug", "runner"])
     await postRun(result)
@@ -281,7 +281,7 @@ async function runJsInterpreter(interpreter: any) {
     while (interpreter.run()) {
         await sleep(200)
     }
-    const result = javascriptAPI.dawData
+    const result = javascriptAPI.project
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
     return javascriptAPI.remapToNativeJs(result)
 }
@@ -330,7 +330,7 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
     }
 }
 
-function getClipTempo(result: DAWData) {
+function getClipTempo(result: Project) {
     const metadata = audioLibrary.cache.standardSounds ?? []
     const tempoCache: { [key: string]: number | undefined } = Object.create(null)
 
@@ -349,7 +349,7 @@ function getClipTempo(result: DAWData) {
     }
 }
 
-async function loadBuffers(result: DAWData) {
+async function loadBuffers(result: Project) {
     const promises = []
     for (const track of result.tracks) {
         for (const clip of track.clips) {
@@ -363,7 +363,7 @@ async function loadBuffers(result: DAWData) {
     return ESUtils.fromEntries(buffers)
 }
 
-export async function loadBuffersForSampleSlicing(result: DAWData) {
+export async function loadBuffersForSampleSlicing(result: Project) {
     const promises = []
     const tempoMap = new TempoMap(result)
 
@@ -413,7 +413,7 @@ function sliceAudioBufferByMeasure(name: string, buffer: AudioBuffer, start: num
 }
 
 // Sort effects, fill in effects with end = 0.
-function fixEffects(result: DAWData) {
+function fixEffects(result: Project) {
     for (const track of result.tracks) {
         for (const effects of Object.values(track.effects)) {
             effects.sort((a, b) => {
@@ -475,7 +475,7 @@ function roundUpToDivision(seconds: number, tempo: number) {
 const timestretchCache = new Map<string, AudioBuffer>()
 
 // Fill in looped clips with multiple clips.
-function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
+function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
     const tempoMap = new TempoMap(result)
     // step 1: fill in looped clips
     result.length = 0
@@ -572,7 +572,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
 
 // Warn users when a clips overlap each other. Done after execution because
 // we don't know the length of clips until then.
-function checkOverlaps(result: DAWData) {
+function checkOverlaps(result: Project) {
     const truncateDigits = 5 // workaround for precision errors
     const margin = 0.001
 
@@ -605,7 +605,7 @@ function checkOverlaps(result: DAWData) {
 // Warn users when a track contains effects, but no audio. Done after execution
 // because we don't know if there are audio samples on the entire track
 // until then. (Doesn't apply to mix track, which can't contain clips.)
-function checkEffects(result: DAWData) {
+function checkEffects(result: Project) {
     for (const [i, track] of Object.entries(result.tracks).slice(1)) {
         const clipCount = track.clips.length
         const effectCount = Object.keys(track.effects).length
@@ -617,7 +617,7 @@ function checkEffects(result: DAWData) {
 }
 
 // Adds a metronome as the last track of a result.
-async function addMetronome(result: DAWData) {
+async function addMetronome(result: Project) {
     const [stressed, unstressed] = await Promise.all([
         audioLibrary.getSound("METRONOME01"),
         audioLibrary.getSound("METRONOME02"),

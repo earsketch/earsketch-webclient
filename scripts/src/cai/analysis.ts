@@ -6,7 +6,7 @@
 import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"
 import esconsole from "../esconsole"
-import { DAWData } from "../app/player"
+import { Project } from "../app/player"
 import * as recommender from "../app/recommender"
 import { SoundEntity } from "common"
 import { getApiCalls } from "./complexityCalculator"
@@ -108,12 +108,12 @@ export function analyzeCode(language: string, script: string) {
 }
 
 // Report the music analysis of a script.
-export function analyzeMusic(trackListing: DAWData, apiCalls: any = null) {
+export function analyzeMusic(trackListing: Project, apiCalls: any = null) {
     return timelineToEval(trackToTimeline(trackListing, apiCalls))
 }
 
 // Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: string, script: string, trackListing: DAWData) {
+export function analyzeCodeAndMusic(language: string, script: string, trackListing: Project) {
     const codeComplexity = analyzeCode(language, script)
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     savedAnalysis = Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
@@ -125,7 +125,7 @@ export function analyzeCodeAndMusic(language: string, script: string, trackListi
 }
 
 // Convert compiler output to timeline representation.
-function trackToTimeline(output: DAWData, apiCalls: any = null) {
+function trackToTimeline(output: Project, apiCalls: any = null) {
     const report: any = {}
     // basic music information
     report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
