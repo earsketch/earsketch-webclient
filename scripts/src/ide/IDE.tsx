@@ -13,7 +13,7 @@ import { CAI } from "../cai/CAI"
 import * as cai from "../cai/caiState"
 import * as caiAnalysis from "../cai/analysis"
 import * as collaboration from "../app/collaboration"
-import { Script } from "common"
+import { Script } from "../types/common"
 import { Curriculum } from "../browser/Curriculum"
 import * as curriculum from "../browser/curriculumState"
 import { DAW, setProject } from "../daw/DAW"
@@ -26,6 +26,7 @@ import * as scripts from "../browser/scriptsState"
 import * as editor from "./Editor"
 import * as ide from "./ideState"
 import * as layout from "./layoutState"
+import { RenderProject } from "../app/player"
 import reporter from "../app/reporter"
 import * as runner from "../app/runner"
 import { ScriptCreator } from "../app/ScriptCreator"
@@ -35,7 +36,6 @@ import * as tabs from "./tabState"
 import * as ideConsole from "./console"
 import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
-import { Project } from "../app/player"
 
 // Flag to prevent successive compilation / script save request
 let isWaitingForServerResponse = false
@@ -264,9 +264,9 @@ export async function compileCode() {
     const scriptID = tabs.selectActiveTabID(state)
     store.dispatch(tabs.removeModifiedScript(scriptID))
 
-    let result: Project
+    let project: RenderProject
     try {
-        result = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
+        project = await (language === "python" ? runner.runPython : runner.runJavaScript)(editor.getValue())
     } catch (error) {
         const duration = Date.now() - startTime
         esconsole(error, ["ERROR", "IDE"])
@@ -293,9 +293,9 @@ export async function compileCode() {
 
     const duration = Date.now() - startTime
     setLoading(false)
-    if (result) {
+    if (project) {
         esconsole("Code compiled, updating DAW.", "ide")
-        setProject(result)
+        setProject(project)
     }
     reporter.compile(language, true, undefined, duration)
     userNotification.showBanner(i18n.t("messages:interpreter.runSuccess"), "success")
@@ -310,7 +310,7 @@ export async function compileCode() {
             // reporter.complexity(language, code)
             let report
             try {
-                report = caiAnalysis.analyzeCodeAndMusic(language, code, result)
+                report = caiAnalysis.analyzeCodeAndMusic(language, code, project)
             } catch (e) {
                 // TODO: Make this work across browsers. (See esconsole for reference.)
                 let stackString = "unknown"
@@ -338,7 +338,7 @@ export async function compileCode() {
 
             console.log("complexityCalculator", report)
             if (FLAGS.SHOW_CAI) {
-                store.dispatch(cai.compileCAI([result, language, code]))
+                store.dispatch(cai.compileCAI([project, language, code]))
             }
         })
     }

@@ -10,7 +10,7 @@ import * as scripts from "../browser/scriptsState"
 import * as userProject from "./userProject"
 import { useSelector, useDispatch } from "react-redux"
 import { Diff } from "./Diff"
-import { Project } from "./player"
+import { RenderProject } from "./player"
 import { DAW, setProject } from "../daw/DAW"
 import { useTranslation } from "react-i18next"
 
@@ -57,7 +57,7 @@ export const ScriptHistory = ({ script, allowRevert, close }: { script: Script, 
     const [history, setHistory] = useState([] as Script[])
     // These are used for the embedded DAW.
     const [compiling, setCompiling] = useState(false)
-    const [compiledResult, setCompiledResult] = useState(null as Project | null)
+    const [compiledResult, setCompiledResult] = useState(null as RenderProject | null)
     // The index (not ID) of the script that is active in the history.
     const [active, setActive] = useState(1)
     // Chronologically adjacent versions of the script for the diff.

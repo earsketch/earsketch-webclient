@@ -1,6 +1,6 @@
 // Web Audio effect chain constructors
 import { TempoMap } from "../app/tempo"
-import { Track } from "../app/player"
+import { RenderTrack } from "../app/player"
 import esconsole from "../esconsole"
 import {
     Effect, BandpassEffect, ChorusEffect, CompressorEffect, DelayEffect, DistortionEffect,
@@ -30,7 +30,7 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export const buildAudioNodeGraph = (
-    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempoMap: TempoMap,
+    context: BaseAudioContext, mix: AudioNode, track: RenderTrack, tracknumber: number, tempoMap: TempoMap,
     offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
 ) => {
     esconsole("Building audio node graph", "debug")

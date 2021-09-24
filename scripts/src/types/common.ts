@@ -40,3 +40,48 @@ export interface SoundEntity {
     tempo?: number
     instrument: string
 }
+
+export interface Clip {
+    name: string
+    loopChild: boolean
+    measure: number
+    start: number
+    end: number
+    silence: number
+    track: number
+    tempo?: number
+    loop: boolean
+}
+
+export interface EffectRange {
+    name: string
+    parameter: string
+    startMeasure: number
+    endMeasure: number
+    startValue: number
+    endValue: number
+    track: number
+}
+
+export type Effect = EffectRange[] & { bypass?: boolean }
+
+export interface Track {
+    clips: Clip[]
+    effects: { [key: string]: Effect }
+    label?: string | number
+    visible?: boolean
+    buttons?: boolean
+    mute?: boolean
+}
+
+export interface ClipSlice {
+    sourceFile: string
+    start: number
+    end: number
+}
+
+export interface Project {
+    length: number
+    tracks: Track[]
+    slicedClips: { [key: string]: ClipSlice }
+}

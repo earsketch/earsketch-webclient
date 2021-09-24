@@ -10,33 +10,34 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
-import { Clip, ClipSlice, Project } from "./player"
+import { ClipSlice, Project } from "../types/common"
 import i18n from "i18next"
 import { TempoMap, timestretch } from "./tempo"
+import { RenderClip, RenderProject, RenderTrack } from "./player"
 
 // After running code, go through each clip, load the audio file and
 // replace looped ones with multiple clips. Why? Because we don't know
 // the length of each audio clip until after running (unless we
 // loaded the clips beforehand and did this at runtime, but that's
 // harder.) Follow up with pitchshifting and setting the result length.
-export async function postRun(result: Project) {
+export async function postRun(project: Project) {
     esconsole("Execution finished. Loading audio buffers...", ["debug", "runner"])
     // NOTE: We used to check if `finish()` was called (by looking at result.finish) and throw an error if not.
     // However, since `finish()` doesn't actually do anything (other than set this flag), we no longer check.
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
     // STEP 0: Fix effects. (This goes first because it may affect the tempo map, which is used in subsequent steps.)
-    fixEffects(result)
+    fixEffects(project)
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
-    await loadBuffersForSampleSlicing(result)
+    await loadBuffersForSampleSlicing(project)
     // STEP 2: Load audio buffers needed for the result.
-    const buffers = await loadBuffers(result)
+    const buffers = await loadBuffers(project)
     esconsole("Filling in looped sounds.", ["debug", "runner"])
     // STEP 3: Insert buffers into clips, fix clip loops/effect lengths, and timestretch clips to fit the tempo map.
     // Before fixing the clips, retrieve the clip tempo info from the metadata cache for a special treatment for the MAKEBEAT clips.
-    getClipTempo(result)
-    fixClips(result, buffers)
+    getClipTempo(project)
+    const result: RenderProject = fixClips(project, buffers)
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
     checkEffects(result)
@@ -48,10 +49,11 @@ export async function postRun(result: Project) {
     await addMetronome(result)
     // STEP 7: Print out string for unit tests, return the result.
     esconsole(ESUtils.formatResultForTests(result), ["nolog", "runner"])
+    return result
 }
 
 // Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
-async function handlePitchshift(result: Project) {
+async function handlePitchshift(result: RenderProject) {
     esconsole("Begin pitchshifting.", ["debug", "runner"])
 
     if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
@@ -62,7 +64,7 @@ async function handlePitchshift(result: Project) {
 
     // Synchronize the userConsole print out with the asyncPitchShift processing.
     try {
-        for (const track of result.tracks.slice(1)) {
+        for (const track of result.tracks.slice(1) as RenderTrack[]) {
             if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
                 pitchshift.pitchshiftClips(track, tempoMap)
                 userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
@@ -475,21 +477,28 @@ function roundUpToDivision(seconds: number, tempo: number) {
 const timestretchCache = new Map<string, AudioBuffer>()
 
 // Fill in looped clips with multiple clips.
-function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
-    const tempoMap = new TempoMap(result)
+function fixClips(project: Project, buffers: { [key: string]: AudioBuffer }) {
+    const tempoMap = new TempoMap(project)
+    const renderProject: RenderProject = {
+        length: 0,
+        tracks: [],
+        slicedClips: project.slicedClips,
+    }
     // step 1: fill in looped clips
-    result.length = 0
+    project.length = 0
 
-    for (const track of result.tracks) {
-        track.analyser = audioContext.createAnalyser()
-        const newClips: Clip[] = []
+    for (const track of project.tracks) {
+        const renderTrack: RenderTrack = {
+            clips: [],
+            effects: track.effects,
+        }
         for (const clip of track.clips) {
-            clip.sourceAudio = buffers[clip.name]
+            const sourceAudio = buffers[clip.name]
             let duration
             let posIncrement = 0
 
             if (clip.tempo === undefined) {
-                duration = ESUtils.timeToMeasure(clip.sourceAudio.duration, tempoMap.getTempoAtMeasure(clip.measure))
+                duration = ESUtils.timeToMeasure(sourceAudio.duration, tempoMap.getTempoAtMeasure(clip.measure))
             } else {
                 // Tempo specified: round to the nearest sixteenth note.
                 // This corrects for imprecision in dealing with integer numbers of samples,
@@ -497,7 +506,7 @@ function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
                 // E.g.: A wave file of one measure at 88 bpm, 44.1kHz has 120273 samples;
                 // converting it to a mp3 and decoding yields 119808 samples,
                 // meaning it falls behind by ~0.01 seconds per loop.
-                const actualLengthInQuarters = clip.sourceAudio.duration / 60 * clip.tempo
+                const actualLengthInQuarters = sourceAudio.duration / 60 * clip.tempo
                 const actualLengthInSixteenths = actualLengthInQuarters * 4
                 // NOTE: This prevents users from using samples which have intentionally weird lenghts,
                 // like 33 32nd notes, as they will be rounded to the nearest 16th.
@@ -513,13 +522,13 @@ function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
 
             // update result length
             const endMeasure = clip.measure + (clip.end - clip.start)
-            result.length = Math.max(result.length, endMeasure + clip.silence - 1)
+            project.length = Math.max(project.length, endMeasure + clip.silence - 1)
 
             // the minimum measure length for which extra clips will be added to fill in the gap
             const fillableGapMinimum = 0.01
             // add clips to fill in empty space
             let measure = clip.measure
-            let buffer = clip.sourceAudio
+            let buffer = sourceAudio
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
                 let start = first ? clip.start : 1
@@ -533,13 +542,13 @@ function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
                     const cacheKey = JSON.stringify([clip.name, start, end, pointsDuringClip])
                     let cached = timestretchCache.get(cacheKey)
 
-                    let input = clip.sourceAudio.getChannelData(0)
+                    let input = sourceAudio.getChannelData(0)
                     if (start !== 1 || end !== duration + 1) {
                         // Not using the entire buffer; only timestretch part of it.
                         // TODO: Consolidate all the slicing logic (between this, createSlice, and pitchshifter).
                         //       Ideally, we'd just slice once for clip.start/clip.end, and then throw those out...
-                        const startIndex = ESUtils.measureToTime(start, clip.tempo) * clip.sourceAudio.sampleRate
-                        const endIndex = ESUtils.measureToTime(end, clip.tempo) * clip.sourceAudio.sampleRate
+                        const startIndex = ESUtils.measureToTime(start, clip.tempo) * sourceAudio.sampleRate
+                        const endIndex = ESUtils.measureToTime(end, clip.tempo) * sourceAudio.sampleRate
                         input = input.subarray(startIndex, endIndex)
                         end -= start - 1
                         start = 1
@@ -553,8 +562,9 @@ function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
                     }
                     buffer = cached
                 }
-                newClips.push({
+                renderTrack.clips.push({
                     ...clip,
+                    sourceAudio,
                     audio: buffer,
                     measure,
                     start,
@@ -565,9 +575,8 @@ function fixClips(result: Project, buffers: { [key: string]: AudioBuffer }) {
                 first = false
             }
         }
-
-        track.clips = newClips
     }
+    return renderProject
 }
 
 // Warn users when a clips overlap each other. Done after execution because
@@ -617,16 +626,15 @@ function checkEffects(result: Project) {
 }
 
 // Adds a metronome as the last track of a result.
-async function addMetronome(result: Project) {
+async function addMetronome(result: RenderProject) {
     const [stressed, unstressed] = await Promise.all([
         audioLibrary.getSound("METRONOME01"),
         audioLibrary.getSound("METRONOME02"),
     ])
     const track = {
-        clips: [] as Clip[],
+        clips: [],
         effects: {},
-        analyser: audioContext.createAnalyser(),
-    }
+    } as RenderTrack
     for (let i = 1; i < result.length + 1; i += 0.25) {
         const name = i % 1 === 0 ? "METRONOME01" : "METRONOME02"
         const sound = i % 1 === 0 ? stressed : unstressed
@@ -641,7 +649,7 @@ async function addMetronome(result: Project) {
             loop: false,
             loopChild: false,
             silence: 0,
-        })
+        } as RenderClip)
     }
     // The metronome needs an analyzer to prevent errors in player
     result.tracks.push(track)

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import * as appState from "../app/appState"
 import * as applyEffects from "../model/applyeffects"
 import { setReady } from "../bubble/bubbleState"
+import { Effect } from "../types/common"
 import * as daw from "./dawState"
 import * as ESUtils from "../esutils"
 import { compileCode } from "../ide/IDE"
@@ -226,7 +227,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
                { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                 toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+                 toggleBypass: (a: string) => void, track: player.RenderTrack, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -244,7 +245,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                 </>}
             </div>
             <div className={`daw-track ${mute ? "mute" : ""}`}>
-                {track.clips.map((clip: player.Clip, index: number) => <Clip key={index} color={color} clip={clip} />)}
+                {track.clips.map((clip: player.RenderClip, index: number) => <Clip key={index} color={color} clip={clip} />)}
             </div>
         </div>
         {showEffects &&
@@ -257,7 +258,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
                         {t("daw.bypass")}
                     </button>
                 </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
+                <EffectEnvelope color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={mute} />
             </div>)}
     </div>
 }
@@ -287,7 +288,7 @@ const drawWaveform = (element: HTMLElement, waveform: number[], width: number, h
     ctx.closePath()
 }
 
-const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
+const Clip = ({ color, clip }: { color: daw.Color, clip: player.RenderClip }) => {
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
     // Minimum width prevents clips from vanishing on zoom out.
@@ -310,8 +311,8 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
     </div>
 }
 
-const Effect = ({ name, color, effect, bypass, mute }:
-                { name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean }) => {
+const EffectEnvelope = ({ name, color, effect, bypass, mute }:
+                { name: string, color: daw.Color, effect: Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -393,7 +394,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
-                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.RenderTrack, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -429,7 +430,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
                         {t("daw.bypass")}
                     </button>}
                 </div>
-                <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
+                <EffectEnvelope color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
             </div>
         })}
     </div>
@@ -561,12 +562,12 @@ const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v ** 2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
+const prepareWaveforms = (tracks: player.RenderTrack[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
     // ignore the mix track (0) and metronome track (len-1)
     for (let i = 1; i < tracks.length - 1; i++) {
-        tracks[i].clips.forEach(clip => {
+        tracks[i].clips.forEach((clip: player.RenderClip) => {
             if (!WaveformCache.checkIfExists(clip)) {
                 // Use pre-timestretching/pitchshifting audio, since measures pass linearly in the DAW.
                 const waveform = clip.sourceAudio.getChannelData(0)
@@ -606,7 +607,7 @@ let lastTab: string | null = null
 // TODO: Temporary hack:
 let _setPlayPosition: ((a: number) => void) | null = null
 
-export function setProject(result: player.Project) {
+export function setProject(result: player.RenderProject) {
     const { dispatch, getState } = store
     let state = getState()
 
@@ -618,8 +619,8 @@ export function setProject(result: player.Project) {
     const playLength = result.length + 1
     dispatch(daw.setPlayLength(playLength))
 
-    const tracks: player.Track[] = []
-    result.tracks.forEach((track, index) => {
+    const tracks: player.RenderTrack[] = []
+    result.tracks.forEach((track: player.RenderTrack, index) => {
         // create a (shallow) copy of the track so that we can
         // add stuff to it without affecting the reference which
         // we want to preserve (e.g., for the autograder)
@@ -627,7 +628,7 @@ export function setProject(result: player.Project) {
         tracks.push(track)
 
         // Copy clips, too... because somehow dispatch(daw.setTracks(tracks)) is doing a deep freeze, preventing clip.source from being set by player.
-        track.clips = track.clips.map(c => Object.assign({}, c))
+        track.clips = track.clips.map((c: player.RenderClip) => Object.assign({}, c))
 
         track.visible = true
         track.label = index

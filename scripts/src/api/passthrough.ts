@@ -15,7 +15,7 @@ import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
-import { Clip, Project, EffectRange, Track } from "../app/player"
+import { Clip, Project, EffectRange, Track } from "../types/common"
 import * as runner from "../app/runner"
 import { TempoMap } from "../app/tempo"
 import * as userProject from "../app/userProject"
@@ -545,19 +545,19 @@ export function analyzeTrack(result: Project, trackNumber: number, featureForAna
     const tempoMap = new TempoMap(result)
     // the analyzeResult will contain a result object that contains only
     // one track that we want to analyze
-    const analyzeResult = {
+    const analyzeProject = {
         init: true,
         finish: true,
         tracks: [{ clips: [], effects: {} }, result.tracks[trackNumber]],
         length: result.length,
         slicedClips: result.slicedClips,
     }
-    return runner.postRun(analyzeResult as any).then(() => {
+    return runner.postRun(analyzeProject).then(result => {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
         // return renderer.renderBuffer(result)
-        const clips = analyzeResult.tracks[1].clips
+        const clips = result.tracks[1].clips
         return renderer.mergeClips(clips, tempoMap)
     }).then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis))
 }
@@ -608,7 +608,7 @@ export function analyzeTrackForTime(result: Project, trackNumber: number, featur
 
     // the analyzeResult will contain a result object that contains only
     // one track that we want to analyze
-    const analyzeResult = {
+    const analyzeProject = {
         init: true,
         finish: true,
         tracks: [{ clips: [], effects: {} }, result.tracks[trackNumber]],
@@ -616,11 +616,11 @@ export function analyzeTrackForTime(result: Project, trackNumber: number, featur
         slicedClips: result.slicedClips,
     }
 
-    return runner.postRun(analyzeResult as any).then(() => {
+    return runner.postRun(analyzeProject).then(result => {
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
-        const clips = analyzeResult.tracks[1].clips
+        const clips = result.tracks[1].clips
         const buffer = renderer.mergeClips(clips, tempoMap)
         return buffer
     }).then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, startSecond, endSecond))

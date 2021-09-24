@@ -1,7 +1,7 @@
 // Render scripts using an offline audio context.
 import * as applyEffects from "../model/applyeffects"
 import esconsole from "../esconsole"
-import { Clip, Project } from "./player"
+import { RenderClip, RenderProject } from "./player"
 import { OfflineAudioContext } from "./audiocontext"
 import { TempoMap } from "./tempo"
 
@@ -9,7 +9,7 @@ const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
 
 // Render a result for offline playback.
-export async function renderBuffer(result: Project) {
+export async function renderBuffer(result: RenderProject) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const origin = 0
@@ -18,7 +18,7 @@ export async function renderBuffer(result: Project) {
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     const mix = context.createGain()
 
-    result.master = context.createGain()
+    const gain = context.createGain()
 
     // we must go through every track and every audio clip and add each of
     // them to the audio context and start them at the right time
@@ -33,7 +33,7 @@ export async function renderBuffer(result: Project) {
 
         const startNode = applyEffects.buildAudioNodeGraph(
             context, mix, track, i, tempoMap,
-            origin, result.master, [], false
+            origin, gain, [], false
         )
 
         const trackGain = context.createGain()
@@ -89,7 +89,7 @@ export async function renderBuffer(result: Project) {
             limiter.attack.value = 0 // as fast as possible
             limiter.release.value = 0.1 // could be a bit shorter
 
-            result.master.connect(limiter)
+            gain.connect(limiter)
             limiter.connect(trackGain)
 
             if (startNode !== undefined) {
@@ -107,7 +107,7 @@ export async function renderBuffer(result: Project) {
             } else {
                 // track gain -> (bypass effect tree) -> analyzer & master
                 trackGain.connect(track.analyser)
-                track.analyser.connect(result.master)
+                track.analyser.connect(gain)
             }
         }
     }
@@ -118,7 +118,7 @@ export async function renderBuffer(result: Project) {
 }
 
 // Render a result for offline playback. Returns a Blob.
-export async function renderWav(result: Project) {
+export async function renderWav(result: RenderProject) {
     const buffer = await renderBuffer(result)
     const pcmarrayL = buffer.getChannelData(0)
     const pcmarrayR = buffer.getChannelData(1)
@@ -129,7 +129,7 @@ export async function renderWav(result: Project) {
 }
 
 // Render a result to mp3 for offline playback. Returns a Blob.
-export async function renderMp3(result: Project) {
+export async function renderMp3(result: RenderProject) {
     const buffer = await renderBuffer(result)
     const mp3encoder = new lamejs.Mp3Encoder(2, 44100, 160)
     const mp3Data = []
@@ -160,7 +160,7 @@ export async function renderMp3(result: Project) {
 
 // Merge all the given clip buffers into one large buffer.
 // Returns a promise that resolves to an AudioBuffer.
-export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
+export async function mergeClips(clips: RenderClip[], tempoMap: TempoMap) {
     esconsole("Merging clips", ["debug", "renderer"])
     // calculate the length of the merged clips
     const length = Math.max(0, ...clips.map(clip => clip.measure + (clip.start - clip.end)))

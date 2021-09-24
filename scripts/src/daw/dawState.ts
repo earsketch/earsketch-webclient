@@ -1,7 +1,7 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit"
 
 import { RootState } from "../reducers"
-import { Track } from "../app/player"
+import { RenderTrack } from "../app/player"
 import { TempoMap } from "../app/tempo"
 
 const shuffle = (array: any[]) => {
@@ -54,7 +54,7 @@ interface SoloMuteConfig {
 }
 
 interface DAWState {
-    tracks: Track[]
+    tracks: RenderTrack[]
     playLength: number
     trackWidth: number
     trackHeight: number
@@ -236,7 +236,7 @@ export const selectTimelineZoomIntervals = createSelector(
     width => getZoomIntervals(TIMELINE_ZOOM_INTERVALS, width)
 )
 
-export const getMuted = (tracks: Track[], soloMute: SoloMuteConfig, metronome: boolean) => {
+export const getMuted = (tracks: RenderTrack[], soloMute: SoloMuteConfig, metronome: boolean) => {
     const keys = Object.keys(tracks).map(x => +x)
     const soloed = keys.filter(key => soloMute[key] === "solo")
     if (soloed.length > 0) {
@@ -254,7 +254,7 @@ export const selectTotalTrackHeight = createSelector(
     [selectTracks, selectShowEffects, selectTrackHeight, selectMixTrackHeight],
     (tracks, effects, height, mixHeight) => {
         let total = 0
-        tracks.forEach((track: Track, index: number) => {
+        tracks.forEach((track: RenderTrack, index: number) => {
             if (track.visible) {
                 total += (index === 0 ? mixHeight : height)
                 if (effects) {

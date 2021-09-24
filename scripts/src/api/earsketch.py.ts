@@ -2,7 +2,7 @@
 // EarSketch API: Python
 import * as passthrough from "./passthrough"
 import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"
-import { Project } from "../app/player"
+import { Project } from "../types/common"
 
 const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 

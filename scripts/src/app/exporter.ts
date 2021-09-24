@@ -3,7 +3,7 @@
 import { Script } from "common"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import { Project } from "./player"
+import { RenderProject } from "./player"
 import * as renderer from "./renderer"
 import * as runner from "./runner"
 import i18n from "i18next"
@@ -44,7 +44,7 @@ async function compile(script: Script) {
 }
 
 // Exports the script as an audio file.
-async function exportAudio(script: Script, type: string, render: (result: Project) => Promise<Blob>) {
+async function exportAudio(script: Script, type: string, render: (result: RenderProject) => Promise<Blob>) {
     const name = ESUtils.parseName(script.name)
     const result = await compile(script)
     try {

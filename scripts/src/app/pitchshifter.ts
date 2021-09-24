@@ -4,10 +4,11 @@
 // That raises the question: do we want to do this in real-time? Do we want the same algorithm?
 // (For example, it looks like Tone.js has a simple PitchShift that can be implemented with just stock Web Audio nodes.)
 import ctx from "./audiocontext"
+import { EffectRange } from "../types/common"
 import * as dsp from "../../lib/earsketch-appdsp"
 import esconsole from "../esconsole"
 import * as userConsole from "../ide/console"
-import { Clip, EffectRange, Track } from "./player"
+import { RenderClip, RenderTrack } from "./player"
 import { TempoMap } from "./tempo"
 
 interface Point {
@@ -100,7 +101,7 @@ const addEnvelopePoint = (points: Point[], effect: EffectRange, tempoMap: TempoM
     }
 }
 
-const getEnvelopeForTrack = (track: Track, tempoMap: TempoMap) => {
+const getEnvelopeForTrack = (track: RenderTrack, tempoMap: TempoMap) => {
     const points: Point[] = []
     if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
         // Compute envelope information
@@ -129,7 +130,7 @@ const pitchshift = (buffer: AudioBuffer, bendinfo: Point[]) => {
     return outBuffer
 }
 
-const getEnvelopeForClip = (clip: Clip, tempoMap: TempoMap, trackEnvelope: Point[]) => {
+const getEnvelopeForClip = (clip: RenderClip, tempoMap: TempoMap, trackEnvelope: Point[]) => {
     const clipStartInSamps = Math.round(tempoMap.measureToTime(clip.measure) * 44100 / dsp.HOP_SIZE)
     const clipEndInSamps = Math.round(tempoMap.measureToTime(clip.measure + (clip.end - clip.start)) * 44100 / dsp.HOP_SIZE)
     const clipLenInSamps = clipEndInSamps - clipStartInSamps
@@ -251,7 +252,7 @@ const getEnvelopeForClip = (clip: Clip, tempoMap: TempoMap, trackEnvelope: Point
     return clipPoints
 }
 
-export function pitchshiftClips(track: Track, tempoMap: TempoMap) {
+export function pitchshiftClips(track: RenderTrack, tempoMap: TempoMap) {
     if (track.clips.length === 0) {
         throw new RangeError("Cannot pitchshift an empty track")
     }

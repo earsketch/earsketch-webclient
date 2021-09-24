@@ -1,4 +1,4 @@
-import { Project } from "./app/player"
+import { Project } from "./types/common"
 import i18n from "i18next"
 
 export const measureToTime = (measure: number, tempo: number, timeSignature = 4) => {

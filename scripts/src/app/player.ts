@@ -5,59 +5,24 @@ import { dbToFloat } from "../model/audioeffects"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
 import { TempoMap } from "./tempo"
+import { Clip, Project, Track } from "common"
 
-// Preliminary type declarations
-// TODO: Move some to runner?
-export interface Clip {
-    name: string
-    loopChild: boolean
-    measure: number
-    start: number
-    end: number
+// TODO: Extract commented fields to separate structure?
+export type RenderClip = Clip & {
     audio: AudioBuffer
     sourceAudio: AudioBuffer
-    playing?: boolean
-    source?: AudioBufferSourceNode
-    gain?: GainNode
-    silence: number
-    track: number
-    tempo?: number
-    loop: boolean
+    // playing: boolean
+    // source: AudioBufferSourceNode
+    // gain: GainNode
 }
 
-export interface EffectRange {
-    name: string
-    parameter: string
-    startMeasure: number
-    endMeasure: number
-    startValue: number
-    endValue: number
-    track: number
+export type RenderTrack = Track & {
+    clips: RenderClip[]
+    // analyser: AnalyserNode
 }
 
-export type Effect = EffectRange[] & { bypass?: boolean }
-
-export interface Track {
-    clips: Clip[]
-    effects: { [key: string]: Effect }
-    analyser: AnalyserNode
-    label?: string | number
-    visible?: boolean
-    buttons?: boolean
-    mute?: boolean
-}
-
-export interface ClipSlice {
-    sourceFile: string
-    start: number
-    end: number
-}
-
-export interface Project {
-    length: number
-    tracks: Track[]
-    master: GainNode
-    slicedClips: { [key: string]: ClipSlice }
+export type RenderProject = Project & {
+    tracks: RenderTrack[]
 }
 
 let isPlaying = false
@@ -83,7 +48,7 @@ let loop = {
 }
 let loopScheduledWhilePaused = false
 
-const renderingDataQueue: (Project | null)[] = [null, null]
+const renderingDataQueue: (RenderProject | null)[] = [null, null]
 let mutedTracks: number[] = []
 let bypassedEffects: { [key: number]: string[] } = {}
 
@@ -109,7 +74,7 @@ const clearAllTimers = () => {
     clearTimeout(loopSchedTimer)
 }
 
-const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
+const playClip = (clip: RenderClip, trackGain: GainNode, pitchShift: any, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
     const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
@@ -161,6 +126,8 @@ const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempoMap: Te
     }
 }
 
+let gain = null as GainNode | null
+
 export const play = (startMes: number, endMes: number, manualOffset = 0) => {
     esconsole("starting playback", ["player", "debug"])
 
@@ -184,8 +151,8 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
     const waStartTime = context.currentTime + manualOffset
 
     // construct webaudio graph
-    renderingData.master = context.createGain()
-    renderingData.master.gain.setValueAtTime(1, context.currentTime)
+    gain = context.createGain()
+    gain.gain.setValueAtTime(1, context.currentTime)
 
     for (let t = 0; t < renderingData.tracks.length; t++) {
         const track = renderingData.tracks[t]
@@ -198,7 +165,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
         // construct the effect graph
-        const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, renderingData.master, trackBypass, false)
+        const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, gain, trackBypass, false)
 
         const trackGain = context.createGain()
         trackGain.gain.setValueAtTime(1.0, context.currentTime)
@@ -212,7 +179,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         // connect the track output to the effect tree
         if (t === 0) {
             // if master track
-            renderingData.master.connect(trackGain)
+            gain.connect(trackGain)
             // if there is at least one effect set in master track
             if (startNode !== undefined) {
                 // TODO: master not connected to the analyzer?
@@ -231,7 +198,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
             } else {
                 // track gain -> (bypass effect tree) -> analyzer & master
                 trackGain.connect(track.analyser)
-                track.analyser.connect(renderingData.master)
+                track.analyser.connect(gain)
             }
         }
 
@@ -313,7 +280,7 @@ export const pause = () => {
     clearTimeout(loopSchedTimer)
 }
 
-const stopAllClips = (renderingData: Project | null, delay: number) => {
+const stopAllClips = (renderingData: RenderProject | null, delay: number) => {
     if (!renderingData) {
         return
     }
@@ -361,8 +328,8 @@ const clearAudioGraph = (idx: number, delay = 0) => {
                 }
             }
 
-            if (renderData.master !== undefined) {
-                renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
+            if (gain !== null) {
+                gain.gain.setValueAtTime(0, context.currentTime + delay)
             }
         }
     }
@@ -487,7 +454,7 @@ export const setLoop = (loopObj: typeof loop) => {
     }
 }
 
-export const setRenderingData = (result: Project) => {
+export const setRenderingData = (result: RenderProject) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
     clearAudioGraph(0)
