@@ -28,7 +28,7 @@ async function queryID(query: any) {
         throw new Error("messages:general.noSelfShare")
     }
 
-    const data = await userProject.get("/users/search", { query, email: "g" })
+    const data = await userProject.get("/users/search", { query })
     if (data) {
         return data.username
     }

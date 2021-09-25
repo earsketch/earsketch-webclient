@@ -578,8 +578,8 @@ export async function setIsAdmin(username: string, isAdmin: boolean) {
 }
 
 // Search users and return user details - intended for admin use
-export async function searchUsers(username: string, email: string) {
-    return (await get("/users/search", { query: username, email: email }))
+export async function searchUsers(username: string) {
+    return (await get("/users/search", { query: username }))
 }
 
 // Set a user password with admin passphrase as credentials
