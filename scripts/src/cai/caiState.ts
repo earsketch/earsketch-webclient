@@ -198,7 +198,7 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         const message = {
             text: [input.label, "", "", "", ""],
             keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
-            recs: ["","",""],
+            recs: ["", "", ""],
             date: Date.now(),
             sender: userProject.getUsername(),
         } as CAIMessage
@@ -270,7 +270,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
                 const message = {
                     text: ["Compiled the script!", "", "", "", ""],
                     keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
-                    recs: ["","",""],
+                    recs: ["", "", ""],
                     date: Date.now(),
                     sender: userProject.getUsername(),
                 } as CAIMessage
@@ -325,7 +325,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
             const message = {
                 text: ["Compiled the script with error: " + data[0], "", "", "", ""],
                 keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
-                recs: ["","",""],
+                recs: ["", "", ""],
                 date: Date.now(),
                 sender: userProject.getUsername(),
             } as CAIMessage
@@ -360,7 +360,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
             collaboration.sendChatMessage({
                 text: ["the CAI Window", "", "", "", ""],
                 keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
-                recs: ["","",""],
+                recs: ["", "", ""],
                 sender: userProject.getUsername(),
                 date: Date.now(),
             } as CAIMessage, "curriculum")
@@ -391,7 +391,7 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
                 collaboration.sendChatMessage({
                     text: ["Curriculum Page " + location as string, "", "", "", ""],
                     keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
-                    recs: ["","",""],
+                    recs: ["", "", ""],
                     sender: userProject.getUsername(),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")

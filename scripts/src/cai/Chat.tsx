@@ -15,6 +15,7 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
 import { getUsername } from "../app/userProject"
+import * as editor from "../ide/Editor"
 
 interface AutocompleteSuggestion {
     utterance: string
@@ -53,6 +54,7 @@ const ChatFooter = () => {
         const message = {
             text: [label, "", "", "", ""],
             keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
+            recs: ["", "", ""],
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
@@ -60,10 +62,12 @@ const ChatFooter = () => {
     }
 
     const parseCAIInput = (input: string) => {
-        const labels = dialogue.getLinks(input)
+        dialogue.setCodeObj(editor.getValue())
+        const structure = dialogue.showNextDialogue(input)
         const outputMessage = {
-            text: labels[0],
-            keyword: labels[1],
+            text: structure[0],
+            keyword: structure[1],
+            recs: structure[2],
             date: Date.now(),
             sender: "CAI",
         } as cai.CAIMessage

@@ -567,7 +567,7 @@ function shuffle(array: any[]) {
     return array
 }
 
-function showNextDialogue() {
+export function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance) {
     let sampleRecs = []
     currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]) // make a copy
     if (currentTreeNode[activeProject].id == 69) {
@@ -582,7 +582,6 @@ function showNextDialogue() {
             }
         }
     }
-    let utterance = currentTreeNode[activeProject].utterance
     if (currentTreeNode[activeProject].title === "Maybe later") {
         studentInteracted = false
     }
