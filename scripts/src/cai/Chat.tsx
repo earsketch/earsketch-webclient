@@ -2,8 +2,12 @@ import React, { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Browser"
 
+import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
+import "@webscopeio/react-textarea-autocomplete/style.css"
+
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
+import { CAI_TREE_NODES } from "./caitree"
 import * as dialogue from "../cai/dialogue"
 import * as tabs from "../ide/tabState"
 import * as appState from "../app/appState"
@@ -11,6 +15,20 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
 import { getUsername } from "../app/userProject"
+
+interface AutocompleteSuggestion {
+    utterance: string
+    slashCommand: string
+}
+
+const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) => {
+    return (
+        <div className="autocomplete-item" style={{ zIndex: 1000 }}>
+            <span className="autocomplete-item-slash-command" style={{ fontWeight: "bold" }}>{`${text.entity.slashCommand}`}: </span>
+            <span className="autocomplete-item-utterance">{`${text.entity.utterance}`}</span>
+        </div>
+    )
+}
 
 const ChatFooter = () => {
     const dispatch = useDispatch()
@@ -21,6 +39,8 @@ const ChatFooter = () => {
     const curriculumView = useSelector(cai.selectCurriculumView)
 
     const [inputText, setInputText] = useState("")
+
+    const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
         dialogue.addToNodeHistory(["chat", [label, getUsername()]])
@@ -69,6 +89,25 @@ const ChatFooter = () => {
         }
     }
 
+    const findUtteranceBySlashCommand = (slashCommandPrompt: string) => {
+        const utterances: AutocompleteSuggestion[] = []
+        for (const node of caiTree) {
+            if ("slashCommand" in node && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
+                utterances.push({
+                    utterance: node.utterance,
+                    slashCommand: node.slashCommand,
+                } as AutocompleteSuggestion)
+            }
+        }
+        return utterances
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === "Enter") {
+            sendMessage()
+        }
+    }
+
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
@@ -87,7 +126,35 @@ const ChatFooter = () => {
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
-                <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { sendMessage() } }} style={{ backgroundColor: "lightgray" }}></input>
+                {wizard
+                    ? <ReactTextareaAutocomplete
+                        /* eslint-disable react/jsx-indent-props */
+                        id="chat-textarea"
+                        value={inputText}
+                        onChange={(e: Event) => setInputText((e.target as HTMLTextAreaElement).value)}
+                        onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e)}
+                        minChar={1}
+                        loadingComponent={() => <span>Loading</span>}
+                        itemClassName="autocomplete-item"
+                        dropdownClassName="autocomplete-list"
+                        containerClassName="autocomplete-container"
+                        trigger={{
+                            "/": {
+                                dataProvider: (token: string) => {
+                                    const utterances = findUtteranceBySlashCommand(token)
+                                    return utterances
+                                },
+                                component: AutocompleteSuggestionItem,
+                                output: (item: AutocompleteSuggestion) => item.utterance,
+                            },
+                        }}
+                        style={{ backgroundColor: "lightGray" }}
+                        onItemSelected={(selection: { currentTrigger: string, item: AutocompleteSuggestion }) => {
+                            dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
+                        }}
+                        /* eslint-enable react/jsx-indent-props */
+                    />
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
