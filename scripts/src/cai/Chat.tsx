@@ -14,6 +14,7 @@ import * as appState from "../app/appState"
 import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
+import { getUsername } from "../app/userProject"
 
 
 const AutocompleteSuggestionItem = (text: any) => {
@@ -31,12 +32,14 @@ const ChatFooter = () => {
     const responseOptions = useSelector(cai.selectResponseOptions)
 
     const wizard = useSelector(cai.selectWizard)
+    const curriculumView = useSelector(cai.selectCurriculumView)
 
     const [inputText, setInputText] = useState("")
 
     const caiTree = CAI_TREE_NODES.slice(0)
 
     const parseStudentInput = (label: string) => {
+        dialogue.addToNodeHistory(["chat", [label, getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
             label: label,
@@ -44,12 +47,12 @@ const ChatFooter = () => {
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
         const message = {
-            text: [label],
-            keyword: ["", "", "", "", ""],
+            text: [label, "", "", "", ""],
+            keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
-        collaboration.sendChatMessage(message)
+        collaboration.sendChatMessage(message, "user")
     }
 
     const parseCAIInput = (input: string) => {
@@ -64,7 +67,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(outputMessage))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(outputMessage, true)
+        collaboration.sendChatMessage(outputMessage, "wizard")
     }
 
     const caiResponseInput = (input: cai.CAIMessage) => {
@@ -72,7 +75,7 @@ const ChatFooter = () => {
         dispatch(cai.addToMessageList(input))
         dispatch(cai.autoScrollCAI())
         cai.newCAIMessage()
-        collaboration.sendChatMessage(input, true)
+        collaboration.sendChatMessage(input, "cai")
     }
 
     const sendMessage = () => {
@@ -104,12 +107,16 @@ const ChatFooter = () => {
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
+                <div style={{ flex: "auto", color: "white" }}>
+                    {curriculumView}
+                </div>}
+            {wizard &&
                 <div style={{ flex: "auto" }}>
                     <ul>
                         {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
                             <li key={inputIdx}>
                                 <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {input.text}
+                                    {cai.combineMessageText(input)}
                                 </button>
                             </li>)}
                     </ul>

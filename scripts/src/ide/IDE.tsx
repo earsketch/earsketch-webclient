@@ -144,7 +144,7 @@ export function initEditor() {
     activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
 
     const activeScript = tabs.selectActiveTabScript(store.getState())
-    editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
+    editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly || (FLAGS.SHOW_CHAT && location.href.includes("wizard")))
 }
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {
@@ -283,10 +283,6 @@ export async function compileCode() {
 
         saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
 
-        if (collaboration.active && collaboration.tutoring) {
-            collaboration.sendCompilationRecord(errType)
-        }
-
         if (FLAGS.SHOW_CAI) {
             store.dispatch(cai.compileError(error))
         }
@@ -340,14 +336,11 @@ export async function compileCode() {
             }
 
             console.log("complexityCalculator", report)
+
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.compileCAI([result, language, code]))
             }
         })
-    }
-
-    if (collaboration.active && collaboration.tutoring) {
-        collaboration.sendCompilationRecord("success")
     }
 
     const { bubble } = state
