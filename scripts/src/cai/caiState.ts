@@ -120,6 +120,7 @@ export const combineMessageText = (input: CAIMessage) => {
     for (let i = 0; i < input.text.length; i++) {
         if (input.text[i]) { output = output + " " + input.text[i] }
         if (input.keyword[i]) { output = output + " " + input.keyword[i][0] }
+        if (input.recs[i]) { output = output + " " + input.recs[i] }
     }
     return output
 }
