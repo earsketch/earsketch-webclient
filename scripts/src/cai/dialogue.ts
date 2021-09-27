@@ -44,8 +44,8 @@ let errorSuccess = 0
 let errorFail = 0
 
 let activeProject = ""
-let nodeHistory: { [key: string]: any [] } = {}
-let recommendationHistory: { [key: string]: any [] } = {}
+let nodeHistory: { [key: string]: any[] } = {}
+let recommendationHistory: { [key: string]: any[] } = {}
 let chattiness = 0
 let currentNoSuggRuns = 0
 let recentScripts: any = {}
@@ -769,7 +769,7 @@ function showNextDialogue() {
             recommendationHistory[activeProject].push(recs[idx])
         }
         let numLoops = 0
-        
+
         while (utterance.includes("[sound_rec]")) {
             const recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11]
             const newRecString = recs[recIndex]
@@ -965,7 +965,7 @@ const LINKS: { [key: string]: string } = {
     filter: "/en/v1/every-effect-explained-in-detail.html#filter",
     FILTER: "/en/v1/every-effect-explained-in-detail.html#filter",
     FILTER_FREQ: "/en/v1/every-effect-explained-in-detail.html#filter",
-    "volume mixing":  "/en/v1/every-effect-explained-in-detail.html#volume",
+    "volume mixing": "/en/v1/every-effect-explained-in-detail.html#volume",
     importing: "/en/v1/every-error-explained-in-detail.html#importerror",
     indented: "/en/v1/every-error-explained-in-detail.html#indentationerror",
     index: "/en/v1/every-error-explained-in-detail.html#indexerror",

@@ -12,7 +12,6 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
 
-
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
 
@@ -44,22 +43,16 @@ const CAIMessageView = (message: cai.CAIMessage) => {
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
                     {message.text[0]}
-                    {message.keyword.map((phrase, index) => (
-                        [
-                        <a href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, index])) }} style={{ color: "blue" }}>{message.keyword[index][0]}</a>,
-                        message.text[index+1]
-                        ]
-                    ))}
-                     {message.recs.map((rec,index) => (
-                        <button
-                        className="btn btn-xs btn-action"
-                        onClick={() => {dispatch(sounds.previewSound(rec)); }}
-                            > {rec}
+                    {message.keyword.map((phrase, index) => ([
+                        <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, index])) }} style={{ color: "blue" }}>{message.keyword[index][0]}</a>,
+                        message.text[index + 1],
+                    ]))}
+                    {message.recs.map((rec, index) => (
+                        <button key={index} className="btn btn-xs btn-action" onClick={() => { dispatch(sounds.previewSound(rec)) }}>
+                            {rec}
                         </button>
-                ))}
+                    ))}
                 </div>
-               
-                
             </div>
             <div className="chat-message-date" style={{ float: message.sender !== "CAI" ? "left" : "right" }}>
                 {ESUtils.formatTime(Date.now() - message.date)}
@@ -80,10 +73,10 @@ export const CaiBody = () => {
             <div className="chat-message-container">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
-                        <li key={idx}>
-                            <CAIMessageView {...message} />
-                        </li>)}
+                        Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
+                            <li key={idx}>
+                                <CAIMessageView {...message} />
+                            </li>)}
                 </ul>
             </div>
         </div>
@@ -126,12 +119,12 @@ const CaiFooter = () => {
             <div style={{ flex: "auto" }}>
                 <ul>
                     {errorOptions.length > 0 &&
-                    Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
-                        <li key={errIdx}>
-                            <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                {input.label}
-                            </button>
-                        </li>)}
+                        Object.entries(errorOptions).map(([errIdx, input]: [string, cai.CAIButton]) =>
+                            <li key={errIdx}>
+                                <button type="button" className="btn btn-cai" onClick={() => dispatch(cai.sendCAIMessage(input))} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                    {input.label}
+                                </button>
+                            </li>)}
                 </ul>
             </div>
         </div>
