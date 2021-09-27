@@ -21,6 +21,7 @@
     "@reduxjs/toolkit": "^1.4.0",
     "@tailwindcss/typography": "^0.3.1",
     "@types/react-dom": "^17.0.8",
+    "@webscopeio/react-textarea-autocomplete": "^4.7.3",
     "ace-builds": "^1.4.11",
     "acorn": "^7.3.1",
     "acorn-walk": "^7.2.0",
