@@ -102,7 +102,7 @@ const ChatFooter = () => {
         return utterances
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
             sendMessage()
         }
@@ -132,7 +132,7 @@ const ChatFooter = () => {
                         id="chat-textarea"
                         value={inputText}
                         onChange={(e: Event) => setInputText((e.target as HTMLTextAreaElement).value)}
-                        onKeyDown={(e: KeyboardEvent) => handleKeyDown(e)}
+                        onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e)}
                         minChar={1}
                         loadingComponent={() => <span>Loading</span>}
                         itemClassName="autocomplete-item"
@@ -149,9 +149,12 @@ const ChatFooter = () => {
                             },
                         }}
                         style={{ backgroundColor: "lightGray" }}
+                        onItemSelected={(selection: { currentTrigger: string, item: AutocompleteSuggestion }) => {
+                            dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
+                        }}
                         /* eslint-enable react/jsx-indent-props */
                     />
-                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { sendMessage() } }} style={{ backgroundColor: "lightgray" }}></input>}
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
