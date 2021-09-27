@@ -23,7 +23,7 @@ const ChatFooter = () => {
     const [inputText, setInputText] = useState("")
 
     const parseStudentInput = (label: string) => {
-        dialogue.addToNodeHistory([label, [getUsername()]])
+        dialogue.addToNodeHistory(["chat", [label, getUsername()]])
         const option = inputOptions.filter(option => { return option.label === inputText })[0]
         const button = {
             label: label,

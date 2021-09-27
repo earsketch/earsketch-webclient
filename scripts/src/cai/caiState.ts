@@ -140,13 +140,13 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
                     dispatch(setResponseOptions([...responseOptions, message]))
                 }
             } else {
-                dialogue.addToNodeHistory([combineMessageText(message), [wizard ? "Wizard" : "CAI"]])
+                dialogue.addToNodeHistory(["chat", [combineMessageText(message), wizard ? "Wizard" : "CAI"]])
                 dispatch(addToMessageList(message))
                 dispatch(autoScrollCAI())
                 newCAIMessage()
             }
         } else {
-            dialogue.addToNodeHistory([combineMessageText(message), ["CAI Suggestion"]])
+            dialogue.addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
             collaboration.sendChatMessage(message, "cai")
         }
     }
