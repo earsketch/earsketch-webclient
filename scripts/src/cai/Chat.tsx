@@ -16,11 +16,15 @@ import * as curriculum from "../browser/curriculumState"
 import * as collaboration from "../app/collaboration"
 import { getUsername } from "../app/userProject"
 
+interface AutocompleteSuggestion {
+    utterance: string
+    slashCommand: string
+}
 
-const AutocompleteSuggestionItem = (text: any) => {
+const AutocompleteSuggestionItem = (text: { entity: AutocompleteSuggestion }) => {
     return (
         <div className="autocomplete-item" style={{ zIndex: 1000 }}>
-            <span className="autocomplete-item-slash-command" style={{ fontWeight : "bold" }}>{`${text.entity.slashCommand}`}: </span>
+            <span className="autocomplete-item-slash-command" style={{ fontWeight: "bold" }}>{`${text.entity.slashCommand}`}: </span>
             <span className="autocomplete-item-utterance">{`${text.entity.utterance}`}</span>
         </div>
     )
@@ -86,19 +90,19 @@ const ChatFooter = () => {
     }
 
     const findUtteranceBySlashCommand = (slashCommandPrompt: string) => {
-        const utterances = []
+        const utterances: AutocompleteSuggestion[] = []
         for (const node of caiTree) {
             if ("slashCommand" in node && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
                 utterances.push({
                     utterance: node.utterance,
                     slashCommand: node.slashCommand,
-                })
+                } as AutocompleteSuggestion)
             }
         }
         return utterances
     }
 
-    const handleKeyDown = (event: any) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === "Enter") {
             sendMessage()
         }
@@ -122,30 +126,32 @@ const ChatFooter = () => {
                     </ul>
                 </div>}
             <div style={{ flex: "auto" }}>
-                <ReactTextareaAutocomplete
-                    id="chat-textarea"
-                    value={inputText}
-                    onChange={(e: any) => setInputText(e.target.value)}
-                    onKeyDown={(e: any) => handleKeyDown(e)}
-                    minChar={1}
-                    loadingComponent={() => <span>Loading</span>}
-                    itemClassName="autocomplete-item"
-                    dropdownClassName="autocomplete-list"
-                    containerClassName="autocomplete-container"
-                    trigger={{
-                        "/": {
-                            dataProvider: (token: string) => {
-                                const utterances = findUtteranceBySlashCommand(token)
-                                return utterances
+                {wizard
+                    ? <ReactTextareaAutocomplete
+                        /* eslint-disable react/jsx-indent-props */
+                        id="chat-textarea"
+                        value={inputText}
+                        onChange={(e: Event) => setInputText((e.target as HTMLTextAreaElement).value)}
+                        onKeyDown={(e: KeyboardEvent) => handleKeyDown(e)}
+                        minChar={1}
+                        loadingComponent={() => <span>Loading</span>}
+                        itemClassName="autocomplete-item"
+                        dropdownClassName="autocomplete-list"
+                        containerClassName="autocomplete-container"
+                        trigger={{
+                            "/": {
+                                dataProvider: (token: string) => {
+                                    const utterances = findUtteranceBySlashCommand(token)
+                                    return utterances
+                                },
+                                component: AutocompleteSuggestionItem,
+                                output: (item: AutocompleteSuggestion) => item.utterance,
                             },
-                            component: AutocompleteSuggestionItem,
-                            output: (item: any, trigger: any) => item.utterance,
-                        },
-                    }}
-                    style={{
-                        backgroundColor: "lightGray",
-                    }}
-                />
+                        }}
+                        style={{ backgroundColor: "lightGray" }}
+                        /* eslint-enable react/jsx-indent-props */
+                    />
+                    : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") { sendMessage() } }} style={{ backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>
             </div>
         </div>
