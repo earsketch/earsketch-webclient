@@ -894,7 +894,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         soundWait.sounds = []
     }
     const structure = getLinks(utterance)
-    if (nodeHistory[activeProject] && utterance != "") {
+    if (!FLAGS.SHOW_CHAT && nodeHistory[activeProject] && utterance != "") {
         // Add current node (by node number) and paramters to node history
         if (Number.isInteger(currentTreeNode[activeProject].id)) {
             addToNodeHistory([currentTreeNode[activeProject].id, parameters])
