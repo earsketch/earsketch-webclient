@@ -452,11 +452,8 @@ function handleFitMediaError() {
                 argumentTypes[i] = "Num"
             }
             //or is it a var or func call
-            //var
-
             
             var errorLineNo: number = currentError.traceback[0].lineno;
-            
             //func call
 
             if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
@@ -464,6 +461,7 @@ function handleFitMediaError() {
                 let functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
                 argumentTypes[i] = estimateFunctionNameReturn(functionName);
             }
+            argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo);
         }
         else {
             //is it the name of a smaple
@@ -494,9 +492,10 @@ function estimateFunctionNameReturn(funcName: string) {
 function estimateVariableType(varName: string, lineno: number) {
 
     let thisVar: any = null
+    let currentVars: any = ccState.getProperty("allVariables");
 
     for (let i = 0; i < currentVars.length; i++) {
-        if (currentVars[i].name == argsSplit[i]) {
+        if (currentVars[i].name == varName) {
             thisVar = currentVars[i]
         }
     }
@@ -509,18 +508,18 @@ function estimateVariableType(varName: string, lineno: number) {
         }
     }
     if (thisVar == null) {
-        return null
+        return ""
     }
     //get most recent outside-of-function assignment (or inside-this-function assignment)
     let funcLines: number[] = ccState.getProperty("functionLines")
     let funcObjs: any = ccState.getProperty("userFunctions")
     let highestLine: number = 0
-    if (funcLines.includes(errorLineNo)) {
+    if (funcLines.includes(lineno)) {
         //what function are we in
         let startLine: number = 0
         let endLine: number = 0
         for (let i = 0; i < funcObjs.length; i++) {
-            if (funcObjs[i].start < errorLineNo && funcObjs[i].end >= errorLineNo) {
+            if (funcObjs[i].start < lineno && funcObjs[i].end >= lineno) {
                 startLine = funcObjs[i].start
                 endLine = funcObjs[i].end
                 break
@@ -528,7 +527,7 @@ function estimateVariableType(varName: string, lineno: number) {
         }
 
         for (let i = 0; i < thisVar.assignments.length; i++) {
-            if (thisVar.assignments[i].line < errorLineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && thisVar.assignments[i].line > startLine && thisVar.assignments[i].line <= endLine) {
+            if (thisVar.assignments[i].line < lineno && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && thisVar.assignments[i].line > startLine && thisVar.assignments[i].line <= endLine) {
                 //then it's valid
                 if (thisVar.assignments[i].line > highestLine) {
                     latestAssignment = Object.assign({}, thisVar.assignments[i])
@@ -538,7 +537,7 @@ function estimateVariableType(varName: string, lineno: number) {
         }
 
         //get type from assigned node
-        argumentTypes[i] = ccHelpers.estimateDataType(latestAssignment)
+        return ccHelpers.estimateDataType(latestAssignment)
     }
 
 }
