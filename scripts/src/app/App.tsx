@@ -488,7 +488,7 @@ function setup() {
 
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
-        store.dispatch(layout.setEast({ open: true }))
+        store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
 

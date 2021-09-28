@@ -472,12 +472,13 @@ export const IDE = () => {
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {showCAI
-                        ? FLAGS.SHOW_CHAT
-                            ? <Chat />
-                            : <CAI />
-                        : <Curriculum />}
-                    {/* NOTE: The chat window might come back here at some point. */}
+                    {showCAI &&
+                            (FLAGS.SHOW_CHAT
+                                ? <Chat />
+                                : <CAI />)}
+                    <div className={showCAI ? "hidden" : ""}>
+                        <Curriculum />
+                    </div>
                 </div>
             </Split>
         </div>
