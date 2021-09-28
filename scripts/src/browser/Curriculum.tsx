@@ -28,13 +28,33 @@ const urlToPermalink = (url: string) => {
         .replace("#", SECTION_URL_CHARACTER)
 }
 
+const getPermalinkParts = (permalink: string) => {
+    return permalink.split(SECTION_URL_CHARACTER)
+}
+
 const permalinkToURL = (permalink: string) => {
-    const linkParts = permalink.split(SECTION_URL_CHARACTER)
+    const linkParts = getPermalinkParts(permalink)
     linkParts[0] += ".html"
     if (linkParts.length === 2) {
         linkParts[0] += "#"
     }
     return linkParts.join("")
+}
+
+const checkLegacyURLs = (permalink: string) => {
+    const linkParts = getPermalinkParts(permalink)
+    let url = OLD_CURRICULUM_LOCATIONS[permalink]
+    if (url !== undefined) {
+        return url
+    }
+
+    if (linkParts.length === 2) {
+        url = OLD_CURRICULUM_LOCATIONS[linkParts[0]]
+        if (url !== undefined) {
+            url += "#" + linkParts[1]
+        }
+    }
+    return url
 }
 
 const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: curriculum.TOCItem, chIdx: string }) => {
@@ -338,7 +358,7 @@ const HotCurriculum = hot(() => {
 
         if (curriculumParam !== null) {
             // check if this value exists in our old locations file first
-            const url = OLD_CURRICULUM_LOCATIONS[curriculumParam]
+            const url = checkLegacyURLs(curriculumParam)
             if (url !== undefined) {
                 dispatch(curriculum.fetchContent({ url }))
             } else {
