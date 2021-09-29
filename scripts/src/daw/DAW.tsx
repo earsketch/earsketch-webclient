@@ -638,7 +638,7 @@ export function setDAWData(result: player.DAWData) {
     const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
-        mix.visible = Object.keys(mix.effects).length > 1 || mix.effects["TEMPO-TEMPO"].length > 1
+        mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
         mix.mute = false
         // the mix track is special
         mix.label = "MIX"
