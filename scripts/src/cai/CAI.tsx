@@ -39,7 +39,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
         } else if (message.text[i][0] === "LINK") {
             wholeMessage.push(<a key={i} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(message.text[i][1][1])) }} style={{ color: "blue" }}>{message.text[i][1][0]}</a>)
         } else if (message.text[i][0] === "sound_rec") {
-            wholeMessage.push(<a key={i} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(message.text[i][1][0])) }} style={{ color: "blue" }}>{message.text[i][1]}</a>)
+            wholeMessage.push(<a key={i} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(message.text[i][1][0])) }} style={{ color: "blue" }}>{message.text[i][1][0]} </a>)
         }
     }
 
