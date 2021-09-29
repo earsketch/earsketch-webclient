@@ -52,9 +52,7 @@ const ChatFooter = () => {
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
         const message = {
-            text: [label, "", "", "", ""],
-            keyword: [["", ""], ["", ""], ["", ""], ["", ""], ["", ""]],
-            recs: ["", "", ""],
+            text: [["plaintext",[label]]],
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
@@ -65,9 +63,7 @@ const ChatFooter = () => {
         dialogue.setCodeObj(editor.getValue())
         const structure = dialogue.showNextDialogue(input)
         const outputMessage = {
-            text: structure[0],
-            keyword: structure[1],
-            recs: structure[2],
+            text: structure,
             date: Date.now(),
             sender: "CAI",
         } as cai.CAIMessage

@@ -568,7 +568,6 @@ function shuffle(array: any[]) {
 }
 
 export function showNextDialogue(utterance: string = currentTreeNode[activeProject].utterance) {
-    let sampleRecs = []
     currentTreeNode[activeProject] = Object.assign({}, currentTreeNode[activeProject]) // make a copy
     if (currentTreeNode[activeProject].id == 69) {
         done = true
@@ -772,10 +771,9 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         while (utterance.includes("[sound_rec]")) {
             const recBounds = [utterance.indexOf("[sound_rec]"), utterance.indexOf("[sound_rec]") + 11]
             const newRecString = recs[recIndex]
-            sampleRecs.push(recs[recIndex])
-            usedRecs.push(recs[recIndex])
+            usedRecs.push(newRecString)
             if (newRecString !== undefined) {
-                utterance = utterance.substring(0, recBounds[0]) + utterance.substring(recBounds[1]).replace(/(\r\n|\n|\r)/gm, "");
+                utterance = utterance.substring(0, recBounds[0]) + "[sound_rec|" + newRecString + "]" + utterance.substring(recBounds[1]).replace(/(\r\n|\n|\r)/gm, "");
                 recIndex++
             }
             numLoops++
@@ -893,48 +891,46 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         complexityWait.node = -1
         soundWait.sounds = []
     }
-    const structure = getLinks(utterance)
+    const structure = processUtterance(utterance)
+
     if (!FLAGS.SHOW_CHAT && nodeHistory[activeProject] && utterance != "") {
-        // Add current node (by node number) and paramters to node history
+        // Add current node (by node number) and parameters to node history
         if (Number.isInteger(currentTreeNode[activeProject].id)) {
             addToNodeHistory([currentTreeNode[activeProject].id, parameters])
         } else {
             addToNodeHistory([0, utterance, parameters])
         }
     }
-    structure.push(sampleRecs)
     return structure
 }
 
-export function getLinks(utterance: string) {
-    let utteranceFirstHalf = utterance
-    let utteranceSecondHalf = ""
-    let keyword = ""
-    let link = ""
-    const textPieces = []
-    const keywordLinks = []
-    // does one iterations/ assumes one appearance
-    if (utterance.includes("[LINK")) {
-        while (utterance.includes("[LINK")) {
-            keyword = utterance.substring(utterance.indexOf("[LINK") + 6, utterance.indexOf("]"))
-            link = LINKS[keyword]
-            utteranceFirstHalf = utterance.substring(0, utterance.indexOf("[LINK"))
-            utteranceSecondHalf = utterance.substring(utterance.indexOf("]") + 1, utterance.length)
-            utterance = utteranceSecondHalf
-            textPieces.push(link ? utteranceFirstHalf : utteranceFirstHalf + keyword)
-            keywordLinks.push(link ? [keyword, link] : ["", ""])
+export function processUtterance(utterance: string) {
+    var message: any[] =  []
+    var pos = utterance.search(/[[]/g)
+    var subMessage: any[] = []
+    if(pos > -1) {
+        while(pos > -1) {
+            var id = utterance.substring(pos+1, utterance.indexOf("|"))
+            var content = utterance.substring(utterance.indexOf("|")+1,utterance.indexOf("]") )
+            if(id === "LINK") {
+                var link = LINKS[content]
+                subMessage = ["LINK",[content,link]]
+            }
+            else if (id === "sound_rec") {
+                subMessage = ["sound_rec",[content]]
+            }
+            if (pos > 0)
+                message.push(["plaintext",[utterance.substring(0,pos)]])
+
+            message.push(subMessage)
+            utterance = utterance.substring(utterance.indexOf("]")+1)
+            pos = utterance.search(/[[]/g)
         }
-    } else {
-        keywordLinks.push(["", ""])
+        if (utterance.length > 0)
+            message.push(["plaintext",[utterance]])
+        return message
     }
-    textPieces.push(utterance)
-    while (textPieces.length < 5) {
-        textPieces.push("")
-    }
-    while (keywordLinks.length < 5) {
-        keywordLinks.push(["", ""])
-    }
-    return [textPieces, keywordLinks]
+    return [["plaintext",[utterance]]]
 }
 
 const LINKS: { [key: string]: string } = {
@@ -978,6 +974,7 @@ const LINKS: { [key: string]: string } = {
     "nested loops": "/en/v1/sonification.html#nestedloops",
 }
 
+//if used, sound_rec needs to be updated with link
 function reconstituteNodeHistory() {
     const newVersion = []
     for (const i in nodeHistory[activeProject]) {

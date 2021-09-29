@@ -32,6 +32,16 @@ export const CaiHeader = () => {
 
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
+    console.log("message",message)
+    var wholeMessage = []
+    for (let i = 0; i < message.text.length; i++) {
+        if (message.text[i][0] === "plaintext")
+            wholeMessage.push(message.text[i][1][0])
+        else if (message.text[i][0] === "LINK")
+            wholeMessage.push(<a key={i} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(message.text[i][1][1])) }} style={{ color: "blue" }}>{message.text[i][1][0]}</a>)
+        else if (message.text[i][0] === "sound_rec")
+            wholeMessage.push(<a key={i} href="#" onClick={e => {e.preventDefault();dispatch(sounds.previewSound(message.text[i][1][0])) }} style={{ color: "blue" }}>{message.text[i][1]}</a>)
+    }
 
     return (
         <div className="chat-message" style={{ color: "black" }}>
@@ -42,16 +52,8 @@ const CAIMessageView = (message: cai.CAIMessage) => {
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
-                    {message.text[0]}
-                    {message.keyword.map((phrase, index) => ([
-                        <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum([message, index])) }} style={{ color: "blue" }}>{message.keyword[index][0]}</a>,
-                        message.text[index + 1],
-                    ]))}
-                    {message.recs.map((rec, index) => (
-                        <button key={index} className="btn btn-xs btn-action" onClick={() => { dispatch(sounds.previewSound(rec)) }}>
-                            {rec}
-                        </button>
-                    ))}
+                    {wholeMessage}
+                    {console.log("whole",wholeMessage)}
                 </div>
             </div>
             <div className="chat-message-date" style={{ float: message.sender !== "CAI" ? "left" : "right" }}>
