@@ -201,21 +201,21 @@ if (FLAGS.SHOW_CAI) {
         if (ctrlDown) {
             if (e.altKey) {
                 caiDialogue.addToNodeHistory(["other", []])
-            } else {
-                switch (c) {
-                    case "c":
-                        caiDialogue.addToNodeHistory(["copy", []])
-                        break
-                    case "x":
-                        caiDialogue.addToNodeHistory(["cut", []])
-                        break
-                    case "v":
-                        caiDialogue.addToNodeHistory(["paste", []])
-                        break
-                }
             }
         } else {
             caiDialogue.addToNodeHistory(["keydown", [c]])
         }
+    })
+
+    window.addEventListener("copy", () => {
+        caiDialogue.addToNodeHistory(["copy", []])
+    })
+
+    window.addEventListener("cut", () => {
+        caiDialogue.addToNodeHistory(["cut", []])
+    })
+
+    window.addEventListener("paste", () => {
+        caiDialogue.addToNodeHistory(["paste", []])
     })
 }

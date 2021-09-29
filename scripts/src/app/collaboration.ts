@@ -297,7 +297,9 @@ export function leaveSession(shareID: string) {
 }
 
 function onMemberJoinedSession(data: Message) {
-    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " has joined the collaboration session.") }
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.sender + " has joined the collaboration session.")
+    }
 
     if (data.sender in otherMembers) {
         otherMembers[data.sender].active = true
@@ -310,7 +312,9 @@ function onMemberJoinedSession(data: Message) {
 }
 
 function onMemberLeftSession(data: Message) {
-    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " has left the collaboration session.") }
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.sender + " has left the collaboration session.")
+    }
 
     if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
@@ -557,7 +561,9 @@ function rejoinSession() {
 }
 
 export function saveScript(_scriptID?: string) {
-    if (cai.selectWizard(store.getState())) { return }
+    if (cai.selectWizard(store.getState())) {
+        return
+    }
     if (!_scriptID || (_scriptID === scriptID)) {
         websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
     }
@@ -565,7 +571,9 @@ export function saveScript(_scriptID?: string) {
 }
 
 function onScriptSaved(data: Message) {
-    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " saved the current version of the script.", "success") }
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.sender + " saved the current version of the script.", "success")
+    }
 }
 
 export function storeCursor(position: Ace.Point) {
@@ -635,7 +643,9 @@ function removeOtherCursors() {
 }
 
 function onMiscMessage(data: Message) {
-    if (!userIsCAI(data.sender)) { userNotification.show(data.text!) }
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.text!)
+    }
 }
 
 function onChangeWriteAccess(data: Message) {
@@ -1087,8 +1097,7 @@ function triggerByNotification(data: Message) {
 
 websocket.subscribe(triggerByNotification)
 
-// TEMPORARY for Wizard of Oz CAI testing, Spring 2020.
+// TEMPORARY for Wizard of Oz CAI testing, Spring 2020-2021.
 function userIsCAI(user: string) {
-    user = user.toUpperCase()
-    return (user.includes("AI_PARTNER") || user === "CAI")
+    return user.toUpperCase() === "CAI"
 }

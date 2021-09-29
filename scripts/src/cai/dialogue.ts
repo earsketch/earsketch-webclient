@@ -339,7 +339,9 @@ export function createButtons() {
             let availableGenres = []
             let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
             if (allSamples.length < 1) {
-                for (let i = 0; i < 5; i++) { allSamples = recommender.addRandomRecInput(allSamples) }
+                for (let i = 0; i < 5; i++) {
+                    allSamples = recommender.addRandomRecInput(allSamples)
+                }
             }
             availableGenres = recommender.availableGenres()
             for (const i in currentTreeNode[activeProject].options) {
@@ -537,7 +539,9 @@ export function createButtons() {
 }
 
 export function addToNodeHistory(nodeObj: any, sourceCode?: string) {
-    if (location.href.includes("wizard") && nodeObj[0] !== "Slash") { return } // Disabled for Wizard of Oz operators.
+    if (location.href.includes("wizard") && nodeObj[0] !== "Slash") {
+        return
+    } // Disabled for Wizard of Oz operators.
     if (FLAGS.SHOW_CAI && nodeHistory[activeProject]) {
         nodeHistory[activeProject].push(nodeObj)
         codeSuggestion.storeHistory(nodeHistory[activeProject])
@@ -723,7 +727,9 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         const count = (utterance.match(/sound_rec/g) || []).length
         let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
         if (allSamples.length < 1) {
-            for (let i = 0; i < 5; i++) { allSamples = recommender.addRandomRecInput(allSamples) }
+            for (let i = 0; i < 5; i++) {
+                allSamples = recommender.addRandomRecInput(allSamples)
+            }
         }
         let recs: any = []
         const usedRecs = []
@@ -755,7 +761,9 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             for (let i = 0; i < combinations.length; i++) {
                 const newRecs = recommender.recommendReverse([], allSamples, 1, 1, combinations[i][0], combinations[i][1], recommendationHistory[activeProject], numNewRecs)
                 for (let k = 0; k < newRecs.length; k++) {
-                    if (!recs.includes(newRecs[k])) { recs.push(newRecs[k]) }
+                    if (!recs.includes(newRecs[k])) {
+                        recs.push(newRecs[k])
+                    }
                 }
                 numNewRecs = count - recs.length
                 if (numNewRecs === 0) {

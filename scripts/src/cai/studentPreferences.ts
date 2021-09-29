@@ -2,7 +2,7 @@
 import * as student from "./student"
 
 // TODO: All of these objects have one entry per project, so project state is spread across all of them.
-// Instead, refactor to group all the state into one object per project, so the consts can just deal with one object
+// Instead, refactor to group all the state into one object per project, so the functions can just deal with one object
 // (and avoid having to index with `[projectName]` everywhere).
 const suggestionsAccepted: { [key: string]: number } = {}
 const suggestionsRejected: { [key: string]: number } = {}
