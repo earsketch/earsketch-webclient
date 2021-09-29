@@ -115,8 +115,8 @@ export const newCAIMessage = () => {
 
 export const combineMessageText = (input: CAIMessage) => {
     let output = ""
-    for (let i = 0; i < input.text.length; i++) {
-        output = output + " " + input.text[i][1][0]
+    for (const subText of input.text) {
+        output = output + " " + subText[1][0]
     }
     return output
 }
@@ -190,9 +190,8 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         if (input.label.trim().replace(/(\r\n|\n|\r)/gm, "") === "") {
             return
         }
-        console.log("input.label",input.label)
         const message = {
-            text: [["plaintext",[input.label]]],
+            text: [["plaintext", [input.label]]],
             date: Date.now(),
             sender: userProject.getUsername(),
         } as CAIMessage
@@ -262,7 +261,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         if (FLAGS.SHOW_CHAT) {
             if (!selectWizard(getState())) {
                 const message = {
-                    text: ["Compiled the script!"],
+                    text: ["plaintext", ["Compiled the script!"]],
                     date: Date.now(),
                     sender: userProject.getUsername(),
                 } as CAIMessage
@@ -313,7 +312,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
 
         if (FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
-                text: ["Compiled the script with error: " + data[0]],
+                text: ["plaintext", ["Compiled the script with error: " + data[0]]],
                 date: Date.now(),
                 sender: userProject.getUsername(),
             } as CAIMessage
@@ -346,7 +345,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
     () => {
         if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
             collaboration.sendChatMessage({
-                text: ["the CAI Window"],
+                text: ["plaintext", ["the CAI Window"]],
                 sender: userProject.getUsername(),
                 date: Date.now(),
             } as CAIMessage, "curriculum")
@@ -375,7 +374,7 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
         if (!(east.open && east.kind === "CAI")) {
             if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
                 collaboration.sendChatMessage({
-                    text: ["Curriculum Page " + location as string],
+                    text: ["plaintext", ["Curriculum Page " + location as string]],
                     sender: userProject.getUsername(),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")

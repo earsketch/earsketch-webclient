@@ -52,7 +52,7 @@ const ChatFooter = () => {
         } as cai.CAIButton
         dispatch(cai.sendCAIMessage(button))
         const message = {
-            text: [["plaintext",[label]]],
+            text: [["plaintext", [label]]],
             date: Date.now(),
             sender: collaboration.userName,
         } as cai.CAIMessage
