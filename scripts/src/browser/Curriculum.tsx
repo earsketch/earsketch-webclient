@@ -43,17 +43,20 @@ const permalinkToURL = (permalink: string) => {
 
 const checkLegacyURLs = (permalink: string) => {
     const linkParts = getPermalinkParts(permalink)
+    // first check to see if the full permalink exists in our legacy mapping
     let url = OLD_CURRICULUM_LOCATIONS[permalink]
     if (url !== undefined) {
         return url
     }
-
+    // if not, and if the permalink includes a section hash,
+    // then check if just the portion to the left of the hash exists in our legacy mapping
     if (linkParts.length === 2) {
         url = OLD_CURRICULUM_LOCATIONS[linkParts[0]]
         if (url !== undefined) {
             url += "#" + linkParts[1]
         }
     }
+    // url will be undefined if we don't have a legacy mapping for it, and then we attempt to load url as-is
     return url
 }
 
