@@ -116,7 +116,7 @@ export const newCAIMessage = () => {
 export const combineMessageText = (input: CAIMessage) => {
     let output = ""
     for (const subText of input.text) {
-        output = output + " " + subText[1][0]
+        output = output + subText[1][0]
     }
     return output
 }
