@@ -261,7 +261,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         if (FLAGS.SHOW_CHAT) {
             if (!selectWizard(getState())) {
                 const message = {
-                    text: ["plaintext", ["Compiled the script!"]],
+                    text: [["plaintext", ["Compiled the script!"]]],
                     date: Date.now(),
                     sender: userProject.getUsername(),
                 } as CAIMessage
@@ -312,7 +312,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
 
         if (FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
-                text: ["plaintext", ["Compiled the script with error: " + data[0]]],
+                text: [["plaintext", ["Compiled the script with error: " + data[0]]]],
                 date: Date.now(),
                 sender: userProject.getUsername(),
             } as CAIMessage
@@ -345,7 +345,7 @@ export const closeCurriculum = createAsyncThunk<void, void, ThunkAPI>(
     () => {
         if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
             collaboration.sendChatMessage({
-                text: ["plaintext", ["the CAI Window"]],
+                text: [["plaintext", ["the CAI Window"]]],
                 sender: userProject.getUsername(),
                 date: Date.now(),
             } as CAIMessage, "curriculum")
@@ -374,7 +374,7 @@ export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
         if (!(east.open && east.kind === "CAI")) {
             if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
                 collaboration.sendChatMessage({
-                    text: ["plaintext", ["Curriculum Page " + location as string]],
+                    text: [["plaintext", ["Curriculum Page " + location as string]]],
                     sender: userProject.getUsername(),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")
