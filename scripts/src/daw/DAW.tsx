@@ -223,8 +223,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 }
 
 const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, track, xScroll }:
-               { color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
-                 toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+{ color: daw.Color, mute: boolean, soloMute: daw.SoloMute, bypass: string[], toggleSoloMute: (a: "solo" | "mute") => void,
+    toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -309,7 +309,7 @@ const Clip = ({ color, clip }: { color: daw.Color, clip: player.Clip }) => {
 }
 
 const Effect = ({ name, color, effect, bypass, mute }:
-                { name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean }) => {
+{ name: string, color: daw.Color, effect: player.Effect, bypass: boolean, mute: boolean }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)
@@ -391,7 +391,7 @@ const Effect = ({ name, color, effect, bypass, mute }:
 }
 
 const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
-                  { color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
+{ color: daw.Color, bypass: string[], toggleBypass: (a: string) => void, track: player.Track, xScroll: number }) => {
     const playLength = useSelector(daw.selectPlayLength)
     const xScale = useSelector(daw.selectXScale)
     const trackHeight = useSelector(daw.selectTrackHeight)

@@ -36,7 +36,7 @@ async function queryID(query: any) {
 }
 
 const UserListInput = ({ users, setUsers, setFinalize }:
-    { users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void }
+{ users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void }
 ) => {
     const theme = useSelector(app.selectColorTheme)
     const [query, setQuery] = useState("")
@@ -429,7 +429,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
 }
 
 const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }:
-    { licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void }
+{ licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void }
 ) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
