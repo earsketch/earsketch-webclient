@@ -111,24 +111,23 @@ const ChatFooter = () => {
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             {wizard &&
-                <div style={{ flex: "auto", color: "white" }}>
-                    {curriculumView}
-                </div>}
+            <div style={{ flex: "auto", color: "white" }}>
+                {curriculumView}
+            </div>}
             {wizard &&
-                <div style={{ flex: "auto" }}>
-                    <ul>
-                        {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
-                            <li key={inputIdx}>
-                                <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
-                                    {cai.combineMessageText(input)}
-                                </button>
-                            </li>)}
-                    </ul>
-                </div>}
+            <div style={{ flex: "auto" }}>
+                <ul>
+                    {Object.entries(responseOptions).map(([inputIdx, input]: [string, cai.CAIMessage]) =>
+                        <li key={inputIdx}>
+                            <button type="button" className="btn btn-cai" onClick={() => caiResponseInput(input)} style={{ margin: "10px", maxWidth: "90%", whiteSpace: "initial", textAlign: "left" }}>
+                                {cai.combineMessageText(input)}
+                            </button>
+                        </li>)}
+                </ul>
+            </div>}
             <div style={{ flex: "auto" }}>
                 {wizard
                     ? <ReactTextareaAutocomplete
-                        /* eslint-disable react/jsx-indent-props */
                         id="chat-textarea"
                         value={inputText}
                         onChange={(e: Event) => setInputText((e.target as HTMLTextAreaElement).value)}
@@ -152,7 +151,6 @@ const ChatFooter = () => {
                         onItemSelected={(selection: { currentTrigger: string, item: AutocompleteSuggestion }) => {
                             dialogue.addToNodeHistory(["Slash", [selection.item.utterance]])
                         }}
-                        /* eslint-enable react/jsx-indent-props */
                     />
                     : <input type="text" value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => handleKeyDown(e)} style={{ backgroundColor: "lightgray" }}></input>}
                 <button className="btn btn-cai" onClick={() => { sendMessage() }} style={{ float: "right" }}> Send </button>

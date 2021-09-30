@@ -461,9 +461,9 @@ export const IDE = () => {
                                         <span className={"console-" + msg.level.replace("status", "info")}>
                                             {msg.text}{" "}
                                             {msg.level === "error" &&
-                                                <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
-                                                    Click here for more information.
-                                                </a>}
+                                            <a className="cursor-pointer" onClick={() => dispatch(curriculum.fetchContent(curriculum.getChapterForError(msg.text)))}>
+                                                Click here for more information.
+                                            </a>}
                                         </span>
                                     </div>)}
                             </div>
@@ -473,9 +473,9 @@ export const IDE = () => {
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
                     {showCAI &&
-                            (FLAGS.SHOW_CHAT
-                                ? <Chat />
-                                : <CAI />)}
+                    (FLAGS.SHOW_CHAT
+                        ? <Chat />
+                        : <CAI />)}
                     <div className={showCAI ? "hidden" : ""}>
                         <Curriculum />
                     </div>
