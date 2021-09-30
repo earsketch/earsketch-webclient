@@ -35,9 +35,9 @@ async function queryID(query: any) {
     throw new Error("messages:general.userDoesNotExist")
 }
 
-const UserListInput = ({ users, setUsers, setFinalize }:
-    { users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void }
-) => {
+const UserListInput = ({ users, setUsers, setFinalize }: {
+    users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void
+}) => {
     const theme = useSelector(app.selectColorTheme)
     const [query, setQuery] = useState("")
     const [error, setError] = useState("")
@@ -428,9 +428,9 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     </form>
 }
 
-const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }:
-    { licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void }
-) => {
+const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }: {
+    licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
+}) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
     const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"

@@ -150,8 +150,9 @@ interface ReferenceScript {
     sourceCode: string
 }
 
-const ReferenceFile = ({ referenceScript, compilingReference }:
-    { referenceScript: ReferenceScript, compilingReference: boolean }) => {
+const ReferenceFile = ({ referenceScript, compilingReference }: {
+    referenceScript: ReferenceScript, compilingReference: boolean
+}) => {
     const [collapse, setCollapse] = useState(true)
 
     return <div className="container">
@@ -171,12 +172,17 @@ const ReferenceFile = ({ referenceScript, compilingReference }:
     </div>
 }
 
-const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles, setPrompts }:
-    {
-        compileError: string, prompts: string[], seed?: number, setReferenceResult: (r: DAWData | null) => void, setCompileError: (e: string) => void,
-        setTestAllTracks: (t: boolean) => void, setTestTracks: (t: boolean[]) => void,
-        setUploads: (u: Upload[]) => void, setFiles: (f: File[]) => void, setPrompts: (p: string[]) => void
-    }) => {
+const ReferenceScriptUpload = ({ compileError, prompts, seed, setReferenceResult, setCompileError, setTestAllTracks, setTestTracks, setUploads, setFiles, setPrompts }: {
+    compileError: string
+    prompts: string[]
+    seed?: number
+    setReferenceResult: (r: DAWData | null) => void
+    setCompileError: (e: string) => void
+    setTestAllTracks: (t: boolean) => void
+    setTestTracks: (t: boolean[]) => void
+    setUploads: (u: Upload[]) => void
+    setFiles: (f: File[]) => void, setPrompts: (p: string[]) => void
+}) => {
     const [referenceScript, setReferenceScript] = useState({ name: "", sourceCode: "" } as ReferenceScript)
     const [compilingReference, setCompilingReference] = useState(false)
 
