@@ -176,7 +176,8 @@ export const Chat = () => {
             <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CaiHeader />
                 <CaiBody />
-                <ChatFooter />
+                {activeScript?.collaborative &&
+                <ChatFooter />}
             </div>
         )
         : <Collapsed title="CAI" position="east" />

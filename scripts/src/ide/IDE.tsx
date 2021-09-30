@@ -144,7 +144,7 @@ export function initEditor() {
     activeTabID && store.dispatch(tabs.setActiveTabAndEditor(activeTabID))
 
     const activeScript = tabs.selectActiveTabScript(store.getState())
-    editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly || (FLAGS.SHOW_CHAT && location.href.includes("wizard")))
+    editor.setReadOnly(store.getState().app.embedMode || activeScript?.readonly)
 }
 
 function embeddedScriptLoaded(username: string, scriptName: string, shareid: string) {

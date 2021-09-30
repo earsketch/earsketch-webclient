@@ -41,8 +41,9 @@ export function getValue() {
 }
 
 export function setReadOnly(value: boolean) {
-    ace.setReadOnly(value)
-    droplet.setReadOnly(value)
+    const wizard = cai.selectWizard(store.getState()) && tabs.selectActiveTabScript(store.getState())?.collaborative
+    ace.setReadOnly(value ||= wizard)
+    droplet.setReadOnly(value ||= wizard)
 }
 
 export function setFontSize(value: number) {
