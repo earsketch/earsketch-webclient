@@ -19,9 +19,7 @@ export const CaiHeader = () => {
         <div id="chat-header">
             <div id="chatroom-title">
                 <div>
-                    {/* eslint-disable */}
                     Talk to CAI about { }
-                    {/* eslint-enable */}
                     {(activeProject && activeProject.length > 0)
                         ? <span id="chat-script-name">{activeProject}</span>
                         : <span>a project, when one is open</span>}

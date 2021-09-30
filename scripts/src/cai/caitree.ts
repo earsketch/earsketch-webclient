@@ -61,7 +61,7 @@ export const CAI_TREE_NODES: {
     id: 7,
     title: "I want to add a different sound.",
     utterance: "Okay! Whenever you are ready, you can run it and we can see how it sounds.",
-    slashCommand: "play_when_youre_ready",
+    slashCommand: "play_when_ready",
     parameters: {},
     options: [],
 },
