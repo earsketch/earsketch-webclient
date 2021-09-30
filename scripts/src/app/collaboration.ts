@@ -1044,7 +1044,7 @@ function onChatMessage(data: Message) {
             store.dispatch(cai.addCAIMessage([outputMessage, true]))
             break
         case "curriculum":
-            store.dispatch(cai.setCurriculumView(data.sender + " is viewing " + outputMessage.text[1]))
+            store.dispatch(cai.setCurriculumView(data.sender + " is viewing " + outputMessage.text[0][1][0]))
             break
     }
 }
