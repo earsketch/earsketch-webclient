@@ -912,6 +912,20 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
     return structure
 }
 
+// utterance (the input) is a text string with [LINK| ] and [sound_rec| ] portions
+// processUtterance takes this string, looks for phrases, and returns the following structure
+
+// the output is an array of arrays. each subarray represents a portion of the utterance,
+// with the first item being what kind of text it is
+// - "plaintext" - which means a normal appearance;
+// - "LINK" - calls a function;
+// - "sound_rec" - calls a function
+// the second part is an array with the content being displayed and whatever else that's necessary
+
+// so something like the following "check out [LINK|fitMedia]"
+// will be processed and the following will be returned
+//  [["plaintext",["check out "]], ["LINK", ["fitMedia","/en/v2/getting-started.html#fitmedia"]]]
+
 export function processUtterance(utterance: string) {
     var message: any[] =  []
     var pos = utterance.search(/[[]/g)

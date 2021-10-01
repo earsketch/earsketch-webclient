@@ -32,16 +32,18 @@ export const CaiHeader = () => {
 
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
-    const wholeMessage = []
-    for (let i = 0; i < message.text.length; i++) {
-        if (message.text[i][0] === "plaintext") {
-            wholeMessage.push(message.text[i][1][0])
-        } else if (message.text[i][0] === "LINK") {
-            wholeMessage.push(<a key={i} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(message.text[i][1][1])) }} style={{ color: "blue" }}>{message.text[i][1][0]}</a>)
-        } else if (message.text[i][0] === "sound_rec") {
-            wholeMessage.push(<a key={i} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(message.text[i][1][0])) }} style={{ color: "blue" }}>{message.text[i][1][0]} </a>)
+    const wholeMessage = message.text.map((phrase, index) => {
+        switch (phrase[0]) {
+            case "plaintext":
+                return phrase[1][0]
+            case "LINK":
+                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+            case "sound_rec":
+                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(phrase[1][0])) }} style={{ color: "blue" }}>{phrase[1][0]} </a>
+            default:
+                return "error"
         }
-    }
+    })
 
     return (
         <div className="chat-message" style={{ color: "black" }}>
@@ -191,11 +193,9 @@ if (FLAGS.SHOW_CAI) {
     }, 5000)
 
     window.addEventListener("keydown", e => {
-        e = e || window.event // IE support
         const c = e.key
         const ctrlDown = e.ctrlKey || e.metaKey // Mac support
 
-        // Check for Alt+Gr (http://en.wikipedia.org/wiki/AltGr_key)
         if (ctrlDown) {
             if (e.altKey) {
                 caiDialogue.addToNodeHistory(["other", []])
