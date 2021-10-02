@@ -13,6 +13,7 @@ import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
+import * as console from "../ide/console"
 
 interface caiState {
     activeProject: string
@@ -131,19 +132,30 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
         } else if (remote) {
             if (selectWizard(getState())) {
                 let responseOptions = selectResponseOptions(getState())
-                if (!responseOptions.includes(message)) {
-                    if (responseOptions.length > 2) {
-                        responseOptions = responseOptions.slice(1)
-                    }
-                    dispatch(setResponseOptions([...responseOptions, message]))
+                const messageText = combineMessageText(message)
+                // Ignore empty messages
+                if (messageText.length === 0) {
+                    return
                 }
+                // Ignore messages already in options
+                for (const response of responseOptions) {
+                    if (combineMessageText(response) === messageText) {
+                        return
+                    }
+                }
+                if (responseOptions.length > 2) {
+                    responseOptions = responseOptions.slice(1)
+                }
+                dispatch(setResponseOptions([...responseOptions, message]))
             } else {
+                // Message from CAI/wizard to user.
                 dialogue.addToNodeHistory(["chat", [combineMessageText(message), wizard ? "Wizard" : "CAI"]])
                 dispatch(addToMessageList(message))
                 dispatch(autoScrollCAI())
                 newCAIMessage()
             }
         } else {
+            // Messages from CAI: save as suggestion and send to wizard.
             dialogue.addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
             collaboration.sendChatMessage(message, "cai")
         }
@@ -307,14 +319,14 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 
 )
 
-export const compileError = createAsyncThunk<void, any, ThunkAPI>(
+export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data)
 
         if (FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
-                text: [["plaintext", ["Compiled the script with error: " + data[0]]]],
+                text: [["plaintext", ["Compiled the script with error: " + console.elaborate(data)]]],
                 date: Date.now(),
                 sender: userProject.getUsername(),
             } as CAIMessage
