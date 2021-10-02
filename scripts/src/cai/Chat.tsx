@@ -166,11 +166,22 @@ export const Chat = () => {
     const paneIsOpen = useSelector(layout.isEastOpen)
     const activeScript = useSelector(tabs.selectActiveTabScript)
     const curriculumLocation = useSelector(curriculum.selectCurrentLocation)
+    const curriculumPage = useSelector(curriculum.selectPageTitle)
+    const showCAI = useSelector(layout.selectEastKind) === "CAI"
 
     useEffect(() => {
         dispatch(cai.caiSwapTab(activeScript ? activeScript.name : ""))
-        dispatch(cai.curriculumPage(curriculumLocation))
-    })
+    }, [activeScript])
+
+    useEffect(() => {
+        dispatch(cai.curriculumPage([curriculumLocation, curriculumPage]))
+    }, [curriculumPage])
+
+    useEffect(() => {
+        if (showCAI) {
+            dispatch(cai.closeCurriculum())
+        }
+    }, [showCAI])
 
     return paneIsOpen
         ? (

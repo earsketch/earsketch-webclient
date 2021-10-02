@@ -380,15 +380,16 @@ export const autoScrollCAI = createAsyncThunk<void, void, ThunkAPI>(
     }
 )
 
-export const curriculumPage = createAsyncThunk<void, number[], ThunkAPI>(
+export const curriculumPage = createAsyncThunk<void, [number[], string?], ThunkAPI>(
     "cai/curriculumPage",
-    (location) => {
+    ([location, title]) => {
         dialogue.addCurriculumPageToHistory(location)
         const east = store.getState().layout.east
         if (!(east.open && east.kind === "CAI")) {
             if (FLAGS.SHOW_CHAT && !selectWizard(store.getState())) {
+                const page = title || location as unknown as string
                 collaboration.sendChatMessage({
-                    text: [["plaintext", ["Curriculum Page " + location as string]]],
+                    text: [["plaintext", ["Curriculum Page " + page]]],
                     sender: userProject.getUsername(),
                     date: Date.now(),
                 } as CAIMessage, "curriculum")

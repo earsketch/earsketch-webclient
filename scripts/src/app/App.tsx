@@ -669,7 +669,7 @@ export const App = () => {
             dispatch(cai.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
-            dispatch(cai.curriculumPage(curriculum.selectCurrentLocation(store.getState())))
+            dispatch(cai.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
         }
     }
 

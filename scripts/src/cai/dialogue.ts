@@ -1107,8 +1107,10 @@ function generateSuggestion() {
     }
     if (isPrompted) {
         studentInteracted = true
-        caiStudentHistoryModule.trackEvent("codeRequest")
-        addToNodeHistory(["request", "codeRequest"])
+        if (!FLAGS.SHOW_CHAT) {
+            caiStudentHistoryModule.trackEvent("codeRequest")
+            addToNodeHistory(["request", "codeRequest"])
+        }
     }
     let outputObj = codeSuggestion.generateCodeSuggestion(nodeHistory[activeProject])
     currentSuggestion[activeProject] = Object.assign({}, outputObj)
