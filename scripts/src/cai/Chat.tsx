@@ -105,6 +105,7 @@ const ChatFooter = () => {
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
             sendMessage()
+            event.preventDefault()
         }
     }
 
