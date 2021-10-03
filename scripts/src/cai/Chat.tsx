@@ -62,16 +62,20 @@ const ChatFooter = () => {
     const parseCAIInput = (input: string) => {
         dialogue.setCodeObj(editor.getValue())
         const structure = dialogue.showNextDialogue(input)
-        const outputMessage = {
-            text: structure,
-            date: Date.now(),
-            sender: "CAI",
-        } as cai.CAIMessage
-        dispatch(cai.setResponseOptions([]))
-        dispatch(cai.addToMessageList(outputMessage))
-        dispatch(cai.autoScrollCAI())
-        cai.newCAIMessage()
-        collaboration.sendChatMessage(outputMessage, "wizard")
+        if (structure.length > 0) {
+            const outputMessage = {
+                text: structure,
+                date: Date.now(),
+                sender: "CAI",
+            } as cai.CAIMessage
+            if (cai.combineMessageText(outputMessage).length > 0) {
+                dispatch(cai.setResponseOptions([]))
+                dispatch(cai.addToMessageList(outputMessage))
+                dispatch(cai.autoScrollCAI())
+                cai.newCAIMessage()
+                collaboration.sendChatMessage(outputMessage, "wizard")
+            }
+        }
     }
 
     const caiResponseInput = (input: cai.CAIMessage) => {

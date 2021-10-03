@@ -901,7 +901,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
     }
     const structure = processUtterance(utterance)
 
-    if (!FLAGS.SHOW_CHAT && nodeHistory[activeProject] && utterance != "") {
+    if (!FLAGS.SHOW_CHAT && nodeHistory[activeProject] && utterance != "" && structure.length > 0) {
         // Add current node (by node number) and parameters to node history
         if (Number.isInteger(currentTreeNode[activeProject].id)) {
             addToNodeHistory([currentTreeNode[activeProject].id, parameters])
@@ -930,26 +930,59 @@ export function processUtterance(utterance: string) {
     var message: any[] =  []
     var pos = utterance.search(/[[]/g)
     var subMessage: any[] = []
-    if(pos > -1) {
-        while(pos > -1) {
-            var id = utterance.substring(pos+1, utterance.indexOf("|"))
-            var content = utterance.substring(utterance.indexOf("|")+1,utterance.indexOf("]") )
-            if(id === "LINK") {
-                var link = LINKS[content]
-                subMessage = ["LINK",[content,link]]
-            }
-            else if (id === "sound_rec") {
-                subMessage = ["sound_rec",[content]]
-            }
-            if (pos > 0)
-                message.push(["plaintext",[utterance.substring(0,pos)]])
+    if (pos > -1) {
+        while (pos > -1) {
+            var pipeIdx = utterance.indexOf("|")
+            var endIdx = utterance.indexOf("]")
+            var nextPos = utterance.substring(pos+1).indexOf("[")
 
-            message.push(subMessage)
-            utterance = utterance.substring(utterance.indexOf("]")+1)
-            pos = utterance.search(/[[]/g)
+            if (nextPos !== -1 && (nextPos < pipeIdx || nextPos < endIdx)) {
+                // new message starts before this one ends
+                utterance = utterance.substring(0,pos) + utterance.substring(pos+1)
+                continue
+            }
+
+            if (pipeIdx !== -1 && endIdx === -1) {
+                // incomplete link
+                endIdx = utterance.substring(pipeIdx).indexOf(" ")
+                if (endIdx === -1) {
+                    endIdx = utterance.length
+                } else {
+                    endIdx += pipeIdx
+                }
+                utterance = utterance.substring(0,endIdx) + "]" + utterance.substring(endIdx)
+            }
+            
+            if (pipeIdx > -1 && endIdx > -1) { 
+                var id = utterance.substring(pos+1, pipeIdx)
+                var content = utterance.substring(pipeIdx+1, endIdx)
+                if(id === "LINK") {
+                    var link = LINKS[content]
+                    subMessage = ["LINK",[content,link]]
+                }
+                else if (id === "sound_rec") {
+                    subMessage = ["sound_rec",[content]]
+                }
+
+                if (pos > 0) {
+                    message.push(["plaintext",[utterance.substring(0,pos)]])
+                }
+
+                if (subMessage.length > 0) {
+                    message.push(subMessage)
+                }
+                utterance = utterance.substring(endIdx+1)
+                pos = utterance.search(/[[]/g)
+            } else {
+                utterance = utterance.substring(pos+1)
+                pos = -1
+            }
         }
-        if (utterance.length > 0)
+
+        if (utterance.length > 0) {
             message.push(["plaintext",[utterance]])
+        }
+
         return message
     }
     return [["plaintext",[utterance]]]
