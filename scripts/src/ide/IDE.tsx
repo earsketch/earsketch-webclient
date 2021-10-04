@@ -476,7 +476,7 @@ export const IDE = () => {
                     (FLAGS.SHOW_CHAT
                         ? <Chat />
                         : <CAI />)}
-                    <div className={showCAI ? "hidden" : ""}>
+                    <div className={showCAI ? "h-full hidden" : "h-full"}>
                         <Curriculum />
                     </div>
                 </div>
