@@ -301,11 +301,7 @@ export function shareWithPeople(shareid: string, users: string[]) {
         users: users.map(id => ({ id, exists: true })),
     }
 
-    if (!websocket.isOpen) {
-        websocket.connect(getUsername(), () => websocket.send(data))
-    } else {
-        websocket.send(data)
-    }
+    websocket.send(data)
 }
 
 // Fetch a script by ID.
