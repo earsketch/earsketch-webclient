@@ -957,8 +957,12 @@ export function processUtterance(utterance: string) {
                 var id = utterance.substring(pos+1, pipeIdx)
                 var content = utterance.substring(pipeIdx+1, endIdx)
                 if(id === "LINK") {
-                    var link = LINKS[content]
-                    subMessage = ["LINK",[content,link]]
+                    if (Object.keys(LINKS).includes(content)) {
+                        var link = LINKS[content]
+                        subMessage = ["LINK",[content,link]]
+                    } else {
+                        subMessage = ["plaintext", [content]]
+                    }
                 }
                 else if (id === "sound_rec") {
                     subMessage = ["sound_rec",[content]]
