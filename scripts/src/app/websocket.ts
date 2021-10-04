@@ -11,6 +11,10 @@ const subscribers: Subscriber[] = []
 export let isOpen = false
 
 export function connect(username: string, callback?: Function) {
+    if (username === "") {
+        return // username is an empty string, not ready to connect to websocket
+    }
+
     username = username.toLowerCase() // Fix for issue #1858
     ws = new WebSocket(`${URL_WEBSOCKET}/socket/${username}/`)
 
@@ -20,7 +24,7 @@ export function connect(username: string, callback?: Function) {
         if (callback !== undefined) {
             callback()
         }
-        checkin()
+        checkin(username)
     }
 
     ws.onerror = (event) => esconsole(event, "websocket")
@@ -62,12 +66,10 @@ export function disconnect() {
 }
 
 // Keep websocket connection alive.
-function checkin() {
+function checkin(username: string) {
     reconnect = 10
-    if (isOpen) {
-        send({ notification_type: "dummy" })
-    }
-    timer = window.setTimeout(checkin, 20000)
+    send({ notification_type: "dummy", sender: username })
+    timer = window.setTimeout(() => checkin(username), 20000)
 }
 
 function checkout() {
