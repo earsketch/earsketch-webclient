@@ -248,6 +248,14 @@ function joinSession(shareID: string, username_: string) {
 function onJoinedSession(data: Message) {
     esconsole("joined collaboration session: " + data.scriptID, "collab")
 
+    if (data.scriptID !== scriptID) {
+        // This message is the server's response to an old request, so we ignore it.
+        // We sent a "joinSession" message earlier when a collaborative script was the active tab,
+        // but we have switched tabs and left the session in the meantime.
+        // (Without this check, the `setEditorTextWithoutOutput()` call below causes #2658.)
+        return
+    }
+
     // clear the websocket connection check
     clearTimeout(timeouts[userName])
     delete timeouts[userName]
