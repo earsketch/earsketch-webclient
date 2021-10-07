@@ -15,7 +15,7 @@ interface locale {
 export const AVAILABLE_LOCALES: locale[] = [
     { displayText: "English", localeCode: "en" },
     { displayText: "Español", localeCode: "es" },
-    { displayText: "Française", localeCode: "fr" },
+    { displayText: "Français", localeCode: "fr" },
 ]
 
 export const LocaleSelector = () => {
