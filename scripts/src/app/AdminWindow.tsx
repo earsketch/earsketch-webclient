@@ -139,23 +139,18 @@ const AdminResetUserPassword = () => {
     const [passwordStatus, setPasswordStatus] = useState({ message: "", style: "" })
 
     const searchUsers = async () => {
-        const testForSpace = username.replace(/\S/g, "#")
-        if (testForSpace.includes(" ") && !testForSpace.includes("#")) {
-            setPasswordStatus({ message: "Include more than spaces", style: "alert alert-danger" })
-        } else {
-            try {
-                const data = await userProject.searchUsers(username)
-                if (data !== null) {
-                    setUserDetails({ username: data.username, email: data.email })
-                    setPasswordStatus({ message: "", style: "" })
-                    return
-                }
-            } catch (error) {
-                esconsole(error, ["error", "admin"])
+        try {
+            const data = await userProject.searchUsers(username.trim())
+            if (data !== null) {
+                setUserDetails({ username: data.username, email: data.email })
+                setPasswordStatus({ message: "", style: "" })
+                return
             }
-            setUserDetails({ username: "", email: "" })
-            setPasswordStatus({ message: "No such user", style: "alert alert-danger" })
+        } catch (error) {
+            esconsole(error, ["error", "admin"])
         }
+        setUserDetails({ username: "", email: "" })
+        setPasswordStatus({ message: "No such user", style: "alert alert-danger" })
     }
 
     const setPassword = async () => {
@@ -180,7 +175,7 @@ const AdminResetUserPassword = () => {
                 <div className="font-bold text-3xl p-2">Password Change</div>
                 <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
-                        placeholder="Username or Email" /* required */ onChange={e => setUsername(e.target.value)} />
+                        placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
                     <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
                 </form>
                 {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>
