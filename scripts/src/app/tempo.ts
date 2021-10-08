@@ -1,6 +1,6 @@
 // Tempo mapping and time stretching.
 import audioContext from "./audiocontext"
-import { DAWData } from "./player"
+import { DAWData, Effect } from "./player"
 
 // Like all other envelopes, tempo is a piecewise linear function.
 interface Point {
@@ -43,6 +43,15 @@ function deltaTimeToMeasure(start: Point, end: Point, deltaTime: number, beatsPe
     return start.measure + (Math.exp(deltaTime / beatsPerMeasure / 60 * tempoSlope) * start.tempo - start.tempo) / tempoSlope
 }
 
+export function effectToPoints(effect: Effect) {
+    const points = []
+    for (const range of effect) {
+        points.push({ measure: range.startMeasure, tempo: range.startValue })
+        points.push({ measure: range.endMeasure, tempo: range.endValue })
+    }
+    return points
+}
+
 export class TempoMap {
     points: Point[] = []
 
@@ -54,11 +63,7 @@ export class TempoMap {
         if (Array.isArray(thing)) {
             this.points = thing
         } else {
-            // Compute envelope information
-            for (const range of thing.tracks[0].effects["TEMPO-TEMPO"]) {
-                this.points.push({ measure: range.startMeasure, tempo: range.startValue })
-                this.points.push({ measure: range.endMeasure, tempo: range.endValue })
-            }
+            this.points = effectToPoints(thing.tracks[0].effects["TEMPO-TEMPO"])
         }
 
         // Canonicalize representation: remove initial points that have no effect on the tempo curve.

@@ -13,7 +13,7 @@ import { compileCode } from "../ide/IDE"
 import * as player from "../app/player"
 import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
-import { TempoMap } from "../app/tempo"
+import { effectToPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
 
 // Width of track control box
@@ -400,8 +400,10 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
     const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
     const showEffects = useSelector(daw.selectShowEffects)
     const trackWidth = useSelector(daw.selectTrackWidth)
-    const hideMixTrackLabel = trackWidth < 950
     const { t } = useTranslation()
+
+    const hideMixTrackLabel = trackWidth < 950
+    let effectOffset = 1
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
@@ -414,8 +416,9 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
         </div>
         {showEffects &&
         Object.entries(track.effects).map(([key, effect], index) => {
-            if (key === "TEMPO-TEMPO" && effect.length === 1) {
+            if (key === "TEMPO-TEMPO" && new TempoMap(effectToPoints(effect)).points.length === 1) {
                 // Constant tempo: don't show the tempo curve.
+                effectOffset = 0
                 return null
             }
             return <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
@@ -423,7 +426,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }:
                     <div className="dawTrackName"></div>
                     {key === "TEMPO-TEMPO"
                         ? <div className="flex-grow text-center">TEMPO</div>
-                        : <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>}
+                        : <div className="dawTrackEffectName">{t("daw.effect")} {index + effectOffset}</div>}
                     {key !== "TEMPO-TEMPO" &&
                     <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
                         {t("daw.bypass")}
