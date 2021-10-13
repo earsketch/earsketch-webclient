@@ -46,9 +46,15 @@ export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any
 }
 
 export function storeErrorInfo(errorMsg: any, codeText: string) {
-    currentError = Object.assign({}, errorMsg)
-    currentText = codeText
-    console.log(handleError())
+    
+    if ('args' in errorMsg) {
+        currentError = Object.assign({}, errorMsg)
+        currentText = codeText
+        console.log(handleError())
+    }
+    else {
+        console.log(errorMsg)
+    }
 }
 
 export function handleError() {
@@ -71,7 +77,16 @@ export function handleError() {
         }
     }
 
-    if (!errorLine.toLowerCase().includes("if") && !errorLine.toLowerCase().includes("elif") && !errorLine.toLowerCase().includes("else") && !errorLine.toLowerCase().includes("for") && !errorLine.toLowerCase().includes("while") && !errorLine.toLowerCase().includes("in")) {
+    var isApiCall: boolean = false
+
+    for (let i = 0; i < PYTHON_AND_API.length; i++) {
+        if (errorLine.includes(PYTHON_AND_API[i])) {
+            isApiCall = true
+            break
+        }
+    }
+
+    if (!isApiCall && !errorLine.toLowerCase().includes("if") && !errorLine.toLowerCase().includes("elif") && !errorLine.toLowerCase().includes("else") && !errorLine.toLowerCase().includes("for") && !errorLine.toLowerCase().includes("while") && !errorLine.toLowerCase().includes("in")) {
         var colon: boolean = false
         var openParen: number = -1
         var closeParen: number = -1
@@ -125,7 +140,7 @@ export function handleError() {
     }
 
     if (errorLine.toLowerCase().includes("fitmedia")) {
-        handleFitMediaError()
+       return handleFitMediaError()
     }
 }
 
@@ -396,11 +411,11 @@ function handleFitMediaError() {
     var parenIndex: number = trimmedErrorLine.indexOf("(")
 
     if (parenIndex == -1) {
-        return ["function", "missing parentheses"]
+        return ["fitMedia", "missing parentheses"]
     }
 
-    if (trimmedErrorLine[trimmedErrorLine.length - 2] != ")") {
-        return ["function", "missing parentheses"]
+    if (trimmedErrorLine[trimmedErrorLine.length - 1] != ")") {
+        return ["fitMedia", "missing parentheses"]
     }
 
     //now clean and check arguments
