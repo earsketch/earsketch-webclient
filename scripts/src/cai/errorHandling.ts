@@ -46,7 +46,8 @@ export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any
 }
 
 export function storeErrorInfo(errorMsg: any, codeText: string) {
-    if ("args" in errorMsg) {
+    
+    if ('args' in errorMsg) {
         currentError = Object.assign({}, errorMsg)
         currentText = codeText
         console.log(handleError())
@@ -76,7 +77,16 @@ export function handleError() {
         }
     }
 
-    if (!errorLine.toLowerCase().includes("if") && !errorLine.toLowerCase().includes("elif") && !errorLine.toLowerCase().includes("else") && !errorLine.toLowerCase().includes("for") && !errorLine.toLowerCase().includes("while") && !errorLine.toLowerCase().includes("in")) {
+    var isApiCall: boolean = false
+
+    for (let i = 0; i < PYTHON_AND_API.length; i++) {
+        if (errorLine.includes(PYTHON_AND_API[i])) {
+            isApiCall = true
+            break
+        }
+    }
+
+    if (!isApiCall && !errorLine.toLowerCase().includes("if") && !errorLine.toLowerCase().includes("elif") && !errorLine.toLowerCase().includes("else") && !errorLine.toLowerCase().includes("for") && !errorLine.toLowerCase().includes("while") && !errorLine.toLowerCase().includes("in")) {
         var colon: boolean = false
         var openParen: number = -1
         var closeParen: number = -1
@@ -107,7 +117,7 @@ export function handleError() {
     //do the same for for loops, while loops, and conditionals
 
     //for loops
-    var forWords: string[] = ["for ", "in "]
+    var forWords: string[] = ["for", "in"]
 
     for (let i = 0; i < forWords.length; i++) {
         if (errorLine.includes(forWords[i])) {
@@ -130,7 +140,7 @@ export function handleError() {
     }
 
     if (errorLine.toLowerCase().includes("fitmedia")) {
-       return  handleFitMediaError()
+       return handleFitMediaError()
     }
 }
 
@@ -226,8 +236,6 @@ function handleFunctionError() {
 
         }
     }
-
-    return ["function", "unknown"]
 }
 
 function isNumeric(str: string) {
@@ -365,16 +373,13 @@ function handleForLoopError() {
         }
         else {
             //we can probably assume it's a variable
-            if (estimateVariableType(trimmedErrorLine, currentError.traceback[0].lineno) != "List" || estimateVariableType(trimmedErrorLine, currentError.traceback[0].lineno) != "Str") {
-                return ["for loop", "invalid iterator"]
-            }
         }
 
         if (!isValid) {
             return ["for loop", "invalid iterable"]
         }
     }
-    return ["for loop", "unknown"]
+
 }
 
 function handleCallError() {
@@ -422,8 +427,8 @@ function handleFitMediaError() {
         var openIndex: number = argString.indexOf("[")
         var closeIndex: number = argString.indexOf("]")
 
-        argString = argString.replace("[", "||")
-        argString = argString.replace("]", "||")
+        argString = argString.replace("[", "")
+        argString = argString.replace("]", "")
 
         for (let i = openIndex; i < closeIndex; i++) {
             if (argString[i] == ",") {
@@ -462,7 +467,7 @@ function handleFitMediaError() {
                 argumentTypes[i] = "Num"
             }
             //or is it a var or func call
-
+            
             var errorLineNo: number = currentError.traceback[0].lineno;
             //func call
 
@@ -471,15 +476,7 @@ function handleFitMediaError() {
                 let functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
                 argumentTypes[i] = estimateFunctionNameReturn(functionName);
             }
-            else {
-                argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo);
-            }
-        }
-        else if (argsSplit[i].includes("|")) {
-            //it's a list
-        }
-        else if (argsSplit[i].includes("||")) {
-            //it's a list index
+            argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo);
         }
         else {
             //is it the name of a smaple
@@ -493,10 +490,6 @@ function handleFitMediaError() {
     //check values 
     //if(argumentTypes[0] != "Sample" && argumentTypes[0])
 
-
-
-    //last item
-    return ["fitMedia", "unknown"]
 }
 
 function estimateFunctionNameReturn(funcName: string) {
