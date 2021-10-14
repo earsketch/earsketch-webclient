@@ -41,10 +41,10 @@ export const ErrorForm = ({ email: storedEmail, close }: { email: string, close:
 
         let localStorageDump = ""
         for (const [key, value] of Object.entries(localStorage)) {
-            if (key === "userstate") {
+            if (key === "persist:user") {
                 try {
                     const state = JSON.parse(value)
-                    delete state.password
+                    delete state.token
                     localStorageDump += `${key}: ${JSON.stringify(state)}\r\n`
                 } catch (error) {
                     localStorageDump += `exception parsing userstate (${value}): ${error.message}`

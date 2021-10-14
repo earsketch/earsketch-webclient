@@ -95,7 +95,12 @@ export function downloadScript(script: Script) {
 }
 
 export async function openScriptHistory(script: Script, allowRevert: boolean) {
-    await userProject.saveScript(script.name, script.source_code)
+    if (script.collaborative) {
+        collaboration.saveScript(script.id)
+    } else if (!script.isShared) {
+        // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
+        await userProject.saveScript(script.name, script.source_code)
+    }
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
