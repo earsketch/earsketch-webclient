@@ -1,5 +1,7 @@
 ﻿// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import * as student from "./student"
+import { addToNodeHistory } from "./dialogue"
+
 
 // TODO: All of these objects have one entry per project, so project state is spread across all of them.
 // Instead, refactor to group all the state into one object per project, so the functions can just deal with one object
@@ -214,6 +216,7 @@ const editPeriod: { startTime: number | null, endTime: number }[] = []
 
 export const addOnPageStatus = (status: number) => {
     onPageHistory.push({ status, time: Date.now() })
+    addToNodeHistory(["page status", status])
     student.updateModel("preferences", { onPageHistory: onPageHistory })
 }
 
@@ -257,11 +260,13 @@ export const addMousePos = (pos: { x: number, y: number }) => {
 
 export const addUIClick = (ui: string) => {
     uiClickHistory.push({ ui, time: Date.now() })
+    addToNodeHistory(["ui click", ui])
     student.updateModel("preferences", { uiClickHistory: uiClickHistory })
 }
 
 export const addPageLoad = (status: number) => {
     pageLoadHistory.push({ status, time: Date.now() })
+    addToNodeHistory(["page load action", status])
     student.updateModel("preferences", { pageLoadHistory: pageLoadHistory })
 }
 

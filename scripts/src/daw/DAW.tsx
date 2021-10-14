@@ -175,14 +175,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); if (FLAGS.SHOW_CAI) { addUIClick("project - play") } }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); if (FLAGS.SHOW_CAI) { addUIClick("project - pause") } }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
