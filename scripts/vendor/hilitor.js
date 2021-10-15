@@ -8,7 +8,7 @@ function Hilitor(id, tag)
   var hiliteTag = tag || "EM";
   var skipTags = new RegExp("^(?:" + hiliteTag + "|SCRIPT|FORM|SPAN)$");
   var colors = ["#ff6", "#a0ffff", "#9f9", "#f99", "#f6f"];
-  var wordColor = [];
+  var wordColor = Object.create(null);
   var colorIdx = 0;
   var matchRegex = "";
   var openLeft = false;
