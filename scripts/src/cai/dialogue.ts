@@ -934,12 +934,14 @@ export function processUtterance(utterance: string) {
         while (pos > -1) {
             var pipeIdx = utterance.indexOf("|")
             var endIdx = utterance.indexOf("]")
-            var nextPos = utterance.substring(pos+1).indexOf("[")
 
-            if (nextPos !== -1 && (nextPos < pipeIdx || nextPos < endIdx)) {
-                // new message starts before this one ends
-                utterance = utterance.substring(0,pos) + utterance.substring(pos+1)
-                continue
+            var nextPos = utterance.substring(pos+1).indexOf("[")
+            if (nextPos !== -1) {
+                if (nextPos + pos < pipeIdx || nextPos + pos < endIdx) {
+                    // new message starts before this one ends
+                    utterance = utterance.substring(0,pos) + utterance.substring(pos+1)
+                    continue
+                }
             }
 
             if (pipeIdx !== -1 && endIdx === -1) {
@@ -951,6 +953,10 @@ export function processUtterance(utterance: string) {
                     endIdx += pipeIdx
                 }
                 utterance = utterance.substring(0,endIdx) + "]" + utterance.substring(endIdx)
+            }
+
+            if (pos > 0) {
+                message.push(["plaintext",[utterance.substring(0,pos)]])
             }
             
             if (pipeIdx > -1 && endIdx > -1) { 
@@ -966,10 +972,6 @@ export function processUtterance(utterance: string) {
                 }
                 else if (id === "sound_rec") {
                     subMessage = ["sound_rec",[content]]
-                }
-
-                if (pos > 0) {
-                    message.push(["plaintext",[utterance.substring(0,pos)]])
                 }
 
                 if (subMessage.length > 0) {
