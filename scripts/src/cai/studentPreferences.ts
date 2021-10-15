@@ -259,9 +259,11 @@ export const addMousePos = (pos: { x: number, y: number }) => {
 }
 
 export const addUIClick = (ui: string) => {
-    uiClickHistory.push({ ui, time: Date.now() })
-    addToNodeHistory(["ui click", ui])
-    student.updateModel("preferences", { uiClickHistory: uiClickHistory })
+    if (FLAGS.SHOW_CAI) {
+        uiClickHistory.push({ ui, time: Date.now() })
+        addToNodeHistory(["ui click", ui])
+        student.updateModel("preferences", { uiClickHistory: uiClickHistory })
+    }
 }
 
 export const addPageLoad = (status: number) => {
