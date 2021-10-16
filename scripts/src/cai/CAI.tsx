@@ -12,6 +12,7 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
 
+
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
 
@@ -37,9 +38,9 @@ const CAIMessageView = (message: cai.CAIMessage) => {
             case "plaintext":
                 return phrase[1][0]
             case "LINK":
-                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
             case "sound_rec":
-                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(phrase[1][0])) }} style={{ color: "blue" }}>{phrase[1][0]} </a>
+                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(phrase[1][0])); caiStudentPreferences.addUIClick("sound - preview - cai") }} style={{ color: "blue" }}>{phrase[1][0]} </a>
             default:
                 return "error"
         }
