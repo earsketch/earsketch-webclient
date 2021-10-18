@@ -29,12 +29,22 @@ export function analyzePython(source_code) {
     ccHelpers.replaceNumericUnaryOps(ast.body)
     // initialize the results object
     const resultsObject = {
-        userFunc: 0,
+
+        boolOps: 0,
+        booleans: 0,
+        comparisons: 0,
         conditionals: 0,
-        forLoops: 0,
-        List: 0,
-        variables: 0,
         consoleInput: 0,
+        floats: 0,
+        forLoops: 0,
+        ints: 0,
+        listOps: 0,
+        lists: 0,
+        mathematicalOperators: 0,
+        strOps: 0,
+        strings: 0,
+        userFunc: 0,
+        variables: 0
     }
     ccState.setProperty("isJavascript", false)
     // PASS 1: Do the same thing for function returns from user-defined functions

@@ -14,55 +14,16 @@ import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
-export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
-    options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void
-}) => {
+export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
+    { options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
     return <div className="container">
         <div className="panel panel-primary">
-            <div className="panel-heading">
-                Step 1: Select Reporter Options
-            </div>
-            <div className="panel-body">
-                <div className="col-md-4">
-                    <label>
-                        Code/Music Analysis Options:
-                    </label><br></br>
-                    <ul>
-                        {Object.entries(options).map(([option, value]) =>
-                            <label key={option}>
-                                {typeof (value) === "boolean" &&
-                                    <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>}
-                                {option}{" "}
-                                {(typeof (value) === "string" || typeof (value) === "number") &&
-                                    <input type="text" value={value} onChange={e => setOptions({ ...options, [option]: e.target.value })} style={{ backgroundColor: "lightgray" }}></input>}
-                            </label>
-                        )}
-                    </ul>
-                </div>
-                {showSeed &&
-                    <div className="col-md-4">
-                        <h4>Random Seed</h4>
-                        <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
-                        {seed !== undefined
-                            ? <div>Use the following random seed:
-                                <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>
-                            </div>
-                            : <div>Use a random seed</div>}
-                        <p className="small">
-                            This will automatically seed every random function in Python and JavaScript.
-                        </p>
-                        <p className="small">
-                            Disclaimer: Testing randomness is inherently difficult. Only use this in the most trivial of cases.
-                        </p>
-                    </div>}
-            </div>
         </div>
     </div>
 }
 
-export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
-    processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void
-}) => {
+export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
+    { processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
@@ -78,19 +39,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
-                        const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
-                        const shareid = match ? match[0].substring(9) : values[shareIDColumn]
-                        contestEntries[shareid] = { id: Number(values[contestIDColumn]), finished: false }
-                        urlList.push("?sharing=" + shareid)
-                    }
+                    urlList.push(values[2])
+
                 }
             } catch (err) {
                 console.error(err)
                 return
             }
             setUrls(urlList)
-            setContestDict?.(contestEntries)
         }
     }
 
@@ -98,9 +54,9 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
         try {
-            const compilerOuptut = await compile(script.source_code, script.name, seed)
+            const compilerOuptut = await compile(script.source_code, "script.py", seed)
             const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage("script.py"), script.source_code)
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {
@@ -118,9 +74,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
             }
         }
-        if (options.HISTORY) {
-            result.version = version
-        }
         setProcessing(null)
         return result
     }
@@ -130,9 +83,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         const history = await userProject.getScriptHistory(script.shareid)
 
         let versions = Object.keys(history) as unknown as number[]
-        if (!options.HISTORY) {
-            versions = [versions[versions.length - 1]]
-        }
+
         for (const version of versions) {
             // add information from base script to version report.
             history[version].name = script.name
@@ -156,55 +107,33 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
         setProcessing(null)
 
-        const matches: RegExpMatchArray | null = []
-        const re = /\?sharing=([^\s.,])+/g
-        esconsole("Running code analyzer.", ["DEBUG"])
-
-        for (const url of urls) {
-            const match = url.match(re)
-            if (match) {
-                for (const m of match) {
-                    matches.push(m)
-                }
-            }
-        }
-
         let results: Result[] = []
-
-        if (!matches) { return }
-        for (const match of matches) {
+        let index: number = 0;
+        for (const url of urls) {
+            const match = url.replace("\\t", "\t")
             esconsole("Grading: " + match, ["DEBUG"])
             const shareId = match.substring(9)
             esconsole("ShareId: " + shareId, ["DEBUG"])
             setProcessing(shareId)
             let script
+            let scriptText
             try {
-                script = await userProject.loadScript(shareId, false)
+                scriptText = match.split("\\n").join("\n")
+                scriptText = scriptText.split("\\t").join("\t")
+                scriptText = scriptText.split("|||").join(",")
+                console.log(index.toString() + "/" + urls.length.toString())
+                index += 1
             } catch {
                 continue
             }
-            if (!script) {
-                const result = {
-                    script: { username: "", shareid: shareId } as Script,
-                    error: "Script not found.",
-                } as Result
-                if (contestDict?.[shareId]) {
-                    result.contestID = contestDict[shareId].id
-                }
-                results = [...results, result]
-                setResults(results)
-                setProcessing(null)
-            } else {
-                setResults([...results, { script }])
-                const result = await runScriptHistory(script)
-                for (const r of result) {
-                    if (contestDict?.[shareId]) {
-                        r.contestID = contestDict[shareId].id
-                    }
-                    results = [...results, r]
-                }
-                setResults(results)
-            }
+            script = { source_code: scriptText } as Script
+            setResults([...results, { script }])
+            const result = await runScript(script)
+
+            results = [...results, result]
+
+            setResults(results)
+
         }
     }
 
@@ -237,22 +166,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     </button>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
                 {!userProject.getToken() &&
-                <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
+                    <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
             </div>
         </div>
     </div>
 }
 
 export interface ReportOptions {
-    OVERVIEW: boolean
     COMPLEXITY: boolean
-    EFFECTS: boolean
-    MEASUREVIEW: boolean
-    GENRE: boolean
-    SOUNDPROFILE: boolean
-    MIXING: boolean
-    HISTORY: boolean
-    APICALLS: boolean
 }
 
 export const CodeAnalyzerCAI = () => {
