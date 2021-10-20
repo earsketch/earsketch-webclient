@@ -12,6 +12,8 @@ import * as layout from "../ide/layoutState"
 import * as curriculum from "../browser/curriculumState"
 import * as sounds from "../browser/soundsState"
 
+import { useTranslation } from "react-i18next"
+import * as editor from "../ide/Editor"
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -31,6 +33,44 @@ export const CaiHeader = () => {
     )
 }
 
+export const SoundPreviewContent = (name: string) => {
+    const theme = useSelector(appState.selectColorTheme)
+    const previewNode = useSelector(sounds.selectPreviewNode)
+    const previewFileName = useSelector(sounds.selectPreviewName)
+    const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
+    const dispatch = useDispatch()
+    const { t } = useTranslation()
+
+    return (
+        <div style={{ display: "inline" }}>
+            <div className={`flex flex-grow truncate left-justify py-2 lightgray border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+                <div className="pl-2 pr-4 h-1">
+                    <button
+                        className="btn btn-xs btn-action"
+                        onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(name)); caiStudentPreferences.addUIClick("sound - preview") }}
+                        title={t("soundBrowser.clip.tooltip.previewSound")}
+                    >
+                        {previewFileName === name
+                            ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
+                            : <i className="icon icon-play4" />}
+                    </button>
+                    {tabsOpen &&
+                        (
+                            <button
+                                className="btn btn-xs btn-action"
+                                onClick={() => { editor.pasteCode(name); caiStudentPreferences.addUIClick("sample - copy") }}
+                                title={t("soundBrowser.clip.tooltip.paste")}
+                            >
+                                <i className="icon icon-paste2" />
+                            </button>
+                        )}
+                </div>
+                <span id="text" className="chat-message-text truncate pl-5">{name}</span>
+            </div>
+        </div>
+    )
+}
+
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
     const wholeMessage = message.text.map((phrase, index) => {
@@ -40,7 +80,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
             case "LINK":
                 return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
             case "sound_rec":
-                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(sounds.previewSound(phrase[1][0])); caiStudentPreferences.addUIClick("sound - preview - cai") }} style={{ color: "blue" }}>{phrase[1][0]} </a>
+                return SoundPreviewContent(phrase[1][0])
             default:
                 return "error"
         }
