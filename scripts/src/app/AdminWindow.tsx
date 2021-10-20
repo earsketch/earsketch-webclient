@@ -123,8 +123,17 @@ const AdminSendBroadcast = () => {
     return <>
         <div className="modal-section-body">
             <div className="m-2 p-4 border-t border-gray-400">
+                <div className="mx-2 px-4 pb-1">
+                    <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
+                    <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
+                        <div key="eeee" className="my-px mx-2 flex items-center">
+                            <button className="flex" title="Remove admin" onClick={print}><i className="icon icon-cross2" /></button>
+                            <div className="my-px mx-2">Test</div>
+                        </div>
+                    </div>
+                </div>
                 {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
-                <div className="font-bold text-3xl p-2">Send Broadcast</div>
+                <div className="font-bold text-2xl p-3"/* was 3xl and p-2 */>Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
                     <input type="text" className="m-2 w-10/12 form-control"
                         placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
