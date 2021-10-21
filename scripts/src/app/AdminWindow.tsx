@@ -104,6 +104,7 @@ const AdminSendBroadcast = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
+    const bruhArray = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
 
     const sendBroadcast = () => {
         // TODO: use `expiration`
@@ -126,10 +127,12 @@ const AdminSendBroadcast = () => {
                 <div className="mx-2 px-4 pb-1">
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
-                        <div key="eeee" className="my-px mx-2 flex items-center">
-                            <button className="flex" title="Remove admin" onClick={print}><i className="icon icon-cross2" /></button>
-                            <div className="my-px mx-2">Test</div>
-                        </div>
+                        {bruhArray.map(word =>
+                            <div key={word} className="my-px mx-2 flex items-center">
+                                <button className="flex" title="Remove admin" onClick={print}><i className="icon icon-cross2" /></button>
+                                <div className="my-px mx-2">{word}</div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
