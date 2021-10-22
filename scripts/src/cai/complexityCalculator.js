@@ -1263,7 +1263,7 @@ function analyzeASTNode(node, results) {
                         //double check for aliases
                         let funcs = ccState.getProperty("userFunctions");
                         for (let i = 0; i < funcs.length; i++) {
-                            if (funcs[i].name == makeBeat && funcs[i].aliases.includes(node.func.id.v)) {
+                            if (funcs[i].name == "makeBeat" && funcs[i].aliases.includes(node.func.id.v)) {
                                 markMakeBeat(node, results);
                             }
                         }
