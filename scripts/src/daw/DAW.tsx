@@ -21,6 +21,7 @@ const X_OFFSET = 100
 
 // Hack because local state gets cleared when the DAW is replaced by a loading screen...
 let _embedCompiled = false
+let userSetVolume = 0
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
@@ -93,7 +94,8 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
     const shareScriptLink = `${SITE_BASE_URI}/?sharing=${useSelector(appState.selectEmbeddedShareID)}`
 
-    const [volume, setVolume] = useState(0) // in dB
+    const [_, setVolume] = useState(0) // in dB
+    const volume = userSetVolume
     const [volumeMuted, setVolumeMuted] = useState(false)
     const minVolume = -20
 
@@ -110,6 +112,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             setVolumeMuted(false)
             player.setVolume(value)
         }
+        userSetVolume = value
     }
 
     const reset = () => {
