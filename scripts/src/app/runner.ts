@@ -26,6 +26,7 @@ export async function postRun(result: DAWData) {
     // (Apparently `finish()` is an artifact of EarSketch's Reaper-based incarnation.)
 
     // STEP 0: Fix effects. (This goes first because it may affect the tempo map, which is used in subsequent steps.)
+    // TODO need to set result.length to the correct song length before fixEffects(). See pitchshiftClips().
     fixEffects(result)
     // STEP 1: Load audio buffers and slice them to generate temporary audio constants.
     esconsole("Loading buffers.", ["debug", "runner"])
@@ -64,7 +65,7 @@ async function handlePitchshift(result: DAWData) {
     try {
         for (const track of result.tracks.slice(1)) {
             if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
-                pitchshift.pitchshiftClips(track, tempoMap)
+                pitchshift.pitchshiftClips(track, tempoMap, result.length)
                 userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
             }
         }

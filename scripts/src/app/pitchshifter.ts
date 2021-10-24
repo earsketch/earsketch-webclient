@@ -251,13 +251,27 @@ const getEnvelopeForClip = (clip: Clip, tempoMap: TempoMap, trackEnvelope: Point
     return clipPoints
 }
 
-export function pitchshiftClips(track: Track, tempoMap: TempoMap) {
+export function pitchshiftClips(track: Track, tempoMap: TempoMap, songLengthInMeasures: number) {
     if (track.clips.length === 0) {
         throw new RangeError("Cannot pitchshift an empty track")
     }
 
     // TODO: This looks broken with high-density automation
     const trackEnvelope = getEnvelopeForTrack(track, tempoMap)
+
+    // Kludge fix to repair trackEnvelope when there is one 1 point, a "start"
+    // Further down in getEnvelopeForClip there will be trouble if trackEnvelope
+    // doesn't have at least 2 points (length==2).
+    //
+    // See the root cause in runner.ts:fixEffects(), where result.length is
+    // incorrectly set to 0 instead of the song length.
+    if (trackEnvelope.length === 1 && trackEnvelope[0].type === "start") {
+        trackEnvelope.push({
+            sampletime: songLengthInMeasures,
+            semitone: trackEnvelope[0].semitone,
+            type: "end",
+        })
+    }
 
     if (Object.keys(BUFFER_CACHE).length > MAX_CACHE) {
         BUFFER_CACHE = Object.create(null)
