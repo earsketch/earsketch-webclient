@@ -122,9 +122,9 @@ export const combineMessageText = (input: CAIMessage) => {
     return output
 }
 
-export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolean?], ThunkAPI>(
+export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolean?, boolean?], ThunkAPI>(
     "cai/addCAIMessage",
-    ([message, remote = false, wizard = false], { getState, dispatch }) => {
+    ([message, remote = false, wizard = false, suggestion = false], { getState, dispatch }) => {
         if (!FLAGS.SHOW_CHAT || message.sender !== "CAI") {
             dispatch(addToMessageList(message))
             dispatch(autoScrollCAI())
@@ -147,8 +147,8 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
                     responseOptions = responseOptions.slice(1)
                 }
                 dispatch(setResponseOptions([...responseOptions, message]))
-            } else {
-                // Message from CAI/wizard to user.
+            } else if (!suggestion) {
+                // Message from CAI/wizard to user. Remove suggestion messages.
                 dialogue.addToNodeHistory(["chat", [combineMessageText(message), wizard ? "Wizard" : "CAI"]])
                 dispatch(addToMessageList(message))
                 dispatch(autoScrollCAI())
@@ -157,7 +157,7 @@ export const addCAIMessage = createAsyncThunk<void, [CAIMessage, boolean, boolea
         } else {
             // Messages from CAI: save as suggestion and send to wizard.
             dialogue.addToNodeHistory(["chat", [combineMessageText(message), "CAI Suggestion"]])
-            collaboration.sendChatMessage(message, "cai")
+            collaboration.sendChatMessage(message, "cai suggestion")
         }
     }
 )

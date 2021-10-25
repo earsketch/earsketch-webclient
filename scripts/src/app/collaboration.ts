@@ -1036,6 +1036,10 @@ function onChatMessage(data: Message) {
             outputMessage.sender = "CAI"
             store.dispatch(cai.addCAIMessage([outputMessage, true]))
             break
+        case "cai suggestion":
+            outputMessage.sender = "CAI"
+            store.dispatch(cai.addCAIMessage([outputMessage, true, false, true]))
+            break
         case "wizard":
             outputMessage.sender = "CAI"
             store.dispatch(cai.addCAIMessage([outputMessage, true, true]))
