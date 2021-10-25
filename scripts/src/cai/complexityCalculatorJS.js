@@ -10,6 +10,12 @@ import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source) {
+
+    if (source == "") {
+        return { complexity: "" };
+    }
+
+
     try {
         ccState.resetState();
         ccState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
@@ -64,9 +70,15 @@ export function analyzeJavascript(source) {
         //translate the calculated values
         // translateIntegerValues(resultsObject);
         ccHelpers.lineDict();
-        return resultsObject;
+
+        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
+
+          //use this for analysis
+        return { complexity: outStr };
+       // return resultsObject;
     }
     catch (error) {
+        return { error: error };
         return {
             ast: {},
             codeFeatures: {

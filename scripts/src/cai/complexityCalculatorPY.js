@@ -21,6 +21,11 @@ function generateAst(source_code) {
 
 // Analyze the source code of a Python script.
 export function analyzePython(source_code) {
+
+    if (source_code == "") {
+        return { complexity: "" };
+    }
+
     ccState.resetState();
     ccState.setProperty("listFuncs", ['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
     ccState.setProperty('studentCode', source_code.split("\n"));
@@ -74,9 +79,14 @@ export function analyzePython(source_code) {
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
         ccHelpers.lineDict();
+        var outStr = JSON.stringify(resultsObject.codeFeatures);
+
+          //uncomment first for analysis
+        //return {complexity: outStr };
         return resultsObject;
     }
     catch (error) {
+        return { error: "ERROR " + error };
         return {
             ast: {},
             codeFeatures: {
