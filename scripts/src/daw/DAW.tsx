@@ -856,7 +856,7 @@ export const DAW = () => {
     }
 
     const onWheel = (event: WheelEvent) => {
-        if (event.ctrlKey) {
+        if ((event.ctrlKey || event.metaKey)) {
             event.preventDefault()
             if (event.shiftKey) {
                 zoomY(-Math.sign(event.deltaY))
