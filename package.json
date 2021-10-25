@@ -103,7 +103,7 @@
     "happypack": "^5.0.1",
     "html-webpack-plugin": "^4.3.0",
     "jasmine-core": "^2.3.4",
-    "karma": "^6.3.4",
+    "karma": "^6.3.5",
     "karma-chrome-launcher": "^3.1.0",
     "karma-html-reporter": "^0.2.7",
     "karma-jasmine": "^4.0.1",
