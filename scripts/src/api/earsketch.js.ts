@@ -8,6 +8,14 @@ const ES_PASSTHROUGH = passthrough as { [key: string]: Function }
 // The result of running the script (DAW state).
 export let dawData: DAWData
 
+// Propagate an error that we encountered during an async native function.
+export let asyncError = null
+export function popAsyncError() {
+    const error = asyncError
+    asyncError = null
+    return error
+}
+
 // Helper function for JS-Interpreter to map an arbitrary pseudo Javascript
 // variable into a native javascript variable.
 export function remapToNativeJs(v: any): any {
@@ -126,8 +134,21 @@ export function setup(interpreter: any, scope: any) {
     //   callback: The callback function for asynchronous execution using JS-Interpreter.
     // See dur() or analyze() for examples on how to use this function.
     async function suspendPassthrough(name: string, callback: any, ...args: any[]) {
-        const result = await ES_PASSTHROUGH[name](...convertArgs(args))
-        callback(remapToPseudoJs(result))
+        try {
+            const result = await ES_PASSTHROUGH[name](...convertArgs(args))
+            callback(remapToPseudoJs(result))
+        } catch (err) {
+            // See https://github.com/NeilFraser/JS-Interpreter/issues/189.
+            const error = interpreter.createObject(interpreter.ERROR)
+            interpreter.setProperty(error, "name", err.name, Interpreter.NONENUMERABLE_DESCRIPTOR)
+            interpreter.setProperty(error, "message", err.message, Interpreter.NONENUMERABLE_DESCRIPTOR)
+            try {
+                interpreter.unwind(Interpreter.Completion.THROW, error, undefined)
+                interpreter.paused_ = false
+            } catch (e) {
+                asyncError = e
+            }
+        }
     }
 
     // Helper function for JS-Interpreter to map an arbitrary real Javascript

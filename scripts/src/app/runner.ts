@@ -280,6 +280,9 @@ function sleep(ms: number) {
 // TODO: Why 200 ms? Can this be simplified?
 async function runJsInterpreter(interpreter: any) {
     while (interpreter.run()) {
+        if (javascriptAPI.asyncError) {
+            throw javascriptAPI.popAsyncError()
+        }
         await sleep(200)
     }
     const result = javascriptAPI.dawData
