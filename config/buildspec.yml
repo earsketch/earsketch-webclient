@@ -40,6 +40,8 @@ phases:
       - export ES_VERSION="${ES_VERSION_LIST//,/.}-$CODEBUILD_BUILD_NUMBER"
       - if [ "$ES_BASE_URI" == "review" ]; then echo "ES_BASE_URI review mode" && export ES_BASE_URI=https://earsketch-test.ersktch.gatech.edu/$LOCAL_STAGING_DIR_NAME; fi
       - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
+      - rm curriculum
+      - mkdir curriculum
   build:
     commands:
       - start_time="$(date -u +%s)"
