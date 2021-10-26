@@ -14,6 +14,8 @@ import * as sounds from "../browser/soundsState"
 
 import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
+import store from "../reducers"
+
 
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
@@ -40,6 +42,7 @@ export const SoundPreviewContent = (name: string) => {
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
     const dispatch = useDispatch()
     const { t } = useTranslation()
+    const wizardMode = cai.selectWizard(store.getState())
 
     return (
         <div style={{ display: "inline" }}>
@@ -54,11 +57,11 @@ export const SoundPreviewContent = (name: string) => {
                             ? (previewNode ? <i className="icon icon-stop2" /> : <i className="animate-spin es-spinner" />)
                             : <i className="icon icon-play4" />}
                     </button>
-                    {tabsOpen &&
+                    {tabsOpen && !wizardMode &&
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => { editor.pasteCode(name); caiStudentPreferences.addUIClick("sample - copy") }}
+                                onClick={() => { editor.pasteCode(name); caiStudentPreferences.addUIClick("sound - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />
