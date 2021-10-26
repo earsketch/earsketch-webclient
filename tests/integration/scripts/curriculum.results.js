@@ -5,7 +5,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -25,7 +30,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -42,7 +52,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -74,7 +89,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -91,7 +111,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -108,7 +133,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 88, endValue: 88 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -133,7 +163,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -170,7 +205,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -194,7 +234,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -224,7 +269,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 130, endValue: 130 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -267,7 +317,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -323,7 +378,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 128, endValue: 128 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -418,7 +478,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -450,7 +515,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -482,7 +552,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 130, endValue: 130 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -549,7 +624,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -597,7 +677,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -652,7 +737,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -689,7 +779,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -743,7 +838,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -812,7 +912,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -871,6 +976,15 @@ export const CURRICULUM_RESULTS = {
         tempo: 120,
         length: 0,
         tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
         ],
     },
 
@@ -880,7 +994,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -975,6 +1094,15 @@ export const CURRICULUM_RESULTS = {
         tempo: 100,
         length: 0,
         tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
+            },
         ],
     },
 
@@ -984,7 +1112,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1066,7 +1199,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 140, endValue: 140 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1259,7 +1397,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1393,6 +1536,15 @@ export const CURRICULUM_RESULTS = {
         tempo: 120,
         length: 0,
         tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
         ],
     },
 
@@ -1402,7 +1554,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1431,7 +1588,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1456,7 +1618,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             { clips: [{ filekey: "YG_EDM_CLAPS_1", track: 1, measure: 1, start: 1, end: 2.9991000000000003, scale: false, loop: true, silence: 0, audio: { filekey: "YG_EDM_CLAPS_1" }, loopChild: false }, { filekey: "YG_EDM_CLAPS_1", audio: { filekey: "YG_EDM_CLAPS_1" }, track: 1, measure: 2.9991000000000003, start: 1, end: 2.9991000000000003, scale: false, loop: true, loopChild: true }], effects: { "FILTER-FILTER_FREQ": [{ track: 1, name: "FILTER", parameter: "FILTER_FREQ", startMeasure: 1, endMeasure: 5, startValue: 10000, endValue: 100 }] }, analyser: {} },
             {
@@ -1491,6 +1658,15 @@ export const CURRICULUM_RESULTS = {
         tempo: 120,
         length: 0,
         tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
         ],
     },
 
@@ -1500,7 +1676,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1525,7 +1706,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1557,7 +1743,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 130, endValue: 130 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1587,7 +1778,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 130, endValue: 130 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1615,6 +1811,15 @@ export const CURRICULUM_RESULTS = {
         tempo: 120,
         length: 0,
         tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
         ],
     },
 
@@ -1622,6 +1827,15 @@ export const CURRICULUM_RESULTS = {
         tempo: 120,
         length: 0,
         tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
         ],
     },
 
@@ -1631,7 +1845,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1676,7 +1895,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -1701,7 +1925,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -2165,7 +2394,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -2629,7 +2863,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -2673,7 +2912,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 140, endValue: 140 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -2759,7 +3003,12 @@ export const CURRICULUM_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 140, endValue: 140 },
+                    ],
+                },
             },
             {
                 clips: [
