@@ -124,12 +124,12 @@ const AdminSendBroadcast = () => {
     return <>
         <div className="modal-section-body">
             <div className="m-2 p-4 border-t border-gray-400">
-                <div className="mx-2 px-4 pb-1">
+                <div className="pb-1">
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
                         {bruhArray.map(word =>
                             <div key={word} className="my-px mx-2 flex items-center">
-                                <button className="flex" title="Remove admin" onClick={print}><i className="icon icon-cross2" /></button>
+                                <button className="flex" title="Expire broadcast" onClick={print}><i className="icon icon-cross2" /></button>
                                 <div className="my-px mx-2">{word}</div>
                             </div>
                         )}
