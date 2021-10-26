@@ -41,7 +41,6 @@ export function init() {
     return {
         init: true,
         finish: false,
-        tempo: 120,
         length: 0,
         tracks: [{
             effects: {
