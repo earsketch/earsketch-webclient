@@ -639,11 +639,11 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         const tempoMap = new TempoMap(analyzeResult as any as DAWData)
         const startSecond = tempoMap.measureToTime(startTime)
         const endSecond = tempoMap.measureToTime(endTime)
-        // TODO: Find a way to do this check in the async promsie chain without Skulpt swallowing the error.
-        // const blockSize = 2048 // TODO: hardcoded in analysis.js as well
-        // if ((endSecond - startSecond) * audioContext.sampleRate < blockSize) {
-        //     throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
-        // }
+        // Check if analysis window is at least one block long.
+        const blockSize = 2048 // TODO: hardcoded in analysis.js as well
+        if ((endSecond - startSecond) * audioContext.sampleRate < blockSize) {
+            throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
+        }
         const buffer = await renderer.mergeClips(clips, tempoMap)
         return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, startSecond, endSecond)
     })()
