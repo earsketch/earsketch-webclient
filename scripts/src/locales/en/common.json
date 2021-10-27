@@ -431,7 +431,7 @@
     "analyze": {
       "description": "This function analyzes an audio file for the specified feature.",
       "parameters": {
-        "audioFile": {
+        "sound": {
           "description": "Audio file to analyze, typically this is a constant from the sound browser."
         },
 
@@ -447,7 +447,7 @@
     "analyzeForTime": {
       "description": "This function analyzes an audio file for the specified feature, for the specified start and end times.",
       "parameters": {
-        "audioFile": {
+        "sound": {
           "description": "Audio file to analyze, typically this is a constant from the sound browser."
         },
         "featureForAnalysis": {
@@ -468,7 +468,7 @@
     "analyzeTrack": {
       "description": "This function analyzes an entire track for the specified feature.",
       "parameters": {
-        "trackNumber": {
+        "track": {
           "description": "Track number to analyze."
         },
         "featureForAnalysis": {
@@ -483,7 +483,7 @@
     "analyzeTrackForTime": {
       "description": "This function analyzes a specified track between a start and end time.",
       "parameters": {
-        "trackNumber": {
+        "track": {
           "description": "Track number to analyze."
         },
         "featureForAnalysis": {
@@ -504,7 +504,7 @@
     "createAudioSlice": {
       "description": "Returns a sound constant that represents a slice of audio from an existing audio clip.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "The audio file from which to create a slice. This is a constant from the sound browser."
         },
         "startPosition": {
@@ -522,7 +522,7 @@
     "dur": {
       "description": "Returns the duration of an audio file in measures.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "The audio file whose duration to return. Typically, this is a constant from the sound browser."
         }
       },
@@ -538,10 +538,10 @@
     "fitMedia": {
       "description": "Adds an audio file to a specified track at specified start and end times. The audio file will be repeated or cut short as needed to fill the specified amount of time.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "Audio file to place on track, typically this is a constant from the sound browser"
         },
-        "trackNumber": {
+        "track": {
           "description": "Track number to insert audio file onto"
         },
         "startLocation": {
@@ -594,10 +594,10 @@
     "insertMedia": {
       "description": "Inserts the entire media file onto a specified track at the specified starting time.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "Audio file to insert on track, typically this is a constant from the sound browser"
         },
-        "trackNumber": {
+        "track": {
           "description": "Track number to insert soundfile onto"
         },
         "trackLocation": {
@@ -610,10 +610,10 @@
     "insertMediaSection": {
       "description": "Inserts a part of an audio file on a specified track at a specified location.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "Audio file to insert on track, typically this is a constant from the sound browser"
         },
-        "trackNumber": {
+        "track": {
           "description": "Track number to insert soundfile onto"
         },
         "trackLocation": {
@@ -631,7 +631,7 @@
     "makeBeat": {
       "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "A single soundfile or a list/array of soundfiles, typically this is a constant from the sound browser"
         },
         "track": {
@@ -649,7 +649,7 @@
     "makeBeatSlice": {
       "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a soundfile. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same soundfile.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "A single soundfile, typically this is a constant from the sound browser"
         },
         "track": {
