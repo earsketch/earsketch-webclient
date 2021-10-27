@@ -243,7 +243,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
-                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 5, startValue: 20, endValue: 20 },
+                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 1, startValue: 20, endValue: 20 },
                     ],
                 },
             },
@@ -270,10 +270,10 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
-                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 5, startValue: 10, endValue: 10 },
+                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 1, startValue: 10, endValue: 10 },
                     ],
                     "PITCHSHIFT-PITCHSHIFT_SHIFT": [
-                        { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 1, endMeasure: 5, startValue: -2, endValue: -2 },
+                        { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 1, endMeasure: 1, startValue: -2, endValue: -2 },
                     ],
                 },
             },
@@ -1480,7 +1480,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 1, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: -100, endValue: -100 },
+                        { track: 1, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: -100, endValue: -100 },
                     ],
                 },
             },
@@ -1521,7 +1521,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 2, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: 100, endValue: 100 },
+                        { track: 2, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
                     ],
                 },
             },
@@ -1562,7 +1562,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 3, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: 0, endValue: 0 },
+                        { track: 3, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: 0, endValue: 0 },
                     ],
                 },
             },
@@ -1603,7 +1603,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 4, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: -50, endValue: -50 },
+                        { track: 4, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: -50, endValue: -50 },
                     ],
                 },
             },
@@ -1644,7 +1644,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 5, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: 50, endValue: 50 },
+                        { track: 5, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: 50, endValue: 50 },
                     ],
                 },
             },
