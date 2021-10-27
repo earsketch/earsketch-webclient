@@ -83,7 +83,7 @@ export function subscribe(callback: Subscriber) {
 
 export function send(data: any) {
     pendingMessages.push(data)
-    const username: string = data.sender
+    const username = data.sender // infer sender from message
 
     if (!isOpen && username !== undefined) {
         esconsole("Reinitializing websocket connection before send", ["info"])

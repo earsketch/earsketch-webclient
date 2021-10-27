@@ -296,6 +296,7 @@ export function shareWithPeople(shareid: string, users: string[]) {
     const data = {
         notification_type: "sharewithpeople",
         username: getUsername(),
+        sender: getUsername(),
         scriptid: shareid,
         // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
         users: users.map(id => ({ id, exists: true })),
