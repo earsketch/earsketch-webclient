@@ -60,6 +60,12 @@ phases:
       - cp -r index.html sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
       - cp -r sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
 
+reports:
+  karma-reports:
+    files:
+      - "tests/integration/scripts/reports/karma/*.xml"
+    file-format: "JUNITXML"
+
 artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME
   files:
