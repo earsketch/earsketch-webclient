@@ -14,7 +14,7 @@ export const customMatchers = {
                 const result = matchResult(actual, expected)
                 if (!result.pass) {
                     result.message += "\nScript:\n\n"
-                    result.message += script
+                    result.message += JSON.stringify(script)
                 }
                 return result
             },
