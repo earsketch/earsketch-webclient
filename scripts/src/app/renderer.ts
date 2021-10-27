@@ -163,7 +163,7 @@ export async function renderMp3(result: DAWData) {
 export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
     esconsole("Merging clips", ["debug", "renderer"])
     // calculate the length of the merged clips
-    const length = Math.max(0, ...clips.map(clip => clip.measure + (clip.start - clip.end)))
+    const length = Math.max(0, ...clips.map(clip => clip.measure + (clip.end - clip.start)))
     const duration = tempoMap.measureToTime(length + 1)
 
     // create an offline context for rendering
