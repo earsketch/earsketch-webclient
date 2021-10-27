@@ -3,6 +3,7 @@ import esconsole from "../esconsole"
 import * as userProject from "./userProject"
 import { ModalFooter } from "../Utils"
 import * as websocket from "./websocket"
+import { Notification } from "../user/userState"
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
     return <>
@@ -104,7 +105,16 @@ const AdminSendBroadcast = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
-    const bruhArray = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
+    // const bruhArray = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
+    const [broadcasts, setBroadcasts] = useState([] as string[])
+
+    useEffect(() => {
+        userProject.getBroadcasts().then((res: Notification[]) => {
+            esconsole("Set Broadcasts res=" + res, ["info"])
+            esconsole("Set Broadcasts res=" + JSON.stringify(res, null, 2), ["info"])
+            setBroadcasts(res.map(u => u.message.text + " - " + u.created).sort((a, b) => a.localeCompare(b)))
+        })
+    }, [])
 
     const sendBroadcast = () => {
         // TODO: use `expiration`
@@ -127,10 +137,10 @@ const AdminSendBroadcast = () => {
                 <div className="pb-1">
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
-                        {bruhArray.map(word =>
-                            <div key={word} className="my-px mx-2 flex items-center">
+                        {broadcasts.map(desc =>
+                            <div key={desc} className="my-px mx-2 flex items-center">
                                 <button className="flex" title="Expire broadcast" onClick={print}><i className="icon icon-cross2" /></button>
-                                <div className="my-px mx-2">{word}</div>
+                                <div className="my-px mx-2">{desc}</div>
                             </div>
                         )}
                     </div>

@@ -556,6 +556,15 @@ export async function renameScript(script: Script, newName: string) {
     return { ...script, name: newName }
 }
 
+// Get all active broadcasts
+export async function getBroadcasts() {
+    if (isLoggedIn()) {
+        return getAuth("/users/broadcasts")
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
+}
+
 // Get all users and their roles
 export async function getAdmins() {
     if (isLoggedIn()) {
