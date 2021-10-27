@@ -6,6 +6,7 @@
 import * as audioLibrary from "../app/audiolibrary"
 import * as caiStudent from "./student"
 import esconsole from "../esconsole"
+import { DAWData } from "../app/player"
 import * as recommender from "../app/recommender"
 import { SoundEntity } from "common"
 import { getApiCalls } from "./complexityCalculator"
@@ -14,6 +15,7 @@ import { analyzeJavascript } from "./complexityCalculatorJS"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+import { TempoMap } from "../app/tempo"
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
@@ -106,27 +108,27 @@ export function analyzeCode(language: string, script: string) {
 }
 
 // Report the music analysis of a script.
-export function analyzeMusic(trackListing: any, apiCalls: any = null) {
+export function analyzeMusic(trackListing: DAWData, apiCalls: any = null) {
     return timelineToEval(trackToTimeline(trackListing, apiCalls))
 }
 
 // Report the code complexity and music analysis of a script.
-export function analyzeCodeAndMusic(language: string, script: string, trackListing: any) {
+export function analyzeCodeAndMusic(language: string, script: string, trackListing: DAWData) {
     const codeComplexity = analyzeCode(language, script)
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     savedAnalysis = Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
     if (caiStudent != null && FLAGS.SHOW_CAI) {
-    // caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity })
+        // caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity })
         caiStudent.updateModel("musicAttributes", musicAnalysis)
     }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
 }
 
 // Convert compiler output to timeline representation.
-function trackToTimeline(output: any, apiCalls: any = null) {
+function trackToTimeline(output: DAWData, apiCalls: any = null) {
     const report: any = {}
     // basic music information
-    report.OVERVIEW = { tempo: output.tempo, measures: output.length, "length (seconds)": (60.0 / output.tempo * output.length * 4.0) }
+    report.OVERVIEW = { measures: output.length, "length (seconds)": new TempoMap(output).measureToTime(output.length + 1) }
     report.EFFECTS = {}
     apiCalls = getApiCalls()
     if (apiCalls !== null) {

@@ -140,7 +140,7 @@ const AdminResetUserPassword = () => {
 
     const searchUsers = async () => {
         try {
-            const data = await userProject.searchUsers(username)
+            const data = await userProject.searchUsers(username.trim())
             if (data !== null) {
                 setUserDetails({ username: data.username, email: data.email })
                 setPasswordStatus({ message: "", style: "" })
@@ -175,7 +175,7 @@ const AdminResetUserPassword = () => {
                 <div className="font-bold text-3xl p-2">Password Change</div>
                 <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
-                        placeholder="Username" required onChange={e => setUsername(e.target.value)} />
+                        placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
                     <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
                 </form>
                 {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>

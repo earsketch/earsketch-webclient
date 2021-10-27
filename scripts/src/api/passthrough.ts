@@ -16,8 +16,8 @@ import * as ESUtils from "../esutils"
 import * as renderer from "../app/renderer"
 import * as userConsole from "../ide/console"
 import { Clip, DAWData, EffectRange, Track } from "../app/player"
-import { measureToTime } from "../esutils"
 import * as runner from "../app/runner"
+import { TempoMap } from "../app/tempo"
 import * as userProject from "../app/userProject"
 
 class ValueError extends Error {
@@ -37,32 +37,71 @@ class InternalError extends Error {
 }
 
 // Generate initial result object.
-export const init = () => {
+export function init() {
     return {
         init: true,
         finish: false,
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [{
+            effects: {
+                "TEMPO-TEMPO": [{
+                    track: 0,
+                    name: "TEMPO",
+                    parameter: "TEMPO",
+                    startMeasure: 1,
+                    endMeasure: 0,
+                    startValue: 120,
+                    endValue: 120,
+                }],
+            },
+            clips: [],
+        }],
         slicedClips: {}, // of the form sliceKey(str) -> {sourceFile: oldSoundFile(str), start: startLocation(float), end: endLocation(float)}
     }
 }
 
 // Set the tempo on the result object.
-export function setTempo(result: DAWData, tempo: number) {
-    esconsole("Calling pt_setTempo from passthrough with parameter " + tempo, ["DEBUG", "PT"])
+export function setTempo(result: DAWData, startTempo: number, startMeasure?: number, endTempo?: number, endMeasure?: number) {
+    esconsole("Calling pt_setTempo from passthrough with parameter " + startTempo, ["DEBUG", "PT"])
 
     const args = [...arguments].slice(1) // remove first argument
-    ptCheckArgs("setTempo", args, 1, 1)
-    // TODO: Can we do some of these checks automatically via TypeScript run-time reflection?
-    ptCheckType("tempo", "number", tempo)
-    ptCheckRange("setTempo", tempo, 45, 220)
+    ptCheckArgs("setTempo", args, 1, 4)
+    ptCheckType("startTempo", "number", startTempo)
+    ptCheckRange("startTempo", startTempo, 45, 220)
 
-    if (Math.floor(tempo) !== tempo) {
-        throw new TypeError("tempo must be an integer")
+    if (startMeasure === undefined) {
+        startMeasure = 1
+    } else {
+        ptCheckType("startMeasure", "number", startMeasure)
+        ptCheckRange("startMeasure", startMeasure, { min: 1 })
     }
 
-    result.tempo = tempo
+    if (endTempo === undefined) {
+        endTempo = startTempo
+    } else {
+        ptCheckType("endTempo", "number", endTempo)
+        ptCheckRange("endTempo", endTempo, 45, 220)
+    }
+
+    if (endMeasure === undefined) {
+        endMeasure = 0
+    } else {
+        ptCheckType("endMeasure", "number", endMeasure)
+        ptCheckRange("endMeasure", endMeasure, { min: 1 })
+    }
+
+    const _effect = {
+        track: 0,
+        name: "TEMPO",
+        parameter: "TEMPO",
+        startValue: startTempo,
+        endValue: endTempo,
+        startMeasure: startMeasure,
+        endMeasure,
+    }
+
+    addEffect(result, _effect)
 
     return result
 }
@@ -440,21 +479,15 @@ export function analyze(result: DAWData, audioFile: string, featureForAnalysis: 
         throw new Error("featureForAnalysis can either be SPECTRAL_CENTROID or RMS_AMPLITUDE")
     }
 
-    const tempo = result.tempo
-
-    const blockSize = 2048 // TODO: hardcoded in analysis.js as well
-    const sampleRate = audioContext.sampleRate
-    if (audioFile in result.slicedClips) {
-        const sliceLengthMeasures = result.slicedClips[audioFile].end - result.slicedClips[audioFile].start
-        const sliceLengthSamples = sliceLengthMeasures * 4 * (60.0 / tempo) * sampleRate
-        if (sliceLengthSamples < blockSize) {
-            throw new RangeError(audioFile + " is too short to be analyzed.")
-        }
-    }
-
     return runner.loadBuffersForSampleSlicing(result)
-        .then(newResult => audioLibrary.getAudioClip(audioFile, newResult.tempo))
-        .then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo))
+        .then(() => audioLibrary.getSound(audioFile))
+        .then(sound => {
+            const blockSize = 2048 // TODO: hardcoded in analysis.js as well
+            if (sound.buffer.length < blockSize) {
+                throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
+            }
+            return analyzer.computeFeatureForBuffer(sound.buffer, featureForAnalysis)
+        })
 }
 
 // Analyze a clip for time.
@@ -474,6 +507,7 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
     ptCheckType("featureForAnalysis", "string", featureForAnalysis)
     ptCheckType("audioFile", "string", audioFile)
     ptCheckFilekeyType(audioFile)
+    // TODO: These should probably be renamed, as they are actually in measures.
     ptCheckType("startTime", "number", startTime)
     ptCheckType("endTime", "number", endTime)
 
@@ -487,19 +521,24 @@ export function analyzeForTime(result: DAWData, audioFile: string, featureForAna
         )
     }
 
-    // Cannot do this assertion within the async promise chain
-    const sampleRate = audioContext.sampleRate
-    const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
-    const endTimeInSamples = Math.round(sampleRate * measureToTime(endTime, result.tempo))
-    const blockSize = 2048 // TODO: hardcoded in analysis.js as well
-    if ((endTimeInSamples - startTimeInSamples) < blockSize) {
-        throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
-    }
+    const tempoMap = new TempoMap(result)
 
-    const tempo = result.tempo
     return runner.loadBuffersForSampleSlicing(result)
-        .then(newResult => audioLibrary.getAudioClip(audioFile, newResult.tempo))
-        .then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo, startTime, endTime))
+        .then(() => audioLibrary.getSound(audioFile))
+        .then(sound => {
+            // For consistency with old behavior, use clip tempo if available and initial tempo if not.
+            const tempo = sound.tempo ?? tempoMap.points[0].tempo
+            const sampleRate = audioContext.sampleRate
+            const startSecond = ESUtils.measureToTime(startTime, tempo)
+            const endSecond = ESUtils.measureToTime(endTime, tempo)
+            const startSample = Math.round(sampleRate * startSecond)
+            const endSample = Math.round(sampleRate * endSecond)
+            const blockSize = 2048 // TODO: hardcoded in analysis.js as well
+            if ((endSample - startSample) < blockSize) {
+                throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
+            }
+            return analyzer.computeFeatureForBuffer(sound.buffer, featureForAnalysis, startSecond, endSecond)
+        })
 }
 
 export function analyzeTrack(result: DAWData, trackNumber: number, featureForAnalysis: string) {
@@ -522,25 +561,27 @@ export function analyzeTrack(result: DAWData, trackNumber: number, featureForAna
         throw new Error("Cannot analyze a track that does not exist: " + trackNumber)
     }
 
-    const tempo = result.tempo
-    // the analyzeResult will contain a result object that contains only
-    // one track that we want to analyze
+    // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
+    // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
-        init: true,
-        finish: true,
-        tempo: result.tempo,
-        tracks: [{ clips: [], effects: {} }, result.tracks[trackNumber]],
-        length: result.length,
+        tracks: [
+            { clips: [], effects: { "TEMPO-TEMPO": result.tracks[0].effects["TEMPO-TEMPO"] } },
+            result.tracks[trackNumber],
+        ],
+        length: 0,
         slicedClips: result.slicedClips,
     }
-    return runner.postRun(analyzeResult as any).then((compiled: DAWData) => {
+    return (async () => {
+        await runner.postRun(analyzeResult as any)
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
         // return renderer.renderBuffer(result)
-        const clips = compiled.tracks[1].clips
-        return renderer.mergeClips(clips, result.tempo)
-    }).then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo))
+        const clips = analyzeResult.tracks[1].clips
+        const tempoMap = new TempoMap(analyzeResult as any as DAWData)
+        const buffer = await renderer.mergeClips(clips, tempoMap)
+        return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis)
+    })()
 }
 
 export function analyzeTrackForTime(result: DAWData, trackNumber: number, featureForAnalysis: string, startTime: number, endTime: number) {
@@ -578,35 +619,34 @@ export function analyzeTrackForTime(result: DAWData, trackNumber: number, featur
         )
     }
 
-    // Cannot do this assertion within the async promise chain
-    const sampleRate = audioContext.sampleRate
-    const startTimeInSamples = Math.round(sampleRate * measureToTime(startTime, result.tempo))
-    const endTimeInSamples = Math.round(sampleRate * measureToTime(endTime, result.tempo))
-    const blockSize = 2048 // TODO: hardcoded in analysis.js as well
-    if ((endTimeInSamples - startTimeInSamples) < blockSize) {
-        throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
-    }
-
-    const tempo = result.tempo
-    // the analyzeResult will contain a result object that contains only
-    // one track that we want to analyze
+    // `analyzeResult` will contain a result object that contains only one track that we want to analyze.
+    // (Plus the mix track, with its tempo curve.)
     const analyzeResult = {
-        init: true,
-        finish: true,
-        tempo: result.tempo,
-        tracks: [{ clips: [], effects: {} }, result.tracks[trackNumber]],
-        length: result.length,
+        tracks: [
+            { clips: [], effects: { "TEMPO-TEMPO": result.tracks[0].effects["TEMPO-TEMPO"] } },
+            result.tracks[trackNumber],
+        ],
+        length: 0,
         slicedClips: result.slicedClips,
     }
 
-    return runner.postRun(analyzeResult as any).then((compiled: DAWData) => {
+    return (async () => {
+        await runner.postRun(analyzeResult as any)
         // TODO: analyzeTrackForTime FAILS to run a second time if the
         // track has effects using renderer.renderBuffer()
         // Until a fix is found, we use mergeClips() and ignore track effects.
-        const clips = compiled.tracks[1].clips
-        const buffer = renderer.mergeClips(clips, result.tempo)
-        return buffer
-    }).then(buffer => analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, tempo, startTime, endTime))
+        const clips = analyzeResult.tracks[1].clips
+        const tempoMap = new TempoMap(analyzeResult as any as DAWData)
+        const startSecond = tempoMap.measureToTime(startTime)
+        const endSecond = tempoMap.measureToTime(endTime)
+        // Check if analysis window is at least one block long.
+        const blockSize = 2048 // TODO: hardcoded in analysis.js as well
+        if ((endSecond - startSecond) * audioContext.sampleRate < blockSize) {
+            throw new RangeError(i18n.t("messages:esaudio.analysisTimeTooShort"))
+        }
+        const buffer = await renderer.mergeClips(clips, tempoMap)
+        return analyzer.computeFeatureForBuffer(buffer, featureForAnalysis, startSecond, endSecond)
+    })()
 }
 
 // Get the duration of a clip.
@@ -618,10 +658,12 @@ export function dur(result: DAWData, fileKey: string) {
     ptCheckArgs("dur", args, 1, 1)
     ptCheckType("fileKey", "string", fileKey)
 
-    return audioLibrary.getAudioClip(fileKey, result.tempo).then(buffer => {
-        // rounds off precision error in JS
-        const digits = 2
-        return Math.round(ESUtils.timeToMeasure(buffer.duration, result.tempo) * Math.pow(10, 2)) / Math.pow(10, digits)
+    const tempoMap = new TempoMap(result)
+    return audioLibrary.getSound(fileKey).then(sound => {
+        // For consistency with old behavior, use clip tempo if available and initial tempo if not.
+        const tempo = sound.tempo ?? tempoMap.points[0].tempo
+        // Round to nearest hundredth.
+        return Math.round(ESUtils.timeToMeasure(sound.buffer.duration, tempo) * 100) / 100
     })
 }
 
@@ -880,7 +922,7 @@ export function rhythmEffects(
                 endValue: endValue,
                 startMeasure: prevMeasure,
                 endMeasure: endMeasure,
-            } as unknown as EffectRange
+            } as EffectRange
 
             addEffect(result, effect)
 
@@ -946,7 +988,7 @@ export function setEffect(
         endValue: effectEndValue,
         startMeasure: effectStartLocation,
         endMeasure: effectEndLocation,
-    } as unknown as EffectRange
+    } as EffectRange
 
     addEffect(result, _effect)
 
@@ -977,18 +1019,12 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 }
 
 // Select a random file.
-export function selectRandomFile(result: DAWData, folderSubstring: string, extension: undefined | string = undefined) {
-    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}, ${extension}`, "PT")
+export function selectRandomFile(result: DAWData, folderSubstring: string = "") {
+    esconsole(`Calling pt_selectRandomFile from passthrough with parameters ${folderSubstring}`, "PT")
 
     const args = [...arguments].slice(1)
-    ptCheckArgs("selectRandomFile", args, 1, 2)
+    ptCheckArgs("selectRandomFile", args, 0, 1)
     ptCheckType("folderSubstring", "string", folderSubstring)
-
-    if (extension !== undefined) {
-        ptCheckType("extension", "string", extension)
-    } else {
-        extension = ".wav"
-    }
 
     let url = URL_DOMAIN + "/audio/random?folderSubstring=" + folderSubstring
 
@@ -1245,10 +1281,10 @@ export const addEffect = (result: DAWData, effect: EffectRange) => {
         throw new RangeError("Cannot add effects before the first track")
     }
 
-    if (applyEffects.EFFECT_MAP[effect.name] === undefined) {
+    const effectType = applyEffects.EFFECT_MAP[effect.name]
+    if (effectType === undefined) {
         throw new RangeError("Effect name does not exist")
-    }
-    if (applyEffects.EFFECT_MAP[effect.name].DEFAULTS[effect.parameter] === undefined) {
+    } else if (effectType !== null && effectType.DEFAULTS[effect.parameter] === undefined) {
         throw new RangeError("Effect parameter does not exist")
     }
 

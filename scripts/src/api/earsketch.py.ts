@@ -90,7 +90,12 @@ export function setup() {
         return mapJsErrors(() => {
             const promise = ES_PASSTHROUGH[name](...convertArgs(args))
             const susp = new Sk.misceval.Suspension()
-            susp.resume = () => Sk.ffi.remapToPy(susp.data.result)
+            susp.resume = () => mapJsErrors(() => {
+                if (susp.data.error) {
+                    throw susp.data.error
+                }
+                return Sk.ffi.remapToPy(susp.data.result)
+            })
             susp.data = {
                 type: "Sk.promise",
                 promise,

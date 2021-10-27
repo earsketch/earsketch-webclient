@@ -1,9 +1,9 @@
 // Render scripts using an offline audio context.
 import * as applyEffects from "../model/applyeffects"
 import esconsole from "../esconsole"
-import * as ESUtils from "../esutils"
 import { Clip, DAWData } from "./player"
 import { OfflineAudioContext } from "./audiocontext"
+import { TempoMap } from "./tempo"
 
 const NUM_CHANNELS = 2
 const SAMPLE_RATE = 44100
@@ -13,7 +13,8 @@ export async function renderBuffer(result: DAWData) {
     esconsole("Begin rendering result to buffer.", ["debug", "renderer"])
 
     const origin = 0
-    const duration = ESUtils.measureToTime(result.length + 1, result.tempo) // need +1 to render to end of last measure
+    const tempoMap = new TempoMap(result)
+    const duration = tempoMap.measureToTime(result.length + 1) // need +1 to render to end of last measure
     const context = new OfflineAudioContext(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
     const mix = context.createGain()
 
@@ -31,76 +32,48 @@ export async function renderBuffer(result: DAWData) {
         track.analyser = context.createGain() as unknown as AnalyserNode
 
         const startNode = applyEffects.buildAudioNodeGraph(
-            context, mix, track, i, result.tempo,
+            context, mix, track, i, tempoMap,
             origin, result.master, [], false
         )
 
         const trackGain = context.createGain()
         trackGain.gain.setValueAtTime(1.0, context.currentTime)
 
+        // TODO: Reduce duplication with `player`.
         for (const clip of track.clips) {
+            const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
+            const clipStartTime = tempoMap.measureToTime(clip.measure)
+            const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
             // create the audio source node to contain the audio buffer
             // and play it at the designated time
-            const source = context.createBufferSource()
+            const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
-            // Special case for pitchshifted tracks. The pitchshifted
-            // audio buffer is different than the clip audio buffer, and
-            // has different start and end times
-            let start, end
-            const pitchshiftEffect = track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]
-            if (pitchshiftEffect !== undefined) {
-                esconsole(`Using pitchshifted audio for ${clip.filekey} on track ${i}`, ["debug", "renderer"])
-                source.buffer = clip.pitchshift!.audio
-                start = ESUtils.measureToTime(
-                    clip.pitchshift!.start, result.tempo
-                )
-                end = ESUtils.measureToTime(
-                    clip.pitchshift!.end, result.tempo
-                )
-            // for all other tracks we can use the unprocessed clip buffer
-            } else {
-                source.buffer = clip.audio
-                start = ESUtils.measureToTime(clip.start, result.tempo)
-                end = ESUtils.measureToTime(clip.end, result.tempo)
-            }
-
-            // connect the buffer source to the effects tree
-            source.connect(trackGain)
-
-            const location = ESUtils.measureToTime(
-                clip.measure, result.tempo
-            )
-
+            // Start/end locations within the clip's audio buffer, in seconds.
+            const startTimeInClip = clipStartTime - clipBufferStartTime
             // the clip duration may be shorter than the buffer duration
-            let clipDuration = end - start
+            let clipDuration = clipEndTime - clipStartTime
 
-            if (origin > location && origin > location + end) {
-                // case: clip is playing in the past
-                // do nothing, we don't have to play this clip
-
-            } else if (origin > location && origin <= location + clipDuration) {
+            if (origin > clipEndTime) {
+                // case: clip is playing in the past: skip the clip
+                continue
+            } else if (origin >= clipStartTime && origin < clipEndTime) {
                 // case: clip is playing from the middle
                 // calculate the offset and begin playing
-                const offset = origin - location
-                start += offset
-                clipDuration -= offset
-                source.start(context.currentTime, start, clipDuration)
-                source.stop(context.currentTime + clipDuration)
-
+                const clipStartOffset = origin - clipStartTime
+                clipDuration -= clipStartOffset
+                source.start(context.currentTime, startTimeInClip + clipStartOffset, clipDuration - clipStartOffset)
                 // keep this flag so we only stop clips that are playing
                 // (otherwise we get an exception raised)
                 clip.playing = true
             } else {
                 // case: clip is in the future
                 // calculate when it should begin and register it to play
-                const offset = location - origin
-
-                source.start(
-                    context.currentTime + offset, start, clipDuration
-                )
+                const untilClipStart = clipStartTime - origin
+                source.start(context.currentTime + untilClipStart, startTimeInClip, clipDuration)
                 clip.playing = true
             }
 
+            source.connect(trackGain)
             // keep a reference to this audio source so we can pause it
             clip.source = source
             clip.gain = trackGain // used to mute the track/clip
@@ -187,40 +160,29 @@ export async function renderMp3(result: DAWData) {
 
 // Merge all the given clip buffers into one large buffer.
 // Returns a promise that resolves to an AudioBuffer.
-export async function mergeClips(clips: Clip[], tempo: number) {
+export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
     esconsole("Merging clips", ["debug", "renderer"])
     // calculate the length of the merged clips
-    let length = 0
-    for (const clip of clips) {
-        const end = clip.measure + clip.end
-        if (end > length) {
-            length = end
-        }
-    }
-    const duration = ESUtils.measureToTime(length, tempo)
+    const length = Math.max(0, ...clips.map(clip => clip.measure + (clip.end - clip.start)))
+    const duration = tempoMap.measureToTime(length + 1)
 
     // create an offline context for rendering
     const context = new (window.OfflineAudioContext || (window as any).webkitOfflineAudioContext)(NUM_CHANNELS, SAMPLE_RATE * duration, SAMPLE_RATE)
 
-    const master = context.createGain()
-    master.connect(context.destination)
+    const mix = context.createGain()
+    mix.connect(context.destination)
 
     for (const clip of clips) {
-        const source = context.createBufferSource()
-        source.buffer = clip.audio
+        const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
+        source.connect(mix)
 
-        source.connect(master)
+        const bufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
+        const startTime = tempoMap.measureToTime(clip.measure)
+        const endTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
+        const startOffset = startTime - bufferStartTime
 
-        const startTime = ESUtils.measureToTime(clip.measure, tempo)
-        const startOffset = ESUtils.measureToTime(clip.start, tempo)
-        const endOffset = ESUtils.measureToTime(clip.end, tempo)
-
-        if (endOffset < startOffset) {
-            continue
-        }
-
-        source.start(startTime + startOffset)
-        source.stop(startTime + (endOffset - startOffset))
+        source.start(startTime, startOffset)
+        source.stop(endTime)
     }
 
     const buffer = await context.startRendering()

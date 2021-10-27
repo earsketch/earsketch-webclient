@@ -4,15 +4,10 @@ import context from "./audiocontext"
 import { dbToFloat } from "../model/audioeffects"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
+import { TempoMap } from "./tempo"
 
 // Preliminary type declarations
 // TODO: Move some to runner?
-export interface Pitchshift {
-    audio: AudioBuffer
-    start: number
-    end: number
-}
-
 export interface Clip {
     filekey: string
     loopChild: boolean
@@ -20,13 +15,13 @@ export interface Clip {
     start: number
     end: number
     audio: AudioBuffer
-    pitchshift?: Pitchshift
+    sourceAudio: AudioBuffer
     playing?: boolean
     source?: AudioBufferSourceNode
     gain?: GainNode
     silence: number
     track: number
-    tempo: number
+    tempo?: number
     loop: boolean
     scale: number
 }
@@ -60,7 +55,6 @@ export interface ClipSlice {
 }
 
 export interface DAWData {
-    tempo: number
     length: number
     tracks: Track[]
     master: GainNode
@@ -116,26 +110,17 @@ const clearAllTimers = () => {
     clearTimeout(loopSchedTimer)
 }
 
-const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempo: number, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
-    const clipStartTime = ESUtils.measureToTime(clip.measure, tempo)
-    let startTimeInClip, endTimeInClip // start/end locations within clip
-    const clipSource = context.createBufferSource()
+const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
+    const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
+    const clipStartTime = tempoMap.measureToTime(clip.measure)
+    const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
 
-    // set buffer & start/end time within clip
-    if (pitchShift && !pitchShift.bypass) {
-        esconsole("Using pitchshifted audio for " + clip.filekey, ["player", "debug"])
-        clipSource.buffer = clip.pitchshift!.audio
-        startTimeInClip = ESUtils.measureToTime(clip.pitchshift!.start, tempo)
-        endTimeInClip = ESUtils.measureToTime(clip.pitchshift!.end, tempo)
-    } else {
-        clipSource.buffer = clip.audio
-        startTimeInClip = ESUtils.measureToTime(clip.start, tempo)
-        endTimeInClip = ESUtils.measureToTime(clip.end, tempo)
-    }
+    const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
+    // Start/end locations within the clip's audio buffer, in seconds.
+    const startTimeInClip = clipStartTime - clipBufferStartTime
     // the clip duration may be shorter than the buffer duration
-    let clipDuration = endTimeInClip - startTimeInClip
-    const clipEndTime = clipStartTime + clipDuration
+    let clipDuration = clipEndTime - clipStartTime
 
     if (startTime >= clipEndTime) {
         // case: clip is in the past: skip the clip
@@ -148,7 +133,6 @@ const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempo: numbe
             clipDuration = endTime - clipStartTime
         }
         // clips -> track gain -> effect tree
-        clipSource.connect(trackGain)
         clipSource.start(waStartTime, startTimeInClip + clipStartOffset, clipDuration - clipStartOffset)
 
         // keep this flag so we only stop clips that are playing (otherwise we get an exception raised)
@@ -164,11 +148,11 @@ const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempo: numbe
         if (clipEndTime > endTime) {
             clipDuration = endTime - clipStartTime
         }
-        clipSource.connect(trackGain)
         clipSource.start(waStartTime + untilClipStart, startTimeInClip, clipDuration)
         setTimeout(() => { clip.playing = true }, (manualOffset + untilClipStart) * 1000)
     }
 
+    clipSource.connect(trackGain)
     // keep a reference to this audio source so we can pause it
     clip.source = clipSource
     clip.gain = trackGain // used to mute the track/clip
@@ -194,9 +178,9 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
 
     const renderingData = renderingDataQueue[1]
 
-    const tempo = renderingData.tempo
-    const startTime = ESUtils.measureToTime(startMes, tempo)
-    const endTime = ESUtils.measureToTime(endMes, tempo)
+    const tempoMap = new TempoMap(renderingData)
+    const startTime = tempoMap.measureToTime(startMes)
+    const endTime = tempoMap.measureToTime(endMes)
 
     const waStartTime = context.currentTime + manualOffset
 
@@ -215,7 +199,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
         // construct the effect graph
-        const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempo, startTime, renderingData.master, trackBypass, false)
+        const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, renderingData.master, trackBypass, false)
 
         const trackGain = context.createGain()
         trackGain.gain.setValueAtTime(1.0, context.currentTime)
@@ -223,7 +207,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         // process each clip in the track
         const pitchShift = track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]
         for (const clipData of track.clips) {
-            playClip(clipData, trackGain, pitchShift, tempo, startTime, endTime, waStartTime, manualOffset)
+            playClip(clipData, trackGain, pitchShift, tempoMap, startTime, endTime, waStartTime, manualOffset)
         }
 
         // connect the track output to the effect tree
@@ -395,8 +379,9 @@ const refresh = (clearAllGraphs = false) => {
     if (isPlaying) {
         esconsole("refreshing the rendering data", ["player", "debug"])
         const currentMeasure = getPosition()
-        const nextMeasure = Math.ceil(currentMeasure)
-        const timeTillNextBar = ESUtils.measureToTime(nextMeasure - currentMeasure + 1, renderingDataQueue[1]!.tempo)
+        const nextMeasure = Math.floor(currentMeasure + 1)
+        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
 
         if (clearAllGraphs) {
             clearAllAudioGraphs(timeTillNextBar)
@@ -429,14 +414,17 @@ export const setLoop = (loopObj: typeof loop) => {
 
     clearAllTimers()
 
-    let currentMeasure, startMes: number, endMes: number
+    const tempoMap = new TempoMap(renderingDataQueue[1]!)
+    const currentMeasure = getPosition()
+    const currentTime = tempoMap.measureToTime(currentMeasure)
+
+    let startMes: number, endMes: number
 
     if (loop.on) {
         if (isPlaying) {
             esconsole("loop switched on while playing", ["player", "debug"])
             loopScheduledWhilePaused = false
 
-            currentMeasure = getPosition()
             let timeTillLoopingBack = 0
 
             if (loop.selection) {
@@ -446,15 +434,15 @@ export const setLoop = (loopObj: typeof loop) => {
                 if (currentMeasure >= startMes && currentMeasure < endMes) {
                     if (currentMeasure < endMes - 1) {
                         startMes = Math.ceil(currentMeasure)
-                        timeTillLoopingBack = ESUtils.measureToTime(2 - (currentMeasure % 1), renderingDataQueue[1]!.tempo)
+                        timeTillLoopingBack = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
                     } else {
-                        timeTillLoopingBack = ESUtils.measureToTime(endMes - currentMeasure + 1, renderingDataQueue[1]!.tempo)
+                        timeTillLoopingBack = tempoMap.measureToTime(endMes) - currentTime
                     }
                 } else {
-                    timeTillLoopingBack = ESUtils.measureToTime(2 - (currentMeasure % 1), renderingDataQueue[1]!.tempo)
+                    timeTillLoopingBack = tempoMap.measureToTime(Math.floor(currentMeasure + 1)) - currentTime
                 }
             } else {
-                timeTillLoopingBack = ESUtils.measureToTime(renderingDataQueue[1]!.length - currentMeasure + 2, renderingDataQueue[1]!.tempo)
+                timeTillLoopingBack = tempoMap.measureToTime(renderingDataQueue[1]!.length + 1) - currentTime
                 startMes = 1
                 endMes = renderingDataQueue[1]!.length + 1
             }
@@ -483,14 +471,12 @@ export const setLoop = (loopObj: typeof loop) => {
 
         if (isPlaying) {
             esconsole("loop switched off while playing", ["player", "debug"])
-            currentMeasure = getPosition()
-
             esconsole(`currentMeasure = ${currentMeasure}, playbackData.endMeasure = ${playbackData.endMeasure}, renderingDataQueue[1].length = ${renderingDataQueue[1]!.length}`, ["player", "debug"])
             if (currentMeasure < playbackData.endMeasure && playbackData.endMeasure <= (renderingDataQueue[1]!.length + 1)) {
                 clearTimeout(playStartTimer)
                 clearTimeout(playEndTimer)
 
-                const timeTillContinuedPoint = ESUtils.measureToTime(playbackData.endMeasure - currentMeasure + 1, renderingDataQueue[1]!.tempo)
+                const timeTillContinuedPoint = tempoMap.measureToTime(playbackData.endMeasure) - currentTime
 
                 startMes = playbackData.endMeasure
                 endMes = renderingDataQueue[1]!.length + 1
@@ -522,8 +508,6 @@ export const setPosition = (position: number) => {
     clearAllTimers()
 
     if (isPlaying) {
-        const currentMeasure = getPosition()
-
         if (loop.on) {
             loopScheduledWhilePaused = true
 
@@ -535,8 +519,10 @@ export const setPosition = (position: number) => {
             }
         }
 
-        const timeTillNextBar = ESUtils.measureToTime(2 - (currentMeasure % 1), renderingDataQueue[1]!.tempo)
-
+        const currentMeasure = getPosition()
+        const nextMeasure = Math.floor(currentMeasure + 1)
+        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const timeTillNextBar = tempoMap.measureToTime(nextMeasure) - tempoMap.measureToTime(currentMeasure)
         clearAllAudioGraphs(timeTillNextBar)
         play(position, playbackData.endMeasure, timeTillNextBar)
     } else {
@@ -546,7 +532,10 @@ export const setPosition = (position: number) => {
 
 export const getPosition = () => {
     if (isPlaying) {
-        playbackData.playheadPos = (context.currentTime - waTimeStarted) * renderingDataQueue[1]!.tempo / 60 / 4 + playbackData.startMeasure + playbackData.startOffset
+        const tempoMap = new TempoMap(renderingDataQueue[1]!)
+        const startTime = tempoMap.measureToTime(playbackData.startMeasure + playbackData.startOffset)
+        const currentTime = startTime + (context.currentTime - waTimeStarted)
+        playbackData.playheadPos = tempoMap.timeToMeasure(currentTime)
     }
     return playbackData.playheadPos
 }

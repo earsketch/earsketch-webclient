@@ -1,19 +1,20 @@
+// TODO: Either time or measures should be fixed as a linear scale,
+//       and the other should vary nonlinearly according to the tempo map.
 import React, { useEffect, useState, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
+import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as applyEffects from "../model/applyeffects"
 import { setReady } from "../bubble/bubbleState"
+import * as daw from "./dawState"
+import * as ESUtils from "../esutils"
 import { compileCode } from "../ide/IDE"
 import * as player from "../app/player"
 import esconsole from "../esconsole"
-import * as ESUtils from "../esutils"
 import store, { RootState } from "../reducers"
+import { effectToPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
-
-import * as daw from "./dawState"
-import { useTranslation } from "react-i18next"
-
 import { addUIClick } from "../cai/studentPreferences"
 
 // Width of track control box
@@ -384,7 +385,7 @@ const Effect = ({ name, color, effect, bypass, mute }: {
     })
 
     return <div ref={element} className={"dawTrackEffect" + (bypass || mute ? " bypassed" : "")} style={{ background: color, width: xScale(playLength) + "px" }}>
-        <div className="clipName">{name}</div>
+        {name !== "TEMPO-TEMPO" && <div className="clipName">{name}</div>}
         <svg className="effectAxis">
             <g></g>
         </svg>
@@ -403,8 +404,10 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
     const mixTrackHeight = useSelector(daw.selectMixTrackHeight)
     const showEffects = useSelector(daw.selectShowEffects)
     const trackWidth = useSelector(daw.selectTrackWidth)
-    const hideMixTrackLabel = trackWidth < 950
     const { t } = useTranslation()
+
+    const hideMixTrackLabel = trackWidth < 950
+    let effectOffset = 1
 
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: mixTrackHeight + "px" }}>
@@ -416,17 +419,26 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
             </div>
         </div>
         {showEffects &&
-        Object.entries(track.effects).map(([key, effect], index) =>
-            <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
-                <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
+        Object.entries(track.effects).map(([key, effect], index) => {
+            if (key === "TEMPO-TEMPO" && new TempoMap(effectToPoints(effect)).points.length === 1) {
+                // Constant tempo: don't show the tempo curve.
+                effectOffset = 0
+                return null
+            }
+            return <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
+                <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
                     <div className="dawTrackName"></div>
-                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                    {key === "TEMPO-TEMPO"
+                        ? <div className="flex-grow text-center">TEMPO</div>
+                        : <div className="dawTrackEffectName">{t("daw.effect")} {index + effectOffset}</div>}
+                    {key !== "TEMPO-TEMPO" &&
                     <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
                         {t("daw.bypass")}
-                    </button>
+                    </button>}
                 </div>
                 <Effect color={color} name={key} effect={effect} bypass={bypass.includes(key)} mute={false} />
-            </div>)}
+            </div>
+        })}
     </div>
 }
 
@@ -525,35 +537,29 @@ const Measureline = () => {
 }
 
 const Timeline = () => {
+    const tempoMap = useSelector(daw.selectTempoMap)
     const xScale = useSelector(daw.selectXScale)
     const playLength = useSelector(daw.selectPlayLength)
-    const timeScale = useSelector(daw.selectTimeScale)
     const songDuration = useSelector(daw.selectSongDuration)
     const intervals = useSelector(daw.selectTimelineZoomIntervals)
     const element = useRef<HTMLDivElement>(null)
 
-    // redraw the timeline when the track width changes
-    useEffect(() => {
-        // create d3 axis
-        const timeline = d3.svg.axis()
-            .scale(timeScale) // scale ticks according to zoom
-            .orient("bottom")
-            .tickValues(d3.range(0, songDuration + 1, intervals.tickInterval))
-            .tickFormat((d: any) => (d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, d))))
-
-        // append axis to timeline dom element
-        d3.select(element.current).select("svg.axis g")
-            .call(timeline)
-            .selectAll("text")
-            // move the first text element to fit inside the view
-            .style("text-anchor", "start")
-            .attr("y", 6)
-            .attr("x", 2)
-    })
+    const ticks: number[] = d3.range(0, songDuration + 1, intervals.tickInterval)
 
     return <div ref={element} id="daw-timeline" className="relative w-full" style={{ minWidth: X_OFFSET + xScale(playLength + 1) + "px" }}>
         <svg className="axis">
-            <g></g>
+            <g>
+                {ticks.map(t => {
+                    const measure = tempoMap.timeToMeasure(t)
+                    return <g key={t} className="tick" transform={`translate(${xScale(measure)},0)`}>
+                        <line y2={t % intervals.labelInterval === 0 ? 6 : 2} x2={0} />
+                        {t % intervals.labelInterval === 0 &&
+                        <text dy=".71em" y={6} x={2}>
+                            {d3.time.format("%M:%S")(new Date(1970, 0, 1, 0, 0, t))}
+                        </text>}
+                    </g>
+                })}
+            </g>
         </svg>
     </div>
 }
@@ -562,21 +568,20 @@ const rms = (array: Float32Array) => {
     return Math.sqrt(array.map(v => v ** 2).reduce((a, b) => a + b) / array.length)
 }
 
-const prepareWaveforms = (tracks: player.Track[], tempo: number) => {
+const prepareWaveforms = (tracks: player.Track[], tempoMap: TempoMap) => {
     esconsole("preparing a waveform to draw", "daw")
 
     // ignore the mix track (0) and metronome track (len-1)
     for (let i = 1; i < tracks.length - 1; i++) {
         tracks[i].clips.forEach(clip => {
             if (!WaveformCache.checkIfExists(clip)) {
-                const waveform = clip.audio.getChannelData(0)
+                // Use pre-timestretching/pitchshifting audio, since measures pass linearly in the DAW.
+                const waveform = clip.sourceAudio.getChannelData(0)
 
-                // uncut clip duration
-                const wfDurInMeasure = ESUtils.timeToMeasure(clip.audio.duration, tempo)
-
-                // clip start in samples
-                const sfStart = (clip.start - 1) / wfDurInMeasure * waveform.length
-                const sfEnd = (clip.end - 1) / wfDurInMeasure * waveform.length
+                // Start/end locations within the clip's audio buffer, in samples.
+                const tempo = clip.tempo ?? tempoMap.points[0].tempo
+                const sfStart = ESUtils.measureToTime(clip.start, tempo) * clip.sourceAudio.sampleRate
+                const sfEnd = ESUtils.measureToTime(clip.end, tempo) * clip.sourceAudio.sampleRate
 
                 // suppress error when clips are overlapped
                 if (sfEnd <= sfStart) {
@@ -612,9 +617,10 @@ export function setDAWData(result: player.DAWData) {
     const { dispatch, getState } = store
     let state = getState()
 
-    prepareWaveforms(result.tracks, result.tempo)
-
-    dispatch(daw.setTempo(result.tempo))
+    const tempoMap = new TempoMap(result)
+    WaveformCache.clear()
+    prepareWaveforms(result.tracks, tempoMap)
+    dispatch(daw.setTempoMap(tempoMap))
 
     const playLength = result.length + 1
     dispatch(daw.setPlayLength(playLength))
@@ -639,7 +645,7 @@ export function setDAWData(result: player.DAWData) {
     const metronome = tracks[tracks.length - 1]
 
     if (mix !== undefined) {
-        mix.visible = Object.keys(mix.effects).length > 0
+        mix.visible = Object.keys(mix.effects).length > 1 || tempoMap.points.length > 1
         mix.mute = false
         // the mix track is special
         mix.label = "MIX"

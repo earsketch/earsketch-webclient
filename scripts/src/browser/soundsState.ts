@@ -282,13 +282,13 @@ export const previewSound = createAsyncThunk<void | null, string, ThunkAPI>(
         dispatch(setPreviewName(name))
         dispatch(setPreviewBSNode(null))
 
-        await audioLibrary.getAudioClip(name, -1).then((buffer: AudioBuffer) => {
+        await audioLibrary.getSound(name).then(sound => {
             if (name !== selectPreviewName(getState())) {
                 // User started clicked play on something else before this finished loading.
                 return
             }
             dispatch(setPreviewBSNode(bs))
-            bs.buffer = buffer
+            bs.buffer = sound.buffer
             bs.connect(context.destination)
             bs.start(0)
             bs.onended = () => {
@@ -390,8 +390,8 @@ function filterEntities(entities: SoundEntities, filters: ReturnType<typeof sele
         return (term.length ? field.includes(term) : true) &&
             (filters.byFavorites ? filters.favorites.includes(v.name) : true) &&
             (filters.artists.length ? filters.artists.includes(v.artist) : true) &&
-            (filters.genres.length ? filters.genres.includes(v.genre) : true) &&
-            (filters.instruments.length ? filters.instruments.includes(v.instrument) : true)
+            (filters.genres.length ? v.genre && filters.genres.includes(v.genre) : true) &&
+            (filters.instruments.length ? v.instrument && filters.instruments.includes(v.instrument) : true)
     })
 }
 
@@ -495,7 +495,10 @@ export const selectFilteredGenres = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, genres: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.genre))).sort()
+        return Array.from(new Set(Object.values(entities)
+            .map(entity => entity.genre)
+            .filter(genre => genre !== undefined) as string[]
+        )).sort()
     }
 )
 
@@ -503,7 +506,10 @@ export const selectFilteredInstruments = createSelector(
     [selectEntities, selectFilters],
     (entities, filters) => {
         entities = filterEntities(entities, { ...filters, instruments: [] })
-        return Array.from(new Set(Object.values(entities).map(entity => entity.instrument))).sort()
+        return Array.from(new Set(Object.values(entities)
+            .map(entity => entity.instrument)
+            .filter(instrument => instrument !== undefined) as string[]
+        )).sort()
     }
 )
 
