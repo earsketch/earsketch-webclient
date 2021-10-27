@@ -16,7 +16,7 @@ describe("API function tests", () => {
     function testPythonAndJavaScript(name, logs = []) {
         it(`should compile ${name} correctly in Python`, done => {
             runner.runPython(API_SCRIPTS[`${name}.py`]).then(result => {
-                expect(result).toMatchResult(API_RESULTS[name], result)
+                expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
                 const expectedLogs = logs.map(text => ({ level: "info", text: Sk.builtin.str(Sk.ffi.remapToPy(text)).v }))
                 expect(ide.selectLogs(store.getState())).toEqual(expectedLogs)
                 done()
@@ -28,7 +28,7 @@ describe("API function tests", () => {
 
         it(`should compile ${name} correctly in JavaScript`, done => {
             runner.runJavaScript(API_SCRIPTS[`${name}.js`]).then(result => {
-                expect(result).toMatchResult(API_RESULTS[name], result)
+                expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
                 expect(ide.selectLogs(store.getState())).toEqual(logs.map(text => ({ level: "info", text })))
                 done()
             }).catch(err => {
