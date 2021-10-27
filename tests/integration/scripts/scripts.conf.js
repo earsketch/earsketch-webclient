@@ -43,7 +43,13 @@ module.exports = function (config) {
         client: {
             captureConsole: false, // set to true to show log messages
         },
-        browsers: ["ChromeHeadless"],
+        browsers: ["ChromeHeadlessNoSandbox"],
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: "ChromeHeadless",
+                flags: ["--no-sandbox"],
+            },
+        },
         singleRun: true,
         proxyValidateSSL: false,
 
