@@ -453,10 +453,10 @@
         "featureForAnalysis": {
           "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
         },
-        "startTime": {
+        "start": {
           "description": "Start location to begin analysis"
         },
-        "endTime": {
+        "end": {
           "description": "End Location to end analysis"
         }
       },
@@ -489,10 +489,10 @@
         "featureForAnalysis": {
           "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
         },
-        "startTime": {
+        "start": {
           "description": "Start location to begin analysis"
         },
-        "endTime": {
+        "end": {
           "description": "End Location to end analysis"
         }
       },
@@ -507,10 +507,10 @@
         "sound": {
           "description": "The audio file from which to create a slice. This is a constant from the sound browser."
         },
-        "startPosition": {
+        "start": {
           "description": "The start position of the slice."
         },
-        "endPosition": {
+        "end": {
           "description": "The end position of the slice."
         }
       },
@@ -544,10 +544,10 @@
         "track": {
           "description": "Track number to insert audio file onto"
         },
-        "startLocation": {
+        "start": {
           "description": "Location where the soundfile will begin (e.g. 1 will start at the beginning of measure 1)."
         },
-        "endLocation": {
+        "end": {
           "description": "Location where the soundfile will end (e.g. 5 will stop the soundfile at the beginning of measure 5)."
         }
       }
@@ -600,7 +600,7 @@
         "track": {
           "description": "Track number to insert soundfile onto"
         },
-        "trackLocation": {
+        "location": {
           "description": "The location at which to start playback of the soundfile. (The soundfile will play through one time, so the end time depends on the length of the soundfile.)"
         }
       }
@@ -616,13 +616,13 @@
         "track": {
           "description": "Track number to insert soundfile onto"
         },
-        "trackLocation": {
+        "location": {
           "description": "The location at which to start playback of the soundfile."
         },
-        "mediaStartLocation": {
+        "start": {
           "description": "Start location within the soundfile to include (e.g. 1.0 is the beginning of the soundfile and 2.0 is measure 2 of the soundfile)."
         },
-        "mediaEndLocation": {
+        "end": {
           "description": "End location within the soundfile to include (e.g. 2.0 is measure 2 of the soundfile)."
         }
       }
@@ -637,10 +637,10 @@
         "track": {
           "description": "Track to place pattern onto"
         },
-        "measure": {
+        "location": {
           "description": "Location to start pattern"
         },
-        "string": {
+        "rhythm": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" plays the soundfile for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
         }
       }
@@ -655,13 +655,13 @@
         "track": {
           "description": "Track to place pattern onto"
         },
-        "measure": {
+        "location": {
           "description": "Location to start pattern"
         },
-        "string": {
+        "rhythm": {
           "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the soundfile at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
-        "beatNumber": {
+        "beatList": {
           "description": "A list/array of start locations within audio file (e.g. [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the soundfile that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
       }
@@ -700,7 +700,7 @@
     "replaceListElement": {
       "description": "Replace all occurrences of a list/array element with a new element.",
       "parameters": {
-        "inputList": {
+        "list": {
           "description": "Original list/array"
         },
         "elementToReplace": {
@@ -733,7 +733,7 @@
     "reverseList": {
       "description": "Reverse the order of the elements of a list/array.",
       "parameters": {
-        "inputList": {
+        "list": {
           "description": "List/array to reverse"
         }
       },
@@ -745,7 +745,7 @@
     "reverseString": {
       "description": "Reverse the order of characters in a string.",
       "parameters": {
-        "inputString": {
+        "string": {
           "description": "String to reverse"
         }
       },
@@ -760,19 +760,19 @@
         "track": {
           "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
         },
-        "effectType": {
+        "type": {
           "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
-        "effectParameter": {
+        "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "effectList": {
+        "list": {
           "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
         },
-        "measure": {
+        "location": {
           "description": "Location to start pattern"
         },
-        "beatString": {
+        "rhythm": {
           "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
         }
       }
@@ -796,13 +796,13 @@
         "track": {
           "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
         },
-        "effectType": {
+        "type": {
           "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
         },
-        "effectParameter": {
+        "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See Every Effect Explained in Detail in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "effectValue": {
+        "value": {
           "description": "Value of effect parameter"
         }
       }
@@ -811,16 +811,16 @@
     "setEffect2": {
       "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>",
       "parameters": {
-        "effectStartValue": {
+        "startValue": {
           "description": "Value of effect parameter at beginning of effect envelope"
         },
-        "effectStartLocation": {
+        "startLocation": {
           "description": "Location of the effectStartValue"
         },
-        "effectEndValue": {
+        "endValue": {
           "description": "Value of effect parameter at end of effect envelope"
         },
-        "effectEndLocation": {
+        "endLocation": {
           "description": "Location of the effectEndValue"
         }
       }
@@ -838,7 +838,7 @@
     "shuffleList": {
       "description": "Randomly rearrange the elements in a list/array.",
       "parameters": {
-        "inputList": {
+        "list": {
           "description": "List/array to shuffle"
         }
       },
@@ -850,7 +850,7 @@
     "shuffleString": {
       "description": "Randomly rearrange the characters in a string.",
       "parameters": {
-        "inputString": {
+        "string": {
           "description": "String to shuffle"
         }
       },
