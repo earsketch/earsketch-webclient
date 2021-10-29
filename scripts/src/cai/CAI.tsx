@@ -16,7 +16,6 @@ import { useTranslation } from "react-i18next"
 import * as editor from "../ide/Editor"
 import store from "../reducers"
 
-
 export const CaiHeader = () => {
     const activeProject = useSelector(cai.selectActiveProject)
 

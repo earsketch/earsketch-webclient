@@ -1,6 +1,7 @@
-﻿// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
-import * as student from "./student"
+﻿import * as student from "./student"
 import { addToNodeHistory } from "./dialogue"
+
+// Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 
 // TODO: All of these objects have one entry per project, so project state is spread across all of them.
 // Instead, refactor to group all the state into one object per project, so the functions can just deal with one object
