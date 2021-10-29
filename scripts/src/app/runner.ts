@@ -526,6 +526,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             let buffer = clip.sourceAudio
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
+                let filekey = clip.filekey
                 let start = first ? clip.start : 1
                 let end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
                 if (clip.tempo === undefined) {
@@ -545,6 +546,8 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                         const startIndex = ESUtils.measureToTime(start, clip.tempo) * clip.sourceAudio.sampleRate
                         const endIndex = ESUtils.measureToTime(end, clip.tempo) * clip.sourceAudio.sampleRate
                         input = input.subarray(startIndex, endIndex)
+                        // Indicate that this clip refers to different audio now (same format as `createAudioSlice()`).
+                        filekey = `${filekey}-${start}-${end}`
                         end -= start - 1
                         start = 1
                     }
@@ -560,6 +563,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 newClips.push({
                     ...clip,
                     audio: buffer,
+                    filekey,
                     measure,
                     start,
                     end,
