@@ -36,7 +36,7 @@ export async function postRun(result: DAWData) {
     esconsole("Filling in looped sounds.", ["debug", "runner"])
     // STEP 3: Insert buffers into clips, fix clip loops/effect lengths, and timestretch clips to fit the tempo map.
     // Before fixing the clips, retrieve the clip tempo info from the metadata cache for a special treatment for the MAKEBEAT clips.
-    getClipTempo(result)
+    await getClipTempo(result)
     fixClips(result, buffers)
     // STEP 4: Warn user about overlapping tracks or effects placed on tracks with no audio.
     checkOverlaps(result)
@@ -334,20 +334,20 @@ function throwErrorWithLineNumber(error: Error | string, lineNumber: number) {
     }
 }
 
-function getClipTempo(result: DAWData) {
-    const metadata = audioLibrary.cache.standardSounds ?? []
+async function getClipTempo(result: DAWData) {
     const tempoCache: { [key: string]: number | undefined } = Object.create(null)
 
-    const lookupTempo = (key: string) => {
+    const lookupTempo = async (key: string) => {
         // Return cached tempo for given key, or search audio sample metadata and cache result.
         if (key in tempoCache) return tempoCache[key]
-        const tempo = metadata.find(item => item.name === key)?.tempo
+        // Note that `getSound` result should be cached from `loadBuffers`/`loadBuffersForSampleSlicing`.
+        const tempo = (await audioLibrary.getSound(key)).tempo
         return (tempoCache[key] = (tempo === undefined || tempo < 0 || isNaN(tempo)) ? undefined : tempo)
     }
 
     for (const track of result.tracks) {
         for (const clip of track.clips) {
-            const tempo = lookupTempo(clip.filekey)
+            const tempo = await lookupTempo(clip.filekey)
             clip.tempo = tempo
         }
     }
