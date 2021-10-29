@@ -1,4 +1,4 @@
-﻿import * as student from "./student"
+import * as student from "./student"
 import { addToNodeHistory } from "./dialogue"
 
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
