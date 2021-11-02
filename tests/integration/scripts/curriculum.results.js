@@ -418,7 +418,7 @@ export const CURRICULUM_RESULTS = {
             },
             {
                 clips: [
-                    { filekey: "YG_EDM_REVERSE_FX_1", track: 3, measure: 16, start: 1, end: 1.9999500000000001, scale: false, loop: true, silence: 0, audio: { filekey: "YG_EDM_REVERSE_FX_1" }, loopChild: false },
+                    { filekey: "YG_EDM_REVERSE_FX_1", track: 3, measure: 16, start: 1, end: 1.9999500000000001, scale: false, loop: true, silence: 0, loopChild: false },
                 ],
                 effects: {},
                 analyzer: {},
@@ -1625,7 +1625,7 @@ export const CURRICULUM_RESULTS = {
                     ],
                 },
             },
-            { clips: [{ filekey: "YG_EDM_CLAPS_1", track: 1, measure: 1, start: 1, end: 2.9991000000000003, scale: false, loop: true, silence: 0, audio: { filekey: "YG_EDM_CLAPS_1" }, loopChild: false }, { filekey: "YG_EDM_CLAPS_1", audio: { filekey: "YG_EDM_CLAPS_1" }, track: 1, measure: 2.9991000000000003, start: 1, end: 2.9991000000000003, scale: false, loop: true, loopChild: true }], effects: { "FILTER-FILTER_FREQ": [{ track: 1, name: "FILTER", parameter: "FILTER_FREQ", startMeasure: 1, endMeasure: 5, startValue: 10000, endValue: 100 }] }, analyser: {} },
+            { clips: [{ filekey: "YG_EDM_CLAPS_1", track: 1, measure: 1, start: 1, end: 2.9991000000000003, scale: false, loop: true, silence: 0, loopChild: false }, { filekey: "YG_EDM_CLAPS_1", track: 1, measure: 2.9991000000000003, start: 1, end: 2.9991000000000003, scale: false, loop: true, loopChild: true }], effects: { "FILTER-FILTER_FREQ": [{ track: 1, name: "FILTER", parameter: "FILTER_FREQ", startMeasure: 1, endMeasure: 5, startValue: 10000, endValue: 100 }] }, analyser: {} },
             {
                 clips: [
                     { filekey: "RD_EDM_SFX_RISER_AIR_1", measure: 1, start: 1, end: 5 },
