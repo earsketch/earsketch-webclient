@@ -265,8 +265,8 @@ export const COURSERA_RESULTS = {
             },
             {
                 clips: [
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3 },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3 },
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
@@ -295,8 +295,8 @@ export const COURSERA_RESULTS = {
             },
             {
                 clips: [
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3 },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3 },
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
@@ -326,10 +326,10 @@ export const COURSERA_RESULTS = {
             },
             {
                 clips: [
-                    { filekey: "DUBSTEP_PAD_004", measure: 1, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
-                    { filekey: "DUBSTEP_PAD_004", measure: 3, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
-                    { filekey: "DUBSTEP_PAD_004", measure: 5, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
-                    { filekey: "DUBSTEP_PAD_004", measure: 7, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "DUBSTEP_PAD_004", measure: 1, start: 1, end: 3 },
+                    { filekey: "DUBSTEP_PAD_004", measure: 3, start: 1, end: 3 },
+                    { filekey: "DUBSTEP_PAD_004", measure: 5, start: 1, end: 3 },
+                    { filekey: "DUBSTEP_PAD_004", measure: 7, start: 1, end: 3 },
                 ],
                 effects: {
                     "PITCHSHIFT-PITCHSHIFT_SHIFT": [
