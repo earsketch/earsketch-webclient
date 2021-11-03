@@ -10,6 +10,7 @@
   },
   "scripts": {
     "test": "karma start tests/integration/scripts/scripts.conf.js",
+    "jest": "jest -- tests/integration-jest/",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js"
   },
@@ -78,6 +79,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.1",
     "@typescript-eslint/parser": "^4.28.1",
     "autoprefixer": "^10.0.1",
+    "babel-jest": "^27.3.1",
     "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.6.0",
@@ -103,6 +105,7 @@
     "happypack": "^5.0.1",
     "html-webpack-plugin": "^4.3.0",
     "jasmine-core": "^2.3.4",
+    "jest": "^27.3.1",
     "karma": "^6.3.5",
     "karma-chrome-launcher": "^3.1.0",
     "karma-html-reporter": "^0.2.7",
@@ -115,6 +118,7 @@
     "postcss": "^8.1.1",
     "postcss-loader": "^4.0.3",
     "style-loader": "^1.2.1",
+    "ts-jest": "^27.0.7",
     "ts-loader": "^8.0.17",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
     "typescript": "^4.2.2",
