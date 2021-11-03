@@ -112,7 +112,7 @@ const AdminSendBroadcast = () => {
         userProject.getBroadcasts().then((res: Notification[]) => {
             esconsole("Set Broadcasts res=" + res, ["info"])
             esconsole("Set Broadcasts res=" + JSON.stringify(res, null, 2), ["info"])
-            setBroadcasts(res.map(u => u.message.text + " - " + u.created).sort((a, b) => a.localeCompare(b)))
+            setBroadcasts(res.map(u => ("\"" + u.message.text + "\" - Sent on: " + u.created?.substr(0, u.created?.indexOf(" ")))))
         })
     }, [])
 
