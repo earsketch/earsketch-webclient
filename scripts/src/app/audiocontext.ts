@@ -8,9 +8,10 @@ declare global {
     }
 }
 
-export const AudioContext = window.AudioContext || window.webkitAudioContext
+// export const AudioContext = window.AudioContext || window.webkitAudioContext
 export const OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
 
+import { AudioContext } from "standardized-audio-context-mock"
 export const context = new AudioContext({
     latencyHint: "interactive",
     sampleRate: 44100,
