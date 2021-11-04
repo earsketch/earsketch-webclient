@@ -10,6 +10,10 @@ module.exports = {
         "ts-jest": {
             tsconfig: "tsconfig.json",
         },
+        FLAGS: {
+            SHOW_CAI: false,
+            ANALYTICS: false,
+        },
     },
     // Tells Jest what folders to ignore for tests
     transformIgnorePatterns: [
@@ -18,6 +22,7 @@ module.exports = {
     testEnvironment: "jsdom",
     moduleNameMapper: {
         "earsketch-dsp": "<rootDir>/scripts/lib/earsketch-dsp.d.ts",
+        recorder: "<rootDir>/scripts/lib/recorderjs/recorder.js",
         // ...pathsToModuleNameMapper(compilerOptions.paths /*, { prefix: '<rootDir>/' } */),
         // "/^(.*)$/": "<rootDir>/scripts/src/types/$1.d.ts",
         // "^dsp(.*)$": "<rootDir>/scripts/src/types/global.d.ts",

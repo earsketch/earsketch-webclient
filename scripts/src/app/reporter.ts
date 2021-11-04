@@ -102,17 +102,20 @@ function share(method: "link" | "people" | "soundcloud", license: string) {
 
 export default { exception, readererror, compile, complexity, share, ...module } as { [key: string]: Function }
 
-// TODO: Disable in dev builds?
 declare let ga: (action: string, data: any, mysteriousThirdArgument?: string) => void
 
-/* eslint-disable no-unused-expressions, no-sequences */
-(function (i: any, s, o, g, r: any, a?: any, m?: any) {
-    i.GoogleAnalyticsObject = r; i[r] = i[r] || function () {
-        (i[r].q = i[r].q || []).push(arguments)
-    }, i[r].l = 1 * (new Date() as any); a = s.createElement(o),
-    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-})(window, document, "script", "https://www.google-analytics.com/analytics.js", "ga")
-/* eslint-enable no-unused-expressions, no-sequences */
+if (FLAGS.ANALYTICS) {
+    /* eslint-disable no-unused-expressions, no-sequences */
+    (function (i: any, s, o, g, r: any, a?: any, m?: any) {
+        i.GoogleAnalyticsObject = r; i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * (new Date() as any); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, "script", "https://www.google-analytics.com/analytics.js", "ga")
+    /* eslint-enable no-unused-expressions, no-sequences */
+} else {
+    (window as any).ga = (..._: any[]) => {}
+}
 
 ga("create", "UA-33307046-2", "auto")
 ga("send", "pageview")
