@@ -429,7 +429,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 4, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 33, startValue: -10, endValue: -10 },
+                        { track: 4, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1, startValue: -10, endValue: -10 },
                     ],
                 },
             },
@@ -454,7 +454,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 7, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 33, startValue: -20, endValue: -20 },
+                        { track: 7, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1, startValue: -20, endValue: -20 },
                     ],
                 },
             },
@@ -465,7 +465,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 8, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 33, startValue: -20, endValue: -20 },
+                        { track: 8, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1, startValue: -20, endValue: -20 },
                     ],
                 },
             },
@@ -1525,7 +1525,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 6, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 17, startValue: -10, endValue: -10 },
+                        { track: 6, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1, startValue: -10, endValue: -10 },
                     ],
                 },
             },
@@ -1632,7 +1632,7 @@ export const CURRICULUM_RESULTS = {
                 ],
                 effects: {
                     "VOLUME-GAIN": [
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 5, startValue: -10, endValue: -10 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1, startValue: -10, endValue: -10 },
                     ],
                 },
             },
