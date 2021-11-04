@@ -17,19 +17,22 @@ module.exports = {
     ],
     testEnvironment: "jsdom",
     moduleNameMapper: {
-        "/^(.*)$/": "<rootDir>/scripts/src/types/$1.d.ts",
-        "^dsp(.*)$": "<rootDir>/scripts/src/types/global.d.ts",
+        "earsketch-dsp": "<rootDir>/scripts/lib/earsketch-dsp.d.ts",
+        // ...pathsToModuleNameMapper(compilerOptions.paths /*, { prefix: '<rootDir>/' } */),
+        // "/^(.*)$/": "<rootDir>/scripts/src/types/$1.d.ts",
+        // "^dsp(.*)$": "<rootDir>/scripts/src/types/global.d.ts",
+        // "earsketch-dsp(.*)$": "<rootDir>/scripts/lib/earsketch-dsp.js",
+        // // mock earsketch-dsp?
         ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
         // Resolve .jpg and similar files to __mocks__/file-mock.js
         ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/file-mock.js",
     },
     testPathIgnorePatterns: ["node_modules", "\\.cache"],
-    // moduleDirectories: ["<rootDir>/node_modules", "<rootDir>/scripts/src"],
+    moduleDirectories: ["node_modules", "scripts/lib"],
     // moduleFileExtensions: [
     //     "ts",
     //     "tsx",
     //     "js",
     //     "jsx",
-    //     "json",
     // ],
 }
