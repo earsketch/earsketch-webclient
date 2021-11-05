@@ -545,10 +545,10 @@
           "description": "Track number to insert audio file onto"
         },
         "start": {
-          "description": "Location where the soundfile will begin (e.g. 1 will start at the beginning of measure 1)."
+          "description": "Location within the track where the soundfile will begin (e.g. 1 will start at the beginning of measure 1)."
         },
         "end": {
-          "description": "Location where the soundfile will end (e.g. 5 will stop the soundfile at the beginning of measure 5)."
+          "description": "Location within the track where the soundfile will end (e.g. 5 will stop the soundfile at the beginning of measure 5)."
         }
       }
     },
@@ -772,7 +772,7 @@
         "trackLocation": {
           "description": "Location within the track to start pattern"
         },
-        "rhythm": {
+        "beat": {
           "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
         }
       }
@@ -811,13 +811,13 @@
     "setEffect2": {
       "description": "This function applies an effect to a specified track number. Unlike the other version of setEffect(), there are additional arguments for setting an envelope that changes the value of an effect parameter over time. For detailed information on all of the effects available to use with setEffect(), please see the curriculum: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>",
       "parameters": {
-        "initialValue": {
+        "x1": {
           "description": "Value of effect parameter at beginning of effect envelope"
         },
         "start": {
           "description": "Location of the initialValue"
         },
-        "finalValue": {
+        "x2": {
           "description": "Value of effect parameter at end of effect envelope"
         },
         "end": {

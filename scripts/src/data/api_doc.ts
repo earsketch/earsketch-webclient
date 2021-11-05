@@ -571,9 +571,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.float",
                     descriptionKey: "api:rhythmEffects.parameters.trackLocation.description",
                 },
-                rhythm: {
+                beat: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:rhythmEffects.parameters.rhythm.description",
+                    descriptionKey: "api:rhythmEffects.parameters.beat.description",
                 },
             },
             example: {
@@ -648,17 +648,17 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                         typeKey: "api:types.effectParameterConstant",
                         descriptionKey: "api:setEffect1.parameters.parameter.description",
                     },
-                    initialValue: {
+                    x1: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.initialValue.description",
+                        descriptionKey: "api:setEffect2.parameters.x1.description",
                     },
                     start: {
                         typeKey: "api:types.float",
                         descriptionKey: "api:setEffect2.parameters.start.description",
                     },
-                    finalValue: {
+                    x2: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.finalValue.description",
+                        descriptionKey: "api:setEffect2.parameters.x2.description",
                     },
                     end: {
                         typeKey: "api:types.float",
