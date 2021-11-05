@@ -33,10 +33,10 @@ let interpolateFitVar: any
     interpolateFitVar = Module.cwrap("interpolateFitVar", "number", ["number", "number", "number", "number", "number", "number", "number"])
 }
 
-function allocateBuffer(type: typeof Int32Array | typeof Float32Array, length: number) {
-    const numBytes = length * type.BYTES_PER_ELEMENT
+function allocateBuffer(Type: typeof Int32Array | typeof Float32Array, length: number) {
+    const numBytes = length * Type.BYTES_PER_ELEMENT
     const ptr = Module._malloc(numBytes)
-    return new type(Module.HEAPF32.buffer, ptr, length)
+    return new Type(Module.HEAPF32.buffer, ptr, length)
 }
 
 function setOutSample(envelope: Float32Array, frames: number) {

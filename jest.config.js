@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 const { pathsToModuleNameMapper } = require("ts-jest/utils")
 // In the following statement, replace `./tsconfig` with the path to your `tsconfig` file
