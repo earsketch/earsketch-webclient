@@ -75,11 +75,11 @@ export function analyzeJavascript(source) {
 
           //use this for analysis
         return { complexity: outStr };
-       // return resultsObject;
+       //return resultsObject;
     }
     catch (error) {
-        return { error: error };
-        return {
+        resultsObject = {
+       // return {
             ast: {},
             codeFeatures: {
 
@@ -117,6 +117,13 @@ export function analyzeJavascript(source) {
                 sounds: {}
             }
         };
+
+        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
+
+
+        //use this for analysis
+        return {complexity: outStr };
+       // return resultsObject;
     }
 }
 

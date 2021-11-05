@@ -79,17 +79,17 @@ export function analyzePython(source_code) {
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
         ccHelpers.lineDict();
-        var outStr = JSON.stringify(resultsObject.codeFeatures);
-
+        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
           //uncomment first for analysis
-        //return {complexity: outStr };
-        return resultsObject;
+        return {complexity: outStr };
+        //return resultsObject;
     }
     catch (error) {
-        return { error: "ERROR " + error };
-        return {
+        resultsObject = {
+            // return {
             ast: {},
             codeFeatures: {
+
                 errors: 1,
                 variables: 0,
                 makeBeat: 0,
@@ -124,5 +124,11 @@ export function analyzePython(source_code) {
                 sounds: {}
             }
         };
+
+        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
+
+        //use this for analysis
+        return {complexity: outStr };
+       // return resultsObject;
     }
 }
