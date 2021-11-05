@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import "../mocks/AudioContext.mock"
-import { AdminWindow } from "../../../scripts/src/app/AdminWindow"
+// import { AdminWindow } from "../../../scripts/src/app/AdminWindow"
 
 describe("Test suite for AdminWindow", () => {
     console.log("test here")
