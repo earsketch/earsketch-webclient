@@ -51,3 +51,4 @@ autograder3/index.html
 autograderAWS/index.html
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
+tests/integration/scripts/reports

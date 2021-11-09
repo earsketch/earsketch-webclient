@@ -1,3 +1,4 @@
 {
-    "threshold": 3
+    "threshold": 3,
+    "ignore": ["**/tests/integration/scripts/**.results.js"]
 }
