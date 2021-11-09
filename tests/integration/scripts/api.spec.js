@@ -16,7 +16,8 @@ describe("API function tests", () => {
     function testPythonAndJavaScript(name, logs = []) {
         it(`should compile ${name} correctly in Python`, done => {
             runner.runPython(API_SCRIPTS[`${name}.py`]).then(result => {
-                expect(result).toMatchResult(API_RESULTS[name], result)
+                expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.py`])
+                // eslint-disable-next-line no-undef
                 const expectedLogs = logs.map(text => ({ level: "info", text: Sk.builtin.str(Sk.ffi.remapToPy(text)).v }))
                 expect(ide.selectLogs(store.getState())).toEqual(expectedLogs)
                 done()
@@ -28,7 +29,7 @@ describe("API function tests", () => {
 
         it(`should compile ${name} correctly in JavaScript`, done => {
             runner.runJavaScript(API_SCRIPTS[`${name}.js`]).then(result => {
-                expect(result).toMatchResult(API_RESULTS[name], result)
+                expect(result).toMatchResult(API_RESULTS[name], API_SCRIPTS[`${name}.js`])
                 expect(ide.selectLogs(store.getState())).toEqual(logs.map(text => ({ level: "info", text })))
                 done()
             }).catch(err => {
@@ -43,8 +44,8 @@ describe("API function tests", () => {
     // TODO: write tests for RMS_AMPLITUDE as well
     testPythonAndJavaScript("analyze", [0.292])
     testPythonAndJavaScript("analyzeForTime", [0.292])
-    testPythonAndJavaScript("analyzeTrack", [0.261])
-    testPythonAndJavaScript("analyzeTrackForTime", [0.279])
+    testPythonAndJavaScript("analyzeTrack", [0.263])
+    testPythonAndJavaScript("analyzeTrackForTime", [0.28])
     testPythonAndJavaScript("createAudioSlice")
     testPythonAndJavaScript("dur", [2])
     testPythonAndJavaScript("fitMedia")

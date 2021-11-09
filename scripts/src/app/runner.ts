@@ -476,7 +476,15 @@ function roundUpToDivision(seconds: number, tempo: number) {
     return [posIncrement, duration]
 }
 
-const timestretchCache = new Map<string, AudioBuffer>()
+const clipCache = new Map<string, AudioBuffer>()
+
+function sliceAudio(audio: AudioBuffer, start: number, end: number, tempo: number) {
+    // Slice down to relevant part of clip.
+    // TODO: Consolidate all the slicing logic (between this, createSlice, and pitchshifter).
+    const startIndex = ESUtils.measureToTime(start, tempo) * audio.sampleRate
+    const endIndex = ESUtils.measureToTime(end, tempo) * audio.sampleRate
+    return audio.getChannelData(0).subarray(startIndex, endIndex)
+}
 
 // Fill in looped clips with multiple clips.
 function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
@@ -526,33 +534,37 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             let buffer = clip.sourceAudio
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
-                let start = first ? clip.start : 1
-                let end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
+                const filekey = clip.filekey
+                const start = first ? clip.start : 1
+                const end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
+
+                const needSlice = start !== 1 || end !== duration + 1
+
                 if (clip.tempo === undefined) {
-                    // If the clip has no tempo, use an even increment: quarter note, half note, whole note, etc.
+                    if (needSlice) {
+                        const cacheKey = JSON.stringify([clip.filekey, start, end])
+                        let cached = clipCache.get(cacheKey)
+                        if (cached === undefined) {
+                            // For consistency with old behavior, use initial tempo since clip tempo is unavailable.
+                            const slice = sliceAudio(clip.sourceAudio, start, end, tempoMap.points[0].tempo)
+                            cached = audioContext.createBuffer(1, slice.length, clip.sourceAudio.sampleRate)
+                            cached.copyToChannel(slice, 0)
+                            clipCache.set(cacheKey, cached)
+                        }
+                        buffer = cached
+                    }
+                    // Clip has no tempo, so use an even increment: quarter note, half note, whole note, etc.
                     [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
                 } else {
                     // Timestretch to match the tempo map at this point in the track (or retrieve cached buffer).
                     const pointsDuringClip = tempoMap.slice(measure, measure + (end - start)).points
                     const cacheKey = JSON.stringify([clip.filekey, start, end, pointsDuringClip])
-                    let cached = timestretchCache.get(cacheKey)
-
-                    let input = clip.sourceAudio.getChannelData(0)
-                    if (start !== 1 || end !== duration + 1) {
-                        // Not using the entire buffer; only timestretch part of it.
-                        // TODO: Consolidate all the slicing logic (between this, createSlice, and pitchshifter).
-                        //       Ideally, we'd just slice once for clip.start/clip.end, and then throw those out...
-                        const startIndex = ESUtils.measureToTime(start, clip.tempo) * clip.sourceAudio.sampleRate
-                        const endIndex = ESUtils.measureToTime(end, clip.tempo) * clip.sourceAudio.sampleRate
-                        input = input.subarray(startIndex, endIndex)
-                        end -= start - 1
-                        start = 1
-                    }
-
+                    let cached = clipCache.get(cacheKey)
                     if (cached === undefined) {
+                        const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, clip.tempo) : clip.sourceAudio.getChannelData(0)
                         cached = timestretch(input, clip.tempo, tempoMap, measure)
                         if (FLAGS.CACHE_TS_RESULTS) {
-                            timestretchCache.set(cacheKey, cached)
+                            clipCache.set(cacheKey, cached)
                         }
                     }
                     buffer = cached
@@ -560,6 +572,7 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 newClips.push({
                     ...clip,
                     audio: buffer,
+                    filekey,
                     measure,
                     start,
                     end,
