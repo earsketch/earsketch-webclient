@@ -81,8 +81,8 @@ export function analyzePython(source_code) {
         ccHelpers.lineDict();
         var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
           //uncomment first for analysis
-        return {complexity: outStr };
-        //return resultsObject;
+       // return {complexity: outStr };
+        return resultsObject;
     }
     catch (error) {
         resultsObject = {
@@ -128,7 +128,7 @@ export function analyzePython(source_code) {
         var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
 
         //use this for analysis
-        return {complexity: outStr };
-       // return resultsObject;
+       // return {complexity: outStr };
+        return resultsObject;
     }
 }

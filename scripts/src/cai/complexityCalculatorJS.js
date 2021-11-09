@@ -74,8 +74,8 @@ export function analyzeJavascript(source) {
         var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
 
           //use this for analysis
-        return { complexity: outStr };
-       //return resultsObject;
+       // return { complexity: outStr };
+       return resultsObject;
     }
     catch (error) {
         resultsObject = {
@@ -122,8 +122,8 @@ export function analyzeJavascript(source) {
 
 
         //use this for analysis
-        return {complexity: outStr };
-       // return resultsObject;
+       // return {complexity: outStr };
+        return resultsObject;
     }
 }
 
