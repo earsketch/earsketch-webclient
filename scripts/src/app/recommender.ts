@@ -2,8 +2,8 @@
 import { fillDict } from "../cai/analysis"
 import { Script } from "common"
 
-import * as NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
-import * as AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+const NUMBERS_AUDIOKEYS_ = require("../data/numbers_audiokeys.json")
+const AUDIOKEYS_RECOMMENDATIONS_ = require("../data/audiokeys_recommendations.json")
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
