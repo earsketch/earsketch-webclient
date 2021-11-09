@@ -1,4 +1,6 @@
 /* eslint-env jasmine */
+import * as _ from "lodash"
+
 window.jasmine.DEFAULT_TIMEOUT_INTERVAL = 240000
 
 window.SITE_DIRECTORY = "/base"
@@ -29,14 +31,15 @@ export const customMatchers = {
  * @returns true if actual is similar to expected
  */
 function matchResult(actual, expected) {
-    if (actual.tempo !== expected.tempo) {
+    const actualTempoMap = actual.tracks[0].effects["TEMPO-TEMPO"]
+    const expectedTempoMap = expected.tracks[0].effects["TEMPO-TEMPO"]
+    if (!_.isEqual(actualTempoMap, expectedTempoMap)) {
         return {
             pass: false,
-            message: "Expected tempo: " + expected.tempo + "\n" +
-                "Actual tempo: " + actual.tempo,
+            message: "Expected tempo map: " + JSON.stringify(expectedTempoMap) + "\n" +
+              "Actual tempo: " + JSON.stringify(actualTempoMap),
         }
     }
-
     if (actual.length !== expected.length) {
         return {
             pass: false,
