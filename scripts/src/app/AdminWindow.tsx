@@ -105,14 +105,16 @@ const AdminSendBroadcast = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
-    // const bruhArray = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
-    const [broadcasts, setBroadcasts] = useState([] as string[])
+    // const [broadcastIDs, setIDs] = useState([])
+    const [broadcasts, setBroadcasts] = useState([] as Notification[])
 
     useEffect(() => {
         userProject.getBroadcasts().then((res: Notification[]) => {
             esconsole("Set Broadcasts res=" + res, ["info"])
             esconsole("Set Broadcasts res=" + JSON.stringify(res, null, 2), ["info"])
-            setBroadcasts(res.map(u => ("\"" + u.message.text + "\" - Sent on: " + u.created?.substr(0, u.created?.indexOf(" ")))))
+            // setBroadcasts(res.map(u => ("\"" + u.message.text + "\" - Sent on: " + u.created?.substr(0, u.created?.indexOf(" ")))))
+            setBroadcasts(res)
+            // setIDs(res.map(x => parseInt(x.id)))
         })
     }, [])
 
@@ -137,10 +139,10 @@ const AdminSendBroadcast = () => {
                 <div className="pb-1">
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
-                        {broadcasts.map(desc =>
-                            <div key={desc} className="my-px mx-2 flex items-center">
-                                <button className="flex" title="Expire broadcast" onClick={print}><i className="icon icon-cross2" /></button>
-                                <div className="my-px mx-2">{desc}</div>
+                        {broadcasts.map(nt =>
+                            <div key={nt.id} className="my-px mx-2 flex items-center">
+                                <button className="flex" title="Expire broadcast" onClick={() => alert(nt.id)}><i className="icon icon-cross2" /></button>
+                                <div className="my-px mx-2">{("\"" + nt.message.text + "\" - Sent on: " + nt.created?.substr(0, nt.created?.indexOf(" ")))}</div>
                             </div>
                         )}
                     </div>
