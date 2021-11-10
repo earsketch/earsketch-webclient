@@ -228,9 +228,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         importImage: {
             descriptionKey: "api:importImage.description",
             parameters: {
-                imageURL: {
+                url: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:importImage.parameters.imageURL.description",
+                    descriptionKey: "api:importImage.parameters.url.description",
                 },
                 nrows: {
                     typeKey: "api:types.integer",
@@ -261,9 +261,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         importFile: {
             descriptionKey: "api:importFile.description",
             parameters: {
-                fileURL: {
+                url: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:importFile.parameters.fileURL.description",
+                    descriptionKey: "api:importFile.parameters.url.description",
                 },
             },
             example: {
@@ -298,9 +298,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.integer",
                     descriptionKey: "api:insertMedia.parameters.track.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:insertMedia.parameters.trackLocation.description",
+                    descriptionKey: "api:insertMedia.parameters.start.description",
                 },
             },
             example: {
@@ -322,9 +322,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.integer",
                     descriptionKey: "api:insertMediaSection.parameters.track.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:insertMediaSection.parameters.trackLocation.description",
+                    descriptionKey: "api:insertMediaSection.parameters.start.description",
                 },
                 sliceStart: {
                     typeKey: "api:types.float",
@@ -354,9 +354,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.integer",
                     descriptionKey: "api:makeBeat.parameters.track.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:makeBeat.parameters.trackLocation.description",
+                    descriptionKey: "api:makeBeat.parameters.start.description",
                 },
                 beat: {
                     typeKey: "api:types.string",
@@ -382,17 +382,17 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.integer",
                     descriptionKey: "api:makeBeatSlice.parameters.track.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:makeBeatSlice.parameters.trackLocation.description",
+                    descriptionKey: "api:makeBeatSlice.parameters.start.description",
                 },
                 beat: {
                     typeKey: "api:types.string",
                     descriptionKey: "api:makeBeatSlice.parameters.beat.description",
                 },
-                startLocations: {
+                sliceStarts: {
                     typeKey: "api:types.listArray",
-                    descriptionKey: "api:makeBeatSlice.parameters.startLocations.description",
+                    descriptionKey: "api:makeBeatSlice.parameters.sliceStarts.description",
                 },
             },
             example: {
@@ -567,9 +567,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.listArray",
                     descriptionKey: "api:rhythmEffects.parameters.list.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:rhythmEffects.parameters.trackLocation.description",
+                    descriptionKey: "api:rhythmEffects.parameters.start.description",
                 },
                 beat: {
                     typeKey: "api:types.string",
@@ -648,17 +648,17 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                         typeKey: "api:types.effectParameterConstant",
                         descriptionKey: "api:setEffect1.parameters.parameter.description",
                     },
-                    x1: {
+                    startValue: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.x1.description",
+                        descriptionKey: "api:setEffect2.parameters.startValue.description",
                     },
                     start: {
                         typeKey: "api:types.float",
                         descriptionKey: "api:setEffect2.parameters.start.description",
                     },
-                    x2: {
+                    endValue: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.x2.description",
+                        descriptionKey: "api:setEffect2.parameters.endValue.description",
                     },
                     end: {
                         typeKey: "api:types.float",
