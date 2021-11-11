@@ -2,13 +2,33 @@ export const API_RESULTS = {
     analyze: {
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+        ],
     },
 
     analyzeForTime: {
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+        ],
     },
 
     analyzeTrack: {
@@ -17,7 +37,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -37,7 +62,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -54,15 +84,33 @@ export const API_RESULTS = {
     dur: {
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+        ],
     },
 
     createAudioSlice: {
         tempo: 120,
         length: 2,
         tracks: [
-            { clips: [], effects: {} },
-            { clips: [{ filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 1, start: 1, end: 2, scale: false, loop: true, silence: 0, audio: { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2" }, loopChild: false }, { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", audio: { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2" }, track: 1, measure: 2, start: 1, end: 2, scale: false, loop: true, loopChild: true }], effects: {}, analyser: {} },
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+            { clips: [{ filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 1, start: 1, end: 2, scale: false, loop: true, silence: 0, loopChild: false }, { filekey: "DUBSTEP_BASS_WOBBLE_001-1-2", track: 1, measure: 2, start: 1, end: 2, scale: false, loop: true, loopChild: true }], effects: {}, analyser: {} },
         ],
         slicedClips: { "DUBSTEP_BASS_WOBBLE_001-1-2": { sourceFile: "DUBSTEP_BASS_WOBBLE_001", start: 1, end: 2 } },
     },
@@ -73,7 +121,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [],
@@ -94,19 +147,49 @@ export const API_RESULTS = {
     importImage1: {
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+        ],
     },
 
     importImage2: {
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+        ],
     },
 
     importFile: {
         tempo: 120,
         length: 0,
-        tracks: [],
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+        ],
     },
 
     insertMedia1: {
@@ -115,7 +198,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -132,7 +220,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -149,7 +242,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [
@@ -166,7 +264,12 @@ export const API_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {},
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
             },
             {
                 clips: [

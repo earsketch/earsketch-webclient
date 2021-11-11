@@ -41,16 +41,12 @@ export async function renderBuffer(result: DAWData) {
 
         // TODO: Reduce duplication with `player`.
         for (const clip of track.clips) {
-            const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
             const clipStartTime = tempoMap.measureToTime(clip.measure)
             const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
             // create the audio source node to contain the audio buffer
             // and play it at the designated time
             const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
-            // Start/end locations within the clip's audio buffer, in seconds.
-            const startTimeInClip = clipStartTime - clipBufferStartTime
-            // the clip duration may be shorter than the buffer duration
             let clipDuration = clipEndTime - clipStartTime
 
             if (origin > clipEndTime) {
@@ -61,7 +57,7 @@ export async function renderBuffer(result: DAWData) {
                 // calculate the offset and begin playing
                 const clipStartOffset = origin - clipStartTime
                 clipDuration -= clipStartOffset
-                source.start(context.currentTime, startTimeInClip + clipStartOffset, clipDuration - clipStartOffset)
+                source.start(context.currentTime, clipStartOffset, clipDuration - clipStartOffset)
                 // keep this flag so we only stop clips that are playing
                 // (otherwise we get an exception raised)
                 clip.playing = true
@@ -69,7 +65,7 @@ export async function renderBuffer(result: DAWData) {
                 // case: clip is in the future
                 // calculate when it should begin and register it to play
                 const untilClipStart = clipStartTime - origin
-                source.start(context.currentTime + untilClipStart, startTimeInClip, clipDuration)
+                source.start(context.currentTime + untilClipStart, 0, clipDuration)
                 clip.playing = true
             }
 
@@ -176,12 +172,10 @@ export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
         const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
         source.connect(mix)
 
-        const bufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
         const startTime = tempoMap.measureToTime(clip.measure)
         const endTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
-        const startOffset = startTime - bufferStartTime
 
-        source.start(startTime, startOffset)
+        source.start(startTime)
         source.stop(endTime)
     }
 
