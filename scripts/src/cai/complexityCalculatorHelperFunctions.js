@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.lineDict = exports.replaceNumericUnaryOps = exports.getFunctionObject = exports.getVariableObject = exports.getLastLine = exports.trimCommentsAndWhitespace = exports.notateConditional = exports.doAstNodesMatch = exports.copyAttributes = exports.appendArray = void 0;
+exports.lineDict = exports.replaceNumericUnaryOps = exports.estimateDataType = exports.numberOfLeadingSpaces = exports.getFunctionObject = exports.getVariableObject = exports.getLastLine = exports.trimCommentsAndWhitespace = exports.notateConditional = exports.doAstNodesMatch = exports.copyAttributes = exports.appendArray = void 0;
 // A library of helper functions for the CAI Code Complexity Calculator
 var ccState = require("./complexityCalculatorState");
 // Appends the values in the source array to the target list.
@@ -267,93 +267,6 @@ function trimCommentsAndWhitespace(stringToTrim) {
     return returnString;
 }
 exports.trimCommentsAndWhitespace = trimCommentsAndWhitespace;
-
-function numberOfLeadingSpaces(stringToCheck) {
-    let number = 0
-
-    for (let i = 0; i < stringToCheck.length; i++) {
-        if (stringToCheck[i] !== " ") {
-            break
-        } else {
-            number += 1
-        }
-    }
-
-    return number
-}
-exports.numberOfLeadingSpaces = numberOfLeadingSpaces;
-
-function estimateDataType(node) {
-    let autoReturns = ["List", "Str"];
-    if (autoReturns.includes(node._astname)) {
-        return node._astname;
-    }
-    else if (node._astname == "Num") {
-
-        if (Object.getPrototypeOf(node.n)["tp$name"] == "int") {
-            return "Int";
-        }
-        else {
-            return "Float";
-        }
-        //return "Num";
-    }
-    else if (node._astname == "Call") {
-        //get name
-        let funcName = "";
-        if ("attr" in node.func) {
-            funcName = node.func.attr.v;
-        }
-        else if ("id" in node.func) {
-            funcName = node.func.id.v;
-        }
-        else {
-            return null;
-        }
-        //look up the function name
-        //builtins first
-        if (ccState.builtInNames.includes(funcName)) {
-            for (let i = 0; i < ccState.builtInReturns.length; i++) {
-                if (ccState.builtInReturns[i].name == funcName) {
-                    return ccState.builtInReturns[i].returns;
-                }
-            }
-        }
-        let existingFunctions = ccState.getProperty("userFunctions");
-        for (let i = 0; i < existingFunctions.length; i++) {
-            if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
-                if (existingFunctions[i].returns == true) {
-                    return estimateDataType(existingFunctions[i].returnVals[0]);
-                }
-            }
-        }
-    }
-    else if (node._astname == "Name") {
-        if (node.id.v === "True" || node.id.v === "False") {
-            return "Bool";
-        }
-
-        //either a function alias or var.
-        let funcs = ccState.getProperty("userFunctions");
-        for (let i = 0; i < funcs.length; i++) {
-            if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
-                return "Func";
-            }
-        }
-
-        let allVars = ccState.getProperty("allVariables");
-
-        for (let i = 0; i < allVars.length; i++) {
-            if (allVars[i].name == node.id.v) {
-
-            }
-        }
-        //return reverseValueTrace(true, node.id.v, node.lineno);
-        //look up the variable
-    }
-    return null;
-}
-
 // Gets the last line in a multiline block of code.
 function getLastLine(functionNode) {
     if (!('body' in functionNode) || functionNode.body.length === 0) {
@@ -389,6 +302,131 @@ function getFunctionObject(funcName) {
     return null;
 }
 exports.getFunctionObject = getFunctionObject;
+function numberOfLeadingSpaces(stringToCheck) {
+    var number = 0;
+    for (var i = 0; i < stringToCheck.length; i++) {
+        if (stringToCheck[i] !== " ") {
+            break;
+        }
+        else {
+            number += 1;
+        }
+    }
+    return number;
+}
+exports.numberOfLeadingSpaces = numberOfLeadingSpaces;
+function estimateDataType(node) {
+    var autoReturns = ["List", "Str"];
+    if (autoReturns.includes(node._astname)) {
+        return node._astname;
+    }
+    else if (node._astname == "Num") {
+        if (Object.getPrototypeOf(node.n)["tp$name"] == "int") {
+            return "Int";
+        }
+        else {
+            return "Float";
+        }
+        //return "Num";
+    }
+    else if (node._astname == "Call") {
+        //get name
+        var funcName = "";
+        if ("attr" in node.func) {
+            funcName = node.func.attr.v;
+        }
+        else if ("id" in node.func) {
+            funcName = node.func.id.v;
+        }
+        else {
+            return null;
+        }
+        //look up the function name
+        //builtins first
+        if (ccState.builtInNames.includes(funcName)) {
+            for (var i = 0; i < ccState.builtInReturns.length; i++) {
+                if (ccState.builtInReturns[i].name == funcName) {
+                    return ccState.builtInReturns[i].returns;
+                }
+            }
+        }
+        var existingFunctions = ccState.getProperty("userFunctions");
+        for (var i = 0; i < existingFunctions.length; i++) {
+            if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
+                if (existingFunctions[i].returns == true) {
+                    return estimateDataType(existingFunctions[i].returnVals[0]);
+                }
+            }
+        }
+    }
+    else if (node._astname == "Name") {
+        if (node.id.v === "True" || node.id.v === "False") {
+            return "Bool";
+        }
+        //either a function alias or var.
+        var funcs = ccState.getProperty("userFunctions");
+        for (var i = 0; i < funcs.length; i++) {
+            if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
+                return "Func";
+            }
+        }
+        var allVars = ccState.getProperty("allVariables");
+        var lineNo = node.lineno;
+        var latestAssignment = null;
+        var thisVar = null;
+        var varList = ccState.getProperty("allVariables");
+        for (var i = 0; i < varList.length; i++) {
+            if (varList[i].name == name) {
+                thisVar = varList[i];
+            }
+        }
+        if (thisVar == null) {
+            return null;
+        }
+        //get most recent outside-of-function assignment (or inside-this-function assignment)
+        var funcLines = ccState.getProperty("functionLines");
+        var funcObjs = ccState.getProperty("userFunctions");
+        var highestLine = 0;
+        if (funcLines.includes(lineNo)) {
+            //what function are we in
+            var startLine = 0;
+            var endLine = 0;
+            for (var i = 0; i < funcObjs.length; i++) {
+                if (funcObjs[i].start < lineNo && funcObjs[i].end >= lineNo) {
+                    startLine = funcObjs[i].start;
+                    endLine = funcObjs[i].end;
+                    break;
+                }
+            }
+            for (var i = 0; i < thisVar.assignments.length; i++) {
+                if (thisVar.assignments[i].line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && thisVar.assignments[i].line > startLine && thisVar.assignments[i].line <= endLine) {
+                    //then it's valid
+                    if (thisVar.assignments[i].line > highestLine) {
+                        latestAssignment = Object.assign({}, thisVar.assignments[i]);
+                        highestLine = latestAssignment.line;
+                    }
+                }
+            }
+            //get type from assigned node
+            return estimateDataType(latestAssignment);
+        }
+    }
+    else if (node._astname == "BinOp") {
+        //estimate both sides. if the same, return that. else return null
+        var left = estimateDataType(node.left);
+        var right = estimateDataType(node.right);
+        if (left == right) {
+            return left;
+        }
+        else
+            return null;
+    }
+    else if (node._astname == "BoolOp" || node._astname == "Compare") {
+        return "Bool";
+    }
+    return null;
+}
+exports.estimateDataType = estimateDataType;
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
 function replaceNumericUnaryOps(ast) {
     for (var i in ast) {
