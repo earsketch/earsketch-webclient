@@ -532,7 +532,7 @@
     },
 
     "finish": {
-      "description": "This function is called at the end of every EarSketch script. This ensures your music is prepared for playback in the digital audio workstation (DAW). It does not need to be added to the code by the user."
+      "description": "This function can optionally be called at the end of the script."
     },
 
     "fitMedia": {
@@ -588,7 +588,7 @@
     },
 
     "init": {
-      "description": "This function is called at the beginning of every EarSketch script. It prepares the digital audio workstation to create your music. It is not required to be included in the code to be called. "
+      "description": "This function can optionally be called at the end of the script."
     },
 
     "insertMedia": {
