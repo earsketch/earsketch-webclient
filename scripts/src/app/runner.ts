@@ -531,14 +531,13 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             const fillableGapMinimum = 0.01
             // add clips to fill in empty space
             let measure = clip.measure
-            let buffer = clip.sourceAudio
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
                 const filekey = clip.filekey
                 const start = first ? clip.start : 1
                 const end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
-
                 const needSlice = start !== 1 || end !== duration + 1
+                let buffer = clip.sourceAudio
 
                 if (clip.tempo === undefined) {
                     if (needSlice) {
