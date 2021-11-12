@@ -10,12 +10,14 @@ import * as curriculumState from "../browser/curriculumState"
 interface locale {
     displayText: string;
     localeCode: string;
+    direction: "ltr" | "rtl"
 }
 
 export const AVAILABLE_LOCALES: locale[] = [
-    { displayText: "English", localeCode: "en" },
-    { displayText: "Español", localeCode: "es" },
-    { displayText: "Français", localeCode: "fr" },
+    { displayText: "English", localeCode: "en", direction: "ltr" },
+    { displayText: "Español", localeCode: "es", direction: "ltr" },
+    { displayText: "Français", localeCode: "fr", direction: "ltr" },
+    { displayText: "Hebrew", localeCode: "he", direction: "rtl" },
 ]
 
 export const LocaleSelector = () => {
@@ -53,7 +55,7 @@ export const LocaleSelector = () => {
                                     className={`${
                                         active ? "bg-gray-500 text-white" : "text-gray-900"
                                     } inline-grid grid-flow-col justify-items-start items-center pl-3 pr-1 py-2 w-full`}
-                                    onClick={() => changeLanguage(locale.localeCode)}
+                                    onClick={() => changeLanguage(locale)}
                                     style={{ gridTemplateColumns: "18px 1fr" }}
                                 >
                                     {locale.localeCode === currentLocale && <i className="icon icon-checkmark4" />}
