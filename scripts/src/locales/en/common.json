@@ -532,7 +532,7 @@
     },
 
     "finish": {
-      "description": "This function can optionally be called at the end of the script."
+      "description": "This function can optionally be called at the end of the script (in previous versions of EarSketch this was required)."
     },
 
     "fitMedia": {
@@ -588,7 +588,7 @@
     },
 
     "init": {
-      "description": "This function can optionally be called at the end of the script."
+      "description": "This function can optionally be called at the start of the script (in previous versions of EarSketch this was required)."
     },
 
     "insertMedia": {
