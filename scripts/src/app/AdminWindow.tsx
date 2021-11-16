@@ -105,16 +105,11 @@ const AdminSendBroadcast = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
-    // const [broadcastIDs, setIDs] = useState([])
     const [broadcasts, setBroadcasts] = useState([] as Notification[])
 
     useEffect(() => {
         userProject.getBroadcasts().then((res: Notification[]) => {
-            esconsole("Set Broadcasts res=" + res, ["info"])
-            esconsole("Set Broadcasts res=" + JSON.stringify(res, null, 2), ["info"])
-            // setBroadcasts(res.map(u => ("\"" + u.message.text + "\" - Sent on: " + u.created?.substr(0, u.created?.indexOf(" ")))))
             setBroadcasts(res)
-            // setIDs(res.map(x => parseInt(x.id)))
         })
     }, [])
 
@@ -133,22 +128,43 @@ const AdminSendBroadcast = () => {
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
     }
 
+    const expireBroadcast = async (id: string) => {
+        setBroadcastStatus({ message: "Please wait...", style: "alert alert-secondary" })
+        try {
+            const data = await userProject.expireBroadcastByID(id)
+            if (data !== null) {
+                const m = `Successfully expired broadcast with ID ${id}.`
+                setBroadcastStatus({ message: m, style: "alert alert-success" })
+                setBroadcasts(broadcasts.filter(u => u.id !== id))
+                return
+            }
+        } catch (error) {
+            esconsole(error, ["error", "admin"])
+        }
+        const m = `Failed to expire broadcast with ID ${id}.`
+        setBroadcastStatus({ message: m, style: "alert alert-danger" })
+    }
+
+    const broadcastText = (nt: Notification) => {
+        return ("\"" + nt.message.text + "\" - Sent on: " + nt.created?.substr(0, nt.created?.indexOf(" ")))
+    }
+
     return <>
         <div className="modal-section-body">
             <div className="m-2 p-4 border-t border-gray-400">
+                {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
                 <div className="pb-1">
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
                         {broadcasts.map(nt =>
                             <div key={nt.id} className="my-px mx-2 flex items-center">
-                                <button className="flex" title="Expire broadcast" onClick={() => alert(nt.id)}><i className="icon icon-cross2" /></button>
-                                <div className="my-px mx-2">{("\"" + nt.message.text + "\" - Sent on: " + nt.created?.substr(0, nt.created?.indexOf(" ")))}</div>
+                                <button className="flex" title="Expire broadcast" onClick={() => expireBroadcast(nt.id!)}><i className="icon icon-cross2" /></button>
+                                <div className="my-px mx-2">{broadcastText(nt)}</div>
                             </div>
                         )}
                     </div>
                 </div>
-                {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
-                <div className="font-bold text-2xl p-3"/* was 3xl and p-2 */>Send Broadcast</div>
+                <div className="font-bold text-2xl p-3">Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
                     <input type="text" className="m-2 w-10/12 form-control"
                         placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />

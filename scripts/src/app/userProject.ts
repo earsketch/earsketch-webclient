@@ -604,6 +604,14 @@ export async function setPasswordForUser(username: string, password: string, adm
     userNotification.show("Successfully set a new password for " + username, "history", 3)
 }
 
+// Expires a broadcast using its ID
+export async function expireBroadcastByID(id: string) {
+    if (!isLoggedIn()) {
+        throw new Error("Login failure")
+    }
+    await getAuth("/users/expire", { id })
+}
+
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
 export function nextName(scriptname: string) {
     const name = ESUtils.parseName(scriptname)
