@@ -146,7 +146,10 @@ const AdminSendBroadcast = () => {
     }
 
     const broadcastText = (nt: Notification) => {
-        return ("\"" + nt.message.text + "\" - Sent on: " + nt.created?.substr(0, nt.created?.indexOf(" ")))
+        const nDaysExpires = new Date(nt.created!)
+        nDaysExpires.setDate(nDaysExpires.getDate() + nt.message.expiration!)
+        // return ("\"" + nt.message.text + "\" - Sent on: " + nt.created?.substr(0, nt.created?.indexOf(" ")))
+        return ("[" + nDaysExpires + " days left] " + nt.message.text + "(" + nt.message.expiration + ")")
     }
 
     return <>
