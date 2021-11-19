@@ -146,10 +146,14 @@ const AdminSendBroadcast = () => {
     }
 
     const broadcastText = (nt: Notification) => {
-        const nDaysExpires = new Date(nt.created!)
-        nDaysExpires.setDate(nDaysExpires.getDate() + nt.message.expiration!)
-        // return ("\"" + nt.message.text + "\" - Sent on: " + nt.created?.substr(0, nt.created?.indexOf(" ")))
-        return ("[" + nDaysExpires + " days left] " + nt.message.text + "(" + nt.message.expiration + ")")
+        // const nDaysExpires = new Date(nt.created!)
+        function addDays(date: Date, days: number) {
+            const result = new Date(date)
+            result.setDate(result.getDate() + days)
+            return result
+        }
+        const n = parseInt(nt.message.expiration!)
+        return (nt.message.text + " [Expires on " + addDays(new Date(nt.created!), n).toLocaleDateString("en-US") + "]")
     }
 
     return <>
