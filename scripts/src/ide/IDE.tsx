@@ -422,10 +422,10 @@ export const IDE = () => {
                 >
                     <div id="devctrl">
                         <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3, 4, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                            <div style={{ display: loading ? "unset" : "none" }} className="loading text-center h-full w-full flex items-center justify-center">
+                            <div className={(loading ? "flex" : "hidden") + " loading text-center h-full w-full items-center justify-center"}>
                                 <i className="es-spinner animate-spin mr-3"></i> {t("loading")}
                             </div>
-                            <div style={{ display: !loading ? "unset" : "none" }} className="workstation h-full w-full"><DAW /></div>
+                            <div className={(loading ? "hidden " : "") + "workstation h-full w-full"}><DAW /></div>
                         </div>
                     </div>
 
