@@ -657,11 +657,11 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                         descriptionKey: "api:setEffect2.parameters.effectStartLocation.description",
                     },
                     effectEndValue: {
-                        typeKey: "api:types.float",
+                        typeKey: "api:types.floatOptional",
                         descriptionKey: "api:setEffect2.parameters.effectEndValue.description",
                     },
                     effectEndLocation: {
-                        typeKey: "api:types.float",
+                        typeKey: "api:types.floatOptional",
                         descriptionKey: "api:setEffect2.parameters.effectEndLocation.description",
                     },
                 },
@@ -674,21 +674,50 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
             },
         ],
 
-        setTempo: {
-            descriptionKey: "api:setTempo.description",
-            parameters: {
-                tempo: {
-                    typeKey: "api:types.integer",
-                    descriptionKey: "api:setTempo.parameters.tempo.description",
+        setTempo: [
+            {
+                descriptionKey: "api:setTempo1.description",
+                parameters: {
+                    tempo: {
+                        typeKey: "api:types.float",
+                        descriptionKey: "api:setTempo1.parameters.tempo.description",
+                    },
                 },
-            },
-            example: {
-                python: "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
+                example: {
+                    python: "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
 
-                javascript: "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);",
+                    javascript: "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);",
+                },
+                autocomplete: "setTempo(tempo)",
             },
-            autocomplete: "setTempo(tempo)",
-        },
+            {
+                descriptionKey: "api:setTempo2.description",
+                parameters: {
+                    startTempo: {
+                        typeKey: "api:types.float",
+                        descriptionKey: "api:setTempo2.parameters.startTempo.description",
+                    },
+                    start: {
+                        typeKey: "api:types.float",
+                        descriptionKey: "api:setTempo2.parameters.start.description",
+                    },
+                    endTempo: {
+                        typeKey: "api:types.floatOptional",
+                        descriptionKey: "api:setTempo2.parameters.endTempo.description",
+                    },
+                    end: {
+                        typeKey: "api:types.floatOptional",
+                        descriptionKey: "api:setTempo2.parameters.end.description",
+                    },
+                },
+                example: {
+                    python: "# Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6)",
+
+                    javascript: "// Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6);",
+                },
+                autocomplete: "setTempo(startTempo, start, endTempo, end)",
+            },
+        ],
 
         shuffleList: {
             descriptionKey: "api:shuffleList.description",

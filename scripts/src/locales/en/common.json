@@ -417,6 +417,7 @@
       "effectConstant": "Effect Constant",
       "effectParameterConstant": "Effect Parameter Constant",
       "float": "Float",
+      "floatOptional": "Float, Optional",
       "array": "Array",
       "integer": "Integer",
       "listArray": "List/Array",
@@ -826,11 +827,29 @@
       }
     },
 
-    "setTempo": {
+    "setTempo1": {
       "description": "Sets the tempo for the project.",
       "parameters": {
         "tempo": {
-          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45. Maximum tempo is 220."
+          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
+        }
+      }
+    },
+
+    "setTempo2": {
+      "description": "Change the tempo for part of the project.",
+      "parameters": {
+        "startTempo": {
+          "description": "Tempo at beginning of region in beats per minute (BPM)"
+        },
+        "start": {
+          "description": "Measure where region begins"
+        },
+        "endTempo": {
+          "description": "Tempo at end of region (if omitted, new tempo persists until next tempo point)"
+        },
+        "end": {
+          "description": "Measure where region ends"
         }
       }
     },
