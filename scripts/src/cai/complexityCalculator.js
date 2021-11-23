@@ -3,7 +3,6 @@ import * as ccHelpers from './complexityCalculatorHelperFunctions';
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
-var codeStructure;
 
 //gets all ES API calls from a student script
 export function getApiCalls() {
@@ -49,6 +48,10 @@ function recursiveCallOnNodes(funcToCall, args, ast) {
     if (ast != null && ast._astname != null && "iter" in ast) {
         funcToCall(ast.iter, args);
         recursiveCallOnNodes(funcToCall, args, ast.iter)
+    }
+    if (ast != null && ast._astname != null && "orelse" in ast) {
+        funcToCall(ast.orelse, args);
+        recursiveCallOnNodes(funcToCall, args, ast.orelse)
     }
 }
 
@@ -226,7 +229,7 @@ function collectFunctionInfo(node, args) {
 
             var calledInsideLoop = false;
             var parentsList = [];
-            getParentList(lineNumber, codeStructure, parentsList);
+            getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList);
             for (var i = parentsList.length - 1; i >= 0; i--) {
                 if (parentsList[i].id == "Loop") {
                     calledInsideLoop = true;
@@ -431,7 +434,7 @@ function collectVariableInfo(node) {
         var assignedInsideLoop = false;
         var loopLine = -1;
         var parentsList = [];
-        getParentList(lineNumber, codeStructure, parentsList);
+        getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList);
         for (var i = parentsList.length - 1; i >= 0; i--) {
             if (parentsList[i].id == "Loop") {
                 assignedInsideLoop = true;
@@ -744,9 +747,9 @@ function reverseValueTrace(isVariable, name, lineNo) {
                     //either a builtin, or a user func
                     //get name
                     var calledName = "";
-                    if (node.func._astname == "Name") {
+                    if (latestAssignment.value.func._astname == "Name") {
                         //find name
-                        calledName = node.func.id.v;
+                        calledName = latestAssignment.value.func.id.v;
                         //is it a built-in func that returns a str or list? check that first
                         if (ccState.builtInNames.includes(calledName)) {
                             //lookup and return
@@ -768,32 +771,32 @@ function reverseValueTrace(isVariable, name, lineNo) {
                         }
 
                     }
-                    else if (node.func._astname == "Attribute") {
-                        //console.log(node.func._astname);
-                        calledName = node.func.attr.v;
+                    else if (latestAssignment.value.func._astname == "Attribute") {
+                        //console.log(latestAssignment.value.func._astname);
+                        calledName = latestAssignment.value.func.attr.v;
                         //TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         //str, list,or var. if var or func return do a reverse variable search, other3wise return
-                        if (node.func.value._astname == "Str") {
+                        if (latestAssignment.value.func.value._astname == "Str") {
                             return "Str";
                         }
-                        if (node.func.value._astname == "List") {
+                        if (latestAssignment.value.func.value._astname == "List") {
                             return "List";
                         }
 
-                        if (node.func.value._astname == "Name") {
+                        if (latestAssignment.value.func.value._astname == "Name") {
 
-                            return reverseValueTrace(true, node.func.value.id.v, node.lineno);
+                            return reverseValueTrace(true, latestAssignment.value.func.value.id.v, latestAssignment.value.lineno);
                         }
-                        if (node.func.value._astname == "Call") {
+                        if (latestAssignment.value.func.value._astname == "Call") {
                             //find the function name and do a recursive call on it
                             var funcName = "";
-                            if (node.func.value.func._astname == "Attribute") {
-                                funcName = node.func.value.func.attr.v;
-                                return reverseValueTrace(false, funcName, node.lineno);
+                            if (latestAssignment.value.func.value.func._astname == "Attribute") {
+                                funcName = latestAssignment.value.func.value.func.attr.v;
+                                return reverseValueTrace(false, funcName, latestAssignment.value.lineno);
                             }
-                            else if (node.func.value.func._astname == "Name") {
-                                funcName = node.func.value.func.id.v;
-                                return reverseValueTrace(false, funcName, node.lineno);
+                            else if (latestAssignment.value.func.value.func._astname == "Name") {
+                                funcName = latestAssignment.value.func.value.func.id.v;
+                                return reverseValueTrace(false, funcName, latestAssignment.value.lineno);
                             }
                             else {
                                 return "";
@@ -967,7 +970,8 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
 
 }
 
-function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, subscriptValue = -1, origLine = -1) { //
+
+function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, subscriptValue = -1, origLine = -1, tracedNodes = []) { //
 
 
 
@@ -1121,10 +1125,10 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
 
             //assignedproper is based on parent node in codestructure
 
-            var assignmentDepthAndParent = locateDepthAndParent(nodeParent[0].lineno, codeStructure, { count: 0 });
+            var assignmentDepthAndParent = ccHelpers.locateDepthAndParent(nodeParent[0].lineno, ccState.getProperty("codeStructure"), { count: 0 });
             //find original use depth and parent, then compare.
             // useLine    is the use line number
-            var useDepthAndParent = locateDepthAndParent(origLine, codeStructure, { count: 0 });
+            var useDepthAndParent = ccHelpers.locateDepthAndParent(origLine, ccState.getProperty("codeStructure"), { count: 0 });
 
             // [-1, {}] depth # and parent structure node.
             if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
@@ -1151,41 +1155,11 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
             }
 
             console.log(nodeParent[0].lineno);
-            return valueTrace(varBool, assignedName, rootAst, [], rootAst, lineVar, useLine, nodeParent[0].lineno);
+            return valueTrace(varBool, assignedName, rootAst, [], rootAst, lineVar, useLine, nodeParent[0].lineno, tracedNodes);
         }
     }
     //general catch-all if none of the above is true
     return false;
-}
-
-function locateDepthAndParent(lineno, parentNode, depthCount) {
-
-
-    //first....is it a child of the parent node?
-    if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
-        depthCount.count += 1;
-        //then, check children.
-        var isInChild = false;
-        var childNode = null;
-        if (parentNode.children.length > 0) {
-            for (var i = 0; i < parentNode.children.length; i++) {
-                if (parentNode.children[i].startline <= lineno && parentNode.children[i].endline >= lineno) {
-                    isInChild = true;
-                    childNode = parentNode.children[i];
-                    break;
-                }
-            }
-        }
-
-        if (!isInChild) {
-            return [depthCount.count, parentNode];
-        }
-        else if (childNode != null) {
-            return locateDepthAndParent(lineno, childNode, depthCount);
-        }
-    }
-
-    return [-1, {}]
 }
 
 
@@ -1262,11 +1236,11 @@ function doComplexityOutput(results, rootAst) {
     //do structural depth
     countStructuralDepth(structure, depthObj, null);
 
-    results.codeStructure["depth"] = depthObj.depth;
-    results.codeStructure["structure"] = structure;
+    results.ccState.getProperty("codeStructure")["depth"] = depthObj.depth;
+    results.ccState.getProperty("codeStructure")["structure"] = structure;
 
-    if (results.codeStructure["depth"] > 3) {
-        results.codeStructure["depth"] = 3;
+    if (results.ccState.getProperty("codeStructure")["depth"] > 3) {
+        results.ccState.getProperty("codeStructure")["depth"] = 3;
     }
 
 }
@@ -1440,7 +1414,7 @@ function analyzeASTNode(node, results) {
                     }
 
                     if (isListFunc) {
-                        args[0].codeFeatures.features.listOps = 1;
+                        results.codeFeatures.features.listOps = 1;
                     }
                 }
                 if (ccState.getProperty("strFuncs").includes(calledName)) {
@@ -1449,8 +1423,9 @@ function analyzeASTNode(node, results) {
                         isListFunc = true;
                     }
 
+
                     if (isStrFunc) {
-                        args[0].codeFeatures.features.strOps = 1;
+                        results.codeFeatures.features.strOps = 1;
                     }
                 }
 
@@ -1666,7 +1641,7 @@ function findFunctionDefName(node, args) {
 }
 
 function getParentList(lineno, parentNode, parentsList) {
-    //recurse through codeStructure, drill down to thing, return
+    //recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
     //first....is it a child of the parent node?
     if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
@@ -1704,10 +1679,12 @@ function findFunctionCallName(node, args) {
 
 //handles sequential calls to complexity passes and creation of output
 export function doAnalysis(ast, results) {
-    codeStructure = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(ast) };
+    var codeStruct = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(ast) };
     for (var i = 0; i < ast.body.length; i++) {
-        codeStructure.children.push(buildStructuralRepresentation(ast.body[i], codeStructure, ast));
+        codeStruct.children.push(buildStructuralRepresentation(ast.body[i], codeStruct, ast));
     }
+
+    ccState.setProperty("codeStructure", codeStruct);
 
     functionPass(ast, results, ast);
     recursiveCallOnNodes(collectVariableInfo, [], ast);

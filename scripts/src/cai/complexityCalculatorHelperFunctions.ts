@@ -290,6 +290,14 @@ export function getFunctionObject(funcName: string) {
     return null
 }
 
+
+export function areTwoNodesSameNode(node1:any, node2:any) {
+    if (node1._astname == node2._astname && node1.lineno == node2.lineno && node1.col_offset == node2.col_offset) {
+        return true;
+    }
+    else return false;
+}
+
 export function numberOfLeadingSpaces(stringToCheck: string) {
     let number = 0
 
@@ -304,7 +312,7 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
     return number
 }
 
-export function estimateDataType(node:any) {
+export function estimateDataType(node:any, tracedNodes: any = []) {
     let autoReturns: string[] = ["List", "Str"];
     if (autoReturns.includes(node._astname)) {
         return node._astname
@@ -340,11 +348,23 @@ export function estimateDataType(node:any) {
                 }
             }
         }
-        let existingFunctions: any = ccState.getProperty("userFunctions");
+        let existingFunctions: any = ccState.getProperty("userFunctionReturns");
         for (let i = 0; i < existingFunctions.length; i++) {
             if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
                 if (existingFunctions[i].returns == true) {
-                    return estimateDataType(existingFunctions[i].returnVals[0])
+
+                    var isDuplicate = false
+                    if (tracedNodes.length > 0) {
+                        for (var k = 0; k < tracedNodes.length; k++) {
+                            if (areTwoNodesSameNode(existingFunctions[i].returnVals[0], tracedNodes[k])) {
+                                isDuplicate = true
+                            }
+                        }
+                    }
+                    if (!isDuplicate) {
+                        tracedNodes.push(existingFunctions[i].returnVals[0])
+                        return estimateDataType(existingFunctions[i].returnVals[0], tracedNodes)
+                    }
                 }
             }
         }
@@ -355,7 +375,7 @@ export function estimateDataType(node:any) {
         }
 
         //either a function alias or var.
-        let funcs: any = ccState.getProperty("userFunctions")
+        let funcs: any = ccState.getProperty("userFunctionReturns")
         for (let i = 0; i < funcs.length; i++) {
             if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
                 return "Func"
@@ -370,7 +390,7 @@ export function estimateDataType(node:any) {
         let thisVar: any = null
         let varList: any = ccState.getProperty("allVariables");
         for (let i = 0; i < varList.length; i++) {
-            if (varList[i].name == name) {
+            if (varList[i].name == node.id.v) {
                 thisVar = varList[i]
             }
         }
@@ -380,7 +400,7 @@ export function estimateDataType(node:any) {
 
         //get most recent outside-of-function assignment (or inside-this-function assignment)
         let funcLines: number[] = ccState.getProperty("functionLines")
-        let funcObjs: any = ccState.getProperty("userFunctions")
+        let funcObjs: any = ccState.getProperty("userFunctionReturns")
         let highestLine: number = 0
         if (funcLines.includes(lineNo)) {
             //what function are we in
@@ -394,24 +414,39 @@ export function estimateDataType(node:any) {
                 }
             }
 
-            for (let i = 0; i < thisVar.assignments.length; i++) {
+            for (var i = 0; i < thisVar.assignments.length; i++) {
                 if (thisVar.assignments[i].line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && thisVar.assignments[i].line > startLine && thisVar.assignments[i].line <= endLine) {
-                    //then it's valid
-                    if (thisVar.assignments[i].line > highestLine) {
-                        latestAssignment = Object.assign({}, thisVar.assignments[i])
-                        highestLine = latestAssignment.line
+
+                    //check and make sure we haven't already gone through this node (prevents infinite recursion)
+                    var isDuplicate = false;
+                    if (tracedNodes.length > 0) {
+                        for (var k = 0; k < tracedNodes.length; k++) {
+                            if (areTwoNodesSameNode(thisVar.assignments[i], tracedNodes[k])) {
+                                isDuplicate = true;
+                            }
+                        }
+                    }
+
+                    if (!isDuplicate) {
+                        //then it's valid
+
+                        if (thisVar.assignments[i].line > highestLine) {
+                            latestAssignment = Object.assign({}, thisVar.assignments[i])
+                            highestLine = latestAssignment.line
+                        }
                     }
                 }
             }
 
             //get type from assigned node
-            return estimateDataType(latestAssignment)
+            tracedNodes.push(latestAssignment)
+            return estimateDataType(latestAssignment, tracedNodes)
         }
     }
     else if (node._astname == "BinOp") {
         //estimate both sides. if the same, return that. else return null
-        let left: string = estimateDataType(node.left)
-        let right: string = estimateDataType(node.right)
+        let left: string = estimateDataType(node.left, tracedNodes)
+        let right: string = estimateDataType(node.right, tracedNodes)
         if (left == right){
             return left
         }

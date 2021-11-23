@@ -21,6 +21,7 @@ let state: { [key: string]: any } = {
     isJavascript: false,
     listFuncs: [],
     userFunctionReturns: [],
+    codeStructure: {}
 }
 
 export function resetState() {
@@ -44,7 +45,8 @@ export function resetState() {
         returns: false,
         isJavascript: false,
         listFuncs: [],
-        userFunctionReturns: [],
+        userFunctionReturns: [],   
+        codeStructure: {}
     }
 }
 

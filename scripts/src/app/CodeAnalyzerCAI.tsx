@@ -42,8 +42,13 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    urlList.push(values[4])
-                    userInfo.push(values[0] + "|" + values[1] + "|" + values[2] + "|" + values[3])
+                    if (values.length > 2) {
+                        urlList.push(values[2])
+                    }
+                    else {
+                        urlList.push("")
+                    }
+                    userInfo.push(values[0] + "|" + values[1])
 
                 }
             } catch (err) {
@@ -59,9 +64,9 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let result: Result
         if (script.source_code != "") {
             try {
-                const compilerOuptut = await compile(script.source_code, "script.js", seed)
+                const compilerOuptut = await compile(script.source_code, "script.py", seed)
                 const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-                reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage("script.js"), script.source_code)
+                reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage("script.py"), script.source_code)
 
                 for (const option of Object.keys(reports)) {
                     if (!options[option as keyof ReportOptions]) {
@@ -73,14 +78,16 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     reports: reports,
                 }
             } catch (err) {
-                console.log("log error", err)
+               // console.log("log error", err)
                 result = {
                     script: script,
                     error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
+                    reports: {  }
                 }
+                result["reports"]["COMPLEXITY"] = { complexity: "{\"errors\":1|\"variables\":0|\"makeBeat\":0|\"iteration\":{\"whileLoops\":0|\"forLoopsPY\":0|\"forLoopsJS\":0|\"iterables\":0|\"nesting\":0}|\"conditionals\":{\"conditionals\":0|\"usedInConditionals\":[]}|\"functions\":{\"repeatExecution\":0|\"manipulateValue\":0}|\"features\":{\"indexing\":0|\"consoleInput\":0|\"listOps\":0|\"strOps\":0|\"binOps\":0|\"comparisons\":0}}" }
             }
         }
-        else {
+        else {                                                         
             result = {script: script }
         }
         setProcessing(null)
@@ -110,6 +117,8 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
            // setProcessing(shareId)
             let script
             let scriptText
+            console.log(index.toString() + "/" + urls.length.toString())
+           
             try {
                 scriptText = match.split("NEWLINE").join("\n")
                 scriptText = scriptText.split("\r").join("\n")
@@ -118,7 +127,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 //trim off extra quotation marks
                 var strInd: number = 0;
 
-                while (scriptText.startsWith("\"\"")) {
+                while (scriptText.startsWith("\"")) {
                     strInd += 1
                     scriptText = scriptText.substring(strInd)
                 }
@@ -135,8 +144,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
 
                 scriptText = scriptText.split("\"\"").join("\"")
-                console.log(index.toString() + "/" + urls.length.toString())
-                index += 1
+                
             } catch {
                 continue
             }
@@ -145,9 +153,8 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             const result = await runScript(script)
 
             results = [...results, result]
-
+            index += 1
             setResults(results)
-            index++;
         }
     }
 

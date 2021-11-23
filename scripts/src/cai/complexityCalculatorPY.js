@@ -80,7 +80,11 @@ export function analyzePython(source_code) {
         // translateIntegerValues(resultsObject);   //translate the calculated values
         ccHelpers.lineDict();
         var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
-          //uncomment first for analysis
+        if ("depth" in resultsObject.codeStructure) {
+
+            outStr += "|depth: " + resultsObject.codeStructure.depth.toString();
+        }
+        //  uncomment first for analysis
        // return {complexity: outStr };
         return resultsObject;
     }
@@ -126,9 +130,12 @@ export function analyzePython(source_code) {
         };
 
         var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
+        if ("depth" in resultsObject.codeStructure) {
 
-        //use this for analysis
+            outStr += "|depth: " + resultsObject.codeStructure.depth.toString();
+        }
+       // use this for analysis
        // return {complexity: outStr };
-        return resultsObject;
+       return resultsObject;
     }
 }
