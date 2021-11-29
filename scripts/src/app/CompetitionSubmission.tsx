@@ -18,16 +18,14 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                     <div className="modal-section-header w-full m-0">
                         <span>Competition Rules</span>
                     </div>
-                    <ul className="list-disc text-left p-10 pl-16">
+                    <ul className="list-disc text-left p-10 pl-16 space-y-2">
                         <li>Submission deadline for Round 1 is 11:59PM EST on February 7, 2022</li>
                         <li>Submission deadline for Round 2 is 11:59PM EST on June 19, 2022</li>
-                        <li>Song must be between 30 seconds and 3 minutes, include 5 unique musical tracks, and a stem from the Entrepreneur Song by Pharrell Williams</li>
+                        <li>Song must be between 30 seconds and 3 minutes, include 5 unique musical tracks, and a stem from the Entrepreneur Song by Pharrell Williams (MS/HS students must also include one custom function)</li>
                         <li>Song needs to be a “Remix” of one of the three songs (Entrepreneur, New Normal, Underdog)</li>
-                        <li>A reflection with their song to explain their message to promote equity</li>
+                        <li>A reflection with student song to explain their message to promote equity</li>
                         <li>Students can submit one song per round</li>
                         <li>Students can work alone or with one partner</li>
-                        <li>MS/HS students need to include at least one custom function in their code to show song structure</li>
-                        <li>ES students only need to have 5 fitMedia() tracks</li>
                         <li>For more information, please visit the <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" rel="noreferrer">competition website</a>.</li>
                     </ul>
                 </div>
