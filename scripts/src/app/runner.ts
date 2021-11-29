@@ -557,13 +557,19 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                 } else {
                     // Timestretch to match the tempo map at this point in the track (or retrieve cached buffer).
                     const clipMap = tempoMap.slice(measure, measure + (end - start))
-                    if (clipMap.points.some(point => point.tempo !== clip.tempo)) {
+                    const needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
+                    if (needStretch || needSlice) {
                         const cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
                         let cached = clipCache.get(cacheKey)
                         if (cached === undefined) {
                             const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, clip.tempo!) : clip.sourceAudio.getChannelData(0)
-                            cached = timestretch(input, clip.tempo!, tempoMap, measure)
-                            if (FLAGS.CACHE_TS_RESULTS) {
+                            if (needStretch) {
+                                cached = timestretch(input, clip.tempo!, tempoMap, measure)
+                            } else {
+                                cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
+                                cached.copyToChannel(input, 0)
+                            }
+                            if (needSlice || FLAGS.CACHE_TS_RESULTS) {
                                 clipCache.set(cacheKey, cached)
                             }
                         }

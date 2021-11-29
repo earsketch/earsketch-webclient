@@ -55,6 +55,9 @@ describe("API function tests", () => {
     testPythonAndJavaScript("insertMedia1")
     testPythonAndJavaScript("insertMedia2")
     testPythonAndJavaScript("insertMediaSection")
+    testPythonAndJavaScript("insertMediaSectionMiddle")
+    testPythonAndJavaScript("insertMediaSectionTimeStretch")
+    testPythonAndJavaScript("insertMediaSectionTimeStretchMiddle")
     // TODO: makeBeat
     testPythonAndJavaScript("makeBeatSlice")
 
