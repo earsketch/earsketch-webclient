@@ -29,6 +29,8 @@ var previousAttributes: any
 var textArray: string[]
 var errorLine: string
 
+var nameThreshold: number = 85
+
 export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any) {
 
     previousAttributes = {
@@ -36,8 +38,6 @@ export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any
         'structure': lastWorkingStructure,
         'soundProfile': lastWorkingSoundProfile
     }
-
-
     lastWorkingAST = Object.assign({}, ast)
     lastWorkingStructure = Object.assign({}, structure)
     lastWorkingSoundProfile = Object.assign({}, soundProfile)
@@ -46,18 +46,18 @@ export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any
 }
 
 export function storeErrorInfo(errorMsg: any, codeText: string) {
-    
+
     if ('args' in errorMsg) {
         currentError = Object.assign({}, errorMsg)
         currentText = codeText
-        console.log(handleError())
+        console.log(handleError(Object.getPrototypeOf(errorMsg)["tp$name"]))
     }
     else {
         console.log(errorMsg)
     }
 }
 
-export function handleError() {
+export function handleError(errorType:string) {
     //function to delegate error handling to one of a number of smaller, targeted error response functions
     //get line of error
     textArray = currentText.split("\n")
@@ -65,10 +65,19 @@ export function handleError() {
 
 
     //check first for undefined variables
-    //TODO
-    //this should check the info about error type which - how the h*ck do i do that again?
-
+    if (errorType == "NameError") {
+        return handleNameError();
+    }
     //otherwise, search for keywords
+
+
+    //fitmedia
+
+    if (errorLine.toLowerCase().includes("fitmedia")) {
+        return handleFitMediaError()
+    }
+
+    //function def
     var functionWords: string[] = ["def ", "function "]
 
     for (let i = 0; i < functionWords.length; i++) {
@@ -117,7 +126,7 @@ export function handleError() {
     //do the same for for loops, while loops, and conditionals
 
     //for loops
-    var forWords: string[] = ["for", "in"]
+    var forWords: string[] = ["for ", "in "]
 
     for (let i = 0; i < forWords.length; i++) {
         if (errorLine.includes(forWords[i])) {
@@ -126,7 +135,7 @@ export function handleError() {
     }
 
     //while loops
-    if (errorLine.includes("while")) {
+    if (errorLine.includes("while ")) {
         return handleWhileLoopError()
     }
 
@@ -139,9 +148,6 @@ export function handleError() {
         }
     }
 
-    if (errorLine.toLowerCase().includes("fitmedia")) {
-       return handleFitMediaError()
-    }
 }
 
 function handleFunctionError() {
@@ -395,7 +401,33 @@ function handleConditionalError() {
 }
 
 function handleNameError() {
+     //dow e recognize the name?
+    var problemName: string = currentError.args.v[0].v.split("'")[1]
 
+    //check if it's a variable or function name that's recognizaed
+    var variableList: any = ccState.getProperty("allVariables")
+    var functionList: any = ccState.getProperty("userFunctionReturns")
+
+    for (var i = 0; i < variableList.length; i++) {
+        if (isTypo(problemName, variableList[i].name)) {
+            return ["name", "typo: " + variableList[i].name]
+        }
+    }
+          
+    for (var i = 0; i < functionList.length; i++) {
+        if (isTypo(problemName, functionList[i].name)) {
+            return ["name", "typo: " + functionList[i].name]
+        }
+    }
+
+    for (var i = 0; i < PYTHON_AND_API.length; i++) {
+        if (isTypo(problemName, PYTHON_AND_API[i])) {
+            return ["name", "typo: " + PYTHON_AND_API[i]]
+        }
+    }
+
+    //else
+    return ["name", "unrecognized: " + problemName]
 }
 
 function handleFitMediaError() {
@@ -419,7 +451,7 @@ function handleFitMediaError() {
     }
 
     //now clean and check arguments
-    var argString: string = trimmedErrorLine.substring(trimmedErrorLine.indexOf("("), trimmedErrorLine.lastIndexOf(")"))
+    var argString: string = trimmedErrorLine.substring(trimmedErrorLine.indexOf("(") + 1, trimmedErrorLine.lastIndexOf(")"))
 
 
     //get rid of list commas
@@ -450,10 +482,13 @@ function handleFitMediaError() {
         return ["fitMedia", "too few arguments"]
     }
 
+    var numberArgs = [-1, -1, -1]
+
     for (let i = 0; i < argsSplit.length; i++) {
         argumentTypes.push("")
         if (isNumeric(argsSplit[i])) {
             argumentTypes[i] = "Num"
+            numberArgs[i - 1] = parseFloat(argsSplit[i])
         }
         else if (argsSplit[i].includes("\"") || argsSplit[i].includes("'")) {
             argumentTypes[i] = "Str"
@@ -467,7 +502,7 @@ function handleFitMediaError() {
                 argumentTypes[i] = "Num"
             }
             //or is it a var or func call
-            
+
             var errorLineNo: number = currentError.traceback[0].lineno;
             //func call
 
@@ -483,12 +518,55 @@ function handleFitMediaError() {
             if (AUDIOKEYS.includes(argsSplit[i])) {
                 argumentTypes[i] = "Sample"
             }
-            //or is it a var or func call
+            //or is it a var or func call that returns a sample
+            var errorLineNo: number = currentError.traceback[0].lineno;
+            //func call
+
+            if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
+
+                let functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
+
+                argumentTypes[i] = estimateFunctionNameReturn(functionName)
+            }
+            else {
+                argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo)
+            }
         }
     }
 
-    //check values 
-    //if(argumentTypes[0] != "Sample" && argumentTypes[0])
+    //check value types 
+    if (argumentTypes[0] != "Sample" && argumentTypes[0] != "") {
+        return (["fitMedia", "arg 1 wrong type"]);
+    }
+    if (argumentTypes[1] != "Num" && argumentTypes[1] != "") {
+        return (["fitMedia", "arg 2 wrong type"])
+    }
+    if (argumentTypes[2] != "Num" && argumentTypes[2] != "") {
+        return (["fitMedia", "arg 3 wrong type"]);
+    }
+    if (argumentTypes[3] != "Num" && argumentTypes[3] != "") {
+        return (["fitMedia", "arg 4 wrong type"]);
+    }
+
+    //then, check number values if possilbe
+    if (numberArgs[0] != -1 && !Number.isInteger(numberArgs[0])) {
+        return (["fitMedia", "track number not integer"])
+    }
+    else if (numberArgs[0] != -1 && numberArgs[0] < 1) {
+        return (["fitMedia", "invalid track number"])
+    }
+    if (numberArgs[1] != -1 && numberArgs[1] < 1) {
+        return (["fitMedia", "invalid start measure"])
+    }
+    if (numberArgs[2] != -1 && numberArgs[2] < 1) {
+        return (["fitMedia", "invalid end measure"])
+    }
+    if (numberArgs[1] != -1 && numberArgs[2] != -1) {
+
+        if (numberArgs[2] <= numberArgs[1]) {
+            return (["fitMedia", "backwards start/end"])
+        }
+    }
 
 }
 
@@ -554,6 +632,15 @@ function estimateVariableType(varName: string, lineno: number) {
         //get type from assigned node
         return ccHelpers.estimateDataType(latestAssignment)
     }
+
+}
+
+function isTypo(original: string, target: string) {
+    var editDistanceThreshold: number = Math.ceil(((original.length + target.length) / 2) * ((100 - nameThreshold) * 0.01))
+    if (ccHelpers.levenshtein(original, target) <= editDistanceThreshold) {
+        return true
+    }
+    else return false
 
 }
 
