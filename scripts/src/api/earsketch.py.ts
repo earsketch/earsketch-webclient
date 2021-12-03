@@ -22,8 +22,7 @@ export function setup() {
     // MASTER_TRACK is a deprecated alias of MIX_TRACK
     mod.MASTER_TRACK = new Sk.builtin.int_(0)
 
-    const passthroughList = ["init", "setTempo", "finish", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
-
+    const passthroughList = ["init", "setTempo", "finish", "fitMedia", "insertMedia", "makeBeat", "rhythmEffects", "setEffect"]
     for (const name of passthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => {
             dawData = callPassthrough(name, ...args)
@@ -31,21 +30,23 @@ export function setup() {
     }
 
     const returnablePassthroughList = ["gauss", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
-
     for (const name of returnablePassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => callPassthrough(name, ...args))
     }
 
     const modAndReturnPassthroughList = ["createAudioSlice"]
-
     for (const name of modAndReturnPassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => callModAndReturnPassthrough(name, ...args))
     }
 
-    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
-
-    for (const name of suspendedPassthroughList) {
+    const suspendPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
+    for (const name of suspendPassthroughList) {
         mod[name] = new Sk.builtin.func((...args: any[]) => suspendPassthrough(name, ...args))
+    }
+
+    const suspendAndModPassthroughList = ["insertMediaSection", "makeBeatSlice"]
+    for (const name of suspendAndModPassthroughList) {
+        mod[name] = new Sk.builtin.func((...args: any[]) => suspendAndModPassthrough(name, ...args))
     }
 
     // Replace input/raw_input with ES readInput. (Issue #1087.)
@@ -104,6 +105,23 @@ export function setup() {
         })
     }
 
+    const suspendAndModPassthrough = (name: string, ...args: any[]) => {
+        return mapJsErrors(() => {
+            const promise = ES_PASSTHROUGH[name](...convertArgs(args))
+            const susp = new Sk.misceval.Suspension()
+            susp.resume = () => mapJsErrors(() => {
+                if (susp.data.error) {
+                    throw susp.data.error
+                }
+                dawData = Sk.ffi.remapToPy(susp.data.result)
+            })
+            susp.data = {
+                type: "Sk.promise",
+                promise,
+            }
+            return susp
+        })
+    }
     mod.__name__ = new Sk.builtin.str("earsketch")
 
     // Inject EarSketch Python API as `earsketch` module.

@@ -61,7 +61,6 @@ export function setup(interpreter: any, scope: any) {
     register("finish", () => {})
 
     const passthroughList = ["init", "setTempo", "fitMedia", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "rhythmEffects", "setEffect"]
-
     for (const name of passthroughList) {
         register(name, (...args: any[]) => {
             dawData = callPassthrough(name, ...args)
@@ -69,13 +68,11 @@ export function setup(interpreter: any, scope: any) {
     }
 
     const returnablePassthroughList = ["gauss", "println", "replaceListElement", "replaceString", "reverseList", "reverseString", "selectRandomFile", "shuffleList", "shuffleString"]
-
     for (const name of returnablePassthroughList) {
         register(name, (...args: any[]) => callPassthrough(name, ...args))
     }
 
     const modAndReturnPassthroughList = ["createAudioSlice"]
-
     for (const name of modAndReturnPassthroughList) {
         register(name, (...args: any[]) => {
             const resultAndReturnVal = callModAndReturnPassthrough(name, ...args)
@@ -84,9 +81,8 @@ export function setup(interpreter: any, scope: any) {
         })
     }
 
-    const suspendedPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
-
-    for (const name of suspendedPassthroughList) {
+    const suspendPassthroughList = ["analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "readInput", "importImage", "importFile"]
+    for (const name of suspendPassthroughList) {
         // Note: There is an open bug in interpreter.js (May 5, 2020)
         // https://github.com/NeilFraser/JS-Interpreter/issues/180
         // These ES APIs take the max of 4 variable-length arguments,
@@ -110,6 +106,22 @@ export function setup(interpreter: any, scope: any) {
 
     // Alias of readInput. TODO: Can we get rid of this? It's not in the API documentation, curriculum, or Python API.
     registerAsync("prompt", (msg: string, callback: any) => suspendPassthrough("readInput", callback, msg))
+
+    const suspendAndModPassthroughList = ["insertMediaSection", "makeBeatSlice"]
+    for (const name of suspendAndModPassthroughList) {
+        registerAsync(name, function (a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
+            const args = []
+            for (let i = 0; i < arguments.length - 1; i++) {
+                if (arguments[i] !== undefined) {
+                    // Ignore unused placeholders (undefined)
+                    args.push(arguments[i])
+                }
+            }
+            // Last item (g) is always the callback function.
+            const callback = arguments[arguments.length - 1]
+            suspendAndModPassthrough(name, callback, ...args)
+        })
+    }
 
     // Convert arguments to JavaScript types.
     const convertArgs = (args: any[]) =>
@@ -137,6 +149,25 @@ export function setup(interpreter: any, scope: any) {
         try {
             const result = await ES_PASSTHROUGH[name](...convertArgs(args))
             callback(remapToPseudoJs(result))
+        } catch (err) {
+            // See https://github.com/NeilFraser/JS-Interpreter/issues/189.
+            const error = interpreter.createObject(interpreter.ERROR)
+            interpreter.setProperty(error, "name", err.name, Interpreter.NONENUMERABLE_DESCRIPTOR)
+            interpreter.setProperty(error, "message", err.message, Interpreter.NONENUMERABLE_DESCRIPTOR)
+            try {
+                interpreter.unwind(Interpreter.Completion.THROW, error, undefined)
+                interpreter.paused_ = false
+            } catch (e) {
+                asyncError = e
+            }
+        }
+    }
+
+    async function suspendAndModPassthrough(name: string, callback: any, ...args: any[]) {
+        try {
+            const result = await ES_PASSTHROUGH[name](...convertArgs(args))
+            dawData = remapToPseudoJs(result)
+            callback()
         } catch (err) {
             // See https://github.com/NeilFraser/JS-Interpreter/issues/189.
             const error = interpreter.createObject(interpreter.ERROR)
