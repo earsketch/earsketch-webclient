@@ -112,22 +112,18 @@ function wrapFunction(fn: Function, config: APIConfig) {
     }
 
     if (config.mod && config.return) {
-        return (...args: any[]) => {
-            mapJSErrors(() => {
-                const { result, returnVal } = fn(...convertArgs(args))
-                dawData = Sk.ffi.remapToPy(result)
-                return Sk.ffi.remapToPy(returnVal)
-            })
-        }
-    }
-
-    return (...args: any[]) => {
-        mapJSErrors(() => {
-            const result = Sk.ffi.remapToPy(fn(...convertArgs(args)))
-            if (config.return) {
-                return result
-            }
-            dawData = result
+        return (...args: any[]) => mapJSErrors(() => {
+            const { result, returnVal } = fn(...convertArgs(args))
+            dawData = Sk.ffi.remapToPy(result)
+            return Sk.ffi.remapToPy(returnVal)
         })
     }
+
+    return (...args: any[]) => mapJSErrors(() => {
+        const result = Sk.ffi.remapToPy(fn(...convertArgs(args)))
+        if (config.return) {
+            return result
+        }
+        dawData = result
+    })
 }

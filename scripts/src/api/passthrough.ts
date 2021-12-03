@@ -1014,7 +1014,7 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 
     result.slicedClips[sliceKey] = sliceDef
 
-    return { result: result, returnVal: sliceKey }
+    return { result, returnVal: sliceKey }
 }
 
 // Select a random file.

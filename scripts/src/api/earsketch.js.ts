@@ -67,7 +67,7 @@ export function setup(interpreter: any, scope: any) {
             // but `createAsyncFunction` demands fixed-length arguments.
             // Hack: Use placeholder arguments (x6 to be safe) and enumerate.
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            interpreter.createAsyncFunction(function (a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
+            return interpreter.createAsyncFunction(function (a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
                 const args = []
                 for (let i = 0; i < arguments.length - 1; i++) {
                     if (arguments[i] !== undefined) {
