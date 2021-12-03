@@ -109,6 +109,7 @@ export function setup(interpreter: any, scope: any) {
 
     const suspendAndModPassthroughList = ["insertMediaSection", "makeBeatSlice"]
     for (const name of suspendAndModPassthroughList) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         registerAsync(name, function (a: any, b: any, c: any, d: any, e: any, f: any, g: any) {
             const args = []
             for (let i = 0; i < arguments.length - 1; i++) {
