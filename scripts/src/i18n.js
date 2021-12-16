@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next"
 import en from "./locales/en/common.json"
 import es from "./locales/es/common.json"
 import fr from "./locales/fr/common.json"
+import iu from "./locales/iu/common.json"
 
 i18n
     .use(initReactI18next) // passes i18n down to react-i18next
@@ -19,6 +20,7 @@ i18n
             en: en,
             es: es,
             fr: fr,
+            iu: iu,
         },
     })
 

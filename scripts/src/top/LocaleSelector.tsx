@@ -16,6 +16,7 @@ export const AVAILABLE_LOCALES: locale[] = [
     { displayText: "English", localeCode: "en" },
     { displayText: "Español", localeCode: "es" },
     { displayText: "Français", localeCode: "fr" },
+    { displayText: "ᐃᓄᒃᑎᑐᑦ", localeCode: "iu" },
 ]
 
 export const LocaleSelector = () => {
