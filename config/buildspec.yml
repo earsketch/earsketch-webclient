@@ -26,6 +26,10 @@ batch:
           ES_API_TARGET_ENVIRONMENT: "production"
 
 phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - export CHROME_BIN='/usr/bin/chromium-browser'
   pre_build:
     commands:
       - export ES_SCRIPT_HOME="$CODEBUILD_SRC_DIR/config/deployment-scripts"
@@ -36,6 +40,8 @@ phases:
       - export ES_VERSION="${ES_VERSION_LIST//,/.}-$CODEBUILD_BUILD_NUMBER"
       - if [ "$ES_BASE_URI" == "review" ]; then echo "ES_BASE_URI review mode" && export ES_BASE_URI=https://earsketch-test.ersktch.gatech.edu/$LOCAL_STAGING_DIR_NAME; fi
       - if [ "$ES_BASE_URL" == "review" ]; then echo "ES_BASE_URL review mode" && export ES_BASE_URL=/$LOCAL_STAGING_DIR_NAME/; fi
+      - rm curriculum
+      - mkdir curriculum
   build:
     commands:
       - start_time="$(date -u +%s)"
@@ -45,6 +51,7 @@ phases:
       - npm install
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - grunt less
+      - npm run test
       - npm run build -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.baseuri=$ES_BASE_URI --env.apihost=$ES_API_HOST --env.buildconfig=$ES_BUILD_ENVIRONMENT --env.baseurl=$ES_BASE_URL
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
@@ -52,6 +59,12 @@ phases:
       - echo "Copying the client files to local distribution folder..."
       - cp -r index.html sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_DIR"
       - cp -r sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
+
+reports:
+  karma-reports:
+    files:
+      - "tests/integration/scripts/reports/karma/*.xml"
+    file-format: "JUNITXML"
 
 artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME

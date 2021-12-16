@@ -856,10 +856,13 @@ export const DAW = () => {
     }
 
     const onWheel = (event: WheelEvent) => {
-        if (event.ctrlKey) {
+        if ((event.ctrlKey || event.metaKey)) {
             event.preventDefault()
             if (event.shiftKey) {
-                zoomY(-Math.sign(event.deltaY))
+                // The `|| event.deltaX` is here to compensate for macOS behavior:
+                // When the shift key is pressed, and the user is using an external mouse, but *not* an Apple™ Magic Mouse™,
+                // and it's a blue moon, but the stars are *not* aligned, macOS remaps vertical scroll into horizontal scroll.
+                zoomY(-Math.sign(event.deltaY || event.deltaX))
             } else {
                 zoomX(-Math.sign(event.deltaY) * 5)
             }
