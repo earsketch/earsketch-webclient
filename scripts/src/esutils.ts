@@ -73,7 +73,7 @@ export const whichBrowser = () => {
 
         M = M[2] ? [M[1], M[2]] : [window.navigator.appName, window.navigator.appVersion, "-?"]
 
-        if ((tem = ua.match(/version\/(\d+)/i)) !== null) {
+        if ((tem = ua.match(/version\/(\d+\.?\d*)/i)) !== null) {
             M.splice(1, 1, tem[1])
         }
     }
