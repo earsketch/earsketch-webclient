@@ -156,7 +156,7 @@ const AdminSendBroadcast = () => {
     }
 
     const broadcastText = (nt: Notification) => {
-        return ("\"" + nt.message.text + "\"")
+        return (`"${nt.message.text}"`)
     }
 
     return <>
@@ -167,7 +167,7 @@ const AdminSendBroadcast = () => {
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
                         {broadcasts.map(nt =>
-                            <div key={nt.id} className="my-px mx-2 flex items-center" style={{ display: "grid", gridTemplateColumns: "12px 445px 130px repeat(3, 1fr)", gridGap: "1px 25px" }}>
+                            <div key={nt.id} className="my-px mx-2 grid items-center" style={{ gridTemplateColumns: "12px 445px 130px repeat(3, 1fr)", gridGap: "1px 25px" }}>
                                 <button className="flex" title="Expire broadcast" onClick={() => expireBroadcast(nt.id!)}><i className="icon icon-cross2" /></button>
                                 <div className="my-px mx-2">{broadcastText(nt)}</div>
                                 <div className="italic my-px">{expireText(nt)}</div>
