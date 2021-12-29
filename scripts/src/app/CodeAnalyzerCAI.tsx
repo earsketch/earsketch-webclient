@@ -14,6 +14,9 @@ import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
+const scriptInfo: any[] = []
+const types: any[] = []
+
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
     { options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
     return <div className="container">
@@ -28,6 +31,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
     const [shareIDColumn, setShareIDColumn] = useState(1)
+   
 
     const updateCSVFile = async (file: File) => {
         if (file) {
@@ -39,7 +43,11 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    urlList.push(values[2])
+                    if (values.length > 4) {
+                        urlList.push(values[5])
+                        scriptInfo.push(values[0] + "," + values[1] + "," + values[2] + "," + values[3] + "," + values[4])
+                        types.push(values[2].substring(2, values[2].length - 1))
+                    }
 
                 }
             } catch (err) {
@@ -53,19 +61,43 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
+        const reports: any = {
+            COMPLEXITY: {complexity: ""} }
         try {
-            const compilerOuptut = await compile(script.source_code, "script.py", seed)
-            const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage("script.py"), script.source_code)
-
-            for (const option of Object.keys(reports)) {
-                if (!options[option as keyof ReportOptions]) {
-                    delete reports[option]
+            if (script.source_code != "\r" && script.source_code != "") {
+                // const compilerOuptut = await compile(script.source_code, "script.py", seed)
+                while (script.source_code.endsWith("\"") || script.source_code.endsWith("\r") || script.source_code.endsWith("\n")) {
+                    script.source_code = script.source_code.substring(0, script.source_code.length - 1);
                 }
+
+                while (script.source_code.startsWith("\"\"")) {
+                    script.source_code = script.source_code.substring(1);
+                }
+
+                if (script.source_code.includes("\"\"")) {
+                    script.source_code= script.source_code.split("\"\"").join("\"");
+                }
+                //caiAnalysisModule.analyzeMusic(compilerOuptut)
+                if (script.name.includes(".js")) {
+                    reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("javascript", script.source_code).split(",").join("|")
+                }
+                else {
+                    while (script.source_code.startsWith("\"")) {
+                        script.source_code = script.source_code.substring(1);
+                    }
+                    reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("python", script.source_code).split(",").join("|")
+                }
+                console.log(reports["COMPLEXITY"])
+
+                //for (const option of Object.keys(reports)) {
+                //    if (!options[option as keyof ReportOptions]) {
+                //        delete reports[option]
+                //    }
+                //}
             }
             result = {
                 script: script,
-                reports: reports,
+                reports: reports
             }
         } catch (err) {
             console.log("log error", err)
@@ -75,6 +107,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             }
         }
         setProcessing(null)
+
         return result
     }
 
@@ -110,26 +143,40 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let results: Result[] = []
         let index: number = 0;
         for (const url of urls) {
-            const match = url.replace("\\t", "\t")
+            const match = url
             esconsole("Grading: " + match, ["DEBUG"])
-            const shareId = match.substring(9)
-            esconsole("ShareId: " + shareId, ["DEBUG"])
-            setProcessing(shareId)
             let script
             let scriptText
+
+
+            console.log(index.toString() + "/" + urls.length.toString())
             try {
-                scriptText = match.split("\\n").join("\n")
-                scriptText = scriptText.split("\\t").join("\t")
-                scriptText = scriptText.split("|||").join(",")
-                console.log(index.toString() + "/" + urls.length.toString())
-                index += 1
+                if (match != "\r") {
+                    scriptText = match.split("NEWLINE").join("\n")
+                    scriptText = scriptText.split("\\t").join("\t")
+                    scriptText = scriptText.split("|||").join(",")
+
+                    //strip extraneous quotation marks
+
+                    while(scriptText.endsWith("\"") || scriptText.endsWith("\n") ||scriptText.endsWith("\r") ){
+                        scriptText = scriptText.substring(0, scriptText.length - 1)
+                    }
+
+                    while (scriptText.startsWith("\"\"")) {
+                        scriptText = scriptText.substring(1)
+                    }
+                }
+                else {
+                    scriptText = ""
+                }
             } catch {
                 continue
             }
-            script = { source_code: scriptText } as Script
+            script = { source_code: scriptText, username: scriptInfo[index], name: types[index] } as Script
+
+            index += 1
             setResults([...results, { script }])
             const result = await runScript(script)
-
             results = [...results, result]
 
             setResults(results)

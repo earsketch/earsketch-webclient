@@ -10,52 +10,70 @@ import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source) {
-    ccState.resetState()
-    ccState.setProperty("listFuncs", ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"])
-    const ast = acorn.parse(source, {
-        locations: true,
-    })
-    ccState.setProperty("studentCode", source.split("\n"))
-    // handle this like you'd handle python.
-    const newAST = convertASTTree(ast)
-    // initialize list of function return objects with all functions from the API that return something (includes casting)
-    const allVariables = []
-    // initialize the results object
-    const resultsObject = {
-        userFunc: 0,
-        conditionals: 0,
-        forLoops: 0,
-        List: 0,
-        variables: 0,
-        consoleInput: 0,
+    try {
+        ccState.resetState()
+        ccState.setProperty("listFuncs", ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"])
+        const ast = acorn.parse(source, {
+            locations: true,
+        })
+        ccState.setProperty("studentCode", source.split("\n"))
+        // handle this like you'd handle python.
+        const newAST = convertASTTree(ast);
+        var resultsObject = {
+            ast: ast,
+            codeFeatures: {
+                errors: 0,
+                variables: 0,
+                makeBeat: 0,
+                iteration: {
+                    whileLoops: 0,
+                    forLoopsPY: 0,
+                    forLoopsJS: 0,
+                    iterables: 0,
+                    nesting: 0
+                },
+                conditionals: {
+                    conditionals: 0,
+                    usedInConditionals: []
+                },
+                functions: {
+                    repeatExecution: 0,
+                    manipulateValue: 0
+                },
+                features: {
+                    indexing: 0,
+                    consoleInput: 0,
+                    listOps: 0,
+                    strOps: 0,
+                    binOps: 0,
+                    comparisons: 0
+                }
+            },
+            codeStructure: {},
+            inputsOutputs: {
+                sections: {},
+                effects: {},
+                sounds: {}
+            }
+        };
+
+        ccState.setProperty("isJavascript", true);
+        cc.doAnalysis(newAST, resultsObject);
+
+        var outStr = JSON.stringify(resultsObject.codeFeatures);
+        outStr += "|depth: " + resultsObject.codeStructure.depth;
+        // ccHelpers.lineDict();
+        return outStr;
+
+        // translate the calculated values
+        // translateIntegerValues(resultsObject);
+        ccHelpers.lineDict()
+        caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
+        //return resultsObject
     }
-    ccState.setProperty("isJavascript", true)
-    // PASS 1: Do the same thing for function returns from user-defined functions
-    cc.evaluateUserFunctionParameters(newAST, resultsObject)
-    // PASS 2: Gather and label all user-defined variables. If the value is a function call or a BinOp
-    cc.gatherAllVariables(newAST)
-    // PASS 3: Account for the variables that only exist as function params. This pass also does a couple other things in the way of functions/removes called function lines from the uncalledFunctionLines so they get checked
-    cc.evaluateFunctionReturnParams(newAST)
-    // Now, use information gained from labeling user functions to fill in missing variable info, and vice-versa. 10 is the max number of times this will happen before we give up. we can change this if it proves problematic
-    let iterations = 0
-    while (!ccHelpers.allReturnsFilled() && iterations < 10) {
-        cc.evaluateAllEmpties()
-        iterations++
+    catch (e) {
+        return "ERROR"
     }
-    // PASS 4: Actually analyze the Python.
-    cc.recursiveAnalyzeAST(newAST, resultsObject, [false, false])
-    // boolops and comparisons count as boolean values, so if they're used at a certain level, booleans should be AT LEAST the value of these
-    if (resultsObject.boolOps > resultsObject.booleans) {
-        resultsObject.booleans = resultsObject.boolOps
-    }
-    if (resultsObject.comparisons > resultsObject.booleans) {
-        resultsObject.booleans = resultsObject.comparisons
-    }
-    // translate the calculated values
-    // translateIntegerValues(resultsObject);
-    ccHelpers.lineDict()
-    caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
-    return resultsObject
 }
 
 // fun javascript conversion times

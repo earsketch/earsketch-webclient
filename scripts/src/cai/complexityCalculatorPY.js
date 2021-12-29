@@ -12,7 +12,7 @@ import * as cc from "./complexityCalculator"
 function generateAst(source_code) {
     try {
         const parse = Sk.parse("<analyzer>", source_code)
-    	ccState.setProperty("studentCode", source_code.split("\n"))
+        ccState.setProperty("studentCode", source_code.split("\n"))
         return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
     } catch (error) {
         throw error
@@ -21,55 +21,64 @@ function generateAst(source_code) {
 
 // Analyze the source code of a Python script.
 export function analyzePython(source_code) {
-    ccState.resetState()
-    ccState.setProperty("listFuncs", ["append", "count", "extend", "index", "insert", "pop", "remove", "reverse", "sort"])
-    ccState.setProperty("studentCode", source_code.split("\n"))
-    // initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
-    const ast = generateAst(source_code)
-    ccHelpers.replaceNumericUnaryOps(ast.body)
-    // initialize the results object
-    const resultsObject = {
+    ccState.resetState();
+    ccState.setProperty("listFuncs", ['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
+    ccState.setProperty('studentCode', source_code.split("\n"));
+    //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
+    try {
+        var ast = generateAst(source_code);
+        ccHelpers.replaceNumericUnaryOps(ast.body);
+        //initialize the results object
+        var resultsObject = {
+            ast: ast,
+            codeFeatures: {
+                errors: 0,
+                variables: 0,
+                makeBeat: 0,
+                iteration: {
+                    whileLoops: 0,
+                    forLoopsPY: 0,
+                    forLoopsJS: 0,
+                    iterables: 0,
+                    nesting: 0
+                },
+                conditionals: {
+                    conditionals: 0,
+                    usedInConditionals: []
+                },
+                functions: {
+                    repeatExecution: 0,
+                    manipulateValue: 0
+                },
+                features: {
+                    indexing: 0,
+                    consoleInput: 0,
+                    listOps: 0,
+                    strOps: 0,
+                    binOps: 0,
+                    comparisons: 0
+                }
+            },
+            codeStructure: {},
+            inputsOutputs: {
+                sections: {},
+                effects: {},
+                sounds: {}
+            }
+        };
 
-        boolOps: 0,
-        booleans: 0,
-        comparisons: 0,
-        conditionals: 0,
-        consoleInput: 0,
-        floats: 0,
-        forLoops: 0,
-        ints: 0,
-        listOps: 0,
-        lists: 0,
-        mathematicalOperators: 0,
-        strOps: 0,
-        strings: 0,
-        userFunc: 0,
-        variables: 0
+        ccState.setProperty("isJavascript", false);
+        cc.doAnalysis(ast, resultsObject);
+
+        // translateIntegerValues(resultsObject);   //translate the calculated values
+
+        var outStr = JSON.stringify(resultsObject.codeFeatures);
+        outStr += "|depth: " + resultsObject.codeStructure.depth;
+       // ccHelpers.lineDict();
+        return outStr;
+        //return resultsObject;
     }
-    ccState.setProperty("isJavascript", false)
-    // PASS 1: Do the same thing for function returns from user-defined functions
-    cc.evaluateUserFunctionParameters(ast, resultsObject)
-    // PASS 2: Gather and label all user-defined variables. If the value is a function call or a BinOp
-    cc.gatherAllVariables(ast)
-    // PASS 3: Account for the variables that only exist as function params.
-    cc.evaluateFunctionReturnParams(ast)
-    // use information gained from labeling user functions to fill in missing variable info, and vice-versa.
-    let iterations = 0
-    while (!ccHelpers.allReturnsFilled() && iterations < 10) {
-        cc.evaluateAllEmpties()
-        iterations++
+    catch (error) {
+        return "ERROR";
     }
-    cc.recursiveAnalyzeAST(ast, resultsObject, [false, false])
-    // PASS 4: Actually analyze the Python.
-    // boolops and comparisons count as boolean values, so if they're used at a certain level, booleans should be AT LEAST the value of these
-    if (resultsObject.boolOps > resultsObject.booleans) {
-        resultsObject.booleans = resultsObject.boolOps
-    }
-    if (resultsObject.comparisons > resultsObject.booleans) {
-        resultsObject.booleans = resultsObject.comparisons
-    }
-    // translateIntegerValues(resultsObject);   //translate the calculated values
-    ccHelpers.lineDict()
-    caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
-    return resultsObject
 }
