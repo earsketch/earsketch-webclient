@@ -72,8 +72,9 @@ export function analyzePython(source_code) {
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
 
-        var outStr = JSON.stringify(resultsObject.codeFeatures);
-        outStr += "|depth: " + resultsObject.codeStructure.depth;
+        var outStr = "depth: " + resultsObject.depth;
+            //= JSON.stringify(resultsObject.codeFeatures);
+       
        // ccHelpers.lineDict();
         return outStr;
         //return resultsObject;

@@ -60,8 +60,10 @@ export function analyzeJavascript(source) {
         ccState.setProperty("isJavascript", true);
         cc.doAnalysis(newAST, resultsObject);
 
-        var outStr = JSON.stringify(resultsObject.codeFeatures);
-        outStr += "|depth: " + resultsObject.codeStructure.depth;
+        var outStr = "depth: " + resultsObject.depth;
+
+            //JSON.stringify(resultsObject.codeFeatures);
+      //  outStr += "|depth: " + resultsObject.codeStructure.depth;
         // ccHelpers.lineDict();
         return outStr;
 

@@ -13,15 +13,16 @@ import * as caiAnalysisModule from "../cai/analysis"
 import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
+import value from 'file-loader!*'
 
 const scriptInfo: any[] = []
 const types: any[] = []
+var headers: string = ""
 
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
     { options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
     return <div className="container">
-        <div className="panel panel-primary">
-        </div>
+
     </div>
 }
 
@@ -31,7 +32,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
     const [shareIDColumn, setShareIDColumn] = useState(1)
-   
+
 
     const updateCSVFile = async (file: File) => {
         if (file) {
@@ -41,13 +42,47 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             try {
                 script = await readFile(file)
                 console.log("script", script)
+
+
+                var numberOfQoutes: number = 0
+                var percentDone: number = 0
+                //newline handling that hurts my soul
+                //we replace all newline characters that have quotes on either end
+                //warning: the code below is cursed.
+                for (var i = 0; i < script.length; i++) {
+                    if (script[i] == "\"") {
+                        numberOfQoutes += 1
+                    }
+
+                    if (script[i] == "\n" && (numberOfQoutes % 2 != 0)) {
+                        script = script.substring(0, i) + "NEWLINE" + script.substring(i + 1)
+                    }
+
+                    if (script[i] == "," && (numberOfQoutes % 2 != 0)) {
+                        script = script.substring(0, i) + "|||" + script.substring(i + 1)
+                    }
+
+                    if (Math.floor(i / script.length * 100) > percentDone) {
+                        percentDone = Math.floor(i / script.length * 100)
+                        console.log("Pre-Processing: " + percentDone + "%")
+                    }
+                }
+
+
+                headers = script.split("\n")[0] + ",depth"
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    if (values.length > 4) {
-                        urlList.push(values[5])
-                        scriptInfo.push(values[0] + "," + values[1] + "," + values[2] + "," + values[3] + "," + values[4])
-                        types.push(values[2].substring(2, values[2].length - 1))
+
+                    urlList.push(values[values.length - 1])
+                    types.push(values[values.length - 2])
+                    var newStr: string = ""
+                    for (var k = 0; k < values.length - 2; k++) {
+                        newStr += (values[k])
+                        if (k != values.length - 3) {
+                            newStr += ","
+                        }
                     }
+                    scriptInfo.push(newStr)
 
                 }
             } catch (err) {
@@ -62,7 +97,8 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
         const reports: any = {
-            COMPLEXITY: {complexity: ""} }
+            COMPLEXITY: { complexity: "" }
+        }
         try {
             if (script.source_code != "\r" && script.source_code != "") {
                 // const compilerOuptut = await compile(script.source_code, "script.py", seed)
@@ -75,7 +111,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 }
 
                 if (script.source_code.includes("\"\"")) {
-                    script.source_code= script.source_code.split("\"\"").join("\"");
+                    script.source_code = script.source_code.split("\"\"").join("\"");
                 }
                 //caiAnalysisModule.analyzeMusic(compilerOuptut)
                 if (script.name.includes(".js")) {
@@ -158,7 +194,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
                     //strip extraneous quotation marks
 
-                    while(scriptText.endsWith("\"") || scriptText.endsWith("\n") ||scriptText.endsWith("\r") ){
+                    while (scriptText.endsWith("\"") || scriptText.endsWith("\n") || scriptText.endsWith("\r")) {
                         scriptText = scriptText.substring(0, scriptText.length - 1)
                     }
 
@@ -186,26 +222,15 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
     return <div className="container">
         <div className="panel panel-primary">
-            {csvInput
-                ? <div className="panel-heading">
-                    Upload CSV File
-                    <button className="btn btn-primary" onClick={() => setCsvInput(false)}>Switch to Text Input</button>
-                </div>
-                : <div className="panel-heading">
-                    Paste share URLs
-                    <button className="btn btn-primary" onClick={() => setCsvInput(true)}>Switch to CSV Input</button>
-                </div>}
-            {csvInput
-                ? <div className="panel-body">
-                    <input type="file" onChange={file => {
-                        if (file.target.files) { updateCSVFile(file.target.files[0]) }
-                    }} />
-                    <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Contest ID Column
-                    <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Share ID Column
-                </div>
-                : <div className="panel-body">
-                    <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
-                </div>}
+            <div className="panel-heading">
+                Upload CSV file with script name and code in last two columns
+            </div>
+
+            <div className="panel-body">
+                <input type="file" onChange={file => {
+                    if (file.target.files) { updateCSVFile(file.target.files[0]) }
+                }} />
+            </div>
             <div className="panel-footer">
                 {processing
                     ? <button className="btn btn-primary" onClick={run} disabled>
