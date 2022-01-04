@@ -95,7 +95,7 @@ function tallyObjectsInConditional(node, tallyList) {
 }
 
 //recurses through AST and calls function info function on each node
-function functionPass(ast, results, rootAst) {
+function functionPass(results, rootAst) {
     recursiveCallOnNodes(collectFunctionInfo, [results, rootAst], rootAst);
     //recursiveFunctionAnalysis(ast, results, rootAst);
 

@@ -40,34 +40,17 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
             const urlList = []
             try {
+                setProcessing("Uploading")
                 script = await readFile(file)
                 console.log("script", script)
 
+                setProcessing(null)
 
-                var numberOfQoutes: number = 0
-                var percentDone: number = 0
                 //newline handling that hurts my soul
                 //we replace all newline characters that have quotes on either end
                 //warning: the code below is cursed.
-                for (var i = 0; i < script.length; i++) {
-                    if (script[i] == "\"") {
-                        numberOfQoutes += 1
-                    }
-
-                    if (script[i] == "\n" && (numberOfQoutes % 2 != 0)) {
-                        script = script.substring(0, i) + "NEWLINE" + script.substring(i + 1)
-                    }
-
-                    if (script[i] == "," && (numberOfQoutes % 2 != 0)) {
-                        script = script.substring(0, i) + "|||" + script.substring(i + 1)
-                    }
-
-                    if (Math.floor(i / script.length * 100) > percentDone) {
-                        percentDone = Math.floor(i / script.length * 100)
-                        console.log("Pre-Processing: " + percentDone + "%")
-                    }
-                }
-
+                
+                script = await cleanupScript(script)
 
                 headers = script.split("\n")[0] + ",depth"
                 for (const row of script.split("\n")) {
@@ -85,6 +68,8 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     scriptInfo.push(newStr)
 
                 }
+
+                setProcessing(null)
             } catch (err) {
                 console.error(err)
                 return
@@ -93,6 +78,33 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
     }
 
+    const cleanupScript = async (script:string)=>{
+        setProcessing("Pre-Processing")
+        
+        var numberOfQuotes: number = 0
+        var percentDone: number = 0
+        for (var i = 0; i < script.length; i++) {
+            if (script[i] == "\"") {
+                numberOfQuotes += 1
+            }
+
+            if (script[i] == "\n" && (numberOfQuotes % 2 != 0)) {
+                script = script.substring(0, i) + "NEWLINE" + script.substring(i + 1)
+            }
+
+            if (script[i] == "," && (numberOfQuotes % 2 != 0)) {
+                script = script.substring(0, i) + "|||" + script.substring(i + 1)
+            }
+
+            if (Math.floor(i / script.length * 100) > percentDone) {
+                percentDone = Math.floor(i / script.length * 100)
+                console.log("Pre-Processing: " + percentDone + "%")
+            }
+        }
+
+        return script
+    }
+    
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
@@ -113,7 +125,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 if (script.source_code.includes("\"\"")) {
                     script.source_code = script.source_code.split("\"\"").join("\"");
                 }
-                //caiAnalysisModule.analyzeMusic(compilerOuptut)
                 if (script.name.includes(".js")) {
                     reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("javascript", script.source_code).split(",").join("|")
                 }
@@ -125,11 +136,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                 }
                 console.log(reports["COMPLEXITY"])
 
-                //for (const option of Object.keys(reports)) {
-                //    if (!options[option as keyof ReportOptions]) {
-                //        delete reports[option]
-                //    }
-                //}
             }
             result = {
                 script: script,
@@ -147,21 +153,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         return result
     }
 
-    const runScriptHistory = async (script: Script) => {
-        const results: Result[] = []
-        const history = await userProject.getScriptHistory(script.shareid)
-
-        let versions = Object.keys(history) as unknown as number[]
-
-        for (const version of versions) {
-            // add information from base script to version report.
-            history[version].name = script.name
-            history[version].username = script.username
-            history[version].shareid = script.shareid
-            results.push(await runScript(history[version], version))
-        }
-        return results
-    }
 
     // Read all script urls, parse their shareid, and then load and run every script adding the results to the results list.
     const run = async () => {
@@ -179,7 +170,11 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         let results: Result[] = []
         let index: number = 0;
         for (const url of urls) {
+            
+            setProcessing(index.toString() + "/" + urls.length.toString())
+           
             const match = url
+            
             esconsole("Grading: " + match, ["DEBUG"])
             let script
             let scriptText
@@ -233,12 +228,12 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             </div>
             <div className="panel-footer">
                 {processing
-                    ? <button className="btn btn-primary" onClick={run} disabled>
+                    ?<div>
+                    <div>{processing}</div> 
+                    <button className="btn btn-primary" onClick={run} disabled>
                         <i className="es-spinner animate-spin mr-3"></i> Run
-                    </button>
+                    </button></div>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
-                {!userProject.getToken() &&
-                    <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
             </div>
         </div>
     </div>
@@ -272,13 +267,6 @@ export const CodeAnalyzerCAI = () => {
         <div className="container">
             <h1>EarSketch Code Analyzer - CAI Version</h1>
         </div>
-        <Options
-            options={options}
-            seed={seed}
-            showSeed={true}
-            setOptions={setOptions}
-            setSeed={setSeed}
-        />
         <Upload
             processing={processing}
             options={options}
@@ -289,7 +277,7 @@ export const CodeAnalyzerCAI = () => {
         <Results
             results={results}
             processing={processing}
-            options={{ useContestID: false, allowedKeys: ["OVERVIEW", "COMPLEXITY", "EFFECTS"], showIndividualResults: true } as DownloadOptions}
+            options={{ useContestID: false, allowedKeys: ["OVERVIEW", "COMPLEXITY", "EFFECTS"], showIndividualResults: false } as DownloadOptions}
         />
         <ModalContainer />
     </div>
