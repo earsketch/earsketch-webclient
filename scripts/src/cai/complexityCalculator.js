@@ -1236,11 +1236,11 @@ function doComplexityOutput(results, rootAst) {
     //do structural depth
     countStructuralDepth(structure, depthObj, null);
 
-    results.ccState.getProperty("codeStructure")["depth"] = depthObj.depth;
-    results.ccState.getProperty("codeStructure")["structure"] = structure;
+    results["depth"] = depthObj.depth;
+    results["structure"] = structure;
 
-    if (results.ccState.getProperty("codeStructure")["depth"] > 3) {
-        results.ccState.getProperty("codeStructure")["depth"] = 3;
+    if (results["depth"] > 3) {
+        results["depth"] = 3;
     }
 
 }

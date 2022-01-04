@@ -79,13 +79,6 @@ export function analyzePython(source_code) {
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
         ccHelpers.lineDict();
-        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
-        if ("depth" in resultsObject.codeStructure) {
-
-            outStr += "|depth: " + resultsObject.codeStructure.depth.toString();
-        }
-        //  uncomment first for analysis
-       // return {complexity: outStr };
         return resultsObject;
     }
     catch (error) {
@@ -128,14 +121,6 @@ export function analyzePython(source_code) {
                 sounds: {}
             }
         };
-
-        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
-        if ("depth" in resultsObject.codeStructure) {
-
-            outStr += "|depth: " + resultsObject.codeStructure.depth.toString();
-        }
-       // use this for analysis
-       // return {complexity: outStr };
        return resultsObject;
     }
 }

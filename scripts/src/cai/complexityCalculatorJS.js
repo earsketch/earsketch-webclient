@@ -71,13 +71,6 @@ export function analyzeJavascript(source) {
         // translateIntegerValues(resultsObject);
         ccHelpers.lineDict();
 
-        //var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
-        //if ("depth" in resultsObject.codeStructure) {
-
-        //    outStr += "|depth: " + resultsObject.codeStructure.depth.toString();
-        //}
-          //use this for analysis
-       // return { complexity: outStr };
        return resultsObject;
     }
     catch (error) {
@@ -121,14 +114,7 @@ export function analyzeJavascript(source) {
             }
         };
 
-        var outStr = JSON.stringify(resultsObject.codeFeatures).split(",").join("|");
-        //if ("depth" in resultsObject.codeStructure) {
-
-        //    outStr += "|depth: " + resultsObject.codeStructure.depth.toString();
-        //}
-
-        //use this for analysis
-        //return {complexity: outStr };
+       
         return resultsObject;
     }
 }

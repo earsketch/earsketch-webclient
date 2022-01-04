@@ -1,6 +1,8 @@
 ﻿// A library of helper functions for the CAI Code Complexity Calculator
 import * as ccState from './complexityCalculatorState';
-let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
+
+import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
 
 // Appends the values in the source array to the target list.
 export function appendArray(source: any[], target: any[]) {
