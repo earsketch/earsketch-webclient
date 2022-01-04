@@ -42,6 +42,10 @@ export function storeWorkingCodeInfo(ast: any, structure: any, soundProfile: any
     currentText = null
 }
 
+export function getWorkingCodeInfo() {
+    return previousAttributes
+}
+
 export function storeErrorInfo(errorMsg: any, codeText: string) {
     if ("args" in errorMsg) {
         currentError = Object.assign({}, errorMsg)
@@ -439,7 +443,7 @@ function handleFitMediaError() {
     }
 
     const argsSplit: string[] = argString.split(",")
-    const argumentTypes: string[] = []
+    const argumentTypes: (string|null)[] = []
 
     // const currentVars: any = ccState.getProperty("allVariables")
 
@@ -587,6 +591,8 @@ function estimateVariableType(varName: string, lineno: number) {
         // get type from assigned node
         return ccHelpers.estimateDataType(latestAssignment)
     }
+
+    return null
 }
 
 function isTypo(original: string, target: string) {
