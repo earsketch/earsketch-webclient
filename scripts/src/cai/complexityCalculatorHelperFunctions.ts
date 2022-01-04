@@ -315,6 +315,35 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
     return number
 }
 
+export function locateDepthAndParent(lineno:number, parentNode:any, depthCount:any) {
+
+
+    //first....is it a child of the parent node?
+    if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
+        depthCount.count += 1;
+        //then, check children.
+        var isInChild = false;
+        var childNode = null;
+        if (parentNode.children.length > 0) {
+            for (var i = 0; i < parentNode.children.length; i++) {
+                if (parentNode.children[i].startline <= lineno && parentNode.children[i].endline >= lineno) {
+                    isInChild = true;
+                    childNode = parentNode.children[i];
+                    break;
+                }
+            }
+        }
+
+        if (!isInChild) {
+            return [depthCount.count, parentNode];
+        }
+        else if (childNode != null) {
+            return locateDepthAndParent(lineno, childNode, depthCount);
+        }
+    }
+
+    return [-1, {}]
+}
 export function estimateDataType(node:any, tracedNodes: any = []) {
     let autoReturns: string[] = ["List", "Str"];
     if (autoReturns.includes(node._astname)) {
@@ -435,21 +464,42 @@ export function estimateDataType(node:any, tracedNodes: any = []) {
                             }
                         }
                     }
+                      //hierarchy check  
+                    var assignedProper = false;
 
-                    if (!isDuplicate) {
-                        //then it's valid
+                    //assignedproper is based on parent node in codestructure
 
-                        if (thisVar.assignments[i].line > highestLine) {
-                            latestAssignment = Object.assign({}, thisVar.assignments[i])
-                            highestLine = latestAssignment.line
+                    var assignmentDepthAndParent = locateDepthAndParent(thisVar.assignments[i].line, ccState.getProperty("codeStructure"), { count: 0 });
+                    //find original use depth and parent, then compare.
+                    // useLine    is the use line number
+                    var useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 });
+
+                    // [-1, {}] depth # and parent structure node.
+                    if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
+                        assignedProper = true;
+                    }
+                    else if (assignmentDepthAndParent[0] == useDepthAndParent[0] && assignmentDepthAndParent[1].startline == useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline == useDepthAndParent[1].endline) {
+                        assignedProper = true;
+                    }
+                    if (assignedProper == true) {
+                        if (!isDuplicate) {
+                            //then it's valid
+
+                            if (thisVar.assignments[i].line > highestLine) {
+                                latestAssignment = Object.assign({}, thisVar.assignments[i])
+                                highestLine = latestAssignment.line
+                            }
                         }
                     }
+                    
                 }
             }
 
             //get type from assigned node
-            tracedNodes.push(latestAssignment)
-            return estimateDataType(latestAssignment, tracedNodes)
+            if (latestAssignment != null) {
+                tracedNodes.push(latestAssignment)
+                return estimateDataType(latestAssignment, tracedNodes)
+            }
         }
     }
     else if (node._astname == "BinOp") {
