@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.lineDict = exports.replaceNumericUnaryOps = exports.getFunctionObject = exports.getVariableObject = exports.getLastLine = exports.trimCommentsAndWhitespace = exports.notateConditional = exports.doAstNodesMatch = exports.copyAttributes = exports.appendArray = void 0;
+exports.lineDict = exports.replaceNumericUnaryOps = exports.estimateDataType = exports.numberOfLeadingSpaces = exports.getFunctionObject = exports.getVariableObject = exports.getLastLine = exports.trimCommentsAndWhitespace = exports.notateConditional = exports.doAstNodesMatch = exports.copyAttributes = exports.appendArray = void 0;
 // A library of helper functions for the CAI Code Complexity Calculator
 var ccState = require("./complexityCalculatorState");
 // Appends the values in the source array to the target list.
@@ -267,93 +267,6 @@ function trimCommentsAndWhitespace(stringToTrim) {
     return returnString;
 }
 exports.trimCommentsAndWhitespace = trimCommentsAndWhitespace;
-
-function numberOfLeadingSpaces(stringToCheck) {
-    let number = 0
-
-    for (let i = 0; i < stringToCheck.length; i++) {
-        if (stringToCheck[i] !== " ") {
-            break
-        } else {
-            number += 1
-        }
-    }
-
-    return number
-}
-exports.numberOfLeadingSpaces = numberOfLeadingSpaces;
-
-function estimateDataType(node) {
-    let autoReturns = ["List", "Str"];
-    if (autoReturns.includes(node._astname)) {
-        return node._astname;
-    }
-    else if (node._astname == "Num") {
-
-        if (Object.getPrototypeOf(node.n)["tp$name"] == "int") {
-            return "Int";
-        }
-        else {
-            return "Float";
-        }
-        //return "Num";
-    }
-    else if (node._astname == "Call") {
-        //get name
-        let funcName = "";
-        if ("attr" in node.func) {
-            funcName = node.func.attr.v;
-        }
-        else if ("id" in node.func) {
-            funcName = node.func.id.v;
-        }
-        else {
-            return null;
-        }
-        //look up the function name
-        //builtins first
-        if (ccState.builtInNames.includes(funcName)) {
-            for (let i = 0; i < ccState.builtInReturns.length; i++) {
-                if (ccState.builtInReturns[i].name == funcName) {
-                    return ccState.builtInReturns[i].returns;
-                }
-            }
-        }
-        let existingFunctions = ccState.getProperty("userFunctions");
-        for (let i = 0; i < existingFunctions.length; i++) {
-            if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
-                if (existingFunctions[i].returns == true) {
-                    return estimateDataType(existingFunctions[i].returnVals[0]);
-                }
-            }
-        }
-    }
-    else if (node._astname == "Name") {
-        if (node.id.v === "True" || node.id.v === "False") {
-            return "Bool";
-        }
-
-        //either a function alias or var.
-        let funcs = ccState.getProperty("userFunctions");
-        for (let i = 0; i < funcs.length; i++) {
-            if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
-                return "Func";
-            }
-        }
-
-        let allVars = ccState.getProperty("allVariables");
-
-        for (let i = 0; i < allVars.length; i++) {
-            if (allVars[i].name == node.id.v) {
-
-            }
-        }
-        //return reverseValueTrace(true, node.id.v, node.lineno);
-        //look up the variable
-    }
-    return null;
-}
-
 // Gets the last line in a multiline block of code.
 function getLastLine(functionNode) {
     if (!('body' in functionNode) || functionNode.body.length === 0) {
@@ -389,6 +302,222 @@ function getFunctionObject(funcName) {
     return null;
 }
 exports.getFunctionObject = getFunctionObject;
+function numberOfLeadingSpaces(stringToCheck) {
+    var number = 0;
+    for (var i = 0; i < stringToCheck.length; i++) {
+        if (stringToCheck[i] !== " ") {
+            break;
+        }
+        else {
+            number += 1;
+        }
+    }
+    return number;
+}
+exports.numberOfLeadingSpaces = numberOfLeadingSpaces;
+
+function areTwoNodesSameNode(node1, node2) {
+    if (node1._astname == node2._astname && node1.lineno == node2.lineno && node1.col_offset == node2.col_offset) {
+        return true;
+    }
+    else return false;
+}
+exports.areTwoNodesSameNode = areTwoNodesSameNode;
+
+
+
+
+function locateDepthAndParent(lineno, parentNode, depthCount) {
+
+
+    //first....is it a child of the parent node?
+    if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
+        depthCount.count += 1;
+        //then, check children.
+        var isInChild = false;
+        var childNode = null;
+        if (parentNode.children.length > 0) {
+            for (var i = 0; i < parentNode.children.length; i++) {
+                if (parentNode.children[i].startline <= lineno && parentNode.children[i].endline >= lineno) {
+                    isInChild = true;
+                    childNode = parentNode.children[i];
+                    break;
+                }
+            }
+        }
+
+        if (!isInChild) {
+            return [depthCount.count, parentNode];
+        }
+        else if (childNode != null) {
+            return locateDepthAndParent(lineno, childNode, depthCount);
+        }
+    }
+
+    return [-1, {}]
+}
+exports.locateDepthAndParent = locateDepthAndParent;
+
+function estimateDataType(node, tracedNodes = []) {
+    let autoReturns = ["List", "Str"];
+    if (autoReturns.includes(node._astname)) {
+        return node._astname
+    }
+    else if (node._astname == "Num") {
+
+        if (Object.getPrototypeOf(node.n)["tp$name"] == "int") {
+            return "Int"
+        }
+        else {
+            return "Float"
+        }
+        //return "Num";
+    }
+    else if (node._astname == "Call") {
+        //get name
+        let funcName = "";
+        if ("attr" in node.func) {
+            funcName = node.func.attr.v
+        }
+        else if ("id" in node.func) {
+            funcName = node.func.id.v
+        }
+        else {
+            return null;
+        }
+        //look up the function name
+        //builtins first
+        if (ccState.builtInNames.includes(funcName)) {
+            for (let i = 0; i < ccState.builtInReturns.length; i++) {
+                if (ccState.builtInReturns[i].name == funcName) {
+                    return ccState.builtInReturns[i].returns
+                }
+            }
+        }
+        let existingFunctions = ccState.getProperty("userFunctionReturns");
+        for (let i = 0; i < existingFunctions.length; i++) {
+            if (existingFunctions[i].name == funcName || existingFunctions[i].aliases.includes(funcName)) {
+                if (existingFunctions[i].returns == true) {
+
+                    var isDuplicate = false
+                    if (tracedNodes.length > 0) {
+                        for (var k = 0; k < tracedNodes.length; k++) {
+                            if (areTwoNodesSameNode(existingFunctions[i].returnVals[0], tracedNodes[k])) {
+                                isDuplicate = true
+                            }
+                        }
+                    }
+                    if (!isDuplicate) {
+                        tracedNodes.push(existingFunctions[i].returnVals[0])
+                        return estimateDataType(existingFunctions[i].returnVals[0], tracedNodes)
+                    }
+                }
+            }
+        }
+    }
+    else if (node._astname == "Name") {
+        if (node.id.v === "True" || node.id.v === "False") {
+            return "Bool"
+        }
+
+        //either a function alias or var.
+        let funcs = ccState.getProperty("userFunctionReturns")
+        for (let i = 0; i < funcs.length; i++) {
+            if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
+                return "Func"
+            }
+        }
+
+        let allVars = ccState.getProperty("allVariables");
+        var lineNo = node.lineno
+
+        let latestAssignment = null
+
+        let thisVar = null
+        let varList = ccState.getProperty("allVariables");
+        for (let i = 0; i < varList.length; i++) {
+            if (varList[i].name == node.id.v) {
+                thisVar = varList[i]
+            }
+        }
+        if (thisVar == null) {
+            return null
+        }                                                                                                               
+
+        //get most recent valid assignment (or inside-this-function assignment)
+        let funcLines = ccState.getProperty("functionLines")
+        let funcObjs = ccState.getProperty("userFunctionReturns")
+        let highestLine = 0
+
+
+        for (var i = 0; i < thisVar.assignments.length; i++) {
+            if (thisVar.assignments[i].line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line)) {
+
+                //check and make sure we haven't already gone through this node (prevents infinite recursion)
+                var isDuplicate = false;
+                if (tracedNodes.length > 0) {
+                    for (var k = 0; k < tracedNodes.length; k++) {
+                        if (areTwoNodesSameNode(thisVar.assignments[i], tracedNodes[k])) {
+                            isDuplicate = true;
+                        }
+                    }
+                }
+
+
+                //hierarchy check  
+                var assignedProper = false;
+
+                //assignedproper is based on parent node in codestructure
+
+                var assignmentDepthAndParent = locateDepthAndParent(thisVar.assignments[i].line, ccState.getProperty("codeStructure"), { count: 0 });
+                //find original use depth and parent, then compare.
+                // useLine    is the use line number
+                var useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 });
+
+                // [-1, {}] depth # and parent structure node.
+                if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
+                    assignedProper = true;
+                }
+                else if (assignmentDepthAndParent[0] == useDepthAndParent[0] && assignmentDepthAndParent[1].startline == useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline == useDepthAndParent[1].endline) {
+                    assignedProper = true;
+                }
+                if (assignedProper == true) {
+                    if (!isDuplicate) {
+                        //then it's valid
+
+                        if (thisVar.assignments[i].line > highestLine) {
+                            latestAssignment = Object.assign({}, thisVar.assignments[i])
+                            highestLine = latestAssignment.line
+                        }
+                    }
+                }
+            }
+        }
+
+        //get type from assigned node
+        if (latestAssignment != null) {
+            tracedNodes.push(latestAssignment)
+            return estimateDataType(latestAssignment, tracedNodes)
+        }
+
+    }
+    else if (node._astname == "BinOp") {
+        //estimate both sides. if the same, return that. else return null
+        let left = estimateDataType(node.left, tracedNodes)
+        let right = estimateDataType(node.right, tracedNodes)
+        if (left == right) {
+            return left
+        }
+        else return null
+    }
+    else if (node._astname == "BoolOp" || node._astname == "Compare") {
+        return "Bool"
+    }
+
+    return null
+}
+
+exports.estimateDataType = estimateDataType;
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
 function replaceNumericUnaryOps(ast) {
     for (var i in ast) {

@@ -3,6 +3,7 @@ import * as ccHelpers from './complexityCalculatorHelperFunctions';
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
+
 //gets all ES API calls from a student script
 export function getApiCalls() {
     return ccState.getProperty("apiCalls");
@@ -48,6 +49,10 @@ function recursiveCallOnNodes(funcToCall, args, ast) {
         funcToCall(ast.iter, args);
         recursiveCallOnNodes(funcToCall, args, ast.iter)
     }
+    if (ast != null && ast._astname != null && "orelse" in ast) {
+        funcToCall(ast.orelse, args);
+        recursiveCallOnNodes(funcToCall, args, ast.orelse)
+    }
 }
 
 function analyzeConditionalTest(testNode, tallyList) {
@@ -66,8 +71,8 @@ function tallyObjectsInConditional(node, tallyList) {
         }
         else {
             //is it a variable
-            let varList = ccState.getProperty("allVariables");
-            for (let i = 0; i < varList.length; i++) {
+            var varList = ccState.getProperty("allVariables");
+            for (var i = 0; i < varList.length; i++) {
                 if (varList[i].name == node.id.v) {
                     tallyList.push("Variable");
                     break;
@@ -75,7 +80,7 @@ function tallyObjectsInConditional(node, tallyList) {
             }
         }
     }
-    else if ((node._astname == "Compare" || node._astname == "BoolOp" || node._astname == "Call" || node._astname == "BinOp") && !tallyList.includes(node._astname)){
+    else if ((node._astname == "Compare" || node._astname == "BoolOp" || node._astname == "Call" || node._astname == "BinOp") && !tallyList.includes(node._astname)) {
         tallyList.push(node._astname);
     }
 
@@ -84,7 +89,7 @@ function tallyObjectsInConditional(node, tallyList) {
         if (node.op.name == "Mod" && !tallyList.includes("Mod")) {
             tallyList.push("Mod");
         }
-       // console.log(node.op.name);
+        // console.log(node.op.name);
     }
 
 }
@@ -95,12 +100,12 @@ function functionPass(ast, results, rootAst) {
     //recursiveFunctionAnalysis(ast, results, rootAst);
 
     //do calls
-    let allFuncs = ccState.getProperty("userFunctions");
-    for (let i = 0; i < allFuncs.length; i++) {
+    var allFuncs = ccState.getProperty("userFunctionReturns");
+    for (var i = 0; i < allFuncs.length; i++) {
 
         //uncalled function lines
         if (allFuncs[i].calls.length == 0) {
-            for (let j = allFuncs[i].start; j <= allFuncs[i].end; j++) {
+            for (var j = allFuncs[i].start; j <= allFuncs[i].end; j++) {
                 ccState.getProperty("uncalledFunctionLines").push(j);
             }
         }
@@ -125,15 +130,16 @@ function functionPass(ast, results, rootAst) {
     }
 
     //do uses
-    for (let i = 0; i < allFuncs.length; i++) {
-        if (allFuncs[i].returns) {
-            if (valueTrace(false, allFuncs[i].name, rootAst, [], rootAst)) {
+    for (var p = 0; p < allFuncs.length; p++) {
+        if (allFuncs[p].returns) {
+            //orgline shoul dbe RETURN lineno.
+            if (valueTrace(false, allFuncs[p].name, rootAst, [], rootAst, [], [], allFuncs[p].start)) {
                 //do stuff
                 results.codeFeatures.functions.manipulateValue = 3;
             }
-            if (allFuncs[i].aliases.length > 0) {
-                for (let j = 0; j < allFuncs[i].aliases.length; j++) {
-                    if (valueTrace(false, allFuncs[i].aliases[j], rootAst, [], rootAst)) {
+            if (allFuncs[p].aliases.length > 0) {
+                for (var j = 0; j < allFuncs[p].aliases.length; j++) {
+                    if (valueTrace(false, allFuncs[p].aliases[j], rootAst, [], rootAst, [], [], allFuncs[p].start)) {
                         //do stuff
                         results.codeFeatures.functions.manipulateValue = 3;
                     }
@@ -142,7 +148,7 @@ function functionPass(ast, results, rootAst) {
         }
     }
 
-    //console.log(ccState.getProperty("userFunctions"));
+    //console.log(ccState.getProperty("userFunctionReturns"));
 }
 
 //collects function info from a node
@@ -158,21 +164,21 @@ function collectFunctionInfo(node, args) {
         }
         //does the node contain a function def?
         if (node._astname == "FunctionDef") {
-            let functionObj = { name: node.name.v, returns: null, params: false, aliases: [], calls: [], start: lineNumber, end: lineNumber, returnVals: [] , functionBody: node.body};
+            var functionObj = { name: node.name.v, returns: null, params: false, aliases: [], calls: [], start: lineNumber, end: lineNumber, returnVals: [], functionBody: node.body };
 
             functionObj.end = ccHelpers.getLastLine(node);
 
-            let funcLines = ccState.getProperty("functionLines");
+            var funcLines = ccState.getProperty("functionLines");
 
-            for (let i = lineNumber; i <= functionObj.end; i++) {
+            for (var i = lineNumber; i <= functionObj.end; i++) {
                 if (!funcLines.includes(i)) {
                     funcLines.push(i);
                 }
             }
 
             //check for value return
-            for (let i = 0; i < node.body.length; i++) {
-                let ret = searchForReturn(node.body[i]);
+            for (var i = 0; i < node.body.length; i++) {
+                var ret = searchForReturn(node.body[i]);
                 if (ret != null) {
                     functionObj.returns = true;
                     functionObj.returnVals.push(ret);
@@ -184,12 +190,12 @@ function collectFunctionInfo(node, args) {
             if (node.args.args != null && node.args.args.length > 0) {
                 //check for parameters that are NOT NULL
                 //these...should all be Name
-                for (let i = 0; i < node.args.args.length; i++) {
+                for (var i = 0; i < node.args.args.length; i++) {
                     if (node.args.args[i]._astname == "Name") {
-                        let argName = node.args.args[i].id.v;
-                        let lineDelims = [functionObj.start, functionObj.end];
+                        var argName = node.args.args[i].id.v;
+                        var lineDelims = [functionObj.start, functionObj.end];
                         //search for use of the value using valueTrace
-                        if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims)) {
+                        if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
                             functionObj.params = true;
                         }
 
@@ -197,14 +203,13 @@ function collectFunctionInfo(node, args) {
 
                     }
                 }
-                
+
                 //
             }
 
-
-            let alreadyExists = false;
-            let currentFuncs = ccState.getProperty("userFunctions");
-            for (let i = 0; i < currentFuncs.length; i++) {
+            var alreadyExists = false;
+            var currentFuncs = ccState.getProperty("userFunctionReturns");
+            for (var i = 0; i < currentFuncs.length; i++) {
                 if (currentFuncs[i].name == functionObj.name) {
                     alreadyExists = true;
                     break;
@@ -212,16 +217,28 @@ function collectFunctionInfo(node, args) {
             }
 
             if (!alreadyExists) {
-                ccState.getProperty("userFunctions").push(functionObj);
+                ccState.getProperty("userFunctionReturns").push(functionObj);
             }
 
 
         }
 
-            //or a function call?
+        //or a function call?
         else if (node._astname == "Call") {
+
+
+            var calledInsideLoop = false;
+            var parentsList = [];
+            getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList);
+            for (var i = parentsList.length - 1; i >= 0; i--) {
+                if (parentsList[i].id == "Loop") {
+                    calledInsideLoop = true;
+                    break;
+                }
+            }
+
             //add it to function calls directory in ccstate
-            let calledName = ""
+            var calledName = ""
             if (node.func._astname == "Name") {
                 //find name
                 calledName = node.func.id.v;
@@ -232,33 +249,32 @@ function collectFunctionInfo(node, args) {
                 calledName = node.func.attr.v;
             }
 
-            var callCurrentFuncs = ccState.getProperty("userFunctions");
-            
+            var callCurrentFuncs = ccState.getProperty("userFunctionReturns");
+
             if (calledName == "readInput") {
                 args[0].codeFeatures.features.consoleInput = 1;
             }
 
-            if (ccState.getProperty("listFuncs").includes(calledName)) {
-                args[0].codeFeatures.features.listOps = 1;
-            }
-            if (ccState.getProperty("strFuncs").includes(calledName)) {
-                args[0].codeFeatures.features.strOps = 1;
-            }
 
-            for (let i = 0; i < callCurrentFuncs.length; i++) {
+
+            for (var i = 0; i < callCurrentFuncs.length; i++) {
                 if (callCurrentFuncs[i].name == calledName || callCurrentFuncs[i].aliases.includes(calledName)) {
                     callCurrentFuncs[i].calls.push(lineNumber);
+                    if (calledInsideLoop) {
+                        //push a second time if it's in a loop
+                        callCurrentFuncs[i].calls.push(lineNumber);
+                    }
 
                     if (callCurrentFuncs[i].name == "readInput") {
                         args[0].codeFeatures.features.consoleInput = 1;
                     }
 
-                    if (ccState.getProperty("listFuncs").includes(callCurrentFuncs[i].name)) {
-                        args[0].codeFeatures.features.listOps = 1;
-                    }
-                    if (ccState.getProperty("strFuncs").includes(callCurrentFuncs[i].name)) {
-                        args[0].codeFeatures.features.strOps = 1;
-                    }
+                    //if (ccState.getProperty("listFuncs").includes(callCurrentFuncs[i].name) && isListFunc) {
+                    //    args[0].codeFeatures.features.listOps = 1;
+                    //}
+                    //if (ccState.getProperty("strFuncs").includes(callCurrentFuncs[i].name) && isStrFunc) {
+                    //    args[0].codeFeatures.features.strOps = 1;
+                    //}
 
                     break;
                 }
@@ -268,34 +284,34 @@ function collectFunctionInfo(node, args) {
         else if (node._astname == "Assign" && node.targets.length == 1) {
 
             //function alias tracking
-            let currentFuncs = ccState.getProperty("userFunctions");
+            var currentFuncs = ccState.getProperty("userFunctionReturns");
 
             if (node.value._astname == "Name") {
-                let assignedName = node.targets[0].id.v;
-                let assignedAlias = node.value.id.v;
-                let assignmentExists = false;
-                for (let i = 0; i < currentFuncs.length; i++) {
+                var assignedName = node.targets[0].id.v;
+                var assignedAlias = node.value.id.v;
+                var assignmentExists = false;
+                for (var i = 0; i < currentFuncs.length; i++) {
                     if ((currentFuncs[i].name == assignedAlias && !currentFuncs[i].aliases.includes(assignedName)) || (currentFuncs[i].aliases.includes(assignedAlias) && !currentFuncs[i].aliases.includes(assignedName))) {
                         assignmentExists = true;
                         currentFuncs[i].aliases.push(assignedName);
                     }
                 }
 
-                let isRename = false;
+                var isRename = false;
                 //is it a built in or api func?
                 isRename = (ccState.apiFunctions.includes(assignedAlias) || ccState.builtInNames.includes(assignedAlias));
 
 
                 if (!assignmentExists && isRename) {
 
-                    ccState.getProperty("userFunctions").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 });
+                    ccState.getProperty("userFunctionReturns").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 });
                 }
             }
 
 
         }
 
-    
+
     }
 }
 
@@ -307,8 +323,8 @@ function markMakeBeat(callNode, results) {
 
     //is makeBeat being used
     //beatString is either a variable or a string.
-    //let's find out what it is
-    let firstArg = callNode.args[0];
+    //var's find out what it is
+    var firstArg = callNode.args[0];
     if (firstArg._astname == "List") {
         results.codeFeatures.makeBeat = 2;
     }
@@ -323,16 +339,16 @@ function isBinopString(binOpNode) {
         return false;
     }
 
-    let leftNode = binOpNode.left;
-    let rightNode = binOpNode.right;
-    let op = binOpNode.op.name;
+    var leftNode = binOpNode.left;
+    var rightNode = binOpNode.right;
+    var op = binOpNode.op.name;
 
     if (op != "Add") {
         return false;
     }
 
-    let left = false;
-    let right = false;
+    var left = false;
+    var right = false;
 
     if (leftNode._astname == "BinOp") {
         if (!isBinopString(leftNode)) {
@@ -381,7 +397,7 @@ function searchForReturn(astNode) {
             var astNodeKeys = Object.keys(astNode.body);
             for (var r = 0; r < astNodeKeys.length; r++) {
                 var node = astNode.body[astNodeKeys[r]];
-                let ret = searchForReturn(node);
+                var ret = searchForReturn(node);
                 if (ret != null) {
                     return ret;
                 }
@@ -391,7 +407,7 @@ function searchForReturn(astNode) {
             var astNodeKeys = Object.keys(astNode);
             for (var r = 0; r < astNodeKeys.length; r++) {
                 var node = astNode[astNodeKeys[r]];
-                let ret = searchForReturn(node);
+                var ret = searchForReturn(node);
                 if (ret != null) {
                     return ret;
                 }
@@ -415,17 +431,28 @@ function collectVariableInfo(node) {
             lineNumber = ccState.getProperty('parentLineNumber');
         }
 
+        var assignedInsideLoop = false;
+        var loopLine = -1;
+        var parentsList = [];
+        getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList);
+        for (var i = parentsList.length - 1; i >= 0; i--) {
+            if (parentsList[i].id == "Loop") {
+                assignedInsideLoop = true;
+                loopLine = parentsList[i].startline;
+                break;
+            }
+        }
 
         if (node._astname == "Assign" && node.targets.length == 1) {
             //does it already exist in the directory
             if ("id" in node.targets[0] && "v" in node.targets[0].id) {
-                let assignedName = node.targets[0].id.v;
+                var assignedName = node.targets[0].id.v;
 
-                let varObject = { name: assignedName, assignments: [] };
-                let alreadyExists = false;
+                var varObject = { name: assignedName, assignments: [] };
+                var alreadyExists = false;
 
-                let currentVars = ccState.getProperty("allVariables");
-                for (let i = 0; i < currentVars.length; i++) {
+                var currentVars = ccState.getProperty("allVariables");
+                for (var i = 0; i < currentVars.length; i++) {
                     if (currentVars[i].name == assignedName) {
                         varObject = currentVars[i];
                         alreadyExists = true;
@@ -433,30 +460,44 @@ function collectVariableInfo(node) {
                     }
                 }
 
-                varObject.assignments.push({ line: lineNumber, value: node.value });
+
+
+
+                if (assignedInsideLoop) {
+
+                    varObject.assignments.push({ line: loopLine, value: node.value });
+                    varObject.assignments.push({ line: loopLine, value: node.value });
+                    //we do this twice on purpose
+                }
+                else {
+
+
+                    varObject.assignments.push({ line: lineNumber, value: node.value });
+                }
+
 
                 //function alias tracking
-                let currentFuncs = ccState.getProperty("userFunctions");
+                var currentFuncs = ccState.getProperty("userFunctionReturns");
 
                 if (node.value._astname == "Name") {
 
-                    let assignedAlias = node.value.id.v;
-                    let assignmentExists = false;
-                    for (let i = 0; i < currentFuncs.length; i++) {
+                    var assignedAlias = node.value.id.v;
+                    var assignmentExists = false;
+                    for (var i = 0; i < currentFuncs.length; i++) {
                         if ((currentFuncs[i].name == assignedAlias && !currentFuncs[i].aliases.includes(assignedName)) || (currentFuncs[i].aliases.includes(assignedAlias) && !currentFuncs[i].aliases.includes(assignedName))) {
                             assignmentExists = true;
                             currentFuncs[i].aliases.push(assignedName);
                         }
                     }
 
-                    let isRename = false;
+                    var isRename = false;
                     //is it a built in or api func?
                     isRename = (ccState.apiFunctions.includes(assignedAlias) || ccState.builtInNames.includes(assignedAlias));
-                        
 
-                    if (!assignmentExists && isRename) { 
 
-                        ccState.getProperty("userFunctions").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 });
+                    if (!assignmentExists && isRename) {
+
+                        ccState.getProperty("userFunctionReturns").push({ name: assignedAlias, returns: false, params: false, aliases: [assignedName], calls: [], start: 0, end: 0 });
                     }
                 }
 
@@ -467,15 +508,15 @@ function collectVariableInfo(node) {
             }
 
         }
-        
+
         if (node._astname == "AugAssign" && node.target._astname == "Name") {
-            let assignedName = node.target.id.v;
+            var assignedName = node.target.id.v;
 
-            let varObject = { name: assignedName, assignments: [] };
-            let alreadyExists = false;
+            var varObject = { name: assignedName, assignments: [] };
+            var alreadyExists = false;
 
-            let currentVars = ccState.getProperty("allVariables");
-            for (let i = 0; i < currentVars.length; i++) {
+            var currentVars = ccState.getProperty("allVariables");
+            for (var i = 0; i < currentVars.length; i++) {
                 if (currentVars[i].name == assignedName) {
                     varObject = currentVars[i];
                     alreadyExists = true;
@@ -483,7 +524,15 @@ function collectVariableInfo(node) {
                 }
             }
 
-            varObject.assignments.push({ line: lineNumber, value: node.value });
+            if (assignedInsideLoop) {
+
+                varObject.assignments.push({ line: loopLine, value: node.value });
+                varObject.assignments.push({ line: loopLine, value: node.value });
+                //we do this twice on purpose
+            }
+            else {
+                varObject.assignments.push({ line: lineNumber, value: node.value });
+            }
 
 
             if (!alreadyExists) {
@@ -494,12 +543,12 @@ function collectVariableInfo(node) {
 
         if (node._astname == "For") {
             //check and add the iterator
-            let assignedName = node.target.id.v;
-            let varObject = { name: assignedName, assignments: [] };
-            let alreadyExists = false;
+            var assignedName = node.target.id.v;
+            var varObject = { name: assignedName, assignments: [] };
+            var alreadyExists = false;
 
-            let currentVars = ccState.getProperty("allVariables");
-            for (let i = 0; i < currentVars.length; i++) {
+            var currentVars = ccState.getProperty("allVariables");
+            for (var i = 0; i < currentVars.length; i++) {
                 if (currentVars[i].name == assignedName) {
                     varObject = currentVars[i];
                     alreadyExists = true;
@@ -507,9 +556,42 @@ function collectVariableInfo(node) {
                 }
             }
 
+
             //this is done twice intentionally
-            varObject.assignments.push({ line: lineNumber, value: node.value });
-            varObject.assignments.push({ line: lineNumber, value: node.value });
+            varObject.assignments.push({ line: lineNumber, value: node });
+            varObject.assignments.push({ line: lineNumber, value: node });
+
+
+            if (!alreadyExists) {
+                ccState.getProperty("allVariables").push(varObject);
+            }
+        }
+
+        if (node._astname == "JSFor") {
+            if ("init" in node) {
+                var assignedName = node.init.targets[0].id.v;
+                var varObject = { name: assignedName, assignments: [] };
+                var alreadyExists = false;
+
+                var currentVars = ccState.getProperty("allVariables");
+                for (var i = 0; i < currentVars.length; i++) {
+                    if (currentVars[i].name == assignedName) {
+                        varObject = currentVars[i];
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+
+
+                //this is done twice intentionally
+                varObject.assignments.push({ line: lineNumber, value: node });
+                varObject.assignments.push({ line: lineNumber, value: node });
+
+
+                if (!alreadyExists) {
+                    ccState.getProperty("allVariables").push(varObject);
+                }
+            }
         }
     }
 }
@@ -521,11 +603,11 @@ function reverseValueTrace(isVariable, name, lineNo) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
 
 
-            let latestAssignment = null;
+            var latestAssignment = null;
 
-            let thisVar = null;
-            let varList = ccState.getProperty("allVariables");
-            for (let i = 0; i < varList.length; i++) {
+            var thisVar = null;
+            var varList = ccState.getProperty("allVariables");
+            for (var i = 0; i < varList.length; i++) {
                 if (varList[i].name == name) {
                     thisVar = varList[i];
                 }
@@ -535,14 +617,14 @@ function reverseValueTrace(isVariable, name, lineNo) {
             }
 
             //get most recent outside-of-function assignment (or inside-this-function assignment)
-            let funcLines = ccState.getProperty("functionLines");
-            let funcObjs = ccState.getProperty("userFunctions");
-            let highestLine = 0;
+            var funcLines = ccState.getProperty("functionLines");
+            var funcObjs = ccState.getProperty("userFunctionReturns");
+            var highestLine = 0;
             if (funcLines.includes(lineNo)) {
                 //what function are we in
-                let startLine = 0;
-                let endLine = 0;
-                for (let i = 0; i < funcObjs.length; i++) {
+                var startLine = 0;
+                var endLine = 0;
+                for (var i = 0; i < funcObjs.length; i++) {
                     if (funcObjs[i].start < lineNo && funcObjs[i].end >= lineNo) {
                         startLine = funcObjs[i].start;
                         endLine = funcObjs[i].end;
@@ -550,7 +632,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                     }
                 }
 
-                for (let i = 0; i < thisVar.assignments.length; i++) {
+                for (var i = 0; i < thisVar.assignments.length; i++) {
                     if (thisVar.assignments[i].line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && thisVar.assignments[i].line > startLine && thisVar.assignments[i].line <= endLine) {
                         //then it's valid
                         if (thisVar.assignments[i].line > highestLine) {
@@ -574,14 +656,14 @@ function reverseValueTrace(isVariable, name, lineNo) {
                 else if (latestAssignment.value._astname == "Call") {
                     //either a builtin, or a user func
                     //get name
-                    let calledName = "";
+                    var calledName = "";
                     if (node.func._astname == "Name") {
                         //find name
                         calledName = node.func.id.v;
                         //is it a built-in func that returns a str or list? check that first
                         if (ccState.builtInNames.includes(calledName)) {
                             //lookup and return
-                            for (let j = 0; j < ccState.builtInReturns.length; j++) {
+                            for (var j = 0; j < ccState.builtInReturns.length; j++) {
                                 if (ccState.builtInReturns[j].name == calledName) {
                                     return ccState.builtInReturns[j].returns;
                                 }
@@ -590,7 +672,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                         }
                         else {
                             //assume it's a user function.
-                            for (let j = 0; j < funcObjs.length; j++) {
+                            for (var j = 0; j < funcObjs.length; j++) {
                                 if ((funcObjs[j].name == calledName || funcObjs[j].aliases.includes(calledName)) && funcObj[j].returnVals.length > 0) {
                                     return getTypeFromASTNode(funcObj[j].returnVals[0]);
                                 }
@@ -601,7 +683,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                     else if (node.func._astname == "Attribute") {
                         //console.log(node.func._astname);
                         calledName = node.func.attr.v;
-                        //TODO this is probably a string or list op, so let's maybe take a look into what it's being performed on
+                        //TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         //str, list,or var. if var or func return do a reverse variable search, other3wise return
                         if (node.func.value._astname == "Str") {
                             return "Str";
@@ -616,7 +698,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                         }
                         if (node.func.value._astname == "Call") {
                             //find the function name and do a recursive call on it
-                            let funcName = "";
+                            var funcName = "";
                             if (node.func.value.func._astname == "Attribute") {
                                 funcName = node.func.value.func.attr.v;
                                 return reverseValueTrace(false, funcName, node.lineno);
@@ -643,7 +725,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
             else {
                 //then we're OUTSIDE a function.
                 //gather up all of the assignments to this point NOT in a function, and get the most recent one there
-                for (let i = 0; i < thisVar.assignments.length; i++) {
+                for (var i = 0; i < thisVar.assignments.length; i++) {
                     if (thisVar.assignments[i].line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(thisVar.assignments[i].line) && !funcLines.includes(thisVar.assignments[i].line)) {
                         //then it's valid
                         if (thisVar.assignments[i].line > highestLine) {
@@ -664,14 +746,14 @@ function reverseValueTrace(isVariable, name, lineNo) {
                 else if (latestAssignment.value._astname == "Call") {
                     //either a builtin, or a user func
                     //get name
-                    let calledName = "";
-                    if (node.func._astname == "Name") {
+                    var calledName = "";
+                    if (latestAssignment.value.func._astname == "Name") {
                         //find name
-                        calledName = node.func.id.v;
+                        calledName = latestAssignment.value.func.id.v;
                         //is it a built-in func that returns a str or list? check that first
                         if (ccState.builtInNames.includes(calledName)) {
                             //lookup and return
-                            for (let j = 0; j < ccState.builtInReturns.length; j++) {
+                            for (var j = 0; j < ccState.builtInReturns.length; j++) {
                                 if (ccState.builtInReturns[j].name == calledName) {
                                     return ccState.builtInReturns[j].returns;
                                 }
@@ -681,7 +763,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                         else {
 
                             //assume it's a user function.
-                            for (let j = 0; j < funcObjs.length; j++) {
+                            for (var j = 0; j < funcObjs.length; j++) {
                                 if ((funcObjs[j].name == calledName || funcObjs[j].aliases.includes(calledName)) && funcObj[j].returnVals.length > 0) {
                                     return getTypeFromASTNode(funcObj[j].returnVals[0]);
                                 }
@@ -689,32 +771,32 @@ function reverseValueTrace(isVariable, name, lineNo) {
                         }
 
                     }
-                    else if (node.func._astname == "Attribute") {
-                        //console.log(node.func._astname);
-                        calledName = node.func.attr.v;
-                        //TODO this is probably a string or list op, so let's maybe take a look into what it's being performed on
+                    else if (latestAssignment.value.func._astname == "Attribute") {
+                        //console.log(latestAssignment.value.func._astname);
+                        calledName = latestAssignment.value.func.attr.v;
+                        //TODO this is probably a string or list op, so var's maybe take a look into what it's being performed on
                         //str, list,or var. if var or func return do a reverse variable search, other3wise return
-                        if (node.func.value._astname == "Str") {
+                        if (latestAssignment.value.func.value._astname == "Str") {
                             return "Str";
                         }
-                        if (node.func.value._astname == "List") {
+                        if (latestAssignment.value.func.value._astname == "List") {
                             return "List";
                         }
 
-                        if (node.func.value._astname == "Name") {
+                        if (latestAssignment.value.func.value._astname == "Name") {
 
-                            return reverseValueTrace(true, node.func.value.id.v, node.lineno);
+                            return reverseValueTrace(true, latestAssignment.value.func.value.id.v, latestAssignment.value.lineno);
                         }
-                        if (node.func.value._astname == "Call") {
+                        if (latestAssignment.value.func.value._astname == "Call") {
                             //find the function name and do a recursive call on it
-                            let funcName = "";
-                            if (node.func.value.func._astname == "Attribute") {
-                                funcName = node.func.value.func.attr.v;
-                                return reverseValueTrace(false, funcName, node.lineno);
+                            var funcName = "";
+                            if (latestAssignment.value.func.value.func._astname == "Attribute") {
+                                funcName = latestAssignment.value.func.value.func.attr.v;
+                                return reverseValueTrace(false, funcName, latestAssignment.value.lineno);
                             }
-                            else if (node.func.value.func._astname == "Name") {
-                                funcName = node.func.value.func.id.v;
-                                return reverseValueTrace(false, funcName, node.lineno);
+                            else if (latestAssignment.value.func.value.func._astname == "Name") {
+                                funcName = latestAssignment.value.func.value.func.id.v;
+                                return reverseValueTrace(false, funcName, latestAssignment.value.lineno);
                             }
                             else {
                                 return "";
@@ -741,17 +823,17 @@ function reverseValueTrace(isVariable, name, lineNo) {
             //we get the return value of the function. this is mostly not super hard.
             //first - is it built in?
             if (ccState.builtInNames.includes(name)) {
-                for (let i = 0; i < ccState.builtInReturns.length; i++) {
+                for (var i = 0; i < ccState.builtInReturns.length; i++) {
                     if (ccState.builtInReturns[i].name == name) {
                         return ccState.builtInReturns[i].returns;
                     }
                 }
             }
             else {
-                let userFuncs = ccState.getProperty("userFunctions");
+                var userFuncs = ccState.getProperty("userFunctionReturns");
                 //find it in user defined functions
-                let funcObj = null;
-                for (let i = 0; i < userFuncs.length; i++) {
+                var funcObj = null;
+                for (var i = 0; i < userFuncs.length; i++) {
                     if (userFuncs[i].name == name) {
                         funcObj = userFuncs[i];
                         break;
@@ -765,15 +847,15 @@ function reverseValueTrace(isVariable, name, lineNo) {
                 return getTypeFromASTNode(funcObj.returnVals[0]);
             }
         }
-        
+
     }
     return "";
 
 }
 
 function getTypeFromASTNode(node) {
-    
-    let autoReturns = ["List", "Str"];
+
+    var autoReturns = ["List", "Str"];
     if (autoReturns.includes(node._astname)) {
         return node._astname;
     }
@@ -789,7 +871,7 @@ function getTypeFromASTNode(node) {
     }
     else if (node._astname == "Call") {
         //get name
-        let funcName = "";
+        var funcName = "";
         if ("attr" in node.func) {
             funcName = node.func.attr.v;
         }
@@ -807,8 +889,8 @@ function getTypeFromASTNode(node) {
         }
 
         //either a function alias or var.
-        let funcs = ccState.getProperty("userFunctions");
-        for (let i = 0; i < funcs.length; i++) {
+        var funcs = ccState.getProperty("userFunctionReturns");
+        for (var i = 0; i < funcs.length; i++) {
             if (funcs[i].name == node.id.v || funcs[i].aliases.includes(node.id.v)) {
                 return "Func";
             }
@@ -818,19 +900,19 @@ function getTypeFromASTNode(node) {
     return "";
 }
 
-function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLine = []) { // = []
+function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLine = [], origLine = -1) { // = []
     if (ast != null && ast.body != null) {
         var astKeys = Object.keys(ast.body);
         for (var r = 0; r < astKeys.length; r++) {
             var node = ast.body[astKeys[r]];
             //parent node tracing
-            let newParents = parentNodes.slice(0);
+            var newParents = parentNodes.slice(0);
             newParents.push([node, astKeys[r]]);
             //is the node a value thingy?
-            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine)) {
+            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, -1, origLine) == true) {
                 return true;
             }
-            if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine)) {
+            if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) == true) {
                 return true;
             }
         }
@@ -840,46 +922,46 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
         for (var r = 0; r < astKeys.length; r++) {
             var node = ast[astKeys[r]];
 
-            let newParents = parentNodes.slice(0);
+            var newParents = parentNodes.slice(0);
             newParents.push([node, astKeys[r]]);
-            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine)) {
+            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, -1, origLine) == true) {
                 return true;
             }
-            if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine)) {
+            if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) == true) {
                 return true;
             }
         }
     }
     else if (ast != null && ast._astname != null && ast._astname == "Expr") {
-        let newParents = parentNodes.slice(0);
+        var newParents = parentNodes.slice(0);
         newParents.push([ast.value, "Expr"]);
-        if (findValueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine)) {
+        if (findValueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, -1, origLine) == true) {
             return true;
         }
-        if (valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine)) {
+        if (valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) == true) {
             return true;
         }
     }
 
     //nodes that need extra testing
     if (ast != null && ast._astname != null && "test" in ast) {
-        let newParents = parentNodes.slice(0);
+        var newParents = parentNodes.slice(0);
         newParents.push([ast.test, "test"]);
-        if (findValueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine)) {
+        if (findValueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, -1, origLine) == true) {
             return true;
         }
-        if (valueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine)) {
+        if (valueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, origLine) == true) {
             return true;
         }
     }
 
     if (ast != null && ast._astname != null && "iter" in ast) {
-        let newParents = parentNodes.slice(0);
+        var newParents = parentNodes.slice(0);
         newParents.push([ast.iter, "iter"]);
-        if (findValueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine)) {
+        if (findValueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, -1, origLine) == true) {
             return true;
         }
-        if (valueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine)) {
+        if (valueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, origLine) == true) {
             return true;
         }
     }
@@ -888,9 +970,13 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
 
 }
 
-function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, subscriptValue = -1) { //
+
+function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, subscriptValue = -1, origLine = -1, tracedNodes = []) { //
+
+
 
     if (node != null && node._astname != null) {
+
         //get linenumber info
         var lineNumber = 0;
         if (node.lineno != null) {
@@ -905,8 +991,8 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         }
 
         //is it what we're looking for?
-        let found = false;
-        let assignedFunc = false;
+        var found = false;
+        var assignedFunc = false;
 
         if (node._astname == "Name" && isVariable) {
             //is it the RIGHT name
@@ -925,14 +1011,14 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
 
             if (node.func._astname == "Name") {
 
-                let calledName = node.func.id.v;
+                var calledName = node.func.id.v;
                 if (calledName == name) {
                     found = true;
                 }
                 else {
                     //check if it's an alias
-                    let currentFuncs = ccState.getProperty("userFunctions");
-                    for (let i = 0; i < currentFuncs; i++) {
+                    var currentFuncs = ccState.getProperty("userFunctionReturns");
+                    for (var i = 0; i < currentFuncs.length; i++) {
                         if (currentFuncs[i].aliases.includes(name)) {
                             found = true;
                             break;
@@ -981,7 +1067,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         //do uses
 
 
-       // console.log(name, nodeParent, secondParent);
+        // console.log(name, nodeParent, secondParent);
 
 
         //is it in a func arg
@@ -994,12 +1080,30 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         else if (thisNode[1] == "iter") {
             isUse = true;
         }
-        else if (nodeParent[1] == "comparators" && secondParent[1] == "test" && parentNodes.length > 3 && parentNodes[parentNodes.length - 4][0]._astname == "JSFor") {
-            //for loop test
-            isUse == true;
+        else {
+
+            //check parents
+            for (var i = parentNodes.length - 1; i >= 0; i--) {
+                if (parentNodes[i][1] == "args") {
+                    isUse = true;
+                    break;
+                }
+                else if (parentNodes[i][1] == "test") {
+                    isUse = true;
+                    break;
+                }
+                else if (parentNodes[i][1] == "iter") {
+                    isUse = true;
+                    break;
+                }
+            }
+
+
         }
 
-        let isWithin = useLine.length == 0;
+
+
+        var isWithin = useLine.length == 0;
 
         if (useLine.length > 0 && lineNumber >= useLine[0] && lineNumber <= useLine[1]) {
             isWithin = true;
@@ -1013,19 +1117,45 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         }
 
         //2. is it a reassignment?
-        let isAssigned = false;
-        let assignedName = "";
+        var isAssigned = false;
+        var assignedName = "";
 
         if (nodeParent[0]._astname == "Assign" && thisNode[1] == "value") {
-            isAssigned = true;
-            if (nodeParent[0].targets[0]._astname == "Name") {
-                assignedName = nodeParent[0].targets[0].id.v;
+            var assignedProper = false;
+
+            //assignedproper is based on parent node in codestructure
+
+            var assignmentDepthAndParent = ccHelpers.locateDepthAndParent(nodeParent[0].lineno, ccState.getProperty("codeStructure"), { count: 0 });
+            //find original use depth and parent, then compare.
+            // useLine    is the use line number
+            var useDepthAndParent = ccHelpers.locateDepthAndParent(origLine, ccState.getProperty("codeStructure"), { count: 0 });
+
+            // [-1, {}] depth # and parent structure node.
+            if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
+                assignedProper = true;
+            }
+            else if (assignmentDepthAndParent[0] == useDepthAndParent[0] && assignmentDepthAndParent[1].startline == useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline == useDepthAndParent[1].endline) {
+                assignedProper = true;
+            }
+            if (assignedProper == true) {
+                isAssigned = true;
+                if (nodeParent[0].targets[0]._astname == "Name") {
+                    assignedName = nodeParent[0].targets[0].id.v;
+                }
             }
         }
 
         //2a. if so, check the root ast for THAT name
-        if (isAssigned) {
-            return valueTrace(isVariable, assignedName, rootAst, [], rootAst, lineVar, useLine);
+        if (isAssigned == true) {
+            var varBool = isVariable;
+
+            //if a function output is assigned to a variable, change isVariable to true
+            if (!isVariable && thisNode[0]._astname == "Call") {
+                varBool = true;
+            }
+
+            console.log(nodeParent[0].lineno);
+            return valueTrace(varBool, assignedName, rootAst, [], rootAst, lineVar, useLine, nodeParent[0].lineno, tracedNodes);
         }
     }
     //general catch-all if none of the above is true
@@ -1037,10 +1167,10 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
 function doComplexityOutput(results, rootAst) {
 
     //do loop nesting check
-    let finalLoops = ccState.getProperty("loopLocations").slice(0);
+    var finalLoops = ccState.getProperty("loopLocations").slice(0);
     finalLoops.sort(sortLoopValues);
-    for (let i = 0; i < finalLoops.length - 1; i++) {
-        for (let j = i + 1; j < finalLoops.length; j++) {
+    for (var i = 0; i < finalLoops.length - 1; i++) {
+        for (var j = i + 1; j < finalLoops.length; j++) {
             if (finalLoops[i][0] < finalLoops[j][0] && finalLoops[i][1] >= finalLoops[j][1]) {
                 //thgese loops are nested
                 results.codeFeatures.iteration.nesting = 1;
@@ -1051,31 +1181,31 @@ function doComplexityOutput(results, rootAst) {
 
     //do variable scoring
     var variableList = ccState.getProperty("allVariables");
-    for (let i = 0; i < variableList.length; i++) {
+    for (var i = 0; i < variableList.length; i++) {
         var lineNoObj = { line: 0 };
-        if (valueTrace(true, variableList[i].name, rootAst, [], rootAst, lineNoObj)) {
+        if (valueTrace(true, variableList[i].name, rootAst, [], rootAst, lineNoObj, [], variableList[i].assignments[0].line)) {
             if (!ccState.getProperty("uncalledFunctionLines").includes(lineNoObj.line)) {
                 if (results.codeFeatures.variables < 1) {
                     results.codeFeatures.variables = 1;
                 }
-                let lineNo = lineNoObj.line;
-                let loopLines = ccState.getProperty("loopLocations");
+                var lineNo = lineNoObj.line;
+                var loopLines = ccState.getProperty("loopLocations");
 
                 //what about multiple assignments
                 if (variableList[i].assignments.length > 0) {
                     //get line numbers of all assignments
-                    let lineAssignments = [];
-                    for (let j = 0; j < variableList[i].assignments.length; j++) {
+                    var lineAssignments = [];
+                    for (var j = 0; j < variableList[i].assignments.length; j++) {
                         lineAssignments.push(variableList[i].assignments[j].line);
                     }
 
-                    let counter = 0;
-                    for (let k = 0; k < lineAssignments.length; k++) {
+                    var counter = 0;
+                    for (var k = 0; k < lineAssignments.length; k++) {
                         if (lineAssignments[k] < lineNo) {
                             counter += 1;
 
                             //check loops too
-                            for (let m = 0; m < loopLines.length; m++) {
+                            for (var m = 0; m < loopLines.length; m++) {
                                 if (lineAssignments[k] > loopLines[m][0] && lineAssignments[k] <= loopLines[m][1]) {
                                     counter += 1;
                                 }
@@ -1096,28 +1226,28 @@ function doComplexityOutput(results, rootAst) {
         }
     }
 
-    let structure = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body) };
-    for (let i = 0; i < rootAst.body.length; i++) {
-        structure.children.push(buildStructuralRepresentation(rootAst.body[i], structure));
+    var structure = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body) };
+    for (var i = 0; i < rootAst.body.length; i++) {
+        structure.children.push(buildStructuralRepresentation(rootAst.body[i], structure, rootAst));
     }
 
-    let depthObj = { depth: 0 };
+    var depthObj = { depth: 0 };
 
     //do structural depth
     countStructuralDepth(structure, depthObj, null);
 
-    results.codeStructure["depth"] = depthObj.depth;
-    results.codeStructure["structure"] = structure;
+    results.ccState.getProperty("codeStructure")["depth"] = depthObj.depth;
+    results.ccState.getProperty("codeStructure")["structure"] = structure;
 
-    if (results.codeStructure["depth"] > 3) {
-        results.codeStructure["depth"] = 3;
+    if (results.ccState.getProperty("codeStructure")["depth"] > 3) {
+        results.ccState.getProperty("codeStructure")["depth"] = 3;
     }
 
 }
 
 function sortLoopValues(a, b) {
-    let scoreA = a[1] - a[0];
-    let scoreB = b[1] - b[0];
+    var scoreA = a[1] - a[0];
+    var scoreB = b[1] - b[0];
 
 
     return scoreB - scoreA;
@@ -1134,7 +1264,7 @@ function countStructuralDepth(structureObj, depthCountObj, parentObj) {
         }
     }
     if (structureObj.children != null && structureObj.children.length > 0) {
-        for (let i = 0; i < structureObj.children.length; i++) {
+        for (var i = 0; i < structureObj.children.length; i++) {
             countStructuralDepth(structureObj.children[i], depthCountObj, structureObj);
         }
     }
@@ -1156,23 +1286,23 @@ function analyzeASTNode(node, results) {
             if (node._astname === "For") {
 
                 //mark loop
-                let firstLine = lineNumber;
-                let lastLine = ccHelpers.getLastLine(node);
+                var firstLine = lineNumber;
+                var lastLine = ccHelpers.getLastLine(node);
 
-                let loopRange = false;
+                var loopRange = false;
                 ccState.getProperty("loopLocations").push([firstLine, lastLine]);
 
                 //is the iterator range()?
                 if (node.iter._astname == "Call") {
                     //is the iter call to range()
                     if (node.iter.func._astname == "Name") {
-                        let iterFuncName = node.iter.func.id.v;
-                        let isRange = iterFuncName == "range";
+                        var iterFuncName = node.iter.func.id.v;
+                        var isRange = iterFuncName == "range";
 
                         //check for renames (unlikely, but we should do it)
                         if (!isRange) {
-                            let currentFuncs = ccState.getProperty("userFunctions");
-                            for (let i = 0; i < currentFuncs.length; i++) {
+                            var currentFuncs = ccState.getProperty("userFunctionReturns");
+                            for (var i = 0; i < currentFuncs.length; i++) {
                                 if (currentFuncs[i].aliases.includes(iterFuncName) && currentFuncs[i].name == "range") {
                                     isRange = true;
                                     break;
@@ -1181,7 +1311,7 @@ function analyzeASTNode(node, results) {
                         }
                         loopRange = isRange;
                         //check number of args
-                        let numArgs = node.iter.args.length;
+                        var numArgs = node.iter.args.length;
 
                         if (results.codeFeatures.iteration.forLoopsPY < numArgs && !ccState.getProperty("isJavascript")) {
                             results.codeFeatures.iteration.forLoopsPY = numArgs;
@@ -1202,8 +1332,8 @@ function analyzeASTNode(node, results) {
                 //test node needs hand checking
 
                 //mark loop
-                let firstLine = lineNumber;
-                let lastLine = ccHelpers.getLastLine(node);
+                var firstLine = lineNumber;
+                var lastLine = ccHelpers.getLastLine(node);
                 results.codeFeatures.iteration.forLoopsJS = 1;
                 ccState.getProperty("loopLocations").push([firstLine, lastLine]);
             }
@@ -1222,16 +1352,16 @@ function analyzeASTNode(node, results) {
                     recursiveAnalyzeAST(node.orelse, results);
                 }
 
-                let conditionalsList = [];
+                var conditionalsList = [];
                 analyzeConditionalTest(node.test, conditionalsList);
-                for (let k = 0; k < conditionalsList.length; k++) {
+                for (var k = 0; k < conditionalsList.length; k++) {
                     if (!results.codeFeatures.conditionals.usedInConditionals.includes(conditionalsList[k])) {
                         results.codeFeatures.conditionals.usedInConditionals.push(conditionalsList[k]);
                     }
                 }
             }
             else if (node._astname === "UnaryOp") {
-                recursiveAnalyzeAST(node.operand, results, loopParent);
+                recursiveAnalyzeAST(node.operand, results);
             }
             else if (node._astname === "Subscript") {
                 results.codeFeatures.features.indexing = 1;
@@ -1249,20 +1379,67 @@ function analyzeASTNode(node, results) {
                 results.codeFeatures.iteration.whileLoops = 1;
 
                 //mark loop
-                let firstLine = lineNumber;
-                let lastLine = ccHelpers.getLastLine(node);
+                var firstLine = lineNumber;
+                var lastLine = ccHelpers.getLastLine(node);
 
                 ccState.getProperty("loopLocations").push([firstLine, lastLine]);
             }
             else if (node._astname == "Call") {
+
+                var calledName = "";
+                var calledOn = "";
+                if (node.func._astname == "Name") {
+                    //find name
+                    calledName = node.func.id.v;
+                    if (node.args.length > 0) {
+                        calledOn = ccHelpers.estimateDataType(node.args[0]);
+                    }
+
+                }
+                else if (node.func._astname == "Attribute") {
+                    //console.log(node.func._astname);
+                    calledName = node.func.attr.v;
+                    if ("value" in node.func) {
+                        calledOn = ccHelpers.estimateDataType(node.func.value);
+                    }
+                }
+                //list and strop calls
+                var isListFunc = false;
+                var isStrFunc = false;
+
+                if (ccState.getProperty("listFuncs").includes(calledName)) {
+
+                    if (calledOn == "List") {
+                        isListFunc = true;
+                    }
+
+                    if (isListFunc) {
+                        results.codeFeatures.features.listOps = 1;
+                    }
+                }
+                if (ccState.getProperty("strFuncs").includes(calledName)) {
+
+                    if (calledOn == "Str") {
+                        isListFunc = true;
+                    }
+
+
+                    if (isStrFunc) {
+                        results.codeFeatures.features.strOps = 1;
+                    }
+                }
+
+
+
                 if ("id" in node.func) {
                     if (node.func.id.v == "makeBeat") {
                         markMakeBeat(node, results);
                     }
                     else {
                         //double check for aliases
-                        let funcs = ccState.getProperty("userFunctions");
-                        for (let i = 0; i < funcs.length; i++) {
+
+                        var funcs = ccState.getProperty("userFunctionReturns");
+                        for (var i = 0; i < funcs.length; i++) {
                             if (funcs[i].name == "makeBeat" && funcs[i].aliases.includes(node.func.id.v)) {
                                 markMakeBeat(node, results);
                             }
@@ -1300,71 +1477,130 @@ function appendOrElses(node, orElseList) {
     return;
 }
 
-function buildStructuralRepresentation(nodeToUse, parentNode) {
-    let node = nodeToUse;
+function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
+    var node = nodeToUse;
     if (nodeToUse._astname == "Expr") {
         node = nodeToUse.value;
     }
 
-    let returnObject = { id: "", children: [], startLine: node.lineno, endline: ccHelpers.getLastLine(node) };
+    var returnObject = { id: "", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode };
     if (node._astname == "Call") {
-        //find the function
-        if (node.func._astname != "Name") {
-            returnObject.id = node._astname;
-            return returnObject;
-        }
-        let funcObj = null;
-        let functionList = ccState.getProperty("userFunctions");
-        for (let i = 0; i < functionList.length; i++) {
-            if (functionList[i].name == node.func.id.v || functionList[i].aliases.includes(node.func.id.v)) {
-                funcObj = functionList[i];
+
+        //if the parent is the definition of a function with the same name, handle the recursion. if this goes ahead recursively, the stack WILL explode.
+        var isRecursive = false;
+
+        var firstParent = parentNode;
+        var nameObj = { name: "", start: -1, end: -1 };
+        var whileCount = 0;
+        while ("parent" in firstParent) {
+            if (firstParent.id == "FunctionDef") {
+                //now we figure out the name of the function
+                var defLine = firstParent.startline;
+
+                recursiveCallOnNodes(findFunctionDefName, [defLine, nameObj], ast);
+            }
+            else if (firstParent.id == "functionCall") {
+                var defLine = firstParent.startline;
+
+                recursiveCallOnNodes(findFunctionCallName, [defLine, nameObj], ast);
+            }
+            firstParent = firstParent.parent;
+
+
+            if (nameObj.name != "" && node.lineno >= nameObj.start && node.lineno <= nameObj.end) {
+                isRecursive = true;
+                break;
+            }
+
+            //emergency break so as not to interrupt user experience
+            whileCount++;
+            if (whileCount > 100) {
                 break;
             }
         }
-        if (funcObj == null) {
-            returnObject.id = node._astname;
-            return returnObject;
+
+        if (isRecursive) {
+            //handle
+            if (node.func._astname != "Name") {
+                returnObject.id = node._astname;
+                return returnObject;
+            }
+            var funcObj = null;
+            var functionList = ccState.getProperty("userFunctionReturns");
+            for (var i = 0; i < functionList.length; i++) {
+                if (functionList[i].name == node.func.id.v || functionList[i].aliases.includes(node.func.id.v)) {
+                    funcObj = functionList[i];
+                    break;
+                }
+            }
+            if (funcObj == null) {
+                returnObject.id = node._astname;
+                return returnObject;
+            }
+            returnObject.id = "functionCall";
+            //dummy node for accurate depth count
+            returnObject.children.push({ id: "functionCall", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: returnObject });
+
+        }
+        else {
+            //find the function
+            if (node.func._astname != "Name") {
+                returnObject.id = node._astname;
+                return returnObject;
+            }
+            var funcObj = null;
+            var functionList = ccState.getProperty("userFunctionReturns");
+            for (var i = 0; i < functionList.length; i++) {
+                if (functionList[i].name == node.func.id.v || functionList[i].aliases.includes(node.func.id.v)) {
+                    funcObj = functionList[i];
+                    break;
+                }
+            }
+            if (funcObj == null) {
+                returnObject.id = node._astname;
+                return returnObject;
+            }
+
+            returnObject.id = "functionCall";
+
+            for (var i = 0; i < funcObj.functionBody.length; i++) {
+                returnObject.children.push(buildStructuralRepresentation(funcObj.functionBody[i], returnObject, ast));
+            }
         }
 
-        returnObject.id = "functionCall";
-
-        for (let i = 0; i < funcObj.functionBody.length; i++) {
-            returnObject.children.push(buildStructuralRepresentation(funcObj.functionBody[i], returnObject));
-        }
-        
     }
     else if (node._astname == "If") {
         //returnObject.id = "If";
-        let ifNode = { id: "If", children: [] };
+        var ifNode = { id: "If", children: [] };
 
-        for (let i = 0; i < node.body.length; i++) {
-            ifNode.children.push(buildStructuralRepresentation(node.body[i], ifNode));
+        for (var i = 0; i < node.body.length; i++) {
+            ifNode.children.push(buildStructuralRepresentation(node.body[i], ifNode, ast));
         }
 
         //parentNode.children.push(ifNode);
 
-        let orElses = [];
+        var orElses = [];
 
-        
+
         appendOrElses(node, orElses);
 
         if (orElses.length > 0) {
             parentNode.children.push(ifNode);
         }
 
-        for (let p = 0; p < orElses.length - 1; p++) {
-            let thisOrElse = { id: "Else", children: [] };
-            for (let j = 0; j < orElses[p].length; j++) {
-                thisOrElse.children.push(buildStructuralRepresentation(orElses[p][j], thisOrElse));
+        for (var p = 0; p < orElses.length - 1; p++) {
+            var thisOrElse = { id: "Else", children: [] };
+            for (var j = 0; j < orElses[p].length; j++) {
+                thisOrElse.children.push(buildStructuralRepresentation(orElses[p][j], thisOrElse, ast));
             }
             parentNode.children.push(Object.assign({}, thisOrElse));
         }
 
         //do and return last orElse
         if (orElses.length > 0) {
-            let lastOrElse = { id: "Else", children: [] };
-            for (let j = 0; j < orElses[orElses.length - 1].length; j++) {
-                lastOrElse.children.push(buildStructuralRepresentation(orElses[orElses.length - 1][j], lastOrElse));
+            var lastOrElse = { id: "Else", children: [] };
+            for (var j = 0; j < orElses[orElses.length - 1].length; j++) {
+                lastOrElse.children.push(buildStructuralRepresentation(orElses[orElses.length - 1][j], lastOrElse, ast));
             }
 
             return lastOrElse;
@@ -1376,22 +1612,83 @@ function buildStructuralRepresentation(nodeToUse, parentNode) {
     else if (node._astname == "For" || node._astname == "JSFor" || node._astname == "While") {
         returnObject.id = "Loop";
 
-        for (let i = 0; i < node.body.length; i++) {
-            returnObject.children.push(buildStructuralRepresentation(node.body[i], returnObject));
+        for (var i = 0; i < node.body.length; i++) {
+            returnObject.children.push(buildStructuralRepresentation(node.body[i], returnObject, ast));
         }
     }
     else {
         returnObject.id = node._astname;
+        if ('body' in node) {
+            for (var i = 0; i < node.body.length; i++) {
+                returnObject.children.push(buildStructuralRepresentation(node.body[i], returnObject, ast));
+            }
+        }
     }
 
     return returnObject;
 }
 
-//handles sequential calls to complexity passes and creation of output
-    export function doAnalysis(ast, results) {
-        functionPass(ast, results, ast);
-        recursiveCallOnNodes(collectVariableInfo, [], ast);
-        console.log(ccState.getProperty("allVariables"));
-        recursiveAnalyzeAST(ast, results);
-        doComplexityOutput(results, ast);
+function findFunctionDefName(node, args) {
+    var lineNumber = args[0];
+    if (node != null && node._astname != null) {
+        //args[1] has property "name" which is how name val is returned
+        if (node._astname == "FunctionDef" && node.lineno == lineNumber) {
+            args[1].name = node.name.v;
+            args[1].start = node.lineno;
+            args[1].end = ccHelpers.getLastLine(node);
+            return;
+        }
     }
+}
+
+function getParentList(lineno, parentNode, parentsList) {
+    //recurse through ccState.getProperty("codeStructure"), drill down to thing, return
+
+    //first....is it a child of the parent node?
+    if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
+        parentsList.push(Object.assign({}, parentNode));
+        //then, check children.
+        var childNode = null;
+        if (parentNode.children.length > 0) {
+            for (var i = 0; i < parentNode.children.length; i++) {
+                if (parentNode.children[i].startline <= lineno && parentNode.children[i].endline >= lineno) {
+                    childNode = parentNode.children[i];
+                    break;
+                }
+            }
+        }
+
+        if (childNode != null) {
+            getParentList(lineno, childNode, parentsList);
+        }
+    }
+
+}
+
+function findFunctionCallName(node, args) {
+    var lineNumber = args[0];
+    if (node != null && node._astname != null) {
+        //args[1] has property "name" which is how name val is returned
+        if (node._astname == "Call" && node.lineno == lineNumber && 'id' in node.func) {
+            args[1].name = node.func.id.v;
+            args[1].start = node.lineno;
+            args[1].end = ccHelpers.getLastLine(node);
+            return;
+        }
+    }
+}
+
+//handles sequential calls to complexity passes and creation of output
+export function doAnalysis(ast, results) {
+    var codeStruct = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(ast) };
+    for (var i = 0; i < ast.body.length; i++) {
+        codeStruct.children.push(buildStructuralRepresentation(ast.body[i], codeStruct, ast));
+    }
+
+    ccState.setProperty("codeStructure", codeStruct);
+
+    functionPass(ast, results, ast);
+    recursiveCallOnNodes(collectVariableInfo, [], ast);
+    recursiveAnalyzeAST(ast, results);
+    doComplexityOutput(results, ast);
+}
