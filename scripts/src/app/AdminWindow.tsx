@@ -145,18 +145,16 @@ const AdminSendBroadcast = () => {
         setBroadcastStatus({ message: m, style: "alert alert-danger" })
     }
 
-    const expireText = (nt: Notification) => {
-        function addDays(date: Date, days: number) {
-            const result = new Date(date)
-            result.setDate(result.getDate() + days)
-            return result
-        }
-        const n = parseInt(nt.message.expiration!)
-        return ("Expires " + addDays(new Date(nt.created!), n).toLocaleDateString("en-US"))
+    const formatExpDate = (nt: Notification) => {
+        const daysUntilExp = parseInt(nt.message.expiration!)
+        const expDate = new Date(nt.created!)
+
+        expDate.setDate(expDate.getDate() + daysUntilExp)
+        return "Expires " + expDate.toLocaleDateString("en-US")
     }
 
     const broadcastText = (nt: Notification) => {
-        return (`"${nt.message.text}"`)
+        return `${nt.message.text}`
     }
 
     return <>
@@ -170,7 +168,7 @@ const AdminSendBroadcast = () => {
                             <div key={nt.id} className="my-px mx-2 grid items-center" style={{ gridTemplateColumns: "12px 445px 130px repeat(3, 1fr)", gridGap: "1px 25px" }}>
                                 <button className="flex" title="Expire broadcast" onClick={() => expireBroadcast(nt.id!)}><i className="icon icon-cross2" /></button>
                                 <div className="my-px mx-2">{broadcastText(nt)}</div>
-                                <div className="italic my-px">{expireText(nt)}</div>
+                                <div className="italic my-px">{formatExpDate(nt)}</div>
                             </div>
                         )}
                     </div>
