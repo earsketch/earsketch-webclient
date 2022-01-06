@@ -87,6 +87,7 @@ function functionPass(ast, results, rootAst) {
     recursiveCallOnNodes(collectFunctionInfo, [results, rootAst], rootAst)
     // recursiveFunctionAnalysis(ast, results, rootAst);
 
+
     // do calls
     for (const func of ccState.getProperty("userFunctionReturns")) {
         // uncalled function lines
@@ -237,14 +238,7 @@ function collectFunctionInfo(node, args) {
                         args[0].codeFeatures.features.consoleInput = 1
                     }
 
-                    // if (ccState.getProperty("listFuncs").includes(func.name) && isListFunc) {
-                    //    args[0].codeFeatures.features.listOps = 1;
-                    // }
-                    // if (ccState.getProperty("strFuncs").includes(func.name) && isStrFunc) {
-                    //    args[0].codeFeatures.features.strOps = 1;
-                    // }
-
-                    break
+                    break;
                 }
             }
         } else if (node._astname === "Assign" && node.targets.length === 1) {
@@ -573,6 +567,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                         // find name
                         calledName = latestAssignment.func.id.v
                         // is it a built-in func that returns a str or list? check that first
+
                         if (ccState.builtInNames.includes(calledName)) {
                             // lookup and return
                             for (const builtInReturn of ccState.builtInReturns) {
@@ -615,6 +610,7 @@ function reverseValueTrace(isVariable, name, lineNo) {
                                 return reverseValueTrace(false, funcName, latestAssignment.lineno)
                             } else {
                                 return ""
+
                             }
                         }
                         return ""
@@ -1076,11 +1072,12 @@ function doComplexityOutput(results, rootAst) {
     // do structural depth
     countStructuralDepth(structure, depthObj, null)
 
-    results.ccState.getProperty("codeStructure").depth = depthObj.depth
-    results.ccState.getProperty("codeStructure").structure = structure
 
-    if (results.ccState.getProperty("codeStructure").depth > 3) {
-        results.ccState.getProperty("codeStructure").depth = 3
+    results.depth = depthObj.depth;
+    results.codeStructure = structure;
+
+    if (results.depth > 3) {
+        results.depth = 3;
     }
 }
 
@@ -1245,6 +1242,7 @@ function analyzeASTNode(node, results) {
                     }
                 }
 
+
                 if ("id" in node.func) {
                     if (node.func.id.v === "makeBeat") {
                         markMakeBeat(node, results)
@@ -1253,6 +1251,7 @@ function analyzeASTNode(node, results) {
                         for (const func of ccState.getProperty("userFunctionReturns")) {
                             if (func.name === "makeBeat" && func.aliases.includes(node.func.id.v)) {
                                 markMakeBeat(node, results)
+
                             }
                         }
                     }
@@ -1362,10 +1361,12 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
         }
     } else if (node._astname === "If") {
         // returnObject.id = "If";
-        const ifNode = { id: "If", children: [] }
+        const ifNode =  { id: "If", children: [], startline:node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode };
+
 
         for (const item of node.body) {
             ifNode.children.push(buildStructuralRepresentation(item, ifNode, ast))
+
         }
 
         // parentNode.children.push(ifNode);
@@ -1375,13 +1376,20 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
         appendOrElses(node, orElses)
 
         if (orElses.length > 0) {
-            parentNode.children.push(ifNode)
+          if(orElses[0][0].lineno - 1 > ifNode.endline){
+              ifNode.endline = orElses[0][0].lineno - 1;
+          }
+          else{
+              ifNode.endline = orElses[0][0].lineno;
+          }
+          parentNode.children.push(ifNode);
         }
 
         for (const orElse of orElses) {
             const thisOrElse = { id: "Else", children: [] }
             for (const item of orElse) {
                 thisOrElse.children.push(buildStructuralRepresentation(item, thisOrElse, ast))
+
             }
             parentNode.children.push(Object.assign({}, thisOrElse))
         }
