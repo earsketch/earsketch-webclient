@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Randomness</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_20">Randomness</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Introducing randomness in music creates a sense of novelty, leading to a more improvisational feel. In this chapter, we turn some control over to the computer, allowing it to introduce elements of randomness into our music.</p>
+</div>
+<div class="sect2">
+<h3 id="randomnumbers">Random numbers</h3>
+<div class="paragraph curriculum-python">
+<p>A <strong>random number</strong> is a generated value that is impossible to predict. A random integer can be generated in Python with the <code>randint()</code> function. <code>randint()</code> is part of Python’s random API, so we need to import it as part of our script setup. Just like we import the EarSketch API with <code>from earsketch import *</code>, the random API is imported with <code>from random import *</code>.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>A <strong>random number</strong> is a generated value that is impossible to predict. A random number can be generated in JavaScript with the <code>random()</code> method. Its syntax is <code>Math.random()</code>, as it is part of a collection of utilities called <code>Math</code>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p><code>randint()</code> produces a random number within a range specified by its two arguments, <code>minimum</code> and <code>maximum</code>. <em>Both</em> arguments are inclusive in this case. For example, <code>randint(1, 5)</code> would produce either 1, 2, 3, 4, or 5. These integers can be used for things like list indices, track numbers, or measure numbers.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><code>Math.random()</code> produces a random floating point number between 0 (inclusive) and 1 (exclusive). To obtain useable values, we scale this range by a multiplier, like <code>Math.random() * multiplier</code>. For example, <code>Math.random() * 6</code> produces a floating point value between 0 and 6. To convert this random floating point value to an integer, we call the method <code>Math.floor()</code>, which rounds its argument down to the nearest whole number. This way, the random value can be used as a list index, a track, or a measure number. The formula for generating random numbers in JavaScript is <code>Math.floor(Math.random() * multiplier)</code>.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>In the example below, random numbers are used to pick random clips from a list. The range of random numbers generated is identical to the list indices. Using these clips in function calls produces musical variety each time the script runs.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>In the example below, random numbers are used to pick random clips from an array. The range of random numbers generated is identical to the array indices. Using these clips in functions calls produces musical variety each time the script runs.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Random Clip
+#
+# author: The EarSketch Team
+#
+# description: Randomly selecting clips from a list
+#
+#
+#
+
+#Setup
+from earsketch import *
+from random import *  # need to import the random library to use randint()
+init()
+setTempo(100)
+
+#Music
+sampleBank = [YG_TRAP_SYNTH_BELL_1,
+			  YG_TRAP_STRINGS_1,
+			  YG_TRAP_SHORT_SYNTH_1,
+			  YG_TRAP_HIT_1,
+			  YG_TRAP_SYNTH_LEAD_6,
+			  YG_TRAP_BELLS_1]
+
+for i in range(1, 9):
+
+	# Generates a random index number between 0 and 5 because the length of sampleBank list is 6 (total number of samples)
+	index = randint(0, len(sampleBank) - 1)
+	fitMedia(sampleBank[index], 1, i, i+1) # Use the random index to get a list element
+
+fitMedia(YG_TRAP_KICK_4, 2, 1, 9)
+fitMedia(YG_TRAP_BASS_1, 3, 1, 9)
+fitMedia(YG_TRAP_SNARE_5, 4, 1, 9)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Random Clip
+//
+// author: The EarSketch Team
+//
+// description: Randomly selecting clips from a list
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+var sampleBank = [YG_TRAP_SYNTH_BELL_1,
+			  YG_TRAP_STRINGS_1,
+			  YG_TRAP_SHORT_SYNTH_1,
+			  YG_TRAP_HIT_1,
+			  YG_TRAP_SYNTH_LEAD_6,
+			  YG_TRAP_BELLS_1];
+
+for(var i = 1; i &lt; 9; i++) {
+  // Generates a random index number between 0 and 5 because the length of sampleBank array is 6 (total number of samples)
+  var index = Math.floor(Math.random() * sampleBank.length);
+
+	// Use the random index to pick a sample
+	fitMedia(sampleBank[index], 1, i, i+1);
+}
+
+fitMedia(YG_TRAP_KICK_4, 2, 1, 9);
+fitMedia(YG_TRAP_BASS_1, 3, 1, 9);
+fitMedia(YG_TRAP_SNARE_5, 4, 1, 9);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="remixingarhythm">Remixing a Rhythm</h3>
+<div class="paragraph">
+<p>Let’s remix a popular rhythm, the amen break, by introducing a random drum pattern. The amen break is widely sampled in electronic music. The code for this particular rhythm is shown below. Two separate <code>makeBeat()</code> calls are used, one to handle the kick and snare, and the other for a series of cymbals. The beat strings used in these function calls are the result of concatenating a set of smaller substrings. This allows us to better understand the structure of the rhythm.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/020-02-RemixingaRhythm-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/020-02-RemixingaRhythm-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/020-02-RemixingaRhythm-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/020-02-RemixingaRhythm-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Amen Break
+#
+# author: The EarSketch Team
+#
+# description: Constructing the amen break with string concatenation
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(140)
+
+#Music
+drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01]
+
+a = "0+0-1+-1+1001+-1"
+b = "0+0-1+-1-10---1+"
+c = "-1001+-1+10---1+"
+cym1 = "2+2+2+2+2+2+2+2+"
+cym2 = "2+2+2+2+2+3+2+2+"
+cym3 = "2+2+2+2+2+4+2+2+"
+
+amenBreak = a + a + b + c
+amenCymbals = cym1 + cym1 + cym2 + cym3
+
+makeBeat(drums, 1, 1, amenBreak)
+makeBeat(drums, 2, 1, amenCymbals)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Amen Break
+//
+// author: The EarSketch Team
+//
+// description: Constructing the amen break with string concatenation
+//
+//
+//
+
+//Setup
+init();
+setTempo(140);
+
+//Music
+var drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01];
+
+var a = "0+0-1+-1+1001+-1";
+var b = "0+0-1+-1-10---1+";
+var c = "-1001+-1+10---1+";
+var cym1 = "2+2+2+2+2+2+2+2+";
+var cym2 = "2+2+2+2+2+3+2+2+";
+var cym3 = "2+2+2+2+2+4+2+2+";
+
+var amenBreak = a + a + b + c;
+var amenCymbals = cym1 + cym1 + cym2 + cym3;
+
+makeBeat(drums, 1, 1, amenBreak);
+makeBeat(drums, 2, 1, amenCymbals);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, a random drum pattern is added to the amen break. A for-loop is used to generate a random beat string. On each loop iteration, a random number is generated, converted to a string type, and concatenated with the new beat string. The range of the random numbers is set to match the indices of our drum samples. Check out the code snippet for this process below.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">insertSection = ""
+
+for i in range(8):
+    insertSection = insertSection + str( randint(0, 4) )</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">var insertSection = "";
+
+for(var i = 0; i &lt; 8; i++) {
+    insertSection = insertSection + Math.floor(Math.random() * 5);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>We want to introduce the random beat string without changing the total length of the amen break. Thus, substrings are required. The snippet below shows code to concatenate the randomly-generated string (which is 8 characters long) with the last 8 characters of the <code>a</code> beatString to create a new 16-character string. We then create the new amen break by concatenating <code>a</code>, <code>newA</code>, <code>b</code>, and <code>c</code> together.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">newA = insertSection + a[8:16]
+newBeat = a + newA + b + c</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">var newA = insertSection + a.substring(8,16);
+var newBeat = a + newA + b + c;</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Adding the two code snippets above into the amen break script results in the following code. We have remixed the amen break!</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Amen Remix
+#
+# author: The EarSketch Team
+#
+# description: Replacing part of the amen break string with a random beat string
+#
+#
+#
+
+#Setup
+from earsketch import *
+from random import *
+init()
+setTempo(140)
+
+#Music
+drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01]
+
+a = "0+0-1+-1+1001+-1"
+b = "0+0-1+-1-10---1+"
+c = "-1001+-1+10---1+"
+cym1 = "2+2+2+2+2+2+2+2+"
+cym2 = "2+2+2+2+2+3+2+2+"
+cym3 = "2+2+2+2+2+4+2+2+"
+
+amenBreak = a + a + b + c
+amenCymbals = cym1 + cym1 + cym2 + cym3
+
+insertSection = ""
+
+for i in range(8):
+	# building the random beat string, 8 characters long
+	insertSection += str( randint(0, 4) )
+
+newA = insertSection + a[8:16]
+newBeat = a + newA + b + c
+
+makeBeat(drums, 1, 1, newBeat)
+makeBeat(drums, 2, 1, amenCymbals)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Amen Remix
+//
+// author: The EarSketch Team
+//
+// description: Replacing part of the amen break string with a random beat string
+//
+//
+//
+
+//Setup
+init();
+setTempo(140);
+
+//Music
+var drums = [OS_KICK05, OS_SNARE06, Y24_HI_HATS_1, Y58_HI_HATS_1, OS_OPENHAT01];
+
+var a = "0+0-1+-1+1001+-1";
+var b = "0+0-1+-1-10---1+";
+var c = "-1001+-1+10---1+";
+var cym1 = "2+2+2+2+2+2+2+2+";
+var cym2 = "2+2+2+2+2+3+2+2+";
+var cym3 = "2+2+2+2+2+4+2+2+";
+
+var amenBreak = a + a + b + c;
+var amenCymbals = cym1 + cym1 + cym2 + cym3;
+
+
+var insertSection = "";
+
+for(var i = 0; i &lt; 8; i++) {
+	// building the random beat string, 8 characters long
+	insertSection += Math.floor(Math.random() * 5);
+}
+
+var newA = insertSection + a.substring(8,16);
+var newBeat = a + newA + b + c;
+
+makeBeat(drums, 1, 1, newBeat);
+makeBeat(drums, 2, 1, amenCymbals);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter20summary">Chapter 20 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Random numbers</strong> generated within a program are impossible to predict.</p>
+</li>
+<li>
+<p>A random integer can be generated using Python’s random API function <code>randint()</code>. This function takes two arguments, <code>minimum</code> and <code>maximum</code>, both of which are inclusive.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Random numbers</strong> generated within a program are impossible to predict.</p>
+</li>
+<li>
+<p>A random integer can be generated using JavaScript’s <code>Math</code> utility and <code>random()</code> method. The method produces floating point values between 0 and 1, so the output needs to be scaled by a multiplier. The full syntax is <code>Math.random() * multiplier</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "What range of numbers will randint(1,5) choose a random number from?", "1, 2, 3, 4, 5", "1, 2, 3, 4", "2, 3, 4, 5", "1,5","python");
+question2 = new Question(2, "In order to use EarSketch functions, we must include the EarSketch API by including “from earsketch import *.” What do we need to include to use randint()?", "from random import *", "from earsketch2 import *", "from integer import *", "from randint import *","python");
+
+question3 = new Question(1, "What range of numbers will (Math.floor(Math.random() * 6)) choose a random number from?", "0-5", "0-4", "1-4", "1-5","javascript",3);
+
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

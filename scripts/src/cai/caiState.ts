@@ -9,6 +9,7 @@ import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import * as studentPreferences from "./studentPreferences"
 import * as studentHistory from "./studentHistory"
+import * as errorHandling from "./errorHandling"
 import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
@@ -146,18 +147,18 @@ export const sendCAIMessage = createAsyncThunk<void, CAIButton, ThunkAPI>(
         codeSuggestion.generateResults(text, lang)
         dialogue.setCodeObj(editor.ace.session.getDocument().getAllLines().join("\n"))
         dispatch(addToMessageList(message))
-        let msgText = dialogue.generateOutput(input.value)
+        const msgText = dialogue.generateOutput(input.value)
 
         if (input.value === "error") {
             dispatch(setErrorOptions([]))
         }
         if (msgText.includes("[ERRORFIX")) {
-            const errorS = msgText.substring(msgText.indexOf("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
-            const errorF = msgText.substring(msgText.lastIndexOf("|") + 1, msgText.length - 1)
-            msgText = msgText.substring(0, msgText.indexOf("[ERRORFIX"))
-            dialogue.setSuccessFail(parseInt(errorS), parseInt(errorF))
-            const actionOutput = dialogue.attemptErrorFix()
-            msgText += "|" + actionOutput ? dialogue.errorFixSuccess() : dialogue.errorFixFail()
+            // const errorS = msgText.substring(msgText.indexOf("[ERRORFIX") + 10, msgText.lastIndexOf("|"))
+            // const errorF = msgText.substring(msgText.lastIndexOf("|") + 1, msgText.length - 1)
+            // msgText = msgText.substring(0, msgText.indexOf("[ERRORFIX"))
+            // dialogue.setSuccessFail(parseInt(errorS), parseInt(errorF))
+            // const actionOutput = dialogue.attemptErrorFix()
+            // msgText += "|" + actionOutput ? dialogue.errorFixSuccess() : dialogue.errorFixFail()
         }
         dispatch(dialogue.isDone() ? setInputOptions([]) : setInputOptions(dialogue.createButtons()))
         if (msgText !== "") {
@@ -257,8 +258,8 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
 export const compileError = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileError",
     (data, { dispatch }) => {
-        const errorReturn = dialogue.handleError(data)
-
+        const errorReturn = dialogue.handleError(data[0])
+        errorHandling.storeErrorInfo(data[0], data[1])
         if (dialogue.isDone()) {
             return
         }

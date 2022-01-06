@@ -21,6 +21,7 @@ let state: { [key: string]: any } = {
     isJavascript: false,
     listFuncs: [],
     userFunctionReturns: [],
+    codeStructure: {}
 }
 
 export function resetState() {
@@ -44,20 +45,34 @@ export function resetState() {
         returns: false,
         isJavascript: false,
         listFuncs: [],
-        userFunctionReturns: [],
+        userFunctionReturns: [],   
+        codeStructure: {}
     }
 }
 
 export function getState() {
-    return {}
+    return {};
 }
 
 export function getProperty(propertyName: string) {
-    return (propertyName in state) ? state[propertyName] : []
+    return (Object.keys(state).includes(propertyName)) ? state[propertyName] : []
 }
 
 export function setProperty(propertyName: string, value: any) {
-    state[propertyName] = value
+    state[propertyName] = value;
+}
+
+export function setIsJavascript(value: boolean) {
+    state.isJavascript = value;
+
+    if (value) {
+        state.listFuncs = JS_LIST_FUNCS.slice(0);
+        state.strFuncs = JS_STR_FUNCS.slice(0);
+    }
+    else {
+        state.listFuncs = PY_LIST_FUNCS.slice(0);
+        state.strFuncs = PY_STR_FUNCS.slice(0);
+    }
 }
 
 export const binOps = {
@@ -88,7 +103,7 @@ export const apiFunctions = [
     "analyze", "random", "randint", "gauss", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish",
     "fitMedia", "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBeatSlice", "print", "readInput",
     "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile", "setEffect", "setTempo",
-    "shuffleList", "shuffleString",
+    "shuffleList", "shuffleString"
 ]
 
 export const PY_LIST_FUNCS = ["append", "count", "extend", "index", "insert", "pop", "remove", "reverse", "sort"]

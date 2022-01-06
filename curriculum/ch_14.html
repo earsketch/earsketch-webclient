@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Musical Repetition</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_14">Musical Repetition</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This chapter takes a look at repetition and contrast as they pertain to music. More complex transition strategies are examined using these two elements.</p>
+</div>
+<div class="sect2">
+<h3 id="repetitioninmusic">Repetition in Music</h3>
+<div class="paragraph">
+<p><strong>Repetition</strong> refers to repeated sounds or sequences of music. It is a key feature that is shared by almost all kinds of music throughout the world. Humans enjoy repetition because of what psychologists call the <strong>mere exposure effect</strong>. We like music or sections of music that we have consciously or unconsciously heard before. Furthermore, musical repetition has the profound effect of drawing the listener into the music, making us feel as if we are participating rather than just listening. Upon hearing a repeated section of music, the brain will try to imagine the next note before it is actually played. This same effect contributes to earworms, or music getting "stuck" in your head. Likewise, each time a section of music is repeated, the listener tends to notice different details of the piece. This is because the brain no longer has to focus on processing the raw melodic content.</p>
+</div>
+<div class="paragraph">
+<p>We have already encountered repetition in previous chapters. Custom functions allow us to repeat entire sections of music, much like a band repeats a chorus. On the other hand, repetition can also occur on a smaller time scale, like a drummer repeating a measure to form a rhythmic pattern. We implement such repetition with a for-loop. Custom functions and for-loops have a parallel element in music notation, the repeat sign. It is used to tell the performer to play a measure of section of music again.</p>
+</div>
+<div class="imageblock" id="repeatsign">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U1P2/Repeat_Sign.png"/>
+</div>
+<div class="title">Figure 14.1: The repeat sign</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="contrast">Contrast</h3>
+<div class="paragraph">
+<p><strong>Contrast</strong> refers to differences in subsequent sections of music, providing an important balance with repetition. Contrast is used to enhance music, bringing new elements to the listener’s attention. These new elements create interest and a sense of momentum. Musicians provide contrast by introducing a rhythmic change, a new melodic line or harmony, and variations in the instruments or sounds used. In popular music, the verse-chorus structure commonly makes use of contrast. While the chorus may borrow ideas from the verse, it is often fuller sounding. Transitions play an important role in musical structure by linking contrasting sections.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="advancedtransitiontechniques">Advanced Transition Techniques</h3>
+<div class="paragraph">
+<p>In <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_6.html#transitionstrategies')">Chapter 6</a>, we examined some popular strategies for creating musical transitions. Implementing repetition and contrast with code allows more advanced techniques to be examined. Take a look at the following advanced techniques.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Snare Roll</strong>: A sequence of repeated snare hits, with increasing density, pitch, or amplitude. Prevalent in electronic music. Snare rolls can be easily implementing by using a clip like RD_FUTURE_DUBSTEP_FILL_1 or HOUSE_BREAK_FILL_003. However, the same effect can be manually achieved by using a for-loop or <code>makeBeat()</code> with a regular snare clip, giving more control over the details of the roll.</p>
+</li>
+<li>
+<p><strong>Looping</strong>: Repeating a short segment of melody before a new section. Often used when DJing. In EarSketch, string concatenation or a series of for-loops is used to implement this technique.</p>
+</li>
+<li>
+<p><strong>Crossfading</strong>: Decreasing the volume of one section while increasing the volume of a new section. Used to transition to a completely new song, especially when DJing. Two <code>setEffect()</code> envelopes can be used to do this: one decreases the volume of one track, while the other simultaneously increases the volume of a second track.</p>
+</li>
+<li>
+<p><strong>Anacrusis</strong>: An anacrusis is a series of notes that lead into the first beat of a new section. This means that the melody of the new section effectively starts a couple beats early.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph curriculum-python">
+<p>We can use string concatenation to implement the looping transition strategy. An example is shown below.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>We can use for-loops to implement the looping transition strategy. An example is shown below.</p>
+</div>
+<div class="videoblock curriculum-python curriculum-mp4" id="video14py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/014-03-AdvancedTransitionTechniques-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/014-03-AdvancedTransitionTechniques-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video14js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/014-03-AdvancedTransitionTechniques-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/014-03-AdvancedTransitionTechniques-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Advanced Transition Techniques - Looping
+#
+# author: The EarSketch Team
+#
+# description: Transitioning between sections by looping the lead line
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(140)
+
+#Music
+beat1 = "0---0+0---0-0+++"
+drum = RD_FUTURE_DUBSTEP_MAINBEAT_11
+lead = RD_FUTURE_DUBSTEP_LEADSYNTH_10
+lead2 = RD_TRAP_PITCHLEAD_3
+wobble1 = DUBSTEP_BASS_WOBBLE_006
+swoosh = RD_FUTURE_DUBSTEP_SFX_8
+subBass = RD_FUTURE_DUBSTEP_SUBBASS_4
+
+# Custom Functions
+
+# define a custom function to use for looping with different step sizes
+def easyLoops(startMeasure, numSteps, startString):
+  endString = ""
+  for i in range(numSteps):
+    endString += startString
+  makeBeat(lead, 1, startMeasure, endString)
+
+# define function for first section of music
+def section1(startMeasure, endMeasure):
+  # drums
+  fitMedia(drum, 2, startMeasure, endMeasure)
+  # lead
+  for measure in range (2, 9, 2):
+    fitMedia(lead, 1, measure, measure + 1)
+  fitMedia(lead, 1, 9, 13)
+
+# define a function for four-measure transition
+def transition(startMeasure):
+  easyLoops(startMeasure, 4, "0+++++++")
+  easyLoops(startMeasure+2, 4, "0+++")
+  easyLoops(startMeasure+3, 4, "0+")
+  easyLoops(startMeasure+3.5, 8, "0")
+  fitMedia(swoosh, 3, startMeasure+2, startMeasure+4)
+
+# define a function for second section of music
+def section2(startMeasure, endMeasure):
+  # drums
+  for measure in range (startMeasure, endMeasure):
+	  makeBeat(drum, 2, measure, beat1)
+  # bass
+  fitMedia(subBass, 4, startMeasure, endMeasure)
+  # lead
+  fitMedia(lead2, 1, startMeasure, 21)
+  for measure in range(21, 23):
+	  makeBeat(lead2, 1, measure, "0-000+++++++++++")
+  makeBeat(lead2, 1, 23, "0-000+++++++++++++++++++++++++++")
+  fitMedia(lead2, 1, 25, 29)
+  for measure in range(29, endMeasure):
+  	makeBeat(lead2, 1, measure, beat1) # switch with drum beat for last phrase
+  # placing dubstep wobbles
+  fitMedia(wobble1, 5, 20.5, 21)
+  fitMedia(wobble1, 5, 24.5, 25)
+  fitMedia(wobble1, 5, 28.5, 29)
+  makeBeat(wobble1, 5, 26.5, "0+--0+")
+  makeBeat(wobble1, 5, 30.5, "0+--0+")
+
+# Function calls
+section1(1,17)
+transition(13)
+section2(17, 32)
+fitMedia(wobble1, 5, 32, 33) # End with longer a dubstep wobble
+
+#Effects
+setEffect(3, VOLUME, GAIN, -9) # dropping swoosh volume
+setEffect(2, VOLUME, GAIN, -6) # drop drum volume slightly
+setEffect(2, FILTER, FILTER_FREQ, 750, 1, 10000, 5) # filter envelope to bring drums in subtly
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Advanced Transition Techniques - Looping
+//
+// author: The EarSketch Team
+//
+// description: Transitioning between sections by looping the lead line
+//
+//
+//
+
+//Setup
+init();
+setTempo(140);
+
+//Music
+var beat1 = "0---0+0---0-0+++";
+var drum = RD_FUTURE_DUBSTEP_MAINBEAT_11;
+var lead = RD_FUTURE_DUBSTEP_LEADSYNTH_10;
+var lead2 = RD_TRAP_PITCHLEAD_3;
+var wobble1 = DUBSTEP_BASS_WOBBLE_006;
+var swoosh = RD_FUTURE_DUBSTEP_SFX_8;
+var subBass = RD_FUTURE_DUBSTEP_SUBBASS_4;
+
+// Custom Functions
+
+// define a custom function to use for looping with different step sizes
+function easyLoops(startMeasure, endMeasure, step){
+  for (var measure = startMeasure; measure &lt; endMeasure; measure += step){
+   fitMedia(lead, 1, measure, measure + step);
+  }
+}
+// define function for first section of music
+function section1(startMeasure, endMeasure){
+  // drums
+  fitMedia(drum, 2, startMeasure, endMeasure);
+  // lead
+  for (var measure = 2; measure &lt; 9; measure += 2){
+    fitMedia(lead, 1, measure, measure + 1);
+  }
+  fitMedia(lead, 1, 9, 13);
+}
+
+// define a function for four-measure transition
+function transition(startMeasure){
+  easyLoops(startMeasure, startMeasure+2, 0.5);
+  easyLoops(startMeasure+2, startMeasure+3, 0.25);
+  easyLoops(startMeasure+3, startMeasure+3.5, 0.125);
+  easyLoops(startMeasure+3.5, startMeasure+4, 0.0625);
+  fitMedia(swoosh, 3, startMeasure+2, startMeasure+4);
+}
+
+// define a function for second set of music
+function section2(startMeasure, endMeasure){
+  // drums
+  for (var measure = startMeasure; measure &lt; endMeasure; measure++){
+	  makeBeat(drum, 2, measure, beat1);
+  }
+  // bass
+  fitMedia(subBass, 4, startMeasure, endMeasure);
+  // lead
+  fitMedia(lead2, 1, startMeasure, 21);
+  for (var measure = 21; measure &lt; 23; measure++){
+	  makeBeat(lead2, 1, measure, "0-000+++++++++++");
+  }
+  makeBeat(lead2, 1, 23, "0-000+++++++++++++++++++++++++++");
+  fitMedia(lead2, 1, 25, 29);
+  for (var measure = 29; measure &lt; endMeasure; measure++){
+  	makeBeat(lead2, 1, measure, beat1); // switch with drum beat for last phrase
+  }
+  // wobbles
+  for (var measure = 20.5; measure &lt; 29; measure += 4){
+    fitMedia(wobble1, 5, measure, measure + 0.5);
+  }
+  for (var measure = 26.5; measure &lt;= 30.5; measure += 4){
+    makeBeat(wobble1, 5, measure, "0+--0+");
+  }
+}
+
+//Function calls
+section1(1,17);
+transition(13);
+section2(17, 32);
+fitMedia(wobble1, 5, 32, 33); // End with longer a dubstep wobble
+
+// Effects
+setEffect(3, VOLUME, GAIN, -9); // dropping swoosh volume
+setEffect(2, VOLUME, GAIN, -6); // drop drum volume slightly
+setEffect(2, FILTER, FILTER_FREQ, 750, 1, 10000, 5); // filter envelope to bring drums in subtly
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>To implement an anacrusis, we need to use a new EarSketch API function, <code>insertMediaSection()</code>. This function is similar to <code>fitMedia()</code>, but allows us to place partial segments of a sound clip. The five arguments for <code>insertMediaSection()</code> are listed below, in order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Clip Name</strong></p>
+</li>
+<li>
+<p><strong>Track Number</strong></p>
+</li>
+<li>
+<p><strong>Measure Number</strong>: The starting measure of the clip. The next two arguments determine the clip’s total length.</p>
+</li>
+<li>
+<p><strong>Start Location</strong>: Starting location within the clip. Specifying "1" starts at the true beginning of the clip (like <code>fitMedia()</code>).</p>
+</li>
+<li>
+<p><strong>End Location</strong>: Ending location within the clip. The true ending of a clip depends on the overall clip length, <code>2</code> for a one measure clip, <code>3</code> for a two measure clip, and <code>5</code> for a four measure clip.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In the example below, we create an anacrusis by bringing in the main melody a measure early. However, using the first 4 beats of the clip would sound strange; we want to use the last 4 beats. RD_TRAP_ARPBLEEPLEAD_5 is a 4-measure clip, spanning measures 1 to 5 if placed at the beginning of a song. To specify the last 4 beats (or last measure) of the clip for <code>insertMediaSection()</code>, 4 and 5 are used for the start location and end location, respectively.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Advanced Transition Techniques - Anacrusis
+#
+# author: The EarSketch Team
+#
+# description: Transitioning between sections using an anacrusis
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+chords1 = HOUSE_DEEP_CRYSTALCHORD_001
+chords2 = HOUSE_DEEP_CRYSTALCHORD_002
+chords3 = HOUSE_DEEP_CRYSTALCHORD_003
+chords4 = HOUSE_DEEP_CRYSTALCHORD_004
+bass = TECHNO_FM_BASS_004
+bass2 = HOUSE_DEEP_BASS_004
+lead1 = TECHNO_POLYLEAD_005
+lead2 = RD_TRAP_ARPBLEEPLEAD_5
+lead3 = HIPHOP_DUSTYGUITAR_002
+beat1 = HOUSE_MAIN_BEAT_008
+beat2 = HOUSE_MAIN_BEAT_009
+riser = HOUSE_SFX_WHOOSH_007
+
+# Custom Functions
+def chordProg(clip, startMeasure):
+  for measure in range (startMeasure, 8, 4):
+    fitMedia(clip, 1, measure, measure + 1)
+
+# Section 1
+# chords
+chordProg(chords1, 1)
+chordProg(chords2, 2)
+chordProg(chords3, 3)
+chordProg(chords4, 4)
+# beat
+fitMedia(beat1, 2, 1, 8)
+# bass
+for measure in range (1, 8):
+  makeBeat(bass, 3, measure, "0+++++++0++0++0+")
+# lead
+fitMedia(lead1, 4, 1, 8)
+
+# Transition
+insertMediaSection(lead2, 5, 8, 4, 5) # placing the last measure (4 beats) of this clip
+fitMedia(riser, 5, 7, 8) # partial riser
+
+#Section 2
+# lead
+fitMedia(lead2, 1, 9, 17)
+fitMedia(lead3, 6, 9, 17)
+# beat
+fitMedia(beat2, 2, 9, 17)
+# bass on off-beat
+for measure in range(9, 17):
+  makeBeat(bass2, 3, measure, "--0+--0+--0+--0+")
+
+#Effects
+setEffect(4, VOLUME, GAIN, -18)
+setEffect(6, VOLUME, GAIN, -10)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Advanced Transition Techniques - Anacrusis
+//
+// author: The EarSketch Team
+//
+// description: Transition between sections using an anacrusis
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var chords1 = HOUSE_DEEP_CRYSTALCHORD_001;
+var chords2 = HOUSE_DEEP_CRYSTALCHORD_002;
+var chords3 = HOUSE_DEEP_CRYSTALCHORD_003;
+var chords4 = HOUSE_DEEP_CRYSTALCHORD_004;
+var bass = TECHNO_FM_BASS_004;
+var bass2 = HOUSE_DEEP_BASS_004;
+var lead1 = TECHNO_POLYLEAD_005;
+var lead2 = RD_TRAP_ARPBLEEPLEAD_5;
+var lead3 = HIPHOP_DUSTYGUITAR_002;
+var beat1 = HOUSE_MAIN_BEAT_008;
+var beat2 = HOUSE_MAIN_BEAT_009;
+var riser = HOUSE_SFX_WHOOSH_007;
+
+// Custom Functions
+function chordProg(clip, startMeasure){
+  for (var measure = startMeasure; measure &lt; 8; measure += 4){
+    fitMedia(clip, 1, measure, measure + 1);
+  }
+}
+
+// Section 1
+// chords
+chordProg(chords1, 1);
+chordProg(chords2, 2);
+chordProg(chords3, 3);
+chordProg(chords4, 4);
+// beat
+fitMedia(beat1, 2, 1, 8);
+// bass
+for(var measure = 1; measure &lt; 8; measure++){
+  makeBeat(bass, 3, measure, "0+++++++0++0++0+");
+}
+// lead
+fitMedia(lead1, 4, 1, 8);
+
+// Transition
+insertMediaSection(lead2, 5, 8, 4, 5); // placing the last measure (4 beats) of this clip
+fitMedia(riser, 5, 7, 8); // partial riser
+
+//Section 2
+//lead
+fitMedia(lead2, 1, 9, 17)
+fitMedia(lead3, 6, 9, 17)
+//beat
+fitMedia(beat2, 2, 9, 17)
+//bass on off-beat
+for(var measure = 9; measure &lt; 17; measure++){
+  makeBeat(bass2, 3, measure, "--0+--0+--0+--0+");
+}
+
+//Effects
+setEffect(4, VOLUME, GAIN, -18);
+setEffect(6, VOLUME, GAIN, -10);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Notice that inside our <code>chordProg()</code> function we are using an incrementing technique discussed in <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_9.html#followingcontrolflow')">Chapter 9</a>. Instead of counting measures 1 through 8 one step at a time (with a technique like <code>measure++</code>), we use <code>measure += 4</code> to count by 4’s. So, when we call <code>chordProg()</code>, the first iteration will place media on our startMeasure (1) like normal, but the next iteration will jump 4 steps and place media starting on measure 5.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Notice that inside our <code>chordProg()</code> function we are using an incrementing technique discussed in <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_9.html#followingcontrolflow')">Chapter 9</a>. We specify a third argument in our <code>range (startMeasure, 8, 4)</code>, indicating step size. Instead of counting measures 1 through 8 one step at a time (with a technique like <code>range (startMeasure, 8)</code>), we are using this third argument to count by 4’s. So, when we call <code>chordProg()</code>, the first iteration will place media on our startMeasure (1) like normal, but the next iteration will jump 4 steps and place media starting on measure 5.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter14summary">Chapter 14 Summary</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Repetition</strong> refers to repeated sounds or sequences of music. It it one of the universal traits of music, as it keeps the human brain occupied when listening.</p>
+</li>
+<li>
+<p>Custom functions and for-loops allow repetitive sequences of music, both on the section level and measure level, to be implemented in EarSketch.</p>
+</li>
+<li>
+<p><strong>Contrast</strong> refers to the differences in neighboring sections of music. It provides an important balance with repetition, keeping the listener interested.</p>
+</li>
+<li>
+<p>An <strong>anacrusis</strong> is a series of notes that lead into the first beat of a melody.</p>
+</li>
+<li>
+<p><code>insertMediaSection()</code> allows partial segments of a sound clip to be inserted into the DAW. It take five arguments:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>fileName:</strong> The sound clip that is used.</p>
+</li>
+<li>
+<p><strong>trackNumber:</strong> The track on which music is placed.</p>
+</li>
+<li>
+<p><strong>measureNumber:</strong> The starting measure of the clip. The next two arguments determine the clip’s total length.</p>
+</li>
+<li>
+<p><strong>startLocation:</strong> Starting location within the clip.</p>
+</li>
+<li>
+<p><strong>endLocation:</strong> Ending location within the clip.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "_____________ refers to repeated sections of music.", "Repetition", "Contrast", "Crossfading", "Anacrusis");
+question2 = new Question(2, "Using makeBeat() to create a repeated sequence of drum hits is an example of what type of transition?", "Snare Roll", "Anacrusis", "Looping", "Crossfading");
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

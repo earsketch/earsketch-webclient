@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Debugging and Documenting</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_3">Debugging and Documenting</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Sometimes programmers make mistakes that cause code to work incorrectly, or not run at all. Strategies for overcoming these mistakes are presented in this chapter.</p>
+</div>
+<div class="sect2">
+<h3 id="whatisdebugging">What is Debugging?</h3>
+<div class="paragraph">
+<p>All programmers encounter occasional flaws and unexpected results when running code; no one is immune to mistakes. In programming, coding faults are called <strong>errors</strong>, or <strong>bugs</strong>. The process of finding and fixing bugs is called <strong>debugging</strong>.</p>
+</div>
+<div class="paragraph">
+<p>Here are three types of errors you can encounter while programming:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Syntax errors</strong>: Your program does not run because your code breaks the language’s <strong>syntax</strong> rules, which tell how to arrange the code.</p>
+</li>
+<li>
+<p><strong>Runtime errors</strong>: Your program starts to run, but halts due to an error.</p>
+</li>
+<li>
+<p><strong>Logic errors</strong>: Your program runs, but it doesn’t do what is expected.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In EarSketch, you can fix logic errors by looking at the DAW to check if the clips you meant to add were actually added in the right place. Print debugging, detailed in <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_15.html')">Chapter 15</a>, can be used for syntax and runtime errors.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="usingtheconsole">Using the Console</h3>
+<div class="videoblock curriculum-python curriculum-mp4" id="video3py">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/003-02-UsingtheConsole-PY.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/003-02-UsingtheConsole-PY.vtt" srclang="en"/></video>
+</div>
+</div>
+<div class="videoblock curriculum-javascript curriculum-mp4" id="video3js">
+<div class="content">
+<video controls="" poster="/earsketch2/img/video-thumbnail.png" preload="none" src="http://localhost:8080/videoMedia/003-02-UsingtheConsole-JS.mp4">
+Your browser does not support the video tag.
+<track kind="captions" src="http://localhost:8080/videoMedia/NewCaptions/003-02-UsingtheConsole-JS.vtt" srclang="en"/></video>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="documentingcode">Documenting Code</h3>
+<div class="paragraph curriculum-python">
+<p><strong>Comments</strong> are added to programs to make the code easier to understand for programmers and collaborators. They can also be used to help organize code or to make notes for future use. In Python, comments are indicated by a line starting with a <code>#</code> symbol. This symbol tells the computer not to execute the statement on that line.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Comments</strong> are added to programs to make the code easier to understand for programmers and collaborators. They can also be used to help organize code or to make notes for future use. In JavaScript, comments are indicated by a line starting with two forward slashes, <code>//</code>. This symbol tells the computer not to execute the statement on that line.</p>
+</div>
+<div class="paragraph">
+<p>You can narrow down an error by putting comment syntax around a block of code, or <strong>Commenting it out</strong>. Since code that is commented out does not run, the error is somewhere in the commented block if no errors occur when the program is run.</p>
+</div>
+<div class="paragraph">
+<p>The following script contains an error, but the console does not point to the exact line it is on when the script is executed. Try to locate the error by commenting out blocks of code in the music section. Then, fix the error and verify that the script runs successfully.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Finding Errors With Comments
+#
+# author: The EarSketch Team
+#
+# description: This script causes an error. Fix the error by
+#              commenting out blocks
+#
+#
+#
+
+#Setup
+from earsketch import *
+
+init()
+setTempo(130)
+
+#Music
+
+claps = HOUSE_BREAKBEAT_006
+singleClap = OS_CLAP03
+hiHat = HOUSE_BREAKBEAT_012
+kick = HOUSE_BREAKBEAT_023
+chords = RD_EDM_ANALOGPLUCK_2
+lead1 = RD_EDM_ANALOGPLUCK_1
+lead2 = RD_TRAP_ARPBLEEPLEAD_5
+lead3 = HOUSE_DEEP_ARPLEAD_001
+bass1 = ELECTRO_ANALOGUE_BASS_013
+bass2 = ELECTRO_ANALOGUE_BASS_008
+noiseSweep = TECHNO_WHITENOISESFX_001
+
+#Leads
+# Try commenting out this block first
+fitMedia(lead1, 3, 17, 24)
+fitMedia(lead2, 8, 17, 25)
+fitMedia(lead2, 8, 9, 10)
+fitMedia(lead2, 8, 11, 12)
+fitMedia(lead2, 8, 13, 14)
+fitMedia(lead2, 8, 15, 17)
+fitMedia(lead3, 4, 5, 24)
+
+#Beat
+#Try commenting out this block next
+fitMedia(kick, 1, 1, 24)
+fitMedia(claps, 2, 5, 16)
+fitMedia(claps, 2, 17, 24)
+fitMedia(singleClap, 9, 16.75, 16.875)
+fitMedia(singleClap, 9, 16.875, 17)
+fitMedia(hiHat, 7, 17, 24
+
+#Auxiliary
+fitMedia(chords, 3, 1, 17)
+fitMedia(noiseSweep, 6, 15, 17)
+fitMedia(bass2, 5, 9, 17)
+fitMedia(bass1, 5, 17, 24)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Finding Errors With Comments
+//
+// author: The EarSketch Team
+//
+// description: This script causes an error. Fix the error by
+//              commenting out blocks
+//
+//
+
+//Setup
+init()
+setTempo(130)
+
+//Music
+
+var claps = HOUSE_BREAKBEAT_006;
+var singleClap = OS_CLAP03;
+var hiHat = HOUSE_BREAKBEAT_012;
+var kick = HOUSE_BREAKBEAT_023;
+var chords = RD_EDM_ANALOGPLUCK_2;
+var lead1 = RD_EDM_ANALOGPLUCK_1;
+var lead2 = RD_TRAP_ARPBLEEPLEAD_5;
+var lead3 = HOUSE_DEEP_ARPLEAD_001;
+var bass1 = ELECTRO_ANALOGUE_BASS_013;
+var bass2 = ELECTRO_ANALOGUE_BASS_008;
+var noiseSweep = TECHNO_WHITENOISESFX_001;
+
+//Leads
+//Try commenting out this block first
+fitMedia(lead1, 3, 17, 24);
+fitMedia(lead2, 8, 17, 25);
+fitMedia(lead2, 8, 9, 10);
+fitMedia(lead2, 8, 11, 12);
+fitMedia(lead2, 8, 13, 14);
+fitMedia(lead2, 8, 15, 17);
+fitMedia(lead3, 4, 5, 24);
+
+//Beat
+//Try commenting out this block next
+fitMedia(kick, 1, 1, 24);
+fitMedia(claps, 2, 5, 16);
+fitMedia(claps, 2, 17, 24);
+fitMedia(singleClap, 9, 16.75, 16.875);
+fitMedia(singleClap, 9, 16.875, 17);
+fitMedia(hiHat, 7, 17, 24
+
+//Auxiliary
+fitMedia(chords, 3, 1, 17);
+fitMedia(noiseSweep, 6, 15, 17);
+fitMedia(bass2, 5, 9, 17);
+fitMedia(bass1, 5, 17, 24);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Large, collaborative programming projects often involve large-scale distribution, and have specific standards and methods. For such projects, it is helpful to agree on how to comment. This will ensure that all team members know how to comment and maintain your program in the future. In <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_21.html#Chapter21')">Chapter 21</a>, we will discuss creative, collaborative work in detail.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="commonerrors">Common Errors</h3>
+<div class="paragraph">
+<p>The following list of common errors can help you identify and prevent bugs in your scripts.</p>
+</div>
+<div class="olist arabic curriculum-python">
+<ol class="arabic">
+<li>
+<p><strong>Misspelling:</strong> Spelling mistakes are the most common error across programming languages. When using variables, make sure to use the same name you gave at assignment. Likewise, check the spelling of EarSketch API functions and sound constants.</p>
+</li>
+<li>
+<p><strong>Case sensitivity:</strong> Most words used in programming are case-sensitive. Pay attention to lowercase and uppercase letters used in variable names and EarSketch API functions.</p>
+</li>
+<li>
+<p><strong>Parentheses:</strong> Forgetting an opening or closing parenthesis where needed will cause a <a href="Ch_31.html#syntaxerror">syntax error</a>. When using functions like <code>fitMedia()</code> (or any other EarSketch API function), make sure your arguments are enclosed by parentheses on both ends.</p>
+</li>
+<li>
+<p><strong>Initializing variables</strong>: Do not forget to initialize, or assign values to, variables before you use them. You usually do this at the top of your script.</p>
+</li>
+<li>
+<p><strong>Script setup:</strong> EarSketch adds setup functions to a new script automatically, but you might accidentally delete <code>from earsketch import *</code>, <code>init()</code>, <code>setTempo()</code>, or <code>finish()</code>. Make sure these functions appear in every script.</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a syntax error. Remember that Python comments must start with a <code>#</code> symbol.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic curriculum-javascript">
+<ol class="arabic">
+<li>
+<p><strong>Misspelling:</strong> Spelling mistakes are the most common error across programming languages. When using variables, make sure to use the same name you gave at assignment. Likewise, check the spelling of EarSketch API functions and sound constants.</p>
+</li>
+<li>
+<p><strong>Case sensitivity:</strong> Most words used in programming are case-sensitive. Pay attention to lowercase and uppercase letters used in variable names and EarSketch API functions.</p>
+</li>
+<li>
+<p><strong>Parentheses:</strong> Forgetting an opening or closing parenthesis where needed will cause a <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_31.html#syntaxerror')">syntax error</a>. When using functions like <code>fitMedia()</code> (or any other EarSketch API function), make sure your arguments are enclosed by parentheses on both ends.</p>
+</li>
+<li>
+<p><strong>Initializing variables</strong>: Do not forget to initialize, or assign values to, variables before you use them. You usually do this at the top of your script.</p>
+</li>
+<li>
+<p><strong>Initializing without var:</strong> Forgetting to initialize a variable with <code>var</code> in JavaScript can cause some confusing errors. Remember, the correct way to initialize a variable looks like this: <code>var measure = 1</code>.</p>
+</li>
+<li>
+<p><strong>Script setup:</strong> EarSketch adds setup functions to a new script automatically, but you might accidentally delete <code>init()</code>, <code>setTempo()</code>, or <code>finish()</code>. Make sure these functions appear in every script.</p>
+</li>
+<li>
+<p><strong>Comments:</strong> Improper commenting will cause a syntax error. Remember that JavaScript comments must start with <code>//</code>.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="debuggingexercise">Debugging Exercise</h3>
+<div class="paragraph">
+<p>Let’s use knowledge of common errors to debug some example code. The two scripts that follow are supposed to produce the same code, but each contains an error. Paste the scripts into the Code Editor and try to correct each error. You may find that running the code is helpful.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Find The Error 1
+#
+# author: The EarSketch Team
+#
+# description: Find and fix the error in this script
+#
+
+from earsketch import *
+
+init()
+setTempo(88)
+
+fitMedia(electroString, 1, 1, 9)
+electroString = Y13_STRING_1
+
+fitMedia(drums, 2, 5, 9)
+drums = HIPHOP_DUSTYGROOVE_017
+
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Find The Error 1
+//
+// author: The EarSketch Team
+//
+// description: Find and fix the error in this script
+//
+
+init();
+setTempo(88);
+
+fitMedia(electroString, 1, 1, 9);
+var electroString = Y13_STRING_1;
+
+fitMedia(drums, 2, 5, 9);
+var drums = HIPHOP_DUSTYGROOVE_017;
+
+finish();</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Find The Error 2
+#
+# author: The EarSketch Team
+#
+# description: Find and fix the error in this script
+#
+
+from earsketch import *
+
+init()
+setTempo(88)
+
+electroString = Y13_STRING_1
+drums = HIPHOP_DUSTYGROOVE_017
+
+fitMedia(electrostring, 1, 1, 9)
+fitMedia(drum, 2, 5, 9)
+
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Find The Error 2
+//
+// author: The EarSketch Team
+//
+// description: Find and fix the error in this script
+//
+
+init();
+setTempo(88);
+
+var electroString = Y13_STRING_1;
+var drums = HIPHOP_DUSTYGROOVE_017;
+
+fitMedia(electrostring, 1, 1, 9);
+fitMedia(drum, 2, 5, 9);
+
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph curriculum-python">
+<p>The console clearly indicates an error in the first script. It throws a <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_31.html#nameerror')">name error</a>, stating that the <code>electroString</code> variable is not defined. <code>electroString</code> is defined, but not until after we try to use it. Remember that all variables must be defined <em>before</em> they are used.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The console clearly indicates an error in the first script. It throws a <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_31.html#typeerror')">type error</a> on line 13, telling us that we used the wrong data type. The <code>electroString</code> variable is defined, but not until after we try to use it. Remember that all variables must be defined <em>before</em> they are used.</p>
+</div>
+<div class="paragraph">
+<p>A similar error message appears for the next script. The console points us to the line where we forgot a capital "S" in <code>electroString</code>. On the next line, we made another name error by referencing the non-existent <code>drum</code> variable instead of <code>drums</code>.</p>
+</div>
+<div class="paragraph">
+<p>Corrected scripts are provided below for reference:</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Fixed Error
+#
+# author: The EarSketch Team
+#
+# description: A script free of errors
+#
+
+from earsketch import *
+
+init()
+setTempo(88)
+
+electroString = Y13_STRING_1
+drums = HIPHOP_DUSTYGROOVE_017
+
+fitMedia(electroString, 1, 1, 9)
+fitMedia(drums, 2, 5, 9)
+
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Fixed Error
+//
+// author: The EarSketch Team
+//
+// description: A script free from errors
+//
+
+init();
+setTempo(88);
+
+var electroString = Y13_STRING_1;
+var drums = HIPHOP_DUSTYGROOVE_017;
+
+fitMedia(electroString, 1, 1, 9);
+fitMedia(drums, 2, 5, 9);
+
+finish();</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>EarSketch provides some additional resources to help you debug your scripts. Take a look at <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_31.html')">Every Error Explained in Detail</a> for a description of different error types and what you can do to prevent them.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter3summary">Chapter 3 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p><strong>Debugging</strong> is the process of finding and fixing <strong>bugs</strong>, errors made by the programmer.</p>
+</li>
+<li>
+<p>The three types of errors are <strong>syntax errors</strong>, <strong>runtime errors</strong>, and <strong>logic errors</strong>.</p>
+</li>
+<li>
+<p><strong>Syntax</strong> rules define the arrangement of code for a particular programming language.</p>
+</li>
+<li>
+<p>The <strong>console</strong> shows information about the state of a program, making it useful for debugging syntax errors. If a program does not run, check the console for guidance.</p>
+</li>
+<li>
+<p><strong>Comments</strong> make code easier to understand and help keep code organized. Inserting a <code>#</code> symbol at the start of a line <strong>comments out</strong> the line.</p>
+</li>
+<li>
+<p>Common beginner errors include typos, incorrect case, missing parentheses, lack of variable initialization, improper script setup, and improper commenting.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p><strong>Debugging</strong> is the process of finding and fixing <strong>bugs</strong>, errors made by the programmer.</p>
+</li>
+<li>
+<p>The three types of errors are <strong>syntax errors</strong>, <strong>runtime errors</strong>, and <strong>logic errors</strong>.</p>
+</li>
+<li>
+<p><strong>Syntax</strong> rules define the arrangement of code for a particular programming language.</p>
+</li>
+<li>
+<p>The <strong>console</strong> shows information about the state of a program, making it useful for debugging syntax errors. If a program does not run, check the console for guidance.</p>
+</li>
+<li>
+<p><strong>Comments</strong> make code easier to understand and help keep code organized. Inserting a two forward slashes, <code>//</code>,  at the start of line <strong>comments out</strong> the line.</p>
+</li>
+<li>
+<p>Common beginner errors include typos, incorrect case, missing parentheses, lack of variable initialization, improper script setup, and improper commenting.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "Which of the following is not a common type of error found in code?", "Grammatical Errors", "Runtime Errors", "Logic Errors", "Syntax Errors");
+question2 = new Question(2, "Which of the following is an example of a Syntax Error?", "The program does not run at all.", "The program runs, but doesn’t do what you expect.", "The program runs, but prints a warning to the console.", "The program runs at first, but eventually crashes.");
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

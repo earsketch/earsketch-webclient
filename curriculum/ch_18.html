@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Data Structures</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="ch_18">Data Structures</h2>
+<div class="sectionbody">
+<div class="paragraph curriculum-python">
+<p>This chapter focuses on lists, also called arrays in some programming languages. Lists are a structure for efficiently storing data in EarSketch, especially audio clips. In addition, new functionality of <code>makeBeat()</code> is covered.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>This chapter focuses on arrays, also called lists in some programming languages. Arrays are a structure for efficiently storing data in EarSketch, especially audio clips. In addition, new functionality of <code>makeBeat()</code> is covered.</p>
+</div>
+<div class="sect2">
+<h3 id="datastructurebasics">Data Structure Basics</h3>
+<div class="paragraph curriculum-python">
+<p>A <strong>list</strong> is a collection of values combined into a single entity. They enable a single variable to store multiple items that can be easily retrieved. These items, referred to as list <strong>elements</strong>, can be any data type. We have seen lists created by the <code>range()</code> function previously. Now, we focus on manually created lists, using brackets (<code>[]</code>).</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>An <strong>array</strong> is a collection of values combined into a single entity. They enable a single variable to store multiple items that can be easily retrieved. These items, referred to as array <strong>elements</strong>, can be any data type. Manually created arrays are made using brackets (<code>[]</code>).</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>Elements stored in a list get assigned an index, just like the characters of a string. Refer to <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_13.html#substrings')">Chapter 13</a> for a detailed explanation of indices. List indices start at <code>0</code> and end at <code>length - 1</code>. The <code>len()</code> function can be used to obtain the length of a list. Individual elements of a list can be accessed by using square bracket notation (<code>[]</code>) along with an index. This same notation can be used to modify any list element.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>Elements stored in an array get assigned an index, just like the characters of a string. Refer to <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_13.html#substrings')">Chapter 13</a> for a detailed explanation of indices. Array indices start at <code>0</code> and end at <code>length-1</code>. The <code>length</code> field can be used to obtain the length of an array, like <code>myArray.length</code>. Individual elements of an array can be accessed by using square bracket notation (<code>[]</code>) along with an index. This same notation can be used to modify any array element.</p>
+</div>
+<div class="paragraph curriculum-python">
+<p>The following example shows how to store items as list elements and retrieve them with bracket notation. A list containing sound clips is initialized. Then, these elements are retrieved in a series of <code>fitMedia()</code> calls.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>The following example shows how to store items as array elements and retrieve them with bracket notation. An array containing sound clips is initialized. Then, these elements are retrieved in a series of <code>fitMedia()</code> calls.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Lists
+#
+# author: The EarSketch Team
+#
+# description: Using a list to hold several audio clips
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(130)
+
+#Music
+
+#create a list of clips
+myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11]
+
+fitMedia(myEnsemble[0], 1, 1, 5) # accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5) # accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5) # accessing index 2
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Arrays
+//
+// author: The EarSketch Team
+//
+// description: Using an array to hold several audio clips
+//
+//
+//
+
+//Setup
+init();
+setTempo(130);
+
+//Music
+
+// create an array of clips
+var myEnsemble = [RD_ROCK_POPRHYTHM_MAINDRUMS_12, RD_ROCK_POPELECTRICBASS_16, RD_ROCK_POPELECTRICLEAD_11];
+
+fitMedia(myEnsemble[0], 1, 1, 5); // accessing index 0
+fitMedia(myEnsemble[1], 2, 1, 5); // accessing index 1
+fitMedia(myEnsemble[2], 3, 1, 5); // accessing index 2
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="imageblock" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U3/18_1_Graphics_ES.jpg"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="iteratingthroughadatastructure">Iterating Through a Data Structure</h3>
+<div class="paragraph curriculum-python">
+<p>For-loops are a convenient way to read through a list from first to last index. The loop in the following example reads through <code>myList</code> and prints each string element in order. The <code>len()</code> function is used to determine how many loops are needed to iterate through the whole list.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p>For-loops are a convenient way to read through an array from first to last index. The loop in the following example reads through <code>myArray</code> and prints each string element in order. The <code>length</code> method is used to determine how many loops are needed to iterate through the whole array.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: List Iteration
+#
+# author: The EarSketch Team
+#
+# description: Printing list elements with a loop
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Body
+myList = ["Get", "thee", "to", "the", "console!"]
+
+# Stopping condition determined by list length
+for i in range (0, len(myList)):
+  print myList[i];
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Array Iteration
+//
+// author: The EarSketch Team
+//
+// description: Printing array elements with a loop
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Body
+var myArray = ["Get", "thee", "to", "the", "console!"];
+
+// Stopping condition determined by array length
+for (var i = 0; i &lt; myArray.length; i++){
+  println(myArray[i]);
+}
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="imageblock curriculum-python" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U3/18_2_Graphics_PY_1_100.gif"/>
+</div>
+</div>
+<div class="imageblock curriculum-javascript" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U3/18_2_Graphics_JS_1_100.gif"/>
+</div>
+</div>
+<div class="paragraph">
+<p>The next example shows how to create an additive introduction in EarSketch in which instruments (tracks) are added to the music one by one. This is commonly used for a song’s introduction. Check out <a href="https://www.youtube.com/watch?v=L53gjP-TtGEKanye" rel="noopener" target="_blank">Kanye West’s "Power"</a>, a great example of this structure. The <code>track</code> and <code>mediaIndex</code> variables are related to <code>measure</code> through variable assignment, allowing them to be iterated on each loop. Remember, indices are 0 based, so <code>mediaIndex</code> must be <code>measure - 1</code>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Additive Introduction
+#
+# author: The EarSketch Team
+#
+# description: Creating an additive introduction with array iteration
+#
+#
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(120)
+
+#Music
+introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001]
+
+for measure in range (1, 5):
+	mediaIndex = measure - 1 # zero-based list index
+	track = measure # change track with measure
+	fitMedia(introArray[mediaIndex], track, measure, 9)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Additive Introduction
+//
+// author: The EarSketch Team
+//
+// description: Creating an additive introduction with array iteration
+//
+//
+//
+
+//Setup
+init();
+setTempo(120);
+
+//Music
+var introArray = [HIPHOP_DUSTYGROOVE_003, TECHNO_LOOP_PART_006, HOUSE_SFX_WHOOSH_001, TECHNO_CLUB5THPAD_001];
+
+
+for (var measure = 1; measure &lt; 5; measure++) {
+	var mediaIndex = measure - 1; // zero-based array index
+	var track = measure; // change track with measure
+	fitMedia(introArray[mediaIndex], track, measure, 9);
+}
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+<div class="imageblock curriculum-python" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U3/18_2_Graphics_PY_2_100.gif"/>
+</div>
+</div>
+<div class="imageblock curriculum-javascript" id="Graphic">
+<div class="content">
+<img alt="Alt Text" src="http://localhost:8080/curriculum/curriculum/media/U3/18_2_Graphics_JS_2_100.gif"/>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="usingdatastructureswithmakebeat">Using Data Structures with makeBeat</h3>
+<div class="paragraph curriculum-python">
+<p><code>makeBeat()</code> has the ability to handle multiple clips at once, allowing a single function call to trigger multiple samples. Passing in a beat string containing numbers 0 through 9 points <code>makeBeat()</code> to the list index of the corresponding sample. All clips must be stored in the same list to use this functionality. Check out the example below to see <code>makeBeat()</code> in action.</p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><code>makeBeat()</code> has the ability to handle multiple clips at once, allowing a single function call to trigger multiple samples. Passing in a beat string containing numbers 0 through 9 points <code>makeBeat()</code> to the array index of the corresponding sample. All clips must be stored in the same array to use this functionality. Check out the example below to see <code>makeBeat()</code> in action.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python"># python code
+#
+# script_name: Making a drum set
+#
+# author: The EarSketch Team
+#
+# description: Using arrays with makeBeat()
+#
+
+#Setup
+from earsketch import *
+init()
+setTempo(100)
+
+#Music
+drums = [ELECTRO_DRUM_MAIN_BEAT_001, # an list of drum clips
+		 ELECTRO_DRUM_MAIN_BEAT_002,
+		 ELECTRO_DRUM_MAIN_BEAT_003,
+		 ELECTRO_DRUM_MAIN_BEAT_004]
+
+# each number is actually an index into the drums list
+drumPattern = '0+0+11112+2+3+++'
+
+makeBeat(drums, 1, 1, drumPattern)
+
+#Finish
+finish()</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">// javascript code
+//
+// script_name: Making a drum set
+//
+// author: The EarSketch Team
+//
+// description: Using arrays with makeBeat()
+//
+//
+//
+
+//Setup
+init();
+setTempo(100);
+
+//Music
+var drums = [ELECTRO_DRUM_MAIN_BEAT_001,  // an array of drum clips
+		 ELECTRO_DRUM_MAIN_BEAT_002,
+		 ELECTRO_DRUM_MAIN_BEAT_003,
+		 ELECTRO_DRUM_MAIN_BEAT_004];
+
+// each number is actually an index into the drums array
+var drumPattern = '0+0+11112+2+3+++';
+
+makeBeat(drums, 1, 1, drumPattern);
+
+//Finish
+finish();</code></pre></div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter18summary">Chapter 18 Summary</h3>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>A <strong>list</strong> is a collection of values combined into a single entity, an efficient way to store data. Items stored within a list, or elements, can be any data type.</p>
+</li>
+<li>
+<p>Like strings, list elements get assigned an index. List indices start at 0.</p>
+</li>
+<li>
+<p>List elements are accessed with bracket notation, like myList[1].</p>
+</li>
+<li>
+<p><code>makeBeat()</code> can construct rhythms from multiple clips at once by passing in a beat string that refers to different list indices. <code>makeBeat()</code> can access clips in indices 0 through 9, provided they are stored in the same list.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>A <strong>array</strong> is a collection of values combined into a single entity, an efficient way to store data. Items stored within a array, or elements, can be any data type.</p>
+</li>
+<li>
+<p>Like strings, array elements get assigned an index. Array indices start at 0.</p>
+</li>
+<li>
+<p>Array elements are accessed with bracket notation, like myArray[1].</p>
+</li>
+<li>
+<p><code>makeBeat()</code> can construct rhythms from multiple clips at once by passing in a beat string that refers to different arrays indices. <code>makeBeat()</code> can access clips in indices 0 through 9, provided they are stored in the same array.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="chapter-questions">Questions</h3>
+<div id="questionsContainer"></div>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/questions.js" type="text/javascript"></script>
+<script>
+question1 = new Question(1, "What is the index number of the first element of a list in Python?", "0", "1", "2", "-1","python");
+question2 = new Question(2, "What does len(myList) return?", "The number of elements in myList", "The data types of myList", "The elements of myList", "The width of myList","python");
+
+question3 = new Question(1, "What is the index number of the first element of an array in Javascript?", "0", "1", "2", "-1","javascript",3);
+question4 = new Question(2, "What does myArray.length return?", "The number of elements in myArray", "The data types of myArray", "The elements of myArray", "The width of myArray","javascript",4);
+</script>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

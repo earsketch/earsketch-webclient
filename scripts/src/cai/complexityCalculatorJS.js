@@ -10,17 +10,26 @@ import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
 export function analyzeJavascript(source) {
+
+    if (source == "") {
+        return { complexity: "" };
+    }
+
+
     try {
-        ccState.resetState()
-        ccState.setProperty("listFuncs", ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"])
-        const ast = acorn.parse(source, {
-            locations: true,
-        })
-        ccState.setProperty("studentCode", source.split("\n"))
-        // handle this like you'd handle python.
-        const newAST = convertASTTree(ast);
+        ccState.resetState();
+        ccState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
+        var ast = acorn.parse(source, {
+            locations: true
+        });
+        ccState.setProperty('studentCode', source.split("\n"));
+        //handle this like you'd handle python.
+        var newAST = convertASTTree(ast);
+        //initialize list of function return objects with all functions from the API that return something (includes casting)
+        var allVariables = [];
+        //initialize the results object
         var resultsObject = {
-            ast: ast,
+            ast: newAST,
             codeFeatures: {
                 errors: 0,
                 variables: 0,

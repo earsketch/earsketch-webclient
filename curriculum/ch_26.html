@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="Asciidoctor 2.0.12" name="generator"/>
+<title>Introduction to GrooveMachine</title>
+
+</head>
+<body class="article">
+<div id="header">
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="IntroductionToGM">Introduction to GrooveMachine</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Groove Machine is shaped like a turntable. It can be used to create musical loops that turn into EarSketch code.</p>
+</div>
+<div class="paragraph">
+<p>Groove Machine has <strong>three</strong> types of controls:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Shapes (left side) : Drop these shapes onto  the 8 different octants (sections) of Groove Machine. Blue shapes are sounds, and green, yellow, and orange shapes are effects. <strong>When hovering over a shape on the left side of the page, make sure to pick one from the window that appears to its right.</strong></p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Green shape - deepens sounds</p>
+</li>
+<li>
+<p>Yellow shape - creates an echo of the sound</p>
+</li>
+<li>
+<p>Orange shape - beat repeat</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Sample Pack Selector (bottom) : Select one of the four sample packs.</p>
+</li>
+<li>
+<p>Direction Change (bottom) : Use these buttons to set whether Groove Machine plays clockwise or counterclockwise.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Once you are happy with the music you’ve made in Groove Machine, click the paste icon above the code to open the script in the EarSketch’s code editor.</p>
+</div>
+<div class="sect2">
+<h3 id="_use_groove_machine">Use Groove Machine</h3>
+<div id="gmMachine">
+<iframe id="frame" src="https://groovemachine.lmc.gatech.edu/codeframe" style="width:560px; height:900px;"> </iframe>
+<script src="http://localhost:8080/curriculum/curriculum/scripts/groovemachine.js" type="text/javascript"></script>
+</div>
+</div>
+<div class="sect2">
+<h3 id="Overview">Overview</h3>
+<div class="paragraph">
+<p>As you work with Groove Machine, the code window below it updates based on the changes you make to the music. Once you are happy with the music you’ve made in Groove Machine, click the paste icon above the code to open the script in the EarSketch’s code editor. Take a look at the script to understand how it works and how you can change it to take the music further.</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lines 7 and 9 : Specify the start and end measure for Groove Machine. You can change the start measure for your music here if you would prefer.</p>
+</li>
+<li>
+<p>Line 8 : Specifies the number of octants used. Each measure in the EarSketch DAW is made up of 2 octants.</p>
+</li>
+<li>
+<p>Line 13 : This is where Groove Machine places the title of the sample pack you’ve selected from the drop down menu.</p>
+</li>
+<li>
+<p>Line 14 : Specifies the direction chosen from the Direction Change buttons on the Groove Machine GUI.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Line 7 and 9 : Specify the start and end measure for Groove Machine. You can change the start measure for your music here if you would prefer.</p>
+</li>
+<li>
+<p>Lines 8 : Specifies the number of octants used. Each measure in the EarSketch DAW is made up of 2 octants.</p>
+</li>
+<li>
+<p>Line  13 : This is where Groove Machine places the title of the sample pack you’ve selected from the drop down menu.</p>
+</li>
+<li>
+<p>Line 14 : Specifies the direction chosen from the Direction Change buttons on the Groove Machine GUI.</p>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lines 18-21 : These lines hold multiples arrays to control samples and effects.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Line 18 : Samples - Here you can decide which sample in your sample_pack to use based off of its number in the sample pack. You can also type None if you don’t want to use any of the samples.</p>
+</li>
+<li>
+<p>Line 19 : Lowpass Filter - ( deepens sounds): On this line use the terms True or False to decide if you want to use the lowpass filter or not.</p>
+</li>
+<li>
+<p>Line 20 : Reverb (Echo) - On this line use the terms True or False to decide if you want to use the reverb or not.</p>
+</li>
+<li>
+<p>Line 21 : Beat Repeat - On this line use the terms True or False to decide if you want to use beat repeat or not.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Lines 18-21 : These lines hold multiple arrays to control samples and effects.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Line 18 : Samples - Here you can decide which sample in your sample_pack to use based off of its number in the sample pack. You can also type None if you don’t want to use any of the samples.</p>
+</li>
+<li>
+<p>Line 19 : Lowpass Filter(deepens sounds) - On this line use the terms True or False to decide if you want to use the lowpass filter or not.</p>
+</li>
+<li>
+<p>Line 20 : Reverb (Echo) - On this line use the terms True or False to decide if you want to use the reverb or not.</p>
+</li>
+<li>
+<p>Line 21 : Beat Repeat - On this line use the terms True or False to decide if you want to use beat repeat or not.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lines 24-51 : playForward function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Clockwise direction of movement for the Groove Machine</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Lines 24-62 : playForward function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Clockwise direction of movement for the Groove Machine</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Question</strong>:
+  What is used within this function to create repetition?</p>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lines 54-82 : playReverse function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Anti-clockwise direction of movement for the Groove Machine</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Lines 64-102 : playReverse function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Anti-clockwise direction of movement for the Groove Machine</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Line 86-87 : addSample function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function uses the fitMedia function covered in unit 1 chapter 2 of the curriculum.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Line 105-107 : addSample function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function uses the fitMedia function covered in unit 1 chapter 2 of the curriculum.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Line 90-92 : addLowpass function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function deepens the sound of the music and filters out higher frequencies.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Line 110-113: addLowpass function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function deepens the sound of the music and filters out higher frequencies.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lines 95-97 : addReverb function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function helps to create an echo of the music.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Lines 116-119 : addReverb function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function helps to create an echo of the music.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-python">
+<ul>
+<li>
+<p>Lines 100-101 : addBeatRepeat function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function creates a rhythmic pattern in the measures of the music.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="ulist curriculum-javascript">
+<ul>
+<li>
+<p>Lines 122-124 : addBeatRepeat function</p>
+<div class="ulist">
+<ul>
+<li>
+<p>This function creates a rhythmic pattern in the measures of the music.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_where_to_put_additional_code">Where to put additional code?</h4>
+<div class="paragraph">
+<p>If you would like to add more to the music using any feature of EarSketch which was previously covered, create space for it between line 17 and the comment on line 18. This is a good spot for placing other setEffect options and fitMedia functions and will help your code to stay organized and clean.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="UnderTheHood">Under the Hood</h3>
+<div class="paragraph">
+<p>Building blocks of  Groove Machine:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Arrays or Lists :  To review this topic go to <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_2.html#datatypes')">2.2: Data Types</a>.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">samples    =  [None,6,None,None,None,None,None,None]
+lowpass    =  [False,False,False,False,False,False,False,False]
+reverb     =  [False,False,False,False,False,False,False,False]
+beatrepeat =  [False,True,False,False,False,False,False,False]</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">var samples     = [null,null,null,null,null,null,null,4]
+var lowpass     = [false,false,false,false,false,false,false,false]
+var reverb      = [false,false,false,false,false,false,false,true]
+var beatrepeat  = [false,false,false,false,false,false,false,false]</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Iterations : for-loop to iterate through the arrays. To review this topic go to <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_12.html#theforloop')">12.1: The For-Loop</a>.</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">for o in range(0,8):
+    # compute start measure of each octant
+    measure = start + o * 0.5
+    # add sample on to EarSketch timeline
+    if samples[o]:
+      if beatrepeat[o]:
+        addBeatRepeat(samples[o],measure)
+      else:
+        addSample(samples[o], measure)
+
+    if lowpass[o]:
+      if samples[o]:
+        addLowPass(measure)
+      else:
+        print "No audio sample, but lowpass modifier exists on octant {} ".format(o)
+        setEffect(1, FILTER, MIX, 1, measure, 1, measure+0.5)
+    else:
+      setEffect(1, FILTER, MIX, 0, measure, 0, measure+0.5)
+
+    if reverb[o]:
+      if samples[o]:
+        addReverb(measure)
+      else:
+        print "No audio sample, but reverb modifier exists on octant {} ".format(o)
+        setEffect(1, REVERB, MIX, 1, measure, 1, measure+0.5)
+    else:
+      setEffect(1, REVERB, MIX, 0, measure, 0, measure+0.5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">for (var o=0; o &lt; 8; o++) {
+    // compute start measure of each octant
+    var measure = start + o * 0.5;
+    // add sample on to EarSketch timeline
+    if (samples[o]) {
+      if (beatrepeat[o])
+        addBeatRepeat(samples[o],measure);
+      else
+        addSample(samples[o], measure);
+    }
+
+    if (lowpass[o]) {
+      if (samples[o]) {
+        addLowPass(measure);
+      }
+      else {
+        println("No audio sample, but lowpass modifier exists on octant " + o);
+        setEffect(1, FILTER, MIX, 1, measure, 1, measure+0.5);
+      }
+    }
+    else {
+      setEffect(1, FILTER, MIX, 0, measure, 0, measure+0.5);
+    }
+
+    if (reverb[o]) {
+      if (samples[o]) {
+        addReverb(measure)
+      }
+      else {
+        println("No audio sample, but reverb modifier exists on octant " + o);
+        setEffect(1, REVERB, MIX, 1, measure, 1, measure+0.5);
+      }
+    }
+    else {
+      setEffect(1, REVERB, MIX, 0, measure, 0, measure+0.5)
+    }
+  }</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p>Abstraction : Abstractions are a bundling of ideas to form a single concept. Functions are an example of this. For further information go to <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_u2_intro.html')">Unit 2: Abstraction</a></p>
+</div>
+<div class="paragraph">
+<p>Ex. addSample custom function</p>
+</div>
+<div class="listingblock curriculum-python">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-python" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="python" data-lang="python">def addSample(sample, measure):
+  fitMedia(sample_pack + str(sample), 1, measure, measure+0.5)</code></pre></div>
+</div>
+</div>
+<div class="listingblock curriculum-javascript">
+<div class="content">
+<div class="currcode-container"><button class="btn-copy copy-btn-javascript" onclick="doCopy(this)" style="display:block"><i class="icon icon-paste2" title="Open the example code in the editor"></i></button><pre class="highlight"><code class="javascript" data-lang="javascript">function addSample(sample, measure) {
+    fitMedia(sample_pack + sample, 1, measure, measure+0.5);
+}</code></pre></div>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Question</strong>:
+  There are many abstractions in the Groove Machine code. Can you name another section that uses abstraction?</p>
+</div>
+<div class="sect3">
+<h4 id="_example_of_abstraction_in_the_code">Example of Abstraction in the code</h4>
+<div class="paragraph">
+<p>With Groove Machine, the <strong>fitMedia</strong> function is used in the custom function addSample.  The parameters of the addSample function include sample and measure. These parameters hold the arguments that are being passed to the fitMedia function within the body.</p>
+</div>
+<div class="paragraph">
+<p><strong>Question</strong>:
+  Do you remember what the parameters are for fitMedia?</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The function addSample takes care of putting samples in chronological order. It also helps to reduce complexity and makes code easily understandable ( refer to <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_9.html#customfunctions')">9.3: Custom Functions</a> for further information about custom functions).</p>
+<div class="olist arabic">
+<div class="title">addSample::</div>
+<ol class="arabic">
+<li>
+<p>The <strong>first parameter</strong> for fitMedia in the custom function addSample, sample_pack + str(sample), means  the sample_pack that was selected above and the particular number of samples within this sample_pack as defined in the sample variable above.</p>
+</li>
+<li>
+<p>The <strong>second parameter</strong> for fitMedia in the custom function addSample is the track number.</p>
+</li>
+<li>
+<p>The <strong>third parameter</strong> for fitMedia in the custom function addSample is the variable "measure". Take a moment and review what is in this variable.</p>
+</li>
+<li>
+<p>The <strong>fourth parameter</strong> for fitMedia in the custom function addSample is the variable "measure" plus +0.5. This specifies where the sample will end.</p>
+</li>
+</ol>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="AdvancedTopics">Advanced Topics and Exercises</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Line 8 : On this line of the code, you can determine how many octants you would like to have for your music.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph curriculum-python">
+<p><strong>Note: If you change the amount of octants make sure that the variables on lines 18-21 have the same amount of values in the arrays. Also make sure to change the range for lines 25 and 55.</strong></p>
+</div>
+<div class="paragraph curriculum-javascript">
+<p><strong>Note: If you change the amount of octants make sure that the variables on lines 18-21 have the same amount of values in the arrays. Also make sure to change the range for lines 25 and 65.</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Line 13 : This is where you need to put the title of the sample pack that you want to use. When you specifically want to select a group of samples from the EarSketch sound browser to use in the Groove Machine code, make sure to include everything in the name except for the ending number. <strong>Some sample packs will have 0’s before their ending numbers but others may not.</strong></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Ex. Sample pack with the two samples</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>HIPHOP_DUSTYMOOG_001
+HIPHOP_DUSTYMOOG_002</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Remove the last number and place it into the sample_pack variable like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>sample_pack = 'HIPHOP_DUSTYMOOG_00'</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Line 14 : This line determines the direction of the Groove Machine and whether it will move forward or backwards. In order for the direction to be forward (or clockwise), forward must equal true ( forward= true), if you would like the direction to be backwards ( or counterclockwise) change this to False (forward=False).</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="_activities">Activities</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>With the sample code that you are using, insert the name of another sample pack you want to use.</p>
+</li>
+<li>
+<p>If you want to use a sample pack that you have created outside of EarSketch, make sure the files start the same name and are numbered in chronological order, upload the files to the EarSketch website, and type the main title of the sample pack into the sample_pack variable.</p>
+</li>
+<li>
+<p>With addBeatRepeat, change up the  string that is one of the parameters of makeBeat. Create different rhythmic ideas with this string. Review creating beats with strings in <a href="#" onclick="angular.element('[ng-controller=layoutController]').scope().loadChapter('ch_11.html#beatpatternswithstrings')">11.2: Beat Patterns With Strings</a> of the curriculum.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

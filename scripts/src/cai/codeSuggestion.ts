@@ -5,6 +5,7 @@ import { CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI } from "./codeRecomm
 import * as caiProjectModel from "./projectModel"
 import * as complexityCalculatorHelperFunctions from "./complexityCalculatorHelperFunctions"
 import * as caiAnalysisModule from "./analysis"
+import * as caiErrorHandling from "./errorHandling"
 
 let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [], sections: 0 }
 let currentDeltaSum = 0
@@ -611,7 +612,8 @@ export function generateResults(text: string, lang: string) {
         CAI_DICT = []
     }
     musicResults = caiAnalysisModule.getReport()
-    // if we have stored results already and nothing's changed, use thos
+    caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
+    //if we have stored results already and nothing's changed, use thos
     let validChange = true
     let allZeros = true
     const keys = Object.keys(results)
