@@ -287,7 +287,7 @@ async function runJsInterpreter(interpreter: any) {
     }
     const result = javascriptAPI.dawData
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
-    return javascriptAPI.remapToNativeJs(result)
+    return javascriptAPI.remapToNative(result)
 }
 
 // Gets the current line number from the top of the JS-interpreter
