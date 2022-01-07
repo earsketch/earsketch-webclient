@@ -149,6 +149,39 @@ export const API_SCRIPTS = {
         "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5);\n" +
         "finish();\n",
 
+    "insertMediaSectionMiddle.py": "from earsketch import * \n" +
+      "init() \n" +
+      "setTempo(120) \n" +
+      "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.5, 2)\n" +
+      "finish() \n",
+
+    "insertMediaSectionMiddle.js": "init();\n" +
+      "setTempo(120);\n" +
+      "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.5, 2);\n" +
+      "finish();\n",
+
+    "insertMediaSectionTimeStretch.py": "from earsketch import * \n" +
+      "init() \n" +
+      "setTempo(121) \n" +
+      "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5)\n" +
+      "finish() \n",
+
+    "insertMediaSectionTimeStretch.js": "init();\n" +
+      "setTempo(121);\n" +
+      "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.0, 1.5);\n" +
+      "finish();\n",
+
+    "insertMediaSectionTimeStretchMiddle.py": "from earsketch import * \n" +
+      "init() \n" +
+      "setTempo(121) \n" +
+      "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.5, 2)\n" +
+      "finish() \n",
+
+    "insertMediaSectionTimeStretchMiddle.js": "init();\n" +
+      "setTempo(121);\n" +
+      "insertMediaSection(HOUSE_BREAKBEAT_003, 1, 3.0, 1.5, 2);\n" +
+      "finish();\n",
+
     "makeBeatSlice.py": "from earsketch import * \n" +
         "init() \n" +
         "setTempo(120) \n" +

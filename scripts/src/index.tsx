@@ -75,7 +75,7 @@ if (window.navigator.appName === "Microsoft Internet Explorer") {
 
 // Check for minimum version of Chrome/Firefox. TODO: Update?
 const M = ESUtils.whichBrowser().split(" ")
-if ((M[0] === "Chrome" && +M[1] < 24) || (M[0] === "Firefox" && +M[1] < 25)) {
+if ((M[0] === "Chrome" && +M[1] < 43) || (M[0] === "Firefox" && +M[1] < 25) || (M[0] === "Safari" && +M[1] < 14.1)) {
     alert("It appears you are using version " + M[1] + " of " + M[0] + ". Please upgrade your browser so that EarSketch functions properly.")
 }
 

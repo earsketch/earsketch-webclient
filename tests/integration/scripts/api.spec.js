@@ -44,8 +44,8 @@ describe("API function tests", () => {
     // TODO: write tests for RMS_AMPLITUDE as well
     testPythonAndJavaScript("analyze", [0.292])
     testPythonAndJavaScript("analyzeForTime", [0.292])
-    testPythonAndJavaScript("analyzeTrack", [0.263])
-    testPythonAndJavaScript("analyzeTrackForTime", [0.28])
+    testPythonAndJavaScript("analyzeTrack", [0.253])
+    testPythonAndJavaScript("analyzeTrackForTime", [0.275])
     testPythonAndJavaScript("createAudioSlice")
     testPythonAndJavaScript("dur", [2])
     testPythonAndJavaScript("fitMedia")
@@ -55,6 +55,9 @@ describe("API function tests", () => {
     testPythonAndJavaScript("insertMedia1")
     testPythonAndJavaScript("insertMedia2")
     testPythonAndJavaScript("insertMediaSection")
+    testPythonAndJavaScript("insertMediaSectionMiddle")
+    testPythonAndJavaScript("insertMediaSectionTimeStretch")
+    testPythonAndJavaScript("insertMediaSectionTimeStretchMiddle")
     // TODO: makeBeat
     testPythonAndJavaScript("makeBeatSlice")
 

@@ -20,9 +20,6 @@ import { addUIClick } from "../cai/studentPreferences"
 // Width of track control box
 const X_OFFSET = 100
 
-// Hack because local state gets cleared when the DAW is replaced by a loading screen...
-let _embedCompiled = false
-
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
     const hideDAW = useSelector(appState.selectHideDAW)
@@ -35,7 +32,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const [embedCompiled, setEmbedCompiled] = useState(_embedCompiled)
+    const [embedCompiled, setEmbedCompiled] = useState(false)
     const needCompile = embedMode && !embedCompiled
     const { t } = useTranslation()
 
@@ -58,7 +55,6 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         if (embedMode && !embedCompiled) {
             compileCode()
             setEmbedCompiled(true)
-            _embedCompiled = true
             return
         }
 
