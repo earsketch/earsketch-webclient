@@ -9,39 +9,39 @@ export function getApiCalls() {
 }
 
 function recursiveCallOnNodes(funcToCall, args, ast) {
-    if (ast !== null && ast.body !== null) {
+    if (ast && ast.body) {
         for (const key of Object.keys(ast.body)) {
             const node = ast.body[key]
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    } else if (ast !== null && ast._astname !== null && ast._astname === "BoolOp") {
+    } else if (ast && ast._astname && ast._astname === "BoolOp") {
         for (const key of Object.keys(ast.values)) {
             const node = ast.values[key]
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    } else if (ast !== null && (ast._astname !== null || (ast[0] !== null && ast[0]._astname !== null)) && Object.keys(ast) !== null) {
+    } else if (ast && (ast._astname || (ast[0] && ast[0]._astname)) && Object.keys(ast)) {
         for (const key of Object.keys(ast)) {
             const node = ast[key]
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    } else if (ast !== null && ast._astname !== null && ast._astname === "Expr") {
+    } else if (ast && ast._astname && ast._astname === "Expr") {
         funcToCall(ast.value, args)
         recursiveCallOnNodes(funcToCall, args, ast.value)
     }
 
-    if (ast !== null && ast._astname !== null && "test" in ast) {
+    if (ast && ast._astname && "test" in ast) {
         funcToCall(ast.test, args)
         recursiveCallOnNodes(funcToCall, args, ast.test)
     }
 
-    if (ast !== null && ast._astname !== null && "iter" in ast) {
+    if (ast && ast._astname && "iter" in ast) {
         funcToCall(ast.iter, args)
         recursiveCallOnNodes(funcToCall, args, ast.iter)
     }
-    if (ast !== null && ast._astname !== null && "orelse" in ast) {
+    if (ast && ast._astname && "orelse" in ast) {
         funcToCall(ast.orelse, args)
         recursiveCallOnNodes(funcToCall, args, ast.orelse)
     }
@@ -138,10 +138,10 @@ function functionPass(ast, results, rootAst) {
 
 // collects function info from a node
 function collectFunctionInfo(node, args) {
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -164,7 +164,7 @@ function collectFunctionInfo(node, args) {
             // check for value return
             for (const item of node.body) {
                 const ret = searchForReturn(item)
-                if (ret !== null) {
+                if (ret) {
                     functionObj.returns = true
                     functionObj.returnVals.push(ret)
                     break
@@ -172,7 +172,7 @@ function collectFunctionInfo(node, args) {
             }
 
             // check for parameters
-            if (node.args.args !== null && node.args.args.length > 0) {
+            if (node.args.args && node.args.args.length > 0) {
                 // check for parameters that are NOT NULL
                 // these...should all be Name
                 for (const arg of node.args.args) {
@@ -336,20 +336,20 @@ function searchForReturn(astNode) {
     if (astNode._astname === "Return") {
         return astNode.value
     } else {
-        if (astNode !== null && astNode.body !== null) {
+        if (astNode && astNode.body) {
             for (const key of Object.keys(astNode.body)) {
                 const node = astNode.body[key]
                 const ret = searchForReturn(node)
-                if (ret !== null) {
+                if (ret) {
                     return ret
                 }
             }
             return null
-        } else if (astNode !== null && (astNode[0] !== null && Object.keys(astNode[0]) !== null)) {
+        } else if (astNode && (astNode[0] && Object.keys(astNode[0]))) {
             for (const key of Object.keys(astNode)) {
                 const node = astNode[key]
                 const ret = searchForReturn(node)
-                if (ret !== null) {
+                if (ret) {
                     return ret
                 }
             }
@@ -360,10 +360,10 @@ function searchForReturn(astNode) {
 
 // collects variable info from a node
 function collectVariableInfo(node) {
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -774,7 +774,7 @@ function getTypeFromASTNode(node) {
 
 function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLine = [], origLine = -1) {
     if (ast === null) { return false }
-    if (ast !== null && ast.body !== null) {
+    if (ast && ast.body) {
         for (const key of Object.keys(ast.body)) {
             const node = ast.body[key]
             // parent node tracing
@@ -788,7 +788,7 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
                 return true
             }
         }
-    } else if (ast !== null && (ast._astname !== null || (ast[0] !== null && ast[0]._astname !== null)) && Object.keys(ast) !== null) {
+    } else if (ast && (ast._astname || (ast[0] && ast[0]._astname)) && Object.keys(ast)) {
         for (const key of Object.keys(ast)) {
             const node = ast[key]
 
@@ -801,7 +801,7 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
                 return true
             }
         }
-    } else if (ast !== null && ast._astname !== null && ast._astname === "Expr") {
+    } else if (ast && ast._astname && ast._astname === "Expr") {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.value, "Expr"])
         if (findValueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
@@ -813,7 +813,7 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
     }
 
     // nodes that need extra testing
-    if (ast !== null && ast._astname !== null && "test" in ast) {
+    if (ast && ast._astname && "test" in ast) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.test, "test"])
         if (findValueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
@@ -824,7 +824,7 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
         }
     }
 
-    if (ast !== null && ast._astname !== null && "iter" in ast) {
+    if (ast && ast._astname && "iter" in ast) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.iter, "iter"])
         if (findValueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
@@ -839,10 +839,10 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
 }
 
 function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, origLine = -1, tracedNodes = []) { //
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -953,7 +953,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         }
 
         if (isUse && isWithin) {
-            if (lineVar !== null) {
+            if (lineVar) {
                 lineVar.line = lineNumber
             }
             return true
@@ -988,7 +988,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         }
 
         // 2a. if so, check the root ast for THAT name
-        if (isAssigned === true) {
+        if (isAssigned === true && assignedName !== name) {
             let varBool = isVariable
 
             // if a function output is assigned to a variable, change isVariable to true
@@ -1097,7 +1097,7 @@ function countStructuralDepth(structureObj, depthCountObj, parentObj) {
             depthCountObj.depth = structureObj.depth
         }
     }
-    if (structureObj.children !== null && structureObj.children.length > 0) {
+    if (structureObj.children && structureObj.children.length > 0) {
         for (const item of structureObj.children) {
             countStructuralDepth(item, depthCountObj, structureObj)
         }
@@ -1106,9 +1106,9 @@ function countStructuralDepth(structureObj, depthCountObj, parentObj) {
 
 // Analyze a single node of a Python AST.
 function analyzeASTNode(node, results) {
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -1268,13 +1268,13 @@ function recursiveAnalyzeAST(ast, results) {
 }
 
 function appendOrElses(node, orElseList) {
-    if (node !== null && "orelse" in node && node.orelse.length > 0) {
-        if ("body" in node.orelse[0]) {
+    if (node && "orelse" in node && node.orelse.length > 0) {
+        if (node.orelse[0].body) {
             orElseList.push(node.orelse[0].body)
-        } else if (!("orelse" in node.orelse[0])) {
+        } else if (!(node.orelse[0].orelse)) {
             orElseList.push(node.orelse)
         }
-        if ("orelse" in node.orelse[0]) {
+        if (node.orelse[0].orelse) {
             appendOrElses(node.orelse[0], orElseList)
         }
     }
@@ -1413,8 +1413,8 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
         }
     } else {
         returnObject.id = node._astname
-        if ("body" in node) {
-            for (const item of node.body.length) {
+        if (node.body) {
+            for (const item of node.body) {
                 returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
             }
         }
@@ -1425,7 +1425,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
 
 function findFunctionDefName(node, args) {
     const lineNumber = args[0]
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // args[1] has property "name" which is how name val is returned
         if (node._astname === "FunctionDef" && node.lineno === lineNumber) {
             args[1].name = node.name.v
@@ -1452,7 +1452,7 @@ function getParentList(lineno, parentNode, parentsList) {
             }
         }
 
-        if (childNode !== null) {
+        if (childNode) {
             getParentList(lineno, childNode, parentsList)
         }
     }
@@ -1460,7 +1460,7 @@ function getParentList(lineno, parentNode, parentsList) {
 
 function findFunctionCallName(node, args) {
     const lineNumber = args[0]
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // args[1] has property "name" which is how name val is returned
         if (node._astname === "Call" && node.lineno === lineNumber && "id" in node.func) {
             args[1].name = node.func.id.v

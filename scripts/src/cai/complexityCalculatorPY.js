@@ -81,8 +81,8 @@ export function analyzePython(source_code) {
             //= JSON.stringify(resultsObject.codeFeatures);
 
        // ccHelpers.lineDict();
-        return outStr;
-        //return resultsObject;
+        //return outStr;
+        return resultsObject;
     }
     catch (error) {
         return "ERROR";

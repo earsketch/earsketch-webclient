@@ -74,13 +74,13 @@ export function analyzeJavascript(source) {
             //JSON.stringify(resultsObject.codeFeatures);
       //  outStr += "|depth: " + resultsObject.codeStructure.depth;
         // ccHelpers.lineDict();
-        return outStr;
+        //return outStr;
 
         // translate the calculated values
         // translateIntegerValues(resultsObject);
         ccHelpers.lineDict()
-        caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
-        //return resultsObject
+        //caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
+        return resultsObject
     }
     catch (e) {
         return "ERROR"
