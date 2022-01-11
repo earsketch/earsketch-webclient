@@ -80,7 +80,9 @@ export function analyzeJavascript(source) {
         // translateIntegerValues(resultsObject);
         ccHelpers.lineDict()
         //caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
-        return resultsObject
+        var outObj = Object.assign({}, resultsObject.codeFeatures);
+        outObj["depth"] = resultsObject.depth;
+        return outObj;
     }
     catch (e) {
         return "ERROR"

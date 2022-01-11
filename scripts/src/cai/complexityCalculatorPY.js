@@ -82,7 +82,9 @@ export function analyzePython(source_code) {
 
        // ccHelpers.lineDict();
         //return outStr;
-        return resultsObject;
+        var outObj = Object.assign({}, resultsObject.codeFeatures);
+        outObj["depth"] = resultsObject.depth;
+        return outObj;
     }
     catch (error) {
         return "ERROR";

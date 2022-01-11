@@ -20,24 +20,23 @@ const types: any[] = []
 var headers: string = ""
 
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
-    { options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
+{ options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
     return <div className="container">
 
     </div>
 }
 
 export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
-    { processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
+{ processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
     const [shareIDColumn, setShareIDColumn] = useState(1)
 
-
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
+            // const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
             const urlList = []
             try {
                 setProcessing("Uploading")
@@ -46,27 +45,25 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
                 setProcessing(null)
 
-                //newline handling that hurts my soul
-                //we replace all newline characters that have quotes on either end
-                //warning: the code below is cursed.
-                
+                // newline handling that hurts my soul
+                // we replace all newline characters that have quotes on either end
+                // warning: the code below is cursed.
                 script = await cleanupScript(script)
 
-                headers = script.split("\n")[0] + ",depth"
+                // headers = script.split("\n")[0] + ",depth"
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
 
                     urlList.push(values[values.length - 1])
                     types.push(values[values.length - 2])
-                    var newStr: string = ""
-                    for (var k = 0; k < values.length - 2; k++) {
+                    let newStr: string = ""
+                    for (let k = 0; k < values.length - 2; k++) {
                         newStr += (values[k])
-                        if (k != values.length - 3) {
+                        if (k !== values.length - 3) {
                             newStr += ","
                         }
                     }
                     scriptInfo.push(newStr)
-
                 }
 
                 setProcessing(null)
@@ -78,21 +75,24 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
     }
 
-    const cleanupScript = async (script:string)=>{
+    const cleanupScript = async (script: string) => {
         setProcessing("Pre-Processing")
-        
         var numberOfQuotes: number = 0
         var percentDone: number = 0
         for (var i = 0; i < script.length; i++) {
-            if (script[i] == "\"") {
+            if (script[i] === "\"") {
                 numberOfQuotes += 1
             }
 
-            if (script[i] == "\n" && (numberOfQuotes % 2 != 0)) {
+            if (script[i] === "\n" && (numberOfQuotes % 2 !== 0)) {
                 script = script.substring(0, i) + "NEWLINE" + script.substring(i + 1)
             }
 
-            if (script[i] == "," && (numberOfQuotes % 2 != 0)) {
+            if (script[i] === "\r") {
+                script = script.substring(0, i) + script.substring(i + 1)
+            }
+
+            if (script[i] === "," && (numberOfQuotes % 2 !== 0)) {
                 script = script.substring(0, i) + "|||" + script.substring(i + 1)
             }
 
@@ -104,15 +104,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
         return script
     }
-    
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
         const reports: any = {
-            COMPLEXITY: { complexity: "" }
+            COMPLEXITY: { complexity: "" },
         }
         try {
-            if (script.source_code != "\r" && script.source_code != "") {
+            if (script.source_code !== "\r" && script.source_code !== "") {
                 // const compilerOuptut = await compile(script.source_code, "script.py", seed)
                 while (script.source_code.endsWith("\"") || script.source_code.endsWith("\r") || script.source_code.endsWith("\n")) {
                     script.source_code = script.source_code.substring(0, script.source_code.length - 1);
@@ -126,20 +125,18 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     script.source_code = script.source_code.split("\"\"").join("\"");
                 }
                 if (script.name.includes(".js")) {
-                    reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("javascript", script.source_code).split(",").join("|")
-                }
-                else {
+                    reports["COMPLEXITY"]["complexity"] = JSON.stringify(caiAnalysisModule.analyzeCode("javascript", script.source_code)).split(",").join("|")
+                } else {
                     while (script.source_code.startsWith("\"")) {
                         script.source_code = script.source_code.substring(1);
                     }
                     reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("python", script.source_code).split(",").join("|")
                 }
                 console.log(reports["COMPLEXITY"])
-
             }
             result = {
                 script: script,
-                reports: reports
+                reports: reports,
             }
         } catch (err) {
             console.log("log error", err)
@@ -152,7 +149,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
         return result
     }
-
 
     // Read all script urls, parse their shareid, and then load and run every script adding the results to the results list.
     const run = async () => {
@@ -168,26 +164,23 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         setProcessing(null)
 
         let results: Result[] = []
-        let index: number = 0;
+        let index: number = 0
         for (const url of urls) {
-            
             setProcessing(index.toString() + "/" + urls.length.toString())
-           
             const match = url
-            
+
             esconsole("Grading: " + match, ["DEBUG"])
             let script
             let scriptText
 
-
             console.log(index.toString() + "/" + urls.length.toString())
             try {
-                if (match != "\r") {
+                if (match !== "\r") {
                     scriptText = match.split("NEWLINE").join("\n")
                     scriptText = scriptText.split("\\t").join("\t")
                     scriptText = scriptText.split("|||").join(",")
 
-                    //strip extraneous quotation marks
+                    // strip extraneous quotation marks
 
                     while (scriptText.endsWith("\"") || scriptText.endsWith("\n") || scriptText.endsWith("\r")) {
                         scriptText = scriptText.substring(0, scriptText.length - 1)
@@ -196,8 +189,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     while (scriptText.startsWith("\"\"")) {
                         scriptText = scriptText.substring(1)
                     }
-                }
-                else {
+                } else {
                     scriptText = ""
                 }
             } catch {
@@ -211,7 +203,6 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             results = [...results, result]
 
             setResults(results)
-
         }
     }
 
@@ -228,11 +219,11 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             </div>
             <div className="panel-footer">
                 {processing
-                    ?<div>
-                    <div>{processing}</div> 
-                    <button className="btn btn-primary" onClick={run} disabled>
-                        <i className="es-spinner animate-spin mr-3"></i> Run
-                    </button></div>
+                    ? <div>
+                        <div>{processing}</div>
+                        <button className="btn btn-primary" onClick={run} disabled>
+                            <i className="es-spinner animate-spin mr-3"></i> Run
+                        </button></div>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
             </div>
         </div>
