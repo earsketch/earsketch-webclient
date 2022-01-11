@@ -6,27 +6,15 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as curriculumState from "../browser/curriculumState"
-
-interface locale {
-    displayText: string;
-    localeCode: string;
-    direction: "ltr" | "rtl"
-}
-
-export const AVAILABLE_LOCALES: locale[] = [
-    { displayText: "English", localeCode: "en", direction: "ltr" },
-    { displayText: "Español", localeCode: "es", direction: "ltr" },
-    { displayText: "Français", localeCode: "fr", direction: "ltr" },
-    { displayText: "Hebrew", localeCode: "he", direction: "rtl" },
-]
+import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
-    const currentLocale = useSelector(appState.selectLocale)
+    const currentLocale = useSelector(appState.selectLocaleCode)
 
     const changeLanguage = (lng: string) => {
-        dispatch(appState.setLocale(lng))
+        dispatch(appState.setLocaleCode(lng))
         dispatch(curriculumState.fetchLocale({ }))
     }
 
@@ -55,7 +43,7 @@ export const LocaleSelector = () => {
                                     className={`${
                                         active ? "bg-gray-500 text-white" : "text-gray-900"
                                     } inline-grid grid-flow-col justify-items-start items-center pl-3 pr-1 py-2 w-full`}
-                                    onClick={() => changeLanguage(locale)}
+                                    onClick={() => changeLanguage(locale.localeCode)}
                                     style={{ gridTemplateColumns: "18px 1fr" }}
                                 >
                                     {locale.localeCode === currentLocale && <i className="icon icon-checkmark4" />}

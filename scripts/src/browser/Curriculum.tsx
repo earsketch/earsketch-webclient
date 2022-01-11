@@ -173,6 +173,7 @@ export const TitleBar = () => {
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
+    const currentLocale = useSelector(appState.selectLocale)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
@@ -198,7 +199,8 @@ export const TitleBar = () => {
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </div>
             </div>
-            <div className="ml-auto">
+            {/* TODO: upgrade to tailwind 3 for rtl modifiers to remove ternary operator */}
+            <div className={currentLocale.direction === "rtl" ? "mr-auto" : "ml-auto"}>
                 <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                     <i className="icon icon-link" />
                 </button>
@@ -218,6 +220,7 @@ export const TitleBar = () => {
 const CurriculumPane = () => {
     const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
+    const currentLocale = useSelector(appState.selectLocale)
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
@@ -285,7 +288,7 @@ const CurriculumPane = () => {
 
     return paneIsOpen
         ? (
-            <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
+            <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
                 <CurriculumHeader />
 
                 <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
@@ -307,6 +310,7 @@ const NavigationBar = () => {
     const location = useSelector(curriculum.selectCurrentLocation)
     const toc = useSelector(curriculum.selectTableOfContents)
     const tocPages = useSelector(curriculum.selectPages)
+    const currentLocale = useSelector(appState.selectLocale)
 
     const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / (toc[location[0]]!.chapters?.[location[1]].sections?.length ?? 1))
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
@@ -336,7 +340,7 @@ const NavigationBar = () => {
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
                     : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
-                        <i className="icon icon-arrow-left2" />
+                        <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "right2" : "left2"}`} />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
                     {pageTitle}
@@ -345,7 +349,7 @@ const NavigationBar = () => {
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
                     : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
-                        <i className="icon icon-arrow-right2" />
+                        <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "left2" : "right2"}`} />
                     </button>}
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? "" : "hidden"}`}>
