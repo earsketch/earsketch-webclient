@@ -287,7 +287,7 @@ async function runJsInterpreter(interpreter: any) {
     }
     const result = javascriptAPI.dawData
     esconsole("Execution finished. Extracting result.", ["debug", "runner"])
-    return javascriptAPI.remapToNativeJs(result)
+    return javascriptAPI.remapToNative(result)
 }
 
 // Gets the current line number from the top of the JS-interpreter
@@ -531,14 +531,13 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
             const fillableGapMinimum = 0.01
             // add clips to fill in empty space
             let measure = clip.measure
-            let buffer = clip.sourceAudio
             let first = true
             while ((first || clip.loop) && measure < endMeasure - fillableGapMinimum) {
                 const filekey = clip.filekey
                 const start = first ? clip.start : 1
                 const end = first ? Math.min(duration + 1, clip.end) : 1 + Math.min(duration, endMeasure - measure)
-
                 const needSlice = start !== 1 || end !== duration + 1
+                let buffer = clip.sourceAudio
 
                 if (clip.tempo === undefined) {
                     if (needSlice) {
@@ -557,17 +556,25 @@ function fixClips(result: DAWData, buffers: { [key: string]: AudioBuffer }) {
                     [posIncrement, duration] = roundUpToDivision(buffer.duration, tempoMap.getTempoAtMeasure(measure))
                 } else {
                     // Timestretch to match the tempo map at this point in the track (or retrieve cached buffer).
-                    const pointsDuringClip = tempoMap.slice(measure, measure + (end - start)).points
-                    const cacheKey = JSON.stringify([clip.filekey, start, end, pointsDuringClip])
-                    let cached = clipCache.get(cacheKey)
-                    if (cached === undefined) {
-                        const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, clip.tempo) : clip.sourceAudio.getChannelData(0)
-                        cached = timestretch(input, clip.tempo, tempoMap, measure)
-                        if (FLAGS.CACHE_TS_RESULTS) {
-                            clipCache.set(cacheKey, cached)
+                    const clipMap = tempoMap.slice(measure, measure + (end - start))
+                    const needStretch = clipMap.points.some(point => point.tempo !== clip.tempo)
+                    if (needStretch || needSlice) {
+                        const cacheKey = JSON.stringify([clip.filekey, start, end, clipMap.points])
+                        let cached = clipCache.get(cacheKey)
+                        if (cached === undefined) {
+                            const input = needSlice ? sliceAudio(clip.sourceAudio, start, end, clip.tempo!) : clip.sourceAudio.getChannelData(0)
+                            if (needStretch) {
+                                cached = timestretch(input, clip.tempo!, tempoMap, measure)
+                            } else {
+                                cached = audioContext.createBuffer(1, input.length, clip.sourceAudio.sampleRate)
+                                cached.copyToChannel(input, 0)
+                            }
+                            if (needSlice || FLAGS.CACHE_TS_RESULTS) {
+                                clipCache.set(cacheKey, cached)
+                            }
                         }
+                        buffer = cached
                     }
-                    buffer = cached
                 }
                 newClips.push({
                     ...clip,

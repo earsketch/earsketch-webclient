@@ -787,11 +787,11 @@
         }
       }
     },
-    "setTempo": {
+    "setTempo1": {
       "description": "Définit le tempo du projet.",
       "parameters": {
         "tempo": {
-          "description": "Le tempo du projet en « beats » par minute (BPM). Le tempo minimum est de 45. Le tempo maximum est de 220."
+          "description": "Le tempo du projet en « beats » par minute (BPM). Le tempo minimum est de 45 BPM. Le tempo maximum est de 220 BPM."
         }
       }
     },

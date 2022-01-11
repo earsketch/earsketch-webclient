@@ -15,12 +15,10 @@ import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
 import { effectToPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
+import { addUIClick } from "../cai/studentPreferences"
 
 // Width of track control box
 const X_OFFSET = 100
-
-// Hack because local state gets cleared when the DAW is replaced by a loading screen...
-let _embedCompiled = false
 
 const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPlayPosition: (a: number) => void }) => {
     const dispatch = useDispatch()
@@ -34,7 +32,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
     const loop = useSelector(daw.selectLoop)
     const autoScroll = useSelector(daw.selectAutoScroll)
     const embedMode = useSelector(appState.selectEmbedMode)
-    const [embedCompiled, setEmbedCompiled] = useState(_embedCompiled)
+    const [embedCompiled, setEmbedCompiled] = useState(false)
     const needCompile = embedMode && !embedCompiled
     const { t } = useTranslation()
 
@@ -57,7 +55,6 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         if (embedMode && !embedCompiled) {
             compileCode()
             setEmbedCompiled(true)
-            _embedCompiled = true
             return
         }
 
@@ -175,14 +172,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={play}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={pause}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}

@@ -258,6 +258,72 @@ export const API_RESULTS = {
         ],
     },
 
+    insertMediaSectionMiddle: {
+        tempo: 120,
+        length: 2.5,
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "HOUSE_BREAKBEAT_003", measure: 3, start: 1.5, end: 2 },
+                ],
+                effects: {},
+            },
+        ],
+    },
+
+    insertMediaSectionTimeStretchMiddle: {
+        tempo: 121,
+        length: 2.5,
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 121, endValue: 121 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "HOUSE_BREAKBEAT_003", measure: 3, start: 1.5, end: 2 },
+                ],
+                effects: {},
+            },
+        ],
+    },
+
+    insertMediaSectionTimeStretch: {
+        tempo: 121,
+        length: 2.5,
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 121, endValue: 121 },
+                    ],
+                },
+            },
+            {
+                clips: [
+                    { filekey: "HOUSE_BREAKBEAT_003", measure: 3, start: 1, end: 1.5 },
+                ],
+                effects: {},
+            },
+        ],
+    },
+
     makeBeatSlice: {
         tempo: 120,
         length: 0.25,

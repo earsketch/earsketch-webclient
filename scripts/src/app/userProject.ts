@@ -296,16 +296,13 @@ export function shareWithPeople(shareid: string, users: string[]) {
     const data = {
         notification_type: "sharewithpeople",
         username: getUsername(),
+        sender: getUsername(),
         scriptid: shareid,
         // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
         users: users.map(id => ({ id, exists: true })),
     }
 
-    if (!websocket.isOpen) {
-        websocket.connect(getUsername(), () => websocket.send(data))
-    } else {
-        websocket.send(data)
-    }
+    websocket.send(data)
 }
 
 // Fetch a script by ID.
@@ -675,8 +672,11 @@ export async function createScript(scriptname: string) {
     return script
 }
 
-export async function uploadCAIHistory(project: string, node: any) {
-    const data = { username: getUsername(), project, node: JSON.stringify(node) }
+export async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
+    const data: { [key: string]: string } = { username: getUsername(), project, node: JSON.stringify(node) }
+    if (sourceCode) {
+        data.source = sourceCode
+    }
     await post("/studies/caihistory", data)
     console.log("saved to CAI history:", project, node)
 }

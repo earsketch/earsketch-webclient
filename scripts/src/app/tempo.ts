@@ -156,6 +156,12 @@ export function timestretch(input: Float32Array, sourceTempo: number, targetTemp
     // Use Kali, a JS implementation of the WSOLA time-stretching algorithm, to time-stretch an audio buffer.
     const kali = new Kali(1)
     kali.setup(audioContext.sampleRate, 1, FLAGS.TS_QUICK_SEARCH)
+    // For reasons unknown, Kali tends to output a discontinuity at the start.
+    // So, we warm it up by feeding in (and then dropping) some silence.
+    const padding = new Float32Array(1024)
+    kali.input(padding)
+    kali.process()
+    kali.output(padding)
 
     // Feed the input buffer to Kali a little bit at a time,
     // calling `kali.setTempo` over the duration of the buffer to respond to tempo changes.

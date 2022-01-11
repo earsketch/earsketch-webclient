@@ -205,8 +205,7 @@ export function insertMediaSection(
     trackNumber: number,
     trackLocation: number,
     mediaStartLocation: number,
-    mediaEndLocation: number,
-    scaleAudio: number | undefined = undefined
+    mediaEndLocation: number
 ) {
     esconsole(
         "Calling pt_insertMediaSection from passthrough with parameters " +
@@ -214,8 +213,7 @@ export function insertMediaSection(
         trackNumber + " , " +
         trackLocation + " , " +
         mediaStartLocation + " , " +
-        mediaEndLocation + " , " +
-        scaleAudio, "PT")
+        mediaEndLocation, "PT")
 
     const args = [...arguments].slice(1)
     ptCheckArgs("insertMediaSection", args, 3, 6)
@@ -241,27 +239,27 @@ export function insertMediaSection(
         mediaEndLocation = 0
     }
 
-    if (scaleAudio !== undefined) {
-        if (typeof (scaleAudio) !== "number") {
-            throw new TypeError("scaleAudio must be a number")
+    const tempoMap = new TempoMap(result)
+
+    return (async () => {
+        await runner.loadBuffersForSampleSlicing(result)
+        const sound = await audioLibrary.getSound(fileName)
+        const tempo = sound.tempo ?? tempoMap.points[0].tempo
+        const dur = ESUtils.timeToMeasure(sound.buffer.duration, tempo)
+        if (mediaStartLocation - 1 >= dur) {
+            throw new RangeError("mediaStartLocation exceeds sound duration")
         }
-    } else {
-        scaleAudio = 1
-    }
-
-    const clip = {
-        filekey: fileName,
-        track: trackNumber,
-        measure: trackLocation,
-        start: mediaStartLocation,
-        end: mediaEndLocation,
-        scale: scaleAudio,
-        loop: true,
-    } as unknown as Clip
-
-    addClip(result, clip)
-
-    return result
+        const clip = {
+            filekey: fileName,
+            track: trackNumber,
+            measure: trackLocation,
+            start: mediaStartLocation,
+            end: mediaEndLocation,
+            loop: true,
+        } as Clip
+        addClip(result, clip)
+        return result
+    })()
 }
 
 // Make a beat of audio clips.
@@ -422,6 +420,8 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
     const REST = "-"
     const SIXTEENTH = 0.0625
 
+    const promises = []
+
     // parse the beat string
     for (let i = 0; i < beatString.length; i++) {
         const current = parseInt(beatString[i])
@@ -451,11 +451,11 @@ export function makeBeatSlice(result: DAWData, media: string, track: number, mea
                 i = j - 1
             }
 
-            result = insertMediaSection(result, media, track, start, sliceStart, sliceEnd)
+            promises.push(insertMediaSection(result, media, track, start, sliceStart, sliceEnd))
         }
     }
 
-    return result
+    return Promise.all(promises).then(() => result)
 }
 
 // Analyze a clip.
@@ -1014,7 +1014,7 @@ export function createAudioSlice(result: DAWData, oldSoundFile: string, startLoc
 
     result.slicedClips[sliceKey] = sliceDef
 
-    return { result: result, returnVal: sliceKey }
+    return { result, returnVal: sliceKey }
 }
 
 // Select a random file.

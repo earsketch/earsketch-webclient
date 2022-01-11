@@ -8,6 +8,9 @@ import reporter from "./reporter"
 import * as userNotification from "../user/notification"
 import * as websocket from "./websocket"
 
+import * as cai from "../cai/caiState"
+import store from "../reducers"
+
 interface Message {
     // eslint-disable-next-line camelcase
     notification_type: string
@@ -32,6 +35,8 @@ interface Message {
     state?: number
     text?: string
     tutoring?: boolean
+    caiMessage?: cai.CAIMessage
+    caiMessageType?: string
 }
 
 interface InsertOperation {
@@ -89,9 +94,6 @@ export let otherMembers: {
 } = Object.create(null)
 const markers: { [key: string]: number } = Object.create(null)
 
-export const chat: {
-    [key: string]: { text: string; popover: boolean }
-} = Object.create(null)
 export let tutoring = false
 
 // This stores the `resolve`s of promises returned by rejoinSession and getScriptText.
@@ -158,12 +160,6 @@ export function openScript(script_: Script, userName: string) {
                 active: false,
                 canEdit: true,
             }
-
-            // TODO: combine with other-members state object?
-            chat[script.username] = {
-                text: "",
-                popover: false,
-            }
         }
 
         for (let member of script.collaborators) {
@@ -173,17 +169,7 @@ export function openScript(script_: Script, userName: string) {
                     active: false,
                     canEdit: true,
                 }
-
-                chat[member] = {
-                    text: "",
-                    popover: false,
-                }
             }
-        }
-
-        chat[userName] = {
-            text: "",
-            popover: false,
         }
     }
     reporter.openSharedScript()
@@ -319,7 +305,9 @@ export function leaveSession(shareID: string) {
 }
 
 function onMemberJoinedSession(data: Message) {
-    userNotification.show(data.sender + " has joined the collaboration session.")
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.sender + " has joined the collaboration session.")
+    }
 
     if (data.sender in otherMembers) {
         otherMembers[data.sender].active = true
@@ -332,7 +320,9 @@ function onMemberJoinedSession(data: Message) {
 }
 
 function onMemberLeftSession(data: Message) {
-    userNotification.show(data.sender + " has left the collaboration session.")
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.sender + " has left the collaboration session.")
+    }
 
     if (data.sender in markers) {
         editSession!.removeMarker(markers[data.sender])
@@ -579,6 +569,9 @@ function rejoinSession() {
 }
 
 export function saveScript(_scriptID?: string) {
+    if (cai.selectWizard(store.getState())) {
+        return
+    }
     if (!_scriptID || (_scriptID === scriptID)) {
         websocket.send({ action: "saveScript", ...makeWebsocketMessage() })
     }
@@ -586,7 +579,9 @@ export function saveScript(_scriptID?: string) {
 }
 
 function onScriptSaved(data: Message) {
-    if (!userIsCAI(data.sender)) { userNotification.show(data.sender + " saved the current version of the script.", "success") }
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.sender + " saved the current version of the script.", "success")
+    }
 }
 
 export function storeCursor(position: Ace.Point) {
@@ -656,7 +651,9 @@ function removeOtherCursors() {
 }
 
 function onMiscMessage(data: Message) {
-    userNotification.show(data.text!)
+    if (!userIsCAI(data.sender)) {
+        userNotification.show(data.text!)
+    }
 }
 
 function onChangeWriteAccess(data: Message) {
@@ -1019,10 +1016,49 @@ export function leaveTutoring() {
     tutoring = false
 }
 
-export function sendChatMessage(text: string) {
-    const message = { action: "chat", text, date: Date.now(), ...makeWebsocketMessage() }
+export function sendChatMessage(caiMessage: cai.CAIMessage, caiMessageType: string) {
+    console.log("sent chat message", caiMessage)
+
+    const message = {
+        action: "chat",
+        caiMessage,
+        caiMessageType,
+        ...makeWebsocketMessage(),
+    } as Message
+
     websocket.send(message)
-    return message
+}
+
+function onChatMessage(data: Message) {
+    console.log("received chat message", data)
+
+    // do nothing on own message
+    if (data.sender === userName) {
+        return
+    }
+
+    const outputMessage = data.caiMessage!
+
+    switch (data.caiMessageType) {
+        case "cai":
+            outputMessage.sender = "CAI"
+            store.dispatch(cai.addCAIMessage([outputMessage, true]))
+            break
+        case "cai suggestion":
+            outputMessage.sender = "CAI"
+            store.dispatch(cai.addCAIMessage([outputMessage, true, false, true]))
+            break
+        case "wizard":
+            outputMessage.sender = "CAI"
+            store.dispatch(cai.addCAIMessage([outputMessage, true, true]))
+            break
+        case "user":
+            store.dispatch(cai.addCAIMessage([outputMessage, true]))
+            break
+        case "curriculum":
+            store.dispatch(cai.setCurriculumView(data.sender + " is viewing " + outputMessage.text[0][1][0]))
+            break
+    }
 }
 
 export function sendCompilationRecord(type: string) {
@@ -1053,7 +1089,7 @@ const SCRIPT_HANDLERS: { [key: string]: (data: Message) => void } = {
     onMemberLeftSession,
     onMiscMessage,
     onWriteAccess: onChangeWriteAccess,
-    onChat: (data: Message) => callbacks.chat?.(data),
+    onChat: onChatMessage,
     onCompile: (data: Message) => callbacks.chat?.(data),
     onSessionClosedForInactivity,
 }
@@ -1073,8 +1109,7 @@ function triggerByNotification(data: Message) {
 
 websocket.subscribe(triggerByNotification)
 
-// TEMPORARY for Wizard of Oz CAI testing, Spring 2020.
+// TEMPORARY for Wizard of Oz CAI testing, Spring 2020-2021.
 function userIsCAI(user: string) {
-    user = user.toUpperCase()
-    return (user.includes("AI_PARTNER") || user.includes("CAI"))
+    return user.toUpperCase() === "CAI"
 }

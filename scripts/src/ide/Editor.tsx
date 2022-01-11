@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next"
 import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
+import * as caiDialogue from "../cai/dialogue"
+import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -39,8 +41,9 @@ export function getValue() {
 }
 
 export function setReadOnly(value: boolean) {
-    ace.setReadOnly(value)
-    droplet.setReadOnly(value)
+    const wizard = cai.selectWizard(store.getState()) && tabs.selectActiveTabScript(store.getState())?.collaborative
+    ace.setReadOnly(value ||= wizard)
+    droplet.setReadOnly(value ||= wizard)
 }
 
 export function setFontSize(value: number) {
@@ -145,6 +148,8 @@ export function clearErrors() {
     }
 }
 
+let firstEdit: number | null = null
+
 function setupAceHandlers(ace: Ace.Editor) {
     ace.on("changeSession", () => callbacks.onChange?.())
 
@@ -153,9 +158,8 @@ function setupAceHandlers(ace: Ace.Editor) {
     ace.on("change", (event) => {
         callbacks.onChange?.()
 
-        const t = Date.now()
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.keyStroke([event.action, event.lines, t]))
+            caiStudentPreferences.addKeystroke(event.action)
         }
 
         if (collaboration.active && !collaboration.lockEditor) {
@@ -182,11 +186,17 @@ function setupAceHandlers(ace: Ace.Editor) {
             clearTimeout(recommendationTimer)
         }
 
+        if (firstEdit === null) {
+            firstEdit = Date.now()
+            caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
+        }
         recommendationTimer = window.setTimeout(() => {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
+                caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
             }
+            firstEdit = null
         }, 1000)
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.

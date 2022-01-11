@@ -30,14 +30,14 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         analyze: {
             descriptionKey: "api:analyze.description",
             parameters: {
-                audioFile: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:analyze.parameters.audioFile.description",
+                    descriptionKey: "api:analyze.parameters.sound.description",
                 },
 
-                featureForAnalysis: {
+                feature: {
                     typeKey: "api:types.analysisConstant",
-                    descriptionKey: "api:analyze.parameters.featureForAnalysis.description",
+                    descriptionKey: "api:analyze.parameters.feature.description",
                 },
             },
             returns: {
@@ -55,21 +55,21 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         analyzeForTime: {
             descriptionKey: "api:analyzeForTime.description",
             parameters: {
-                audioFile: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:analyzeForTime.parameters.audioFile.description",
+                    descriptionKey: "api:analyzeForTime.parameters.sound.description",
                 },
-                featureForAnalysis: {
+                feature: {
                     typeKey: "api:types.analysisConstant",
-                    descriptionKey: "api:analyzeForTime.parameters.featureForAnalysis.description",
+                    descriptionKey: "api:analyzeForTime.parameters.feature.description",
                 },
-                startTime: {
+                sliceStart: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:analyzeForTime.parameters.startTime.description",
+                    descriptionKey: "api:analyzeForTime.parameters.sliceStart.description",
                 },
-                endTime: {
+                sliceEnd: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:analyzeForTime.parameters.endTime.description",
+                    descriptionKey: "api:analyzeForTime.parameters.sliceEnd.description",
                 },
             },
             returns: {
@@ -87,13 +87,13 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         analyzeTrack: {
             descriptionKey: "api:analyzeTrack.description",
             parameters: {
-                trackNumber: {
+                track: {
                     typeKey: "api:types.integer",
-                    descriptionKey: "api:analyzeTrack.parameters.trackNumber.description",
+                    descriptionKey: "api:analyzeTrack.parameters.track.description",
                 },
-                featureForAnalysis: {
+                feature: {
                     typeKey: "api:types.analysisConstant",
-                    descriptionKey: "api:analyzeTrack.parameters.featureForAnalysis.description",
+                    descriptionKey: "api:analyzeTrack.parameters.feature.description",
                 },
             },
             returns: {
@@ -111,21 +111,21 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         analyzeTrackForTime: {
             descriptionKey: "api:analyzeTrackForTime.description",
             parameters: {
-                trackNumber: {
+                track: {
                     typeKey: "api:types.integer",
-                    descriptionKey: "api:analyzeTrackForTime.parameters.trackNumber.description",
+                    descriptionKey: "api:analyzeTrackForTime.parameters.track.description",
                 },
-                featureForAnalysis: {
+                feature: {
                     typeKey: "api:types.analysisConstant",
-                    descriptionKey: "api:analyzeTrackForTime.parameters.featureForAnalysis.description",
+                    descriptionKey: "api:analyzeTrackForTime.parameters.feature.description",
                 },
-                startTime: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:analyzeTrackForTime.parameters.startTime.description",
+                    descriptionKey: "api:analyzeTrackForTime.parameters.start.description",
                 },
-                endTime: {
+                end: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:analyzeTrackForTime.parameters.endTime.description",
+                    descriptionKey: "api:analyzeTrackForTime.parameters.end.description",
                 },
             },
             returns: {
@@ -143,17 +143,17 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         createAudioSlice: {
             descriptionKey: "api:createAudioSlice.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:createAudioSlice.parameters.fileName.description",
+                    descriptionKey: "api:createAudioSlice.parameters.sound.description",
                 },
-                startPosition: {
+                sliceStart: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:createAudioSlice.parameters.startPosition.description",
+                    descriptionKey: "api:createAudioSlice.parameters.sliceStart.description",
                 },
-                endPosition: {
+                sliceEnd: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:createAudioSlice.parameters.endPosition.description",
+                    descriptionKey: "api:createAudioSlice.parameters.sliceEnd.description",
                 },
             },
             example: {
@@ -171,9 +171,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         dur: {
             descriptionKey: "api:dur.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:dur.parameters.fileName.description",
+                    descriptionKey: "api:dur.parameters.sound.description",
                 },
             },
             example: {
@@ -200,21 +200,21 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         fitMedia: {
             descriptionKey: "api:fitMedia.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:fitMedia.parameters.fileName.description",
+                    descriptionKey: "api:fitMedia.parameters.sound.description",
                 },
-                trackNumber: {
+                track: {
                     typeKey: "api:types.integer",
-                    descriptionKey: "api:fitMedia.parameters.trackNumber.description",
+                    descriptionKey: "api:fitMedia.parameters.track.description",
                 },
-                startLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:fitMedia.parameters.startLocation.description",
+                    descriptionKey: "api:fitMedia.parameters.start.description",
                 },
-                endLocation: {
+                end: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:fitMedia.parameters.endLocation.description",
+                    descriptionKey: "api:fitMedia.parameters.end.description",
                 },
             },
             example: {
@@ -228,9 +228,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         importImage: {
             descriptionKey: "api:importImage.description",
             parameters: {
-                imageURL: {
+                url: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:importImage.parameters.imageURL.description",
+                    descriptionKey: "api:importImage.parameters.url.description",
                 },
                 nrows: {
                     typeKey: "api:types.integer",
@@ -261,9 +261,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         importFile: {
             descriptionKey: "api:importFile.description",
             parameters: {
-                fileURL: {
+                url: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:importFile.parameters.fileURL.description",
+                    descriptionKey: "api:importFile.parameters.url.description",
                 },
             },
             example: {
@@ -290,17 +290,17 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         insertMedia: {
             descriptionKey: "api:insertMedia.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:insertMedia.parameters.fileName.description",
+                    descriptionKey: "api:insertMedia.parameters.sound.description",
                 },
-                trackNumber: {
+                track: {
                     typeKey: "api:types.integer",
-                    descriptionKey: "api:insertMedia.parameters.trackNumber.description",
+                    descriptionKey: "api:insertMedia.parameters.track.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:insertMedia.parameters.trackLocation.description",
+                    descriptionKey: "api:insertMedia.parameters.start.description",
                 },
             },
             example: {
@@ -314,25 +314,25 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         insertMediaSection: {
             descriptionKey: "api:insertMediaSection.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:insertMediaSection.parameters.fileName.description",
+                    descriptionKey: "api:insertMediaSection.parameters.sound.description",
                 },
-                trackNumber: {
+                track: {
                     typeKey: "api:types.integer",
-                    descriptionKey: "api:insertMediaSection.parameters.trackNumber.description",
+                    descriptionKey: "api:insertMediaSection.parameters.track.description",
                 },
-                trackLocation: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:insertMediaSection.parameters.trackLocation.description",
+                    descriptionKey: "api:insertMediaSection.parameters.start.description",
                 },
-                mediaStartLocation: {
+                sliceStart: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:insertMediaSection.parameters.mediaStartLocation.description",
+                    descriptionKey: "api:insertMediaSection.parameters.sliceStart.description",
                 },
-                mediaEndLocation: {
+                sliceEnd: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:insertMediaSection.parameters.mediaEndLocation.description",
+                    descriptionKey: "api:insertMediaSection.parameters.sliceEnd.description",
                 },
             },
             example: {
@@ -346,21 +346,21 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         makeBeat: {
             descriptionKey: "api:makeBeat.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundOrList",
-                    descriptionKey: "api:makeBeat.parameters.fileName.description",
+                    descriptionKey: "api:makeBeat.parameters.sound.description",
                 },
                 track: {
                     typeKey: "api:types.integer",
                     descriptionKey: "api:makeBeat.parameters.track.description",
                 },
-                measure: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:makeBeat.parameters.measure.description",
+                    descriptionKey: "api:makeBeat.parameters.start.description",
                 },
-                string: {
+                beat: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:makeBeat.parameters.string.description",
+                    descriptionKey: "api:makeBeat.parameters.beat.description",
                 },
             },
             example: {
@@ -374,25 +374,25 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         makeBeatSlice: {
             descriptionKey: "api:makeBeatSlice.description",
             parameters: {
-                fileName: {
+                sound: {
                     typeKey: "api:types.soundConstant",
-                    descriptionKey: "api:makeBeatSlice.parameters.fileName.description",
+                    descriptionKey: "api:makeBeatSlice.parameters.sound.description",
                 },
                 track: {
                     typeKey: "api:types.integer",
                     descriptionKey: "api:makeBeatSlice.parameters.track.description",
                 },
-                measure: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:makeBeatSlice.parameters.measure.description",
+                    descriptionKey: "api:makeBeatSlice.parameters.start.description",
                 },
-                string: {
+                beat: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:makeBeatSlice.parameters.string.description",
+                    descriptionKey: "api:makeBeatSlice.parameters.beat.description",
                 },
-                beatNumber: {
+                sliceStarts: {
                     typeKey: "api:types.listArray",
-                    descriptionKey: "api:makeBeatSlice.parameters.beatNumber.description",
+                    descriptionKey: "api:makeBeatSlice.parameters.sliceStarts.description",
                 },
             },
             example: {
@@ -459,9 +459,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         replaceListElement: {
             descriptionKey: "api:replaceListElement.description",
             parameters: {
-                inputList: {
+                list: {
                     typeKey: "api:types.listArray",
-                    descriptionKey: "api:replaceListElement.parameters.inputList.description",
+                    descriptionKey: "api:replaceListElement.parameters.list.description",
                 },
                 elementToReplace: {
                     typeKey: "api:types.any",
@@ -511,9 +511,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         reverseList: {
             descriptionKey: "api:reverseList.description",
             parameters: {
-                inputList: {
+                list: {
                     typeKey: "api:types.listArray",
-                    descriptionKey: "api:reverseList.parameters.inputList.description",
+                    descriptionKey: "api:reverseList.parameters.list.description",
                 },
             },
             returns: {
@@ -531,9 +531,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         reverseString: {
             descriptionKey: "api:reverseString.description",
             parameters: {
-                inputString: {
+                string: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:reverseString.parameters.inputString.description",
+                    descriptionKey: "api:reverseString.parameters.string.description",
                 },
             },
             returns: {
@@ -555,25 +555,25 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                     typeKey: "api:types.integer",
                     descriptionKey: "api:rhythmEffects.parameters.track.description",
                 },
-                effectType: {
+                type: {
                     typeKey: "api:types.effectConstant",
-                    descriptionKey: "api:rhythmEffects.parameters.effectType.description",
+                    descriptionKey: "api:rhythmEffects.parameters.type.description",
                 },
-                effectParameter: {
+                parameter: {
                     typeKey: "api:types.effectParameterConstant",
-                    descriptionKey: "api:rhythmEffects.parameters.effectParameter.description",
+                    descriptionKey: "api:rhythmEffects.parameters.parameter.description",
                 },
-                effectList: {
+                list: {
                     typeKey: "api:types.listArray",
-                    descriptionKey: "api:rhythmEffects.parameters.effectList.description",
+                    descriptionKey: "api:rhythmEffects.parameters.list.description",
                 },
-                measure: {
+                start: {
                     typeKey: "api:types.float",
-                    descriptionKey: "api:rhythmEffects.parameters.measure.description",
+                    descriptionKey: "api:rhythmEffects.parameters.start.description",
                 },
-                beatString: {
+                beat: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:rhythmEffects.parameters.beatString.description",
+                    descriptionKey: "api:rhythmEffects.parameters.beat.description",
                 },
             },
             example: {
@@ -613,17 +613,17 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                         typeKey: "api:types.integer",
                         descriptionKey: "api:setEffect1.parameters.track.description",
                     },
-                    effectType: {
+                    type: {
                         typeKey: "api:types.effectConstant",
-                        descriptionKey: "api:setEffect1.parameters.effectType.description",
+                        descriptionKey: "api:setEffect1.parameters.type.description",
                     },
-                    effectParameter: {
+                    parameter: {
                         typeKey: "api:types.effectParameterConstant",
-                        descriptionKey: "api:setEffect1.parameters.effectParameter.description",
+                        descriptionKey: "api:setEffect1.parameters.parameter.description",
                     },
-                    effectValue: {
+                    value: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect1.parameters.effectValue.description",
+                        descriptionKey: "api:setEffect1.parameters.value.description",
                     },
                 },
                 example: {
@@ -640,29 +640,29 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
                         typeKey: "api:types.integer",
                         descriptionKey: "api:setEffect1.parameters.track.description",
                     },
-                    effectType: {
+                    type: {
                         typeKey: "api:types.effectConstant",
-                        descriptionKey: "api:setEffect1.parameters.effectType.description",
+                        descriptionKey: "api:setEffect1.parameters.type.description",
                     },
-                    effectParameter: {
+                    parameter: {
                         typeKey: "api:types.effectParameterConstant",
-                        descriptionKey: "api:setEffect1.parameters.effectParameter.description",
+                        descriptionKey: "api:setEffect1.parameters.parameter.description",
                     },
-                    effectStartValue: {
+                    startValue: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.effectStartValue.description",
+                        descriptionKey: "api:setEffect2.parameters.startValue.description",
                     },
-                    effectStartLocation: {
+                    start: {
                         typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.effectStartLocation.description",
+                        descriptionKey: "api:setEffect2.parameters.start.description",
                     },
-                    effectEndValue: {
-                        typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.effectEndValue.description",
+                    endValue: {
+                        typeKey: "api:types.floatOptional",
+                        descriptionKey: "api:setEffect2.parameters.endValue.description",
                     },
-                    effectEndLocation: {
-                        typeKey: "api:types.float",
-                        descriptionKey: "api:setEffect2.parameters.effectEndLocation.description",
+                    end: {
+                        typeKey: "api:types.floatOptional",
+                        descriptionKey: "api:setEffect2.parameters.end.description",
                     },
                 },
                 example: {
@@ -674,28 +674,57 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
             },
         ],
 
-        setTempo: {
-            descriptionKey: "api:setTempo.description",
-            parameters: {
-                tempo: {
-                    typeKey: "api:types.integer",
-                    descriptionKey: "api:setTempo.parameters.tempo.description",
+        setTempo: [
+            {
+                descriptionKey: "api:setTempo1.description",
+                parameters: {
+                    tempo: {
+                        typeKey: "api:types.float",
+                        descriptionKey: "api:setTempo1.parameters.tempo.description",
+                    },
                 },
-            },
-            example: {
-                python: "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
+                example: {
+                    python: "# Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110)",
 
-                javascript: "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);",
+                    javascript: "// Sets the Project's Tempo to 110 Beats Per Minute\nsetTempo(110);",
+                },
+                autocomplete: "setTempo(tempo)",
             },
-            autocomplete: "setTempo(tempo)",
-        },
+            {
+                descriptionKey: "api:setTempo2.description",
+                parameters: {
+                    startTempo: {
+                        typeKey: "api:types.float",
+                        descriptionKey: "api:setTempo2.parameters.startTempo.description",
+                    },
+                    start: {
+                        typeKey: "api:types.float",
+                        descriptionKey: "api:setTempo2.parameters.start.description",
+                    },
+                    endTempo: {
+                        typeKey: "api:types.floatOptional",
+                        descriptionKey: "api:setTempo2.parameters.endTempo.description",
+                    },
+                    end: {
+                        typeKey: "api:types.floatOptional",
+                        descriptionKey: "api:setTempo2.parameters.end.description",
+                    },
+                },
+                example: {
+                    python: "# Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2)\n# Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6)",
+
+                    javascript: "// Set the tempo to 110 Beats Per Minute at measure 2\nsetTempo(110, 2);\n// Ramp tempo from 80 BPM to 140 BPM from measure 3 to 6\nsetTempo(80, 3, 140, 6);",
+                },
+                autocomplete: "setTempo(startTempo, start, endTempo, end)",
+            },
+        ],
 
         shuffleList: {
             descriptionKey: "api:shuffleList.description",
             parameters: {
-                inputList: {
+                list: {
                     typeKey: "api:types.listArray",
-                    descriptionKey: "api:shuffleList.parameters.inputList.description",
+                    descriptionKey: "api:shuffleList.parameters.list.description",
                 },
             },
             returns: {
@@ -713,9 +742,9 @@ export const ESApiDoc: { [key: string]: APIItem | readonly APIItem[] } =
         shuffleString: {
             descriptionKey: "api:shuffleString.description",
             parameters: {
-                inputString: {
+                string: {
                     typeKey: "api:types.string",
-                    descriptionKey: "api:shuffleString.parameters.inputString.description",
+                    descriptionKey: "api:shuffleString.parameters.string.description",
                 },
             },
             returns: {

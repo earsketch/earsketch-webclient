@@ -493,7 +493,7 @@ function setup() {
 
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
-        store.dispatch(layout.setEast({ open: true }))
+        store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
 
@@ -669,10 +669,12 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
+            dispatch(cai.closeCurriculum())
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
+            dispatch(cai.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
         }
     }
 
