@@ -4,7 +4,7 @@ import storage from "redux-persist/lib/storage"
 
 import * as ESUtils from "../esutils"
 import { RootState } from "../reducers"
-import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
 
@@ -104,6 +104,6 @@ export const selectModal = (state: RootState) => state.app.modal
 export const selectLocale = createSelector(
     [selectLocaleCode],
     (localeCode) => {
-        return AVAILABLE_LOCALES.find(l => l.localeCode === localeCode) ?? AVAILABLE_LOCALES[1]
+        return AVAILABLE_LOCALES.find(l => l.localeCode === localeCode) ?? ENGLISH_LOCALE
     }
 )
