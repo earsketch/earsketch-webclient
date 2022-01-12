@@ -87,7 +87,6 @@ function functionPass(ast, results, rootAst) {
     recursiveCallOnNodes(collectFunctionInfo, [results, rootAst], rootAst)
     // recursiveFunctionAnalysis(ast, results, rootAst);
 
-
     // do calls
     for (const func of ccState.getProperty("userFunctionReturns")) {
         // uncalled function lines
@@ -238,7 +237,7 @@ function collectFunctionInfo(node, args) {
                         args[0].codeFeatures.features.consoleInput = 1
                     }
 
-                    break;
+                    break
                 }
             }
         } else if (node._astname === "Assign" && node.targets.length === 1) {
@@ -610,7 +609,6 @@ function reverseValueTrace(isVariable, name, lineNo) {
                                 return reverseValueTrace(false, funcName, latestAssignment.lineno)
                             } else {
                                 return ""
-
                             }
                         }
                         return ""
@@ -1072,12 +1070,11 @@ function doComplexityOutput(results, rootAst) {
     // do structural depth
     countStructuralDepth(structure, depthObj, null)
 
-
-    results.depth = depthObj.depth;
-    results.codeStructure = structure;
+    results.depth = depthObj.depth
+    results.codeStructure = structure
 
     if (results.depth > 3) {
-        results.depth = 3;
+        results.depth = 3
     }
 }
 
@@ -1242,7 +1239,6 @@ function analyzeASTNode(node, results) {
                     }
                 }
 
-
                 if ("id" in node.func) {
                     if (node.func.id.v === "makeBeat") {
                         markMakeBeat(node, results)
@@ -1251,7 +1247,6 @@ function analyzeASTNode(node, results) {
                         for (const func of ccState.getProperty("userFunctionReturns")) {
                             if (func.name === "makeBeat" && func.aliases.includes(node.func.id.v)) {
                                 markMakeBeat(node, results)
-
                             }
                         }
                     }
@@ -1362,7 +1357,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
         }
     } else if (node._astname === "If") {
         // returnObject.id = "If";
-        const ifNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode };
+        const ifNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
 
         for (const item of node.body) {
             ifNode.children.push(buildStructuralRepresentation(item, ifNode, ast))
