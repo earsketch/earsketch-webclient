@@ -114,6 +114,10 @@ export function handleError(errorType: string) {
             trues += 1
         }
 
+        if (trues > 0 && !colon) {
+            return handleCallError()
+        }
+
         if (trues > 1 && handleFunctionError() != null) {
             return handleFunctionError()
         }
@@ -320,7 +324,7 @@ function handleForLoopError() {
             }
         }
     } else {
-        const isValid: boolean = false
+        let isValid: boolean = false
 
         // then this ought to be a string, a list, or a variable containing one of those things, or a function returning one of those things
         if (trimmedErrorLine.includes("(") && trimmedErrorLine.endsWith(")")) {
@@ -339,21 +343,43 @@ function handleForLoopError() {
                 // look up return type. if it's not a string or list, it's not valid
                 for (const builtInReturn of ccState.builtInReturns) {
                     if (builtInReturn.name === functionName) {
-                        if (builtInReturn.returns === "Str" || builtInReturn.returns === "Str") { break }
+                        if (builtInReturn.returns === "Str" || builtInReturn.returns === "List") {
+                            break
+                        } else { isValid = false }
                     }
                 }
-                // isValid = true
+            }
+            // otherwise, it's probably user-defined, and we have to determine what THAT returns. please help
+            const allFuncs: any = ccState.getProperty("userFunctionReturns")
+
+            for (const item of allFuncs) {
+                if (item.name === functionName) {
+                    const returns = ccHelpers.estimateDataType(item.returns)
+                    if (returns === "List" || returns === "Str") {
+                        return handleCallError()
+                        // if it does, we should pass this to the function call error handler
+                    } else { isValid = false }
+                }
+            }
+        } else if (!((trimmedErrorLine.includes("[") && trimmedErrorLine.endsWith("]")) || (trimmedErrorLine.includes("\"") || trimmedErrorLine.includes("'")))) {
+            // is it a list or a string that's missing something.
+            if (trimmedErrorLine.includes("[") || trimmedErrorLine.includes("]")) {
+                isValid = false
             }
 
-            // const allFuncs: any = ccState.getProperty("userFunctions")
+            // it could be a string with escaped quotes...leave this for now
+            // check if it's a variable.
 
-            // if it does, we should pass this to the function call error handler
-        } else if (trimmedErrorLine.includes("[") && trimmedErrorLine.endsWith("]")) {
-            // it's a list
-        } else if (trimmedErrorLine.includes("\"") || trimmedErrorLine.includes("'")) {
-            // it's a string
-        } else {
-            // we can probably assume it's a variable
+            const allVars = ccState.getProperty("allVariables")
+
+            for (const item of allVars) {
+                if (trimmedErrorLine === item.name) {
+                    const varType = estimateVariableType(item.name, currentError.traceback[0].lineno)
+                    if (varType !== "Str" && varType !== "List" && varType !== "") {
+                        isValid = false
+                    }
+                }
+            }
         }
 
         if (!isValid) {
@@ -362,9 +388,64 @@ function handleForLoopError() {
     }
 }
 
-// function handleCallError() {
+function handleCallError() {
+    // potential common call errors: wrong # of args (incl. no args),
+    // wrong arg types (? may not be able to find this, or may be caught elsewhere - ignoring for now
+    // missing parens
+    // extra words like "new"
 
-// }
+    // step one. do we have BOTH/matching parentheses
+
+    if ((errorLine.includes("(") && !errorLine.includes(")")) || !(errorLine.includes("(") && errorLine.includes(")"))) {
+        return ["function call", "missing parentheses"]
+    }
+
+    // otherwise, make sure the parens match up
+    const openParens = (errorLine.split("(").length - 1)
+    const closeParens = (errorLine.split(")").length - 1)
+
+    if (openParens !== closeParens) {
+        return ["function call", "parentheses mismatch"]
+    }
+
+    // check for extra words
+    const args = errorLine.substring(errorLine.indexOf("(") + 1, errorLine.lastIndexOf(")")).split(",")
+    errorLine = ccHelpers.trimCommentsAndWhitespace(errorLine.substring(0, errorLine.indexOf("(")))
+    if (errorLine.includes(" ") && errorLine.split(" ").length > 0) {
+        return ["function call", "extra words"]
+    }
+
+    // if no extra words make sure we have the right number of args, if we can
+    // first, find the function
+
+    // TODO: check args for API calls. Sigh.
+    let isApiCall: boolean = false
+
+    for (const apiCall of PYTHON_AND_API) {
+        if (errorLine.includes(apiCall)) {
+            isApiCall = true
+            break
+        }
+    }
+
+    // then we check it against existing user functions.
+    // if they don't have a previous successful run, we're out of luck here  ¯\_(ツ)_/¯
+
+    if (!isApiCall) {
+        const allFuncs: any = ccState.getProperty("userFunctionReturns")
+
+        for (const item of allFuncs) {
+            if (item.name === errorLine) {
+                if (item.args && item.args.length > args.length) {
+                    return ["function call", "too few arguments"]
+                } else if (item.args && item.args.length < args.length) {
+                    return ["function call", "too many arguments"]
+                }
+                break
+            }
+        }
+    }
+}
 
 function handleWhileLoopError() {
 
@@ -375,7 +456,7 @@ function handleConditionalError() {
 }
 
 function handleNameError() {
-    // dow e recognize the name?
+    // do we recognize the name?
     const problemName: string = currentError.args.v[0].v.split("'")[1]
 
     // check if it's a variable or function name that's recognizaed
