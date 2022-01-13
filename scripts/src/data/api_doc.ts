@@ -23,7 +23,7 @@ export interface APIItem {
     caveats?: string
 }
 
-// TODO: Would simplify things if this were *always* APIItem[] (which array of size 1 for single-signature functions).
+// TODO: Would simplify things if this were *always* APIItem[] (with array of size 1 for single-signature functions).
 const apiDoc: { [key: string]: APIItem | APIItem[] } = {
     analyze: {
         descriptionKey: "api:analyze.description",
