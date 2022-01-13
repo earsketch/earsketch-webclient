@@ -58,6 +58,12 @@ function getJavascriptBlocks(...names: string[]) {
     return getSignatures(names).map(signature => ({ block: signature + ";" }))
 }
 
+const advancedFunctions = [
+    "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "importImage", "importFile",
+    "insertMediaSection", "makeBeatSlice", "readInput", "replaceListElement", "replaceString",
+    "reverseList", "reverseString", "rhythmEffects", "shuffleList", "shuffleString",
+]
+
 export const blockPalettePython = {
     mode: "python",
     modeOptions: blockModeOptions,
@@ -76,11 +82,7 @@ export const blockPalettePython = {
         {
             name: "Advanced",
             color: "green",
-            blocks: getPythonBlocks(
-                "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "importImage", "importFile",
-                "insertMediaSection", "makeBeatSlice", "readInput", "replaceListElement", "replaceString",
-                "reverseList", "reverseString", "rhythmEffects", "shuffleList", "shuffleString"
-            ),
+            blocks: getPythonBlocks(...advancedFunctions),
         },
         {
             name: "Variables",
@@ -156,11 +158,7 @@ export const blockPaletteJavascript = {
         {
             name: "Advanced",
             color: "green",
-            blocks: getJavascriptBlocks(
-                "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "dur", "importImage", "importFile",
-                "insertMediaSection", "makeBeatSlice", "readInput", "replaceListElement", "replaceString",
-                "reverseList", "reverseString", "rhythmEffects", "shuffleList", "shuffleString"
-            ),
+            blocks: getJavascriptBlocks(...advancedFunctions),
         },
         {
             name: "Variables",
