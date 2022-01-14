@@ -16,8 +16,6 @@ type Subscriber = (data: any) => void
 const subscribers: Subscriber[] = []
 
 export function login(username_: string) {
-    console.log("login:", username_)
-
     // This function should only ever be called once (per login).
     if (username === null) {
         username = username_.toLowerCase() // Fix for issue #1858
@@ -28,8 +26,6 @@ export function login(username_: string) {
 }
 
 function connect() {
-    console.log("connect:", ws?.readyState)
-
     if (ws?.readyState === WebSocket.OPEN) {
         // We already have a valid connection, no need to connect.
         return
@@ -66,15 +62,12 @@ function connect() {
 }
 
 function keepalive() {
-    console.log("keepalive")
     // This will happen at most once every TIMEOUT seconds.
     // Note that `send()` resets the timeout.
     send({ notification_type: "dummy" })
 }
 
 export function send(data: any) {
-    console.log("send:", data, `(state=${ws?.readyState})`)
-
     pendingMessages.push(data)
 
     if (ws?.readyState !== WebSocket.OPEN) {
@@ -91,12 +84,10 @@ export function send(data: any) {
 }
 
 export function subscribe(callback: Subscriber) {
-    console.log("subscribe:", callback)
     subscribers.push(callback)
 }
 
 export function logout() {
-    console.log("logout")
     pendingMessages = []
     username = null
     window.clearInterval(timer)
