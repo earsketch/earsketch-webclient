@@ -165,10 +165,10 @@ const AdminSendBroadcast = () => {
                     <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
                     <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
                         {broadcasts.map(nt =>
-                            <div key={nt.id} className="my-px mx-2 grid items-center" style={{ gridTemplateColumns: "12px 445px 130px repeat(3, 1fr)", gridGap: "1px 25px" }}>
+                            <div key={nt.id} className="my-px mx-2 flex items-center">
                                 <button className="flex" title="Expire broadcast" onClick={() => expireBroadcast(nt.id!)}><i className="icon icon-cross2" /></button>
-                                <div className="my-px mx-2">{broadcastText(nt)}</div>
-                                <div className="italic my-px">{formatExpDate(nt)}</div>
+                                <div className="my-px mx-2 flex-auto w-4/5 ">{broadcastText(nt)}</div>
+                                <div className="italic mx-2 my-px flex-auto w-1/5">{formatExpDate(nt)}</div>
                             </div>
                         )}
                     </div>
