@@ -81,7 +81,10 @@ export function send(data: any) {
     pendingMessages.push(data)
 
     if (ws?.readyState !== WebSocket.OPEN) {
+        // WebSocket is not ready for use.
+        // Connect, which will flush the queue when the WebSocket is ready.
         connect()
+        return
     }
 
     // Flush message queue.
