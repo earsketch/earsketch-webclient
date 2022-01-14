@@ -160,7 +160,7 @@ export async function login(username: string) {
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = addSharedScript
 
-    websocket.connect(username)
+    websocket.login(username)
     collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
@@ -275,7 +275,7 @@ export function clearUser() {
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
     }
-    websocket.disconnect()
+    websocket.logout()
 }
 
 export function isLoggedIn() {
