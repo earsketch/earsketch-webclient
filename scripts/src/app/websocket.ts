@@ -62,8 +62,7 @@ function connect() {
 }
 
 function keepalive() {
-    // This will happen at most once every TIMEOUT seconds.
-    // Note that `send()` resets the timeout.
+    // This happens once every TIMEOUT seconds.
     send({ notification_type: "dummy" })
 }
 
