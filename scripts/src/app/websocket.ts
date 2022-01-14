@@ -8,8 +8,8 @@ const TIMEOUT = 20
 let connectTime = 0
 let timer = 0
 
-let ws: WebSocket | null
-let username: string | null
+let ws: WebSocket | null = null
+let username: string | null = null
 let pendingMessages: any[] = []
 
 type Subscriber = (data: any) => void
@@ -18,12 +18,11 @@ const subscribers: Subscriber[] = []
 export function login(username_: string) {
     console.log("username:", username_)
 
-    if (username !== null) {
-        // This function should only ever be called once (per login).
-        return
+    // This function should only ever be called once (per login).
+    if (username === null) {
+        username = username_.toLowerCase() // Fix for issue #1858
+        connect()
     }
-    username = username_.toLowerCase() // Fix for issue #1858
-    connect()
 }
 
 function connect() {
