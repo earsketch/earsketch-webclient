@@ -16,12 +16,14 @@ type Subscriber = (data: any) => void
 const subscribers: Subscriber[] = []
 
 export function login(username_: string) {
-    console.log("username:", username_)
+    console.log("login:", username_)
 
     // This function should only ever be called once (per login).
     if (username === null) {
         username = username_.toLowerCase() // Fix for issue #1858
-        connect()
+        // Start keepalive heartbeat.
+        keepalive()
+        timer = window.setInterval(keepalive, TIMEOUT * 1000)
     }
 }
 
@@ -48,11 +50,7 @@ function connect() {
     ws = new WebSocket(`${URL_WEBSOCKET}/socket/${username}/`)
     connectTime = Date.now()
 
-    ws.onopen = () => {
-        esconsole("socket has been opened", "websocket")
-        // Start keepalive heartbeat.
-        keepalive()
-    }
+    ws.onopen = () => esconsole("socket has been opened", "websocket")
 
     ws.onerror = (event) => esconsole(event, "websocket")
 
@@ -75,7 +73,7 @@ function keepalive() {
 }
 
 export function send(data: any) {
-    console.log("send:", data)
+    console.log("send:", data, `(state=${ws?.readyState})`)
 
     pendingMessages.push(data)
 
@@ -90,10 +88,6 @@ export function send(data: any) {
     while (pendingMessages.length) {
         ws!.send(JSON.stringify(pendingMessages.shift()))
     }
-
-    // Reset timer for keepalive, since we just sent at least one message.
-    window.clearTimeout(timer)
-    timer = window.setTimeout(keepalive, TIMEOUT * 1000)
 }
 
 export function subscribe(callback: Subscriber) {
@@ -105,7 +99,7 @@ export function logout() {
     console.log("logout")
     pendingMessages = []
     username = null
-    window.clearTimeout(timer)
+    window.clearInterval(timer)
     ws?.close()
     ws = null
 }
