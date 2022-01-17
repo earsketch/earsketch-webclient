@@ -448,11 +448,83 @@ function handleCallError() {
 }
 
 function handleWhileLoopError() {
+    // 5 things to look for
+    if (!errorLine.includes("while")) {
+        return ["while loop", "missing while keyword"]
+    }
 
+    // now check for parens.
+    if (!errorLine.includes("(") || !errorLine.includes(")")) {
+        return ["while loop", "missing parentheses"]
+    }
+
+    // are there matching numbers of parens
+    const openParens = (errorLine.split("(").length - 1)
+    const closeParens = (errorLine.split(")").length - 1)
+
+    if (openParens !== closeParens) {
+        return ["while loop", "parentheses mismatch"]
+    }
+
+    // many things can go wrong in the condition block.
+    // some of them we can check for
+    // there should be EITHER a comparator or a boolean value
+    // but we honestly cannt tell the contents of a variable or function return f o r s u r e; should we bother? 
+    // plus it might be a whole null vs not-null thing...leaving this for now
+
+    // check for colon
+    if (!ccHelpers.trimCommentsAndWhitespace(errorLine).endsWith(":")) {
+        return ["while loop", "missing colon"]
+    }
+
+    // check for body
+    // find next non-blank line (if there is one). assess indent
+    let nextLine: string = ""
+    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+        nextLine = textArray[i]
+        if (nextLine !== "") {
+            break
+        }
+    }
+
+    // compare indent on nextLine vs errorLine
+    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+        return ["while loop", "missing body"]
+    }
 }
 
 function handleConditionalError() {
+    if (!errorLine.includes("(") || !errorLine.includes(")")) {
+        return ["conditional", "missing parentheses"]
+    }
+    // are there matching numbers of parens
+    const openParens = (errorLine.split("(").length - 1)
+    const closeParens = (errorLine.split(")").length - 1)
 
+    if (openParens !== closeParens) {
+        return ["conditional", "parentheses mismatch"]
+    }
+
+    // again, right now we'll ignore the condition. but let's amke sure there's a colon
+    if (!ccHelpers.trimCommentsAndWhitespace(errorLine).endsWith(":")) {
+        return ["conditional", "missing colon"]
+    }
+
+    // check for body
+    // find next non-blank line (if there is one). assess indent
+    let nextLine: string = ""
+    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+        nextLine = textArray[i]
+        if (nextLine !== "") {
+            break
+        }
+    }
+    // compare indent on nextLine vs errorLine
+    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+        return ["conditional", "missing body"]
+    }
+
+    // now, the fun parts: looking for a misindented else
 }
 
 function handleNameError() {

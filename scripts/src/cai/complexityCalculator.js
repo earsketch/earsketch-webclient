@@ -184,8 +184,6 @@ function collectFunctionInfo(node, args) {
                         }
                     }
                 }
-
-                //
             }
 
             let alreadyExists = false
