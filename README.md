@@ -53,7 +53,6 @@ This is a general overview of the web client architecture.
 
 ### Libraries
 
-- AngularJS (but we're transitioning to React)
 - Skulpt, for running Python code in the browser
 - DSP.js
 - Ace, for editing code
