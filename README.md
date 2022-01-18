@@ -1,6 +1,6 @@
 # earsketch-webclient
 
-The AngularJS / React web browser client for EarSketch
+The React web browser client for EarSketch
 
 
 ## Local client build
