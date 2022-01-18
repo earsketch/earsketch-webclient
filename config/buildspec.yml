@@ -61,7 +61,7 @@ phases:
       - cp -r sc.html sorry.html favicon.ico tpBody.html autograder/ codeAnalyzer/ codeAnalyzerCAI/ codeAnalyzerContest/ css/ ExportToReaper/ fonts/ img/ scripts/ templates/ dist/ "$LOCAL_STAGING_CACHED_DIR"
   post_build:
     commands:
-      - if [ "$ES_BUILD_TYPE" == "review" ]; then python "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"
+      - if [ "$ES_BUILD_TYPE" == "review" ]; then python3 "$ES_SCRIPT_HOME/github_create_deployment.py" $GITHUB_USER $GITHUB_TOKEN "$CODEBUILD_RESOLVED_SOURCE_VERSION" "$LOCAL_STAGING_DIR_NAME"
 
 reports:
   karma-reports:
