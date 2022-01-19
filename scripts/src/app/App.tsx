@@ -318,7 +318,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts">
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts" aria-label="Show/Hide Keyboard Shortcuts">
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
@@ -341,7 +341,7 @@ const FontSizeMenu = () => {
     const fontSize = useSelector(appState.selectFontSize)
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Font Size">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Font Size" aria-label="Select Font Size">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -373,7 +373,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Settings and Additional Options">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Settings and Additional Options" aria-label="Settings and Additional Options">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>

@@ -1016,13 +1016,13 @@ export const DAW = () => {
                 </div>
 
                 <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none" title="Zoom In"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none" title="Zoom Out"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none" title="Zoom In" aria-label="Zoom In"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none" title="Zoom Out" aria-label="Zoom In"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Zoom In"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Zoom Out"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Zoom In" aria-label="Zoom In"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Zoom Out" aria-label="Zoom Out"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"
