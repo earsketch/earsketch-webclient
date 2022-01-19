@@ -341,7 +341,7 @@ const FontSizeMenu = () => {
     const fontSize = useSelector(appState.selectFontSize)
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Font Size">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -373,7 +373,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Settings and Additional Options">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -438,7 +438,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
             <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
             <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
+            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Submit"><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
