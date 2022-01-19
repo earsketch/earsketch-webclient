@@ -214,7 +214,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                     </button>
                 </span>
                 <span className="daw-transport-button">
-                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} />
+                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} title="Volume Control" aria-label="Volume Control"/>
                 </span>
             </span>
         </div>
