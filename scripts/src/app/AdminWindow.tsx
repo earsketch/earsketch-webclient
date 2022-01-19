@@ -126,6 +126,7 @@ const AdminSendBroadcast = () => {
         })
         // always show success message, as we have no indication of failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
+        userProject.getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
     }
 
     const expireBroadcast = async (id: string) => {
