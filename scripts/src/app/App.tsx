@@ -695,7 +695,7 @@ export const App = () => {
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <div>
-                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title-amazon-banner" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }} rel="noreferrer">
+                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "24px"}} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
