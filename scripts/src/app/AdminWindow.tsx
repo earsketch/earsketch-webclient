@@ -114,14 +114,13 @@ const AdminSendBroadcast = () => {
     }, [])
 
     const sendBroadcast = () => {
-        // TODO: use `expiration`
         websocket.send({
             notification_type: "broadcast",
             username: userProject.getUsername().toLowerCase(),
             message: {
                 text: message,
                 hyperlink: link ?? "",
-                expiration: 0,
+                expiration,
             },
         })
         // always show success message, as we have no indication of failure
