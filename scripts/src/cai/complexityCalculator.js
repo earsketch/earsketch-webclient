@@ -1068,14 +1068,23 @@ function doComplexityOutput(results, rootAst) {
     const depthObj = { depth: 0 }
 
     // do structural depth
-    countStructuralDepth(structure, depthObj, null)
+    var depthCounter = []
+    countStructuralDepth(structure, depthObj, null, depthCounter)
 
     results.depth = depthObj.depth
     results.codeStructure = structure
 
-    if (results.depth > 3) {
-        results.depth = 3
+    let depthTotal = 0
+
+    for (const depthNum of depthCounter) {
+        depthTotal += depthNum
     }
+
+    results["depthAvg"] = depthTotal / depthCounter.length
+
+    // if (results.depth > 3) {
+    //     results.depth = 3
+    // }
 }
 
 function sortLoopValues(a, b) {
@@ -1085,15 +1094,17 @@ function sortLoopValues(a, b) {
     return scoreB - scoreA
 }
 
-function countStructuralDepth(structureObj, depthCountObj, parentObj) {
+function countStructuralDepth(structureObj, depthCountObj, parentObj, depthArray = []) {
     if (!parentObj) {
         structureObj.depth = 0
     } else {
         structureObj.depth = parentObj.depth + 1
+        depthArray.push(structureObj.depth)
         if (structureObj.depth > depthCountObj.depth) {
             depthCountObj.depth = structureObj.depth
         }
     }
+
     if (structureObj.children && structureObj.children.length > 0) {
         for (const item of structureObj.children) {
             countStructuralDepth(item, depthCountObj, structureObj)
