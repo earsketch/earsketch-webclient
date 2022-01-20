@@ -1,7 +1,7 @@
 import { Ace, Range } from "ace-builds"
 import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { importScript, reloadRecommendations } from "../app/App"
@@ -277,16 +277,20 @@ export const Editor = () => {
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
+    const [clickedElement, setClickedElement] = useState(false)
 
     useEffect(() => {
         if (!editorElement.current) return
         setup(editorElement.current, language, theme, fontSize)
+        editorElement.current.onclick = () => { setClickedElement(true) }
         const observer = new ResizeObserver(() => droplet.resize())
         observer.observe(editorElement.current)
         return () => {
             editorElement.current && observer.unobserve(editorElement.current)
         }
     }, [editorElement.current])
+
+    useEffect(() => setClickedElement(false), [activeScript])
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
 
@@ -356,7 +360,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className="absolute top-4 right-0" onClick={() => importScript(activeScript)}>
+            <div className={"absolute top-4 right-0 " + (clickedElement ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span>{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>
