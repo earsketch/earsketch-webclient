@@ -1,6 +1,7 @@
+import sys
+
 import requests
 from requests.auth import HTTPBasicAuth
-import sys
 
 if len(sys.argv) < 5:
     print("Error, no arguments given")
