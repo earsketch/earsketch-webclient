@@ -1,6 +1,3 @@
-/* eslint-disable */
-// TODO: Resolve lint issues.
-
 // Student preference module for CAI (Co-creative Artificial Intelligence) Project.
 import * as caiStudent from "./student"
 
@@ -151,7 +148,7 @@ function runSound(soundsUsedArray: string[]) {
             soundSuggestionTracker[activeProject].push(suggestion)
             updateAcceptanceRatio()
         } else {
-            if (suggestion[0] == 0) {
+            if (suggestion[0] === 0) {
             //    suggestionsRejected[activeProject] += 1
             //    updateAcceptanceRatio()
             } else {
@@ -184,7 +181,7 @@ function runCode(complexityOutput: any) {
             updateAcceptanceRatio()
             codeSuggestionsUsed[activeProject].push(suggestion)
         } else {
-            if (suggestion[0] == 0) {
+            if (suggestion[0] === 0) {
                 // suggestionsRejected[activeProject] += 1
                 // updateAcceptanceRatio()
             } else {
@@ -200,12 +197,12 @@ function updateAcceptanceRatio() {
     caiStudent.updateModel("preferences", { acceptanceRatio: acceptanceRatio })
 }
 
-const bucketSize = 30 // options range from 10s - 120s
+// const bucketSize = 30 // options range from 10s - 120s
 // for experimenting
 // const bucketOptions = [10,20,30,40,50,60,90,120]
 
 const onPageHistory: any[] = []
-let lastEditTS = 0
+// let lastEditTS = 0
 const deleteKeyTS = []
 const recentCompiles = 3
 const compileTS: any[] = []
@@ -224,12 +221,12 @@ function returnPageStatus() {
 
 function addCompileTS(time: any) {
     compileTS.push(time)
-    lastEditTS = time
+    // lastEditTS = time
     caiStudent.updateModel("preferences", { compileTS: compileTS })
 }
 
 function addKeystroke(action: string, content: any, time: any) {
-    if (action == "remove") {
+    if (action === "remove") {
         deleteKeyTS.push(time)
     }
 }
@@ -249,7 +246,7 @@ function stuckOnError() {
 }
 
 function allEqual(arr: any[]) {
-    return new Set(arr).size == 1
+    return new Set(arr).size === 1
 }
 
 function addMousePos(pos: any) {

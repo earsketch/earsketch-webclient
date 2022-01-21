@@ -334,7 +334,7 @@ export function locateDepthAndParent(lineno: number, parentNode: any, depthCount
     return [-1, {}]
 }
 
-export function estimateDataType(node: any, tracedNodes: any = []): string | null {
+export function estimateDataType(node: any, tracedNodes: any = []): string {
     const autoReturns: string[] = ["List", "Str"]
     if (autoReturns.includes(node._astname)) {
         return node._astname
@@ -353,7 +353,7 @@ export function estimateDataType(node: any, tracedNodes: any = []): string | nul
         } else if ("id" in node.func) {
             funcName = node.func.id.v
         } else {
-            return null
+            return ""
         }
         // look up the function name
         // builtins first
@@ -414,7 +414,7 @@ export function estimateDataType(node: any, tracedNodes: any = []): string | nul
             }
         }
         if (thisVar === null) {
-            return null
+            return ""
         }
 
         // get most recent outside-of-function assignment (or inside-this-function assignment)
@@ -485,12 +485,12 @@ export function estimateDataType(node: any, tracedNodes: any = []): string | nul
         const right: string | null = estimateDataType(node.right, tracedNodes)
         if (left === right) {
             return left
-        } else return null
+        } else return ""
     } else if (node._astname === "BoolOp" || node._astname === "Compare") {
         return "Bool"
     }
 
-    return null
+    return ""
 }
 
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis

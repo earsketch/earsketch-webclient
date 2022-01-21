@@ -1,34 +1,27 @@
-/* eslint-disable */
-// TODO: Resolve lint issues.
-
 import * as acorn from "acorn"
-
 import * as ccState from "./complexityCalculatorState"
-import * as caiErrorHandling from "./errorHandling"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as cc from "./complexityCalculator"
 
 // Process JavaScript code through the complexity calculator service.
-export function analyzeJavascript(source) {
-
-    if (source == "") {
-        return { complexity: "" };
+export function analyzeJavascript(source: string) {
+    if (source === "") {
+        return { complexity: "" }
     }
 
-
     try {
-        ccState.resetState();
-        ccState.setProperty("listFuncs", ['length', 'of', 'concat', 'copyWithin', 'entries', 'every', 'fill', 'filter', 'find', 'findIndex', 'forEach', 'includes', 'indexOf', 'join', 'keys', 'lastIndexOf', 'map', 'pop', 'push', 'reduce', 'reduceRight', 'reverse', 'shift', 'slice', 'some', 'sort', 'splice', 'toLocaleString', 'toSource', 'toString', 'unshift', 'values']);
-        var ast = acorn.parse(source, {
-            locations: true
-        });
-        ccState.setProperty('studentCode', source.split("\n"));
-        //handle this like you'd handle python.
-        var newAST = convertASTTree(ast);
-        //initialize list of function return objects with all functions from the API that return something (includes casting)
-        var allVariables = [];
-        //initialize the results object
-        var resultsObject = {
+        ccState.resetState()
+        ccState.setProperty("listFuncs", ["length", "of", "concat", "copyWithin", "entries", "every", "fill", "filter", "find", "findIndex", "forEach", "includes", "indexOf", "join", "keys", "lastIndexOf", "map", "pop", "push", "reduce", "reduceRight", "reverse", "shift", "slice", "some", "sort", "splice", "toLocaleString", "toSource", "toString", "unshift", "values"])
+        const ast = acorn.parse(source, {
+            locations: true,
+        })
+        ccState.setProperty("studentCode", source.split("\n"))
+        // handle this like you'd handle python.
+        const newAST = convertASTTree(ast)
+        // initialize list of function return objects with all functions from the API that return something (includes casting)
+        // const allVariables = []
+        // initialize the results object
+        const resultsObject: cc.Results = {
             ast: newAST,
             codeFeatures: {
                 errors: 0,
@@ -39,15 +32,15 @@ export function analyzeJavascript(source) {
                     forLoopsPY: 0,
                     forLoopsJS: 0,
                     iterables: 0,
-                    nesting: 0
+                    nesting: 0,
                 },
                 conditionals: {
                     conditionals: 0,
-                    usedInConditionals: []
+                    usedInConditionals: [],
                 },
                 functions: {
                     repeatExecution: 0,
-                    manipulateValue: 0
+                    manipulateValue: 0,
                 },
                 features: {
                     indexing: 0,
@@ -55,27 +48,26 @@ export function analyzeJavascript(source) {
                     listOps: 0,
                     strOps: 0,
                     binOps: 0,
-                    comparisons: 0
-                }
+                    comparisons: 0,
+                },
             },
-            codeStructure: {},
+            codeStructure: {} as cc.StructuralNode,
             inputsOutputs: {
                 sections: {},
                 effects: {},
-                sounds: {}
-            }
-        };
-        ccState.setIsJavascript(true);
-        cc.doAnalysis(newAST, resultsObject);
-        //translate the calculated values
+                sounds: {},
+            },
+            depth: 0,
+        }
+        ccState.setIsJavascript(true)
+        cc.doAnalysis(newAST, resultsObject)
+        // translate the calculated values
         // translateIntegerValues(resultsObject);
-        ccHelpers.lineDict();
+        ccHelpers.lineDict()
 
-       return resultsObject;
-    }
-    catch (error) {
-        resultsObject = {
-       // return {
+        return resultsObject
+    } catch (error) {
+        return {
             ast: {},
             codeFeatures: {
 
@@ -87,15 +79,15 @@ export function analyzeJavascript(source) {
                     forLoopsPY: 0,
                     forLoopsJS: 0,
                     iterables: 0,
-                    nesting: 0
+                    nesting: 0,
                 },
                 conditionals: {
                     conditionals: 0,
-                    usedInConditionals: []
+                    usedInConditionals: [],
                 },
                 functions: {
                     repeatExecution: 0,
-                    manipulateValue: 0
+                    manipulateValue: 0,
                 },
                 features: {
                     indexing: 0,
@@ -103,79 +95,77 @@ export function analyzeJavascript(source) {
                     listOps: 0,
                     strOps: 0,
                     binOps: 0,
-                    comparisons: 0
-                }
+                    comparisons: 0,
+                },
             },
-            codeStructure: {},
+            codeStructure: {} as cc.StructuralNode,
             inputsOutputs: {
                 sections: {},
                 effects: {},
-                sounds: {}
-            }
-        };
-
-       
-        return resultsObject;
+                sounds: {},
+            },
+            depth: 0,
+        } as cc.Results
     }
 }
 
 // fun javascript conversion times
-function convertASTTree(AstTree) {
-    const bodyItems = []
+function convertASTTree(AstTree: any) {
+    const bodyItems: cc.Node[] = []
     for (const i in AstTree.body) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)
     }
-    const parentItem = { body: bodyItems }
+    const parentItem = { body: bodyItems } as cc.Node
     return parentItem
 }
 
-let jsParentLine
-let jsParentCol
+let jsParentLine: number
+let jsParentCol: number
 
 // Converts a Javascript AST to a fake Python AST
 // does this by hierarchically going through JS AST nodes, and constructing a new AST with matching nodes structured like Skulpt Python nodes
-function convertASTNode(JsAst) {
-    const returnObject = {}
+function convertASTNode(JsAst: any) {
+    const returnObject: cc.Node = {}
+    const nodeBody: any = []
     let object = JsAst
     if (JsAst.type === "ExpressionStatement") { // remove expression objects. we do not need them.
         object = JsAst.expression
     }
     let hasBody = false
-    if ("body" in object && "body" in object.body) { // we skip the blockstatement....thing
+    if (object.body && object.body.body) { // we skip the blockstatement....thing
         hasBody = true
-        var nodeBody = []
-        for (var i in object.body.body) {
-            const bodyItem = convertASTNode(object.body.body[i])
+        for (const item of object.body.body) {
+            const bodyItem = convertASTNode(item)
             nodeBody.push(bodyItem)
         }
-        if (object.body.body[0] != null && "loc" in object.body.body[0]) {
+        if (object.body.body[0] !== null && "loc" in object.body.body[0]) {
             nodeBody.lineno = object.body.body[0].loc.start.line
         } else {
             nodeBody.lineno = jsParentLine
         }
     }
     // line number
-    if (object.loc != null) {
+    if (object.loc) {
         returnObject.lineno = object.loc.start.line
-        returnObject.col_offset = object.loc.start.column
+        returnObject.colOffset = object.loc.start.column
 
         jsParentLine = object.loc.start.line
         jsParentCol = object.loc.start.column
     } else {
         returnObject.lineno = jsParentLine
-        returnObject.col_offset = jsParentCol
+        returnObject.colOffset = jsParentCol
     }
     // now for the hard part - covering everything we might possibly need.
     if (object.type === "ForStatement") { // for loops are a special case, because they function VERY differently in js than in python. We have to build in csome extra stuff in our analysis function, but that's doable, methinks.
         returnObject._astname = "JSFor"
-        if (object.init != null) {
+        if (object.init !== null) {
             returnObject.init = convertASTNode(object.init)
         }
-        if (object.test != null) {
+        if (object.test !== null) {
             returnObject.test = convertASTNode(object.test)
         }
-        if (object.update != null) {
+        if (object.update !== null) {
             returnObject.update = convertASTNode(object.update)
         }
         if (hasBody) {
@@ -185,7 +175,7 @@ function convertASTNode(JsAst) {
         returnObject._astname = "For"
         // has an iter and a target
         returnObject.iter = convertASTNode(object.right)
-        if (object.left.type = "VariableDeclaration") {
+        if (object.left.type === "VariableDeclaration") {
             returnObject.target = convertASTNode(object.left.declarations[0].id)
         } else {
             returnObject.iter = convertASTNode(object.left)
@@ -194,7 +184,7 @@ function convertASTNode(JsAst) {
             returnObject.body = nodeBody
         }
     } else if (object.type === "WhileStatement") {
-        if (object.test != null) {
+        if (object.test !== null) {
             returnObject.test = convertASTNode(object.test)
         }
         if (hasBody) {
@@ -203,15 +193,14 @@ function convertASTNode(JsAst) {
     } else if (object.type === "FunctionDeclaration") {
         returnObject._astname = "FunctionDef"
         // has id.v with "name" ast
-        if (object.id != null) {
+        if (object.id !== null) {
             const funcName = object.id.name
             returnObject.name = { v: funcName, lineno: object.loc.start.line }
         }
         // and a params property.
-        var paramsObject = []
-        for (var i in object.params) {
-            var paramObject = convertASTNode(object.params[i])
-            paramsObject.push(paramObject)
+        const paramsObject = []
+        for (const param of object.params) {
+            paramsObject.push(convertASTNode(param))
         }
         returnObject.args = {
             args: paramsObject,
@@ -226,20 +215,19 @@ function convertASTNode(JsAst) {
         // name the function after its location so its return gets properly tallied by function evaluate.
         returnObject.functionName = "" + object.loc.start.line + "|" + object.loc.start.column
         // make a child object the serves as a function definition
-        const funcDefObj = {
+        const funcDefObj: cc.Node = {
             _astname: "FunctionDef",
             lineno: object.loc.start.line,
-            name: { v: returnObject.functionName },
+            name: { v: returnObject.functionName } as cc.Node,
         }
         // body in funcdefobj
         if (hasBody) {
             funcDefObj.body = nodeBody
         }
         // params
-        var paramsObject = []
-        for (var i in object.params) {
-            var paramObject = convertASTNode(object.params[i])
-            paramsObject.push(paramObject)
+        const paramsObject = []
+        for (const param of object.params) {
+            paramsObject.push(convertASTNode(param))
         }
         funcDefObj.args = {
             args: paramsObject,
@@ -248,22 +236,22 @@ function convertASTNode(JsAst) {
         returnObject.functionDef = funcDefObj
     } else if (object.type === "IfStatement") {
         returnObject._astname = "If"
-        if (object.test != null) {
+        if (object.test !== null) {
             returnObject.test = convertASTNode(object.test)
         }
         returnObject.body = []
-        if (object.consequent != null && "body" in object.consequent) {
-            for (var i in object.consequent.body) {
-                const addObj = convertASTNode(object.consequent.body[i])
-                if (addObj != null) { returnObject.body.push(addObj) }
+        if (object.consequent !== null && "body" in object.consequent) {
+            for (const item of object.consequent.body) {
+                const addObj = convertASTNode(item)
+                if (addObj !== null) { returnObject.body.push(addObj) }
             }
         }
         // alternate is the "else" component
-        if (object.alternate != null && object.alternate.type !== "EmptyStatement") {
+        if (object.alternate !== null && object.alternate.type !== "EmptyStatement") {
             if (object.alternate.type === "BlockStatement") {
                 const bodyList = []
-                for (var i in object.alternate.body) {
-                    bodyList.push(convertASTNode(object.alternate.body[i]))
+                for (const item of object.alternate.body) {
+                    bodyList.push(convertASTNode(item))
                 }
                 returnObject.orelse = bodyList
             } else {
@@ -275,7 +263,7 @@ function convertASTNode(JsAst) {
         const declaratorNode = object.declarations[0]
         returnObject._astname = "Assign"
         returnObject.targets = [convertASTNode(declaratorNode.id)]
-        if (declaratorNode.init != null) {
+        if (declaratorNode.init !== null) {
             returnObject.value = convertASTNode(declaratorNode.init)
         } else { // fake null node
             returnObject.value = { lineno: object.loc.start.line }
@@ -309,7 +297,7 @@ function convertASTNode(JsAst) {
     } else if (object.type === "CallExpression") {
         returnObject._astname = "Call"
         returnObject.func = {} // initialize function object
-        const attrFuncs = ["pop", "reverse", "length", "sort", "concat", "indexOf", "splice", "push"]
+        // const attrFuncs = ["pop", "reverse", "length", "sort", "concat", "indexOf", "splice", "push"]
         // first, we HAVE to get the function name
         // if it's a listop or strop . we need all the extra stuff bc memberexpression can also be a subscript which doesn't get saved as an attr
         if (object.callee.type === "MemberExpression" && "property" in object.callee && "name" in object.callee.property &&
@@ -322,14 +310,13 @@ function convertASTNode(JsAst) {
             }
             returnObject.func.value = convertASTNode(object.callee.object)
             if (object.arguments.length > 0) {
-                var argsObj = []
-                for (var i in object.arguments) {
-                    argsObj.push(convertASTNode(object.arguments[i]))
+                const argsObj = []
+                for (const argument of object.arguments) {
+                    argsObj.push(convertASTNode(argument))
                 }
                 returnObject.args = argsObj
             }
-        } else if (object.callee.type === "MemberExpression" && "object" in object.callee &&
-        	"name" in object.callee.object && (ccState.JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
+        } else if (object.callee.type === "MemberExpression" && "object" in object.callee && "name" in object.callee.object && (ccState.JS_BUILT_IN_OBJECTS.includes(object.callee.object.name))) {
             returnObject.func.id = {
                 v: object.callee.property.name,
                 lineno: object.loc.start.line,
@@ -338,15 +325,15 @@ function convertASTNode(JsAst) {
         } else {
             const funcVal = convertASTNode(object.callee)
             returnObject.func = funcVal
-            var argsObj = []
-            for (var i in object.arguments) {
-                argsObj.push(convertASTNode(object.arguments[i]))
+            const argsObj = []
+            for (const argument of object.arguments) {
+                argsObj.push(convertASTNode(argument))
             }
             returnObject.args = argsObj
         }
     } else if (object.type === "ReturnStatement") {
         returnObject._astname = "Return"
-        if (object.argument != null) {
+        if (object.argument !== null) {
             returnObject.value = convertASTNode(object.argument)
         }
     } else if (object.type === "BinaryExpression") {
@@ -357,7 +344,7 @@ function convertASTNode(JsAst) {
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
-            returnObject.op = { name: ccState.binOps[object.operator] }
+            returnObject.op = { name: ccState.binOps[object.operator] } as cc.Node
         } else if (Object.keys(ccState.comparatorOps).includes(object.operator)) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"
@@ -387,7 +374,7 @@ function convertASTNode(JsAst) {
         }
     } else if (object.type === "Literal") {
         // this is all of our basic datatypes - int, float, bool, str, and null
-        if (object.value == null) {
+        if (object.value === null) {
             returnObject._astname = "Name"
             returnObject.id = {
                 v: "None",
@@ -427,8 +414,8 @@ function convertASTNode(JsAst) {
     } else if (object.type === "ArrayExpression") {
         returnObject._astname = "List"
         const eltsObj = []
-        for (var i in object.elements) {
-            eltsObj.push(convertASTNode(object.elements[i]))
+        for (const element of object.elements) {
+            eltsObj.push(convertASTNode(element))
         }
         returnObject.elts = eltsObj
     } else if (object.type === "UpdateExpression" || object.type === "AssignmentExpression") {

@@ -1,12 +1,9 @@
-/* eslint-disable */
-// TODO: Resolve lint issues.
-
 // Project Modeling module for CAI (Co-creative Artificial Intelligence) Project.
 import * as recommender from "../app/recommender"
 
 let activeProject: string = ""
 let availableGenres: string[] = []
-const availableInstruments: string[] = []
+// const availableInstruments: string[] = []
 
 // Initialize empty model.
 const defaultProjectModel = { genre: [], instrument: [], form: [], "code structure": [] }
@@ -65,17 +62,17 @@ export function randomPropertySuggestion() {
     const possibleProperties = []
     const multiples = Object.keys(suggestableProperties.multiple)
     const singles = Object.keys(suggestableProperties.one)
-    for (let i = 0; i < multiples.length; i++) {
-        if (projectModel[activeProject][multiples[i]].length < multiples.length) {
-            possibleProperties.push(multiples[i])
+    for (const multiple of multiples) {
+        if (projectModel[activeProject][multiple].length < multiples.length) {
+            possibleProperties.push(multiple)
         }
     }
-    for (let i = 0; i < singles.length; i++) {
-        if (projectModel[activeProject][singles[i]].length == 0) {
-            possibleProperties.push(singles[i])
+    for (const single of singles) {
+        if (projectModel[activeProject][single].length === 0) {
+            possibleProperties.push(single)
         }
     }
-    if (possibleProperties.length == 0) {
+    if (possibleProperties.length === 0) {
         return {}
     }
     // select a property at random
@@ -87,8 +84,7 @@ export function randomPropertySuggestion() {
     }
     // list possible values, avoiding repeating existing values in the model
     const possibleValues = []
-    for (let i = 0; i < suggestablePropertyOptions[selectedProperty].length; i++) {
-        const valueOption = suggestablePropertyOptions[selectedProperty][i]
+    for (const valueOption of suggestablePropertyOptions[selectedProperty].length) {
         if (!projectModel[activeProject][selectedProperty].includes(valueOption)) {
             possibleValues.push(valueOption)
         }
@@ -127,13 +123,13 @@ export function updateModel(property: string, value: string) {
     switch (property) {
         case "genre":
         case "code structure":
-        case "instrument":
+        case "instrument": {
             const index = projectModel[activeProject][property].indexOf(value)
             if (index === -1) {
                 projectModel[activeProject][property].push(value) // Unlimited number of genres/instruments.
             }
             break
-        case "form":
+        } case "form":
             projectModel[activeProject].form[0] = value // Only one form at a time.
             break
         default:
@@ -156,7 +152,7 @@ export function clearProperty(property: string) {
 }
 
 // Remove single property from array.
-export function removeProperty(property: string, propertyValue: any) {
+export function removeProperty(property: string, propertyValue: string | number) {
     if (projectModel[activeProject][property]) {
         const index = projectModel[activeProject][property].indexOf(propertyValue)
         if (index > -1) {

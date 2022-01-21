@@ -14,7 +14,6 @@ import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
-
 const userInfo: string[] = []
 
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
@@ -44,12 +43,10 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     const values = row.split(",")
                     if (values.length > 2) {
                         urlList.push(values[2])
-                    }
-                    else {
+                    } else {
                         urlList.push("")
                     }
                     userInfo.push(values[0] + "|" + values[1])
-
                 }
             } catch (err) {
                 console.error(err)
@@ -78,17 +75,16 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     reports: reports,
                 }
             } catch (err) {
-               // console.log("log error", err)
+                // console.log("log error", err)
                 result = {
                     script: script,
                     error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
-                    reports: {  }
+                    reports: { },
                 }
-                result["reports"]["COMPLEXITY"] = { complexity: "{\"errors\":1|\"variables\":0|\"makeBeat\":0|\"iteration\":{\"whileLoops\":0|\"forLoopsPY\":0|\"forLoopsJS\":0|\"iterables\":0|\"nesting\":0}|\"conditionals\":{\"conditionals\":0|\"usedInConditionals\":[]}|\"functions\":{\"repeatExecution\":0|\"manipulateValue\":0}|\"features\":{\"indexing\":0|\"consoleInput\":0|\"listOps\":0|\"strOps\":0|\"binOps\":0|\"comparisons\":0}}" }
+                result.reports.COMPLEXITY = { complexity: "{\"errors\":1|\"variables\":0|\"makeBeat\":0|\"iteration\":{\"whileLoops\":0|\"forLoopsPY\":0|\"forLoopsJS\":0|\"iterables\":0|\"nesting\":0}|\"conditionals\":{\"conditionals\":0|\"usedInConditionals\":[]}|\"functions\":{\"repeatExecution\":0|\"manipulateValue\":0}|\"features\":{\"indexing\":0|\"consoleInput\":0|\"listOps\":0|\"strOps\":0|\"binOps\":0|\"comparisons\":0}}" }
             }
-        }
-        else {                                                         
-            result = {script: script }
+        } else {
+            result = { script: script }
         }
         setProcessing(null)
         return result
@@ -108,24 +104,24 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         setProcessing(null)
 
         let results: Result[] = []
-        let index: number = 0;
+        let index: number = 0
         for (const url of urls) {
             const match = url
-           // esconsole("Grading: " + match, ["DEBUG"])
-           // const shareId = match.substring(9)
-           // esconsole("ShareId: " + shareId, ["DEBUG"])
-           // setProcessing(shareId)
+            // esconsole("Grading: " + match, ["DEBUG"])
+            // const shareId = match.substring(9)
+            // esconsole("ShareId: " + shareId, ["DEBUG"])
+            // setProcessing(shareId)
             let script
             let scriptText
             console.log(index.toString() + "/" + urls.length.toString())
-           
+
             try {
                 scriptText = match.split("NEWLINE").join("\n")
                 scriptText = scriptText.split("\r").join("\n")
                 scriptText = scriptText.split("\\t").join("\t")
                 scriptText = scriptText.split("|||").join(",")
-                //trim off extra quotation marks
-                var strInd: number = 0;
+                // trim off extra quotation marks
+                let strInd: number = 0
 
                 while (scriptText.startsWith("\"")) {
                     strInd += 1
@@ -142,9 +138,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     scriptText = scriptText.substring(13)
                 }
 
-
                 scriptText = scriptText.split("\"\"").join("\"")
-                
             } catch {
                 continue
             }

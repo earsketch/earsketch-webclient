@@ -3,67 +3,157 @@ import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
+export interface Node {
+    _astname?: string,
+    body?: Node[],
+    lineno?: number,
+    colOffset?: number,
+    test?: Node,
+    left?: Node,
+    right?: Node,
+    comparators?: Node[],
+    ops?: Node[],
+    op?: Node | string,
+    args?: Node | Node[],
+    target?: Node,
+    targets?: Node[],
+    operator?: string,
+    v?: string | number,
+    id?: Node,
+    n?: Node,
+    value?: Node,
+    func?: Node,
+    subscript?: string,
+    slice?: Node,
+    orelse?: Node[],
+    name?: Node | string,
+    init?: Node,
+    update?: Node,
+    iter?: Node,
+    values?: Node[],
+    elts?: Node[],
+    attr?: Node,
+    functionName?: string,
+    functionDef?: Node,
+    operand?: Node,
+    s?: Node,
+}
+
+export interface Results {
+    ast: any,
+    codeFeatures: {
+        errors: number,
+        variables: number,
+        makeBeat: number,
+        iteration: {
+            whileLoops: number,
+            forLoopsPY: number,
+            forLoopsJS: number,
+            iterables: number,
+            nesting: number,
+        },
+        conditionals: {
+            conditionals: number,
+            usedInConditionals: string [],
+        },
+        functions: {
+            repeatExecution: number,
+            manipulateValue: number,
+        },
+        features: {
+            indexing: number,
+            consoleInput: number,
+            listOps: number,
+            strOps: number,
+            binOps: number,
+            comparisons: number,
+        },
+    },
+    codeStructure: StructuralNode,
+    inputsOutputs: {
+        sections: { [key: string]: number },
+        effects: { [key: string]: number },
+        sounds: { [key: string]: number },
+    },
+    depth: number,
+}
+
+export interface StructuralNode {
+    id: string,
+    children: StructuralNode[],
+    startline?: number,
+    endline?: number,
+    parent?: StructuralNode,
+    depth?: number,
+}
+
 // gets all ES API calls from a student script
 export function getApiCalls() {
     return ccState.getProperty("apiCalls")
 }
 
-function recursiveCallOnNodes(funcToCall, args, ast) {
-    if (ast !== null && ast.body !== null) {
-        for (const key of Object.keys(ast.body)) {
-            const node = ast.body[key]
+export function getUserFunctionReturns() {
+    return ccState.getProperty("userFunctionReturns")
+}
+
+export function getAllVariables() {
+    return ccState.getProperty("allVariables")
+}
+
+function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | number | string)[], ast: Node | Node[]) {
+    if (Array.isArray(ast)) {
+        for (const node of ast) {
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    } else if (ast !== null && ast._astname !== null && ast._astname === "BoolOp") {
-        for (const key of Object.keys(ast.values)) {
-            const node = ast.values[key]
+        return
+    }
+    if (ast.body) {
+        for (const node of ast.body) {
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    } else if (ast !== null && (ast._astname !== null || (ast[0] !== null && ast[0]._astname !== null)) && Object.keys(ast) !== null) {
-        for (const key of Object.keys(ast)) {
-            const node = ast[key]
-            funcToCall(node, args)
-            recursiveCallOnNodes(funcToCall, args, node)
+    } else if (ast._astname === "BoolOp" && ast.values) {
+        for (const value of ast.values) {
+            funcToCall(value, args)
+            recursiveCallOnNodes(funcToCall, args, value)
         }
-    } else if (ast !== null && ast._astname !== null && ast._astname === "Expr") {
+    } else if (ast._astname === "Expr" && ast.value) {
         funcToCall(ast.value, args)
         recursiveCallOnNodes(funcToCall, args, ast.value)
     }
 
-    if (ast !== null && ast._astname !== null && "test" in ast) {
+    if (ast.test) {
         funcToCall(ast.test, args)
         recursiveCallOnNodes(funcToCall, args, ast.test)
     }
-
-    if (ast !== null && ast._astname !== null && "iter" in ast) {
+    if (ast.iter) {
         funcToCall(ast.iter, args)
         recursiveCallOnNodes(funcToCall, args, ast.iter)
     }
-    if (ast !== null && ast._astname !== null && "orelse" in ast) {
+    if (ast.orelse) {
         funcToCall(ast.orelse, args)
         recursiveCallOnNodes(funcToCall, args, ast.orelse)
     }
 }
 
-function analyzeConditionalTest(testNode, tallyList) {
+function analyzeConditionalTest(testNode: Node, tallyList: string[]) {
     tallyObjectsInConditional(testNode, tallyList)
     recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode)
 }
 
-function tallyObjectsInConditional(node, tallyList) {
+function tallyObjectsInConditional(node: Node, tallyList: string[]) {
     if (node === null) {
         return
     }
     if (node._astname === "Name") {
         // boolval or variable
-        if ((node.id.v === "True" || node.id.v === "False") && !tallyList.includes("Bool")) {
+        if ((node.id?.v === "True" || node.id?.v === "False") && !tallyList.includes("Bool")) {
             tallyList.push("Bool")
         } else {
             // is it a variable
             for (const variable of ccState.getProperty("allVariables")) {
-                if (variable.name === node.id.v) {
+                if (variable.name === node.id?.v) {
                     tallyList.push("Variable")
                     break
                 }
@@ -74,19 +164,20 @@ function tallyObjectsInConditional(node, tallyList) {
     }
 
     // extra handling for mod
-    if (node._astname === "BinOp") {
-        if (node.op.name === "Mod" && !tallyList.includes("Mod")) {
-            tallyList.push("Mod")
+    if (node._astname === "BinOp" && node.op) {
+        if (typeof node.op !== "string") {
+            if (node.op.name === "Mod" && !tallyList.includes("Mod")) {
+                tallyList.push("Mod")
+            }
         }
         // console.log(node.op.name);
     }
 }
 
 // recurses through AST and calls function info function on each node
-function functionPass(ast, results, rootAst) {
+function functionPass(ast: Node, results: Results, rootAst: Node) {
     recursiveCallOnNodes(collectFunctionInfo, [results, rootAst], rootAst)
     // recursiveFunctionAnalysis(ast, results, rootAst);
-
 
     // do calls
     for (const func of ccState.getProperty("userFunctionReturns")) {
@@ -118,13 +209,13 @@ function functionPass(ast, results, rootAst) {
     for (const func of ccState.getProperty("userFunctionReturns")) {
         if (func.returns) {
             // orgline shoul dbe RETURN lineno.
-            if (valueTrace(false, func.name, rootAst, [], rootAst, [], [], func.start)) {
+            if (valueTrace(false, func.name, rootAst, [], rootAst, null, [], func.start)) {
                 // do stuff
                 results.codeFeatures.functions.manipulateValue = 3
             }
             if (func.aliases.length > 0) {
                 for (const alias of func.aliases) {
-                    if (valueTrace(false, alias, rootAst, [], rootAst, [], [], func.start)) {
+                    if (valueTrace(false, alias, rootAst, [], rootAst, null, [], func.start)) {
                         // do stuff
                         results.codeFeatures.functions.manipulateValue = 3
                     }
@@ -137,19 +228,39 @@ function functionPass(ast, results, rootAst) {
 }
 
 // collects function info from a node
-function collectFunctionInfo(node, args) {
+function collectFunctionInfo(node: Node, args: [Results, Node]) {
     if (node !== null && node._astname !== null) {
         // get linenumber info
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
             lineNumber = ccState.getProperty("parentLineNumber")
         }
         // does the node contain a function def?
-        if (node._astname === "FunctionDef") {
-            const functionObj = { name: node.name.v, returns: null, params: false, aliases: [], calls: [], start: lineNumber, end: lineNumber, returnVals: [], functionBody: node.body }
+        if (node._astname === "FunctionDef" && node.name) {
+            const functionObj: {
+                name: string,
+                returns: Boolean,
+                params: Boolean,
+                aliases: string[],
+                calls: string[],
+                start: number,
+                end: number,
+                returnVals: Node[],
+                functionBody: Node[],
+            } = {
+                name: typeof node.name === "string" ? node.name : String(node.name.v),
+                returns: false,
+                params: false,
+                aliases: [],
+                calls: [],
+                start: lineNumber,
+                end: lineNumber,
+                returnVals: [],
+                functionBody: Array.isArray(node.body) ? node.body : [],
+            }
 
             functionObj.end = ccHelpers.getLastLine(node)
 
@@ -162,22 +273,24 @@ function collectFunctionInfo(node, args) {
             }
 
             // check for value return
-            for (const item of node.body) {
-                const ret = searchForReturn(item)
-                if (ret !== null) {
-                    functionObj.returns = true
-                    functionObj.returnVals.push(ret)
-                    break
+            if (node.body) {
+                for (const item of node.body) {
+                    const ret = searchForReturn(item)
+                    if (ret) {
+                        functionObj.returns = true
+                        functionObj.returnVals.push(ret)
+                        break
+                    }
                 }
             }
 
             // check for parameters
-            if (node.args.args !== null && node.args.args.length > 0) {
+            if (!Array.isArray(node.args) && node.args?.args && Array.isArray(node.args.args) && node.args.args.length > 0) {
                 // check for parameters that are NOT NULL
                 // these...should all be Name
                 for (const arg of node.args.args) {
                     if (arg._astname === "Name") {
-                        const argName = arg.id.v
+                        const argName = String(arg.id?.v)
                         const lineDelims = [functionObj.start, functionObj.end]
                         // search for use of the value using valueTrace
                         if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
@@ -203,7 +316,7 @@ function collectFunctionInfo(node, args) {
         } else if (node._astname === "Call") {
             // or a function call?
             let calledInsideLoop = false
-            const parentsList = []
+            const parentsList: StructuralNode[] = []
             getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList)
             for (let i = parentsList.length - 1; i >= 0; i--) {
                 if (parentsList[i].id === "Loop") {
@@ -214,12 +327,12 @@ function collectFunctionInfo(node, args) {
 
             // add it to function calls directory in ccstate
             let calledName = ""
-            if (node.func._astname === "Name") {
+            if (node.func?._astname === "Name") {
                 // find name
-                calledName = node.func.id.v
-            } else if (node.func._astname === "Attribute") {
+                calledName = String(node.func.id?.v)
+            } else if (node.func?._astname === "Attribute") {
                 // console.log(node.func._astname);
-                calledName = node.func.attr.v
+                calledName = String(node.func.attr?.v)
             }
 
             if (calledName === "readInput") {
@@ -238,15 +351,15 @@ function collectFunctionInfo(node, args) {
                         args[0].codeFeatures.features.consoleInput = 1
                     }
 
-                    break;
+                    break
                 }
             }
-        } else if (node._astname === "Assign" && node.targets.length === 1) {
+        } else if (node._astname === "Assign" && node.targets?.length === 1) {
             // function alias tracking
 
-            if (node.value._astname === "Name") {
-                const assignedName = node.targets[0].id.v
-                const assignedAlias = node.value.id.v
+            if (node.value?._astname === "Name") {
+                const assignedName = String(node.targets[0].id?.v)
+                const assignedAlias = String(node.value.id?.v)
                 let assignmentExists = false
                 for (const func of ccState.getProperty("userFunctionReturns")) {
                     if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
@@ -267,10 +380,12 @@ function collectFunctionInfo(node, args) {
     }
 }
 
-function markMakeBeat(callNode, results) {
+function markMakeBeat(callNode: Node, results: Results) {
     if (results.codeFeatures.makeBeat < 1) {
         results.codeFeatures.makeBeat = 1
     }
+
+    if (!Array.isArray(callNode.args)) { return }
 
     // is makeBeat being used
     // beatString is either a variable or a string.
@@ -284,14 +399,14 @@ function markMakeBeat(callNode, results) {
     }
 }
 
-function isBinopString(binOpNode) {
-    if (binOpNode === null || binOpNode._astname !== "BinOp") {
+function isBinopString(binOpNode: Node) {
+    if (binOpNode === null || binOpNode._astname !== "BinOp" || !binOpNode.left || !binOpNode.right) {
         return false
     }
 
     const leftNode = binOpNode.left
     const rightNode = binOpNode.right
-    const op = binOpNode.op.name
+    const op = typeof binOpNode.op === "string" ? binOpNode.op : binOpNode.op?.name
 
     if (op !== "Add") {
         return false
@@ -332,22 +447,19 @@ function isBinopString(binOpNode) {
 }
 
 // recursively searches for a "return" within an ast node
-function searchForReturn(astNode) {
-    if (astNode._astname === "Return") {
+function searchForReturn(astNode: Node): Node | null {
+    if (Array.isArray(astNode)) {
+        for (const node of astNode) {
+            const ret = searchForReturn(node)
+            if (ret) { return ret }
+        }
+        return null
+    }
+    if (astNode._astname === "Return" && astNode.value) {
         return astNode.value
     } else {
-        if (astNode !== null && astNode.body !== null) {
-            for (const key of Object.keys(astNode.body)) {
-                const node = astNode.body[key]
-                const ret = searchForReturn(node)
-                if (ret !== null) {
-                    return ret
-                }
-            }
-            return null
-        } else if (astNode !== null && (astNode[0] !== null && Object.keys(astNode[0]) !== null)) {
-            for (const key of Object.keys(astNode)) {
-                const node = astNode[key]
+        if (astNode.body) {
+            for (const node of astNode.body) {
                 const ret = searchForReturn(node)
                 if (ret !== null) {
                     return ret
@@ -356,11 +468,16 @@ function searchForReturn(astNode) {
             return null
         }
     }
+    return null
 }
 
 // collects variable info from a node
-function collectVariableInfo(node) {
-    if (node !== null && node._astname !== null) {
+function collectVariableInfo(node: Node) {
+    let varObject: {
+        name: string, assignments: { line: number, value?: Node }[]
+    }
+
+    if (node && node._astname && node.lineno) {
         // get linenumber info
         let lineNumber = 0
         if (node.lineno !== null) {
@@ -372,22 +489,23 @@ function collectVariableInfo(node) {
 
         let assignedInsideLoop = false
         let loopLine = -1
-        const parentsList = []
+        const parentsList: StructuralNode[] = []
         getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList)
         for (let i = parentsList.length - 1; i >= 0; i--) {
             if (parentsList[i].id === "Loop") {
                 assignedInsideLoop = true
-                loopLine = parentsList[i].startline
+                if (parentsList[i].startline) {
+                    loopLine = parentsList[i].startline
+                }
                 break
             }
         }
 
-        if (node._astname === "Assign" && node.targets.length === 1) {
+        if (node._astname === "Assign" && node.targets?.length === 1) {
             // does it already exist in the directory
-            if ("id" in node.targets[0] && "v" in node.targets[0].id) {
-                const assignedName = node.targets[0].id.v
-
-                let varObject = { name: assignedName, assignments: [] }
+            if (node.targets[0].id && node.targets[0].id.v) {
+                const assignedName = String(node.targets[0].id.v)
+                varObject = { name: assignedName, assignments: [] }
                 let alreadyExists = false
 
                 for (const currentVar of ccState.getProperty("allVariables")) {
@@ -398,18 +516,19 @@ function collectVariableInfo(node) {
                     }
                 }
 
-                if (assignedInsideLoop) {
-                    varObject.assignments.push({ line: loopLine, value: node.value })
-                    varObject.assignments.push({ line: loopLine, value: node.value })
-                    // we do this twice on purpose
-                } else {
-                    varObject.assignments.push({ line: lineNumber, value: node.value })
+                if (node.value) {
+                    if (assignedInsideLoop) {
+                        varObject.assignments.push({ line: loopLine, value: node.value })
+                        varObject.assignments.push({ line: loopLine, value: node.value })
+                        // we do this twice on purpose
+                    } else {
+                        varObject.assignments.push({ line: lineNumber, value: node.value })
+                    }
                 }
 
                 // function alias tracking
-
-                if (node.value._astname === "Name") {
-                    const assignedAlias = node.value.id.v
+                if (node.value?._astname === "Name") {
+                    const assignedAlias = String(node.value.id?.v)
                     let assignmentExists = false
                     for (const func of ccState.getProperty("userFunctionReturns")) {
                         if ((func.name === assignedAlias && !func.aliases.includes(assignedName)) || (func.aliases.includes(assignedAlias) && !func.aliases.includes(assignedName))) {
@@ -433,10 +552,9 @@ function collectVariableInfo(node) {
             }
         }
 
-        if (node._astname === "AugAssign" && node.target._astname === "Name") {
-            const assignedName = node.target.id.v
-
-            let varObject = { name: assignedName, assignments: [] }
+        if (node._astname === "AugAssign" && node.target?._astname === "Name") {
+            const assignedName = String(node.target.id?.v)
+            varObject = { name: assignedName, assignments: [] }
             let alreadyExists = false
 
             for (const variable of ccState.getProperty("allVariables")) {
@@ -460,10 +578,10 @@ function collectVariableInfo(node) {
             }
         }
 
-        if (node._astname === "For") {
+        if (node._astname === "For" && node.target) {
             // check and add the iterator
-            const assignedName = node.target.id.v
-            let varObject = { name: assignedName, assignments: [] }
+            const assignedName = String(node.target.id?.v)
+            varObject = { name: assignedName, assignments: [] }
             let alreadyExists = false
 
             for (const variable of ccState.getProperty("allVariables")) {
@@ -484,9 +602,9 @@ function collectVariableInfo(node) {
         }
 
         if (node._astname === "JSFor") {
-            if ("init" in node) {
-                const assignedName = node.init.targets[0].id.v
-                let varObject = { name: assignedName, assignments: [] }
+            if (node.init && node.init.targets) {
+                const assignedName = String(node.init.targets[0].id?.v)
+                varObject = { name: assignedName, assignments: [] }
                 let alreadyExists = false
 
                 for (const variable of ccState.getProperty("allVariables")) {
@@ -509,7 +627,7 @@ function collectVariableInfo(node) {
     }
 }
 
-function reverseValueTrace(isVariable, name, lineNo) {
+function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): string {
     if (isVariable) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
             let latestAssignment = null
@@ -610,7 +728,6 @@ function reverseValueTrace(isVariable, name, lineNo) {
                                 return reverseValueTrace(false, funcName, latestAssignment.lineno)
                             } else {
                                 return ""
-
                             }
                         }
                         return ""
@@ -733,9 +850,9 @@ function reverseValueTrace(isVariable, name, lineNo) {
     return ""
 }
 
-function getTypeFromASTNode(node) {
+function getTypeFromASTNode(node: Node) {
     const autoReturns = ["List", "Str"]
-    if (autoReturns.includes(node._astname)) {
+    if (node._astname && autoReturns.includes(node._astname)) {
         return node._astname
     } else if (node._astname === "Num") {
         if (Object.getPrototypeOf(node.n).tp$name === "int") {
@@ -744,18 +861,18 @@ function getTypeFromASTNode(node) {
             return "Float"
         }
         // return "Num";
-    } else if (node._astname === "Call") {
+    } else if (node._astname === "Call" && node.lineno) {
         // get name
         let funcName = ""
-        if ("attr" in node.func) {
-            funcName = node.func.attr.v
-        } else if ("id" in node.func) {
-            funcName = node.func.id.v
+        if (node.func?.attr) {
+            funcName = String(node.func.attr.v)
+        } else if (node.func?.id) {
+            funcName = String(node.func.id.v)
         } else {
             return ""
         }
         return reverseValueTrace(false, funcName, node.lineno)
-    } else if (node._astname === "Name") {
+    } else if (node._astname === "Name" && node.id && node.lineno) {
         if (node.id.v === "True" || node.id.v === "False") {
             return "Bool"
         }
@@ -767,44 +884,44 @@ function getTypeFromASTNode(node) {
                 return "Func"
             }
         }
-        return reverseValueTrace(true, node.id.v, node.lineno)
+        return reverseValueTrace(true, String(node.id.v), node.lineno)
     }
     return ""
 }
 
-function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLine = [], origLine = -1) {
+function valueTrace(isVariable: Boolean, name: string, ast: Node, parentNodes: [Node, string][], rootAst: Node, lineVar: { line: number } | null, useLine: number[] = [], origLine = -1) {
     if (ast === null) { return false }
-    if (ast !== null && ast.body !== null) {
-        for (const key of Object.keys(ast.body)) {
+    if (ast && ast.body) {
+        for (const key in ast.body) {
             const node = ast.body[key]
             // parent node tracing
             const newParents = parentNodes.slice(0)
             newParents.push([node, key])
             // is the node a value thingy?
-            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
+            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
                 return true
             }
             if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
                 return true
             }
         }
-    } else if (ast !== null && (ast._astname !== null || (ast[0] !== null && ast[0]._astname !== null)) && Object.keys(ast) !== null) {
-        for (const key of Object.keys(ast)) {
+    } else if (Array.isArray(ast) && (ast._astname !== null || (ast[0] !== null && ast[0]._astname !== null)) && Object.keys(ast) !== null) {
+        for (const key in ast) {
             const node = ast[key]
 
             const newParents = parentNodes.slice(0)
             newParents.push([node, key])
-            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
+            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
                 return true
             }
             if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
                 return true
             }
         }
-    } else if (ast !== null && ast._astname !== null && ast._astname === "Expr") {
+    } else if (ast && ast._astname && ast._astname === "Expr" && ast.value) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.value, "Expr"])
-        if (findValueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
+        if (findValueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) === true) {
             return true
         }
         if (valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) === true) {
@@ -813,10 +930,10 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
     }
 
     // nodes that need extra testing
-    if (ast !== null && ast._astname !== null && "test" in ast) {
+    if (ast !== null && ast._astname !== null && ast.test) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.test, "test"])
-        if (findValueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
+        if (findValueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, origLine) === true) {
             return true
         }
         if (valueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, origLine) === true) {
@@ -824,10 +941,10 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
         }
     }
 
-    if (ast !== null && ast._astname !== null && "iter" in ast) {
+    if (ast !== null && ast._astname !== null && ast.iter) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.iter, "iter"])
-        if (findValueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, -1, origLine) === true) {
+        if (findValueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, origLine) === true) {
             return true
         }
         if (valueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, origLine) === true) {
@@ -838,11 +955,11 @@ function valueTrace(isVariable, name, ast, parentNodes, rootAst, lineVar, useLin
     return false
 }
 
-function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, useLine, origLine = -1, tracedNodes = []) { //
-    if (node !== null && node._astname !== null) {
+function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNodes: [Node, string][], rootAst: Node, lineVar: { line: number } | null, useLine: number [], origLine = -1) { //
+    if (node && node._astname && node.id && node.func) {
         // get linenumber info
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -871,7 +988,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
             // is it the function we're looking for or one of its aliases?
 
             if (node.func._astname === "Name") {
-                const calledName = node.func.id.v
+                const calledName = String(node.func.id?.v)
                 if (calledName === name) {
                     found = true
                 } else {
@@ -963,7 +1080,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
         let isAssigned = false
         let assignedName = ""
 
-        if (nodeParent[0]._astname === "Assign" && thisNode[1] === "value") {
+        if (nodeParent[0]._astname === "Assign" && thisNode[1] === "value" && nodeParent[0].lineno) {
             let assignedProper = false
 
             // assignedproper is based on parent node in codestructure
@@ -981,8 +1098,8 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
             }
             if (assignedProper === true) {
                 isAssigned = true
-                if (nodeParent[0].targets[0]._astname === "Name") {
-                    assignedName = nodeParent[0].targets[0].id.v
+                if (nodeParent[0].targets && nodeParent[0].targets[0]._astname === "Name") {
+                    assignedName = String(nodeParent[0].targets[0].id?.v)
                 }
             }
         }
@@ -997,7 +1114,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
             }
 
             console.log(nodeParent[0].lineno)
-            return valueTrace(varBool, assignedName, rootAst, [], rootAst, lineVar, useLine, nodeParent[0].lineno, tracedNodes)
+            return valueTrace(varBool, assignedName, rootAst, [], rootAst, lineVar, useLine, nodeParent[0].lineno)
         }
     }
     // general catch-all if none of the above is true
@@ -1005,7 +1122,7 @@ function findValueTrace(isVariable, name, node, parentNodes, rootAst, lineVar, u
 }
 
 // takes all the collected info and generates the relevant results
-function doComplexityOutput(results, rootAst) {
+function doComplexityOutput(results: Results, rootAst: Node) {
     // do loop nesting check
     const finalLoops = ccState.getProperty("loopLocations").slice(0)
     finalLoops.sort(sortLoopValues)
@@ -1062,9 +1179,11 @@ function doComplexityOutput(results, rootAst) {
         }
     }
 
-    const structure = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body) }
-    for (const item of rootAst.body) {
-        structure.children.push(buildStructuralRepresentation(item, structure, rootAst))
+    const structure: StructuralNode = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(rootAst.body) }
+    if (rootAst.body) {
+        for (const item of rootAst.body) {
+            structure.children.push(buildStructuralRepresentation(item, structure, rootAst))
+        }
     }
 
     const depthObj = { depth: 0 }
@@ -1072,24 +1191,23 @@ function doComplexityOutput(results, rootAst) {
     // do structural depth
     countStructuralDepth(structure, depthObj, null)
 
-
-    results.depth = depthObj.depth;
-    results.codeStructure = structure;
+    results.depth = depthObj.depth
+    results.codeStructure = structure
 
     if (results.depth > 3) {
-        results.depth = 3;
+        results.depth = 3
     }
 }
 
-function sortLoopValues(a, b) {
+function sortLoopValues(a: number[], b: number[]) {
     const scoreA = a[1] - a[0]
     const scoreB = b[1] - b[0]
 
     return scoreB - scoreA
 }
 
-function countStructuralDepth(structureObj, depthCountObj, parentObj) {
-    if (parentObj === null) {
+function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number }, parentObj: StructuralNode | null) {
+    if (!parentObj || !parentObj.depth) {
         structureObj.depth = 0
     } else {
         structureObj.depth = parentObj.depth + 1
@@ -1105,10 +1223,10 @@ function countStructuralDepth(structureObj, depthCountObj, parentObj) {
 }
 
 // Analyze a single node of a Python AST.
-function analyzeASTNode(node, results) {
-    if (node !== null && node._astname !== null) {
+function analyzeASTNode(node: Node, results: Results) {
+    if (node !== null && node._astname !== null && node.test) {
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -1124,10 +1242,10 @@ function analyzeASTNode(node, results) {
                 ccState.getProperty("loopLocations").push([firstLine, lastLine])
 
                 // is the iterator range()?
-                if (node.iter._astname === "Call") {
+                if (node.iter?._astname === "Call" && node.iter) {
                     // is the iter call to range()
-                    if (node.iter.func._astname === "Name") {
-                        const iterFuncName = node.iter.func.id.v
+                    if (node.iter.func?._astname === "Name") {
+                        const iterFuncName = node.iter.func.id?.v
                         let isRange = iterFuncName === "range"
 
                         // check for renames (unlikely, but we should do it)
@@ -1141,7 +1259,7 @@ function analyzeASTNode(node, results) {
                         }
                         loopRange = isRange
                         // check number of args
-                        const numArgs = node.iter.args.length
+                        const numArgs = Array.isArray(node.iter.args) ? node.iter.args.length : 1
 
                         if (results.codeFeatures.iteration.forLoopsPY < numArgs && !ccState.getProperty("isJavascript")) {
                             results.codeFeatures.iteration.forLoopsPY = numArgs
@@ -1166,25 +1284,27 @@ function analyzeASTNode(node, results) {
                 if (results.codeFeatures.conditionals.conditionals < 1) {
                     results.codeFeatures.conditionals.conditionals = 1
                 }
-                if ("orelse" in node && node.orelse.length > 0) {
+                if (node.orelse && node.orelse.length > 0) {
                     if (results.codeFeatures.conditionals.conditionals < 2) {
                         results.codeFeatures.conditionals.conditionals = 2
                     }
-                    if ("orelse" in node.orelse[0] && node.orelse[0].orelse.length > 0 && results.codeFeatures.conditionals.conditionals < 3) {
+                    if (node.orelse[0].orelse && node.orelse[0].orelse.length > 0 && results.codeFeatures.conditionals.conditionals < 3) {
                         results.codeFeatures.conditionals.conditionals = 3
                     }
 
-                    recursiveAnalyzeAST(node.orelse, results)
+                    for (const orelse of node.orelse) {
+                        recursiveAnalyzeAST(orelse, results)
+                    }
                 }
 
-                const conditionalsList = []
+                const conditionalsList: string[] = []
                 analyzeConditionalTest(node.test, conditionalsList)
                 for (const conditional of conditionalsList) {
                     if (!results.codeFeatures.conditionals.usedInConditionals.includes(conditional)) {
                         results.codeFeatures.conditionals.usedInConditionals.push(conditional)
                     }
                 }
-            } else if (node._astname === "UnaryOp") {
+            } else if (node._astname === "UnaryOp" && node.operand) {
                 recursiveAnalyzeAST(node.operand, results)
             } else if (node._astname === "Subscript") {
                 results.codeFeatures.features.indexing = 1
@@ -1203,18 +1323,18 @@ function analyzeASTNode(node, results) {
                 const lastLine = ccHelpers.getLastLine(node)
 
                 ccState.getProperty("loopLocations").push([firstLine, lastLine])
-            } else if (node._astname === "Call") {
+            } else if (node._astname === "Call" && node.func) {
                 let calledName = ""
                 let calledOn = ""
                 if (node.func._astname === "Name") {
                     // find name
-                    calledName = node.func.id.v
-                    if (node.args.length > 0) {
+                    calledName = String(node.func.id?.v)
+                    if (node.args && Array.isArray(node.args) && node.args.length > 0) {
                         calledOn = ccHelpers.estimateDataType(node.args[0])
                     }
                 } else if (node.func._astname === "Attribute") {
                     // console.log(node.func._astname);
-                    calledName = node.func.attr.v
+                    calledName = String(node.func.attr?.v)
                     if ("value" in node.func) {
                         calledOn = ccHelpers.estimateDataType(node.func.value)
                     }
@@ -1242,8 +1362,7 @@ function analyzeASTNode(node, results) {
                     }
                 }
 
-
-                if ("id" in node.func) {
+                if (node.func?.id) {
                     if (node.func.id.v === "makeBeat") {
                         markMakeBeat(node, results)
                     } else {
@@ -1251,7 +1370,6 @@ function analyzeASTNode(node, results) {
                         for (const func of ccState.getProperty("userFunctionReturns")) {
                             if (func.name === "makeBeat" && func.aliases.includes(node.func.id.v)) {
                                 markMakeBeat(node, results)
-
                             }
                         }
                     }
@@ -1262,14 +1380,14 @@ function analyzeASTNode(node, results) {
 }
 
 // Recursively analyze a python abstract syntax tree.
-function recursiveAnalyzeAST(ast, results) {
-    recursiveCallOnNodes(analyzeASTNode, results, ast)
+function recursiveAnalyzeAST(ast: Node, results: Results) {
+    recursiveCallOnNodes(analyzeASTNode, [results], ast)
     return results
 }
 
-function appendOrElses(node, orElseList) {
-    if (node !== null && "orelse" in node && node.orelse.length > 0) {
-        if ("body" in node.orelse[0]) {
+function appendOrElses(node: Node, orElseList: Node[][]) {
+    if (node.orelse && node.orelse.length > 0) {
+        if (node.orelse[0].body) {
             orElseList.push(node.orelse[0].body)
         } else if (!("orelse" in node.orelse[0])) {
             orElseList.push(node.orelse)
@@ -1280,13 +1398,13 @@ function appendOrElses(node, orElseList) {
     }
 }
 
-function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
+function buildStructuralRepresentation(nodeToUse: Node, parentNode: StructuralNode, ast: Node) {
     let node = nodeToUse
-    if (nodeToUse._astname === "Expr") {
+    if (nodeToUse._astname === "Expr" && nodeToUse.value) {
         node = nodeToUse.value
     }
 
-    const returnObject = { id: "", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
+    const returnObject: StructuralNode = { id: "", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
     if (node._astname === "Call") {
         // if the parent is the definition of a function with the same name, handle the recursion. if this goes ahead recursively, the stack WILL explode.
         let isRecursive = false
@@ -1294,16 +1412,11 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
         let firstParent = parentNode
         const nameObj = { name: "", start: -1, end: -1 }
         let whileCount = 0
-        while ("parent" in firstParent) {
-            if (firstParent.id === "FunctionDef") {
-                // now we figure out the name of the function
-                recursiveCallOnNodes(findFunctionDefName, [firstParent.startline, nameObj], ast)
-            } else if (firstParent.id === "functionCall") {
-                recursiveCallOnNodes(findFunctionCallName, [firstParent.startline, nameObj], ast)
-            }
+        while (firstParent.parent && firstParent.startline) {
+            recursiveCallOnNodes(findFunctionArgumentName, [firstParent.id, firstParent.startline, nameObj], ast)
             firstParent = firstParent.parent
 
-            if (nameObj.name !== "" && node.lineno >= nameObj.start && node.lineno <= nameObj.end) {
+            if (nameObj.name !== "" && node.lineno && node.lineno >= nameObj.start && node.lineno <= nameObj.end) {
                 isRecursive = true
                 break
             }
@@ -1317,13 +1430,13 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
 
         if (isRecursive) {
             // handle
-            if (node.func._astname !== "Name") {
+            if (node.func?._astname !== "Name") {
                 returnObject.id = node._astname
                 return returnObject
             }
             let funcObj = null
             for (const func of ccState.getProperty("userFunctionReturns")) {
-                if (func.name === node.func.id.v || func.aliases.includes(node.func.id.v)) {
+                if (func.name === node.func.id?.v || func.aliases.includes(node.func.id?.v)) {
                     funcObj = func
                     break
                 }
@@ -1337,13 +1450,13 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
             returnObject.children.push({ id: "functionCall", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: returnObject })
         } else {
             // find the function
-            if (node.func._astname !== "Name") {
+            if (node.func?._astname !== "Name") {
                 returnObject.id = node._astname
                 return returnObject
             }
             let funcObj = null
             for (const func of ccState.getProperty("userFunctionReturns")) {
-                if (func.name === node.func.id.v || func.aliases.includes(node.func.id.v)) {
+                if (func.name === node.func.id?.v || func.aliases.includes(node.func.id?.v)) {
                     funcObj = func
                     break
                 }
@@ -1359,44 +1472,40 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
                 returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
             }
         }
-    } else if (node._astname === "If") {
+    } else if (node._astname === "If" && node.body) {
         // returnObject.id = "If";
-        const ifNode =  { id: "If", children: [], startline:node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode };
-
+        const ifNode: StructuralNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
 
         for (const item of node.body) {
             ifNode.children.push(buildStructuralRepresentation(item, ifNode, ast))
-
         }
 
         // parentNode.children.push(ifNode);
 
-        const orElses = []
+        const orElses: Node[][] = []
 
         appendOrElses(node, orElses)
 
         if (orElses.length > 0) {
-          if(orElses[0][0].lineno - 1 > ifNode.endline){
-              ifNode.endline = orElses[0][0].lineno - 1;
-          }
-          else{
-              ifNode.endline = orElses[0][0].lineno;
-          }
-          parentNode.children.push(ifNode);
+            if (orElses[0][0].lineno && ifNode.endline && orElses[0][0].lineno - 1 > ifNode.endline) {
+                ifNode.endline = orElses[0][0].lineno - 1
+            } else {
+                ifNode.endline = orElses[0][0].lineno
+            }
+            parentNode.children.push(ifNode)
         }
 
         for (const orElse of orElses) {
-            const thisOrElse = { id: "Else", children: [] }
+            const thisOrElse: StructuralNode = { id: "Else", children: [] }
             for (const item of orElse) {
                 thisOrElse.children.push(buildStructuralRepresentation(item, thisOrElse, ast))
-
             }
             parentNode.children.push(Object.assign({}, thisOrElse))
         }
 
         // do and return last orElse
         if (orElses.length > 0) {
-            const lastOrElse = { id: "Else", children: [] }
+            const lastOrElse: StructuralNode = { id: "Else", children: [] }
             for (const item of orElses[orElses.length - 1]) {
                 lastOrElse.children.push(buildStructuralRepresentation(item, lastOrElse, ast))
             }
@@ -1408,13 +1517,15 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
     } else if (node._astname === "For" || node._astname === "JSFor" || node._astname === "While") {
         returnObject.id = "Loop"
 
-        for (const item of node.body) {
-            returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
+        if (node.body) {
+            for (const item of node.body) {
+                returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
+            }
         }
     } else {
-        returnObject.id = node._astname
-        if ("body" in node) {
-            for (const item of node.body.length) {
+        if (node._astname) { returnObject.id = node._astname }
+        if (node.body) {
+            for (const item of node.body) {
                 returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
             }
         }
@@ -1423,29 +1534,33 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
     return returnObject
 }
 
-function findFunctionDefName(node, args) {
-    const lineNumber = args[0]
+function findFunctionArgumentName(node: Node, args: [ "FunctionDef" | "functionCall", string | number, { name: string, start: number, end: number }]) {
+    // arg[0]: function definition or function call
+    const type = args[0] === "FunctionDef" ? "FunctionDef" : "Call"
+    // arg[1] is the line number
+    const lineNumber = args[1]
     if (node !== null && node._astname !== null) {
-        // args[1] has property "name" which is how name val is returned
-        if (node._astname === "FunctionDef" && node.lineno === lineNumber) {
-            args[1].name = node.name.v
-            args[1].start = node.lineno
-            args[1].end = ccHelpers.getLastLine(node)
+        // args[2] has property "name" which is how name val is returned
+        if (node._astname === type && node.lineno === lineNumber) {
+            const name = args[0] === "FunctionDef" ? node.name : node.func?.id
+            args[2].name = typeof name === "string" ? name : String(name?.v)
+            args[2].start = node.lineno
+            args[2].end = ccHelpers.getLastLine(node)
         }
     }
 }
 
-function getParentList(lineno, parentNode, parentsList) {
+function getParentList(lineno: number, parentNode: StructuralNode, parentsList: StructuralNode[]) {
     // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
     // first....is it a child of the parent node?
-    if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
+    if (parentNode.startline && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.
         let childNode = null
         if (parentNode.children.length > 0) {
             for (const item of parentNode.children) {
-                if (item.startline <= lineno && item.endline >= lineno) {
+                if (item.startline && item.endline && item.startline <= lineno && item.endline >= lineno) {
                     childNode = item
                     break
                 }
@@ -1458,23 +1573,13 @@ function getParentList(lineno, parentNode, parentsList) {
     }
 }
 
-function findFunctionCallName(node, args) {
-    const lineNumber = args[0]
-    if (node !== null && node._astname !== null) {
-        // args[1] has property "name" which is how name val is returned
-        if (node._astname === "Call" && node.lineno === lineNumber && "id" in node.func) {
-            args[1].name = node.func.id.v
-            args[1].start = node.lineno
-            args[1].end = ccHelpers.getLastLine(node)
-        }
-    }
-}
-
 // handles sequential calls to complexity passes and creation of output
-export function doAnalysis(ast, results) {
-    const codeStruct = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(ast) }
-    for (const item of ast.body) {
-        codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
+export function doAnalysis(ast: Node, results: Results) {
+    const codeStruct: StructuralNode = { id: "body", children: [], startline: 0, endline: ccHelpers.getLastLine(ast) }
+    if (ast.body) {
+        for (const item of ast.body) {
+            codeStruct.children.push(buildStructuralRepresentation(item, codeStruct, ast))
+        }
     }
 
     ccState.setProperty("codeStructure", codeStruct)

@@ -1,40 +1,31 @@
-/* eslint-disable */
-// TODO: Resolve lint issues.
-
 import * as ccState from "./complexityCalculatorState"
-import * as caiErrorHandling from "./errorHandling"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as cc from "./complexityCalculator"
 
 // Process Python code through the complexity calculator service.
 
 // Build the abstract syntax tree for Python.
-function generateAst(source_code) {
-    try {
-        const parse = Sk.parse("<analyzer>", source_code)
-    	ccState.setProperty("studentCode", source_code.split("\n"))
-        return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
-    } catch (error) {
-        throw error
-    }
+function generateAst(source: string) {
+    const parse = Sk.parse("<analyzer>", source)
+    ccState.setProperty("studentCode", source.split("\n"))
+    return Sk.astFromParse(parse.cst, "<analyzer>", parse.flags)
 }
 
 // Analyze the source code of a Python script.
-export function analyzePython(source_code) {
-
-    if (source_code == "") {
-        return { complexity: "" };
+export function analyzePython(source: string) {
+    if (source === "") {
+        return { complexity: "" }
     }
 
-    ccState.resetState();
-    ccState.setProperty("listFuncs", ['append', 'count', 'extend', 'index', 'insert', 'pop', 'remove', 'reverse', 'sort']);
-    ccState.setProperty('studentCode', source_code.split("\n"));
-    //initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
+    ccState.resetState()
+    ccState.setProperty("listFuncs", ["append", "count", "extend", "index", "insert", "pop", "remove", "reverse", "sort"])
+    ccState.setProperty("studentCode", source.split("\n"))
+    // initialize list of function return objects with all functions from the API that return something (includes casting), using a slice to make a copy so as not to overwrite anything in starterReturns
     try {
-        var ast = generateAst(source_code);
-        ccHelpers.replaceNumericUnaryOps(ast.body);
-        //initialize the results object
-        var resultsObject = {
+        const ast = generateAst(source)
+        ccHelpers.replaceNumericUnaryOps(ast.body)
+        // initialize the results object
+        const resultsObject: cc.ResultsObject = {
             ast: ast,
             codeFeatures: {
                 errors: 0,
@@ -45,15 +36,15 @@ export function analyzePython(source_code) {
                     forLoopsPY: 0,
                     forLoopsJS: 0,
                     iterables: 0,
-                    nesting: 0
+                    nesting: 0,
                 },
                 conditionals: {
                     conditionals: 0,
-                    usedInConditionals: []
+                    usedInConditionals: [],
                 },
                 functions: {
                     repeatExecution: 0,
-                    manipulateValue: 0
+                    manipulateValue: 0,
                 },
                 features: {
                     indexing: 0,
@@ -61,28 +52,25 @@ export function analyzePython(source_code) {
                     listOps: 0,
                     strOps: 0,
                     binOps: 0,
-                    comparisons: 0
-                }
+                    comparisons: 0,
+                },
             },
             codeStructure: {},
             inputsOutputs: {
                 sections: {},
                 effects: {},
-                sounds: {}
-            }
-        };
+                sounds: {},
+            },
+        }
 
-        ccState.setIsJavascript(false);
-        cc.doAnalysis(ast, resultsObject);
-
-
+        ccState.setIsJavascript(false)
+        cc.doAnalysis(ast, resultsObject)
 
         // translateIntegerValues(resultsObject);   //translate the calculated values
-        ccHelpers.lineDict();
-        return resultsObject;
-    }
-    catch (error) {
-        resultsObject = {
+        ccHelpers.lineDict()
+        return resultsObject
+    } catch (error) {
+        return {
             // return {
             ast: {},
             codeFeatures: {
@@ -95,15 +83,15 @@ export function analyzePython(source_code) {
                     forLoopsPY: 0,
                     forLoopsJS: 0,
                     iterables: 0,
-                    nesting: 0
+                    nesting: 0,
                 },
                 conditionals: {
                     conditionals: 0,
-                    usedInConditionals: []
+                    usedInConditionals: [],
                 },
                 functions: {
                     repeatExecution: 0,
-                    manipulateValue: 0
+                    manipulateValue: 0,
                 },
                 features: {
                     indexing: 0,
@@ -111,16 +99,15 @@ export function analyzePython(source_code) {
                     listOps: 0,
                     strOps: 0,
                     binOps: 0,
-                    comparisons: 0
-                }
+                    comparisons: 0,
+                },
             },
             codeStructure: {},
             inputsOutputs: {
                 sections: {},
                 effects: {},
-                sounds: {}
-            }
-        };
-       return resultsObject;
+                sounds: {},
+            },
+        } as cc.ResultsObject
     }
 }
