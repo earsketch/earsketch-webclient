@@ -1,5 +1,4 @@
 import sys
-import json
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -35,5 +34,6 @@ createDeploymentStatusParams = {
     "environment_url": environment_url
 }
 
-r = requests.post("{}deployments/{}/statuses".format(url, new_deployment_id), headers=headers, auth=auth, json=createDeploymentStatusParams)
+r = requests.post("{}deployments/{}/statuses".format(url, new_deployment_id),
+                  headers=headers, auth=auth, json=createDeploymentStatusParams)
 new_deployment_status = r.json()
