@@ -102,7 +102,6 @@ const AdminSendBroadcast = () => {
 
     const [message, setMessage] = useState("")
     const [link, setLink] = useState("")
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
     const [broadcasts, setBroadcasts] = useState([] as Notification[])
@@ -181,7 +180,7 @@ const AdminSendBroadcast = () => {
                         <input type="text" className="m-2 w-1/4 form-control"
                             placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
                         <input type="number" className="m-2 w-1/4 form-control"
-                            placeholder="Days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
+                            placeholder="Days until expiration" required min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
                         <input type="submit" value="SEND" className="btn btn-primary" />
                     </div>
                 </form>
