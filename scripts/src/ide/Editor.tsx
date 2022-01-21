@@ -277,12 +277,18 @@ export const Editor = () => {
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
-    const [clickedElement, setClickedElement] = useState(false)
+    const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
         if (!editorElement.current) return
         setup(editorElement.current, language, theme, fontSize)
-        editorElement.current.onclick = () => { setClickedElement(true) }
+        editorElement.current.onclick = () => setShaking(true)
+        editorElement.current.onkeypress = e => {
+            if (e.key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(e.key)) {
+                setShaking(false)
+                setTimeout(() => setShaking(true), 0)
+            }
+        }
         const observer = new ResizeObserver(() => droplet.resize())
         observer.observe(editorElement.current)
         return () => {
@@ -290,7 +296,7 @@ export const Editor = () => {
         }
     }, [editorElement.current])
 
-    useEffect(() => setClickedElement(false), [activeScript])
+    useEffect(() => setShaking(false), [activeScript])
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
 
@@ -360,7 +366,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className={"absolute top-4 right-0 " + (clickedElement ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
+            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span>{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>
