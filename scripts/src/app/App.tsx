@@ -628,11 +628,6 @@ export const App = () => {
     }
 
     const logout = async () => {
-        dispatch(user.logout())
-        dispatch(sounds.resetUserSounds())
-        dispatch(sounds.resetFavorites())
-        dispatch(sounds.resetAllFilters())
-
         // save all unsaved open scripts
         try {
             const promise = saveAll()
@@ -655,6 +650,11 @@ export const App = () => {
                 userProject.clearUser()
             }
         }
+
+        dispatch(user.logout())
+        dispatch(sounds.resetUserSounds())
+        dispatch(sounds.resetFavorites())
+        dispatch(sounds.resetAllFilters())
 
         // Clear out all the values set at login.
         setUsername("")
@@ -824,7 +824,7 @@ window.onbeforeunload = () => {
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
         const promise = saveAll()
         if (promise) {
-            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptcloud"), "success"))
+            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
             return ""
         }
     }
