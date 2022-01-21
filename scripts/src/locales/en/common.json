@@ -621,10 +621,10 @@
           "description": "The location within the track at which to start playback of the sound file."
         },
         "sliceStart": {
-          "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)."
+          "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)"
         },
         "sliceEnd": {
-          "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)."
+          "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)"
         }
       }
     },
@@ -762,7 +762,7 @@
           "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
         },
         "type": {
-          "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
@@ -798,7 +798,7 @@
           "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
         },
         "type": {
-          "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
         },
         "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
@@ -837,19 +837,19 @@
     },
 
     "setTempo2": {
-      "description": "Change the tempo for part of the project.",
+      "description": "Change the tempo for a section of the project.",
       "parameters": {
         "startTempo": {
-          "description": "Tempo at beginning of region in beats per minute (BPM)"
+          "description": "Tempo at beginning of section in beats per minute (BPM)"
         },
         "start": {
-          "description": "Measure where region begins"
+          "description": "Measure where section begins"
         },
         "endTempo": {
-          "description": "Tempo at end of region (if omitted, new tempo persists until next tempo point)"
+          "description": "Tempo at end of section (if omitted, new tempo persists until next tempo point)"
         },
         "end": {
-          "description": "Measure where region ends"
+          "description": "Measure where section ends"
         }
       }
     },
