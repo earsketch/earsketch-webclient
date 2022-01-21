@@ -282,12 +282,12 @@ export const Editor = () => {
     useEffect(() => {
         if (!editorElement.current) return
         setup(editorElement.current, language, theme, fontSize)
-        // Listen for events to visually remind the user when the script is readonly.
-        editorElement.current.onclick = () => setShaking(true)
         const startShaking = () => {
             setShaking(false)
             setTimeout(() => setShaking(true), 0)
         }
+        // Listen for events to visually remind the user when the script is readonly.
+        editorElement.current.onclick = startShaking
         editorElement.current.oncut = editorElement.current.onpaste = startShaking
         editorElement.current.onkeydown = e => {
             if (e.key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(e.key)) {
