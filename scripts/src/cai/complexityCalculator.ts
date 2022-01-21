@@ -143,7 +143,7 @@ function analyzeConditionalTest(testNode: Node, tallyList: string[]) {
 }
 
 function tallyObjectsInConditional(node: Node, tallyList: string[]) {
-    if (node === null) {
+    if (!node) {
         return
     }
     if (node._astname === "Name") {
@@ -298,8 +298,6 @@ function collectFunctionInfo(node: Node, args: [Results, Node]) {
                         }
                     }
                 }
-
-                //
             }
 
             let alreadyExists = false
@@ -447,7 +445,7 @@ function isBinopString(binOpNode: Node) {
 }
 
 // recursively searches for a "return" within an ast node
-function searchForReturn(astNode: Node): Node | null {
+function searchForReturn(astNode: Node | Node[]): Node | null {
     if (Array.isArray(astNode)) {
         for (const node of astNode) {
             const ret = searchForReturn(node)
@@ -461,7 +459,15 @@ function searchForReturn(astNode: Node): Node | null {
         if (astNode.body) {
             for (const node of astNode.body) {
                 const ret = searchForReturn(node)
-                if (ret !== null) {
+                if (ret) {
+                    return ret
+                }
+            }
+            return null
+        } else if (Array.isArray(astNode)) {
+            for (const node of astNode) {
+                const ret = searchForReturn(node)
+                if (ret) {
                     return ret
                 }
             }
@@ -480,7 +486,7 @@ function collectVariableInfo(node: Node) {
     if (node && node._astname && node.lineno) {
         // get linenumber info
         let lineNumber = 0
-        if (node.lineno !== null) {
+        if (node.lineno) {
             lineNumber = node.lineno
             ccState.setProperty("parentLineNumber", lineNumber)
         } else {
@@ -638,7 +644,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
                     thisVar = variable
                 }
             }
-            if (thisVar === null) {
+            if (!thisVar) {
                 return ""
             }
 
@@ -670,7 +676,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
 
                 // we can do three things with the assigned value.
 
-                if (latestAssignment === null) {
+                if (!latestAssignment) {
                     return ""
                 }
 
@@ -749,7 +755,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
                     }
                 }
 
-                if (latestAssignment === null) {
+                if (!latestAssignment) {
                     return ""
                 }
 
@@ -839,7 +845,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
                     }
                 }
 
-                if (funcObj === null || funcObj.returnVals.length === 0) {
+                if (!funcObj || funcObj.returnVals.length === 0) {
                     return ""
                 }
                 // if we have a function object, find its return value
@@ -1041,9 +1047,9 @@ function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNod
         // console.log(name, nodeParent, secondParent);
 
         // is it in a func arg
-        if (nodeParent[1] === "args") {
+        if (nodeParent && nodeParent[1] === "args") {
             isUse = true
-        } else if (thisNode[1] === "test" && nodeParent[0]._astname === "If") {
+        } else if (thisNode[1] === "test" && nodeParent && nodeParent[0]._astname === "If") {
             isUse = true
         } else if (thisNode[1] === "iter") {
             isUse = true
@@ -1070,7 +1076,7 @@ function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNod
         }
 
         if (isUse && isWithin) {
-            if (lineVar !== null) {
+            if (lineVar) {
                 lineVar.line = lineNumber
             }
             return true
@@ -1105,7 +1111,7 @@ function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNod
         }
 
         // 2a. if so, check the root ast for THAT name
-        if (isAssigned === true) {
+        if (isAssigned === true && assignedName !== name) {
             let varBool = isVariable
 
             // if a function output is assigned to a variable, change isVariable to true
@@ -1215,7 +1221,7 @@ function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { dep
             depthCountObj.depth = structureObj.depth
         }
     }
-    if (structureObj.children !== null && structureObj.children.length > 0) {
+    if (structureObj.children && structureObj.children.length > 0) {
         for (const item of structureObj.children) {
             countStructuralDepth(item, depthCountObj, structureObj)
         }
@@ -1389,10 +1395,10 @@ function appendOrElses(node: Node, orElseList: Node[][]) {
     if (node.orelse && node.orelse.length > 0) {
         if (node.orelse[0].body) {
             orElseList.push(node.orelse[0].body)
-        } else if (!("orelse" in node.orelse[0])) {
+        } else if (!(node.orelse[0].orelse)) {
             orElseList.push(node.orelse)
         }
-        if ("orelse" in node.orelse[0]) {
+        if (node.orelse[0].orelse) {
             appendOrElses(node.orelse[0], orElseList)
         }
     }
@@ -1441,7 +1447,7 @@ function buildStructuralRepresentation(nodeToUse: Node, parentNode: StructuralNo
                     break
                 }
             }
-            if (funcObj === null) {
+            if (!funcObj) {
                 returnObject.id = node._astname
                 return returnObject
             }
@@ -1461,15 +1467,16 @@ function buildStructuralRepresentation(nodeToUse: Node, parentNode: StructuralNo
                     break
                 }
             }
-            if (funcObj === null) {
+            if (!funcObj) {
                 returnObject.id = node._astname
                 return returnObject
             }
 
             returnObject.id = "functionCall"
-
-            for (const item of funcObj.functionBody) {
-                returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
+            if (funcObj.functionBody) {
+                for (const item of funcObj.functionBody) {
+                    returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
+                }
             }
         }
     } else if (node._astname === "If" && node.body) {
@@ -1567,7 +1574,7 @@ function getParentList(lineno: number, parentNode: StructuralNode, parentsList: 
             }
         }
 
-        if (childNode !== null) {
+        if (childNode) {
             getParentList(lineno, childNode, parentsList)
         }
     }
