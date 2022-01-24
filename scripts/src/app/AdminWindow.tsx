@@ -101,11 +101,21 @@ const AdminSendBroadcast = () => {
 
     const [message, setMessage] = useState("")
     const [link, setLink] = useState("")
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
 
     const sendBroadcast = () => {
-        websocket.broadcast(message, userProject.getUsername(), link, expiration)
+        // TODO: use `expiration`
+        websocket.send({
+            notification_type: "broadcast",
+            username: userProject.getUsername().toLowerCase(),
+            message: {
+                text: message,
+                hyperlink: link ?? "",
+                expiration: 0,
+            },
+        })
         // always show success message, as we have no indication of failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
     }
