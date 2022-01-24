@@ -146,7 +146,7 @@
     "renameScript.prompt": "Enter the new name for this script:",
     "rename.submit": "Rename",
     "renameScript.appendSuffix": "Append Suffix",
-    "renameScript.alreadyExists": "A script named '{{scriptName}}' already exists in your workspace.`",
+    "renameScript.alreadyExists": "A script named '{{scriptName}}' already exists in your workspace.",
     "renameSound.title": "Rename Sound",
     "renameSound.prompt": "Enter the new name for your sound:",
     "create": "Create",
@@ -289,7 +289,7 @@
     "confirm": {
       "deletescript": "Deleted scripts disappear from Scripts list and can be restored from \"Deleted Scripts\".",
       "deleteSharedScript": "Are you sure you want to delete the shared script \"{{scriptName}}\"?",
-      "deleteSound": "Do you really want to delete sound {{soundName}}",
+      "deleteSound": "Do you really want to delete sound {{soundName}}?",
       "leaveCollaboration": "Do you want to leave the collaboration on \"{{scriptName}}\"?"
     },
     "interpreter": {
@@ -311,7 +311,7 @@
       "allscriptscloud": "All unsaved scripts successfully saved to the cloud.",
       "badsharelink": "Error opening a script. The share link in the URL may be wrong.",
       "scriptcopied": "Script successfully copied.",
-      "emailConflict": "Failed to update the user profile. Please check that this E-mail address is not used in other EarSketch accounts. (Hint: If you cannot remember such user account, try logging out and choose Reset Account -> Forgot Your Password? option. This lets you retrieve the account tied to the E-mail address."
+      "emailConflict": "Failed to update the user profile. Please check that this E-mail address is not used in other EarSketch accounts. (Hint: If you cannot remember the other user account, try logging out and choose Reset Account -> Forgot Your Password? option. This lets you retrieve the account tied to the E-mail address."
     },
     "download": {
       "script": "Save your code as a text file on your computer.",
@@ -458,7 +458,7 @@
           "description": "Start location within the sound to begin analysis"
         },
         "sliceEnd": {
-          "description": "End Location within the sound to end analysis"
+          "description": "End location within the sound to end analysis"
         }
       },
       "returns": {
@@ -494,7 +494,7 @@
           "description": "Start location within the track to begin analysis"
         },
         "end": {
-          "description": "End Location within the track to end analysis"
+          "description": "End location within the track to end analysis"
         }
       },
       "returns": {
@@ -546,10 +546,10 @@
           "description": "Track number to insert audio file onto"
         },
         "start": {
-          "description": "Location within the track where the soundfile will begin (e.g. 1 will start at the beginning of measure 1)."
+          "description": "Location within the track where the sound file will begin (e.g. 1 will start at the beginning of measure 1)."
         },
         "end": {
-          "description": "Location within the track where the soundfile will end (e.g. 5 will stop the soundfile at the beginning of measure 5)."
+          "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
         }
       }
     },
@@ -599,10 +599,10 @@
           "description": "Audio file to insert on track, typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track number to insert soundfile onto"
+          "description": "Track number to insert sound file onto"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the soundfile. (The soundfile will play through one time, so the end time depends on the length of the soundfile.)"
+          "description": "The location within the track at which to start playback of the sound file. (The sound file will play through one time, so the end time depends on the length of the sound file.)"
         }
       }
     },
@@ -615,16 +615,16 @@
           "description": "Audio file to insert on track, typically this is a constant from the sound browser"
         },
         "track": {
-          "description": "Track number to insert soundfile onto"
+          "description": "Track number to insert sound file onto"
         },
         "start": {
-          "description": "The location within the track at which to start playback of the soundfile."
+          "description": "The location within the track at which to start playback of the sound file."
         },
         "sliceStart": {
-          "description": "Start location within the soundfile to include (e.g. 1.0 is the beginning of the soundfile and 2.0 is measure 2 of the soundfile)."
+          "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)"
         },
         "sliceEnd": {
-          "description": "End location within the soundfile to include (e.g. 2.0 is measure 2 of the soundfile)."
+          "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)"
         }
       }
     },
@@ -633,7 +633,7 @@
       "description": "Creates a rhythmic pattern through specifying a string of characters. This string of characters can be of ANY length. We recommend choosing string lengths in multiples of 16 (e.g. 16, 32, 64, etc.), because this creates pattern lengths that are aligned with measures (each measure is 16 characters long).",
       "parameters": {
         "sound": {
-          "description": "A single soundfile or a list/array of soundfiles, typically this is a constant from the sound browser"
+          "description": "A single sound file or a list/array of sound files, typically this is a constant from the sound browser"
         },
         "track": {
           "description": "Track to place pattern onto"
@@ -642,16 +642,16 @@
           "description": "Location within the track to start pattern"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the soundfile for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
         }
       }
     },
 
     "makeBeatSlice": {
-      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a soundfile. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same soundfile.",
+      "description": "Creates a rhythmic pattern through specifying a string of characters indicating the start position within a sound file. Unlike makeBeat, which always plays sounds from the beginning, makeBeatSlice lets you create rhythms that combine many different slices of sound from the same sound file.",
       "parameters": {
         "sound": {
-          "description": "A single soundfile, typically this is a constant from the sound browser"
+          "description": "A single sound file, typically this is a constant from the sound browser"
         },
         "track": {
           "description": "Track to place pattern onto"
@@ -660,10 +660,10 @@
           "description": "Location within the track to start pattern"
         },
         "beat": {
-          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the soundfile at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the soundfile for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
         "sliceStarts": {
-          "description": "A list/array of starting locations within audio file (e.g. [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the soundfile that can be referenced in the beat string by \"0\" and \"1\" respectively."
+          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
       }
     },
@@ -762,7 +762,7 @@
           "description": "Track to place pattern onto (or MIX_TRACK to apply it to all tracks)."
         },
         "type": {
-          "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
         "parameter": {
           "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
@@ -798,10 +798,10 @@
           "description": "Track to place effect onto (or MIX_TRACK to apply it to all tracks)"
         },
         "type": {
-          "description": "Effect constant: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
         },
         "parameter": {
-          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See Every Effect Explained in Detail in the curriculum sidebar for a complete list of effect parameters.)"
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
         "value": {
           "description": "Value of effect parameter"
@@ -816,13 +816,13 @@
           "description": "Value of effect parameter at beginning of effect envelope"
         },
         "start": {
-          "description": "Location within the track of the initialValue"
+          "description": "Location within the track of the startValue"
         },
         "endValue": {
           "description": "Value of effect parameter at end of effect envelope"
         },
         "end": {
-          "description": "Location within the track of the finalValue"
+          "description": "Location within the track of the endValue"
         }
       }
     },
@@ -837,19 +837,19 @@
     },
 
     "setTempo2": {
-      "description": "Change the tempo for part of the project.",
+      "description": "Change the tempo for a section of the project.",
       "parameters": {
         "startTempo": {
-          "description": "Tempo at beginning of region in beats per minute (BPM)"
+          "description": "Tempo at beginning of section in beats per minute (BPM)"
         },
         "start": {
-          "description": "Measure where region begins"
+          "description": "Measure where section begins"
         },
         "endTempo": {
-          "description": "Tempo at end of region (if omitted, new tempo persists until next tempo point)"
+          "description": "Tempo at end of section (if omitted, new tempo persists until next tempo point)"
         },
         "end": {
-          "description": "Measure where region ends"
+          "description": "Measure where section ends"
         }
       }
     },
