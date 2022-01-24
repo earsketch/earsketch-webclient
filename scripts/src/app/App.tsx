@@ -577,6 +577,12 @@ export const App = () => {
         }
     }, [theme])
 
+    async function receiveMessage(event: any) {
+        const credentials = JSON.parse(event.data)
+        await login(credentials.username, credentials.password)
+    }
+    window.addEventListener("message", receiveMessage, false)
+
     const login = async (username: string, password: string) => {
         esconsole("Logging in", ["DEBUG", "MAIN"])
         saveAll()
