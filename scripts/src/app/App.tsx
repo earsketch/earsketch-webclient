@@ -318,7 +318,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts">
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts" aria-label="Show/Hide Keyboard Shortcuts">
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
@@ -341,7 +341,7 @@ const FontSizeMenu = () => {
     const fontSize = useSelector(appState.selectFontSize)
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Font Size" aria-label="Select Font Size">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -373,7 +373,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Settings and Additional Options" aria-label="Settings and Additional Options">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -438,13 +438,13 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
             <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
             <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
+            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
                 {loggedIn
                     ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
+                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }} title="Create or Reset Account" aria-label="Create or Reset Account">{t("createResetAccount")}</div>}
             </Menu.Button>
             <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
@@ -695,7 +695,7 @@ export const App = () => {
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <div>
-                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }} rel="noreferrer">
+                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}

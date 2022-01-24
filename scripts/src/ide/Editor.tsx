@@ -1,7 +1,7 @@
 import { Ace, Range } from "ace-builds"
 import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { importScript, reloadRecommendations } from "../app/App"
@@ -277,16 +277,32 @@ export const Editor = () => {
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
+    const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
         if (!editorElement.current) return
         setup(editorElement.current, language, theme, fontSize)
+        const startShaking = () => {
+            setShaking(false)
+            setTimeout(() => setShaking(true), 0)
+        }
+        // Listen for events to visually remind the user when the script is readonly.
+        editorElement.current.onclick = startShaking
+        editorElement.current.oncut = editorElement.current.onpaste = startShaking
+        editorElement.current.onkeydown = e => {
+            if (e.key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(e.key)) {
+                startShaking()
+            }
+        }
+
         const observer = new ResizeObserver(() => droplet.resize())
         observer.observe(editorElement.current)
         return () => {
             editorElement.current && observer.unobserve(editorElement.current)
         }
     }, [editorElement.current])
+
+    useEffect(() => setShaking(false), [activeScript])
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
 
@@ -356,7 +372,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className="absolute top-4 right-0" onClick={() => importScript(activeScript)}>
+            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span>{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>

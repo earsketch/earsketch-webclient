@@ -39,7 +39,7 @@ export const LocaleSelector = () => {
     return (
         <div className="">
             <Menu as="div" className="relative inline-block text-left">
-                <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+                <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Language" aria-label="Select Language">
                     <div className="flex flex-row items-center">
                         <div><i className="icon icon-earth"></i></div>
                         <div className="ml-1"><span className="caret"></span></div>
