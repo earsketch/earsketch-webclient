@@ -97,7 +97,10 @@ export function setLanguage(language: string) {
 }
 
 export function pasteCode(code: string) {
-    if (ace.getReadOnly()) return
+    if (ace.getReadOnly()) {
+        shakeImportButton()
+        return
+    }
     if (droplet.currentlyUsingBlocks) {
         if (!droplet.cursorAtSocket()) {
             // This is a hack to enter "insert mode" first, so that the `setFocusedText` call actually does something.
@@ -237,8 +240,9 @@ function setupAceHandlers(ace: Ace.Editor) {
 }
 
 let setupDone = false
+let shakeImportButton: () => void
 
-function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number) {
+function setup(element: HTMLDivElement, language: string, theme: "light" | "dark", fontSize: number, shakeCallback: () => void) {
     if (setupDone) return
 
     if (language === "python") {
@@ -260,7 +264,7 @@ function setup(element: HTMLDivElement, language: string, theme: "light" | "dark
         showPrintMargin: false,
         wrap: false,
     })
-
+    shakeImportButton = shakeCallback
     initEditor()
     setupDone = true
 }
@@ -281,13 +285,13 @@ export const Editor = () => {
 
     useEffect(() => {
         if (!editorElement.current) return
-        setup(editorElement.current, language, theme, fontSize)
         const startShaking = () => {
             setShaking(false)
             setTimeout(() => setShaking(true), 0)
         }
+        setup(editorElement.current, language, theme, fontSize, startShaking)
         // Listen for events to visually remind the user when the script is readonly.
-        editorElement.current.onclick = startShaking
+        editorElement.current.onclick = () => setShaking(true)
         editorElement.current.oncut = editorElement.current.onpaste = startShaking
         editorElement.current.onkeydown = e => {
             if (e.key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(e.key)) {
