@@ -160,7 +160,7 @@ export async function login(username: string) {
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = addSharedScript
 
-    websocket.connect(username)
+    websocket.login(username)
     collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
@@ -275,7 +275,7 @@ export function clearUser() {
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
     }
-    websocket.disconnect()
+    websocket.logout()
 }
 
 export function isLoggedIn() {
@@ -296,16 +296,13 @@ export function shareWithPeople(shareid: string, users: string[]) {
     const data = {
         notification_type: "sharewithpeople",
         username: getUsername(),
+        sender: getUsername(),
         scriptid: shareid,
         // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
         users: users.map(id => ({ id, exists: true })),
     }
 
-    if (!websocket.isOpen) {
-        websocket.connect(getUsername(), () => websocket.send(data))
-    } else {
-        websocket.send(data)
-    }
+    websocket.send(data)
 }
 
 // Fetch a script by ID.
@@ -559,6 +556,15 @@ export async function renameScript(script: Script, newName: string) {
     return { ...script, name: newName }
 }
 
+// Get all active broadcasts
+export async function getBroadcasts() {
+    if (isLoggedIn()) {
+        return getAuth("/users/broadcasts")
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
+}
+
 // Get all users and their roles
 export async function getAdmins() {
     if (isLoggedIn()) {
@@ -596,6 +602,14 @@ export async function setPasswordForUser(username: string, password: string, adm
     }
     await postAuth("/users/modifypwdadmin", data)
     userNotification.show("Successfully set a new password for " + username, "history", 3)
+}
+
+// Expires a broadcast using its ID
+export async function expireBroadcastByID(id: string) {
+    if (!isLoggedIn()) {
+        throw new Error("Login failure")
+    }
+    await getAuth("/users/expire", { id })
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
@@ -675,8 +689,11 @@ export async function createScript(scriptname: string) {
     return script
 }
 
-export async function uploadCAIHistory(project: string, node: any) {
-    const data = { username: getUsername(), project, node: JSON.stringify(node) }
+export async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
+    const data: { [key: string]: string } = { username: getUsername(), project, node: JSON.stringify(node) }
+    if (sourceCode) {
+        data.source = sourceCode
+    }
     await post("/studies/caihistory", data)
     console.log("saved to CAI history:", project, node)
 }

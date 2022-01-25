@@ -775,11 +775,11 @@
         }
       }
     },
-    "setTempo": {
+    "setTempo1": {
       "description": "Establece el tempo del proyecto.",
       "parameters": {
         "tempo": {
-          "description": "El tempo del proyecto en pulsaciones por minuto (PPM). El tempo mínimo es 45. El tempo máximo es 220."
+          "description": "El tempo del proyecto en pulsaciones por minuto (PPM). El tempo mínimo es 45 PPM. El tempo máximo es 220 PPM."
         }
       }
     },

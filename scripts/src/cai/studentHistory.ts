@@ -6,8 +6,8 @@ import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import store from "../reducers"
 import * as scriptsState from "../browser/scriptsState"
-import * as caiStudent from "./student"
-import * as caiStudentPreferenceModule from "./studentPreferences"
+import * as student from "./student"
+import * as studentPreferences from "./studentPreferences"
 
 let aggregateScore: { [key: string]: number } = {}
 let curriculumPagesViewed: string[] = []
@@ -29,17 +29,17 @@ export function trackEvent(eventName: string) {
 
 function incrementCodeRequest() {
     codeRequests += 1
-    caiStudent.updateModel("preferences", { codeRequests: codeRequests })
+    student.updateModel("preferences", { codeRequests: codeRequests })
 }
 
 function incrementSoundRequest() {
     soundRequests += 1
-    caiStudent.updateModel("preferences", { soundRequests: soundRequests })
+    student.updateModel("preferences", { soundRequests: soundRequests })
 }
 
 function incrementErrorRequest() {
     errorRequests += 1
-    caiStudent.updateModel("preferences", { errorRequests: errorRequests })
+    student.updateModel("preferences", { errorRequests: errorRequests })
 }
 
 export function calculateAggregateCodeScore() {
@@ -136,14 +136,14 @@ export function addScoreToAggregate(script: string, scriptType: string) {
     } else if (newOutput.userFunc === "ReturnAndArgs") {
         newOutput.userFunc = 4
     }
-    caiStudentPreferenceModule.runCode(newOutput)
+    studentPreferences.runCode(newOutput)
     // update aggregateScore
     for (const i in aggregateScore) {
         if (newOutput[i] > aggregateScore[i]) {
             aggregateScore[i] = newOutput[i]
         }
     }
-    caiStudent.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput })
+    student.updateModel("codeKnowledge", { aggregateComplexity: aggregateScore, currentComplexity: newOutput })
 }
 
 // called when the student accesses a curriculum page from broadcast listener in caiWindowDirective
@@ -153,7 +153,7 @@ export function addCurriculumPage(page: any) {
     }
     if (!curriculumPagesViewed.includes(page)) {
         curriculumPagesViewed.push(page)
-        caiStudent.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed })
+        student.updateModel("codeKnowledge", { curriculum: curriculumPagesViewed })
     }
 }
 

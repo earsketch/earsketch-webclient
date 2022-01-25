@@ -13,6 +13,7 @@ import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
+import * as cai from "../cai/caiState"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -173,7 +174,16 @@ export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
+    const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
+
+    if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
+        useEffect(() => {
+            if (!pageTitle?.includes("Loading")) {
+                dispatch(cai.curriculumPage([location, pageTitle]))
+            }
+        }, [location, pageTitle])
+    }
 
     return (
         <div className="flex items-center p-3 text-2xl">

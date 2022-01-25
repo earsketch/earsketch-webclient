@@ -1,12 +1,14 @@
 import { Ace, Range } from "ace-builds"
 import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { importScript, reloadRecommendations } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
+import * as caiDialogue from "../cai/dialogue"
+import * as caiStudentPreferences from "../cai/studentPreferences"
 import * as collaboration from "../app/collaboration"
 import * as config from "./editorConfig"
 import * as editor from "./ideState"
@@ -39,8 +41,9 @@ export function getValue() {
 }
 
 export function setReadOnly(value: boolean) {
-    ace.setReadOnly(value)
-    droplet.setReadOnly(value)
+    const wizard = cai.selectWizard(store.getState()) && tabs.selectActiveTabScript(store.getState())?.collaborative
+    ace.setReadOnly(value ||= wizard)
+    droplet.setReadOnly(value ||= wizard)
 }
 
 export function setFontSize(value: number) {
@@ -145,6 +148,8 @@ export function clearErrors() {
     }
 }
 
+let firstEdit: number | null = null
+
 function setupAceHandlers(ace: Ace.Editor) {
     ace.on("changeSession", () => callbacks.onChange?.())
 
@@ -153,9 +158,8 @@ function setupAceHandlers(ace: Ace.Editor) {
     ace.on("change", (event) => {
         callbacks.onChange?.()
 
-        const t = Date.now()
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.keyStroke([event.action, event.lines, t]))
+            caiStudentPreferences.addKeystroke(event.action)
         }
 
         if (collaboration.active && !collaboration.lockEditor) {
@@ -182,11 +186,17 @@ function setupAceHandlers(ace: Ace.Editor) {
             clearTimeout(recommendationTimer)
         }
 
+        if (firstEdit === null) {
+            firstEdit = Date.now()
+            caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
+        }
         recommendationTimer = window.setTimeout(() => {
             reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
+                caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
             }
+            firstEdit = null
         }, 1000)
 
         // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
@@ -267,16 +277,32 @@ export const Editor = () => {
     const language = ESUtils.parseLanguage(activeScript?.name ?? ".py")
     const scriptID = useSelector(tabs.selectActiveTabID)
     const modified = useSelector(tabs.selectModifiedScripts).includes(scriptID!)
+    const [shaking, setShaking] = useState(false)
 
     useEffect(() => {
         if (!editorElement.current) return
         setup(editorElement.current, language, theme, fontSize)
+        const startShaking = () => {
+            setShaking(false)
+            setTimeout(() => setShaking(true), 0)
+        }
+        // Listen for events to visually remind the user when the script is readonly.
+        editorElement.current.onclick = startShaking
+        editorElement.current.oncut = editorElement.current.onpaste = startShaking
+        editorElement.current.onkeydown = e => {
+            if (e.key.length === 1 || ["Enter", "Backspace", "Delete", "Tab"].includes(e.key)) {
+                startShaking()
+            }
+        }
+
         const observer = new ResizeObserver(() => droplet.resize())
         observer.observe(editorElement.current)
         return () => {
             editorElement.current && observer.unobserve(editorElement.current)
         }
     }, [editorElement.current])
+
+    useEffect(() => setShaking(false), [activeScript])
 
     useEffect(() => ace?.setTheme(ACE_THEMES[theme]), [theme])
 
@@ -346,7 +372,7 @@ export const Editor = () => {
         <div ref={editorElement} id="editor" className="code-container">
             {/* import button */}
             {activeScript?.readonly && !embedMode &&
-            <div className="absolute top-4 right-0" onClick={() => importScript(activeScript)}>
+            <div className={"absolute top-4 right-0 " + (shaking ? "animate-shake" : "")} onClick={() => importScript(activeScript)}>
                 <div className="btn-action btn-floating">
                     <i className="icon icon-import"></i><span>{t("importToEdit").toLocaleUpperCase()}</span>
                 </div>
