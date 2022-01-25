@@ -267,10 +267,8 @@ export async function getLockedSharedScriptId(shareid: string) {
     return (await get("/scripts/lockedshareid", { shareid })).shareid
 }
 
-// Delete a user saved to local storage. I.e., logout.
+// Delete a user saved to local storage (logout).
 export function clearUser() {
-    store.dispatch(scriptsState.resetRegularScripts())
-    store.dispatch(scriptsState.resetSharedScripts())
     localStorage.clear()
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
