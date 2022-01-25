@@ -5,7 +5,7 @@ import storage from "redux-persist/es/storage"
 import { RootState } from "../reducers"
 
 export interface Notification {
-    message: { text: string, json?: string, action?: string, hyperlink?: string }
+    message: { text: string, json?: string, action?: string, hyperlink?: string, expiration?: string }
     // eslint-disable-next-line camelcase
     notification_type: string
     time: number
