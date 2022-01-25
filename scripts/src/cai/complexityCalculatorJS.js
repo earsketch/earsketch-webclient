@@ -81,17 +81,44 @@ export function analyzeJavascript(source) {
         ccHelpers.lineDict()
         //caiErrorHandling.updateNames(ccState.getProperty("allVariables"), ccState.getProperty("userFunctionParameters"))
         var outObj = Object.assign({}, resultsObject.codeFeatures);
-        outObj["depth"] = resultsObject.depth;
-        return outObj;
+        outObj.conditionals.usedInConditionals = outObj.conditionals.usedInConditionals.join("&")
+        
+        let breadthIn = {breadth: 0}
+        addUpBreadth(outObj, breadthIn)
+ 
+        
+        outObj["depth"] = resultsObject.depth
+        outObj["depthAvg"] = resultsObject.depthAvg
+        outObj["breadth"] = breadthIn.breadth
+        //outObj["depthAvg"] = resultsObject["depthAvg"]
+        return JSON.stringify(outObj);
     }
     catch (e) {
         return "ERROR"
     }
 }
 
+
+function addUpBreadth(resultsObj, breadthItem) {
+    if(typeof resultsObj === "number" && resultsObj > 0){
+        breadthItem.breadth += 1
+    }
+    else if(!Array.isArray(resultsObj) && typeof resultsObj === "object"){
+        let keys = Object.keys(resultsObj)
+        for (let i = 0; i < keys.length; i++) {
+            let childObj = resultsObj[keys[i]]
+            addUpBreadth(childObj, breadthItem)
+        }
+    }
+}
+
 // fun javascript conversion times
 function convertASTTree(AstTree) {
     const bodyItems = []
+    
+    if (AstTree.body[0].type === "ExpressionStatement" && AstTree.body[0].expression.type === "Literal" && AstTree.body[0].expression.value === "use strict") {
+        AstTree.body.shift()
+    }
     for (const i in AstTree.body) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)

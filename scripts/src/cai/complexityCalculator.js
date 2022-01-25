@@ -1070,6 +1070,7 @@ function doComplexityOutput(results, rootAst) {
     countStructuralDepth(structure, depthObj, null, depthCounter)
 
     results.depth = depthObj.depth
+    
     results.codeStructure = structure
 
     let depthTotal = 0
@@ -1079,7 +1080,9 @@ function doComplexityOutput(results, rootAst) {
     }
 
     results["depthAvg"] = depthTotal / depthCounter.length
-
+    if (results.depthAvg > 1.53 && results.depthAvg < 1.54) {
+        console.log("SCREAM")
+    }
     // if (results.depth > 3) {
     //     results.depth = 3
     // }
@@ -1105,7 +1108,7 @@ function countStructuralDepth(structureObj, depthCountObj, parentObj, depthArray
 
     if (structureObj.children && structureObj.children.length > 0) {
         for (const item of structureObj.children) {
-            countStructuralDepth(item, depthCountObj, structureObj)
+            countStructuralDepth(item, depthCountObj, structureObj, depthArray)
         }
     }
 }
@@ -1308,7 +1311,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
             firstParent = firstParent.parent
 
             if (nameObj.name !== "" && node.lineno >= nameObj.start && node.lineno <= nameObj.end) {
-                isRecursive = true
+                // isRecursive = true
                 break
             }
 
@@ -1320,7 +1323,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
         }
 
         if (isRecursive) {
-            // handle
+            /*   // handle
             if (node.func._astname !== "Name") {
                 returnObject.id = node._astname
                 return returnObject
@@ -1339,7 +1342,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
             returnObject.id = "functionCall"
             // dummy node for accurate depth count
             returnObject.children.push({ id: "functionCall", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: returnObject })
-        } else {
+        */ } else {
             // find the function
             if (node.func._astname !== "Name") {
                 returnObject.id = node._astname
@@ -1360,7 +1363,7 @@ function buildStructuralRepresentation(nodeToUse, parentNode, ast) {
             returnObject.id = "functionCall"
             if (funcObj.functionBody) {
                 for (const item of funcObj.functionBody) {
-                    returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
+                    // returnObject.children.push(buildStructuralRepresentation(item, returnObject, ast))
                 }
             }
         }

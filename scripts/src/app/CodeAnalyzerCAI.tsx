@@ -125,12 +125,12 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     script.source_code = script.source_code.split("\"\"").join("\"");
                 }
                 if (script.name.includes(".js")) {
-                    reports["COMPLEXITY"]["complexity"] = JSON.stringify(caiAnalysisModule.analyzeCode("javascript", script.source_code)).split(",").join("|")
+                    reports["COMPLEXITY"]["complexity"] = JSON.stringify(caiAnalysisModule.analyzeCode("javascript", script.source_code))// .split(":").join(",")// .split(",").join("|")
                 } else {
                     while (script.source_code.startsWith("\"")) {
                         script.source_code = script.source_code.substring(1);
                     }
-                    reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("python", script.source_code).split(",").join("|")
+                    reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("python", script.source_code)// .split(":").join(",")// .split(",").join("|")
                 }
                 console.log(reports["COMPLEXITY"])
             }

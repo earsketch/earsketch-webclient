@@ -19,6 +19,18 @@ function generateAst(source_code) {
     }
 }
 
+function addUpBreadth(resultsObj, breadthItem) {
+    if(typeof resultsObj === "number" && resultsObj > 0){
+        breadthItem.breadth += 1
+    }
+    else if(!Array.isArray(resultsObj) && typeof resultsObj === "object"){
+        let keys = Object.keys(resultsObj)
+        for (let i = 0; i < keys.length; i++) {
+            let childObj = resultsObj[keys[i]]
+            addUpBreadth(childObj, breadthItem)
+        }
+    }
+}
 // Analyze the source code of a Python script.
 export function analyzePython(source_code) {
 
@@ -83,8 +95,17 @@ export function analyzePython(source_code) {
        // ccHelpers.lineDict();
         //return outStr;
         var outObj = Object.assign({}, resultsObject.codeFeatures);
-        outObj["depth"] = resultsObject.depth;
-        return outObj;
+        outObj.conditionals.usedInConditionals = outObj.conditionals.usedInConditionals.join("&")
+       
+       // outObj["depthAvg"] = resultsObject["depthAvg"]
+       let breadthIn = {breadth: 0}
+       addUpBreadth(outObj, breadthIn)
+
+       
+       outObj["depth"] = resultsObject.depth
+       outObj["depthAvg"] = resultsObject.depthAvg
+       outObj["breadth"] = breadthIn.breadth
+        return JSON.stringify(outObj);
     }
     catch (error) {
         return "ERROR";
