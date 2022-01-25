@@ -113,7 +113,7 @@
     "formFieldPlaceholder.emailOptional": "ᖃᕆᑕᐅᔭᒥ ᑐᕌᕈᑏᑦ (ᐊᑐᕈᒪᒍᖕᓂ)",
     "formFieldPlaceholder.firstName": "ᐊᑏᑦ ᓯᕗᓪᓕ",
     "formFieldPlaceholder.lastName": "ᐊᑏᑦ ᑭᖑᓪᓕᖅ",
-    "formFieldPlaceholder.oldPassword": "ᓄᑕᐅᖏᑐᖅ ᐃᓯᕈᖕᓇᐅᑏᑦ",
+    "formFieldPlaceholder.currentPassword": "Verify your current password",
     "formFieldPlaceholder.newPassword": "ᓄᑖᖅ ᐃᑎᕈᖕᓇᐅᑏᑦ",
     "formFieldPlaceholder.confirmNewPassword": "ᐊᖏᕐᓗᒍ ᓄᑖᖅ ᐃᑎᕈᖕᓇᐅᑏᑦ",
     "formFieldPlaceholder.typeDescriptionHere": "ᐅᖃᐅᓯᖓ ᑎᑎᕋᕐᓗᒍ",
@@ -231,7 +231,23 @@
     "curriculum.toc": "ᐃᓗᓕᖏᑦ",
     "curriculum.previousPage": "ᒪᒃᐱᐅᓚᐅᖅᑐᖅ",
     "curriculum.nextPage": "ᓄᑕᖅ ᒪᒃᐱᖅ",
-    "curriculum.copyURL": "ᐊᔨᓕᐅᕐᓗᒍ ᖃᕆᑕᐅᔭᒥ ᑕᑯᔪᑎᖓ URL"
+    "curriculum.copyURL": "ᐊᔨᓕᐅᕐᓗᒍ ᖃᕆᑕᐅᔭᒥ ᑕᑯᔪᑎᖓ URL",
+    "shortcuts.run": "Run script",
+    "shortcuts.save": "Save script",
+    "shortcuts.undo": "Undo",
+    "shortcuts.redo": "Redo",
+    "shortcuts.comment": "Comment code",
+    "shortcuts.autocomplete": "Autocomplete",
+    "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
+    "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "hardware.ctrl": "Ctrl",
+    "hardware.cmd": "Cmd",
+    "hardware.shift": "Shift",
+    "hardware.alt": "Alt",
+    "hardware.option": "Option",
+    "hardware.enter": "Enter",
+    "hardware.space": "Space",
+    "hardware.wheel": "Mouse Wheel"
   },
   "bubble": {
     "userLanguage": "ᐅᖃᐅᓯᖓ",
@@ -295,12 +311,7 @@
       "allscriptscloud": "ᑕᒪᕐᒥᒃ ᐊᓯᐅᑕᐃᓕᔪᑎᖃᖏᑐᑦ ᐃᓕᔭᐅᓯᒪᓕᖅᐳᑦ ᑲᓚᐅᑦ ᑐᖁᐃᕕᖓᓐᓄᑦ.",
       "badsharelink": "ᑕᒻᒫᔭᕐᓂᕋᖅᑐᖅ ᐅᒃᑯᐃᕐᓂᖕᓂᐊᕐᓗᓐᓂ ᑎᑎᖃᒻᒥᒃ ᐅᖃᒐᒃᓴᒻᒥᒃ. ᖃᕆᑕᐅᔭᒻᒥ ᑎᑎᕋᖅᓯᒪᓂᖓ ᑕᒻᒫᔭᖅᓯᒪᓇᕐᓕᐊᖅ.",
       "scriptcopied": "ᑎᑎᖃᖅ ᐅᖃᒐᒃᓴᑦ ᐊᔪᕈᑎᖃᕐᖏᓗᓐᓂ ᐊᔪᖃᖅᓯᔭᐅᕗᖅ.",
-      "teachersLink": "ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨᑉ ᐊᑐᕈᑎᖓ ᑐᒃᓯᕋᕐᒪᑦ ᐊᑎᕐᓂᒃ ᖃᕆᑕᐅᔭᑯᑦ ᑐᕌᕈᑎᖓᓐᓂ ᐃᑎᕐᓂᐊᕐᓗᓐᓂ ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨᑉ ᖃᕆᑕᐅᔭᑰᕈᑎᖓᓐᓄᑦ. ᑕᑉᑯᐊ ᑐᒃᓯᕋᒐᐅᔪᑦ ᐊᑐᐃᓐᓇᕈᖅᑎᕐᓂᐊᖅᐸᑎᑦ ᐋᕿᒃᓱᐃᕕᖕᒥ ᐅᕙᓐᓂ ᐊᑐᕈᑎᖓᑕ ᐊᓯᖏᓐᓂᒃ ᓂᕈᐊᒐᒃᓴᑦ.",
-      "infoRequired": "ᓯᕗᓪᓕᖅ ᐊᑎᖓ, ᑭᖑᓪᓕᖅ ᐊᑎᖓ, ᐊᒻᒪ ᑐᕌᕈᑎᖓ ᖃᕆᑕᐅᔭᑯᑦ ᐊᑐᕆᐊᓖᑦ ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨ ᐱᑖᕈᐊᕐᓂᖅᐸᑦ ᐊᑐᕈᑎᖓᓐᓂᒃ.",
-      "emailConflict": "ᓄᑕᖑᖅᑎᖏᑐᖅ ᐊᑐᖅᑎᐅᔪᑉ ᐃᑎᕈᑎᖓ. ᑎᑎᖃᑎᑦ ᖃᐅᔨᒋᐊᓗᒋᑦ ᐊᑐᒐᐅᖏᒪᖔᑦ ᐊᑎᖏᓐᓄᑦ EarSketch ᐃᑎᕈᖕᓇᐅᒻᒧᑦ. (ᐅᓇᑐᑦ: ᐊᐅᓚᔨᖏᑯᕕᑦ ᐊᑐᕈᓇᐅᑎᖃᖅᑐᒻᒥᒃ, ᖃᕆᑕᐅᔭᐃᑦ ᓄᖃᓚᐅᕐᓗᒍ ᐊᒪ ᐱᒋᐊᓕᓵᕐᓗᑎᑦ  -> ᐳᐃᒍᖅᐱᐅᒃ ᑭᓯᕕᑦ ᐃᑎᕈᖕᓇᐅᑎᖓ? ᐊᑐᒐᐅᔪᓪᓗᐊᖅᑐᖅ. ᖃᕆᑕᐅᔭᑯᑦ ᑎᑎᖃᓂᒃ ᑕᑯᔪᑎᑦ ᐊᑐᕐᓗᒍ.",
-      "teacherSiteLoginError": "ᑕᒻᒫᔭᖅᑐᖅ ᑕᑯᔪᑎᖓᓐᓂᒃ ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨᑉ ᖃᕆᑕᐅᔭᒻᒥ! ",
-      "promptFixAtTeacherSite": ". ᐊᑐᖅᑎᐅᔪᑉ ᑎᑎᕋᖅᑕᖏᑦ ᐊᓯᐊᖑᕆᐊᕐᓗᒋᑦ ᖃᕆᑕᐅᔭᒻᒥ ᐊᓯᐊᖑᕈᑎᖓᓐᓂ.",
-      "teachersPageNoAccess": "ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨᑉ ᖃᕆᑕᐅᔭᒧᐊᕐᓂᐊᕐᓗᓐᓂ ᐊᑐᕈᑎᖓᓐᓂᒃ ᐱᖃᕆᐊᖃᖅᐳᑎᑦ ᐊᑐᕈᒪᓐᓂᕈᖕᓂ. ᑐᒃᓯᕋᕈᖕᓇᖅᐳᑎᑦ ᐱᑖᕈᐊᕐᓗᑎᑦ ᑐᓴᐅᖅᑎᑦᓯᔪᒻᒥ."
+      "emailConflict": "ᓄᑕᖑᖅᑎᖏᑐᖅ ᐊᑐᖅᑎᐅᔪᑉ ᐃᑎᕈᑎᖓ. ᑎᑎᖃᑎᑦ ᖃᐅᔨᒋᐊᓗᒋᑦ ᐊᑐᒐᐅᖏᒪᖔᑦ ᐊᑎᖏᓐᓄᑦ EarSketch ᐃᑎᕈᖕᓇᐅᒻᒧᑦ. (ᐅᓇᑐᑦ: ᐊᐅᓚᔨᖏᑯᕕᑦ ᐊᑐᕈᓇᐅᑎᖃᖅᑐᒻᒥᒃ, ᖃᕆᑕᐅᔭᐃᑦ ᓄᖃᓚᐅᕐᓗᒍ ᐊᒪ ᐱᒋᐊᓕᓵᕐᓗᑎᑦ  -> ᐳᐃᒍᖅᐱᐅᒃ ᑭᓯᕕᑦ ᐃᑎᕈᖕᓇᐅᑎᖓ? ᐊᑐᒐᐅᔪᓪᓗᐊᖅᑐᖅ. ᖃᕆᑕᐅᔭᑯᑦ ᑎᑎᖃᓂᒃ ᑕᑯᔪᑎᑦ ᐊᑐᕐᓗᒍ."
     },
     "download": {
       "script": "ᓇᓗᓇᐃᑯᑕᓕᐊᑦ ᑎᑎᖃᑦ ᐃᓚᖓᓐᓄᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᓕᐅᕐᓗᒍ ᐃᑭᐊᖅᓯᕕᖕᓄᑦ.",
@@ -406,6 +417,7 @@
       "effectConstant": "ᐊᒃᑐᐃᓂᖓᓐᓄᑦ ᑲᔪᓰᓐᓇᖅᑐᖅ",
       "effectParameterConstant": "ᐊᒃᑐᐃᓂᖏᑦ ᑭᒡᓕᖃᕐᕕᖏᑕ ᑲᔪᓰᓐᓇᖅᑐᖅ ",
       "float": "ᐳᒃᑕᓛᑉᓗᓂ",
+      "floatOptional": "Float, Optional",
       "array": "ᑲᑎᖅᓱᐊᑦ",
       "integer": "ᓈᓴᐅᑎᖓ",
       "listArray": "ᑎᑎᖃᑦ/ᑲᑎᖅᓱᐊᑦ",
@@ -420,10 +432,10 @@
     "analyze": {
       "description": "ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᖃᐅᔨᓴᕐᓂᐊᕐᓗᓐᓂ ᓂᐱᐅᑉ ᑐᖁᕈᑎᖓᓐᓂᒃ ᓇᓗᓇᐃᖅᑕᐅᓯᒪᔪᒻᒥᒃ.",
       "parameters": {
-        "audioFile": {
+        "sound": {
           "description": "ᓂᐱᐅᑉ ᑐᖁᐃᔪᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᒃ, ᑕᒻᓇᐅᑉᓗᓐᓂ ᑲᔪᓰᓐᓇᖅᑐᖅ ᓂᐱᓐᓂᒃ ᑐᓵᔪᑎᖓ ᖃᕆᑕᐅᔭᒻᒥ."
         },
-        "featureForAnalysis": {
+        "feature": {
           "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
         }
       },
@@ -434,17 +446,17 @@
     "analyzeForTime": {
       "description": "ᐊᑐᓱᖅᑐᖅ ᖃᐅᔨᓴᕐᓂᐊᕐᓗᓐᓂ ᓂᐱᖓᓐᓂᒃ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᒃ ᐃᓕᖁᓯᖓᓐᓂᒃ, ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᐊᒪ ᐃᓱᓕᑉᕕᖓᓐᓄᑦ ᖃᑉᓯᐅᓂᖏᓐᓂᒃ.",
       "parameters": {
-        "audioFile": {
-          "description": "ᓂᐱ ᑐᖁᕈᑎᖓ ᖃᐅᔨᓴᕐᓂᐅᑉ, ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᖃᕆᑕᐅᔭᒥ ᓂᐱᓐᓂᒃ ᑐᓵᔪᒻᒥᑦ."
+        "sound": {
+          "description": "ᓂᐱᐅᑉ ᑐᖁᐃᔪᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᒃ, ᑕᒻᓇᐅᑉᓗᓐᓂ ᑲᔪᓰᓐᓇᖅᑐᖅ ᓂᐱᓐᓂᒃ ᑐᓵᔪᑎᖓ ᖃᕆᑕᐅᔭᒻᒥ."
         },
-        "featureForAnalysis": {
+        "feature": {
           "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
         },
-        "startTime": {
-          "description": "ᐱᒋᐊᕐᕕᖓ ᖃᐅᔨᓴᕆᐊᕐᓂᐅᑉ"
+        "sliceStart": {
+          "description": "Start location within the sound to begin analysis"
         },
-        "endTime": {
-          "description": "ᐃᓱᖓᑕ ᓇᓂᓯᐅᕐᓂᖓ ᖃᐅᔨᓴᕐᓂᖅ ᐱᐊᓂᖁᓗᒍ"
+        "sliceEnd": {
+          "description": "End location within the sound to end analysis"
         }
       },
       "returns": {
@@ -454,10 +466,10 @@
     "analyzeTrack": {
       "description": "ᑕᒻᓇ ᖃᐅᔨᓴᖅᐸᒃᑐᖅ ᑕᒪᐃᓐᓂᒃ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒥᒃ ᓇᓗᓇᐃᖅᑕᐅᓯᒪᔪᒻᒥᒃ ᐃᓕᖁᓯᖓᓐᓂᒃ.",
       "parameters": {
-        "trackNumber": {
+        "track": {
           "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᐅᑉ."
         },
-        "featureForAnalysis": {
+        "feature": {
           "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
         }
       },
@@ -468,17 +480,17 @@
     "analyzeTrackForTime": {
       "description": "ᑕᒻᓇ ᖃᐅᔨᓴᕐᓂᖅ ᓂᐱᒻᒥᒃ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᒃ ᖃᐅᔨᓴᓱᖅᐳᖅ ᐱᒋᐊᕐᕕᖓᓐᓂ ᐊᒻᒪ ᐃᓱᐊᓐᓂᒃ ᑕᑭᓂᖓᓐᓂ.",
       "parameters": {
-        "trackNumber": {
-          "description": "ᓂᐱᓕᐅᖅᓯᒪᔪᑉ ᓈᓴᐅᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᒃ."
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᐅᑉ."
         },
-        "featureForAnalysis": {
-          "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓕᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
+        "feature": {
+          "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
         },
-        "startTime": {
-          "description": "ᐱᒋᐊᕐᕕᖓ ᖃᐅᔨᓴᕐᓂᐅᑉ"
+        "start": {
+          "description": "Start location within the track to begin analysis"
         },
-        "endTime": {
-          "description": "ᐃᓱᖓᑕ ᓇᓂᓯᐅᕐᓂᖓ ᖃᐅᔨᓴᕐᓂᖅ ᐃᓱᓕᔪᑎᖓᑕ"
+        "end": {
+          "description": "End location within the track to end analysis"
         }
       },
       "returns": {
@@ -488,13 +500,13 @@
     "createAudioSlice": {
       "description": "ᓂᐱᒻᒥᒃ ᐅᑎᖅᑎᑦᓯᑉᓗᓐᓂ ᐊᕕᒃᓯᒪᓂᖓᑕ ᐊᑐᒐᐅᓚᐅᖅᑐᒻᒥᑦ ᓂᐱᓕᐅᕐᓂᑯᒻᒥᑦ.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "ᓂᐱᒻᒧᑦ ᑐᖁᐃᕕᒃ ᐱᒋᐊᕈᑎᖓᓐᓂᒃ ᐊᕕᒃᓯᒪᔪᒻᒥᒃ. ᑕᒻᓇ ᐊᑐᓱᖅᑐᖅ ᓂᐱᒻᒧᑦ ᖃᐅᔨᓴᕈᒻᒥᒃ ᖃᕆᑕᐅᔭᒻᒥ."
         },
-        "startPosition": {
+        "sliceStart": {
           "description": "ᐱᒋᐊᕐᕕᖓ ᐊᕕᒃᓯᒪᔫᑉ."
         },
-        "endPosition": {
+        "sliceEnd": {
           "description": "ᐃᓱᐊ ᐃᓂᖃᕐᕕᖓᑕ ᐊᕕᒃᓯᒪᔫᑉ."
         }
       },
@@ -505,7 +517,7 @@
     "dur": {
       "description": "ᑕᑭᓂᖓ ᐅᑎᖅᑎᑕᐅᑉᓗᓐᓂ ᓂᐱᐅᑉ ᑐᖁᐃᔪᑎᖓ ᐆᒃᑐᕋᐅᑎᓐᓄᑦ.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "ᓂᐱᐅᑉ ᑐᖁᕐᕕᖓ ᑕᑭᓂᖓᑕ ᐃᓕᖁᓯᖓᓂᓯᐅᖅᐳᖅ. ᑕᒻᓇ ᖃᕆᑕᐅᔭᑯᑦ ᓂᐱᓐᓂᒃ ᐊᑐᕈᑎᓐᓂᒃ ᐊᑐᖅᐸᒃᑐᖅ."
         }
       },
@@ -519,24 +531,24 @@
     "fitMedia": {
       "description": "ᐃᓚᓯᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᖁᐃᕕᖓᓐᓂᒃ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᐱᒋᐊᕐᕕᖃᖅᑐᒻᒥᒃ ᐊᒻᒪ ᐃᓱᓕᑉᕕᖃᖅᑐᒻᒥᒃ. ᓂᐱᐅᑉ ᑐᖁᖅᑐᐃᕕᖓ ᐊᑐᑲᓂᕐᓂᐊᖅᐳᖅ ᓄᖃᖅᑎᑕᐅᓗᓂᓗᓐᓂᑦ ᐃᓂᖃᑎᐊᖁᑉᓗᒍ ᑕᑭᓂᖓ.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "ᓂᐱᑉ ᑐᖁᖅᓯᒪᕕᖓ ᓂᐱᐅᕐᓂᑯᒻᒥ, ᐱᒋᐊᕐᕕᖃᓱᖅᑐᖅ ᖃᕆᑕᐅᔭᒥ ᓂᐱᓐᓂᒃ ᑐᓴᔾᔪᒥᑦ"
         },
-        "trackNumber": {
+        "track": {
           "description": "ᓂᐱᑉ ᓈᓴᐅᑎᖓ ᐃᓕᔭᐅᓗᓐᓂ ᓂᐱᐅᑉ ᑐᖁᖅᓯᒪᕕᖓ ᐃᓗᐊᓐᓂ"
         },
-        "startLocation": {
-          "description": "ᓇᓂᓯᐅᕐᓂᖓ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᓂᐱᐅᑉ ᐱᒋᐊᕐᓗᓐᓂ (ᐅᓇᑐᑦ 1 ᐱᒋᐊᕐᓂᐊᖅᑐᖅ ᐆᒃᑐᕋᐅᑎᖓᓐᓂᑦ 1)."
+        "start": {
+          "description": "Location within the track where the sound file will begin (e.g. 1 will start at the beginning of measure 1)."
         },
-        "endLocation": {
-          "description": "ᓇᓂᓯᐅᕐᓂᖓ ᓂᐱᑉ ᑐᖁᐃᕕᖓᑕ ᐃᓱᓕᓐᓂᐊᖅᑐᑉ (ᐅᓇᑐᑦ 5 ᓄᖃᕐᓂᐊᖅᑐᖅ ᓂᐱᐅᑉ ᑐᖁᐃᕕᖓᑕ ᐱᒋᐊᕐᕕᖓᓐᓄᑦ ᐆᒃᑐᕋᖅᓯᒪᔪᒻᒧᑦ 5)."
+        "end": {
+          "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
         }
       }
     },
     "importImage": {
       "description": "ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᐊᔨᒻᒥᒃ ᑕᑯᔪᒪᑉᓗᓐᓂ ᖃᕆᑕᐅᔭᒻᒥᑦ ᐊᒻᒪ ᒪᕈᐃᓕᖓᓕᕐᓗᒍ ᐊᕕᒃᓯᒪᓂᖓ/ᑎᑎᖃᖏᓪᓗ ᖃᑯᐊᖓᔪᖅ ᐅᕙᓗᓂᑦ ᐱᖓᓱᐃᓕᖓᓗᒍ ᑎᑎᕋᖅᓯᒪᓂᖏᑦ RGB ᑲᓚᖃᕐᓗᓐᓂ, ᐊᕿᒃᑕᐅᓯᒪᔪᖅ ᖃᑉᓯᐅᓂᖏᑦ ᐊᕙᓗᐃᑦ ᐊᒻᒪ ᑎᑯᓕᐊᖅᑐᑦ ᒪᓕᒡᓗᒋᑦ.",
       "parameters": {
-        "imageURL": {
+        "url": {
           "description": "ᖃᕆᑕᐅᔭᒻᒥ ᑐᕌᕈᑎᖓ ᐊᔨᑉ ᓇᓂᓯᐅᕐᓂᖓᑕ"
         },
         "nrows": {
@@ -557,7 +569,7 @@
     "importFile": {
       "description": "ᑕᒻᓇ ᐊᔪᖏᔪᑎᖓ ᑐᖁᖅᓯᒪᔪᑉ ᖃᕆᑕᐅᔭᒥ ᐊᒻᒪ ᐃᓗᓕᖏᑦ ᐊᒃᖢᓇᐅᔭᐅᑉᓗᑎᒃ.",
       "parameters": {
-        "fileURL": {
+        "url": {
           "description": "ᖃᕆᑕᐅᔭᒻᒥ ᓇᓂᓯᐅᕐᓂᖓ ᑐᖁᖅᓯᒪᔪᖅ"
         }
       },
@@ -571,13 +583,13 @@
     "insertMedia": {
       "description": "ᐃᓕᓱᖅᑐᖅ ᑕᒪᕐᒥᒃ ᓂᐱᓐᓂᒃ ᑐᖁᕐᕕᖓᓐᓄᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᑦ.",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "ᓂᐱᖓᑕ ᑐᖁᕐᕕᖓ ᐃᓕᓐᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ, ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᓵᔪᑎᖓᓐᓄᑦ ᖃᕆᑕᐅᔭᒻᒥ"
         },
-        "trackNumber": {
-          "description": "ᓂᐱᖓᑕ ᓈᓴᐅᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐅᕗᖓ"
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐅᕗᖓ"
         },
-        "trackLocation": {
+        "start": {
           "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐱᒋᐊᕐᕕᖓᑕ ᓂᐱᐅᑉ ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ. (The ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᑐᓵᓐᓇᕐᓂᐊᖅᑐᖅ ᐊᑕᐅᓰᕐᓗᓐᓂ, ᐃᓱᐊ ᖃᐅᔨᓐᓇᕐᓗᓐᓂ ᐊᑭᓂᖓ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ.)"
         }
       }
@@ -585,19 +597,19 @@
     "insertMediaSection": {
       "description": "ᐃᓕᓱᖅᑐᖅ ᐃᓚᖓᓐᓂᒃ ᓂᐱᐅᑉ ᑐᖁᖅᑐᐃᕕᖓᓐᓄ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒧᑦ ᓇᓂᓯᐅᕐᓂᖓᓐᓂᒃ.",
       "parameters": {
-        "fileName": {
-          "description": "ᓂᐱᒻᒧᑦ ᑐᖁᖅᑐᐃᕕᒃ ᐃᓕᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᕐᕕᖕᒧᑦ, ᑕᒻᓇ ᖃᕆᑕᐅᔭᒃᑯᑦ ᑭᓯᐊᓐᓂ ᐃᓕᔭᕆᐊᖃᖅᐳᖅ"
+        "sound": {
+          "description": "ᓂᐱᖓᑕ ᑐᖁᕐᕕᖓ ᐃᓕᓐᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ, ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᓵᔪᑎᖓᓐᓄᑦ ᖃᕆᑕᐅᔭᒻᒥ"
         },
-        "trackNumber": {
+        "track": {
           "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐅᕗᖓ"
         },
-        "trackLocation": {
+        "start": {
           "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐱᖑᐊᕐᕆᐊᕐᖃᕕᖓᑕ ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ."
         },
-        "mediaStartLocation": {
+        "sliceStart": {
           "description": "ᓇᓂᓯᐅᕐᓂᖓᑕ ᐱᒋᐊᕐᕕᖓ ᐃᓗᐊᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐃᓚᖃᕐᓗᓐᓂ (ᐅᑯᐊᑐᑦ 1.0 ᐱᒋᐊᕈᑎᒋᓗᓂᐅᒃ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐊᒻᒪ 2.0 ᐆᒃᑐᕋᐅᑕᐅᓗᓐᓂ 2 ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ)."
         },
-        "mediaEndLocation": {
+        "sliceEnd": {
           "description": "ᐃᓱᖓᑕ ᓇᓂᓯᐅᕐᓂᖓ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐃᓚᖃᕐᓗᓐᓂ (ᐅᑯᐊᑐᑦ 2.0 ᐆᒃᑐᕋᖅᓯᒪᑉᓗᓐᓂ 2 ᓂᐱᖓᑕ ᑐᖁᖅᓯᒪᑉᕕᖓᓐᓂ)."
         }
       }
@@ -605,37 +617,37 @@
     "makeBeat": {
       "description": "ᓴᓇᔪᖕᓇᖅᑐᖅ ᓂᐱᒻᒥᒃ ᐊᑐᒐᐅᓂᐊᖅᑐᒻᒥᒃ ᐊᔨᖏᖏᑐᓐᓂᒃ ᑎᑎᖃᓐᓂᒃ ᐊᑐᕐᓗᓐᓂ. ᑕᑉᑯᐊ ᑎᑎᖃᑦ ᖃᓄᒥᐊᖅ ᑕᑭᓂᖃᕈᖕᓇᖅᐳᑦ. ᐃᓱᒪᕗᒍᑦ ᐊᕕᒃᓯᒪᓗᑎᒃ ᖃᑉᓯᐅᓂᖏ 16 (ᐅᑯᐊᑐᑦ 16, 32, 64, etc.), ᑕᑉᑯᐊ ᐊᔨᖏᒻᒥᒃ ᑕᑭᓂᖏᓐᓂᒃ ᐊᔪᖏᒻᒪᑕ (ᐊᑕᐅᓯᖅ ᑕᑭᓂᖓ 16 ᑎᑎᖃᑦ ᑕᑭᑎᒋᓗᑎᒃ).",
       "parameters": {
-        "fileName": {
+        "sound": {
           "description": "ᐊᑕᐅᓯᑐᐊᖅ ᓂᐱᒻᒧᑦ ᐃᓕᓯᔪᑦ ᑎᑎᖃᓪᓗᓂᑦ/ᐊᕕᒃᓯᒪᔪᑦ ᓂᐱᖓᑕ ᐃᓕᔪᑎᖓᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ ᐱᒋᐊᕈᑎᖃᕐᓗᓐᓂ"
         },
         "track": {
           "description": "ᓂᐱᖓᑕ ᐃᓕᔭᐅᕕᒋᓂᐊᖅᑕᖓ"
         },
-        "measure": {
-          "description": "ᐱᒋᐊᕐᕕᒋᓂᐊᖅᑕᖓ ᓂᐱᓕᐅᕐᓂᐊᕐᓗᓐᓂ"
+        "start": {
+          "description": "Location within the track to start pattern"
         },
-        "string": {
-          "description": "ᐊᒃᖢᓇᐅᔭᖓᑕ ᓇᓗᓇᐃᑯᑕᖓ ᐱᖑᐊᒐᐅᓂᐊᖅᑐᖅ. \"0\" ᐊᑐᒐᐅᑉᓗᓐᓂ ᓂᐱᑉ ᐃᓂᖃᕐᕕᖓ 16ᖓᓐᓂᑦ ᐱᒋᐊᕐᓗᓐᓂ. \"+\" ᑲᑎᑕᐅᑉᓗᑎᒃ (ᐅᓇᑐᑦ ᑲᔪᓯᔪᖅ ᓄᖃᖓᒥᐊᖅᑐᕐᓗ) ᓂᐱᑉ ᐃᓂᖃᕐᕕᖓᓐᓂᑦ ᐃᓚᑲᓂᖅᓯᒪᑉᓗᓐᓂ 16−ᖓᓂᒃ ᓂᐱᖃᕐᓂᖓᓐᓂᒃ \"-\" rests (ᐅᓇᑐᑦ ᓂᐱᖃᖏᓂᖃᖅᑐᖅ) 16−ᖓᓐᓂ ᓂᐱᑉ ᓇᓗᓇᐃᑯᑕᖓᓐᓂ. ᐃᓱᒪᒋᔭᐅᓂᖓ makeBeat ᑎᑎᖃᖏᑦ/ᑲᑎᑕᐅᓯᒪᔪᓪᓗ ᓂᐱᑦ, ᑕᒻᓇ \"0\" ᑎᑭᓪᓗᒍ \"9\" ᓂᐱᖃᕐᓂᐊᖅᐳᖅ ᑎᑎᖃᖏᓐᓂ/ᑲᑎᑕᐅᓯᒪᓂᖏᓂᓗ 16−ᖓᓐᓂ ᓂᐱᖃᕐᓂᖓᓐᓂ."
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
         }
       }
     },
     "makeBeatSlice": {
       "description": "ᓴᓇᔭᐅᓯᒪᔪᖅ ᓂᐱᖃᕐᓂᖏᓐᓂᒃ ᓇᓗᓇᐃᑯᑕᖃᖅᑐᑦ ᓂᐱᖏᑕ ᐱᒋᐊᕐᕕᖏᓐᓂᒃ ᐃᓗᐊᓐᓂᓯᐅᖅᑐᑦ ᓂᐱᐅᑉ ᐃᓂᖃᕐᕕᖓᑕ. ᐊᓯᖏᑎᑑᖏᑐᖅ makeBeat, ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᑭᓯᐊᓐᓂ ᓂᑉᔮᕆᐊᓱᖅᑐᑦ, makeBeatSlice ᐊᑐᕐᓗᒍ ᓴᓇᔫᓪᓗᐊᖅᐳᑎᑦ ᐊᔨᖏᖏᑐᓐᓂᒃ ᓂᐱᖃᖅᑎᓪᓗᒍ ᑭᓯᐊᓐᓂ ᐊᑕᐅᓯᕐᒥ ᐃᓂᖃᕐᕕᖓᓐᓂᒃ ᐊᑐᕐᓗᑎᑦ.",
       "parameters": {
-        "fileName": {
-          "description": "ᐊᑕᐅᓯᖅ ᓂᐱᖃᕐᓂᖓᑕ ᐃᓂᖃᕐᕕᖓ ᐃᓕᓯᒪᕗᖅ ᓂᐱᓐᓂᒃ ᑕᑯᓂᐊᕐᓗᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ"
+        "sound": {
+          "description": "A single sound file, typically this is a constant from the sound browser"
         },
         "track": {
           "description": "ᓂᐱᖃᕐᕕᖓᑕ ᐃᓕᔭᐅᕕᒋᓂᐊᖅᑕᖓ"
         },
-        "measure": {
-          "description": "ᐱᒋᐊᕐᓂᖓᑕ ᓇᓗᓇᐃᑯᑕᖓ"
+        "start": {
+          "description": "Location within the track to start pattern"
         },
-        "string": {
-          "description": "ᓂᐱᖓᑕ ᓇᓗᓇᐃᑯᑕᖓ ᑐᑭᖃᖅᑎᑕᐅᑉᓗᓐᓂ ᓂᐱᖃᕐᓂᖓᑕ ᑐᓵᓂᐊᕐᓗᒍ ᐱᖑᐊᖅᑎᑕᐅᑎᓪᓗᒍ. \"0\" ᐅᕗᖓ \"9\" ᑐᓵᓐᓇᖅᑐᖅ ᓂᐱᑉ ᐃᓂᖃᕐᕕᖓᓐᓂ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥ ᑎᑎᕋᖅᓯᒪᔪᑦ ᐊᑎᖏᓐᓂ ᓇᓂᓯᐅᕐᓂᖏᓐᓂ beatNumber ᑎᑎᖃᖏᑦ/ᓂᕈᐊᒐᐅᓯᒪᔪᑦ 16−ᖓᓐᓂ ᓂᐱᖃᕈᑎᖓᓐᓂ. \"+\" ties (ᐅᓇᑐᑦ ᑲᔪᓯᔪᖅ ᓄᖃᖓᒥᐊᖅᑐᕐᓗ) ᓂᐱᑉ ᐃᓂᖃᕐᕕᖓᓐᓂ ᐃᓚᓯᒪᑲᓂᖅᑐᑉ 16ᔾᖓᓐᓂᒃ ᓂᐱᖃᕐᓂᒥᖓᓐᓂᒃ. \"-\" ᓄᖃᖓᔪᖅ (ᐅᓇᑐᑦ ᓂᐱᖃᖏᑎᓪᓗᒍ) 16−ᖓᓐᓂ ᓂᐱᖃᕈᑎᖓᓐᓂ."
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
         },
-        "beatNumber": {
-          "description": "ᐊᑎᖏᑦ/ᑲᑎᓴᐅᒥᒪᔪᑦ ᐱᒋᐊᕐᕕᖏᑦ ᐃᓗᐊᓐᓂ ᓂᐱᖓᑕ ᐃᓂᖃᕐᕕᖓᓐᓂ (ᐅᓇᑐᑦ [1.0, 2.5] ᓴᕿᑎᑦᓯᑉᓗᓐᓂ ᓇᓂᓯᐅᕐᓂᖏᓐᓂᒃ ᐆᒃᑐᕋᐅᑎᖓᑦ 1 ᐊᒻᒪ ᐆᒃᑐᕋᐅᑎᖓᑦ 2.5 ᓂᐱᖓᑕ ᐃᓂᖃᕐᕕᖓᓐᓂ ᓂᑉᔮᕐᓂᖓᑕ ᓇᓗᓇᐃᑯᑕᖓᓐᓄᑦ \"0\" ᐊᒻᒪ \"1\" ᒪᓕᒃᑐᕋᐅᑉᓗᑎᒃ."
+        "sliceStarts": {
+          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
         }
       }
     },
@@ -669,8 +681,8 @@
     "replaceListElement": {
       "description": "ᐊᓯᐊᖑᓗᒃᑖᕐᓗᒋᑦ ᑎᑎᖃᑦ ᐊᕕᒃᓯᒪᓂᖏᓪᓗ ᓄᑕᓐᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᓐᓂᒃ.",
       "parameters": {
-        "inputList": {
-          "description": "ᑎᑎᖃᑐᖃᖏᑦ/ᐊᕕᒃᓯᒪᔪᑦ"
+        "list": {
+          "description": "Original list/array"
         },
         "elementToReplace": {
           "description": "ᐅᑯᐊ ᐊᓯᐊᖑᕆᐊᖃᖅᑐᑦ."
@@ -700,8 +712,8 @@
     "reverseList": {
       "description": "ᐅᑎᒻᒧᑦ ᐃᓗᓕᖏᑦ ᑎᑎᕋᕐᓗᒋᑦ ᑲᑎᑕᐅᓯᒪᔪᑦ.",
       "parameters": {
-        "inputList": {
-          "description": "ᑎᑎᖃᑦ/ᑭᖑᒻᒧᑦ ᐃᖏᕋᑎᓪᓗᒍ"
+        "list": {
+          "description": "List/array to reverse"
         }
       },
       "returns": {
@@ -711,8 +723,8 @@
     "reverseString": {
       "description": "ᐃᓕᖁᓯᑐᖃᖓᓐᓄᑦ ᐅᑎᖅᑎᓱᒪᓐᓂᕈᖕᓂ ᐊᕿᒃᑕᐅᓯᒪᔪᑦ.",
       "parameters": {
-        "inputString": {
-          "description": "ᐃᓕᖁᓯᖓᓐᓄᑦ ᐅᑎᖅᑎᓂᐊᓗᒍ"
+        "string": {
+          "description": "String to reverse"
         }
       },
       "returns": {
@@ -725,28 +737,28 @@
         "track": {
           "description": "ᓇᓗᓇᐃᑯᑕᖓ ᐃᓕᔭᐅᓯᒪᔪᑦ ᐅᑯᓄᖓ (ᐅᕙᓗᓂᑦ MIX_TRACK ᓂᐱᓕᐅᕐᓕᑯᓄᑦ ᐊᑐᒐᐅᖁᑉᓗᒍ)."
         },
-        "effectType": {
-          "description": "ᐊᒃᑐᐃᓂᖏᑦ ᐱᓕᑭᑕᐃᓐᓇᖅᑐᖅ: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, ᐅᕙᓘᓃᑦ WAH."
+        "type": {
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
         },
-        "effectParameter": {
-          "description": "ᑲᔪᓰᓐᓇᖅᑐᖅ ᑭᒡᓕᖃᕐᕕᖓ effectType ᓴᓇᓂᐊᕐᓗᓐᓂ ᐃᓂᖃᕐᕕᖓᓐᓂᒃ ᐅᕗᖓ. (ᑕᑯᓗᒍ <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>ᐊᒃᑐᐃᓂᓗᒃᑖᖏ ᐅᖃᐅᓯᐅᓯᒪᔪᑦ ᓇᓗᓇᐃᕐᖢᑎᒃ</a> ᐃᓕᓂᐊᕈᑎᑦ ᐃᓂᖃᕐᕕᖓᓐᓂ ᑎᑎᖃᓐᓂ ᐊᒃᑐᐃᓂᑦ ᑭᒡᓕᖃᕐᓂᖏᓐᓂ.)"
+        "parameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "effectList": {
-          "description": "ᑎᑎᖃᑦ/ᑲᑎᖅᓱᐊᑦ ᑭᔨᓕᖃᕐᓂᖏᓐᓄᑦ ᐊᑑᑎᖏᑕ (ᐅᑯᐊᑐᑦ [0.0, 5.3, -12])."
+        "list": {
+          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
         },
-        "measure": {
-          "description": "ᐱᒋᐊᕐᕕᖓ ᐆᒃᑐᕋᕐᓂᐊᕐᓗᒍ ᐋᖅᑭᒃᓯᒪᓂᖓ "
+        "start": {
+          "description": "Location within the track to start pattern"
         },
-        "beatString": {
-          "description": "ᓇᓗᓇᐃᑯᑕᖅ ᓂᐱᒋᓂᐊᖅᑕᖓᓐᓂᒃ ᓴᓇᓂᐊᕐᓗᓐᓂ ᐃᓕᖁᓯᕆᓂᐊᖅᑕᖓᓐᓂᒃ. \"0\" ᐅᕗᖓ \"9\" ᐊᑐᖅᑐᖅ ᑭᒡᓕᖃᕐᓂᖓᓐᓂᒃ ᓇᓗᓇᐃᒐᐅᓯᒪᔪᒻᒥᑦ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᑎᑎᖃᖏᓐᓂᑦ/ᑲᑎᖅᓱᐊᕐᓂᑦ 16−ᖓᑕ ᓂᐱᖓ ᐊᑐᒐᐅᓗᓐᓂ. \"+\" ties (ᐅᓇ ᐆᒃᑐᕋᐅᑕᐅᓗᓐᓂ ᐊᑐᐃᓐᓇᒥᐊᕐᓗᒍ ᐅᕙᓘᓃᑦ ᐱᐊᓂᖕᓂᓗᒥᐊᕐᓗᓐᓂ) ᑭᒡᓕᖃᕐᓂᖓᑕ ᐊᑐᕐᓂᖓ ᐃᓚᓯᒪᑲᓂᕐᓗᒍ 16−ᖓᓐᓂᒃ ᓂᐱᖓᓐᓂᒃ. \"-\" ᐊᒻᒧᒃᑕᕐᓂᖏ (ᐆᒃᑑᑎᒋᓗᒍ, ᐊᓯᐊᖑᖅᐸᓕᐊᓂᖓ ᐱᐊᓚᐃᑲᓗᐊᕐᖢᓐᓂ) ᑭᒡᓕᓕᑉᕕᖓᓐᓄᑦ 16−ᖓᓐᓂᑦ ᓂᐱᐅᑉ."
+        "beat": {
+          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
         }
       }
     },
     "selectRandomFile": {
       "description": "ᓇᑭᒥᐊᖅ ᐱᒋᐊᕐᕕᒋᓂᐊᖅᑕᖓᑕ ᓂᐱᒻᒥᒃ ᑐᖅᑯᐃᕝᕕᖓᓂᒃ.",
       "parameters": {
-        "folder": {
-          "description": " ᑐᖅᑯᐃᕝᕕᒃ ᓇᑭᒥᐊᖅ ᓂᐱᐅᑉ ᑐᖁᐃᕕᖓᓐᓂᑦ. ᓂᐱᐅᑉ ᕿᓂᕈᑎᖓᓐᓂᑦ ᐊᑐᒐᐅᔪᖅ (ᑐᖁᐃᕕᐅᑉ ᐊᑎᖓ, ᑭᓯᐊᓐᓂ ᑎᑎᖃᐅᑉ ᐊᑎᕆᖓᑕᖓ)."
+        "folderSubstring": {
+          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
         }
       },
       "returns": {
@@ -759,46 +771,63 @@
         "track": {
           "description": "ᓂᐱᐅᑉ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᐃᓕᔭᐅᓂᐊᖅᑐᖅ (ᐊᑯᑕᐅᓗᓂᓘᓐᓃᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᑕᒪᐃᓐᓄᑦ ᑐᓵᕐᓈᒐᐅᓂᐊᖅᑐᓐᓄᑦ)"
         },
-        "effectType": {
-          "description": "ᓂᐱᖏᑕ ᐃᓗᓕᖏᑦ: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, ᐅᕙᓘᓃᑦ WAH"
+        "type": {
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
         },
-        "effectParameter": {
-          "description": "ᓇᓗᓇᐃᕐᓂᓱᖅᐳᖅ ᑭᔨᓕᖃᕐᓂᖏᓐᓂᒃ ᐊᑐᖅᑕᐅᔪᑦ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᐃᓂᖃᕐᕕᓕᐅᒐᐅᓂᐊᖅᑐᒻᒧᑦ (ᑕᑯᒋᐊᕐᓗᒍ ᐊᒃᑐᐃᓂᐅᔪᑦ ᐅᓂᑉᑳᖅᓯᒪᔪᑦ ᐃᓕᓐᓂᐊᕈᑎᓐᓂ ᑎᑎᖃᖏᓐᓂᒃ ᐊᒃᑐᐃᓂᖏᑕ ᑭᒡᓕᖃᕐᓂᖏᓐᓂᒃ ᐅᖃᐅᓯᖃᖅᑐᑦ.)"
+        "parameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
         },
-        "effectValue": {
-          "description": "ᑭᔨᓕᖃᕐᓂᖏᑕ ᐊᑑᑎᖃᕐᓂᖏᑦ ᐊᑐᒐᐅᔪᑦ"
+        "value": {
+          "description": "Value of effect parameter"
         }
       }
     },
     "setEffect2": {
       "description": "ᑖᑉᓱᒪ ᐊᐅᓚᓂᖓ ᐊᑐᒐᐅᔪᖅ ᓂᐱᓕᐅᕈᑎᐅᑉ ᓈᓴᐅᑎᖏᓐᓄᑦ. ᐊᓯᖏᑎᑑᖏᑐᖅ ᐋᕿᒃᑕᐅᓯᒪᑉᓗᓐᓂ ᐅᑯᐊᑎᑐᑦ(), ᐊᓯᖏᓐᓂᑦ ᐃᓱᒪᒋᔭᐅᓯᒪᔪᖃᕋᓗᐊᕐᓗᓐᓂ ᐊᓯᐊᖑᕈᑎᓐᓂᒃ ᐊᒃᑐᐃᓂᖏᑕ ᑭᔨᓕᖃᕐᓂᖏᓐᓄᑦ. ᑐᑭᓯᑲᓂᕈᑎᑦ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᑕᒻᓇ ᐊᑐᒐᐅᓗᓐᓂ (), ᑕᑯᒋᐊᕐᓗᒋᑦ ᐃᓕᓐᓂᐊᕈᑎᑦ: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>ᖃᓄᐃᓕᐅᕐᓂᓗᒃᑖᖏᑦ ᐅᓂᑉᑳᖅᓯᒪᕗᑦ</a>",
       "parameters": {
-        "effectStartValue": {
-          "description": "ᐊᑑᑎᖃᕐᓂᖓ ᐊᒃᑐᐃᓂᖏᑕ ᑭᒡᓕᖃᕐᓂᖓ ᐱᒋᐊᕐᓂᖓᓐᓂᑦ ᐊᒃᑐᐃᓂᐅᑉ ᐴᒃᓴᐅᑉ"
+        "startValue": {
+          "description": "Value of effect parameter at beginning of effect envelope"
         },
-        "effectStartLocation": {
-          "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐊᒃᑐᐃᓂᖓᑕ ᐱᒋᐊᕐᓂᖓ ᐊᑑᑎᖃᕐᓂᖏᑕ"
+        "start": {
+          "description": "Location within the track of the startValue"
         },
-        "effectEndValue": {
-          "description": "ᐊᑑᑎᖃᕐᓂᖏᑦ ᐃᓗᐊᓂᓯᐅᕐᓂᖏᑕ ᐴᒃᓴᑉ ᐊᑐᒐᐅᔪᑉ"
+        "endValue": {
+          "description": "Value of effect parameter at end of effect envelope"
         },
-        "effectEndLocation": {
-          "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐊᒃᑐᐃᓂᖏᑕ ᐊᑑᑎᖃᕐᓂᖏᑦ"
+        "end": {
+          "description": "Location within the track of the endValue"
         }
       }
     },
-    "setTempo": {
-      "description": "ᑎᒡᓕᖅᑖᕐᓂᖓᓐᓂᒃ ᐊᖀᒋᐊᖅᓯᓱᖅᑐᖅ.",
+    "setTempo1": {
+      "description": "Sets the tempo for the project.",
       "parameters": {
         "tempo": {
-          "description": "ᐱᓕᕆᐊᖑᔪᑉ ᑎᒡᓕᖅᑖᕐᓂᖓ ᐊᑕᐅᓯᖅ ᒥᓂᑦ ᐃᓗᐊᓐᓂ (BPM). ᑎᒡᓕᖅᑖᕐᓂᖓ ᒥᑭᓂᖅᓴᖅ 45. ᑎᒡᓕᖅᑖᕐᓂᖓ ᐊᖏᓂᖅᓴᖅ 220."
+          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
+        }
+      }
+    },
+    "setTempo2": {
+      "description": "Change the tempo for a section of the project.",
+      "parameters": {
+        "startTempo": {
+          "description": "Tempo at beginning of section in beats per minute (BPM)"
+        },
+        "start": {
+          "description": "Measure where section begins"
+        },
+        "endTempo": {
+          "description": "Tempo at end of section (if omitted, new tempo persists until next tempo point)"
+        },
+        "end": {
+          "description": "Measure where section ends"
         }
       }
     },
     "shuffleList": {
       "description": "ᐊᕿᒃᓱᕐᓗᒋᑦ ᐃᓗᓕᖏᑦ ᑎᑎᖃᑦ ᑲᑎᑕᐅᓂᖏᓪᓗ ᒪᓕᒡᓗᒋᑦ.",
       "parameters": {
-        "inputList": {
+        "list": {
           "description": "ᑎᑎᖃᕐᓗᒋᑦ/ᑲᑎᑕᐅᓂᖏᑦ ᐊᑉᒍᑉᓗᒋᑦ"
         }
       },
@@ -809,7 +838,7 @@
     "shuffleString": {
       "description": "ᓇᓕᐊᖕᓂᒥᐊᖅ ᐊᑐᓕᖅᑎᑦᓯᔪᑦ ᑕᐅᑐᒐᐅᔪᒪᔪᓐᓂᒃ.",
       "parameters": {
-        "inputString": {
+        "string": {
           "description": "ᖃᓄᒥᐊᖅ ᓂᐱᓂᒍᑎᖓ"
         }
       },
