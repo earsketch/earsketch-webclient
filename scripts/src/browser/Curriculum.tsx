@@ -65,16 +65,14 @@ const checkLegacyURLs = (permalink: string) => {
 const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: curriculum.TOCItem, chIdx: string }) => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
-    const theme = useSelector(appState.selectColorTheme)
-    const textClass = "text-" + (theme === "light" ? "black" : "white")
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
     return (
         <li className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
-            <div className="toc-item">
+            <div>
                 &emsp;
                 {ch.sections && ch.sections.length > 0 &&
                 <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
-                <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
+                <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
                 </a>
             </div>
@@ -82,9 +80,9 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li key={secIdx} className="toc-sections py-1">
-                        <div className="toc-item">
+                        <div>
                             &emsp;&emsp;
-                            <a href="#" className={textClass} onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
+                            <a href="#" className="text-black dark:text-white" onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
                                 {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx + 1} {sec.title}
                             </a>
                         </div>
@@ -98,21 +96,19 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
 const TableOfContents = () => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
-    const theme = useSelector(appState.selectColorTheme)
     const toc = useSelector(curriculum.selectTableOfContents)
     const { t } = useTranslation()
-    const textClass = "text-" + (theme === "light" ? "black" : "white")
     return (
         <>
             <div className="inline-block font-bold text-center w-full">{t("curriculum.toc")}</div>
-            <hr className={`border-1 my-2 ${theme === "light" ? " border-black" : "border-white"}`} />
+            <hr className="border-1 my-2 border-black dark:border-white" />
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className="toc-item">
+                        <div className="">
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
-                            <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
+                            <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
                             {focus[0] === unitIdx && unit.chapters &&
