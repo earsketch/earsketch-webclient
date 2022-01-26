@@ -36,7 +36,7 @@
     "scriptBrowser.deletedscripts": "Deleted Scripts",
     "scriptBrowser.restore": "Restore",
     "keepUnsavedTabs": "Keep unsaved tabs open",
-    "ignore": "Ignore",
+    "discardChanges": "Discard changes",
     "script": "Script",
     "version": "Version",
     "script_plural": "Scripts",

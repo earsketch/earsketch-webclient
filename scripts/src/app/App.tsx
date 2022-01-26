@@ -637,7 +637,7 @@ export const App = () => {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
         } catch (error) {
-            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "ignore", okKey: "keepUnsavedTabs" })) {
+            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "discardChanges", okKey: "keepUnsavedTabs" })) {
                 keepUnsavedTabs = true
             }
         }
