@@ -75,8 +75,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                     <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
-                    className="text-black dark:text-white inline-grid grid-flow-col"
-                    style={{ gridTemplateColumns: "24px 1fr" }}
+                    className="text-black dark:text-white flex"
                     onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
                     <span>{ch.title}</span>
@@ -86,10 +85,9 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li key={secIdx} className="py-1">
-                        <span className="pl-10">
+                        <span className="pl-10 flex">
                             <a href="#"
-                                className="text-black dark:text-white inline-grid grid-flow-col"
-                                style={{ gridTemplateColumns: (chNumForDisplay ? chNumForDisplay.toString().length : 1) * 20 + "px 1fr" }}
+                                className="text-black dark:text-white flex"
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
                                 <span>{chNumForDisplay}.{+secIdx + 1} </span>
                                 <span className="pl-1">{sec.title}</span>
