@@ -67,25 +67,34 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
     const focus = useSelector(curriculum.selectFocus)
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
     return (
-        <li className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
-            <div>
-                &emsp;
-                {ch.sections && ch.sections.length > 0 &&
-                <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
-                <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
-                    {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
+        <li className="pl-5" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+            <span className="inline-grid grid-flow-col"
+                style={{ gridTemplateColumns: "17px 1fr" }}>
+                <span>
+                    {ch.sections && ch.sections.length > 0 &&
+                    <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                </span>
+                <a href="#"
+                    className="text-black dark:text-white inline-grid grid-flow-col"
+                    style={{ gridTemplateColumns: "24px 1fr" }}
+                    onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
+                    <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
+                    <span>{ch.title}</span>
                 </a>
-            </div>
+            </span>
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
-                    <li key={secIdx} className="toc-sections py-1">
-                        <div>
-                            &emsp;&emsp;
-                            <a href="#" className="text-black dark:text-white" onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
-                                {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx + 1} {sec.title}
+                    <li key={secIdx} className="py-1">
+                        <span className="pl-10">
+                            <a href="#"
+                                className="text-black dark:text-white inline-grid grid-flow-col"
+                                style={{ gridTemplateColumns: (chNumForDisplay ? chNumForDisplay.toString().length : 1) * 20 + "px 1fr" }}
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
+                                <span>{chNumForDisplay}.{+secIdx + 1} </span>
+                                <span className="pl-1">{sec.title}</span>
                             </a>
-                        </div>
+                        </span>
                     </li>
                 )}
             </ul>
@@ -105,7 +114,7 @@ const TableOfContents = () => {
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className="">
+                        <div>
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
@@ -150,15 +159,14 @@ const CurriculumSearchResults = () => {
     const dispatch = useDispatch()
     const results = useSelector(curriculum.selectSearchResults)
     const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
-    const theme = useSelector(appState.selectColorTheme)
     const [resultsRef, resultsStyle] = useHeightLimiter(showResults)
 
     return showResults
         ? (
-            <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === "light" ? "bg-white" : "bg-gray-900"}`} style={resultsStyle}>
+            <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
                     <a tabIndex={0} key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
-                        <div className={`px-5 py-2 search-item ${theme === "light" ? "text-black" : "text-white"}`}>{result.title}</div>
+                        <div className="px-5 py-2 search-item text-black dark:text-white">{result.title}</div>
                     </a>)}
             </div>
         )
@@ -167,7 +175,6 @@ const CurriculumSearchResults = () => {
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
     const location = useSelector(curriculum.selectCurrentLocation)
     const pageTitle = useSelector(curriculum.selectPageTitle)
@@ -188,7 +195,7 @@ export const TitleBar = () => {
             </div>
             <div>
                 <div
-                    className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
+                    className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
@@ -198,7 +205,7 @@ export const TitleBar = () => {
                 <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                     <i className="icon icon-link" />
                 </button>
-                <button className={`border-2 -my-1 ${theme === "light" ? "border-black" : "border-white"} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
+                <button className="border-2 -my-1 border-black dark:border-white w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom"
                     title={t("curriculum.switchScriptLanguage")}
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
@@ -307,7 +314,6 @@ const NavigationBar = () => {
     const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / (toc[location[0]]!.chapters?.[location[1]].sections?.length ?? 1))
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
-    const theme = useSelector(appState.selectColorTheme)
     const triggerRef = useRef<HTMLButtonElement>(null)
     const [highlight, setHighlight] = useState(false)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
@@ -346,7 +352,7 @@ const NavigationBar = () => {
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? "" : "hidden"}`}>
                 <div ref={dropdownRef} style={tocStyle}
-                    className={`w-full pointer-events-auto p-5 border border-black bg-${theme === "light" ? "white" : "black"}`}>
+                    className="w-full pointer-events-auto p-5 border border-black bg-white dark:bg-black">
                     <TableOfContents />
                 </div>
             </div>
