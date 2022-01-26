@@ -101,39 +101,41 @@ export function getAllVariables() {
 }
 
 function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | number | string)[], ast: Node | Node[]) {
-    if (Array.isArray(ast)) {
-        for (const node of ast) {
+    if (ast && (Array.isArray(ast) || ast._astname)) {
+        const nodesToRecurse = Array.isArray(ast) ? ast : Object.values(ast)
+        for (const node of nodesToRecurse) {
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-        return
-    }
-    if (ast.body) {
-        for (const node of ast.body) {
-            funcToCall(node, args)
-            recursiveCallOnNodes(funcToCall, args, node)
-        }
-    } else if (ast._astname === "BoolOp" && ast.values) {
-        for (const value of ast.values) {
-            funcToCall(value, args)
-            recursiveCallOnNodes(funcToCall, args, value)
-        }
-    } else if (ast._astname === "Expr" && ast.value) {
-        funcToCall(ast.value, args)
-        recursiveCallOnNodes(funcToCall, args, ast.value)
-    }
+        if (!Array.isArray(ast)) {
+            if (ast.body) {
+                for (const node of ast.body) {
+                    funcToCall(node, args)
+                    recursiveCallOnNodes(funcToCall, args, node)
+                }
+            } else if (ast._astname === "BoolOp" && ast.values) {
+                for (const value of ast.values) {
+                    funcToCall(value, args)
+                    recursiveCallOnNodes(funcToCall, args, value)
+                }
+            } else if (ast._astname === "Expr" && ast.value) {
+                funcToCall(ast.value, args)
+                recursiveCallOnNodes(funcToCall, args, ast.value)
+            }
 
-    if (ast.test) {
-        funcToCall(ast.test, args)
-        recursiveCallOnNodes(funcToCall, args, ast.test)
-    }
-    if (ast.iter) {
-        funcToCall(ast.iter, args)
-        recursiveCallOnNodes(funcToCall, args, ast.iter)
-    }
-    if (ast.orelse) {
-        funcToCall(ast.orelse, args)
-        recursiveCallOnNodes(funcToCall, args, ast.orelse)
+            if (ast.test) {
+                funcToCall(ast.test, args)
+                recursiveCallOnNodes(funcToCall, args, ast.test)
+            }
+            if (ast.iter) {
+                funcToCall(ast.iter, args)
+                recursiveCallOnNodes(funcToCall, args, ast.iter)
+            }
+            if (ast.orelse) {
+                funcToCall(ast.orelse, args)
+                recursiveCallOnNodes(funcToCall, args, ast.orelse)
+            }
+        }
     }
 }
 
@@ -229,7 +231,7 @@ function functionPass(ast: Node, results: Results, rootAst: Node) {
 
 // collects function info from a node
 function collectFunctionInfo(node: Node, args: [Results, Node]) {
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
         if (node.lineno) {
@@ -911,19 +913,6 @@ function valueTrace(isVariable: Boolean, name: string, ast: Node, parentNodes: [
                 return true
             }
         }
-    } else if (Array.isArray(ast) && (ast._astname !== null || (ast[0] !== null && ast[0]._astname !== null)) && Object.keys(ast) !== null) {
-        for (const key in ast) {
-            const node = ast[key]
-
-            const newParents = parentNodes.slice(0)
-            newParents.push([node, key])
-            if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
-                return true
-            }
-            if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
-                return true
-            }
-        }
     } else if (ast && ast._astname && ast._astname === "Expr" && ast.value) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.value, "Expr"])
@@ -933,10 +922,25 @@ function valueTrace(isVariable: Boolean, name: string, ast: Node, parentNodes: [
         if (valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) === true) {
             return true
         }
+    } else if (ast) {
+        const nodesToRecurse = Array.isArray(ast) ? (Array.from(ast.keys())).map(String) : Object.keys(ast)
+        for (const key of nodesToRecurse) {
+            const node = ast[key]
+            if (typeof node === "object") {
+                const newParents = parentNodes.slice(0)
+                newParents.push([node, key])
+                if (findValueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
+                    return true
+                }
+                if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
+                    return true
+                }
+            }
+        }
     }
 
     // nodes that need extra testing
-    if (ast !== null && ast._astname !== null && ast.test) {
+    if (ast && ast._astname && ast.test) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.test, "test"])
         if (findValueTrace(isVariable, name, ast.test, newParents, rootAst, lineVar, useLine, origLine) === true) {
@@ -947,7 +951,7 @@ function valueTrace(isVariable: Boolean, name: string, ast: Node, parentNodes: [
         }
     }
 
-    if (ast !== null && ast._astname !== null && ast.iter) {
+    if (ast && ast._astname && ast.iter) {
         const newParents = parentNodes.slice(0)
         newParents.push([ast.iter, "iter"])
         if (findValueTrace(isVariable, name, ast.iter, newParents, rootAst, lineVar, useLine, origLine) === true) {
@@ -962,7 +966,7 @@ function valueTrace(isVariable: Boolean, name: string, ast: Node, parentNodes: [
 }
 
 function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNodes: [Node, string][], rootAst: Node, lineVar: { line: number } | null, useLine: number [], origLine = -1) { //
-    if (node && node._astname && node.id && node.func) {
+    if (node && node._astname) {
         // get linenumber info
         let lineNumber = 0
         if (node.lineno) {
@@ -982,18 +986,18 @@ function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNod
 
         if (node._astname === "Name" && isVariable) {
             // is it the RIGHT name
-            if (node.id.v === name) {
+            if (node.id && node.id.v === name) {
                 found = true
             }
         } else if (node._astname === "Name") {
-            if (node.id.v === name) {
+            if (node.id && node.id.v === name) {
                 found = true
                 // assignedFunc = true
             }
         } else if (node._astname === "Call" && !isVariable) {
             // is it the function we're looking for or one of its aliases?
 
-            if (node.func._astname === "Name") {
+            if (node.func && node.func._astname === "Name") {
                 const calledName = String(node.func.id?.v)
                 if (calledName === name) {
                     found = true
@@ -1229,8 +1233,9 @@ function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { dep
 }
 
 // Analyze a single node of a Python AST.
-function analyzeASTNode(node: Node, results: Results) {
-    if (node !== null && node._astname !== null && node.test) {
+function analyzeASTNode(node: Node, resultInArray: Results[]) {
+    const results: Results = resultInArray[0]
+    if (node && node._astname) {
         let lineNumber = 0
         if (node.lineno) {
             lineNumber = node.lineno
@@ -1304,7 +1309,9 @@ function analyzeASTNode(node: Node, results: Results) {
                 }
 
                 const conditionalsList: string[] = []
-                analyzeConditionalTest(node.test, conditionalsList)
+                if (node.test) {
+                    analyzeConditionalTest(node.test, conditionalsList)
+                }
                 for (const conditional of conditionalsList) {
                     if (!results.codeFeatures.conditionals.usedInConditionals.includes(conditional)) {
                         results.codeFeatures.conditionals.usedInConditionals.push(conditional)
@@ -1546,7 +1553,7 @@ function findFunctionArgumentName(node: Node, args: [ "FunctionDef" | "functionC
     const type = args[0] === "FunctionDef" ? "FunctionDef" : "Call"
     // arg[1] is the line number
     const lineNumber = args[1]
-    if (node !== null && node._astname !== null) {
+    if (node && node._astname) {
         // args[2] has property "name" which is how name val is returned
         if (node._astname === type && node.lineno === lineNumber) {
             const name = args[0] === "FunctionDef" ? node.name : node.func?.id

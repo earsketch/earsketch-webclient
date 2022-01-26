@@ -496,7 +496,7 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
 export function replaceNumericUnaryOps(ast: any) {
     for (const i in ast) {
-        if (ast[i] !== null && ast[i]._astname !== null) {
+        if (ast[i] && ast[i]._astname) {
             if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) {
                 ast[i] = ast[i].operand
             } else if (ast[i] !== null && "body" in ast[i]) {
@@ -584,10 +584,10 @@ export function lineDict() {
     // note every time the user defines a function
     for (const u in ccState.getProperty("userFunctionReturns")) {
         if (ccState.getProperty("userFunctionReturns")[u].startLine !== null) {
-            const index = ccState.getProperty("userFunctionReturns")[u].startLine - 1
+            const index = ccState.getProperty("userFunctionReturns")[u].start - 1
             lineDictionary[index].userFunction = ccState.getProperty("userFunctionReturns")[u]
             let i = index + 1
-            while (i < ccState.getProperty("userFunctionReturns")[u].endLine) {
+            while (i < ccState.getProperty("userFunctionReturns")[u].end) {
                 lineDictionary[i].userFunction = ccState.getProperty("userFunctionReturns")[u]
                 i++
             }
