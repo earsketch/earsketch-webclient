@@ -67,7 +67,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
     const focus = useSelector(curriculum.selectFocus)
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
     return (
-        <li className="pl-5" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+        <li className="pl-5 py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
             <span className="inline-grid grid-flow-col"
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
@@ -78,7 +78,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                     className="text-black dark:text-white flex"
                     onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
-                    <span>{ch.title}</span>
+                    <span className="pl-1">{ch.title}</span>
                 </a>
             </span>
             <ul>
@@ -112,7 +112,7 @@ const TableOfContents = () => {
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div>
+                        <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
                             <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
