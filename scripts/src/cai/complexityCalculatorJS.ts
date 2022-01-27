@@ -116,7 +116,7 @@ function convertASTTree(AstTree: any) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)
     }
-    const parentItem = { body: bodyItems } as cc.Node
+    const parentItem = { _astname: "Module", body: bodyItems } as cc.Node
     return parentItem
 }
 

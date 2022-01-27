@@ -108,7 +108,7 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | numb
             recursiveCallOnNodes(funcToCall, args, node)
         }
         if (!Array.isArray(ast)) {
-            if (ast.body) {
+            /*  if (ast.body) {
                 for (const node of ast.body) {
                     funcToCall(node, args)
                     recursiveCallOnNodes(funcToCall, args, node)
@@ -134,7 +134,7 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | numb
             if (ast.orelse) {
                 funcToCall(ast.orelse, args)
                 recursiveCallOnNodes(funcToCall, args, ast.orelse)
-            }
+            } */
         }
     }
 }
@@ -1217,9 +1217,9 @@ function sortLoopValues(a: number[], b: number[]) {
 }
 
 function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number }, parentObj: StructuralNode | null) {
-    if (!parentObj || !parentObj.depth) {
+    if (!parentObj) {
         structureObj.depth = 0
-    } else {
+    } else if (typeof parentObj.depth !== "undefined" && parentObj.depth !== null) {
         structureObj.depth = parentObj.depth + 1
         if (structureObj.depth > depthCountObj.depth) {
             depthCountObj.depth = structureObj.depth
