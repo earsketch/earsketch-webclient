@@ -128,15 +128,11 @@ export function initEditor() {
         },
     })
 
-    // Replace default autocomplete binding to use the correct modifier on Mac.
-    const startAutocomplete = editor.ace.commands.byName.startAutocomplete
-    editor.ace.commands.removeCommand(startAutocomplete)
+    // Add additional autocomplete shortcut for Mac.
     editor.ace.commands.addCommand({
-        ...startAutocomplete,
-        bindKey: {
-            win: "Ctrl-Space",
-            mac: "Option-Space",
-        },
+        ...editor.ace.commands.byName.startAutocomplete,
+        name: "startAutocompleteMac",
+        bindKey: { mac: "Option-Space" },
     })
 
     editor.droplet.setEditorState(false)
