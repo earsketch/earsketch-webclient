@@ -128,6 +128,17 @@ export function initEditor() {
         },
     })
 
+    // Replace default autocomplete binding to use the correct modifier on Mac.
+    const startAutocomplete = editor.ace.commands.byName.startAutocomplete
+    editor.ace.commands.removeCommand(startAutocomplete)
+    editor.ace.commands.addCommand({
+        ...startAutocomplete,
+        bindKey: {
+            win: "Ctrl-Space",
+            mac: "Command-Space",
+        },
+    })
+
     editor.droplet.setEditorState(false)
 
     // open shared script from URL
