@@ -1568,7 +1568,7 @@ function getParentList(lineno: number, parentNode: StructuralNode, parentsList: 
     // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
     // first....is it a child of the parent node?
-    if (parentNode.startline && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
+    if (typeof parentNode.startline !== "undefined" && parentNode.startline !== null && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.
         let childNode = null

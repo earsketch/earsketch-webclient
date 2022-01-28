@@ -418,66 +418,53 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
         }
 
         // get most recent outside-of-function assignment (or inside-this-function assignment)
-        const funcLines: number[] = ccState.getProperty("functionLines")
-        const funcObjs: any = ccState.getProperty("userFunctionReturns")
+        // const funcLines: number[] = ccState.getProperty("functionLines")
+        // const funcObjs: any = ccState.getProperty("userFunctionReturns")
         let highestLine: number = 0
-        if (funcLines.includes(lineNo)) {
-            // what function are we in
-            let startLine: number = 0
-            let endLine: number = 0
-            for (const funcObj of funcObjs) {
-                if (funcObj.start < lineNo && funcObj.end >= lineNo) {
-                    startLine = funcObj.start
-                    endLine = funcObj.end
-                    break
-                }
-            }
-
-            for (const assignment of thisVar.assignments) {
-                if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
-                    // check and make sure we haven't already gone through this node (prevents infinite recursion)
-                    let isDuplicate = false
-                    if (tracedNodes.length > 0) {
-                        for (const tracedNode in tracedNodes) {
-                            if (areTwoNodesSameNode(assignment, tracedNode)) {
-                                isDuplicate = true
-                            }
+        for (const assignment of thisVar.assignments) {
+            if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line)) {
+                // check and make sure we haven't already gone through this node (prevents infinite recursion)
+                let isDuplicate = false
+                if (tracedNodes.length > 0) {
+                    for (const tracedNode in tracedNodes) {
+                        if (areTwoNodesSameNode(assignment, tracedNode)) {
+                            isDuplicate = true
                         }
                     }
-                    // hierarchy check
-                    let assignedProper = false
+                }
+                // hierarchy check
+                let assignedProper = false
 
-                    // assignedproper is based on parent node in codestructure
+                // assignedproper is based on parent node in codestructure
 
-                    const assignmentDepthAndParent = locateDepthAndParent(assignment.line, ccState.getProperty("codeStructure"), { count: 0 })
-                    // find original use depth and parent, then compare.
-                    // useLine    is the use line number
-                    const useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 })
+                const assignmentDepthAndParent = locateDepthAndParent(assignment.line, ccState.getProperty("codeStructure"), { count: 0 })
+                // find original use depth and parent, then compare.
+                // useLine    is the use line number
+                const useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 })
 
-                    // [-1, {}] depth # and parent structure node.
-                    if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
-                        assignedProper = true
-                    } else if (assignmentDepthAndParent[0] === useDepthAndParent[0] && assignmentDepthAndParent[1].startline === useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === useDepthAndParent[1].endline) {
-                        assignedProper = true
-                    }
-                    if (assignedProper === true) {
-                        if (!isDuplicate) {
-                            // then it's valid
+                // [-1, {}] depth # and parent structure node.
+                if (assignmentDepthAndParent[0] < useDepthAndParent[0]) {
+                    assignedProper = true
+                } else if (assignmentDepthAndParent[0] === useDepthAndParent[0] && assignmentDepthAndParent[1].startline === useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === useDepthAndParent[1].endline) {
+                    assignedProper = true
+                }
+                if (assignedProper === true) {
+                    if (!isDuplicate) {
+                        // then it's valid
 
-                            if (assignment.line > highestLine) {
-                                latestAssignment = Object.assign({}, assignment)
-                                highestLine = latestAssignment.line
-                            }
+                        if (assignment.line > highestLine) {
+                            latestAssignment = Object.assign({}, assignment)
+                            highestLine = latestAssignment.line
                         }
                     }
                 }
             }
+        }
 
-            // get type from assigned node
-            if (latestAssignment != null) {
-                tracedNodes.push(latestAssignment)
-                return estimateDataType(latestAssignment, tracedNodes)
-            }
+        // get type from assigned node
+        if (latestAssignment != null) {
+            tracedNodes.push(latestAssignment)
+            return estimateDataType(latestAssignment, tracedNodes)
         }
     } else if (node._astname === "BinOp") {
         // estimate both sides. if the same, return that. else return null
