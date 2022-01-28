@@ -32,6 +32,9 @@ export const TitleBar = () => {
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
+                    aria-label={`Collapse ${t("contentManager.title")}`}
+                    title={`Collapse ${t("contentManager.title")}`}
+                    role="button"
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </div>
@@ -95,10 +98,11 @@ export const Header = ({ title }: { title: string }) => (
 
 interface SearchBarProps {
     searchText: string
+    aria?: string
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
+export const SearchBar = ({ searchText, aria, dispatchSearch, dispatchReset }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
@@ -127,13 +131,14 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchB
 interface DropdownMultiSelectorProps {
     title: string
     category: string
+    aria?: string
     items: string[]
     position: "center" | "left" | "right"
     numSelected?: number
     FilterItem: React.FC<any>
 }
 
-export const DropdownMultiSelector = ({ title, category, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
+export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const [showTooltip, setShowTooltip] = useState(false)
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null)
@@ -175,8 +180,10 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
                 })
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
+            aria-labelledby={category === "sortBy" ? "Sort By" : `Filter by ${aria}`} 
+            title={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}  
         >
-            <div className="flex justify-left truncate">
+            <div className="flex justify-left truncate">    
                 <div className="truncate min-w-0">
                     {title}
                 </div>
@@ -191,18 +198,23 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
             style={showTooltip ? styles.popper : { display: "none" }}
             {...attributes.popper}
             className={`border border-black p-2 z-50 ${theme === "light" ? "bg-white" : "bg-black"}`}
+            role="listbox" 
+            aria-multiselectable="true"
+            title="Dropdown Multiselect"
+            aria-label="Dropdown Multiselect" 
         >
-            <div>
+           
+            <div role="option">
                 <FilterItem
                     category={category}
                     isClearItem={true}
                 />
                 {items.map((item, index) => <FilterItem
-                    key={index}
-                    value={item}
-                    category={category}
-                />)}
-            </div>
+                        key={index}
+                        value={item}
+                        category={category}
+                    />)}
+                </div>
         </div>
     </>)
 }
@@ -212,6 +224,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
 }) => {
     const [expanded, setExpanded] = useState(initExpanded)
     const [highlight, setHighlight] = useState(false)
+    const filteredTitle = title.replace(/\([^)]*\)/g, "")
 
     return (
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "flex-grow" : "flex-grow-0"}`}>
@@ -235,8 +248,8 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </div>
                     <div className="w-1/12 text-2xl">
                         {expanded
-                            ? <i className="icon icon-arrow-down2" />
-                            : <i className="icon icon-arrow-right2" />}
+                            ? <i className="icon icon-arrow-down2" title={`Collapse ${filteredTitle}`} aria-label={`Collapse ${filteredTitle}`} role="button"/>
+                            : <i className="icon icon-arrow-right2" title={`Expand ${filteredTitle}`} aria-label={`Expand ${filteredTitle}`} role="button" />}
                     </div>
                 </div>
             </div>
@@ -258,6 +271,8 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             onClick={() => {
                 position === "west" ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }))
             }}
+            aria-label={`Open ${title}`}
+            title={`Open ${title}`}
         >
             <div
                 className={`

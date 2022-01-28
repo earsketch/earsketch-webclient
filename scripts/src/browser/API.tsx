@@ -96,6 +96,8 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     <button
                         className={`hover:bg-gray-200 active:bg-gray-300 h-full pt-1 mr-2 text-lg rounded-full px-4 border border-gray-600 ${tabsOpen ? "" : "hidden"}`}
                         onClick={() => { paste(name, obj); addUIClick("api - copy - " + name) }}
+                        title={`Copy ${name} function`}
+                        aria-label={`Copy ${name} function`}
                     >
                         <i className="icon icon-paste2" />
                     </button>

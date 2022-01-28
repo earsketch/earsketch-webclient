@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next"
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <div className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript}>
+        <div className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title="Create New Script" aria-label="Create New Script">
             <div className="align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm">
                 <i className="icon icon-plus2" />
             </div>
@@ -42,13 +42,14 @@ const ScriptSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
+const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean}) => {
     const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-
+    const ariaStrings = {"owners": "Owners", "types": "File Type"}
+    const aria = isClearItem ? "Clear Filter by " + ariaStrings[category] : value
     return (
         <>
             <div
@@ -63,6 +64,10 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                 }}
                 onMouseEnter={() => setHighlight(true)}
                 onMouseLeave={() => setHighlight(false)}
+                aria-selected={selected}
+                aria-label={aria}
+                title={aria}
+                
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
@@ -93,6 +98,8 @@ const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribut
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
+            aria-label={value}
+            title={value}
         >
             <div className="w-8">
                 <i className={`icon ${ascending ? "icon-arrow-up" : "icon-arrow-down"} ${selected ? "block" : "hidden"}`} />
@@ -118,6 +125,7 @@ const Filters = () => {
                     title={t("scriptBrowser.filterDropdown.owner")}
                     category="owners"
                     items={owners}
+                    aria="Owners"
                     numSelected={numOwnersSelected}
                     position="left"
                     FilterItem={FilterItem}
@@ -125,6 +133,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
+                    aria="File Type"
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"
@@ -133,6 +142,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.sortBy")}
                     category="sortBy"
+                    aria="Sort By"
                     items={["Date", "A-Z"]}
                     position="right"
                     FilterItem={SortOptionsItem}
@@ -150,6 +160,9 @@ const ShowDeletedScripts = () => {
             <div className="pr-2">
                 <input
                     type="checkbox"
+                    aria-label="Show Deleted Scripts"
+                    title="Show Deleted Scripts"
+                    role="checkbox"
                     style={{ margin: 0 }}
                     onClick={(event: MouseEvent) => {
                         const elem = event.target as HTMLInputElement
@@ -164,7 +177,7 @@ const ShowDeletedScripts = () => {
     )
 }
 
-const PillButton = ({ onClick, children }: { onClick: Function, children: React.ReactNode }) => {
+const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string }) => {
     const [highlight, setHighlight] = useState(false)
     const theme = useSelector(appState.selectColorTheme)
     let bgColor
@@ -184,6 +197,8 @@ const PillButton = ({ onClick, children }: { onClick: Function, children: React.
             }}
             onMouseEnter={() => setHighlight(true)}
             onMouseLeave={() => setHighlight(false)}
+            aria-label={aria}
+            title={aria}
         >
             {children}
         </div>
@@ -193,7 +208,7 @@ const PillButton = ({ onClick, children }: { onClick: Function, children: React.
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => shareScript(script)}>
+        <PillButton onClick={() => shareScript(script)} aria={`Share ${script.name}`}>
             <i className="icon-share32" />
             <div>{t("script.share")}</div>
         </PillButton>
@@ -203,7 +218,7 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={`Restore ${script.name}`}>
             <i className="icon-rotate-cw2"/>
             <div>{t("scriptBrowser.restore")}</div>
         </PillButton>
@@ -350,6 +365,8 @@ const ScriptEntry = ({ script, bgTint, type }: { script: Script, bgTint: boolean
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
                 }
             }}
+            title={`Open ${script.name} in Code Editor`}
+            aria-label={`Open ${script.name} in Code Editor`}
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div

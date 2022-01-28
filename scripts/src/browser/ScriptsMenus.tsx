@@ -15,6 +15,7 @@ import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
 
 export const shareScript = (script: Script) => {
+    console.log(script)
     _shareScript(Object.assign({}, script))
 }
 
@@ -47,12 +48,13 @@ export class VirtualRef {
 interface MenuItemProps {
     name: string
     icon: string
+    aria: string
     onClick: Function
     disabled?: boolean
     visible?: boolean
 }
 
-const MenuItem = ({ name, icon, onClick, disabled = false, visible = true }: MenuItemProps) => {
+const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true }: MenuItemProps) => {
     const [highlight, setHighlight] = useState(false)
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
@@ -72,6 +74,9 @@ const MenuItem = ({ name, icon, onClick, disabled = false, visible = true }: Men
                 onClick()
                 dispatch(scripts.resetDropdownMenu())
             }}
+            aria-label={aria}
+            title={aria}
+            aria-labelledby={`scriptsmenubutton_${name}`}
         >
             <div className="flex justify-center items-center w-6">
                 <i className={`${icon} align-middle`} />
@@ -132,10 +137,13 @@ export const ScriptDropdownMenu = () => {
                     onClick={() => {
                         dispatch(scripts.resetDropdownMenu())
                     }}
+                    aria-label="Close Script Options"
+                    title="Close Script Options"
+                    role="button"
                 />
             </div>
             <MenuItem
-                name={t("thing.open")} icon="icon-file-empty"
+                name={t("thing.open")} icon="icon-file-empty" aria={script ? `Open ${script.name}` : `Open Script`}
                 visible={!context}
                 onClick={() => {
                     if (!script) return
@@ -148,7 +156,7 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.copy")} icon="icon-copy"
+                name={t("script.copy")} icon="icon-copy" aria={script ? `Copy ${script.name}` : `Copy Script`}
                 visible={type === "regular"}
                 onClick={() => {
                     userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
@@ -157,45 +165,45 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.rename")} icon="icon-pencil2"
+                name={t("script.rename")} icon="icon-pencil2" aria={script ? `Rename ${script.name}` : `Rename Script`}
                 visible={type === "regular"}
                 onClick={() => renameScript(script!)}
             />
             <MenuItem
-                name={t("script.download")} icon="icon-cloud-download"
+                name={t("script.download")} icon="icon-cloud-download" aria={script ? `Download ${script.name}` : `Download Script`}
                 onClick={() => downloadScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.print")} icon="icon-printer"
+                name={t("script.print")} icon="icon-printer" aria={script ? `Print ${script.name}` : `Print Script`}
                 onClick={() => {
                     exporter.print(unsavedScript!)
                 }}
             />
             <MenuItem
-                name={t("script.share")} icon="icon-share32"
+                name={t("script.share")} icon="icon-share32" aria={script ? `Share ${script.name}` : `Share Script`}
                 visible={type === "regular"}
                 disabled={!loggedIn}
                 onClick={() => shareScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.submitCompetition")} icon="icon-share2"
+                name={t("script.submitCompetition")} icon="icon-share2" aria={script ? `Submit ${script.name} to Competition` : `Submit Script to Competition`}
                 visible={type === "regular" && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
                 onClick={() => submitToCompetition(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.history")} icon="icon-history"
+                name={t("script.history")} icon="icon-history" aria={script ? `Show ${script.name} History` : `Show Script History`}
                 disabled={!loggedIn || type === "readonly"}
                 onClick={() => {
                     script && openScriptHistory(unsavedScript!, !script.isShared)
                 }}
             />
             <MenuItem
-                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign"
+                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign" aria={script ? `Show Code Indicator for ${script.name}` : `Show Code Indicator`}
                 onClick={() => openCodeIndicator(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.import")} icon="icon-import"
+                name={t("script.import")} icon="icon-import" aria={script ? `Import ${script.name}` : `Import Script`}
                 visible={["shared", "readonly"].includes(type as string)}
                 onClick={async () => {
                     let imported
@@ -217,7 +225,7 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.delete")} icon="icon-bin"
+                name={t("script.delete")} icon="icon-bin" aria={script ? `Delete ${script.name}` : `Delete Script`}
                 visible={type !== "readonly"}
                 onClick={() => {
                     if (type === "regular") {
@@ -244,8 +252,11 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dispatch(scripts.setDropdownMenu({ script, type }))
             }}
             className="flex justify-left truncate"
+            title="Script Options"
+            aria-haspopup="true"
+            id={`scriptsmenubutton_${script.name}`}
         >
-            <div className="truncate min-w-0">
+            <div className="truncate min-w-0" >
                 <i className="icon-menu3 text-4xl px-2 align-middle" />
             </div>
         </div>

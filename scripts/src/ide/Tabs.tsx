@@ -94,6 +94,8 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                     event.preventDefault()
                     event.stopPropagation()
                 }}
+                title={`Close ${scriptName}`}
+                aria-label={`Close ${scriptName}`}
             >
                 <i className="icon-cross2 cursor-pointer" />
             </button>
