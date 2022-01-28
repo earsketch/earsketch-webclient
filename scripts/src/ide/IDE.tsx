@@ -135,7 +135,7 @@ export function initEditor() {
         ...startAutocomplete,
         bindKey: {
             win: "Ctrl-Space",
-            mac: "Command-Space",
+            mac: "Option-Space",
         },
     })
 
