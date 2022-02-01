@@ -396,7 +396,7 @@ const TunepadTab = ({ close }: { close: () => void }) => {
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             {!isSafari && <>
-                <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
+                <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
                 <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
             </>}
         </div>
@@ -436,7 +436,7 @@ const GrooveMachineTab = ({ close }: { close: () => void }) => {
     return <form onSubmit={e => { e.preventDefault(); gmWindow.current!.postMessage("save-wav-data", "*") }}>
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
-            <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
+            <iframe title="Groove Machine" aria-label="Groove Machine" ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
             <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </div>
         <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
