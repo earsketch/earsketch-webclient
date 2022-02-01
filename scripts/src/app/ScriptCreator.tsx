@@ -64,11 +64,12 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="flex">
                     <div className="input-group w-1/2 mx-6">
                         <input className="form-control" autoFocus autoComplete="off"
+                            name="Script Name" id="scriptName" placeholder="Script Name"
                             value={name} onChange={e => setName(e.target.value)} />
                         <div className="input-group-addon">{extension}</div>
                     </div>
 
-                    <select className="form-control w-1/2 mx-6" value={extension} onChange={e => setExtension(e.target.value)}>
+                    <select className="form-control w-1/2 mx-6" value={extension} onChange={e => setExtension(e.target.value)} title="Select Script Language" aria-label="Select Script Language">
                         <option value=".py">Python</option>
                         <option value=".js">JavaScript</option>
                     </select>
