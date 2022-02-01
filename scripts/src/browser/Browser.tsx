@@ -60,6 +60,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                 open: true,
                 kind: type,
             }))}
+            title={`Open ${name} Tab`}
+            aria-label={`Open ${name} Tab`}
         >
             {children}
             {name}

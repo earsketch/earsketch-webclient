@@ -17,6 +17,7 @@ import { SoundEntity } from "common"
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
 import { addUIClick } from "../cai/studentPreferences"
+import { element } from "prop-types"
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
@@ -78,6 +79,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.artists")}
                     category="artists"
+                    aria="Artist"
                     items={artists}
                     position="left"
                     numSelected={numArtistsSelected}
@@ -86,6 +88,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.genres")}
                     category="genres"
+                    aria="Genre"
                     items={genres}
                     position="center"
                     numSelected={numGenresSelected}
@@ -94,6 +97,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.instruments")}
                     category="instruments"
+                    aria="Instrument"
                     items={instruments}
                     position="right"
                     numSelected={numInstrumentsSelected}
@@ -118,6 +122,9 @@ const ShowOnlyFavorites = () => {
                         const elem = event.target as HTMLInputElement
                         dispatch(sounds.setFilterByFavorites(elem.checked))
                     }}
+                    title="Show Only Favorites"
+                    aria-label="Show Only Favorites"
+                    role="checkbox"
                 />
             </div>
             <div className="pr-1">
