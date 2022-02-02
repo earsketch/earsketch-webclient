@@ -1094,16 +1094,15 @@ function findValueTrace(isVariable: Boolean, name: string, node: Node, parentNod
             let assignedProper = false
 
             // assignedproper is based on parent node in codestructure
-
             const assignmentDepthAndParent = ccHelpers.locateDepthAndParent(nodeParent[0].lineno, ccState.getProperty("codeStructure"), { count: 0 })
             // find original use depth and parent, then compare.
             // useLine    is the use line number
-            const useDepthAndParent = ccHelpers.locateDepthAndParent(origLine, ccState.getProperty("codeStructure"), { count: 0 })
+            const declarationDepthAndParent = ccHelpers.locateDepthAndParent(origLine, ccState.getProperty("codeStructure"), { count: 0 })
 
             // [-1, {}] depth # and parent structure node.
-            if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
+            if (assignmentDepthAndParent[0] > declarationDepthAndParent[0]) {
                 assignedProper = true
-            } else if (assignmentDepthAndParent[0] === useDepthAndParent[0] && assignmentDepthAndParent[1].startline === useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === useDepthAndParent[1].endline) {
+            } else if (assignmentDepthAndParent[0] === declarationDepthAndParent[0] && assignmentDepthAndParent[1].startline === declarationDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === declarationDepthAndParent[1].endline) {
                 assignedProper = true
             }
             if (assignedProper === true) {

@@ -310,13 +310,12 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
 export function locateDepthAndParent(lineno: number, parentNode: any, depthCount: any): [number, any] {
     // first....is it a child of the parent node?
     if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
-        depthCount.count += 1
         // then, check children.
         let isInChild = false
         let childNode = null
         if (parentNode.children.length > 0) {
             for (const item of parentNode.children) {
-                if (item.startline <= lineno && item.endline >= lineno) {
+                if (item.startline <= lineno && item.endline >= lineno) { //  && item.startline !== item.endline
                     isInChild = true
                     childNode = item
                     break
@@ -325,9 +324,16 @@ export function locateDepthAndParent(lineno: number, parentNode: any, depthCount
         }
 
         if (!isInChild) {
-            return [depthCount.count, parentNode]
+            if (!parentNode.parent) {
+                return [depthCount.count, parentNode]
+            } else {
+                return [depthCount.count, parentNode.parent]
+            }
         } else if (childNode != null) {
+            depthCount.count += 1
             return locateDepthAndParent(lineno, childNode, depthCount)
+        } else {
+            depthCount.count += 1
         }
     }
 
@@ -464,7 +470,7 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
         // get type from assigned node
         if (latestAssignment != null) {
             tracedNodes.push(latestAssignment)
-            return estimateDataType(latestAssignment, tracedNodes)
+            return estimateDataType(latestAssignment.value, tracedNodes)
         }
     } else if (node._astname === "BinOp") {
         // estimate both sides. if the same, return that. else return null
