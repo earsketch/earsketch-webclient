@@ -446,12 +446,6 @@ const fixLocation = (href: string | undefined, loc: number[] | undefined) => {
 
     href ??= locationToUrl[loc.join(",")]
 
-    if (loc.length === 1 && toc[loc[0]].chapters) {
-        if (toc[loc[0]].chapters!.length > 0) {
-            loc = [...loc, 0]
-        }
-    }
-
     if (loc.length === 2 && toc[loc[0]].chapters) {
         const currChapter = toc[loc[0]].chapters![loc[1]]
 

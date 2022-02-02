@@ -3,6 +3,7 @@ import esconsole from "../esconsole"
 import * as userProject from "./userProject"
 import { ModalFooter } from "../Utils"
 import * as websocket from "./websocket"
+import { Notification } from "../user/userState"
 
 export const AdminWindow = ({ close }: { close: (info?: any) => void }) => {
     return <>
@@ -101,30 +102,77 @@ const AdminSendBroadcast = () => {
 
     const [message, setMessage] = useState("")
     const [link, setLink] = useState("")
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expiration, setExpiration] = useState(DEFAULT_EXP_DAYS)
     const [broadcastStatus, setBroadcastStatus] = useState({ message: "", style: "" })
+    const [broadcasts, setBroadcasts] = useState([] as Notification[])
+
+    useEffect(() => {
+        userProject.getBroadcasts().then((res: Notification[]) => {
+            setBroadcasts(res)
+        })
+    }, [])
 
     const sendBroadcast = () => {
-        // TODO: use `expiration`
         websocket.send({
             notification_type: "broadcast",
             username: userProject.getUsername().toLowerCase(),
             message: {
                 text: message,
                 hyperlink: link ?? "",
-                expiration: 0,
+                expiration,
             },
         })
         // always show success message, as we have no indication of failure
         setBroadcastStatus({ message: "Broadcast message sent", style: "alert alert-success" })
+        userProject.getBroadcasts().then((res: Notification[]) => setBroadcasts(res))
+    }
+
+    const expireBroadcast = async (id: string) => {
+        setBroadcastStatus({ message: "Please wait...", style: "alert alert-secondary" })
+        try {
+            const data = await userProject.expireBroadcastByID(id)
+            if (data !== null) {
+                const m = `Successfully expired broadcast with ID ${id}.`
+                setBroadcastStatus({ message: m, style: "alert alert-success" })
+                setBroadcasts(broadcasts.filter(u => u.id !== id))
+                return
+            }
+        } catch (error) {
+            esconsole(error, ["error", "admin"])
+        }
+        const m = `Failed to expire broadcast with ID ${id}.`
+        setBroadcastStatus({ message: m, style: "alert alert-danger" })
+    }
+
+    const formatExpDate = (nt: Notification) => {
+        const daysUntilExp = parseInt(nt.message.expiration!)
+        const expDate = new Date(nt.created!)
+
+        expDate.setDate(expDate.getDate() + daysUntilExp)
+        return "Expires " + expDate.toLocaleDateString("en-US")
+    }
+
+    const broadcastText = (nt: Notification) => {
+        return `${nt.message.text}`
     }
 
     return <>
         <div className="modal-section-body">
             <div className="m-2 p-4 border-t border-gray-400">
                 {broadcastStatus.message && <div className={broadcastStatus.style}>{broadcastStatus.message}</div>}
-                <div className="font-bold text-3xl p-2">Send Broadcast</div>
+                <div className="pb-1">
+                    <div className="font-bold text-3xl p-2">Manage Active Broadcasts</div>
+                    <div className="p-2 text-left w-full border border-gray-300 h-40 bg-grey-light overflow-y-scroll">
+                        {broadcasts.map(nt =>
+                            <div key={nt.id} className="my-px mx-2 flex items-center">
+                                <button className="flex" title="Expire broadcast" onClick={() => expireBroadcast(nt.id!)}><i className="icon icon-cross2" /></button>
+                                <div className="my-px mx-2 flex-auto w-3/4 ">{broadcastText(nt)}</div>
+                                <div className="italic mx-2 my-px flex-auto w-1/4">{formatExpDate(nt)}</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="font-bold text-2xl p-3">Send Broadcast</div>
                 <form onSubmit={e => { e.preventDefault(); sendBroadcast() }}>
                     <input type="text" className="m-2 w-10/12 form-control"
                         placeholder="Message" required maxLength={500} onChange={e => setMessage(e.target.value)} />
@@ -132,7 +180,7 @@ const AdminSendBroadcast = () => {
                         <input type="text" className="m-2 w-1/4 form-control"
                             placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
                         <input type="number" className="m-2 w-1/4 form-control"
-                            placeholder="Days until expiration" min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
+                            placeholder="Days until expiration" required min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
                         <input type="submit" value="SEND" className="btn btn-primary" />
                     </div>
                 </form>
