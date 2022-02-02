@@ -25,7 +25,7 @@ const userSlice = createSlice({
     initialState: {
         loggedIn: false,
         username: null as string | null,
-        token: null as string | null,
+        token: null as string | null, // any changes to token storage need to also be updated in /public/message-login.html for third-party authentication
         notifications: [] as Notification[],
     },
     reducers: {
