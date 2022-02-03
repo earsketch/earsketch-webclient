@@ -131,6 +131,11 @@ module.exports = {
             template: "public/index.html",
         }),
         new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname, "message-login.html"),
+            template: "public/message-login.html",
+            inject: false,
+        }),
+        new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "autograder/index.html"),
             template: "public/index.html",
         }),

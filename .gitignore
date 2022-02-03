@@ -9,6 +9,7 @@ earsketch.min.js*
 dist/
 index.html
 css/earsketch/allstyles.css
+message-login.html
 
 # EarSketchWS
 EarSketchWS/build
