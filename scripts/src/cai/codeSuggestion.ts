@@ -1,6 +1,3 @@
-/* eslint-disable */
-// TODO: Resolve lint issues.
-
 import { CAI_DELTA_LIBRARY, CAI_RECOMMENDATIONS, CAI_NUCLEI } from "./codeRecommendations"
 import * as caiProjectModel from "./projectModel"
 import * as complexityCalculatorHelperFunctions from "./complexityCalculatorHelperFunctions"
@@ -11,9 +8,9 @@ let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [],
 let currentDeltaSum = 0
 let noDeltaCount = 0
 let currentResults: any = {}
-const averageGenreThreshold = 0.8
+// const averageGenreThreshold = 0.8
 let musicResults: any = {}
-let genreListCurrent = []
+// let genreListCurrent = []
 let currentEffects: any = []
 let sectionLines: any = []
 let CAI_DICT: any = {}
@@ -128,7 +125,7 @@ const CAI_REC_DECISION_TREE: any [] = [
         node: 9,
         condition: function () {
             // has the delta suggestion already been made?
-            const deltaInLib = false
+            // const deltaInLib = false
             possibleDeltaSuggs = []
             for (const i in CAI_DELTA_LIBRARY) {
                 // get current value and compare to end value
@@ -449,7 +446,7 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
 ]
 
-let currentLineDict = {}
+// let currentLineDict = {}
 // let suggestionTypes = ["augmentation", "modification", "organization"]
 let currentSections: any = []
 let currentSounds: any = []
@@ -507,7 +504,7 @@ export function generateCodeSuggestion(history: any[]) {
             currentEffects.push(musicResults.APICALLS[i].args)
         }
     }
-    genreListCurrent = musicResults.GENRE
+    // genreListCurrent = musicResults.GENRE
     let isNew = true
     for (const i in history) {
         // get utterance
@@ -584,7 +581,7 @@ export function randomNucleus(history: any = {}, suppressRepetition = true) {
 }
 
 export function generateResults(text: string, lang: string) {
-    let results = null
+    let results: any
     try {
         results = caiAnalysisModule.analyzeCode(lang, text)
     } catch (e) { // default value
@@ -613,7 +610,7 @@ export function generateResults(text: string, lang: string) {
     }
     musicResults = caiAnalysisModule.getReport()
     caiErrorHandling.storeWorkingCodeInfo(results.ast, results.codeStructure, musicResults)
-    //if we have stored results already and nothing's changed, use thos
+    // if we have stored results already and nothing's changed, use thos
     let validChange = true
     let allZeros = true
     const keys = Object.keys(results)
@@ -692,9 +689,9 @@ export function generateResults(text: string, lang: string) {
     const soundsAdded: any [] = []
     const soundsRemoved: any [] = []
     if (currentSounds.length > 0) {
-        for (let i = 0; i < newSounds.length; i++) {
-            if (!currentSounds.includes(newSounds[i]) && !soundsAdded.includes(newSounds[i])) {
-                soundsAdded.push(newSounds[i])
+        for (const newSound of newSounds) {
+            if (!currentSounds.includes(newSound) && !soundsAdded.includes(newSound)) {
+                soundsAdded.push(newSound)
             }
         }
         for (let i = 0; i < currentSounds.length; i++) {
@@ -724,7 +721,7 @@ export function generateResults(text: string, lang: string) {
     }
     if (!isEmpty(currentResults) || validChange) {
         currentResults = results
-        currentLineDict = CAI_DICT
+        // currentLineDict = CAI_DICT
     }
     if (!isEmpty(currentResults)) {
         if (currentResults.userFunc === "Args" || currentResults.userFunc === "Returns") {

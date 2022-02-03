@@ -1,6 +1,3 @@
-/* eslint-disable */
-// TODO: Resolve lint issues.
-
 // Student History module for CAI (Co-creative Artificial Intelligence) Project.
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
@@ -69,11 +66,11 @@ export function calculateAggregateCodeScore() {
                 consoleInput: 0,
             }
         }
-        for (let i = 0; i < keys.length; i++) {
-            if (!savedNames.includes(scripts[keys[i]].name)) {
-                savedNames.push(scripts[keys[i]].name)
-                savedScripts.push(scripts[keys[i]].source_code)
-                scriptTypes.push(scripts[keys[i]].name.substring(scripts[keys[i]].name.length - 2))
+        for (const key of keys) {
+            if (!savedNames.includes(scripts[key].name)) {
+                savedNames.push(scripts[key].name)
+                savedScripts.push(scripts[key].source_code)
+                scriptTypes.push(scripts[key].name.substring(scripts[key].name.length - 2))
                 if (savedNames.length >= 30) {
                     break
                 }
@@ -82,9 +79,9 @@ export function calculateAggregateCodeScore() {
         for (let i = 0; i < savedScripts.length; i++) {
             const sc = savedScripts[i]
             const ty = scriptTypes[i]
-            let output
+            let output: any
             try {
-                if (ty == "py") {
+                if (ty === "py") {
                     output = Object.assign({}, analyzePython(sc))
                 } else {
                     output = Object.assign({}, analyzeJavascript(sc))
@@ -115,12 +112,12 @@ export function calculateAggregateCodeScore() {
 }
 
 export function addScoreToAggregate(script: string, scriptType: string) {
-    if (aggregateScore == null) {
+    if (aggregateScore === null) {
         calculateAggregateCodeScore()
     }
-    let newOutput
+    let newOutput: any
     // analyze new code
-    if (scriptType == "python") {
+    if (scriptType === "python") {
         newOutput = Object.assign({}, analyzePython(script))
     } else {
         newOutput = Object.assign({}, analyzeJavascript(script))
@@ -158,6 +155,6 @@ export function addCurriculumPage(page: any) {
 }
 
 // returns array of all curriculum pages viewed
-function retrievePagesViewed() {
-    return curriculumPagesViewed
-}
+// function retrievePagesViewed() {
+//     return curriculumPagesViewed
+// }

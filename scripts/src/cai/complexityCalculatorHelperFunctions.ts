@@ -310,13 +310,12 @@ export function numberOfLeadingSpaces(stringToCheck: string) {
 export function locateDepthAndParent(lineno: number, parentNode: any, depthCount: any): [number, any] {
     // first....is it a child of the parent node?
     if (parentNode.startline <= lineno && parentNode.endline >= lineno) {
-        depthCount.count += 1
         // then, check children.
         let isInChild = false
         let childNode = null
         if (parentNode.children.length > 0) {
             for (const item of parentNode.children) {
-                if (item.startline <= lineno && item.endline >= lineno) {
+                if (item.startline <= lineno && item.endline >= lineno) { //  && item.startline !== item.endline
                     isInChild = true
                     childNode = item
                     break
@@ -325,16 +324,23 @@ export function locateDepthAndParent(lineno: number, parentNode: any, depthCount
         }
 
         if (!isInChild) {
-            return [depthCount.count, parentNode]
+            if (!parentNode.parent) {
+                return [depthCount.count, parentNode]
+            } else {
+                return [depthCount.count, parentNode.parent]
+            }
         } else if (childNode != null) {
+            depthCount.count += 1
             return locateDepthAndParent(lineno, childNode, depthCount)
+        } else {
+            depthCount.count += 1
         }
     }
 
     return [-1, {}]
 }
 
-export function estimateDataType(node: any, tracedNodes: any = []): string | null {
+export function estimateDataType(node: any, tracedNodes: any = []): string {
     const autoReturns: string[] = ["List", "Str"]
     if (autoReturns.includes(node._astname)) {
         return node._astname
@@ -353,7 +359,7 @@ export function estimateDataType(node: any, tracedNodes: any = []): string | nul
         } else if ("id" in node.func) {
             funcName = node.func.id.v
         } else {
-            return null
+            return ""
         }
         // look up the function name
         // builtins first
@@ -414,70 +420,57 @@ export function estimateDataType(node: any, tracedNodes: any = []): string | nul
             }
         }
         if (thisVar === null) {
-            return null
+            return ""
         }
 
         // get most recent outside-of-function assignment (or inside-this-function assignment)
-        const funcLines: number[] = ccState.getProperty("functionLines")
-        const funcObjs: any = ccState.getProperty("userFunctionReturns")
+        // const funcLines: number[] = ccState.getProperty("functionLines")
+        // const funcObjs: any = ccState.getProperty("userFunctionReturns")
         let highestLine: number = 0
-        if (funcLines.includes(lineNo)) {
-            // what function are we in
-            let startLine: number = 0
-            let endLine: number = 0
-            for (const funcObj of funcObjs) {
-                if (funcObj.start < lineNo && funcObj.end >= lineNo) {
-                    startLine = funcObj.start
-                    endLine = funcObj.end
-                    break
-                }
-            }
-
-            for (const assignment of thisVar.assignments) {
-                if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line) && assignment.line > startLine && assignment.line <= endLine) {
-                    // check and make sure we haven't already gone through this node (prevents infinite recursion)
-                    let isDuplicate = false
-                    if (tracedNodes.length > 0) {
-                        for (const tracedNode in tracedNodes) {
-                            if (areTwoNodesSameNode(assignment, tracedNode)) {
-                                isDuplicate = true
-                            }
+        for (const assignment of thisVar.assignments) {
+            if (assignment.line < lineNo && !ccState.getProperty("uncalledFunctionLines").includes(assignment.line)) {
+                // check and make sure we haven't already gone through this node (prevents infinite recursion)
+                let isDuplicate = false
+                if (tracedNodes.length > 0) {
+                    for (const tracedNode in tracedNodes) {
+                        if (areTwoNodesSameNode(assignment, tracedNode)) {
+                            isDuplicate = true
                         }
                     }
-                    // hierarchy check
-                    let assignedProper = false
+                }
+                // hierarchy check
+                let assignedProper = false
 
-                    // assignedproper is based on parent node in codestructure
+                // assignedproper is based on parent node in codestructure
 
-                    const assignmentDepthAndParent = locateDepthAndParent(assignment.line, ccState.getProperty("codeStructure"), { count: 0 })
-                    // find original use depth and parent, then compare.
-                    // useLine    is the use line number
-                    const useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 })
+                const assignmentDepthAndParent = locateDepthAndParent(assignment.line, ccState.getProperty("codeStructure"), { count: 0 })
+                // find original use depth and parent, then compare.
+                // useLine    is the use line number
+                const useDepthAndParent = locateDepthAndParent(lineNo, ccState.getProperty("codeStructure"), { count: 0 })
 
-                    // [-1, {}] depth # and parent structure node.
-                    if (assignmentDepthAndParent[0] > useDepthAndParent[0]) {
-                        assignedProper = true
-                    } else if (assignmentDepthAndParent[0] === useDepthAndParent[0] && assignmentDepthAndParent[1].startline === useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === useDepthAndParent[1].endline) {
-                        assignedProper = true
-                    }
-                    if (assignedProper === true) {
-                        if (!isDuplicate) {
-                            // then it's valid
+                // [-1, {}] depth # and parent structure node.
+                if (assignmentDepthAndParent[0] < useDepthAndParent[0]) {
+                    assignedProper = true
+                } else if (assignmentDepthAndParent[0] === useDepthAndParent[0] && assignmentDepthAndParent[1].startline === useDepthAndParent[1].startline && assignmentDepthAndParent[1].endline === useDepthAndParent[1].endline) {
+                    assignedProper = true
+                }
+                if (assignedProper === true) {
+                    if (!isDuplicate) {
+                        // then it's valid
 
-                            if (assignment.line > highestLine) {
-                                latestAssignment = Object.assign({}, assignment)
-                                highestLine = latestAssignment.line
-                            }
+                        if (assignment.line > highestLine) {
+                            latestAssignment = Object.assign({}, assignment)
+                            highestLine = latestAssignment.line
                         }
                     }
                 }
             }
+        }
 
-            // get type from assigned node
-            if (latestAssignment != null) {
-                tracedNodes.push(latestAssignment)
-                return estimateDataType(latestAssignment, tracedNodes)
-            }
+        // get type from assigned node
+        if (latestAssignment != null) {
+            tracedNodes.push(latestAssignment)
+            return estimateDataType(latestAssignment.value, tracedNodes)
         }
     } else if (node._astname === "BinOp") {
         // estimate both sides. if the same, return that. else return null
@@ -485,18 +478,18 @@ export function estimateDataType(node: any, tracedNodes: any = []): string | nul
         const right: string | null = estimateDataType(node.right, tracedNodes)
         if (left === right) {
             return left
-        } else return null
+        } else return ""
     } else if (node._astname === "BoolOp" || node._astname === "Compare") {
         return "Bool"
     }
 
-    return null
+    return ""
 }
 
 // Replaces AST nodes for objects such as negative variables to eliminate the negative for analysis
 export function replaceNumericUnaryOps(ast: any) {
     for (const i in ast) {
-        if (ast[i] !== null && ast[i]._astname !== null) {
+        if (ast[i] && ast[i]._astname) {
             if (ast[i]._astname === "UnaryOp" && (ast[i].op.name === "USub" || ast[i].op.name === "UAdd")) {
                 ast[i] = ast[i].operand
             } else if (ast[i] !== null && "body" in ast[i]) {
@@ -584,10 +577,10 @@ export function lineDict() {
     // note every time the user defines a function
     for (const u in ccState.getProperty("userFunctionReturns")) {
         if (ccState.getProperty("userFunctionReturns")[u].startLine !== null) {
-            const index = ccState.getProperty("userFunctionReturns")[u].startLine - 1
+            const index = ccState.getProperty("userFunctionReturns")[u].start - 1
             lineDictionary[index].userFunction = ccState.getProperty("userFunctionReturns")[u]
             let i = index + 1
-            while (i < ccState.getProperty("userFunctionReturns")[u].endLine) {
+            while (i < ccState.getProperty("userFunctionReturns")[u].end) {
                 lineDictionary[i].userFunction = ccState.getProperty("userFunctionReturns")[u]
                 i++
             }
