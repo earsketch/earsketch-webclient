@@ -93,6 +93,7 @@ const MessageFooter = () => {
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
                             aria-label="Select Programming Language"
+                            title="Select Programming Language"
                         >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>
