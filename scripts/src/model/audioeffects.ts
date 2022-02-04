@@ -668,6 +668,163 @@ export class DistortionEffect extends MixableEffect {
     }
 }
 
+// const windowSize = 0.1
+
+// function pitchshiftPart(context: AudioContext): [OscillatorNode, GainNode, DelayNode] {
+//     const osc = new OscillatorNode(context, { type: "sawtooth" })
+//     const gain = new GainNode(context, { gain: windowSize / 2 })
+//     const delay = new DelayNode(context, { delayTime: windowSize / 2 })
+
+//     // Vary delay from [0, windowSize].
+//     osc.connect(gain)
+//     gain.connect(delay.delayTime)
+
+//     return [osc, gain, delay]
+// }
+
+// function crossfade(context: AudioContext, a: AudioNode, b: AudioNode): [OscillatorNode, GainNode, GainNode] {
+//     const osc = new OscillatorNode(context, { type: "triangle" })
+//     const oscGainA = new GainNode(context, { gain: 0.5 })
+//     const oscGainB = new GainNode(context, { gain: 0.5 })
+
+//     osc.connect(oscGainA)
+//     osc.connect(oscGainB)
+
+//     const mixA = new GainNode(context, { gain: 0.5 })
+//     a.connect(mixA)
+//     oscGainA.connect(mixA.gain)
+
+//     const mixB = new GainNode(context, { gain: 0.5 })
+//     b.connect(mixB)
+//     oscGainB.connect(mixB.gain)
+
+//     return [osc, mixA, mixB]
+// }
+
+const Tone = (window as any).Tone
+
+function intervalToFrequencyRatio(i: number) {
+    return 2 ** (i / 12)
+}
+
+// the `Object.getPrototypeOf` is hacking around `FeedbackEffect` not being exposed
+export class MyPitchShift extends Object.getPrototypeOf(Tone.PitchShift) {
+    readonly name: string = "MyPitchShift";
+
+    private _frequency: any
+    private _delayA: any
+    private _lfoA: any
+    private _delayB: any
+    private _lfoB: any
+    private _crossFade: any
+    private _crossFadeLFO: any
+    private _feedbackDelay: any
+    readonly delayTime: any
+    private _pitch: number
+    private _windowSize;
+
+    constructor() {
+        super(MyPitchShift.getDefaults())
+
+        this._frequency = new Tone.Signal({ context: this.context })
+        this._delayA = new Tone.Delay({
+            maxDelay: 1,
+            context: this.context,
+        })
+        this._lfoA = new Tone.LFO({
+            context: this.context,
+            min: 0,
+            max: 0.1,
+            type: "sawtooth",
+        }).connect(this._delayA.delayTime)
+        this._delayB = new Tone.Delay({
+            maxDelay: 1,
+            context: this.context,
+        })
+        this._lfoB = new Tone.LFO({
+            context: this.context,
+            min: 0,
+            max: 0.1,
+            type: "sawtooth",
+            phase: 180,
+        }).connect(this._delayB.delayTime)
+        this._crossFade = new Tone.CrossFade({ context: this.context })
+        this._crossFadeLFO = new Tone.LFO({
+            context: this.context,
+            min: 0,
+            max: 1,
+            type: "triangle",
+            phase: 90,
+        }).connect(this._crossFade.fade)
+        this._feedbackDelay = new Tone.Delay({
+            delayTime: 0,
+            context: this.context,
+        })
+        this.delayTime = this._feedbackDelay.delayTime
+        this._pitch = 0
+
+        this._windowSize = 0.1
+
+        // connect the two delay lines up
+        this._delayA.connect(this._crossFade.a)
+        this._delayB.connect(this._crossFade.b)
+        // connect the frequency
+        this._frequency.fan(this._lfoA.frequency, this._lfoB.frequency, this._crossFadeLFO.frequency)
+        // route the input
+        this.effectSend.fan(this._delayA, this._delayB)
+        this._crossFade.chain(this._feedbackDelay, this.effectReturn)
+        // start the LFOs at the same time
+        const now = this.now()
+        this._lfoA.start(now)
+        this._lfoB.start(now)
+        this._crossFadeLFO.start(now)
+        // set the initial value
+        this.windowSize = this._windowSize
+    }
+
+    static getDefaults(): any {
+        return {
+            ...Object.getPrototypeOf(Tone.PitchShift).getDefaults(),
+            pitch: 0,
+            windowSize: 0.1,
+            delayTime: 0,
+            feedback: 0,
+        }
+    }
+
+    get pitch() {
+        return this._pitch
+    }
+
+    set pitch(interval) {
+        this._pitch = interval
+        let factor = 0
+        if (interval < 0) {
+            this._lfoA.min = 0
+            this._lfoA.max = this._windowSize
+            this._lfoB.min = 0
+            this._lfoB.max = this._windowSize
+            factor = intervalToFrequencyRatio(interval - 1) + 1
+        } else {
+            this._lfoA.min = this._windowSize
+            this._lfoA.max = 0
+            this._lfoB.min = this._windowSize
+            this._lfoB.max = 0
+            factor = intervalToFrequencyRatio(interval) - 1
+        }
+        this._frequency.value = factor * (1.2 / this._windowSize)
+    }
+
+    get windowSize() {
+        return this._windowSize
+    }
+
+    set windowSize(size) {
+        this._windowSize = this.toSeconds(size)
+        this.pitch = this._pitch
+    }
+}
+
 export class PitchshiftEffect extends MixableEffect {
     static DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
     static DEFAULTS = {
@@ -677,9 +834,38 @@ export class PitchshiftEffect extends MixableEffect {
     }
 
     static create(context: AudioContext) {
+        // const node = super.create(context)
+
+        // const [oscA, gainA, delayA] = pitchshiftPart(context)
+        // // TODO: Phase offset
+        // const [oscB, gainB, delayB] = pitchshiftPart(context)
+        // const [oscMix, mixA, mixB] = crossfade(context, delayA, delayB)
+
+        // node.input.connect(delayA)
+        // node.input.connect(delayB)
+
+        // const now = context.currentTime
+        // oscA.start(now)
+        // // Advance oscB to make it out-of-phase with oscA.
+        // oscB.frequency.value = 1000
+        // oscB.start(now)
+        // oscB.frequency.setValueAtTime(0, now + 0.5 / 1000)
+
+        // const frequency = new ConstantSourceNode(context, { offset: 0 })
+        // frequency.connect(oscMix.frequency)
+        // frequency.connect(oscA.frequency)
+        // frequency.connect(oscB.frequency)
+
+        // const direction = new ConstantSourceNode(context, { offset: windowSize / 2 })
+        // direction.connect(gainA.gain)
+        // direction.connect(gainB.gain)
+
+        // mixA.connect(node.wetLevel)
+        // mixB.connect(node.wetLevel)
+        // return { frequency, direction, ...node }
         const Tone = (window as any).Tone
         const node = {
-            shift: new Tone.PitchShift(0),
+            shift: new MyPitchShift(),
             ...super.create(context),
         }
         console.log("node.input:", node.input)
@@ -693,6 +879,18 @@ export class PitchshiftEffect extends MixableEffect {
         return {
             PITCHSHIFT_SHIFT: {
                 setValueAtTime(value: number, time: number) {
+                    // console.log("setValueAtTime", value, time)
+                    // if (value < 0) {
+                    //     node.direction.offset.setValueAtTime(windowSize / 2, time)
+                    //     const factor = 2 ** ((value - 1) / 12) + 1
+                    //     console.log("factor =", factor)
+                    //     node.frequency.offset.setValueAtTime(factor * 1.2 / windowSize, time)
+                    // } else {
+                    //     node.direction.offset.setValueAtTime(-windowSize / 2, time)
+                    //     const factor = 2 ** (value / 12) - 1
+                    //     console.log("factor =", factor)
+                    //     node.frequency.offset.setValueAtTime(factor * 1.2 / windowSize, time)
+                    // }
                     console.log("scheduling for", value, time)
                     // For some reason the Transport callback isn't firing,
                     // so for the moment we use setTimeout as a hack for evaluation.
