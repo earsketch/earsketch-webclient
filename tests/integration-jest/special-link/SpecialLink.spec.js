@@ -1,25 +1,26 @@
 import React from "react"
-import renderer from "react-test-renderer"
+import ReactDOM from "react-dom"
+import { act } from "react-dom/test-utils"
+import pretty from "pretty"
 import SpecialLink from "./SpecialLink"
 
-describe("Link custom component", () => {
-    it("renders correctly", () => {})
+let container
 
-    // demo of react-test-renderer
-    const component = renderer.create(
-        <SpecialLink page="http://www.gatech.edu">Georgia Tech</SpecialLink>
-    )
-    let tree = component.toJSON()
+beforeEach(() => {
+    container = document.createElement("div")
+    document.body.appendChild(container)
+})
 
-    // demo of jest snapshot testing
-    expect(tree).toMatchInlineSnapshot(`
-<a
-  className="normal"
-  href="http://www.gatech.edu"
-  onMouseEnter={[Function]}
-  onMouseLeave={[Function]}
->
-  Georgia Tech
-</a>
-`)
+afterEach(() => {
+    document.body.removeChild(container)
+    container = null
+})
+
+it("can render", () => {
+    act(() => {
+        ReactDOM.render(<SpecialLink page="https://www.gatech.edu">Georgia Tech</SpecialLink>, container)
+    })
+    expect(
+        pretty(container.innerHTML)
+    ).toMatchInlineSnapshot(`"<a class=\\"normal\\" href=\\"https://www.gatech.edu\\">Georgia Tech</a>"`)
 })
