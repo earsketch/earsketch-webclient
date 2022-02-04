@@ -42,13 +42,13 @@ const ScriptSearchBar = () => {
     return <SearchBar {...props} />
 }
 
-const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean}) => {
+const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
     const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    const ariaStrings = {"owners": "Owners", "types": "File Type"}
+    const ariaStrings = { "owners": "Owners", "types": "File Type" }
     const aria = isClearItem ? "Clear Filter by " + ariaStrings[category] : value
     return (
         <>
@@ -67,7 +67,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                 aria-selected={selected}
                 aria-label={aria}
                 title={aria}
-                
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>

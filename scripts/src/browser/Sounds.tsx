@@ -17,7 +17,6 @@ import { SoundEntity } from "common"
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
 import { addUIClick } from "../cai/studentPreferences"
-import { element } from "prop-types"
 
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
