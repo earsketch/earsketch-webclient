@@ -21,14 +21,14 @@ import { useTranslation } from "react-i18next"
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <div className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title="Create New Script" aria-label="Create New Script">
+        <button className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title="Create New Script" aria-label="Create New Script">
             <div className="align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm">
                 <i className="icon icon-plus2" />
             </div>
             <div className="mr-3">
                 {t("newScript")}
             </div>
-        </div>
+        </button>
     )
 }
 
@@ -188,7 +188,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
     }
 
     return (
-        <div
+        <button
             className={`flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 ${bgColor}`}
             onClick={(event) => {
                 event.preventDefault()
@@ -201,7 +201,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
             title={aria}
         >
             {children}
-        </div>
+        </button>
     )
 }
 

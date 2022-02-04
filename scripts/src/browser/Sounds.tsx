@@ -139,7 +139,7 @@ const AddSound = () => {
     const { t } = useTranslation()
 
     return (
-        <div
+        <button
             className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer"
             onClick={() => openUploadWindow()}
         >
@@ -149,7 +149,7 @@ const AddSound = () => {
             <div className="mr-3">
                 {t("soundBrowser.button.addSound")}
             </div>
-        </div>
+        </button>
     )
 }
 

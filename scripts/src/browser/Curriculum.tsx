@@ -193,12 +193,14 @@ export const TitleBar = () => {
                 {t("curriculum.title").toLocaleUpperCase()}
             </div>
             <div>
-                <div
+                <button
                     className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
+                    title={`Toggle ${t("curriculum.title")}`}
+                    aria-label={`Toggle ${t("curriculum.title")}`}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-                </div>
+                </button>
             </div>
             <div className="ml-auto">
                 <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>

@@ -61,7 +61,7 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
     const cursor = disabled ? "cursor-not-allowed" : "cursor-pointer"
 
     return (
-        <div
+        <button
             className={`
                 ${visible ? "flex" : "hidden"} items-center justify-start p-2 space-x-4 ${cursor} 
                 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}
@@ -82,7 +82,7 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
                 <i className={`${icon} align-middle`} />
             </div>
             <div className={`${disabled ? "text-gray-500" : ""}`}>{name}</div>
-        </div>
+        </button>
     )
 }
 
@@ -132,15 +132,15 @@ export const ScriptDropdownMenu = () => {
                 <div className="truncate">
                     {script?.name}
                 </div>
-                <i
+                <button
                     className={`icon-cross2 pr-1 align-middle cursor-pointer ${theme === "light" ? "text-gray-700" : "text-gray-500"}`}
                     onClick={() => {
                         dispatch(scripts.resetDropdownMenu())
                     }}
                     aria-label="Close Script Options"
                     title="Close Script Options"
-                    role="button"
-                />
+                >
+                </button>
             </div>
             <MenuItem
                 name={t("thing.open")} icon="icon-file-empty" aria={script ? `Open ${script.name}` : `Open Script`}

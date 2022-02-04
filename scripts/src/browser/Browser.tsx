@@ -27,17 +27,16 @@ export const TitleBar = () => {
                 {t("contentManager.title").toLocaleUpperCase()}
             </div>
             <div>
-                <div
+                <button
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
-                    aria-label={`Collapse ${t("contentManager.title")}`}
-                    title={`Collapse ${t("contentManager.title")}`}
-                    role="button"
+                    aria-label={`Toggle ${t("contentManager.title")}`}
+                    title={`Toggle ${t("contentManager.title")}`}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-                </div>
+                </button>
             </div>
         </div>
     )
@@ -48,7 +47,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
     const isSelected = useSelector(layout.selectWestKind) === type
 
     return (
-        <div
+        <button
             className={`p-3 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : ""} truncate`}
             style={isSelected
                 ? {
@@ -65,7 +64,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
         >
             {children}
             {name}
-        </div>
+        </button>
     )
 }
 
@@ -250,8 +249,8 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </div>
                     <div className="w-1/12 text-2xl">
                         {expanded
-                            ? <i className="icon icon-arrow-down2" title={`Collapse ${filteredTitle}`} aria-label={`Collapse ${filteredTitle}`} role="button"/>
-                            : <i className="icon icon-arrow-right2" title={`Expand ${filteredTitle}`} aria-label={`Expand ${filteredTitle}`} role="button" />}
+                            ? <button className="icon icon-arrow-down2" title={`Collapse ${filteredTitle}`} aria-label={`Collapse ${filteredTitle}`}> </button>
+                            : <button className="icon icon-arrow-right2" title={`Expand ${filteredTitle}`} aria-label={`Expand ${filteredTitle}`}> </button>}
                     </div>
                 </div>
             </div>

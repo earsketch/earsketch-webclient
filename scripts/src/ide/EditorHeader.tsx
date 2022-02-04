@@ -35,15 +35,19 @@ const UndoRedoButtons = () => {
     })
 
     return (<>
-        <i
+        <button
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: "scaleX(-1)" }}
             onClick={() => editor.checkUndo() && editor.undo()}
-        />
-        <i
+            title="Undo"
+            aria-label={`Undo Code Edit${hasUndo ? "" : " disabled"}`}
+        ></button>
+        <button
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
             onClick={() => editor.checkRedo() && editor.redo()}
-        />
+            title="Redo"
+            aria-label={`Redo Code Edit${hasRedo ? "" : " disabled"}`}
+        ></button>
     </>)
 }
 
@@ -95,7 +99,7 @@ export const EditorHeader = () => {
                     </div>
                 )}
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
-                    <div
+                    <button
                         className={`
                                 rounded-full
                                 text-white
@@ -110,9 +114,9 @@ export const EditorHeader = () => {
                     >
                         <i className="icon-share32 pr-2" />
                         {t("script.share").toLocaleUpperCase()}
-                    </div>
+                    </button>
                 )}
-                <div
+                <button
                     className={`
                         flex
                         rounded-full px-3 py-1
@@ -126,7 +130,7 @@ export const EditorHeader = () => {
                         <i className="icon-arrow-right22 font-bold text-green-600" />
                     </div>
                     {t("editor.run").toLocaleUpperCase()}
-                </div>
+                </button>
             </div>
         </div>
     )
