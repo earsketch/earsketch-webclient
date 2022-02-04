@@ -8,7 +8,6 @@ import * as javascriptAPI from "../api/earsketch.js"
 import * as pythonAPI from "../api/earsketch.py"
 import esconsole from "../esconsole"
 import * as ESUtils from "../esutils"
-import * as pitchshift from "./pitchshifter"
 import * as userConsole from "../ide/console"
 import { Clip, ClipSlice, DAWData, Track } from "./player"
 import i18n from "i18next"
@@ -43,7 +42,7 @@ export async function postRun(result: DAWData) {
     checkEffects(result)
     // STEP 5: Pitchshift tracks that need it.
     esconsole("Handling pitchshifted tracks.", ["debug", "runner"])
-    await handlePitchshift(result)
+    // await handlePitchshift(result)
     // STEP 6: Insert metronome as the last track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
@@ -52,29 +51,29 @@ export async function postRun(result: DAWData) {
 }
 
 // Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
-async function handlePitchshift(result: DAWData) {
-    esconsole("Begin pitchshifting.", ["debug", "runner"])
+// async function handlePitchshift(result: DAWData) {
+//     esconsole("Begin pitchshifting.", ["debug", "runner"])
 
-    if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
-        userConsole.status("Applying PITCHSHIFT on audio clips")
-    }
+//     if (result.tracks.some(t => t.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined)) {
+//         userConsole.status("Applying PITCHSHIFT on audio clips")
+//     }
 
-    const tempoMap = new TempoMap(result)
+//     const tempoMap = new TempoMap(result)
 
-    // Synchronize the userConsole print out with the asyncPitchShift processing.
-    try {
-        for (const track of result.tracks.slice(1)) {
-            if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
-                pitchshift.pitchshiftClips(track, tempoMap, result.length)
-                userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
-            }
-        }
-        esconsole("Pitchshifting promise resolved.", ["debug", "runner"])
-    } catch (err) {
-        esconsole(err, ["error", "runner"])
-        throw err
-    }
-}
+//     // Synchronize the userConsole print out with the asyncPitchShift processing.
+//     try {
+//         for (const track of result.tracks.slice(1)) {
+//             if (track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"] !== undefined) {
+//                 pitchshift.pitchshiftClips(track, tempoMap, result.length)
+//                 userConsole.status("PITCHSHIFT applied on clips on track " + track.clips[0].track)
+//             }
+//         }
+//         esconsole("Pitchshifting promise resolved.", ["debug", "runner"])
+//     } catch (err) {
+//         esconsole(err, ["error", "runner"])
+//         throw err
+//     }
+// }
 
 // Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
 const iterFields = (node: any) => {

@@ -1,5 +1,8 @@
 // jscpd:ignore-start
 // TODO: Fix JSCPD lint issues, or tell it to ease up.
+
+import context from "../app/audiocontext"
+
 // Need to scale the effects
 export const dbToFloat = (dbValue: number) => {
     return (Math.pow(10, (0.05 * dbValue)))
@@ -665,7 +668,7 @@ export class DistortionEffect extends MixableEffect {
     }
 }
 
-export class PitchshiftEffect extends Effect {
+export class PitchshiftEffect extends MixableEffect {
     static DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
     static DEFAULTS = {
         PITCHSHIFT_SHIFT: { min: -12.0, max: 12.0, value: 0.0 },
@@ -673,9 +676,35 @@ export class PitchshiftEffect extends Effect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
-    static create() {
-        // Dummy effect, handled outside of Web Audio graph.
-        return null
+    static create(context: AudioContext) {
+        const Tone = (window as any).Tone
+        const node = {
+            shift: new Tone.PitchShift(0),
+            ...super.create(context),
+        }
+        console.log("node.input:", node.input)
+        console.log("node.shift:", node.shift)
+        Tone.connect(node.input, node.shift)
+        Tone.connect(node.shift, node.wetLevel)
+        return node
+    }
+
+    static getParameters(node: any) {
+        return {
+            PITCHSHIFT_SHIFT: {
+                setValueAtTime(value: number, time: number) {
+                    console.log("scheduling for", value, time)
+                    // For some reason the Transport callback isn't firing,
+                    // so for the moment we use setTimeout as a hack for evaluation.
+                    // (window as any).Tone.Transport.scheduleOnce(() => { console.log("setting pitch to", value); node.shift.pitch = value }, time)
+                    setTimeout(() => { console.log("setting pitch to", value); node.shift.pitch = value }, time - context.currentTime)
+                },
+                linearRampToValueAtTime() {
+                    console.log("not implemented")
+                },
+            },
+            ...super.getParameters(node),
+        }
     }
 }
 
