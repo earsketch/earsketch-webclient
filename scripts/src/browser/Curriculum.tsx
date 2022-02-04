@@ -72,7 +72,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button aria-label={`${focus[1] === chIdx ? `Collapse Chapter ${+(chIdx)+1}: ` : `Expand Chapter ${+(chIdx)+1}: `} ${ch.title}`} title={`${focus[1] === chIdx ? `Collapse Chapter` : `Expand Chapter `}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
                     className="text-black dark:text-white flex"
@@ -84,7 +84,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
-                    <li key={secIdx} className="py-1">
+                    <li role="button" aria-label={`Open Section: ${sec.title}`} key={secIdx} className="py-1">
                         <span className="pl-10 flex">
                             <a href="#"
                                 className="text-black dark:text-white flex"
@@ -105,6 +105,7 @@ const TableOfContents = () => {
     const focus = useSelector(curriculum.selectFocus)
     const toc = useSelector(curriculum.selectTableOfContents)
     const { t } = useTranslation()
+    
     return (
         <>
             <div className="inline-block font-bold text-center w-full">{t("curriculum.toc")}</div>
@@ -114,7 +115,7 @@ const TableOfContents = () => {
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <button aria-label={`${focus[0] === unitIdx ? "Collapse " : "Expand "} Unit ${unitIdx}`} title={`${focus[0] === unitIdx ? "Collapse" : "Expand"}`}><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
@@ -204,7 +205,7 @@ export const TitleBar = () => {
                     <i className="icon icon-link" />
                 </button>
                 <button className="border-2 -my-1 border-black dark:border-white w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom"
-                    title={t("curriculum.switchScriptLanguage")}
+                    title={t("curriculum.switchScriptLanguage") + ` to ${language === "python" ? "javascript" : "python"}`}
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
                         dispatch(appState.setScriptLanguage(newLanguage))
@@ -335,7 +336,7 @@ const NavigationBar = () => {
                 onMouseLeave={() => setHighlight(false)}>
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
+                    : <button aria-label={t("curriculum.previousPage")} className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
                         <i className="icon icon-arrow-left2" />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
@@ -344,7 +345,7 @@ const NavigationBar = () => {
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
+                    : <button aria-label={t("curriculum.nextPage")} className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
                         <i className="icon icon-arrow-right2" />
                     </button>}
             </div>
