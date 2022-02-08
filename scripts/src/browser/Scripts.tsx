@@ -48,7 +48,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    const ariaStrings = { "owners": "Owners", "types": "File Type" }
+    const ariaStrings = { owners: "Owners", types: "File Type" }
     const aria = isClearItem ? "Clear Filter by " + ariaStrings[category] : value
     return (
         <>

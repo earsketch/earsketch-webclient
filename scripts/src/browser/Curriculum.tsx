@@ -72,7 +72,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button aria-label={`${focus[1] === chIdx ? `Collapse Chapter ${+(chIdx)+1}: ` : `Expand Chapter ${+(chIdx)+1}: `} ${ch.title}`} title={`${focus[1] === chIdx ? `Collapse Chapter` : `Expand Chapter `}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button aria-label={`${focus[1] === chIdx ? `Collapse Chapter ${+(chIdx) + 1}: ` : `Expand Chapter ${+(chIdx) + 1}: `} ${ch.title}`} title={`${focus[1] === chIdx ? "Collapse Chapter" : "Expand Chapter "}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
                     className="text-black dark:text-white flex"
@@ -105,7 +105,6 @@ const TableOfContents = () => {
     const focus = useSelector(curriculum.selectFocus)
     const toc = useSelector(curriculum.selectTableOfContents)
     const { t } = useTranslation()
-    
     return (
         <>
             <div className="inline-block font-bold text-center w-full">{t("curriculum.toc")}</div>

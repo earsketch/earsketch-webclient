@@ -103,7 +103,7 @@ interface SearchBarProps {
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
-export const SearchBar = ({ searchText, aria, dispatchSearch, dispatchReset }: SearchBarProps) => {
+export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchBarProps) => {
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
@@ -181,10 +181,10 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                 })
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
-            aria-labelledby={category === "sortBy" ? "Sort By" : `Filter by ${aria}`} 
-            title={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}  
+            aria-labelledby={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
+            title={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
         >
-            <div className="flex justify-left truncate">    
+            <div className="flex justify-left truncate">
                 <div className="truncate min-w-0">
                     {title}
                 </div>
@@ -199,23 +199,22 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
             style={showTooltip ? styles.popper : { display: "none" }}
             {...attributes.popper}
             className={`border border-black p-2 z-50 ${theme === "light" ? "bg-white" : "bg-black"}`}
-            role="listbox" 
+            role="listbox"
             aria-multiselectable="true"
             title="Dropdown Multiselect"
-            aria-label="Dropdown Multiselect" 
+            aria-label="Dropdown Multiselect"
         >
-           
             <div role="option">
                 <FilterItem
                     category={category}
                     isClearItem={true}
                 />
                 {items.map((item, index) => <FilterItem
-                        key={index}
-                        value={item}
-                        category={category}
-                    />)}
-                </div>
+                    key={index}
+                    value={item}
+                    category={category}
+                />)}
+            </div>
         </div>
     </>)
 }

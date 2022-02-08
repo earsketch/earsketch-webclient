@@ -143,7 +143,7 @@ export const ScriptDropdownMenu = () => {
                 </button>
             </div>
             <MenuItem
-                name={t("thing.open")} icon="icon-file-empty" aria={script ? `Open ${script.name}` : `Open Script`}
+                name={t("thing.open")} icon="icon-file-empty" aria={script ? `Open ${script.name}` : "Open Script"}
                 visible={!context}
                 onClick={() => {
                     if (!script) return
@@ -156,7 +156,7 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.copy")} icon="icon-copy" aria={script ? `Copy ${script.name}` : `Copy Script`}
+                name={t("script.copy")} icon="icon-copy" aria={script ? `Copy ${script.name}` : "Copy Script"}
                 visible={type === "regular"}
                 onClick={() => {
                     userProject.saveScript(unsavedScript!.name, unsavedScript!.source_code, false).then(() => {
@@ -165,45 +165,45 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.rename")} icon="icon-pencil2" aria={script ? `Rename ${script.name}` : `Rename Script`}
+                name={t("script.rename")} icon="icon-pencil2" aria={script ? `Rename ${script.name}` : "Rename Script"}
                 visible={type === "regular"}
                 onClick={() => renameScript(script!)}
             />
             <MenuItem
-                name={t("script.download")} icon="icon-cloud-download" aria={script ? `Download ${script.name}` : `Download Script`}
+                name={t("script.download")} icon="icon-cloud-download" aria={script ? `Download ${script.name}` : "Download Script"}
                 onClick={() => downloadScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.print")} icon="icon-printer" aria={script ? `Print ${script.name}` : `Print Script`}
+                name={t("script.print")} icon="icon-printer" aria={script ? `Print ${script.name}` : "Print Script"}
                 onClick={() => {
                     exporter.print(unsavedScript!)
                 }}
             />
             <MenuItem
-                name={t("script.share")} icon="icon-share32" aria={script ? `Share ${script.name}` : `Share Script`}
+                name={t("script.share")} icon="icon-share32" aria={script ? `Share ${script.name}` : "Share Script"}
                 visible={type === "regular"}
                 disabled={!loggedIn}
                 onClick={() => shareScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.submitCompetition")} icon="icon-share2" aria={script ? `Submit ${script.name} to Competition` : `Submit Script to Competition`}
+                name={t("script.submitCompetition")} icon="icon-share2" aria={script ? `Submit ${script.name} to Competition` : "Submit Script to Competition"}
                 visible={type === "regular" && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
                 onClick={() => submitToCompetition(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.history")} icon="icon-history" aria={script ? `Show ${script.name} History` : `Show Script History`}
+                name={t("script.history")} icon="icon-history" aria={script ? `Show ${script.name} History` : "Show Script History"}
                 disabled={!loggedIn || type === "readonly"}
                 onClick={() => {
                     script && openScriptHistory(unsavedScript!, !script.isShared)
                 }}
             />
             <MenuItem
-                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign" aria={script ? `Show Code Indicator for ${script.name}` : `Show Code Indicator`}
+                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign" aria={script ? `Show Code Indicator for ${script.name}` : "Show Code Indicator"}
                 onClick={() => openCodeIndicator(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.import")} icon="icon-import" aria={script ? `Import ${script.name}` : `Import Script`}
+                name={t("script.import")} icon="icon-import" aria={script ? `Import ${script.name}` : "Import Script"}
                 visible={["shared", "readonly"].includes(type as string)}
                 onClick={async () => {
                     let imported
@@ -225,7 +225,7 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.delete")} icon="icon-bin" aria={script ? `Delete ${script.name}` : `Delete Script`}
+                name={t("script.delete")} icon="icon-bin" aria={script ? `Delete ${script.name}` : "Delete Script"}
                 visible={type !== "readonly"}
                 onClick={() => {
                     if (type === "regular") {
