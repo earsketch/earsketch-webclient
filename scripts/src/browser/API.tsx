@@ -101,9 +101,9 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                         <i className="icon icon-paste2" />
                     </button>
                     <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap" 
-                            onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj) }}
-                            title={`${obj.details ? "Close" : "Open"} ${name} function details`}
-                            aria-label={`${obj.details ? "Close" : "Open"} ${name} function details`}>
+                        onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj) }}
+                        title={`${obj.details ? "Close" : "Open"} ${name} function details`}
+                        aria-label={`${obj.details ? "Close" : "Open"} ${name} function details`}>
                         <div className="inline-block w-12">{obj.details ? t("api:close") : t("api:open")}</div>
                         <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
                     </button>
