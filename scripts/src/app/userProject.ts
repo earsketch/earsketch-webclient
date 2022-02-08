@@ -44,8 +44,9 @@ async function fetchAPI(endpoint: string, init?: RequestInit) {
         ...init,
         headers: {
             ...init?.headers,
+            // add custom headers here
             "X-EarSketch-Version": `${BUILD_NUM}`.split("-")[0],
-        }, // add custom headers here
+        },
     }
     try {
         const response = await fetch(URL_DOMAIN + endpoint, init)
