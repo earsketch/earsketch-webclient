@@ -138,9 +138,9 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <span role="button" aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
-        </span>
+        </button>
         <Transition
             show={copied}
             enter="ease-out duration-300"
@@ -220,7 +220,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 <div id="share-link-container" className="mt-5 flex">
                     <input title="Share URL" aria-label="Share URL" ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
-                    <span role="button" aria-label="Download URL shortcut file" className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></span>
+                    <button aria-label="Download URL shortcut file" className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></button>
                 </div>
                 <hr className="mt-3" />
 
@@ -440,10 +440,10 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
     return <div>
         <div className="bg-blue-200 px-6 py-4">
             <h4>
-                <a role="button" className="text-black" onClick={() => setCollapsed(!collapsed)}>
+                <button className="text-black" onClick={() => setCollapsed(!collapsed)}>
                     {t("scriptShare.moreDetails")}
                     <i className={`ml-3 icon icon-arrow-${collapsed ? "right" : "down"}2`} />
-                </a>
+                </button>
             </h4>
         </div>
         {!collapsed &&
