@@ -48,7 +48,7 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
 
     return (
         <button
-            className={`p-3 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : ""} truncate`}
+            className={`p-3 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
             style={isSelected
                 ? {
                     color: "#F5AE3C",
