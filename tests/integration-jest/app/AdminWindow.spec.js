@@ -9,7 +9,7 @@ jest.mock("../../../scripts/src/app/userProject")
 jest.mock("../../../scripts/src/app/websocket")
 jest.mock("../../../scripts/src/Utils")
 
-it("renders with fetched data", async () => {
+it("renders with mocked data", async () => {
     render(<AdminWindow close={() => { }}/>) // begin rendering
     await screen.findByText("georgepburdell") // wait for userProject mock to return data
     expect(screen.findByText("georgepburdell")) // verify value
