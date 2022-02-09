@@ -128,6 +128,13 @@ export function initEditor() {
         },
     })
 
+    // Add additional autocomplete shortcut for Mac.
+    editor.ace.commands.addCommand({
+        ...editor.ace.commands.byName.startAutocomplete,
+        name: "startAutocompleteMac",
+        bindKey: { mac: "Option-Space" },
+    })
+
     editor.droplet.setEditorState(false)
 
     // open shared script from URL

@@ -40,6 +40,14 @@ export function form(obj: { [key: string]: string | Blob } = {}) {
 // password in the client.
 
 async function fetchAPI(endpoint: string, init?: RequestInit) {
+    init = {
+        ...init,
+        headers: {
+            ...init?.headers,
+            // add custom headers here
+            "X-EarSketch-Version": `${BUILD_NUM}`.split("-")[0],
+        },
+    }
     try {
         const response = await fetch(URL_DOMAIN + endpoint, init)
         if (!response.ok) {
@@ -160,7 +168,7 @@ export async function login(username: string) {
     // register callbacks / member values in the userNotification service
     userNotification.callbacks.addSharedScript = addSharedScript
 
-    websocket.connect(username)
+    websocket.login(username)
     collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
@@ -267,15 +275,13 @@ export async function getLockedSharedScriptId(shareid: string) {
     return (await get("/scripts/lockedshareid", { shareid })).shareid
 }
 
-// Delete a user saved to local storage. I.e., logout.
+// Delete a user saved to local storage (logout).
 export function clearUser() {
-    store.dispatch(scriptsState.resetRegularScripts())
-    store.dispatch(scriptsState.resetSharedScripts())
     localStorage.clear()
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
     }
-    websocket.disconnect()
+    websocket.logout()
 }
 
 export function isLoggedIn() {
@@ -556,6 +562,15 @@ export async function renameScript(script: Script, newName: string) {
     return { ...script, name: newName }
 }
 
+// Get all active broadcasts
+export async function getBroadcasts() {
+    if (isLoggedIn()) {
+        return getAuth("/users/broadcasts")
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
+}
+
 // Get all users and their roles
 export async function getAdmins() {
     if (isLoggedIn()) {
@@ -593,6 +608,14 @@ export async function setPasswordForUser(username: string, password: string, adm
     }
     await postAuth("/users/modifypwdadmin", data)
     userNotification.show("Successfully set a new password for " + username, "history", 3)
+}
+
+// Expires a broadcast using its ID
+export async function expireBroadcastByID(id: string) {
+    if (!isLoggedIn()) {
+        throw new Error("Login failure")
+    }
+    await getAuth("/users/expire", { id })
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
