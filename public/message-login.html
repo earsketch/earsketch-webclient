@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+<body>
+<script type="text/javascript">
+  async function receiveMessage(event) {
+    const { username, password } = JSON.parse(event.data)
+    const headers = { Authorization: "Basic " + btoa(username + ":" + password) }
+    const token = await (await fetch("<%= URL_DOMAIN %>" + "/users/token", { headers })).text()
+    localStorage.setItem("persist:user", JSON.stringify({ token: JSON.stringify(token) }))
+  }
+  window.addEventListener("message", receiveMessage, false)
+</script>
+</body>
+</html>

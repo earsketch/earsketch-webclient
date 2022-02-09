@@ -432,7 +432,7 @@ export const selectFilteredFeaturedFolders = createSelector(
     [selectFilteredFeaturedEntities],
     (entities: SoundEntities) => {
         const entityList = Object.values(entities)
-        return Array.from(new Set(entityList.map(v => v.folder)))
+        return Array.from(new Set(entityList.map(v => v.folder))).sort()
     }
 )
 

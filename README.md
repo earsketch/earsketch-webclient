@@ -1,6 +1,6 @@
 # earsketch-webclient
 
-The AngularJS / React web browser client for EarSketch
+The React web browser client for EarSketch
 
 
 ## Local client build
@@ -8,16 +8,16 @@ The AngularJS / React web browser client for EarSketch
 1. Clone earsketch-webclient and earsketch-curriculum into the same directory
 
 ```bash
-$ git clone https://github.com/GTCMT/earsketch-webclient.git
-$ git clone https://github.com/GTCMT/earsketch-curriculum.git
+git clone https://github.com/GTCMT/earsketch-webclient.git
+git clone https://github.com/GTCMT/earsketch-curriculum.git
 ```
 
 2. Run curriculum `local_dev_curriculum_asciidoc_builder.sh` _(python3 and BeautifulSoup4 package required)_
 
 ```bash
-$ cd earsketch-curriculum/scripts
+cd earsketch-curriculum/scripts
 
-$ ./local_dev_curriculum_asciidoc_builder.sh /path/to/earsketch-curriculum
+./local_dev_curriculum_asciidoc_builder.sh /path/to/earsketch-curriculum
 # creates earsketch-curriculum/curriculum-local/*.html
 # creates earsketch-curriculum/curriculum-local/curr_toc.js
 # creates earsketch-curriculum/curriculum-local/curr_pages.js
@@ -27,21 +27,21 @@ $ ./local_dev_curriculum_asciidoc_builder.sh /path/to/earsketch-curriculum
 3. Confirm the earsketch-webclient/curriculum link is working _(windows only)_
 
 ```bash
-$ ls -l earsketch-webclient/curriculum
+ls -l earsketch-webclient/curriculum
 # points to ../earsketch-curriculum/curriculum-local/
 
 # if you do not see directory contents, including curr_toc.js, then re-create it
-$ cd earsketch-webclient
-$ rm curriculum
-$ ln -s ../earsketch-currciulum/curriculum-local curriculum
+cd earsketch-webclient
+rm curriculum
+ln -s ../earsketch-currciulum/curriculum-local curriculum
 ```
 
 4. Serve the client with npm
 
 ```bash
-$ npm install
-$ grunt less     # prepares css files
-$ npm run serve  # serves client
+npm install
+grunt less     # prepares css files
+npm run serve  # serves client
 ```
 
 More details in `earsketch-webclient/DeveloperDocs/build-guide-web-client.md`.
@@ -53,24 +53,23 @@ This is a general overview of the web client architecture.
 
 ### Libraries
 
-- AngularJS (but we're transitioning to React)
 - Skulpt, for running Python code in the browser
 - DSP.js
 - Ace, for editing code
 - D3.js
 - jQuery
-- lodash
+- Lodash
 - MathJax
 - lunr, for search
 - hilitor, for highlighting search keywords
-- Webpack
+- webpack
 
 ### Layout
 
 Everything is under `webclient/`. Most of the subdirectories contain resources (audio, images, HTML, CSS). Some relevant contents:
 
 - `webpack.*.js`
-  WebPack configuration files. See `build-guide-web-client.md` for more details.
+  webpack configuration files. See `build-guide-web-client.md` for more details.
 
 - `tests/`
   - `manual/`
@@ -120,7 +119,7 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
 - `doc/` is the destination folder for inline JSDoc generation, but it is kind of defunct.
 
-- Bower is around but unused, previously due to people including hard copies of libraries, and (going forward) due to our using Webpack + NPM instead.
+- Bower is around but unused, previously due to people including hard copies of libraries, and (going forward) due to our using webpack + npm instead.
 
 - There are some rogue files lying around that are ripe for removal, such as `scripts/lib/levenshtein-search.js`.
 
