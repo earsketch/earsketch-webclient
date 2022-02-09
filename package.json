@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "karma start tests/integration/scripts/scripts.conf.js",
-    "jest": "jest --verbose -- tests/integration-jest/",
+    "test-jest": "jest --verbose -- tests/integration-jest/",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js"
   },
