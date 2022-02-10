@@ -52,6 +52,9 @@
 <!--- Dev Conventions (to be improved by everyone!) --->
 ## Coding Conventions
 
+### Writing text
+Before adding any static text to the web client, please internationalize it so it can be translated! See our [internationalization guide](i18n.md).
+
 ### Printing debug messages to the browser console
 Use esconsole(message, [tags], ...) for controlled printing and logging. You can use custom tags with lower case or upper case, and multiple tags.
 

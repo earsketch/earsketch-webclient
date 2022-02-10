@@ -63,6 +63,7 @@ This is a general overview of the web client architecture.
 - lunr, for search
 - hilitor, for highlighting search keywords
 - webpack
+- i18next ([internationalization guide](DeveloperDocs/i18n.md))
 
 ### Layout
 
@@ -94,7 +95,10 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
     - `data/`
       Miscellaneous JSON data stored in globals: `ESApiDoc`, `ESMessages`, `ESNum_Slides`, `ESCurr_*`.
-
+    
+    - `locales/`
+      Language/locale-specific strings files for translation support
+    
     - `model/`
       - `applyeffects.js`
         User-accessible effects, built on top of WebAudio nodes.
