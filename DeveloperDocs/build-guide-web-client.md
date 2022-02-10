@@ -130,11 +130,11 @@ Install dependencies:
     npm install
 
 ### Generating documentation
-#### Using Grunt:
+#### Using Grunt
     cd <webclient directory>
     grunt doc
 
-#### Not using Grunt:
+#### Not using Grunt
     cd <webclient directory>
     ./node_modules/.bin/jsdoc -c conf.json
 If you installed jsdoc globally:
@@ -144,7 +144,7 @@ If you installed jsdoc globally:
 The HTML documentation will be generated under ./webclient/doc
 
 ### Writing documentation
-JSDoc documentation (http://usejsdoc.org/)
+[JSDoc documentation](http://usejsdoc.org/)
 
 ### Configuration
 webclient/conf.json is used for configuring jsdoc.
@@ -172,7 +172,7 @@ Using grunt (Make sure to install / update the npm packages first):
     cd <webclient folder>
     grunt less
 
-### Manually compiling using the compile_less.sh script.
+### Manually compiling using the compile_less.sh script
 
 All scripts cam be compiled by running ./compile_less.sh in the /css directory
 
@@ -180,7 +180,7 @@ All less variables are stored in css/variables.less
 
 All less files are included in /css/allstyles.less + /css/allstyles.css
 
-### Manually compiling individual scripts: using the lessc command in the css folder, i.e.,
+### Manually compiling individual scripts: using the lessc command in the css folder
 
     ./node_modules/less/bin/lessc styles.less styles.css
 
