@@ -95,13 +95,6 @@ module.exports = {
             options: {
                 exports: ["DSP", "FFT", "WindowFunction"],
             },
-        }, {
-            test: path.resolve(__dirname, `${libDir}/earsketch-dsp.js`),
-            loader: "exports-loader",
-            options: {
-                type: "commonjs",
-                exports: ["Module"],
-            },
         }],
     },
     plugins: [
