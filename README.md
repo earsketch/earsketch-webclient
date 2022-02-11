@@ -121,7 +121,5 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 
 - Bower is around but unused, previously due to people including hard copies of libraries, and (going forward) due to our using webpack + npm instead.
 
-- There are some rogue files lying around that are ripe for removal, such as `scripts/lib/levenshtein-search.js`.
-
 - `scripts/src/model/modules.js` defines namespaces prefixed by `EarSketch.`, but it is essentially defunct. We should remove it since we're trying to clean up the global namespace anyway.
 (The only two namespaces it defines are `EarSketch.Global.ExitFlag` and `EarSketch.analytics`, and neither is actually in use as far as I can tell.)
