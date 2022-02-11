@@ -16,10 +16,6 @@ export const context = new AudioContext({
     sampleRate: 44100,
 })
 
-const Tone = (window as any).Tone
-Tone.setContext(context)
-Tone.Transport.start()
-
 export default context
 
 // Old comment; is this still relevant?
