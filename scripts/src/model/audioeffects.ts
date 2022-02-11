@@ -668,7 +668,7 @@ export class DistortionEffect extends MixableEffect {
     }
 }
 
-// const windowSize = 0.1
+const windowSize = 0.1
 
 // function pitchshiftPart(context: AudioContext): [OscillatorNode, GainNode, DelayNode] {
 //     const osc = new OscillatorNode(context, { type: "sawtooth" })
@@ -682,29 +682,82 @@ export class DistortionEffect extends MixableEffect {
 //     return [osc, gain, delay]
 // }
 
-// function crossfade(context: AudioContext, a: AudioNode, b: AudioNode): [OscillatorNode, GainNode, GainNode] {
-//     const osc = new OscillatorNode(context, { type: "triangle" })
-//     const oscGainA = new GainNode(context, { gain: 0.5 })
-//     const oscGainB = new GainNode(context, { gain: 0.5 })
+function crossfade(context: AudioContext): [OscillatorNode, GainNode, GainNode] {
+    const [real, imag] = _getRealImaginary(Math.PI * 90 / 180)
+    const periodicWave = context.createPeriodicWave(real, imag)
+    const osc = new OscillatorNode(context, { type: "custom", periodicWave })
+    const oscGainA = new GainNode(context, { gain: -0.5 })
+    const oscGainB = new GainNode(context, { gain: 0.5 })
 
-//     osc.connect(oscGainA)
-//     osc.connect(oscGainB)
+    osc.connect(oscGainA)
+    osc.connect(oscGainB)
 
-//     const mixA = new GainNode(context, { gain: 0.5 })
-//     a.connect(mixA)
-//     oscGainA.connect(mixA.gain)
+    const mixA = new GainNode(context, { gain: 0.5 })
+    // a.connect(mixA)
+    oscGainA.connect(mixA.gain)
 
-//     const mixB = new GainNode(context, { gain: 0.5 })
-//     b.connect(mixB)
-//     oscGainB.connect(mixB.gain)
+    const mixB = new GainNode(context, { gain: 0.5 })
+    // b.connect(mixB)
+    oscGainB.connect(mixB.gain)
 
-//     return [osc, mixA, mixB]
-// }
+    return [osc, mixA, mixB]
+}
 
 const Tone = (window as any).Tone
 
 function intervalToFrequencyRatio(i: number) {
     return 2 ** (i / 12)
+}
+
+function _getRealImaginary(phase: number): Float32Array[] {
+    let type = "triangle"
+    const fftSize = 4096
+    let periodicWaveSize = fftSize / 2
+
+    const real = new Float32Array(periodicWaveSize)
+    const imag = new Float32Array(periodicWaveSize)
+
+    let partialCount = 1
+    const partial = /^(sine|triangle|square|sawtooth)(\d+)$/.exec(type)
+    if (partial) {
+        partialCount = parseInt(partial[2], 10) + 1
+        type = partial[1]
+        partialCount = Math.max(partialCount, 2)
+        periodicWaveSize = partialCount
+    }
+
+    for (let n = 1; n < periodicWaveSize; ++n) {
+        const piFactor = 2 / (n * Math.PI)
+        let b
+        switch (type) {
+            case "sine":
+                b = (n <= partialCount) ? 1 : 0
+                break
+            case "square":
+                b = (n & 1) ? 2 * piFactor : 0
+                break
+            case "sawtooth":
+                b = piFactor * ((n & 1) ? 1 : -1)
+                break
+            case "triangle":
+                if (n & 1) {
+                    b = 2 * (piFactor * piFactor) * ((((n - 1) >> 1) & 1) ? -1 : 1)
+                } else {
+                    b = 0
+                }
+                break
+            default:
+                throw new TypeError("Oscillator: invalid type: " + type)
+        }
+        if (b !== 0) {
+            real[n] = -b * Math.sin(phase * n)
+            imag[n] = b * Math.cos(phase * n)
+        } else {
+            real[n] = 0
+            imag[n] = 0
+        }
+    }
+    return [real, imag]
 }
 
 // the `Object.getPrototypeOf` is hacking around `FeedbackEffect` not being exposed
@@ -718,18 +771,15 @@ export class MyPitchShift extends Object.getPrototypeOf(Tone.PitchShift) {
     private _lfoB: any
     private _crossFade: any
     private _crossFadeLFO: any
-    private _feedbackDelay: any
     readonly delayTime: any
     private _pitch: number
-    private _windowSize;
 
     constructor() {
         super(MyPitchShift.getDefaults())
 
         this._frequency = new Tone.Signal({ context: this.context })
-        this._delayA = new Tone.Delay({
-            maxDelay: 1,
-            context: this.context,
+        this._delayA = new DelayNode(this.context.rawContext, {
+            maxDelayTime: 1,
         })
         this._lfoA = new Tone.LFO({
             context: this.context,
@@ -737,9 +787,8 @@ export class MyPitchShift extends Object.getPrototypeOf(Tone.PitchShift) {
             max: 0.1,
             type: "sawtooth",
         }).connect(this._delayA.delayTime)
-        this._delayB = new Tone.Delay({
-            maxDelay: 1,
-            context: this.context,
+        this._delayB = new DelayNode(this.context.rawContext, {
+            maxDelayTime: 1,
         })
         this._lfoB = new Tone.LFO({
             context: this.context,
@@ -756,30 +805,33 @@ export class MyPitchShift extends Object.getPrototypeOf(Tone.PitchShift) {
             type: "triangle",
             phase: 90,
         }).connect(this._crossFade.fade)
-        this._feedbackDelay = new Tone.Delay({
-            delayTime: 0,
-            context: this.context,
-        })
-        this.delayTime = this._feedbackDelay.delayTime
+        const [crossfadeLFO, crossfadeA, crossfadeB] = crossfade(this.context.rawContext)
         this._pitch = 0
 
-        this._windowSize = 0.1
-
         // connect the two delay lines up
-        this._delayA.connect(this._crossFade.a)
-        this._delayB.connect(this._crossFade.b)
+        // Tone.connect(this._delayA, this._crossFade.a)
+        // Tone.connect(this._delayB, this._crossFade.b)
+        this._delayA.connect(crossfadeA)
+        this._delayB.connect(crossfadeB)
         // connect the frequency
-        this._frequency.fan(this._lfoA.frequency, this._lfoB.frequency, this._crossFadeLFO.frequency)
+        this._frequency.fan(this._lfoA.frequency, this._lfoB.frequency, crossfadeLFO.frequency)
+        // this._frequency.fan(this._lfoA.frequency, this._lfoB.frequency, this._crossFadeLFO.frequency)
         // route the input
         this.effectSend.fan(this._delayA, this._delayB)
-        this._crossFade.chain(this._feedbackDelay, this.effectReturn)
+        Tone.connect(crossfadeA, this.effectReturn)
+        Tone.connect(crossfadeB, this.effectReturn)
+        // this._crossFade.connect(this.effectReturn)
         // start the LFOs at the same time
-        const now = this.now()
+        const now = this.now() // + 0.25 / 1000
         this._lfoA.start(now)
         this._lfoB.start(now)
-        this._crossFadeLFO.start(now)
+        // this._crossFadeLFO.start(now)
+        // crossfadeLFO.frequency.value = 100
+        // crossfadeLFO.start(now - 0.25 / 100)
+        // crossfadeLFO.frequency.setValueAtTime(0, now)
+        crossfadeLFO.start(now)
         // set the initial value
-        this.windowSize = this._windowSize
+        this.pitch = this._pitch
     }
 
     static getDefaults(): any {
@@ -801,27 +853,18 @@ export class MyPitchShift extends Object.getPrototypeOf(Tone.PitchShift) {
         let factor = 0
         if (interval < 0) {
             this._lfoA.min = 0
-            this._lfoA.max = this._windowSize
+            this._lfoA.max = windowSize
             this._lfoB.min = 0
-            this._lfoB.max = this._windowSize
+            this._lfoB.max = windowSize
             factor = intervalToFrequencyRatio(interval - 1) + 1
         } else {
-            this._lfoA.min = this._windowSize
+            this._lfoA.min = windowSize
             this._lfoA.max = 0
-            this._lfoB.min = this._windowSize
+            this._lfoB.min = windowSize
             this._lfoB.max = 0
             factor = intervalToFrequencyRatio(interval) - 1
         }
-        this._frequency.value = factor * (1.2 / this._windowSize)
-    }
-
-    get windowSize() {
-        return this._windowSize
-    }
-
-    set windowSize(size) {
-        this._windowSize = this.toSeconds(size)
-        this.pitch = this._pitch
+        this._frequency.value = factor * (1.2 / windowSize)
     }
 }
 
