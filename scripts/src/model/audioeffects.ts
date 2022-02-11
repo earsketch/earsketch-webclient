@@ -1,8 +1,6 @@
 // jscpd:ignore-start
 // TODO: Fix JSCPD lint issues, or tell it to ease up.
 
-import context from "../app/audiocontext"
-
 // Need to scale the effects
 export const dbToFloat = (dbValue: number) => {
     return (Math.pow(10, (0.05 * dbValue)))
@@ -668,68 +666,18 @@ export class DistortionEffect extends MixableEffect {
     }
 }
 
-const windowSize = 0.1
-
-// function pitchshiftPart(context: AudioContext): [OscillatorNode, GainNode, DelayNode] {
-//     const osc = new OscillatorNode(context, { type: "sawtooth" })
-//     const gain = new GainNode(context, { gain: windowSize / 2 })
-//     const delay = new DelayNode(context, { delayTime: windowSize / 2 })
-
-//     // Vary delay from [0, windowSize].
-//     osc.connect(gain)
-//     gain.connect(delay.delayTime)
-
-//     return [osc, gain, delay]
-// }
-
-function crossfade(context: AudioContext): [OscillatorNode, GainNode, GainNode] {
-    const [real, imag] = _getRealImaginary("triangle", Math.PI * 90 / 180)
-    const periodicWave = context.createPeriodicWave(real, imag)
-    const osc = new OscillatorNode(context, { type: "custom", periodicWave })
-    const oscGainA = new GainNode(context, { gain: -0.5 })
-    const oscGainB = new GainNode(context, { gain: 0.5 })
-
-    osc.connect(oscGainA)
-    osc.connect(oscGainB)
-
-    const mixA = new GainNode(context, { gain: 0.5 })
-    // a.connect(mixA)
-    oscGainA.connect(mixA.gain)
-
-    const mixB = new GainNode(context, { gain: 0.5 })
-    // b.connect(mixB)
-    oscGainB.connect(mixB.gain)
-
-    return [osc, mixA, mixB]
-}
-
-function intervalToFrequencyRatio(i: number) {
-    return 2 ** (i / 12)
-}
-
+// Helper for pitch shift effect, which requires initial phase offset for LFOs.
 function _getRealImaginary(type: string, phase: number): [Float32Array, Float32Array] {
     const fftSize = 4096
-    let periodicWaveSize = fftSize / 2
+    const periodicWaveSize = fftSize / 2
 
     const real = new Float32Array(periodicWaveSize)
     const imag = new Float32Array(periodicWaveSize)
-
-    let partialCount = 1
-    const partial = /^(sine|triangle|square|sawtooth)(\d+)$/.exec(type)
-    if (partial) {
-        partialCount = parseInt(partial[2], 10) + 1
-        type = partial[1]
-        partialCount = Math.max(partialCount, 2)
-        periodicWaveSize = partialCount
-    }
 
     for (let n = 1; n < periodicWaveSize; ++n) {
         const piFactor = 2 / (n * Math.PI)
         let b
         switch (type) {
-            case "sine":
-                b = (n <= partialCount) ? 1 : 0
-                break
             case "square":
                 b = (n & 1) ? 2 * piFactor : 0
                 break
@@ -744,7 +692,7 @@ function _getRealImaginary(type: string, phase: number): [Float32Array, Float32A
                 }
                 break
             default:
-                throw new TypeError("Oscillator: invalid type: " + type)
+                throw new TypeError("invalid type: " + type)
         }
         if (b !== 0) {
             real[n] = -b * Math.sin(phase * n)
@@ -757,81 +705,6 @@ function _getRealImaginary(type: string, phase: number): [Float32Array, Float32A
     return [real, imag]
 }
 
-export class MyPitchShift {
-    private _frequency: any
-    private _delayA: DelayNode
-    private _lfoGainA: GainNode
-    private _delayB: DelayNode
-    private _lfoGainB: GainNode
-    private _pitch: number
-
-    constructor(context: AudioContext, input: AudioNode, output: AudioNode) {
-        this._delayA = new DelayNode(context, {
-            maxDelayTime: 1,
-        })
-        const lfoA = new OscillatorNode(context, {
-            type: "sawtooth",
-        })
-        this._lfoGainA = new GainNode(context)
-        lfoA.connect(this._lfoGainA)
-        this._lfoGainA.connect(this._delayA.delayTime)
-
-        this._delayB = new DelayNode(context, {
-            maxDelayTime: 1,
-        })
-        const lfoB = new OscillatorNode(context, {
-            type: "custom",
-            periodicWave: context.createPeriodicWave(..._getRealImaginary("sawtooth", Math.PI)),
-        })
-        this._lfoGainB = new GainNode(context)
-        lfoB.connect(this._lfoGainB)
-        this._lfoGainB.connect(this._delayB.delayTime)
-        const [crossfadeLFO, crossfadeA, crossfadeB] = crossfade(context)
-        this._pitch = 0
-
-        // connect the two delay lines up
-        this._delayA.connect(crossfadeA)
-        this._delayB.connect(crossfadeB)
-
-        this._frequency = multiParam([lfoA.frequency, lfoB.frequency, crossfadeLFO.frequency])
-        // route the input
-        input.connect(this._delayA)
-        input.connect(this._delayB)
-        crossfadeA.connect(output)
-        crossfadeB.connect(output)
-        // start the LFOs at the same time
-        const now = context.currentTime
-        lfoA.start(now)
-        lfoB.start(now)
-        crossfadeLFO.start(now)
-        // set the initial value
-        this.pitch = this._pitch
-    }
-
-    get pitch() {
-        return this._pitch
-    }
-
-    set pitch(interval) {
-        this._pitch = interval
-        let factor = 0
-        if (interval < 0) {
-            this._lfoGainA.gain.value = windowSize / 2
-            this._delayA.delayTime.value = windowSize / 2
-            this._lfoGainB.gain.value = windowSize / 2
-            this._delayB.delayTime.value = windowSize / 2
-            factor = intervalToFrequencyRatio(interval - 1) + 1
-        } else {
-            this._lfoGainA.gain.value = -windowSize / 2
-            this._delayA.delayTime.value = windowSize / 2
-            this._lfoGainB.gain.value = -windowSize / 2
-            this._delayB.delayTime.value = windowSize / 2
-            factor = intervalToFrequencyRatio(interval) - 1
-        }
-        this._frequency.setValueAtTime(factor * (1.2 / windowSize), this._delayA.context.currentTime)
-    }
-}
-
 export class PitchshiftEffect extends MixableEffect {
     static DEFAULT_PARAM = "PITCHSHIFT_SHIFT"
     static DEFAULTS = {
@@ -840,40 +713,87 @@ export class PitchshiftEffect extends MixableEffect {
         MIX: { min: 0.0, max: 1.0, value: 1.0 },
     }
 
+    private static WINDOW_SIZE = 0.1
+    private static CACHED_WAVEFORMS = new Map()
+
     static create(context: AudioContext) {
-        const node = super.create(context)
-        node.shift = new MyPitchShift(context, node.input, node.wetLevel)
+        if (!this.CACHED_WAVEFORMS.has(context)) {
+            this.CACHED_WAVEFORMS.set(context, {
+                triangle90: context.createPeriodicWave(..._getRealImaginary("triangle", Math.PI * 90 / 180)),
+                sawtooth180: context.createPeriodicWave(..._getRealImaginary("sawtooth", Math.PI)),
+            })
+        }
+        const { triangle90, sawtooth180 } = this.CACHED_WAVEFORMS.get(context)
+
+        const node = {
+            delayA: new DelayNode(context, { maxDelayTime: 1, delayTime: this.WINDOW_SIZE / 2 }),
+            delayB: new DelayNode(context, { maxDelayTime: 1, delayTime: this.WINDOW_SIZE / 2 }),
+            lfoA: new OscillatorNode(context, { type: "sawtooth" }),
+            lfoB: new OscillatorNode(context, {
+                type: "custom",
+                periodicWave: sawtooth180,
+            }),
+            lfoGainA: new GainNode(context, { gain: this.WINDOW_SIZE / 2 }),
+            lfoGainB: new GainNode(context, { gain: this.WINDOW_SIZE / 2 }),
+            ...super.create(context),
+        }
+
+        // Connect out-of-phase sawtooth waves to delay lines.
+        node.lfoA.connect(node.lfoGainA)
+        node.lfoGainA.connect(node.delayA.delayTime)
+
+        node.lfoB.connect(node.lfoGainB)
+        node.lfoGainB.connect(node.delayB.delayTime)
+
+        // Set up crossfade between two out-of-phase sawtooth-driven delay lines.
+        const crossfadeLFO = new OscillatorNode(context, {
+            type: "custom",
+            periodicWave: triangle90,
+        })
+        const oscGainA = new GainNode(context, { gain: -0.5 })
+        const oscGainB = new GainNode(context, { gain: 0.5 })
+        crossfadeLFO.connect(oscGainA)
+        crossfadeLFO.connect(oscGainB)
+        const crossfadeA = new GainNode(context, { gain: 0.5 })
+        oscGainA.connect(crossfadeA.gain)
+        const crossfadeB = new GainNode(context, { gain: 0.5 })
+        oscGainB.connect(crossfadeB.gain)
+        // Connect delay lines to crossfade.
+        node.delayA.connect(crossfadeA)
+        node.delayB.connect(crossfadeB)
+
+        node.frequency = multiParam([node.lfoA.frequency, node.lfoB.frequency, crossfadeLFO.frequency])
+        // Route input and output.
+        node.input.connect(node.delayA)
+        node.input.connect(node.delayB)
+        crossfadeA.connect(node.wetLevel)
+        crossfadeB.connect(node.wetLevel)
+
+        const now = context.currentTime
+        node.lfoA.start(now)
+        node.lfoB.start(now)
+        crossfadeLFO.start(now)
+
         return node
     }
 
     static getParameters(node: any) {
         return {
-            PITCHSHIFT_SHIFT: {
-                setValueAtTime(value: number, time: number) {
-                    // console.log("setValueAtTime", value, time)
-                    // if (value < 0) {
-                    //     node.direction.offset.setValueAtTime(windowSize / 2, time)
-                    //     const factor = 2 ** ((value - 1) / 12) + 1
-                    //     console.log("factor =", factor)
-                    //     node.frequency.offset.setValueAtTime(factor * 1.2 / windowSize, time)
-                    // } else {
-                    //     node.direction.offset.setValueAtTime(-windowSize / 2, time)
-                    //     const factor = 2 ** (value / 12) - 1
-                    //     console.log("factor =", factor)
-                    //     node.frequency.offset.setValueAtTime(factor * 1.2 / windowSize, time)
-                    // }
-                    console.log("scheduling for", value, time)
-                    // For some reason the Transport callback isn't firing,
-                    // so for the moment we use setTimeout as a hack for evaluation.
-                    // (window as any).Tone.Transport.scheduleOnce(() => { console.log("setting pitch to", value); node.shift.pitch = value }, time)
-                    setTimeout(() => { console.log("setting pitch to", value); node.shift.pitch = value }, time - context.currentTime)
-                },
-                linearRampToValueAtTime() {
-                    console.log("not implemented")
-                },
-            },
+            PITCHSHIFT_SHIFT: node.frequency,
             ...super.getParameters(node),
         }
+    }
+
+    static scale(parameter: string, value: number) {
+        if (parameter === "PITCHSHIFT_SHIFT") {
+            // The extra factor of 1.2 and the separate positive and negative formulae are a little mysterious.
+            if (value < 0) {
+                return (1 + 2 ** ((value - 1) / 12)) * 1.2 / this.WINDOW_SIZE
+            } else {
+                return (1 - 2 ** (value / 12)) * 1.2 / this.WINDOW_SIZE
+            }
+        }
+        return value
     }
 }
 
