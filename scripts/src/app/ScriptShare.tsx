@@ -130,7 +130,8 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     const { t } = useTranslation()
     const [copied, setCopied] = useState(false)
 
-    const handleClick = () => {
+    const handleClick = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        if (e) e.preventDefault()
         textElement.current?.select()
         document.execCommand("copy")
         setCopied(true)
@@ -138,7 +139,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <button aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={(e) => handleClick(e)} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
         </button>
         <Transition

@@ -32,8 +32,8 @@ export const TitleBar = () => {
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
-                    aria-label={`Toggle ${t("contentManager.title")}`}
-                    title={`Toggle ${t("contentManager.title")}`}
+                    aria-label={`Close ${t("contentManager.title")}`}
+                    title={`Close ${t("contentManager.title")}`}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </button>
@@ -181,7 +181,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                 })
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
-            aria-labelledby={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
+            aria-label={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
             title={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
         >
             <div className="flex justify-left truncate">
