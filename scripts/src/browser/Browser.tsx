@@ -201,8 +201,6 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
             className={`border border-black p-2 z-50 ${theme === "light" ? "bg-white" : "bg-black"}`}
             role="listbox"
             aria-multiselectable="true"
-            title="Dropdown Multiselect"
-            aria-label="Dropdown Multiselect"
         >
             <div role="option">
                 <FilterItem

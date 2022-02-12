@@ -47,6 +47,8 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
                 }}
+                title={isClearItem ? `Clear filter by ${category}` : value}
+                aria-label={isClearItem ? `Clear filter by ${category}` : value}
                 onMouseEnter={() => setHighlight(true)}
                 onMouseLeave={() => setHighlight(false)}
             >
