@@ -256,7 +256,7 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
             aria-haspopup="true"
             id={`scriptsmenubutton_${script.name}`}
         >
-            <div className="truncate min-w-0" >
+            <div className="truncate min-w-0">
                 <i className="icon-menu3 text-4xl px-2 align-middle" />
             </div>
         </div>
