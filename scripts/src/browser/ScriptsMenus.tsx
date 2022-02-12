@@ -63,7 +63,7 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
     return (
         <button
             className={`
-                ${visible ? "flex" : "hidden"} items-center justify-start p-2 space-x-4 ${cursor} 
+                ${visible ? "flex" : "hidden"} items-center justify-start p-2 space-x-4 w-full ${cursor} 
                 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}
                 ${theme === "light" ? "text-black" : "text-white"}
             `}

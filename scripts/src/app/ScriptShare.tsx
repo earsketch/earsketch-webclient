@@ -130,8 +130,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     const { t } = useTranslation()
     const [copied, setCopied] = useState(false)
 
-    const handleClick = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        if (e) e.preventDefault()
+    const handleClick = () => {
         textElement.current?.select()
         document.execCommand("copy")
         setCopied(true)
@@ -139,7 +138,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <button aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={(e) => handleClick(e)} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
         </button>
         <Transition
@@ -221,7 +220,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                 <div id="share-link-container" className="mt-5 flex">
                     <input title="Share URL" aria-label="Share URL" ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
-                    <button aria-label="Download URL shortcut file" className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></button>
+                    <button aria-label="Download URL shortcut file" className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></button>
                 </div>
                 <hr className="mt-3" />
 
@@ -441,7 +440,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
     return <div>
         <div className="bg-blue-200 px-6 py-4">
             <h4>
-                <button className="text-black" onClick={() => setCollapsed(!collapsed)}>
+                <button className="text-black" onClick={e => { e.preventDefault(); setCollapsed(!collapsed) }}>
                     {t("scriptShare.moreDetails")}
                     <i className={`ml-3 icon icon-arrow-${collapsed ? "right" : "down"}2`} />
                 </button>
