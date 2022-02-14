@@ -26,7 +26,6 @@ module.exports = function (config) {
         plugins: [
             "karma-chrome-launcher",
             "karma-jasmine",
-            "karma-html-reporter",
             "karma-webpack",
             "karma-junit-reporter",
         ],
@@ -36,7 +35,7 @@ module.exports = function (config) {
         browserDisconnectTolerance: 3,
         browserNoActivityTimeout: 120000,
 
-        reporters: ["progress", "html", "junit"],
+        reporters: ["progress", "junit"],
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
