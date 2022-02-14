@@ -1,3 +1,4 @@
+const { backgroundColor } = require("tailwindcss/lib/plugins")
 module.exports = {
     purge: [],
     darkMode: "class",
@@ -49,7 +50,7 @@ module.exports = {
             },
         },
     },
-    variants: ["hover", "active", "dark"],
+    variants: ["odd", "active", "dark", "hover"],
     plugins: [
         require("@tailwindcss/typography"),
     ],
