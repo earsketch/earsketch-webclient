@@ -73,22 +73,18 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
 }
 
 const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribute, isClearItem: boolean }) => {
-    const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector(scripts.selectSortByAttribute) === value
     const ascending = useSelector(scripts.selectSortByAscending)
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
 
     if (isClearItem) return null
 
     return (
         <div
-            className={`flex justify-left items-center cursor-pointer pr-8 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}`}
+            className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
             onClick={() => {
                 dispatch(scripts.setSorter(value))
             }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
         >
             <div className="w-8">
                 <i className={`icon ${ascending ? "icon-arrow-up" : "icon-arrow-down"} ${selected ? "block" : "hidden"}`} />
