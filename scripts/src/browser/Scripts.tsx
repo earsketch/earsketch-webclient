@@ -157,25 +157,14 @@ const ShowDeletedScripts = () => {
 }
 
 const PillButton = ({ onClick, children }: { onClick: Function, children: React.ReactNode }) => {
-    const [highlight, setHighlight] = useState(false)
-    const theme = useSelector(appState.selectColorTheme)
-    let bgColor
-    if (highlight) {
-        bgColor = theme === "light" ? "bg-blue-100" : "bg-blue-500"
-    } else {
-        bgColor = theme === "light" ? "bg-white" : "bg-gray-900"
-    }
-
     return (
         <div
-            className={`flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 ${bgColor}`}
+            className="flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
             onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
                 onClick?.()
             }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
         >
             {children}
         </div>
