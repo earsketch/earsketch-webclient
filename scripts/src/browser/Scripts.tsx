@@ -43,16 +43,14 @@ const ScriptSearchBar = () => {
 }
 
 const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
-    const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
     return (
         <>
             <div
-                className={`flex justify-left items-center cursor-pointer pr-8 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}`}
+                className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(scripts.resetFilter(category))
@@ -61,8 +59,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                         else dispatch(scripts.addFilterItem({ category, value }))
                     }
                 }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
