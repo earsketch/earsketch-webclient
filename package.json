@@ -37,7 +37,7 @@
     "js-interpreter": "^2.2.0",
     "jszip": "^3.7.1",
     "lamejs": "^1.2.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "lunr": "^2.3.8",
     "prop-types": "^15.7.2",
     "re-reselect": "^4.0.0",
