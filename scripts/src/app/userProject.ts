@@ -166,9 +166,8 @@ export async function login(username: string) {
     collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabs.closeTab(id))
 
     // register callbacks / member values in the userNotification service
-    userNotification.callbacks.addSharedScript = addSharedScript
+    userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
 
-    websocket.login(username)
     collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
@@ -222,7 +221,10 @@ export async function login(username: string) {
     }
 
     // load scripts in shared browser
-    return getSharedScripts()
+    await getSharedScripts()
+    // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
+    // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
+    websocket.login(username)
 }
 
 export async function refreshCodeBrowser() {
@@ -540,13 +542,18 @@ async function importSharedScript(scriptid: string) {
 }
 
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
-async function addSharedScript(shareID: string) {
+// Returns a Promise if a script is actually added, and undefined otherwise (i.e. the user already had it, or isn't logged in).
+function addSharedScript(shareID: string, refresh: boolean = true) {
     if (isLoggedIn()) {
-        const scriptList = await getSharedScripts()
-        if (!scriptList.some(script => script.shareid === shareID)) {
-            const script = await loadScript(shareID, true)
-            await saveSharedScript(shareID, script.name, script.source_code, script.username)
-            getSharedScripts()
+        const sharedScripts = scriptsState.selectSharedScripts(store.getState())
+        if (sharedScripts[shareID] === undefined) {
+            return (async () => {
+                const script = await loadScript(shareID, true)
+                await saveSharedScript(shareID, script.name, script.source_code, script.username)
+                if (refresh) {
+                    await getSharedScripts()
+                }
+            })()
         }
     }
 }
