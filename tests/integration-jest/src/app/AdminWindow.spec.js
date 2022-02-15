@@ -12,5 +12,5 @@ jest.mock("../../../../scripts/src/Utils")
 it("renders with mocked data", async () => {
     render(<AdminWindow close={() => { }}/>) // begin rendering
     await screen.findByText("georgepburdell") // wait for userProject mock to return data
-    expect(screen.findByText("georgepburdell")) // verify value
+    await expect(screen.findByText("georgepburdell")) // verify value
 })
