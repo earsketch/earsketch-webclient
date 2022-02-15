@@ -1,4 +1,3 @@
-const { backgroundColor } = require("tailwindcss/lib/plugins")
 module.exports = {
     purge: [],
     darkMode: "class",
