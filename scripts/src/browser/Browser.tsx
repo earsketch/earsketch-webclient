@@ -11,8 +11,6 @@ import { APIBrowser } from "./API"
 import { RootState } from "../reducers"
 import { BrowserTabType } from "../ide/layoutState"
 
-const darkBgColor = "#223546"
-
 export const TitleBar = () => {
     const theme = useSelector(appState.selectColorTheme)
     const dispatch = useDispatch()
@@ -68,11 +66,9 @@ export const BrowserTabs = () => {
     const { t } = useTranslation()
     return (
         <div
-            className="flex justify-between text-center"
+            className="flex justify-between text-center text-white bg-blue"
             id="browser-tabs"
             style={{
-                backgroundColor: darkBgColor,
-                color: "white",
                 minHeight: "fit-content", // Safari-specific issue
             }}
         >
@@ -211,7 +207,6 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     title: string, visible: boolean, initExpanded: boolean, className?: string, children: React.ReactNode
 }) => {
     const [expanded, setExpanded] = useState(initExpanded)
-    const [highlight, setHighlight] = useState(false)
 
     return (
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "flex-grow" : "flex-grow-0"}`}>
@@ -219,15 +214,9 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                 {expanded &&
                     (<div className="h-auto border-l-4 border-orange-400" />)}
                 <div
-                    className="flex flex-grow justify-between items-center p-3 text-2xl border-t border-gray-600 cursor-pointer select-none truncate"
-                    style={{
-                        backgroundColor: highlight ? "#334657" : darkBgColor,
-                        color: "#F5AE3C",
-                    }}
+                    className="flex flex-grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
-                    onMouseEnter={() => setHighlight(true)}
-                    onMouseLeave={() => setHighlight(false)}
                 >
                     <div className="flex items-center truncate py-1">
                         <i className="icon-album pr-3" />

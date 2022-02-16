@@ -43,16 +43,14 @@ const ScriptSearchBar = () => {
 }
 
 const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.Filters, value: string, isClearItem: boolean }) => {
-    const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
     return (
         <>
             <div
-                className={`flex justify-left items-center cursor-pointer pr-8 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}`}
+                className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(scripts.resetFilter(category))
@@ -61,8 +59,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                         else dispatch(scripts.addFilterItem({ category, value }))
                     }
                 }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
@@ -77,22 +73,18 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
 }
 
 const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribute, isClearItem: boolean }) => {
-    const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector(scripts.selectSortByAttribute) === value
     const ascending = useSelector(scripts.selectSortByAscending)
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
 
     if (isClearItem) return null
 
     return (
         <div
-            className={`flex justify-left items-center cursor-pointer pr-8 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}`}
+            className="flex justify-left items-center cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
             onClick={() => {
                 dispatch(scripts.setSorter(value))
             }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
         >
             <div className="w-8">
                 <i className={`icon ${ascending ? "icon-arrow-up" : "icon-arrow-down"} ${selected ? "block" : "hidden"}`} />
@@ -165,25 +157,14 @@ const ShowDeletedScripts = () => {
 }
 
 const PillButton = ({ onClick, children }: { onClick: Function, children: React.ReactNode }) => {
-    const [highlight, setHighlight] = useState(false)
-    const theme = useSelector(appState.selectColorTheme)
-    let bgColor
-    if (highlight) {
-        bgColor = theme === "light" ? "bg-blue-100" : "bg-blue-500"
-    } else {
-        bgColor = theme === "light" ? "bg-white" : "bg-gray-900"
-    }
-
     return (
         <div
-            className={`flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 ${bgColor}`}
+            className="flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
             onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
                 onClick?.()
             }}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
         >
             {children}
         </div>
@@ -311,10 +292,8 @@ const SharedScriptInfoCaller = ({ script }: { script: Script }) => {
     )
 }
 
-const ScriptEntry = ({ script, bgTint, type }: { script: Script, bgTint: boolean, type: ScriptType }) => {
+const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
-    const [highlight, setHighlight] = useState(false)
-    const theme = useSelector(appState.selectColorTheme)
     const open = useSelector(tabs.selectOpenTabs).includes(script.shareid)
     const active = useSelector(tabs.selectActiveTabID) === script.shareid
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid)
@@ -323,26 +302,12 @@ const ScriptEntry = ({ script, bgTint, type }: { script: Script, bgTint: boolean
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
 
-    let bgColor
-    if (highlight) {
-        bgColor = theme === "light" ? "bg-blue-200" : "bg-blue-500"
-    } else {
-        if (theme === "light") {
-            bgColor = bgTint ? "bg-white" : "bg-gray-300"
-        } else {
-            bgColor = bgTint ? "bg-gray-900" : "bg-gray-800"
-        }
-    }
-    const borderColor = theme === "light" ? "border-gray-500" : "border-gray-700"
-
     const shared = script.creator || script.isShared
     const collaborators = script.collaborators as string[]
 
     return (
         <div
-            className={`flex flex-row justify-start ${bgColor} border-t border-b border-r ${borderColor} cursor-pointer`}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
+            className="flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 cursor-pointer"
             onClick={() => {
                 if (type === "regular") {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
@@ -407,8 +372,11 @@ const WindowedScriptCollection = ({ title, entities, scriptIDs, type, visible = 
                     {({ index, style }) => {
                         const ID = scriptIDs[index]
                         return (
-                            <div style={style}>
-                                <ScriptEntry key={ID} script={entities[ID]} bgTint={index % 2 === 0} type={type} />
+                            <div style={style}
+                                className="bg-gray-300 odd:bg-white
+                                           dark:bg-gray-800 dark:odd:bg-gray-900
+                                           hover:bg-blue-200 dark:hover:bg-blue-500">
+                                <ScriptEntry key={ID} script={entities[ID]} type={type} />
                             </div>
                         )
                     }}
