@@ -43,10 +43,10 @@ import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { ModalFooter, Prompt } from "../Utils"
 
-const licenses_ = require("../data/licenses.json")
+import licenses_ from "../data/licenses.json"
 
 const licenses: { [key: string]: any } = {}
-for (const license of Object.values(licenses_)) {
+for (const license of licenses_) {
     licenses[(license as any).id] = license
 }
 

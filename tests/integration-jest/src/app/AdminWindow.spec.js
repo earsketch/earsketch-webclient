@@ -7,7 +7,6 @@ import { AdminWindow } from "../../../../scripts/src/app/AdminWindow" // called 
 // tell jest to use our mocks in place of these modules, located in __mocks__/
 jest.mock("../../../../scripts/src/app/userProject")
 jest.mock("../../../../scripts/src/app/websocket")
-jest.mock("../../../../scripts/src/Utils")
 
 it("renders with mocked data", async () => {
     render(<AdminWindow close={() => { }}/>) // begin rendering
