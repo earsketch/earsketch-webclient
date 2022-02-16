@@ -53,20 +53,17 @@ interface MenuItemProps {
 }
 
 const MenuItem = ({ name, icon, onClick, disabled = false, visible = true }: MenuItemProps) => {
-    const [highlight, setHighlight] = useState(false)
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
     const cursor = disabled ? "cursor-not-allowed" : "cursor-pointer"
 
     return (
         <div
             className={`
                 ${visible ? "flex" : "hidden"} items-center justify-start p-2 space-x-4 ${cursor} 
-                ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}
-                ${theme === "light" ? "text-black" : "text-white"}
+                bg-white dark:bg-black
+                hover:bg-blue-200 dark:hover:bg-blue-500
+                text-black dark:text-white
             `}
-            onMouseEnter={() => setHighlight(true)}
-            onMouseLeave={() => setHighlight(false)}
             onClick={() => {
                 if (disabled) return null
                 onClick()

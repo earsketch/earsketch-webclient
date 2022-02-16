@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, ChangeEvent } from "react"
+import React, { useEffect, useRef, ChangeEvent } from "react"
 import { hot } from "react-hot-loader/root"
 import { useSelector, useDispatch } from "react-redux"
 
@@ -302,7 +302,6 @@ const NavigationBar = () => {
     const pageTitle = useSelector(curriculum.selectPageTitle)
     const theme = useSelector(appState.selectColorTheme)
     const triggerRef = useRef<HTMLButtonElement>(null)
-    const [highlight, setHighlight] = useState(false)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
 
     const handleClick = (event: Event & { target: HTMLElement }) => {
@@ -318,10 +317,7 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none"
-                style={{ backgroundColor: highlight ? "#334657" : "#223546", color: "white" }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}>
+            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
                     : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
