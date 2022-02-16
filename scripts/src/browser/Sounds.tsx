@@ -16,6 +16,8 @@ import { SoundEntity } from "common"
 
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
+import { addUIClick } from "../cai/studentPreferences"
+
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(sounds.selectSearchText)
@@ -49,7 +51,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                 onMouseLeave={() => setHighlight(false)}
             >
                 <div className="w-8">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
+                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
                 </div>
                 <div className="select-none">
                     {isClearItem ? t("clear") : value}
@@ -176,7 +178,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={() => dispatch(sounds.previewSound(name))}
+                        onClick={() => { dispatch(sounds.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -199,7 +201,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => editor.pasteCode(name)}
+                                onClick={() => { editor.pasteCode(name); addUIClick("sample - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />

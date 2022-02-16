@@ -1206,11 +1206,6 @@ kbd {
   text-align: right;
 }
 
-.shake.notAllowedTo  {
-  -webkit-animation: shake 400ms ease-in-out;
-  animation: shake 400ms ease-in-out;
-}
-
 .blink {
   color: red;
   animation: blink-animation 1s steps(5, start) infinite;
@@ -1246,70 +1241,6 @@ kbd {
   100% {
     transform: scale(1.35);
   }
-}
-
-@-webkit-keyframes shake {
-    0% {
-        -webkit-transform: translateX(0);
-        transform: translateX(0);
-    }
-
-    12.5% {
-        -webkit-transform: translateX(-6px) rotateY(-5deg);
-        transform: translateX(-6px) rotateY(-5deg);
-    }
-
-    37.5% {
-        -webkit-transform: translateX(5px) rotateY(4deg);
-        transform: translateX(5px) rotateY(4deg);
-    }
-
-    62.5% {
-        -webkit-transform: translateX(-3px) rotateY(-2deg);
-        transform: translateX(-3px) rotateY(-2deg);
-    }
-
-    87.5% {
-        -webkit-transform: translateX(2px) rotateY(1deg);
-        transform: translateX(2px) rotateY(1deg);
-    }
-
-    100% {
-        -webkit-transform: translateX(0);
-        transform: translateX(0);
-    }
-}
-
-@keyframes shake {
-    0% {
-        -webkit-transform: translateX(0);
-        transform: translateX(0);
-    }
-
-    12.5% {
-        -webkit-transform: translateX(-6px) rotateY(-5deg);
-        transform: translateX(-6px)  rotateY(-5deg);
-    }
-
-    37.5% {
-        -webkit-transform: translateX(5px) rotateY(4deg);
-        transform: translateX(5px) rotateY(4deg);
-    }
-
-    62.5% {
-        -webkit-transform: translateX(-3px) rotateY(-2deg);
-        transform: translateX(-3px) rotateY(-2deg);
-    }
-
-    87.5% {
-        -webkit-transform: translateX(2px) rotateY(1deg);
-        transform: translateX(2px) rotateY(1deg);
-    }
-
-    100% {
-        -webkit-transform: translateX(0);
-        transform: translateX(0);
-    }
 }
 
 @keyframes blink-animation {

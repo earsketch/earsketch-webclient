@@ -41,16 +41,12 @@ export async function renderBuffer(result: DAWData) {
 
         // TODO: Reduce duplication with `player`.
         for (const clip of track.clips) {
-            const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
             const clipStartTime = tempoMap.measureToTime(clip.measure)
             const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
             // create the audio source node to contain the audio buffer
             // and play it at the designated time
             const source = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
-            // Start/end locations within the clip's audio buffer, in seconds.
-            const startTimeInClip = clipStartTime - clipBufferStartTime
-            // the clip duration may be shorter than the buffer duration
             let clipDuration = clipEndTime - clipStartTime
 
             if (origin > clipEndTime) {
@@ -61,7 +57,7 @@ export async function renderBuffer(result: DAWData) {
                 // calculate the offset and begin playing
                 const clipStartOffset = origin - clipStartTime
                 clipDuration -= clipStartOffset
-                source.start(context.currentTime, startTimeInClip + clipStartOffset, clipDuration - clipStartOffset)
+                source.start(context.currentTime, clipStartOffset, clipDuration - clipStartOffset)
                 // keep this flag so we only stop clips that are playing
                 // (otherwise we get an exception raised)
                 clip.playing = true
@@ -69,7 +65,7 @@ export async function renderBuffer(result: DAWData) {
                 // case: clip is in the future
                 // calculate when it should begin and register it to play
                 const untilClipStart = clipStartTime - origin
-                source.start(context.currentTime + untilClipStart, startTimeInClip, clipDuration)
+                source.start(context.currentTime + untilClipStart, 0, clipDuration)
                 clip.playing = true
             }
 
@@ -163,7 +159,7 @@ export async function renderMp3(result: DAWData) {
 export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
     esconsole("Merging clips", ["debug", "renderer"])
     // calculate the length of the merged clips
-    const length = Math.max(0, ...clips.map(clip => clip.measure + (clip.start - clip.end)))
+    const length = Math.max(0, ...clips.map(clip => clip.measure + (clip.end - clip.start)))
     const duration = tempoMap.measureToTime(length + 1)
 
     // create an offline context for rendering
@@ -177,15 +173,10 @@ export async function mergeClips(clips: Clip[], tempoMap: TempoMap) {
         source.connect(mix)
 
         const startTime = tempoMap.measureToTime(clip.measure)
-        const startOffset = tempoMap.measureToTime(clip.start)
-        const endOffset = tempoMap.measureToTime(clip.end)
+        const endTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
 
-        if (endOffset < startOffset) {
-            continue
-        }
-
-        source.start(startTime + startOffset)
-        source.stop(startTime + (endOffset - startOffset))
+        source.start(startTime)
+        source.stop(endTime)
     }
 
     const buffer = await context.startRendering()

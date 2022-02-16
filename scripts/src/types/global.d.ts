@@ -32,6 +32,8 @@ declare const $: any
 declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
 
+declare module "@webscopeio/react-textarea-autocomplete"
+
 declare module "angular" {
     const module: any
     const bootstrap: any

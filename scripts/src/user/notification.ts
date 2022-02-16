@@ -2,6 +2,7 @@ import * as ESUtils from "../esutils"
 import store from "../reducers"
 import * as userProject from "../app/userProject"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
+import * as websocket from "../app/websocket"
 
 export const user = { isAdmin: false, loginTime: Date.now() }
 
@@ -126,3 +127,11 @@ export function markAllAsRead() {
     }
     store.dispatch(setNotifications(newNotifications))
 }
+
+websocket.subscribe(data => {
+    if (data.notification_type === "notifications") {
+        loadHistory(data.notifications)
+    } else if (data.notification_type === "broadcast") {
+        handleBroadcast(data)
+    }
+})
