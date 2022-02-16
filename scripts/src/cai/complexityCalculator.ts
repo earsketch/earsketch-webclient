@@ -314,6 +314,12 @@ function collectFunctionInfo(node: Node, args: [Results, Node]) {
                 ccState.getProperty("userFunctionReturns").push(functionObj)
             }
         } else if (node._astname === "Call") {
+            if (node.func && node.func.id && node.func.id.v) {
+                const callObject = { line: node.lineno, function: node.func.id.v }
+                if (typeof node.func.id.v === "string" && ccState.apiFunctions.includes(node.func.id.v)) {
+                    ccState.getProperty("apiCalls").push(callObject)
+                }
+            }
             // or a function call?
             let calledInsideLoop = false
             const parentsList: StructuralNode[] = []
