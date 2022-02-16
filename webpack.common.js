@@ -24,6 +24,7 @@ module.exports = {
             skulpt: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt.min.js`),
             skulptStdLib: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt-stdlib.js`),
             droplet: path.resolve(__dirname, `${libDir}/droplet/droplet-full.min.js`),
+            hilitor: path.resolve(__dirname, `${vendorDir}/hilitor.js`),
             highlight: path.resolve(__dirname, `${libDir}/highlightjs/highlight.pack.js`),
             jsInterpreter: path.resolve(__dirname, `${vendorDir}/js-interpreter/interpreter.js`),
             jsDiffLib: path.resolve(__dirname, `${libDir}/jsdifflib/difflib.js`),
@@ -118,6 +119,7 @@ module.exports = {
             d3: "d3",
             lamejs: "lamejs",
             JSZip: "jszip",
+            Hilitor: "exports-loader?type=commonjs&exports=single Hilitor!hilitor",
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
@@ -129,11 +131,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "index.html"),
             template: "public/index.html",
-        }),
-        new HtmlWebpackPlugin({
-            filename: path.resolve(__dirname, "message-login.html"),
-            template: "public/message-login.html",
-            inject: false,
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "autograder/index.html"),

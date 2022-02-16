@@ -5,7 +5,7 @@ import storage from "redux-persist/es/storage"
 import { RootState } from "../reducers"
 
 export interface Notification {
-    message: { text: string, json?: string, action?: string, hyperlink?: string, expiration?: string }
+    message: { text: string, json?: string, action?: string, hyperlink?: string }
     // eslint-disable-next-line camelcase
     notification_type: string
     time: number
@@ -25,7 +25,7 @@ const userSlice = createSlice({
     initialState: {
         loggedIn: false,
         username: null as string | null,
-        token: null as string | null, // any changes to token storage need to also be updated in /public/message-login.html for third-party authentication
+        token: null as string | null,
         notifications: [] as Notification[],
     },
     reducers: {

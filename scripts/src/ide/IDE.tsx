@@ -12,7 +12,6 @@ import * as bubble from "../bubble/bubbleState"
 import { CAI } from "../cai/CAI"
 import * as cai from "../cai/caiState"
 import * as caiAnalysis from "../cai/analysis"
-import { Chat } from "../cai/Chat"
 import * as collaboration from "../app/collaboration"
 import { Script } from "common"
 import { Curriculum } from "../browser/Curriculum"
@@ -126,13 +125,6 @@ export function initEditor() {
         exec() {
             compileCode()
         },
-    })
-
-    // Add additional autocomplete shortcut for Mac.
-    editor.ace.commands.addCommand({
-        ...editor.ace.commands.byName.startAutocomplete,
-        name: "startAutocompleteMac",
-        bindKey: { mac: "Option-Space" },
     })
 
     editor.droplet.setEditorState(false)
@@ -289,6 +281,10 @@ export async function compileCode() {
 
         saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
 
+        if (collaboration.active && collaboration.tutoring) {
+            collaboration.sendCompilationRecord(errType)
+        }
+
         if (FLAGS.SHOW_CAI) {
             store.dispatch(cai.compileError([error, code]))
         }
@@ -341,11 +337,14 @@ export async function compileCode() {
             }
 
             console.log("complexityCalculator", report)
-
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.compileCAI([result, language, code]))
             }
         })
+    }
+
+    if (collaboration.active && collaboration.tutoring) {
+        collaboration.sendCompilationRecord("success")
     }
 
     const { bubble } = state
@@ -423,10 +422,11 @@ export const IDE = () => {
                 >
                     <div id="devctrl">
                         <div className="h-full max-h-full relative" id="workspace" style={bubbleActive && [3, 4, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                            <div className={(loading ? "flex" : "hidden") + " loading text-center h-full w-full items-center justify-center"}>
-                                <i className="es-spinner animate-spin mr-3"></i> {t("loading")}
-                            </div>
-                            <div className={(loading ? "hidden " : "") + "workstation h-full w-full"}><DAW /></div>
+                            {loading
+                                ? <div className="loading text-center h-full w-full flex items-center justify-center">
+                                    <i className="es-spinner animate-spin mr-3"></i> {t("loading")}
+                                </div>
+                                : <div className="workstation h-full w-full"><DAW /></div>}
                         </div>
                     </div>
 
@@ -476,13 +476,10 @@ export const IDE = () => {
                 </Split>
 
                 <div className="h-full" id="curriculum-container" style={bubbleActive && [8, 9].includes(bubblePage) ? { zIndex: 35 } : {}}>
-                    {showCAI &&
-                    (FLAGS.SHOW_CHAT
-                        ? <Chat />
-                        : <CAI />)}
-                    <div className={showCAI ? "h-full hidden" : "h-full"}>
-                        <Curriculum />
-                    </div>
+                    {showCAI
+                        ? <CAI />
+                        : <Curriculum />}
+                    {/* NOTE: The chat window might come back here at some point. */}
                 </div>
             </Split>
         </div>

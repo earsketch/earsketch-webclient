@@ -110,12 +110,15 @@ const clearAllTimers = () => {
     clearTimeout(loopSchedTimer)
 }
 
-const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
+const playClip = (clip: Clip, trackGain: GainNode, pitchShift: any, tempoMap: TempoMap, startTime: number, endTime: number, waStartTime: number, manualOffset: number) => {
+    const clipBufferStartTime = tempoMap.measureToTime(clip.measure + (clip.start - 1))
     const clipStartTime = tempoMap.measureToTime(clip.measure)
     const clipEndTime = tempoMap.measureToTime(clip.measure + (clip.end - clip.start))
 
     const clipSource = new AudioBufferSourceNode(context, { buffer: clip.audio })
 
+    // Start/end locations within the clip's audio buffer, in seconds.
+    const startTimeInClip = clipStartTime - clipBufferStartTime
     // the clip duration may be shorter than the buffer duration
     let clipDuration = clipEndTime - clipStartTime
 
@@ -130,7 +133,7 @@ const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime
             clipDuration = endTime - clipStartTime
         }
         // clips -> track gain -> effect tree
-        clipSource.start(waStartTime, clipStartOffset, clipDuration - clipStartOffset)
+        clipSource.start(waStartTime, startTimeInClip + clipStartOffset, clipDuration - clipStartOffset)
 
         // keep this flag so we only stop clips that are playing (otherwise we get an exception raised)
         setTimeout(() => { clip.playing = true }, manualOffset * 1000)
@@ -145,7 +148,7 @@ const playClip = (clip: Clip, trackGain: GainNode, tempoMap: TempoMap, startTime
         if (clipEndTime > endTime) {
             clipDuration = endTime - clipStartTime
         }
-        clipSource.start(waStartTime + untilClipStart, 0, clipDuration)
+        clipSource.start(waStartTime + untilClipStart, startTimeInClip, clipDuration)
         setTimeout(() => { clip.playing = true }, (manualOffset + untilClipStart) * 1000)
     }
 
@@ -202,8 +205,9 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         trackGain.gain.setValueAtTime(1.0, context.currentTime)
 
         // process each clip in the track
+        const pitchShift = track.effects["PITCHSHIFT-PITCHSHIFT_SHIFT"]
         for (const clipData of track.clips) {
-            playClip(clipData, trackGain, tempoMap, startTime, endTime, waStartTime, manualOffset)
+            playClip(clipData, trackGain, pitchShift, tempoMap, startTime, endTime, waStartTime, manualOffset)
         }
 
         // connect the track output to the effect tree

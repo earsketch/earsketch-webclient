@@ -1,95 +1,105 @@
 import esconsole from "../esconsole"
+import * as userNotification from "../user/notification"
 
-// If a connection attempt is taking longer than TIMEOUT seconds,
-// we will disconnect and try reconnecting.
-const TIMEOUT = 20
-
-// Module state:
-let connectTime = 0
+let ws: WebSocket | null
+let reconnect = 10
 let timer = 0
-
-let ws: WebSocket | null = null
-let username: string | null = null
-let pendingMessages: any[] = []
-
+const pendingMessages: any[] = []
 type Subscriber = (data: any) => void
 const subscribers: Subscriber[] = []
 
-export function login(username_: string) {
-    // This function should only ever be called once (per login).
-    if (username === null) {
-        username = username_.toLowerCase() // Fix for issue #1858
-        // Start keepalive heartbeat.
-        keepalive()
-        timer = window.setInterval(keepalive, TIMEOUT * 1000)
-    }
-}
+export let isOpen = false
 
-function connect() {
-    if (ws?.readyState === WebSocket.OPEN) {
-        // We already have a valid connection, no need to connect.
-        return
-    } else if (ws?.readyState === WebSocket.CONNECTING) {
-        if (Date.now() - connectTime < TIMEOUT * 1000) {
-            // We have a connection that has been attempting to connect for less than TIMEOUT,
-            // so let it keep going!
-            return
-        } else {
-            // Connection has been connecting for longer than TIMEOUT, so let's close it and try again.
-            ws.close()
-            ws = null
-        }
-    } else if ([WebSocket.CLOSING, WebSocket.CLOSED].includes(ws?.readyState as any)) {
-        ws = null
-    }
-
+export function connect(username: string, callback?: Function) {
+    username = username.toLowerCase() // Fix for issue #1858
     ws = new WebSocket(`${URL_WEBSOCKET}/socket/${username}/`)
-    connectTime = Date.now()
 
-    ws.onopen = () => esconsole("socket has been opened", "websocket")
+    ws.onopen = () => {
+        esconsole("socket has been opened", "websocket")
+        isOpen = true
+        if (callback !== undefined) {
+            callback()
+        }
+        checkin()
+    }
 
     ws.onerror = (event) => esconsole(event, "websocket")
 
-    // NOTE: keepalive/send is responsible for attempting a reconnect (as determined by TIMEOUT).
-    ws.onclose = () => esconsole("socket has been closed", "websocket")
+    ws.onclose = (event) => {
+        esconsole("socket has been closed", "websocket")
+        isOpen = false
+        if (reconnect > 0) {
+            esconsole(event, "reconnecting (" + reconnect + " times remaining)")
+            connect(username)
+            reconnect--
+        } else {
+            checkout()
+        }
+    }
 
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data)
         for (const subscriber of subscribers) {
             subscriber(data)
         }
+
+        // TODO: handle these in userNotification
+        if (data.notification_type === "notifications") {
+            userNotification.loadHistory(data.notifications)
+        } else if (data.notification_type === "broadcast") {
+            userNotification.handleBroadcast(data)
+        } else if (data.notification_type === "collaboration") {
+            // Handled by collaboration; don't spam the console.
+        } else {
+            esconsole(data, "websocket")
+        }
     }
 }
 
-function keepalive() {
-    // This happens once every TIMEOUT seconds.
-    send({ notification_type: "dummy" })
+export function disconnect() {
+    checkout()
+    ws?.close()
 }
 
-export function send(data: any) {
-    pendingMessages.push(data)
-
-    if (ws?.readyState !== WebSocket.OPEN) {
-        // WebSocket is not ready for use.
-        // Connect, which will flush the queue when the WebSocket is ready.
-        connect()
-        return
+// Keep websocket connection alive.
+function checkin() {
+    reconnect = 10
+    if (isOpen) {
+        send({ notification_type: "dummy" })
     }
+    timer = window.setTimeout(checkin, 20000)
+}
 
-    // Flush message queue.
-    while (pendingMessages.length) {
-        ws!.send(JSON.stringify(pendingMessages.shift()))
-    }
+function checkout() {
+    reconnect = 0
+    clearTimeout(timer)
 }
 
 export function subscribe(callback: Subscriber) {
     subscribers.push(callback)
 }
 
-export function logout() {
-    pendingMessages = []
-    username = null
-    window.clearInterval(timer)
-    ws?.close()
-    ws = null
+export function send(data: any) {
+    pendingMessages.push(data)
+    if (isOpen) {
+        while (pendingMessages.length) {
+            ws!.send(JSON.stringify(pendingMessages.shift()))
+        }
+    }
+}
+
+// TODO: probably move this to the notification service
+export function broadcast(text: string, user: string, hyperlink?: string, expiration?: number, type?: string) {
+    // TODO: For unknown reasons, expiration is ignored here.
+    user = user.toLowerCase() // Fix for issue #1858
+
+    send({
+        notification_type: type ?? "broadcast",
+        username: user,
+        message: {
+            text: text,
+            hyperlink: hyperlink ?? "",
+            expiration: 0,
+        },
+    })
 }

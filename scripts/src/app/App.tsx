@@ -318,7 +318,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts" aria-label="Show/Hide Keyboard Shortcuts">
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts">
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
@@ -341,7 +341,7 @@ const FontSizeMenu = () => {
     const fontSize = useSelector(appState.selectFontSize)
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Font Size" aria-label="Select Font Size">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -373,7 +373,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Settings and Additional Options" aria-label="Settings and Additional Options">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -438,13 +438,13 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
             <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
             <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
+            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
                 {loggedIn
                     ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }} title="Create or Reset Account" aria-label="Create or Reset Account">{t("createResetAccount")}</div>}
+                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
             </Menu.Button>
             <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
@@ -493,7 +493,7 @@ function setup() {
 
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
-        store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
+        store.dispatch(layout.setEast({ open: true }))
     }
 }
 
@@ -628,7 +628,11 @@ export const App = () => {
     }
 
     const logout = async () => {
-        let keepUnsavedTabs = false
+        dispatch(user.logout())
+        dispatch(sounds.resetUserSounds())
+        dispatch(sounds.resetFavorites())
+        dispatch(sounds.resetAllFilters())
+
         // save all unsaved open scripts
         try {
             const promise = saveAll()
@@ -636,43 +640,21 @@ export const App = () => {
             if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
-        } catch (error) {
-            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "discardChanges", okKey: "keepUnsavedTabs" })) {
-                keepUnsavedTabs = true
-            }
-        }
 
-        leaveCollaborationSession()
+            leaveCollaborationSession()
 
-        userProject.clearUser()
-        userNotification.clearHistory()
-        reporter.logout()
+            userProject.clearUser()
+            userNotification.clearHistory()
+            reporter.logout()
 
-        if (keepUnsavedTabs) {
-            // Close unmodified tabs/scripts.
-            const state = store.getState()
-            const modified = tabs.selectModifiedScripts(state)
-            for (const tab of tabs.selectOpenTabs(state)) {
-                if (!modified.includes(tab)) {
-                    dispatch(tabs.closeAndSwitchTab(tab))
-                }
-            }
-            const regularScripts = scripts.selectRegularScripts(state)
-            const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
-            dispatch(scripts.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
-        } else {
+            dispatch(scripts.resetReadOnlyScripts())
             dispatch(tabs.resetTabs())
             dispatch(tabs.resetModifiedScripts())
-            dispatch(scripts.resetRegularScripts())
+        } catch (error) {
+            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "keepUnsavedTabs", okKey: "ignore" })) {
+                userProject.clearUser()
+            }
         }
-
-        dispatch(scripts.resetSharedScripts())
-        dispatch(scripts.resetReadOnlyScripts())
-
-        dispatch(user.logout())
-        dispatch(sounds.resetUserSounds())
-        dispatch(sounds.resetFavorites())
-        dispatch(sounds.resetAllFilters())
 
         // Clear out all the values set at login.
         setUsername("")
@@ -687,12 +669,10 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
-            dispatch(cai.closeCurriculum())
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
-            dispatch(cai.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
         }
     }
 
@@ -713,7 +693,7 @@ export const App = () => {
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <div>
-                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
+                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
@@ -842,7 +822,7 @@ window.onbeforeunload = () => {
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
         const promise = saveAll()
         if (promise) {
-            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
+            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptcloud"), "success"))
             return ""
         }
     }

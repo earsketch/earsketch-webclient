@@ -23,7 +23,7 @@ export function error(error: string | Error) {
 }
 
 // Elaborate error messages printed to the user console. Available cases based on Skulpt's error messages and Node.js's errors.
-export function elaborate(error: string | Error) {
+function elaborate(error: string | Error) {
     const msg = error.toString()
     const parts = msg.split(":")
     switch (parts[0]) {

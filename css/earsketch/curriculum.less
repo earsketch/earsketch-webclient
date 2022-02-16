@@ -12,6 +12,14 @@
   height: 100%;
 
   // These reset the defaults under .prose (a tailwind plugin).
+  #toc {
+    > li::before, ul > li::before {
+      display: none;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
   .stretch {
     all: unset;
   }
@@ -43,7 +51,7 @@
   margin-top:1em;
 }
 
-.btn-copy-url, .btn-slides, .btn-fullscreen {
+.btn-copy-url, .btn-slides, .btn-toc, .btn-fullscreen {
   float: right;
 }
 

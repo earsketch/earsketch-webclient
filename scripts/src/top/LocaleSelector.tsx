@@ -16,8 +16,6 @@ export const AVAILABLE_LOCALES: locale[] = [
     { displayText: "English", localeCode: "en" },
     { displayText: "Español", localeCode: "es" },
     { displayText: "Français", localeCode: "fr" },
-    { displayText: "ᐃᓄᒃᑎᑐᑦ", localeCode: "iu" },
-    { displayText: "Ojibwe", localeCode: "oj" },
 ]
 
 export const LocaleSelector = () => {
@@ -41,7 +39,7 @@ export const LocaleSelector = () => {
     return (
         <div className="">
             <Menu as="div" className="relative inline-block text-left">
-                <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Language" aria-label="Select Language">
+                <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
                     <div className="flex flex-row items-center">
                         <div><i className="icon icon-earth"></i></div>
                         <div className="ml-1"><span className="caret"></span></div>

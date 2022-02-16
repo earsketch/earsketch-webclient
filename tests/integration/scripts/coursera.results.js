@@ -5,12 +5,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 112, endValue: 112 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -38,12 +33,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 96, endValue: 96 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -66,12 +56,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 96, endValue: 96 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -110,12 +95,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 96, endValue: 96 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -160,12 +140,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 96, endValue: 96 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -229,12 +204,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -243,7 +213,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
-                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 1, startValue: 20, endValue: 20 },
+                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 5, startValue: 20, endValue: 20 },
                     ],
                 },
             },
@@ -256,24 +226,19 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3 },
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3 },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
-                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 1, startValue: 10, endValue: 10 },
+                        { track: 1, name: "DISTORTION", parameter: "DISTO_GAIN", startMeasure: 1, endMeasure: 5, startValue: 10, endValue: 10 },
                     ],
                     "PITCHSHIFT-PITCHSHIFT_SHIFT": [
-                        { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 1, endMeasure: 1, startValue: -2, endValue: -2 },
+                        { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 1, endMeasure: 5, startValue: -2, endValue: -2 },
                     ],
                 },
             },
@@ -286,17 +251,12 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3 },
-                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3 },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 1, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "HOUSE_DEEP_PIANO_001", measure: 3, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
                 ],
                 effects: {
                     "DISTORTION-DISTO_GAIN": [
@@ -317,19 +277,14 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 140, endValue: 140 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
-                    { filekey: "DUBSTEP_PAD_004", measure: 1, start: 1, end: 3 },
-                    { filekey: "DUBSTEP_PAD_004", measure: 3, start: 1, end: 3 },
-                    { filekey: "DUBSTEP_PAD_004", measure: 5, start: 1, end: 3 },
-                    { filekey: "DUBSTEP_PAD_004", measure: 7, start: 1, end: 3 },
+                    { filekey: "DUBSTEP_PAD_004", measure: 1, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "DUBSTEP_PAD_004", measure: 3, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "DUBSTEP_PAD_004", measure: 5, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
+                    { filekey: "DUBSTEP_PAD_004", measure: 7, start: 1, end: 3, pitchshift: { start: 1, end: 3 } },
                 ],
                 effects: {
                     "PITCHSHIFT-PITCHSHIFT_SHIFT": [
@@ -1062,7 +1017,7 @@ export const COURSERA_RESULTS = {
                         { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 8.956164383561644, endMeasure: 8.967123287671232, startValue: 1.7999999999999994, endValue: 1.7999999999999994 },
                         { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 8.967123287671232, endMeasure: 8.978082191780821, startValue: 1.3599999999999997, endValue: 1.3599999999999997 },
                         { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 8.978082191780821, endMeasure: 8.98904109589041, startValue: 1.1199999999999997, endValue: 1.1199999999999997 },
-                        { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 8.98904109589041, endMeasure: 8.98904109589041, startValue: 0.44000000000000017, endValue: 0.44000000000000017 },
+                        { track: 1, name: "PITCHSHIFT", parameter: "PITCHSHIFT_SHIFT", startMeasure: 8.98904109589041, endMeasure: 9, startValue: 0.44000000000000017, endValue: 0.44000000000000017 },
                     ],
                 },
             },
@@ -1075,12 +1030,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 153, endValue: 153 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -1222,12 +1172,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 153, endValue: 153 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -1369,12 +1314,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 140, endValue: 140 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -1436,12 +1376,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 220, endValue: 220 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -1480,7 +1415,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 1, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: -100, endValue: -100 },
+                        { track: 1, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: -100, endValue: -100 },
                     ],
                 },
             },
@@ -1521,7 +1456,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 2, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: 100, endValue: 100 },
+                        { track: 2, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: 100, endValue: 100 },
                     ],
                 },
             },
@@ -1562,7 +1497,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 3, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: 0, endValue: 0 },
+                        { track: 3, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: 0, endValue: 0 },
                     ],
                 },
             },
@@ -1603,7 +1538,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 4, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: -50, endValue: -50 },
+                        { track: 4, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: -50, endValue: -50 },
                     ],
                 },
             },
@@ -1644,7 +1579,7 @@ export const COURSERA_RESULTS = {
                 ],
                 effects: {
                     "PAN-LEFT_RIGHT": [
-                        { track: 5, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 1, startValue: 50, endValue: 50 },
+                        { track: 5, name: "PAN", parameter: "LEFT_RIGHT", startMeasure: 1, endMeasure: 65, startValue: 50, endValue: 50 },
                     ],
                 },
             },
@@ -1657,12 +1592,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -1672,13 +1602,13 @@ export const COURSERA_RESULTS = {
                     "VOLUME-GAIN": [
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1.0625, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.0625, endMeasure: 1.125, startValue: 0, endValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: 0, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.1875, endMeasure: 1.25, startValue: -60, endValue: -60 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: -60, endValue: -60 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.3125, endMeasure: 1.375, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.375, endMeasure: 1.4375, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.4375, endMeasure: 1.5, startValue: -60, endValue: -60 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: -60, endValue: -60 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5625, endMeasure: 1.625, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.625, endMeasure: 1.6875, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.6875, endMeasure: 1.75, startValue: 0, endValue: 0 },
@@ -1686,7 +1616,7 @@ export const COURSERA_RESULTS = {
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.8125, endMeasure: 1.875, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.875, endMeasure: 1.9375, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.9375, endMeasure: 2, startValue: 0, endValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: -60, endValue: -60 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2.0625, endMeasure: 2.125, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2.125, endMeasure: 2.1875, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2.1875, endMeasure: 2.25, startValue: 0, endValue: 0 },
@@ -1713,13 +1643,13 @@ export const COURSERA_RESULTS = {
                     "VOLUME-GAIN": [
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1.0625, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.0625, endMeasure: 1.125, startValue: -60, endValue: -60 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: -60, endValue: -60 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.1875, endMeasure: 1.25, startValue: 0, endValue: 0 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: 0, endValue: 0 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.3125, endMeasure: 1.375, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.375, endMeasure: 1.4375, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.4375, endMeasure: 1.5, startValue: 0, endValue: 0 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: 0, endValue: 0 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5625, endMeasure: 1.625, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.625, endMeasure: 1.6875, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.6875, endMeasure: 1.75, startValue: -60, endValue: -60 },
@@ -1727,7 +1657,7 @@ export const COURSERA_RESULTS = {
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.8125, endMeasure: 1.875, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.875, endMeasure: 1.9375, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.9375, endMeasure: 2, startValue: -60, endValue: -60 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: 0, endValue: 0 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2.0625, endMeasure: 2.125, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2.125, endMeasure: 2.1875, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2.1875, endMeasure: 2.25, startValue: -60, endValue: -60 },
@@ -1755,12 +1685,7 @@ export const COURSERA_RESULTS = {
         tracks: [
             {
                 clips: [],
-                effects: {
-                    "TEMPO-TEMPO": [
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
-                    ],
-                },
+                effects: {},
             },
             {
                 clips: [
@@ -1770,13 +1695,13 @@ export const COURSERA_RESULTS = {
                     "VOLUME-GAIN": [
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1.0625, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.0625, endMeasure: 1.125, startValue: -60, endValue: -60 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: -60, endValue: -60 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: 0, endValue: 0 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.1875, endMeasure: 1.25, startValue: 0, endValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: 0, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.3125, endMeasure: 1.375, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.375, endMeasure: 1.4375, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.4375, endMeasure: 1.5, startValue: 0, endValue: 0 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: 0, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5625, endMeasure: 1.625, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.625, endMeasure: 1.6875, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.6875, endMeasure: 1.75, startValue: -60, endValue: -60 },
@@ -1784,7 +1709,7 @@ export const COURSERA_RESULTS = {
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.8125, endMeasure: 1.875, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.875, endMeasure: 1.9375, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 1.9375, endMeasure: 2, startValue: -60, endValue: -60 },
-                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: 0, endValue: 0 },
+                        { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2.0625, endMeasure: 2.125, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2.125, endMeasure: 2.1875, startValue: -60, endValue: -60 },
                         { track: 1, name: "VOLUME", parameter: "GAIN", startMeasure: 2.1875, endMeasure: 2.25, startValue: -60, endValue: -60 },
@@ -1811,13 +1736,13 @@ export const COURSERA_RESULTS = {
                     "VOLUME-GAIN": [
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1, endMeasure: 1.0625, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.0625, endMeasure: 1.125, startValue: 0, endValue: 0 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: 0, endValue: 0 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.125, endMeasure: 1.1875, startValue: -60, endValue: -60 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.1875, endMeasure: 1.25, startValue: -60, endValue: -60 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: -60, endValue: -60 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.25, endMeasure: 1.3125, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.3125, endMeasure: 1.375, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.375, endMeasure: 1.4375, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.4375, endMeasure: 1.5, startValue: -60, endValue: -60 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: -60, endValue: -60 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5, endMeasure: 1.5625, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.5625, endMeasure: 1.625, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.625, endMeasure: 1.6875, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.6875, endMeasure: 1.75, startValue: 0, endValue: 0 },
@@ -1825,7 +1750,7 @@ export const COURSERA_RESULTS = {
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.8125, endMeasure: 1.875, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.875, endMeasure: 1.9375, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 1.9375, endMeasure: 2, startValue: 0, endValue: 0 },
-                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: -60, endValue: -60 },
+                        { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2, endMeasure: 2.0625, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2.0625, endMeasure: 2.125, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2.125, endMeasure: 2.1875, startValue: 0, endValue: 0 },
                         { track: 2, name: "VOLUME", parameter: "GAIN", startMeasure: 2.1875, endMeasure: 2.25, startValue: 0, endValue: 0 },

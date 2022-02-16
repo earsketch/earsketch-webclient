@@ -90,9 +90,9 @@ async function _getSound(name: string) {
     esconsole(`Decoding ${name} buffer`, ["debug", "audiolibrary"])
     let buffer: AudioBuffer
     try {
-        // Using decodeAudioData's newer promise-based syntax (requires Safari 14.1+)
+        // decodeAudioData has a newer promise-based syntax, but unfortunately Safari does not support it.
         // See https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/decodeAudioData#browser_compatibility
-        buffer = await ctx.decodeAudioData(data)
+        buffer = await new Promise((resolve, reject) => ctx.decodeAudioData(data, buffer => resolve(buffer), reject))
     } catch (err) {
         esconsole("Error decoding audio: " + name, ["error", "audiolibrary"])
         throw err

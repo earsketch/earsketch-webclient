@@ -28,7 +28,6 @@ module.exports = function (config) {
             "karma-jasmine",
             "karma-html-reporter",
             "karma-webpack",
-            "karma-junit-reporter",
         ],
 
         captureTimeout: 20000,
@@ -36,32 +35,15 @@ module.exports = function (config) {
         browserDisconnectTolerance: 3,
         browserNoActivityTimeout: 120000,
 
-        reporters: ["progress", "html", "junit"],
+        reporters: ["progress", "html"],
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
         client: {
             captureConsole: false, // set to true to show log messages
         },
-        browsers: ["ChromeHeadlessNoSandbox"],
-        customLaunchers: {
-            ChromeHeadlessNoSandbox: {
-                base: "ChromeHeadless",
-                flags: ["--no-sandbox"],
-            },
-        },
+        browsers: ["ChromeHeadless"],
         singleRun: true,
         proxyValidateSSL: false,
-
-        junitReporter: {
-            outputDir: "reports/karma", // results will be saved as $outputDir/$browserName.xml
-            outputFile: undefined, // if included, results will be saved as $outputDir/$browserName/$outputFile
-            suite: "", // suite will become the package name attribute in xml testsuite element
-            useBrowserName: true, // add browser name to report and classes names
-            nameFormatter: undefined, // function (browser, result) to customize the name attribute in xml testcase element
-            classNameFormatter: undefined, // function (browser, result) to customize the classname attribute in xml testcase element
-            properties: {}, // key value pair of properties to add to the <properties> section of the report
-            xmlVersion: null, // use '1' if reporting to be per SonarQube 6.2 XML format
-        },
     })
 }

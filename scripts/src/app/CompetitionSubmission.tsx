@@ -18,19 +18,20 @@ export const CompetitionSubmission = ({ name, shareID, close }: { name: string, 
                     <div className="modal-section-header w-full m-0">
                         <span>Competition Rules</span>
                     </div>
-                    <ul className="list-disc text-left p-10 pl-16 space-y-2">
-                        <li>Submission deadline for Round 1 is 11:59PM EST on February 7, 2022</li>
-                        <li>Submission deadline for Round 2 is 11:59PM EST on June 19, 2022</li>
-                        <li>Song must be between 30 seconds and 3 minutes, include 5 unique musical tracks, and a stem from the Entrepreneur Song by Pharrell Williams (MS/HS students must also include one custom function)</li>
-                        <li>Song needs to be a “Remix” of one of the three featured songs (Entrepreneur, New Normal, Underdog)</li>
-                        <li>A reflection describing song message must be included with song submission</li>
-                        <li>Students can submit one song per round</li>
-                        <li>Students can work alone or with one partner</li>
+                    <ul className="list-disc text-left p-10 pl-16">
+                        <li>Submission deadline for Round 1 is 11:59PM EST on March 12, 2021.</li>
+                        <li>Submission deadline for Round 2 is 11:59PM EST on June 4, 2021.</li>
+                        <li>Students may work individually or in pairs.</li>
+                        <li>Students may submit multiple entries, but a winning submission from Round 1 may not be submitted for Round 2.</li>
+                        <li>Open to middle and high school students in the US and Canada.</li>
+                        <li>Must include at least one musical stem from Pharrell &amp; Jay-Z&apos;s &quot;Entrepreneur.&quot;</li>
+                        <li>Must be 30 seconds to 3 minutes in length.</li>
+                        <li>Code must run without errors.</li>
                         <li>For more information, please visit the <a href="https://www.amazonfutureengineer.com/yourvoiceispower" target="_blank" rel="noreferrer">competition website</a>.</li>
                     </ul>
                 </div>
                 <div className="text-center m-auto">
-                    <a href={"https://rocketjudge.com/register/WL8i2vts#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
+                    <a href={"https://rocketjudge.com/register/poRnymQW#scriptid=".concat(shareID)} target="_blank" rel="noreferrer">
                         <button style={{ minWidth: "270px", fontSize: "26px", color: "black", background: "#d3d25a" }}>Click Here to Submit</button>
                     </a>
                 </div>
