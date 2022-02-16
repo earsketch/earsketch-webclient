@@ -133,7 +133,7 @@ function trackToTimeline(output: any, apiCalls: any = null) {
     for (let i = 0; i < output.tracks.length - 1; i++) {
         for (const sample of output.tracks[i].clips) {
             // report sound for every measure it is used in.
-            for (let k = Math.floor(sample.start); k < Math.ceil(sample.end); k++) {
+            for (let k = Math.floor(sample.start - 1 + sample.measure); k < Math.ceil(sample.end - 1 + sample.measure); k++) {
                 if (!measureView[k] || measureView[k] === null) {
                     measureView[k] = []
                 }

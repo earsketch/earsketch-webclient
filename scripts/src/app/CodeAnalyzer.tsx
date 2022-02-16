@@ -17,7 +17,7 @@ export const generateCSV = (results: Result[], options: DownloadOptions) => {
     const colMap: { [key: string]: { [key: string]: number } } = {}
 
     for (const result of results) {
-        if (result.reports) {
+        if (result && result.reports) {
             for (const name of Object.keys(result.reports)) {
                 if (options.allowedKeys && !options.allowedKeys.includes(name)) {
                     delete result.reports[name]
@@ -42,15 +42,18 @@ export const generateCSV = (results: Result[], options: DownloadOptions) => {
         for (let i = 0; i < headers.length; i++) {
             row[i] = ""
         }
-        if (result.script) {
+        if (result && result.script) {
             row[0] = options.useContestID ? result.contestID : result.script.username
             row[1] = result.script.name
             row[2] = result.script.shareid
         }
-        if (result.error) {
+        if (result && result.error) {
             row[3] = result.error
         }
-        if (result.reports) {
+        // if (result && !result.error) {
+        //    row[3] = "no error"
+        // }
+        if (result && result.reports) {
             for (const name of Object.keys(result.reports)) {
                 const report = result.reports[name]
                 if (Array.isArray(report)) {
@@ -172,7 +175,7 @@ const ReportDisplay = ({ report }: { report: { [key: string]: string | number } 
 }
 
 const ResultPanel = ({ result }: { result: Result }) => {
-    return <div className="container">
+   /*  return <div className="container">
         <div className="panel panel-primary">
             {result.script &&
                 <div className="panel-heading" style={{ overflow: "auto" }}>
@@ -200,7 +203,7 @@ const ResultPanel = ({ result }: { result: Result }) => {
                     </div>
                 </div>}
         </div>
-    </div>
+    </div> */
 }
 
 export const Results = ({ results, processing, options }: { results: Result[], processing: string | null, options: DownloadOptions }) => {
@@ -209,7 +212,7 @@ export const Results = ({ results, processing, options }: { results: Result[], p
             <ul>
                 {results.map((result, index) =>
                     <li key={index}>
-                        <ResultPanel result={result} />
+                        {/*  <ResultPanel result={result} /> */}
                     </li>
                 )}
             </ul>}

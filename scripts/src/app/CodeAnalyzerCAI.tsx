@@ -19,10 +19,49 @@ const scriptInfo: any[] = []
 const types: any[] = []
 var headers: string = ""
 
-export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
-{ options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
+export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
+    options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void
+}) => {
     return <div className="container">
-
+        <div className="panel panel-primary">
+            <div className="panel-heading">
+                Step 1: Select Reporter Options
+            </div>
+            <div className="panel-body">
+                <div className="col-md-4">
+                    <label>
+                        Code/Music Analysis Options:
+                    </label><br></br>
+                    <ul>
+                        {Object.entries(options).map(([option, value]) =>
+                            <label key={option}>
+                                {typeof (value) === "boolean" &&
+                                    <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>}
+                                {option}{" "}
+                                {(typeof (value) === "string" || typeof (value) === "number") &&
+                                    <input type="text" value={value} onChange={e => setOptions({ ...options, [option]: e.target.value })} style={{ backgroundColor: "lightgray" }}></input>}
+                            </label>
+                        )}
+                    </ul>
+                </div>
+                {showSeed &&
+                    <div className="col-md-4">
+                        <h4>Random Seed</h4>
+                        <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
+                        {seed !== undefined
+                            ? <div>Use the following random seed:
+                                <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>
+                            </div>
+                            : <div>Use a random seed</div>}
+                        <p className="small">
+                            This will automatically seed every random function in Python and JavaScript.
+                        </p>
+                        <p className="small">
+                            Disclaimer: Testing randomness is inherently difficult. Only use this in the most trivial of cases.
+                        </p>
+                    </div>}
+            </div>
+        </div>
     </div>
 }
 
@@ -112,19 +151,40 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
         try {
             if (script.source_code !== "\r" && script.source_code !== "") {
-                // const compilerOuptut = await compile(script.source_code, "script.py", seed)
                 while (script.source_code.endsWith("\"") || script.source_code.endsWith("\r") || script.source_code.endsWith("\n")) {
                     script.source_code = script.source_code.substring(0, script.source_code.length - 1);
                 }
 
                 while (script.source_code.startsWith("\"\"")) {
-                    script.source_code = script.source_code.substring(1);
+                    script.source_code = script.source_code.substring(1)
                 }
 
                 if (script.source_code.includes("\"\"")) {
-                    script.source_code = script.source_code.split("\"\"").join("\"");
+                    script.source_code = script.source_code.split("\"\"").join("\"")
                 }
-                if (script.name.includes(".js")) {
+
+                let compilerOuptut: any
+                if (script.name.includes("js")) {
+                    compilerOuptut = await compile(script.source_code, "script.js", seed)
+                } else {
+                    while (script.source_code.startsWith("\"")) {
+                        script.source_code = script.source_code.substring(1)
+                    }
+                    compilerOuptut = await compile(script.source_code, "script.py", seed)
+                }
+                let complexityString: string = ""
+                const analysisOutput = caiAnalysisModule.analyzeMusic(compilerOuptut)
+                for (const subobj in analysisOutput) {
+                    console.log(subobj)
+                    if (subobj === "OVERVIEW" ||subobj === "MEASUREVIEW" || subobj === "GENRE" || subobj === "SOUNDPROFILE") {
+                        complexityString += ","
+                        complexityString += subobj + "|"
+                        complexityString += JSON.stringify(analysisOutput[subobj]).split(",").join("|")
+                    }
+                }
+                reports["COMPLEXITY"]["complexity"] = complexityString.substring(1)
+
+                /* if (script.name.includes(".js")) {
                     reports["COMPLEXITY"]["complexity"] = JSON.stringify(caiAnalysisModule.analyzeCode("javascript", script.source_code))// .split(":").join(",")// .split(",").join("|")
                 } else {
                     while (script.source_code.startsWith("\"")) {
@@ -132,11 +192,11 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     }
                     reports["COMPLEXITY"]["complexity"] = caiAnalysisModule.analyzeCode("python", script.source_code)// .split(":").join(",")// .split(",").join("|")
                 }
-                console.log(reports["COMPLEXITY"])
-            }
-            result = {
-                script: script,
-                reports: reports,
+                console.log(reports["COMPLEXITY"]) */
+                result = {
+                    script: script,
+                    reports: reports,
+                }
             }
         } catch (err) {
             console.log("log error", err)
@@ -234,6 +294,7 @@ export interface ReportOptions {
     COMPLEXITY: boolean
 }
 
+
 export const CodeAnalyzerCAI = () => {
     document.getElementById("loading-screen")!.style.display = "none"
 
@@ -258,6 +319,13 @@ export const CodeAnalyzerCAI = () => {
         <div className="container">
             <h1>EarSketch Code Analyzer - CAI Version</h1>
         </div>
+        <Options
+            options={options}
+            seed={seed}
+            showSeed={true}
+            setOptions={setOptions}
+            setSeed={setSeed}
+        />
         <Upload
             processing={processing}
             options={options}
@@ -268,7 +336,7 @@ export const CodeAnalyzerCAI = () => {
         <Results
             results={results}
             processing={processing}
-            options={{ useContestID: false, allowedKeys: ["OVERVIEW", "COMPLEXITY", "EFFECTS"], showIndividualResults: false } as DownloadOptions}
+            options={{ useContestID: false, allowedKeys: ["OVERVIEW", "COMPLEXITY", "MEASUREVIEW", "GENRE", "SOUNDPROFILE"], showIndividualResults: false } as DownloadOptions}
         />
         <ModalContainer />
     </div>
