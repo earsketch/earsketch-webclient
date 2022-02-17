@@ -248,14 +248,36 @@ export function getKeySignatureString(filename: string) {
     }
 }
 
-function estimateKeySignature(filenames:Array<number>) {
-    // For a given set of files, return an estimated key signature. 
+function computeMode(array: Array<number>) {
+    // Given an array of numbers, return the most frequent number in the array.
+    // If there is a tie, return the lowest number.
+    const counts: { [key: number]: number } = {}
+    for (const num of array) {
+        if (num in counts) {
+            counts[num] = counts[num] + 1
+        } else {
+            counts[num] = 1
+        }
+    }
+    let maxCount = 0
+    let mode = 0
+    for (const num in counts) {
+        if (counts[num] > maxCount) {
+            maxCount = counts[num]
+            mode = Number(num)
+        }
+    }
+    return mode
+}
+
+function estimateKeySignature(filenames: Array<number>) {
+    // For a given set of files, return an estimated key signature.
     const keyClass = filenames.map(f => KEYSIGNATURES[`${f}`])
     // now filter out all the -1's
     const keyClassFiltered = keyClass.filter(k => k !== -1)
-    if (keyClassFiltered.length !== 0){
-        // return average rounded to nearest integer
-        return keyClassFiltered.reduce((a, b) => a + b) / keyClassFiltered.length
+    if (keyClassFiltered.length !== 0) {
+        const mode = computeMode(keyClassFiltered)
+        return mode
     }
-    return -1 
+    return -1
 }
