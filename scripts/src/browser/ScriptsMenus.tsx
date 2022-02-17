@@ -15,7 +15,6 @@ import * as userNotification from "../user/notification"
 import * as userProject from "../app/userProject"
 
 export const shareScript = (script: Script) => {
-    console.log(script)
     _shareScript(Object.assign({}, script))
 }
 
