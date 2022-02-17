@@ -247,3 +247,15 @@ export function getKeySignatureString(filename: string) {
         return "N/A"
     }
 }
+
+function estimateKeySignature(filenames:Array<number>) {
+    // For a given set of files, return an estimated key signature. 
+    const keyClass = filenames.map(f => KEYSIGNATURES[`${f}`])
+    // now filter out all the -1's
+    const keyClassFiltered = keyClass.filter(k => k !== -1)
+    if (keyClassFiltered.length !== 0){
+        // return average rounded to nearest integer
+        return keyClassFiltered.reduce((a, b) => a + b) / keyClassFiltered.length
+    }
+    return -1 
+}
