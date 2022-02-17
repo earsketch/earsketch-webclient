@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next"
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <button className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title="Create New Script" aria-label="Create New Script">
+        <button className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} >
             <div className="align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm">
                 <i className="icon icon-plus2" />
             </div>
@@ -48,8 +48,8 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
     const dispatch = useDispatch()
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    const ariaStrings = { owners: "Owners", types: "File Type" }
-    const aria = isClearItem ? "Clear Filter by " + ariaStrings[category] : value
+    const ariaStrings = { owners: t("scriptBrowser.filterDropdown.owner"), types: t("scriptBrowser.filterDropdown.fileType") }
+    const aria = isClearItem ? t("scriptBrowser.filterDropdown.clearFilter") + ariaStrings[category] : value
     return (
         <>
             <div
@@ -132,7 +132,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
-                    aria="File Type"
+                    aria={t("scriptBrowser.filterDropdown.fileType")}
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"
@@ -141,7 +141,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.sortBy")}
                     category="sortBy"
-                    aria="Sort By"
+                    aria={t("scriptBrowser.filterDropdown.sortBy")}
                     items={["Date", "A-Z"]}
                     position="right"
                     FilterItem={SortOptionsItem}
@@ -159,8 +159,8 @@ const ShowDeletedScripts = () => {
             <div className="pr-2">
                 <input
                     type="checkbox"
-                    aria-label="Show Deleted Scripts"
-                    title="Show Deleted Scripts"
+                    aria-label={t("scriptBrowser.showDeleted")}
+                    title={t("scriptBrowser.showDeleted")}
                     role="checkbox"
                     style={{ margin: 0 }}
                     onClick={(event: MouseEvent) => {
@@ -207,7 +207,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => shareScript(script)} aria={`Share ${script.name}`}>
+        <PillButton onClick={() => shareScript(script)} aria={t("scriptShare.title")}>
             <i className="icon-share32" />
             <div>{t("script.share")}</div>
         </PillButton>
@@ -217,7 +217,7 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={`Restore ${script.name}`}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={`${t("scriptBrowser.restore")} ${script.name}`}>
             <i className="icon-rotate-cw2"/>
             <div>{t("scriptBrowser.restore")}</div>
         </PillButton>
@@ -334,6 +334,7 @@ const ScriptEntry = ({ script, bgTint, type }: { script: Script, bgTint: boolean
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid)
     const tabIndicator = (open || active) ? (active ? (modified ? "border-red-600" : "border-green-400") : (modified ? "border-red-400" : "border-green-300") + " opacity-80") : "opacity-0"
     const loggedIn = useSelector(user.selectLoggedIn)
+    const { t } = useTranslation()
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
 
@@ -364,8 +365,8 @@ const ScriptEntry = ({ script, bgTint, type }: { script: Script, bgTint: boolean
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
                 }
             }}
-            title={`Open ${script.name} in Code Editor`}
-            aria-label={`Open ${script.name} in Code Editor`}
+            title={t("scriptBrowser.openInEditor", script.name)}
+            aria-label={t("scriptBrowser.openInEditor", script.name)}
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div

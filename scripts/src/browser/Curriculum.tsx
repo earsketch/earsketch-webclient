@@ -66,13 +66,14 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
+    const { t } = useTranslation()
     return (
         <li className="pl-5 py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
             <span className="inline-grid grid-flow-col"
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button aria-label={`${focus[1] === chIdx ? `Collapse Chapter ${+(chIdx) + 1}: ` : `Expand Chapter ${+(chIdx) + 1}: `} ${ch.title}`} title={`${focus[1] === chIdx ? "Collapse Chapter" : "Expand Chapter "}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")} ${ch.title}`} title={`${focus[1] === chIdx ? t("thing.collapse") : t("thing.expand")}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
                     className="text-black dark:text-white flex"
@@ -84,7 +85,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
-                    <li role="button" aria-label={`Open Section: ${sec.title}`} key={secIdx} className="py-1">
+                    <li role="button" aria-label={t("curriculum.openSection", sec.title)} key={secIdx} className="py-1">
                         <span className="pl-10 flex">
                             <a href="#"
                                 className="text-black dark:text-white flex"
@@ -114,7 +115,7 @@ const TableOfContents = () => {
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button aria-label={`${focus[0] === unitIdx ? "Collapse " : "Expand "} Unit ${unitIdx}`} title={`${focus[0] === unitIdx ? "Collapse" : "Expand"}`}><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <button aria-label={`${focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} ${unitIdx}`} title={`${focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} ${unitIdx}`}><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>

@@ -32,8 +32,8 @@ export const TitleBar = () => {
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
-                    aria-label={`Close ${t("contentManager.title")}`}
-                    title={`Close ${t("contentManager.title")}`}
+                    aria-label={t("thing.close") + " " + t("contentManager.title")}
+                    title={`${t("thing.close")} ${t("contentManager.title")}`}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </button>
@@ -45,6 +45,7 @@ export const TitleBar = () => {
 const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
+    const { t } = useTranslation()
 
     return (
         <button
@@ -59,8 +60,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                 open: true,
                 kind: type,
             }))}
-            title={`Open ${name} Tab`}
-            aria-label={`Open ${name} Tab`}
+            title={t("contentManager.openTab", { name })}
+            aria-label={t("contentManager.openTab", { name })}
         >
             {children}
             {name}
@@ -141,6 +142,7 @@ interface DropdownMultiSelectorProps {
 
 export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const theme = useSelector(appState.selectColorTheme)
+    const { t } = useTranslation()
     const [showTooltip, setShowTooltip] = useState(false)
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null)
     const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
@@ -181,7 +183,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                 })
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
-            aria-label={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
+            aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { aria })}
             title={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
         >
             <div className="flex justify-left truncate">
@@ -223,6 +225,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     const [expanded, setExpanded] = useState(initExpanded)
     const [highlight, setHighlight] = useState(false)
     const filteredTitle = title.replace(/\([^)]*\)/g, "")
+    const { t } = useTranslation()
 
     return (
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "flex-grow" : "flex-grow-0"}`}>
@@ -246,8 +249,8 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </div>
                     <div className="w-1/12 text-2xl">
                         {expanded
-                            ? <button className="icon icon-arrow-down2" title={`Collapse ${filteredTitle}`} aria-label={`Collapse ${filteredTitle}`}> </button>
-                            : <button className="icon icon-arrow-right2" title={`Expand ${filteredTitle}`} aria-label={`Expand ${filteredTitle}`}> </button>}
+                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { filteredTitle })} aria-label={t("contentManager.collapseCollection", { filteredTitle })}> </button>
+                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { filteredTitle })} aria-label={t("contentManager.expandCollection", { filteredTitle })}> </button>}
                     </div>
                 </div>
             </div>
@@ -262,6 +265,7 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     const theme = useSelector(appState.selectColorTheme)
     const embedMode = useSelector(appState.selectEmbedMode)
     const dispatch = useDispatch()
+    const { t } = useTranslation()
 
     return (
         <div
@@ -269,8 +273,8 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             onClick={() => {
                 position === "west" ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }))
             }}
-            aria-label={`Open ${title}`}
-            title={`Open ${title}`}
+            aria-label={t("thing.open") + " " + title}
+            title={t("thing.open") + " " + title}
         >
             <div
                 className={`

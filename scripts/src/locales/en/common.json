@@ -2,6 +2,9 @@
   "common": {
     "loading": "Loading...",
     "contentManager.title": "Content Manager",
+    "contentManager.openTab": "Open {{name}} Tab",
+    "thing.collapse": "Collapse {{name}}",
+    "thing.expand": "Expand {{name}}",
     "search": "Search",
     "results": "Results",
     "noResults": "No results",
@@ -29,11 +32,14 @@
     "soundBrowser.clip.tooltip.previewSound": "Preview sound",
     "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
     "soundBrowser.clip.tooltip.paste": "Paste to editor",
+    "scriptBrowser.filterDropdown.clearFilter": "Clear Filter by ",
     "scriptBrowser.filterDropdown.owner": "Owner",
     "scriptBrowser.filterDropdown.fileType": "File Type",
+    "scriptBrowser.filterDropdown.filterBy": "Filter By {{filter}}",
     "scriptBrowser.filterDropdown.sortBy": "Sort By",
     "scriptBrowser.showDeleted": "Show deleted",
     "scriptBrowser.deletedscripts": "Deleted Scripts",
+    "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Restore",
     "keepUnsavedTabs": "Keep unsaved tabs open",
     "ignore": "Ignore",
@@ -233,6 +239,10 @@
     "curriculum.previousPage": "Previous Page",
     "curriculum.nextPage": "Next Page",
     "curriculum.copyURL": "Copy curriculum URL",
+    "curriculum.expandChapter": "Expand Chapter {{chIdx}}: ",
+    "curriculum.collapseChapter": "Collapse Chapter {{chIdx}}: ",
+    "curriculum.openSection": "Open Section: {{section}}: ",
+    "curriculum.closeSection": "Close Section: {{section}}: ",
     "shortcuts.run": "Run script",
     "shortcuts.save": "Save script",
     "shortcuts.undo": "Undo",
@@ -249,12 +259,6 @@
     "hardware.enter": "Enter",
     "hardware.space": "Space",
     "hardware.wheel": "Mouse Wheel"
-  },
-  "ariaverbiage": {
-    "contentmanager": {},
-    "curriculum": {},
-    "daw": {},
-    "header": {}
   },
   "bubble": {
     "userLanguage": "Language",
