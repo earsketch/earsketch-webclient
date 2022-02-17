@@ -195,8 +195,8 @@ export const TitleBar = () => {
                 <button
                     className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
-                    title={`Close ${t("curriculum.title")}`}
-                    aria-label={`Close ${t("curriculum.title")}`}
+                    title={`${t("thing.close")} ${t("curriculum.title")}`}
+                    aria-label={`${t("thing.close")} ${t("curriculum.title")}`}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </button>

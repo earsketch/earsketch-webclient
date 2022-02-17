@@ -69,7 +69,7 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                         <div className="input-group-addon">{extension}</div>
                     </div>
 
-                    <select className="form-control w-1/2 mx-6" value={extension} onChange={e => setExtension(e.target.value)} title="Select Script Language" aria-label="Select Script Language">
+                    <select className="form-control w-1/2 mx-6" value={extension} onChange={e => setExtension(e.target.value)} title={t("curriculum.switchScriptLanguage")} aria-label={t("curriculum.switchScriptLanguage")}>
                         <option value=".py">Python</option>
                         <option value=".js">JavaScript</option>
                     </select>

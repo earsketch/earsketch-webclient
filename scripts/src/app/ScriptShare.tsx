@@ -138,7 +138,7 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <button aria-label="Copy Share Link to Clipboard" ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label={t("scriptShare.copyClipboard")} ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
         </button>
         <Transition
@@ -206,21 +206,23 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                         <button type="button" onClick={() => setLock(true)}
                             className={"btn " + (lock ? "btn-primary" : "btn-default")}
                             style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
-                            aria-label="Toggle Share Current Script Version">
+                            aria-label={t("scriptShare.tab.viewonly.shareCurrent")}
+                            title={t("scriptShare.tab.viewonly.shareCurrent")}>
                             {t("scriptShare.tab.viewonly.shareCurrent")}
                         </button>
                         <button type="button" onClick={() => setLock(false)}
                             className={"btn " + (lock ? "btn-default" : "btn-primary")}
                             style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}
-                            aria-label="Toggle Share Future Script Versions">
+                            aria-label={t("scriptShare.tab.viewonly.shareFuture")}
+                            title={t("scriptShare.tab.viewonly.shareFuture")}>
                             {t("scriptShare.tab.viewonly.shareFuture")}
                         </button>
                     </div>
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
-                    <input title="Share URL" aria-label="Share URL" ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
-                    <button aria-label="Download URL shortcut file" className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></button>
+                    <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="glyphicon glyphicon-download-alt" /></button>
                 </div>
                 <hr className="mt-3" />
 

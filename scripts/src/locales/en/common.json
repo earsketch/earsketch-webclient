@@ -168,6 +168,7 @@
     "exit": "Exit",
     "more": "More",
     "scriptShare.title": "Share \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.downloadShortcutFile": "Download URL Shortcut File",
     "scriptShare.tab.viewonly.title": "Let Others View",
     "scriptShare.tab.viewonly.linkTitle": "Sharable View-only Link",
     "scriptShare.tab.viewonly.shareCurrent": "Share Current Version",
@@ -248,6 +249,12 @@
     "hardware.enter": "Enter",
     "hardware.space": "Space",
     "hardware.wheel": "Mouse Wheel"
+  },
+  "ariaverbiage": {
+    "contentmanager": {},
+    "curriculum": {},
+    "daw": {},
+    "header": {}
   },
   "bubble": {
     "userLanguage": "Language",
@@ -406,6 +413,7 @@
     "noparams": "No Parameters",
     "parameters": "Parameters",
     "returnValue": "Return Value",
+    "pasteToCodeEditor": "Paste {{name}} function into code editor",
     "example": "Example",
     "defaultValue": "Default Value",
     "open": "Open",
