@@ -71,24 +71,10 @@ module.exports = {
         }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/,
             exclude: /(node_modules|bower_components)/,
-            use: [{
-                loader: "file-loader",
-                options: {
-                    name: "img/[hash]-[name].[ext]",
-                },
-            }],
+            type: "asset/resource",
         }, {
-            // TODO: Do this instead when we switch to Webpack 5
-            // test: /\.(woff|woff2|eot|ttf|otf)$/i,
-            // type: 'asset/resource',
-            test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-            use: [{
-                loader: "file-loader",
-                options: {
-                    name: "[hash]-[name].[ext]",
-                    outputPath: "fonts/",
-                },
-            }],
+            test: /\.(woff|woff2|eot|ttf|otf)$/i,
+            type: "asset/resource",
         }, {
             test: path.resolve(__dirname, `${libDir}/dsp.js`),
             loader: "exports-loader",
@@ -121,7 +107,6 @@ module.exports = {
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
-        new webpack.HotModuleReplacementPlugin(),
         new HappyPack({
             threads: 4,
             loaders: ["babel-loader?presets[]=@babel/env"],
