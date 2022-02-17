@@ -32,6 +32,9 @@ module.exports = env => {
             devMiddleware: {
                 publicPath: "/",
             },
+            client: {
+                progress: true,
+            },
         },
         module: {
             rules: [{
