@@ -28,6 +28,7 @@ module.exports = env => {
         devServer: {
             port: port,
             hot: "only",
+            static: "./",
             devMiddleware: {
                 publicPath: "/",
             },
