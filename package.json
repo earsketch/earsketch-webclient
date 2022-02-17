@@ -110,7 +110,7 @@
     "karma-jasmine": "^4.0.1",
     "karma-junit-reporter": "^2.0.1",
     "karma-sourcemap-loader": "^0.3.8",
-    "karma-webpack": "^4.0.2",
+    "karma-webpack": "^5.0.0",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
     "mini-css-extract-plugin": "^2.5.3",
