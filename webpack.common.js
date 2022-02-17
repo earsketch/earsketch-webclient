@@ -5,7 +5,6 @@ const path = require("path")
 const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
 
 const vendorDir = "scripts/vendor"
 const libDir = "scripts/lib"
@@ -135,9 +134,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
             template: "public/index.html",
-        }),
-        new TsconfigPathsPlugin({
-            configFile: "tsconfig.json",
         }),
     ],
     optimization: {
