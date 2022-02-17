@@ -47,7 +47,7 @@ module.exports = {
         rules: [{
             test: /\.(js|jsx|mjs)$/,
             exclude: [
-                /(node_modules|bower_components)/,
+                /(node_modules)/,
                 path.resolve(__dirname, libDir),
                 path.resolve(__dirname, vendorDir),
                 path.resolve(__dirname, dataDir),
@@ -69,7 +69,7 @@ module.exports = {
             use: ["style-loader", "css-loader", "postcss-loader"],
         }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/,
-            exclude: /(node_modules|bower_components)/,
+            exclude: /(node_modules)/,
             type: "asset/resource",
         }, {
             test: /\.(woff|woff2|eot|ttf|otf)$/i,
