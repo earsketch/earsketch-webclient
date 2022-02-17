@@ -4,9 +4,18 @@ import { Script } from "common"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
+import KEYSIGNATURES_ from "../data/numbers_keysigs.json"
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
+const KEYSIGNATURES: { [key: string]: number } = KEYSIGNATURES_
+
+// All the key signatures as a human-readable label.
+const KEY_LABELS = ["A major", "Bb major", "B major", "C major", "Db major",
+    "D major", "Eb major", "E major", "F major", "F# major",
+    "G major", "Ab major", "A minor", "Bb minor", "B minor",
+    "C minor", "C# minor", "D minor", "D# minor", "E minor",
+    "F minor", "F# minor", "G minor", "G# minor"]
 
 // Load lists of numbers and keys
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
@@ -220,4 +229,21 @@ export function availableInstruments() {
         }
     }
     return instruments
+}
+
+export function getKeySignatureString(filename: string) {
+    // For a given filename, return the key signature of the file using the KEYSIGNATURES object.
+    // If the file is not in the database, return "N/A"
+    const audioNumber = AUDIOKEYS.indexOf(filename)
+
+    if (audioNumber === -1) {
+        return "N/A"
+    }
+    const keyClass = KEYSIGNATURES[`${audioNumber}`]
+    if (keyClass !== -1) {
+        const keyLabel = KEY_LABELS[keyClass]
+        return keyLabel
+    } else {
+        return "N/A"
+    }
 }
