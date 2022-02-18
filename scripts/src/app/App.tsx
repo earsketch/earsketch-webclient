@@ -354,7 +354,8 @@ const FontSizeMenu = () => {
                     {({ active }) =>
                         <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
                             onClick={() => dispatch(appState.setFontSize(size))}
-                            style={{ gridTemplateColumns: "18px 1fr" }}>
+                            style={{ gridTemplateColumns: "18px 1fr" }}
+                            aria-selected={fontSize === size}>
                             {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
                             {fontSize !== size && <span></span>}
                             {size}

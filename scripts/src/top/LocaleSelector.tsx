@@ -58,6 +58,7 @@ export const LocaleSelector = () => {
                                     } inline-grid grid-flow-col justify-items-start items-center pl-3 pr-1 py-2 w-full`}
                                     onClick={() => changeLanguage(locale.localeCode)}
                                     style={{ gridTemplateColumns: "18px 1fr" }}
+                                    aria-selected={locale.localeCode === currentLocale}
                                 >
                                     {locale.localeCode === currentLocale && <i className="icon icon-checkmark4" />}
                                     {locale.localeCode !== currentLocale && <span></span>}
