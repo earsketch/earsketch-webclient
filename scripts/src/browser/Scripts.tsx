@@ -60,8 +60,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                         else dispatch(scripts.addFilterItem({ category, value }))
                     }
                 }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}
                 aria-selected={selected}
                 aria-label={aria}
                 title={aria}
@@ -172,7 +170,7 @@ const ShowDeletedScripts = () => {
 
 const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string  }) => {
     return (
-        <div
+        <button
             className="flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
             onClick={(event) => {
                 event.preventDefault()
