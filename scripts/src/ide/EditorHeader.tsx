@@ -21,6 +21,8 @@ const UndoRedoButtons = () => {
     const [hasUndo, setHasUndo] = useState(false)
     const [hasRedo, setHasRedo] = useState(false)
 
+    const { t } = useTranslation()
+
     const onChange = () => {
         // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
         setTimeout(() => {
@@ -39,14 +41,14 @@ const UndoRedoButtons = () => {
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: "scaleX(-1)" }}
             onClick={() => editor.checkUndo() && editor.undo()}
-            title="Undo"
-            aria-label={`Undo Code Edit${hasUndo ? "" : " disabled"}`}
+            title={t("editor.undoEdit")}
+            aria-label={`${t("editor.undoEdit")} ${hasUndo ? "" : " disabled"}`}
         ></button>
         <button
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
             onClick={() => editor.checkRedo() && editor.redo()}
-            title="Redo"
-            aria-label={`Redo Code Edit${hasRedo ? "" : " disabled"}`}
+            title={t("editor.undoEdit")}
+            aria-label={`${t("editor.redoEdit")} ${hasUndo ? "" : " disabled"}`}
         ></button>
     </>)
 }

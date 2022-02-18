@@ -38,6 +38,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const active = activeTabID === scriptID
     const collaborators = script.collaborators as string[]
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (active && script.collaborative) {
@@ -95,8 +96,8 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                     event.preventDefault()
                     event.stopPropagation()
                 }}
-                title={`Close ${scriptName}`}
-                aria-label={`Close ${scriptName}`}
+                title={`${t("thing.close")} ${scriptName}`}
+                aria-label={`${t("thing.close")} ${scriptName}`}
             >
                 <i className="icon-cross2 cursor-pointer" />
             </button>

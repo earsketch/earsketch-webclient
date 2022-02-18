@@ -85,7 +85,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
-                    <li role="button" aria-label={t("curriculum.openSection", sec.title)} key={secIdx} className="py-1">
+                    <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx} className="py-1">
                         <span className="pl-10 flex">
                             <a href="#"
                                 className="text-black dark:text-white flex"

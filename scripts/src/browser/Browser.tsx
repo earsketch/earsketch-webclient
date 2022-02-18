@@ -249,8 +249,8 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </div>
                     <div className="w-1/12 text-2xl">
                         {expanded
-                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { filteredTitle })} aria-label={t("contentManager.collapseCollection", { filteredTitle })}> </button>
-                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { filteredTitle })} aria-label={t("contentManager.expandCollection", { filteredTitle })}> </button>}
+                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
+                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
                     </div>
                 </div>
             </div>

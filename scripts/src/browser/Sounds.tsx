@@ -123,8 +123,8 @@ const ShowOnlyFavorites = () => {
                         const elem = event.target as HTMLInputElement
                         dispatch(sounds.setFilterByFavorites(elem.checked))
                     }}
-                    title="Show Only Favorites"
-                    aria-label="Show Only Favorites"
+                    title={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
                     role="checkbox"
                 />
             </div>

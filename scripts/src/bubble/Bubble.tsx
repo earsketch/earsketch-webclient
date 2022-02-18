@@ -92,8 +92,8 @@ const MessageFooter = () => {
                             className="border-0 border-b-2 border-black outline-none"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
-                            aria-label="Select Programming Language"
-                            title="Select Programming Language"
+                            aria-label={t("bubble:selectLanguage")}
+                            title={t("bubble:selectLanguage")}
                         >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>
