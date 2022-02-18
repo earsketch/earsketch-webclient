@@ -298,7 +298,6 @@ function forgotPass() {
 }
 
 const KeyboardShortcuts = () => {
-    const { t } = useTranslation()
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
     const { t } = useTranslation()
@@ -319,7 +318,7 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("header.shortcuts")} aria-label={t("header.shortcuts")}>
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
@@ -343,7 +342,7 @@ const FontSizeMenu = () => {
     const { t } = useTranslation()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("header.fontSize")} aria-label={t("header.fontSize")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -375,7 +374,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("header.settings")} aria-label={t("header.settings")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>

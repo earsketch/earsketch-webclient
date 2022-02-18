@@ -24,6 +24,7 @@ export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocale)
+    const { t } = useTranslation()
 
     const changeLanguage = (lng: string) => {
         dispatch(appState.setLocale(lng))
@@ -41,7 +42,7 @@ export const LocaleSelector = () => {
     return (
         <div className="">
             <Menu as="div" className="relative inline-block text-left">
-                <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("header.selectLanguage")} aria-label={t("header.selectLanguage")}>
+                <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.selectLanguage")} aria-label={t("ariaDescriptors:header.selectLanguage")}>
                     <div className="flex flex-row items-center">
                         <div><i className="icon icon-earth"></i></div>
                         <div className="ml-1"><span className="caret"></span></div>
