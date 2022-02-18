@@ -340,8 +340,14 @@ export function locateDepthAndParent(lineno: number, parentNode: any, depthCount
     return [-1, {}]
 }
 
-export function estimateDataType(node: any, tracedNodes: any = []): string {
+export function estimateDataType(node: any, tracedNodes: any = [], includeSampleName: boolean = false, includeListElements: string[] = []): string {
+    const sampleBool = includeSampleName
     const autoReturns: string[] = ["List", "Str"]
+    if (node._astname === "List" && node.elts && Array.isArray(node.elts)) {
+        for (const n of node.elts) {
+            includeListElements.push(estimateDataType(n, tracedNodes, true, includeListElements))
+        }
+    }
     if (autoReturns.includes(node._astname)) {
         return node._astname
     } else if (node._astname === "Num") {
@@ -384,7 +390,7 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
                     }
                     if (!isDuplicate) {
                         tracedNodes.push(existingFunction.returnVals[0])
-                        return estimateDataType(existingFunction.returnVals[0], tracedNodes)
+                        return estimateDataType(existingFunction.returnVals[0], tracedNodes, sampleBool, includeListElements)
                     }
                 }
             }
@@ -397,7 +403,11 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
         // either a function alias or var OR sample name.
 
         if (AUDIOKEYS.includes(node.id.v)) {
-            return "Sample"
+            if (!includeSampleName) {
+                return "Sample"
+            } else {
+                return node.id.v
+            }
         }
 
         const funcs: any = ccState.getProperty("userFunctions")
@@ -432,8 +442,8 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
                 // check and make sure we haven't already gone through this node (prevents infinite recursion)
                 let isDuplicate = false
                 if (tracedNodes.length > 0) {
-                    for (const tracedNode in tracedNodes) {
-                        if (areTwoNodesSameNode(assignment, tracedNode)) {
+                    for (const tracedNode of tracedNodes) {
+                        if (areTwoNodesSameNode(assignment.value, tracedNode.value)) {
                             isDuplicate = true
                         }
                     }
@@ -470,12 +480,12 @@ export function estimateDataType(node: any, tracedNodes: any = []): string {
         // get type from assigned node
         if (latestAssignment != null) {
             tracedNodes.push(latestAssignment)
-            return estimateDataType(latestAssignment.value, tracedNodes)
+            return estimateDataType(latestAssignment.value, tracedNodes, sampleBool, includeListElements)
         }
     } else if (node._astname === "BinOp") {
         // estimate both sides. if the same, return that. else return null
-        const left: string | null = estimateDataType(node.left, tracedNodes)
-        const right: string | null = estimateDataType(node.right, tracedNodes)
+        const left: string | null = estimateDataType(node.left, tracedNodes, sampleBool, includeListElements)
+        const right: string | null = estimateDataType(node.right, tracedNodes, sampleBool, includeListElements)
         if (left === right) {
             return left
         } else return ""
