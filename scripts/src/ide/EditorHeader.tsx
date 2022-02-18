@@ -126,7 +126,7 @@ export const EditorHeader = () => {
                     className={`
                         flex
                         rounded-full px-3 py-1
-                        bg-gradient-to-t from-green-300 to-green-800
+                        bg-green-700
                         text-white cursor-pointer
                     `}
                     id="run-button"
