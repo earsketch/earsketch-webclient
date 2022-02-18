@@ -168,7 +168,7 @@ const ShowDeletedScripts = () => {
     )
 }
 
-const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string  }) => {
+const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string }) => {
     return (
         <button
             className="flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"

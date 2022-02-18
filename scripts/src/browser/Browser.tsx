@@ -219,7 +219,6 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     title: string, visible: boolean, initExpanded: boolean, className?: string, children: React.ReactNode
 }) => {
     const [expanded, setExpanded] = useState(initExpanded)
-    const [highlight, setHighlight] = useState(false)
     const filteredTitle = title.replace(/\([^)]*\)/g, "")
     const { t } = useTranslation()
 
