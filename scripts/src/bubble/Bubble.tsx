@@ -80,7 +80,7 @@ const MessageFooter = () => {
                                 dispatch(curriculum.fetchLocale({}))
                             }}
                             value={locale}
-                            aria-label="Select Language"
+                            aria-label={t("header.selectLanguage")}
                         >
                             {AVAILABLE_LOCALES.map(({ displayText, localeCode }) => <option key={localeCode} value={localeCode}>{displayText}</option>)}
                         </select>
