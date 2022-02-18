@@ -53,3 +53,4 @@ autograderAWS/index.html
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
 tests/integration/scripts/reports
+tests/integration/_karma_webpack_
