@@ -658,7 +658,9 @@ export function setDAWData(result: player.DAWData) {
         dispatch(daw.setSoloMute({}))
         dispatch(daw.setBypass({}))
         // Set zoom based on play length.
-        dispatch(daw.setTrackWidth(64000 / playLength))
+        // (The `max()` puts a cap on zoom when dealing with a small number of measures.)
+        const trackWidth = 64000 / Math.max(playLength, 8)
+        dispatch(daw.setTrackWidth(trackWidth))
         dispatch(daw.setTrackHeight(45))
         lastTab = state.tabs.activeTabID
         // Get updated state after dispatches:

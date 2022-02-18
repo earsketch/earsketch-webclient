@@ -100,7 +100,7 @@ module.exports = {
             loader: "exports-loader",
             options: {
                 type: "commonjs",
-                exports: ["Module"],
+                exports: ["single Module"],
             },
         }],
     },
@@ -129,6 +129,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "index.html"),
             template: "public/index.html",
+        }),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname, "message-login.html"),
+            template: "public/message-login.html",
+            inject: false,
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "autograder/index.html"),

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit"
 import { createTransform, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import * as dayjs from "dayjs"
+import dayjs from "dayjs"
 
 import { Script, ScriptType } from "common"
 import { selectUserName } from "../user/userState"

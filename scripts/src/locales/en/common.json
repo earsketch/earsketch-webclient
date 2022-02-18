@@ -45,7 +45,7 @@
     "scriptBrowser.options.close": "Close Script Options",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Keep unsaved tabs open",
-    "ignore": "Ignore",
+    "discardChanges": "Discard changes",
     "script": "Script",
     "version": "Version",
     "script_plural": "Scripts",
