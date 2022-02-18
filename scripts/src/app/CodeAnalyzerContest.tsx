@@ -84,10 +84,74 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
             let complexity
             let complexityScore = 0
             let complexityPass = 0
+            let sourceCode: string[] | string = []
 
             try {
-                complexity = reader.analyze(ESUtils.parseLanguage(result.script.name), result.script.source_code)
-                complexityScore = reader.total(complexity)
+                // TODO: process print statements through Skulpt. Temporary removal of print statements.
+                const sourceCodeLines = result.script.source_code.split("\n")
+                const gradingCounts = {
+                    makeBeat: 0,
+                    setEffect: 0,
+                    setTempo: 0,
+                    additional: 0,
+                }
+                for (const line of sourceCodeLines) {
+                    // disable print statements for automatic judging.
+                    if (!line.includes("print")) {
+                        sourceCode.push(line)
+                    }
+                    // count makeBeat and setEffect functions
+                    if (line.includes("makeBeat")) {
+                        gradingCounts.makeBeat += 1
+                    }
+                    if (line.includes("setEffect")) {
+                        gradingCounts.setEffect += 1
+                    }
+                    if (line.includes("setTempo")) {
+                        gradingCounts.setTempo += 1
+                    }
+
+                    // count additional functions
+                    for (const name of ["createAudioSlice", "analyzeTrack", "insertMediaSection"]) {
+                        if (line.includes(name)) {
+                            gradingCounts.additional += 1
+                        }
+                    }
+                }
+                sourceCode = sourceCode.join("\n")
+
+                complexity = reader.analyze(ESUtils.parseLanguage(result.script.name), sourceCode)
+
+                // Custom Functions: 30 for first 3, then 10
+                for (let i = 0; i < complexity.userFunc; i++) {
+                    complexityScore += i < 3 ? 30 : 10
+                }
+
+                // Lists, List/String Operations: 15
+                complexityScore += (complexity.lists + complexity.listOps + complexity.strOps) * 15
+
+                // Conditionals: 20, Conditionals with Booleans: 25
+                complexityScore += complexity.conditionals * 20
+                complexityScore += complexity.booleanConditionals * 25
+
+                // Loops: 15
+                complexityScore += complexity.loops * 15
+
+                // makeBeat: 5
+                complexityScore += gradingCounts.makeBeat * 5
+
+                // setEffect: 5
+                complexityScore += Math.min(gradingCounts.setEffect, 5) * 5
+
+                // setTempo: 10
+                complexityScore += Math.min(gradingCounts.setTempo, 5) * 10
+
+                // Variables: 2
+                // complexityScore += gradingCounts.variables * 2
+
+                // createAudioSlice, analyzeTrack, insertMediaSection: 10
+                complexityScore += gradingCounts.additional * 10
+
                 complexityPass = complexityScore >= options.complexityThreshold ? 1 : 0
             } catch (e) {
                 complexity = {
@@ -121,16 +185,6 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 })
                 continue
             }
-
-            // TODO: process print statements through Skulpt. Temporary removal of print statements.
-            const sourceCodeLines = result.script.source_code.split("\n")
-            let sourceCode: string[] | string = []
-            for (const line of sourceCodeLines) {
-                if (!line.includes("print")) {
-                    sourceCode.push(line)
-                }
-            }
-            sourceCode = sourceCode.join("\n")
 
             if (!sourceCode.includes(options.artistName)) {
                 addResult({
@@ -229,11 +283,12 @@ export const CodeAnalyzerContest = () => {
             processing={processing}
             options={{
                 OVERVIEW: true,
-                COMPLEXITY: false,
+                COMPLEXITY: true,
                 MEASUREVIEW: true,
                 EFFECTS: false,
                 MIXING: false,
                 HISTORY: false,
+                APICALLS: false,
             } as ReportOptions}
             contestDict={contestDict}
             setProcessing={setProcessing}

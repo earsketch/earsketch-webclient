@@ -98,9 +98,10 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
         try {
+            const complexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
             const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+            reports.COMPLEXITY = complexity
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {
