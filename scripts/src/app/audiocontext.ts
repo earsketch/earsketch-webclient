@@ -16,6 +16,8 @@ export const context = new AudioContext({
     sampleRate: 44100,
 })
 
+context.audioWorklet.addModule("pitchshift-worklet.js")
+
 export default context
 
 // Old comment; is this still relevant?
