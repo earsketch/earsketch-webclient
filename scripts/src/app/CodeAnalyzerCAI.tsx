@@ -254,6 +254,7 @@ export interface ReportOptions {
     MIXING: boolean
     HISTORY: boolean
     APICALLS: boolean
+    VARIABLES: boolean
 }
 
 export const CodeAnalyzerCAI = () => {
@@ -272,6 +273,7 @@ export const CodeAnalyzerCAI = () => {
         MIXING: false,
         HISTORY: false,
         APICALLS: false,
+        VARIABLES: false,
     } as ReportOptions)
 
     const [seed, setSeed] = useState(Date.now() as number | undefined)

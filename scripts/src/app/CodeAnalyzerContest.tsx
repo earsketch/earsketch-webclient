@@ -147,7 +147,9 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
                 complexityScore += Math.min(gradingCounts.setTempo, 5) * 10
 
                 // Variables: 2
-                // complexityScore += gradingCounts.variables * 2
+                if (result.reports?.VARIABLES && Array.isArray(result.reports?.VARIABLES)) {
+                    complexityScore += Object.entries(result.reports?.VARIABLES).length * 2
+                }
 
                 // createAudioSlice, analyzeTrack, insertMediaSection: 10
                 complexityScore += gradingCounts.additional * 10
@@ -211,6 +213,8 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
             if (length && measureView) {
                 const reports = Object.assign({}, result.reports, contestGrading(length, measureView))
                 delete reports.MEASUREVIEW
+                delete reports?.APICALLS
+                delete reports?.VARIABLES
                 reports.COMPLEXITY = { ...complexity }
                 reports.COMPLEXITY_TOTAL = { total: complexityScore }
 
@@ -288,7 +292,8 @@ export const CodeAnalyzerContest = () => {
                 EFFECTS: false,
                 MIXING: false,
                 HISTORY: false,
-                APICALLS: false,
+                APICALLS: true,
+                VARIABLES: true,
             } as ReportOptions}
             contestDict={contestDict}
             setProcessing={setProcessing}

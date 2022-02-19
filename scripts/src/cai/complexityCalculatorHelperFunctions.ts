@@ -79,7 +79,7 @@ export function retrieveFromList(callingNode: any): any {
     // Gets the node referenced by an AST subscript node. (OR an array of nodes, if the subscript is a slice instead of index) WHAT IF WE THROW A STRING AT IT???
     function getSubscriptValue(subscriptNodeToGet: any) {
         const subscriptNode = subscriptNodeToGet
-        if (subscriptNode.slice._astname === "Index") { // handle singular indices
+        if (subscriptNode.slice && subscriptNode.slice._astname === "Index") { // handle singular indices
             let indexValue = 0
             let objToIndex = []
             const valObj = retrieveFromList(subscriptNode.value)
@@ -133,7 +133,7 @@ export function retrieveFromList(callingNode: any): any {
             if (valObj != null && "id" in valObj) {
                 return null
             } // if we don't know what it is we're indexing, just return
-        } else if (subscriptNode.slice._astname === "Slice") { // handle slices
+        } else if (subscriptNode.slice && subscriptNode.slice._astname === "Slice") { // handle slices
             let lower = null
             let upper = null
             const lowerNode = retrieveFromList(subscriptNode.slice.lower)
@@ -1434,7 +1434,7 @@ export function isCallAStrOp(node: any) {
 // Does this node contain any string indexing or slicing?
 export function getStringIndexingInNode(node: any): any {
     function getStringIndexing(node: any): any {
-        if (node._astname === "Subscript" && (node.slice._astname === "Index" || node.slice._astname === "Slice")) {
+        if (node._astname && node._astname === "Subscript" && (node.slice._astname && node.slice._astname === "Index" || node.slice._astname === "Slice")) {
             // is the thing we're indexing a string?
             if (node.value._astname === "Str") {
                 return [true, true]
@@ -1559,7 +1559,7 @@ export function getStringIndexingInNode(node: any): any {
         }
     }
     if (node._astname === "Subscript") {
-        if (node.slice._astname === "Index" || node.slice._astname === "Slice") {
+        if (node.slice && node.slice._astname && node.slice._astname === "Index" || node.slice._astname === "Slice") {
             if (node.value._astname === "Str") {
                 return [true, ccState.getProperty("originalityLines").includes(node.lineno)]
             }
@@ -1599,7 +1599,7 @@ export function isCallAListOp(node: any) {
 // Does this node contain any list indexing or slicing?
 export function getIndexingInNode(node: any): any {
     function getNestedIndexing(node: any): any {
-        if (node._astname === "Subscript" && node.slice._astname === "Index") { // if the thing we're indexing is a list, return true
+        if (node._astname === "Subscript" && node.slice && node.slice._astname === "Index") { // if the thing we're indexing is a list, return true
             if (node.value._astname === "List") {
                 return [true, ccState.getProperty("originalityLines").includes(node.lineno)]
             }
@@ -1718,7 +1718,7 @@ export function getIndexingInNode(node: any): any {
         return [true, ccState.getProperty("originalityLines").includes(node.lineno)]
     }
     if (node._astname === "Subscript") {
-        if (node.slice._astname === "Index" || node.slice._astname === "Slice") {
+        if (node.slice && node.slice._astname === "Index" || node.slice._astname === "Slice") {
             // is the thing being indexed a list?
             if (node.value._astname === "List") {
                 return [true, true]
@@ -2668,6 +2668,9 @@ export function getNestedVariables(nodeToCheck: any, nameList: string[]) {
         return nameList
     }
     // call checkNode() on appropriate parts of nodes that contain other nodes
+    if (!nodeToCheck._astname) {
+        return nameList
+    }
     if (nodeToCheck._astname === "List") {
         for (let p = 0; p < nodeToCheck.elts.length; p++) {
             checkNode(nodeToCheck.elts[p], nameList)
@@ -2686,7 +2689,7 @@ export function getNestedVariables(nodeToCheck: any, nameList: string[]) {
         }
     } else if (nodeToCheck._astname === "UnaryOp") {
         checkNode(nodeToCheck.operand, nameList)
-    } else if (nodeToCheck._astname === "Subscript") {
+    } else if (nodeToCheck._astname === "Subscript" && nodeToCheck.slice) {
         if (nodeToCheck.slice._astname === "Index") {
             checkNode(nodeToCheck.slice.value, nameList)
         } else if (nodeToCheck.slice._astname === "Slice") {
@@ -2694,7 +2697,7 @@ export function getNestedVariables(nodeToCheck: any, nameList: string[]) {
             checkNode(nodeToCheck.slice.lower, nameList)
         }
         checkNode(nodeToCheck.value, nameList)
-    } else if (retrieveFromList(nodeToCheck) != nodeToCheck) {
+    } else if (retrieveFromList(nodeToCheck) != nodeToCheck && nodeToCheck.func) {
         checkNode(nodeToCheck.func.value, nameList)
         if (nodeToCheck.args.length > 0) {
             checkNode(nodeToCheck.args[0], nameList)
