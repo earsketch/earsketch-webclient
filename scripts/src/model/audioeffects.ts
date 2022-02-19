@@ -726,8 +726,8 @@ export class PitchshiftEffect extends MixableEffect {
         const { triangle90, sawtooth180 } = this.CACHED_WAVEFORMS.get(context)
 
         const node = {
-            delayA: new DelayNode(context, { maxDelayTime: 1, delayTime: this.WINDOW_SIZE / 2 }),
-            delayB: new DelayNode(context, { maxDelayTime: 1, delayTime: this.WINDOW_SIZE / 2 }),
+            delayA: new DelayNode(context, { maxDelayTime: this.WINDOW_SIZE, delayTime: this.WINDOW_SIZE / 2 }),
+            delayB: new DelayNode(context, { maxDelayTime: this.WINDOW_SIZE, delayTime: this.WINDOW_SIZE / 2 }),
             lfoA: new OscillatorNode(context, { type: "sawtooth" }),
             lfoB: new OscillatorNode(context, {
                 type: "custom",
@@ -786,12 +786,9 @@ export class PitchshiftEffect extends MixableEffect {
 
     static scale(parameter: string, value: number) {
         if (parameter === "PITCHSHIFT_SHIFT") {
-            // The extra factor of 1.2 and the separate positive and negative formulae are a little mysterious.
-            if (value < 0) {
-                return (1 + 2 ** ((value - 1) / 12)) * 1.2 / this.WINDOW_SIZE
-            } else {
-                return (1 - 2 ** (value / 12)) * 1.2 / this.WINDOW_SIZE
-            }
+            // Convert pitchshift interval to LFO frequency.
+            const rate = 2 ** (value / 12)
+            return (1 - rate) / this.WINDOW_SIZE
         }
         return value
     }
