@@ -1,6 +1,8 @@
+// TODO: Figure out the Right Way to do this with webpack, rather than creating an object URL.
+const workletSource = `
 const WINDOW_SIZE = 0.1
 
-// Unfortunately, `%` in JS can return negative values.
+// Unfortunately, % in JS can return negative values.
 function mod(a, b) {
     const r = a % b
     return r < 0 ? r + b : r
@@ -63,3 +65,6 @@ class Pitchshifter extends AudioWorkletProcessor {
 }
 
 registerProcessor("pitchshifter", Pitchshifter)
+`
+
+export const workletURL = URL.createObjectURL(new Blob([workletSource], { type: "application/javascript" }))
