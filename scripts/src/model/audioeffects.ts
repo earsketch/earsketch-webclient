@@ -1,6 +1,5 @@
 // jscpd:ignore-start
 // TODO: Fix JSCPD lint issues, or tell it to ease up.
-
 // Need to scale the effects
 export const dbToFloat = (dbValue: number) => {
     return (Math.pow(10, (0.05 * dbValue)))
@@ -664,45 +663,6 @@ export class DistortionEffect extends MixableEffect {
         }
         return value
     }
-}
-
-// Helper for pitch shift effect, which requires initial phase offset for LFOs.
-function _getRealImaginary(type: string, phase: number): [Float32Array, Float32Array] {
-    const fftSize = 4096
-    const periodicWaveSize = fftSize / 2
-
-    const real = new Float32Array(periodicWaveSize)
-    const imag = new Float32Array(periodicWaveSize)
-
-    for (let n = 1; n < periodicWaveSize; ++n) {
-        const piFactor = 2 / (n * Math.PI)
-        let b
-        switch (type) {
-            case "square":
-                b = (n & 1) ? 2 * piFactor : 0
-                break
-            case "sawtooth":
-                b = piFactor * ((n & 1) ? 1 : -1)
-                break
-            case "triangle":
-                if (n & 1) {
-                    b = 2 * (piFactor * piFactor) * ((((n - 1) >> 1) & 1) ? -1 : 1)
-                } else {
-                    b = 0
-                }
-                break
-            default:
-                throw new TypeError("invalid type: " + type)
-        }
-        if (b !== 0) {
-            real[n] = -b * Math.sin(phase * n)
-            imag[n] = b * Math.cos(phase * n)
-        } else {
-            real[n] = 0
-            imag[n] = 0
-        }
-    }
-    return [real, imag]
 }
 
 export class PitchshiftEffect extends MixableEffect {
