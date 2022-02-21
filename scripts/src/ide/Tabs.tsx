@@ -1,4 +1,4 @@
-import * as classNames from "classnames"
+import classNames from "classnames"
 import React, { useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { useTranslation } from "react-i18next"

@@ -1,5 +1,5 @@
 import React, { Component, useState, ChangeEvent, LegacyRef } from "react"
-import PropTypes from "prop-types"
+import * as PropTypes from "prop-types"
 import { useSelector, useDispatch } from "react-redux"
 
 import * as api from "./apiState"

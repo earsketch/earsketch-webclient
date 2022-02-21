@@ -4,6 +4,9 @@ import * as ccState from "./complexityCalculatorState"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
+/* eslint-disable */
+// TODO: Resolve lint issues.
+import AUDIOKEYS_RECOMMENDATIONS from "../data/audiokeys_recommendations.json"
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
 const PYTHON_AND_API = [
@@ -151,8 +154,8 @@ export function handleError(errorType: string) {
 
 function basicChecks() {
     // check for import, init, and finish
-    
-    
+
+
 }
 
 function handleFunctionError() {
@@ -476,7 +479,7 @@ function handleWhileLoopError() {
     // many things can go wrong in the condition block.
     // some of them we can check for
     // there should be EITHER a comparator or a boolean value
-    // but we honestly cannt tell the contents of a variable or function return f o r s u r e; should we bother? 
+    // but we honestly cannt tell the contents of a variable or function return f o r s u r e; should we bother?
     // plus it might be a whole null vs not-null thing...leaving this for now
 
     // check for colon

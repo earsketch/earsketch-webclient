@@ -43,6 +43,13 @@ import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { ModalFooter, Prompt } from "../Utils"
 
+import licenses_ from "../data/licenses.json"
+
+const licenses: { [key: string]: any } = {}
+for (const license of licenses_) {
+    licenses[(license as any).id] = license
+}
+
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
 // There is a little type magic here to accomplish three things:
@@ -212,14 +219,6 @@ export async function closeAllTabs() {
         }
     }
 }
-
-const licenses = {} as { [key: string]: any }
-
-userProject.getLicenses().then(ls => {
-    for (const license of Object.values(ls)) {
-        licenses[(license as any).id] = license
-    }
-})
 
 export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
