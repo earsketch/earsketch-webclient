@@ -1343,6 +1343,29 @@ function analyzeASTNode(node: Node, resultInArray: Results[]) {
 
                 ccState.getProperty("loopLocations").push([firstLine, lastLine])
             } else if (node._astname === "Call" && node.func) {
+                if (node.func && node.func.id && node.func.id.v) {
+                    const callObject = { line: node.lineno, function: node.func.id.v, clips: [""] }
+                    if (callObject.function === "fitMedia" && node.args && Array.isArray(node.args)) {
+                        const thisClip = ccHelpers.estimateDataType(node.args[0], [], true)
+                        callObject.clips = [thisClip]
+                    } else if (callObject.function === "makeBeat" && node.args && Array.isArray(node.args)) {
+                        // is the first element a list or a sample?
+                        const firstArgType = ccHelpers.estimateDataType(node.args[0], [], false)
+                        if (firstArgType === "List") {
+                            // get list elts
+                            callObject.clips = []
+                            ccHelpers.estimateDataType(node.args[0], [], false, callObject.clips)
+                        } else if (firstArgType === "Sample") {
+                            callObject.clips = [(ccHelpers.estimateDataType(node.args[0], [], true))]
+                        }
+                    } else {
+                        callObject.clips = []
+                    }
+                    if (typeof node.func.id.v === "string" && ccState.apiFunctions.includes(node.func.id.v)) {
+                        ccState.getProperty("apiCalls").push(callObject)
+                    }
+                }
+
                 let calledName = ""
                 let calledOn = ""
                 if (node.func._astname === "Name") {
