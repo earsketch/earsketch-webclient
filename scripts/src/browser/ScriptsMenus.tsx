@@ -63,7 +63,7 @@ const MenuItem = ({ name, icon, aria, onClick, disabled = false, visible = true 
                 ${visible ? "flex" : "hidden"} items-center justify-start p-2 space-x-4 ${cursor} 
                 bg-white dark:bg-black
                 hover:bg-blue-200 dark:hover:bg-blue-500
-                text-black dark:text-white
+                text-black dark:text-white w-full
             `}
             onClick={() => {
                 if (disabled) return null

@@ -14,6 +14,8 @@ import * as tabs from "./tabState"
 import * as layout from "../ide/layoutState"
 
 const CreateScriptButton = () => {
+    const { t } = useTranslation()
+
     return <button
         className={`
             bg-black text-white dark:bg-white dark:text-black
@@ -23,6 +25,7 @@ const CreateScriptButton = () => {
         `}
         id="create-script-button"
         onClick={createScript}
+        title={t("newScript")}
     >
         <i className="icon icon-plus2" />
     </button>
