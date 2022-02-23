@@ -63,6 +63,7 @@ This is a general overview of the web client architecture.
 - lunr, for search
 - hilitor, for highlighting search keywords
 - webpack
+- i18next ([internationalization guide](DeveloperDocs/i18n.md))
 
 ### Layout
 
@@ -95,6 +96,9 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
     - `data/`
       Miscellaneous JSON data stored in globals: `ESApiDoc`, `ESMessages`, `ESNum_Slides`, `ESCurr_*`.
 
+    - `locales/`
+      Language/locale-specific strings files for translation support
+
     - `model/`
       - `applyeffects.js`
         User-accessible effects, built on top of WebAudio nodes.
@@ -120,8 +124,6 @@ Everything is under `webclient/`. Most of the subdirectories contain resources (
 - `doc/` is the destination folder for inline JSDoc generation, but it is kind of defunct.
 
 - Bower is around but unused, previously due to people including hard copies of libraries, and (going forward) due to our using webpack + npm instead.
-
-- There are some rogue files lying around that are ripe for removal, such as `scripts/lib/levenshtein-search.js`.
 
 - `scripts/src/model/modules.js` defines namespaces prefixed by `EarSketch.`, but it is essentially defunct. We should remove it since we're trying to clean up the global namespace anyway.
 (The only two namespaces it defines are `EarSketch.Global.ExitFlag` and `EarSketch.analytics`, and neither is actually in use as far as I can tell.)

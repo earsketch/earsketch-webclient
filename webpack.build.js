@@ -22,7 +22,7 @@ module.exports = env => {
         output: {
             // Generate JS files to...
             path: path.resolve(__dirname, "dist/"),
-            filename: "bundle.[hash].js",
+            filename: "bundle.[contenthash].js",
             publicPath: "dist/",
         },
         module: {
@@ -50,7 +50,7 @@ module.exports = env => {
                 SITE_BASE_URI: JSON.stringify(`${clientBaseURI}`),
             }),
             new CleanWebpackPlugin(),
-            new MiniCssExtractPlugin({ filename: "[name].[hash].css" }),
+            new MiniCssExtractPlugin({ filename: "[name].[contenthash].css" }),
         ],
         devtool: "source-map",
     })
