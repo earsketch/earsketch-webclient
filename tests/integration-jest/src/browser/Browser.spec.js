@@ -6,7 +6,6 @@ import { Browser } from "../../../../scripts/src/browser/Browser" // called by o
 import store, { persistor } from "../../../../scripts/src/reducers"
 import { Provider } from "react-redux"
 
-import { useTranslation } from "react-i18next"
 jest.mock("react-i18next")
 
 it("renders with mocked data", async () => {
