@@ -73,6 +73,26 @@ const sortEffects = (result: DAWData) => {
     }
 }
 
+// grep function copied from jquery source. It was the only remaining use of jquery.
+function grep(elems: any[], callback: (elementOfArray: object, indexInArray: number) => boolean, invert = false) {
+    let callbackInverse
+    const matches = []
+    let i = 0
+    const length = elems.length
+    const callbackExpect = !invert
+
+    // Go through the array, only saving the items
+    // that pass the validator function
+    for (; i < length; i++) {
+        callbackInverse = !callback(elems[i], i)
+        if (callbackInverse !== callbackExpect) {
+            matches.push(elems[i])
+        }
+    }
+
+    return matches
+}
+
 // Function to compare the similarity of two script results.
 const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, testTracks: boolean[]) => {
     // create copies for destructive comparison
@@ -86,8 +106,8 @@ const compare = (reference: DAWData, test: DAWData, testAllTracks: boolean, test
     sortEffects(test)
     // remove tracks we're not testing
     if (!testAllTracks) {
-        reference.tracks = $.grep(reference.tracks, (n: any, i: number) => testTracks[i])
-        test.tracks = $.grep(test.tracks, (n: any, i: number) => testTracks[i])
+        reference.tracks = grep(reference.tracks, (n: any, i: number) => testTracks[i])
+        test.tracks = grep(test.tracks, (n: any, i: number) => testTracks[i])
     }
     return JSON.stringify(reference) === JSON.stringify(test)
 }
