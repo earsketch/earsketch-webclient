@@ -1,0 +1,854 @@
+{
+  "common": {
+    "loading": "ᐃᓗᓪᓕᖅᐸᓪᓕᐊᔪᖅ...",
+    "contentManager.title": "ᐃᓗᓕᖏᓐᓄᑦ ᒥᐊᓂᖅᓯᔨ",
+    "search": "ᕿᓂᕐᓗᒍ",
+    "results": "ᑐᑭᖏᑦ",
+    "noResults": "ᑐᑭᖏ ᐱᑕᖃᖏᑐᑦ",
+    "soundBrowser.title": "ᓂᐱᖏ",
+    "soundBrowser.title.collection": "ᓂᐱᖏ ᑲᑎᖅᓱᐊᑦ",
+    "soundBrowser.title.featuredArtist": "ᑐᓵᒐᐅᒐᔪᖅᑐᖅ ᑎᑕᒃᑎ",
+    "soundBrowser.title.recommendations": "ᐊᑐᓕᖁᔭᐅᔪᑦ",
+    "soundBrowser.button.addSound": "ᓂᐱᑖᖅᑎᓪᓗᒍ",
+    "soundBrowser.button.showOnlyStars": "ᓄᐃᑕᓂᖓ ᑭᓯᒻᒥ",
+    "filter": "ᐊᓯᖏᓐᓂᒃ ᐊᑐᖏᑎᑦᓯᓂᖅ",
+    "startQuickTour": "ᐱᒋᐊᕐᓂᐊᕐᓗᓐᓂ ᐃᓕᓐᓂᐊᕈᑦ",
+    "switchTheme": "ᐊᓯᐊᖑᕐᓗᒍ ᐱᒋᐊᕈᑎᖓ",
+    "reportError": "ᑕᒻᒫᔭᕐᒪᑦ ᓇᓗᓇᐃᑯᑕᖅ",
+    "leave": "ᓴᓇᖏᓚᐅᕐᓂᖅ",
+    "soundBrowser.filterDropdown.artists": "ᑎᑕᒃᑎᑦ",
+    "soundBrowser.filterDropdown.genres": "ᐊᖑᑕᐅᓂᖓ ᐊᕐᓇᐅᓂᖓ",
+    "soundBrowser.filterDropdown.instruments": "ᑎᑕᐅᑎᑦ",
+    "soundBrowser.clip.tooltip.file": "ᑎᑎᖃᑦ",
+    "soundBrowser.clip.tooltip.folder": "ᑎᑎᖃᑦ ᐴᖓ",
+    "soundBrowser.clip.tooltip.artist": "ᑎᑕᒃᑎ",
+    "soundBrowser.clip.tooltip.genre": "ᐊᕐᓇᖅ ᐊᖑᑦ",
+    "soundBrowser.clip.tooltip.instrument": "ᑎᑕᐅᑦ",
+    "soundBrowser.clip.tooltip.originalTempo": "ᓂᐱᑐᖃᖓ",
+    "soundBrowser.clip.tooltip.year": "ᐅᑭᐅᖓ",
+    "soundBrowser.clip.tooltip.previewSound": "ᑕᑯᒃᓴᐅᓂᐊᖅᑐᑉ ᓂᐱᖓ",
+    "soundBrowser.clip.tooltip.markFavorite": "ᐱᐅᒋᔭᐅᓂᖓᓄ ᓇᓗᓇᐃᑯᑕᖅ",
+    "soundBrowser.clip.tooltip.paste": "ᓂᐱᑎᓪᓗᒍ ᐋᕿᒃᓱᐃᔪᒻᒧᑦ",
+    "scriptBrowser.filterDropdown.owner": "ᓇᖕᒥᓂᓕᒃ",
+    "scriptBrowser.filterDropdown.fileType": "ᑎᑎᖃᑉ ᓇᓕᐊᖑᓂᖓ",
+    "scriptBrowser.filterDropdown.sortBy": "ᐊᕕᒃᑐᕐᓗᒍ",
+    "scriptBrowser.showDeleted": "ᓄᖑᑎᕐᓂᑯ ᑕᑯᒃᓴᐅᓗᓂ",
+    "scriptBrowser.deletedscripts": "ᓄᖑᑎᖅᓯᒪᔪᑦ ᐅᖃᒐᒃᓴᑦ",
+    "scriptBrowser.restore": "ᐃᓕᖁᓯᖓᓄᑦ ᐅᑎᖅᑎᓂᖅ",
+    "keepUnsavedTabs": "ᐊᓯᐅᒌᑯᑎᖃᖏᑐᑦ ᐅᑯᐃᖅᓯᒪᑐᐃᓐᓇᕐᓗᒋᑦ",
+    "ignore": "ᐃᓱᒪᒋᖏᒥᐊᕐᓗᒍ",
+    "script": "ᐅᖃᐅᓯᕐᓄᑦ ᒪᓕᒋᐊᓕᒃ",
+    "version": "ᓇᓕᐊᖑᓂᖓ",
+    "script_plural": "ᐅᖃᐅᓯᕐᓄᑦ ᒪᓕᒋᐊᓖᑦ",
+    "scriptBrowser.myScripts": "ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ",
+    "scriptBrowser.sharedScripts": "ᐊᒥᖃᒐᒃᓴᑦ ᐅᖃᐅᓯᒃᓴᑦ",
+    "daw.title": "ᖃᕆᑕᐅᔭᑯᑦ ᓂᐱᓐᓂᒃ ᑐᓵᔾᔪᑦ",
+    "daw.shortTitle": "DAW",
+    "daw.effect": "ᐊᒃᑐᐃᓂᖓ",
+    "daw.effect_plural": "ᐊᒃᑐᐃᓂᖏᑦ",
+    "daw.tooltip.reset": "ᐃᓕᖁᓯᖓᓄᑦ ᐅᑎᖅᑎᓪᓗᒍ",
+    "daw.tooltip.play": "ᐱᖑᐊᕐᓗᒍ",
+    "daw.tooltip.loopProject": "ᐃᓱᐃᑦᑐᖅ ᐱᓕᕆᐊᖅ",
+    "daw.tooltip.pause": "ᓄᖃᖅᑎᓚᐅᕐᓗᒍ",
+    "daw.tooltip.autoScroll": "ᐃᖕᒥᓂᒃ ᓄᐃᐸᓕᐊᔪᑦ ᐱᒋᐊᕐᕕᖓᓐᓄᑦ",
+    "daw.tooltip.toggleMetronome": "Toggle Metronome",
+    "daw.tooltip.toggleVolume": "ᐅᐊᔪᑎᖓᑕ ᓂᐱᖅᖁᖅᑐᓂᖓ",
+    "daw.tooltip.solo": "ᐊᑕᐅᓯᑐᖅ",
+    "daw.tooltip.mute": "ᓂᐸᐃᕈᑎᓗᒍ",
+    "daw.abbreviation.solo": "S",
+    "daw.abbreviation.mute": "M",
+    "daw.tooltip.toggleEffects": "ᐅᐊᔪᑎᖏᑦ ᖃᓄᐃᑐᒥᐊᑦ",
+    "daw.bypass": "ᐊᑉᓗᕈᑦ",
+    "newScript": "ᓄᑖᖅ ᐅᖃᒐᒃᓴᖅ",
+    "editor.title": "ᓈᓴᐅᑎᖏᓐᓂᒃ ᐋᕿᒃᓱᐃᔪᑦ",
+    "editor.blocksMode": "ᐃᓕᖁᓯᖓᓐᓂᒃ ᐊᔪᓕᖅᑎᑦᓯᔪᑦ",
+    "editor.run": "ᑲᔪᓯᒥᐊᕐᓗᓂ",
+    "editor.noScriptsLoaded": "ᐃᓕᓯᖏᑐᑎᑦ ᐅᖃᕆᐊᓕᖕᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᓐᓂᒃ.",
+    "editor.clickHereCreateScript": "ᐅᓇ ᓇᕿᓪᓗᒍ ᓄᑖᒻᒥᒃ ᑎᑎᖃᕐᓂᐊᕐᓗᓐᓂ ᐅᖃᕆᐊᓕᖕᓂᒃ!",
+    "editor.mode": "ᒫᓐᓇ ᐅᕙᓂᓯᐅᖅᐳᑎᑦ <span class=\"empty-script-lang\">{{scriptlang}}</span> mode.",
+    "editor.ifYouWant": "ᐅᕗᖓ ᓅᑦᑐᐊᕐᓂᕈᕕᑦ <span class=\"empty-script-lang\">{{otherScriptLang}}</span> mode, <br /> ᒪᑐᐃᖅᓯᓗᑎᑦ ᑎᑎᖃᒻᒥᒃ ᐅᖃᕆᐊᓕᖕᒥᒃ ᐅᓇ ᐊᑐᕐᓗᒍ <span class=\"empty-script-lang\">{{otherScriptExt}}</span> ᓄᑖᒥᒡᒡᓗᕙ ᓴᓇᓗᑎᑦ <br /> ᓂᕈᐊᕐᓗᒍᓗ <span class=\"empty-script-lang\">{{otherScriptLang}}</span> ᐅᖃᕆᐊᓕᐅᑉ ᑎᑎᖃᑉ ᐅᖃᐅᓯᕆᓂᐊᖅᑕᖓᓐᓂᒃ.",
+    "tabs.otherTabs": "ᐊᓯᖏ ᓇᕿᑕᐅᑎᑦ",
+    "tabs.closeAll": "ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᕐᓗᒋᑦ",
+    "footer.teachers": "ᐃᓕᓐᓂᐊᖅᑎᑦᓯᔨᑦ",
+    "footer.help": "ᐃᑲᔪᕈᑦ / ᑐᓴᖅᑎᓪᓗᒍ",
+    "thing.open": "ᒪᑐᕐᓗᒍ",
+    "thing.close": "ᒪᑐᓗᒍ",
+    "script.copy": "ᐊᔨᖓᓐᓂᒃ ᓴᓇᓂᐊᕐᓗᓐᓂ",
+    "script.rename": "ᐊᓯᐊᓂᒃ ᐊᑎᓕᕐᓗᒍ",
+    "script.download": "ᖃᕆᑕᐅᔭᒻᒧᑦ ᐃᓕᓂᐊᕐᓗᒍ",
+    "script.print": "ᐊᓕᓚᔪᒻᒧᑦ ᐃᓕᓂᐊᕐᓗᒍ",
+    "script.share": "ᐊᒥᖃᕐᓗᒍ",
+    "script.submitCompetition": "ᐋᒃᑐᖃᑕᐅᔪᒪᓐᓂᕈᕕᑦ",
+    "script.history": "ᓄᑕᐅᖏᑐᑦ",
+    "script.codeIndicator": "ᓈᓴᐅᑎᖓᑕ ᓇᓗᓇᐃᑯᑕᖓ",
+    "script.import": "ᐊᓯᐊᓐᓂᑦ ᑕᑯᔪᒪᒍᕕᑦ",
+    "script.delete": "ᓄᖑᑎᕐᓗᒍ",
+    "sharedScript.noDescription": "ᑕᒻᓇ ᐊᑎᖃᖏᑐᖅ ᑎᑎᖃᑦ ᐊᖃᕆᐊᓕᒃ.",
+    "sharedScript.originalAuthor": "ᑎᑎᕋᓚᐅᖅᑐᖅ",
+    "sharedScript.collaborators": "ᐊᓯᖏᓐᓂᒃ ᐃᑲᔪᖅᑎᐅᔪᑦ",
+    "sharedScript.license": "ᓚᐃᓴᖓᓐᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᖅ",
+    "sharedScript.viewOnlyLink": "ᑕᒪᕐᒥᒃ ᑕᑯᓗᒋᑦ ᑎᑎᕋᕐᓂᑯᑦ",
+    "lastModified": "ᑭᖑᓪᓕᖅ ᐋᑭᒐᐅᓚᐅᖅᑐᖅ",
+    "ok": "ᓈᒻᒪᒃᑐᖅ",
+    "confirm": "ᓈᒻᒪᒋᓗᒍ",
+    "default": "ᐃᓕᖁᓯᑐᖃᖓ",
+    "importToEdit": "ᐊᓯᐊᖑᕈᒪᒍᖕᓂ",
+    "notifications.title": "ᖃᐅᔨᒪᔪᑏᑦ",
+    "notifications.pinned": "ᐊᑕᐃᓐᓇᕐᓂᐊᖅᑐᑦ ᖃᐅᔨᒪᔪᑏᑦ",
+    "notifications.other": "ᐊᓯᖏ ᖃᐅᔨᒪᔪᑏᑦ",
+    "notifications.viewAll": "ᑕᒪᕐᒥᒃ ᑕᑯᓗᒋᑦ",
+    "notifications.markAllRead": "ᐅᖃᓕᒫᒐᓂᒃᓯᒪᔪᑦ ᑕᒪᕐᒥᒃ",
+    "forgotPassword.title": "ᐃᓯᕈᖕᓇᐅᑏᑦ ᐳᐃᒍᕈᖕᓂ?",
+    "forgotPassword.prompt": "ᖃᕆᑕᐅᔭᒥ ᑎᑎᕋᕈᑏᑦ ᐃᓕᓗᒍ",
+    "forgotPassword.submit": "ᓴᑐᕈᒪᒍᖕᓂ",
+    "forgotPassword.email": "ᖃᕆᑕᐅᔭᒥ ᑎᑎᕋᕐᕕᒃᓴᕕᑦ ᑐᕌᕈᑎᖓ",
+    "createResetAccount": "ᓴᓴᖤᐊᕐᓗᑎᑦ / ᐃᑎᕈᖕᓇᐅᑏᑦ ᐋᕿᒍᒪᒍᖕᓂ",
+    "accountCreator.prompt": "ᐃᓯᕈᖕᓇᐅᑎᓕᐅᕐᓂᖅ",
+    "accountCreator.success": "ᐃᓯᕈᖕᓇᐅᑎᑖᖅᐳᑎᑦ!",
+    "accountCreator.submit": "ᐃᓯᕈᖕᓇᐅᑎᓕᐅᕈᒪᒍᕕᑦ",
+    "formfieldPlaceholder.username": "ᓇᐃᓕᒋᐊᖅᓯᒪᔪᖅ ᐊᑏᑦ",
+    "formfieldPlaceholder.password": "ᐃᓯᕈᖕᓇᐅᑏᑦ",
+    "formfieldPlaceholder.confirmPassword": "ᐃᓯᕈᖕᓇᐅᑏᑦ ᓈᒻᒪᒋᒍᖕᓂ",
+    "formFieldPlaceholder.email": "ᖃᕆᑕᐅᔭᑯᑦ ᑐᕌᕈᑏᑦ",
+    "formFieldPlaceholder.emailOptional": "ᖃᕆᑕᐅᔭᒥ ᑐᕌᕈᑏᑦ (ᐊᑐᕈᒪᒍᖕᓂ)",
+    "formFieldPlaceholder.firstName": "ᐊᑏᑦ ᓯᕗᓪᓕ",
+    "formFieldPlaceholder.lastName": "ᐊᑏᑦ ᑭᖑᓪᓕᖅ",
+    "formFieldPlaceholder.currentPassword": "Verify your current password",
+    "formFieldPlaceholder.newPassword": "ᓄᑖᖅ ᐃᑎᕈᖕᓇᐅᑏᑦ",
+    "formFieldPlaceholder.confirmNewPassword": "ᐊᖏᕐᓗᒍ ᓄᑖᖅ ᐃᑎᕈᖕᓇᐅᑏᑦ",
+    "formFieldPlaceholder.typeDescriptionHere": "ᐅᖃᐅᓯᖓ ᑎᑎᕋᕐᓗᒍ",
+    "cancel": "ᓴᑐᐃᓗᒍ",
+    "update": "ᓄᑖᖑᕐᓗᒍ",
+    "save": "ᐃᓕᓗᒍ",
+    "saveAndSend": "ᐃᓕᓗᒍ ᐊᒪ ᐊᐅᓚᖅᑎᓪᓗᒍ",
+    "upload": "ᑕᑯᔪᒪᒍᖕᓂ",
+    "editProfile": "ᐊᕿᒡᓗᒍ ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᓖᑦ",
+    "registerAccount": "ᓄᑖᒻᒥᒃ ᐃᑎᕈᖕᓇᐅᑎᑖᕐᓗᑎᑦ",
+    "logout": "Logout",
+    "notifications.none": "ᖃᐅᔨᒪᔪᑎᖃᖏᑐᖅ.",
+    "profileEditor.prompt": "ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᓕᒃ ᐊᓯᐊᖑᕐᓗᒍ {{ᐊᑏᑦ ᓇᐃᓕᒋᐊᖅᓯᒪᔪᖅ}}",
+    "profileEditor.error": "ᑕᒻᒪᖅᓯᒪᔪᖅ ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᖃᖅᑐᖅ.",
+    "profileEditor.success": "ᐃᓕᖕᓂᒃ ᐅᖃᐅᓯᖃᖅᑐᖅ ᓄᑕᖑᖅᑎᑕᐅᔪᖅ!",
+    "changePassword.prompt": "ᐊᓯᖑᕐᓗᒍ ᐃᓯᕈᖕᓇᐅᑏᑦ",
+    "changePassword.success": "ᐃᓯᕈᖕᓇᐅᑎᖓ ᐊᓯᐊᖑᖅᑕᐅᔪᖅ!",
+    "download.multiTrack": "ᐊᓯᖏᑦ ᑐᓵᔭᒃᓴᑦ",
+    "scriptHistory.running": "ᐅᖃᕆᐊᓕᖕᓂᒃ ᑎᑎᖃᓐᓂᒃ ᐊᑐᒐᒃᓴᖅ...",
+    "scriptHistory.versionSuccess": "ᑕᒻᓇ ᐊᑐᒐᒃᓴᖅ ᑲᔪᓯᑎᐊᖅᑐᖅ.",
+    "scriptHistory.versionError": "ᐊᑐᕈᒪᔭᖅ ᑕᒻᒪᖅᓯᒪᔪᖅ.",
+    "scriptHistory.restore": "ᐃᓕᖁᓯᖓᓐᓄᑦ ᐅᑎᖅᑎᓪᓗᒍ ᐊᑐᒐᒃᓴᖅ",
+    "scriptHistory.title": "ᖃᓄᐃᑑᓂᖓ ᐆᒻᒪ {{scriptName}}",
+    "scriptHistory.heading": "ᖃᓄᐃᑑᓂᖓ ᐊᑐᓚᐅᖅᑐᑉ",
+    "scriptHistory.diff": "ᐊᓯᐊᖑᔪᖅ ᓯᕗᓪᓕᐅᑉ ᐊᑐᓚᐅᖅᑐᑉ",
+    "scriptHistory.activeCollab": "ᐊᑐᒐᐅᔪᑦ ᐱᓕᕆᖃᑕᐅᔪᑦ",
+    "scriptHistory.onlyMyScripts": "ᐅᑎᖅᑕᐅᔪᓪᓗᐊᖅᑐᖅ ᑭᓯᐊᓐᓂ ᐊᑎᖃᕐᓗᒍ $t(scriptBrowser.myScripts)",
+    "scriptHistory.fetching": "ᓄᑕᐅᖏᑐᓐᓂᒃ ᑕᑯᓂᐊᕐᓗᓐᓂ.",
+    "renameScript.title": "ᓄᑕᒻᒥᒃ ᐊᑎᓕᕐᓗᒍ ᑎᑎᖃᖅ ᐊᖃᕆᐊᓕᒃ",
+    "renameScript.prompt": "ᓄᑖᖅ ᐊᑎᖓ ᑎᑎᕋᐅᑉ ᐊᖃᕆᐊᓕᐅᑉ:",
+    "rename.submit": "ᓄᑕᖅ ᐊᑎᖓ",
+    "renameScript.appendSuffix": "ᓯᕗᓪᓕᐊᕈᓯᖓ ᐃᓕᓗᒍ",
+    "renameScript.alreadyExists": "ᐅᖃᕆᐊᓕᐅᑉ ᐊᑎᖓ '{{scriptName}}' ᖃᕆᑕᐅᔭᕐᓂᓯᐅᓕᖅᑐᖅ.`",
+    "renameSound.title": "ᓂᐱᖓ ᓄᑖᖅ ᐊᑎᖓ",
+    "renameSound.prompt": "ᓄᑖᖅ ᐊᑎᖓ ᓂᐱᓕᐅᖅᓯᒪᔪᑉ:",
+    "create": "ᓴᓇᓗᒍ",
+    "scriptCreator.title": "ᓄᑕᖅ ᐊᑎᖓ ᐅᖃᕆᐊᓕᐅᑉ ᑎᑎᖃᑉ",
+    "scriptCreator.scriptName": "ᐅᖃᕆᐊᓕᐅᑉ ᐊᑎᖓ",
+    "scriptCreator.scriptName.subtext": "ᓱᓇᒥᒃ ᐊᑎᖃᕐᓂᐊᖅᐸ ᐅᖃᕆᐊᓕᒃ ᓴᓇᔭᑦ?",
+    "scriptCreator.scriptLang": "ᐅᖃᐅᓯᖓ ᐅᖃᕆᐊᓕᐅᑉ",
+    "scriptCreator.scriptLang.subtext": "ᖃᓄᐃᑐᒥᒃ ᐅᖃᐅᓯᕐᒥᒃ ᐊᑐᖅᐱᓐ?",
+    "scriptAnalysis.title": "ᓈᓴᐅᑎᑦ-ᑎᑎᖃᐃᑦ ᓇᓗᓇᐃᑯᑕᖓ ᐅᒻᒪ {{scriptName}}",
+    "scriptAnalysis.category.loops": "ᐊᓯᖏᓐᓄᑦ",
+    "scriptAnalysis.category.conditionals": "ᒪᓕᒐᖃᖅᑐᖅ",
+    "scriptAnalysis.category.conditionalsWithBool": "ᒪᓕᒐᖏᑦ ᐆᒻᒪ Booleans",
+    "scriptAnalysis.category.lists": "ᑎᑎᖃᑦ",
+    "scriptAnalysis.category.listStringOps": "ᐊᑎᖏᑦ ᐊᒪ ᓇᓕᐊᖑᓂᖏᓐᓄᑦ ᐊᐅᓚᑕᐅᓂᖏᑦ",
+    "scriptAnalysis.category.userFunctions": "ᐊᑐᖅᑎᐅᔪᑉ ᐊᐅᓚᔪᑎᖏ",
+    "category": "ᐊᑯᒃᓯᒪᓂᖓ",
+    "count": "ᖃᑉᓯᐅᓂᖏ",
+    "total": "ᑲᑎᓪᓗᒋᑦ",
+    "exit": "ᐊᓂᓗᓐᓂ",
+    "more": "ᐃᓚᖏᑦ",
+    "scriptShare.title": "ᐊᒥᖃᕐᓂᖅ \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.title": "ᐊᓯᖏᓐᓄᑦ ᑕᑯᔭᐅᔫᓪᓗᐊᕐᓗᓐᓂ",
+    "scriptShare.tab.viewonly.linkTitle": "ᐊᓯᖏᓐᓄᑦ ᑕᑯᔭᐅᔫᓪᓗᐊᕈᑦ",
+    "scriptShare.tab.viewonly.shareCurrent": "ᐊᓯᖏᓐᓄᑦ ᑕᑯᔭᐅᔪᑎᑉ ᐊᑐᐊᒐᖓ",
+    "scriptShare.tab.viewonly.shareFuture": "ᐊᒥᖃᕐᓗᒋᑦ ᐊᓯᐊᖑᕈᑎᑦ",
+    "scriptShare.tab.viewonly.otherUsers": "ᐊᐅᓚᖅᑎᓪᓗᒍ ᑕᑯᔪᑎᑦ ᐊᓯᖏᓐᓄᑦ ᐊᑐᖅᑎᑕᐅᔪᓐᓄᑦ",
+    "scriptShare.tab.viewonly.usersPlaceholder": "ᓇᓗᓇᐃᑯᑕᖓ ᑎᑎᕋᕐᓗᒍ, ᐊᕕᒃᓯᒪᓗᒍ.",
+    "scriptShare.tab.collab.title": "ᐊᓯᖏᓐᓄᑦ ᐋᕿᒃᓱᖅᑕᐅᓗᓐᓂ",
+    "scriptShare.tab.collab.addRemove": "ᐃᓚᓗᒍ ᐱᕐᓗᒍᓗᓐᓂᑦ ᐱᓕᕆᖃᑎᒌᖕᓂᖅ",
+    "scriptShare.tab.embed.title": "ᐊᒥᖃᕐᓗᒍ ᓇᓗᓇᖅᓯᓯᒪᔪᖅ ᐅᖃᕆᐊᓕᒃ ᑎᑎᖃᖅ",
+    "scriptShare.tab.embed.linkTitle": "ᓇᓗᓇᖅᓯᓯᒪᔪᖅ IFrame code",
+    "scriptShare.tab.embed.showCode": "ᓈᓴᐅᑎᖓ ᑕᑯᒃᓴᐅᓗᓂ:",
+    "scriptShare.tab.embed.showDAW": "ᑕᑯᒃᓴᐅᓗᓐᓂ DAW:",
+    "scriptShare.tab.soundcloud.title": "ᐊᒥᖃᕐᓗᒍ ᐅᕙᓐᓂ SoundCloud",
+    "scriptShare.tab.soundcloud.shareDesc.private": "ᐊᓯᖏᓐᓄᑦ ᑐᕌᖏᑐᖅ. ᐅᕙᒻᓄᑦ ᑭᓯᒻᒥ ᓂᑉᑕᔪᖅ.",
+    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "ᐃᓄᒥᐊᓐᓄᑦ. ᐊᓯᖏᓐᓄᑦ ᐊᔪᖃᖅᓯᔭᐅᔪᓪᓗᐊᖅᑐᖅ ᐊᒪ ᑐᓵᔭᐅᓗᓐᓂ.",
+    "scriptShare.tab.soundcloud.shareDesc.public": "ᐃᓄᒥᐊᓐᓄᑦ. ᐊᓯᖏᓐᓄᑦ ᓂᐱᓕᐅᒐᐅᔪᓪᓗᐊᖅᑐᖅ.",
+    "scriptShare.tab.soundcloud.sharePrompt": "ᖃᓄᖅ ᓱᓕᕆᔪᓪᓗᐊᖅᐸᑦ ᐊᓯᖏᑦ ᐃᒻᖏᐅᑎᖏᓐᓂᒃ ᐅᕙᓐᓂ SoundCloud?",
+    "scriptShare.tab.soundcloud.songName": "ᐃᒻᖏᐅᑎᑉ ᐊᑎᖓ",
+    "scriptShare.tab.soundcloud.view": "ᑕᑯᓗᒍ ᐅᕙᓐᓂ SoundCloud",
+    "scriptShare.moreDetails": "ᑐᑭᓯᑲᓂᕈᑎᑦ (ᓱᓇᐅᓂᖏᑦ, ᓚᐃᓴᖏᑦ)...",
+    "scriptShare.descriptionOptional": "ᐅᓂᑉᑲᖅᓯᒪᔪᖅ (ᐊᑐᕈᖕᓇᖅᑐᖅ)",
+    "scriptShare.licenseType": "ᓚᐃᓴᐅᑉ ᓈᓴᐅᑎᖓ",
+    "scriptShare.copyClipboard": "ᐊᔪᖃᖅᓯᒪᓗᒍ ᐃᓕᓯᑉᕕᖕᒧᑦ",
+    "soundUploader.title": "ᐃᓚᓯᓗᓐᓂ ᓄᑖᒻᒥᒃ ᐃᒻᖏᐅᒻᒥᒃ",
+    "soundUploader.title.upload": "ᓂᐱᓕᐅᕐᓗᒍ ᐃᒻᖏᐅᑦ",
+    "soundUploader.title.record": "ᓂᐱᓕᐅᕌᓚᒋᐊᕐᓗᒍ",
+    "soundUploader.file.prompt": "ᑐᖁᐃᕕᖓ ᒪᑐᓗᒍ ...",
+    "soundUploader.constantRequired": "ᑲᔪᓯᔪᑉ ᐊᑎᖓ (ᐱᔭᕆᐊᓕᒃ)",
+    "soundUploader.tempoOptional": "ᓂᐱᖓ (ᐊᑐᕈᖕᓇᖅᑐᖅ)",
+    "soundUploader.record.measures.title": "ᐆᒃᑐᕋᐅᑎᖓᑕ ᐅᐊᔪᑎᖓ",
+    "soundUploader.record.measures.metronomeClick": "ᓇᕿᓪᓗᒍ ᓂᐱᓕᐅᖅᑎᓪᓗᑎᑦ",
+    "soundUploader.record.measures.tempo": "ᓂᐱᖓ (ᖃᑉᓰᖅᑕᕐᓂᖓ ᒥᓂᑦᒥ)",
+    "soundUploader.record.measures.countoff": "ᑭᓯᔾᔪᑎᖓ",
+    "soundUploader.record.measures.toRecord": "ᑭᓯᔪᑎᖓ ᓂᐱᓕᐅᕐᓂᐊᕐᓗᓐᓂ",
+    "soundUploader.record.prompt": "ᓂᐱᓕᐅᓕᕐᓗᒍ",
+    "soundUploader.record.getReady": "ᐊᑐᐃᓐᓇᕈᕐᓂᖅ!",
+    "metronome": "Metronome",
+    "clear": "Clear",
+    "soundUploader.record.mic.waiting": "ᐅᖃᕐᕕᖓ ᐊᑐᐃᓇᐅᓂᖓᓐᓂᒃ ᐅᑕᕿᓂᖅ ...",
+    "soundUploader.record.mic.reenable": "ᐅᖃᕐᕕᖓ ᐊᔪᖏᓕᖅᑎᓪᓗᒍ ᐆᒃᑐᑲᓐᓂᕐᓗᓂᓗ.",
+    "soundUploader.freesound.description": "ᖃᕆᑕᐅ.ᒻᒥ ᐊᒥᓱᑎᐊᒥᐊᑦ ᐊᑭᖃᖏᑐᑦ ᓂᐱᒃᓴᑦ, ᓂᐱᓕᐅᖅᓯᒪᔪᑦ ᐊᑕᓐᓂᓯᐅᖅᑐᑦ Creative Commons ᓚᐃᓴᖏᓐᓂ. ᕿᓂᕈᖕᓇᖅᐳᑎᑦ ᐅᕙᓐᓂ Freesound ᐊᓯᐅᑕᐃᓕᔪᒻᒥᒃ ᑎᑎᕋᕐᓗᑎᑦ ᐅᕗᖓ EarSketch ᐊᑖᓐᓂ.",
+    "soundUploader.freesound.searching": "ᕿᓂᕐᓂᖅ Freesound...",
+    "soundUploader.freesound.uploadedBy": "ᓂᐱᓕᐅᕐᓗᒍ ᐅᕗᖓ Freesound ᐊᑐᖅᑎᑕᖓᓐᓄᑦ {{userName}}",
+    "formattedTime.justNow": "ᒡᒪᓐᓇᐅᔪᖅ",
+    "formattedTime.recently": "ᐊᑯᓂᐅᖏᑐᖅ",
+    "formattedTime.minutesAgo": "1 ᒥᓂᑦ ᐱᐊᓂᒃᑐᖅ",
+    "formattedTime.minutesAgo_plural": "{{count}} ᒥᓂᑦᖑᓚᐅᖅᑐᑦ",
+    "formattedTime.hoursAgo": "1 ᐃᑲᕋᖅ ᐊᑕᐅᓯᖅ",
+    "formattedTime.hoursAgo_plural": "{{count}} ᐃᑲᕋᑦ ᐱᐊᓂᒃᑐᑦ",
+    "formattedTime.daysAgo": "ᐃᒃᐸᒃᓴᖅ",
+    "formattedTime.daysAgo_plural": "{{count}} ᐅᑉᓗᑦ ᐱᐊᓂᒃᑐᑦ",
+    "formattedTime.weeksAgo": "ᐱᓇᓱᐊᕈᓯᕐᒥ",
+    "formattedTime.weeksAgo_plural": "{{count}} ᐱᓇᓱᐊᕈᓯᐅᓚᐅᖅᑐᒻᒥ",
+    "formattedTime.monthsAgo": "ᑕᕿᐅᓚᐅᖅᑐᒻᒥ",
+    "formattedTime.monthsAgo_plural": "{{count}} ᑕᕿᐅᓚᐅᖅᑐᓐᓂ",
+    "formattedTime.yearsAgo": "ᐊᕌᓐᓂ",
+    "formattedTime.yearsAgo_plural": "{{count}} ᐅᑭᐅᒐᓴᐃᑦ",
+    "curriculum.title": "ᐃᓕᓐᓂᐊᕈᑎᑦ",
+    "curriculum.switchScriptLanguage": "ᐊᓯᐊᓐᓂᒃ ᐅᖃᐅᓯᖃᓕᕐᓗᓐᓂ ᑎᑎᕋᖅᓯᒪᔪᖅ",
+    "curriculum.showTOC": "ᐃᓗᓕᖏᓐᓂᒃ ᑕᑯᔪᑕᐅᔪᖅ",
+    "curriculum.toc": "ᐃᓗᓕᖏᑦ",
+    "curriculum.previousPage": "ᒪᒃᐱᐅᓚᐅᖅᑐᖅ",
+    "curriculum.nextPage": "ᓄᑕᖅ ᒪᒃᐱᖅ",
+    "curriculum.copyURL": "ᐊᔨᓕᐅᕐᓗᒍ ᖃᕆᑕᐅᔭᒥ ᑕᑯᔪᑎᖓ URL",
+    "shortcuts.run": "Run script",
+    "shortcuts.save": "Save script",
+    "shortcuts.undo": "Undo",
+    "shortcuts.redo": "Redo",
+    "shortcuts.comment": "Comment code",
+    "shortcuts.autocomplete": "Autocomplete",
+    "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
+    "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "hardware.ctrl": "Ctrl",
+    "hardware.cmd": "Cmd",
+    "hardware.shift": "Shift",
+    "hardware.alt": "Alt",
+    "hardware.option": "Option",
+    "hardware.enter": "Enter",
+    "hardware.space": "Space",
+    "hardware.wheel": "Mouse Wheel"
+  },
+  "bubble": {
+    "userLanguage": "ᐅᖃᐅᓯᖓ",
+    "script.name": "ᑕᑯᐊᓪᓚᒋᐊᕐᓂᖅ",
+    "defaultProgrammingLanguage": "ᐊᕿᒃᓯᒪᔪᑐᖃᖅ ᐅᖃᐅᓯᖅ ᐊᑐᒐᐅᓂᐊᖅᑐᖅ",
+    "buttons": {
+      "skip": "ᐊᑉᓗᕐᓗᒍ",
+      "skipTour": "ᐃᓕᓂᐊᕈᑦ ᐊᑉᓗᕐᓗᒍ",
+      "start": "ᐱᒋᐊᕐᕕᖓ",
+      "close": "ᒪᑐᔪᖅ",
+      "next": "ᑐᒡᓕᐊ"
+    },
+    "header": {
+      "start": "ᑐᖓᓱᒋᑦ ᐅᕗᖓ EarSketch",
+      "codeEditor": "1/8 ᓈᓴᐅᑎᓐᓂᒃ ᐋᕿᒃᓱᐃᔪᑦ (Code Editor)",
+      "runCode": "2/8 ᒡᓇᓴᐅᑎ ᓇᓗᓇᐃᑯᑕᖓ ᐊᑐᕐᓗᒍ",
+      "previewMusic": "3/8 ᓂᐱᓕᐅᕐᓂᑯᑦ ᑐᓵᑲᓂᕐᓗᒍ",
+      "playMusic": "4/8 ᑐᓵᔪᒪᓐᓂᕈᖕᓂ",
+      "exploreCode": "5/8 ᒡᓇᓴᐅᑎᑦ ᓱᓇᐅᓂᖏᓐᓂᒃ ᑕᑯᒋᐊᕐᓂᖅ",
+      "addSounds": "6/8 ᓂᐱᓐᓂᒃ ᐃᓚᓯᔪᑦ ᓇᓴᐅᑎᓐᓄᑦ",
+      "saveCode": "7/8 ᐊᓯᐅᑎᑕᐅᓕᓗᒍ ᓈᓴᐅᑎᑦ",
+      "readCurriculum": "8/8 ᐅᖃᓗᓕᒫᕐᓗᒍ ᐃᓕᓐᓂᐊᕈᑎᑦ",
+      "end": "End"
+    },
+    "body": {
+      "start": "ᐊᑐᐃᓐᓇᐅᓕᖅᐱᑦ ᓈᓴᐅᑎᓐᓂᒃ ᐃᒻᖏᐅᑎᓕᐅᕐᓗᑎᓪᓗ ᐱᒋᐊᕐᓂᖅ? ᓯᕗᓪᓕᕐᒥᒃ ᐊᑐᕐᓂᐊᕈᖕᓂ, ᓇᕿᓪᓗᒍ <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Start</span> ᐊᑕᓐᓂ ᐃᓕᓂᐊᕈᑎᑉ EarSketch ᐃᓗᐊᖅᓴᐅᑎ. ᐊᑐᖅᓯᒪᓐᓂᕈᖕᓂ, ᓇᕿᓪᓗᒍ <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Skip</span> ᓈᓴᐅᓯᖅᑐᐃᒋᐊᓕᕐᓗᑎᑦ.<br><br>*ᐋᕿᒃᓯᒪᔪᐅᑕᖅ ᓈᓴᐅᓯᖅᑐᐃᓂᐊᕐᓗᓐᓂ ᓴᑉᓱᒧᖓ ᐃᓕᓐᓂᐊᕈᒻᒧᑦ Python, ᓇᕿᓪᓗᒍ ᐊᑖᓐᓂ ᐊᓯᖑᕈᒪᒍᒃᓂ JavaScript.",
+      "codeEditor": "ᓈᓴᐅᑎᑦ ᓇᓗᓇᐃᑯᑕᑦ ᐱᓕᕆᔪᑎᒋᓂᐊᖅᑕᑦ ᓂᐱᓕᐅᕐᓂᐊᓗᕐᑎᑦ. ᑎᑎᖃᓐᓂᒃ ᐊᑐᖅᑐᖅ ᓈᓴᐅᑎᖃᖅᑐᓐᓂᒃ.",
+      "runCode": "ᓈᓴᐅᑎᑦ ᖃᐅᔨᓴᕐᓗᒋᑦ ᓂᐱᖑᕐᓂᐊᕐᓂᖏᓐᓂᒃ. ᓇᕿᓪᓗᒍ <span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> ᓇᕿᑕᕈᑎᖓ ᑕᑯᒋᐊᕐᓗᒍ ᓈᓴᐅᑎᖓ ᓈᓴᐅᑎᑎᒍᑦ ᓂᐱᓕᐅᕈᑎᑉ ᐱᓕᕆᔪᑎᖓᓐᓂ ᖁᓚᓂᓯᐅᖅᑐᖅ ᓴᓇᐅᑎᑦ ᐊᕿᒃᓱᕈᑎᖏᓐᓂ.",
+      "previewMusic": "ᓈᓴᐅᑎᑎᒍᑦ ᓂᐱᓕᐅᕈᑎᑉ ᐱᓕᕆᔪᑎᖓ (DAW) ᑕᑭᓂᖏᓐᓂᒃ ᖃᐅᔨᓴᐅᑎᓕᒃ ᓈᓴᐅᑎᓐᓂᒃ ᓯᑲᓐᓂᒃ ᐊᒪ ᑕᑭᓂᖏᓐᓂᒃ ᐆᒃᑐᕋᐅᑎᓕᒃ. ᐊᑕᓐᓂ ᓂᐱᓕᐅᕐᓂᐅᑉ ᐃᓚᓯᒪᔪᑦ ᐃᒻᖏᐅᑎᖏᓐᓄᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᑉᓗ ᓇᓂᓯᐅᓕᕐᓂᖓᓐᓂᒃ.",
+      "playMusic": "ᓇᕿᑲᕈᑎᖏ ᖁᓚᓐᓂ ᑕᓕᖅᐱᐊᓐᓂ DAW ᐊᐅᓚᔪᑕᐅᔪᑦ ᑐᓵᓂᐊᕐᓗᓐᓂ ᓂᐱᒻᒥᒃ. ᑐᓵᔪᓪᓗᐊᖅᐸᑎᑦ ᓴᕿᓪᓗᒍ ᑯᕇᓐ ᐃᖅᑐᐊᖅᑐᖅ <span class=\"align-middle icon icon-play4 text-green-600 text-2xl\"></span>.",
+      "exploreCode": "ᓴᐅᒥᐊᓐᓂ ᑕᑯᔪᑎᑉ ᐊᓯᖏᓐᓂᒃ ᑕᑯᔪᒪᓐᓂᕈᕕᑦ. ᓇᕿᓪᓗᒍ ᐅᐊᔪᑎᖓ ᖁᓚᓐᓂ ᒪᐃᑐᕈᒪᒍᖕᓂ/ᒪᑐᔪᒪᒍᖕᓂ. ᐊᑕᐅᓯᐅᖏᑐᒻᒥᒃ ᑕᑯᔪᑎᑕᓕᒃ, ᑕᑉᑯᐊ ᑕᑯᒋᐊᕐᓂᐊᖅᐸᕗᑦ.",
+      "addSounds": "ᓯᕗᓪᓕᖅ ᑕᑯᔪᑕᐅᔪᖅ ᐅᓇᐅᑉᓗᓐᓂ <span class=\"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> SOUNDS. ᑕᑯᕙᓕᐊᓗᒍ ᓇᕿᓪᓗᒍᓗ ᑐᖁᕈᑎᖏᑦ ᐃᓗᓕᖃᖅᑐᑦ 4,000+ ᓂᐱᓐᓂᒃ ᐊᑐᕈᖕᓇᖅᑕᕐᓂᒃ ᓂᐱᓕᐅᖅᑕᕕᑦ, ᓇᓴᔭᐅᓐᓂᑯᑦ ᖃᐅᔨᒪᔭᐅᑎᐊᖅᑐᓐᓄᑦ ᐃᒻᖏᐅᓯᐅᖅᑎᓐᓄᑦ.",
+      "saveCode": "ᐊᓯᐅᑕᐃᓕᔪᒻᒧᑦ ᓈᓴᐅᑎᑦ ᐃᓕᔭᐅᔪᖅ ᐅᕗᖓ <span class=\"text-yellow-500 text-3xl align-middle icon icon-embed2\"></span> SCRIPTS. ᕿᓂᕈᖕᓇᖅᐳᑎᑦ ᑎᑎᖃᓐᓂᒃ ᐅᖃᕆᐊᓕᖕᓂᒃ ᐅᑉᓗᖓᓐᓂᒃ, ᐅᖃᐅᓯᖓᓐᓂᒃ ᐊᒻᒪ ᓇᖕᒥᓂᖃᖅᑐᒻᒥᒃ.",
+      "readCurriculum": "ᑕᓕᖅᐱᐊᓐᓂ ᐃᓕᓂᐊᕈᑎᑦ ᐊᐅᓚᔪᑎᖏᑦ. ᐅᐊᔪᑎᖓ ᐊᑐᕐᓗᒍ ᑕᑯᔪᒪᒍᕕᑦ ᐃᓕᓂᐊᕈᑎᓐᓂᒃ ᐊᒪ ᑐᖓᓱᖁᔨᔪᒻᒥᒃ ᐃᓗᓕᖏᓐᓂᒃ ᑕᑯᓂᐊᕐᓗᓐᓂ.",
+      "end": "ᖁᕕᐊᓱᒃᐳᒍᑦ! ᐃᓕᓐᓂᐊᕈᑦ ᐱᐊᓂᒃᑲᖕᓂ. ᓂᐱᒻᒥᒃ ᓴᓇᔪᖕᓇᖅᓯᒪᕗᑎᑦ. ᓇᕿᓪᓗᒍ <span class=\"align-middle icon icon-plus2\"></span> ᐅᑯᐃᕈᒪᒍᖕᓂ ᓄᑕᒻᒥᒃ ᓴᓇᓗᑎᑦ ᑎᑎᖃᒻᒥᒃ ᐅᖃᕆᐊᓕᖕᒥᒃ ᓈᓴᐅᑎᖏᓐᓂᒃ."
+    }
+  },
+  "messages": {
+    "confirm": {
+      "deletescript": "ᓄᖑᑎᖅᓯᒪᔪᑦ ᑎᑎᖃᑦ ᐅᕙᖓᑦ Scripts ᑎᑎᖃᖏᓐᓂᑦ ᐅᑎᖅᑎᑕᐅᔪᓪᓗᐊᖅᐳᑦ ᐅᕙᖓᑦ \"Deleted Scripts\".",
+      "deleteSharedScript": "ᓄᖑᑎᕈᒪᒍᖕᓂ ᐊᒥᖃᓚᐅᒃᑲᑦ ᑎᑎᖃᖅ ᐊᖃᕆᐊᓕᒃ \"{{scriptName}}\"?",
+      "deleteSound": "ᓂᐱᓕᐅᖅᑕᐃᑦ ᓄᖑᑎᕈᒪᕕᐅᒃ {{soundName}}",
+      "leaveCollaboration": "ᕿᒪᓚᐅᖅᐱᐅᒃ ᐱᓕᕆᖃᑎᒌᖕᓂᖅ  ᐃᑯᒪᑐᐃᓐᓇᖅᐱᐅᒃ \"{{scriptName}}\"?"
+    },
+    "interpreter": {
+      "runSuccess": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᔪᓯᑎᐊᖅᑐᖅ! ᓇᕿᓪᓗᒍ ᑐᓵᔪᒪᓐᓂᕈᖕᓂ ᓂᐱᓕᐅᖅᑕᐃᑦ.",
+      "runFailed": "ᐊᑕᐅᓯᕐᒥᒃ ᐅᖓᑕᓂᓗ ᑕᒻᒪᖅᓯᒪᔪᖅᑕᓕᒃ ᑎᑎᖃᒻᒥ ᐅᖃᕆᐊᓕᖕᒥ. ᑕᑯᓗᒋᑦ ᓈᓴᐅᑎᖏᑦ ᓱᓇᐅᓂᖓᓐᓂᒃ.",
+      "noimport": " ᑐᑭᓕᐅᒐᐅᓯᒪᖏᑐᖅ. ᐃᒻᒪᖄ \"ᐅᕙᖓᑦ ᓯᐅᑎᒃᑯᑦ ᑐᓵᔭᒃᓴᒻᒥᑦ *\" ᐊᓯᐊᐅᓯᒪᖕᒪᑦ."
+    },
+    "dawservice": {
+      "effecttrackwarning": "ᐃᓚᓯᓂᖅ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᓯᕗᓂᖓᓂ ᓂᐱᓕᐅᒐᐅᓂᖓᑕ"
+    },
+    "esaudio": {
+      "stringindex": "ᑎᒡᓕᖅᑕᕐᓂᖓ ᓯᓚᑕᐅᑎᓯᒪᔪᖅ",
+      "nonlistRangeError": "ᓂᐱᖏᑦᑕ ᐊᔨᒌᖏᓐᓂᖏᑦ ᑭᓯᒻᒥᒃ ᐊᑐᖅᑕᖅᐳᑦ 0, +, or -",
+      "tempoRange": " ᓂᐱᖓᑕ ᓇᑭᕐᓂᖓ ᐊᑯᓂᖓᓐᓂ 45 bpm ᐊᒻᒪ 220 bpm",
+      "analysisTimeTooShort": "ᖃᐅᔨᓴᕐᓂᐅᑉ ᐊᑯᓂᐅᑎᒋᓂᖓ (ᐃᓱᓕᑉᕕᖓ − ᐱᒋᐊᕐᕕᖓ) ᒥᑭᓗᐊᖅᑐᖅ"
+    },
+    "user": {
+      "scriptcloud": "ᐅᖃᒐᒃᓴᑉ ᑎᑎᖃᖓ ᐊᑐᐃᓐᓇᐅᓂᐊᓕᕐᓗᓐᓂ ᐃᓕᔭᐅᓯᒪᓕᖅᐳᖅ ᑲᓚᐅᑦ ᑐᖁᖅᑕᕐᕕᖓᓐᓄᑦ.",
+      "allscriptscloud": "ᑕᒪᕐᒥᒃ ᐊᓯᐅᑕᐃᓕᔪᑎᖃᖏᑐᑦ ᐃᓕᔭᐅᓯᒪᓕᖅᐳᑦ ᑲᓚᐅᑦ ᑐᖁᐃᕕᖓᓐᓄᑦ.",
+      "badsharelink": "ᑕᒻᒫᔭᕐᓂᕋᖅᑐᖅ ᐅᒃᑯᐃᕐᓂᖕᓂᐊᕐᓗᓐᓂ ᑎᑎᖃᒻᒥᒃ ᐅᖃᒐᒃᓴᒻᒥᒃ. ᖃᕆᑕᐅᔭᒻᒥ ᑎᑎᕋᖅᓯᒪᓂᖓ ᑕᒻᒫᔭᖅᓯᒪᓇᕐᓕᐊᖅ.",
+      "scriptcopied": "ᑎᑎᖃᖅ ᐅᖃᒐᒃᓴᑦ ᐊᔪᕈᑎᖃᕐᖏᓗᓐᓂ ᐊᔪᖃᖅᓯᔭᐅᕗᖅ.",
+      "emailConflict": "ᓄᑕᖑᖅᑎᖏᑐᖅ ᐊᑐᖅᑎᐅᔪᑉ ᐃᑎᕈᑎᖓ. ᑎᑎᖃᑎᑦ ᖃᐅᔨᒋᐊᓗᒋᑦ ᐊᑐᒐᐅᖏᒪᖔᑦ ᐊᑎᖏᓐᓄᑦ EarSketch ᐃᑎᕈᖕᓇᐅᒻᒧᑦ. (ᐅᓇᑐᑦ: ᐊᐅᓚᔨᖏᑯᕕᑦ ᐊᑐᕈᓇᐅᑎᖃᖅᑐᒻᒥᒃ, ᖃᕆᑕᐅᔭᐃᑦ ᓄᖃᓚᐅᕐᓗᒍ ᐊᒪ ᐱᒋᐊᓕᓵᕐᓗᑎᑦ  -> ᐳᐃᒍᖅᐱᐅᒃ ᑭᓯᕕᑦ ᐃᑎᕈᖕᓇᐅᑎᖓ? ᐊᑐᒐᐅᔪᓪᓗᐊᖅᑐᖅ. ᖃᕆᑕᐅᔭᑯᑦ ᑎᑎᖃᓂᒃ ᑕᑯᔪᑎᑦ ᐊᑐᕐᓗᒍ."
+    },
+    "download": {
+      "script": "ᓇᓗᓇᐃᑯᑕᓕᐊᑦ ᑎᑎᖃᑦ ᐃᓚᖓᓐᓄᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᓕᐅᕐᓗᒍ ᐃᑭᐊᖅᓯᕕᖕᓄᑦ.",
+      "wav": "ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᒻᖏᐅᑎᓕᐊᖅᐱᑦ ᑭᖑᓪᓕᖃᕐᓗᒍ WAV ᓂᐱᖓ (ᐊᖏᓂᖅᓴᒻᒥᒃ ᐊᑐᕐᓂᐊᕐᒪᑦ, ᐊᒻᒪ ᓂᐱᖓ ᑐᓴᕐᓂᕐᓂᖅᓴᐅᓂᐊᕐᓗᓐᓂ).",
+      "mp3": "ᐊᓯᐊᑕᐃᓕᔪᑎᓕᐅᕐᓗᒍ ᐃᒻᖏᐅᑎᓕᐊᑦ ᑭᖑᓪᓕᖓ MP3 ᖑᓗᒍ (ᐃᓂᑭᓐᓂᖅᓴᒻᒥᒃ ᐊᑐᓱᖅᑐᖅ, ᑭᓯᐊᓐᓂ ᓂᐱᖓ ᐱᐅᓗᐊᖏᑐᖅ).",
+      "multitrack": "ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᐊᓯᐊᖑᓐᓂᒃ ᐊᑎᖅᑖᕐᓗᒍ ᐊᕕᒃᓯᒪᓗᓐᓂ WAV ᑐᖁᐃᔪᑎᖓ (ᐊᓯᐊᓐᓂᒃ ᖃᕆᓴᐅᔭᒻᒥ ᓂᐱᓕᐅᕈᒻᒥᒃ ᐅᑯᓂᖓ GarageBand, Logic, Pro Tools, Reaper, FruityLoops, Cubase, Audition, ᐅᕙᓗᓂᑦ Live).",
+      "compileerror": "ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᐱᐊᓂᒃᓯᒪᑎᐊᖏᑐᑦ.",
+      "emptyerror": "ᐃᒻᖏᐅᑎᖓ ᐱᑕᖃᖏᑐᖅ!",
+      "rendererror": "ᐅᖃᕆᐊᓖᒃ ᑎᑎᖃᖅ ᐱᐊᓂᑎᐊᖅᓯᒪᖏᖢᓐᓂ ᐊᓯᐊᑕᐃᓕᔪᒻᒧᑦ ᐃᓕᔭᐅᔪᖅ."
+    },
+    "changepassword": {
+      "pwdauth": "ᓄᑕᐅᖏᑐᖅ ᐃᓯᕈᓐᓇᐅᑖ ᑕᒻᒫᔭᖅᓯᒪᔪᖅ. ᐃᓯᕈᖕᓇᐅᑎᖓ ᐊᓯᐊᖑᒐᐅᓂᖅ ᐊᔪᖅᑐᖅ.",
+      "pwdfail": "ᐃᒡᕕᑦ ᐃᓯᕈᓐᓇᐅᑖ ᐊᔨᖏᖏᑕᖓ ᑎᑎᕋᓚᐅᑲᖅᐱᑦ ᐃᓯᕈᓐᓇᐅᑖ.",
+      "pwdlength": "ᐃᕖᑦ ᐃᓯᕈᓐᓇᐅᑖ ᓇᓗᐊᖅᑐᖅ. ᐃᓯᕈᖕᓇᐅᑎᖓ ᑕᑭᓂᖃᕆᐊᓕᒃ 5−ᓂᒃ ᑎᑎᖃᓐᓂᒃ.",
+      "commerror": "ᑎᑎᖃᖓ ᑕᒻᒪᖅᓯᒪᔪᖅ ...",
+      "commerror2": "ᑎᑎᖃᖓ ᑕᒻᒪᖅᓯᒪᔪᖅ ..."
+    },
+    "downloadprotecteddata": {
+      "nopassword": "ᑭᓯᕕᑦ ᖃᐅᔨᒪᔭᖓ ᑎᑎᕋᕐᓗᒍ.",
+      "servertimeout": "ᐊᔪᕈᑎᖃᖅᑐᖅ ᐃᓱᐊᓐᓂ. ᐆᒃᑐᑲᓐᓂᕐᓗᑎᑦ.",
+      "unexpectederror": "ᓂᕆᐅᓇᖏᑐᒻᒥᒃ ᑕᒻᒪᖅᓯᒪᔪᖅ. ᐅᒃᑐᑲᓐᓂᕐᓗᑎᑦ ᐊᓯᖏᓐᓂᒃ ᑕᑯᔪᑎᓐᓂᒃ."
+    },
+    "forgotpassword": {
+      "fail": "ᖃᕆᑕᐅᔭᒥ ᑎᑎᖃᖁᑎᑦ ᐊᑐᖏᓕᖅᑐᖅ ᐃᓚᐅᖏᑐᕐᓘᓃᑦ EarSketch ᐃᑎᕈᖕᓇᐅᑎᖓᓐᓄᑦ.",
+      "success": "ᑎᑎᖃᐅᑎᑎᑦ ᑕᑯᒋᐊᕐᓗᒋᑦ ᐅᑯᓇᖓᑦ EarSketch ᐃᑎᕈᖕᓇᐅᑏᑦ ᐋᕿᒋᐊᖃᕐᓂᖓᓐᓂᒃ."
+    },
+    "uploadcontroller": {
+      "freesoundSelection": "ᓂᕈᐊᕐᓗᑎᑦ ᓂᐱᖓᓐᓂᒃ ᐅᕙᖓᑦ Freesound ᕿᓂᕈᑎᖓᓐᓂᑦ...",
+      "userAuth": "ᐊᑐᖅᑎᓗᐊᕕᐅᖏᑐᖅ ...",
+      "wavsel": "ᓂᕈᐊᕐᓗᑎᑦ ᐊᔪᖏᑐᒻᒥᒃ ᓂᐱᖓᑕ ᐃᓂᖃᕐᕕᖓᓐᓂᑦ ...",
+      "invalidfile": " ᓂᐱᖏᖏᑕᖓ ᐃᓂᖃᕐᕕᖓᓐᓂ ...",
+      "undefinedconstant": "ᑐᑭᖃᑎᐊᖏᑐᖅ ᐊᑐᒐᐅᓱᐊᖅᑐᖅ...",
+      "alreadyused": " ᐊᑐᒐᐅᓯᒪᓕᐊᓂᒃᑐᖅ ᑕᒻᓇ",
+      "invalidconstant": " ᐊᑐᕐᓂᖅ ᐊᔪᖅᑐᖅ ᐆᒃᑐᕋᐅᓂᓗᒃᑐᖅ...",
+      "tempointeger": "ᓂᐱᖓᑕ ᓈᓴᐅᑎᖓ ᓈᒻᒪᒋᐊᓕᒃ...",
+      "bigsize": " ᒪᒥᐊᓇᕋᓗᐊᖅᐳᖅ, ᓂᐱᖃᑕ ᐃᓂᖃᕐᕕᖓ ᑕᑭᓂᖃᕆᐊᓕᒃ 30 ᓯᑲᓐᔅ ᐅᑖᓂᐅᖏᑐᖅ.",
+      "timeout": "ᓄᖃᖓᓚᐅᕐᓂᖓᓐᓄᑦ ᖃᕆᑕᐅᔭᒻᒥ ᐊᒧᓂᐊᕐᓗᒍ ᑕᒻᒪᖅᓯᒪᔪᖅ ...",
+      "uploadsuccess": "ᑲᔪᓯᑎᐊᖅᑐᖅ ᐊᒧᓂᐊᕐᓂᖓ ᓂᐱᓕᐅᖅᓯᒪᔪᑉ",
+      "commerror": "ᐊᒧᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᑕᒻᒪᖅᓯᒪᔪᖅ ...",
+      "commerror2": "ᐊᒧᕙᓕᐊᓂᖓ ᓂᐱᓕᐅᖅᓯᒪᔪᑉ ᑕᒻᒪᖅᓯᒪᔪᖅ ...",
+      "chrome_mic_noaccess": "ᐅᖃᕐᕕᖓᓐᓂᒃ ᐊᔪᓕᖅᑎᑦᓯᓯᓯᒪᕗᑎᑦ. ᐊᔪᕈᖕᓇᐃᑎᓪᓗᒍ ᓇᕿᖏᓪᓗᒍ 'i' ᖃᕆᑕᐅᔭᕐᓂ ᐊᒻᒪ ᓂᕈᐊᕐᓗᒍ 'ᐊᔪᖏᑎᑦᓯᓂᖅ' ᓂᐱᖃᕈᑎᑉ ᓴᓂᐊᓐᓂ. ᐆᒃᑐᑲᓐᓂᕐᓗᒍ.",
+      "ff_mic_noaccess": "ᐅᖃᕐᕕᖓᓐᓂᒃ ᐊᔪᓕᖅᑎᑦᓯᓯᓯᒪᕗᑎᑦ. ᐊᔪᕈᖕᓇᐃᑎᓪᓗᒍ ᓇᕿᖏᓪᓗᒍ 'i' ᖃᕆᑕᐅᔭᕐᓂ ᐊᒻᒪ ᓂᕈᐊᕐᓗᒍ 'ᐊᔪᖏᑎᑦᓯᓂᖅ' ᓂᐱᖃᕈᑎᑉ ᓴᓂᐊᓐᓂ. ᐆᒃᑐᑲᓐᓂᕐᓗᒍ ᐊᑐᕐᓗᑎᑦ EarSketch.",
+      "mic_noaccess": "ᓂᐱᖃᕈᑎᑦ ᐊᔪᓕᖅᑎᓯᒪᔭᑦ. ᓂᐱᓕᐅᕈᒪᒍᕕᑦ ᖃᕆᑕᐅᔭᒃᑯᑦ ᐊᔪᕈᖕᓇᐃᖅᑎᓪᓗᒍ, ᐊᒻᒪ ᐆᒃᑐᑲᓐᓂᕐᓗᑎᑦ."
+    },
+    "createaccount": {
+      "pwdfail": "ᐃᑎᕈᑏᑦ ᖃᕆᑕᐅᔭᒻᒥ ᐊᓯᐊᖑᖕᒪᑦ ᓯᕗᓪᓕᕐᒥᒃ ᐊᑐᓚᐅᑲᕐᓂᑦ.",
+      "useralreadyexists": "ᐊᔪᖏᔪᑏᑦ ᖃᕆᑕᐅᔭᑯᓪᓗ ᑎᑎᕋᕈᑎᕕᑦ ᐊᑎᖓ ᐊᑐᕐᓗᒍ ᑕᑯᔪᒪᓐᓂᕈᖕᓂ ᐊᔪᖏᔪᑏᑦ.",
+      "commerror": "ᑐᓴᐅᒪᔪᑏᑦ ᐊᔪᓕᖅᓯᒪᔪᖅ  ...",
+      "usernameconstraint": "ᐊᔪᖏᔪᑏᑦ ᓈᓴᐅᒻᒥᒃ ᐱᒋᐊᕐᕕᖃᕆᐊᖃᖏᓚᖅ, ᐊᒻᒪ ᐊᕕᒃᓯᒪᔪᖃᖏᓗᓐᓂ ᐊᓯᖏᓐᓂᒃᓗ ᑎᑎᖃᓐᓂᒃ ᐊᑐᖏᓗᓐᓂ"
+    },
+    "general": {
+      "unauthenticated": "ᐃᑎᕈᒪᓐᓂᕈᕕ ᓯᕗᓪᓕᕐᒥᒃ ᐱᒋᐊᕈᑎᑦ ᐊᑐᕐᓗᒍ ᑭᓯᐊᓐᓂ...",
+      "loginsuccess": "ᐃᑎᕈᖕᓇᓕᖅᐳᑎᑦ",
+      "loginfailure": "ᓇᐃᑦᑐᖅ ᐊᑏᑦ ᐃᑎᕈᖕᓇᐅᑏᓪᓗ ᑕᒻᒪᖅᓯᒪᖕᒪᓂᒃ. ᐆᒃᑐᑲᓐᓂᕐᓗᑎᑦ ᓄᑖᒥᒡᓗ ᐃᑎᕈᖕᓇᐅᒻᒥᒃ ᓴᓇᓗᑎᑦ.",
+      "complexitySyntaxError": "ᓈᓴᐅᑎᑦ ᐊᑐᕐᓂᖅ ᐊᔪᓕᖅᓯᒪᖕᒪᑕ, ᓱᓇᒥᑭᐊᖅ ᑎᑎᖃᒻᒥᒃ ᓈᓴᐅᒻᒥᒃᓘᕙ ᐃᓕᔭᕆᐊᖃᖏᑐᒻᒥᒃ ᐃᓕᓯᒪᔪᖅᑕᖃᕐᒪᑦ.",
+      "soundrenamed": "ᑲᔪᓯᑎᐊᖅᑐᖅ ᐊᓯᐊᓐᓂᒃ ᐊᑎᖃᓕᕐᓗᓐᓂ ᓂᐱᖓ",
+      "renameSoundEmpty": "ᓂᐱᖓᑕ ᐊᑎᖓ ᐃᓗᓕᖃᕆᐊᖃᖅᐳᖅ (ᐅᑯᓂᖓᓗᓐᓂᑦ ᑎᑎᕋᖅᓯᒪᓗᓐᓂ \"_\")!",
+      "renameSoundSpecialChar": "ᐊᑎᖓᑕ ᐊᓯᐊᖑᕈᑎᖓᓐᓂ...",
+      "renameSoundConflict": "ᓂᐱᐅᑉ ᐊᑎᖓ ᐊᑐᒐᐅᓕᐊᓂᒃᑐᖅ",
+      "shortname": "ᐊᑎᖃᕐᓗᓐᓂ ᑲᑭᓂᖃᖅᑐᒻᒥᒃ 3 ᑎᑎᖃᓐᓂᒃ.",
+      "illegalCharacterInUserID": "ᑎᑎᖃᓐᓂ ᑭᓯᐊᓐᓂ ᐊᑐᕐᓗᑎᑦ, ᓈᓴᐅᑎᓐᓂᒃ ᐅᕙᓘᓃᑦ _ ᐊᑐᕐᓂᐊᖅᑐᑉ ᓇᓗᓇᐃᑯᑕᖓᓐᓄᑦ.",
+      "userDoesNotExist": "ᐊᑐᕐᓂᐊᖅᑐᑉ ᓇᓗᓇᐃᑯᑕᖓ ᐱᑕᖃᖏᑐᖅ.",
+      "noSelfShare": "ᐃᓕᖕᓂᒃ ᐊᒥᖄᖃᑎᖃᕐᓂᖅ ᐅᖃᒐᒃᓴᓐᓂᒃ ᑎᑎᖃᓐᓂᒃ ᐊᔪᖅᑐᑎᑦ!"
+    },
+    "idecontroller": {
+      "running": "ᐃᖏᕋᔪᑦ ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ...",
+      "success": "ᑎᑎᖃᑦ ᐅᖃᒐᒃᓴᑦ ᑲᔪᓯᑎᐊᖅᐳᑦ",
+      "overwrite": "ᐊᑎᖅ ᐊᑐᒐᐅᓕᐊᓂᒃᑐᖅ. ᐊᓯᐊᓂᒃ ᐊᑐᕐᓂᐊᖅᐳᑎᑦ ᑭᓯᕕᑦ ᖃᐅᔨᒪᔭᖓᓐᓂᒃ ᓄᑕᒻᒥᒃ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓂᒃ.",
+      "illegalname": "ᐊᑐᕐᓗᑎᑦ ᑎᑎᕋᒥᐊᓂᒃ, ᓈᓴᐅᑎᓐᓂᒃ, ᐅᕙᓘᓃᑦ _ ᑐᖁᕆᐊᓕᐅᑉ ᐊᑎᒃᓴᖓᓐᓄᑦ.",
+      "savefailed": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᖅ. ᑭᓯᐊᓐᓂ ᐅᖃᕆᐊᓕᒃ ᓄᖑᑕᐃᓕᔪᑎᑕᖓᑕ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᐳᑎᑦ.",
+      "blocksyntaxerror": "ᓄᖃᖓᑎᑦᑎᓂᖅ ᐃᓕᖏᓗᒍ ᐊᔪᓕᖅᑐᖅ. ᓯᕗᓂᖓᓂ ᑎᑎᖃᖅ ᓈᒻᒪᖕᒪᖔᑦ ᖃᐅᔨᓴᕐᓗᒍ.",
+      "saveallfailed": "ᐃᓚᖏᑦ ᑎᑎᖃᑦ ᐅᖃᕆᐊᓖᑦ ᑲᓚᐅᑦᒧᑦ ᐃᓕᓂᖅ ᐊᔪᖅᑐᑦ, ᑭᓯᐊᓐᓂ ᖃᕆᑕᐅᔭᖅ ᓯᓚᑰᖏᓗᒍ ᐊᔪᖏᑐᑦ ᐊᓯᐊᑕᐃᓕᔪᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ.",
+      "closealltabs": "ᒪᑐᐃᓯᒪᔪᖅ ᑕᒪᕐᒥᒃ ᒪᑐᓂᐊᖅᐳᑦ. ᓈᒻᒪᒃᓴᖅᐱᑦ ᑲᔪᓯᒥᐊᕐᓗᑎᑦ?",
+      "soundcloud": {
+        "description": "EarSketch  ᐃᑲᔪᖅᐸᖕᒪᑦ ᐃᓕᓂᐊᕈᑕᐅᑉᓗᓐᓂ ᖃᕆᑕᐅᔭᑯᑦ ᓂᑉᔭᐅᓯᔭᕐᓂᕐᒥᒃ, ᐃᒻᖏᐅᑎᓐᓂᒃ ᐊᒪ ᐃᒻᖏᐅᑎᓕᕐᓂᕐᒥᒃ ᖁᕕᐊᓇᕐᓗᓐᓂ. ᓈᓴᐅᑎᖏᓐᓂᒃ ᐃᓕᓯᔪᖕᓇᖅᐳᑎᑦ Python ᐅᕙᓗᓂᑦ JavaScript, ᐅᖃᐅᓯᓕᕆᔪᑏᒃ ᐊᑐᒐᐅᒐᔪᒃᑐᒃ, ᐊᔨᖏᖏᑐᓐᓂᒃ ᓴᓇᓂᕐᒥᒃ ᐊᔪᖏᑐᒃ ᖃᕆᑕᐅᔭᒃᑯᑦ. ᑐᑭᓯᓱᐊᕈᕕᑦ EarSketch, ᖃᕆᑕᐅᔭᒧᓕᐊᕐᓗᑎᑦ http://earsketch.gatech.edu.",
+        "share": "ᓂᐱ ᑕᑯᔪᒪᒍᖕᓂ EarSketch, ᑕᑯᒋᐊᕐᓗᒍ",
+        "code": "ᑕᒻᓇ ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᐅᑯᓄᖓ ᓈᓴᐅᑎᓐᓄᑦ ᓴᓇᔭᐅᓚᐅᖅᐳᖅ:"
+      }
+    },
+    "shareScript": {
+      "menuDescriptions": {
+        "viewOnly": "ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ ᑕᑯᔭᐅᖁᕙᕋ (ᐋᕿᒃᓱᕐᓂᖅ ᐊᔪᖅᑐᑦ)",
+        "collaboration": "ᐋᕿᒃᓱᒐᐅᖁᒐᓗᐊᖅᐸᕋ ᑭᓇᒧᒃᑭᐊᖅ ᑎᑎᖃᖅ ᐅᖃᕆᐊᓕᒃ.",
+        "embedded": "ᖃᕆᑕᐅᔭᒻᒧᑦ ᐃᓕᔪᒪᕙᕋ ᐃᒻᖏᐅᑎᓕᐊᕋ.",
+        "soundCloud": "ᐃᖏᐅᓯᐊᕋ ᑎᑎᕋᒐᐅᖁᕙᕋ ᐅᕙᓐᓂ SoundCloud."
+      },
+      "sharedViewOnly": "ᐊᒥᖄᖃᑎᖃᕐᓂᖅ {{scriptName}} ᑕᑯᑐᐃᓐᓇᕐᓗᒍ ᐋᕿᒐᐅᓯᒪᔪᖅ ᐅᑯᓄᒐ  ",
+      "soundcloudError": "ᑕᒻᒪᖅᓯᒪᔪᖅ ᓅᐸᓕᐊᓂᖓ SoundCloud."
+    }
+  },
+  "api": {
+    "noparams": "ᑭᒡᓕᓕᕕᖃᖏᑐᖅ",
+    "parameters": "ᑭᒡᓕᓕᕕᖏᑦ",
+    "returnValue": "ᐅᑎᖅᑎᑕᐅᓂᖓ ᐊᑭᑐᓂᖓᑕ",
+    "example": "ᐆᒃᑐᕋᐅᑦ",
+    "defaultValue": "ᐋᕿᐊᑕᖅᓯᒪᔪᖅ ᐃᓕᖁᓯᖓ",
+    "open": "ᒪᑐᐃᕐᓗᒍ",
+    "close": "ᒪᑐᓗᒍ",
+    "types": {
+      "soundConstant": "ᓂᐱᖓ ᑲᔪᓰᓐᓇᖅᑐᖅ ",
+      "analysisConstant": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ ",
+      "folderConstant": "ᑕᖁᐃᕕᒃ ᑲᔪᓰᓐᓇᖅᑐᖅ ",
+      "effectConstant": "ᐊᒃᑐᐃᓂᖓᓐᓄᑦ ᑲᔪᓰᓐᓇᖅᑐᖅ",
+      "effectParameterConstant": "ᐊᒃᑐᐃᓂᖏᑦ ᑭᒡᓕᖃᕐᕕᖏᑕ ᑲᔪᓰᓐᓇᖅᑐᖅ ",
+      "float": "ᐳᒃᑕᓛᑉᓗᓂ",
+      "floatOptional": "Float, Optional",
+      "array": "ᑲᑎᖅᓱᐊᑦ",
+      "integer": "ᓈᓴᐅᑎᖓ",
+      "listArray": "ᑎᑎᖃᑦ/ᑲᑎᖅᓱᐊᑦ",
+      "list": "ᑎᑎᖃᑦ",
+      "string": "ᐊᒃᖢᓇᐅᔭᖅ",
+      "stringOptional": "ᐊᒃᖢᓇᐅᔭᖅ, ᐊᑐᕈᖕᓇᖅᑐᖅ",
+      "stringNumberList": "ᐊᒃᖢᓇᐅᔭᖅ/ᓈᓴᐅᑎᖓ/ᑎᑎᖃᖏᑦ",
+      "any": "Any type",
+      "booleanOptional": "Boolean, ᐊᑐᕈᖕᓇᖅᑐᖅ",
+      "soundOrList": "ᓂᐱᖓ ᑲᔪᓰᓐᓇᖅᑐᖅ ᐅᕙᓘᓃᑦ ᑎᑎᖃᖏ/ᑲᑎᖅᓱᐊᑦ"
+    },
+    "analyze": {
+      "description": "ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᖃᐅᔨᓴᕐᓂᐊᕐᓗᓐᓂ ᓂᐱᐅᑉ ᑐᖁᕈᑎᖓᓐᓂᒃ ᓇᓗᓇᐃᖅᑕᐅᓯᒪᔪᒻᒥᒃ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᐅᑉ ᑐᖁᐃᔪᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᒃ, ᑕᒻᓇᐅᑉᓗᓐᓂ ᑲᔪᓰᓐᓇᖅᑐᖅ ᓂᐱᓐᓂᒃ ᑐᓵᔪᑎᖓ ᖃᕆᑕᐅᔭᒻᒥ."
+        },
+        "feature": {
+          "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
+        }
+      },
+      "returns": {
+        "description": "ᖃᐅᔨᓴᕐᓂᑯ ᓇᓗᓇᐃᒐᐅᓯᒪᔪᒻᒥᒃ ᖃᓄᐃᑑᓂᖓᓐᓂᒃ (ᑖᒻᓇᖃᑦᑖᖅ ᐊᑯᓂᖓᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓂ)."
+      }
+    },
+    "analyzeForTime": {
+      "description": "ᐊᑐᓱᖅᑐᖅ ᖃᐅᔨᓴᕐᓂᐊᕐᓗᓐᓂ ᓂᐱᖓᓐᓂᒃ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᒃ ᐃᓕᖁᓯᖓᓐᓂᒃ, ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᐊᒪ ᐃᓱᓕᑉᕕᖓᓐᓄᑦ ᖃᑉᓯᐅᓂᖏᓐᓂᒃ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᐅᑉ ᑐᖁᐃᔪᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᒃ, ᑕᒻᓇᐅᑉᓗᓐᓂ ᑲᔪᓰᓐᓇᖅᑐᖅ ᓂᐱᓐᓂᒃ ᑐᓵᔪᑎᖓ ᖃᕆᑕᐅᔭᒻᒥ."
+        },
+        "feature": {
+          "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
+        },
+        "sliceStart": {
+          "description": "Start location within the sound to begin analysis"
+        },
+        "sliceEnd": {
+          "description": "End location within the sound to end analysis"
+        }
+      },
+      "returns": {
+        "description": "ᖃᐅᔨᓐᓂᑯ ᓇᓗᓇᐃᒐᐅᓯᒪᔪᑉ ᐃᓕᖁᓯᖓᓐᓂᒃ (ᐊᑯᓂᖓᓐᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓐᓂ)."
+      }
+    },
+    "analyzeTrack": {
+      "description": "ᑕᒻᓇ ᖃᐅᔨᓴᖅᐸᒃᑐᖅ ᑕᒪᐃᓐᓂᒃ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒥᒃ ᓇᓗᓇᐃᖅᑕᐅᓯᒪᔪᒻᒥᒃ ᐃᓕᖁᓯᖓᓐᓂᒃ.",
+      "parameters": {
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᐅᑉ."
+        },
+        "feature": {
+          "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
+        }
+      },
+      "returns": {
+        "description": "ᖃᐅᔨᓐᓂᑯᑦ ᓇᓗᓇᐃᖅᓯᒪᔪᑉ ᓱᓇᐅᓂᖓᓐᓂᒃ  (ᐊᑯᓂᖓᓐᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓐᓂ)."
+      }
+    },
+    "analyzeTrackForTime": {
+      "description": "ᑕᒻᓇ ᖃᐅᔨᓴᕐᓂᖅ ᓂᐱᒻᒥᒃ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᒃ ᖃᐅᔨᓴᓱᖅᐳᖅ ᐱᒋᐊᕐᕕᖓᓐᓂ ᐊᒻᒪ ᐃᓱᐊᓐᓂᒃ ᑕᑭᓂᖓᓐᓂ.",
+      "parameters": {
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᖃᐅᔨᓴᕆᐊᓕᐅᑉ."
+        },
+        "feature": {
+          "description": "ᖃᐅᔨᓴᕐᓂᖅ ᑲᔪᓰᓐᓇᖅᑐᖅ. ᒪᕈᖕᓂᒃ ᐃᑲᔪᖅᐸᒃᐳᖅ ᖃᐅᔨᓴᕐᓂᐅᑉ ᐃᓕᖁᓯᖓ:  RMS_AMPLITUDE ᖃᐅᔨᓴᖅᐸᒃᐳᖅ ᓂᐱᖁᖅᑐᓂᖓᓐᓂᒃ ᐊᒻᒪ SPECTRAL_CENTROID ᖃᐅᔨᓴᖅᐸᒃᖢᓐᓂ ᖃᐅᒻᒪᓂᖓᓐᓂᒃ."
+        },
+        "start": {
+          "description": "Start location within the track to begin analysis"
+        },
+        "end": {
+          "description": "End location within the track to end analysis"
+        }
+      },
+      "returns": {
+        "description": "ᖃᐅᔨᓴᒐᐅᓂᖓᑕ ᖃᓄᐃᓐᓂᖓ ᓇᓗᓇᐃᖅᓯᒪᔪᑉ (ᐊᑯᓂᖓᓐᓂ 0 ᐊᒻᒪ 1 ᐃᓚᐅᑉᓗᓐᓂ)."
+      }
+    },
+    "createAudioSlice": {
+      "description": "ᓂᐱᒻᒥᒃ ᐅᑎᖅᑎᑦᓯᑉᓗᓐᓂ ᐊᕕᒃᓯᒪᓂᖓᑕ ᐊᑐᒐᐅᓚᐅᖅᑐᒻᒥᑦ ᓂᐱᓕᐅᕐᓂᑯᒻᒥᑦ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᒻᒧᑦ ᑐᖁᐃᕕᒃ ᐱᒋᐊᕈᑎᖓᓐᓂᒃ ᐊᕕᒃᓯᒪᔪᒻᒥᒃ. ᑕᒻᓇ ᐊᑐᓱᖅᑐᖅ ᓂᐱᒻᒧᑦ ᖃᐅᔨᓴᕈᒻᒥᒃ ᖃᕆᑕᐅᔭᒻᒥ."
+        },
+        "sliceStart": {
+          "description": "ᐱᒋᐊᕐᕕᖓ ᐊᕕᒃᓯᒪᔫᑉ."
+        },
+        "sliceEnd": {
+          "description": "ᐃᓱᐊ ᐃᓂᖃᕐᕕᖓᑕ ᐊᕕᒃᓯᒪᔫᑉ."
+        }
+      },
+      "returns": {
+        "description": "ᓄᑕᖅ ᐊᕕᒃᓯᒪᔪᖅ ᐃᓚᖓᓐᓂᒃ ᐊᑐᖅᐸᒃᑐᖅ ᓂᐱᓕᐅᕈᑎᐅᑉ. "
+      }
+    },
+    "dur": {
+      "description": "ᑕᑭᓂᖓ ᐅᑎᖅᑎᑕᐅᑉᓗᓐᓂ ᓂᐱᐅᑉ ᑐᖁᐃᔪᑎᖓ ᐆᒃᑐᕋᐅᑎᓐᓄᑦ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᐅᑉ ᑐᖁᕐᕕᖓ ᑕᑭᓂᖓᑕ ᐃᓕᖁᓯᖓᓂᓯᐅᖅᐳᖅ. ᑕᒻᓇ ᖃᕆᑕᐅᔭᑯᑦ ᓂᐱᓐᓂᒃ ᐊᑐᕈᑎᓐᓂᒃ ᐊᑐᖅᐸᒃᑐᖅ."
+        }
+      },
+      "returns": {
+        "description": "ᐅᒃᑐᕋᐅᑎᑉ ᑕᑭᓂᖓ."
+      }
+    },
+    "finish": {
+      "description": "ᑕᒻᓇ ᐊᑎᖃᖅᑎᑕᕆᐊᖃᖅᐳᖅ ᐃᓱᐊᓐᓂ EarSketch ᑎᑎᖃᑦ ᐅᖃᕆᐊᖃᖅᑐᑦ. ᓂᐱᓕᐅᖅᓯᒪᔭᑦ ᐊᔪᖏᑎᐊᕐᓗᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ ᓂᐱᓐᓂᒃ ᑐᓴᔪᒻᒥ (DAW)."
+    },
+    "fitMedia": {
+      "description": "ᐃᓚᓯᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᖁᐃᕕᖓᓐᓂᒃ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᐱᒋᐊᕐᕕᖃᖅᑐᒻᒥᒃ ᐊᒻᒪ ᐃᓱᓕᑉᕕᖃᖅᑐᒻᒥᒃ. ᓂᐱᐅᑉ ᑐᖁᖅᑐᐃᕕᖓ ᐊᑐᑲᓂᕐᓂᐊᖅᐳᖅ ᓄᖃᖅᑎᑕᐅᓗᓂᓗᓐᓂᑦ ᐃᓂᖃᑎᐊᖁᑉᓗᒍ ᑕᑭᓂᖓ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᑉ ᑐᖁᖅᓯᒪᕕᖓ ᓂᐱᐅᕐᓂᑯᒻᒥ, ᐱᒋᐊᕐᕕᖃᓱᖅᑐᖅ ᖃᕆᑕᐅᔭᒥ ᓂᐱᓐᓂᒃ ᑐᓴᔾᔪᒥᑦ"
+        },
+        "track": {
+          "description": "ᓂᐱᑉ ᓈᓴᐅᑎᖓ ᐃᓕᔭᐅᓗᓐᓂ ᓂᐱᐅᑉ ᑐᖁᖅᓯᒪᕕᖓ ᐃᓗᐊᓐᓂ"
+        },
+        "start": {
+          "description": "Location within the track where the sound file will begin (e.g. 1 will start at the beginning of measure 1)."
+        },
+        "end": {
+          "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
+        }
+      }
+    },
+    "importImage": {
+      "description": "ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᐊᔨᒻᒥᒃ ᑕᑯᔪᒪᑉᓗᓐᓂ ᖃᕆᑕᐅᔭᒻᒥᑦ ᐊᒻᒪ ᒪᕈᐃᓕᖓᓕᕐᓗᒍ ᐊᕕᒃᓯᒪᓂᖓ/ᑎᑎᖃᖏᓪᓗ ᖃᑯᐊᖓᔪᖅ ᐅᕙᓗᓂᑦ ᐱᖓᓱᐃᓕᖓᓗᒍ ᑎᑎᕋᖅᓯᒪᓂᖏᑦ RGB ᑲᓚᖃᕐᓗᓐᓂ, ᐊᕿᒃᑕᐅᓯᒪᔪᖅ ᖃᑉᓯᐅᓂᖏᑦ ᐊᕙᓗᐃᑦ ᐊᒻᒪ ᑎᑯᓕᐊᖅᑐᑦ ᒪᓕᒡᓗᒋᑦ.",
+      "parameters": {
+        "url": {
+          "description": "ᖃᕆᑕᐅᔭᒻᒥ ᑐᕌᕈᑎᖓ ᐊᔨᑉ ᓇᓂᓯᐅᕐᓂᖓᑕ"
+        },
+        "nrows": {
+          "description": "ᖃᑉᓯᐅᓂᖏᑦ ᐊᕙᓗᐃᑦ ᐱᒃᓱ ᑎᑎᖃᖏᑕ ᐅᑎᕐᓂᐊᖅᑐᑦ (ᐊᖏᓂᖓ ᐋᕿᒐᐅᓂᐊᖅᐳᖅ ᑕᑉᑯᐊ ᐊᕙᓗᖏᑦ ᒪᓕᒡᓗᒋᑦ)"
+        },
+        "ncols": {
+          "description": "ᐊᕕᒃᓯᒪᓂᖏ ᐱᒃᓱ ᐅᑎᕐᓂᐊᖅᑐᑦ (ᐊᔨ ᐊᖏᓂᖓ ᐋᕿᒐᐅᓂᐊᖅᐳᖅ ᑕᑉᑯᐊ ᐱᒃᓱ ᖃᑉᓯᐅᓂᖏᑦ ᒪᓕᒡᓗᒋᑦ)"
+        },
+        "includeRGB": {
+          "default": "ᓱᓕᖏᑐᖅ",
+          "description": "ᓱᓕᓐᓂᖏᐸᑦ ᒪᕈᐃᓕᖓᔪᖅ ᖃᑯᕐᓗᕿᓗᓐᓂ ᑎᑎᕋᖅᓯᒪᔪᖅ. ᓱᓕᓐᓂᖅᐸᑦ, ᐱᖓᓲᓕᖓᔪᖅ RGB ᑲᓚᖃᕐᓗᓐᓂ ᐱᒃᓱ ᐊᑎᖏᓐᓂ, ᐱᖓᔪᖓᑦ ᐅᑯᐊᖑᓗᑎᒃ R, G, ᐊᒻᒪ B, ᒪᓕᒃᑐᕋᐅᓪᓗᑎᒃ."
+        }
+      },
+      "returns": {
+        "description": "ᐊᑕᐅᓯᐅᖏᑐᒻᒥᒃ ᐃᓗᓕᖃᖅᑐᖅ ᐊᑎᖏᑦ ᐃᓗᓕᖏᑕ (0-255) ᐊᒥᓲᓂᖏ ᑕᐃᔭᐅᑉᓗᑎᒃ ᐱᒃᓱᓐᓂᒃ."
+      }
+    },
+    "importFile": {
+      "description": "ᑕᒻᓇ ᐊᔪᖏᔪᑎᖓ ᑐᖁᖅᓯᒪᔪᑉ ᖃᕆᑕᐅᔭᒥ ᐊᒻᒪ ᐃᓗᓕᖏᑦ ᐊᒃᖢᓇᐅᔭᐅᑉᓗᑎᒃ.",
+      "parameters": {
+        "url": {
+          "description": "ᖃᕆᑕᐅᔭᒻᒥ ᓇᓂᓯᐅᕐᓂᖓ ᑐᖁᖅᓯᒪᔪᖅ"
+        }
+      },
+      "returns": {
+        "description": "ᐃᓗᓕᖏ ᑐᖁᕐᓗᒋᑦ ᐊᒃᖢᓇᐅᔭᖅᑎᑐᑦ."
+      }
+    },
+    "init": {
+      "description": "ᑕᒻᓇ ᓯᕗᓪᓕᐅᔭᕆᐊᓕᒃ ᑕᒪᐃᓐᓂ EarSketch ᐅᖃᒐᒃᓴᓐᓂ. ᐊᕿᒃᓱᐃᓱᕐᒪᑦ ᓂᐱᖓᓐᓂᒃ ᐱᓕᕆᑉᕕᖕᒥᒃ ᓴᓇᓂᐊᕐᓗᓐᓂ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒥᒃ."
+    },
+    "insertMedia": {
+      "description": "ᐃᓕᓱᖅᑐᖅ ᑕᒪᕐᒥᒃ ᓂᐱᓐᓂᒃ ᑐᖁᕐᕕᖓᓐᓄᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒥᑦ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᖓᑕ ᑐᖁᕐᕕᖓ ᐃᓕᓐᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ, ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᓵᔪᑎᖓᓐᓄᑦ ᖃᕆᑕᐅᔭᒻᒥ"
+        },
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐅᕗᖓ"
+        },
+        "start": {
+          "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐱᒋᐊᕐᕕᖓᑕ ᓂᐱᐅᑉ ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ. (The ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᑐᓵᓐᓇᕐᓂᐊᖅᑐᖅ ᐊᑕᐅᓰᕐᓗᓐᓂ, ᐃᓱᐊ ᖃᐅᔨᓐᓇᕐᓗᓐᓂ ᐊᑭᓂᖓ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ.)"
+        }
+      }
+    },
+    "insertMediaSection": {
+      "description": "ᐃᓕᓱᖅᑐᖅ ᐃᓚᖓᓐᓂᒃ ᓂᐱᐅᑉ ᑐᖁᖅᑐᐃᕕᖓᓐᓄ ᓇᓗᓇᐃᖅᓯᒪᔪᒻᒧᑦ ᓇᓂᓯᐅᕐᓂᖓᓐᓂᒃ.",
+      "parameters": {
+        "sound": {
+          "description": "ᓂᐱᖓᑕ ᑐᖁᕐᕕᖓ ᐃᓕᓐᓂᐊᕐᓗᒍ ᓂᐱᓕᐅᖅᓯᒪᔪᒻᒧᑦ, ᑕᒻᓇ ᐊᑐᒐᐅᓱᖅᑐᖅ ᓂᐱᐅᑉ ᑐᓵᔪᑎᖓᓐᓄᑦ ᖃᕆᑕᐅᔭᒻᒥ"
+        },
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᓈᓴᐅᑎᖓ ᐃᓕᓂᐊᕐᓗᒍ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐅᕗᖓ"
+        },
+        "start": {
+          "description": "ᓇᓂᓯᐅᕐᓂᖓ ᐱᖑᐊᕐᕆᐊᕐᖃᕕᖓᑕ ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ."
+        },
+        "sliceStart": {
+          "description": "ᓇᓂᓯᐅᕐᓂᖓᑕ ᐱᒋᐊᕐᕕᖓ ᐃᓗᐊᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐃᓚᖃᕐᓗᓐᓂ (ᐅᑯᐊᑐᑦ 1.0 ᐱᒋᐊᕈᑎᒋᓗᓂᐅᒃ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐊᒻᒪ 2.0 ᐆᒃᑐᕋᐅᑕᐅᓗᓐᓂ 2 ᐅᕙᓐᓂ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ)."
+        },
+        "sliceEnd": {
+          "description": "ᐃᓱᖓᑕ ᓇᓂᓯᐅᕐᓂᖓ ᓂᐱᖓᑕ ᑐᖅᑯᖅᓯᒪᕝᕕᖓ ᐃᓚᖃᕐᓗᓐᓂ (ᐅᑯᐊᑐᑦ 2.0 ᐆᒃᑐᕋᖅᓯᒪᑉᓗᓐᓂ 2 ᓂᐱᖓᑕ ᑐᖁᖅᓯᒪᑉᕕᖓᓐᓂ)."
+        }
+      }
+    },
+    "makeBeat": {
+      "description": "ᓴᓇᔪᖕᓇᖅᑐᖅ ᓂᐱᒻᒥᒃ ᐊᑐᒐᐅᓂᐊᖅᑐᒻᒥᒃ ᐊᔨᖏᖏᑐᓐᓂᒃ ᑎᑎᖃᓐᓂᒃ ᐊᑐᕐᓗᓐᓂ. ᑕᑉᑯᐊ ᑎᑎᖃᑦ ᖃᓄᒥᐊᖅ ᑕᑭᓂᖃᕈᖕᓇᖅᐳᑦ. ᐃᓱᒪᕗᒍᑦ ᐊᕕᒃᓯᒪᓗᑎᒃ ᖃᑉᓯᐅᓂᖏ 16 (ᐅᑯᐊᑐᑦ 16, 32, 64, etc.), ᑕᑉᑯᐊ ᐊᔨᖏᒻᒥᒃ ᑕᑭᓂᖏᓐᓂᒃ ᐊᔪᖏᒻᒪᑕ (ᐊᑕᐅᓯᖅ ᑕᑭᓂᖓ 16 ᑎᑎᖃᑦ ᑕᑭᑎᒋᓗᑎᒃ).",
+      "parameters": {
+        "sound": {
+          "description": "ᐊᑕᐅᓯᑐᐊᖅ ᓂᐱᒻᒧᑦ ᐃᓕᓯᔪᑦ ᑎᑎᖃᓪᓗᓂᑦ/ᐊᕕᒃᓯᒪᔪᑦ ᓂᐱᖓᑕ ᐃᓕᔪᑎᖓᓐᓂ ᖃᕆᑕᐅᔭᒻᒥ ᐱᒋᐊᕈᑎᖃᕐᓗᓐᓂ"
+        },
+        "track": {
+          "description": "ᓂᐱᖓᑕ ᐃᓕᔭᐅᕕᒋᓂᐊᖅᑕᖓ"
+        },
+        "start": {
+          "description": "Location within the track to start pattern"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+        }
+      }
+    },
+    "makeBeatSlice": {
+      "description": "ᓴᓇᔭᐅᓯᒪᔪᖅ ᓂᐱᖃᕐᓂᖏᓐᓂᒃ ᓇᓗᓇᐃᑯᑕᖃᖅᑐᑦ ᓂᐱᖏᑕ ᐱᒋᐊᕐᕕᖏᓐᓂᒃ ᐃᓗᐊᓐᓂᓯᐅᖅᑐᑦ ᓂᐱᐅᑉ ᐃᓂᖃᕐᕕᖓᑕ. ᐊᓯᖏᑎᑑᖏᑐᖅ makeBeat, ᐱᒋᐊᕐᕕᖓᓐᓂᑦ ᑭᓯᐊᓐᓂ ᓂᑉᔮᕆᐊᓱᖅᑐᑦ, makeBeatSlice ᐊᑐᕐᓗᒍ ᓴᓇᔫᓪᓗᐊᖅᐳᑎᑦ ᐊᔨᖏᖏᑐᓐᓂᒃ ᓂᐱᖃᖅᑎᓪᓗᒍ ᑭᓯᐊᓐᓂ ᐊᑕᐅᓯᕐᒥ ᐃᓂᖃᕐᕕᖓᓐᓂᒃ ᐊᑐᕐᓗᑎᑦ.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound file, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "ᓂᐱᖃᕐᕕᖓᑕ ᐃᓕᔭᐅᕕᒋᓂᐊᖅᑕᖓ"
+        },
+        "start": {
+          "description": "Location within the track to start pattern"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+        },
+        "sliceStarts": {
+          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+        }
+      }
+    },
+    "print": {
+      "description": "ᐃᓕᔪᑎᖓᓐᓂ ᖃᐅᔨᓴᐅᑎᑉ ᓂᑉᑕᔪᑦ.",
+      "parameters": {
+        "input": {
+          "description": "ᐊᑑᑎᖏᑦ ᐊᓕᓚᔪᒻᒧᑦ ᐊᒥᓱᓕᐅᕆᐊᓖᑦ"
+        }
+      }
+    },
+    "println": {
+      "description": "ᐃᓕᔪᑎᖓᓐᓂ ᖃᐅᔨᓴᐅᑎᑉ ᓂᑉᑕᔪᑦ.",
+      "parameters": {
+        "input": {
+          "description": "ᐊᑑᑎᖃᕐᓂᖏᑦ ᐊᓕᓚᔪᒻᒧᑦ ᐃᓕᔭᐅᓂᐊᖅᑐᑦ"
+        }
+      }
+    },
+    "readInput": {
+      "description": "ᑕᒻᓇ ᐅᑐᕐᓗᒍ ᐊᑐᖅᑎᑕᐅᔪᖅ ᐃᓕᓯᓂᐊᖅᐸᑦ ᓄᑕᒻᒥᒃ.",
+      "parameters": {
+        "prompt": {
+          "description": "ᓇᓗᓇᐃᑯᑕᖓ ᐊᑐᖅᑎᑕᐅᔪᑉ ᐊᐱᕆᔭᐅᒃᐸᒃ ᐃᓕᓯᖁᔭᐅᓗᓐᓂ."
+        }
+      },
+      "returns": {
+        "description": "ᓄᑕᖅ ᐃᓕᔭᐅᓚᐅᖅᑐᖅ ᐊᑐᖅᑎᐅᔪᒻᒧᑦ."
+      }
+    },
+    "replaceListElement": {
+      "description": "ᐊᓯᐊᖑᓗᒃᑖᕐᓗᒋᑦ ᑎᑎᖃᑦ ᐊᕕᒃᓯᒪᓂᖏᓪᓗ ᓄᑕᓐᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᓐᓂᒃ.",
+      "parameters": {
+        "list": {
+          "description": "Original list/array"
+        },
+        "elementToReplace": {
+          "description": "ᐅᑯᐊ ᐊᓯᐊᖑᕆᐊᖃᖅᑐᑦ."
+        },
+        "withElement": {
+          "description": "ᓄᑕᖅ ᐃᓕᖁᓯᖓ ᐊᓯᖏᓐᓄᑦ ᐊᑐᓚᐅᖅᑐᓐᓄᑦ ᐃᓕᔭᐅᓂᐊᖅᑐᖅ ᐃᓕᖁᓯᕆᓚᐅᖅᑕᖏᓐᓄᑦ elementToReplace."
+        }
+      }
+    },
+    "replaceString": {
+      "description": "ᑕᒻᓇ ᐃᓕᖁᓯᖓ ᐊᓯᐊᖑᖅᑎᑦᓯᔪᑦ ᑕᒪᐃᓐᓂᒃ ᐃᓕᖁᓯᖏᓐᓂᒃ ᓄᑕᒻᒥᒃ ᐃᓕᖁᓯᖃᓕᖅᖢᓐᓂ.",
+      "parameters": {
+        "string": {
+          "description": "ᐊᑐᒐᐅᔪᑐᖃᖅ ᓂᐱᐅᑉ ᐊᒃᖢᓇᐅᔭᖓ"
+        },
+        "characterToReplace": {
+          "description": "ᐃᓕᓯᖏᑦ ᓂᐱᐅᑉ ᐊᒃᖢᓇᐅᔭᖓᑕ ᐊᓯᐊᖑᖅᑕᐅᓂᐊᖅᑐᑦ"
+        },
+        "withCharacter": {
+          "description": "ᓄᑕᖅ ᑎᑎᖃᖅ ᐊᓯᐊᖑᖅᑎᑦᓯᓂᐊᖅᑐᖅ ᒪᓕᒐᐅᓚᐅᖅᑐᓐᓂᒃ characterToReplace"
+        }
+      },
+      "returns": {
+        "description": "ᓄᑕᖅ ᓂᐱᖓᓐᓄᑦ ᐊᒃᖢᓇᐅᔭᖅ ᓇᒻᒪᒃᑐᓐᓂᒃ ᑎᑎᕋᖅᓯᒪᔪᖅ ᐊᓯᖏᓐᓂᒃ"
+      }
+    },
+    "reverseList": {
+      "description": "ᐅᑎᒻᒧᑦ ᐃᓗᓕᖏᑦ ᑎᑎᕋᕐᓗᒋᑦ ᑲᑎᑕᐅᓯᒪᔪᑦ.",
+      "parameters": {
+        "list": {
+          "description": "List/array to reverse"
+        }
+      },
+      "returns": {
+        "description": "ᓄᑖᖅ ᑎᑎᕋᖅ/ᑲᑎᒪᐅᓯᒪᔪᑦ ᐅᑎᒻᒧᑦ ᐋᕿᒃᓱᖅᓯᒪᔪᑦ"
+      }
+    },
+    "reverseString": {
+      "description": "ᐃᓕᖁᓯᑐᖃᖓᓐᓄᑦ ᐅᑎᖅᑎᓱᒪᓐᓂᕈᖕᓂ ᐊᕿᒃᑕᐅᓯᒪᔪᑦ.",
+      "parameters": {
+        "string": {
+          "description": "String to reverse"
+        }
+      },
+      "returns": {
+        "description": "ᓄᑕᑦ ᐃᓕᖁᓯᖏᑦ ᑎᑎᖃᑦ ᑭᓯᐊᓐᓂ ᐅᑎᖅᑎᑕᐅᓯᒪᔪᑦ"
+      }
+    },
+    "rhythmEffects": {
+      "description": "ᑎᑎᖃᑦ ᒪᓕᒡᓗᒋᑦ ᐊᔨᒌᓐᓂᒃ ᓂᐱᖃᖅᑐᑦ ᓇᓗᓇᐃᑯᑕᐅᑉᓗᑎᒃ ᐊᕿᒃᑕᐅᓯᒪᓂᖏᓐᓂᒃ",
+      "parameters": {
+        "track": {
+          "description": "ᓇᓗᓇᐃᑯᑕᖓ ᐃᓕᔭᐅᓯᒪᔪᑦ ᐅᑯᓄᖓ (ᐅᕙᓗᓂᑦ MIX_TRACK ᓂᐱᓕᐅᕐᓕᑯᓄᑦ ᐊᑐᒐᐅᖁᑉᓗᒍ)."
+        },
+        "type": {
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+        },
+        "parameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+        },
+        "list": {
+          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+        },
+        "start": {
+          "description": "Location within the track to start pattern"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+        }
+      }
+    },
+    "selectRandomFile": {
+      "description": "ᓇᑭᒥᐊᖅ ᐱᒋᐊᕐᕕᒋᓂᐊᖅᑕᖓᑕ ᓂᐱᒻᒥᒃ ᑐᖅᑯᐃᕝᕕᖓᓂᒃ.",
+      "parameters": {
+        "folderSubstring": {
+          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
+        }
+      },
+      "returns": {
+        "description": "ᓂᐱᖓ ᐊᑕᐅᓯᒥᐊᖅ ᑐᖅᑯᐃᕝᕕᒃ."
+      }
+    },
+    "setEffect1": {
+      "description": "ᑕᒻᓇ ᑭᓯᐊᓐᓂ ᐊᑐᒐᓱᖅᑐᖅ ᓂᐱᐅᑉ ᐊᑐᒐᐅᔪᑉ ᓇᓗᓇᐃᑯᑕᖓᓐᓄᑦ ᑭᒡᓕᖃᕐᓂᖏᓐᓄᑦ ᓂᐱᓕᐅᕈᑎᐅᑉ ᐃᓗᐊᓐᓂ. ᑐᑭᓯᑲᓂᕈᑎᑦ ᐊᑐᒐᐅᓂᖏᑕ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᐊᒃᓱᕈᑎᑉ(), ᑕᑯᒋᐊᕐᓗᒍ <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>ᐊᒃᑐᐃᓂᓗᒃᑖᑦ ᐅᓂᑉᑳᒐᐅᔪᑦ ᓇᓗᓇᐃᖅᓯᒪᑉᓗᑎᒃ</a> ᐃᓕᓐᓂᐊᕈᑎᓐᓂ.",
+      "parameters": {
+        "track": {
+          "description": "ᓂᐱᐅᑉ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᐃᓕᔭᐅᓂᐊᖅᑐᖅ (ᐊᑯᑕᐅᓗᓂᓘᓐᓃᑦ ᓂᐱᓕᐅᖅᓯᒪᔪᖅ ᑕᒪᐃᓐᓄᑦ ᑐᓵᕐᓈᒐᐅᓂᐊᖅᑐᓐᓄᑦ)"
+        },
+        "type": {
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+        },
+        "parameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+        },
+        "value": {
+          "description": "Value of effect parameter"
+        }
+      }
+    },
+    "setEffect2": {
+      "description": "ᑖᑉᓱᒪ ᐊᐅᓚᓂᖓ ᐊᑐᒐᐅᔪᖅ ᓂᐱᓕᐅᕈᑎᐅᑉ ᓈᓴᐅᑎᖏᓐᓄᑦ. ᐊᓯᖏᑎᑑᖏᑐᖅ ᐋᕿᒃᑕᐅᓯᒪᑉᓗᓐᓂ ᐅᑯᐊᑎᑐᑦ(), ᐊᓯᖏᓐᓂᑦ ᐃᓱᒪᒋᔭᐅᓯᒪᔪᖃᕋᓗᐊᕐᓗᓐᓂ ᐊᓯᐊᖑᕈᑎᓐᓂᒃ ᐊᒃᑐᐃᓂᖏᑕ ᑭᔨᓕᖃᕐᓂᖏᓐᓄᑦ. ᑐᑭᓯᑲᓂᕈᑎᑦ ᐊᒃᑐᐃᓂᖏᓐᓄᑦ ᑕᒻᓇ ᐊᑐᒐᐅᓗᓐᓂ (), ᑕᑯᒋᐊᕐᓗᒋᑦ ᐃᓕᓐᓂᐊᕈᑎᑦ: <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>ᖃᓄᐃᓕᐅᕐᓂᓗᒃᑖᖏᑦ ᐅᓂᑉᑳᖅᓯᒪᕗᑦ</a>",
+      "parameters": {
+        "startValue": {
+          "description": "Value of effect parameter at beginning of effect envelope"
+        },
+        "start": {
+          "description": "Location within the track of the startValue"
+        },
+        "endValue": {
+          "description": "Value of effect parameter at end of effect envelope"
+        },
+        "end": {
+          "description": "Location within the track of the endValue"
+        }
+      }
+    },
+    "setTempo1": {
+      "description": "Sets the tempo for the project.",
+      "parameters": {
+        "tempo": {
+          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
+        }
+      }
+    },
+    "setTempo2": {
+      "description": "Change the tempo for a section of the project.",
+      "parameters": {
+        "startTempo": {
+          "description": "Tempo at beginning of section in beats per minute (BPM)"
+        },
+        "start": {
+          "description": "Measure where section begins"
+        },
+        "endTempo": {
+          "description": "Tempo at end of section (if omitted, new tempo persists until next tempo point)"
+        },
+        "end": {
+          "description": "Measure where section ends"
+        }
+      }
+    },
+    "shuffleList": {
+      "description": "ᐊᕿᒃᓱᕐᓗᒋᑦ ᐃᓗᓕᖏᑦ ᑎᑎᖃᑦ ᑲᑎᑕᐅᓂᖏᓪᓗ ᒪᓕᒡᓗᒋᑦ.",
+      "parameters": {
+        "list": {
+          "description": "ᑎᑎᖃᕐᓗᒋᑦ/ᑲᑎᑕᐅᓂᖏᑦ ᐊᑉᒍᑉᓗᒋᑦ"
+        }
+      },
+      "returns": {
+        "description": "ᓄᑖᖅ ᑎᑎᖃᑦ/ᑲᑎᑕᐅᓯᒪᔪᑦ ᐅᖃᐅᓯᖏᑦ ᒪᓕᒐᐅᑉᓗᑎᒃ."
+      }
+    },
+    "shuffleString": {
+      "description": "ᓇᓕᐊᖕᓂᒥᐊᖅ ᐊᑐᓕᖅᑎᑦᓯᔪᑦ ᑕᐅᑐᒐᐅᔪᒪᔪᓐᓂᒃ.",
+      "parameters": {
+        "string": {
+          "description": "ᖃᓄᒥᐊᖅ ᓂᐱᓂᒍᑎᖓ"
+        }
+      },
+      "returns": {
+        "description": "ᓄᑖᑦ ᐃᓕᖁᓯᖏᑦ ᓱᓇᓐᓂᒃ ᐅᖃᐅᓯᖏᑕ ᖃᓄᒥᐊᖅ ᐋᕿᒃᓯᒪᔪᑦ."
+      }
+    }
+  },
+  "templates": {
+    "python": "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
+    "javascript": "\"use strict\";\n\n//\t\tjavascript code\n//\t\tscript_name:\n//\n//\t\tauthor:\n//\t\tdescription:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+  }
+}

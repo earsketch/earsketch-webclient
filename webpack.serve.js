@@ -26,9 +26,15 @@ module.exports = env => {
             publicPath: "/", // webclient folder
         },
         devServer: {
-            publicPath: "/",
             port: port,
-            hotOnly: true,
+            hot: "only",
+            static: "./",
+            devMiddleware: {
+                publicPath: "/",
+            },
+            client: {
+                progress: true,
+            },
         },
         module: {
             rules: [{

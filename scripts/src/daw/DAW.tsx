@@ -15,6 +15,7 @@ import esconsole from "../esconsole"
 import store, { RootState } from "../reducers"
 import { effectToPoints, TempoMap } from "../app/tempo"
 import * as WaveformCache from "../app/waveformcache"
+import { addUIClick } from "../cai/studentPreferences"
 
 // Width of track control box
 const X_OFFSET = 100
@@ -171,14 +172,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={play}>
+                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={pause}>
+                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -213,7 +214,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                     </button>
                 </span>
                 <span className="daw-transport-button">
-                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} />
+                    <input id="dawVolumeSlider" type="range" min={minVolume} max="0" value={volumeMuted ? minVolume : volume} onChange={e => changeVolume(+e.target.value)} title="Volume Control" aria-label="Volume Control"/>
                 </span>
             </span>
         </div>
@@ -657,7 +658,9 @@ export function setDAWData(result: player.DAWData) {
         dispatch(daw.setSoloMute({}))
         dispatch(daw.setBypass({}))
         // Set zoom based on play length.
-        dispatch(daw.setTrackWidth(64000 / playLength))
+        // (The `max()` puts a cap on zoom when dealing with a small number of measures.)
+        const trackWidth = 64000 / Math.max(playLength, 8)
+        dispatch(daw.setTrackWidth(trackWidth))
         dispatch(daw.setTrackHeight(45))
         lastTab = state.tabs.activeTabID
         // Get updated state after dispatches:
@@ -1015,13 +1018,13 @@ export const DAW = () => {
                 </div>
 
                 <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
-                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none" title="Horizontal Zoom In" aria-label="Horizontal Zoom In"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none" title="Horizontal Zoom Out" aria-label="Horizontal Zoom Out"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
-                    <button onMouseDown={zoomInY} className="zoom-in leading-none"><i className="icon-plus2 text-sm"></i></button>
-                    <button onMouseDown={zoomOutY} className="zoom-out leading-none"><i className="icon-minus text-sm"></i></button>
+                    <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Vertical Zoom In" aria-label="Vertical Zoom In"><i className="icon-plus2 text-sm"></i></button>
+                    <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Vertical Zoom Out" aria-label="Vertical Zoom Out"><i className="icon-minus text-sm"></i></button>
                 </div>
 
                 <div ref={yScrollEl} className="absolute overflow-y-scroll z-20"

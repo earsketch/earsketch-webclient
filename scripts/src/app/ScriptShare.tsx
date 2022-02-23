@@ -408,7 +408,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <div className="container">
                 <div className="row mt-5 justify-between flex">
                     {ACCESS_OPTIONS.map(({ descriptionKey }, index) =>
-                        <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline">
+                        <div key={index} style={{ color: "#717171" }} className="radio-inline">
                             <label>
                                 <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
                                 <span />{t(descriptionKey)}
@@ -461,7 +461,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
                         {Object.entries(licenses).map(([id, license]) =>
-                            <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
+                            <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 flex-grow">
                                 <label>
                                     <input type="radio" name="optradio" value={id} checked={+id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(+id) }} />
                                     <span></span>{license.license}

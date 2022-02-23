@@ -1,7 +1,7 @@
 # EarSketch Web Client App
 
 ## Getting started with client development
-1. Clone the EarSketch repo from `https://github.com/GTCMT/earsketch`.
+1. Clone the EarSketch repository from `https://github.com/GTCMT/earsketch-webclient`.
 2. Install the latest-stable `node.js` and `npm`. If you have them already, check if the versions are at least >=10 and >=6, respectively.
 3. In `<repo>/webclient`, run `npm install`. This installs JS libraries and may take a while.
 4. Run `npm run serve` to start a local dev server. This should automatically open the ES client application hosted at `localhost:8080`.
@@ -14,22 +14,22 @@
 
 ### Configuration files
 - Note: all under `./webclient` directory.
-- `webpack.common.js`: The base config file for `webpack`. May need modifications when adding / removing libraries outside NPM or dealing with global / constant variables.
+- `webpack.common.js`: The base config file for `webpack`. May need modifications when adding / removing libraries outside npm or dealing with global / constant variables.
 - `webpack.dev.js`: Configs specific to local development (not for the DEV server!).
 - `webpack.prod.js`: Configs for the release build (used on DEV and PROD servers). Generates minified `dist/bundle.js` loaded in `index.html`.
-- `package.json`: The NPM config file organizing the library dependencies and build commands.
+- `package.json`: The npm config file organizing the library dependencies and build commands.
 - `package-lock.json`: Describes the `node_modules` structure. Do not modify.
 - `.babelrc`: The config file for Babel, an ES6+ to ES5 transpiler.
 - `scripts/src/index.js`: The JS entry-point for loading all the modules in order (AMD only).
 
-### webpack.common.js
+### `webpack.common.js`
 - `resolve.alias`: Defines module names for import / require. For AMD loading in `index.js`, all our source-code files are shimmed here. This won't be necessary as much once we start using the ESM imports in individual source-code files.
 - `module.rules`: This is where we configure various file loaders (preprocessors) and source-code transformers.
-    + HappyPack: Runs Babel transpiler in multiple threads (thus faster).
-    + Exports loader: Makes certain variables in the source code available for import / require. Exported names are then typically treated as semi-global variables in our code base -- something to be avoided in the future.
+  + HappyPack: Runs Babel transpiler in multiple threads (thus faster).
+  + Exports loader: Makes certain variables in the source code available for import / require. Exported names are then typically treated as semi-global variables in our codebase -- something to be avoided in the future.
 - `plugins.(providePlugin)`: Exports and/or exposes certain variables as semi-global variables. Again, only a tentative solution used in the current AMD loading.
 
-### index.js
+### `index.js`
 - The entry point for our JavaScript madness.
 - Some modules are loaded and initialized here (e.g., `jquery` and `jqueryUI`) as some libraries assume the availability of other objects in the context. Something to be avoided in our own dev process.
 - Some of the `exports-loader` outputs are assigned to the global scope with `Object.assign(window,src)`. Again, to be eliminated in the future.
@@ -39,7 +39,7 @@
 
 ### Guidelines for adding new modules
 #### Third-party libraries
-- Install with NPM whenever possible. Notify other developers to run `npm install` after pushing.
+- Install with npm whenever possible. Notify other developers to run `npm install` after pushing.
 - Prefer `import`-ing the library in individual source files where necessary than loading in `index.js`.
 - For older (unmaintained) libraries, you may need to add a shim for a specific file and/or expose a variable as module with `exports-loader`.
 
@@ -51,6 +51,9 @@
 
 <!--- Dev Conventions (to be improved by everyone!) --->
 ## Coding Conventions
+
+### Writing text
+Before adding any static text to the web client, please internationalize it so it can be translated! See our [internationalization guide](i18n.md).
 
 ### Printing debug messages to the browser console
 Use esconsole(message, [tags], ...) for controlled printing and logging. You can use custom tags with lower case or upper case, and multiple tags.
@@ -81,26 +84,26 @@ Grunt is used to make running tasks such as JSDoc generation, LESS compilation, 
 http://gruntjs.com/getting-started
 
 ### Usage
-Install Node (NPM) if you have not done already.
+Install Node (npm) if you have not done already.
 
 Install Grunt-cli, preferably to your global environment:
 
-    $ sudo npm install -g grunt-cli
+    sudo npm install -g grunt-cli
 
-Install NPM dependencies. If any of the tasks does not work, you should try installing (or updating) packages first.
+Install npm dependencies. If any of the tasks does not work, you should try installing (or updating) packages first.
 
-    $ cd (webclient directory)
-    $ npm install
+    cd (webclient directory)
+    npm install
 
 To run all the default grunt tasks:
 
-    $ cd (webclient directory)
-    $ grunt
+    cd (webclient directory)
+    grunt
 
 To run a specific task, such as jsdoc building:
 
-    $ cd (webclient directory)
-    $ grunt jsdoc
+    cd (webclient directory)
+    grunt jsdoc
 
 <hr>
 ## Bower
@@ -115,33 +118,33 @@ To be written more.
 We use JSDoc to generate the developer documentation from the code.
 
 ### Preparation
-Install NPM (https://www.npmjs.com/) if you have not already.
+Install [npm](https://www.npmjs.com/) if you have not already.
 
 (Optional) install JSDoc globally on your system:
 
-    $ sudo npm install jsdoc -g
+    sudo npm install jsdoc -g
 
 Install dependencies:
 
-    $ cd <webclient directory>
-    $ npm install
+    cd <webclient directory>
+    npm install
 
 ### Generating documentation
-#### Using Grunt:
-    $ cd <webclient directory>
-    $ grunt doc
+#### Using Grunt
+    cd <webclient directory>
+    grunt doc
 
-#### Not using Grunt:
-    $ cd <webclient directory>
-    $ ./node_modules/.bin/jsdoc -c conf.json
+#### Not using Grunt
+    cd <webclient directory>
+    ./node_modules/.bin/jsdoc -c conf.json
 If you installed jsdoc globally:
 
-    $ jsdoc -c conf.json
+    jsdoc -c conf.json
 
 The HTML documentation will be generated under ./webclient/doc
 
 ### Writing documentation
-JSDoc documentation (http://usejsdoc.org/)
+[JSDoc documentation](http://usejsdoc.org/)
 
 ### Configuration
 webclient/conf.json is used for configuring jsdoc.
@@ -153,23 +156,23 @@ webclient/conf.json is used for configuring jsdoc.
 LESS is a CSS extension with variables, etc. that needs to be compiled into a regular css file. Please be careful that if you work directly on a regular CSS file, it may be overwritten when someone compiles a paired LESS file.
 
 ### Setup
-With NPM, install less:
+With npm, install less:
 
-    $ cd <webclient directory>
-    $ npm install
+    cd <webclient directory>
+    npm install
 
 (Optional) install Less globally on your system:
 
-    $ sudo npm install less -g
+    sudo npm install less -g
 
 
 ### Compiling
 Using grunt (Make sure to install / update the npm packages first):
 
-    $ cd <webclient folder>
-    $ grunt less
+    cd <webclient folder>
+    grunt less
 
-### Manually compiling using the compile_less.sh script.
+### Manually compiling using the compile_less.sh script
 
 All scripts cam be compiled by running ./compile_less.sh in the /css directory
 
@@ -177,13 +180,13 @@ All less variables are stored in css/variables.less
 
 All less files are included in /css/allstyles.less + /css/allstyles.css
 
-### Manually compiling individual scripts: using the lessc command in the css folder, i.e.,
+### Manually compiling individual scripts: using the lessc command in the css folder
 
-    $ ./node_modules/less/bin/lessc styles.less styles.css
+    ./node_modules/less/bin/lessc styles.less styles.css
 
 If you installed Less globally:
 
-    $ lessc /css/styles.less /css/styles.css
+    lessc /css/styles.less /css/styles.css
 
 <hr>
 <!--- Authoring --->

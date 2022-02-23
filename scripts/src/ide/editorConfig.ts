@@ -1,4 +1,6 @@
-const blockDropdownNumbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+import { APIItem, ESApiDoc } from "../data/api_doc"
+
+const blockDropdownNumbers = [...Array(15).keys()].map(i => i + 1 + "")
 const blockDropdownEffects = ["BANDPASS", "CHORUS", "COMPRESSOR", "DELAY", "DISTORTION", "EQ3BAND", "FILTER", "FLANGER", "PAN", "PHASER", "PITCHSHIFT", "REVERB", "RINGMOD", "TREMOLO", "VOLUME", "WAH"]
 const blockDropdownEffectParameters = ["MIX", "BYPASS", "BANDPASS_FREQ", "BANDPASS_WIDTH", "CHORUS_LENGTH", "CHORUS_NUMVOICES", "CHORUS_RATE", "CHORUS_MOD", "COMPRESSOR_THRESHOLD", "COMPRESSOR_RATIO", "DELAY_TIME", "DELAY_FEEDBACK", "DISTO_GAIN", "EQ3BAND_LOWGAIN", "EQ3BAND_LOWFREQ", "EQ3BAND_MIDGAIN", "EQ3BAND_MIDFREQ", "EQ3BAND_HIGHGAIN", "EQ3BAND_HIGHFREQ", "FILTER_FREQ", "FILTER_RESONANCE", "FLANGER_LENGTH", "FLANGER_FEEDBACK", "FLANGER_RATE", "LEFT_RIGHT", "PHASER_RATE", "PHASER_RANGEMIN", "PHASER_RANGEMAX", "PHASER_FEEDBACK", "PITCHSHIFT_SHIFT", "REVERB_TIME", "REVERB_DAMPFREQ", "RINGMOD_MODFREQ", "RINGMOD_FEEDBACK", "TREMOLO_FREQ", "TREMOLO_AMOUNT", "GAIN", "WAH_POSITION"]
 
@@ -20,6 +22,7 @@ const blockModeOptions = {
         analyzeForTime: { color: "green" },
         analyzeTrack: { color: "green", dropdown: [blockDropdownNumbers] },
         analyzeTrackForTime: { color: "green", dropdown: [blockDropdownNumbers] },
+        createAudioSlice: { color: "green" },
         dur: { color: "green" },
         importImage: { color: "green" },
         importFile: { color: "green" },
@@ -39,6 +42,26 @@ const blockModeOptions = {
     },
 }
 
+function getSignatures(names: string[]) {
+    // TODO: Use Array.flat() when we update our target.
+    const items = names.map(name => ESApiDoc[name]).map(info => Array.isArray(info) ? info : [info])
+    // HACK: Droplet inexplicably has some problem with parameters named "type", so we rename them for now.
+    return ([] as APIItem[]).concat(...items).map(info => info.autocomplete!.replace(", type,", ", effectType,"))
+}
+
+function getPythonBlocks(names: string[]) {
+    return getSignatures(names).map(signature => ({ block: signature }))
+}
+
+// TODO: Any objection to ditching these extra semicolons? Then we can dispense with this function.
+// (Note that our autocomplete does not include them in JS mode.)
+function getJavascriptBlocks(names: string[]) {
+    return getSignatures(names).map(signature => ({ block: signature + ";" }))
+}
+
+const basicFunctions = ["init", "finish", "print", "println", "setTempo", "fitMedia", "makeBeat", "setEffect", "selectRandomFile", "insertMedia"]
+const advancedFunctions = Object.keys(ESApiDoc).filter(f => !basicFunctions.includes(f)).sort()
+
 export const blockPalettePython = {
     mode: "python",
     modeOptions: blockModeOptions,
@@ -48,39 +71,16 @@ export const blockPalettePython = {
             color: "purple",
             blocks: [
                 { block: "from earsketch import *" },
-                { block: "setTempo(tempo)" },
-                { block: "fitMedia(fileName, trackNumber, startLocation, endLocation)" },
-                { block: "makeBeat(fileName, trackNumber, measure, string)" },
-                { block: "setEffect(trackNumber, effectType, effectParameter, effectValue)" },
-                { block: "setEffect(trackNumber, effectType, effectParameter, effectStartValue, effectStartLocation, effectEndValue, effectEndLocation)" },
+                ...getPythonBlocks(basicFunctions.slice(4, 8)),
                 { block: "print \"Hello World!\"" },
                 { block: "# comment" },
-                { block: "selectRandomFile(folder)" },
-                { block: "insertMedia(fileName, trackNumber, trackLocation)" },
+                ...getPythonBlocks(basicFunctions.slice(8)),
             ],
         },
         {
             name: "Advanced",
             color: "green",
-            blocks: [
-                { block: "analyze(audioFile, featureForAnalysis)" },
-                { block: "analyzeForTime(audioFile, featureForAnalysis, startTime, endTime)" },
-                { block: "analyzeTrack(trackNumber, featureForAnalysis)" },
-                { block: "analyzeTrackForTime(trackNumber, featureForAnalysis, startTime, endTime)" },
-                { block: "dur(fileName)" },
-                { block: "importImage(imageURL, nrows, ncols, includeRGB=False)" },
-                { block: "importFile(fileURL)" },
-                { block: "insertMediaSection (fileName, trackNumber, trackLocation, mediaStartLocation, mediaEndLocation)" },
-                { block: "makeBeatSlice(fileName, trackNumber, measure, string, beatNumber)" },
-                { block: "readInput(prompt)" },
-                { block: "replaceListElement(inputList, elementToReplace, withElement)" },
-                { block: "replaceString(string, characterToReplace, withCharacter)" },
-                { block: "reverseList(inputList)" },
-                { block: "reverseString(inputString)" },
-                { block: "rhythmEffects(trackNumber, effectType, effectParameter, effectList, measure, beatString)" },
-                { block: "shuffleList(inputList)" },
-                { block: "shuffleString(inputString)" },
-            ],
+            blocks: getPythonBlocks(advancedFunctions),
         },
         {
             name: "Variables",
@@ -147,38 +147,16 @@ export const blockPaletteJavascript = {
             color: "purple",
             blocks: [
                 { block: "setTempo(tempo);" },
-                { block: "fitMedia(fileName, trackNumber, startLocation, endLocation);" },
-                { block: "makeBeat(fileName, trackNumber, measure, string);" },
-                { block: "setEffect(trackNumber, effectType, effectParameter, effectValue);" },
-                { block: "setEffect(trackNumber, effectType, effectParameter, effectStartValue, effectStartLocation, effectEndValue, effectEndLocation);" },
+                ...getJavascriptBlocks(basicFunctions.slice(4, 8)),
                 { block: "println(\"Hello World!\");" },
                 { block: "// comment" },
-                { block: "selectRandomFile(folder);" },
-                { block: "insertMedia(fileName, trackNumber, trackLocation);" },
+                ...getJavascriptBlocks(basicFunctions.slice(8)),
             ],
         },
         {
             name: "Advanced",
             color: "green",
-            blocks: [
-                { block: "analyze(audioFile, featureForAnalysis);" },
-                { block: "analyzeForTime(audioFile, featureForAnalysis, startTime, endTime);" },
-                { block: "analyzeTrack(trackNumber, featureForAnalysis);" },
-                { block: "analyzeTrackForTime(trackNumber, featureForAnalysis, startTime, endTime);" },
-                { block: "dur(fileName);" },
-                { block: "importImage(imageURL, nrows, ncols, includeRGB=False);" },
-                { block: "importFile(fileURL);" },
-                { block: "insertMediaSection (fileName, trackNumber, trackLocation, mediaStartLocation, mediaEndLocation);" },
-                { block: "makeBeatSlice(fileName, trackNumber, measure, string, beatNumber);" },
-                { block: "readInput(prompt);" },
-                { block: "replaceListElement(inputList, elementToReplace, withElement);" },
-                { block: "replaceString(string, characterToReplace, withCharacter);" },
-                { block: "reverseList(inputList);" },
-                { block: "reverseString(inputString);" },
-                { block: "rhythmEffects(trackNumber, effectType, effectParameter, effectList, measure, beatString);" },
-                { block: "shuffleList(inputList);" },
-                { block: "shuffleString(inputString);" },
-            ],
+            blocks: getJavascriptBlocks(advancedFunctions),
         },
         {
             name: "Variables",
