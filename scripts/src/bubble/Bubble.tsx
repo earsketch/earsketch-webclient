@@ -82,7 +82,7 @@ const MessageFooter = () => {
                             value={locale}
                             aria-label="Select Language"
                         >
-                            {AVAILABLE_LOCALES.map(({ displayText, localeCode }) => <option key={localeCode} value={localeCode}>{displayText}</option>)}
+                            {Object.entries(AVAILABLE_LOCALES).map(([, locale]) => <option key={locale.localeCode} value={locale.localeCode}>{locale.displayText}</option>)}
                         </select>
                     </div>
 

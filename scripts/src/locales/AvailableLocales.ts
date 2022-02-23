@@ -6,7 +6,7 @@ interface locale {
 
 export const ENGLISH_LOCALE: locale = { displayText: "English", localeCode: "en", direction: "ltr" }
 
-export const AVAILABLE_LOCALES: locale[] = [
+const availableLocales: locale[] = [
     { displayText: "العربية", localeCode: "ar", direction: "rtl" },
     ENGLISH_LOCALE,
     { displayText: "Español", localeCode: "es", direction: "ltr" },
@@ -15,3 +15,5 @@ export const AVAILABLE_LOCALES: locale[] = [
     { displayText: "ᐃᓄᒃᑎᑐᑦ", localeCode: "iu", direction: "ltr" },
     { displayText: "Ojibwe", localeCode: "oj", direction: "ltr" },
 ]
+
+export const AVAILABLE_LOCALES: { [key: string]: locale } = Object.assign({}, ...availableLocales.map((l) => ({ [l.localeCode]: l })))

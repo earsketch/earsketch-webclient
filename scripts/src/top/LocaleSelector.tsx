@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as curriculumState from "../browser/curriculumState"
-import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
@@ -19,10 +19,10 @@ export const LocaleSelector = () => {
     }
 
     useEffect(() => {
-        if (AVAILABLE_LOCALES.some(l => l.localeCode === currentLocale)) {
+        if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
             i18n.changeLanguage(currentLocale)
         } else {
-            changeLanguage(AVAILABLE_LOCALES[0].localeCode)
+            changeLanguage(ENGLISH_LOCALE.localeCode)
         }
     }, [currentLocale])
 
@@ -36,7 +36,7 @@ export const LocaleSelector = () => {
                     </div>
                 </Menu.Button>
                 <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    {AVAILABLE_LOCALES.map((locale) =>
+                    {Object.entries(AVAILABLE_LOCALES).map(([, locale]) =>
                         <Menu.Item key={locale.localeCode}>
                             {({ active }) => (
                                 <button

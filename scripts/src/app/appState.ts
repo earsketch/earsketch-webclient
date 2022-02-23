@@ -104,6 +104,6 @@ export const selectModal = (state: RootState) => state.app.modal
 export const selectLocale = createSelector(
     [selectLocaleCode],
     (localeCode) => {
-        return AVAILABLE_LOCALES.find(l => l.localeCode === localeCode) ?? ENGLISH_LOCALE
+        return AVAILABLE_LOCALES[localeCode] ?? ENGLISH_LOCALE
     }
 )
