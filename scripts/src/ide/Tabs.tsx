@@ -26,6 +26,7 @@ const CreateScriptButton = () => {
         id="create-script-button"
         onClick={createScript}
         title={t("newScript")}
+        aria-label={t("newScript")}
     >
         <i className="icon icon-plus2" />
     </button>

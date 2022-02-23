@@ -180,7 +180,7 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
             aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { aria })}
-            title={category === "sortBy" ? "Sort By" : `Filter by ${aria}`}
+            title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { aria })}
         >
             <div className="flex justify-left truncate">
                 <div className="truncate min-w-0">
