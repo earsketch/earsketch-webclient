@@ -156,11 +156,10 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     // console.log(inputSamples)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
-               
         if (audioNumber !== undefined) {
             const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
-                const soundObj = NUMBERS_AUDIOKEYS[`${num}`]                
+                const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2]
 
                 const key = NUMBERS_AUDIOKEYS[num]
@@ -179,9 +178,9 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
 function filterRecommendations(inputRecs: { [key: string]: number }, recommendedSounds: string[], inputSamples: string[],
     genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number) {
     const recs: { [key: string]: number } = {}
-    console.log("got recs: recs", recs)
-    console.log("The recommended sounds are: ", recommendedSounds)
-    console.log("The input samples are: ", inputSamples)
+    console.log(inputSamples)
+    const estimated_key = estimateKeySignature(inputSamples)
+    console.log(estimated_key)
     for (const key in inputRecs) {
         if (!recommendedSounds.includes(key) && !inputSamples.includes(key) &&
             !previousRecommendations.includes(key) && key.slice(0, 3) !== "OS_") {
@@ -279,9 +278,9 @@ function computeMode(array: Array<number>) {
     return mode
 }
 
-function estimateKeySignature(filenames: Array<number>) {
+function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
-    const keyClass = filenames.map(f => KEYSIGNATURES[`${f}`])
+    const keyClass = filenames.map(f => KEYSIGNATURES_STRING[`${f}`].keysig)
     // now filter out all the -1's
     const keyClassFiltered = keyClass.filter(k => k !== -1)
     if (keyClassFiltered.length !== 0) {
