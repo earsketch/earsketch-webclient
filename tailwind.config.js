@@ -1,5 +1,8 @@
 module.exports = {
-    purge: [],
+    content: [
+        "./public/*.html",
+        "./scripts/src/**/*.{ts,tsx}",
+    ],
     darkMode: "class",
     theme: {
         extend: {
@@ -49,7 +52,6 @@ module.exports = {
             },
         },
     },
-    variants: ["odd", "active", "dark", "hover"],
     plugins: [
         require("@tailwindcss/typography"),
     ],
