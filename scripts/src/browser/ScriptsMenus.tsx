@@ -26,7 +26,7 @@ export function generateGetBoundingClientRect(x = 0, y = 0) {
         right: x,
         bottom: y,
         left: x,
-    })
+    }) as ClientRect
 }
 
 export interface VirtualReference extends PopperJS.VirtualElement {

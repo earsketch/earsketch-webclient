@@ -52,7 +52,7 @@ phases:
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - grunt less
       - npm run test
-      - npm run build -- --env.release=$ES_VERSION --env.flags=config/$ENV_FLAGS_FILE --env.baseuri=$ES_BASE_URI --env.apihost=$ES_API_HOST --env.buildconfig=$ES_BUILD_ENVIRONMENT --env.baseurl=$ES_BASE_URL
+      - npm run build -- --env release=$ES_VERSION --env flags=config/$ENV_FLAGS_FILE --env baseuri=$ES_BASE_URI --env apihost=$ES_API_HOST --env buildconfig=$ES_BUILD_ENVIRONMENT --env baseurl=$ES_BASE_URL
       - end_time="$(date -u +%s)" && elapsed="$(($end_time-$start_time))" && echo "Total of $elapsed seconds elapsed for build"
       - mkdir $LOCAL_STAGING_DIR
       - mkdir $LOCAL_STAGING_CACHED_DIR

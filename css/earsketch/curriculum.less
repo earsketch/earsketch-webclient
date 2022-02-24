@@ -207,3 +207,30 @@
   text-align: right;
   content: " Try Again!"
 }
+
+// Override tailwind 2's modern-normalize dependency so RTL ordered lists work properly
+// TODO: we should be able to remove this hack and use tailwind RTL support when upgrading to tailwind 3
+.curriculum-rtl .prose ul > li,
+.curriculum-rtl .prose ol > li{
+  padding-right: 1.75em;
+  padding-left: 0;
+}
+.curriculum-rtl .prose ol > li:before{
+  right:0.25em ;
+  left: auto;
+}
+.curriculum-rtl .prose ol > li:before,
+.curriculum-rtl .prose ul > li:before{
+  right:0.25em ;
+  left: auto;
+}
+
+.curriculum-rtl .prose thead td:first-child,
+.curriculum-rtl .prose thead th:first-child{
+  padding-right: 0;
+}
+
+.curriculum-rtl .prose thead td:last-child,
+.curriculum-rtl .prose thead th:last-child{
+  padding-left: 0;
+}
