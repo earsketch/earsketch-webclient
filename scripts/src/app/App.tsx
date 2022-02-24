@@ -320,7 +320,7 @@ const KeyboardShortcuts = () => {
         <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts" aria-label="Show/Hide Keyboard Shortcuts">
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
             <table>
                 {Object.entries(shortcuts).map(([action, keys], index, arr) =>
                     <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
@@ -403,7 +403,7 @@ const NotificationMenu = () => {
             <div className="relative right-1">
                 <NotificationPopup />
             </div>
-            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-3/4">
+            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-3/4">
                 {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
             </Popover.Panel>
         </Popover>
