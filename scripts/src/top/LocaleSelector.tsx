@@ -6,35 +6,23 @@ import { useTranslation } from "react-i18next"
 
 import * as appState from "../app/appState"
 import * as curriculumState from "../browser/curriculumState"
-
-interface locale {
-    displayText: string;
-    localeCode: string;
-}
-
-export const AVAILABLE_LOCALES: locale[] = [
-    { displayText: "English", localeCode: "en" },
-    { displayText: "Español", localeCode: "es" },
-    { displayText: "Français", localeCode: "fr" },
-    { displayText: "ᐃᓄᒃᑎᑐᑦ", localeCode: "iu" },
-    { displayText: "Ojibwe", localeCode: "oj" },
-]
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
-    const currentLocale = useSelector(appState.selectLocale)
+    const currentLocale = useSelector(appState.selectLocaleCode)
 
     const changeLanguage = (lng: string) => {
-        dispatch(appState.setLocale(lng))
+        dispatch(appState.setLocaleCode(lng))
         dispatch(curriculumState.fetchLocale({ }))
     }
 
     useEffect(() => {
-        if (AVAILABLE_LOCALES.some(l => l.localeCode === currentLocale)) {
+        if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
             i18n.changeLanguage(currentLocale)
         } else {
-            changeLanguage(AVAILABLE_LOCALES[0].localeCode)
+            changeLanguage(ENGLISH_LOCALE.localeCode)
         }
     }, [currentLocale])
 
@@ -48,7 +36,7 @@ export const LocaleSelector = () => {
                     </div>
                 </Menu.Button>
                 <Menu.Items className="absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    {AVAILABLE_LOCALES.map((locale) =>
+                    {Object.entries(AVAILABLE_LOCALES).map(([, locale]) =>
                         <Menu.Item key={locale.localeCode}>
                             {({ active }) => (
                                 <button

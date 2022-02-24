@@ -9,7 +9,7 @@ import * as app from "../app/appState"
 import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
 import * as curriculum from "../browser/curriculumState"
-import { AVAILABLE_LOCALES } from "../top/LocaleSelector"
+import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
 const Backdrop = () => {
     return (
@@ -38,7 +38,7 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
 
 const MessageFooter = () => {
     const currentPage = useSelector(bubble.selectCurrentPage)
-    const locale = useSelector(app.selectLocale)
+    const locale = useSelector(app.selectLocaleCode)
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
@@ -75,14 +75,14 @@ const MessageFooter = () => {
                         <select
                             className="border-0 border-b-2 border-black outline-none"
                             onChange={e => {
-                                dispatch(app.setLocale(e.currentTarget.value))
+                                dispatch(app.setLocaleCode(e.currentTarget.value))
                                 // TODO: This should happen automatically when the locale changes.
                                 dispatch(curriculum.fetchLocale({}))
                             }}
                             value={locale}
                             aria-label="Select Language"
                         >
-                            {AVAILABLE_LOCALES.map(({ displayText, localeCode }) => <option key={localeCode} value={localeCode}>{displayText}</option>)}
+                            {Object.entries(AVAILABLE_LOCALES).map(([, locale]) => <option key={locale.localeCode} value={locale.localeCode}>{locale.displayText}</option>)}
                         </select>
                     </div>
 
