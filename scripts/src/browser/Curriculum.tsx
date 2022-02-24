@@ -73,7 +73,7 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")} ${ch.title}`} title={`${focus[1] === chIdx ? t("thing.collapse") : t("thing.expand")}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
                     className="text-black dark:text-white flex"
@@ -115,7 +115,7 @@ const TableOfContents = () => {
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button aria-label={`${focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} ${unitIdx}`} title={`${focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} ${unitIdx}`}><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
@@ -196,8 +196,8 @@ export const TitleBar = () => {
                 <button
                     className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
-                    title={`${t("thing.close")} ${t("curriculum.title")}`}
-                    aria-label={`${t("thing.close")} ${t("curriculum.title")}`}
+                    title={t("curriculum.openTOC")}
+                    aria-label={t("curriculum.openTOC")}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </button>
@@ -207,7 +207,7 @@ export const TitleBar = () => {
                     <i className="icon icon-link" />
                 </button>
                 <button className="border-2 -my-1 border-black dark:border-white w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom"
-                    title={t("curriculum.switchScriptLanguage") + ` to ${language === "python" ? "javascript" : "python"}`}
+                    title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
                         dispatch(appState.setScriptLanguage(newLanguage))

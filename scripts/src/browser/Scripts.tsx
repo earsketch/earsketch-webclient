@@ -46,8 +46,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
-    const ariaStrings = { owners: t("scriptBrowser.filterDropdown.owner"), types: t("scriptBrowser.filterDropdown.fileType") }
-    const aria = isClearItem ? t("scriptBrowser.filterDropdown.clearFilter") + ariaStrings[category] : value
     return (
         <>
             <div
@@ -113,18 +111,18 @@ const Filters = () => {
             <div className="pb-2 text-lg">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
-                    title={t("scriptBrowser.filterDropdown.owner")}
+                    title={t("scriptBrowser.filterDropdown.filterByOwner")}
                     category="owners"
                     items={owners}
-                    aria="Owners"
+                    aria={t("scriptBrowser.filterDropdown.filterByOwner")}
                     numSelected={numOwnersSelected}
                     position="left"
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title={t("scriptBrowser.filterDropdown.fileType")}
+                    title={t("scriptBrowser.filterDropdown.filterByFile")}
                     category="types"
-                    aria={t("scriptBrowser.filterDropdown.fileType")}
+                    aria={t("scriptBrowser.filterDropdown.filterByFile")}
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"
@@ -200,7 +198,7 @@ const RestoreButton = ({ script }: { script: Script }) => {
     return (
         <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={`${t("scriptBrowser.restore")} ${script.name}`}>
             <i className="icon-rotate-cw2"/>
-            <div>{t("scriptBrowser.restore")}</div>
+            <div>{t("scriptBrowser.restore", { scriptname: script.name })}</div>
         </PillButton>
     )
 }
@@ -330,8 +328,8 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
                 }
             }}
-            title={t("scriptBrowser.openInEditor", script.name)}
-            aria-label={t("scriptBrowser.openInEditor", script.name)}
+            title={t("scriptBrowser.openInEditor", { name: script.name })}
+            aria-label={t("scriptBrowser.openInEditor", { name: script.name })}
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div

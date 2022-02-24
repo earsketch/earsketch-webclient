@@ -102,8 +102,8 @@ const Entry = ({ name, obj }: { name: string, obj: APIItem & { details?: boolean
                     </button>
                     <button className="hover:bg-gray-200 active:bg-gray-300 h-full text-xl rounded-full pl-4 border border-gray-600 whitespace-nowrap"
                         onClick={() => { obj.details = !obj.details; forceUpdate(); addUIClick("api - read - " + obj) }}
-                        title={`${obj.details ? t("thing.close") : t("thing.open")} ${name} function details`}
-                        aria-label={`${obj.details ? t("thing.close") : t("thing.open")} ${name} function details`}>
+                        title={obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}
+                        aria-label={`${obj.details ? t("ariaDescriptors:api.closeFunctionDetails", { functionName: name }) : t("ariaDescriptors:api.openFunctionDetails", { functionName: name })}`}>
                         <div className="inline-block w-12">{obj.details ? t("api:close") : t("api:open")}</div>
                         <i className={`inline-block align-middle mb-px mx-2 icon icon-${obj.details ? "arrow-down" : "arrow-right"}`} />
                     </button>

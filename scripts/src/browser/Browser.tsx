@@ -30,8 +30,8 @@ export const TitleBar = () => {
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
-                    aria-label={t("thing.close") + " " + t("contentManager.title")}
-                    title={`${t("thing.close")} ${t("contentManager.title")}`}
+                    aria-label={t("contentManager.close")}
+                    title={t("contentManager.close")}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </button>
@@ -58,8 +58,8 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                 open: true,
                 kind: type,
             }))}
-            title={t("contentManager.openTab", { name })}
-            aria-label={t("contentManager.openTab", { name })}
+            title={t("contentManager.openTab", { name: name })}
+            aria-label={t("contentManager.openTab", { name: name })}
         >
             {children}
             {name}
@@ -179,8 +179,8 @@ export const DropdownMultiSelector = ({ title, category, aria, items, position, 
                 })
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
-            aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { aria })}
-            title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { aria })}
+            aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
+            title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
         >
             <div className="flex justify-left truncate">
                 <div className="truncate min-w-0">
@@ -256,14 +256,15 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
+    console.log(title)
     return (
         <div
             className={`${embedMode ? "hidden" : "flex"} flex-col h-full cursor-pointer`}
             onClick={() => {
                 position === "west" ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }))
             }}
-            aria-label={t("thing.open") + " " + title}
-            title={t("thing.open") + " " + title}
+            aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
+            title={t("ariaDescriptors:general.openPanel", { panelName: title })}
         >
             <div
                 className={`

@@ -42,13 +42,13 @@ const UndoRedoButtons = () => {
             style={{ transform: "scaleX(-1)" }}
             onClick={() => editor.checkUndo() && editor.undo()}
             title={t("editor.undoEdit")}
-            aria-label={`${t("editor.undoEdit")} ${hasUndo ? "" : " disabled"}`}
+            aria-label={hasUndo ? t("editor.undoEdit") : t("ariaDescriptors:editor.undoEditDisabled") }
         ></button>
         <button
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
             onClick={() => editor.checkRedo() && editor.redo()}
             title={t("editor.undoEdit")}
-            aria-label={`${t("editor.redoEdit")} ${hasUndo ? "" : " disabled"}`}
+            aria-label={hasRedo ? t("editor.redoEdit") : t("editor.redoEditDisabled")}
         ></button>
     </>)
 }

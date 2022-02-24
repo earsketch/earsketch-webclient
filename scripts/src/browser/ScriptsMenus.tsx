@@ -132,13 +132,13 @@ export const ScriptDropdownMenu = () => {
                     onClick={() => {
                         dispatch(scripts.resetDropdownMenu())
                     }}
-                    aria-label={t("scriptBrowser.options.close")}
-                    title={t("scriptBrowser.options.close")}
+                    aria-label={script ? t("ariaDescriptors:scriptBrowser.close", { scriptname: script?.name }) : t("thing.close")}
+                    title={script ? t("ariaDescriptors:scriptBrowser.close") : t("thing.close")}
                 >
                 </button>
             </div>
             <MenuItem
-                name={t("thing.open")} icon="icon-file-empty" aria={script ? `${t("thing.open")} ${script.name}` : `${t("thing.open")} ${t("script")}`}
+                name={t("thing.open")} icon="icon-file-empty" aria={script ? t("ariaDescriptors:scriptBrowser.open", { scriptname: script.name }) : t("thing.open")}
                 visible={!context}
                 onClick={() => {
                     if (!script) return
@@ -160,45 +160,45 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.rename")} icon="icon-pencil2" aria={script ? `${t("script.rename")} ${script.name}` : t("script.rename")}
+                name={t("script.rename")} icon="icon-pencil2" aria={script ? t("ariaDescriptors:scriptBrowser.rename", { scriptname: script.name }) : t("script.rename")}
                 visible={type === "regular"}
                 onClick={() => renameScript(script!)}
             />
             <MenuItem
-                name={t("script.download")} icon="icon-cloud-download" aria={script ? `${t("script.download")} ${script.name}` : t("script.download")}
+                name={t("script.download")} icon="icon-cloud-download" aria={script ? t("ariaDescriptors:scriptBrowser.download", { scriptname: script.name }) : t("script.download")}
                 onClick={() => downloadScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.print")} icon="icon-printer" aria={script ? `${t("script.print")} ${script.name}` : t("script.print")}
+                name={t("script.print")} icon="icon-printer" aria={script ? t("ariaDescriptors:script.print", { scriptname: script.name }) : t("script.print")}
                 onClick={() => {
                     exporter.print(unsavedScript!)
                 }}
             />
             <MenuItem
-                name={t("script.share")} icon="icon-share32" aria={script ? `${t("script.share")} ${script.name}` : t("script.share")}
+                name={t("script.share")} icon="icon-share32" aria={script ? t("ariaDescriptors:script.share", script.name) : t("script.share")}
                 visible={type === "regular"}
                 disabled={!loggedIn}
                 onClick={() => shareScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.submitCompetition")} icon="icon-share2" aria={script ? `${t("script.submitCompetitionrDescriptive", { name: script.name })}` : t("script.submitCompetition")}
+                name={t("script.submitCompetition")} icon="icon-share2" aria={script ? t("script.submitCompetitionrDescriptive", { name: script.name }) : t("script.submitCompetition")}
                 visible={type === "regular" && loggedIn && FLAGS.SHOW_AMAZON}
                 disabled={!loggedIn}
                 onClick={() => submitToCompetition(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.history")} icon="icon-history" aria={script ? `${t("script.historyDescriptive", { name: script.name })}` : t("script.history")}
+                name={t("script.history")} icon="icon-history" aria={script ? t("script.historyDescriptive", { name: script.name }) : t("script.history")}
                 disabled={!loggedIn || type === "readonly"}
                 onClick={() => {
                     script && openScriptHistory(unsavedScript!, !script.isShared)
                 }}
             />
             <MenuItem
-                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign" aria={script ? `${t("script.codeIndicatorDescriptive", { name: script.name })}` : t("script.codeIndicator")}
+                name={t("script.codeIndicator")} icon="glyphicon glyphicon-info-sign" aria={script ? t("script.codeIndicatorDescriptive", { name: script.name }) : t("script.codeIndicator")}
                 onClick={() => openCodeIndicator(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.import")} icon="icon-import" aria={script ? `${t("script.import")} ${script.name}` : t("script.import")}
+                name={t("script.import")} icon="icon-import" aria={script ? t("ariaDescriptors:scriptBrowser.import", { scriptname: script.name }) : t("script.import")}
                 visible={["shared", "readonly"].includes(type as string)}
                 onClick={async () => {
                     let imported
@@ -220,7 +220,7 @@ export const ScriptDropdownMenu = () => {
                 }}
             />
             <MenuItem
-                name={t("script.delete")} icon="icon-bin" aria={script ? `${t("script.delete")} ${script.name}` : t("script.delete")}
+                name={t("script.delete")} icon="icon-bin" aria={script ? t("ariaDescriptors:scriptBrowser.delete", { scriptname: script.name }) : t("script.delete")}
                 visible={type !== "readonly"}
                 onClick={() => {
                     if (type === "regular") {
@@ -236,6 +236,7 @@ export const ScriptDropdownMenu = () => {
 
 export const DropdownMenuCaller = ({ script, type }: { script: Script, type: ScriptType }) => {
     const dispatch = useDispatch()
+    const { t } = useTranslation()
 
     return (
         <div
@@ -247,9 +248,9 @@ export const DropdownMenuCaller = ({ script, type }: { script: Script, type: Scr
                 dispatch(scripts.setDropdownMenu({ script, type }))
             }}
             className="flex justify-left truncate"
-            title="Script Options"
+            title={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
+            aria-label={t("ariaDescriptors:scriptBrowser.options", { scriptname: script.name })}
             aria-haspopup="true"
-            id={`scriptsmenubutton_${script.name}`}
         >
             <div className="truncate min-w-0">
                 <i className="icon-menu3 text-4xl px-2 align-middle" />
