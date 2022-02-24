@@ -64,8 +64,8 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                 <div className="flex">
                     <div className="input-group w-1/2 mx-6">
                         <input className="form-control" autoFocus autoComplete="off"
-                            name="Script Name" id="scriptName" placeholder="Script Name"
-                            title={t("contentManager.scriptName")} aria-label={t("contentManager.scriptName")}
+                            name={t("scriptCreator.scriptName")} id="scriptName" placeholder={t("scriptCreator.scriptName")}
+                            title={t("scriptCreator.scriptName")} aria-label={t("scriptCreator.scriptName")}
                             value={name} onChange={e => setName(e.target.value)} />
                         <div className="input-group-addon">{extension}</div>
                     </div>
