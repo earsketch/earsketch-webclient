@@ -24,7 +24,7 @@ export const useHeightLimiter = (show: boolean, marginBottom: string|null = null
 
 const ProgressBar = ({ progress }: { progress: number }) => {
     const percent = Math.floor(progress * 100) + "%"
-    return <div className="progress flex-grow mb-0 mr-3">
+    return <div className="progress grow mb-0 mr-3">
         <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
     </div>
 }

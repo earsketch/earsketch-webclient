@@ -313,7 +313,7 @@ const FreesoundTab = ({ close }: { close: () => void }) => {
                 <a href="https://freesound.org/" target="_blank" rel="noreferrer">Freesound</a> {t("soundUploader.freesound.description")}
             </div>
             <div className="search-block flex">
-                <input className="form-control shake form-search flex-grow" placeholder="Search" type="text" value={query}
+                <input className="form-control shake form-search grow" placeholder="Search" type="text" value={query}
                     onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Enter") search() }} required />
                 <input type="button" onClick={search} className="btn btn-hollow btn-filter" value={t("search").toLocaleUpperCase()} />
             </div>
@@ -423,7 +423,7 @@ export const SoundUploader = ({ close }: { close: () => void }) => {
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey, icon }, index) =>
-                        <li key={index} className={"flex-grow" + (activeTab === index ? " active" : "")}>
+                        <li key={index} className={"grow" + (activeTab === index ? " active" : "")}>
                             <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="h-full flex justify-center items-center" style={{ textDecoration: "none" }}>
                                 <i className={`icon icon-${icon} mr-3`}></i>{t(titleKey).toLocaleUpperCase()}
                             </a>
