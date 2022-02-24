@@ -59,8 +59,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                     }
                 }}
                 aria-selected={selected}
-                aria-label={aria}
-                title={aria}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
