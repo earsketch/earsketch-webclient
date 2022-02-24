@@ -1,3 +1,5 @@
+const colors = require("tailwindcss/colors")
+
 module.exports = {
     content: [
         "./public/*.html",
@@ -37,6 +39,8 @@ module.exports = {
                 blue: {
                     DEFAULT: "#223546",
                 },
+                green: colors.emerald,
+                current: "currentColor",
             },
             keyframes: {
                 shake: {
