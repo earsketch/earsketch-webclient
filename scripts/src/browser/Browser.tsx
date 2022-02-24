@@ -212,7 +212,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
             <div className="flex flex-row grow-0 justify-start">
                 {expanded &&
-                    (<div className="h-auto border-l-4 border-orange-400" />)}
+                    (<div className="h-auto border-l-4 border-amber" />)}
                 <div
                     className="flex grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
