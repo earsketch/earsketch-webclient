@@ -25,7 +25,7 @@ export function analyzePython(source: string) {
         const ast = generateAst(source)
         ccHelpers.replaceNumericUnaryOps(ast.body)
         // initialize the results object
-        const resultsObject: cc.ResultsObject = {
+        const resultsObject: cc.Results = {
             ast: ast,
             codeFeatures: {
                 errors: 0,
@@ -55,12 +55,13 @@ export function analyzePython(source: string) {
                     comparisons: 0,
                 },
             },
-            codeStructure: {},
+            codeStructure: {} as cc.StructuralNode,
             inputsOutputs: {
                 sections: {},
                 effects: {},
                 sounds: {},
             },
+            depth: 0,
         }
 
         ccState.setIsJavascript(false)
@@ -102,12 +103,13 @@ export function analyzePython(source: string) {
                     comparisons: 0,
                 },
             },
-            codeStructure: {},
+            codeStructure: {} as cc.StructuralNode,
             inputsOutputs: {
                 sections: {},
                 effects: {},
                 sounds: {},
             },
-        } as cc.ResultsObject
+            depth: 0,
+        } as cc.Results
     }
 }

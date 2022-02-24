@@ -151,8 +151,6 @@ export function handleError(errorType: string) {
 
 function basicChecks() {
     // check for import, init, and finish
-    
-    
 }
 
 function handleFunctionError() {
@@ -476,7 +474,7 @@ function handleWhileLoopError() {
     // many things can go wrong in the condition block.
     // some of them we can check for
     // there should be EITHER a comparator or a boolean value
-    // but we honestly cannt tell the contents of a variable or function return f o r s u r e; should we bother? 
+    // but we honestly cannt tell the contents of a variable or function return f o r s u r e; should we bother?
     // plus it might be a whole null vs not-null thing...leaving this for now
 
     // check for colon
