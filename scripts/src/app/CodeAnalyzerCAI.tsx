@@ -61,7 +61,7 @@ export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
 }
 
 export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
-    processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void
+    processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: string | number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: string | number, finished: boolean } }) => void
 }) => {
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
@@ -71,17 +71,17 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
+            const contestEntries: { [key: string]: { id: string | number, finished: boolean } } = {}
             const urlList = []
             try {
                 script = await readFile(file)
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                    if (values && values[shareIDColumn] && values[contestIDColumn] && values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
                         const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
                         const shareid = match ? match[0].substring(9) : values[shareIDColumn]
-                        contestEntries[shareid] = { id: Number(values[contestIDColumn]), finished: false }
+                        contestEntries[shareid] = { id: values[contestIDColumn], finished: false }
                         urlList.push("?sharing=" + shareid)
                     }
                 }
@@ -130,16 +130,20 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         const results: Result[] = []
         const history = await userProject.getScriptHistory(script.shareid)
 
-        let versions = Object.keys(history) as unknown as number[]
-        if (!options.HISTORY) {
-            versions = [versions[versions.length - 1]]
-        }
-        for (const version of versions) {
-            // add information from base script to version report.
-            history[version].name = script.name
-            history[version].username = script.username
-            history[version].shareid = script.shareid
-            results.push(await runScript(history[version], version))
+        if (!history.length) {
+            results.push(await runScript(script))
+        } else {
+            let versions = Object.keys(history) as unknown as number[]
+            if (!options.HISTORY) {
+                versions = [versions[versions.length - 1]]
+            }
+            for (const version of versions) {
+                // add information from base script to version report.
+                history[version].name = script.name
+                history[version].username = script.username
+                history[version].shareid = script.shareid
+                results.push(await runScript(history[version], version))
+            }
         }
         return results
     }
@@ -148,7 +152,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const run = async () => {
         setResults([])
         setContestResults?.([])
-        const contestDictRefresh: { [key: string]: { id: number, finished: boolean } } = {}
+        const contestDictRefresh: { [key: string]: { id: string | number, finished: boolean } } = {}
         if (contestDict) {
             for (const shareid of Object.keys(contestDict)) {
                 contestDictRefresh[shareid] = { id: contestDict[shareid].id, finished: false }

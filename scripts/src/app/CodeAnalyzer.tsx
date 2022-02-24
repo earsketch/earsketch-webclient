@@ -238,7 +238,7 @@ export interface Result {
     }
     error?: string
     version?: number | null
-    contestID?: number
+    contestID?: string | number
 }
 
 export interface DownloadOptions {
