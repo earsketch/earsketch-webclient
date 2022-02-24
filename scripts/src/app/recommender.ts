@@ -5,10 +5,12 @@ import { Script } from "common"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
 import KEYSIGNATURES_ from "../data/numbers_keysigs.json"
+import KEYSIGNATURES_STRING_ from "../data/keysigs2.json"
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
 const KEYSIGNATURES: { [key: string]: number } = KEYSIGNATURES_
+const KEYSIGNATURES_STRING: { [key: string]: { [key: string]: number } } = KEYSIGNATURES_STRING_
 
 // All the key signatures as a human-readable label.
 const KEY_LABELS = ["A major", "Bb major", "B major", "C major", "Db major",
@@ -151,12 +153,16 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     similarity = Math.sign(similarity)
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
+    // console.log(inputSamples)
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
+               
         if (audioNumber !== undefined) {
             const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
+                const soundObj = NUMBERS_AUDIOKEYS[`${num}`]                
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2]
+
                 const key = NUMBERS_AUDIOKEYS[num]
 
                 if (key in recs) {
@@ -173,6 +179,9 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
 function filterRecommendations(inputRecs: { [key: string]: number }, recommendedSounds: string[], inputSamples: string[],
     genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number) {
     const recs: { [key: string]: number } = {}
+    console.log("got recs: recs", recs)
+    console.log("The recommended sounds are: ", recommendedSounds)
+    console.log("The input samples are: ", inputSamples)
     for (const key in inputRecs) {
         if (!recommendedSounds.includes(key) && !inputSamples.includes(key) &&
             !previousRecommendations.includes(key) && key.slice(0, 3) !== "OS_") {
