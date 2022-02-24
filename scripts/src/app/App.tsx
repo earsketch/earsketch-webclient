@@ -703,7 +703,7 @@ export const App = () => {
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
+            {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
