@@ -256,23 +256,6 @@ const CurriculumPane = () => {
         }
     }, [content, language, paneIsOpen])
 
-    // GrooveMachine integration, for the "Intro to GrooveMachine" chapter.
-    useEffect(() => {
-        const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
-        if (!frame) return
-        const handleMessage = (message: MessageEvent) => {
-            if (message.isTrusted) {
-                if (message.data === "langrequest") {
-                    frame.contentWindow!.postMessage({ lang: language }, "*")
-                } else if (typeof message.data === "string") {
-                    importScript(message.data)
-                }
-            }
-        }
-        window.addEventListener("message", handleMessage)
-        return () => window.removeEventListener("message", handleMessage)
-    }, [content])
-
     useEffect(() => {
         const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
         if (frame) frame.contentWindow!.postMessage({ lang: language }, "*")
