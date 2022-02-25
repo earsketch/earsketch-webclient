@@ -59,7 +59,4 @@ module.exports = {
     plugins: [
         require("@tailwindcss/typography"),
     ],
-    corePlugins: {
-        preflight: true, // Applies normalize.css to reset the default styles polluted by bootstrap, etc. See: https://tailwindcss.com/docs/preflight
-    },
 }
