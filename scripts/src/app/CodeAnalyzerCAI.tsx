@@ -14,87 +14,182 @@ import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
-const userInfo: string[] = []
-
-export const Options = ({ options, seed, showSeed, setOptions, setSeed }:
-    { options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void }) => {
+export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
+    options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void
+}) => {
     return <div className="container">
         <div className="panel panel-primary">
+            <div className="panel-heading">
+                Step 1: Select Reporter Options
+            </div>
+            <div className="panel-body">
+                <div className="col-md-4">
+                    <label>
+                        Code/Music Analysis Options:
+                    </label><br></br>
+                    <ul>
+                        {Object.entries(options).map(([option, value]) =>
+                            <label key={option}>
+                                {typeof (value) === "boolean" &&
+                                    <input type="checkbox" checked={value} onChange={e => setOptions({ ...options, [option]: e.target.checked })}></input>}
+                                {option}{" "}
+                                {(typeof (value) === "string" || typeof (value) === "number") &&
+                                    <input type="text" value={value} onChange={e => setOptions({ ...options, [option]: e.target.value })} style={{ backgroundColor: "lightgray" }}></input>}
+                            </label>
+                        )}
+                    </ul>
+                </div>
+                {showSeed &&
+                    <div className="col-md-4">
+                        <h4>Random Seed</h4>
+                        <input type="checkbox" checked={seed !== undefined} onChange={e => setSeed(e.target.checked ? Date.now() : undefined)}></input>
+                        {seed !== undefined
+                            ? <div>Use the following random seed:
+                                <input type="text" value={seed} onChange={e => setSeed(Number(e.target.value))}></input>
+                            </div>
+                            : <div>Use a random seed</div>}
+                        <p className="small">
+                            This will automatically seed every random function in Python and JavaScript.
+                        </p>
+                        <p className="small">
+                            Disclaimer: Testing randomness is inherently difficult. Only use this in the most trivial of cases.
+                        </p>
+                    </div>}
+            </div>
         </div>
     </div>
 }
 
-export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }:
-    { processing: string | null, options: ReportOptions, seed?: number, contestDict?: { [key: string]: { id: number, finished: boolean } }, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: { [key: string]: { id: number, finished: boolean } }) => void }) => {
+export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
+    processing: string | null, options: ReportOptions, seed?: number, contestDict?: Entries, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: Entries) => void
+}) => {
     const [urls, setUrls] = useState([] as string[])
     const [csvInput, setCsvInput] = useState(false)
+    const [csvText, setCsvText] = useState(false)
     const [contestIDColumn, setContestIDColumn] = useState(0)
     const [shareIDColumn, setShareIDColumn] = useState(1)
+    const [fileNameColumn, setFileNameColumn] = useState(0)
+    const [sourceCodeColumn, setSourceCodeColumn] = useState(1)
 
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
-            const contestEntries: { [key: string]: { id: number, finished: boolean } } = {}
+            const contestEntries = {} as Entries
             const urlList = []
+            const sourceCodeList = []
             try {
                 script = await readFile(file)
                 console.log("script", script)
                 for (const row of script.split("\n")) {
                     const values = row.split(",")
-                    if (values.length > 2) {
-                        urlList.push(values[2])
+                    if (csvText) {
+                        if (values[fileNameColumn] !== "File Name" && values[sourceCodeColumn] !== "Source Code") {
+                            sourceCodeList.push(values[sourceCodeColumn])
+                            contestEntries[values[fileNameColumn]] = { id: values[fileNameColumn], finished: false }
+                        }
                     } else {
-                        urlList.push("")
+                        if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
+                            const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
+                            const shareid = match ? match[0].substring(9) : values[shareIDColumn]
+                            contestEntries[shareid] = { id: Number(values[contestIDColumn]), finished: false }
+                            urlList.push("?sharing=" + shareid)
+                        }
                     }
-                    userInfo.push(values[0] + "|" + values[1])
                 }
             } catch (err) {
                 console.error(err)
                 return
             }
             setUrls(urlList)
+            setContestDict?.(contestEntries)
         }
     }
 
     // Run a single script and add the result to the results list.
     const runScript = async (script: Script, version: number | null = null) => {
         let result: Result
-        if (script.source_code != "") {
-            try {
-                const compilerOuptut = await compile(script.source_code, "script.py", seed)
-                const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-                reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage("script.py"), script.source_code)
+        try {
+            const compilerOuptut = await compile(script.source_code, script.name, seed)
+            const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
+            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
 
-                for (const option of Object.keys(reports)) {
-                    if (!options[option as keyof ReportOptions]) {
-                        delete reports[option]
-                    }
+            for (const option of Object.keys(reports)) {
+                if (!options[option as keyof ReportOptions]) {
+                    delete reports[option]
                 }
-                result = {
-                    script: script,
-                    reports: reports,
-                }
-            } catch (err) {
-                // console.log("log error", err)
-                result = {
-                    script: script,
-                    error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
-                    reports: { },
-                }
-                result.reports.COMPLEXITY = { complexity: "{\"errors\":1|\"variables\":0|\"makeBeat\":0|\"iteration\":{\"whileLoops\":0|\"forLoopsPY\":0|\"forLoopsJS\":0|\"iterables\":0|\"nesting\":0}|\"conditionals\":{\"conditionals\":0|\"usedInConditionals\":[]}|\"functions\":{\"repeatExecution\":0|\"manipulateValue\":0}|\"features\":{\"indexing\":0|\"consoleInput\":0|\"listOps\":0|\"strOps\":0|\"binOps\":0|\"comparisons\":0}}" }
             }
-        } else {
-            result = { script: script }
+            result = {
+                script: script,
+                reports: reports,
+            }
+        } catch (err) {
+            console.log("log error", err)
+            result = {
+                script: script,
+                error: (err.args && err.traceback) ? err.args.v[0].v + " on line " + err.traceback[0].lineno : err.message,
+            }
+        }
+        if (options.HISTORY) {
+            result.version = version
         }
         setProcessing(null)
         return result
+    }
+
+    const runScriptHistory = async (script: Script) => {
+        const results: Result[] = []
+        const history = await userProject.getScriptHistory(script.shareid)
+
+        let versions = Object.keys(history) as unknown as number[]
+        if (!options.HISTORY) {
+            versions = [versions[versions.length - 1]]
+        }
+        for (const version of versions) {
+            // add information from base script to version report.
+            history[version].name = script.name
+            history[version].username = script.username
+            history[version].shareid = script.shareid
+            results.push(await runScript(history[version], version))
+        }
+        return results
+    }
+
+    const runSourceCodes = async () => {
+        const contestDictRefresh = {} as Entries
+        if (contestDict) {
+            for (const fileName of Object.keys(contestDict)) {
+                contestDictRefresh[fileName] = { id: contestDict[fileName].id, finished: false }
+            }
+            setContestDict?.({ ...contestDictRefresh })
+        }
+        setProcessing(null)
+
+        let results: Result[] = []
+
+        if (contestDict) {
+            for (const fileName of Object.keys(contestDict)) {
+                const script = { source_code: contestDict[fileName].sourceCode } as Script
+                setResults([...results, { script }])
+                const result = await runScript(script)
+                if (contestDict?.[fileName]) {
+                    result.contestID = contestDict[fileName].id
+                }
+                results = [...results, result]
+            }
+            setResults(results)
+        }
     }
 
     // Read all script urls, parse their shareid, and then load and run every script adding the results to the results list.
     const run = async () => {
         setResults([])
         setContestResults?.([])
-        const contestDictRefresh: { [key: string]: { id: number, finished: boolean } } = {}
+
+        if (csvText) {
+            return runSourceCodes()
+        }
+
+        const contestDictRefresh = {} as Entries
         if (contestDict) {
             for (const shareid of Object.keys(contestDict)) {
                 contestDictRefresh[shareid] = { id: contestDict[shareid].id, finished: false }
@@ -103,52 +198,55 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
         setProcessing(null)
 
-        let results: Result[] = []
-        let index: number = 0
+        const matches: RegExpMatchArray | null = []
+        const re = /\?sharing=([^\s.,])+/g
+        esconsole("Running code analyzer.", ["DEBUG"])
+
         for (const url of urls) {
-            const match = url
-            // esconsole("Grading: " + match, ["DEBUG"])
-            // const shareId = match.substring(9)
-            // esconsole("ShareId: " + shareId, ["DEBUG"])
-            // setProcessing(shareId)
+            const match = url.match(re)
+            if (match) {
+                for (const m of match) {
+                    matches.push(m)
+                }
+            }
+        }
+
+        let results: Result[] = []
+
+        if (!matches) { return }
+        for (const match of matches) {
+            esconsole("Grading: " + match, ["DEBUG"])
+            const shareId = match.substring(9)
+            esconsole("ShareId: " + shareId, ["DEBUG"])
+            setProcessing(shareId)
             let script
-            let scriptText
-            console.log(index.toString() + "/" + urls.length.toString())
-
             try {
-                scriptText = match.split("NEWLINE").join("\n")
-                scriptText = scriptText.split("\r").join("\n")
-                scriptText = scriptText.split("\\t").join("\t")
-                scriptText = scriptText.split("|||").join(",")
-                // trim off extra quotation marks
-                let strInd: number = 0
-
-                while (scriptText.startsWith("\"")) {
-                    strInd += 1
-                    scriptText = scriptText.substring(strInd)
-                }
-
-                strInd = scriptText.length
-
-                while (scriptText.endsWith('"') || scriptText.endsWith("\n") || scriptText.endsWith("'") || scriptText.endsWith(" ")) {
-                    strInd -= 1
-                    scriptText = scriptText.substring(0, strInd)
-                }
-                if (scriptText.startsWith("use strict\"\";")) {
-                    scriptText = scriptText.substring(13)
-                }
-
-                scriptText = scriptText.split("\"\"").join("\"")
+                script = await userProject.loadScript(shareId, false)
             } catch {
                 continue
             }
-            script = { source_code: scriptText, username: userInfo[index] } as Script
-            setResults([...results, { script }])
-            const result = await runScript(script)
-
-            results = [...results, result]
-            index += 1
-            setResults(results)
+            if (!script) {
+                const result = {
+                    script: { username: "", shareid: shareId } as Script,
+                    error: "Script not found.",
+                } as Result
+                if (contestDict?.[shareId]) {
+                    result.contestID = contestDict[shareId].id
+                }
+                results = [...results, result]
+                setResults(results)
+                setProcessing(null)
+            } else {
+                setResults([...results, { script }])
+                const result = await runScriptHistory(script)
+                for (const r of result) {
+                    if (contestDict?.[shareId]) {
+                        r.contestID = contestDict[shareId].id
+                    }
+                    results = [...results, r]
+                }
+                setResults(results)
+            }
         }
     }
 
@@ -163,13 +261,26 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     Paste share URLs
                     <button className="btn btn-primary" onClick={() => setCsvInput(true)}>Switch to CSV Input</button>
                 </div>}
+            {csvText
+                ? <div className="panel-heading">
+                    <button className="btn btn-primary" onClick={() => setCsvText(false)}>Switch to Share IDs</button>
+                </div>
+                : <div className="panel-heading">
+                    <button className="btn btn-primary" onClick={() => setCsvText(true)}>Switch to Source Code</button>
+                </div>}
             {csvInput
                 ? <div className="panel-body">
                     <input type="file" onChange={file => {
                         if (file.target.files) { updateCSVFile(file.target.files[0]) }
                     }} />
-                    <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Contest ID Column
-                    <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />Share ID Column
+                    {csvText
+                        ? <input type="text" value={fileNameColumn} onChange={e => setFileNameColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                        : <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />}
+                    {csvText ? "Filename Column" : "Contest ID Column"}
+                    {csvText
+                        ? <input type="text" value={sourceCodeColumn} onChange={e => setSourceCodeColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                        : <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />}
+                    {csvText ? "Source Code Column" : "Share ID Column"}
                 </div>
                 : <div className="panel-body">
                     <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
@@ -181,14 +292,30 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     </button>
                     : <button className="btn btn-primary" onClick={run}> Run </button>}
                 {!userProject.getToken() &&
-                    <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
+                <div>This service requires you to be logged in. Please log into EarSketch using a different tab.</div>}
             </div>
         </div>
     </div>
 }
 
 export interface ReportOptions {
+    OVERVIEW: boolean
     COMPLEXITY: boolean
+    EFFECTS: boolean
+    MEASUREVIEW: boolean
+    GENRE: boolean
+    SOUNDPROFILE: boolean
+    MIXING: boolean
+    HISTORY: boolean
+    APICALLS: boolean
+}
+
+export interface Entries {
+    [key: string]: {
+        id: string | number
+        finished: boolean
+        sourceCode?: string
+    }
 }
 
 export const CodeAnalyzerCAI = () => {
