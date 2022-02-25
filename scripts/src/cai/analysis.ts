@@ -94,7 +94,7 @@ export function fillDict() {
     })
 }
 
-fillDict()
+// fillDict()
 
 // Report the code complexity analysis of a script.
 export function analyzeCode(language: string, script: string) {

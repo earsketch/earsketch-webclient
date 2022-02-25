@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { Collapsed } from "../browser/Browser"
 
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
-import "@webscopeio/react-textarea-autocomplete/style.css"
+// import "@webscopeio/react-textarea-autocomplete/style.css"
 
 import { CaiHeader, CaiBody } from "./CAI"
 import * as cai from "./caiState"
