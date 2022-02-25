@@ -194,7 +194,7 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={`${t("scriptBrowser.restore")} ${script.name}`}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={t("scriptBrowser.restore", { scriptname: script.name })}>
             <i className="icon-rotate-cw2"/>
             <div>{t("scriptBrowser.restore", { scriptname: script.name })}</div>
         </PillButton>
