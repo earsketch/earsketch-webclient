@@ -6,9 +6,9 @@ import { ModalContainer } from "./App"
 import * as reader from "./reader"
 
 import { Result, Results, DownloadOptions } from "./CodeAnalyzer"
-import { Options, Upload, ReportOptions } from "./CodeAnalyzerCAI"
+import { Options, Upload, ReportOptions, Entries } from "./CodeAnalyzerCAI"
 
-const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: { [key: string]: { id: number, finished: boolean } }, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
+const ContestGrading = ({ results, contestResults, contestDict, options, setContestResults }: { results: Result[], contestResults: Result[], contestDict: Entries, options: ContestOptions, setContestResults: (r: Result[]) => void }) => {
     const [musicPassed, setMusicPassed] = useState(0)
     const [codePassed, setCodePassed] = useState(0)
     const [musicCodePassed, setMusicCodePassed] = useState(0)
@@ -203,7 +203,7 @@ export const CodeAnalyzerContest = () => {
     const [processing, setProcessing] = useState(null as string | null)
     const [results, setResults] = useState([] as Result[])
 
-    const [contestDict, setContestDict] = useState({} as { [key: string]: { id: number, finished: boolean } })
+    const [contestDict, setContestDict] = useState({} as Entries)
     const [contestResults, setContestResults] = useState([] as Result[])
 
     const [options, setOptions] = useState({

@@ -482,7 +482,7 @@ function searchForReturn(astNode: Node | Node[]): Node | null {
 // collects variable info from a node
 function collectVariableInfo(node: Node) {
     let varObject: {
-        name: string, assignments: { line: number, value?: Node }[]
+        name: string, assignments: { line?: number, value?: Node }[]
     }
 
     if (node && node._astname && node.lineno) {
@@ -496,7 +496,7 @@ function collectVariableInfo(node: Node) {
         }
 
         let assignedInsideLoop = false
-        let loopLine = -1
+        let loopLine: number | undefined = -1
         const parentsList: StructuralNode[] = []
         getParentList(lineNumber, ccState.getProperty("codeStructure"), parentsList)
         for (let i = parentsList.length - 1; i >= 0; i--) {
@@ -923,9 +923,7 @@ function valueTrace(isVariable: Boolean, name: string, ast: Node, parentNodes: [
             return true
         }
     } else if (ast) {
-        const nodesToRecurse = Array.isArray(ast) ? (Array.from(ast.keys())).map(String) : Object.keys(ast)
-        for (const key of nodesToRecurse) {
-            const node = ast[key]
+        for (const [key, node] of Object.entries(ast)) {
             if (typeof node === "object") {
                 const newParents = parentNodes.slice(0)
                 newParents.push([node, key])
