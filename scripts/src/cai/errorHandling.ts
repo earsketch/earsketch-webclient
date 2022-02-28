@@ -46,32 +46,53 @@ export function getWorkingCodeInfo() {
     return previousAttributes
 }
 
-export function storeErrorInfo(errorMsg: any, codeText: string) {
-    if ("args" in errorMsg) {
+export function storeErrorInfo(errorMsg: any, codeText: string, language: string) {
+    if ("args" in errorMsg && language === "python") {
         currentError = Object.assign({}, errorMsg)
         currentText = codeText
-        console.log(handleError(Object.getPrototypeOf(errorMsg).tp$name))
+        console.log(handlePythonError(Object.getPrototypeOf(errorMsg).tp$name))
+    } else if (language === "javascript") {
+        currentError = { linenumber: errorMsg.linenumber, message: "", stack: "" }
+        if (errorMsg.message && errorMsg.stack) {
+            currentError.message = errorMsg.message
+            currentError.stack = errorMsg.stack
+        }
+        currentText = codeText
+        console.log(handleJavascriptError())
     } else {
         console.log(errorMsg)
     }
 }
 
-export function handleError(errorType: string) {
+function handleJavascriptError() {
     // function to delegate error handling to one of a number of smaller, targeted error response functions
     // get line of error
     textArray = currentText.split("\n")
     errorLine = textArray[currentError.traceback[0].lineno - 1]
-    basicChecks()
+
+
+}
+
+export function handlePythonError(errorType: string) {
+    // function to delegate error handling to one of a number of smaller, targeted error response functions
+    // get line of error
+    textArray = currentText.split("\n")
+    errorLine = textArray[currentError.traceback[0].lineno - 1]
+
+    // check for import, init, and finish
+    if (!currentText.includes("from earsketch import *") && !currentText.includes("from earsketch import*")) {
+        return ["import", "missing import"]
+    }
 
     // check first for undefined variables
     if (errorType === "NameError") {
-        return handleNameError()
+        return handlePythonNameError()
     }
     // otherwise, search for keywords
 
     // fitmedia
     if (errorLine.toLowerCase().includes("fitmedia")) {
-        return handleFitMediaError()
+        return handlePythonFitMediaError()
     }
 
     // function def
@@ -79,7 +100,7 @@ export function handleError(errorType: string) {
 
     for (const functionWord of functionWords) {
         if (errorLine.toLowerCase().includes(functionWord)) {
-            return handleFunctionError()
+            return handlePythonFunctionError()
         }
     }
 
@@ -116,11 +137,11 @@ export function handleError(errorType: string) {
         }
 
         if (trues > 0 && !colon) {
-            return handleCallError()
+            return handlePythonCallError()
         }
 
-        if (trues > 1 && handleFunctionError() != null) {
-            return handleFunctionError()
+        if (trues > 1 && handlePythonFunctionError() != null) {
+            return handlePythonFunctionError()
         }
     }
     // do the same for for loops, while loops, and conditionals
@@ -130,13 +151,13 @@ export function handleError(errorType: string) {
 
     for (const forWord of forWords) {
         if (errorLine.includes(forWord)) {
-            return handleForLoopError()
+            return handlePythonForLoopError()
         }
     }
 
     // while loops
     if (errorLine.includes("while ")) {
-        return handleWhileLoopError()
+        return handlePythonWhileLoopError()
     }
 
     // conditionals
@@ -144,16 +165,12 @@ export function handleError(errorType: string) {
 
     for (const conditionalWord of conditionalWords) {
         if (errorLine.toLowerCase().includes(conditionalWord)) {
-            return handleConditionalError()
+            return handlePythonConditionalError()
         }
     }
 }
 
-function basicChecks() {
-    // check for import, init, and finish
-}
-
-function handleFunctionError() {
+function handlePythonFunctionError() {
     // find next non-blank line (if there is one). assess indent
     let nextLine: string = ""
     for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
@@ -244,7 +261,7 @@ function isNumeric(str: string) {
         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
-function handleForLoopError() {
+function handlePythonForLoopError() {
     // find next non-blank line (if there is one). assess indent
     let nextLine: string = ""
     for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
@@ -361,8 +378,8 @@ function handleForLoopError() {
                 if (item.name === functionName) {
                     const returns = ccHelpers.estimateDataType(item.returns)
                     if (returns === "List" || returns === "Str") {
-                        return handleCallError()
-                        // if it does, we should pass this to the function call error handler
+                        return handlePythonCallError()
+                        // if it does, we should pass this to the function call error handlePythonr
                     } else { isValid = false }
                 }
             }
@@ -393,7 +410,7 @@ function handleForLoopError() {
     }
 }
 
-function handleCallError() {
+function handlePythonCallError() {
     // potential common call errors: wrong # of args (incl. no args),
     // wrong arg types (? may not be able to find this, or may be caught elsewhere - ignoring for now
     // missing parens
@@ -452,7 +469,7 @@ function handleCallError() {
     }
 }
 
-function handleWhileLoopError() {
+function handlePythonWhileLoopError() {
     // 5 things to look for
     if (!errorLine.includes("while")) {
         return ["while loop", "missing while keyword"]
@@ -498,7 +515,7 @@ function handleWhileLoopError() {
     }
 }
 
-function handleConditionalError() {
+function handlePythonConditionalError() {
     if (errorLine.includes("if")) { // if or elif
         if (!errorLine.includes("(") || !errorLine.includes(")")) {
             return ["conditional", "missing parentheses"]
@@ -547,7 +564,7 @@ function handleConditionalError() {
     }
 }
 
-function handleNameError() {
+function handlePythonNameError() {
     // do we recognize the name?
     const problemName: string = currentError.args.v[0].v.split("'")[1]
 
@@ -577,7 +594,7 @@ function handleNameError() {
     return ["name", "unrecognized: " + problemName]
 }
 
-function handleFitMediaError() {
+function handlePythonFitMediaError() {
     const trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
 
     if (trimmedErrorLine.includes("fitmedia") || trimmedErrorLine.includes("FitMedia") || trimmedErrorLine.includes("Fitmedia")) {

@@ -259,7 +259,7 @@ export const compileError = createAsyncThunk<void, any, ThunkAPI>(
     "cai/compileError",
     (data, { dispatch }) => {
         const errorReturn = dialogue.handleError(data[0])
-        errorHandling.storeErrorInfo(data[0], data[1])
+        errorHandling.storeErrorInfo(data[0], data[1], data[2])
         if (dialogue.isDone()) {
             return
         }

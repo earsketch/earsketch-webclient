@@ -287,7 +287,7 @@ export async function compileCode() {
         }
 
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.compileError([error, code]))
+            store.dispatch(cai.compileError([error, code, language]))
         }
         return
     }
