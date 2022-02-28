@@ -71,12 +71,25 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     const [fileNameColumn, setFileNameColumn] = useState(0)
     const [sourceCodeColumn, setSourceCodeColumn] = useState(1)
 
+    const [sourceCodeEntries, setSourceCodeEntries] = useState({} as Entries)
+    const [newline, setNewline] = useState("\n")
+    const [comma, setComma] = useState(",")
+
+    const sourceCodeReformat = (sourceCode: String) => {
+        if (sourceCode) {
+            let formattedCode = sourceCode.replace(new RegExp(newline, "g"), "\n")
+            formattedCode = formattedCode.replace(new RegExp(comma, "g"), ",")
+            return formattedCode
+        } else {
+            return ""
+        }
+    }
+
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
             const contestEntries = {} as Entries
             const urlList = []
-            const sourceCodeList = []
             try {
                 script = await readFile(file)
                 console.log("script", script)
@@ -84,8 +97,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     const values = row.split(",")
                     if (csvText) {
                         if (values[fileNameColumn] !== "File Name" && values[sourceCodeColumn] !== "Source Code") {
-                            sourceCodeList.push(values[sourceCodeColumn])
-                            contestEntries[values[fileNameColumn]] = { id: values[fileNameColumn], finished: false }
+                            contestEntries[values[fileNameColumn]] = { id: values[fileNameColumn], sourceCode: sourceCodeReformat(values[sourceCodeColumn]), finished: false }
                         }
                     } else {
                         if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
@@ -102,6 +114,10 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
             }
             setUrls(urlList)
             setContestDict?.(contestEntries)
+
+            if (csvText) {
+                setSourceCodeEntries(contestEntries)
+            }
         }
     }
 
@@ -155,24 +171,24 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     }
 
     const runSourceCodes = async () => {
-        const contestDictRefresh = {} as Entries
-        if (contestDict) {
-            for (const fileName of Object.keys(contestDict)) {
-                contestDictRefresh[fileName] = { id: contestDict[fileName].id, finished: false }
+        const sourceCodeRefresh = {} as Entries
+        if (sourceCodeEntries) {
+            for (const fileName of Object.keys(sourceCodeEntries)) {
+                sourceCodeRefresh[fileName] = { id: sourceCodeEntries[fileName].id, sourceCode: sourceCodeEntries[fileName].sourceCode, finished: false }
             }
-            setContestDict?.({ ...contestDictRefresh })
+            setSourceCodeEntries?.({ ...sourceCodeRefresh })
         }
         setProcessing(null)
 
         let results: Result[] = []
 
-        if (contestDict) {
-            for (const fileName of Object.keys(contestDict)) {
-                const script = { source_code: contestDict[fileName].sourceCode } as Script
+        if (sourceCodeEntries) {
+            for (const fileName of Object.keys(sourceCodeEntries)) {
+                const script = { source_code: sourceCodeEntries[fileName].sourceCode } as Script
                 setResults([...results, { script }])
                 const result = await runScript(script)
-                if (contestDict?.[fileName]) {
-                    result.contestID = contestDict[fileName].id
+                if (sourceCodeEntries?.[fileName]) {
+                    result.contestID = sourceCodeEntries[fileName].id
                 }
                 results = [...results, result]
             }
@@ -281,6 +297,14 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                         ? <input type="text" value={sourceCodeColumn} onChange={e => setSourceCodeColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
                         : <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />}
                     {csvText ? "Source Code Column" : "Share ID Column"}
+                    {csvText &&
+                        <input type="text" value={newline} onChange={e => setNewline(e.target.value)} style={{ backgroundColor: "lightgray" }} />}
+                    {csvText &&
+                        "Newline character"}
+                    {csvText &&
+                        <input type="text" value={comma} onChange={e => setComma(e.target.value)} style={{ backgroundColor: "lightgray" }} />}
+                    {csvText &&
+                        "Comma character"}
                 </div>
                 : <div className="panel-body">
                     <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
