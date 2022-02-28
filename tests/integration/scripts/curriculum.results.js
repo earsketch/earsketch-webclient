@@ -3091,4 +3091,8 @@ export const CURRICULUM_RESULTS = {
             },
         ],
     },
+
+    "Number Parsing": {
+        tempo: 99,
+    },
 }
