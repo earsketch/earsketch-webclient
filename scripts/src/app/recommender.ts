@@ -4,12 +4,12 @@ import { Script } from "common"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
-import KEYSIGNATURES_ from "../data/numbers_keysigs.json"
+// import KEYSIGNATURES_ from "../data/numbers_keysigs.json"
 import KEYSIGNATURES_STRING_ from "../data/keysigs2.json"
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
-const KEYSIGNATURES: { [key: string]: number } = KEYSIGNATURES_
+// const KEYSIGNATURES: { [key: string]: number } = KEYSIGNATURES_
 const KEYSIGNATURES_STRING: { [key: string]: { [key: string]: number } } = KEYSIGNATURES_STRING_
 
 // All the key signatures as a human-readable label.
@@ -180,7 +180,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
 }
 
 function filterRecommendations(inputRecs: { [key: string]: number }, recommendedSounds: string[], inputSamples: string[],
-    genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number, keyStrictness: boolean = true) {
+    genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number) {
     const recs: { [key: string]: number } = {}
     const recommendedSignatures = recommendedSounds.map(s => KEY_LABELS[estimateKeySignature([s])])
     console.log("the key signatures in the recommended sounds are: ", recommendedSignatures)
