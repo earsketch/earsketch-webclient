@@ -150,7 +150,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const name = clip.name
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    const keySig = getKeySignatureString(name);
+    const keySig = getKeySignatureString(name)
     const tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
         ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
         ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
