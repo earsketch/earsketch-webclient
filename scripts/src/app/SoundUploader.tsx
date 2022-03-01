@@ -396,48 +396,9 @@ const TunepadTab = ({ close }: { close: () => void }) => {
         <div className="modal-body transparent">
             {error && <div className="alert alert-danger">{error}</div>}
             {!isSafari && <>
-                <iframe ref={login} name="tunepadIFrame" id="tunepadIFrame" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
+                <iframe ref={login} name="tunepad-iframe" id="tunepad-iframe" allow="microphone https://tunepad.xyz/ https://tunepad.live/" width="100%" height="500px" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
                 <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
             </>}
-        </div>
-        <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
-    </form>
-}
-
-const GrooveMachineTab = ({ close }: { close: () => void }) => {
-    const GROOVEMACHINE_URL = "https://groovemachine.lmc.gatech.edu"
-    const [error, setError] = useState("")
-    const [name, setName] = useState("")
-    const [progress, setProgress] = useState<number>()
-    const [ready, setReady] = useState(false)
-    const gmWindow = useRef<Window>()
-
-    useEffect(() => {
-        const handleMessage = async (message: MessageEvent) => {
-            if (message.origin !== GROOVEMACHINE_URL || !message.isTrusted) return
-            if (message.data === 0) {
-                setReady(false)
-            } else if (message.data === 1) {
-                setReady(true)
-            } else {
-                const file = new Blob([message.data.wavData], { type: "audio/wav" })
-                try {
-                    await uploadFile(file, name, ".wav", message.data.tempo, setProgress)
-                    close()
-                } catch (error) {
-                    setError(error.message)
-                }
-            }
-        }
-        window.addEventListener("message", handleMessage)
-        return () => window.removeEventListener("message", handleMessage)
-    }, [name])
-
-    return <form onSubmit={e => { e.preventDefault(); gmWindow.current!.postMessage("save-wav-data", "*") }}>
-        <div className="modal-body transparent">
-            {error && <div className="alert alert-danger">{error}</div>}
-            <iframe ref={el => { if (el) gmWindow.current = el.contentWindow! }} src={GROOVEMACHINE_URL} allow="microphone" width="100%" height="500px">IFrames are not supported by your browser.</iframe>
-            <input type="text" placeholder="e.g. MYSYNTH_01" className="form-control" value={name} onChange={e => setName(cleanName(e.target.value))} required />
         </div>
         <ModalFooter submit="upload" ready={ready} progress={progress} close={close} />
     </form>
@@ -448,7 +409,6 @@ const Tabs = [
     { component: RecordTab, titleKey: "soundUploader.title.record", icon: "microphone" },
     { component: FreesoundTab, titleKey: "FREESOUND", icon: "search" },
     { component: TunepadTab, titleKey: "TUNEPAD", icon: "cloud-upload" },
-    { component: GrooveMachineTab, titleKey: "GROOVEMACHINE", icon: "cloud-upload" },
 ]
 
 export const SoundUploader = ({ close }: { close: () => void }) => {

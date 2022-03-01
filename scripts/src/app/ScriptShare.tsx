@@ -138,9 +138,9 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <span ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label={t("scriptShare.copyClipboard")} ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
-        </span>
+        </button>
         <Transition
             show={copied}
             enter="ease-out duration-300"
@@ -205,20 +205,24 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     <div className="btn-group">
                         <button type="button" onClick={() => setLock(true)}
                             className={"btn " + (lock ? "btn-primary" : "btn-default")}
-                            style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}>
+                            style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+                            aria-label={t("scriptShare.tab.viewonly.shareCurrent")}
+                            title={t("scriptShare.tab.viewonly.shareCurrent")}>
                             {t("scriptShare.tab.viewonly.shareCurrent")}
                         </button>
                         <button type="button" onClick={() => setLock(false)}
                             className={"btn " + (lock ? "btn-default" : "btn-primary")}
-                            style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}>
+                            style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}
+                            aria-label={t("scriptShare.tab.viewonly.shareFuture")}
+                            title={t("scriptShare.tab.viewonly.shareFuture")}>
                             {t("scriptShare.tab.viewonly.shareFuture")}
                         </button>
                     </div>
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
-                    <input ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
-                    <span className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></span>
+                    <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="glyphicon glyphicon-download-alt" /></button>
                 </div>
                 <hr className="mt-3" />
 
@@ -438,10 +442,10 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
     return <div>
         <div className="bg-blue-200 px-6 py-4">
             <h4>
-                <a role="button" className="text-black" onClick={() => setCollapsed(!collapsed)}>
+                <button className="text-black" onClick={e => { e.preventDefault(); setCollapsed(!collapsed) }}>
                     {t("scriptShare.moreDetails")}
                     <i className={`ml-3 icon icon-arrow-${collapsed ? "right" : "down"}2`} />
-                </a>
+                </button>
             </h4>
         </div>
         {!collapsed &&
@@ -507,7 +511,7 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
-                        <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
+                        <li aria-label={t(titleKey)} key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
                             <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
                         </li>)}
                 </ul>

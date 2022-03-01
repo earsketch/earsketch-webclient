@@ -21,6 +21,8 @@ const UndoRedoButtons = () => {
     const [hasUndo, setHasUndo] = useState(false)
     const [hasRedo, setHasRedo] = useState(false)
 
+    const { t } = useTranslation()
+
     const onChange = () => {
         // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
         setTimeout(() => {
@@ -35,15 +37,19 @@ const UndoRedoButtons = () => {
     })
 
     return (<>
-        <i
+        <button
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: "scaleX(-1)" }}
             onClick={() => editor.checkUndo() && editor.undo()}
-        />
-        <i
+            title={t("editor.undoEdit")}
+            aria-label={hasUndo ? t("editor.undoEdit") : t("ariaDescriptors:editor.undoEditDisabled")}
+        ></button>
+        <button
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
             onClick={() => editor.checkRedo() && editor.redo()}
-        />
+            title={t("editor.redoEdit")}
+            aria-label={hasRedo ? t("editor.redoEdit") : t("ariaDescriptors:editor.redoEditDisabled")}
+        ></button>
     </>)
 }
 
@@ -95,7 +101,7 @@ export const EditorHeader = () => {
                     </div>
                 )}
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
-                    <div
+                    <button
                         className={`
                                 rounded-full
                                 text-white
@@ -110,9 +116,9 @@ export const EditorHeader = () => {
                     >
                         <i className="icon-share32 pr-2" />
                         {t("script.share").toLocaleUpperCase()}
-                    </div>
+                    </button>
                 )}
-                <div
+                <button
                     className={`
                         flex
                         rounded-full px-3 py-1
@@ -126,7 +132,7 @@ export const EditorHeader = () => {
                         <i className="icon-arrow-right22 font-bold text-green-600" />
                     </div>
                     {t("editor.run").toLocaleUpperCase()}
-                </div>
+                </button>
             </div>
         </div>
     )

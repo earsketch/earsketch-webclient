@@ -18,8 +18,6 @@ module.exports = {
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
         alias: {
-            jqueryUI: "jquery-ui-dist/jquery-ui.js",
-            bootstrapBundle: "bootstrap/dist/js/bootstrap.bundle.min.js",
             skulpt: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt.min.js`),
             skulptStdLib: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt-stdlib.js`),
             droplet: path.resolve(__dirname, `${libDir}/droplet/droplet-full.min.js`),
@@ -92,9 +90,6 @@ module.exports = {
     plugins: [
         // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-
             SC: "soundcloud",
             lunr: "lunr",
             hljs: "highlight",

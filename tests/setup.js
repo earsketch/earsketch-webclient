@@ -152,8 +152,6 @@ function checkSimilarity(actual, expected) {
     return valid
 }
 
-require("bootstrapBundle")
-
 Object.assign(window, require("dsp"))
 // Object.assign(window,require('esDSP'));
 
@@ -168,5 +166,3 @@ require("lodash")
 require("kali")
 require("chance")
 require("recorder")
-
-require("bootstrapBundle")

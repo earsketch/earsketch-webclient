@@ -45,6 +45,8 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
                 }}
+                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
@@ -74,6 +76,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.artists")}
                     category="artists"
+                    aria={t("soundBrowser.clip.tooltip.artist")}
                     items={artists}
                     position="left"
                     numSelected={numArtistsSelected}
@@ -82,6 +85,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.genres")}
                     category="genres"
+                    aria={t("soundBrowser.clip.tooltip.genre")}
                     items={genres}
                     position="center"
                     numSelected={numGenresSelected}
@@ -90,6 +94,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.instruments")}
                     category="instruments"
+                    aria={t("soundBrowser.clip.tooltip.instrument")}
                     items={instruments}
                     position="right"
                     numSelected={numInstrumentsSelected}
@@ -114,6 +119,9 @@ const ShowOnlyFavorites = () => {
                         const elem = event.target as HTMLInputElement
                         dispatch(sounds.setFilterByFavorites(elem.checked))
                     }}
+                    title={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    role="checkbox"
                 />
             </div>
             <div className="pr-1">
@@ -128,7 +136,7 @@ const AddSound = () => {
     const { t } = useTranslation()
 
     return (
-        <div
+        <button
             className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer"
             onClick={() => openUploadWindow()}
         >
@@ -138,7 +146,7 @@ const AddSound = () => {
             <div className="mr-3">
                 {t("soundBrowser.button.addSound")}
             </div>
-        </div>
+        </button>
     )
 }
 
@@ -358,9 +366,10 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                             const names = namesByFolders[folders[index]]
                             return (
                                 <div style={style}
-                                    className="bg-gray-300 odd:bg-white
-                                               dark:bg-gray-800 dark:odd:bg-gray-900
-                                               hover:bg-blue-200 dark:hover:bg-blue-500">
+                                    className={index % 2 === 0
+                                        ? "bg-white dark:bg-gray-900"
+                                        : "bg-gray-300 dark:bg-gray-800" +
+                                         " hover:bg-blue-200 dark:hover:bg-blue-500"}>
                                     <Folder
                                         folder={folders[index]}
                                         names={names}
