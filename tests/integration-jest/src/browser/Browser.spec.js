@@ -7,6 +7,7 @@ import store, { persistor } from "../../../../scripts/src/reducers"
 import { Provider } from "react-redux"
 
 jest.mock("react-i18next")
+jest.mock("../../../../scripts/src/app/audiolibrary")
 
 it("renders with mocked data", async () => {
   render(<Provider store={store}><Browser /></Provider>)
