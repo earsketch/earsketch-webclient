@@ -256,7 +256,6 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     const dispatch = useDispatch()
     const { t } = useTranslation()
 
-    console.log(title)
     return (
         <div
             className={`${embedMode ? "hidden" : "flex"} flex-col h-full cursor-pointer`}
