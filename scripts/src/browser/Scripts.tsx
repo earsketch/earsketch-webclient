@@ -109,18 +109,18 @@ const Filters = () => {
             <div className="pb-2 text-lg">{t("filter").toLocaleUpperCase()}</div>
             <div className="flex justify-between">
                 <DropdownMultiSelector
-                    title={t("scriptBrowser.filterDropdown.filterByOwner")}
+                    title={t("scriptBrowser.filterDropdown.owner")}
                     category="owners"
                     items={owners}
-                    aria={t("scriptBrowser.filterDropdown.filterByOwner")}
+                    aria={t("scriptBrowser.filterDropdown.owner")}
                     numSelected={numOwnersSelected}
                     position="left"
                     FilterItem={FilterItem}
                 />
                 <DropdownMultiSelector
-                    title={t("scriptBrowser.filterDropdown.filterByFile")}
+                    title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
-                    aria={t("scriptBrowser.filterDropdown.filterByFile")}
+                    aria={t("scriptBrowser.filterDropdown.fileType")}
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"
@@ -184,7 +184,7 @@ const PillButton = ({ onClick, children, aria }: { onClick: Function, children: 
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => shareScript(script)} aria={t("scriptShare.title")}>
+        <PillButton onClick={() => shareScript(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
             <i className="icon-share32" />
             <div>{t("script.share")}</div>
         </PillButton>

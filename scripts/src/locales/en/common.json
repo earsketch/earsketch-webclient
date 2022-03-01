@@ -289,7 +289,7 @@
     "scriptBrowser.open": "Open {{scriptname}}",
     "scriptBrowser.rename": "Rename {{scriptname}}",
     "scriptBrowser.download": "Download {{scriptname}}",
-    "scriptBrowser.print": "Download {{scriptname}}",
+    "scriptBrowser.print": "Print {{scriptname}}",
     "scriptBrowser.share": "Share {{scriptname}}",
     "scriptBrowser.import": "Import {{scriptname}}",
     "scriptBrowser.delete": "Delete {{scriptname}}",

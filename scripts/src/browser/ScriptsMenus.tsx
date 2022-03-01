@@ -169,13 +169,13 @@ export const ScriptDropdownMenu = () => {
                 onClick={() => downloadScript(unsavedScript!)}
             />
             <MenuItem
-                name={t("script.print")} icon="icon-printer" aria={script ? t("ariaDescriptors:script.print", { scriptname: script.name }) : t("script.print")}
+                name={t("script.print")} icon="icon-printer" aria={script ? t("ariaDescriptors:scriptBrowser.print", { scriptname: script.name }) : t("script.print")}
                 onClick={() => {
                     exporter.print(unsavedScript!)
                 }}
             />
             <MenuItem
-                name={t("script.share")} icon="icon-share32" aria={script ? t("ariaDescriptors:script.share", script.name) : t("script.share")}
+                name={t("script.share")} icon="icon-share32" aria={script ? t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name }) : t("script.share")}
                 visible={type === "regular"}
                 disabled={!loggedIn}
                 onClick={() => shareScript(unsavedScript!)}
