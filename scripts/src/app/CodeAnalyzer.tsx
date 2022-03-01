@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
@@ -160,9 +160,31 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
 }
 
 const ReportDisplay = ({ report }: { report: { [key: string]: string | number } | { [key: string]: string | number }[] }) => {
+    const [cleanReport, setCleanReport] = useState({} as { [key: string]: string | number } | { [key: string]: string | number }[])
+
+    useEffect(() => {
+        const tempReport = {} as { [key: string]: string | number }
+        if (Array.isArray(report)) {
+            for (const reportItem of report) {
+                for (const key in reportItem) {
+                    if (key !== "codeStructure" && key !== "ast") {
+                        tempReport[key] = reportItem[key]
+                    }
+                }
+            }
+        } else {
+            for (const key in report) {
+                if (key !== "codeStructure" && key !== "ast") {
+                    tempReport[key] = report[key]
+                }
+            }
+        }
+        setCleanReport(tempReport)
+    }, [report])
+
     return <table className="table">
         <tbody>
-            {Object.entries(report).map(([key, value]) =>
+            {Object.entries(cleanReport).map(([key, value]) =>
                 <tr key={key}>
                     <th>{key}</th><td>{JSON.stringify(value)}</td>
                 </tr>
@@ -205,6 +227,10 @@ const ResultPanel = ({ result }: { result: Result }) => {
 
 export const Results = ({ results, processing, options }: { results: Result[], processing: string | null, options: DownloadOptions }) => {
     return <div>
+        {results.length > 0 &&
+            <div className="container" style={{ textAlign: "center" }}>
+                <button className="btn btn-lg btn-primary" onClick={() => download(results, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
+            </div>}
         {results.length > 0 && options.showIndividualResults &&
             <ul>
                 {results.map((result, index) =>
@@ -224,18 +250,16 @@ export const Results = ({ results, processing, options }: { results: Result[], p
                     </div>}
 
             </div>}
-        {results.length > 0 &&
-            <div className="container" style={{ textAlign: "center" }}>
-                <button className="btn btn-lg btn-primary" onClick={() => download(results, options)}><i className="glyphicon glyphicon-download-alt"></i> Download Report</button>
-            </div>}
     </div>
+}
+
+export interface Report {
+    [key: string]: { [key: string]: string | number } | { [key: string]: string | number }[]
 }
 
 export interface Result {
     script: Script
-    reports?: {
-        [key: string]: { [key: string]: string | number } | { [key: string]: string | number }[]
-    }
+    reports?: Report
     error?: string
     version?: number | null
     contestID?: string | number

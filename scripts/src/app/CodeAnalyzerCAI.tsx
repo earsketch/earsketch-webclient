@@ -184,7 +184,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
         if (sourceCodeEntries) {
             for (const fileName of Object.keys(sourceCodeEntries)) {
-                const script = { source_code: sourceCodeEntries[fileName].sourceCode } as Script
+                const script = { source_code: sourceCodeEntries[fileName].sourceCode, name: fileName } as Script
                 setResults([...results, { script }])
                 const result = await runScript(script)
                 if (sourceCodeEntries?.[fileName]) {
