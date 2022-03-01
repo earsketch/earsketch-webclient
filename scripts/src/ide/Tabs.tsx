@@ -81,6 +81,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         }}
         title={script.name}
         aria-label={script.name}
+        role="button"
     >
         <DropdownContextMenuCaller
             className="flex justify-between items-center truncate p-3 w-full"
