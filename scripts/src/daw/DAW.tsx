@@ -164,7 +164,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         <div className="daw-transport-container">
             {/* Beginning */}
             <span className="daw-transport-button">
-                <button type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
+                <button aria-label={t("daw.tooltip.reset")} type="submit" className="btn dark:text-white hover:opacity-70" data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.reset")} onClick={reset}>
                     <span className="icon icon-first"></span>
                 </button>
             </span>
@@ -172,14 +172,14 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             <span id="daw-play-button">
                 {/* Play */}
                 {!playing && <span className="daw-transport-button">
-                    <button type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
+                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
 
                 {/* Pause */}
                 {playing && <span className="daw-transport-button">
-                    <button type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
+                    <button aria-label={t("daw.tooltip.pause")} type="submit" className="btn dark:text-white hover:opacity-70" title={t("daw.tooltip.pause")} onClick={() => { pause(); addUIClick("project - pause") }}>
                         <span className="icon icon-pause2"></span>
                     </button>
                 </span>}
@@ -187,21 +187,21 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
 
             {/* Loop */}
             <span className="daw-transport-button">
-                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
+                <button aria-label={t("daw.tooltip.loopProject")} type="submit" className={"btn dark:text-white hover:opacity-70" + (loop.on ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.loopProject")} onClick={toggleLoop}>
                     <span className="icon icon-loop"></span>
                 </button>
             </span>
 
             {/* Autoscroll */}
             <span className="daw-transport-button follow-icon">
-                <button type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
+                <button aria-label={t("daw.tooltip.autoScroll")} type="submit" className={"btn dark:text-white hover:opacity-70" + (autoScroll ? " btn-clear-warning" : "")} data-toggle="tooltip" data-placement="bottom" title={t("daw.tooltip.autoScroll")} onClick={() => dispatch(daw.setAutoScroll(!autoScroll))}>
                     <span className="icon icon-move-up"></span>
                 </button>
             </span>
 
             {/* Metronome */}
             <span className="daw-transport-button">
-                <button id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
+                <button aria-label={t("daw.tooltip.toggleMetronome")} id="dawMetronomeButton" className={"btn dark:text-white hover:opacity-70" + (metronome ? " btn-clear-warning" : "")} data-toggle="tooltip" title={t("daw.tooltip.toggleMetronome")} data-placement="bottom" onClick={toggleMetronome}>
                     <span className="icon icon-meter3"></span>
                 </button>
             </span>
@@ -209,7 +209,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
             {/* Volume Control */}
             <span className="daw-transport-button" id="volume-control">
                 <span onClick={() => mute(!volumeMuted)}>
-                    <button id="muteButton" className="btn dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
+                    <button aria-label={t("daw.tooltip.toggleVolume")} id="muteButton" className="btn dark:text-white hover:opacity-70" style={{ width: "40px" }} title={t("daw.tooltip.toggleVolume")} data-toggle="tooltip" data-placement="bottom">
                         <span className={"icon icon-volume-" + (volumeMuted ? "mute" : "high")}></span>
                     </button>
                 </span>
@@ -976,7 +976,7 @@ export const DAW = () => {
         <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
-                title={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
+                title={t("daw.tooltip.toggleEffects")} aria-label={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
                 <span className="mr-1">{t("daw.effect", { count: 0 }).toLocaleUpperCase()}</span>
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
