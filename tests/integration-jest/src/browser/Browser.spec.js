@@ -10,6 +10,6 @@ jest.mock("react-i18next")
 jest.mock("../../../../scripts/src/app/audiolibrary")
 
 it("renders with mocked data", async () => {
-  render(<Provider store={store}><Browser /></Provider>)
-  await screen.findByText("soundBrowser.filterDropdown.instruments")
+    render(<Provider store={store}><Browser /></Provider>)
+    await screen.findByText("soundBrowser.filterDropdown.instruments")
 })
