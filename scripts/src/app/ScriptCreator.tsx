@@ -53,8 +53,8 @@ export const ScriptCreator = ({ close }: { close: (value?: any) => void }) => {
                 </div>}
                 <div className="flex">
                     <div className="form-group w-1/2 mx-6">
-                        <label>{t("contentManager.scriptName")}</label>
-                        <p className="small">{t("contentManager.scriptName")}</p>
+                        <label>{t("scriptCreator.scriptName")}</label>
+                        <p className="small">{t("scriptCreator.scriptName.subtext")}</p>
                     </div>
                     <div className="form-group w-1/2 mx-6">
                         <label>{t("scriptCreator.scriptLang")}</label>
