@@ -11,7 +11,7 @@ import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
-    const currentLocale = useSelector(appState.selectLocale)
+    const currentLocale = useSelector(appState.selectLocaleCode)
     const { t } = useTranslation()
     const changeLanguage = (lng: string) => {
         dispatch(appState.setLocaleCode(lng))
