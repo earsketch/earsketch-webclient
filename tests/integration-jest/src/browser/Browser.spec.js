@@ -10,4 +10,5 @@ jest.mock("react-i18next")
 
 it("renders with mocked data", async () => {
   render(<Provider store={store}><Browser /></Provider>)
+  await screen.findByText("soundBrowser.filterDropdown.instruments")
 })

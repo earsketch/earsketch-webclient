@@ -1,1 +1,1 @@
-export function useTranslation() { return { t: key => "translated_text" } }
+export function useTranslation() { return { t: key => key } }
