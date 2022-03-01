@@ -45,8 +45,8 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
                 }}
-                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter") : value}
-                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter") : value}
+                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />

@@ -194,9 +194,9 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={t("scriptBrowser.restore", { scriptname: script.name })}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
             <i className="icon-rotate-cw2"/>
-            <div>{t("scriptBrowser.restore", { scriptname: script.name })}</div>
+            <div>{t("scriptBrowser.restore")}</div>
         </PillButton>
     )
 }
@@ -315,10 +315,10 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
 
     const shared = script.creator || script.isShared
     const collaborators = script.collaborators as string[]
-
+    const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
     return (
         <div
-            className="flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 cursor-pointer"
+            className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
             onClick={() => {
                 if (type === "regular") {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
@@ -326,8 +326,8 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
                 }
             }}
-            title={t("scriptBrowser.openInEditor", { name: script.name })}
-            aria-label={t("scriptBrowser.openInEditor", { name: script.name })}
+            title={ariaLabel}
+            aria-label={ariaLabel}
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div
