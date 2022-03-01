@@ -10,7 +10,7 @@ export async function getStandardSounds() {
             path: "filename/placeholder/here.wav",
             public: 1,
             tempo: 140,
-            year: 2012
+            year: 2012,
         },
         {
             artist: "RICHARD DEVINE",
@@ -22,7 +22,7 @@ export async function getStandardSounds() {
             path: "filename/placeholder/here.wav",
             public: 1,
             tempo: 140,
-            year: 2012
+            year: 2012,
         },
         {
             artist: "YOUNG GURU",
