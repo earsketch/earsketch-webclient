@@ -30,8 +30,8 @@ export const TitleBar = () => {
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
-                    aria-label={t("contentManager.close")}
-                    title={t("contentManager.close")}
+                    aria-label={t("ariaDescriptors:contentManager.close")}
+                    title={t("ariaDescriptors:contentManager.close")}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
                 </button>
