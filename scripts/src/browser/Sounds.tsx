@@ -76,7 +76,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.artists")}
                     category="artists"
-                    aria="Artist"
+                    aria={t("soundBrowser.clip.tooltip.artist")}
                     items={artists}
                     position="left"
                     numSelected={numArtistsSelected}
@@ -85,7 +85,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.genres")}
                     category="genres"
-                    aria="Genre"
+                    aria={t("soundBrowser.clip.tooltip.genre")}
                     items={genres}
                     position="center"
                     numSelected={numGenresSelected}
@@ -94,7 +94,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.instruments")}
                     category="instruments"
-                    aria="Instrument"
+                    aria={t("soundBrowser.clip.tooltip.instrument")}
                     items={instruments}
                     position="right"
                     numSelected={numInstrumentsSelected}

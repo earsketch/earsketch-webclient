@@ -247,6 +247,8 @@
     "curriculum.switchScriptLanguage": "Switch script language",
     "curriculum.showTOC": "Show Table of Contents",
     "curriculum.toc": "Table of Contents",
+    "curriculum.open": "Open Curriculum",
+    "curriculum.close": "Close Curriculum",
     "curriculum.previousPage": "Previous Page",
     "curriculum.nextPage": "Next Page",
     "curriculum.copyURL": "Copy curriculum URL",
