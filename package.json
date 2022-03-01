@@ -35,7 +35,7 @@
     "i18next": "^20.6.1",
     "js-interpreter": "^2.3.1",
     "jszip": "^3.7.1",
-    "lamejs": "^1.2.1",
+    "lamejs": "1.2.0",
     "lodash": "^4.17.21",
     "lunr": "^2.3.9",
     "prop-types": "^15.8.1",
