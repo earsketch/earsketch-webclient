@@ -14,6 +14,8 @@ import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
 
+import * as cc from "../cai/complexityCalculator"
+
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void
 }) => {
@@ -85,6 +87,18 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         }
     }
 
+    const cleanComplexityOutput = (complexityObj: any, outObj: any) => {
+        if (complexityObj) {
+            for (const complexityItem in complexityObj) {
+                if (typeof complexityObj[complexityItem] === "object") {
+                    cleanComplexityOutput(complexityObj[complexityItem], outObj)
+                } else {
+                    outObj[complexityItem] = complexityObj[complexityItem]
+                }
+            }
+        }
+    }
+
     const updateCSVFile = async (file: File) => {
         if (file) {
             let script
@@ -127,7 +141,11 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
             const reports = caiAnalysisModule.analyzeMusic(compilerOuptut)
-            reports.COMPLEXITY = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code)
+
+            const outputComplexity = caiAnalysisModule.analyzeCode(ESUtils.parseLanguage(script.name), script.source_code) as cc.Results
+            const cleanedComplexity = { depth: outputComplexity.depth }
+            cleanComplexityOutput(outputComplexity.codeFeatures, cleanedComplexity)
+            reports.COMPLEXITY = cleanedComplexity
 
             for (const option of Object.keys(reports)) {
                 if (!options[option as keyof ReportOptions]) {
