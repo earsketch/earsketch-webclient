@@ -15,7 +15,6 @@ import scripts from "./browser/scriptsState"
 import api from "./browser/apiState"
 import daw from "./daw/dawState"
 import curriculum from "./browser/curriculumState"
-import recommender from "./browser/recommenderState"
 import cai from "./cai/caiState"
 
 const rootReducer = combineReducers({
@@ -30,7 +29,6 @@ const rootReducer = combineReducers({
     api,
     daw,
     curriculum,
-    recommender,
     cai,
 })
 

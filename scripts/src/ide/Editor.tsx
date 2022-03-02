@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { importScript, reloadRecommendations } from "../app/App"
+import { importScript } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as caiDialogue from "../cai/dialogue"
@@ -194,7 +194,6 @@ function setupAceHandlers(ace: Ace.Editor) {
             caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
         }
         recommendationTimer = window.setTimeout(() => {
-            reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
                 caiStudentPreferences.addEditPeriod(firstEdit, Date.now())
