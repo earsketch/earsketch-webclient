@@ -68,6 +68,10 @@ reports:
     files:
       - "tests/integration/scripts/reports/karma/*.xml"
     file-format: "JUNITXML"
+  jest-reports:
+    files:
+      - "tests/integration-jest/reports/jest/*.xml"
+    file-format: JUNITXML
 
 artifacts:
   base-directory: $LOCAL_STAGING_DIR_NAME
