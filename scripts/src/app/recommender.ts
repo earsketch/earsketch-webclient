@@ -13,11 +13,41 @@ const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } 
 const KEYSIGNATURES_STRING: { [key: string]: { [key: string]: number } } = KEYSIGNATURES_STRING_
 
 // All the key signatures as a human-readable label.
-const KEY_LABELS = ["A major", "Bb major", "B major", "C major", "Db major",
-    "D major", "Eb major", "E major", "F major", "F# major",
-    "G major", "Ab major", "A minor", "Bb minor", "B minor",
-    "C minor", "C# minor", "D minor", "D# minor", "E minor",
-    "F minor", "F# minor", "G minor", "G# minor"]
+const KEY_LABELS: Array<string> = [
+    "C major", "C# major", "D major", "D# major",
+    "E major", "F major", "F# major", "G major",
+    "G# major", "A major", "A# major", "B major",
+    "C minor", "C# minor", "D minor", "D# minor",
+    "E minor", "F minor", "F# minor", "G minor",
+    "G# minor", "A minor", "A# minor", "B minor",
+]
+
+const relativeKeys: { [key: string]: string } = {
+    "A major": "F# minor",
+    "Bb major": "G minor",
+    "B major": "G# minor",
+    "C major": "A minor",
+    "Db major": "Bb minor",
+    "D major": "B minor",
+    "Eb major": "C minor",
+    "E major": "C# minor",
+    "F major": "D minor",
+    "F# major": "D# minor",
+    "G major": "E minor",
+    "Ab major": "F minor",
+    "A minor": "C major",
+    "Bb minor": "Db major",
+    "B minor": "D major",
+    "C minor": "Eb major",
+    "C# minor": "E major",
+    "D minor": "F major",
+    "D# minor": "F# major",
+    "E minor": "G major",
+    "F minor": "Ab major",
+    "F# minor": "A major",
+    "G minor": "Bb major",
+    "G# minor": "B major",
+}
 
 // Load lists of numbers and keys
 let AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS)
@@ -147,12 +177,13 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
     return filteredRecs
 }
 
-function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, keyStrictness: boolean = true) {
+function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, useKeyInfo: boolean = true) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
     const estimatedKey = estimateKeySignature(inputSamples)
-    console.log(`current estimated Key: ${KEY_LABELS[estimatedKey]}`)
+    const estimatedKeyString = KEY_LABELS[estimatedKey]
+    console.log(`current estimated Key: ${estimatedKeyString}`)
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
 
@@ -162,10 +193,20 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
             const audioRec = AUDIOKEYS_RECOMMENDATIONS[audioNumber]
             for (const [num, value] of Object.entries(audioRec)) {
                 const soundObj = NUMBERS_AUDIOKEYS[`${num}`]
-                // console.log(`soundObj: ${soundObj}, keySignature: ${KEYSIGNATURES_STRING[soundObj].keysig}`)
-                const match = KEYSIGNATURES_STRING[soundObj].keysig === estimatedKey
-                const keyScore = (keyStrictness ? (match ? 1 : 0) : 0) * 4
-                console.log(`The keyscore is: ${keyScore}`)
+                let keyScore = 0
+                if (estimatedKey !== -1) {
+                    const estimatedRelative = relativeKeys[estimatedKeyString]
+                    const match = KEYSIGNATURES_STRING[soundObj].keysig === estimatedKey
+                    const relativeMatch = getKeyLabel(KEYSIGNATURES_STRING[soundObj].keysig) === estimatedRelative
+                    if (match) {
+                        keyScore = (useKeyInfo ? (match ? 1 : 0) : 0) * 4
+                    } else if (relativeMatch) {
+                        keyScore = (useKeyInfo ? (relativeMatch ? 1 : 0) : 0) * 4
+                    }
+                }
+                if (keyScore !== 0) {
+                    console.log(`${soundObj}: ${keyScore}, ${getKeyLabel(KEYSIGNATURES_STRING[soundObj].keysig)}`)
+                }
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
                 const key = NUMBERS_AUDIOKEYS[num]
                 if (key in recs) {
@@ -250,7 +291,6 @@ export function getKeySignatureString(filename: string) {
     //     return "N/A"
     // }
     const keyClass = KEYSIGNATURES_STRING[`${filename}`].keysig
-    console.log(keyClass)
     if (keyClass !== -1) {
         const keyLabel = KEY_LABELS[keyClass]
         return keyLabel
@@ -291,4 +331,9 @@ function estimateKeySignature(filenames: string[]) {
         return mode
     }
     return -1
+}
+
+function getKeyLabel(key: number) {
+    // Given a key number, return the key label.
+    return KEY_LABELS[key]
 }
