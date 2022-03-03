@@ -1,14 +1,6 @@
 /* eslint-env jest */
 import * as esutils from "../../../scripts/src/esutils"
 
-it("detects py with parseLanguage()", () => {
-    expect(esutils.parseLanguage("song.py")).toBe("python")
-})
-
-it("detects js with parseLanguage()", () => {
-    expect(esutils.parseLanguage("song.js")).toBe("javascript")
-})
-
 test.each([
     { measure: 2, tempo: -1, timeSignature: 4, expected: 2.0 },
     { measure: 2, tempo: 120, timeSignature: 4, expected: 2.0 },
@@ -18,4 +10,24 @@ test.each([
     { measure: 10, tempo: 110, timeSignature: 3, expected: 14.727272727 },
 ])(".measureToTime($measure, $tempo, timeSignature)", ({ measure, tempo, timeSignature, expected }) => {
     expect(esutils.measureToTime(measure, tempo, timeSignature)).toBeCloseTo(expected, 8)
+})
+
+it("detects py with parseLanguage()", () => {
+    expect(esutils.parseLanguage("song.py")).toBe("python")
+})
+
+it("detects js with parseLanguage()", () => {
+    expect(esutils.parseLanguage("song.js")).toBe("javascript")
+})
+
+it("detects name from filename with parseName()", () => {
+    expect(esutils.parseName("test.abc")).toBe("test")
+})
+
+it("detects name from non-filename with parseName()", () => {
+    expect(esutils.parseName("test")).toBe("test")
+})
+
+it("detects name from non-filename with parseName()", () => {
+    expect(esutils.parseName("test.test.abc")).toBe("test.test")
 })
