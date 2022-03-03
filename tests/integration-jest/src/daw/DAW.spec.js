@@ -12,16 +12,7 @@ import ResizeObserver from "resize-observer-polyfill"
 window.d3 = d3
 window.ResizeObserver = ResizeObserver
 
-jest.mock("react-i18next", () => ({
-    useTranslation: () => {
-        return {
-            t: (str) => str,
-            i18n: {
-                changeLanguage: () => new Promise(() => {}),
-            },
-        }
-    },
-}))
+jest.mock("react-i18next")
 
 it("renders with mocked data", async () => {
     render(<Provider store={store}>
