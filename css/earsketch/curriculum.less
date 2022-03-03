@@ -208,8 +208,7 @@
   content: " Try Again!"
 }
 
-// Override tailwind 2's modern-normalize dependency so RTL ordered lists work properly or user :before or :after
-// TODO: we should be able to remove this hack and use tailwind RTL support when upgrading to tailwind 3
+// TODO: transition once tailwind/typography supports RTL, or use :before or :after to consolidate with ltr classes
 .curriculum-rtl .prose ul > li,
 .curriculum-rtl .prose ol > li{
   padding-right: 1.75em;
