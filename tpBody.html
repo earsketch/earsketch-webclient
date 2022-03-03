@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <body>
 
 
   <!-- BUTTON TO CREATE A NEW TUNEPAD SAMPLE -->
-  <form method="post" action="https://tunepad.xyz/embed/project/new" target="tunepadIFrame">
+  <form method="post" action="https://tunepad.xyz/embed/project/new" target="tunepad-iframe">
     <input type="hidden" name="bpm" value="90">
     <input type="hidden" name="name" value="My Earsketch Project Name">
     <input type="hidden" name="description" value="Project description not required">
@@ -13,7 +14,7 @@
 
 
   <!-- BUTTON TO EDIT AN EXISTING TUNEPAD SAMPLE -->
-  <form method="post" action="https://tunepad.xyz/embed/project/edit/804" target="tunepadIFrame">
+  <form method="post" action="https://tunepad.xyz/embed/project/edit/804" target="tunepad-iframe">
     <input type="hidden" name="username" value="earsketchtestuser">
     <input type="hidden" name="password" value="earsketchtest">
     <button type="submit">Edit TunePad Sample</button>
@@ -26,11 +27,11 @@
 
 
   <!-- TUNEPAD WILL SHOW UP IN THIS IFRAME -->
-  <iframe name="tunepadIFrame" id="tunepadIFrame" width="740" height="600">IFrames are not supported by your browser.</iframe>
+  <iframe name="tunepad-iframe" id="tunepad-iframe" width="740" height="600" title="Tunepad" aria-label="Tunepad">IFrames are not supported by your browser.</iframe>
 
 
   <script>
-    var tunepadWindow = document.getElementById("tunepadIFrame").contentWindow;
+    var tunepadWindow = document.getElementById("tunepad-iframe").contentWindow;
     var snd;
     function saveWavData() {
       if (tunepadWindow != null) {

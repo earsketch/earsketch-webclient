@@ -21,14 +21,14 @@ import { useTranslation } from "react-i18next"
 const CreateScriptButton = () => {
     const { t } = useTranslation()
     return (
-        <div className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript}>
+        <button className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer" onClick={createScript} title={t("scriptCreator.title")} aria-label={t("scriptCreator.title")} >
             <div className="align-middle rounded-full bg-white text-black p-1 ml-2 mr-3 text-sm">
                 <i className="icon icon-plus2" />
             </div>
             <div className="mr-3">
                 {t("newScript")}
             </div>
-        </div>
+        </button>
     )
 }
 
@@ -46,7 +46,6 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
     const selected = isClearItem ? false : useSelector((state: RootState) => state.scripts.filters[category].includes(value))
     const dispatch = useDispatch()
     const { t } = useTranslation()
-
     return (
         <>
             <div
@@ -59,6 +58,7 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof scripts.
                         else dispatch(scripts.addFilterItem({ category, value }))
                     }
                 }}
+                aria-selected={selected}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
@@ -85,6 +85,8 @@ const SortOptionsItem = ({ value, isClearItem }: { value: scripts.SortByAttribut
             onClick={() => {
                 dispatch(scripts.setSorter(value))
             }}
+            aria-label={value}
+            title={value}
         >
             <div className="w-8">
                 <i className={`icon ${ascending ? "icon-arrow-up" : "icon-arrow-down"} ${selected ? "block" : "hidden"}`} />
@@ -110,6 +112,7 @@ const Filters = () => {
                     title={t("scriptBrowser.filterDropdown.owner")}
                     category="owners"
                     items={owners}
+                    aria={t("scriptBrowser.filterDropdown.owner")}
                     numSelected={numOwnersSelected}
                     position="left"
                     FilterItem={FilterItem}
@@ -117,6 +120,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.fileType")}
                     category="types"
+                    aria={t("scriptBrowser.filterDropdown.fileType")}
                     items={["Python", "JavaScript"]}
                     numSelected={numTypesSelected}
                     position="center"
@@ -125,6 +129,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("scriptBrowser.filterDropdown.sortBy")}
                     category="sortBy"
+                    aria={t("scriptBrowser.filterDropdown.sortBy")}
                     items={["Date", "A-Z"]}
                     position="right"
                     FilterItem={SortOptionsItem}
@@ -142,6 +147,9 @@ const ShowDeletedScripts = () => {
             <div className="pr-2">
                 <input
                     type="checkbox"
+                    aria-label={t("scriptBrowser.showDeleted")}
+                    title={t("scriptBrowser.showDeleted")}
+                    role="checkbox"
                     style={{ margin: 0 }}
                     onClick={(event: MouseEvent) => {
                         const elem = event.target as HTMLInputElement
@@ -156,25 +164,27 @@ const ShowDeletedScripts = () => {
     )
 }
 
-const PillButton = ({ onClick, children }: { onClick: Function, children: React.ReactNode }) => {
+const PillButton = ({ onClick, children, aria }: { onClick: Function, children: React.ReactNode, aria: string }) => {
     return (
-        <div
+        <button
             className="flex items-center space-x-2 border border-gray-800 rounded-full px-4 py-1 bg-white dark:bg-gray-900 hover:bg-blue-100 dark:hover:bg-blue-500"
             onClick={(event) => {
                 event.preventDefault()
                 event.stopPropagation()
                 onClick?.()
             }}
+            aria-label={aria}
+            title={aria}
         >
             {children}
-        </div>
+        </button>
     )
 }
 
 const ShareButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => shareScript(script)}>
+        <PillButton onClick={() => shareScript(script)} aria={t("ariaDescriptors:scriptBrowser.share", { scriptname: script.name })}>
             <i className="icon-share32" />
             <div>{t("script.share")}</div>
         </PillButton>
@@ -184,7 +194,7 @@ const ShareButton = ({ script }: { script: Script }) => {
 const RestoreButton = ({ script }: { script: Script }) => {
     const { t } = useTranslation()
     return (
-        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))}>
+        <PillButton onClick={() => userProject.restoreScript(Object.assign({}, script))} aria={t("ariaDescriptors:scriptBrowser.restore", { scriptname: script.name })}>
             <i className="icon-rotate-cw2"/>
             <div>{t("scriptBrowser.restore")}</div>
         </PillButton>
@@ -299,15 +309,16 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
     const modified = useSelector(tabs.selectModifiedScripts).includes(script.shareid)
     const tabIndicator = (open || active) ? (active ? (modified ? "border-red-600" : "border-green-400") : (modified ? "border-red-400" : "border-green-300") + " opacity-80") : "opacity-0"
     const loggedIn = useSelector(user.selectLoggedIn)
+    const { t } = useTranslation()
 
     // Note: Circumvents the issue with ShareButton where it did not reference unsaved scripts opened in editor tabs.
 
     const shared = script.creator || script.isShared
     const collaborators = script.collaborators as string[]
-
+    const ariaLabel = type === "deleted" ? "" : t("scriptBrowser.openInEditor", { name: script.name })
     return (
         <div
-            className="flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 cursor-pointer"
+            className={`flex flex-row justify-start border-t border-b border-r border-gray-500 dark:border-gray-700 ${type === "deleted" ? "" : "cursor-pointer"}`}
             onClick={() => {
                 if (type === "regular") {
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
@@ -315,6 +326,8 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
                     dispatch(tabs.setActiveTabAndEditor(script.shareid))
                 }
             }}
+            title={ariaLabel}
+            aria-label={ariaLabel}
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div

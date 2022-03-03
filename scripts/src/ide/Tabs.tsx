@@ -14,7 +14,9 @@ import * as tabs from "./tabState"
 import * as layout from "../ide/layoutState"
 
 const CreateScriptButton = () => {
-    return <div
+    const { t } = useTranslation()
+
+    return <button
         className={`
             bg-black text-white dark:bg-white dark:text-black
             h-7 w-7 mx-3 my-2
@@ -23,9 +25,11 @@ const CreateScriptButton = () => {
         `}
         id="create-script-button"
         onClick={createScript}
+        title={t("newScript")}
+        aria-label={t("newScript")}
     >
         <i className="icon icon-plus2" />
-    </div>
+    </button>
 }
 
 const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: string, inMenu: boolean }) => {
@@ -38,6 +42,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
     const activeTabID = useSelector(tabs.selectActiveTabID)
     const active = activeTabID === scriptID
     const collaborators = script.collaborators as string[]
+    const { t } = useTranslation()
 
     useEffect(() => {
         if (active && script.collaborative) {
@@ -75,6 +80,8 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
             }
         }}
         title={script.name}
+        aria-label={script.name}
+        role="button"
     >
         <DropdownContextMenuCaller
             className="flex justify-between items-center truncate p-3 w-full"
@@ -94,6 +101,8 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
                     event.preventDefault()
                     event.stopPropagation()
                 }}
+                title={t("ariaDescriptors:scriptBrowser.close", { scriptname: scriptName })}
+                aria-label={t("ariaDescriptors:scriptBrowser.close", { scriptname: scriptName })}
             >
                 <i className="icon-cross2 cursor-pointer" />
             </button>

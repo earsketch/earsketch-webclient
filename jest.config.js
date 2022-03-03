@@ -11,6 +11,7 @@ module.exports = {
             SHOW_CAI: false,
             ANALYTICS: false,
         },
+        URL_DOMAIN: "https://api-dev.ersktch.gatech.edu/EarSketchWS",
     },
     // Tells Jest what folders to ignore for tests
     transformIgnorePatterns: [

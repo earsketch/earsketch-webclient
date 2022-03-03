@@ -1,4 +1,5 @@
 // Run user scripts.
+import Interpreter from "js-interpreter"
 import * as acorn from "acorn"
 import * as walk from "acorn-walk"
 
