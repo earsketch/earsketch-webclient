@@ -1,3 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+export async function getStandardFolders() {
+    return []
+}
+
+export async function getMetadata(name: string) {
+    return null
+}
+
+export function getSound(filekey: string) {
+    return null
+}
+
 export async function getStandardSounds() {
     return [
         {
