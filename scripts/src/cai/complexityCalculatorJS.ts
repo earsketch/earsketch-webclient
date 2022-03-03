@@ -68,7 +68,7 @@ export function analyzeJavascript(source: string) {
         return resultsObject
     } catch (error) {
         return {
-            ast: {},
+            ast: {} as cc.AnyNode,
             codeFeatures: {
 
                 errors: 1,
@@ -116,7 +116,7 @@ function convertASTTree(AstTree: any) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)
     }
-    const parentItem = { _astname: "Module", body: bodyItems } as cc.Node
+    const parentItem = { _astname: "Module", body: bodyItems } as cc.ModuleNode
     return parentItem
 }
 
@@ -126,7 +126,7 @@ let jsParentCol: number
 // Converts a Javascript AST to a fake Python AST
 // does this by hierarchically going through JS AST nodes, and constructing a new AST with matching nodes structured like Skulpt Python nodes
 function convertASTNode(JsAst: any) {
-    const returnObject: cc.Node = {}
+    const returnObject: any = {}
     const nodeBody: any = []
     let object = JsAst
     if (JsAst.type === "ExpressionStatement") { // remove expression objects. we do not need them.
@@ -215,10 +215,13 @@ function convertASTNode(JsAst: any) {
         // name the function after its location so its return gets properly tallied by function evaluate.
         returnObject.functionName = "" + object.loc.start.line + "|" + object.loc.start.column
         // make a child object the serves as a function definition
-        const funcDefObj: cc.Node = {
+        const funcDefObj: cc.FunctionDefNode = {
             _astname: "FunctionDef",
             lineno: object.loc.start.line,
-            name: { v: returnObject.functionName } as cc.Node,
+            name: { v: returnObject.functionName } as cc.strNode,
+            body: [] as (cc.IfNode | cc.ForNode | cc.JsForNode | cc.WhileNode)[],
+            args: {} as cc.ArgumentsNode,
+            colOffset: 0,
         }
         // body in funcdefobj
         if (hasBody) {
@@ -232,7 +235,7 @@ function convertASTNode(JsAst: any) {
         funcDefObj.args = {
             args: paramsObject,
             lineno: object.loc.start.line,
-        }
+        } as cc.ArgumentsNode
         returnObject.functionDef = funcDefObj
     } else if (object.type === "IfStatement") {
         returnObject._astname = "If"
@@ -344,7 +347,7 @@ function convertASTNode(JsAst: any) {
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
-            returnObject.op = { name: ccState.binOps[object.operator] } as cc.Node
+            returnObject.op = { name: ccState.binOps[object.operator] } as cc.opNode
         } else if (Object.keys(ccState.comparatorOps).includes(object.operator)) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"

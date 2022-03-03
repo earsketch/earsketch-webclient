@@ -73,7 +73,7 @@ export function analyzePython(source: string) {
     } catch (error) {
         return {
             // return {
-            ast: {},
+            ast: {} as cc.AnyNode,
             codeFeatures: {
 
                 errors: 1,
