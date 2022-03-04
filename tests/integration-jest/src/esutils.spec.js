@@ -1,6 +1,5 @@
 /* eslint-env jest */
-import { parseLanguage } from "../../../scripts/src/esutils"
-import { compareObjStructure } from "../../../scripts/src/esutils"
+import { parseLanguage, compareObjStructure } from "../../../scripts/src/esutils"
 
 it("detects py with parseLanguage()", () => {
     expect(parseLanguage("song.py")).toBe("python")
