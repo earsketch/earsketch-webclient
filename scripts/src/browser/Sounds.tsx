@@ -296,7 +296,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
 const WindowedRecommendations = () => {
     const loggedIn = useSelector(user.selectLoggedIn)
     const tabsOpen = !!useSelector(tabs.selectOpenTabs).length
-    const recommendations = useSelector(tabs.selectRecommendations)
+    const recommendations = useSelector((state: RootState) => state.recommender.recommendations)
     const { t } = useTranslation()
 
     return (

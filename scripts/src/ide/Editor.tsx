@@ -18,6 +18,7 @@ import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
+import { reloadRecommendations } from "../app/reloadRecommender"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 
@@ -194,6 +195,7 @@ function setupAceHandlers(ace: Ace.Editor) {
             caiDialogue.addToNodeHistory(["Code Edit", firstEdit])
         }
         recommendationTimer = window.setTimeout(() => {
+            reloadRecommendations()
             if (FLAGS.SHOW_CAI) {
                 store.dispatch(cai.checkForCodeUpdates())
                 caiStudentPreferences.addEditPeriod(firstEdit, Date.now())

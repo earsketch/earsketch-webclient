@@ -12,6 +12,7 @@ import * as editor from "./ideState"
 import reporter from "../app/reporter"
 import * as userProject from "../app/userProject"
 import * as recommender from "../app/recommender"
+import { reloadRecommendations } from "../app/reloadRecommender"
 
 interface TabState {
     openTabs: string[],
@@ -131,36 +132,6 @@ export const selectActiveTabScript = createSelector(
     (activeTabID: string, scriptEntities: scripts.Scripts) => scriptEntities[activeTabID]
 )
 
-export const selectRecommendations = createSelector(
-    [selectActiveTabID, scripts.selectAllScripts, scripts.selectFilteredActiveScripts],
-    (activeTabID, allScripts, filteredActiveScripts) => {
-        let res = [] as any[]
-        if (!activeTabID) return res
-        // Get the modified / unsaved script.
-        const script = allScripts[activeTabID]
-        if (!script) return res
-        let input = recommender.addRecInput([], script)
-        if (input.length === 0) {
-            const filteredScripts = Object.values(filteredActiveScripts)
-            if (filteredScripts.length) {
-                const lim = Math.min(5, filteredScripts.length)
-                for (let i = 0; i < lim; i++) {
-                    input = recommender.addRecInput(input, filteredScripts[i])
-                }
-            }
-        }
-        // If there are no samples to use for recommendation, just use something random so the window isn't blank.
-        if (input.length === 0) {
-            input = recommender.addRandomRecInput(input)
-        }
-        [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-            res = recommender.recommend(res, input, ...v)
-        })
-
-        return res
-    }
-)
-
 // Note: Do not export and modify directly.
 interface TabsMutableState {
     editorSessions: {
@@ -203,6 +174,7 @@ export const setActiveTabAndEditor = createAsyncThunk<void, string, ThunkAPI>(
 
         prevTabID && (scriptID !== prevTabID) && dispatch(ensureCollabScriptIsClosed(prevTabID))
         scriptID && dispatch(openAndActivateTab(scriptID))
+        reloadRecommendations()
     }
 )
 
