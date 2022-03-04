@@ -8,26 +8,21 @@ test.each([
     { measure: 3, tempo: 220, timeSignature: 4, expected: 2.18181818 },
     { measure: 9.25, tempo: 88, timeSignature: 4, expected: 22.5 },
     { measure: 10, tempo: 110, timeSignature: 3, expected: 14.727272727 },
-])(".measureToTime($measure, $tempo, timeSignature)", ({ measure, tempo, timeSignature, expected }) => {
+])("esutils measureToTime($measure, $tempo, timeSignature)", ({ measure, tempo, timeSignature, expected }) => {
     expect(esutils.measureToTime(measure, tempo, timeSignature)).toBeCloseTo(expected, 8)
 })
 
-it("detects py with parseLanguage()", () => {
-    expect(esutils.parseLanguage("song.py")).toBe("python")
+test.each([
+    { filename: "song.py", expected: "python" },
+    { filename: "song.js", expected: "javascript" },
+])("esutils parseLanguage($filename)", ({ filename, expected }) => {
+    expect(esutils.parseLanguage(filename)).toBe(expected)
 })
 
-it("detects js with parseLanguage()", () => {
-    expect(esutils.parseLanguage("song.js")).toBe("javascript")
-})
-
-it("detects name from filename with parseName()", () => {
-    expect(esutils.parseName("test.abc")).toBe("test")
-})
-
-it("detects name from non-filename with parseName()", () => {
-    expect(esutils.parseName("test")).toBe("test")
-})
-
-it("detects name from non-filename with parseName()", () => {
-    expect(esutils.parseName("test.test.abc")).toBe("test.test")
+test.each([
+    { filename: "test.abc", expected: "test" },
+    { filename: "test", expected: "test" },
+    { filename: "test.test.abc", expected: "test.test" },
+])("esutils parseName($filename)", ({ filename, expected }) => {
+    expect(esutils.parseName(filename)).toBe(expected)
 })
