@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { importScript, reloadRecommendations } from "../app/App"
+import { importScript } from "../app/App"
 import * as appState from "../app/appState"
 import * as cai from "../cai/caiState"
 import * as caiDialogue from "../cai/dialogue"
@@ -18,6 +18,7 @@ import * as tabs from "./tabState"
 import * as userConsole from "./console"
 import * as ESUtils from "../esutils"
 import store from "../reducers"
+import { reloadRecommendations } from "../app/reloadRecommender"
 
 const COLLAB_COLORS = [[255, 80, 80], [0, 255, 0], [255, 255, 50], [100, 150, 255], [255, 160, 0], [180, 60, 255]]
 

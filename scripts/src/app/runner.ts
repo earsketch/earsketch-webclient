@@ -48,8 +48,6 @@ export async function postRun(result: DAWData) {
     // STEP 6: Insert metronome as the last track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
-    // STEP 7: Print out string for unit tests, return the result.
-    esconsole(ESUtils.formatResultForTests(result), ["nolog", "runner"])
 }
 
 // Pitchshift tracks in a result object because we can't yet make pitchshift an effect node.
@@ -178,8 +176,6 @@ export async function runPython(code: string) {
 
     const lines = code.match(/\n/g) ? code.match(/\n/g)!.length + 1 : 1
     esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
-    // printing for unit tests
-    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "runner"])
 
     // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
@@ -249,9 +245,6 @@ function createJsInterpreter(code: string) {
 
 // Compile a javascript script.
 export async function runJavaScript(code: string) {
-    // printing for unit tests
-    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "runner"])
-
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
 
     const mainInterpreter = createJsInterpreter(code)
