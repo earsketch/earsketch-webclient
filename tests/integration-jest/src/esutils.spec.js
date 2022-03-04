@@ -1,5 +1,4 @@
 /* eslint-env jest */
-import { parse } from "acorn"
 import { parseLanguage } from "../../../scripts/src/esutils"
 import { parseExt } from "../../../scripts/src/esutils"
 
