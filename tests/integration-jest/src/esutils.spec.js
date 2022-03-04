@@ -27,18 +27,16 @@ test.each([
     expect(esutils.parseName(filename)).toBe(expected)
 })
 
-it("reduce precision to default digits (5) with toPrecision()", () => {
-    expect(toPrecision(0.123456789)).toBe(0.12346)
+test.each([
+    { value: 0.123456789, expected: 0.12346 },
+    { value: 0.123, expected: 0.12300 },
+])("esutils toPrecision($value)", ({ value, expected }) => {
+    expect(esutils.toPrecision(value)).toBe(expected)
 })
 
-it("increase precision to default digits (5) with toPrecision()", () => {
-    expect(toPrecision(0.123)).toBe(0.12300)
-})
-
-it("reduce precision to custom digits (8) with toPrecision()", () => {
-    expect(toPrecision(0.123456789, 8)).toBe(0.12345679)
-})
-
-it("reduce precision to custom digits (8) with toPrecision()", () => {
-    expect(toPrecision(0.123, 8)).toBe(0.12300000)
+test.each([
+    { value: 0.123456789, digits: 5, expected: 0.12346 },
+    { value: 0.123, digits: 8, expected: 0.12300000 },
+])("esutils toPrecision($value, $digits)", ({ value, expected }) => {
+    expect(esutils.toPrecision(value)).toBe(expected)
 })
