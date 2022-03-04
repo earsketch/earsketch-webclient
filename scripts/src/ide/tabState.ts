@@ -11,7 +11,6 @@ import * as user from "../user/userState"
 import * as editor from "./ideState"
 import reporter from "../app/reporter"
 import * as userProject from "../app/userProject"
-import * as recommender from "../app/recommender"
 import { reloadRecommendations } from "../app/reloadRecommender"
 
 interface TabState {
