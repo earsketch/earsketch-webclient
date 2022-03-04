@@ -42,24 +42,12 @@ test.each([
 })
 
 test.each([
-    { desc: "empty objects", expected: true,
-        objA: {},
-        objB: {} },
-    { desc: "identical objects", expected: true,
-        objA: { a: 1, b: 2, c: 3 },
-        objB: { a: 1, b: 2, c: 3 } },
-    { desc: "dissimilar objects", expected: false,
-        objA: { a: 1, b: 2, c: 3 },
-        objB: { a: 1, b: 2 } },
-    { desc: "same props diff values", expected: true,
-        objA: { a: 1, b: 2, c: 3 },
-        objB: { a: 1, b: 2, c: 4 } },
-    { desc: "nested objects", expected: true,
-        objA: { a: 1, b: 2, c: { d: 3, e: 4 } },
-        objB: { a: 1, b: 2, c: { d: 3, e: 4 } } },
-    { desc: "dissimilar nested", expected: false,
-        objA: { a: 1, b: 2, c: { d: 3, e: 4 } },
-        objB: { a: 1, b: 2, c: { d: 3 } } },
-])("compareObjStructure($desc)", ({ desc, objA, objB, expected }) => {
+    { desc: "empty objects", expected: true, objA: {}, objB: {} },
+    { desc: "identical objects", expected: true, objA: { a: 1, b: 2, c: 3 }, objB: { a: 1, b: 2, c: 3 } },
+    { desc: "dissimilar objects", expected: false, objA: { a: 1, b: 2, c: 3 }, objB: { a: 1, b: 2 } },
+    { desc: "same props diff values", expected: true, objA: { a: 1, b: 2, c: 3 }, objB: { a: 1, b: 2, c: 4 } },
+    { desc: "nested objects", expected: true, objA: { a: 1, b: 2, c: { d: 3, e: 4 } }, objB: { a: 1, b: 2, c: { d: 3, e: 4 } } },
+    { desc: "dissimilar nested", expected: false, objA: { a: 1, b: 2, c: { d: 3, e: 4 } }, objB: { a: 1, b: 2, c: { d: 3 } } },
+])("compareObjStructure($desc)", ({ objA, objB, expected }) => {
     expect(esutils.compareObjStructure(objA, objB)).toBe(expected)
 })
