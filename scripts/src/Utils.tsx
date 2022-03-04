@@ -41,7 +41,7 @@ export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
     })
     return <div className="modal-footer flex items-center justify-end">
         {progress !== undefined && <ProgressBar progress={progress} />}
-        {close !== undefined && <input type="button" className="btn btn-default" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
+        {close !== undefined && <input type="button" className="btn bg-white text-black hover:text-black hover:bg-gray-200" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
         {submit && <input type="submit" className={btnClass} value={t(submit).toLocaleUpperCase()} disabled={!(ready ?? true)}/>}
     </div>
 }
