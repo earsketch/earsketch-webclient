@@ -3,7 +3,6 @@ import i18n from "i18next"
 import { useDispatch, useSelector } from "react-redux"
 import React, { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { debounce } from "lodash"
 
 import { importScript } from "../app/App"
 import * as appState from "../app/appState"
@@ -157,20 +156,6 @@ let firstEdit: number | null = null
 function setupAceHandlers(ace: Ace.Editor) {
     ace.on("changeSession", () => callbacks.onChange?.())
 
-    const updateScript = () => {
-        const activeTabID = tabs.selectActiveTabID(store.getState())
-        const editSession = ace.getSession()
-        tabs.setEditorSession(activeTabID, editSession)
-
-        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
-        if (script) {
-            store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
-            if (!script.collaborative) {
-                store.dispatch(tabs.addModifiedScript(activeTabID))
-            }
-        }
-    }
-    const debouncedUpdateScript = debounce(updateScript, 250, { maxWait: 1000 })
     // TODO: add listener if collaboration userStatus is owner, remove otherwise
     // TODO: also make sure switching / closing tab is handled
     ace.on("change", (event) => {
@@ -216,9 +201,19 @@ function setupAceHandlers(ace: Ace.Editor) {
             firstEdit = null
         }, 1000)
 
-        // saving the script text and editor session to redux is expensive,
-        // so we debounce this so it doesn't occur on every keystroke
-        debouncedUpdateScript()
+        // TODO: This is a lot of Redux stuff to do on every keystroke. We should make sure this won't cause performance problems.
+        //       If it becomes necessary, we could buffer some of these updates, or move some state out of Redux into "mutable" state.
+        const activeTabID = tabs.selectActiveTabID(store.getState())
+        const editSession = ace.getSession()
+        tabs.setEditorSession(activeTabID, editSession)
+
+        const script = activeTabID === null ? null : scripts.selectAllScripts(store.getState())[activeTabID]
+        if (script) {
+            store.dispatch(scripts.setScriptSource({ id: activeTabID, source: editSession.getValue() }))
+            if (!script.collaborative) {
+                store.dispatch(tabs.addModifiedScript(activeTabID))
+            }
+        }
     })
 
     ace.getSession().selection.on("changeSelection", () => {
