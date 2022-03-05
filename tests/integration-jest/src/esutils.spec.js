@@ -37,6 +37,14 @@ test.each([
 })
 
 test.each([
+    { datestring: "2019-04-22 16:14:28.0", expected: 1555964068000 },
+    { datestring: "2022-03-04 14:14:14.1", expected: 1646421254000 },
+    { datestring: "2000-05-26 01:01:01.0", expected: 959317261000 }
+])("parseDate($datestring)", ({ datestring, expected }) => {
+    expect(esutils.parseDate(datestring)).toBe(expected)
+})
+
+test.each([
     { value: 0.123456789, expected: 0.12346 },
     { value: 0.123, expected: 0.12300 },
 ])("toPrecision($value)", ({ value, expected }) => {
