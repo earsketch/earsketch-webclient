@@ -1,5 +1,6 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import classNames from "classnames"
 
 // Useful for preventing absolute-positioned elements from exceeding window height.
 export const useHeightLimiter = (show: boolean, marginBottom: string|null = null): [MutableRefObject<HTMLDivElement|null>, React.CSSProperties] => {
@@ -24,7 +25,7 @@ export const useHeightLimiter = (show: boolean, marginBottom: string|null = null
 
 const ProgressBar = ({ progress }: { progress: number }) => {
     const percent = Math.floor(progress * 100) + "%"
-    return <div className="progress flex-grow mb-0 mr-3">
+    return <div className="progress grow mb-0 mr-3">
         <div className="progress-bar progress-bar-success" style={{ width: percent }}>{percent}</div>
     </div>
 }
@@ -33,11 +34,15 @@ export const ModalFooter = ({ submit, cancel, ready, progress, type, close }: {
     submit?: string, cancel?: string, ready?: boolean, progress?: number, type?: string, close?: () => void
 }) => {
     const { t } = useTranslation()
-
+    const btnClass = classNames({
+        btn: true,
+        "bg-sky-600 text-white hover:text-white hover:bg-sky-700": !type,
+        "bg-red-600 text-white hover:text-white hover:bg-red-700": type === "danger",
+    })
     return <div className="modal-footer flex items-center justify-end">
         {progress !== undefined && <ProgressBar progress={progress} />}
-        {close !== undefined && <input type="button" className="btn btn-default" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
-        {submit && <input type="submit" className={`btn btn-${type ?? "primary"}`} value={t(submit).toLocaleUpperCase()} disabled={!(ready ?? true)}/>}
+        {close !== undefined && <input type="button" className="btn bg-white text-black hover:text-black hover:bg-gray-200" onClick={() => close()} value={t(cancel ?? "cancel").toLocaleUpperCase()} />}
+        {submit && <input type="submit" className={btnClass} value={t(submit).toLocaleUpperCase()} disabled={!(ready ?? true)}/>}
     </div>
 }
 

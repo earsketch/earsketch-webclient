@@ -90,7 +90,7 @@ const AdminManageRoles = () => {
                 <form onSubmit={e => { e.preventDefault(); addAdmin() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
                         placeholder="Username" required onChange={e => setNewAdmin(e.target.value)}/>
-                    <input type="submit" value="ADD ADMIN" className="btn btn-primary" />
+                    <input type="submit" value="ADD ADMIN" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </form>
             </div>
         </div>
@@ -181,7 +181,7 @@ const AdminSendBroadcast = () => {
                             placeholder="Hyperlink (optional)" maxLength={500} onChange={e => setLink(e.target.value)} />
                         <input type="number" className="m-2 w-1/4 form-control"
                             placeholder="Days until expiration" required min={1} max={14} onChange={e => setExpiration(+e.target.value)} />
-                        <input type="submit" value="SEND" className="btn btn-primary" />
+                        <input type="submit" value="SEND" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                     </div>
                 </form>
             </div>
@@ -234,7 +234,7 @@ const AdminResetUserPassword = () => {
                 <form onSubmit={e => { e.preventDefault(); searchUsers() }} className="flex items-center">
                     <input type="text" className="m-2 w-1/4 form-control"
                         placeholder="Username or Email" required onChange={e => setUsername(e.target.value)} />
-                    <input type="submit" value="SEARCH USERS" className="btn btn-primary" />
+                    <input type="submit" value="SEARCH USERS" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                 </form>
                 {userDetails.username.length > 0 && <form onSubmit={e => { e.preventDefault(); setPassword() }}>
                     <div className="p-4">
@@ -246,7 +246,7 @@ const AdminResetUserPassword = () => {
                             placeholder="Admin passphrase" onChange={e => setAdminPassphrase(e.target.value)} />
                         <input type="password" className="m-2 w-1/4 form-control"
                             placeholder="New user password" onChange={e => setNewUserPassword(e.target.value)} />
-                        <input type="submit" value="SET PASSWORD" className="btn btn-primary" />
+                        <input type="submit" value="SET PASSWORD" className="btn bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700" />
                     </div>
                 </form>}
             </div>

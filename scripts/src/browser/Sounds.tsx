@@ -46,6 +46,8 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
                 }}
+                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
                 <div className="w-8">
                     <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
@@ -75,6 +77,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.artists")}
                     category="artists"
+                    aria={t("soundBrowser.clip.tooltip.artist")}
                     items={artists}
                     position="left"
                     numSelected={numArtistsSelected}
@@ -83,6 +86,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.genres")}
                     category="genres"
+                    aria={t("soundBrowser.clip.tooltip.genre")}
                     items={genres}
                     position="center"
                     numSelected={numGenresSelected}
@@ -91,6 +95,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.instruments")}
                     category="instruments"
+                    aria={t("soundBrowser.clip.tooltip.instrument")}
                     items={instruments}
                     position="right"
                     numSelected={numInstrumentsSelected}
@@ -115,6 +120,9 @@ const ShowOnlyFavorites = () => {
                         const elem = event.target as HTMLInputElement
                         dispatch(sounds.setFilterByFavorites(elem.checked))
                     }}
+                    title={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    role="checkbox"
                 />
             </div>
             <div className="pr-1">
@@ -129,7 +137,7 @@ const AddSound = () => {
     const { t } = useTranslation()
 
     return (
-        <div
+        <button
             className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer"
             onClick={() => openUploadWindow()}
         >
@@ -139,7 +147,7 @@ const AddSound = () => {
             <div className="mr-3">
                 {t("soundBrowser.button.addSound")}
             </div>
-        </div>
+        </button>
     )
 }
 
@@ -170,7 +178,7 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-4 border-blue-300" />
-            <div className={`flex flex-grow truncate justify-between py-2 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className={`flex grow truncate justify-between py-2 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
                     <span className="truncate pl-5">{name}</span>
                 </div>
@@ -262,7 +270,7 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
             {expanded &&
                 (<div className="h-auto border-l-4 border-blue-500" />)}
             <div
-                className="flex flex-grow truncate justify-between items-center p-3 text-2xl cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
+                className="flex grow truncate justify-between items-center p-3 text-2xl cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
                 onClick={() => {
                     setExpanded((v: Set<number>) => {
@@ -416,7 +424,7 @@ export const SoundBrowser = () => {
 
     return (
         <>
-            <div className="flex-grow-0">
+            <div className="grow-0">
                 <div className="pb-3">
                     <SoundSearchBar />
                     <Filters />
@@ -428,7 +436,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className="flex-grow flex flex-col justify-start">
+            <div className="grow flex flex-col justify-start">
                 <DefaultSoundCollection />
                 <FeaturedArtistCollection />
                 <WindowedRecommendations />

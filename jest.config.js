@@ -11,6 +11,7 @@ module.exports = {
             SHOW_CAI: false,
             ANALYTICS: false,
         },
+        URL_DOMAIN: "https://api-dev.ersktch.gatech.edu/EarSketchWS",
     },
     // Tells Jest what folders to ignore for tests
     transformIgnorePatterns: [
@@ -26,4 +27,11 @@ module.exports = {
     },
     testPathIgnorePatterns: ["node_modules", "\\.cache"],
     moduleDirectories: ["node_modules", "scripts/lib"],
+    reporters: [
+        "default",
+        ["jest-junit", {
+            outputDirectory: "tests/integration-jest/reports/jest",
+            outputName: "jest-test-report.xml",
+        }],
+    ],
 }

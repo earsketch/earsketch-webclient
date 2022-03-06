@@ -80,7 +80,7 @@ const MessageFooter = () => {
                                 dispatch(curriculum.fetchLocale({}))
                             }}
                             value={locale}
-                            aria-label="Select Language"
+                            aria-label={t("ariaDescriptors:header.selectLanguage")}
                         >
                             {Object.entries(AVAILABLE_LOCALES).map(([, locale]) => <option key={locale.localeCode} value={locale.localeCode}>{locale.displayText}</option>)}
                         </select>
@@ -92,7 +92,8 @@ const MessageFooter = () => {
                             className="border-0 border-b-2 border-black outline-none"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
-                            aria-label="Select Programming Language"
+                            aria-label={t("bubble:selectLanguage")}
+                            title={t("bubble:selectLanguage")}
                         >
                             <option value="Python">Python</option>
                             <option value="JavaScript">JavaScript</option>

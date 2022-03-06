@@ -25,14 +25,16 @@ export const TitleBar = () => {
                 {t("contentManager.title").toLocaleUpperCase()}
             </div>
             <div>
-                <div
+                <button
                     className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
                     onClick={() => {
                         dispatch(layout.setWest({ open: false }))
                     }}
+                    aria-label={t("ariaDescriptors:contentManager.close")}
+                    title={t("ariaDescriptors:contentManager.close")}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-                </div>
+                </button>
             </div>
         </div>
     )
@@ -41,10 +43,11 @@ export const TitleBar = () => {
 const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabType, children: React.ReactNode }) => {
     const dispatch = useDispatch()
     const isSelected = useSelector(layout.selectWestKind) === type
+    const { t } = useTranslation()
 
     return (
-        <div
-            className={`p-3 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : ""} truncate`}
+        <button
+            className={`p-3 w-1/3 cursor-pointer ${isSelected ? "border-b-4" : "border-b-4 border-transparent"} truncate`}
             style={isSelected
                 ? {
                     color: "#F5AE3C",
@@ -55,10 +58,12 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
                 open: true,
                 kind: type,
             }))}
+            title={t("contentManager.openTab", { name: name })}
+            aria-label={t("contentManager.openTab", { name: name })}
         >
             {children}
             {name}
-        </div>
+        </button>
     )
 }
 
@@ -91,6 +96,7 @@ export const Header = ({ title }: { title: string }) => (
 
 interface SearchBarProps {
     searchText: string
+    aria?: string
     dispatchSearch: ChangeEventHandler<HTMLInputElement>
     dispatchReset: MouseEventHandler<HTMLElement>
 }
@@ -123,14 +129,16 @@ export const SearchBar = ({ searchText, dispatchSearch, dispatchReset }: SearchB
 interface DropdownMultiSelectorProps {
     title: string
     category: string
+    aria?: string
     items: string[]
     position: "center" | "left" | "right"
     numSelected?: number
     FilterItem: React.FC<any>
 }
 
-export const DropdownMultiSelector = ({ title, category, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
+export const DropdownMultiSelector = ({ title, category, aria, items, position, numSelected, FilterItem }: DropdownMultiSelectorProps) => {
     const theme = useSelector(appState.selectColorTheme)
+    const { t } = useTranslation()
     const [showTooltip, setShowTooltip] = useState(false)
     const [referenceElement, setReferenceElement] = useState<HTMLDivElement|null>(null)
     const [popperElement, setPopperElement] = useState<HTMLDivElement|null>(null)
@@ -171,6 +179,8 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
                 })
             }}
             className={`flex justify-between vertical-center w-1/3 truncate border-b-2 cursor-pointer select-none ${margin} ${theme === "light" ? "border-black" : "border-white"}`}
+            aria-label={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
+            title={category === "sortBy" ? t("scriptBrowser.filterDropdown.sortBy") : t("scriptBrowser.filterDropdown.filterBy", { filter: aria })}
         >
             <div className="flex justify-left truncate">
                 <div className="truncate min-w-0">
@@ -187,8 +197,10 @@ export const DropdownMultiSelector = ({ title, category, items, position, numSel
             style={showTooltip ? styles.popper : { display: "none" }}
             {...attributes.popper}
             className={`border border-black p-2 z-50 ${theme === "light" ? "bg-white" : "bg-black"}`}
+            role="listbox"
+            aria-multiselectable="true"
         >
-            <div>
+            <div role="option">
                 <FilterItem
                     category={category}
                     isClearItem={true}
@@ -207,14 +219,16 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     title: string, visible: boolean, initExpanded: boolean, className?: string, children: React.ReactNode
 }) => {
     const [expanded, setExpanded] = useState(initExpanded)
+    const filteredTitle = title.replace(/\([^)]*\)/g, "")
+    const { t } = useTranslation()
 
     return (
-        <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "flex-grow" : "flex-grow-0"}`}>
-            <div className="flex flex-row flex-grow-0 justify-start">
+        <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
+            <div className="flex flex-row grow-0 justify-start">
                 {expanded &&
-                    (<div className="h-auto border-l-4 border-orange-400" />)}
+                    (<div className="h-auto border-l-4 border-amber" />)}
                 <div
-                    className="flex flex-grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
+                    className="flex grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
@@ -224,12 +238,12 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </div>
                     <div className="w-1/12 text-2xl">
                         {expanded
-                            ? <i className="icon icon-arrow-down2" />
-                            : <i className="icon icon-arrow-right2" />}
+                            ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
+                            : <button className="icon icon-arrow-right2" title={t("thing.expand", { name: filteredTitle })} aria-label={t("thing.expand", { name: filteredTitle })}> </button>}
                     </div>
                 </div>
             </div>
-            <div className="flex-grow">
+            <div className="grow">
                 {expanded && children}
             </div>
         </div>
@@ -240,6 +254,7 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
     const theme = useSelector(appState.selectColorTheme)
     const embedMode = useSelector(appState.selectEmbedMode)
     const dispatch = useDispatch()
+    const { t } = useTranslation()
 
     return (
         <div
@@ -247,6 +262,8 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             onClick={() => {
                 position === "west" ? dispatch(layout.setWest({ open: true })) : dispatch(layout.setEast({ open: true }))
             }}
+            aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
+            title={t("ariaDescriptors:general.openPanel", { panelName: title })}
         >
             <div
                 className={`
@@ -257,7 +274,7 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
                 <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
             </div>
             <div
-                className="flex-grow flex items-center justify-center"
+                className="grow flex items-center justify-center"
             >
                 <div
                     className={`
@@ -297,7 +314,7 @@ export const Browser = () => {
             <TitleBar />
             <BrowserTabs />
             {Object.entries(BrowserComponents).map(([type, TabBody]) =>
-                <div key={type} className={"flex flex-col flex-grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
+                <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
         </div>
         {!open && <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
     </div>

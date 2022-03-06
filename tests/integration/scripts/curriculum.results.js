@@ -3091,4 +3091,19 @@ export const CURRICULUM_RESULTS = {
             },
         ],
     },
+
+    "Number Parsing": {
+        length: 0,
+        tracks: [
+            {
+                clips: [],
+                effects: {
+                    "TEMPO-TEMPO": [
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 120, endValue: 120 },
+                        { track: 0, name: "TEMPO", parameter: "TEMPO", startMeasure: 1, endMeasure: 1, startValue: 99, endValue: 99 },
+                    ],
+                },
+            },
+        ],
+    },
 }
