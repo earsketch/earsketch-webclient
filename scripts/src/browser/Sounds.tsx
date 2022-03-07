@@ -243,7 +243,7 @@ const ClipList = ({ names }: { names: string[] }) => {
     return (
         <div className="flex flex-col">
             {names?.map((v: string) =>
-                <Clip
+                entities[v] && <Clip
                     key={v} clip={entities[v]}
                     bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
                 />
