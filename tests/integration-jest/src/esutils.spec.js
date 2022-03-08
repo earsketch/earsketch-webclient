@@ -40,7 +40,7 @@ test.each([
     { datestring: "2019-04-22 16:14:28.0", expected: 1555964068000 },
     { datestring: "2022-03-04 14:14:14.6", expected: 1646421254000 },
     { datestring: "2022-03-04 14:14:14.9", expected: 1646421254000 },
-    { datestring: "2000-05-26 01:01:01.1", expected: 959317261000 }
+    { datestring: "2000-05-26 01:01:01.1", expected: 959317261000 },
 ])("parseDate($datestring)", ({ datestring, expected }) => {
     expect(esutils.parseDate(datestring)).toBe(expected)
 })
@@ -72,8 +72,8 @@ test.each([
 
 test.each([
     { input: "mocha", expected: null },
-    { input: "mocha!", expected: [ '!' ] },
-    { input: "/{mocha?", expected: [ '/', '{', '?' ] }
+    { input: "mocha!", expected: ["!"] },
+    { input: "/{mocha?", expected: ["/", "{", "?"] },
 ])("checkIllegalCharacters($input)", ({ input, expected }) => {
     expect(esutils.checkIllegalCharacters(input)).toStrictEqual(expected)
 })
