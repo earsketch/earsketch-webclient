@@ -127,7 +127,7 @@ const ShowOnlyFavorites = () => {
             <div className="pr-1">
                 {t("soundBrowser.button.showOnlyStars")}
             </div>
-            <i className="icon icon-star-full text-orange-600" />
+            <i className="icon icon-star-full2 text-orange-600" />
         </div>
     )
 }
