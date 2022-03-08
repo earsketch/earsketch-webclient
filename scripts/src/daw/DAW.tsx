@@ -425,8 +425,8 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                 <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
                     <div className="dawTrackName"></div>
                     {key === "TEMPO-TEMPO"
-                      ? <div className="grow text-center">TEMPO</div>
-                      : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {index + effectOffset}</div>}
+                        ? <div className="grow text-center">TEMPO</div>
+                        : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {index + effectOffset}</div>}
                     {key !== "TEMPO-TEMPO" &&
                     <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
                         {t("daw.bypass")}
