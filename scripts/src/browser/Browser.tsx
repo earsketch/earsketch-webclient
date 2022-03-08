@@ -223,12 +223,12 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
     const { t } = useTranslation()
 
     return (
-        <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "flex-grow" : "flex-grow-0"}`}>
-            <div className="flex flex-row flex-grow-0 justify-start">
+        <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
+            <div className="flex flex-row grow-0 justify-start">
                 {expanded &&
-                    (<div className="h-auto border-l-4 border-orange-400" />)}
+                    (<div className="h-auto border-l-4 border-amber" />)}
                 <div
-                    className="flex flex-grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
+                    className="flex grow justify-between items-center p-3 text-2xl text-amber bg-blue hover:bg-gray-700 border-t border-gray-600 cursor-pointer select-none truncate"
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
@@ -243,7 +243,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     </div>
                 </div>
             </div>
-            <div className="flex-grow">
+            <div className="grow">
                 {expanded && children}
             </div>
         </div>
@@ -274,7 +274,7 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
                 <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
             </div>
             <div
-                className="flex-grow flex items-center justify-center"
+                className="grow flex items-center justify-center"
             >
                 <div
                     className={`
@@ -314,7 +314,7 @@ export const Browser = () => {
             <TitleBar />
             <BrowserTabs />
             {Object.entries(BrowserComponents).map(([type, TabBody]) =>
-                <div key={type} className={"flex flex-col flex-grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
+                <div key={type} className={"flex flex-col grow min-h-0" + (+type === kind ? "" : " hidden")}><TabBody /></div>)}
         </div>
         {!open && <Collapsed title={t("contentManager.title").toLocaleUpperCase()} position="west" />}
     </div>

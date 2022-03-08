@@ -20,7 +20,7 @@ const CreateScriptButton = () => {
         className={`
             bg-black text-white dark:bg-white dark:text-black
             h-7 w-7 mx-3 my-2
-            flex items-center justify-center flex-shrink-0
+            flex items-center justify-center shrink-0
             text-lg cursor-pointer
         `}
         id="create-script-button"
@@ -50,7 +50,7 @@ const Tab = ({ scriptID, scriptName, inMenu }: { scriptID: string, scriptName: s
         }
     }, [activeTabID])
 
-    const tabClass = classNames("flex-shrink-0 h-14 cursor-pointer border",
+    const tabClass = classNames("shrink-0 h-14 cursor-pointer border",
         {
             "w-48": !inMenu,
             "bg-blue border-blue": active,
@@ -115,7 +115,7 @@ const CloseAllTab = () => {
     const { t } = useTranslation()
     return <div
         className={`
-            flex-shrink-0 h-12 p-3 cursor-pointer
+            shrink-0 h-12 p-3 cursor-pointer
             flex items-center
             text-white bg-gray-800 border border-gray-800    
         `}

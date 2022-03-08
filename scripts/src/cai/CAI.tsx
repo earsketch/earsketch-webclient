@@ -45,7 +45,7 @@ export const SoundPreviewContent = (name: string) => {
 
     return (
         <div style={{ display: "inline" }}>
-            <div className={`flex flex-grow truncate left-justify py-2 lightgray border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className={`flex grow truncate left-justify py-2 lightgray border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"

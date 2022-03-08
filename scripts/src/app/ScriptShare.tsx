@@ -96,7 +96,7 @@ const UserListInput = ({ users, setUsers, setFinalize }: {
                     <span className="mr-1" style={{ color: theme === "dark" ? "white" : "black" }}>{name}</span>
                     <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
                 </div>)}
-            <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
+            <input className="bg-transparent border-none outline-none grow" style={{ width: "24em" }} placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
@@ -220,7 +220,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     </div>
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
-                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="share-link outline-none grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
                     <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="glyphicon glyphicon-download-alt" /></button>
                 </div>
@@ -465,7 +465,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
                         {Object.entries(licenses).map(([id, license]) =>
-                            <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 flex-grow">
+                            <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 grow">
                                 <label>
                                     <input type="radio" name="optradio" value={id} checked={+id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(+id) }} />
                                     <span></span>{license.license}
@@ -511,7 +511,7 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
-                        <li aria-label={t(titleKey)} key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
+                        <li aria-label={t(titleKey)} key={index} className={"uib-tab nav-item grow" + (activeTab === index ? " active" : "")}>
                             <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
                         </li>)}
                 </ul>

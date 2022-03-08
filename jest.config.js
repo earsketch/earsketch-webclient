@@ -27,4 +27,11 @@ module.exports = {
     },
     testPathIgnorePatterns: ["node_modules", "\\.cache"],
     moduleDirectories: ["node_modules", "scripts/lib"],
+    reporters: [
+        "default",
+        ["jest-junit", {
+            outputDirectory: "tests/integration-jest/reports/jest",
+            outputName: "jest-test-report.xml",
+        }],
+    ],
 }

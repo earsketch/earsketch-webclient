@@ -148,7 +148,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         }
     }, [el])
 
-    return <div ref={el} id="dawHeader" className="flex-grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
+    return <div ref={el} id="dawHeader" className="grow-0 bg-gray-900" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
         {/* TODO: don't use bootstrap classes */}
         {/* DAW Label */}
         <div className="btn-group" id="daw-label">
@@ -425,8 +425,8 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                 <div className="dawEffectCtrl flex items-center" style={{ left: xScroll + "px" }}>
                     <div className="dawTrackName"></div>
                     {key === "TEMPO-TEMPO"
-                        ? <div className="flex-grow text-center">TEMPO</div>
-                        : <div className="dawTrackEffectName text-gray-700">{t("daw.effect")} {index + effectOffset}</div>}
+                      ? <div className="grow text-center">TEMPO</div>
+                      : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {index + effectOffset}</div>}
                     {key !== "TEMPO-TEMPO" &&
                     <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
                         {t("daw.bypass")}
@@ -973,7 +973,7 @@ export const DAW = () => {
         <Header playPosition={playPosition} setPlayPosition={setPlayPosition}></Header>
 
         {!hideDAW &&
-        <div id="zoom-container" className="flex-grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
+        <div id="zoom-container" className="grow relative w-full h-full flex flex-col overflow-x-auto overflow-y-hidden z-0">
             {/* Effects Toggle */}
             <button className="btn-effect flex items-center justify-center bg-white hover:bg-blue-100 dark:text-white dark:bg-gray-900 dark:hover:bg-blue-500"
                 title={t("daw.tooltip.toggleEffects")} aria-label={t("daw.tooltip.toggleEffects")} onClick={() => dispatch(daw.toggleEffects())} disabled={!hasEffects}>
@@ -981,9 +981,9 @@ export const DAW = () => {
                 <span className={"icon icon-eye" + (showEffects ? "" : "-blocked")}></span>
             </button>
 
-            <div className="flex-grow flex h-full relative">
+            <div className="grow flex h-full relative">
                 {/* DAW Container */}
-                <div ref={el} className="flex-grow overflow-hidden" id="daw-container" tabIndex={0}
+                <div ref={el} className="grow overflow-hidden" id="daw-container" tabIndex={0}
                     onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     <div className="relative">
                         <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>
@@ -1017,12 +1017,12 @@ export const DAW = () => {
                     </div>
                 </div>
 
-                <div id="horz-zoom-slider-container" className="flex flex-row flex-grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
+                <div id="horz-zoom-slider-container" className="flex flex-row grow-0 absolute pr-5 pb-1 bg-white w-full justify-end items-center z-20" style={{ boxShadow: "0 -6px 3px -6px black" }}>
                     <button onMouseDown={zoomInX} className="zoom-in pr-2 leading-none" title="Horizontal Zoom In" aria-label="Horizontal Zoom In"><i className="icon-plus2 text-sm"></i></button>
                     <button onMouseDown={zoomOutX} className="zoom-out pr-2 leading-none" title="Horizontal Zoom Out" aria-label="Horizontal Zoom Out"><i className="icon-minus text-sm"></i></button>
                 </div>
 
-                <div id="vert-zoom-slider-container" className="flex flex-col flex-grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
+                <div id="vert-zoom-slider-container" className="flex flex-col grow-0 absolute pb-5 bg-white justify-end items-center z-20" style={{ height: "calc(100% - 30px)", boxShadow: "-6px 0 3px -6px black" }}>
                     <button onMouseDown={zoomInY} className="zoom-in leading-none" title="Vertical Zoom In" aria-label="Vertical Zoom In"><i className="icon-plus2 text-sm"></i></button>
                     <button onMouseDown={zoomOutY} className="zoom-out leading-none" title="Vertical Zoom Out" aria-label="Vertical Zoom Out"><i className="icon-minus text-sm"></i></button>
                 </div>
