@@ -164,7 +164,7 @@ export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | Function
     strNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
     ReturnNode | ModuleNode | UnaryOpNode
 
-export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | CallNode | FunctionDefNode | AssignNode | AugAssignNode
+export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | BinOpNode | BoolOpNode | CompareNode | ListNode | AttributeNode | CallNode | SubscriptNode | NameNode
 
 export type HasBodyNode = FunctionDefNode | IfNode | ForNode | JsForNode | WhileNode | ModuleNode
 
@@ -218,6 +218,9 @@ export interface StructuralNode {
     depth?: number,
 }
 
+const StatementTypes: String[] = ["BinOp", "BoolOp", "Compare", "List", "FunctionDef", "If", "Attribute", "Call", "Assign", "AugAssign", "Subscript", "For", "JSFor", "While", "Expr", "Num", "ImportFrom", "Name", "Print"]
+const ArrayKeys: String[] = ["body", "args", "orelse", "comparators"]
+
 // gets all ES API calls from a student script
 export function getApiCalls() {
     return ccState.getProperty("apiCalls")
@@ -242,7 +245,7 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | numb
         }
     } else {
         for (const child of Object.entries(ast)) {
-            if (child[1] && ((Array.isArray(child[1]) && (child[0] === "body" || child[0] === "orelse" || child[0] === "args" || child[0] === "comparators")) || child[1]._astname)) {
+            if (child[1] && ((Array.isArray(child[1]) && ArrayKeys.includes(child[0])) || child[1]._astname)) {
                 if (child[1]._astname) {
                     funcToCall(child[1], args)
                 }
@@ -1044,7 +1047,7 @@ function valueTrace(isVariable: Boolean,
                 if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
                     return true
                 }
-            } else if (Array.isArray(node) && (key === "body" || key === "args" || key === "orelse" || key === "comparators")) {
+            } else if (Array.isArray(node) && ArrayKeys.includes(key)) {
                 for (const [subkey, subnode] of Object.entries(node)) {
                     const newParents = parentNodes.slice(0)
                     newParents.push([ast, key])
