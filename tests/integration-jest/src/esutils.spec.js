@@ -14,15 +14,9 @@ test.each(measuresAndTimes)("measureToTime($measure, $tempo, $timeSignature)", (
     expect(esutils.measureToTime(measure, tempo, timeSignature)).toBeCloseTo(time, 8)
 })
 
-test.each(measuresAndTimes)("timeToMeasure($time, $tempo, $timeSignature)", ({ measure, tempo, timeSignature, time }) => {
-    // For historic(?) reasons, `timeToMeasure` returns a measure *difference* rather than an absolute measure,
-    // unlike `measureToTime`, which takes an absolute (i.e. 1-indexed) measure.
-    // In my opinion, we should either:
-    // - change the name of this function so it doesn't appear to be the inverse of `measureToTime`
-    // - change the behavior of this function to match `measureToTime` and update call sites
-    // - change the behavior of `measureToTime` to match this and update call sites
-    // - (in my dreams) change our measure representation to be 0-indexed (like time) and teach the programmers of tomorrow good conventions!
-    expect(esutils.timeToMeasure(time, tempo, timeSignature)).toBeCloseTo(measure - 1, 8)
+test.each(measuresAndTimes)("timeToMeasureDelta($time, $tempo, $timeSignature)", ({ measure, tempo, timeSignature, time }) => {
+    // NOTE: The `-1` is because this returns a measure difference rather than an absolute position.
+    expect(esutils.timeToMeasureDelta(time, tempo, timeSignature)).toBeCloseTo(measure - 1, 8)
 })
 
 test.each([
