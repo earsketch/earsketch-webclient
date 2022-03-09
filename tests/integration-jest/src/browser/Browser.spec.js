@@ -18,16 +18,20 @@ it("renders with mocked data", async () => {
     await screen.findByText("soundBrowser.button.addSound")
 })
 it("changes tabs on click", async () => {
+    const renderWaitsForThisText = "SCRIPTBROWSER.MYSCRIPTS (0)"
+    const visibleSoundBrowserText = "SOUNDBROWSER.TITLE.COLLECTION (0)"
+    const scriptBrowserTabText = "SCRIPT"
+
     render(<Provider store={store}><Browser /></Provider>)
-    await screen.findByText("SCRIPTBROWSER.MYSCRIPTS (0)")
+    await screen.findByText(renderWaitsForThisText)
+    const elm = screen.getByText(visibleSoundBrowserText)
+    const soundBrowserDiv = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+    const scriptBrowserButton = screen.getByText(scriptBrowserTabText)
 
-    expect(screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")).toBeVisible()
-    expect(screen.getByText("soundBrowser.button.addSound")).toBeVisible()
-
-    userEvent.click(screen.getByText("SCRIPT")) // todo why does this do nothing
-
-    expect(screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")).toBeVisible()
-    expect(screen.getByText("soundBrowser.button.addSound")).toBeVisible()
+    // expect sound browser pane to be hidden after clicking script browser tab
+    expect(soundBrowserDiv).not.toHaveClass("hidden")
+    userEvent.click(scriptBrowserButton)
+    expect(soundBrowserDiv).toHaveClass("hidden")
 })
 
 // sound browser
