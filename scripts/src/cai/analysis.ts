@@ -289,7 +289,7 @@ function trackToTimeline(output: any, apiCalls: any = null) {
                             section[itemType][item.name].measure.push(i)
                             if (apiCalls.length > 0) {
                                 apiCalls.forEach((codeLine: any) => {
-                                    if (codeLine.args.includes(item.name)) {
+                                    if (codeLine.clips.includes(item.name)) {
                                         if (!section[itemType][item.name].line.includes(codeLine.line)) {
                                             section[itemType][item.name].line.push(codeLine.line)
                                         }

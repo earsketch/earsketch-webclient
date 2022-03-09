@@ -1,5 +1,6 @@
 import * as ccState from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+import { node } from "prop-types"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
@@ -161,9 +162,9 @@ export interface ModuleNode extends Node {
 
 export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
     strNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
-    ReturnNode | ModuleNode
+    ReturnNode | ModuleNode | UnaryOpNode
 
-export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | CallNode
+export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | CallNode | FunctionDefNode | AssignNode | AugAssignNode
 
 export type HasBodyNode = FunctionDefNode | IfNode | ForNode | JsForNode | WhileNode | ModuleNode
 
@@ -231,50 +232,23 @@ export function getAllVariables() {
 }
 
 function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | number | string | { name: string, start: number, end: number })[], ast: AnyNode | AnyNode[]) {
-    let nodesToRecurse: AnyNode []
+    let nodesToRecurse: AnyNode [] = []
     if (Array.isArray(ast)) {
         nodesToRecurse = ast
-    } else {
-        if (ast._astname === "FunctionDef" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
-            nodesToRecurse = ast.body
-        } else if (ast._astname === "Assign" || ast._astname === "AugAssign" || ast._astname === "Expr") {
-            nodesToRecurse = [ast.value]
-        } else {
-            nodesToRecurse = []
-        }
-    }
-    for (const node of nodesToRecurse) {
-        funcToCall(node, args)
-        recursiveCallOnNodes(funcToCall, args, node)
-    }
-    if (!Array.isArray(ast)) {
-        /*  if (ast.body) {
-            for (const node of ast.body) {
-                funcToCall(node, args)
-                recursiveCallOnNodes(funcToCall, args, node)
-            }
-        } else if (ast._astname === "BoolOp" && ast.values) {
-            for (const value of ast.values) {
-                funcToCall(value, args)
-                recursiveCallOnNodes(funcToCall, args, value)
-            }
-        } else if (ast._astname === "Expr" && ast.value) {
-            funcToCall(ast.value, args)
-            recursiveCallOnNodes(funcToCall, args, ast.value)
-        }
 
-        if (ast.test) {
-            funcToCall(ast.test, args)
-            recursiveCallOnNodes(funcToCall, args, ast.test)
+        for (const node of nodesToRecurse) {
+            funcToCall(node, args)
+            recursiveCallOnNodes(funcToCall, args, node)
         }
-        if (ast.iter) {
-            funcToCall(ast.iter, args)
-            recursiveCallOnNodes(funcToCall, args, ast.iter)
+    } else {
+        for (const child of Object.entries(ast)) {
+            if (child[1] && ((Array.isArray(child[1]) && (child[0] === "body" || child[0] === "orelse" || child[0] === "args" || child[0] === "comparators")) || child[1]._astname)) {
+                if (child[1]._astname) {
+                    funcToCall(child[1], args)
+                }
+                recursiveCallOnNodes(funcToCall, args, child[1])
+            }
         }
-        if (ast.orelse) {
-            funcToCall(ast.orelse, args)
-            recursiveCallOnNodes(funcToCall, args, ast.orelse)
-        } */
     }
 }
 
@@ -429,7 +403,7 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
                 for (const arg of node.args.args) {
                     if (arg._astname === "Name") {
                         const argName = String(arg.id.v)
-                        const lineDelims = [functionObj.start, functionObj.end]
+                        const lineDelims = [functionObj.start + 1, functionObj.end]
                         // search for use of the value using valueTrace
                         if (valueTrace(true, argName, args[1], [], args[1], { line: 0 }, lineDelims, node.lineno)) {
                             functionObj.params = true
@@ -593,7 +567,7 @@ function searchForReturn(astNode: StatementNode | (StatementNode)[]): Node | nul
         return searchForReturn(astNode.value)
     } else if (astNode._astname === "Call") {
         return null
-    } else {
+    } else if (astNode._astname === "FunctionDef" || astNode._astname === "For" || astNode._astname === "JSFor" || astNode._astname === "While" || astNode._astname === "If") {
         for (const node of astNode.body) {
             const ret = searchForReturn(node)
             if (ret) {
@@ -602,6 +576,7 @@ function searchForReturn(astNode: StatementNode | (StatementNode)[]): Node | nul
         }
         return null
     }
+    return null
 }
 
 // collects variable info from a node
@@ -1034,7 +1009,7 @@ function valueTrace(isVariable: Boolean,
         console.log(ast)
         return null
     }
-    if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor") {
+    if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
         for (const key in ast.body) {
             const node = ast.body[key]
             // parent node tracing
@@ -1057,7 +1032,8 @@ function valueTrace(isVariable: Boolean,
         if (valueTrace(isVariable, name, ast.value, newParents, rootAst, lineVar, useLine, origLine) === true) {
             return true
         }
-    } else if (ast) {
+    }
+    if (ast) {
         for (const [key, node] of Object.entries(ast)) {
             if (node?._astname) {
                 const newParents = parentNodes.slice(0)
@@ -1067,6 +1043,18 @@ function valueTrace(isVariable: Boolean,
                 }
                 if (valueTrace(isVariable, name, node, newParents, rootAst, lineVar, useLine, origLine) === true) {
                     return true
+                }
+            } else if (Array.isArray(node) && (key === "body" || key === "args" || key === "orelse" || key === "comparators")) {
+                for (const [subkey, subnode] of Object.entries(node)) {
+                    const newParents = parentNodes.slice(0)
+                    newParents.push([ast, key])
+                    newParents.push([subnode, subkey])
+                    if (findValueTrace(isVariable, name, subnode, newParents, rootAst, lineVar, useLine, origLine) === true) {
+                        return true
+                    }
+                    if (valueTrace(isVariable, name, subnode, newParents, rootAst, lineVar, useLine, origLine) === true) {
+                        return true
+                    }
                 }
             }
         }
