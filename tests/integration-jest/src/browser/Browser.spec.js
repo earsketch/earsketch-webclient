@@ -19,8 +19,15 @@ it("renders with mocked data", async () => {
 })
 it("changes tabs on click", async () => {
     render(<Provider store={store}><Browser /></Provider>)
-    await screen.findByText("soundBrowser.button.addSound")
-    userEvent.click(screen.getByText("soundBrowser.button.addSound"))
+    await screen.findByText("SCRIPTBROWSER.MYSCRIPTS (0)")
+
+    expect(screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")).toBeVisible()
+    expect(screen.getByText("soundBrowser.button.addSound")).toBeVisible()
+
+    userEvent.click(screen.getByText("SCRIPT")) // todo why does this do nothing
+
+    expect(screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")).toBeVisible()
+    expect(screen.getByText("soundBrowser.button.addSound")).toBeVisible()
 })
 
 // sound browser
