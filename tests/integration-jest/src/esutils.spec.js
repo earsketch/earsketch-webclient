@@ -1,15 +1,28 @@
 /* eslint-env jest */
 import * as esutils from "../../../scripts/src/esutils"
 
-test.each([
-    { measure: 2, tempo: -1, timeSignature: 4, expected: 2.0 },
-    { measure: 2, tempo: 120, timeSignature: 4, expected: 2.0 },
-    { measure: 1, tempo: 99, timeSignature: 4, expected: 0.0 },
-    { measure: 3, tempo: 220, timeSignature: 4, expected: 2.18181818 },
-    { measure: 9.25, tempo: 88, timeSignature: 4, expected: 22.5 },
-    { measure: 10, tempo: 110, timeSignature: 3, expected: 14.727272727 },
-])("measureToTime($measure, $tempo, timeSignature)", ({ measure, tempo, timeSignature, expected }) => {
-    expect(esutils.measureToTime(measure, tempo, timeSignature)).toBeCloseTo(expected, 8)
+const measuresAndTimes = [
+    { measure: 2, tempo: -1, timeSignature: 4, time: 2.0 },
+    { measure: 2, tempo: 120, timeSignature: 4, time: 2.0 },
+    { measure: 1, tempo: 99, timeSignature: 4, time: 0.0 },
+    { measure: 3, tempo: 220, timeSignature: 4, time: 2.18181818 },
+    { measure: 9.25, tempo: 88, timeSignature: 4, time: 22.5 },
+    { measure: 10, tempo: 110, timeSignature: 3, time: 14.727272727 },
+]
+
+test.each(measuresAndTimes)("measureToTime($measure, $tempo, $timeSignature)", ({ measure, tempo, timeSignature, time }) => {
+    expect(esutils.measureToTime(measure, tempo, timeSignature)).toBeCloseTo(time, 8)
+})
+
+test.each(measuresAndTimes)("timeToMeasure($time, $tempo, $timeSignature)", ({ measure, tempo, timeSignature, time }) => {
+    // For historic(?) reasons, `timeToMeasure` returns a measure *difference* rather than an absolute measure,
+    // unlike `measureToTime`, which takes an absolute (i.e. 1-indexed) measure.
+    // In my opinion, we should either:
+    // - change the name of this function so it doesn't appear to be the inverse of `measureToTime`
+    // - change the behavior of this function to match `measureToTime` and update call sites
+    // - change the behavior of `measureToTime` to match this and update call sites
+    // - (in my dreams) change our measure representation to be 0-indexed (like time) and teach the programmers of tomorrow good conventions!
+    expect(esutils.timeToMeasure(time, tempo, timeSignature)).toBeCloseTo(measure - 1, 8)
 })
 
 test.each([
