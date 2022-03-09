@@ -12,8 +12,27 @@ import { Browser } from "../../../../scripts/src/browser/Browser"
 jest.mock("react-i18next")
 jest.mock("../../../../scripts/src/app/audiolibrary")
 
+// content pane
 it("renders with mocked data", async () => {
+    render(<Provider store={store}><Browser /></Provider>)
+    await screen.findByText("soundBrowser.button.addSound")
+})
+it("changes tabs on click", async () => {
     render(<Provider store={store}><Browser /></Provider>)
     await screen.findByText("soundBrowser.button.addSound")
     userEvent.click(screen.getByText("soundBrowser.button.addSound"))
 })
+
+// sound browser
+it.skip("folds and unfolds sound folder", async () => {})
+it.skip("marks favorites on click", async () => {})
+it.skip("previews sounds with play button", async () => {})
+
+// script browser
+it.skip("populates scripts", async () => {})
+it.skip("populates shared scripts", async () => {})
+it.skip("opens script on click", async () => {})
+it.skip("opens context menu on right-click", async () => {})
+
+// api browser
+it.skip("folds and unfolds api descriptions", async () => {})
