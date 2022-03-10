@@ -20,6 +20,9 @@ jest.mock("../../../../scripts/src/app/userProject")
 // prepare redux state
 let nSounds
 let nRegScripts
+let nDelScripts
+let rendered
+
 beforeAll(async () => {
     store.dispatch(soundState.getDefaultSounds()) // loads mocked sound library
     nSounds = soundState.getDefaultSounds().length + 1
@@ -27,18 +30,23 @@ beforeAll(async () => {
     const scripts = await userProject.getAuth("/scripts/owned") // loads mocked scripts
     store.dispatch(scriptsState.setRegularScripts(scripts))
     nRegScripts = 2
+    nDelScripts = 0
 })
 
-// test content pane
+// shared logic for rendering the components
+beforeEach(async () => {
+    rendered = render(<Provider store={store}><Browser /></Provider>)
+    // confirm it renders with mocked data
+    await screen.findAllByText("SOUNDBROWSER.TITLE.COLLECTION (" + nSounds + ")")
+    await screen.findAllByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
+    await screen.findAllByText("SCRIPTBROWSER.DELETEDSCRIPTS (" + nDelScripts + ")")
+})
+
 it("renders with mocked data", async () => {
-    render(<Provider store={store}><Browser /></Provider>)
-    await screen.findByText("SCRIPTBROWSER.DELETEDSCRIPTS (0)")
+    // automatically tested by the beforeEach()
 })
-it("shows and hides content browsers on tab change", async () => {
-    // render the components
-    render(<Provider store={store}><Browser /></Provider>)
-    await screen.findByText("SCRIPTBROWSER.DELETEDSCRIPTS (0)")
 
+it("shows and hides content browsers on tab change", async () => {
     // locate elements for our test
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
