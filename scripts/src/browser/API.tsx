@@ -212,7 +212,7 @@ const APISearchBar = () => {
 export const APIBrowser = () => {
     return (
         <>
-            <div className="flex-grow-0 pb-4">
+            <div className="grow-0 pb-4">
                 <APISearchBar />
             </div>
 

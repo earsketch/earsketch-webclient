@@ -12,6 +12,7 @@ module.exports = {
             ANALYTICS: false,
         },
         URL_DOMAIN: "https://api-dev.ersktch.gatech.edu/EarSketchWS",
+        SITE_BASE_URI: "http://localhost:0/fake-path-for-jest/",
     },
     // Tells Jest what folders to ignore for tests
     transformIgnorePatterns: [
@@ -21,6 +22,7 @@ module.exports = {
     moduleNameMapper: {
         "earsketch-dsp": "<rootDir>/scripts/lib/earsketch-dsp.d.ts",
         recorder: "<rootDir>/scripts/lib/recorderjs/recorder.js",
+        d3: "<rootDir>/scripts/vendor/d3.min.js",
         ".+\\.(css|styl|less|sass|scss)$": "identity-obj-proxy",
         // Resolve .jpg and similar files to __mocks__/file-mock.js
         ".+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/__mocks__/file-mock.js",

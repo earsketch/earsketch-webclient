@@ -25,8 +25,6 @@ import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
-import * as recommenderState from "../browser/recommenderState"
-import * as recommender from "./recommender"
 import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
 import { ScriptAnalysis } from "./ScriptAnalysis"
@@ -234,33 +232,6 @@ export function openUploadWindow() {
     }
 }
 
-export function reloadRecommendations() {
-    const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const allScripts = scripts.selectAllScripts(store.getState())
-    // Get the modified / unsaved script.
-    const script = allScripts[activeTabID]
-    if (!script) return
-    let input = recommender.addRecInput([], script)
-    let res = [] as any[]
-    if (input.length === 0) {
-        const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
-        if (filteredScripts.length) {
-            const lim = Math.min(5, filteredScripts.length)
-            for (let i = 0; i < lim; i++) {
-                input = recommender.addRecInput(input, filteredScripts[i])
-            }
-        }
-    }
-    // If there are no samples to use for recommendation, just use something random so the window isn't blank.
-    if (input.length === 0) {
-        input = recommender.addRandomRecInput(input)
-    }
-    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-        res = recommender.recommend(res, input, ...v)
-    })
-    store.dispatch(recommenderState.setRecommendations(res))
-}
-
 export function openSharedScript(shareID: string) {
     esconsole("opening a shared script: " + shareID, "main")
     openShare(shareID).then(() => {
@@ -320,7 +291,7 @@ const KeyboardShortcuts = () => {
         <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
             <table>
                 {Object.entries(shortcuts).map(([action, keys], index, arr) =>
                     <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
@@ -405,7 +376,7 @@ const NotificationMenu = () => {
             <div className="relative right-1">
                 <NotificationPopup />
             </div>
-            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-3/4">
+            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-3/4">
                 {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
             </Popover.Panel>
         </Popover>
@@ -439,7 +410,7 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
             <input type="text" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
             <input type="password" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
+            <button type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
@@ -705,7 +676,7 @@ export const App = () => {
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
+            {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />

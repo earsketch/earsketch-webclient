@@ -1,5 +1,10 @@
+const colors = require("tailwindcss/colors")
+
 module.exports = {
-    purge: [],
+    content: [
+        "./public/*.html",
+        "./scripts/src/**/*.{ts,tsx}",
+    ],
     darkMode: "class",
     theme: {
         extend: {
@@ -34,6 +39,8 @@ module.exports = {
                 blue: {
                     DEFAULT: "#223546",
                 },
+                green: colors.emerald,
+                current: "currentColor",
             },
             keyframes: {
                 shake: {
@@ -49,11 +56,7 @@ module.exports = {
             },
         },
     },
-    variants: ["odd", "active", "dark", "hover"],
     plugins: [
         require("@tailwindcss/typography"),
     ],
-    corePlugins: {
-        preflight: true, // Applies normalize.css to reset the default styles polluted by bootstrap, etc. See: https://tailwindcss.com/docs/preflight
-    },
 }

@@ -331,9 +331,9 @@ const ScriptEntry = ({ script, type }: { script: Script, type: ScriptType }) => 
         >
             <div className={`h-auto border-l-4 ${tabIndicator}`} />
             <div
-                className="flex flex-grow truncate p-3"
+                className="flex grow truncate p-3"
             >
-                <div className="h-12 flex flex-grow items-center truncate justify-between">
+                <div className="h-12 flex grow items-center truncate justify-between">
                     <div className="flex justify-start items-center truncate font-medium space-x-2">
                         <div className="truncate">
                             {script.name}

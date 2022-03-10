@@ -7,7 +7,6 @@ import * as appState from "../app/appState"
 import { SearchBar, Collapsed } from "./Browser"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
-import { importScript } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
@@ -68,30 +67,30 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
     const { t } = useTranslation()
     return (
-        <li className="pl-5 py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+        <li className="ltr:pl-5 rtl:pr-5 py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
             <span className="inline-grid grid-flow-col"
                 style={{ gridTemplateColumns: "17px 1fr" }}>
                 <span>
                     {ch.sections && ch.sections.length > 0 &&
-                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
                 </span>
                 <a href="#"
                     className="text-black dark:text-white flex"
                     onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
                     <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
-                    <span className="pl-1">{ch.title}</span>
+                    <span className="ltr:pl-1 rtl:pr-1">{ch.title}</span>
                 </a>
             </span>
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
                     <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx} className="py-1">
-                        <span className="pl-10 flex">
+                        <span className="ltr:pl-10 rtl:pr-10 flex">
                             <a href="#"
                                 className="text-black dark:text-white flex"
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
                                 <span>{chNumForDisplay}.{+secIdx + 1} </span>
-                                <span className="pl-1">{sec.title}</span>
+                                <span className="ltr:pl-1 rtl:pr-1">{sec.title}</span>
                             </a>
                         </span>
                     </li>
@@ -115,7 +114,7 @@ const TableOfContents = () => {
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
                         <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
                             <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
@@ -190,7 +189,7 @@ export const TitleBar = () => {
 
     return (
         <div className="flex items-center p-3 text-2xl">
-            <div className="pl-3 pr-4 font-semibold truncate">
+            <div className="ltr:pl-3 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
                 {t("curriculum.title").toLocaleUpperCase()}
             </div>
             <div>
@@ -258,23 +257,6 @@ const CurriculumPane = () => {
             }
         }
     }, [content, language, paneIsOpen])
-
-    // GrooveMachine integration, for the "Intro to GrooveMachine" chapter.
-    useEffect(() => {
-        const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
-        if (!frame) return
-        const handleMessage = (message: MessageEvent) => {
-            if (message.isTrusted) {
-                if (message.data === "langrequest") {
-                    frame.contentWindow!.postMessage({ lang: language }, "*")
-                } else if (typeof message.data === "string") {
-                    importScript(message.data)
-                }
-            }
-        }
-        window.addEventListener("message", handleMessage)
-        return () => window.removeEventListener("message", handleMessage)
-    }, [content])
 
     useEffect(() => {
         const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
