@@ -18,12 +18,16 @@ jest.mock("../../../../scripts/src/app/audiolibrary")
 jest.mock("../../../../scripts/src/app/userProject")
 
 // prepare redux state
-store.dispatch(soundState.getDefaultSounds()) // loads mocked sound library
-const nSounds = soundState.getDefaultSounds().length + 1
+let nSounds
+let nRegScripts
+beforeAll(async () => {
+    store.dispatch(soundState.getDefaultSounds()) // loads mocked sound library
+    nSounds = soundState.getDefaultSounds().length + 1
 
-const scripts = userProject.getAuth("/scripts/owned") // loads mocked scripts
-store.dispatch(scriptsState.setRegularScripts(scripts))
-const nRegScripts = 2
+    const scripts = await userProject.getAuth("/scripts/owned") // loads mocked scripts
+    store.dispatch(scriptsState.setRegularScripts(scripts))
+    nRegScripts = 2
+})
 
 // test content pane
 it("renders with mocked data", async () => {

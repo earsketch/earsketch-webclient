@@ -18,7 +18,7 @@ export async function getBroadcasts() {
     ]
 }
 
-export function getAuth(endpoint: string) {
+export async function getAuth(endpoint: string) {
     if (endpoint === "/scripts/owned") {
         return [
             {
