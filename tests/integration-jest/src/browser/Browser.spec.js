@@ -8,14 +8,24 @@ import "../../AudioContextMock/AudioContext.mock" // jsdom has no AudioContext
 import { Provider } from "react-redux" // redux
 import store from "../../../../scripts/src/reducers" // earsketch redux store
 import { Browser } from "../../../../scripts/src/browser/Browser"
-import * as sounds from "../../../../scripts/src/browser/soundsState"
+import * as soundState from "../../../../scripts/src/browser/soundsState"
+import * as scriptsState from "../../../../scripts/src/browser/scriptsState"
+import * as userProject from "../../../../scripts/src/app/userProject"
 
+// mocked modules
 jest.mock("react-i18next")
 jest.mock("../../../../scripts/src/app/audiolibrary")
+jest.mock("../../../../scripts/src/app/userProject")
 
-store.dispatch(sounds.getDefaultSounds()) // loads mocked sound library
+// prepare redux state
+store.dispatch(soundState.getDefaultSounds()) // loads mocked sound library
+const nSounds = soundState.getDefaultSounds().length + 1
 
-// content pane
+const scripts = userProject.getAuth("/scripts/owned") // loads mocked scripts
+store.dispatch(scriptsState.setRegularScripts(scripts))
+const nRegScripts = 2
+
+// test content pane
 it("renders with mocked data", async () => {
     render(<Provider store={store}><Browser /></Provider>)
     await screen.findByText("SCRIPTBROWSER.DELETEDSCRIPTS (0)")
@@ -29,10 +39,9 @@ it("shows and hides content browsers on tab change", async () => {
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
     const buttonApiBrowser = screen.getByText("API")
-    const nSounds = sounds.getDefaultSounds().length + 1
     let elm = screen.getByText("SOUNDBROWSER.TITLE.COLLECTION (" + nSounds + ")")
     const divSoundBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-    elm = screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")
+    elm = screen.getByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
     const divScriptBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
     elm = screen.getByText("analyze")
     const divApiBrowser = elm.parentNode.parentNode.parentNode.parentNode
@@ -55,16 +64,16 @@ it("shows and hides content browsers on tab change", async () => {
     expect(divApiBrowser).not.toHaveClass("hidden")
 })
 
-// sound browser
+// test sound browser
 it.skip("folds and unfolds sound folder", async () => {})
 it.skip("marks favorites on click", async () => {})
 it.skip("previews sounds with play button", async () => {})
 
-// script browser
+// test script browser
 it.skip("populates scripts", async () => {})
 it.skip("populates shared scripts", async () => {})
 it.skip("opens script on click", async () => {})
 it.skip("opens context menu on right-click", async () => {})
 
-// api browser
+// test api browser
 it.skip("folds and unfolds api descriptions", async () => {})
