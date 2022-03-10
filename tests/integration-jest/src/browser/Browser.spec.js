@@ -8,9 +8,12 @@ import "../../AudioContextMock/AudioContext.mock" // jsdom has no AudioContext
 import { Provider } from "react-redux" // redux
 import store from "../../../../scripts/src/reducers" // earsketch redux store
 import { Browser } from "../../../../scripts/src/browser/Browser"
+import * as sounds from "../../../../scripts/src/browser/soundsState"
 
 jest.mock("react-i18next")
 jest.mock("../../../../scripts/src/app/audiolibrary")
+
+store.dispatch(sounds.getDefaultSounds()) // loads mocked sound library
 
 // content pane
 it("renders with mocked data", async () => {
@@ -26,7 +29,8 @@ it("shows and hides content browsers on tab change", async () => {
     const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
     const buttonScriptsBrowser = screen.getByText("SCRIPT")
     const buttonApiBrowser = screen.getByText("API")
-    let elm = screen.getByText("SOUNDBROWSER.TITLE.COLLECTION (0)")
+    const nSounds = sounds.getDefaultSounds().length + 1
+    let elm = screen.getByText("SOUNDBROWSER.TITLE.COLLECTION (" + nSounds + ")")
     const divSoundBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
     elm = screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")
     const divScriptBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
