@@ -15,23 +15,40 @@ jest.mock("../../../../scripts/src/app/audiolibrary")
 // content pane
 it("renders with mocked data", async () => {
     render(<Provider store={store}><Browser /></Provider>)
-    await screen.findByText("soundBrowser.button.addSound")
+    await screen.findByText("SCRIPTBROWSER.DELETEDSCRIPTS (0)")
 })
-it("changes tabs on click", async () => {
-    const renderWaitsForThisText = "SCRIPTBROWSER.MYSCRIPTS (0)"
-    const visibleSoundBrowserText = "SOUNDBROWSER.TITLE.COLLECTION (0)"
-    const scriptBrowserTabText = "SCRIPT"
-
+it("shows and hides content browsers on tab change", async () => {
+    // render the components
     render(<Provider store={store}><Browser /></Provider>)
-    await screen.findByText(renderWaitsForThisText)
-    const elm = screen.getByText(visibleSoundBrowserText)
-    const soundBrowserDiv = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
-    const scriptBrowserButton = screen.getByText(scriptBrowserTabText)
+    await screen.findByText("SCRIPTBROWSER.DELETEDSCRIPTS (0)")
 
-    // expect sound browser pane to be hidden after clicking script browser tab
-    expect(soundBrowserDiv).not.toHaveClass("hidden")
-    userEvent.click(scriptBrowserButton)
-    expect(soundBrowserDiv).toHaveClass("hidden")
+    // locate elements for our test
+    const buttonSoundsBrowser = screen.getByText("SOUNDBROWSER.TITLE")
+    const buttonScriptsBrowser = screen.getByText("SCRIPT")
+    const buttonApiBrowser = screen.getByText("API")
+    let elm = screen.getByText("SOUNDBROWSER.TITLE.COLLECTION (0)")
+    const divSoundBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+    elm = screen.getByText("SCRIPTBROWSER.MYSCRIPTS (0)")
+    const divScriptBrowser = elm.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+    elm = screen.getByText("analyze")
+    const divApiBrowser = elm.parentNode.parentNode.parentNode.parentNode
+
+    // expect panes to be hidden after clicking the different tabs
+    // note: toBeVisible() is not applicable here because we do not insert our css into jsdom
+    userEvent.click(buttonSoundsBrowser)
+    expect(divSoundBrowser).not.toHaveClass("hidden")
+    expect(divScriptBrowser).toHaveClass("hidden")
+    expect(divApiBrowser).toHaveClass("hidden")
+
+    userEvent.click(buttonScriptsBrowser)
+    expect(divSoundBrowser).toHaveClass("hidden")
+    expect(divScriptBrowser).not.toHaveClass("hidden")
+    expect(divApiBrowser).toHaveClass("hidden")
+
+    userEvent.click(buttonApiBrowser)
+    expect(divSoundBrowser).toHaveClass("hidden")
+    expect(divScriptBrowser).toHaveClass("hidden")
+    expect(divApiBrowser).not.toHaveClass("hidden")
 })
 
 // sound browser
