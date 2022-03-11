@@ -62,7 +62,7 @@ export const LocaleSelector = () => {
             <Menu as="div" className="relative inline-block text-left">
                 <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.selectLanguage")} aria-label={t("ariaDescriptors:header.selectLanguage")}>
                     <div className="flex flex-row items-center">
-                        <div><i className="icon icon-earth"></i></div>
+                        <div tabIndex={0}><i className="icon icon-earth"></i></div>
                         <div className="ml-1"><span className="caret"></span></div>
                     </div>
                 </Menu.Button>
