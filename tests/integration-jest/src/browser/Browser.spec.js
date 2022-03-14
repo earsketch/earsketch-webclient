@@ -21,7 +21,6 @@ jest.mock("../../../../scripts/src/app/userProject")
 let nSounds
 let nRegScripts
 let nDelScripts
-let rendered
 
 beforeAll(async () => {
     store.dispatch(soundState.getDefaultSounds()) // loads mocked sound library
@@ -35,7 +34,7 @@ beforeAll(async () => {
 
 // shared logic for rendering the components
 beforeEach(async () => {
-    rendered = render(<Provider store={store}><Browser /></Provider>)
+    render(<Provider store={store}><Browser /></Provider>)
     // confirm it renders with mocked data
     await screen.findAllByText("SOUNDBROWSER.TITLE.COLLECTION (" + nSounds + ")")
     await screen.findAllByText("SCRIPTBROWSER.MYSCRIPTS (" + nRegScripts + ")")
@@ -58,7 +57,7 @@ it("shows and hides content browsers on tab change", async () => {
     elm = screen.getByText("analyze")
     const divApiBrowser = elm.parentNode.parentNode.parentNode.parentNode
 
-    // expect panes to be hidden after clicking the different tabs
+    // click tabs and verify background panes become hidden
     // note: toBeVisible() is not applicable here because we do not insert our css into jsdom
     userEvent.click(buttonSoundsBrowser)
     expect(divSoundBrowser).not.toHaveClass("hidden")
@@ -75,17 +74,3 @@ it("shows and hides content browsers on tab change", async () => {
     expect(divScriptBrowser).toHaveClass("hidden")
     expect(divApiBrowser).not.toHaveClass("hidden")
 })
-
-// test sound browser
-it.skip("folds and unfolds sound folder", async () => {})
-it.skip("marks favorites on click", async () => {})
-it.skip("previews sounds with play button", async () => {})
-
-// test script browser
-it.skip("populates scripts", async () => {})
-it.skip("populates shared scripts", async () => {})
-it.skip("opens script on click", async () => {})
-it.skip("opens context menu on right-click", async () => {})
-
-// test api browser
-it.skip("folds and unfolds api descriptions", async () => {})
