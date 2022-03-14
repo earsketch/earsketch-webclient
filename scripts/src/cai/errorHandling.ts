@@ -52,7 +52,7 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
         currentText = codeText
         console.log(handlePythonError(Object.getPrototypeOf(errorMsg).tp$name))
     } else if (language === "javascript") {
-        currentError = { linenumber: errorMsg.linenumber, message: "", stack: "" }
+        currentError = { linenumber: errorMsg.lineNumber, message: "", stack: "" }
         if (errorMsg.message && errorMsg.stack) {
             currentError.message = errorMsg.message
             currentError.stack = errorMsg.stack
@@ -68,18 +68,151 @@ function handleJavascriptError() {
     // function to delegate error handling to one of a number of smaller, targeted error response functions
     // get line of error
     textArray = currentText.split("\n")
-    errorLine = textArray[currentError.traceback[0].lineno - 1]
+    errorLine = textArray[currentError.linenumber - 1]
+    const errorType = currentError.stack.split(":")[0]
 
+    if (errorType === "ReferenceError") {
+        return handleJavascriptReferenceError()
+    }
 
+    for (let i = 0; i < textArray.length; i++) {
+        const line = textArray[i]
+        if (line.includes("function") || line.includes("def")) {
+            const functionErrorCheck = handleJavascriptFunctionError(line, i + 1)
+            if (functionErrorCheck) {
+                return functionErrorCheck
+            }
+        }
+    }
+    return ["", ""]
+}
+
+function handleJavascriptReferenceError() {
+    // do we recognize the name?
+    const problemName: string = currentError.stack.split(":")[1].split(" is not defined")[0]
+    console.log(problemName)
+
+    // check if it's a variable or function name that's recognizaed
+    const variableList: any = ccState.getProperty("allVariables")
+    const functionList: any = ccState.getProperty("userFunctionReturns")
+
+    for (const variable of variableList) {
+        if (isTypo(problemName, variable.name)) {
+            return ["name", "typo: " + variable.name]
+        }
+    }
+
+    for (const func of functionList) {
+        if (isTypo(problemName, func.name)) {
+            return ["name", "typo: " + func.name]
+        }
+    }
+
+    for (const apiCall of PYTHON_AND_API) {
+        if (isTypo(problemName, apiCall)) {
+            return ["name", "typo: " + apiCall]
+        }
+    }
+
+    // else
+    return ["name", "unrecognized: " + problemName]
+}
+
+function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number) {
+    let trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(thisLine)
+
+    if (!trimmedErrorLine.startsWith("function")) {
+        return ["function", "missing function keyword"]
+    }
+
+    // check for a function name
+    trimmedErrorLine = ccHelpers.trimCommentsAndWhitespace(trimmedErrorLine.substring(trimmedErrorLine.indexOf("function") + 8))
+    // if the first charater is not a paren or an open curly brace we're probably good to go
+    const validFuncStarChars = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    if (!validFuncStarChars.includes(trimmedErrorLine[0].toUpperCase())) {
+        return ["function", "invalid function name"]
+    }
+
+    // check for parentheses. there should be, at the very least, an open-paren ON THIS LINE
+    if (!trimmedErrorLine.includes("(")) {
+        return ["function", "missing opening parenthesis"]
+    }
+    // now we check for a close paren.
+    // check existing line first
+    let functionParams = ""
+    let hasCloseParen: boolean = false
+    let numOpenParens = 0
+    let numCloseParens = 0
+
+    let positionIndices = [0, 0]
+    if (trimmedErrorLine.split(")").length < trimmedErrorLine.split("(").length) {
+        for (let lineIndex = thisLineNumber - 1; lineIndex < textArray.length; lineIndex++) {
+            positionIndices = [lineIndex, 0]
+            for (const charValue of textArray[lineIndex]) {
+                if (charValue === ")") {
+                    numCloseParens += 1
+                    if (numCloseParens === numOpenParens) {
+                        hasCloseParen = true
+                        break
+                    } else {
+                        functionParams += charValue
+                    }
+                } else if (charValue !== "\n") {
+                    functionParams += charValue
+                    if (charValue === "(") {
+                        numOpenParens += 1
+                    }
+                }
+                positionIndices[1] += 1
+            }
+            if (hasCloseParen) {
+                break
+            }
+        }
+    }
+    if (hasCloseParen === false) {
+        return ["function", "missing closing parenthesis"]
+    }
+
+    functionParams = functionParams.substring(functionParams.indexOf("(") + 1)
+    console.log(functionParams)
+    let hasOpenBrace = false
+    // check for open and curly brace immediately following parentheses
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+        let startValue = 0
+        if (lineIndex === positionIndices[0]) {
+            startValue = positionIndices[1]
+        }
+        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
+            if (textArray[lineIndex][charIndex] === "{") {
+                hasOpenBrace = true
+                positionIndices = [lineIndex, charIndex]
+                break
+            } else if (textArray[lineIndex][charIndex] !== " " || textArray[lineIndex][charIndex] !== "\n" || textArray[lineIndex][charIndex] !== "\t") {
+                return ["function", "missing open curly brace"]
+            }
+        }
+        if (hasOpenBrace) {
+            break
+        }
+    }
+
+    // check for closing curly brace. what's inside is the body of the function
+
+    // check for body - maybe. we might not need this in JS.
+
+    // check parameters to make sure they're not values
+
+    return null
 }
 
 export function handlePythonError(errorType: string) {
-    // function to delegate error handling to one of a number of smaller, targeted error response functions
+    // function to delegate error handling to one of a number of smaller,  targeted error response functions
     // get line of error
     textArray = currentText.split("\n")
     errorLine = textArray[currentError.traceback[0].lineno - 1]
 
-    // check for import, init, and finish
+    // check for import, init,and finish
     if (!currentText.includes("from earsketch import *") && !currentText.includes("from earsketch import*")) {
         return ["import", "missing import"]
     }
@@ -168,6 +301,8 @@ export function handlePythonError(errorType: string) {
             return handlePythonConditionalError()
         }
     }
+
+    return ["", ""]
 }
 
 function handlePythonFunctionError() {
