@@ -1,29 +1,8 @@
-# Cypress end-to-end tests
+# EarSketch Cypress End-to-End Tests
 
-End-to-end automated testing for the EarSketch web application
-
-Requires nodejs.
-
-
-## Run test with Cypress GUI
-
+Run tests with the following command.
 ```bash
-npm install
-npx cypress open
+npm run test-cypress
 ```
 
-Configuration options set in `cypress.json`.
-
-Examples in `cypress/integration/examples/`.
-
-
-## Test cases
-
-Our custom tests are configured in `test-cases/` (see `cypress.json`)
-
-```
-src/api-browser-test.js
-src/general-client-test.js
-src/scripts-browser-test.js
-src/sound-browser-test.js
-```
+JUnit-style output is written to `e2e-cypress/report.xml`.

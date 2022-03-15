@@ -409,6 +409,8 @@
       return this.createDelay();
     };
 
+    AudioContext.prototype.resume = function() {};
+
     return AudioContext;
 
   })();
