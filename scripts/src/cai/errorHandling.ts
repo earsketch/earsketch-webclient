@@ -84,6 +84,14 @@ function handleJavascriptError() {
             }
         }
     }
+
+    // check for mismatched curly braces
+    if (errorType === "SyntaxError") {
+        const textString = textArray.join(" ")
+        if (textString.split("{").length !== textString.split("}").length) {
+            return ["syntax", "mismatched curly braces"]
+        }
+    }
     return ["", ""]
 }
 
@@ -145,31 +153,30 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     let numCloseParens = 0
 
     let positionIndices = [0, 0]
-    if (trimmedErrorLine.split(")").length < trimmedErrorLine.split("(").length) {
-        for (let lineIndex = thisLineNumber - 1; lineIndex < textArray.length; lineIndex++) {
-            positionIndices = [lineIndex, 0]
-            for (const charValue of textArray[lineIndex]) {
-                if (charValue === ")") {
-                    numCloseParens += 1
-                    if (numCloseParens === numOpenParens) {
-                        hasCloseParen = true
-                        break
-                    } else {
-                        functionParams += charValue
-                    }
-                } else if (charValue !== "\n") {
+    for (let lineIndex = thisLineNumber - 1; lineIndex < textArray.length; lineIndex++) {
+        positionIndices = [lineIndex, 0]
+        for (const charValue of textArray[lineIndex]) {
+            positionIndices[1] += 1
+            if (charValue === ")") {
+                numCloseParens += 1
+                if (numCloseParens === numOpenParens) {
+                    hasCloseParen = true
+                    break
+                } else {
                     functionParams += charValue
-                    if (charValue === "(") {
-                        numOpenParens += 1
-                    }
                 }
-                positionIndices[1] += 1
-            }
-            if (hasCloseParen) {
-                break
+            } else if (charValue !== "\n") {
+                functionParams += charValue
+                if (charValue === "(") {
+                    numOpenParens += 1
+                }
             }
         }
+        if (hasCloseParen) {
+            break
+        }
     }
+
     if (hasCloseParen === false) {
         return ["function", "missing closing parenthesis"]
     }
@@ -181,7 +188,7 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
         let startValue = 0
         if (lineIndex === positionIndices[0]) {
-            startValue = positionIndices[1]
+            startValue = positionIndices[1] + 1
         }
         for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
             if (textArray[lineIndex][charIndex] === "{") {
