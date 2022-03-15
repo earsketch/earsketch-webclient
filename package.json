@@ -11,6 +11,8 @@
   "scripts": {
     "test": "karma start tests/integration/scripts/scripts.conf.js",
     "test-jest": "jest --verbose -- tests/integration-jest/",
+    "test-cypress": "cypress run",
+    "test-cypress-gui": "cypress open",
     "serve": "webpack-dev-server --open --config webpack.serve.js",
     "build": "webpack --config webpack.build.js"
   },
@@ -85,6 +87,7 @@
     "babel-loader": "^8.2.3",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.6.0",
+    "cypress": "^9.5.2",
     "dotenv-webpack": "^4.0.0",
     "eslint": "^8.9.0",
     "eslint-config-standard": "^16.0.3",
