@@ -37,6 +37,15 @@ test.each([
 })
 
 test.each([
+    { datestring: "2019-04-22 16:14:28.0Zxx", expected: 1555949668000 },
+    { datestring: "2022-03-04 14:14:14.6Zxx", expected: 1646403254600 },
+    { datestring: "2022-03-04 14:14:14.9Zxx", expected: 1646403254900 },
+    { datestring: "2000-05-26 01:01:01.1Zxx", expected: 959302861100 },
+])("parseDate($datestring)", ({ datestring, expected }) => {
+    expect(esutils.parseDate(datestring)).toBe(expected)
+})
+
+test.each([
     { value: 0.123456789, expected: 0.12346 },
     { value: 0.123, expected: 0.12300 },
 ])("toPrecision($value)", ({ value, expected }) => {
@@ -59,4 +68,12 @@ test.each([
     { desc: "dissimilar nested", expected: false, objA: { a: 1, b: 2, c: { d: 3, e: 4 } }, objB: { a: 1, b: 2, c: { d: 3 } } },
 ])("compareObjStructure($desc)", ({ objA, objB, expected }) => {
     expect(esutils.compareObjStructure(objA, objB)).toBe(expected)
+})
+
+test.each([
+    { input: "mocha", expected: null },
+    { input: "mocha!", expected: ["!"] },
+    { input: "/{mocha?", expected: ["/", "{", "?"] },
+])("checkIllegalCharacters($input)", ({ input, expected }) => {
+    expect(esutils.checkIllegalCharacters(input)).toStrictEqual(expected)
 })

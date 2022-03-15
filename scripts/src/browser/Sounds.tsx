@@ -128,7 +128,7 @@ const ShowOnlyFavorites = () => {
             <div className="pr-1">
                 {t("soundBrowser.button.showOnlyStars")}
             </div>
-            <i className="icon icon-star-full2 fav-icon" />
+            <i className="icon icon-star-full2 text-orange-600" />
         </div>
     )
 }
@@ -200,8 +200,8 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite
-                                    ? <i className="icon icon-star-full2 fav-icon" />
-                                    : <i className="icon icon-star-empty3 fav-icon" />}
+                                    ? <i className="icon icon-star-full2 text-orange-600" />
+                                    : <i className="icon icon-star-empty3 text-orange-600" />}
                             </button>
                         )}
                     {tabsOpen &&
@@ -246,7 +246,7 @@ const ClipList = ({ names }: { names: string[] }) => {
     return (
         <div className="flex flex-col">
             {names?.map((v: string) =>
-                <Clip
+                entities[v] && <Clip
                     key={v} clip={entities[v]}
                     bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
                 />

@@ -82,11 +82,13 @@ export const EditorHeader = () => {
                 <UndoRedoButtons />
 
                 {!(script?.collaborative) && (
-                    <div
+                    <button
                         className="flex items-center cursor-pointer truncate"
                         onClick={() => {
                             dispatch(ide.setBlocksMode(!blocksMode))
                         }}
+                        title={t("editor.blocksMode")}
+                        aria-label={t("editor.blocksMode")}
                     >
                         <div
                             className={`
@@ -98,7 +100,7 @@ export const EditorHeader = () => {
                             <div className="w-4 h-4 bg-white rounded-full">&nbsp;</div>
                         </div>
                         {t("editor.blocksMode").toLocaleUpperCase()}
-                    </div>
+                    </button>
                 )}
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
                     <button
@@ -113,6 +115,8 @@ export const EditorHeader = () => {
                             const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
                             shareScript(Object.assign({}, unsavedScript))
                         }}
+                        title={t("script.share")}
+                        aria-label={t("script.share")}
                     >
                         <i className="icon-share32 pr-2" />
                         {t("script.share").toLocaleUpperCase()}
@@ -122,11 +126,13 @@ export const EditorHeader = () => {
                     className={`
                         flex
                         rounded-full px-3 py-1
-                        bg-gradient-to-t from-green-300 to-green-800
+                        bg-green-700
                         text-white cursor-pointer
                     `}
                     id="run-button"
                     onClick={compileCode}
+                    title={t("editor.run")}
+                    aria-label={t("editor.run")}
                 >
                     <div className="flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1">
                         <i className="icon-arrow-right22 font-bold text-green-600" />
