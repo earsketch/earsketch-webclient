@@ -153,17 +153,28 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
         const recs: { [key: string]: number } = {}
         const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         filteredRecs = []
-        for (const i in outputs) {
-            const outputRecs = generateRecommendations([outputs[i]], coUsage, similarity)
-            if (!(outputs[i] in recs)) {
-                recs[outputs[i]] = 0
+        // for (const i in outputs) {
+        //     const outputRecs = generateRecommendations([outputs[i]], coUsage, similarity, true)
+        //     if (!(outputs[i] in recs)) {
+        //         recs[outputs[i]] = 0
+        //     }
+        //     for (const key in outputRecs) {
+        //         if (inputSamples.length === 0 || inputSamples.includes(key)) {
+        //             recs[outputs[i]] = recs[outputs[i]] + outputRecs[key]
+        //         }
+        //     }
+        // }
+        outputs.forEach((it: string, idx: number) => {
+            const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, true)
+            if (!(outputs[idx] in recs)) {
+                recs[outputs[idx]] = 0
             }
             for (const key in outputRecs) {
                 if (inputSamples.length === 0 || inputSamples.includes(key)) {
-                    recs[outputs[i]] = recs[outputs[i]] + outputRecs[key]
+                    recs[outputs[idx]] = recs[outputs[idx]] + outputRecs[key]
                 }
             }
-        }
+        })
         filteredRecs = filterRecommendations(recs, recommendedSounds, inputSamples, [], [],
             previousRecommendations, bestLimit)
         if (genreLimit.length > 0) {
@@ -183,7 +194,6 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     similarity = Math.sign(similarity)
     const estimatedKey = estimateKeySignature(inputSamples)
     const estimatedKeyString = KEY_LABELS[estimatedKey]
-    console.log(`current estimated Key: ${estimatedKeyString}`)
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
 
@@ -204,9 +214,6 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
                         keyScore = (useKeyInfo ? (relativeMatch ? 1 : 0) : 0) * 4
                     }
                 }
-                if (keyScore !== 0) {
-                    console.log(`${soundObj}: ${keyScore}, ${getKeyLabel(KEYSIGNATURES_STRING[soundObj].keysig)}`)
-                }
                 const fullVal = value[0] + coUsage * value[1] + similarity * value[2] + keyScore
                 const key = NUMBERS_AUDIOKEYS[num]
                 if (key in recs) {
@@ -223,8 +230,7 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
 function filterRecommendations(inputRecs: { [key: string]: number }, recommendedSounds: string[], inputSamples: string[],
     genreLimit: string[], instrumentLimit: string[], previousRecommendations: string[], bestLimit: number) {
     const recs: { [key: string]: number } = {}
-    const recommendedSignatures = recommendedSounds.map(s => KEY_LABELS[estimateKeySignature([s])])
-    console.log("the key signatures in the recommended sounds are: ", recommendedSignatures)
+    // const recommendedSignatures = recommendedSounds.map(s => KEY_LABELS[estimateKeySignature([s])])
     for (const key in inputRecs) {
         if (!recommendedSounds.includes(key) && !inputSamples.includes(key) &&
             !previousRecommendations.includes(key) && key.slice(0, 3) !== "OS_") {
@@ -323,14 +329,17 @@ function computeMode(array: Array<number>) {
 
 function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
-    const keyClass = filenames.map(f => KEYSIGNATURES_STRING[`${f}`].keysig)
-    // now filter out all the -1's
-    const keyClassFiltered = keyClass.filter(k => k !== -1)
-    if (keyClassFiltered.length !== 0) {
-        const mode = computeMode(keyClassFiltered)
-        return mode
+    try {
+        const keyClass = filenames.map(f => KEYSIGNATURES_STRING[f].keysig)
+        const keyClassFiltered = keyClass.filter(k => k !== -1).filter(k => k !== undefined)
+        if (keyClassFiltered.length !== 0) {
+            const mode = computeMode(keyClassFiltered)
+            return mode
+        }
+        return -1
+    } catch (e) {
+        return -1
     }
-    return -1
 }
 
 function getKeyLabel(key: number) {
