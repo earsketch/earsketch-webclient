@@ -6,24 +6,23 @@ import { useTranslation, getI18n } from "react-i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 
 import * as appState from "../app/appState"
-import * as curriculumState from "../browser/curriculumState"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 export const chooseDetectedLanguage = (detected: string | string[] | undefined) => {
     if (!detected) return ENGLISH_LOCALE.localeCode
     if (Array.isArray(detected)) {
         for (const locale of detected) {
-            const supportedLocale = isLocaleSupported(locale)
+            const supportedLocale = getSupportedLocale(locale)
             if (supportedLocale) return supportedLocale
         }
     } else {
-        const supportedLocale = isLocaleSupported(detected)
+        const supportedLocale = getSupportedLocale(detected)
         if (supportedLocale) return supportedLocale
     }
     return ENGLISH_LOCALE.localeCode
 }
 
-const isLocaleSupported = (localeCode: string) => {
+const getSupportedLocale = (localeCode: string) => {
     localeCode = localeCode.toLowerCase()
     if (Object.keys(AVAILABLE_LOCALES).includes(localeCode)) {
         return localeCode
@@ -45,7 +44,6 @@ export const LocaleSelector = () => {
 
     const changeLanguage = (lng: string) => {
         dispatch(appState.setLocaleCode(lng))
-        dispatch(curriculumState.fetchLocale({ }))
     }
 
     useEffect(() => {

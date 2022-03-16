@@ -76,8 +76,6 @@ const MessageFooter = () => {
                             className="border-0 border-b-2 border-black outline-none"
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
-                                // TODO: This should happen automatically when the locale changes.
-                                dispatch(curriculum.fetchLocale({}))
                             }}
                             value={locale}
                             aria-label={t("ariaDescriptors:header.selectLanguage")}

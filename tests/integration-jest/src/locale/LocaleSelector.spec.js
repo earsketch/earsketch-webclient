@@ -1,6 +1,4 @@
 /* eslint-env jest */
-// TODO: the import of curriculumState in LocaleSelector causes a dependency chain all the way up to audioContext.ts. Maybe we could decouple this?
-import "../../AudioContextMock/AudioContext.mock" // jsdom is missing AudioContext, so we provide it
 import { chooseDetectedLanguage } from "../../../../scripts/src/top/LocaleSelector"
 
 jest.mock("../../../../scripts/src/reducers")
