@@ -52,6 +52,12 @@ autograder3/index.html
 autograderAWS/index.html
 css/earsketch/theme_dark.css
 css/earsketch/theme_light.css
+
+# Test reports
 tests/integration/scripts/reports
 tests/integration/_karma_webpack_
-/tests/integration-jest/reports/
+tests/integration-jest/reports/
+tests/e2e-cypress/report.xml
+tests/e2e-cypress/screenshots/
+tests/e2e-cypress/videos/
+tests/e2e-cypress/downloads/
