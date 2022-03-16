@@ -296,12 +296,22 @@ export function getKeySignatureString(filename: string) {
     // if (audioNumber === -1) {
     //     return "N/A"
     // }
-    const keyClass = KEYSIGNATURES_STRING[`${filename}`].keysig
-    if (keyClass !== -1) {
+    const keyClass = getKeySignature(filename)
+    if (keyClass === undefined || keyClass === -1) {
+        return "N/A"
+    } else {
         const keyLabel = KEY_LABELS[keyClass]
         return keyLabel
-    } else {
-        return "N/A"
+    }
+}
+
+function getKeySignature(filename: string) {
+    console.log(filename)
+    try {
+        const keyClass = KEYSIGNATURES_STRING[filename].keysig
+        return keyClass
+    } catch (e) {
+        return -1
     }
 }
 
@@ -329,17 +339,13 @@ function computeMode(array: Array<number>) {
 
 function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
-    try {
-        const keyClass = filenames.map(f => KEYSIGNATURES_STRING[f].keysig)
-        const keyClassFiltered = keyClass.filter(k => k !== -1).filter(k => k !== undefined)
-        if (keyClassFiltered.length !== 0) {
-            const mode = computeMode(keyClassFiltered)
-            return mode
-        }
-        return -1
-    } catch (e) {
-        return -1
+    const keyClass = filenames.map(f => getKeySignature(f))
+    const keyClassFiltered = keyClass.filter(k => k !== -1).filter(k => k !== undefined)
+    if (keyClassFiltered.length !== 0) {
+        const mode = computeMode(keyClassFiltered)
+        return mode
     }
+    return -1
 }
 
 function getKeyLabel(key: number) {
