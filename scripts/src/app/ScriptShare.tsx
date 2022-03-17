@@ -194,6 +194,9 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         close()
     }
 
+    const selectedClasses = "bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700"
+    const unselectedClasses = "bg-white text-black hover:text-black hover:bg-gray-200"
+
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
         <div className="modal-body">
             <div>
@@ -204,14 +207,14 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     </span>
                     <div className="btn-group">
                         <button type="button" onClick={() => setLock(true)}
-                            className={"btn " + (lock ? "btn-primary" : "btn-default")}
+                            className={"btn " + (lock ? selectedClasses : unselectedClasses)}
                             style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
                             aria-label={t("scriptShare.tab.viewonly.shareCurrent")}
                             title={t("scriptShare.tab.viewonly.shareCurrent")}>
                             {t("scriptShare.tab.viewonly.shareCurrent")}
                         </button>
                         <button type="button" onClick={() => setLock(false)}
-                            className={"btn " + (lock ? "btn-default" : "btn-primary")}
+                            className={"btn " + (lock ? unselectedClasses : selectedClasses)}
                             style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}
                             aria-label={t("scriptShare.tab.viewonly.shareFuture")}
                             title={t("scriptShare.tab.viewonly.shareFuture")}>
