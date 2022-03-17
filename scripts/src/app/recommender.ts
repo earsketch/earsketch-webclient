@@ -1,7 +1,7 @@
 // Recommend audio samples.
 import { fillDict } from "../cai/analysis"
 import { Script } from "common"
-
+import store from "../reducers"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
 // import KEYSIGNATURES_ from "../data/numbers_keysigs.json"
@@ -153,17 +153,6 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
         const recs: { [key: string]: number } = {}
         const outputs = findGenreInstrumentCombinations(genreLimit, instrumentLimit)
         filteredRecs = []
-        // for (const i in outputs) {
-        //     const outputRecs = generateRecommendations([outputs[i]], coUsage, similarity, true)
-        //     if (!(outputs[i] in recs)) {
-        //         recs[outputs[i]] = 0
-        //     }
-        //     for (const key in outputRecs) {
-        //         if (inputSamples.length === 0 || inputSamples.includes(key)) {
-        //             recs[outputs[i]] = recs[outputs[i]] + outputRecs[key]
-        //         }
-        //     }
-        // }
         outputs.forEach((it: string, idx: number) => {
             const outputRecs = generateRecommendations([outputs[idx]], coUsage, similarity, true)
             if (!(outputs[idx] in recs)) {
@@ -196,7 +185,6 @@ function generateRecommendations(inputSamples: string[], coUsage: number = 1, si
     const estimatedKeyString = KEY_LABELS[estimatedKey]
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
-
     for (const inputSample of inputSamples) {
         const audioNumber = Object.keys(NUMBERS_AUDIOKEYS).find(n => NUMBERS_AUDIOKEYS[n] === inputSample)
         if (audioNumber !== undefined) {
@@ -306,11 +294,11 @@ export function getKeySignatureString(filename: string) {
 }
 
 function getKeySignature(filename: string) {
-    console.log(filename)
-    try {
-        const keyClass = KEYSIGNATURES_STRING[filename].keysig
-        return keyClass
-    } catch (e) {
+    const song = store.getState().sounds.defaultSounds.entities[filename]
+    const keySig = song.keySignature
+    if (keySig !== undefined) {
+        return KEY_LABELS.indexOf(keySig)
+    } else {
         return -1
     }
 }

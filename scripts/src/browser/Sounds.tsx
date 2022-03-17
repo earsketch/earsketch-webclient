@@ -13,8 +13,6 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import { RootState } from "../reducers"
 import { SoundEntity } from "common"
-import { getKeySignatureString } from "../app/recommender"
-
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
 import { addUIClick } from "../cai/studentPreferences"
