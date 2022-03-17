@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 
 import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
+import classNames from "classnames"
 
 import { renameSound, deleteSound, openUploadWindow } from "../app/App"
 import * as sounds from "./soundsState"
@@ -364,12 +365,14 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                     >
                         {({ index, style }) => {
                             const names = namesByFolders[folders[index]]
+                            const folderClass = classNames({
+                                "hover:bg-blue-200 dark:hover:bg-blue-500": true,
+                                "bg-white dark:bg-gray-900": index % 2 === 0,
+                                "bg-gray-300 dark:bg-gray-800": index % 2 !== 0,
+                            })
                             return (
                                 <div style={style}
-                                    className={index % 2 === 0
-                                        ? "bg-white dark:bg-gray-900"
-                                        : "bg-gray-300 dark:bg-gray-800" +
-                                         " hover:bg-blue-200 dark:hover:bg-blue-500"}>
+                                    className={folderClass}>
                                     <Folder
                                         folder={folders[index]}
                                         names={names}
