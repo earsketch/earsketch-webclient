@@ -298,7 +298,7 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         dispatch(setErrorOptions([]))
 
         const output: any = dialogue.processCodeRun(code, getUserFunctionReturns(), getAllVariables(), results, {})
-        if (output !== null && output !== "" && output[0][0] !== "") {
+        if (output !== null && output !== "" && output[0][0] !== "" && output[0][1] !== "") {
             const message = {
                 text: output,
                 date: Date.now(),

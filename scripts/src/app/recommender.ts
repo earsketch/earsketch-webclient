@@ -4,16 +4,14 @@ import { Script } from "common"
 import store from "../reducers"
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
 import AUDIOKEYS_RECOMMENDATIONS_ from "../data/audiokeys_recommendations.json"
-// import KEYSIGNATURES_ from "../data/numbers_keysigs.json"
 import KEYSIGNATURES_STRING_ from "../data/keysigs2.json"
 
 const NUMBERS_AUDIOKEYS: { [key: string]: string } = NUMBERS_AUDIOKEYS_
 const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } = AUDIOKEYS_RECOMMENDATIONS_
-// const KEYSIGNATURES: { [key: string]: number } = KEYSIGNATURES_
 const KEYSIGNATURES_STRING: { [key: string]: { [key: string]: number } } = KEYSIGNATURES_STRING_
 
 // All the key signatures as a human-readable label.
-const KEY_LABELS: Array<string> = [
+const KEY_LABELS: string [] = [
     "C major", "C# major", "D major", "D# major",
     "E major", "F major", "F# major", "G major",
     "G# major", "A major", "A# major", "B major",
@@ -177,11 +175,22 @@ export function recommendReverse(recommendedSounds: string[], inputSamples: stri
     return filteredRecs
 }
 
-function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, useKeyInfo: boolean = true) {
+function generateRecommendations(inputSamples: string[], coUsage: number = 1, similarity: number = 1, useKeyInfo: string | boolean = true) {
     // Co-usage and similarity for alternate recommendation types: 1 - maximize, -1 - minimize, 0 - ignore.
     coUsage = Math.sign(coUsage)
     similarity = Math.sign(similarity)
-    const estimatedKey = estimateKeySignature(inputSamples)
+    let estimatedKey: number
+
+    switch (useKeyInfo) {
+        case true:
+            estimatedKey = estimateKeySignature(inputSamples)
+            break
+        case false:
+            estimatedKey = -1
+            break
+        default:
+            estimatedKey = KEY_LABELS.indexOf(useKeyInfo)
+    }
     const estimatedKeyString = KEY_LABELS[estimatedKey]
     // Generate recommendations for each input sample and add together
     const recs: { [key: string]: number } = Object.create(null)
@@ -280,10 +289,6 @@ export function availableInstruments() {
 export function getKeySignatureString(filename: string) {
     // For a given filename, return the key signature of the file using the KEYSIGNATURES object.
     // If the file is not in the database, return "N/A"
-    // const audioNumber = KEYSIGNATURES_STRING
-    // if (audioNumber === -1) {
-    //     return "N/A"
-    // }
     const keyClass = getKeySignature(filename)
     if (keyClass === undefined || keyClass === -1) {
         return "N/A"

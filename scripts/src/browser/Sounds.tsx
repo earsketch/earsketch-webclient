@@ -156,14 +156,12 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const name = clip.name
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-    console.log(clip.keyConfidence)
     let keySig = ""
     if (clip.keySignature !== undefined) {
         keySig = clip.keySignature
     } else {
         keySig = "N/A"
     }
-    console.log(keySig)
     let tooltip = ""
     if (FLAGS.SHOW_CAI) {
         tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
