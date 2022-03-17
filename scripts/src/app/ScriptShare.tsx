@@ -194,7 +194,7 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         close()
     }
 
-    const selectedClasses = "bg-sky-600 text-white hover:text-white hover:bg-sky-700"
+    const selectedClasses = "bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700"
     const unselectedClasses = "bg-white text-black hover:text-black hover:bg-gray-200"
 
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
