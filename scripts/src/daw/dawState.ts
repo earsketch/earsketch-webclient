@@ -2,6 +2,7 @@ import { createSlice, createSelector } from "@reduxjs/toolkit"
 
 import { RootState } from "../reducers"
 import { Track } from "../app/player"
+import { TempoMap } from "../app/tempo"
 
 const shuffle = (array: any[]) => {
     let i = array.length
@@ -17,10 +18,7 @@ const shuffle = (array: any[]) => {
 const TRACK_COLORS = ["#f2fdbf", "#f3d8b2", "#ff8080", "#9fa2fd", "#9fb2fd", "#9fc2fd", "#9fd2fd", "#9fe2fd",
     "#9ff2fd", "#9fe29d", "#9fe2bd", "#bfe2bf", "#dfe2bf", "#ffe2bf", "#ffff00", "#ffc0cb"]
 
-const BEATS_PER_MEASURE = 4
-
 // Intervals of measure line based on zoom levels
-// This list is referred during zoom in/out
 const MEASURELINE_ZOOM_INTERVALS = [
     { end: 750, tickInterval: 4, labelInterval: 4, tickDivision: 1 },
     { end: 1350, tickInterval: 1, labelInterval: 4, tickDivision: 4 },
@@ -30,16 +28,16 @@ const MEASURELINE_ZOOM_INTERVALS = [
 ]
 
 // Intervals of timeline based on zoom levels
-// This list is referred during zoom in/out
 const TIMELINE_ZOOM_INTERVALS = [
-    { end: 950, tickInterval: 15 },
-    { end: 1550, tickInterval: 10 },
-    { end: 2650, tickInterval: 5 },
-    { end: 2950, tickInterval: 5 },
-    { end: 3950, tickInterval: 4 },
-    { end: 7850, tickInterval: 2 },
-    { end: 9150, tickInterval: 1 },
-    { end: Infinity, tickInterval: 1 },
+    { end: 950, tickInterval: 1, labelInterval: 15 },
+    { end: 1550, tickInterval: 1, labelInterval: 10 },
+    { end: 2650, tickInterval: 1, labelInterval: 5 },
+    { end: 2950, tickInterval: 1, labelInterval: 5 },
+    { end: 3950, tickInterval: 1, labelInterval: 4 },
+    { end: 7850, tickInterval: 1, labelInterval: 2 },
+    { end: 9150, tickInterval: 0.5, labelInterval: 1 },
+    { end: 12850, tickInterval: 0.25, labelInterval: 1 },
+    { end: Infinity, tickInterval: 0.125, labelInterval: 1 },
 ]
 
 // We want to keep the length of a bar proportional to number of pixels on the screen.
@@ -63,7 +61,7 @@ interface DAWState {
     trackColors: Color[]
     showEffects: boolean
     metronome: boolean
-    tempo: number
+    tempoMap: TempoMap
     playing: boolean
     pendingPosition: number | null
     soloMute: SoloMuteConfig
@@ -88,7 +86,7 @@ const dawSlice = createSlice({
         trackColors: shuffle(TRACK_COLORS.slice()),
         showEffects: true,
         metronome: false,
-        tempo: 120,
+        tempoMap: new TempoMap(),
         playing: false,
         pendingPosition: null, // null indicates no position pending.
         soloMute: {}, // Track index -> "mute" or "solo"
@@ -127,8 +125,8 @@ const dawSlice = createSlice({
         setMetronome(state, { payload }) {
             state.metronome = payload
         },
-        setTempo(state, { payload }) {
-            state.tempo = payload
+        setTempoMap(state, { payload }) {
+            state.tempoMap = payload
         },
         setPlaying(state, { payload }) {
             state.playing = payload
@@ -161,7 +159,7 @@ export const {
     setShowEffects,
     toggleEffects,
     setMetronome,
-    setTempo,
+    setTempoMap,
     setPlaying,
     setPendingPosition,
     setSoloMute,
@@ -177,7 +175,7 @@ export const selectTrackHeight = (state: RootState) => state.daw.trackHeight
 export const selectTrackColors = (state: RootState) => state.daw.trackColors
 export const selectShowEffects = (state: RootState) => state.daw.showEffects
 export const selectMetronome = (state: RootState) => state.daw.metronome
-export const selectTempo = (state: RootState) => state.daw.tempo
+export const selectTempoMap = (state: RootState) => state.daw.tempoMap
 export const selectPlaying = (state: RootState) => state.daw.playing
 export const selectPendingPosition = (state: RootState) => state.daw.pendingPosition
 export const selectSoloMute = (state: RootState) => state.daw.soloMute
@@ -204,9 +202,9 @@ export const selectXScale = createSelector(
 )
 
 export const selectTimeScale = createSelector(
-    [selectTrackWidth, selectTempo],
-    (trackWidth, tempo) => {
-        const secondsFitToScreen = MEASURES_FIT_TO_SCREEN * BEATS_PER_MEASURE / (tempo / 60)
+    [selectTrackWidth, selectTempoMap],
+    (trackWidth, tempoMap) => {
+        const secondsFitToScreen = tempoMap.measureToTime(MEASURES_FIT_TO_SCREEN)
         return d3.scale.linear()
             .domain([0, secondsFitToScreen])
             .range([0, trackWidth])
@@ -214,8 +212,8 @@ export const selectTimeScale = createSelector(
 )
 
 export const selectSongDuration = createSelector(
-    [selectPlayLength, selectTempo],
-    (playLength, tempo) => playLength * BEATS_PER_MEASURE / (tempo / 60)
+    [selectPlayLength, selectTempoMap],
+    (playLength, tempoMap) => tempoMap.measureToTime(playLength)
 )
 
 const getZoomIntervals = (intervals: ({ end: number } & any)[], width: number) => {

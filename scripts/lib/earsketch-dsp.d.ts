@@ -1,1 +1,2 @@
-export declare var Module: any
+declare let x: any
+export = x

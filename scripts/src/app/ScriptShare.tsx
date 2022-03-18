@@ -35,9 +35,9 @@ async function queryID(query: any) {
     throw new Error("messages:general.userDoesNotExist")
 }
 
-const UserListInput = ({ users, setUsers, setFinalize }:
-    { users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void }
-) => {
+const UserListInput = ({ users, setUsers, setFinalize }: {
+    users: string[], setUsers: (u: string[]) => void, setFinalize: (f: () => Promise<string[] | null>) => void
+}) => {
     const theme = useSelector(app.selectColorTheme)
     const [query, setQuery] = useState("")
     const [error, setError] = useState("")
@@ -96,7 +96,7 @@ const UserListInput = ({ users, setUsers, setFinalize }:
                     <span className="mr-1" style={{ color: theme === "dark" ? "white" : "black" }}>{name}</span>
                     <span className="cursor-pointer" onClick={() => removeUser(index)} style={{ color: "#c25452" }}>X</span>
                 </div>)}
-            <input className="bg-transparent border-none outline-none flex-grow" style={{ width: "24em" }} placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
+            <input className="bg-transparent border-none outline-none grow" style={{ width: "24em" }} placeholder={t("scriptShare.tab.viewonly.usersPlaceholder")} autoFocus
                 value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => handleInput(e)} onBlur={addUser} />
         </div>
         <hr className="mt-3" />
@@ -138,9 +138,9 @@ export const CopyButton = ({ textElement }: { textElement: React.RefObject<HTMLI
     }
 
     return <>
-        <span ref={setReferenceElement} onClick={handleClick} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
+        <button aria-label={t("scriptShare.copyClipboard")} ref={setReferenceElement} onClick={e => { e.preventDefault(); handleClick() }} className="copy-share-link" title={t("scriptShare.copyClipboard")}>
             <i className="icon icon-paste4"></i>
-        </span>
+        </button>
         <Transition
             show={copied}
             enter="ease-out duration-300"
@@ -194,6 +194,9 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
         close()
     }
 
+    const selectedClasses = "bg-sky-600 text-white hover:text-white focus:text-white hover:bg-sky-700"
+    const unselectedClasses = "bg-white text-black hover:text-black hover:bg-gray-200"
+
     return <form onSubmit={e => { e.preventDefault(); submit() }}>
         <div className="modal-body">
             <div>
@@ -204,21 +207,25 @@ export const LinkTab = ({ script, licenses, licenseID, setLicenseID, description
                     </span>
                     <div className="btn-group">
                         <button type="button" onClick={() => setLock(true)}
-                            className={"btn " + (lock ? "btn-primary" : "btn-default")}
-                            style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}>
+                            className={"btn " + (lock ? selectedClasses : unselectedClasses)}
+                            style={{ marginRight: 0, borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+                            aria-label={t("scriptShare.tab.viewonly.shareCurrent")}
+                            title={t("scriptShare.tab.viewonly.shareCurrent")}>
                             {t("scriptShare.tab.viewonly.shareCurrent")}
                         </button>
                         <button type="button" onClick={() => setLock(false)}
-                            className={"btn " + (lock ? "btn-default" : "btn-primary")}
-                            style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}>
+                            className={"btn " + (lock ? unselectedClasses : selectedClasses)}
+                            style={{ borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }}
+                            aria-label={t("scriptShare.tab.viewonly.shareFuture")}
+                            title={t("scriptShare.tab.viewonly.shareFuture")}>
                             {t("scriptShare.tab.viewonly.shareFuture")}
                         </button>
                     </div>
                 </div>
                 <div id="share-link-container" className="mt-5 flex">
-                    <input ref={linkElement} className="share-link outline-none flex-grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
+                    <input title={t("scriptShare.tab.viewonly.linkTitle")} aria-label={t("scriptShare.tab.viewonly.linkTitle")} ref={linkElement} className="share-link outline-none grow" style={{ backgroundColor: "inherit" }} type="text" value={link} readOnly />
                     <CopyButton textElement={linkElement} />
-                    <span className="download-share-url" onClick={downloadShareUrl} title="Download URL shortcut file"><i className="glyphicon glyphicon-download-alt" /></span>
+                    <button aria-label={t("scriptShare.tab.viewonly.downloadShortcutFile")} className="download-share-url" onClick={e => { e.preventDefault(); downloadShareUrl() }} title={t("scriptShare.tab.viewonly.downloadShortcutFile")}><i className="glyphicon glyphicon-download-alt" /></button>
                 </div>
                 <hr className="mt-3" />
 
@@ -408,7 +415,7 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
             <div className="container">
                 <div className="row mt-5 justify-between flex">
                     {ACCESS_OPTIONS.map(({ descriptionKey }, index) =>
-                        <div key={index} style={{ color: "#8c8c8c" }} className="radio-inline">
+                        <div key={index} style={{ color: "#717171" }} className="radio-inline">
                             <label>
                                 <input type="radio" name="useraccess" value={index} checked={index === access} onChange={e => { if (e.target.checked) setAccess(index) }} />
                                 <span />{t(descriptionKey)}
@@ -428,9 +435,9 @@ const SoundCloudTab = ({ script, licenses, licenseID, setLicenseID, description,
     </form>
 }
 
-const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }:
-    { licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void }
-) => {
+const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescription }: {
+    licenses: Licenses, licenseID: number, setLicenseID: (id: number) => void, description: string, setDescription: (ds: string) => void
+}) => {
     const [collapsed, setCollapsed] = useState(true)
     const { t } = useTranslation()
     const licenseLink = "https://creativecommons.org/licenses/" + licenses[licenseID].license.split(" ")[1].toLowerCase() + "/4.0"
@@ -438,10 +445,10 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
     return <div>
         <div className="bg-blue-200 px-6 py-4">
             <h4>
-                <a role="button" className="text-black" onClick={() => setCollapsed(!collapsed)}>
+                <button className="text-black" onClick={e => { e.preventDefault(); setCollapsed(!collapsed) }}>
                     {t("scriptShare.moreDetails")}
                     <i className={`ml-3 icon icon-arrow-${collapsed ? "right" : "down"}2`} />
-                </a>
+                </button>
             </h4>
         </div>
         {!collapsed &&
@@ -461,7 +468,7 @@ const MoreDetails = ({ licenses, licenseID, setLicenseID, description, setDescri
                 <div className="container" id="share-licenses-container">
                     <div className="row mt-6 flex">
                         {Object.entries(licenses).map(([id, license]) =>
-                            <div key={id} style={{ color: "#8c8c8c" }} className="radio-inline p-0 flex-grow">
+                            <div key={id} style={{ color: "#717171" }} className="radio-inline p-0 grow">
                                 <label>
                                     <input type="radio" name="optradio" value={id} checked={+id === licenseID} onChange={e => { if (e.target.checked) setLicenseID(+id) }} />
                                     <span></span>{license.license}
@@ -507,7 +514,7 @@ export const ScriptShare = ({ script, licenses, close }: { script: Script, licen
             <div className="es-modal-tabcontainer">
                 <ul className="nav-pills flex flex-row">
                     {Tabs.map(({ titleKey }, index) =>
-                        <li key={index} className={"uib-tab nav-item flex-grow" + (activeTab === index ? " active" : "")}>
+                        <li aria-label={t(titleKey)} key={index} className={"uib-tab nav-item grow" + (activeTab === index ? " active" : "")}>
                             <a href="#" onClick={e => { e.preventDefault(); setActiveTab(index) }} className="nav-link h-full flex justify-center items-center" style={{ textDecoration: "none" }}>{t(titleKey).toLocaleUpperCase()}</a>
                         </li>)}
                 </ul>

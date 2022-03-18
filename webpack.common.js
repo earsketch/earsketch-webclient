@@ -5,7 +5,6 @@ const path = require("path")
 const webpack = require("webpack")
 const HappyPack = require("happypack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
 
 const vendorDir = "scripts/vendor"
 const libDir = "scripts/lib"
@@ -19,14 +18,10 @@ module.exports = {
     resolve: {
         extensions: ["*", ".js", ".jsx", ".ts", ".tsx", ".mjs", ".wasm", ".json", ".css"],
         alias: {
-            jqueryUI: "jquery-ui-dist/jquery-ui.js",
-            bootstrapBundle: "bootstrap/dist/js/bootstrap.bundle.min.js",
             skulpt: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt.min.js`),
             skulptStdLib: path.resolve(__dirname, `${vendorDir}/skulpt/skulpt-stdlib.js`),
             droplet: path.resolve(__dirname, `${libDir}/droplet/droplet-full.min.js`),
-            hilitor: path.resolve(__dirname, `${vendorDir}/hilitor.js`),
             highlight: path.resolve(__dirname, `${libDir}/highlightjs/highlight.pack.js`),
-            jsInterpreter: path.resolve(__dirname, `${vendorDir}/js-interpreter/interpreter.js`),
             jsDiffLib: path.resolve(__dirname, `${libDir}/jsdifflib/difflib.js`),
             jsDiffView: path.resolve(__dirname, `${libDir}/jsdifflib/diffview.js`),
             kali: path.resolve(__dirname, `${libDir}/kali.min.js`),
@@ -49,7 +44,7 @@ module.exports = {
         rules: [{
             test: /\.(js|jsx|mjs)$/,
             exclude: [
-                /(node_modules|bower_components)/,
+                /(node_modules)/,
                 path.resolve(__dirname, libDir),
                 path.resolve(__dirname, vendorDir),
                 path.resolve(__dirname, dataDir),
@@ -71,25 +66,11 @@ module.exports = {
             use: ["style-loader", "css-loader", "postcss-loader"],
         }, {
             test: /\.(png|svg|jpg|jpeg|gif)$/,
-            exclude: /(node_modules|bower_components)/,
-            use: [{
-                loader: "file-loader",
-                options: {
-                    name: "img/[hash]-[name].[ext]",
-                },
-            }],
+            exclude: /(node_modules)/,
+            type: "asset/resource",
         }, {
-            // TODO: Do this instead when we switch to Webpack 5
-            // test: /\.(woff|woff2|eot|ttf|otf)$/i,
-            // type: 'asset/resource',
-            test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-            use: [{
-                loader: "file-loader",
-                options: {
-                    name: "[hash]-[name].[ext]",
-                    outputPath: "fonts/",
-                },
-            }],
+            test: /\.(woff|woff2|eot|ttf|otf)$/i,
+            type: "asset/resource",
         }, {
             test: path.resolve(__dirname, `${libDir}/dsp.js`),
             loader: "exports-loader",
@@ -101,29 +82,23 @@ module.exports = {
             loader: "exports-loader",
             options: {
                 type: "commonjs",
-                exports: ["Module"],
+                exports: ["single Module"],
             },
         }],
     },
     plugins: [
         // These names are pre-exposed as semi-global variables. No need to assign them to the window scope in index.ts.
         new webpack.ProvidePlugin({
-            $: "jquery",
-            jQuery: "jquery",
-
             SC: "soundcloud",
             lunr: "lunr",
             hljs: "highlight",
             droplet: "droplet",
-            Interpreter: "js-interpreter",
             d3: "d3",
             lamejs: "lamejs",
             JSZip: "jszip",
-            Hilitor: "exports-loader?type=commonjs&exports=single Hilitor!hilitor",
             createAudioMeter: "exports-loader?type=commonjs&exports=single createAudioMeter!volumeMeter",
             difflib: "exports-loader?type=commonjs&exports=single difflib!jsDiffLib",
         }),
-        new webpack.HotModuleReplacementPlugin(),
         new HappyPack({
             threads: 4,
             loaders: ["babel-loader?presets[]=@babel/env"],
@@ -131,6 +106,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "index.html"),
             template: "public/index.html",
+        }),
+        new HtmlWebpackPlugin({
+            filename: path.resolve(__dirname, "message-login.html"),
+            template: "public/message-login.html",
+            inject: false,
         }),
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "autograder/index.html"),
@@ -147,9 +127,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: path.resolve(__dirname, "codeAnalyzerContest/index.html"),
             template: "public/index.html",
-        }),
-        new TsconfigPathsPlugin({
-            configFile: "tsconfig.json",
         }),
     ],
     optimization: {

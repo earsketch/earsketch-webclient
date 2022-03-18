@@ -8,13 +8,12 @@ import * as userProject from "./userProject"
 
 import { Script } from "common"
 
+import * as cc from "../cai/complexityCalculator"
 import * as caiAnalysisModule from "../cai/analysis"
 
 import { DownloadOptions, Result, Results } from "./CodeAnalyzer"
 import { compile, readFile } from "./Autograder"
 import { ContestOptions } from "./CodeAnalyzerContest"
-
-import * as cc from "../cai/complexityCalculator"
 
 export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     options: ReportOptions | ContestOptions, seed?: number, showSeed: boolean, setOptions: (o: any) => void, setSeed: (s?: number) => void

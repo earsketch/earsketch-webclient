@@ -21,6 +21,8 @@ const UndoRedoButtons = () => {
     const [hasUndo, setHasUndo] = useState(false)
     const [hasRedo, setHasRedo] = useState(false)
 
+    const { t } = useTranslation()
+
     const onChange = () => {
         // ACE hasUndo/hasRedo API are not ready synchronously after editor onChange.
         setTimeout(() => {
@@ -35,15 +37,19 @@ const UndoRedoButtons = () => {
     })
 
     return (<>
-        <i
+        <button
             className={`icon-spinner11 ${hasUndo ? enabled : disabled}`}
             style={{ transform: "scaleX(-1)" }}
             onClick={() => editor.checkUndo() && editor.undo()}
-        />
-        <i
+            title={t("editor.undoEdit")}
+            aria-label={hasUndo ? t("editor.undoEdit") : t("ariaDescriptors:editor.undoEditDisabled")}
+        ></button>
+        <button
             className={`icon-spinner11 ${hasRedo ? enabled : disabled}`}
             onClick={() => editor.checkRedo() && editor.redo()}
-        />
+            title={t("editor.redoEdit")}
+            aria-label={hasRedo ? t("editor.redoEdit") : t("ariaDescriptors:editor.redoEditDisabled")}
+        ></button>
     </>)
 }
 
@@ -76,11 +82,13 @@ export const EditorHeader = () => {
                 <UndoRedoButtons />
 
                 {!(script?.collaborative) && (
-                    <div
+                    <button
                         className="flex items-center cursor-pointer truncate"
                         onClick={() => {
                             dispatch(ide.setBlocksMode(!blocksMode))
                         }}
+                        title={t("editor.blocksMode")}
+                        aria-label={t("editor.blocksMode")}
                     >
                         <div
                             className={`
@@ -92,10 +100,10 @@ export const EditorHeader = () => {
                             <div className="w-4 h-4 bg-white rounded-full">&nbsp;</div>
                         </div>
                         {t("editor.blocksMode").toLocaleUpperCase()}
-                    </div>
+                    </button>
                 )}
                 {(loggedIn && scriptType !== "readonly" && !(scriptType === "shared" && script?.collaborative)) && (
-                    <div
+                    <button
                         className={`
                                 rounded-full
                                 text-white
@@ -107,26 +115,30 @@ export const EditorHeader = () => {
                             const unsavedScript = scripts.selectRegularScripts(store.getState())[activeTab]
                             shareScript(Object.assign({}, unsavedScript))
                         }}
+                        title={t("script.share")}
+                        aria-label={t("script.share")}
                     >
                         <i className="icon-share32 pr-2" />
                         {t("script.share").toLocaleUpperCase()}
-                    </div>
+                    </button>
                 )}
-                <div
+                <button
                     className={`
                         flex
                         rounded-full px-3 py-1
-                        bg-gradient-to-t from-green-300 to-green-800
+                        bg-green-700
                         text-white cursor-pointer
                     `}
                     id="run-button"
                     onClick={compileCode}
+                    title={t("editor.run")}
+                    aria-label={t("editor.run")}
                 >
                     <div className="flex items-center bg-white rounded-full text-xl my-1 mr-2 p-1">
                         <i className="icon-arrow-right22 font-bold text-green-600" />
                     </div>
                     {t("editor.run").toLocaleUpperCase()}
-                </div>
+                </button>
             </div>
         </div>
     )

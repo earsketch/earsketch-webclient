@@ -19,7 +19,7 @@ const currDir = path.resolve(__dirname, "../curriculum")
 module.exports = merge(common, {
     mode: "development", // For localhost with websocket-dev-server
     output: {
-        path: __dirname,
+        path: path.resolve(__dirname, "integration/_karma_webpack_"),
         filename: "dist/bundle.js", // HtmlWebpackPlugin demands this workaround.
         publicPath: "/", // webclient folder
     },
@@ -30,28 +30,12 @@ module.exports = merge(common, {
     },
     module: {
         rules: [{
-            test: require.resolve("angular"),
-            loader: "exports-loader",
-            options: {
-                type: "commonjs",
-                exports: "single angular",
-            },
-        }, {
-            test: require.resolve("ng-midway-tester/src/ngMidwayTester.js"),
-            loader: "exports-loader",
-            options: {
-                type: "commonjs",
-                exports: "single ngMidwayTester",
-            },
-        }, {
             test: /allstyles.less/,
             use: ["style-loader", "css-loader", "less-loader"],
         }],
     },
     resolve: {
         alias: {
-            angular: "angular",
-            ngMidwayTester: "ng-midway-tester/src/ngMidwayTester.js",
             currToC: `${currDir}/curr_toc.js`,
             currPages: `${currDir}/curr_pages.js`,
             currSearchDoc: `${currDir}/curr_searchdoc.js`,

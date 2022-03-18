@@ -3,8 +3,8 @@
 // Workaround for pre-14.1 Safari:
 declare global {
     interface Window {
-      webkitAudioContext: typeof window.AudioContext
-      webkitOfflineAudioContext: typeof window.OfflineAudioContext
+        webkitAudioContext: typeof window.AudioContext
+        webkitOfflineAudioContext: typeof window.OfflineAudioContext
     }
 }
 

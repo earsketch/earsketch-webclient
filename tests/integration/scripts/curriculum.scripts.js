@@ -1269,4 +1269,7 @@ export const CURRICULUM_SCRIPTS = {
     "makeBeat(drums, 2, 1, amenCymbals);\n" +
     "finish();\n",
 
+    "Number Parsing.js": "var tempo = \"99\";\n" +
+      "tempo = Number(tempo);\n" +
+      "setTempo(tempo);\n",
 }

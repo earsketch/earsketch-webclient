@@ -25,8 +25,6 @@ import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
-import * as recommenderState from "../browser/recommenderState"
-import * as recommender from "./recommender"
 import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
 import { ScriptAnalysis } from "./ScriptAnalysis"
@@ -42,6 +40,13 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { ModalFooter, Prompt } from "../Utils"
+
+import licenses_ from "../data/licenses.json"
+
+const licenses: { [key: string]: any } = {}
+for (const license of licenses_) {
+    licenses[(license as any).id] = license
+}
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -95,7 +100,12 @@ export function downloadScript(script: Script) {
 }
 
 export async function openScriptHistory(script: Script, allowRevert: boolean) {
-    await userProject.saveScript(script.name, script.source_code)
+    if (script.collaborative) {
+        collaboration.saveScript(script.id)
+    } else if (!script.isShared) {
+        // saveScript() saves regular scripts - if called for shared scripts, it will create a local copy (#2663).
+        await userProject.saveScript(script.name, script.source_code)
+    }
     store.dispatch(tabs.removeModifiedScript(script.shareid))
     openModal(ScriptHistory, { script, allowRevert })
     reporter.openHistory()
@@ -208,14 +218,6 @@ export async function closeAllTabs() {
     }
 }
 
-const licenses = {} as { [key: string]: any }
-
-userProject.getLicenses().then(ls => {
-    for (const license of Object.values(ls)) {
-        licenses[(license as any).id] = license
-    }
-})
-
 export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
@@ -228,33 +230,6 @@ export function openUploadWindow() {
     } else {
         userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
     }
-}
-
-export function reloadRecommendations() {
-    const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const allScripts = scripts.selectAllScripts(store.getState())
-    // Get the modified / unsaved script.
-    const script = allScripts[activeTabID]
-    if (!script) return
-    let input = recommender.addRecInput([], script)
-    let res = [] as any[]
-    if (input.length === 0) {
-        const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
-        if (filteredScripts.length) {
-            const lim = Math.min(5, filteredScripts.length)
-            for (let i = 0; i < lim; i++) {
-                input = recommender.addRecInput(input, filteredScripts[i])
-            }
-        }
-    }
-    // If there are no samples to use for recommendation, just use something random so the window isn't blank.
-    if (input.length === 0) {
-        input = recommender.addRandomRecInput(input)
-    }
-    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-        res = recommender.recommend(res, input, ...v)
-    })
-    store.dispatch(recommenderState.setRecommendations(res))
 }
 
 export function openSharedScript(shareID: string) {
@@ -293,9 +268,9 @@ function forgotPass() {
 }
 
 const KeyboardShortcuts = () => {
-    const { t } = useTranslation()
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
+    const { t } = useTranslation()
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
@@ -313,10 +288,10 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts">
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
             <table>
                 {Object.entries(shortcuts).map(([action, keys], index, arr) =>
                     <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
@@ -334,9 +309,10 @@ const KeyboardShortcuts = () => {
 const FontSizeMenu = () => {
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
+    const { t } = useTranslation()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -348,7 +324,8 @@ const FontSizeMenu = () => {
                     {({ active }) =>
                         <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
                             onClick={() => dispatch(appState.setFontSize(size))}
-                            style={{ gridTemplateColumns: "18px 1fr" }}>
+                            style={{ gridTemplateColumns: "18px 1fr" }}
+                            aria-selected={fontSize === size}>
                             {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
                             {fontSize !== size && <span></span>}
                             {size}
@@ -368,7 +345,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -399,7 +376,7 @@ const NotificationMenu = () => {
             <div className="relative right-1">
                 <NotificationPopup />
             </div>
-            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-3/4">
+            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-3/4">
                 {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
             </Popover.Panel>
         </Popover>
@@ -431,15 +408,15 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
     return <>
         {!loggedIn &&
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }}><i className="icon icon-arrow-right" /></button>
+            <input type="text" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input type="password" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
                 {loggedIn
                     ? <div className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></div>
-                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }}>{t("createResetAccount")}</div>}
+                    : <div className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }} title="Create or Reset Account" aria-label="Create or Reset Account">{t("createResetAccount")}</div>}
             </Menu.Button>
             <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
@@ -488,7 +465,7 @@ function setup() {
 
     // If in CAI study mode, switch to active CAI view.
     if (FLAGS.SHOW_CAI) {
-        store.dispatch(layout.setEast({ open: true }))
+        store.dispatch(layout.setEast({ open: true, kind: "CAI" }))
     }
 }
 
@@ -623,11 +600,7 @@ export const App = () => {
     }
 
     const logout = async () => {
-        dispatch(user.logout())
-        dispatch(sounds.resetUserSounds())
-        dispatch(sounds.resetFavorites())
-        dispatch(sounds.resetAllFilters())
-
+        let keepUnsavedTabs = false
         // save all unsaved open scripts
         try {
             const promise = saveAll()
@@ -635,21 +608,43 @@ export const App = () => {
             if (promise) {
                 userNotification.show(i18n.t("messages:user.allscriptscloud"))
             }
-
-            leaveCollaborationSession()
-
-            userProject.clearUser()
-            userNotification.clearHistory()
-            reporter.logout()
-
-            dispatch(scripts.resetReadOnlyScripts())
-            dispatch(tabs.resetTabs())
-            dispatch(tabs.resetModifiedScripts())
         } catch (error) {
-            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "keepUnsavedTabs", okKey: "ignore" })) {
-                userProject.clearUser()
+            if (await confirm({ textKey: "messages:idecontroller.saveallfailed", cancelKey: "discardChanges", okKey: "keepUnsavedTabs" })) {
+                keepUnsavedTabs = true
             }
         }
+
+        leaveCollaborationSession()
+
+        userProject.clearUser()
+        userNotification.clearHistory()
+        reporter.logout()
+
+        if (keepUnsavedTabs) {
+            // Close unmodified tabs/scripts.
+            const state = store.getState()
+            const modified = tabs.selectModifiedScripts(state)
+            for (const tab of tabs.selectOpenTabs(state)) {
+                if (!modified.includes(tab)) {
+                    dispatch(tabs.closeAndSwitchTab(tab))
+                }
+            }
+            const regularScripts = scripts.selectRegularScripts(state)
+            const modifiedScripts = Object.entries(regularScripts).filter(([id, _]) => modified.includes(id))
+            dispatch(scripts.setRegularScripts(ESUtils.fromEntries(modifiedScripts)))
+        } else {
+            dispatch(tabs.resetTabs())
+            dispatch(tabs.resetModifiedScripts())
+            dispatch(scripts.resetRegularScripts())
+        }
+
+        dispatch(scripts.resetSharedScripts())
+        dispatch(scripts.resetReadOnlyScripts())
+
+        dispatch(user.logout())
+        dispatch(sounds.resetUserSounds())
+        dispatch(sounds.resetFavorites())
+        dispatch(sounds.resetAllFilters())
 
         // Clear out all the values set at login.
         setUsername("")
@@ -664,10 +659,12 @@ export const App = () => {
     const toggleCAIWindow = () => {
         if (!showCAI) {
             dispatch(layout.setEast({ open: true, kind: "CAI" }))
+            dispatch(cai.closeCurriculum())
             document.getElementById("caiButton")!.classList.remove("flashNavButton")
             dispatch(cai.autoScrollCAI())
         } else {
             dispatch(layout.setEast({ kind: "CURRICULUM" }))
+            dispatch(cai.curriculumPage([curriculum.selectCurrentLocation(store.getState()), curriculum.selectPageTitle(store.getState())]))
         }
     }
 
@@ -679,7 +676,7 @@ export const App = () => {
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
+            {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
@@ -688,7 +685,7 @@ export const App = () => {
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
                         <div>
-                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" id="app-title" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px" }} rel="noreferrer">
+                            {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
@@ -817,7 +814,7 @@ window.onbeforeunload = () => {
         // See https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event.
         const promise = saveAll()
         if (promise) {
-            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptcloud"), "success"))
+            promise.then(() => userNotification.show(i18n.t("messages:user.allscriptscloud"), "success"))
             return ""
         }
     }

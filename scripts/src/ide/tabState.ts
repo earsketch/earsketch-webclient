@@ -4,7 +4,6 @@ import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import * as ace from "ace-builds"
 
-import { reloadRecommendations } from "../app/App"
 import * as app from "../app/appState"
 import * as collaboration from "../app/collaboration"
 import * as scripts from "../browser/scriptsState"
@@ -12,6 +11,7 @@ import * as user from "../user/userState"
 import * as editor from "./ideState"
 import reporter from "../app/reporter"
 import * as userProject from "../app/userProject"
+import { reloadRecommendations } from "../app/reloadRecommender"
 
 interface TabState {
     openTabs: string[],

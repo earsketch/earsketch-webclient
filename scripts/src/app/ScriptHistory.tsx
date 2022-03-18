@@ -18,8 +18,9 @@ function parseActiveUsers(activeUsers: string | string[]) {
     return Array.isArray(activeUsers) ? activeUsers.join(", ") : activeUsers
 }
 
-const Version = ({ version, now, allowRevert, compiled, active, activate, run, revert, closeDAW }:
-    { version: any, now: number, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any }) => {
+const Version = ({ version, now, allowRevert, compiled, active, activate, run, revert, closeDAW }: {
+    version: any, now: number, allowRevert: boolean, compiled: boolean, active: boolean, run: any, activate: any, revert: any, closeDAW: any
+}) => {
     const { t } = useTranslation()
     return <tr className={active ? "active" : ""}>
         <td>

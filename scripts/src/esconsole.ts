@@ -414,3 +414,6 @@ esconsole.addESTagToLog = addESTagToLog
 esconsole.addESTagToNotLog = addESTagToNotLog
 
 export default esconsole
+
+// Allow changing esconsole settings from browser console.
+Object.assign(window, { esconsole })
