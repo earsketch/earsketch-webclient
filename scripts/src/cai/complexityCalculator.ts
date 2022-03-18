@@ -16,10 +16,16 @@ export interface BinOpNode extends Node {
     op: opNode,
 }
 
+export interface NameByReference {
+    name: string,
+    start: number,
+    end: number,
+}
+
 export interface BoolOpNode extends Node {
     _astname: "BoolOp",
     op: opNode,
-    values: Node[],
+    values: AnyNode[],
 
 }
 
@@ -30,8 +36,8 @@ export interface UnaryOpNode extends Node {
 
 export interface CompareNode extends Node {
     _astname: "Compare",
-    left: Node,
-    comparators: Node[],
+    left: AnyNode,
+    comparators: AnyNode[],
     ops: opNode[],
 }
 
@@ -86,12 +92,14 @@ export interface strNode extends Node {
 
 export interface SubscriptNode extends Node {
     _astname: "Subscript",
+    value: AnyNode,
+    slice: AnyNode,
 }
 
 export interface ForNode extends Node {
     _astname: "For",
     body: StatementNode [],
-    value: Node,
+    value: AnyNode,
     iter: StatementNode,
     target: NameNode,
 }
@@ -99,7 +107,9 @@ export interface ForNode extends Node {
 export interface JsForNode extends Node {
     _astname: "JSFor",
     body: StatementNode [],
-    init: AssignNode,
+    init?: AssignNode | AugAssignNode,
+    test?: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
+    update?: StatementNode,
 }
 
 export interface WhileNode extends Node {
@@ -136,13 +146,13 @@ export interface opNode extends Node {
 
 export interface SliceNode extends Node {
     _astname: "Slice",
-    lower: Node,
-    upper: Node,
+    lower: AnyNode,
+    upper: AnyNode,
 }
 
 export interface IndexNode extends Node {
     _astname: "Index",
-    value: Node,
+    value: AnyNode,
 }
 
 export interface NameNode extends Node {
@@ -218,7 +228,7 @@ export interface StructuralNode {
     depth?: number,
 }
 
-const StatementTypes: String[] = ["BinOp", "BoolOp", "Compare", "List", "FunctionDef", "If", "Attribute", "Call", "Assign", "AugAssign", "Subscript", "For", "JSFor", "While", "Expr", "Num", "ImportFrom", "Name", "Print"]
+// const StatementTypes: String[] = ["BinOp", "BoolOp", "Compare", "List", "FunctionDef", "If", "Attribute", "Call", "Assign", "AugAssign", "Subscript", "For", "JSFor", "While", "Expr", "Num", "ImportFrom", "Name", "Print"]
 const ArrayKeys: String[] = ["body", "args", "orelse", "comparators"]
 
 // gets all ES API calls from a student script
@@ -234,7 +244,7 @@ export function getAllVariables() {
     return ccState.getProperty("allVariables")
 }
 
-function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | number | string | { name: string, start: number, end: number })[], ast: AnyNode | AnyNode[]) {
+function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | string | NameByReference | ModuleNode)[], ast: AnyNode | AnyNode[]) {
     let nodesToRecurse: AnyNode [] = []
     if (Array.isArray(ast)) {
         nodesToRecurse = ast
@@ -244,14 +254,69 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | Node | numb
             recursiveCallOnNodes(funcToCall, args, node)
         }
     } else {
-        for (const child of Object.entries(ast)) {
-            if (child[1] && ((Array.isArray(child[1]) && ArrayKeys.includes(child[0])) || child[1]._astname)) {
-                if (child[1]._astname) {
-                    funcToCall(child[1], args)
-                }
-                recursiveCallOnNodes(funcToCall, args, child[1])
+        if (ast._astname === "FunctionDef" || ast._astname === "If" || ast._astname === "For" || ast._astname === "JSFor" || ast._astname === "While" || ast._astname === "Module") {
+            nodesToRecurse = nodesToRecurse.concat(ast.body)
+        }
+        if ((ast._astname === "If" || ast._astname === "JSFor" || ast._astname === "While") && ast.test) {
+            nodesToRecurse = nodesToRecurse.concat([ast.test])
+        }
+        if (ast._astname === "BinOp") {
+            nodesToRecurse = nodesToRecurse.concat([ast.left, ast.right])
+        }
+        if (ast._astname === "Compare") {
+            nodesToRecurse = nodesToRecurse.concat([ast.left])
+            nodesToRecurse = nodesToRecurse.concat(ast.comparators)
+        }
+        if (ast._astname === "FunctionDef") {
+            nodesToRecurse = nodesToRecurse.concat(ast.args.args)
+        }
+        if (ast._astname === "Call" && ast.args) {
+            nodesToRecurse = nodesToRecurse.concat(ast.args)
+        }
+        if (ast._astname === "Assign") {
+            nodesToRecurse = nodesToRecurse.concat(ast.targets)
+        }
+        if (ast._astname === "Attribute" || ast._astname === "Assign" || ast._astname === "Expr" || ast._astname === "AugAssign" || ast._astname === "Subscript" || ast._astname === "Index") {
+            nodesToRecurse = nodesToRecurse.concat([ast.value])
+        }
+        if (ast._astname === "Call") {
+            nodesToRecurse = nodesToRecurse.concat([ast.func])
+        }
+        if (ast._astname === "Subscript") {
+            nodesToRecurse = nodesToRecurse.concat([ast.slice])
+        }
+        if (ast._astname === "If" && ast.orelse) {
+            nodesToRecurse = nodesToRecurse.concat(ast.orelse)
+        }
+        if (ast._astname === "JSFor") {
+            if (ast.update) {
+                nodesToRecurse = nodesToRecurse.concat([ast.update])
+            }
+            if (ast.init) {
+                nodesToRecurse = nodesToRecurse.concat([ast.init])
             }
         }
+        if (ast._astname === "For") {
+            nodesToRecurse = nodesToRecurse.concat([ast.iter])
+        }
+        if (ast._astname === "List") {
+            nodesToRecurse = nodesToRecurse.concat(ast.elts)
+        }
+        if (ast._astname === "BoolOp") {
+            nodesToRecurse = nodesToRecurse.concat(ast.values)
+        }
+        for (const node of nodesToRecurse) {
+            funcToCall(node, args)
+            recursiveCallOnNodes(funcToCall, args, node)
+        }
+    //     for (const child of Object.entries(ast)) {
+    //         if (child[1] && ((Array.isArray(child[1]) && ArrayKeys.includes(child[0])) || child[1]._astname)) {
+    //             if (child[1]._astname) {
+    //                 funcToCall(child[1], args)
+    //             }
+    //             recursiveCallOnNodes(funcToCall, args, child[1])
+    //         }
+    //     }
     }
 }
 
@@ -556,7 +621,7 @@ function isBinopString(binOpNode: BinOpNode) {
 }
 
 // recursively searches for a "return" within an ast node
-function searchForReturn(astNode: StatementNode | (StatementNode)[]): Node | null {
+function searchForReturn(astNode: StatementNode | (StatementNode)[]): AnyNode | null {
     if (Array.isArray(astNode)) {
         for (const node of astNode) {
             const ret = searchForReturn(node)
@@ -713,7 +778,7 @@ function collectVariableInfo(node: AssignNode | AugAssignNode | NameNode | ForNo
         }
 
         if (node._astname === "JSFor") {
-            if (node.init && node.init.targets) {
+            if (node.init && node.init._astname === "Assign") {
                 const assignedName = String(node.init.targets[0].id.v)
                 varObject = { name: assignedName, assignments: [] }
                 let alreadyExists = false
@@ -1569,7 +1634,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
         let isRecursive = false
 
         let firstParent = parentNode
-        const nameObj = { name: "", start: -1, end: -1 }
+        const nameObj: NameByReference = { name: "", start: -1, end: -1 }
         let whileCount = 0
         while (firstParent.parent && firstParent.startline) {
             recursiveCallOnNodes(findFunctionArgumentName, [firstParent.id, firstParent.startline, nameObj], rootAst)
@@ -1690,7 +1755,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
     return returnObject
 }
 
-function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "FunctionDef" | "functionCall", string | number, { name: string, start: number, end: number }]) {
+function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "FunctionDef" | "functionCall", string | number, NameByReference]) {
     // arg[0]: function definition or function call
     const type = args[0] === "FunctionDef" ? "FunctionDef" : "Call"
     // arg[1] is the line number
