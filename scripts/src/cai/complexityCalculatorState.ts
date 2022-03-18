@@ -1,6 +1,6 @@
 // Manages the state of the complexity calculator service.
 
-let state: { [key: string]: any } = {
+const defaultState: { [key: string]: any } = {
     allVariables: [],
     apiCalls: [],
     allCalls: [],
@@ -24,30 +24,10 @@ let state: { [key: string]: any } = {
     codeStructure: {},
 }
 
+let state = Object.assign(defaultState)
+
 export function resetState() {
-    state = {
-        allVariables: [],
-        apiCalls: [],
-        allCalls: [],
-        allConditionals: [],
-        variableAssignments: [],
-        originalityLines: [],
-        loopLocations: [],
-        functionLines: [],
-        uncalledFunctionLines: [],
-        userFunctionParameters: [],
-        makeBeatRenames: [],
-        userFunctionRenames: [],
-        forLoopFuncs: [],
-        parentLineNumber: 0,
-        studentCode: [],
-        takesArgs: false,
-        returns: false,
-        isJavascript: false,
-        listFuncs: [],
-        userFunctionReturns: [],
-        codeStructure: {},
-    }
+    state = Object.assign(defaultState)
 }
 
 export function getState() {
