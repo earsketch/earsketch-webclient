@@ -153,18 +153,21 @@ function basicChecks() {
     // check for import, init, and finish
 }
 
-function handleFunctionError() {
-    // find next non-blank line (if there is one). assess indent
+function findNextLine(startLineNo: number) {
     let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
+    for (let i = startLineNo; i < textArray.length; i++) {
         nextLine = textArray[i]
         if (nextLine !== "") {
             break
         }
     }
+    return nextLine
+}
 
+function handleFunctionError() {
+    // find next non-blank line (if there is one). assess indent
     // compare indent on nextLine vs errorLine
-    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+    if (ccHelpers.numberOfLeadingSpaces(findNextLine(currentError.traceback[0].lineno)) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
         return ["function", "missing body"]
     }
 
@@ -482,18 +485,8 @@ function handleWhileLoopError() {
         return ["while loop", "missing colon"]
     }
 
-    // check for body
-    // find next non-blank line (if there is one). assess indent
-    let nextLine: string = ""
-    for (let i = currentError.traceback[0].lineno; i < textArray.length; i++) {
-        nextLine = textArray[i]
-        if (nextLine !== "") {
-            break
-        }
-    }
-
     // compare indent on nextLine vs errorLine
-    if (ccHelpers.numberOfLeadingSpaces(nextLine) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
+    if (ccHelpers.numberOfLeadingSpaces(findNextLine(currentError.traceback[0].lineno)) <= ccHelpers.numberOfLeadingSpaces(errorLine)) {
         return ["while loop", "missing body"]
     }
 }
