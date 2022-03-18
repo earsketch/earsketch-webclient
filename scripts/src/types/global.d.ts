@@ -14,7 +14,6 @@ declare const diffview: any
 declare const droplet: any
 declare const hljs: any
 declare const Hilitor: any
-declare const Interpreter: any // JS-Interpreter
 declare const JSZip: any
 declare const lamejs: any
 // NOTE: It looks like bringing in d3 types would require upgrading past d3 v3,
@@ -25,19 +24,14 @@ declare const Kali: any
 declare const SC: any // Soundcloud
 declare const Sk: any
 
+declare module "js-interpreter"
 declare module "xml2js"
 declare module "chance"
-declare const $: any
 
 declare const createAudioMeter: (audioContext: AudioContext, clipLevel: number, averaging: number, clipLag: number) => AudioNode
 declare const Recorder: any
 
 declare module "@webscopeio/react-textarea-autocomplete"
-
-declare module "angular" {
-    const module: any
-    const bootstrap: any
-}
 
 declare module "file-loader!*" {
     const value: any

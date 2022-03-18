@@ -1,9 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSelector, createSlice } from "@reduxjs/toolkit"
 import { persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 
 import * as ESUtils from "../esutils"
 import { RootState } from "../reducers"
+import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
 
 export type Modal = (props: { [key: string]: any, close: (payload?: any) => void }) => JSX.Element
 
@@ -57,7 +58,7 @@ const appSlice = createSlice({
         setEmbeddedShareID(state, { payload }) {
             state.embeddedShareID = payload
         },
-        setLocale(state, { payload }) {
+        setLocaleCode(state, { payload }) {
             state.locale = payload
         },
         setModal(state, { payload }) {
@@ -83,7 +84,7 @@ export const {
     setEmbeddedScriptUsername,
     setEmbeddedScriptName,
     setEmbeddedShareID,
-    setLocale,
+    setLocaleCode,
     setModal,
 } = appSlice.actions
 
@@ -97,5 +98,12 @@ export const selectHideEditor = (state: RootState) => state.app.hideEditor
 export const selectEmbeddedScriptUsername = (state: RootState) => state.app.embeddedScriptUsername
 export const selectEmbeddedScriptName = (state: RootState) => state.app.embeddedScriptName
 export const selectEmbeddedShareID = (state: RootState) => state.app.embeddedShareID
-export const selectLocale = (state: RootState) => state.app.locale
+export const selectLocaleCode = (state: RootState) => state.app.locale
 export const selectModal = (state: RootState) => state.app.modal
+
+export const selectLocale = createSelector(
+    [selectLocaleCode],
+    (localeCode) => {
+        return AVAILABLE_LOCALES[localeCode] ?? ENGLISH_LOCALE
+    }
+)

@@ -1,4 +1,5 @@
 // Run user scripts.
+import Interpreter from "js-interpreter"
 import * as acorn from "acorn"
 import * as walk from "acorn-walk"
 
@@ -42,8 +43,6 @@ export async function postRun(result: DAWData) {
     // STEP 5: Insert metronome as the last track.
     esconsole("Adding metronome track.", ["debug", "runner"])
     await addMetronome(result)
-    // STEP 6: Print out string for unit tests, return the result.
-    esconsole(ESUtils.formatResultForTests(result), ["nolog", "runner"])
 }
 
 // Skulpt AST-walking code; based on https://gist.github.com/acbart/ebd2052e62372df79b025aee60ff450e.
@@ -147,8 +146,6 @@ export async function runPython(code: string) {
 
     const lines = code.match(/\n/g) ? code.match(/\n/g)!.length + 1 : 1
     esconsole("Running " + lines + " lines of Python", ["debug", "runner"])
-    // printing for unit tests
-    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "runner"])
 
     // STEP 2: Run Python code using Skulpt.
     esconsole("Running script using Skulpt.", ["debug", "runner"])
@@ -218,9 +215,6 @@ function createJsInterpreter(code: string) {
 
 // Compile a javascript script.
 export async function runJavaScript(code: string) {
-    // printing for unit tests
-    esconsole(ESUtils.formatScriptForTests(code), ["nolog", "runner"])
-
     esconsole("Running script using JS-Interpreter.", ["debug", "runner"])
 
     const mainInterpreter = createJsInterpreter(code)

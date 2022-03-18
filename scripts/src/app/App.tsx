@@ -25,8 +25,6 @@ import * as layout from "../ide/layoutState"
 import { LocaleSelector } from "../top/LocaleSelector"
 import { NotificationBar, NotificationHistory, NotificationList, NotificationPopup } from "../user/Notifications"
 import { ProfileEditor } from "./ProfileEditor"
-import * as recommenderState from "../browser/recommenderState"
-import * as recommender from "./recommender"
 import { RenameScript, RenameSound } from "./Rename"
 import reporter from "./reporter"
 import { ScriptAnalysis } from "./ScriptAnalysis"
@@ -42,6 +40,13 @@ import * as user from "../user/userState"
 import * as userNotification from "../user/notification"
 import * as userProject from "./userProject"
 import { ModalFooter, Prompt } from "../Utils"
+
+import licenses_ from "../data/licenses.json"
+
+const licenses: { [key: string]: any } = {}
+for (const license of licenses_) {
+    licenses[(license as any).id] = license
+}
 
 const FONT_SIZES = [10, 12, 14, 18, 24, 36]
 
@@ -213,14 +218,6 @@ export async function closeAllTabs() {
     }
 }
 
-const licenses = {} as { [key: string]: any }
-
-userProject.getLicenses().then(ls => {
-    for (const license of Object.values(ls)) {
-        licenses[(license as any).id] = license
-    }
-})
-
 export async function shareScript(script: Script) {
     await userProject.saveScript(script.name, script.source_code)
     store.dispatch(tabs.removeModifiedScript(script.shareid))
@@ -233,33 +230,6 @@ export function openUploadWindow() {
     } else {
         userNotification.show(i18n.t("messages:general.unauthenticated"), "failure1")
     }
-}
-
-export function reloadRecommendations() {
-    const activeTabID = tabs.selectActiveTabID(store.getState())!
-    const allScripts = scripts.selectAllScripts(store.getState())
-    // Get the modified / unsaved script.
-    const script = allScripts[activeTabID]
-    if (!script) return
-    let input = recommender.addRecInput([], script)
-    let res = [] as any[]
-    if (input.length === 0) {
-        const filteredScripts = Object.values(scripts.selectFilteredActiveScripts(store.getState()))
-        if (filteredScripts.length) {
-            const lim = Math.min(5, filteredScripts.length)
-            for (let i = 0; i < lim; i++) {
-                input = recommender.addRecInput(input, filteredScripts[i])
-            }
-        }
-    }
-    // If there are no samples to use for recommendation, just use something random so the window isn't blank.
-    if (input.length === 0) {
-        input = recommender.addRandomRecInput(input)
-    }
-    [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(v => {
-        res = recommender.recommend(res, input, ...v)
-    })
-    store.dispatch(recommenderState.setRecommendations(res))
 }
 
 export function openSharedScript(shareID: string) {
@@ -298,9 +268,9 @@ function forgotPass() {
 }
 
 const KeyboardShortcuts = () => {
-    const { t } = useTranslation()
     const isMac = ESUtils.whichOS() === "MacOS"
     const modifier = isMac ? "Cmd" : "Ctrl"
+    const { t } = useTranslation()
 
     const localize = (key: string) => key.length > 1 ? t(`hardware.${key.toLowerCase()}`) : key
 
@@ -318,10 +288,10 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title="Show/Hide Keyboard Shortcuts" aria-label="Show/Hide Keyboard Shortcuts">
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
             <i className="icon icon-keyboard" />
         </Popover.Button>
-        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-1/2 w-max">
+        <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
             <table>
                 {Object.entries(shortcuts).map(([action, keys], index, arr) =>
                     <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
@@ -339,9 +309,10 @@ const KeyboardShortcuts = () => {
 const FontSizeMenu = () => {
     const dispatch = useDispatch()
     const fontSize = useSelector(appState.selectFontSize)
+    const { t } = useTranslation()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Select Font Size" aria-label="Select Font Size">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -353,7 +324,8 @@ const FontSizeMenu = () => {
                     {({ active }) =>
                         <button className={`${active ? "bg-gray-500 text-white" : "text-gray-900"} inline-grid grid-flow-col justify-items-start items-center px-3 py-2 w-full`}
                             onClick={() => dispatch(appState.setFontSize(size))}
-                            style={{ gridTemplateColumns: "18px 1fr" }}>
+                            style={{ gridTemplateColumns: "18px 1fr" }}
+                            aria-selected={fontSize === size}>
                             {fontSize === size && <i className="mr-3 icon icon-checkmark4" />}
                             {fontSize !== size && <span></span>}
                             {size}
@@ -373,7 +345,7 @@ const MiscActionMenu = () => {
     ]
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title="Settings and Additional Options" aria-label="Settings and Additional Options">
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
                 <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
@@ -404,7 +376,7 @@ const NotificationMenu = () => {
             <div className="relative right-1">
                 <NotificationPopup />
             </div>
-            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 transform -translate-x-3/4">
+            <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-3/4">
                 {({ close }) => <NotificationList showHistory={setShowHistory} close={close} />}
             </Popover.Panel>
         </Popover>
@@ -436,9 +408,9 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
     return <>
         {!loggedIn &&
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input type="text" autoComplete="on" name="username" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input type="password" autoComplete="current-password" name="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button type="submit" className="btn btn-xs btn-default" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
+            <input type="text" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input type="password" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
@@ -704,7 +676,7 @@ export const App = () => {
         <link rel="stylesheet" type="text/css" href={`scripts/lib/highlightjs/styles/${theme === "dark" ? "monokai-sublime" : "vs"}.css`} />
 
         <div className="flex flex-col justify-start h-screen max-h-screen">
-            {!embedMode && <div id="top-header-nav" className="flex-shrink-0">
+            {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
                     <div id="app-title-container" className="pull-left">
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />

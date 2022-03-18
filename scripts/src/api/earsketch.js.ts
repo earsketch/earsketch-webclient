@@ -1,4 +1,5 @@
 // EarSketch API: Javascript
+import Interpreter from "js-interpreter"
 import * as passthrough from "./passthrough"
 import { API_FUNCTIONS, APIConfig } from "./api"
 import { ANALYSIS_NAMES, EFFECT_NAMES } from "../app/audiolibrary"

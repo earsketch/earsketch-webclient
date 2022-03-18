@@ -388,7 +388,7 @@ export const IDE = () => {
         }
     }, [logs])
 
-    const gutterSize = hideEditor ? 0 : 8
+    const gutterSize = hideEditor ? 0 : 9
     const isWestOpen = useSelector(layout.isWestOpen)
     const isEastOpen = useSelector(layout.isEastOpen)
     const minWidths = embedMode ? [0, 0, 0] : [isWestOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH, layout.MIN_WIDTH, isEastOpen ? layout.MIN_WIDTH : layout.COLLAPSED_WIDTH]
@@ -403,7 +403,7 @@ export const IDE = () => {
         verticalRatio = hideEditor ? [100, 0, 0] : (hideDAW ? [0, 100, 0] : [25, 75, 0])
     }
 
-    return <div id="main-container" className="flex-grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
+    return <div id="main-container" className="grow flex flex-row h-full overflow-hidden" style={embedMode ? { top: "0", left: "0" } : {}}>
         <div className="w-full h-full">
             <Split
                 className="split flex flex-row h-full" gutterSize={gutterSize} snapOffset={0}
@@ -433,7 +433,7 @@ export const IDE = () => {
                     <div className={"flex flex-col" + (hideEditor ? " hidden" : "")} id="coder" style={{ WebkitTransform: "translate3d(0,0,0)", ...(bubbleActive && [1, 2, 9].includes(bubblePage) ? { zIndex: 35 } : {}) }}>
                         <EditorHeader />
 
-                        <div className="flex-grow h-full overflow-y-hidden">
+                        <div className="grow h-full overflow-y-hidden">
                             <div className={"h-full flex flex-col" + (numTabs === 0 ? " hidden" : "")}>
                                 <Tabs />
                                 {embedMode && <div className="embedded-script-info h-auto" >
