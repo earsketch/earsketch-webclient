@@ -1,6 +1,5 @@
 import * as ccState from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
-import { node } from "prop-types"
 
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
@@ -171,8 +170,8 @@ export interface ModuleNode extends Node {
 }
 
 export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
-    strNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
-    ReturnNode | ModuleNode | UnaryOpNode
+strNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | ArgumentsNode | NumNode | nNode | opNode | SliceNode | IndexNode | NameNode |
+ReturnNode | ModuleNode | UnaryOpNode
 
 export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | BinOpNode | BoolOpNode | CompareNode | ListNode | AttributeNode | CallNode | SubscriptNode | NameNode
 
@@ -1812,4 +1811,45 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     recursiveCallOnNodes(collectVariableInfo, [], ast)
     recursiveAnalyzeAST(ast, results)
     doComplexityOutput(results, ast)
+}
+
+export function emptyResultsObject(ast: AnyNode): Results {
+    return {
+        ast: ast,
+        codeFeatures: {
+            errors: 0,
+            variables: 0,
+            makeBeat: 0,
+            iteration: {
+                whileLoops: 0,
+                forLoopsPY: 0,
+                forLoopsJS: 0,
+                iterables: 0,
+                nesting: 0,
+            },
+            conditionals: {
+                conditionals: 0,
+                usedInConditionals: [],
+            },
+            functions: {
+                repeatExecution: 0,
+                manipulateValue: 0,
+            },
+            features: {
+                indexing: 0,
+                consoleInput: 0,
+                listOps: 0,
+                strOps: 0,
+                binOps: 0,
+                comparisons: 0,
+            },
+        },
+        codeStructure: {} as StructuralNode,
+        inputsOutputs: {
+            sections: {},
+            effects: {},
+            sounds: {},
+        },
+        depth: 0,
+    }
 }

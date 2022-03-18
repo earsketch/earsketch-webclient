@@ -21,44 +21,7 @@ export function analyzeJavascript(source: string) {
         // initialize list of function return objects with all functions from the API that return something (includes casting)
         // const allVariables = []
         // initialize the results object
-        const resultsObject: cc.Results = {
-            ast: newAST,
-            codeFeatures: {
-                errors: 0,
-                variables: 0,
-                makeBeat: 0,
-                iteration: {
-                    whileLoops: 0,
-                    forLoopsPY: 0,
-                    forLoopsJS: 0,
-                    iterables: 0,
-                    nesting: 0,
-                },
-                conditionals: {
-                    conditionals: 0,
-                    usedInConditionals: [],
-                },
-                functions: {
-                    repeatExecution: 0,
-                    manipulateValue: 0,
-                },
-                features: {
-                    indexing: 0,
-                    consoleInput: 0,
-                    listOps: 0,
-                    strOps: 0,
-                    binOps: 0,
-                    comparisons: 0,
-                },
-            },
-            codeStructure: {} as cc.StructuralNode,
-            inputsOutputs: {
-                sections: {},
-                effects: {},
-                sounds: {},
-            },
-            depth: 0,
-        }
+        const resultsObject = cc.emptyResultsObject(newAST)
         ccState.setIsJavascript(true)
         cc.doAnalysis(newAST, resultsObject)
         // translate the calculated values
@@ -67,45 +30,7 @@ export function analyzeJavascript(source: string) {
 
         return resultsObject
     } catch (error) {
-        return {
-            ast: {} as cc.AnyNode,
-            codeFeatures: {
-
-                errors: 1,
-                variables: 0,
-                makeBeat: 0,
-                iteration: {
-                    whileLoops: 0,
-                    forLoopsPY: 0,
-                    forLoopsJS: 0,
-                    iterables: 0,
-                    nesting: 0,
-                },
-                conditionals: {
-                    conditionals: 0,
-                    usedInConditionals: [],
-                },
-                functions: {
-                    repeatExecution: 0,
-                    manipulateValue: 0,
-                },
-                features: {
-                    indexing: 0,
-                    consoleInput: 0,
-                    listOps: 0,
-                    strOps: 0,
-                    binOps: 0,
-                    comparisons: 0,
-                },
-            },
-            codeStructure: {} as cc.StructuralNode,
-            inputsOutputs: {
-                sections: {},
-                effects: {},
-                sounds: {},
-            },
-            depth: 0,
-        } as cc.Results
+        return cc.emptyResultsObject({} as cc.AnyNode)
     }
 }
 
