@@ -33,6 +33,7 @@ module.exports = {
 
             // Emscripten
             esDSP: path.resolve(__dirname, `${libDir}/earsketch-dsp.js`),
+            worklet: path.resolve(__dirname, `${libDir}/worklet.js`),
 
             // Controllers
             chatWindowDirective: path.resolve(__dirname, `${appDir}/chatWindowDirective.js`),
@@ -42,6 +43,9 @@ module.exports = {
         // These files are preprocessed and loaded in a special way (e.g., making certain variables exportable).
         // Note that exports-loader does not expose the variables as semi-globals automatically, so they may need to be assigned to the window scope in index.ts.
         rules: [{
+            test: path.resolve(__dirname, `${libDir}/worklet.js`),
+            type: "asset/resource",
+        }, {
             test: /\.(js|jsx|mjs)$/,
             exclude: [
                 /(node_modules)/,

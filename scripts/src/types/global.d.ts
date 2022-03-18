@@ -43,3 +43,8 @@ declare module "dsp" {
     const FFT: any
     const WindowFunction: any
 }
+
+declare module "worklet" {
+    const x: string
+    export default x
+}
