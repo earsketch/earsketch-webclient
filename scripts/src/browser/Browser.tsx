@@ -22,7 +22,7 @@ export const TitleBar = () => {
             style={{ minHeight: "fit-content" }} // Safari-specific issue
         >
             <div className="pl-3 pr-4 font-semibold truncate">
-                {t("contentManager.title").toLocaleUpperCase()}
+                <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
             <div>
                 <button

@@ -155,7 +155,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
         <div className="btn-group" id="daw-label">
             <span className="panel-label">
                 {titleKey &&
-                <span className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</span>}
+                <h2 className="font-semibold font-sans text-black dark:text-white text-2xl pl-2">{t(titleKey).toLocaleUpperCase()}</h2>}
             </span>
         </div>
         {embedMode && <div>
@@ -985,7 +985,7 @@ export const DAW = () => {
 
             <div className="grow flex h-full relative">
                 {/* DAW Container */}
-                <div ref={el} className="grow overflow-hidden" id="daw-container" tabIndex={0}
+                <div ref={el} className="grow overflow-hidden" id="daw-container"
                     onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseMove={onMouseMove} onKeyDown={onKeyDown}>
                     <div className="relative">
                         <div id="daw-clickable" style={{ position: "relative", top: yScroll + "px" }}>

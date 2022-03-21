@@ -288,8 +288,8 @@ const KeyboardShortcuts = () => {
     }
 
     return <Popover>
-        <Popover.Button tabIndex={0} className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
-            <i tabIndex={0} className="icon icon-keyboard" />
+        <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-6" title={t("ariaDescriptors:header.shortcuts")} aria-label={t("ariaDescriptors:header.shortcuts")}>
+            <i className="icon icon-keyboard" />
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
             <table>
@@ -312,9 +312,9 @@ const FontSizeMenu = () => {
     const { t } = useTranslation()
 
     return <Menu as="div" className="relative inline-block text-left mx-3">
-        <Menu.Button tabIndex={0} className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
+        <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.fontSize")} aria-label={t("ariaDescriptors:header.fontSize")}>
             <div className="flex flex-row items-center">
-                <div><i tabIndex={0} className="icon icon-font-size2" /></div>
+                <div><i className="icon icon-font-size2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
@@ -347,7 +347,7 @@ const MiscActionMenu = () => {
     return <Menu as="div" className="relative inline-block text-left mx-3">
         <Menu.Button className="text-gray-400 hover:text-gray-300 text-4xl" title={t("ariaDescriptors:header.settings")} aria-label={t("ariaDescriptors:header.settings")}>
             <div className="flex flex-row items-center">
-                <div><i tabIndex={0} className="icon icon-cog2" /></div>
+                <div><i className="icon icon-cog2" /></div>
                 <div className="ml-1"><span className="caret" /></div>
             </div>
         </Menu.Button>
@@ -370,7 +370,7 @@ const NotificationMenu = () => {
         {showHistory && <NotificationHistory close={() => setShowHistory(false)} />}
         <Popover>
             <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-3 relative" title="Show/Hide Notifications">
-                <i tabIndex={0}className="icon icon-bell" />
+                <i className="icon icon-bell" />
                 {numUnread > 0 && <div className="text-2xl text-white bg-red-600 rounded-2xl absolute h-6 w-6 top-0 -right-1 leading-none">{numUnread}</div>}
             </Popover.Button>
             <div className="relative right-1">
@@ -408,15 +408,15 @@ const LoginMenu = ({ loggedIn, isAdmin, username, password, setUsername, setPass
     return <>
         {!loggedIn &&
         <form className="flex items-center" onSubmit={e => { e.preventDefault(); login(username, password) }}>
-            <input tabIndex={0} type="text" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
-            <input tabIndex={0} type="password" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
-            <button tabIndex={0} type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
+            <input type="text" autoComplete="on" name="username" title={t("formfieldPlaceholder.username")} aria-label={t("formfieldPlaceholder.username")} value={username} onChange={e => setUsername(e.target.value)} placeholder={t("formfieldPlaceholder.username")} required />
+            <input type="password" autoComplete="current-password" name="password" title={t("formfieldPlaceholder.password")} aria-label={t("formfieldPlaceholder.password")} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("formfieldPlaceholder.password")} required />
+            <button type="submit" className="btn btn-xs bg-white text-black hover:text-black hover:bg-gray-200" style={{ marginLeft: "6px", padding: "2px 5px 3px" }} title="Login" aria-label="Login"><i className="icon icon-arrow-right" /></button>
         </form>}
         <Menu as="div" className="relative inline-block text-left mx-3">
             <Menu.Button className="text-gray-400 text-4xl">
                 {loggedIn
                     ? <button className="btn btn-xs btn-default dropdown-toggle bg-gray-400 px-3 rounded-lg text-2xl">{username}<span className="caret" /></button>
-                    : <button tabIndex={0} className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }} title="Create or Reset Account" aria-label="Create or Reset Account">{t("createResetAccount")}</button>}
+                    : <button className="btn btn-xs btn-default dropdown-toggle" style={{ marginLeft: "6px", height: "23px" }} title="Create or Reset Account" aria-label="Create or Reset Account">{t("createResetAccount")}</button>}
             </Menu.Button>
             <Menu.Items className="w-72 absolute z-50 right-0 mt-2 origin-top-right bg-gray-100 divide-y divide-gray-100 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 {(loggedIn
@@ -678,18 +678,18 @@ export const App = () => {
         <div className="flex flex-col justify-start h-screen max-h-screen">
             {!embedMode && <div id="top-header-nav" className="shrink-0">
                 <div id="top-header-nav-left" style={{ WebkitTransform: "translate3d(0,0,0)" }}>
-                    <div tabIndex={0} id="app-title-container" className="pull-left">
+                    <button id="app-title-container" className="pull-left" tabIndex={0}>
                         <img id="app-logo" src="img/ES_logo_extract.svg" alt="EarSketch Logo" />
-                        <a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a>
-                    </div>
+                        <h1><a href="http://earsketch.gatech.edu/landing" target="_blank" id="app-title" rel="noreferrer">EarSketch</a></h1>
+                    </button>
 
                     <div id="top-header-nav-links" className="pull-left" style={{ maxWidth: "500px" }}>
-                        <div>
+                        <button tabIndex={0}>
                             {showAmazonBanner && <a href="https://www.amazonfutureengineer.com/earsketch" target="_blank" className="text-black normal-case dark:text-white" style={{ color: "yellow", textShadow: "1px 1px #FF0000", lineHeight: "21px", fontSize: "18px" }} rel="noreferrer">
                                 <div><img id="app-logo" src="img/afe_logo.png" alt="Amazon Logo" style={{ marginLeft: "17px", marginRight: "0px", height: "13px" }} /></div>
                                 Celebrity Remix
                             </a>}
-                        </div>
+                        </button>
                     </div>
                     <div className="clear:both"></div>
                 </div>

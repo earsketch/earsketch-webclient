@@ -163,7 +163,7 @@ const CurriculumSearchResults = () => {
         ? (
             <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
-                    <a tabIndex={0} key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
+                    <a key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
                         <div className="px-5 py-2 search-item text-black dark:text-white">{result.title}</div>
                     </a>)}
             </div>
@@ -190,7 +190,7 @@ export const TitleBar = () => {
     return (
         <div className="flex items-center p-3 text-2xl">
             <div className="ltr:pl-3 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
-                {t("curriculum.title").toLocaleUpperCase()}
+                <h2>{t("curriculum.title").toLocaleUpperCase()}</h2>
             </div>
             <div>
                 <button
