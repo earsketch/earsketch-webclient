@@ -33,6 +33,7 @@
     "soundBrowser.clip.tooltip.previewSound": "Preview sound",
     "soundBrowser.clip.tooltip.markFavorite": "Mark as favorite",
     "soundBrowser.clip.tooltip.paste": "Paste to editor",
+    "soundBrowser.clip.tooltip.key": "Key Signature",
     "scriptBrowser.filterDropdown.clearFilter": "Clear Filter by {{filterName}}",
     "scriptBrowser.filterDropdown.owner": "Owner",
     "scriptBrowser.filterDropdown.fileType": "File Type",

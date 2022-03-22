@@ -14,7 +14,6 @@ import * as user from "../user/userState"
 import * as tabs from "../ide/tabState"
 import { RootState } from "../reducers"
 import { SoundEntity } from "common"
-
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
 import { addUIClick } from "../cai/studentPreferences"
@@ -158,14 +157,33 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     const name = clip.name
     const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
-
-    const tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
+    let keySig = ""
+    if (clip.keySignature !== undefined) {
+        keySig = clip.keySignature
+    } else {
+        keySig = "N/A"
+    }
+    let tooltip = ""
+    if (FLAGS.SHOW_CAI) {
+        tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
+            ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
+            ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
+            ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
+            ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
+            ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
+            ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}
+            ${t("soundBrowser.clip.tooltip.key")}: ${keySig}
+            `.replace(/\n\s+/g, "\n")
+    } else {
+        tooltip = `${t("soundBrowser.clip.tooltip.file")}: ${name}
         ${t("soundBrowser.clip.tooltip.folder")}: ${clip.folder}
         ${t("soundBrowser.clip.tooltip.artist")}: ${clip.artist}
         ${t("soundBrowser.clip.tooltip.genre")}: ${clip.genre}
         ${t("soundBrowser.clip.tooltip.instrument")}: ${clip.instrument}
         ${t("soundBrowser.clip.tooltip.originalTempo")}: ${clip.tempo}
-        ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}`.replace(/\n\s+/g, "\n")
+        ${t("soundBrowser.clip.tooltip.year")}: ${clip.year}        
+        `.replace(/\n\s+/g, "\n")
+    }
 
     const loggedIn = useSelector(user.selectLoggedIn)
     const isFavorite = loggedIn && useSelector(sounds.selectFavorites).includes(name)
