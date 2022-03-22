@@ -35,6 +35,7 @@ let currentError = ["", ""]
 let currentComplexity: { [key: string]: any } = {}
 let currentInstr: any = null
 let currentGenre: any = null
+let currentKey: any = null
 
 let currentProperty: any = ""
 let currentPropertyValue: any = ""
@@ -176,6 +177,7 @@ export function clearNodeHistory() {
     currentComplexity = {}
     currentInstr = null
     currentGenre = null
+    currentKey = null
 
     complexityUpdated = true
     errorSuccess = 0
@@ -655,6 +657,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         currentInstr = null
         currentGenre = null
         currentSection = null
+        currentKey = null
         utterance = utterance.substring(0, utterance.indexOf("[RESET_PARAMS]"))
     }
     if (utterance.includes("[STOREPROPERTY]")) {
@@ -757,6 +760,16 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
             genreArray = caiProjectModel.getModel().genre.slice(0)
         } else if (currentGenre != null) {
             genreArray = [currentGenre]
+        }
+        let key = null
+        if ("KEY" in currentTreeNode[activeProject].parameters) {
+            currentKey = currentTreeNode[activeProject].parameters.KEY
+            parameters.push(["KEY", currentKey])
+            key = currentKey
+        } else if (currentKey == null && caiProjectModel.getModel().key.length > 0) {
+            key = caiProjectModel.getModel().key.slice(0)
+        } else if (currentKey != null) {
+            key = currentKey
         }
         const count = (utterance.match(/sound_rec/g) || []).length
         let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
