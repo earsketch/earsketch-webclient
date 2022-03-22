@@ -83,6 +83,19 @@ function handleJavascriptError() {
                 return functionErrorCheck
             }
         }
+        if (line.includes("for")) {
+            if (line.includes(" in ") || line.includes(" of ")) {
+                const forInCheck = handleJavascriptForInLoopError(i)
+                if (forInCheck) {
+                    return forInCheck
+                }
+            } else {
+                const forCheck = handleJavascriptForLoopError(i)
+                if (forCheck) {
+                    return forCheck
+                }
+            }
+        }
     }
 
     // check for mismatched curly braces
@@ -93,6 +106,79 @@ function handleJavascriptError() {
         }
     }
     return ["", ""]
+}
+
+function handleJavascriptForLoopError(lineno: number) {
+    // we have the for keyword
+
+    // check for parentheses
+    const trimmedLine = ccHelpers.trimCommentsAndWhitespace(textArray[lineno].substring(textArray.indexOf("for") + 3))
+    if (!trimmedLine.startsWith("(")) {
+        return ["for loop", "missing opening parenthesis"]
+    }
+
+    // now we check for a close paren.
+    // check existing line first
+    let forLoopParams = ""
+    let hasCloseParen: boolean = false
+    let numOpenParens = 0
+    let numCloseParens = 0
+
+    let positionIndices = [0, 0]
+    for (let lineIndex = lineno; lineIndex < textArray.length; lineIndex++) {
+        positionIndices = [lineIndex, 0]
+        for (const charValue of textArray[lineIndex]) {
+            positionIndices[1] += 1
+            if (charValue === ")") {
+                numCloseParens += 1
+                if (numCloseParens === numOpenParens) {
+                    hasCloseParen = true
+                    break
+                } else {
+                    forLoopParams += charValue
+                }
+            } else if (charValue !== "\n") {
+                forLoopParams += charValue
+                if (charValue === "(") {
+                    numOpenParens += 1
+                }
+            }
+        }
+        if (hasCloseParen) {
+            break
+        }
+    }
+
+    if (hasCloseParen === false) {
+        return ["for loop", "missing closing parenthesis"]
+    }
+
+    forLoopParams = forLoopParams.substring(forLoopParams.indexOf("(") + 1)
+
+    // check for semicolons
+    const forLoopParamArray = forLoopParams.split(";")
+    if (forLoopParamArray.length !== 3) {
+        return ["for loop", "invalid loop declaration"]
+    }
+
+    // check loop condition to make sure it's the right type
+    const loopCondition = forLoopParamArray[1]
+    // needs AT LEAST ONE of the following: 1. A comparison operator (==, ===, >, <, <=, >=) 2. A boolean value (true, false) 3. A variable CONTAINING a boolean value. we'll have to estimate datatype for this.
+    let checkForValidCondition = false
+    if (loopCondition.includes(">") || loopCondition.includes("<") || loopCondition.includes("===") || loopCondition.includes("==") || loopCondition.includes(">=") || loopCondition.includes("<=") || loopCondition.includes("!=") || loopCondition.includes("!==")) {
+        checkForValidCondition = true
+    } else if (loopCondition.includes(" true ") || loopCondition.includes(" false ")) {
+        checkForValidCondition = true
+    } else {
+        // check through any known names
+    }
+
+    // check for body, either one-line of within curly braces
+    return null
+}
+
+function handleJavascriptForInLoopError(lineno: number) {
+    return null
 }
 
 function handleJavascriptReferenceError() {
