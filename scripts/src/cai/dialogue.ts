@@ -381,6 +381,24 @@ export function createButtons() {
                     buttons.push({ label: caiTree[nextNode].title, value: nextNode })
                 }
             }
+        } else if ("dropup" in currentTreeNode[activeProject] && currentTreeNode[activeProject].dropup == "Keys") {
+            // filter the button options
+            let availableKeys = []
+            let allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
+            if (allSamples.length < 1) {
+                for (let i = 0; i < 5; i++) {
+                    allSamples = recommender.addRandomRecInput(allSamples)
+                }
+            }
+            availableKeys = recommender.KEY_LABELS
+            // availableKeys = ['F#', 'B', 'D']
+            for (const i in currentTreeNode[activeProject].options) {
+                const nextNode = currentTreeNode[activeProject].options[i]
+                if (availableKeys.includes(caiTree[nextNode].title)) {
+                    console.log(caiTree[nextNode].title)
+                    buttons.push({ label: caiTree[nextNode].title, value: nextNode })
+                }
+            }
         } else {
             for (const i in currentTreeNode[activeProject].options) {
                 const nextNode = currentTreeNode[activeProject].options[i]
@@ -718,6 +736,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         if (!currentTreeNode[activeProject].options.includes(93)) {
             currentTreeNode[activeProject].options.push(93)
             currentTreeNode[activeProject].options.push(102)
+            currentTreeNode[activeProject].options.push(103)
         }
         let instrumentArray = []
         if ("INSTRUMENT" in currentTreeNode[activeProject].parameters) {

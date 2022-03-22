@@ -11,7 +11,7 @@ const AUDIOKEYS_RECOMMENDATIONS: { [key: string]: { [key: string]: number[] } } 
 const KEYSIGNATURES_STRING: { [key: string]: { [key: string]: number } } = KEYSIGNATURES_STRING_
 
 // All the key signatures as a human-readable label.
-const KEY_LABELS: string [] = [
+export const KEY_LABELS: string [] = [
     "C major", "C# major", "D major", "D# major",
     "E major", "F major", "F# major", "G major",
     "G# major", "A major", "A# major", "B major",
