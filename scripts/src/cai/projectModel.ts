@@ -6,16 +6,18 @@ import * as recommender from "../app/recommender"
 
 let activeProject: string = ""
 let availableGenres: string[] = []
+let availableKeys: string[] = []
 const availableInstruments: string[] = []
 
 // Initialize empty model.
-const defaultProjectModel = { genre: [], instrument: [], form: [], "code structure": [] }
+const defaultProjectModel = { genre: [], instrument: [], form: [], key:[], "code structure": [] }
 
 const propertyOptions: { [key: string]: any } = {
     genre: availableGenres,
     // 'instrument': availableInstruments,
     form: ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
     "code structure": ["forLoop", "function", "consoleInput", "conditional"],
+    key: ['C','C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'],
 }
 
 const suggestablePropertyOptions: { [key: string]: any } = {
@@ -30,6 +32,7 @@ const propertyButtons: { [key: string]: string } = {
     // 'instrument': "there's an instrument i want to make sure is in the project",
     form: "i have a form in mind",
     "code structure": "i need to use a specific code structure",
+    key: "i want to use a specific key",
 }
 
 const suggestableProperties: { [key: string]: { [key: string]: any } } = {
@@ -39,6 +42,7 @@ const suggestableProperties: { [key: string]: { [key: string]: any } } = {
     },
     one: {
         form: ["[FORM]"],
+        key: ["[KEY]"],
     },
 }
 
@@ -132,6 +136,9 @@ export function updateModel(property: string, value: string) {
             if (index === -1) {
                 projectModel[activeProject][property].push(value) // Unlimited number of genres/instruments.
             }
+            break
+        case "key":
+            projectModel[activeProject].key[0] = value
             break
         case "form":
             projectModel[activeProject].form[0] = value // Only one form at a time.

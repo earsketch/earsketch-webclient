@@ -266,6 +266,12 @@ export const addUIClick = (ui: string) => {
     }
 }
 
+export const addTabSwitch = (tab: string | null) => {
+    if (FLAGS.SHOW_CAI) {
+        addToNodeHistory(["switch tab", tab, Date.now()])
+    }
+}
+
 export const addPageLoad = (status: number) => {
     pageLoadHistory.push({ status, time: Date.now() })
     addToNodeHistory(["page load action", status])
