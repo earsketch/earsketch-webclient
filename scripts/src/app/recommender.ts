@@ -299,21 +299,12 @@ export function getKeySignatureString(filename: string) {
     // For a given filename, return the key signature of the file using the KEYSIGNATURES object.
     // If the file is not in the database, return "N/A"
     const keyClass = getKeySignature(filename)
-    if (keyClass === undefined || keyClass === -1) {
-        return "N/A"
-    }
-
-    const keyLabel = KEY_LABELS[keyClass]
-    return keyLabel
+    return keyClass > -1 ? KEY_LABELS[keyClass] : "N/A"
 }
 
 function getKeySignature(filename: string) {
-    const song = store.getState().sounds.defaultSounds.entities[filename]
-    const keySig = song.keySignature
-    if (keySig !== undefined) {
-        return KEY_LABELS.indexOf(keySig)
-    }
-    return -1
+    const keySig = store.getState().sounds.defaultSounds.entities[filename].keySignature
+    return keySig !== undefined ? KEY_LABELS.indexOf(keySig) : -1
 }
 
 function computeMode(array: number[]): number {
@@ -329,11 +320,7 @@ function estimateKeySignature(filenames: string[]) {
     // For a given set of files, return an estimated key signature.
     const keyClass = filenames.map(f => getKeySignature(f))
     const keyClassFiltered = keyClass.filter(k => k !== -1).filter(k => k !== undefined)
-    if (keyClassFiltered.length !== 0) {
-        const mode = computeMode(keyClassFiltered)
-        return mode
-    }
-    return -1
+    return keyClassFiltered.length !== 0 ? computeMode(keyClassFiltered) : -1
 }
 
 function getKeyLabel(key: number) {
