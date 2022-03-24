@@ -783,7 +783,7 @@ export function showNextDialogue(utterance: string = currentTreeNode[activeProje
         if (recommendationHistory[activeProject].length === Object.keys(recommender.getKeyDict("genre")).length) {
             recommendationHistory[activeProject] = []
         }
-        recs = recommender.recommendReverse([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count)
+        recs = recommender.recommendReverse([], allSamples, 1, 1, genreArray, instrumentArray, recommendationHistory[activeProject], count, key)
         recs = recs.slice(0, count)
         let recIndex = 0
         if (currentSection != null && musicResults != {} && musicResults.SOUNDPROFILE != null) {
