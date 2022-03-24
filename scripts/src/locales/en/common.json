@@ -226,6 +226,7 @@
     "clear": "Clear",
     "soundUploader.record.mic.waiting": "Waiting for microphone access...",
     "soundUploader.record.mic.reenable": "Enable mic and click here to try again.",
+    "soundUploader.record.firefoxMacError": "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari.",
     "soundUploader.freesound.description": "is an online database of thousands of free audio clips, including everything from music to field recordings, all under Creative Commons licenses. You can search for clips on Freesound and save them to EarSketch below.",
     "soundUploader.freesound.searching": "Searching Freesound...",
     "soundUploader.freesound.uploadedBy": "Uploaded by Freesound user {{userName}}",

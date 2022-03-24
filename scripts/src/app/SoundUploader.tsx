@@ -136,9 +136,10 @@ const FileTab = ({ close }: { close: () => void }) => {
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
+    const { t } = useTranslation()
     const isMacFirefox = ESUtils.whichBrowser().includes("Firefox") && ESUtils.whichOS() === "MacOS"
     const [name, setName] = useState("")
-    const [error, setError] = useState(isMacFirefox ? "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari." : "")
+    const [error, setError] = useState(isMacFirefox ? t("soundUploader.record.firefoxMacError") : "")
     const [progress, setProgress] = useState<number>()
     const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
@@ -149,7 +150,6 @@ const RecordTab = ({ close }: { close: () => void }) => {
     const [measures, setMeasures] = useState(2)
     const [micReady, setMicReady] = useState(false)
     const [beat, setBeat] = useState(0)
-    const { t } = useTranslation()
 
     const startRecording = () => {
         recorder.properties.bpm = tempo
