@@ -1,14 +1,15 @@
 // Web Audio effect chain constructors
+import { TempoMap } from "../app/tempo"
 import { Track } from "../app/player"
 import esconsole from "../esconsole"
-import * as ESUtils from "../esutils"
 import {
     Effect, BandpassEffect, ChorusEffect, CompressorEffect, DelayEffect, DistortionEffect,
     Eq3BandEffect, FilterEffect, FlangerEffect, PanEffect, PhaserEffect, PitchshiftEffect,
-    ReverbEffect, RingmodEffect, TremoloEffect, VolumeEffect, WahEffect,
+    ReverbEffect, RingmodEffect, TempoEffect, TremoloEffect, VolumeEffect, WahEffect,
 } from "./audioeffects"
 
 export const EFFECT_MAP: { [key: string]: typeof Effect } = {
+    TEMPO: TempoEffect,
     VOLUME: VolumeEffect,
     DELAY: DelayEffect,
     FILTER: FilterEffect,
@@ -29,7 +30,7 @@ export const EFFECT_MAP: { [key: string]: typeof Effect } = {
 
 // Build audio node graph and schedule automation.
 export const buildAudioNodeGraph = (
-    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempo: number,
+    context: BaseAudioContext, mix: AudioNode, track: Track, tracknumber: number, tempoMap: TempoMap,
     offsetInSeconds: number, output: AudioNode, bypassedEffects: string[], wavExport: boolean
 ) => {
     esconsole("Building audio node graph", "debug")
@@ -66,20 +67,18 @@ export const buildAudioNodeGraph = (
         // These exceptions are:
         // - In the "Apply defaults" sections, Eq3Band skips EQ3BAND_HIGHFREQ.
         //   This seems probably unintentional. There's also something weird in Eq3Band creation where the high freq is set to 0.
-        // - Several chunks of logic are skipped for Pitchshift, which is apparently a do-nothing node.
-        //   The old comment explaining this is: "Do nothing, as we are using SoX for this effect. Just wrap a gain node."
-        //   We are no longer using SoX for this, but the Pitchshift here indeed does nothing.
         // - Distortion's DISTO_GAIN is basically an alias for MIX, with the result that some logic is skipped
         //   when setting one or the other (presumably to avoid overwriting whichever parameter was just set).
         // - For reasons unknown, setting REVERB_TIME does not actually set the REVERB_TIME
         //   if the effect is not in the future. This might be unintentional.
         // - CHORUS_NUMVOICES always uses endValue and not startValue. Probably unintentional.
+        // PITCHSHIFT remains an intentional exception, because it is handled outside of the Web Audio graph in pitchshifter.
 
         // Setup.
         const effectType = EFFECT_MAP[effect.name]
-        const pastEndLocation = (effect.endMeasure !== 0) && (ESUtils.measureToTime(effect.endMeasure, tempo) <= offsetInSeconds)
-        const startTime = Math.max(context.currentTime + ESUtils.measureToTime(effect.startMeasure, tempo) - offsetInSeconds, context.currentTime)
-        const endTime = Math.max(context.currentTime + ESUtils.measureToTime(effect.endMeasure, tempo) - offsetInSeconds, context.currentTime)
+        const pastEndLocation = (effect.endMeasure !== 0) && (tempoMap.measureToTime(effect.endMeasure) <= offsetInSeconds)
+        const startTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.startMeasure) - offsetInSeconds, context.currentTime)
+        const endTime = Math.max(context.currentTime + tempoMap.measureToTime(effect.endMeasure) - offsetInSeconds, context.currentTime)
         const time = pastEndLocation ? context.currentTime : startTime
         // Scale values from the ranges the user passes into the API to the ranges our Web Audio nodes expect.
         const startValue = effectType.scale(effect.parameter, effect.startValue ?? effectType.DEFAULTS[effect.parameter].value)
@@ -94,9 +93,9 @@ export const buildAudioNodeGraph = (
             // Create node for effect. We only do this once per effect type.
             // Subsequent EffectRanges with the same name modify the existing effect.
             const node = effectType.create(context)
-            lastNode.connect(node.input)
 
-            if (effect.name !== "PITCHSHIFT") {
+            if (node !== null) {
+                lastNode.connect(node.input)
                 // Apply all defaults when the node is created. They will be overrided later with the setValueAtTime API.
                 // NOTE: Weird exception for DISTORTION + MIX here from before The Great Refactoring.
                 for (const [parameter, info] of Object.entries(effectType.DEFAULTS)) {
@@ -112,11 +111,12 @@ export const buildAudioNodeGraph = (
 
         const node = effectNodes[effect.name]
 
-        // Handle parameters.
-        if (effect.name === "PITCHSHIFT") {
-            // Pre-Refactoring exception because Pitchshift effect does nothing. (Actual pitchshifting is handled somewhere else.)
+        if (node === null) {
+            // Dummy node, nothing to see here.
             continue
         }
+
+        // Handle parameters.
 
         // Inexplicably, this did not happen for REVERB_TIME pre-Refactoring.
         // So, for now, it does not happen here.

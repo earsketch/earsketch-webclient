@@ -2,13 +2,14 @@ import * as ESUtils from "../esutils"
 import store from "../reducers"
 import * as userProject from "../app/userProject"
 import { Notification, pushNotification, selectNotifications, setNotifications } from "./userState"
+import * as websocket from "../app/websocket"
 
 export const user = { isAdmin: false, loginTime: Date.now() }
 
 export const callbacks = {
     show: (() => {}) as (text: string, type?: string, duration?: number) => void,
     popup: (() => {}) as (text: string, type?: string, duration?: number) => void,
-    addSharedScript: (() => {}) as (shareID: string, id: string) => void,
+    addSharedScript: (() => {}) as (shareID: string) => Promise<void> | undefined,
 }
 
 // TODO: Clarify usage of temporary (popup) and "permanent" (history/list) notifications.
@@ -42,6 +43,7 @@ export const showBanner = (text: string, type: string = "") => callbacks.show(te
 // Fill the history array at initialization from webservice call as well as localStorage. Sorting might be needed.
 export function loadHistory(notifications: Notification[]) {
     let text = ""
+    let needRefresh = false
 
     notifications = notifications.map(v => {
         v.pinned = v.notification_type === "broadcast"
@@ -53,8 +55,8 @@ export function loadHistory(notifications: Notification[]) {
             v.message = { text }
 
             // auto-add new view-only scripts that are shared to the shared-script browser
-            if (v.unread) {
-                callbacks.addSharedScript(v.shareid!, v.id!)
+            if (v.unread && callbacks.addSharedScript(v.shareid!)) {
+                needRefresh = true
             }
         } else if (v.notification_type === "collaborate_script") {
             // This notification may have been processed before.
@@ -90,6 +92,9 @@ export function loadHistory(notifications: Notification[]) {
         return v
     })
 
+    if (needRefresh) {
+        userProject.getSharedScripts()
+    }
     notifications.sort((a, b) => b.time - a.time)
     store.dispatch(setNotifications(notifications))
 }
@@ -126,3 +131,11 @@ export function markAllAsRead() {
     }
     store.dispatch(setNotifications(newNotifications))
 }
+
+websocket.subscribe(data => {
+    if (data.notification_type === "notifications") {
+        loadHistory(data.notifications)
+    } else if (data.notification_type === "broadcast") {
+        handleBroadcast(data)
+    }
+})

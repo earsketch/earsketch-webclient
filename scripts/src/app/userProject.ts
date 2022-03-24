@@ -40,6 +40,14 @@ export function form(obj: { [key: string]: string | Blob } = {}) {
 // password in the client.
 
 async function fetchAPI(endpoint: string, init?: RequestInit) {
+    init = {
+        ...init,
+        headers: {
+            ...init?.headers,
+            // add custom headers here
+            "X-EarSketch-Version": `${BUILD_NUM}`.split("-")[0],
+        },
+    }
     try {
         const response = await fetch(URL_DOMAIN + endpoint, init)
         if (!response.ok) {
@@ -158,9 +166,8 @@ export async function login(username: string) {
     collaboration.callbacks.closeSharedScriptIfOpen = (id: string) => store.dispatch(tabs.closeTab(id))
 
     // register callbacks / member values in the userNotification service
-    userNotification.callbacks.addSharedScript = addSharedScript
+    userNotification.callbacks.addSharedScript = id => addSharedScript(id, false)
 
-    websocket.connect(username)
     collaboration.setUserName(username)
 
     // used for managing websocket notifications locally
@@ -214,7 +221,10 @@ export async function login(username: string) {
     }
 
     // load scripts in shared browser
-    return getSharedScripts()
+    await getSharedScripts()
+    // Wait to receive websocket notifications until *after* we have the list of existing shared scripts.
+    // This prevents us from re-adding shared scripts when we get a bunch of unread share notifications.
+    websocket.login(username)
 }
 
 export async function refreshCodeBrowser() {
@@ -267,15 +277,13 @@ export async function getLockedSharedScriptId(shareid: string) {
     return (await get("/scripts/lockedshareid", { shareid })).shareid
 }
 
-// Delete a user saved to local storage. I.e., logout.
+// Delete a user saved to local storage (logout).
 export function clearUser() {
-    store.dispatch(scriptsState.resetRegularScripts())
-    store.dispatch(scriptsState.resetSharedScripts())
     localStorage.clear()
     if (FLAGS.SHOW_CAI) {
         store.dispatch(cai.resetState())
     }
-    websocket.disconnect()
+    websocket.logout()
 }
 
 export function isLoggedIn() {
@@ -296,16 +304,13 @@ export function shareWithPeople(shareid: string, users: string[]) {
     const data = {
         notification_type: "sharewithpeople",
         username: getUsername(),
+        sender: getUsername(),
         scriptid: shareid,
         // TODO: Simplify what the server expects. (`exists` is an artifact of the old UI.)
         users: users.map(id => ({ id, exists: true })),
     }
 
-    if (!websocket.isOpen) {
-        websocket.connect(getUsername(), () => websocket.send(data))
-    } else {
-        websocket.send(data)
-    }
+    websocket.send(data)
 }
 
 // Fetch a script by ID.
@@ -537,13 +542,18 @@ async function importSharedScript(scriptid: string) {
 }
 
 // Only add but not open a shared script (view-only) shared by another user. Script is added to the shared-script browser.
-async function addSharedScript(shareID: string) {
+// Returns a Promise if a script is actually added, and undefined otherwise (i.e. the user already had it, or isn't logged in).
+function addSharedScript(shareID: string, refresh: boolean = true) {
     if (isLoggedIn()) {
-        const scriptList = await getSharedScripts()
-        if (!scriptList.some(script => script.shareid === shareID)) {
-            const script = await loadScript(shareID, true)
-            await saveSharedScript(shareID, script.name, script.source_code, script.username)
-            getSharedScripts()
+        const sharedScripts = scriptsState.selectSharedScripts(store.getState())
+        if (sharedScripts[shareID] === undefined) {
+            return (async () => {
+                const script = await loadScript(shareID, true)
+                await saveSharedScript(shareID, script.name, script.source_code, script.username)
+                if (refresh) {
+                    await getSharedScripts()
+                }
+            })()
         }
     }
 }
@@ -557,6 +567,15 @@ export async function renameScript(script: Script, newName: string) {
     }
     store.dispatch(scriptsState.setScriptName({ id, name: newName }))
     return { ...script, name: newName }
+}
+
+// Get all active broadcasts
+export async function getBroadcasts() {
+    if (isLoggedIn()) {
+        return getAuth("/users/broadcasts")
+    } else {
+        esconsole("Login failure", ["error", "user"])
+    }
 }
 
 // Get all users and their roles
@@ -596,6 +615,14 @@ export async function setPasswordForUser(username: string, password: string, adm
     }
     await postAuth("/users/modifypwdadmin", data)
     userNotification.show("Successfully set a new password for " + username, "history", 3)
+}
+
+// Expires a broadcast using its ID
+export async function expireBroadcastByID(id: string) {
+    if (!isLoggedIn()) {
+        throw new Error("Login failure")
+    }
+    await getAuth("/users/expire", { id })
 }
 
 // If a scriptname already is taken, find the next possible name by appending a number (1), (2), etc...
@@ -675,8 +702,11 @@ export async function createScript(scriptname: string) {
     return script
 }
 
-export async function uploadCAIHistory(project: string, node: any) {
-    const data = { username: getUsername(), project, node: JSON.stringify(node) }
+export async function uploadCAIHistory(project: string, node: any, sourceCode?: string) {
+    const data: { [key: string]: string } = { username: getUsername(), project, node: JSON.stringify(node) }
+    if (sourceCode) {
+        data.source = sourceCode
+    }
     await post("/studies/caihistory", data)
     console.log("saved to CAI history:", project, node)
 }

@@ -1,17 +1,18 @@
-import React, { useEffect, useState, useRef, ChangeEvent } from "react"
+import React, { useEffect, useRef, ChangeEvent } from "react"
 import { hot } from "react-hot-loader/root"
 import { useSelector, useDispatch } from "react-redux"
+import { Hilitor } from "../../vendor/hilitor"
 
 import * as appState from "../app/appState"
 import { SearchBar, Collapsed } from "./Browser"
 import * as curriculum from "./curriculumState"
 import * as ESUtils from "../esutils"
-import { importScript } from "../ide/IDE"
 import * as layout from "../ide/layoutState"
 import * as userNotification from "../user/notification"
 import { OLD_CURRICULUM_LOCATIONS } from "../data/old_curriculum"
 import { useHeightLimiter } from "../Utils"
 import { useTranslation } from "react-i18next"
+import * as cai from "../cai/caiState"
 
 const SECTION_URL_CHARACTER = ":"
 
@@ -28,8 +29,12 @@ const urlToPermalink = (url: string) => {
         .replace("#", SECTION_URL_CHARACTER)
 }
 
+const getPermalinkParts = (permalink: string) => {
+    return permalink.split(SECTION_URL_CHARACTER)
+}
+
 const permalinkToURL = (permalink: string) => {
-    const linkParts = permalink.split(SECTION_URL_CHARACTER)
+    const linkParts = getPermalinkParts(permalink)
     linkParts[0] += ".html"
     if (linkParts.length === 2) {
         linkParts[0] += "#"
@@ -37,32 +42,57 @@ const permalinkToURL = (permalink: string) => {
     return linkParts.join("")
 }
 
+const checkLegacyURLs = (permalink: string) => {
+    const linkParts = getPermalinkParts(permalink)
+    // first check to see if the full permalink exists in our legacy mapping
+    let url = OLD_CURRICULUM_LOCATIONS[permalink]
+    if (url !== undefined) {
+        return url
+    }
+    // if not, and if the permalink includes a section hash,
+    // then check if just the portion to the left of the hash exists in our legacy mapping
+    if (linkParts.length === 2) {
+        url = OLD_CURRICULUM_LOCATIONS[linkParts[0]]
+        if (url !== undefined) {
+            url += "#" + linkParts[1]
+        }
+    }
+    // url will be undefined if we don't have a legacy mapping for it, and then we attempt to load url as-is
+    return url
+}
+
 const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: curriculum.TOCItem, chIdx: string }) => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
-    const theme = useSelector(appState.selectColorTheme)
-    const textClass = "text-" + (theme === "light" ? "black" : "white")
     const chNumForDisplay = curriculum.getChNumberForDisplay(unitIdx, chIdx)
+    const { t } = useTranslation()
     return (
-        <li className="toc-chapters py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
-            <div className="toc-item">
-                &emsp;
-                {ch.sections && ch.sections.length > 0 &&
-                <button><i className={`pr-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
-                <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
-                    {chNumForDisplay}{chNumForDisplay && <span>. </span>}{ch.title}
+        <li className="ltr:pl-5 rtl:pr-5 py-1" onClick={(e) => { e.stopPropagation(); dispatch(curriculum.toggleFocus([unitIdx, chIdx])) }}>
+            <span className="inline-grid grid-flow-col"
+                style={{ gridTemplateColumns: "17px 1fr" }}>
+                <span>
+                    {ch.sections && ch.sections.length > 0 &&
+                    <button aria-label={`${focus[1] === chIdx ? t("curriculum.collapseChapterDescriptive", { title: ch.title }) : t("curriculum.expandChapterDescriptive", { title: ch.title })}`} title={`${focus[1] === chIdx ? t("curriculum.collapseChapter") : t("curriculum.expandChapter")}`}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[1] === chIdx ? "down" : "right"}`} /></button>}
+                </span>
+                <a href="#"
+                    className="text-black dark:text-white flex"
+                    onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx], url: ch.URL })) }}>
+                    <span>{chNumForDisplay}{chNumForDisplay && <>.</>}</span>
+                    <span className="ltr:pl-1 rtl:pr-1">{ch.title}</span>
                 </a>
-            </div>
+            </span>
             <ul>
                 {focus[1] === chIdx && ch.sections &&
                 Object.entries(ch.sections).map(([secIdx, sec]: [string, curriculum.TOCItem]) =>
-                    <li key={secIdx} className="toc-sections py-1">
-                        <div className="toc-item">
-                            &emsp;&emsp;
-                            <a href="#" className={textClass} onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
-                                {chNumForDisplay}{chNumForDisplay && <span>.</span>}{+secIdx + 1} {sec.title}
+                    <li role="button" aria-label={t("curriculum.openSection", { section: sec.title })} key={secIdx} className="py-1">
+                        <span className="ltr:pl-10 rtl:pr-10 flex">
+                            <a href="#"
+                                className="text-black dark:text-white flex"
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); dispatch(curriculum.fetchContent({ location: [unitIdx, chIdx, secIdx], url: sec.URL })) }}>
+                                <span>{chNumForDisplay}.{+secIdx + 1} </span>
+                                <span className="ltr:pl-1 rtl:pr-1">{sec.title}</span>
                             </a>
-                        </div>
+                        </span>
                     </li>
                 )}
             </ul>
@@ -73,21 +103,19 @@ const TableOfContentsChapter = ({ unitIdx, ch, chIdx }: { unitIdx: string, ch: c
 const TableOfContents = () => {
     const dispatch = useDispatch()
     const focus = useSelector(curriculum.selectFocus)
-    const theme = useSelector(appState.selectColorTheme)
     const toc = useSelector(curriculum.selectTableOfContents)
     const { t } = useTranslation()
-    const textClass = "text-" + (theme === "light" ? "black" : "white")
     return (
         <>
             <div className="inline-block font-bold text-center w-full">{t("curriculum.toc")}</div>
-            <hr className={`border-1 my-2 ${theme === "light" ? " border-black" : "border-white"}`} />
+            <hr className="border-1 my-2 border-black dark:border-white" />
             <ul id="toc" className="select-none">
                 {Object.entries(toc).map(([unitIdx, unit]: [string, curriculum.TOCItem]) => (
                     <li key={unitIdx} className="p-2" onClick={() => dispatch(curriculum.toggleFocus([unitIdx, null]))}>
-                        <div className="toc-item">
+                        <div className="flex items-start">
                             {unit.chapters && unit.chapters.length > 0 &&
-                            <button><i className={`pr-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
-                            <a href="#" className={textClass} onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
+                            <button aria-label={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")} title={focus[0] === unitIdx ? t("thing.collapse") : t("thing.expand")}><i className={`ltr:pr-1 rtl:pl-1 icon icon-arrow-${focus[0] === unitIdx ? "down" : "right"}`} /></button>}
+                            <a href="#" className="text-black dark:text-white" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ location: [unitIdx], url: unit.URL })) }}>{unit.title}</a>
                         </div>
                         <ul>
                             {focus[0] === unitIdx && unit.chapters &&
@@ -129,15 +157,14 @@ const CurriculumSearchResults = () => {
     const dispatch = useDispatch()
     const results = useSelector(curriculum.selectSearchResults)
     const showResults = useSelector(curriculum.selectShowResults) && (results.length > 0)
-    const theme = useSelector(appState.selectColorTheme)
     const [resultsRef, resultsStyle] = useHeightLimiter(showResults)
 
     return showResults
         ? (
-            <div ref={resultsRef} className={`absolute z-50 bg-white w-full border-b border-black ${theme === "light" ? "bg-white" : "bg-gray-900"}`} style={resultsStyle}>
+            <div ref={resultsRef} className="absolute z-50 bg-white w-full border-b border-black bg-white dark:bg-gray-900" style={resultsStyle}>
                 {results.map(result =>
                     <a tabIndex={0} key={result.id} href="#" onClick={e => { e.preventDefault(); dispatch(curriculum.fetchContent({ url: result.id })); dispatch(curriculum.showResults(false)) }}>
-                        <div className={`px-5 py-2 search-item ${theme === "light" ? "text-black" : "text-white"}`}>{result.title}</div>
+                        <div className="px-5 py-2 search-item text-black dark:text-white">{result.title}</div>
                     </a>)}
             </div>
         )
@@ -146,30 +173,42 @@ const CurriculumSearchResults = () => {
 
 export const TitleBar = () => {
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
     const language = useSelector(appState.selectScriptLanguage)
+    const currentLocale = useSelector(appState.selectLocale)
     const location = useSelector(curriculum.selectCurrentLocation)
+    const pageTitle = useSelector(curriculum.selectPageTitle)
     const { t } = useTranslation()
+
+    if (FLAGS.SHOW_CAI && FLAGS.SHOW_CHAT) {
+        useEffect(() => {
+            if (!pageTitle?.includes("Loading")) {
+                dispatch(cai.curriculumPage([location, pageTitle]))
+            }
+        }, [location, pageTitle])
+    }
 
     return (
         <div className="flex items-center p-3 text-2xl">
-            <div className="pl-3 pr-4 font-semibold truncate">
+            <div className="ltr:pl-3 ltr:pr-4 rtl:pl-4 rtl:pr-3 font-semibold truncate">
                 {t("curriculum.title").toLocaleUpperCase()}
             </div>
             <div>
-                <div
-                    className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
+                <button
+                    className="flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer bg-black dark:bg-gray-700"
                     onClick={() => dispatch(layout.setEast({ open: false }))}
+                    title={t("curriculum.close")}
+                    aria-label={t("curriculum.close")}
                 >
                     <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-                </div>
+                </button>
             </div>
-            <div className="ml-auto">
+            {/* TODO: upgrade to tailwind 3 for rtl modifiers to remove ternary operator */}
+            <div className={currentLocale.direction === "rtl" ? "mr-auto" : "ml-auto"}>
                 <button className="px-2 -my-1 align-middle text-3xl" onClick={() => copyURL(language, location)} title={t("curriculum.copyURL")}>
                     <i className="icon icon-link" />
                 </button>
-                <button className={`border-2 -my-1 ${theme === "light" ? "border-black" : "border-white"} w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom`}
-                    title={t("curriculum.switchScriptLanguage")}
+                <button className="border-2 -my-1 border-black dark:border-white w-16 px-3 rounded-lg text-xl font-bold mx-3 align-text-bottom"
+                    title={t("ariaDescriptors:curriculum.switchScriptLanguage", { language: language === "python" ? "javascript" : "python" })}
                     onClick={() => {
                         const newLanguage = (language === "python" ? "javascript" : "python")
                         dispatch(appState.setScriptLanguage(newLanguage))
@@ -184,6 +223,7 @@ export const TitleBar = () => {
 const CurriculumPane = () => {
     const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
+    const currentLocale = useSelector(appState.selectLocale)
     const fontSize = useSelector(appState.selectFontSize)
     const theme = useSelector(appState.selectColorTheme)
     const paneIsOpen = useSelector(layout.isEastOpen)
@@ -218,23 +258,6 @@ const CurriculumPane = () => {
         }
     }, [content, language, paneIsOpen])
 
-    // GrooveMachine integration, for the "Intro to GrooveMachine" chapter.
-    useEffect(() => {
-        const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
-        if (!frame) return
-        const handleMessage = (message: MessageEvent) => {
-            if (message.isTrusted) {
-                if (message.data === "langrequest") {
-                    frame.contentWindow!.postMessage({ lang: language }, "*")
-                } else if (typeof message.data === "string") {
-                    importScript(message.data)
-                }
-            }
-        }
-        window.addEventListener("message", handleMessage)
-        return () => window.removeEventListener("message", handleMessage)
-    }, [content])
-
     useEffect(() => {
         const frame: HTMLIFrameElement = content?.querySelector("#gmFrame")
         if (frame) frame.contentWindow!.postMessage({ lang: language }, "*")
@@ -251,7 +274,7 @@ const CurriculumPane = () => {
 
     return paneIsOpen
         ? (
-            <div className={`font-sans h-full flex flex-col ${theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"}`}>
+            <div dir={currentLocale.direction} className={`font-sans h-full flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white ${currentLocale.direction === "rtl" ? "curriculum-rtl" : ""}`}>
                 <CurriculumHeader />
 
                 <div id="curriculum" className={theme === "light" ? "curriculum-light" : "dark"} style={{ fontSize }}>
@@ -273,13 +296,12 @@ const NavigationBar = () => {
     const location = useSelector(curriculum.selectCurrentLocation)
     const toc = useSelector(curriculum.selectTableOfContents)
     const tocPages = useSelector(curriculum.selectPages)
+    const currentLocale = useSelector(appState.selectLocale)
 
     const progress = (location[2] === undefined ? 0 : (+location[2] + 1) / (toc[location[0]]!.chapters?.[location[1]].sections?.length ?? 1))
     const showTableOfContents = useSelector(curriculum.selectShowTableOfContents)
     const pageTitle = useSelector(curriculum.selectPageTitle)
-    const theme = useSelector(appState.selectColorTheme)
     const triggerRef = useRef<HTMLButtonElement>(null)
-    const [highlight, setHighlight] = useState(false)
     const [dropdownRef, tocStyle] = useHeightLimiter(showTableOfContents, "46px")
 
     const handleClick = (event: Event & { target: HTMLElement }) => {
@@ -295,14 +317,11 @@ const NavigationBar = () => {
 
     return (
         <>
-            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none"
-                style={{ backgroundColor: highlight ? "#334657" : "#223546", color: "white" }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}>
+            <div id="curriculum-navigation" className="w-full flex justify-between items-stretch cursor-pointer select-none text-white bg-blue hover:bg-gray-700">
                 {((location + "") === (tocPages[0] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
-                        <i className="icon icon-arrow-left2" />
+                    : <button aria-label={t("curriculum.previousPage")} className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, -1) }))} title={t("curriculum.previousPage")}>
+                        <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "right2" : "left2"}`} />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
                     {pageTitle}
@@ -310,13 +329,13 @@ const NavigationBar = () => {
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />
-                    : <button className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
-                        <i className="icon icon-arrow-right2" />
+                    : <button aria-label={t("curriculum.nextPage")} className="text-2xl p-3" onClick={() => dispatch(curriculum.fetchContent({ location: curriculum.adjustLocation(location, +1) }))} title={t("curriculum.nextPage")}>
+                        <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "left2" : "right2"}`} />
                     </button>}
             </div>
             <div className={`z-50 pointer-events-none absolute w-full px-4 py-3 ${showTableOfContents ? "" : "hidden"}`}>
                 <div ref={dropdownRef} style={tocStyle}
-                    className={`w-full pointer-events-auto p-5 border border-black bg-${theme === "light" ? "white" : "black"}`}>
+                    className="w-full pointer-events-auto p-5 border border-black bg-white dark:bg-black">
                     <TableOfContents />
                 </div>
             </div>
@@ -338,7 +357,7 @@ const HotCurriculum = hot(() => {
 
         if (curriculumParam !== null) {
             // check if this value exists in our old locations file first
-            const url = OLD_CURRICULUM_LOCATIONS[curriculumParam]
+            const url = checkLegacyURLs(curriculumParam)
             if (url !== undefined) {
                 dispatch(curriculum.fetchContent({ url }))
             } else {

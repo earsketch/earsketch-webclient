@@ -1,4 +1,3 @@
-import { DAWData } from "./app/player"
 import i18n from "i18next"
 
 export const measureToTime = (measure: number, tempo: number, timeSignature = 4) => {
@@ -73,7 +72,7 @@ export const whichBrowser = () => {
 
         M = M[2] ? [M[1], M[2]] : [window.navigator.appName, window.navigator.appVersion, "-?"]
 
-        if ((tem = ua.match(/version\/(\d+)/i)) !== null) {
+        if ((tem = ua.match(/version\/(\d+\.?\d*)/i)) !== null) {
             M.splice(1, 1, tem[1])
         }
     }
@@ -92,82 +91,6 @@ export const whichOS = () => {
         return "Linux"
     }
     return "Unknown OS"
-}
-
-// Returns a human-readable string that is convenient to copy and paste into
-// integration tests. For scripts.
-export const formatScriptForTests = (script: string) => {
-    const lines = script.replace(/'/g, '"').split("\n")
-    let s = "\n"
-    let c = 0
-    for (const line of lines) {
-        if (line.startsWith("//") ||
-            line.startsWith("#") ||
-            line === "") {
-            continue
-        }
-        if (c > 0) {
-            s += "+ "
-        }
-        s += "'" + line + "\\n'\n"
-        c++
-    }
-    return s
-}
-
-// Returns a human readable string that is convenient to copy and paste into
-// integration tests. For script outputs. It returns only the relevant parts
-// of the result object.
-export const formatResultForTests = (result: DAWData) => {
-    let s = "\n{\n"
-    s += "    tempo: " + result.tempo + ",\n"
-    s += "    length: " + result.length + ",\n"
-    s += "    tracks: [\n"
-    for (const track of result.tracks.slice(0, -1)) {
-        s += "        {clips: ["
-        if (track.clips.length > 0) {
-            s += "\n"
-        }
-        for (const clip of track.clips) {
-            const temp = {
-                filekey: clip.filekey,
-                measure: clip.measure,
-                start: clip.start,
-                end: clip.end,
-                pitchshift: undefined as any,
-            }
-            if (clip.pitchshift !== undefined) {
-                temp.pitchshift = {}
-                temp.pitchshift.start = clip.pitchshift.start
-                temp.pitchshift.end = clip.pitchshift.end
-            }
-            s += "            " + JSON.stringify(temp) + ",\n"
-        }
-        if (track.clips.length > 0) {
-            s += "        "
-        }
-        s += "],\n"
-        s += "        effects: {"
-        if (Object.keys(track.effects).length > 0) {
-            s += "\n"
-        }
-        for (const key in track.effects) {
-            s += '            "' + key + '":[\n'
-            for (const range of track.effects[key]) {
-                s += "                " + JSON.stringify(range)
-                s += ",\n"
-            }
-            s += "            ],\n"
-        }
-        if (Object.keys(track.effects).length > 0) {
-            s += "        "
-        }
-        s += "}},\n"
-    }
-    s += "    ]\n"
-    s += "}\n"
-
-    return s
 }
 
 export const truncate = (value: number, digits: number) => {
@@ -242,6 +165,14 @@ export const formatTime = (milliseconds: number) => {
         case years < 1: return i18n.t("formattedTime.monthsAgo", { count: months })
         default: return i18n.t("formattedTime.yearsAgo", { count: years })
     }
+}
+
+// TODO: Update our target to more recent ES, or use a polyfill.
+export function fromEntries<V>(iterable: [string, V][]) {
+    return [...iterable].reduce((obj, [key, val]) => {
+        obj[key] = val
+        return obj
+    }, {} as { [key: string]: V })
 }
 
 const defaultTo = (value: number, defaultValue: number) => {

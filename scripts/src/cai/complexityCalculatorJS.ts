@@ -21,44 +21,7 @@ export function analyzeJavascript(source: string) {
         // initialize list of function return objects with all functions from the API that return something (includes casting)
         // const allVariables = []
         // initialize the results object
-        const resultsObject: cc.Results = {
-            ast: newAST,
-            codeFeatures: {
-                errors: 0,
-                variables: 0,
-                makeBeat: 0,
-                iteration: {
-                    whileLoops: 0,
-                    forLoopsPY: 0,
-                    forLoopsJS: 0,
-                    iterables: 0,
-                    nesting: 0,
-                },
-                conditionals: {
-                    conditionals: 0,
-                    usedInConditionals: [],
-                },
-                functions: {
-                    repeatExecution: 0,
-                    manipulateValue: 0,
-                },
-                features: {
-                    indexing: 0,
-                    consoleInput: 0,
-                    listOps: 0,
-                    strOps: 0,
-                    binOps: 0,
-                    comparisons: 0,
-                },
-            },
-            codeStructure: {} as cc.StructuralNode,
-            inputsOutputs: {
-                sections: {},
-                effects: {},
-                sounds: {},
-            },
-            depth: 0,
-        }
+        const resultsObject = cc.emptyResultsObject(newAST)
         ccState.setIsJavascript(true)
         cc.doAnalysis(newAST, resultsObject)
         // translate the calculated values
@@ -67,45 +30,7 @@ export function analyzeJavascript(source: string) {
 
         return resultsObject
     } catch (error) {
-        return {
-            ast: {},
-            codeFeatures: {
-
-                errors: 1,
-                variables: 0,
-                makeBeat: 0,
-                iteration: {
-                    whileLoops: 0,
-                    forLoopsPY: 0,
-                    forLoopsJS: 0,
-                    iterables: 0,
-                    nesting: 0,
-                },
-                conditionals: {
-                    conditionals: 0,
-                    usedInConditionals: [],
-                },
-                functions: {
-                    repeatExecution: 0,
-                    manipulateValue: 0,
-                },
-                features: {
-                    indexing: 0,
-                    consoleInput: 0,
-                    listOps: 0,
-                    strOps: 0,
-                    binOps: 0,
-                    comparisons: 0,
-                },
-            },
-            codeStructure: {} as cc.StructuralNode,
-            inputsOutputs: {
-                sections: {},
-                effects: {},
-                sounds: {},
-            },
-            depth: 0,
-        } as cc.Results
+        return cc.emptyResultsObject({} as cc.AnyNode)
     }
 }
 
@@ -116,7 +41,7 @@ function convertASTTree(AstTree: any) {
         const toAdd = convertASTNode(AstTree.body[i])
         bodyItems.push(toAdd)
     }
-    const parentItem = { _astname: "Module", body: bodyItems } as cc.Node
+    const parentItem = { _astname: "Module", body: bodyItems } as cc.ModuleNode
     return parentItem
 }
 
@@ -126,7 +51,7 @@ let jsParentCol: number
 // Converts a Javascript AST to a fake Python AST
 // does this by hierarchically going through JS AST nodes, and constructing a new AST with matching nodes structured like Skulpt Python nodes
 function convertASTNode(JsAst: any) {
-    const returnObject: cc.Node = {}
+    const returnObject: any = {}
     const nodeBody: any = []
     let object = JsAst
     if (JsAst.type === "ExpressionStatement") { // remove expression objects. we do not need them.
@@ -215,10 +140,13 @@ function convertASTNode(JsAst: any) {
         // name the function after its location so its return gets properly tallied by function evaluate.
         returnObject.functionName = "" + object.loc.start.line + "|" + object.loc.start.column
         // make a child object the serves as a function definition
-        const funcDefObj: cc.Node = {
+        const funcDefObj: cc.FunctionDefNode = {
             _astname: "FunctionDef",
             lineno: object.loc.start.line,
-            name: { v: returnObject.functionName } as cc.Node,
+            name: { v: returnObject.functionName } as cc.strNode,
+            body: [] as (cc.IfNode | cc.ForNode | cc.JsForNode | cc.WhileNode)[],
+            args: {} as cc.ArgumentsNode,
+            colOffset: 0,
         }
         // body in funcdefobj
         if (hasBody) {
@@ -232,7 +160,7 @@ function convertASTNode(JsAst: any) {
         funcDefObj.args = {
             args: paramsObject,
             lineno: object.loc.start.line,
-        }
+        } as cc.ArgumentsNode
         returnObject.functionDef = funcDefObj
     } else if (object.type === "IfStatement") {
         returnObject._astname = "If"
@@ -344,7 +272,7 @@ function convertASTNode(JsAst: any) {
             // binop has left, right, and operator
             returnObject.left = convertASTNode(object.left)
             returnObject.right = convertASTNode(object.right)
-            returnObject.op = { name: ccState.binOps[object.operator] } as cc.Node
+            returnObject.op = { name: ccState.binOps[object.operator] } as cc.opNode
         } else if (Object.keys(ccState.comparatorOps).includes(object.operator)) {
             // we make a compare node, then we make a binop node
             returnObject._astname = "Compare"

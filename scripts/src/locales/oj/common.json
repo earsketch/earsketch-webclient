@@ -1,0 +1,854 @@
+{
+  "common": {
+    "loading": "boozitaasowin...",
+    "contentManager.title": "genawenjigemagak",
+    "search": "endone’igemagak",
+    "results": "mikigewin",
+    "noResults": "Gaawiin gegoo mikigewin",
+    "soundBrowser.title": "Enitaagwak",
+    "soundBrowser.title.collection": "Gakina Enitaagwakin",
+    "soundBrowser.title.featuredArtist": "Waa-izhinaagwak",
+    "soundBrowser.title.recommendations": "Ge-gojitoong",
+    "soundBrowser.button.addSound": "Atoon ge-initaagwak",
+    "soundBrowser.button.showOnlyStars": "Naagwatoon eta go",
+    "filter": "Biinichigan",
+    "startQuickTour": "Naagajichigewinr",
+    "switchTheme": "Gwekinaagwatoon",
+    "reportError": "Naagwatoon Wanichigewin",
+    "leave": "Boonitoon",
+    "soundBrowser.filterDropdown.artists": "Gaa-dazhiikamowaad",
+    "soundBrowser.filterDropdown.genres": "Inweg",
+    "soundBrowser.filterDropdown.instruments": "Gidochiganan",
+    "soundBrowser.clip.tooltip.file": "Naa’isijigan",
+    "soundBrowser.clip.tooltip.folder": "Biinjibii’iganan",
+    "soundBrowser.clip.tooltip.artist": "Gaa-dazhiikamowaad",
+    "soundBrowser.clip.tooltip.genre": "Enweg",
+    "soundBrowser.clip.tooltip.instrument": "Gidochigan",
+    "soundBrowser.clip.tooltip.originalTempo": "Meshkodaabikinigan",
+    "soundBrowser.clip.tooltip.year": "Apii gikinoonowin",
+    "soundBrowser.clip.tooltip.previewSound": "Bangii gii-pizindaan",
+    "soundBrowser.clip.tooltip.markFavorite": "Daangibii’an menotaman",
+    "soundBrowser.clip.tooltip.paste": "Naabibii’an izhichigewin",
+    "scriptBrowser.filterDropdown.owner": "Debendang",
+    "scriptBrowser.filterDropdown.fileType": "Gaa’-inweg",
+    "scriptBrowser.filterDropdown.sortBy": "Andone’igewin",
+    "scriptBrowser.showDeleted": "Gaa-kaasiibii’igaadeg",
+    "scriptBrowser.deletedscripts": "Ge-gaasiibii’igemagak",
+    "scriptBrowser.restore": "Azhe-naagwatoon",
+    "keepUnsavedTabs": "Baakisidoon ezhibii’iganan",
+    "ignore": "Aanwetamowin",
+    "script": "Izhichigewin",
+    "version": "Gaa-inweg",
+    "script_plural": "Izhichigewinan",
+    "scriptBrowser.myScripts": "Nindizhichigewinan",
+    "scriptBrowser.sharedScripts": "Maamawichigewinan",
+    "daw.title": "Wenji-bagakitaagwak",
+    "daw.shortTitle": "DAW",
+    "daw.effect": "Ge-izhichigemagak",
+    "daw.effect_plural": "Ge-izhichigemagakin",
+    "daw.tooltip.reset": "Aanji-maajitoon",
+    "daw.tooltip.play": "Noondaagwatoon",
+    "daw.tooltip.loopProject": "Aayaanji-izhichigewinan",
+    "daw.tooltip.pause": "Gibitinan",
+    "daw.tooltip.autoScroll": "Bimizha’igewin",
+    "daw.tooltip.toggleMetronome": "Eyekoweng",
+    "daw.tooltip.toggleVolume": "Epiitaweg",
+    "daw.tooltip.solo": "Nishike",
+    "daw.tooltip.mute": "Gibaabikinigan",
+    "daw.abbreviation.solo": "N",
+    "daw.abbreviation.mute": "G",
+    "daw.tooltip.toggleEffects": "Ayaandwewesidoon",
+    "daw.bypass": "Baazijigan",
+    "newScript": "Oshki-izhichigewin",
+    "editor.title": "Endazhi-wiindamaading",
+    "editor.blocksMode": "Gibichibii’igan",
+    "editor.run": "Maajitoon",
+    "editor.noScriptsLoaded": "Gaawiin gegoo izhichigewinan.",
+    "editor.clickHereCreateScript": "Daanginan omaa ji-ozhitooyan oshki-izhichigewinan!",
+    "editor.mode": "Aazha gibiinjibii’ige <span  class=\"empty-script-lang\">{{scriptlang}}</span> mode.",
+    "editor.ifYouWant": "Giishpin aabajitooyan <span class=\"empty-script-lang\">{{otherScriptLang}}</span> mode, <br /> please open a script with <span class=\"empty-script-lang\">{{otherScriptExt}}</span> or create a new one <br /> and select <span class=\"empty-script-lang\">{{otherScriptLang}}</span> izhichigewin.",
+    "tabs.otherTabs": "Aanind izhibii’iganan",
+    "tabs.closeAll": "Gakina giba’an",
+    "footer.teachers": "Gekinoo’amaagewaad",
+    "footer.help": "Ge-onji-wiiji’igooyan",
+    "thing.open": "Baakinan",
+    "thing.close": "Giba’an",
+    "script.copy": "Aanji-ozhitoon",
+    "script.rename": "Aanji-nikaadan",
+    "script.download": "Naabibii’an",
+    "script.print": "Saagijibii’an",
+    "script.share": "Okowichigewin",
+    "script.submitCompetition": "Miigiwen gidanokiiwin",
+    "script.history": "Gaa-onjiigin izhichigewinan",
+    "script.codeIndicator": "Gaa-onji-gikendaming",
+    "script.import": "Aazhawe atoon",
+    "script.delete": "Gaasiibii’an",
+    "sharedScript.noDescription": "Bizhishigwaa owe izhichigewin.",
+    "sharedScript.originalAuthor": "Gaa-gii-maajitood",
+    "sharedScript.collaborators": "Gaa-wiijitwaawaad",
+    "sharedScript.license": "Omazina’iganigikinawaajibii’igan",
+    "sharedScript.viewOnlyLink": "Waabandan eta go izhichigewin",
+    "lastModified": "Iskwaaj gii-anokaadaman",
+    "ok": "Ahaaw isa",
+    "confirm": "Dibaadondeg",
+    "default": "Azhese",
+    "importToEdit": "Biidoon Aanjichigewin",
+    "notifications.title": "Wiindamaadiwin",
+    "notifications.pinned": "Minjimendamowiindamaadiwin",
+    "notifications.other": "Aanind Wiindamaadiwin",
+    "notifications.viewAll": "Gakina Waabanjiganan",
+    "notifications.markAllRead": "Mazinaatebii’an Waabanjiganan",
+    "forgotPassword.title": "Gigii-wanendaan na Gigiimoojibii’igan?",
+    "forgotPassword.prompt": "Ozhibii’an gidaazhawaatebii’igan",
+    "forgotPassword.submit": "Mikan gigiimoojibii’igan",
+    "forgotPassword.email": "Gidaazhawaatebii’igan",
+    "createResetAccount": "Ozhitoon Oshki-gikinawaajibii’igan",
+    "accountCreator.prompt": "Ozhitoon gegoo gikinawaajibii’igan",
+    "accountCreator.success": "Naagwad gikinawaajibii’igan!",
+    "accountCreator.submit": "Ozhitoon Gegoo Gikinawaajibii’igan",
+    "formfieldPlaceholder.username": "Izhinikaazowin",
+    "formfieldPlaceholder.password": "Gigiimoojibii’igan",
+    "formfieldPlaceholder.confirmPassword": "Miinawaa Ozhibii’an Gigiimoojibii’igan",
+    "formFieldPlaceholder.email": "Gidaazhawaatebii’igan",
+    "formFieldPlaceholder.emailOptional": "Gidaazhawaatebii’igan (Giin sa go)",
+    "formFieldPlaceholder.firstName": "Nitaminkaazowin",
+    "formFieldPlaceholder.lastName": "Ishkwenikaazowin",
+    "formFieldPlaceholder.currentPassword": "Verify your current password",
+    "formFieldPlaceholder.newPassword": "Oshki-gegiimoojibii’igan",
+    "formFieldPlaceholder.confirmNewPassword": "Miinawaa Ozhibii’an Gigiimoojibii’igand",
+    "formFieldPlaceholder.typeDescriptionHere": "Ezhinaagwak waa-izhichigeyan",
+    "cancel": "Gaasiibii’an",
+    "update": "Gwayakonaagwak",
+    "save": "Ganawendan",
+    "saveAndSend": "Ganawendan gaye Izhinizha’an",
+    "upload": "Aazhawibiinjibi’an",
+    "editProfile": "Aanji-ayaawiyaan",
+    "registerAccount": "ozhitoon Oshki-gikinawaajibii’igan",
+    "logout": "Gibaabikinan",
+    "notifications.none": "Gaawiin gegoo wiindamaadiwin.",
+    "profileEditor.prompt": "Aanji-ayaawiyaan {{izhinikaazowin}}",
+    "profileEditor.error": "Wanichigewin gaa-aawiyaan.",
+    "profileEditor.success": "Gaa-aawiyaan gwayakonaagwak!",
+    "changePassword.prompt": "Aanjitoon Giimoojibii’ igan",
+    "changePassword.success": "Aanjibii’igan gwayakosin!",
+    "download.multiTrack": "Niibiwa Nagamonan",
+    "scriptHistory.running": "Aabadadoon izhichigewinan...",
+    "scriptHistory.versionSuccess": "Minobii’igaadewan.",
+    "scriptHistory.versionError": "Gii-wanibii’igaade.",
+    "scriptHistory.restore": "Mookinan ezhibii’iganan",
+    "scriptHistory.title": "Minjimendamowizhichigewinan {{izhichigewinikaazowin}}",
+    "scriptHistory.heading": "Minjimendamowizhichigewinan",
+    "scriptHistory.diff": "Aanji-izhibii’igewinan",
+    "scriptHistory.activeCollab": "Gaa-nitaa-wiiji’iwewaad",
+    "scriptHistory.onlyMyScripts": "Aazha gidaa - azhe - waabandaan izhibii’ igewin $t(scriptBrowser.myScripts)",
+    "scriptHistory.fetching": "Naagwatoon izhibii’igewinan.",
+    "renameScript.title": "Aanji-nikaadan",
+    "renameScript.prompt": "Ezhi-oshki-izhinikaadegin:",
+    "rename.submit": "Aanji-nikaadan",
+    "renameScript.appendSuffix": "Ishkwebii’igan",
+    "renameScript.alreadyExists": "Aazha naagwad ezhinikaadeg anokiiwin.",
+    "renameSound.title": "Aanjitoon Enitaagwak",
+    "renameSound.prompt": "Ozhibii’an weshki-initaagwak:",
+    "create": "Ozhitoon",
+    "scriptCreator.title": "Ozhitoon oshki-izhichigewin",
+    "scriptCreator.scriptName": "Izhichigewinikaadeg",
+    "scriptCreator.scriptName.subtext": "Aaniin ge-izhikaadamaan oshki-izhichigewin?",
+    "scriptCreator.scriptLang": "Inwewin Izhichigewin",
+    "scriptCreator.scriptLang.subtext": "Wegonen inwewin ayaabajitooyan?",
+    "scriptAnalysis.title": "Aaniin gegoo izhichigewinan",
+    "scriptAnalysis.category.loops": "Ayaanjisijiganan",
+    "scriptAnalysis.category.conditionals": "Ezhichigaadegin",
+    "scriptAnalysis.category.conditionalsWithBool": "Ezhichigemagak Aazhawaatebii’iganan",
+    "scriptAnalysis.category.lists": "Ozhibii’iganan",
+    "scriptAnalysis.category.listStringOps": "Aazhawaatebii’igan odikidoowinan",
+    "scriptAnalysis.category.userFunctions": "Enaabadakin",
+    "category": "Gaayaabadak",
+    "count": "Endasingin",
+    "total": "Maamawi gakinal",
+    "exit": "Gaasiibii’igan",
+    "more": "Geyaabi",
+    "scriptShare.title": "Aazhawinamaadiwin \"{{scriptName}}\"",
+    "scriptShare.tab.viewonly.title": "Awiya Gewiinawaa Oga-waabandaanaawaa",
+    "scriptShare.tab.viewonly.linkTitle": "Awiya Gewiinawaa Oga-waabandaanaawaa Eta Go Gaawiin Aanjitoowaad",
+    "scriptShare.tab.viewonly.shareCurrent": "Aazhawinamaw enitaagwak",
+    "scriptShare.tab.viewonly.shareFuture": "Aazhawinamaw Waa-initaagwak naagaj",
+    "scriptShare.tab.viewonly.otherUsers": "Awiya Gewiinawaa Oga-waabandaanaawaa Eta Go Gaawiin Aanjitoowaad",
+    "scriptShare.tab.viewonly.usersPlaceholder": "Ozhibii’an Giwiinzowin naanaagewaasawabii’an.",
+    "scriptShare.tab.collab.title": "Bagidin Aanind Ji-aanjitoowaad",
+    "scriptShare.tab.collab.addRemove": "Aanind Ashi Gemaa Gaye Aanind Aanjishim Gaa-wiiji’iwewaad",
+    "scriptShare.tab.embed.title": "Aazhawinamaagen Gaa-gii-ozhichigaadegin",
+    "scriptShare.tab.embed.linkTitle": "Aazha ayaawan Gikinawaajibii’iganan",
+    "scriptShare.tab.embed.showCode": "Aazhawinamaagen Izhibii’igewin:",
+    "scriptShare.tab.embed.showDAW": "Naagotoon DAW:",
+    "scriptShare.tab.soundcloud.title": "Ganawendan SoundCloud",
+    "scriptShare.tab.soundcloud.shareDesc.private": "Niin eta.  Nindaa-waabandaan.",
+    "scriptShare.tab.soundcloud.shareDesc.publicDownload": "Awegwen igo.  Odaa-aazhawaatebii’aan.",
+    "scriptShare.tab.soundcloud.shareDesc.public": "Awegwen igo.  Awiya dash odaa-bizindaanaawaan eta.",
+    "scriptShare.tab.soundcloud.sharePrompt": "Aaniin gewiinawaa awiya ge-izhi-naagwatoowaapan SoundCloud?",
+    "scriptShare.tab.soundcloud.songName": "Ezhinikaadeg Nagamon",
+    "scriptShare.tab.soundcloud.view": "Waabandan imaa SoundCloud",
+    "scriptShare.moreDetails": "Ezhinaagwak gikinawaajibii’igan (Ezhinaagwak, Omazina’iganigikinawaajibii’igan)...",
+    "scriptShare.descriptionOptional": "Ezhinaagwak (giin sa go)",
+    "scriptShare.licenseType": "Omazina’iganigikinawaajibii’igan dinowa",
+    "scriptShare.copyClipboard": "Naabibii’an",
+    "soundUploader.title": "Oshki-inwewin Atoon",
+    "soundUploader.title.upload": "Aazhawebii’an inwewinan",
+    "soundUploader.title.record": "Gizhii-aazhawibii’an",
+    "soundUploader.file.prompt": "Onaabandan mazina’igan...",
+    "soundUploader.constantRequired": "Wiinzowin (ji-ayaayan)",
+    "soundUploader.tempoOptional": "Epiichiiyan (giin sa go)",
+    "soundUploader.record.measures.title": "Gaa-apiichiiyan",
+    "soundUploader.record.measures.metronomeClick": "Daanginan aazhawewesijigeyan",
+    "soundUploader.record.measures.tempo": "Epiichiibideg",
+    "soundUploader.record.measures.countoff": "Agindan Endasinging",
+    "soundUploader.record.measures.toRecord": "Minik Aazhawewsijigewin",
+    "soundUploader.record.prompt": "Ozhibii’an Enitaagwak",
+    "soundUploader.record.getReady": "Ozhiitaan!",
+    "metronome": "Ekowed",
+    "clear": "Gaasiibii’igan",
+    "soundUploader.record.mic.waiting": "Biitoon baswewesijigan...",
+    "soundUploader.record.mic.reenable": "Daanginan aazhawewesijigan gagwe-aabajitoon.",
+    "soundUploader.freesound.description": "aazhawaatebii’iganing ezhi-baatayiinakin michi-bizindamowinan, aazhawewsijiganan, omazina’iganigikinawaajibii’igan Creative Commons.  Anda-waabandan enwegin Freesound gaye ganawendan EarSketch naazhaya’ii.",
+    "soundUploader.freesound.searching": "Anda-waabandan Freesound…",
+    "soundUploader.freesound.uploadedBy": "Aazhabiinjibii’an Freesound wiinzowin {{awiya Wiinzowin}}",
+    "formattedTime.justNow": "Noongom igo",
+    "formattedTime.recently": "nooma igo",
+    "formattedTime.minutesAgo": "1 diba'igaans api",
+    "formattedTime.minutesAgo_plural": "{{count}} go Izhi-ningoding diba’igaansan apii",
+    "formattedTime.hoursAgo": "Izhi - ningoding diba’ igan apii",
+    "formattedTime.hoursAgo_plural": "{{count}} go diba’igan apii",
+    "formattedTime.daysAgo": "bijiinaago",
+    "formattedTime.daysAgo_plural": "{{count}} go daso-giizhik",
+    "formattedTime.weeksAgo": "awas gaa-gii-izhiseg",
+    "formattedTime.weeksAgo_plural": "{{count}} go apii gaa-gii-izhiseg",
+    "formattedTime.monthsAgo": "ishkwaaj iwedi giizisl",
+    "formattedTime.monthsAgo_plural": "{{count}} go daso - giizis",
+    "formattedTime.yearsAgo": "Awasibiboonong",
+    "formattedTime.yearsAgo_plural": "{{count}} go daso - biboon",
+    "curriculum.title": "Inanokiiwibii’ igan",
+    "curriculum.switchScriptLanguage": "Aanjisinging ikidowinan",
+    "curriculum.showTOC": "Waabanda’ iwen Enaajimomagakin",
+    "curriculum.toc": "Enaajimomagakin",
+    "curriculum.previousPage": "Odaanaang Baakiiginigan",
+    "curriculum.nextPage": "Niigaan Baakiiginigan",
+    "curriculum.copyURL": "Naabibii’ an Inanokiiwibii’ igan",
+    "shortcuts.run": "Run script",
+    "shortcuts.save": "Save script",
+    "shortcuts.undo": "Undo",
+    "shortcuts.redo": "Redo",
+    "shortcuts.comment": "Comment code",
+    "shortcuts.autocomplete": "Autocomplete",
+    "shortcuts.zoomHorizontal": "Zoom (Horizontal)",
+    "shortcuts.zoomVertical": "Zoom (Vertical)",
+    "hardware.ctrl": "Ctrl",
+    "hardware.cmd": "Cmd",
+    "hardware.shift": "Shift",
+    "hardware.alt": "Alt",
+    "hardware.option": "Option",
+    "hardware.enter": "Enter",
+    "hardware.space": "Space",
+    "hardware.wheel": "Mouse Wheel"
+  },
+  "bubble": {
+    "userLanguage": "Inwewin",
+    "script.name": "Ajina izhichigewinan",
+    "defaultProgrammingLanguage": "Nitam enweg aazhawaatebii’ iganan",
+    "buttons": {
+      "skip": "Gaawiin Memwech",
+      "skipTour": "Gaawiin Memwech Izhichigewinan",
+      "start": "maajitoon",
+      "close": "gibaakwa’an",
+      "next": "nawaj"
+    },
+    "header": {
+      "start": "Boozhoo EarSketch",
+      "codeEditor": "1 / 8 Waabandan Gaa - gii - ozhitood",
+      "runCode": "2 / 8 Aabajitoon Gaa - gii - aazhawaatebii’ ang",
+      "previewMusic": "3 / 8 Waabandan ginagamonan",
+      "playMusic": "4 / 8 Gidootoon ginagamonan",
+      "exploreCode": "5 / 8 Waabandan gaa - gii - aazhawaatebii’ ang",
+      "addSounds": "6 / 8 Aanind atoon enitaagwakin imaa gaa - gii - aazhawaatebii’ ang",
+      "saveCode": "7 / 8 Ganawendan gaa - gii - aazhawatebii’ ang",
+      "readCurriculum": "8 / 8 Agindan inanokiiwin",
+      "end": "Mii i"
+    },
+    "body": {
+      "start": "Gigiizhiitaa na ji - maajitaayan izhichigewin gaye ji - ozhitooyan nagamon? Giishpin nitam ezhichigewinan, daanginan <span class=\"border-2 border-black rounded-full px-2 bg-black text-white font-thin text-xl\">Start</span> naazhaya’ii wewiibinaabin gaa-izhichigeyan EarSketch. Giishpin nagajitooyan, daanginan <span class=\"border-2 border-black rounded-full px-2 font-normal text-xl\">Skip</span> to start coding.<br><br>* izhinikaade inwewin Pytho, daanginan naazhaya’ii ji-aanjisidooyan inwewin JavaScript.",
+      "codeEditor": "Aazhawaatebii’ iganing ge - dazhi - ozhitooyan nagamon. Gaa - dazhiikang wabandan ji - naagwak nagamon.",
+      "runCode": "Waabandan owe <span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> Daaginan <span class=\"font-black text-green-600 text-2xl\"><i class=\"align-middle icon icon-arrow-right22\"></i>RUN</span> gaa - dazhiikang dananokiiwin ogijaya’ ii gaa - dazhiikang.",
+      "previewMusic": "Endananokiing(E) giga - waabandaan minik gaa - anokiidaman diba’ iganensens. Naazhaya’ ii gidananokiiwin, enitaagwakin nagamonan omaa ayaawan.",
+      "playMusic": "Ogijaya’ ii daanginan(E) da - naagwad ge - onji - waabandaman ji - gidotooyan.Gidaa - daanginaan gaa - ozhaawashko - shaagawaag ji - gidotooyan <span class=\"align-middle icon icon-play4 text-green-600 text-2xl\"></span>.",
+      "exploreCode": "Namanjaya’ ii waabanjiganing ge - onji - mikaman.Daanginan daangibii’ igan ogijaya’ ii ji - baakinamang gaye giba’ aman.Baatayiinadoon daangininganan.Baamaa giga - waabandaanan eshtigemagakin.",
+      "addSounds": "Nitam mekaged < span class = \"text-yellow-500 text-3xl align-middle icon icon-headphones\"></span> NOONDAAGWAD.  Naazhaya’ii ipidoon mekagemagak daanginan biinjibii’iganan ji-noondaman 4,000+ nagamonan, negamowaad gaa-gii-ozhitoowaad.",
+      "saveCode": "Aazha ganawenjigemagak < span class = \"text-yellow-500 text-3xl align-middle icon icon-embed2\"></span> MAZINA’IGANAN.  Gidaa-waabandaanan mazina’igan e’apii gaa-ozhichigaadegin, gaye inwewin.",
+      "readCurriculum": "Na’ iiwaya’ iing inanokiiwibii’ iganan.Daanginan ji - waabandaman inanokiiwibii’ igan gaye ge - wiiji’ ik daanginan ji - waabandamang.",
+      "end": "Howa! Gigiizhitoon anokiiwin. Mii dash ge - izhi - maajitooyan gidochigewin. Daanginan <span class=\"align-middle icon icon-plus2\"></span> oshki-anokiiwin gaye gaa-maajii-dazhiikang."
+    }
+  },
+  "messages": {
+    "confirm": {
+      "deletescript": "Gaawiin naagwasinoon baamaa miinawaa giga - naagwatoon \"Gaasiibii’an\".",
+      "deleteSharedScript": "Geget ina go giwii - kaasiibii’ aan maamawichigemazina’ igan \"{{scriptName}}\"?",
+      "deleteSound": "Geget ina go giwii - kaasiibii’ aan enweg {{soundName}}",
+      "leaveCollaboration": "Giwii - nagadaan ina maamawichigewin \"{{scriptName}}\"?"
+    },
+    "interpreter": {
+      "runSuccess": "Mazina’ iganigwayakochigewin! Daaginan ji - noondaman gidochigewin.",
+      "runFailed": "Wanichigewin: Bezhig miinawaa awashime wanichigewin. Ganawaabandan aazhawaatebii’ igan ekidomagak.",
+      "noimport": "gaawiin gikendaagwasinoon. Maagizhaa \"earsketch ge-naagwak\" wanisin."
+    },
+    "dawservice": {
+      "effecttrackwarning": "Gegoo inwetoon jibwaa-ozhitooyan nagamon"
+    },
+    "esaudio": {
+      "stringindex": "gaawiin aabajitoosiin madwezhichigewin",
+      "nonlistRangeError": "madweyigaade eta 0, + gaye - ",
+      "tempoRange": "Maagizhaa epiitawek 45 bpm gaye 220 bpm apiitawewan",
+      "analysisTimeTooShort": "Naanaagajitoon diba’ igan(ishkwaaj - maajitaayan) onzaam agaasin"
+    },
+    "user": {
+      "scriptcloud": "Weweni ganawenjigewining.",
+      "allscriptscloud": "Aazha gakina ganawenjigaadewan.",
+      "badsharelink": "Nitam gegoo wanisin.Ganabaj gii - wanibii’ igaadeg.",
+      "scriptcopied": "Gwayakobii’ igaade mazina’ igan.",
+      "emailConflict": "Gaawiin gii-anokiimagasinoon.  Inaabin gidaazhawaatebii’iganing EarSketch gaa-doodang. (Waabandan: Giishpin gikendanziyan, gojitoon miinawaa gaye maajiitoon gakina -> wanibii’ igaade)"
+    },
+    "download": {
+      "script": "Ganawendan gidanakiiwin imaa gidaazhawaatebii’ iganing.",
+      "wav": "Ganawendan ginagamon WAV(ganawendan ji - michaag, gimazinaatebii’ iganiing).",
+      "mp3": "Ganawendan ginagamon MP3(ganawendan ji - michaag, gimazinaatebii’ iganiing).",
+      "multitrack": "Bebezhig wiindan ezhinikaadegin WAV(ji - naabibii’ igaadegin GarageBand, Logic, Pro Tools, Reaper, FruityLoops, Cubase, Audition, or Live).",
+      "compileerror": "Gaawiin weweni naagwasinoon ge - izhichigewin.",
+      "emptyerror": "Bizhishigwaananamon!",
+      "rendererror": "Gii - ayaa wanichigewin ji - naabibii’ igaade izhichigewin."
+    },
+    "changepassword": {
+      "pwdauth": "Gete-giimoojibii’igan wanitaagwad.  Gaawiin daa-aanjichigaadesinoon.",
+      "pwdfail": "Aazha gaa-gii-ozhibii’aman gaawiin daabida initaagwasinoon.",
+      "pwdlength": "Onzaam dakobii’ igaade.Maagizhaa 5 awashime.",
+      "commerror": "Gii - wanitaagwad aazhawaatebii’ igan...",
+      "commerror2": "Gii - wanitaagwad aazhawaatebii’ igan..."
+    },
+    "downloadprotecteddata": {
+      "nopassword": "Ozhibii’ igan gimoojibii’ igan.",
+      "servertimeout": "Miinawaa gii - maazhise.Gojitoon miinawaa.",
+      "unexpectederror": "Gaa - gikendaagwasinookwanichigewin.Miinawaa gojitoon maagizhaa gidaa - wiindamaage."
+    },
+    "forgotpassword": {
+      "fail": "Inaabin gidaazhawaatebii’ iganing gegoo jii - igooyan EarSketch ji - ozhitooyan oshki - giimoojibii’ igan.",
+      "success": "Please check your e-mail for a message from EarSketch to reset your password."
+    },
+    "uploadcontroller": {
+      "freesoundSelection": "Onaabandan Freesound...",
+      "userAuth": "Gaa - gwayakojigesik enaabadak...",
+      "wavsel": "Onaabandan nagamon...",
+      "invalidfile": "gaawiin anokiimagasinoon nagamon",
+      "undefinedconstant": "Gaawiin madwesisinoon...",
+      "alreadyused": "mii owe medwesing",
+      "invalidconstant": "gaawiin madwesisinoon...",
+      "tempointeger": "Meshkodaabikinigan gwayakobii’ igan...",
+      "bigsize": "Hay’, gaawiiin nawaj ji - ginwaag 30 diba’ igaansens.",
+      "timeout": "Aatawe aatawaatebii’ igan...",
+      "uploadsuccess": "Anokiimagadoon enitaagwakin",
+      "commerror": "Gii - wanitaagwad aazhawaatebii’ igan enitaagwakin...",
+      "commerror2": "Gii - wanitaagwad aazhawaatebii’ igan enitaagwakin...",
+      "chrome_mic_noaccess": "Gigii - gibaabikinaan ginoondaagochigan. Miinawaa wii - madwesijigeyan daanginan‘ i’ gaye daanginan‘ ge - gashkatooyan’ jiigaya’ ii gaa - ayaag‘ madwesijigan’. Miinawaa gojitoon.",
+      "ff_mic_noaccess": "Gigii - gibaabikinaan ginoondaagochigan. Miinawaa wii - madwesijigeyan daanginan, .madwesijigan aazhawinamaagen EarSketch.Miinawaa gojitoon.",
+      "mic_noaccess": "Gigii - gibaabikinaan ginoondaagochigan. Miinawaa wii - madwesijigeyan daanginan, aanji - baakinan madwesijigan izhichigewin. Miinawaa gojitoon."
+    },
+    "createaccount": {
+      "pwdfail": "Gaa - ikidomagak gaawiin owe gigiimoojibii’ igan aawanzinoon.",
+      "useralreadyexists": "Aazha owe gii - wiinde gaawiin gidaayaabajitoosiin.Daangin‘ gii - moojibii’ igan’ daanginan owe gashkatoosiwan ji - waabandaman gikinawaajibii’ igan.",
+      "commerror": "Gii - wanitaagwad...",
+      "usernameconstraint": "Ozhitoon wiinzowin gikinawaajibii’ igan gegoo aabajitooken asigibii’ igan giishpin maajii - doodang"
+    },
+    "general": {
+      "unauthenticated": "Biinjibii’ igen waa - ozhitooyan...",
+      "loginsuccess": "Weweni biinjibii’ igen",
+      "loginfailure": "Wanibii’ igaade gikinwaajibii’ igan.Miinawaa gojitoon maagizhaa bekaanak.",
+      "complexitySyntaxError": "Gaawiin gii - anokiimagasinoon gaa - gii - ozhibii’ aman. Ganabaj gigii - wanichige gaa - izhibii’ aman gigikinawaajibii’ igan.",
+      "soundrenamed": "Weweni aanjinikaadan",
+      "renameSoundEmpty": "Ji - bizhisigwaasinook enitaagwak(gaawiin onowe aabadasinoon \"_\")!",
+      "renameSoundSpecialChar": "Gego daanginigan aabajitooken wii - aanjibii’ aman...",
+      "renameSoundConflict": "Aazha gii - aabadad wiinzowin",
+      "shortname": "Ozhitoon wiinzowin 3 ozhibii’iganan maagizhaa nawaj niibiwa.",
+      "illegalCharacterInUserID": "Aabajitoon asigibii’ igaasan, gaye _ gikinawaajibii’ iganan.",
+      "userDoesNotExist": "Gaawiin ayaasinoon owe.",
+      "noSelfShare": "Gego aazhawenimaageken!"
+    },
+    "idecontroller": {
+      "running": "Anokiimagad izhichigewin...",
+      "success": "Weweni anokiimagad izhichigewin",
+      "overwrite": "Aazha ayaamagad izhichigewin. Ozhitoon wiinzowin miinawaa aanjitoon.",
+      "illegalname": "Aabajitoon asibii’ iganensan eta go.",
+      "savefailed": "Gaawiin aabadasinoon izhichigewin. Ingoji izhi - ganawendan gidizhichigewin.",
+      "blocksyntaxerror": "Gaawiin ji - atooyan jakibii’ iganan.Naagaj ji - minonaagwak ozhibii’ igan.",
+      "saveallfailed": "Aanind gaawiin daa - ganawendaagwasinoon.Ingoji izhi - ganawendan gidizhichigewin.",
+      "closealltabs": "Mii owe gakina ge - giba’ ang mazinaatebii’ iganansan. Geget ina giwii - maajitoon ?",
+      "soundcloud": {
+        "description": "EarSketch giga - wiiji' igon ge - izhichigeyan, ji - ozhitooyan nagamonan ji - minwendaman. Niizhi giga - gikendaanan Python gaye JaveScript, miiwan onowe miziwe ayaabadakin, ayaanjijichigewinan, atoon aanind bakaan enitaagwakin. Omaa izhaan nawaj geyaabi ji - gikendaman, http://earsketch.gatech.edu",
+        "share": "Ji - atooyan omaa EarSketch",
+        "code": "Owe nagamon gaa - ozhitood owe gikinawaajibii’ igan: "
+      }
+    },
+    "shareScript": {
+      "menuDescriptions": {
+        "viewOnly": "Awiya ji - waabandang nindizhichigewin.(Gaawiin ji - aanjitood.)",
+        "collaboration": "Awiya gewiin ji - aanjitood nindizhichigewin.",
+        "embedded": "Ji - atooyaan ninagamon aazhawibii’ iganing.",
+        "soundCloud": "Ji - atooyaan ninagamon SoundCloud."
+      },
+      "sharedViewOnly": "Ji - waabandang {{scriptName}} eta go",
+      "soundcloudError": "Wanichigewin ayaa imaa SoundCloud."
+    }
+  },
+  "api": {
+    "noparams": "Gaawiin gegoo biminizha’ iganan",
+    "parameters": "Ge - biminizha’ iman eta go",
+    "returnValue": "Minik ge - ondiniman",
+    "example": "Naske owe",
+    "defaultValue": "Minik awiya ge - ondinang",
+    "open": "Baakinan",
+    "close": "Gibisin",
+    "types": {
+      "soundConstant": "Apane gaa - inweg",
+      "analysisConstant": "Apane naanaagadawaabandaman",
+      "folderConstant": "Apane Ezhi - ganawenjigaadegin",
+      "effectConstant": "Apane ge - izhiseg",
+      "effectParameterConstant": "Gaa - gii - ozhitooyan enitaagwakin apane",
+      "float": "Ogijisinoon",
+      "floatOptional": "Float, Optional",
+      "array": "Ezhi - bebakaanakin",
+      "integer": "Gii - izhichigewin",
+      "listArray": "Ezhibii’ igaadeg / Ezhi - bebakaanakin",
+      "list": "Ezhibii’ igaadeg",
+      "string": "Asigibii’ igan",
+      "stringOptional": "Asigibii’ igan, Giin Igo",
+      "stringNumberList": "Asigibii’ igan / Gikinawaajibii’ igan / Ezhibii’ igaadeg",
+      "any": "Wegodogwen igo",
+      "booleanOptional": "Ezhibii’ iganan, Giin igo",
+      "soundOrList": "Apane enitaagwak gaye Ezhibii’ igaadeg / ezhi - bebakaanakin"
+    },
+    "analyze": {
+      "description": "Enda-waabanjigemagak.",
+      "parameters": {
+        "sound": {
+          "description": "Audio file to analyze, typically this is a constant from the sound browser."
+        },
+        "feature": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        }
+      },
+      "returns": {
+        "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1)."
+      }
+    },
+    "analyzeForTime": {
+      "description": "Enda - waabanjigemagak, gaa - maajichigemagak gaye ishkwaaj.",
+      "parameters": {
+        "sound": {
+          "description": "Audio file to analyze, typically this is a constant from the sound browser."
+        },
+        "feature": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        },
+        "sliceStart": {
+          "description": "Start location within the sound to begin analysis"
+        },
+        "sliceEnd": {
+          "description": "End location within the sound to end analysis"
+        }
+      },
+      "returns": {
+        "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1 maamawi)."
+      }
+    },
+    "analyzeTrack": {
+      "description": "Naanaagadawaabandaman gakina nagamon.",
+      "parameters": {
+        "track": {
+          "description": "Track number to analyze."
+        },
+        "feature": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        }
+      },
+      "returns": {
+        "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1 maamawi)."
+      }
+    },
+    "analyzeTrackForTime": {
+      "description": "Naanaagazotan minik enitaagwak biinish ishkweya’ ii.",
+      "parameters": {
+        "track": {
+          "description": "Track number to analyze."
+        },
+        "feature": {
+          "description": "Analysis feature constant. The analysis functions currently support two features: RMS_AMPLITUDE analyzes how loud the sound is and SPECTRAL_CENTROID analyzes how bright the sound is."
+        },
+        "start": {
+          "description": "Start location within the track to begin analysis"
+        },
+        "end": {
+          "description": "End location within the track to end analysis"
+        }
+      },
+      "returns": {
+        "description": "Enitaagwakin gaye ezhinaagwakin(maagizhaa omaa 0 miinawaa 1 maamawi)."
+      }
+    },
+    "createAudioSlice": {
+      "description": "Bangii biidoon gaagaajizitaagwak.",
+      "parameters": {
+        "sound": {
+          "description": "The audio file from which to create a slice. This is a constant from the sound browser."
+        },
+        "sliceStart": {
+          "description": "The start position of the slice."
+        },
+        "sliceEnd": {
+          "description": "The end position of the slice."
+        }
+      },
+      "returns": {
+        "description": "Enitaagwak bakweniman."
+      }
+    },
+    "dur": {
+      "description": "Naagwad ekoweg.",
+      "parameters": {
+        "sound": {
+          "description": "The audio file whose duration to return. Typically, this is a constant from the sound browser."
+        }
+      },
+      "returns": {
+        "description": "Enigokwaag"
+      }
+    },
+    "finish": {
+      "description": "Ji - wiindaman ji - giishitooyan EarSketch izhichigewin.Ji - noondaman enwek nagamon(DAW)."
+    },
+    "fitMedia": {
+      "description": "Mii omaa ge-onji-noondaman niigaan maagizhaa ishkweya’ii.  Ji-aanji-noondaagwak maagizhaa gaye bangii giin igo eshtigeyan.",
+      "parameters": {
+        "sound": {
+          "description": "Audio file to place on track, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track number to insert audio file onto"
+        },
+        "start": {
+          "description": "Location within the track where the sound file will begin (e.g. 1 will start at the beginning of measure 1)."
+        },
+        "end": {
+          "description": "Location within the track where the sound file will end (e.g. 5 will stop the sound file at the beginning of measure 5)."
+        }
+      }
+    },
+    "importImage": {
+      "description": "Owe daanginigan mii omaa ge - onji - naagwak wenji - aanjiseg ezhibii’ igaadeg / ezhi - bebakaanakin gaye niswewaan ezhinaagwak RGB ezhinaagwakin, ekosingin.",
+      "parameters": {
+        "url": {
+          "description": "The URL at which the image is located"
+        },
+        "nrows": {
+          "description": "Endasinging gaa - gakakinaagwakin ekosingin(Ge - onji - bagakinaagwakin)"
+        },
+        "ncols": {
+          "description": "Endasinging gaa - gakakinaagwakin ekosingin(Ge - onji - bagakinaagwakin)"
+        },
+        "includeRGB": {
+          "default": "False",
+          "description": "Wanichigewin, da - waabajiinaagwad. Wanichigesing, da - naagwadoon enaandegin RGB mii owe R, G, gaye B."
+        }
+      },
+      "returns": {
+        "description": "Ekosingin gaa - gagakaagin(0 - 225)."
+      }
+    },
+    "importFile": {
+      "description": "Gaa - gii - izhichigeyan aazhawaatebii’ iganing da - bi - azhe - giiwemagadoon.",
+      "parameters": {
+        "url": {
+          "description": "The URL at which the file is located"
+        }
+      },
+      "returns": {
+        "description": "Asigibii’ iganan gaa - gii - ozhitooyan."
+      }
+    },
+    "init": {
+      "description": "Mii owe nitam ge - izhichigeyan EarSketch izhichigewin.Ozhisinoon nagamonan waa - ozhitooyan."
+    },
+    "insertMedia": {
+      "description": "Mii omaa gakina ge - ategin nagamoning apii go endawendaman.",
+      "parameters": {
+        "sound": {
+          "description": "Audio file to insert on track, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track number to insert sound file onto"
+        },
+        "start": {
+          "description": "The location within the track at which to start playback of the sound file. (The sound file will play through one time, so the end time depends on the length of the sound file.)"
+        }
+      }
+    },
+    "insertMediaSection": {
+      "description": "Ge - atoonyan igo da - onji - noondaagwad.",
+      "parameters": {
+        "sound": {
+          "description": "Audio file to insert on track, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Track number to insert sound file onto"
+        },
+        "start": {
+          "description": "The location within the track at which to start playback of the sound file."
+        },
+        "sliceStart": {
+          "description": "Start location within the sound file to include (e.g. 1.0 is the beginning of the sound file and 2.0 is measure 2 of the sound file)"
+        },
+        "sliceEnd": {
+          "description": "End location within the sound file to include (e.g. 2.0 is measure 2 of the sound file)"
+        }
+      }
+    },
+    "makeBeat": {
+      "description": "Ozhising epiitaweg asigibii’ iganan. AMANJI IGO daa - akwaawan asigibii’ iganan .16 eta ji - akwaagin asigibii’ iganan(e.g .16, 32, 64, etc.), mii omaa ge - onji - gikendaman ekobii’ igaadegin asigibii’ iganan(16 akwaawan asigibii’ iganan.)",
+      "parameters": {
+        "sound": {
+          "description": "A single sound file or a list/array of sound files, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Etooyan enitaagwak"
+        },
+        "start": {
+          "description": "Location within the track to start pattern"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" plays the sound file for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note. If the first argument to makeBeat is a list/array of sounds, the \"0\" through \"9\" will play the sound at that list/array index for a sixteenth note."
+        }
+      }
+    },
+    "makeBeatSlice": {
+      "description": "Ozhising epiitaweg asigibii’ iganan giwiindamaagon wenji - maajiseg nagamon. MakeBeat, apane maajitaamagad, makeBeatSlice ji - ozhitooyan bebakaanakin enitaagwakin mii go bezhigon nagamon.",
+      "parameters": {
+        "sound": {
+          "description": "A single sound file, typically this is a constant from the sound browser"
+        },
+        "track": {
+          "description": "Ge - atooyan nagamon"
+        },
+        "start": {
+          "description": "Location within the track to start pattern"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic pattern to play. \"0\" through \"9\" plays the sound file at the location specified at the corresponding index of the beatNumber list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the sound file for an additional sixteenth note. \"-\" rests (i.e. creates silence) for a sixteenth note."
+        },
+        "sliceStarts": {
+          "description": "A list/array of starting locations within audio file. For example, [1.0, 2.5] creates two time locations at measure 1 and measure 2.5 of the sound file that can be referenced in the beat string by \"0\" and \"1\" respectively."
+        }
+      }
+    },
+    "print": {
+      "description": "Naagwad ge - atooyan gidanokiiwin gidaazhawaatebii’ iganing.",
+      "parameters": {
+        "input": {
+          "description": "Minik ge - zaagijibii’ aman"
+        }
+      }
+    },
+    "println": {
+      "description": "Naagwad ge - atooyan gidanokiiwin gidaazhawaatebii’ iganing.",
+      "parameters": {
+        "input": {
+          "description": "Minik ge - zaagijibii’ aman"
+        }
+      }
+    },
+    "readInput": {
+      "description": "Wiindamaw ge - aabajitood ge - izhi - atood odanokiiwin aazhawaatebii’ iganing.",
+      "parameters": {
+        "prompt": {
+          "description": " Mii omaa ge-onji-gikendang aandi ge-atood."
+        }
+      },
+      "returns": {
+        "description": "Mii owe ge - izhichigemagak atooyan gidaazhawaatebii’ iganing."
+      }
+    },
+    "replaceListElement": {
+      "description": "Aanjitood ge - initaagwak oshki - izhichigewin.",
+      "parameters": {
+        "list": {
+          "description": "Original list/array"
+        },
+        "elementToReplace": {
+          "description": "Ge - meshkojisigaageyan."
+        },
+        "withElement": {
+          "description": "Aanjitood enitaagwak oshki - izhichigewin."
+        }
+      }
+    },
+    "replaceString": {
+      "description": "Mii awe ge - aanjitood nitam asigibii’ iganan onowe dash oshki - asigibii’ iganan.",
+      "parameters": {
+        "string": {
+          "description": "Nitam asigibii’ igan"
+        },
+        "characterToReplace": {
+          "description": "Aanjitoonan nitam asigibii’ iganan"
+        },
+        "withCharacter": {
+          "description": "Oshki - asigibii’ igan gakina ogaa - aanjitoonan"
+        }
+      },
+      "returns": {
+        "description": "Oshki - asigibii’ iganan gaa - gii - aanjitood gwayko - asigibii’ iganan"
+      }
+    },
+    "reverseList": {
+      "description": "Azhe - noondaagwatoon enitaagwakin.",
+      "parameters": {
+        "list": {
+          "description": "List/array to reverse"
+        }
+      },
+      "returns": {
+        "description": "Weshki - initaagwak gaa - azhetaagwakin"
+      }
+    },
+    "reverseString": {
+      "description": "Azhetaagwatoon asigibii’ iganan.",
+      "parameters": {
+        "string": {
+          "description": "String to reverse"
+        }
+      },
+      "returns": {
+        "description": "Weshki - initaagwak gaa - azhetaagwak"
+      }
+    },
+    "rhythmEffects": {
+      "description": "Asigibii’ igan enitaagwak ji - ozhitood madwetang.",
+      "parameters": {
+        "track": {
+          "description": "Waa - atooyan ge - initaagwak(MIX_TRACK giga - aabajitoon)."
+        },
+        "type": {
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH."
+        },
+        "parameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+        },
+        "list": {
+          "description": "List/array of effect parameter values (e.g. [0.0, 5.3, -12])."
+        },
+        "start": {
+          "description": "Location within the track to start pattern"
+        },
+        "beat": {
+          "description": "A string indicating the rhythmic envelope pattern to create. \"0\" through \"9\" uses the effect parameter value at the location specified at the corresponding index of the effectList list/array for a sixteenth note. \"+\" ties (i.e. continues or sustains) the parameter value for an additional sixteenth note. \"-\" ramps (i.e. creates a gradual change) to the next parameter value for a sixteenth note."
+        }
+      }
+    },
+    "selectRandomFile": {
+      "description": "Minik waa - odaapinaman nagamon waa - izhi - ganawendaman.",
+      "parameters": {
+        "folderSubstring": {
+          "description": "Substring indicating which standard folders to pick a random sound from. Typically, this is part of a folder name (not a sound constant) from the sound browser."
+        }
+      },
+      "returns": {
+        "description": "Wegonen igo enitaagwak ezhi - ganawenjigaadegin."
+      }
+    },
+    "setEffect1": {
+      "description": "Owe eta go nagamon gikinawaajibii’ igan odaa - gashkatoon gakina ji - aanjitood nagamon.Omaa ge - onji - gikendaman setEffect(), inaabin omaa <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>, ozhichigewining.",
+      "parameters": {
+        "track": {
+          "description": "Nagamon gaa - aanjitooyan(gaye MIX_TRACK mii omaa ge - dazhi - aanjitooyan)"
+        },
+        "type": {
+          "description": "Options: BANDPASS, CHORUS, COMPRESSOR, DELAY, DISTORTION, EQ3BAND, FILTER, FLANGER, PAN, PHASER, PITCHSHIFT, REVERB, RINGMOD, TREMOLO, VOLUME, or WAH"
+        },
+        "parameter": {
+          "description": "Constant indicating which parameter of the effectType to create the envelope for. (See <a href='#' onclick='event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a> in the curriculum sidebar for a complete list of effect parameters.)"
+        },
+        "value": {
+          "description": "Value of effect parameter"
+        }
+      }
+    },
+    "setEffect2": {
+      "description": "Owe eta go nagamon gikinawaajibii’ igan.Gaawiin noon iwedi bezhig setEffect(), geyaabi ayaawan aanjichigewinan ani - aanji - meshkojishkaa endasing gegoo.Nawaj geyaabi gikendamowin omaa ge - onji - gikendaman setEffect(), inaabin ozhichigewining: <a href='#' onclick = 'event.preventDefault(); loadCurriculumChapter(\"/en/v1/every-effect-explained-in-detail.html\")'>Every Effect Explained in Detail</a>",
+      "parameters": {
+        "startValue": {
+          "description": "Value of effect parameter at beginning of effect envelope"
+        },
+        "start": {
+          "description": "Location within the track of the startValue"
+        },
+        "endValue": {
+          "description": "Value of effect parameter at end of effect envelope"
+        },
+        "end": {
+          "description": "Location within the track of the endValue"
+        }
+      }
+    },
+    "setTempo1": {
+      "description": "Sets the tempo for the project.",
+      "parameters": {
+        "tempo": {
+          "description": "The project tempo in beats per minute (BPM). Minimum tempo is 45 BPM. Maximum tempo is 220 BPM."
+        }
+      }
+    },
+    "setTempo2": {
+      "description": "Change the tempo for a section of the project.",
+      "parameters": {
+        "startTempo": {
+          "description": "Tempo at beginning of section in beats per minute (BPM)"
+        },
+        "start": {
+          "description": "Measure where section begins"
+        },
+        "endTempo": {
+          "description": "Tempo at end of section (if omitted, new tempo persists until next tempo point)"
+        },
+        "end": {
+          "description": "Measure where section ends"
+        }
+      }
+    },
+    "shuffleList": {
+      "description": "Ezhi - bebakaanitaagwakin aanjisingin enitaagwakin.",
+      "parameters": {
+        "list": {
+          "description": "List/array to shuffle"
+        }
+      },
+      "returns": {
+        "description": "Weshki - initaagwakin ginigawitaagwadoon."
+      }
+    },
+    "shuffleString": {
+      "description": "Bebakaan aanjisidoon asigibii’ iganan.",
+      "parameters": {
+        "string": {
+          "description": "String to shuffle"
+        }
+      },
+      "returns": {
+        "description": "Oshki-asigibii’iganan bebakaanisidoon."
+      }
+    }
+  },
+  "templates": {
+    "python": "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
+    "javascript": "\"Owe eta aabajitoon\";\n\n//\t\tjavascript code\n//\t\tscript_name:\n//\n//\t\tauthor:\n//\t\tdescription:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+  }
+}

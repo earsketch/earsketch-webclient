@@ -281,4 +281,11 @@ export const OLD_CURRICULUM_LOCATIONS: { [index: string]: string } = {
     "9-3-8": "/en/v1/ch_YVIPModule4.html#_bonus_functions_with_staggered_start_and_end_measures",
     "9-4": "/en/v1/ch_YVIP_FinalSubmission.html",
     "9-4-0": "/en/v1/ch_YVIP_FinalSubmission.html#SubmitYourRemix",
+    // old spanish filename links from before moving back to english filenames everywhere
+    "/es/v2/bienvenidos": "/es/v2/welcome.html",
+    "/es/v2/empezamos-con-earsketch": "/es/v2/getting-started.html",
+    "/es/v2/tu-primera-cancion": "/es/v2/your-first-song.html",
+    "/es/v2/anade-algunos-ritmos": "/es/v2/add-beats.html",
+    "/es/v2/ciclos-y-lineas-musicales": "/es/v2/loops-and-layers.html",
+    "/es/v2/efectos-y-envelopes": "/es/v2/effects-and-envelopes.html",
 } as const

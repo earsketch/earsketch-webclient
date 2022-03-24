@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 
 import { VariableSizeList as List } from "react-window"
 import AutoSizer from "react-virtualized-auto-sizer"
+import classNames from "classnames"
 
 import { renameSound, deleteSound, openUploadWindow } from "../app/App"
 import * as sounds from "./soundsState"
@@ -16,6 +17,8 @@ import { SoundEntity } from "common"
 
 import { SearchBar, Collection, DropdownMultiSelector } from "./Browser"
 
+import { addUIClick } from "../cai/studentPreferences"
+
 const SoundSearchBar = () => {
     const dispatch = useDispatch()
     const searchText = useSelector(sounds.selectSearchText)
@@ -27,16 +30,14 @@ const SoundSearchBar = () => {
 }
 
 const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.Filters, value: string, isClearItem: boolean }) => {
-    const [highlight, setHighlight] = useState(false)
     const selected = isClearItem ? false : useSelector((state: RootState) => state.sounds.filters[category].includes(value))
     const dispatch = useDispatch()
-    const theme = useSelector(appState.selectColorTheme)
     const { t } = useTranslation()
 
     return (
         <>
             <div
-                className={`flex justify-left cursor-pointer pr-8 ${theme === "light" ? (highlight ? "bg-blue-200" : "bg-white") : (highlight ? "bg-blue-500" : "bg-black")}`}
+                className="flex justify-left cursor-pointer pr-8 bg-white hover:bg-blue-200 dark:bg-black dark:hover:bg-blue-500"
                 onClick={() => {
                     if (isClearItem) {
                         dispatch(sounds.resetFilter(category))
@@ -45,11 +46,11 @@ const FilterItem = ({ category, value, isClearItem }: { category: keyof sounds.F
                         else dispatch(sounds.addFilterItem({ category, value }))
                     }
                 }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}
+                title={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
+                aria-label={isClearItem ? t("ariaDescriptors:sounds.clearFilter", { category }) : value}
             >
                 <div className="w-8">
-                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`}/>
+                    <i className={`glyphicon glyphicon-ok ${selected ? "block" : "hidden"}`} />
                 </div>
                 <div className="select-none">
                     {isClearItem ? t("clear") : value}
@@ -76,6 +77,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.artists")}
                     category="artists"
+                    aria={t("soundBrowser.clip.tooltip.artist")}
                     items={artists}
                     position="left"
                     numSelected={numArtistsSelected}
@@ -84,6 +86,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.genres")}
                     category="genres"
+                    aria={t("soundBrowser.clip.tooltip.genre")}
                     items={genres}
                     position="center"
                     numSelected={numGenresSelected}
@@ -92,6 +95,7 @@ const Filters = () => {
                 <DropdownMultiSelector
                     title={t("soundBrowser.filterDropdown.instruments")}
                     category="instruments"
+                    aria={t("soundBrowser.clip.tooltip.instrument")}
                     items={instruments}
                     position="right"
                     numSelected={numInstrumentsSelected}
@@ -116,12 +120,15 @@ const ShowOnlyFavorites = () => {
                         const elem = event.target as HTMLInputElement
                         dispatch(sounds.setFilterByFavorites(elem.checked))
                     }}
+                    title={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    aria-label={t("soundBrowser.button.showOnlyStarsDescriptive")}
+                    role="checkbox"
                 />
             </div>
             <div className="pr-1">
                 {t("soundBrowser.button.showOnlyStars")}
             </div>
-            <i className="icon icon-star-full2 fav-icon" />
+            <i className="icon icon-star-full2 text-orange-600" />
         </div>
     )
 }
@@ -130,7 +137,7 @@ const AddSound = () => {
     const { t } = useTranslation()
 
     return (
-        <div
+        <button
             className="flex items-center rounded-full py-1 bg-black text-white cursor-pointer"
             onClick={() => openUploadWindow()}
         >
@@ -140,7 +147,7 @@ const AddSound = () => {
             <div className="mr-3">
                 {t("soundBrowser.button.addSound")}
             </div>
-        </div>
+        </button>
     )
 }
 
@@ -169,14 +176,14 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
     return (
         <div className="flex flex-row justify-start">
             <div className="h-auto border-l-4 border-blue-300" />
-            <div className={`flex flex-grow truncate justify-between py-2 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
+            <div className={`flex grow truncate justify-between py-2 ${bgcolor} border ${theme === "light" ? "border-gray-300" : "border-gray-700"}`}>
                 <div className="flex items-center min-w-0" title={tooltip}>
                     <span className="truncate pl-5">{name}</span>
                 </div>
                 <div className="pl-2 pr-4 h-1">
                     <button
                         className="btn btn-xs btn-action"
-                        onClick={() => dispatch(sounds.previewSound(name))}
+                        onClick={() => { dispatch(sounds.previewSound(name)); addUIClick("sound - preview") }}
                         title={t("soundBrowser.clip.tooltip.previewSound")}
                     >
                         {previewFileName === name
@@ -191,15 +198,15 @@ const Clip = ({ clip, bgcolor }: { clip: SoundEntity, bgcolor: string }) => {
                                 title={t("soundBrowser.clip.tooltip.markFavorite")}
                             >
                                 {isFavorite
-                                    ? <i className="icon icon-star-full2 fav-icon" />
-                                    : <i className="icon icon-star-empty3 fav-icon" />}
+                                    ? <i className="icon icon-star-full2 text-orange-600" />
+                                    : <i className="icon icon-star-empty3 text-orange-600" />}
                             </button>
                         )}
                     {tabsOpen &&
                         (
                             <button
                                 className="btn btn-xs btn-action"
-                                onClick={() => editor.pasteCode(name)}
+                                onClick={() => { editor.pasteCode(name); addUIClick("sample - copy") }}
                                 title={t("soundBrowser.clip.tooltip.paste")}
                             >
                                 <i className="icon icon-paste2" />
@@ -237,7 +244,7 @@ const ClipList = ({ names }: { names: string[] }) => {
     return (
         <div className="flex flex-col">
             {names?.map((v: string) =>
-                <Clip
+                entities[v] && <Clip
                     key={v} clip={entities[v]}
                     bgcolor={theme === "light" ? "bg-white" : "bg-gray-900"}
                 />
@@ -249,34 +256,19 @@ const ClipList = ({ names }: { names: string[] }) => {
 interface FolderProps {
     folder: string,
     names: string[],
-    bgTint: boolean,
     index: number,
     expanded: boolean,
     setExpanded: React.Dispatch<React.SetStateAction<Set<number>>>
     listRef: React.RefObject<any>
 }
 
-const Folder = ({ folder, names, bgTint, index, expanded, setExpanded, listRef }: FolderProps) => {
-    const [highlight, setHighlight] = useState(false)
-    const theme = useSelector(appState.selectColorTheme)
-
-    let bgColor
-    if (highlight) {
-        bgColor = theme === "light" ? "bg-blue-200" : "bg-blue-500"
-    } else {
-        if (theme === "light") {
-            bgColor = bgTint ? "bg-white" : "bg-gray-300"
-        } else {
-            bgColor = bgTint ? "bg-gray-900" : "bg-gray-800"
-        }
-    }
-
+const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: FolderProps) => {
     return (<>
         <div className="flex flex-row justify-start">
             {expanded &&
                 (<div className="h-auto border-l-4 border-blue-500" />)}
             <div
-                className={`flex flex-grow truncate justify-between items-center p-3 text-2xl ${bgColor} cursor-pointer border-b border-r ${theme === "light" ? "border-gray-500" : "border-gray-700"}`}
+                className="flex grow truncate justify-between items-center p-3 text-2xl cursor-pointer border-b border-r border-gray-500 dark:border-gray-700"
                 title={folder}
                 onClick={() => {
                     setExpanded((v: Set<number>) => {
@@ -289,8 +281,6 @@ const Folder = ({ folder, names, bgTint, index, expanded, setExpanded, listRef }
                     })
                     listRef?.current?.resetAfterIndex(index)
                 }}
-                onMouseEnter={() => setHighlight(true)}
-                onMouseLeave={() => setHighlight(false)}
             >
                 <div className="truncate">{folder}</div>
                 <span className="btn btn-xs w-1/12 text-2xl">
@@ -375,12 +365,17 @@ const WindowedSoundCollection = ({ title, folders, namesByFolders, visible = tru
                     >
                         {({ index, style }) => {
                             const names = namesByFolders[folders[index]]
+                            const folderClass = classNames({
+                                "hover:bg-blue-200 dark:hover:bg-blue-500": true,
+                                "bg-white dark:bg-gray-900": index % 2 === 0,
+                                "bg-gray-300 dark:bg-gray-800": index % 2 !== 0,
+                            })
                             return (
-                                <div style={style}>
+                                <div style={style}
+                                    className={folderClass}>
                                     <Folder
                                         folder={folders[index]}
                                         names={names}
-                                        bgTint={index % 2 === 0}
                                         index={index}
                                         expanded={expanded.has(index)}
                                         setExpanded={setExpanded}
@@ -429,7 +424,7 @@ export const SoundBrowser = () => {
 
     return (
         <>
-            <div className="flex-grow-0">
+            <div className="grow-0">
                 <div className="pb-3">
                     <SoundSearchBar />
                     <Filters />
@@ -441,7 +436,7 @@ export const SoundBrowser = () => {
                 </div>
             </div>
 
-            <div className="flex-grow flex flex-col justify-start">
+            <div className="grow flex flex-col justify-start">
                 <DefaultSoundCollection />
                 <FeaturedArtistCollection />
                 <WindowedRecommendations />
