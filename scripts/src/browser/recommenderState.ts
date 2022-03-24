@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit"
+import reporter from "./reporter"
 
 interface RecommenderState {
     recommendations: string[],
@@ -10,7 +11,8 @@ interface RecommenderState {
             [key: string]: string
         }
     }
-    typeIDs: string[]
+    typeIDs: string[],
+    recommendationHistory: string[]
 }
 const recommenderSlice = createSlice({
     name: "recommender",
@@ -31,10 +33,17 @@ const recommenderSlice = createSlice({
             },
         },
         typeIDs: ["others", "fit", "discover", "lucky"],
+        recommendationHistory: [],
     } as RecommenderState,
     reducers: {
         setRecommendations(state, { payload }) {
             state.recommendations = payload
+            payload.forEach((sound: string) => {
+                if (!state.recommendationHistory.includes(sound)) {
+                    state.recommendationHistory.push(sound)
+                    reporter.recommendation(sound)
+                }
+            })
         },
         resetRecommendations(state) {
             state.recommendations = []
