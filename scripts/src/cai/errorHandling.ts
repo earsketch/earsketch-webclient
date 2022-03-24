@@ -75,24 +75,29 @@ function handleJavascriptError() {
         return handleJavascriptReferenceError()
     }
 
-    for (let i = 0; i < textArray.length; i++) {
-        const line = textArray[i]
-        if (line.includes("function") || line.includes("def")) {
-            const functionErrorCheck = handleJavascriptFunctionError(line, i + 1)
-            if (functionErrorCheck) {
-                return functionErrorCheck
-            }
-        }
-        if (line.includes("for")) {
-            if (line.includes(" in ") || line.includes(" of ")) {
-                const forInCheck = handleJavascriptForInLoopError(i)
-                if (forInCheck) {
-                    return forInCheck
+    if (ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
+        return handlePythonFitMediaError(currentError.linenumber - 1)
+    } else {
+        for (let i = 0; i < textArray.length; i++) {
+            const line = textArray[i]
+            if (line.includes("function") || line.includes("def")) {
+                const functionErrorCheck = handleJavascriptFunctionError(line, i + 1)
+                if (functionErrorCheck) {
+                    return functionErrorCheck
                 }
-            } else {
-                const forCheck = handleJavascriptForLoopError(i)
-                if (forCheck) {
-                    return forCheck
+            }
+            if (line.includes("for")) {
+                if (!line.includes(" in ") && !line.includes(" of ")) {
+                    const forCheck = handleJavascriptForLoopError(i)
+                    if (forCheck) {
+                        return forCheck
+                    }
+                }
+            }
+            if (ccHelpers.trimCommentsAndWhitespace(line).startsWith("if")) {
+                const conditionalCheck = checkJavascriptConditional(i)
+                if (conditionalCheck !== null) {
+                    return conditionalCheck
                 }
             }
         }
@@ -112,44 +117,15 @@ function handleJavascriptForLoopError(lineno: number) {
     // we have the for keyword
 
     // check for parentheses
-    const trimmedLine = ccHelpers.trimCommentsAndWhitespace(textArray[lineno].substring(textArray.indexOf("for") + 3))
+    const trimmedLine = ccHelpers.trimCommentsAndWhitespace(textArray[lineno].substring(textArray.indexOf("for") + 4))
     if (!trimmedLine.startsWith("(")) {
         return ["for loop", "missing opening parenthesis"]
     }
 
     // now we check for a close paren.
     // check existing line first
-    let forLoopParams = ""
-    let hasCloseParen: boolean = false
-    let numOpenParens = 0
-    let numCloseParens = 0
-
-    let positionIndices = [0, 0]
-    for (let lineIndex = lineno; lineIndex < textArray.length; lineIndex++) {
-        positionIndices = [lineIndex, 0]
-        for (const charValue of textArray[lineIndex]) {
-            positionIndices[1] += 1
-            if (charValue === ")") {
-                numCloseParens += 1
-                if (numCloseParens === numOpenParens) {
-                    hasCloseParen = true
-                    break
-                } else {
-                    forLoopParams += charValue
-                }
-            } else if (charValue !== "\n") {
-                forLoopParams += charValue
-                if (charValue === "(") {
-                    numOpenParens += 1
-                }
-            }
-        }
-        if (hasCloseParen) {
-            break
-        }
-    }
-
-    if (hasCloseParen === false) {
+    let forLoopParams = checkForClosingParenthesis(lineno)[0] as string
+    if (forLoopParams === "") {
         return ["for loop", "missing closing parenthesis"]
     }
 
@@ -164,20 +140,12 @@ function handleJavascriptForLoopError(lineno: number) {
     // check loop condition to make sure it's the right type
     const loopCondition = forLoopParamArray[1]
     // needs AT LEAST ONE of the following: 1. A comparison operator (==, ===, >, <, <=, >=) 2. A boolean value (true, false) 3. A variable CONTAINING a boolean value. we'll have to estimate datatype for this.
-    let checkForValidCondition = false
-    if (loopCondition.includes(">") || loopCondition.includes("<") || loopCondition.includes("===") || loopCondition.includes("==") || loopCondition.includes(">=") || loopCondition.includes("<=") || loopCondition.includes("!=") || loopCondition.includes("!==")) {
-        checkForValidCondition = true
-    } else if (loopCondition.includes(" true ") || loopCondition.includes(" false ")) {
-        checkForValidCondition = true
-    } else {
-        // check through any known names
+    const validCondition = isAppropriateJSConditional(loopCondition, lineno)
+
+    if (!validCondition) {
+        return ["for loop", "invalid loop condition"]
     }
 
-    // check for body, either one-line of within curly braces
-    return null
-}
-
-function handleJavascriptForInLoopError(lineno: number) {
     return null
 }
 
@@ -233,41 +201,15 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     }
     // now we check for a close paren.
     // check existing line first
-    let functionParams = ""
-    let hasCloseParen: boolean = false
-    let numOpenParens = 0
-    let numCloseParens = 0
+    const closingParenOutput = checkForClosingParenthesis(thisLineNumber)
+    let functionParams = closingParenOutput[0] as string
+    let positionIndices = closingParenOutput[1] as number[]
 
-    let positionIndices = [0, 0]
-    for (let lineIndex = thisLineNumber - 1; lineIndex < textArray.length; lineIndex++) {
-        positionIndices = [lineIndex, 0]
-        for (const charValue of textArray[lineIndex]) {
-            positionIndices[1] += 1
-            if (charValue === ")") {
-                numCloseParens += 1
-                if (numCloseParens === numOpenParens) {
-                    hasCloseParen = true
-                    break
-                } else {
-                    functionParams += charValue
-                }
-            } else if (charValue !== "\n") {
-                functionParams += charValue
-                if (charValue === "(") {
-                    numOpenParens += 1
-                }
-            }
-        }
-        if (hasCloseParen) {
-            break
-        }
-    }
-
-    if (hasCloseParen === false) {
+    if (functionParams === "") {
         return ["function", "missing closing parenthesis"]
     }
 
-    functionParams = functionParams.substring(functionParams.indexOf("(") + 1)
+    functionParams = functionParams.substring(functionParams.indexOf("("))
     console.log(functionParams)
     let hasOpenBrace = false
     // check for open and curly brace immediately following parentheses
@@ -290,11 +232,76 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
         }
     }
 
-    // check for closing curly brace. what's inside is the body of the function
+    let hasCloseBrace = false
+    let numOpenBraces = 0
+    let numCloseBraces = 0
 
-    // check for body - maybe. we might not need this in JS.
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+        let startValue = 0
+        if (lineIndex === positionIndices[0]) {
+            startValue = positionIndices[1] + 1
+        }
+        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
+            positionIndices[1] += 1
+            if (textArray[lineIndex][charIndex] === "}") {
+                numCloseBraces += 1
+                if (numCloseBraces === numOpenBraces) {
+                    hasCloseBrace = true
+                    break
+                }
+            } else {
+                if (textArray[lineIndex][charIndex] === "{") {
+                    numOpenBraces += 1
+                }
+            }
+        }
+        if (hasCloseBrace) {
+            break
+        }
+    }
+    if (!hasCloseBrace) {
+        return ["function", "missing closing curly brace"]
+    }
 
-    // check parameters to make sure they're not values
+    let paramString = functionParams
+
+    if (paramString.length > 0) {
+        // param handling. what the heckie do we do here. we can check for numerical or string values, plus we
+
+        if (paramString.includes(" ") && !paramString.includes(",")) {
+            return ["function", "parameters missing commas"]
+        }
+
+        // get rid of list commas
+        while (paramString.includes("[")) {
+            const openIndex: number = paramString.indexOf("[")
+            const closeIndex: number = paramString.indexOf("]")
+
+            paramString = paramString.replace("[", "")
+            paramString = paramString.replace("]", "")
+
+            for (let i = openIndex; i < closeIndex; i++) {
+                if (paramString[i] === ",") {
+                    paramString = replaceAt(paramString, i, "|")
+                }
+            }
+        }
+
+        const params: string[] = paramString.split(",")
+        const currentVariableNames: string[] = []
+
+        const currentVars: any[] = ccState.getProperty("allVariables")
+
+        for (const currentVar of currentVars) {
+            currentVariableNames.push(currentVar.name)
+        }
+
+        for (const paramName of params) {
+            if (isNumeric(paramName) || (paramName === "True" || paramName === "False") || (paramName.includes("\"")) || (paramName.includes("|")) || (currentVariableNames.includes(paramName))) {
+                return ["function", "value instead of parameter"]
+            }
+        }
+    }
 
     return null
 }
@@ -318,7 +325,7 @@ export function handlePythonError(errorType: string) {
 
     // fitmedia
     if (errorLine.toLowerCase().includes("fitmedia")) {
-        return handlePythonFitMediaError()
+        return handlePythonFitMediaError(currentError.traceback[0].lineno)
     }
 
     // function def
@@ -822,7 +829,7 @@ function handlePythonNameError() {
     return ["name", "unrecognized: " + problemName]
 }
 
-function handlePythonFitMediaError() {
+function handlePythonFitMediaError(errorLineNo: number) {
     const trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
 
     if (trimmedErrorLine.includes("fitmedia") || trimmedErrorLine.includes("FitMedia") || trimmedErrorLine.includes("Fitmedia")) {
@@ -874,6 +881,11 @@ function handlePythonFitMediaError() {
 
     const numberArgs = [-1, -1, -1]
 
+    // trim leading/trailing spaces
+    for (let i = 0; i < argsSplit.length; i++) {
+        argsSplit[i] = ccHelpers.trimCommentsAndWhitespace(argsSplit[i])
+    }
+
     for (let i = 0; i < argsSplit.length; i++) {
         argumentTypes.push("")
         if (isNumeric(argsSplit[i])) {
@@ -904,7 +916,7 @@ function handlePythonFitMediaError() {
                 argumentTypes[i] = "Sample"
             }
             // or is it a var or func call that returns a sample
-            const errorLineNo: number = currentError.traceback[0].lineno
+            // const errorLineNo: number = currentError.traceback[0].lineno
             // func call
 
             if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
@@ -948,6 +960,157 @@ function handlePythonFitMediaError() {
             return (["fitMedia", "backwards start/end"])
         }
     }
+}
+
+function checkJavascriptConditional(lineIndex: number) {
+    // find first if in line, grab everything after that
+    const trimmedConditionalString = ccHelpers.trimCommentsAndWhitespace(textArray[lineIndex].substring(textArray[lineIndex].indexOf("if") + 3))
+
+    // first check: parens
+    if (!trimmedConditionalString.startsWith("(")) {
+        return ["conditional", "missing opening parenthesis"]
+    }
+
+    // check for close parens
+    // now we check for a close paren.
+    // check existing line first
+    const parensOutput = checkForClosingParenthesis(lineIndex)
+    const condition = parensOutput[0] as string
+    let positionIndices = parensOutput[1] as number[]
+    if (condition === "") {
+        return ["conditional", "missing closing parenthesis"]
+    }
+
+    // second check: appropriate conditional
+    const isConditionValid = isAppropriateJSConditional(condition as string, lineIndex)
+
+    if (!isConditionValid) {
+        return ["conditional", "invalid condition"]
+    }
+
+    // third check: is there an "else" or "else if" following? if so, we need curly braces.
+
+    // to do this, we need to find the end of the body. to do THAT, we need to find the beginning of the body.
+    // use positionIndices for this.
+    // if there's an else if, recurse through and check that.
+    // check for open and curly brace immediately following parentheses
+    let hasOpenBrace = false
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+        let startValue = 0
+        if (lineIndex === positionIndices[0]) {
+            startValue = positionIndices[1] + 1
+        }
+        for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
+            if (textArray[lineIndex][charIndex] === "{") {
+                hasOpenBrace = true
+                positionIndices = [lineIndex, charIndex]
+                break
+            }
+        }
+        if (hasOpenBrace) {
+            break
+        }
+    }
+    if (hasOpenBrace) {
+        let hasCloseBrace = false
+        let numOpenBraces = 0
+        let numCloseBraces = 0
+
+        for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+            let startValue = 0
+            if (lineIndex === positionIndices[0]) {
+                startValue = positionIndices[1] + 1
+            }
+            for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
+                positionIndices[1] += 1
+                if (textArray[lineIndex][charIndex] === "}") {
+                    numCloseBraces += 1
+                    if (numCloseBraces === numOpenBraces) {
+                        hasCloseBrace = true
+                        break
+                    }
+                } else {
+                    if (textArray[lineIndex][charIndex] === "{") {
+                        numOpenBraces += 1
+                    }
+                }
+            }
+            if (hasCloseBrace) {
+                break
+            }
+        }
+    }
+    // if the next thing after positionIndices is "else if," recurse
+    const nextItem = ccHelpers.trimCommentsAndWhitespace(textArray[positionIndices[0]].substring(positionIndices[1]))
+    if (nextItem.startsWith("else if")) {
+        return checkJavascriptConditional(positionIndices[0])
+    }
+    // if all checks pass return null
+    return null
+}
+
+function checkForClosingParenthesis(startLine: number) {
+    let body = ""
+    let hasCloseParen: boolean = false
+    let numOpenParens = 0
+    let numCloseParens = 0
+
+    let positionIndices = [0, 0]
+    for (let lineInd = startLine; lineInd < textArray.length; lineInd++) {
+        positionIndices = [lineInd, 0]
+        for (const charValue of textArray[lineInd]) {
+            positionIndices[1] += 1
+            if (charValue === ")") {
+                numCloseParens += 1
+                if (numCloseParens === numOpenParens) {
+                    hasCloseParen = true
+                    break
+                } else {
+                    body += charValue
+                }
+            } else if (charValue !== "\n") {
+                body += charValue
+                if (charValue === "(") {
+                    numOpenParens += 1
+                }
+            }
+        }
+        if (hasCloseParen) {
+            break
+        }
+    }
+
+    if (hasCloseParen) {
+        return [body, positionIndices]
+    } else {
+        return ["", [0, 0]]
+    }
+}
+
+function isAppropriateJSConditional(conditional: string, lineIndex: number) {
+    let checkForValidCondition = false
+    if (conditional.includes(">") || conditional.includes("<") || conditional.includes("===") || conditional.includes("==") || conditional.includes(">=") || conditional.includes("<=") || conditional.includes("!=") || conditional.includes("!==")) {
+        checkForValidCondition = true
+    } else if (conditional.includes(" true ") || conditional.includes(" false ")) {
+        checkForValidCondition = true
+    } else {
+        // check through any known names. but what if it's a new variable the student has defined?
+        // we should jsut check to see if it's the "wrong" kind of name, and pass otherwise
+        if (conditional.includes("(")) {
+            const loopFuncName = conditional.split("(")[0]
+            const funcReturnType = estimateFunctionNameReturn(loopFuncName)
+            if (funcReturnType === "Bool" || funcReturnType === "") {
+                checkForValidCondition = true
+            }
+        } else {
+            const varType = estimateVariableType(conditional, lineIndex + 1)
+            if (varType === "Bool" || varType === "") {
+                checkForValidCondition = true
+            }
+        }
+    }
+
+    return checkForValidCondition
 }
 
 function estimateFunctionNameReturn(funcName: string) {
