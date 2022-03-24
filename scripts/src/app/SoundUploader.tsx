@@ -136,8 +136,9 @@ const FileTab = ({ close }: { close: () => void }) => {
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
+    const isMacFirefox = ESUtils.whichBrowser().includes("Firefox") && ESUtils.whichOS() === "MacOS"
     const [name, setName] = useState("")
-    const [error, setError] = useState("")
+    const [error, setError] = useState(isMacFirefox ? "Sorry, recording in EarSketch currently does not work in Firefox on Mac. Please use Chrome or Safari." : "")
     const [progress, setProgress] = useState<number>()
     const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
@@ -189,7 +190,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                 (error
                     ? <input type="button" className="btn btn-primary block m-auto" onClick={() => { setError(""); recorder.init() }} value={t("soundUploader.record.mic.reenable") as string} />
                     : t("soundUploader.record.mic.waiting"))}
-            {micReady && <div>
+            {micReady && !isMacFirefox && <div>
                 <div className="modal-section-header">
                     <span>{t("soundUploader.record.measures.title")}</span>
                     {metronome &&
