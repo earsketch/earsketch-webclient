@@ -46,6 +46,8 @@
     "scriptBrowser.openInEditor": "Open {{name}} in Code Editor",
     "scriptBrowser.restore": "Restore",
     "scriptBrowser.options.close": "Close Script Options",
+    "scriptBrowser.collab.sharedWith": "Shared with {{collaborators}}",
+    "scriptBrowser.shared.sharedBy": "Shared by {{username}}",
     "script.options.copy": "Create Copy of {{scriptname}}",
     "keepUnsavedTabs": "Keep unsaved tabs open",
     "discardChanges": "Discard changes",
