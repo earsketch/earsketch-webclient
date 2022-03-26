@@ -61,8 +61,10 @@ const BrowserTab = ({ name, type, children }: { name: string, type: BrowserTabTy
             title={t("contentManager.openTab", { name: name })}
             aria-label={t("contentManager.openTab", { name: name })}
         >
-            {children}
-            {name}
+            <h3>
+                {children}
+                {name}
+            </h3>
         </button>
     )
 }

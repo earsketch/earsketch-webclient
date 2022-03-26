@@ -409,12 +409,16 @@ button:focus {
     width: 90px;
     height: 23px;
     margin: 5px;
+
+    &:focus {
+      outline: 3px solid orangered; 
+    }
   }
 
   button:focus {
-    background: transparent;
-    color:  red;
-    outline: 1px dashed red;
+    // background: transparent;
+    color:  orangered; 
+    outline: 2px solid orangered; // TODO: outline not showing 
     opacity: 1;
   }
 }

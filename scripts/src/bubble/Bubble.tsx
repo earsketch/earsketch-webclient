@@ -29,6 +29,7 @@ const NavButton = (props: { tag: string, primary?: boolean, name: string }) => {
         <button
             className={`border-2 ${borderColor} rounded-full p-2 px-4 mx-2 ${backgroundColor} ${pointer}`}
             onClick={() => dispatch(action())}
+            tabIndex={0}
         >
             {props.name}
         </button>
@@ -73,6 +74,7 @@ const MessageFooter = () => {
                         <div className="text-sm">{t("bubble:userLanguage")}</div>
                         <select
                             className="border-0 border-b-2 border-black outline-none"
+                            tabIndex={0}
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
                             }}
@@ -86,6 +88,7 @@ const MessageFooter = () => {
                     <div>
                         <div className="text-sm">{t("bubble:defaultProgrammingLanguage")}</div>
                         <select
+                            tabIndex={0}
                             className="border-0 border-b-2 border-black outline-none"
                             onChange={e => dispatch(bubble.setLanguage(e.currentTarget.value))}
                             id="language"
@@ -109,12 +112,13 @@ const DismissButton = () => {
     const dispatch = useDispatch()
 
     return (
-        <div
+        <button
             className="absolute top-0 right-0 m-4 text-3xl cursor-pointer"
+            tabIndex={0}
             onClick={() => dispatch(bubble.dismissBubble())}
         >
             <span className="icon icon-cross2" />
-        </div>
+        </button>
     )
 }
 
@@ -213,6 +217,8 @@ const MessageBox = () => {
             className="absolute z-40 w-1/3 bg-white p-8 shadow-xl"
             ref={setPopperElement as LegacyRef<HTMLDivElement>}
             style={pages[currentPage].ref === null ? {} : styles.popper}
+            role="dialog"
+            aria-modal="true"
             {...attributes.popper}
         >
             {[0, 9].includes(currentPage) && <DismissButton />}
