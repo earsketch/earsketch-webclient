@@ -293,14 +293,16 @@ const KeyboardShortcuts = () => {
         </Popover.Button>
         <Popover.Panel className="absolute z-10 mt-2 bg-gray-100 shadow-lg p-4 -translate-x-1/2 w-max">
             <table>
-                {Object.entries(shortcuts).map(([action, keys], index, arr) =>
-                    <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
-                        <td className="p-2 pr-4">{t(`shortcuts.${action}`)}</td>
-                        <td>{Array.isArray(keys)
-                            ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
-                            : keys}
-                        </td>
-                    </tr>)}
+                <tbody>
+                    {Object.entries(shortcuts).map(([action, keys], index, arr) =>
+                        <tr key={action} className={index === arr.length - 1 ? "" : "border-b"}>
+                            <td className="p-2 pr-4">{t(`shortcuts.${action}`)}</td>
+                            <td>{Array.isArray(keys)
+                                ? keys.map(key => <kbd key={key}>{localize(key)}</kbd>).reduce((a: any, b: any): any => [a, " + ", b])
+                                : keys}
+                            </td>
+                        </tr>)}
+                </tbody>
             </table>
         </Popover.Panel>
     </Popover>
