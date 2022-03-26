@@ -409,17 +409,6 @@ button:focus {
     width: 90px;
     height: 23px;
     margin: 5px;
-
-    &:focus {
-      outline: 3px solid orangered; 
-    }
-  }
-
-  button:focus {
-    // background: transparent;
-    color:  orangered; 
-    outline: 2px solid orangered; // TODO: outline not showing 
-    opacity: 1;
   }
 }
 
@@ -1489,3 +1478,21 @@ kbd {
   font-family: Roboto, Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
   font-size: 14px;
 }
+
+// Accessibility 
+// keyboard focus only highlighting 
+button:focus-visible {
+  border: 4px solid #f5ae3c; // TODO Update with tailwind theme()
+  outline: 4px solid #f5ae3c; 
+  opacity: 1;
+}
+
+input:focus-visible {
+  outline: 4px solid #f5ae3c; 
+}
+
+div:focus-visible {
+  outline: 4px solid #f5ae3c; 
+}
+
+// Skip to main content

@@ -329,8 +329,10 @@ const NavigationBar = () => {
                         <i className={`icon icon-arrow-${currentLocale.direction === "rtl" ? "right2" : "left2"}`} />
                     </button>}
                 <button ref={triggerRef} className="w-full" title={t("curriculum.showTOC")} onClick={() => dispatch(curriculum.showTableOfContents(!showTableOfContents))}>
-                    {pageTitle}
-                    <i className="icon icon-arrow-down2 text-lg p-2" />
+                    <h3 aria-label={t("curriculum.showTOC")} title={t("curriculum.showTOC")}>
+                        {pageTitle}
+                        <i className="icon icon-arrow-down2 text-lg p-2" />
+                    </h3>
                 </button>
                 {((location + "") === (tocPages[tocPages.length - 1] + ""))
                     ? <span />

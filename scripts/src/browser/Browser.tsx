@@ -227,7 +227,7 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
 
     return (
         <div className={`${visible ? "flex" : "hidden"} flex-col justify-start ${className} ${expanded ? "grow" : "grow-0"}`}>
-            <div className="flex flex-row grow-0 justify-start">
+            <div className="flex flex-row grow-0 justify-start" tabIndex={-1}>
                 {expanded &&
                     (<div className="h-auto border-l-4 border-amber" />)}
                 <div
@@ -235,10 +235,10 @@ export const Collection = ({ title, visible = true, initExpanded = true, classNa
                     title={title}
                     onClick={() => setExpanded(v => !v)}
                 >
-                    <div className="flex items-center truncate py-1">
+                    <h3 className="flex items-center truncate py-1">
                         <i className="icon-album pr-3" />
                         <div className="truncate">{title}</div>
-                    </div>
+                    </h3>
                     <div className="w-1/12 text-2xl">
                         {expanded
                             ? <button className="icon icon-arrow-down2" title={t("thing.collapse", { name: filteredTitle })} aria-label={t("thing.collapse", { name: filteredTitle })}> </button>
