@@ -24,18 +24,17 @@ export const TitleBar = () => {
             <div className="pl-3 pr-4 font-semibold truncate">
                 <h2>{t("contentManager.title").toLocaleUpperCase()}</h2>
             </div>
-            <div>
-                <button
-                    className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
-                    onClick={() => {
-                        dispatch(layout.setWest({ open: false }))
-                    }}
-                    aria-label={t("ariaDescriptors:contentManager.close")}
-                    title={t("ariaDescriptors:contentManager.close")}
-                >
-                    <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-                </button>
-            </div>
+            <button
+                className={`flex justify-end w-12 h-7 p-1 rounded-full cursor-pointer ${theme === "light" ? "bg-black" : "bg-gray-700"}`}
+                onClick={() => {
+                    dispatch(layout.setWest({ open: false }))
+                }}
+                aria-label={t("ariaDescriptors:contentManager.close")}
+                title={t("ariaDescriptors:contentManager.close")}
+                tabIndex={0}
+            >
+                <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
+            </button>
         </div>
     )
 }
@@ -268,14 +267,14 @@ export const Collapsed = ({ position = "west", title = null }: { position: "west
             aria-label={t("ariaDescriptors:general.openPanel", { panelName: title })}
             title={t("ariaDescriptors:general.openPanel", { panelName: title })}
         >
-            <div
+            <button
                 className={`
                     flex justify-start w-12 h-7 p-1 m-3 rounded-full 
                     ${theme === "light" ? "bg-black" : "bg-gray-700"}
                 `}
             >
                 <div className="w-5 h-5 bg-white rounded-full">&nbsp;</div>
-            </div>
+            </button>
             <div
                 className="grow flex items-center justify-center"
             >
