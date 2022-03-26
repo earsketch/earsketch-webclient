@@ -283,11 +283,11 @@ const Folder = ({ folder, names, index, expanded, setExpanded, listRef }: Folder
                 }}
             >
                 <div className="truncate">{folder}</div>
-                <span className="btn btn-xs w-1/12 text-2xl">
+                <button className="btn btn-xs w-1/12 text-2xl">
                     {expanded
                         ? <i className="icon icon-arrow-down2" />
                         : <i className="icon icon-arrow-right2" />}
-                </span>
+                </button>
             </div>
         </div>
         {expanded && <ClipList names={names} />}
