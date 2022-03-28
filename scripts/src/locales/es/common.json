@@ -809,5 +809,9 @@
   "templates": {
     "python": "#\t\tcódigo python\n#\t\tnombre_del_script:\n#\n#\t\tautor:\n#\t\tdescripción:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
     "javascript": "\"use strict\";\n\n//\t\tcódigo javascript\n//\t\tnombre_del_script:\n//\n//\t\tautor:\n//\t\tdescripción:\n//\n\ninit();\nsetTempo(120);\n\n\n\nfinish();\n"
+  },
+  "console": {
+    "warningHeading": "sp Warning message",
+    "errorHeading": "sp Error message"
   }
 }
