@@ -96,7 +96,7 @@ function handleJavascriptError() {
             }
             if (ccHelpers.trimCommentsAndWhitespace(line).startsWith("if")) {
                 const conditionalCheck = checkJavascriptConditional(i)
-                if (conditionalCheck !== null) {
+                if (conditionalCheck[0] !== "") {
                     return conditionalCheck
                 }
             }
@@ -962,7 +962,7 @@ function handlePythonFitMediaError(errorLineNo: number) {
     }
 }
 
-function checkJavascriptConditional(lineIndex: number) {
+function checkJavascriptConditional(lineIndex: number): string[] {
     // find first if in line, grab everything after that
     const trimmedConditionalString = ccHelpers.trimCommentsAndWhitespace(textArray[lineIndex].substring(textArray[lineIndex].indexOf("if") + 3))
 
@@ -1045,8 +1045,8 @@ function checkJavascriptConditional(lineIndex: number) {
     if (nextItem.startsWith("else if")) {
         return checkJavascriptConditional(positionIndices[0])
     }
-    // if all checks pass return null
-    return null
+    // if all checks pass return empty
+    return ["", ""]
 }
 
 function checkForClosingParenthesis(startLine: number) {

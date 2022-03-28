@@ -290,7 +290,7 @@ export async function compileCode() {
         saveActiveScriptWithRunStatus(userProject.STATUS_UNSUCCESSFUL)
 
         if (FLAGS.SHOW_CAI) {
-            store.dispatch(cai.compileError([error, code, language]))
+            store.dispatch(cai.compileError(error)) //, code, language
         }
         return
     }
