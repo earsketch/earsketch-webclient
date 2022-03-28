@@ -30,50 +30,50 @@ export function elaborate(error: string | Error) {
     switch (parts[0]) {
         // Generic & Python-specific errors from Skulpt (errors.js)
         case "AssertionError":
-            parts[0] = i18n.t("console:errors.AssertionError")
+            parts[0] = "AssertionError: " + i18n.t("console:errors.AssertionError")
             break
         case "AttributeError":
-            parts[0] = i18n.t("console:errors.AttributeError")
+            parts[0] = "AttributeError: " + i18n.t("console:errors.AttributeError")
             break
         case "ImportError":
-            parts[0] = i18n.t("console:errors.ImportError")
+            parts[0] = "ImportError: " + i18n.t("console:errors.ImportError")
             break
         case "IndentationError":
-            parts[0] = i18n.t("console:errors.IndentationError")
+            parts[0] = "IndentationError: " + i18n.t("console:errors.IndentationError")
             break
         case "IndexError":
-            parts[0] = i18n.t("console:errors.IndexError")
+            parts[0] = "IndexError: " + i18n.t("console:errors.IndexError")
             break
         case "KeyError":
-            parts[0] = i18n.t("console:errors.KeyError")
+            parts[0] = "KeyError: " + i18n.t("console:errors.KeyError")
             break
         case "NameError":
-            parts[0] = i18n.t("console:errors.NameError")
+            parts[0] = "NameError: " + i18n.t("console:errors.NameError")
             break
         case "ParseError":
-            parts[0] = i18n.t("console:errors.ParseError")
+            parts[0] = "ParseError: " + i18n.t("console:errors.ParseError")
             break
         case "SyntaxError":
-            parts[0] = i18n.t("console:errors.SyntaxError")
+            parts[0] = "SyntaxError: " + i18n.t("console:errors.SyntaxError")
             break
         case "TypeError":
-            parts[0] = i18n.t("console:errors.TypeError")
+            parts[0] = "TypeError: " + i18n.t("console:errors.TypeError")
             break
         case "TokenError":
-            parts[0] = i18n.t("console:errors.TokenError")
+            parts[0] = "TokenError: " + i18n.t("console:errors.TokenError")
             break
         case "ValueError":
-            parts[0] = i18n.t("console:errors.ValueError")
+            parts[0] = "ValueError: " + i18n.t("console:errors.ValueError")
             break
         // JS-specific errors
         case "RangeError":
-            parts[0] = i18n.t("console:errors.RangeError")
+            parts[0] = "RangeError: " + i18n.t("console:errors.RangeError")
             break
         case "ReferenceError":
-            parts[0] = i18n.t("console:errors.ReferenceError")
+            parts[0] = "ReferenceError: " + i18n.t("console:errors.ReferenceError")
             break
         case "Unknown identifier":
-            parts[0] = i18n.t("console:errors.UnknownIdentifier")
+            parts[0] = "Unknown identifier: " + i18n.t("console:errors.UnknownIdentifier")
             break
         // HTTP errors while communicating with server
         case "NetworkError":
