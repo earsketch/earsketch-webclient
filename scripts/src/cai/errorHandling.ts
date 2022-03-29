@@ -84,13 +84,13 @@ function handleJavascriptError() {
     errorLine = textArray[currentError.linenumber - 1]
     const errorType = currentError.stack.split(":")[0]
 
-    if (errorType === "ReferenceError" && !ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).includes("fitmedia")) {
+    if (errorType === "ReferenceError") {
         return handleJavascriptReferenceError()
     }
 
     for (const word of errorLine.split(" ")) {
         for (const builtin of JS_AND_API) {
-            if (isTypo(word, builtin)) {
+            if (word.length > 4 && isTypo(word, builtin)) { // arbitrary length threshold to prevent stupid shenangians
                 return ["name", "typo: " + builtin]
             }
         }
@@ -247,7 +247,7 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
                 hasOpenBrace = true
                 positionIndices = [lineIndex, charIndex]
                 break
-            } else if (textArray[lineIndex][charIndex] !== " " || textArray[lineIndex][charIndex] !== "\n" || textArray[lineIndex][charIndex] !== "\t") {
+            } else if (!(textArray[lineIndex][charIndex] === " " || textArray[lineIndex][charIndex] === "\n" || textArray[lineIndex][charIndex] === "\t")) {
                 return ["function", "missing open curly brace"]
             }
         }
@@ -337,7 +337,7 @@ export function handlePythonError(errorType: string) {
 
     // fitmedia
     if (errorLine.toLowerCase().includes("fitmedia")) {
-        return handlePythonFitMediaError(currentError.traceback[0].lineno)
+        return handlePythonFitMediaError(currentError.traceback[0].lineno - 1)
     }
 
     // function def
@@ -1163,6 +1163,9 @@ function estimateVariableType(varName: string, lineno: number) {
 }
 
 function isTypo(original: string, target: string) {
+    if (original === target) {
+        return false
+    }
     const editDistanceThreshold: number = Math.ceil(((original.length + target.length) / 2) * ((100 - nameThreshold) * 0.01))
     if (ccHelpers.levenshtein(original, target) <= editDistanceThreshold) {
         return true
