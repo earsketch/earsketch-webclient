@@ -15,7 +15,6 @@
 describe("Bubble Tour Test", () => {
     // var consolespy;
     it("Visits Earsketch", () => {
-
         // Chose visiting site (comment out others)
         // cy.visit("https://earsketch-test.ersktch.gatech.edu/earsketch2/")
         cy.visit("http://localhost:8888")
@@ -60,19 +59,17 @@ describe("Bubble Tour Test", () => {
         cy.get("button").contains("Logout").click()
 
         // step 1
-        //cy.get('button').contains('Next').click()
+        // cy.get('button').contains('Next').click()
 
         // step 2
         // make sure next is grayed out until you click run
-        //cy.get('button').contains('Next').should('have.class','cursor-not-allowed')
+        // cy.get('button').contains('Next').should('have.class','cursor-not-allowed')
 
         // click run button
-        //cy.get('#run-button').click().then((step2) => {
-           // cy.get('#console').should('contain', 'Script ran successfully')
-           // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
-        //})
-
-
+        // cy.get('#run-button').click().then((step2) => {
+        // cy.get('#console').should('contain', 'Script ran successfully')
+        // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
+        // })
 
         //  cy.get('@consoleLog').then((consoleLog) => {
 
@@ -84,7 +81,7 @@ describe("Bubble Tour Test", () => {
         //  cy.get('#console').contains('Script ran successfully')
         //  cy.get('button').contains('Next').click()
 
-         // step 3
+        // step 3
         // cy.get('button').contains('Next').click()
         //
         // // step 4
@@ -116,31 +113,21 @@ describe("Bubble Tour Test", () => {
         //
         // // close tutorial!
         // cy.get('button').contains('Close').click()
-
     })
 
+    // it('calls console.log with expected text', function () {
+    //     cy.get('#run-button').click()
+    //     cy.get('@consoleLog').should('be.calledWith', 'code compiled')
+    //   })
 
+    // //it just waits 5 seconds before clicking next so that everything can load. i wanted to go into the console log and watch though. :(
+    // cy.wait(5000)
 
-        // it('calls console.log with expected text', function () {
-        //     cy.get('#run-button').click()
-        //     cy.get('@consoleLog').should('be.calledWith', 'code compiled')
-        //   })
+    // // NOW we can click next
+    // cy.get('button').contains('Next').click()
 
+    // // now on step 3
+    // cy.get('button').contains('Next').click()
 
-
-        // //it just waits 5 seconds before clicking next so that everything can load. i wanted to go into the console log and watch though. :(
-        // cy.wait(5000)
-
-        // // NOW we can click next
-        // cy.get('button').contains('Next').click()
-
-        // // now on step 3
-        // cy.get('button').contains('Next').click()
-
-        // cy.get('button[ng-click="play();"]').click()
-
-
+    // cy.get('button[ng-click="play();"]').click()
 })
-
-
-
