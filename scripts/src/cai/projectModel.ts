@@ -8,6 +8,7 @@ let activeProject: string = ""
 let availableGenres: string[] = []
 let availableKeys: string[] = []
 const availableInstruments: string[] = []
+const dropupLabel: { [key: string]: string } = {"genre": "Genres", "form": "Forms", "key": "Keys", "instrument": "Instruments", "code structure": "Code Structures"}
 
 // Initialize empty model.
 const defaultProjectModel = { genre: [], instrument: [], form: [], key:[], "code structure": [] }
@@ -17,7 +18,12 @@ const propertyOptions: { [key: string]: any } = {
     // 'instrument': availableInstruments,
     form: ["ABA", "ABAB", "ABCBA", "ABAC", "ABACAB", "ABBA", "ABCCAB", "ABCAB", "ABCAC", "ABACA", "ABACABA"],
     "code structure": ["forLoop", "function", "consoleInput", "conditional"],
-    key: ['C','C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'],
+    key: ["C major", "C# major", "D major", "D# major",
+    "E major", "F major", "F# major", "G major",
+    "G# major", "A major", "A# major", "B major",
+    "C minor", "C# minor", "D minor", "D# minor",
+    "E minor", "F minor", "F# minor", "G minor",
+    "G# minor", "A minor", "A# minor", "B minor"]
 }
 
 const suggestablePropertyOptions: { [key: string]: any } = {
@@ -47,6 +53,10 @@ const suggestableProperties: { [key: string]: { [key: string]: any } } = {
 }
 
 const projectModel: { [key: string]: any } = {}
+
+export function getDropupLabel(property: string) {
+    return dropupLabel[property]
+}
 
 // returns a list of all properties that can be set/adjusted
 export function getProperties() {

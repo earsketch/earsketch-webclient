@@ -572,7 +572,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i have some ideas",
     utterance: "cool, what were you thinking?",
     parameters: {},
-    dropup: "Project attributes",
+    // dropup: "Project attributes",
     options: ["PROPERTIES|78"],
 },
 {
@@ -601,7 +601,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i have some other thoughts",
     utterance: "ok, what else are you thinking?",
     parameters: {},
-    dropup: "Project attributes",
+    // dropup: "Project attributes",
     options: ["PROPERTIES|78"],
 },
 {
@@ -659,7 +659,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i want to tell you what i think we should make",
     utterance: "sure, what were you thinking?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: ["PROPERTIES|78"],
 },
 {
@@ -667,7 +667,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i want to change one of our ideas about the project",
     utterance: "which of these do you want to remove from our list?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: [94, 95],
 },
 {
@@ -704,7 +704,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i want to remove one of our ideas",
     utterance: "which of these do you want to remove from our list?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: ["CLEARPROPERTYOPTIONS|90"],
 },
 {
@@ -712,7 +712,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i want to change one of our ideas",
     utterance: "which of these do you want to change?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: ["[CHANGEPROPERTYOPTIONS|96]"],
 },
 {
@@ -720,7 +720,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "",
     utterance: "ok, what do you want to change it out for?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: ["[SWAPPROPERTYOPTIONS|97]"],
 },
 {
@@ -750,7 +750,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i want to change something else",
     utterance: "what do you want to change?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: ["[CHANGEPROPERTYOPTIONS|96]"],
 },
 {
@@ -758,7 +758,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "i've got another idea",
     utterance: "what should we add?",
     parameters: {},
-    dropup: "ideas",
+    // dropup: "ideas",
     options: ["PROPERTIES|78"],
 },
 {
@@ -777,7 +777,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     // slashCommand: "request_instrument_2",
     parameters: {},
     dropup: "Keys",
-    options: [104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125],
+    options: [104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126],
 },
 {
     id: 104,
@@ -927,14 +927,14 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     options: [19, 6, 5],
 },
 {
-    id: 124,
+    id: 125,
     title: "A# minor",
     utterance: "How about [sound_rec]?[WAIT|34]",
     parameters: { KEY: "A# minor" },
     options: [19, 6, 5],
 },
 {
-    id: 125,
+    id: 126,
     title: "B minor",
     utterance: "How about [sound_rec]?[WAIT|34]",
     parameters: { KEY: "B minor" },

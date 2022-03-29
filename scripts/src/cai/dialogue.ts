@@ -461,6 +461,7 @@ export function createButtons() {
                 newNode.id = tempID
                 newNode.title = caiProjectModel.getPropertyButtons()[keys[j]]
                 newNode.parameters = { property: keys[j] }
+                newNode.dropup = caiProjectModel.getDropupLabel(keys[j])
                 caiTree.push(newNode)
                 buttons.push({ label: newNode.title, value: newNode.id })
                 currentTreeNode[activeProject].options.push(tempID)
