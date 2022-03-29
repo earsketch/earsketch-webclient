@@ -2,6 +2,7 @@
 import * as ccState from "./complexityCalculatorState"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+// import { fitMedia } from "src/api/passthrough"
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
 
@@ -13,6 +14,15 @@ const PYTHON_AND_API = [
     "setEffect", "setTempo", "shuffleList", "shuffleString", "and", "as", "assert", "break", "del", "elif",
     "class", "continue", "def", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "not", "or",
     "pass", "print", "raise", "return", "try", "while", "with", "yield",
+] as readonly string[]
+
+const JS_AND_API = [
+    "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", "fitMedia",
+    "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBealSlice", "readInput",
+    "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile",
+    "setEffect", "setTempo", "shuffleList", "shuffleString", "and", "as", "assert", "break", "del", "else if",
+    "continue", "function", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "or",
+    "pass", "println", "raise", "return", "try", "while", "with", "yield", "catch",
 ] as readonly string[]
 
 let lastWorkingAST: any
@@ -58,6 +68,9 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
             currentError.stack = errorMsg.stack
         }
         currentText = codeText
+        // incredibly annoying quote cleanup
+        currentText = currentText.replace(/[\u201C\u201D]/g, '"')
+        currentText = currentText.replace(/[\u2018\u2019]/g, "'")
         console.log(handleJavascriptError())
     } else {
         console.log(errorMsg)
@@ -71,34 +84,46 @@ function handleJavascriptError() {
     errorLine = textArray[currentError.linenumber - 1]
     const errorType = currentError.stack.split(":")[0]
 
-    if (errorType === "ReferenceError") {
+    if (errorType === "ReferenceError" && !ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).includes("fitmedia")) {
         return handleJavascriptReferenceError()
     }
 
-    if (ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
-        return handlePythonFitMediaError(currentError.linenumber - 1)
-    } else {
-        for (let i = 0; i < textArray.length; i++) {
-            const line = textArray[i]
-            if (line.includes("function") || line.includes("def")) {
-                const functionErrorCheck = handleJavascriptFunctionError(line, i + 1)
-                if (functionErrorCheck) {
-                    return functionErrorCheck
+    for (const word of errorLine.split(" ")) {
+        for (const builtin of JS_AND_API) {
+            if (isTypo(word, builtin)) {
+                return ["name", "typo: " + builtin]
+            }
+        }
+    }
+
+    for (let i = 0; i < textArray.length; i++) {
+        const line = textArray[i]
+
+        if (ccHelpers.trimCommentsAndWhitespace(errorLine.toLowerCase()).startsWith("fitmedia")) {
+            const fitMediaFix = handlePythonFitMediaError(currentError.linenumber - 1)
+            if (fitMediaFix) {
+                return fitMediaFix
+            }
+        }
+
+        if (line.includes("function") || line.includes("def")) {
+            const functionErrorCheck = handleJavascriptFunctionError(line, i)
+            if (functionErrorCheck) {
+                return functionErrorCheck
+            }
+        }
+        if (line.includes("for")) {
+            if (!line.includes(" in ") && !line.includes(" of ")) {
+                const forCheck = handleJavascriptForLoopError(i)
+                if (forCheck) {
+                    return forCheck
                 }
             }
-            if (line.includes("for")) {
-                if (!line.includes(" in ") && !line.includes(" of ")) {
-                    const forCheck = handleJavascriptForLoopError(i)
-                    if (forCheck) {
-                        return forCheck
-                    }
-                }
-            }
-            if (ccHelpers.trimCommentsAndWhitespace(line).startsWith("if")) {
-                const conditionalCheck = checkJavascriptConditional(i)
-                if (conditionalCheck[0] !== "") {
-                    return conditionalCheck
-                }
+        }
+        if (ccHelpers.trimCommentsAndWhitespace(line).startsWith("if")) {
+            const conditionalCheck = checkJavascriptConditional(i)
+            if (conditionalCheck[0] !== "") {
+                return conditionalCheck
             }
         }
     }
@@ -151,8 +176,7 @@ function handleJavascriptForLoopError(lineno: number) {
 
 function handleJavascriptReferenceError() {
     // do we recognize the name?
-    const problemName: string = currentError.stack.split(":")[1].split(" is not defined")[0]
-    console.log(problemName)
+    const problemName: string = ccHelpers.trimCommentsAndWhitespace(currentError.stack.split(":")[1].split(" is not defined")[0])
 
     // check if it's a variable or function name that's recognizaed
     const variableList: any = ccState.getProperty("allVariables")
@@ -170,7 +194,7 @@ function handleJavascriptReferenceError() {
         }
     }
 
-    for (const apiCall of PYTHON_AND_API) {
+    for (const apiCall of JS_AND_API) {
         if (isTypo(problemName, apiCall)) {
             return ["name", "typo: " + apiCall]
         }
@@ -209,14 +233,14 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
         return ["function", "missing closing parenthesis"]
     }
 
-    functionParams = functionParams.substring(functionParams.indexOf("("))
+    functionParams = functionParams.substring(functionParams.indexOf("(") + 1)
     console.log(functionParams)
     let hasOpenBrace = false
     // check for open and curly brace immediately following parentheses
-    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex++) {
         let startValue = 0
         if (lineIndex === positionIndices[0]) {
-            startValue = positionIndices[1] + 1
+            startValue = positionIndices[1]
         }
         for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
             if (textArray[lineIndex][charIndex] === "{") {
@@ -236,10 +260,10 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
     let numOpenBraces = 0
     let numCloseBraces = 0
 
-    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex) {
+    for (let lineIndex = positionIndices[0]; lineIndex < textArray.length; lineIndex++) {
         let startValue = 0
         if (lineIndex === positionIndices[0]) {
-            startValue = positionIndices[1] + 1
+            startValue = positionIndices[1]
         }
         for (let charIndex = startValue; charIndex < textArray[lineIndex].length; charIndex++) {
             positionIndices[1] += 1
@@ -273,19 +297,7 @@ function handleJavascriptFunctionError(thisLine: string, thisLineNumber: number)
         }
 
         // get rid of list commas
-        while (paramString.includes("[")) {
-            const openIndex: number = paramString.indexOf("[")
-            const closeIndex: number = paramString.indexOf("]")
-
-            paramString = paramString.replace("[", "")
-            paramString = paramString.replace("]", "")
-
-            for (let i = openIndex; i < closeIndex; i++) {
-                if (paramString[i] === ",") {
-                    paramString = replaceAt(paramString, i, "|")
-                }
-            }
-        }
+        paramString = cleanupListsAndObjects(paramString)
 
         const params: string[] = paramString.split(",")
         const currentVariableNames: string[] = []
@@ -460,20 +472,7 @@ function handlePythonFunctionError() {
         }
 
         // get rid of list commas
-        while (paramString.includes("[")) {
-            const openIndex: number = paramString.indexOf("[")
-            const closeIndex: number = paramString.indexOf("]")
-
-            paramString = paramString.replace("[", "")
-            paramString = paramString.replace("]", "")
-
-            for (let i = openIndex; i < closeIndex; i++) {
-                if (paramString[i] === ",") {
-                    paramString = replaceAt(paramString, i, "|")
-                }
-            }
-        }
-
+        paramString = cleanupListsAndObjects(paramString)
         const params: string[] = paramString.split(",")
         const currentVariableNames: string[] = []
 
@@ -554,19 +553,7 @@ function handlePythonForLoopError() {
         // check args
 
         // get rid of list commas
-        while (argString.includes("[")) {
-            const openIndex: number = argString.indexOf("[")
-            const closeIndex: number = argString.indexOf("]")
-
-            argString = argString.replace("[", "")
-            argString = argString.replace("]", "")
-
-            for (let i = openIndex; i < closeIndex; i++) {
-                if (argString[i] === ",") {
-                    argString = replaceAt(argString, i, "|")
-                }
-            }
-        }
+        argString = cleanupListsAndObjects(argString)
 
         const rangeArgs: string[] = argString.split(",")
         if (rangeArgs.length > 1 || rangeArgs.length > 3) {
@@ -831,7 +818,7 @@ function handlePythonNameError() {
 
 function handlePythonFitMediaError(errorLineNo: number) {
     const trimmedErrorLine: string = ccHelpers.trimCommentsAndWhitespace(errorLine)
-
+    const lineIndex = errorLineNo
     if (trimmedErrorLine.includes("fitmedia") || trimmedErrorLine.includes("FitMedia") || trimmedErrorLine.includes("Fitmedia")) {
         return ["fitMedia", "miscapitalization"]
     }
@@ -845,28 +832,21 @@ function handlePythonFitMediaError(errorLineNo: number) {
         return ["fitMedia", "missing parentheses"]
     }
 
-    if (trimmedErrorLine[trimmedErrorLine.length - 1] !== ")") {
+    const parenOutput = checkForClosingParenthesis(lineIndex)
+    if (parenOutput[0] === "") {
         return ["fitMedia", "missing parentheses"]
     }
+    // if (trimmedErrorLine[trimmedErrorLine.length - 1] !== ")") {
+    //     return ["fitMedia", "missing parentheses"]
+    // }
 
     // now clean and check arguments
-    let argString: string = trimmedErrorLine.substring(trimmedErrorLine.indexOf("(") + 1, trimmedErrorLine.lastIndexOf(")"))
+    let argString: string = parenOutput[0] as string
+    argString = argString.substring(argString.indexOf("(") + 1)
+    // trimmedErrorLine.substring(trimmedErrorLine.indexOf("(") + 1, trimmedErrorLine.lastIndexOf(")"))
 
     // get rid of list commas
-    while (argString.includes("[")) {
-        const openIndex: number = argString.indexOf("[")
-        const closeIndex: number = argString.indexOf("]")
-
-        argString = argString.replace("[", "")
-        argString = argString.replace("]", "")
-
-        for (let i = openIndex; i < closeIndex; i++) {
-            if (argString[i] === ",") {
-                argString = replaceAt(argString, i, "|")
-            }
-        }
-    }
-
+    argString = cleanupListsAndObjects(argString)
     const argsSplit: string[] = argString.split(",")
     const argumentTypes: (string|null)[] = []
 
@@ -888,9 +868,14 @@ function handlePythonFitMediaError(errorLineNo: number) {
 
     for (let i = 0; i < argsSplit.length; i++) {
         argumentTypes.push("")
+        const paddedArg = " " + argsSplit[i] + " "
         if (isNumeric(argsSplit[i])) {
             argumentTypes[i] = "Num"
             numberArgs[i - 1] = parseFloat(argsSplit[i])
+        } else if (argsSplit[i].startsWith("OPENBRACE")) {
+            argumentTypes[i] = "ObjOrArray"
+        } else if (paddedArg.includes(" true ") || paddedArg.includes(" false ") || paddedArg.includes(">") || paddedArg.includes("<") || paddedArg.includes("=") || paddedArg.includes(" and ") || paddedArg.includes(" or ") || paddedArg.includes("&&") || paddedArg.includes("||")) {
+            argumentTypes[i] = "bool"
         } else if (argsSplit[i].includes("\"") || argsSplit[i].includes("'")) {
             argumentTypes[i] = "Str"
         } else if (argsSplit[i].includes("+")) {
@@ -914,17 +899,18 @@ function handlePythonFitMediaError(errorLineNo: number) {
             // is it the name of a smaple
             if (AUDIOKEYS.includes(argsSplit[i])) {
                 argumentTypes[i] = "Sample"
-            }
-            // or is it a var or func call that returns a sample
-            // const errorLineNo: number = currentError.traceback[0].lineno
-            // func call
-
-            if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
-                const functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
-
-                argumentTypes[i] = estimateFunctionNameReturn(functionName)
             } else {
-                argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo)
+                // or is it a var or func call that returns a sample
+                // const errorLineNo: number = currentError.traceback[0].lineno
+                // func call
+
+                if (argsSplit[i].includes("(") || argsSplit[i].includes(")")) {
+                    const functionName: string = argsSplit[i].substring(0, argsSplit[i].indexOf("("))
+
+                    argumentTypes[i] = estimateFunctionNameReturn(functionName)
+                } else {
+                    argumentTypes[i] = estimateVariableType(argsSplit[i], errorLineNo)
+                }
             }
         }
     }
@@ -964,7 +950,7 @@ function handlePythonFitMediaError(errorLineNo: number) {
 
 function checkJavascriptConditional(lineIndex: number): string[] {
     // find first if in line, grab everything after that
-    const trimmedConditionalString = ccHelpers.trimCommentsAndWhitespace(textArray[lineIndex].substring(textArray[lineIndex].indexOf("if") + 3))
+    const trimmedConditionalString = ccHelpers.trimCommentsAndWhitespace(textArray[lineIndex].substring(textArray[lineIndex].indexOf("if") + 2))
 
     // first check: parens
     if (!trimmedConditionalString.startsWith("(")) {
@@ -1185,4 +1171,35 @@ function isTypo(original: string, target: string) {
 
 function replaceAt(original: string, index: number, replacement: string) {
     return original.substr(0, index) + replacement + original.substr(index + replacement.length)
+}
+
+function cleanupListsAndObjects(inputStr: string) {
+    let trimmedStr = inputStr
+    while (trimmedStr.includes("[")) {
+        const openIndex: number = trimmedStr.indexOf("[")
+        const closeIndex: number = trimmedStr.indexOf("]")
+
+        trimmedStr = trimmedStr.replace("[", "OPENBRACE")
+        trimmedStr = trimmedStr.replace("]", "CLOSEBRACE")
+
+        for (let i = openIndex; i < closeIndex; i++) {
+            if (trimmedStr[i] === ",") {
+                trimmedStr = replaceAt(trimmedStr, i, "|")
+            }
+        }
+    }
+    while (trimmedStr.includes("{")) {
+        const openIndex: number = trimmedStr.indexOf("{")
+        const closeIndex: number = trimmedStr.indexOf("}")
+
+        trimmedStr = trimmedStr.replace("{", "OPENBRACE")
+        trimmedStr = trimmedStr.replace("}", "CLOSEBRACE")
+
+        for (let i = openIndex; i < closeIndex; i++) {
+            if (trimmedStr[i] === ",") {
+                trimmedStr = replaceAt(trimmedStr, i, "|")
+            }
+        }
+    }
+    return trimmedStr
 }

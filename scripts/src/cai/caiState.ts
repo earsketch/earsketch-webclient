@@ -9,12 +9,13 @@ import * as codeSuggestion from "./codeSuggestion"
 import * as dialogue from "./dialogue"
 import * as studentPreferences from "./studentPreferences"
 import * as studentHistory from "./studentHistory"
-// import * as errorHandling from "./errorHandling"
+import * as errorHandling from "./errorHandling"
 import { getUserFunctionReturns, getAllVariables } from "./complexityCalculator"
 import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
+// import { IDE } from "src/ide/IDE"
 
 interface caiState {
     activeProject: string
@@ -324,7 +325,8 @@ export const compileError = createAsyncThunk<void, string | Error, ThunkAPI>(
     "cai/compileError",
     (data, { getState, dispatch }) => {
         const errorReturn = dialogue.handleError(data)
-
+        console.log(JSON.stringify(data))
+        errorHandling.storeErrorInfo(data, editor.ace.getValue(), getState().app.scriptLanguage)
         if (FLAGS.SHOW_CHAT && !selectWizard(getState())) {
             const message = {
                 text: [["plaintext", ["Compiled the script with error: " + console.elaborate(data)]]],
