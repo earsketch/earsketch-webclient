@@ -134,12 +134,11 @@ const CaiFooter = () => {
     const inputOptions = useSelector(cai.selectInputOptions)
     const errorOptions = useSelector(cai.selectErrorOptions)
     const dropupLabel = useSelector(cai.selectDropupLabel)
-    const buttonLimit = 6
 
     return (
         <div id="chat-footer" style={{ marginTop: "auto", display: "block" }}>
             <div style={{ flex: "auto" }}>
-                {inputOptions.length < buttonLimit
+                {!dropupLabel.length
                     ? <ul>
                         {Object.entries(inputOptions).map(([inputIdx, input]: [string, cai.CAIButton]) =>
                             <li key={inputIdx}>

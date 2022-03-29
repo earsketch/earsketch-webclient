@@ -569,6 +569,8 @@ export function createButtons() {
     }
     if ("dropup" in currentTreeNode[activeProject]) {
         currentDropup = currentTreeNode[activeProject].dropup
+    } else {
+        currentDropup = ""
     }
     return buttons
 }

@@ -96,7 +96,7 @@ const ChatFooter = () => {
     const findUtteranceBySlashCommand = (slashCommandPrompt: string) => {
         const utterances: AutocompleteSuggestion[] = []
         for (const node of caiTree) {
-            if ("slashCommand" in node && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
+            if (node.slashCommand && node.slashCommand.toLowerCase().startsWith(slashCommandPrompt.toLowerCase())) {
                 utterances.push({
                     utterance: node.utterance,
                     slashCommand: node.slashCommand,

@@ -1,6 +1,15 @@
-export const CAI_TREE_NODES: {
-    [key: string]: any
-} = [{
+interface CaiTreeNode {
+    id: number,
+    title: string,
+    utterance: string,
+    parameters: { [key: string]: any },
+    options: (string | number) [],
+    event?: string [],
+    dropup?: string,
+    slashCommand?: string,
+}
+
+export const CAI_TREE_NODES: CaiTreeNode [] = [{
     id: 0,
     title: "",
     utterance: "[GREETING]",
