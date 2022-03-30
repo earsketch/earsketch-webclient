@@ -52,20 +52,21 @@ describe("Bubble Tour Test", () => {
         cy.get("button[id='run-button']").click()
 
         // Confirm success from the ES console
-        cy.get(":nth-child(2) > .console-info").should("contain", "Script ran successfully")
+        // cy.get(":nth-child(2) > .console-info").should("contain", "Script ran successfully")
+        cy.contains("span", "Script ran successfully")
 
         cy.get("button[id=headlessui-menu-button-11]").click()
         cy.get("button").contains("Logout").click()
 
         // step 1
-        //cy.get('button').contains('Next').click()
+        // cy.get('button').contains('Next').click()
 
         // step 2
         // make sure next is grayed out until you click run
-        //cy.get('button').contains('Next').should('have.class','cursor-not-allowed')
+        // cy.get('button').contains('Next').should('have.class','cursor-not-allowed')
 
         // click run button
-        //cy.get('#run-button').click().then((step2) => {
+        // cy.get('#run-button').click().then((step2) => {
            // cy.get('#console').should('contain', 'Script ran successfully')
            // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
         //})
