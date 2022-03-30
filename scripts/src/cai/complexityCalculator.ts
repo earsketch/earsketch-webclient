@@ -429,6 +429,7 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
                 end: number,
                 returnVals: Node[],
                 functionBody: Node[],
+                args: number,
             } = {
                 name: typeof node.name === "string" ? node.name : String(node.name.v),
                 returns: false,
@@ -439,6 +440,7 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
                 end: lineNumber,
                 returnVals: [],
                 functionBody: Array.isArray(node.body) ? node.body : [],
+                args: 0,
             }
 
             functionObj.end = ccHelpers.getLastLine(node)
@@ -467,6 +469,7 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
             if (!Array.isArray(node.args) && node.args.args && Array.isArray(node.args.args) && node.args.args.length > 0) {
                 // check for parameters that are NOT NULL
                 // these...should all be Name
+                functionObj.args = node.args.args.length
                 for (const arg of node.args.args) {
                     if (arg._astname === "Name") {
                         const argName = String(arg.id.v)

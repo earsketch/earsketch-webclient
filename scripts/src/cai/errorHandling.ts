@@ -401,7 +401,7 @@ export function handlePythonError(errorType: string) {
     }
 
     // while loops
-    if (errorLine.includes("while ")) {
+    if (errorLine.includes("while ") || errorLine.includes("while(")) {
         return handlePythonWhileLoopError()
     }
 
@@ -522,10 +522,10 @@ function handlePythonForLoopError() {
     const nextSpace: number = trimmedErrorLine.indexOf(" ")
 
     const iteratorName: string = trimmedErrorLine.substring(0, nextSpace)
-    trimmedErrorLine = trimmedErrorLine.substring(nextSpace)
+    trimmedErrorLine = ccHelpers.trimCommentsAndWhitespace(trimmedErrorLine.substring(nextSpace))
 
     // check for iterator name
-    if (iteratorName === "" || iteratorName === " ") {
+    if (iteratorName === "" || iteratorName === " " || iteratorName === "in") {
         return ["for loop", "missing iterator name"]
     }
 
@@ -556,7 +556,7 @@ function handlePythonForLoopError() {
         argString = cleanupListsAndObjects(argString)
 
         const rangeArgs: string[] = argString.split(",")
-        if (rangeArgs.length > 1 || rangeArgs.length > 3) {
+        if (rangeArgs.length < 1 || rangeArgs.length > 3) {
             return ["for loop", "incorrect number of range arguments"]
         }
         // each arg should be a number
@@ -680,9 +680,9 @@ function handlePythonCallError() {
 
         for (const item of allFuncs) {
             if (item.name === errorLine) {
-                if (item.args && item.args.length > args.length) {
+                if (item.args > args.length) {
                     return ["function call", "too few arguments"]
-                } else if (item.args && item.args.length < args.length) {
+                } else if (item.args && item.args < args.length) {
                     return ["function call", "too many arguments"]
                 }
                 break
@@ -868,7 +868,7 @@ function handlePythonFitMediaError(errorLineNo: number) {
 
     for (let i = 0; i < argsSplit.length; i++) {
         argumentTypes.push("")
-        const paddedArg = " " + argsSplit[i] + " "
+        const paddedArg = (" " + argsSplit[i] + " ").toLowerCase()
         if (isNumeric(argsSplit[i])) {
             argumentTypes[i] = "Num"
             numberArgs[i - 1] = parseFloat(argsSplit[i])
@@ -930,18 +930,18 @@ function handlePythonFitMediaError(errorLineNo: number) {
     }
 
     // then, check number values if possilbe
-    if (numberArgs[0] !== -1 && !Number.isInteger(numberArgs[0])) {
+    if (!isNaN(numberArgs[0]) && !Number.isInteger(numberArgs[0])) {
         return (["fitMedia", "track number not integer"])
     } else if (numberArgs[0] !== -1 && numberArgs[0] < 1) {
         return (["fitMedia", "invalid track number"])
     }
-    if (numberArgs[1] !== -1 && numberArgs[1] < 1) {
+    if (!isNaN(numberArgs[1]) && numberArgs[1] < 1) {
         return (["fitMedia", "invalid start measure"])
     }
-    if (numberArgs[2] !== -1 && numberArgs[2] < 1) {
+    if (!isNaN(numberArgs[2]) && numberArgs[2] < 1) {
         return (["fitMedia", "invalid end measure"])
     }
-    if (numberArgs[1] !== -1 && numberArgs[2] !== -1) {
+    if (!isNaN(numberArgs[1]) && !isNaN(numberArgs[2])) {
         if (numberArgs[2] <= numberArgs[1]) {
             return (["fitMedia", "backwards start/end"])
         }
