@@ -29,13 +29,12 @@ describe("Bubble Tour Test", () => {
         // Skip the tour
         cy.get("button").contains("Skip").click()
 
+        cy.get("#app-title").should("contain", "EarSketch")
+
         // Login to Test user
         cy.get("input[name='username']").type("satCypress")
         cy.get("input[name='password']").type("testsat")
         cy.get("button[title='Login']").click()
-
-        // optional
-        cy.wait(2000)
 
         // Add sound?
         // cy.get("div").contains("Add Sound").click()
@@ -52,24 +51,26 @@ describe("Bubble Tour Test", () => {
         // Run new Script
         cy.get("button[id='run-button']").click()
 
-        // Verify results manually during wait period?
-        cy.wait(5000)
+        // Confirm success from the ES console
+        cy.get(":nth-child(2) > .console-info").should("contain", "Script ran successfully")
 
         cy.get("button[id=headlessui-menu-button-11]").click()
         cy.get("button").contains("Logout").click()
 
         // step 1
-        // cy.get('button').contains('Next').click()
+        //cy.get('button').contains('Next').click()
 
         // step 2
         // make sure next is grayed out until you click run
-        // cy.get('button').contains('Next').should('have.class','cursor-not-allowed')
+        //cy.get('button').contains('Next').should('have.class','cursor-not-allowed')
 
         // click run button
-        // cy.get('#run-button').click().then((step2) => {
-        // cy.get('#console').should('contain', 'Script ran successfully')
-        // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
-        // })
+        //cy.get('#run-button').click().then((step2) => {
+           // cy.get('#console').should('contain', 'Script ran successfully')
+           // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
+        //})
+
+
 
         //  cy.get('@consoleLog').then((consoleLog) => {
 
