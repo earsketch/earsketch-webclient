@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next"
 import * as app from "../app/appState"
 import { pages } from "./bubbleData"
 import * as bubble from "./bubbleState"
-import * as curriculum from "../browser/curriculumState"
 import { AVAILABLE_LOCALES } from "../locales/AvailableLocales"
 
 const Backdrop = () => {
@@ -76,8 +75,6 @@ const MessageFooter = () => {
                             className="border-0 border-b-2 border-black outline-none"
                             onChange={e => {
                                 dispatch(app.setLocaleCode(e.currentTarget.value))
-                                // TODO: This should happen automatically when the locale changes.
-                                dispatch(curriculum.fetchLocale({}))
                             }}
                             value={locale}
                             aria-label={t("ariaDescriptors:header.selectLanguage")}

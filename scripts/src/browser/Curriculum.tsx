@@ -221,6 +221,7 @@ export const TitleBar = () => {
 }
 
 const CurriculumPane = () => {
+    const dispatch = useDispatch()
     const { t } = useTranslation()
     const language = useSelector(appState.selectScriptLanguage)
     const currentLocale = useSelector(appState.selectLocale)
@@ -229,6 +230,10 @@ const CurriculumPane = () => {
     const paneIsOpen = useSelector(layout.isEastOpen)
     const content = useSelector(curriculum.selectContent)
     const curriculumBody = useRef<HTMLElement>(null)
+
+    useEffect(() => {
+        dispatch(curriculum.fetchLocale({ }))
+    }, [currentLocale])
 
     useEffect(() => {
         if (content && curriculumBody.current) {
