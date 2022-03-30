@@ -1,4 +1,4 @@
-﻿import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as ccState from "./complexityCalculatorState"
 
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
