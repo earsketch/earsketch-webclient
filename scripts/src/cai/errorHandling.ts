@@ -324,6 +324,11 @@ export function handlePythonError(errorType: string) {
     textArray = currentText.split("\n")
     errorLine = textArray[currentError.traceback[0].lineno - 1]
 
+    // check for mismatched parentheses
+    if (checkForClosingParenthesis(0, false)[0] === "") {
+        return ["parentheses", "mismatch"]
+    }
+
     // check for import, init,and finish
     if (!currentText.includes("from earsketch import *") && !currentText.includes("from earsketch import*")) {
         return ["import", "missing import"]
@@ -1035,20 +1040,24 @@ function checkJavascriptConditional(lineIndex: number): string[] {
     return ["", ""]
 }
 
-function checkForClosingParenthesis(startLine: number) {
+function checkForClosingParenthesis(startLine: number, stopAtClose: boolean = true) {
     let body = ""
     let hasCloseParen: boolean = false
     let numOpenParens = 0
     let numCloseParens = 0
+    let isInString = false
 
     let positionIndices = [0, 0]
     for (let lineInd = startLine; lineInd < textArray.length; lineInd++) {
         positionIndices = [lineInd, 0]
         for (const charValue of textArray[lineInd]) {
             positionIndices[1] += 1
-            if (charValue === ")") {
+            if (charValue === "\"" || charValue === "'") {
+                isInString = !isInString
+            }
+            if (charValue === ")" && !isInString) {
                 numCloseParens += 1
-                if (numCloseParens === numOpenParens) {
+                if (numCloseParens === numOpenParens && stopAtClose) {
                     hasCloseParen = true
                     break
                 } else {
@@ -1056,7 +1065,7 @@ function checkForClosingParenthesis(startLine: number) {
                 }
             } else if (charValue !== "\n") {
                 body += charValue
-                if (charValue === "(") {
+                if (charValue === "(" && !isInString) {
                     numOpenParens += 1
                 }
             }
@@ -1066,7 +1075,7 @@ function checkForClosingParenthesis(startLine: number) {
         }
     }
 
-    if (hasCloseParen) {
+    if (hasCloseParen || numCloseParens === numOpenParens) {
         return [body, positionIndices]
     } else {
         return ["", [0, 0]]
