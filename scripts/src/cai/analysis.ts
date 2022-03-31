@@ -130,11 +130,18 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
     }
     let measureView: { [key: number]: any[] } = {}
     // report sounds used in each track
-    for (let i = 0; i < output.tracks.length - 1; i++) {
-        for (const sample of output.tracks[i].clips) {
+    for (const track of output.tracks) {
+        if (track.clips.length < 1) {
+            continue
+        }
+
+        for (const sample of track.clips) {
+            if (sample.filekey.includes("METRONOME")) {
+                continue
+            }
             // report sound for every measure it is used in.
-            for (let k = Math.floor(sample.start); k < Math.ceil(sample.end); k++) {
-                if (!measureView[k] || measureView[k] === null) {
+            for (let k = Math.floor(sample.measure + sample.start - 1); k < Math.ceil(sample.measure + sample.end - 1); k++) {
+                if (!measureView[k]) {
                     measureView[k] = []
                 }
                 if (measureView[k]) {
@@ -147,15 +154,14 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                         }
                     }
                     if (!isDupe) {
-                        measureView[k].push({ type: "sound", track: i, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey] })
+                        measureView[k].push({ type: "sound", track: sample.track, name: sample.filekey, genre: keyGenreDict[sample.filekey], instrument: keyInstrumentDict[sample.filekey] })
                     }
                 }
             }
         }
         // report effects used in each track
-        Object.keys(output.tracks[i].effects).forEach((effectName) => {
-            const arr = output.tracks[i].effects[effectName]
-            for (const sample of arr) {
+        Object.keys(track.effects).forEach((effectName) => {
+            for (const sample of track.effects[effectName]) {
                 for (let n = sample.startMeasure; n <= (sample.endMeasure); n++) {
                     // If effect appears at all (level 1)
                     if (measureView[n] === null) {
@@ -177,7 +183,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
                             interpValue = (sample.endValue - sample.startValue) * interpStep
                             report.EFFECTS[sample.name] = 3
                         }
-                        measureView[n].push({ type: "effect", track: i, name: sample.name, param: sample.parameter, value: interpValue })
+                        measureView[n].push({ type: "effect", track: sample.track, name: sample.name, param: sample.parameter, value: interpValue })
                     }
                 }
             }
@@ -214,7 +220,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
 
     const soundProfile: any = {}
     const sectionNames = ["A", "B", "C", "D", "E", "F", "G"]
-    const thresholds = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+    const thresholds = [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
     let sectionDepth = 0
     let numberOfDivisions = 1
 
@@ -224,7 +230,7 @@ function trackToTimeline(output: DAWData, apiCalls: any = null) {
         const sectionValues = sectionMeasures.map((section) => { return section.value })
         const uniqueValues = sectionValues.filter((v, i, a) => a.indexOf(v) === i)
         // TODO: Remove limit on sectionDepth
-        if (sectionMeasures.length > numberOfDivisions && uniqueValues.length > 1 && sectionDepth < 3) {
+        if (sectionMeasures.length >= numberOfDivisions && uniqueValues.length >= 1 && sectionDepth < 3) {
             const sectionPairs: any = {}
             const sectionRepetitions: any = {}
             let sectionUse = 0
@@ -373,7 +379,7 @@ export function getReport() {
 }
 
 // Form Analysis: return list of consecutive lists of numbers from vals (number list).
-function findSections(vals: any, threshold: any = 0.25, step: any = 0) {
+function findSections(vals: any, threshold: number = 0.25, step: number = 0) {
     let run = []
     const result = []
     const span = []
