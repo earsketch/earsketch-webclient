@@ -75,18 +75,21 @@ export const SoundPreviewContent = (name: string) => {
 
 const CAIMessageView = (message: cai.CAIMessage) => {
     const dispatch = useDispatch()
-    const wholeMessage = message.text.map((phrase, index) => {
-        switch (phrase[0]) {
-            case "plaintext":
-                return phrase[1][0]
-            case "LINK":
-                return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
-            case "sound_rec":
-                return SoundPreviewContent(phrase[1][0])
-            default:
-                return "error"
-        }
-    })
+
+    const wholeMessage = (message: cai.CAIMessage) => {
+        return message.text.map((phrase, index) => {
+            switch (phrase[0]) {
+                case "plaintext":
+                    return phrase[1][0]
+                case "LINK":
+                    return <a key={index} href="#" onClick={e => { e.preventDefault(); dispatch(cai.openCurriculum(phrase[1][1])); caiDialogue.addToNodeHistory(["curriculum", phrase[1][1]]) }} style={{ color: "blue" }}>{phrase[1][0]}</a>
+                case "sound_rec":
+                    return SoundPreviewContent(phrase[1][0])
+                default:
+                    return "error"
+            }
+        })
+    }
 
     return (
         <div className="chat-message" style={{ color: "black" }}>
@@ -97,7 +100,7 @@ const CAIMessageView = (message: cai.CAIMessage) => {
             }}>
                 <div className="chat-message-sender">{message.sender}</div>
                 <div id="text" className="chat-message-text">
-                    {wholeMessage}
+                    {wholeMessage(message)}
                 </div>
             </div>
             <div className="chat-message-date" style={{ float: message.sender !== "CAI" ? "left" : "right" }}>
@@ -119,7 +122,7 @@ export const CaiBody = () => {
             <div className="chat-message-container">
                 <ul>
                     {messageList[activeProject] &&
-                    Object.entries(messageList[activeProject]).map(([idx, message]: [string, cai.CAIMessage]) =>
+                    Object.entries(messageList[activeProject]).map(([_, message]: [string, cai.CAIMessage], idx) =>
                         <li key={idx}>
                             <CAIMessageView {...message} />
                         </li>)}
