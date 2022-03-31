@@ -1244,8 +1244,6 @@ function findValueTrace(isVariable: Boolean,
         const thisNode = parentNodes[parentNodes.length - 1]
         // do uses
 
-        // console.log(name, nodeParent, secondParent);
-
         // is it in a func arg
         if (nodeParent && nodeParent[1] === "args") {
             isUse = true
@@ -1560,7 +1558,6 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
                     calledOn = ccHelpers.estimateDataType(node.args[0])
                 }
             } else if (node.func._astname === "Attribute") {
-                // console.log(node.func._astname);
                 calledName = String(node.func.attr.v)
                 if ("value" in node.func) {
                     calledOn = ccHelpers.estimateDataType(node.func.value)
@@ -1700,7 +1697,6 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
             }
         }
     } else if (node._astname === "If") {
-        // returnObject.id = "If";
         const ifNode: StructuralNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
 
         for (const item of node.body) {
@@ -1781,7 +1777,7 @@ function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "Fun
 function getParentList(lineno: number, parentNode: StructuralNode, parentsList: StructuralNode[]) {
     // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
-    // first....is it a child of the parent node?
+    // first, is it a child of the parent node?
     if (typeof parentNode.startline !== "undefined" && parentNode.startline !== null && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.

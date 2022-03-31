@@ -23,14 +23,8 @@ const librarySoundGenres: string[] = []
 const keyGenreDict: { [key: string]: string } = {}
 const keyInstrumentDict: { [key: string]: string } = {}
 let genreDist: any = []
-// let soundsLoaded = false
 let savedReport = {}
 export let savedAnalysis = {}
-
-// const apiCalls = []
-
-// Load lists of numbers and keys
-// const AUDIOKEYS = Object.keys(AUDIOKEYS_RECOMMENDATIONS)
 
 // Populate the sound-browser items
 function populateLibrarySounds() {
@@ -47,7 +41,6 @@ function populateLibrarySounds() {
     }).then(() => {
         esconsole("***WS Loading Custom Sounds OK...", ["info", "init"])
         esconsole("Reported load time from this point.", ["info", "init"])
-        // soundsLoaded = true
     })
 }
 
@@ -112,7 +105,6 @@ export function analyzeCodeAndMusic(language: string, script: string, trackListi
     const musicAnalysis = analyzeMusic(trackListing, getApiCalls())
     savedAnalysis = Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
     if (caiStudent !== null && FLAGS.SHOW_CAI) {
-    // caiStudent.updateModel("codeKnowledge", { currentComplexity: codeComplexity })
         caiStudent.updateModel("musicAttributes", musicAnalysis)
     }
     return Object.assign({}, { Code: codeComplexity }, { Music: musicAnalysis })
@@ -419,44 +411,8 @@ function convertToMeasures(span: any, intRep: any) {
     return measureSpan
 }
 
-// Genre Analysis: return measure-by-measure list of closest genre.
-// function findGenre(measureView: any) {
-//     const genres: any[] = []
-//     for (const measure in measureView) {
-//         genres.push([])
-//         for (const item in measureView[measure]) {
-//             if (measureView[measure][item].type === "sound") {
-//                 const sounds: SoundEntity[] = librarySounds.filter(sound => {
-//                     return sound.name === measureView[measure][item].name
-//                 })
-//                 sounds.forEach((sound) => {
-//                     genres[genres.length - 1].push(sound.genre)
-//                 })
-//             }
-//         }
-//     }
-//     return genres
-// }
-
 // Genre Analysis: return measure-by-measure list of recommended genre using co-usage data.
 function kMeansGenre(measureView: any) {
-    // function genreStrNearestGenre(genre: string) {
-    //     const genum = librarySoundGenres.indexOf(genre)
-    //     return librarySoundGenres[genreDist.indexOf(Math.max(...genreDist[genum]))]
-    // }
-
-    // function genreOfListSimple(sampleList: string[]) {
-    //     const temp = Array(librarySoundGenres.length).fill(0)
-    //     for (const item in sampleList) {
-    //         temp[librarySoundGenres.indexOf(keyGenreDict[item])] += 1
-    //     }
-    //     return librarySoundGenres[temp.indexOf(Math.max(...temp))]
-    // }
-
-    // function getGenreForSample(sample: string) {
-    //     return keyGenreDict[sample]
-    // }
-
     function getStanNumForSample(sample: string) {
         return librarySoundGenres.indexOf(keyGenreDict[sample])
     }

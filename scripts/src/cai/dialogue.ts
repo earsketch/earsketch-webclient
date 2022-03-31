@@ -152,15 +152,10 @@ export function clearNodeHistory() {
     currentParameters = {}
     currentTreeNode = {}
     studentCodeObj = []
-    // musicAnalysisObj = {}
-    // measures = []
-    // lineNodes = []
-    // parameterNodes = []
 
     currentProperty = ""
 
     currentSuggestion = {}
-    // utteranceObj
 
     currentWait = -1
     errorWait = -1
@@ -173,7 +168,6 @@ export function clearNodeHistory() {
     currentInstr = null
     currentGenre = null
 
-    // complexityUpdated = true
     errorSuccess = 0
     errorFail = 0
 
@@ -225,7 +219,6 @@ function explainError() {
 }
 
 export function processCodeRun(studentCode: string, functions: any[], variables: any[], complexityResults: any, musicResults: any) {
-    // caiErrorHandling.updateNames(variables, functions)
     studentCodeObj = studentCode
     const allSamples = recommender.addRecInput([], { source_code: studentCodeObj } as Script)
     caiStudentPreferenceModule.runSound(allSamples)
@@ -316,10 +309,6 @@ export function processCodeRun(studentCode: string, functions: any[], variables:
 export function setCodeObj(newCode: any) {
     studentCodeObj = newCode
 }
-
-// function clearParameters() {
-//     currentParameters = {}
-// }
 
 // Creates label/value array from dialogue selection options available to current node.
 export function createButtons() {
@@ -1022,38 +1011,6 @@ const LINKS: { [key: string]: string } = {
     "nested loops": "/en/v1/sonification.html#nestedloops",
 }
 
-// if used, sound_rec needs to be updated with link
-// function reconstituteNodeHistory() {
-//     const newVersion = []
-//     for (const i in nodeHistory[activeProject]) {
-//         if (nodeHistory[activeProject][i][0] !== 0 || i === "0") {
-//             const newItem = nodeHistory[activeProject][i].slice()
-//             newItem[0] = caiTree[newItem[0]].utterance
-//             // now, we go through the parameters and replace things like sound recs, section,
-//             if (newItem[0].includes("sound_rec")) {
-//                 // find recs
-//                 let soundRecs = []
-//                 for (const i in newItem) {
-//                     const val = newItem[i][0][0]
-//                     if (val === "sound_rec") {
-//                         soundRecs = newItem[i][0][1]
-//                         break
-//                     }
-//                 }
-//                 if (soundRecs.length > 0) {
-//                     let index = 0
-//                     while (newItem[0].includes("sound_rec")) {
-//                         newItem[0] = newItem[0].replace("[sound_rec]", soundRecs[index])
-//                         index++
-//                     }
-//                 }
-//             }
-//             newVersion.push(newItem)
-//         }
-//     }
-//     return newVersion
-// }
-
 export function errorFixSuccess() {
     currentTreeNode[activeProject] = Object.assign({}, caiTree[errorSuccess])
     return showNextDialogue()
@@ -1159,19 +1116,6 @@ function generateSuggestion() {
         return ""
     }
 }
-
-// function printObject(obj: any) {
-//     const keys = Object.keys(obj)
-//     let returnStrings = ""
-//     for (const i in keys) {
-//         if (typeof obj[keys[i]] === "object") {
-//             returnStrings += (keys[i] + ": \n{\n" + printObject(obj[keys[i]]) + "}\n")
-//         } else {
-//             returnStrings += (keys[i] + ": " + obj[keys[i]] + "\n")
-//         }
-//     }
-//     return returnStrings
-// }
 
 // helper function to generate random integers
 function randomIntFromInterval(min: number, max: number) { // min and max included

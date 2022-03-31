@@ -15,7 +15,6 @@ import { analyzePython } from "./complexityCalculatorPY"
 import { analyzeJavascript } from "./complexityCalculatorJS"
 import * as collaboration from "../app/collaboration"
 import * as console from "../ide/console"
-// import { IDE } from "src/ide/IDE"
 
 interface caiState {
     activeProject: string
@@ -288,7 +287,6 @@ export const compileCAI = createAsyncThunk<void, any, ThunkAPI>(
         }
 
         // call cai analysis here
-        // const result = data[0]
         const language = data[1]
         const code = data[2]
 
