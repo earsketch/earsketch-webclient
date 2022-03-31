@@ -372,7 +372,7 @@ const NotificationMenu = () => {
         <Popover>
             <Popover.Button className="text-gray-400 hover:text-gray-300 text-4xl mx-3 relative" title={t("ariaDescriptors:header.toggleNotifications")}>
                 <i className="icon icon-bell" />
-                {numUnread > 0 && <div className="text-2xl text-white bg-red-600 rounded-2xl absolute h-6 w-6 top-0 -right-1 leading-none">{numUnread}</div>}
+                {numUnread > 0 && <div role="status" aria-label={t("ariaDescriptors:header.unreadNotifications", { numUnread })} className="text-2xl text-white bg-red-600 rounded-2xl absolute h-6 w-6 top-0 -right-1 leading-none">{numUnread}</div>}
             </Popover.Button>
             <div className="relative right-1">
                 <NotificationPopup />

@@ -288,6 +288,7 @@
     "header.fontSize": "Select Font Size",
     "header.settings": "Settings and Additional Options",
     "header.toggleNotifications": "Show/Hide Notifications",
+    "header.unreadNotifications": "You have {{numUnread}} unread notifications",
     "contentManager.scriptName": "Script Name",
     "contentManager.close": "Close Content Manager",
     "scriptBrowser.restore": "Restore {{scriptname}}",
