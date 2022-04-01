@@ -675,7 +675,7 @@ export class PitchshiftEffect extends MixableEffect {
 
     static create(context: AudioContext) {
         const node = {
-            shifter: new AudioWorkletNode(context, "pitchshifter"),
+            shifter: new AudioWorkletNode(context, "pitchshifter2"),
             ...super.create(context),
         }
         node.input.connect(node.shifter)

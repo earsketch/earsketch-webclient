@@ -9,6 +9,8 @@
 
 
 #include <math.h>
+#include <string.h>
+#include <emscripten.h>
 
 #define ZEROAMP 0.000001
 
@@ -29,10 +31,9 @@ void fillHann(float ww[], int N)
     
 }
 
-void windowSignal(float ww[],float xx[],  int N)
-{
-    for (int i=0; i<N; i++) {
-        xx[i] = ww[i]*xx[i];
+void windowSignal(float output[], float a[], float b[], int N) {
+    for (int i = 0; i < N; i++) {
+        output[i] = a[i] * b[i];
     }
 }
 
@@ -43,40 +44,7 @@ void windowSignalQ(float ww[],float xx[],  int N, float factor)
     }
 }
 
-void interpolateFitVar(float yvals[],float outvals[], int hops[],  int N,int NOUT,  int FRAMES , int HOPSOURCE)
-{
-    int yindex, count , hopAccum, hopIndex;
-    float min, max;
-    float findex;
-    float inc;
-    findex = 0.0f;
-    count =0;
-    
-    hopAccum = hops[0];
-    hopIndex = 0;
-    
-    while ((findex < N) &&(count<NOUT) ) {
-        yindex = floor(findex);
-        min = yvals[yindex];
-        max = yvals[yindex +1];
-        outvals[count] = min + (max-min)*(findex -yindex);
-        count++;
-        inc = (float)hops[hopIndex]/(float)HOPSOURCE;
-        findex = findex + inc;
-        if ((hopIndex <FRAMES) &&(findex > hopAccum) ) {
-            hopIndex++;
-            hopAccum = hopAccum + hops[hopIndex];
-        }
-    }
-    if (count<NOUT) {
-        for (int i=count; i<NOUT; i++) {
-            outvals[i] = yvals[N];
-        }
-    }
-}
-
-void interpolateFit(float yvals[],float outvals[],  int N,int NOUT,  float inc)
-{
+void interpolateFit(float yvals[],float outvals[],  int N,int NOUT,  float inc) {
     int yindex, count;
     float min, max;
     float findex;
@@ -342,25 +310,48 @@ void unconvert( float C[], float S[], int N2, int I, float accumphase[] )
             S[imag] = -mag*sin( phase );
     }
 }
-/*
-int main(int argc, const char * argv[])
-{
+
+#define WINDOW_SIZE 1024
+// TODO: Change this back to 256.
+#define HOP_SIZE 128
+
+EMSCRIPTEN_KEEPALIVE
+float buffer[HOP_SIZE];
+float input[WINDOW_SIZE];
+float hannWindow[WINDOW_SIZE];
+float windowed[WINDOW_SIZE];
+float lastPhase[WINDOW_SIZE / 2 + 1];
+float magFreqPairs[WINDOW_SIZE + 2];
+float accumPhase[WINDOW_SIZE / 2 + 1];
+float overlapped[WINDOW_SIZE];
+float interpolated[WINDOW_SIZE];
+
+EMSCRIPTEN_KEEPALIVE
+void setup() {
     initDSP();
-    int N= 1024;
-    float ww[1024];
-    
-    fillHann(ww, N);
-
-    
-    float mm[1024];
-    mm[0] = 1;
-    rfft(mm, N/2, 1);
-
-    
-    rfft(mm, N/2, 0);
-
-
-    return 0;
+    fillHann(hannWindow, WINDOW_SIZE);
+    memset(input, 0, WINDOW_SIZE * sizeof(float));
+    memset(overlapped, 0, WINDOW_SIZE * sizeof(float));
 }
-*/
 
+// To use, fill `buffer` with input beforehand,
+// and read output from `buffer` afterwards.
+EMSCRIPTEN_KEEPALIVE
+void processBlock(float factor) {
+    // Shift `buffer` on to the end of `input`.
+    memmove(input, &input[HOP_SIZE], (WINDOW_SIZE - HOP_SIZE) * sizeof(float));
+    memcpy(&input[WINDOW_SIZE - HOP_SIZE], buffer, HOP_SIZE * sizeof(float));
+    int hopOut = round(factor * HOP_SIZE);
+    windowSignal(windowed, input, hannWindow, WINDOW_SIZE);
+    rfft(windowed, WINDOW_SIZE / 2, 1);
+    convert(windowed, magFreqPairs, WINDOW_SIZE / 2, HOP_SIZE, lastPhase);
+    unconvert(magFreqPairs, windowed, WINDOW_SIZE / 2, hopOut, accumPhase);
+    rfft(windowed, WINDOW_SIZE / 2, 0);
+    double scale = 1 / sqrt((double)WINDOW_SIZE / hopOut / 2);
+    windowSignalQ(hannWindow, windowed, WINDOW_SIZE, scale);
+    overlapadd(windowed, overlapped, 0, WINDOW_SIZE);
+    // TODO: This interpolation should probably have access to the last sample from the previous block.
+    interpolateFit(overlapped, buffer, hopOut, HOP_SIZE, (float)hopOut / HOP_SIZE);
+    memmove(overlapped, &overlapped[hopOut], (WINDOW_SIZE - hopOut) * sizeof(float));
+    memset(&overlapped[WINDOW_SIZE - hopOut], 0, hopOut * sizeof(float));
+}
