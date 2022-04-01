@@ -48,6 +48,12 @@ describe("Bubble Tour Test", () => {
         cy.get("input[name='Script Name']").type("test" + cypTestScriptId)
         cy.get("input[value='CREATE']").click()
 
+        // Add fitMedia line of code
+        cy.get(".ace_content").click()
+        cy.get(".ace_content")
+            .type(Cypress._.repeat("{downarrow}", 10))
+            .type("fitMedia(HIPHOP_FUNKBEAT_001, 1, 1, 9)")
+
         // Run new Script
         cy.get("button[id='run-button']").click()
 
@@ -67,11 +73,9 @@ describe("Bubble Tour Test", () => {
 
         // click run button
         // cy.get('#run-button').click().then((step2) => {
-           // cy.get('#console').should('contain', 'Script ran successfully')
-           // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
-        //})
-
-
+        // cy.get('#console').should('contain', 'Script ran successfully')
+        // cy.get('button').contains('Next').should('not.have.class','cursor-allowed').click()
+        // })
 
         //  cy.get('@consoleLog').then((consoleLog) => {
 
