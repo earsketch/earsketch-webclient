@@ -1,20 +1,30 @@
 const WINDOW_SIZE = 1024
 const HOP_SIZE = 128
 
-const setup = Module._setup()
-const psBuffer = new Float32Array(Module.HEAP32.buffer, Module._buffer, HOP_SIZE)
+Module._setup()
 
-function processBlock(input, output, factor) {
-    psBuffer.set(input)
-    _processBlock(factor)
-    output.set(psBuffer)
+// Statically-allocated temporary buffer for marshalling data to/from WASM module.
+const scratchBuffer = new Float32Array(Module.HEAP32.buffer, Module._buffer, HOP_SIZE)
+
+class Pitchshifter {
+    constructor() {
+        this._shifter = Module._createShifter()
+        console.log("created shifter", this._shifter)
+    }
+
+    processBlock(input, output, factor) {
+        scratchBuffer.set(input)
+        Module._processBlock(this._shifter, Module._buffer, Module._buffer, factor)
+        output.set(scratchBuffer)
+    }
+
+    destroy() {
+        Module._destroyShifter(this._shifter)
+        console.log("destroyed shifter", this._shifter)
+    }
 }
 
-// TODO: Is there one instance of `Module` per created worklet node,
-// or is there just one instance of the AudioWorkletProcessor?
-// (If the latter, then each Pitchshifter needs to get its own
-//  input & overlap buffers to avoid interference with the others.)
-class Pitchshifter extends AudioWorkletProcessor {
+class PitchshiftProcessor extends AudioWorkletProcessor {
     // Static getter to define AudioParam objects in this custom processor.
     static get parameterDescriptors() {
         return [{
@@ -25,21 +35,26 @@ class Pitchshifter extends AudioWorkletProcessor {
 
     constructor() {
         super()
-        setup()
+        this.shifter = new Pitchshifter()
+        this.port.onmessage = (e) => {
+            // TODO: We need to send this message when disposing of the AudioWorkletNode to avoid leaking buffers.
+            // (We should probably have some more discipline with our audio nodes in general - I suspect we are leaking nodes across scripts.)
+            if (e.data === "destroy") {
+                this.shifter.destroy()
+            } else {
+                throw new Error(`Unexpected message '${e.data}'`)
+            }
+        }
     }
 
     process(inputs, outputs, parameters) {
-        const input = inputs[0][0]
-        if (input === undefined) {
-            // This case happens in Firefox, but not Chromium.
-            return true
-        }
         const output = outputs[0][0]
+        const input = inputs[0][0] ?? new Float32Array(output.length)
         const shift = parameters.shift[0]
         const factor = 2 ** (shift / 12)
-        processBlock(input, output, factor)
+        this.shifter.processBlock(input, output, factor)
         return true
     }
 }
 
-registerProcessor("pitchshifter2", Pitchshifter)
+registerProcessor("pitchshifter", PitchshiftProcessor)

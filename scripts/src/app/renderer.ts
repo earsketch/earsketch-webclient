@@ -1,6 +1,6 @@
 // Render scripts using an offline audio context.
 import * as applyEffects from "../model/applyeffects"
-import { workletURL } from "../model/pitchshift"
+import workletURL from "worklet"
 import esconsole from "../esconsole"
 import { Clip, DAWData } from "./player"
 import { OfflineAudioContext } from "./audiocontext"

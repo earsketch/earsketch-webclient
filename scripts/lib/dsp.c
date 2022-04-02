@@ -9,6 +9,7 @@
 
 
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 #include <emscripten.h>
 
@@ -312,37 +313,56 @@ void unconvert( float C[], float S[], int N2, int I, float accumphase[] )
 }
 
 #define WINDOW_SIZE 1024
-// TODO: Change this back to 256.
 #define HOP_SIZE 128
 
 EMSCRIPTEN_KEEPALIVE
 float buffer[HOP_SIZE];
-float input[WINDOW_SIZE];
+
 float hannWindow[WINDOW_SIZE];
-float windowed[WINDOW_SIZE];
-float lastPhase[WINDOW_SIZE / 2 + 1];
-float magFreqPairs[WINDOW_SIZE + 2];
-float accumPhase[WINDOW_SIZE / 2 + 1];
-float overlapped[WINDOW_SIZE];
-float interpolated[WINDOW_SIZE];
 
 EMSCRIPTEN_KEEPALIVE
 void setup() {
     initDSP();
     fillHann(hannWindow, WINDOW_SIZE);
-    memset(input, 0, WINDOW_SIZE * sizeof(float));
-    memset(overlapped, 0, WINDOW_SIZE * sizeof(float));
 }
 
-// To use, fill `buffer` with input beforehand,
-// and read output from `buffer` afterwards.
+// Internal state for one pitchshifter instance.
+typedef struct {
+    float inputWindow[WINDOW_SIZE];
+    float overlapped[WINDOW_SIZE];
+    float lastPhase[WINDOW_SIZE / 2 + 1];
+    float accumPhase[WINDOW_SIZE / 2 + 1];
+} shifter;
+
 EMSCRIPTEN_KEEPALIVE
-void processBlock(float factor) {
-    // Shift `buffer` on to the end of `input`.
-    memmove(input, &input[HOP_SIZE], (WINDOW_SIZE - HOP_SIZE) * sizeof(float));
-    memcpy(&input[WINDOW_SIZE - HOP_SIZE], buffer, HOP_SIZE * sizeof(float));
+shifter *createShifter() {
+    shifter *s = malloc(sizeof(shifter));
+    memset(s, 0, sizeof(shifter));
+    return s;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void destroyShifter(shifter *s) {
+    free(s);
+}
+
+// Process HOP_SIZE samples. Expects `input` and `output` to be HOP_SIZE long.
+EMSCRIPTEN_KEEPALIVE
+void processBlock(shifter *s, float input[], float output[], float factor) {
+    static float windowed[WINDOW_SIZE];
+    static float magFreqPairs[WINDOW_SIZE + 2];
+
+    float *inputWindow = s->inputWindow;
+    float *overlapped = s->overlapped;
+    float *lastPhase = s->lastPhase;
+    float *accumPhase = s->accumPhase;
+    // Shift `input` (length HOP_SIZE) on to the end of `inputWindow` (length WINDOW_SIZE).
+    memmove(inputWindow, &inputWindow[HOP_SIZE], (WINDOW_SIZE - HOP_SIZE) * sizeof(float));
+    memcpy(&inputWindow[WINDOW_SIZE - HOP_SIZE], input, HOP_SIZE * sizeof(float));
     int hopOut = round(factor * HOP_SIZE);
-    windowSignal(windowed, input, hannWindow, WINDOW_SIZE);
+
+    // Phase vocoder.
+    windowSignal(windowed, inputWindow, hannWindow, WINDOW_SIZE);
     rfft(windowed, WINDOW_SIZE / 2, 1);
     convert(windowed, magFreqPairs, WINDOW_SIZE / 2, HOP_SIZE, lastPhase);
     unconvert(magFreqPairs, windowed, WINDOW_SIZE / 2, hopOut, accumPhase);
@@ -350,8 +370,9 @@ void processBlock(float factor) {
     double scale = 1 / sqrt((double)WINDOW_SIZE / hopOut / 2);
     windowSignalQ(hannWindow, windowed, WINDOW_SIZE, scale);
     overlapadd(windowed, overlapped, 0, WINDOW_SIZE);
-    // TODO: This interpolation should probably have access to the last sample from the previous block.
-    interpolateFit(overlapped, buffer, hopOut, HOP_SIZE, (float)hopOut / HOP_SIZE);
+
+    // Shift `hopOut` samples from the beginning of `overlapped` and interpolate them back into `HOP_SIZE` samples.
+    interpolateFit(overlapped, output, hopOut, HOP_SIZE, (float)hopOut / HOP_SIZE);
     memmove(overlapped, &overlapped[hopOut], (WINDOW_SIZE - hopOut) * sizeof(float));
     memset(&overlapped[WINDOW_SIZE - hopOut], 0, hopOut * sizeof(float));
 }
