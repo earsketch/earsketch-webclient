@@ -8,9 +8,7 @@ let currentDelta: { [key: string]: any } = { soundsAdded: [], soundsRemoved: [],
 let currentDeltaSum = 0
 let noDeltaCount = 0
 let currentResults: any = {}
-// const averageGenreThreshold = 0.8
 let musicResults: any = {}
-// let genreListCurrent = []
 let currentEffects: any = []
 let sectionLines: any = []
 let CAI_DICT: any = {}
@@ -125,7 +123,6 @@ const CAI_REC_DECISION_TREE: any [] = [
         node: 9,
         condition: function () {
             // has the delta suggestion already been made?
-            // const deltaInLib = false
             possibleDeltaSuggs = []
             for (const i in CAI_DELTA_LIBRARY) {
                 // get current value and compare to end value
@@ -446,8 +443,6 @@ const CAI_REC_DECISION_TREE: any [] = [
     },
 ]
 
-// let currentLineDict = {}
-// let suggestionTypes = ["augmentation", "modification", "organization"]
 let currentSections: any = []
 let currentSounds: any = []
 
@@ -504,7 +499,6 @@ export function generateCodeSuggestion(history: any[]) {
             currentEffects.push(musicResults.APICALLS[i].args)
         }
     }
-    // genreListCurrent = musicResults.GENRE
     let isNew = true
     for (const i in history) {
         // get utterance

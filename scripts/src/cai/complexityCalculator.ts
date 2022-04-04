@@ -1,6 +1,5 @@
 import * as ccState from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
-
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
 export interface Node {
@@ -19,6 +18,10 @@ export interface NameByReference {
     name: string,
     start: number,
     end: number,
+}
+
+export interface HasBodyNode extends Node {
+    body: StatementNode[],
 }
 
 export interface BoolOpNode extends Node {
@@ -45,18 +48,16 @@ export interface ListNode extends Node {
     elts: StatementNode[],
 }
 
-export interface FunctionDefNode extends Node {
+export interface FunctionDefNode extends HasBodyNode {
     _astname: "FunctionDef",
-    body: StatementNode [],
     args: ArgumentsNode,
     name: strNode,
 }
 
-export interface IfNode extends Node {
+export interface IfNode extends HasBodyNode {
     _astname: "If",
-    body: StatementNode [],
     test: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
-    orelse: (FunctionDefNode | IfNode | ForNode | JsForNode | WhileNode) [],
+    orelse: StatementNode [],
 }
 
 export interface AttributeNode extends Node {
@@ -95,25 +96,22 @@ export interface SubscriptNode extends Node {
     slice: AnyNode,
 }
 
-export interface ForNode extends Node {
+export interface ForNode extends HasBodyNode {
     _astname: "For",
-    body: StatementNode [],
     value: AnyNode,
     iter: StatementNode,
     target: NameNode,
 }
 
-export interface JsForNode extends Node {
+export interface JsForNode extends HasBodyNode {
     _astname: "JSFor",
-    body: StatementNode [],
     init?: AssignNode | AugAssignNode,
     test?: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
     update?: StatementNode,
 }
 
-export interface WhileNode extends Node {
+export interface WhileNode extends HasBodyNode {
     _astname: "While",
-    body: StatementNode [],
     test: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
 }
 
@@ -147,6 +145,7 @@ export interface SliceNode extends Node {
     _astname: "Slice",
     lower: AnyNode,
     upper: AnyNode,
+    step: AnyNode,
 }
 
 export interface IndexNode extends Node {
@@ -164,9 +163,8 @@ export interface ReturnNode extends Node {
     value: AnyNode,
 }
 
-export interface ModuleNode extends Node {
+export interface ModuleNode extends HasBodyNode {
     _astname: "Module",
-    body: StatementNode [],
 }
 
 export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
@@ -174,8 +172,6 @@ strNode | SubscriptNode | ForNode | JsForNode | WhileNode | ExprNode | Arguments
 ReturnNode | ModuleNode | UnaryOpNode
 
 export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | BinOpNode | BoolOpNode | CompareNode | ListNode | AttributeNode | CallNode | SubscriptNode | NameNode
-
-export type HasBodyNode = FunctionDefNode | IfNode | ForNode | JsForNode | WhileNode | ModuleNode
 
 export type ConditionalNode = BinOpNode | BoolOpNode | CompareNode | NameNode | CallNode
 
@@ -187,8 +183,8 @@ export interface Results {
         makeBeat: number,
         iteration: {
             whileLoops: number,
-            forLoopsPY: number,
-            forLoopsJS: number,
+            forLoopsRange: number,
+            forLoopsIterable: number,
             iterables: number,
             nesting: number,
         },
@@ -1462,10 +1458,10 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
                     // check number of args
                     const numArgs = Array.isArray(node.iter.args) ? node.iter.args.length : 1
 
-                    if (results.codeFeatures.iteration.forLoopsPY < numArgs && !ccState.getProperty("isJavascript")) {
-                        results.codeFeatures.iteration.forLoopsPY = numArgs
+                    if (results.codeFeatures.iteration.forLoopsRange < numArgs && !ccState.getProperty("isJavascript")) {
+                        results.codeFeatures.iteration.forLoopsRange = numArgs
                     } else if (ccState.getProperty("isJavascript")) {
-                        results.codeFeatures.iteration.forLoopsJS = 1
+                        results.codeFeatures.iteration.forLoopsIterable = 1
                     }
                 }
             }
@@ -1479,7 +1475,7 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
             // mark loop
             const firstLine = lineNumber
             const lastLine = ccHelpers.getLastLine(node)
-            results.codeFeatures.iteration.forLoopsJS = 1
+            results.codeFeatures.iteration.forLoopsIterable = 1
             ccState.getProperty("loopLocations").push([firstLine, lastLine])
         } else if (node._astname === "If") {
             if (results.codeFeatures.conditionals.conditionals < 1) {
@@ -1610,9 +1606,9 @@ function recursiveAnalyzeAST(ast: AnyNode, results: Results) {
 
 function appendOrElses(node: IfNode, orElseList: Node[][]) {
     if (node.orelse && node.orelse.length > 0) {
-        if (node.orelse[0].body) {
+        if ("body" in node.orelse[0]) {
             orElseList.push(node.orelse[0].body)
-        } else if (!(node.orelse[0]._astname === "If")) {
+        } else {
             orElseList.push(node.orelse)
         }
         if (node.orelse[0]._astname === "If") {
@@ -1821,8 +1817,8 @@ export function emptyResultsObject(ast: AnyNode): Results {
             makeBeat: 0,
             iteration: {
                 whileLoops: 0,
-                forLoopsPY: 0,
-                forLoopsJS: 0,
+                forLoopsRange: 0,
+                forLoopsIterable: 0,
                 iterables: 0,
                 nesting: 0,
             },

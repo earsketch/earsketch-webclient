@@ -19,13 +19,11 @@ export function analyzeJavascript(source: string) {
         // handle this like you'd handle python.
         const newAST = convertASTTree(ast)
         // initialize list of function return objects with all functions from the API that return something (includes casting)
-        // const allVariables = []
         // initialize the results object
         const resultsObject = cc.emptyResultsObject(newAST)
         ccState.setIsJavascript(true)
         cc.doAnalysis(newAST, resultsObject)
         // translate the calculated values
-        // translateIntegerValues(resultsObject);
         ccHelpers.lineDict()
 
         return resultsObject

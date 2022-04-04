@@ -1,7 +1,8 @@
-import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+﻿import * as ccHelpers from "./complexityCalculatorHelperFunctions"
 import * as ccState from "./complexityCalculatorState"
-
 import NUMBERS_AUDIOKEYS_ from "../data/numbers_audiokeys.json"
+
+const levenshtein = require("fast-levenshtein")
 // import { fitMedia } from "src/api/passthrough"
 // Load lists of numbers and keys
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
@@ -1176,7 +1177,7 @@ function isTypo(original: string, target: string) {
         return false
     }
     const editDistanceThreshold: number = Math.ceil(((original.length + target.length) / 2) * ((100 - nameThreshold) * 0.01))
-    if (ccHelpers.levenshtein(original, target) <= editDistanceThreshold) {
+    if (levenshtein.get(original, target) <= editDistanceThreshold) {
         return true
     } else return false
 }

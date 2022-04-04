@@ -35,7 +35,7 @@ export function getState() {
 }
 
 export function getProperty(propertyName: string) {
-    return (Object.keys(state).includes(propertyName)) ? state[propertyName] : []
+    return (Object.prototype.hasOwnProperty.call(state, propertyName)) ? state[propertyName] : []
 }
 
 export function setProperty(propertyName: string, value: any) {
