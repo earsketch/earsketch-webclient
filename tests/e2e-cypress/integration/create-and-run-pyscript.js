@@ -1,4 +1,6 @@
 /* eslint-disable no-undef */
+import * as MockSocket from "mock-socket"
+
 // describe('My First Test', () => {
 //     it('Visits the Kitchen Sink', () => {
 //       cy.visit('https://example.cypress.io')
@@ -17,7 +19,21 @@ describe("Bubble Tour Test", () => {
     it("Visits Earsketch", () => {
         // Chose visiting site (comment out others)
         // cy.visit("https://earsketch-test.ersktch.gatech.edu/earsketch2/")
-        cy.visit("http://localhost:8888")
+        // cy.visit("http://localhost:8888")
+        const cypTestScriptId = Math.floor(Math.random() * 1000)
+        const cypTestName = "test" + cypTestScriptId
+
+        cy.interceptAudioStandard()
+        cy.interceptUsersToken()
+        cy.interceptUsersInfo()
+        cy.interceptAudioUser()
+        cy.interceptAudioFavorites()
+        cy.interceptScriptsOwned()
+        cy.interceptScriptsShared()
+        cy.interceptScriptSave(cypTestName + ".py")
+
+        cy.visitWithStubWebSocket("/", MockSocket.WebSocket)
+        cy.login()
 
         // , {
         //     onBeforeLoad (win) {
@@ -27,14 +43,14 @@ describe("Bubble Tour Test", () => {
         // })
 
         // Skip the tour
-        cy.get("button").contains("Skip").click()
+        // cy.get("button").contains("Skip").click()
 
         cy.get("#app-title").should("contain", "EarSketch")
 
         // Login to Test user
-        cy.get("input[name='username']").type("satCypress")
-        cy.get("input[name='password']").type("testsat")
-        cy.get("button[title='Login']").click()
+        // cy.get("input[name='username']").type("satCypress")
+        // cy.get("input[name='password']").type("testsat")
+        // cy.get("button[title='Login']").click()
 
         // Add sound?
         // cy.get("div").contains("Add Sound").click()
@@ -44,8 +60,7 @@ describe("Bubble Tour Test", () => {
         // Add Script?
         cy.get("button[title='Open SCRIPTS Tab']").click()
         cy.get("button[title='Create a new script']").click()
-        const cypTestScriptId = Math.floor(Math.random() * 1000)
-        cy.get("input[name='Script Name']").type("test" + cypTestScriptId)
+        cy.get("input[name='Script Name']").type(cypTestName)
         cy.get("input[value='CREATE']").click()
 
         // Add fitMedia line of code
@@ -63,6 +78,7 @@ describe("Bubble Tour Test", () => {
 
         cy.get("button[id=headlessui-menu-button-11]").click()
         cy.get("button").contains("Logout").click()
+
 
         // step 1
         // cy.get('button').contains('Next').click()

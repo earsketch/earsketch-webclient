@@ -148,3 +148,27 @@ Cypress.Commands.add("interceptAudioSample", () => {
         ).as("audio_sample")
     })
 })
+
+Cypress.Commands.add("interceptScriptSave", (scriptName, responsePayload = {
+    created: "2022-04-06 14:53:07.0",
+    file_location: "",
+    id: -1,
+    modified: "2022-04-06 14:53:07.0",
+    name: scriptName,
+    run_status: 0,
+    shareid: "5555555555555555555555",
+    soft_delete: false,
+    source_code: "#\t\tpython code\n#\t\tscript_name:\n#\n#\t\tauthor:\n#\t\tdescription:\n#\n\nfrom earsketch import *\n\ninit()\nsetTempo(120)\n\n\n\nfinish()\n",
+    username: "cypress",
+}) => {
+    cy.intercept(
+        {
+            hostname: API_HOST,
+            method: "POST",
+            path: "/EarSketchWS/scripts/save",
+        },
+        {
+            body: responsePayload,
+        }
+    ).as("scripts_save")
+})
