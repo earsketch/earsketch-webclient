@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 
 import * as ESUtils from "../esutils"
 import { ModalContainer } from "./App"
@@ -159,32 +159,10 @@ const Upload = ({ processing, setResults, setProcessing }: { processing: string 
     </div>
 }
 
-const ReportDisplay = ({ report }: { report: { [key: string]: string | number } | { [key: string]: string | number }[] }) => {
-    const [cleanReport, setCleanReport] = useState({} as { [key: string]: string | number } | { [key: string]: string | number }[])
-
-    useEffect(() => {
-        const tempReport = {} as { [key: string]: string | number }
-        if (Array.isArray(report)) {
-            for (const reportItem of report) {
-                for (const key in reportItem) {
-                    if (key !== "codeStructure" && key !== "ast") {
-                        tempReport[key] = reportItem[key]
-                    }
-                }
-            }
-        } else {
-            for (const key in report) {
-                if (key !== "codeStructure" && key !== "ast") {
-                    tempReport[key] = report[key]
-                }
-            }
-        }
-        setCleanReport(tempReport)
-    }, [report])
-
+const ReportDisplay = ({ report }: { report: Report | Report [] }) => {
     return <table className="table">
         <tbody>
-            {Object.entries(cleanReport).map(([key, value]) =>
+            {Object.entries(report).filter(reportItem => !["codeStructure", "ast"].includes(reportItem[0])).map(([key, value]) =>
                 <tr key={key}>
                     <th>{key}</th><td>{JSON.stringify(value)}</td>
                 </tr>
@@ -253,15 +231,19 @@ export const Results = ({ results, processing, options }: { results: Result[], p
     </div>
 }
 
-export interface Report {
-    [key: string]: { [key: string]: string | number } | { [key: string]: string | number }[]
+interface Report {
+    [key: string]: string | number
+}
+
+export interface Reports {
+    [key: string]: Report | Report []
 }
 
 export interface Result {
     script: Script
-    reports?: Report
+    reports?: Reports
     error?: string
-    version?: number | null
+    version?: number
     contestID?: string | number
 }
 

@@ -135,7 +135,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     }
 
     // Run a single script and add the result to the results list.
-    const runScript = async (script: Script, version: number | null = null) => {
+    const runScript = async (script: Script, version?: number) => {
         let result: Result
         try {
             const compilerOuptut = await compile(script.source_code, script.name, seed)
