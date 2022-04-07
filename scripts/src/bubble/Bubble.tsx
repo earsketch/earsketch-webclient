@@ -140,6 +140,36 @@ const MessageBox = () => {
         ],
     })
 
+    // TODO - Where should this go?
+    // add elements inside modal that should be focusable
+    const focusableElements = 'button, select, textarea, [tabindex]:not([tabindex="-1"])'
+    const modal = document.querySelector("#targetModal") // select the modal
+    const firstFocusableElement = modal?.querySelectorAll(focusableElements)[0] // get first element to be focused inside modal
+    const focusableContent = modal?.querySelectorAll(focusableElements)
+    const lastFocusableElement = focusableContent ? focusableContent[focusableContent.length - 1] : null // get last element to be focused inside modal
+    let focusIdx = 0
+
+    document.addEventListener("keydown", (e) => {
+        const isTabPressed = e.key === "Tab"
+        if (!isTabPressed) return
+
+        if (e.shiftKey) { // shift + tab
+            focusableContent && focusIdx === 0 ? focusIdx = focusableContent.length - 1 : focusIdx--
+            if (document.activeElement === firstFocusableElement) {
+                (lastFocusableElement as HTMLElement)?.focus()
+                e.preventDefault()
+            }
+        } else { // tab
+            focusableContent && focusIdx === focusableContent.length - 1 ? focusIdx = 0 : focusIdx++
+            // focusIdx++
+            if (document.activeElement === lastFocusableElement) { // if focused has reached to last focusable element then focus first focusable element after pressing tab
+                (firstFocusableElement as HTMLElement)?.focus() // add focus for the first focusable element
+                e.preventDefault()
+            }
+        }
+        if (focusableContent) (focusableContent[focusIdx] as HTMLElement)?.focus()
+    })
+
     const arrowStyle = { ...styles.arrow }
     switch (placement) {
         case "top":
@@ -219,6 +249,7 @@ const MessageBox = () => {
             style={pages[currentPage].ref === null ? {} : styles.popper}
             role="dialog"
             aria-modal="true"
+            id="targetModal"
             {...attributes.popper}
         >
             {[0, 9].includes(currentPage) && <DismissButton />}
