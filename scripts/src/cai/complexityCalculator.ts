@@ -9,8 +9,8 @@ export interface Node {
 
 export interface BinOpNode extends Node {
     _astname: "BinOp",
-    left: BinOpNode | ListNode | strNode | NumNode | CallNode | NameNode,
-    right: BinOpNode | ListNode | strNode | NumNode | CallNode | NameNode,
+    left: BinOpNode | CallNode | NameNode | strNode | NumNode | SubscriptNode | ListNode,
+    right: BinOpNode | CallNode | NameNode | strNode | NumNode | SubscriptNode | ListNode,
     op: opNode,
 }
 
@@ -38,8 +38,8 @@ export interface UnaryOpNode extends Node {
 
 export interface CompareNode extends Node {
     _astname: "Compare",
-    left: AnyNode,
-    comparators: AnyNode[],
+    left: comparableNode,
+    comparators: comparableNode[],
     ops: opNode[],
 }
 
@@ -150,7 +150,7 @@ export interface SliceNode extends Node {
 
 export interface IndexNode extends Node {
     _astname: "Index",
-    value: AnyNode,
+    value: AnyNode, // anything that can hold a numerical value
 }
 
 export interface NameNode extends Node {
@@ -174,6 +174,8 @@ ReturnNode | ModuleNode | UnaryOpNode
 export type StatementNode = IfNode | ForNode | JsForNode | WhileNode | ExprNode | ReturnNode | FunctionDefNode | AssignNode | AugAssignNode | BinOpNode | BoolOpNode | CompareNode | ListNode | AttributeNode | CallNode | SubscriptNode | NameNode
 
 export type ConditionalNode = BinOpNode | BoolOpNode | CompareNode | NameNode | CallNode
+
+export type comparableNode = BinOpNode | strNode | NumNode | CompareNode | ListNode | CallNode | SubscriptNode | ExprNode | NameNode
 
 export interface Results {
     ast: AnyNode,
@@ -1024,7 +1026,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
     return ""
 }
 
-function getTypeFromASTNode(node: ListNode | strNode | NumNode | CallNode | NameNode) {
+function getTypeFromASTNode(node: ListNode | strNode | NumNode | CallNode | NameNode | SubscriptNode) {
     const autoReturns = ["List", "Str"]
     if (node._astname && autoReturns.includes(node._astname)) {
         return node._astname
