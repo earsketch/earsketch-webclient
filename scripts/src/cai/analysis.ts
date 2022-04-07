@@ -379,7 +379,7 @@ function findSections(vals: any, threshold: number = 0.25, step: number = 0) {
     let expect = null
 
     for (const v in vals) {
-        if (((expect + threshold) >= vals[v] && vals[v] >= (expect - threshold)) || expect === null) {
+        if (expect === null || ((expect + threshold) >= vals[v] && vals[v] >= (expect - threshold))) {
             run.push(vals[v])
         } else {
             result.push(run)
