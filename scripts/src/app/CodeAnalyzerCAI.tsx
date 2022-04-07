@@ -285,43 +285,33 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
 
     return <div className="container">
         <div className="panel panel-primary">
-            {csvInput
-                ? <div className="panel-heading">
-                    Upload CSV File
-                    <button className="btn btn-primary" onClick={() => setCsvInput(false)}>Switch to Text Input</button>
-                </div>
-                : <div className="panel-heading">
-                    Paste share URLs
-                    <button className="btn btn-primary" onClick={() => setCsvInput(true)}>Switch to CSV Input</button>
-                </div>}
-            {csvText
-                ? <div className="panel-heading">
-                    <button className="btn btn-primary" onClick={() => setCsvText(false)}>Switch to Share IDs</button>
-                </div>
-                : <div className="panel-heading">
-                    <button className="btn btn-primary" onClick={() => setCsvText(true)}>Switch to Source Code</button>
-                </div>}
+            <div className="panel-heading">
+                {csvInput
+                    ? "Step 2: Upload CSV File"
+                    : "Step 2: Paste share URLs"}
+            </div>
+            <div className="panel-body">
+                <button className="btn btn-primary" onClick={() => setCsvInput(!csvInput)}> {csvInput ? "Switch to Text Input" : "Switch to CSV Input"}</button>
+                {" "}
+                {csvInput &&
+                    <button className="btn btn-primary" onClick={() => setCsvText(!csvText)}> {csvText ? "Switch to Share IDs" : "Switch to Source Code"}</button>}
+            </div>
             {csvInput
                 ? <div className="panel-body">
                     <input type="file" onChange={file => {
                         if (file.target.files) { updateCSVFile(file.target.files[0]) }
                     }} />
-                    {csvText
-                        ? <input type="text" value={fileNameColumn} onChange={e => setFileNameColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                        : <input type="text" value={contestIDColumn} onChange={e => setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />}
-                    {csvText ? "Filename Column" : "Contest ID Column"}
-                    {csvText
-                        ? <input type="text" value={sourceCodeColumn} onChange={e => setSourceCodeColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
-                        : <input type="text" value={shareIDColumn} onChange={e => setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />}
-                    {csvText ? "Source Code Column" : "Share ID Column"}
+                    <label>{csvText ? "Filename Column" : "Contest ID Column"}</label>
+                    <input type="text" value={csvText ? fileNameColumn : contestIDColumn} onChange={e => csvText ? setFileNameColumn(Number(e.target.value)) : setContestIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
+                    <label>{csvText ? "Source Code Column" : "Share ID Column"}</label>
+                    <input type="text" value={csvText ? sourceCodeColumn : shareIDColumn} onChange={e => csvText ? setSourceCodeColumn(Number(e.target.value)) : setShareIDColumn(Number(e.target.value))} style={{ backgroundColor: "lightgray" }} />
                     {csvText &&
-                        <input type="text" value={newline} onChange={e => setNewline(e.target.value)} style={{ backgroundColor: "lightgray" }} />}
-                    {csvText &&
-                        "Newline character"}
-                    {csvText &&
-                        <input type="text" value={comma} onChange={e => setComma(e.target.value)} style={{ backgroundColor: "lightgray" }} />}
-                    {csvText &&
-                        "Comma character"}
+                        <div>
+                            <label> Newline Character </label>
+                            <input type="text" value={newline} onChange={e => setNewline(e.target.value)} style={{ backgroundColor: "lightgray" }} />
+                            <label> Comma Character </label>
+                            <input type="text" value={comma} onChange={e => setComma(e.target.value)} style={{ backgroundColor: "lightgray" }} />
+                        </div>}
                 </div>
                 : <div className="panel-body">
                     <textarea className="form-control" placeholder="One per line..." onChange={e => setUrls(e.target.value.split("\n"))}></textarea>
