@@ -623,7 +623,7 @@ export const CAI_TREE_NODES: CaiTreeNode [] = [{
     title: "wait, i have an idea about our project",
     utterance: "ok, what were you thinking?",
     parameters: {},
-    dropup: "Project Properties",
+    // dropup: "Project Properties",
     options: ["PROPERTIES|78"],
 },
 {
