@@ -291,10 +291,18 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                     : "Step 2: Paste share URLs"}
             </div>
             <div className="panel-body">
-                <button className="btn btn-primary" onClick={() => setCsvInput(!csvInput)}> {csvInput ? "Switch to Text Input" : "Switch to CSV Input"}</button>
-                {" "}
-                {csvInput &&
-                    <button className="btn btn-primary" onClick={() => setCsvText(!csvText)}> {csvText ? "Switch to Share IDs" : "Switch to Source Code"}</button>}
+                <div>
+                    <button className="btn btn-primary" style={{ width: "15%", backgroundColor: csvInput ? "lightgray" : "#333" }} onClick={() => setCsvInput(false)}> Text Input </button>
+                    {" "}
+                    {csvInput &&
+                        <button className="btn btn-primary" style={{ width: "15%", backgroundColor: csvText ? "lightgray" : "#333" }} onClick={() => setCsvText(false)}> Share IDs </button>}
+                </div>
+                <div>
+                    <button className="btn btn-primary" style={{ width: "15%", backgroundColor: !csvInput ? "lightgray" : "#333" }} onClick={() => setCsvInput(true)}> CSV Input </button>
+                    {" "}
+                    {csvInput &&
+                        <button className="btn btn-primary" style={{ width: "15%", backgroundColor: !csvText ? "lightgray" : "#333" }} onClick={() => setCsvText(true)}> Source Code </button>}
+                </div>
             </div>
             {csvInput
                 ? <div className="panel-body">
