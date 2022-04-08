@@ -61,6 +61,12 @@ export const Options = ({ options, seed, showSeed, setOptions, setSeed }: {
     </div>
 }
 
+const FormatButton = ({ label, formatChange, variable, value }: {
+    label: string, formatChange: (v: boolean) => void, variable: boolean, value: boolean
+}) => {
+    return <button className="btn btn-primary" style={{ width: "15%", backgroundColor: variable === value ? "#333" : "lightgray" }} onClick={() => formatChange(value)}> {label} </button>
+}
+
 export const Upload = ({ processing, options, seed, contestDict, setResults, setContestResults, setProcessing, setContestDict }: {
     processing: string | null, options: ReportOptions, seed?: number, contestDict?: Entries, setResults: (r: Result[]) => void, setContestResults?: (r: Result[]) => void, setProcessing: (p: string | null) => void, setContestDict?: (d: Entries) => void
 }) => {
@@ -286,22 +292,23 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
     return <div className="container">
         <div className="panel panel-primary">
             <div className="panel-heading">
+                Step 2:
                 {csvInput
-                    ? "Step 2: Upload CSV File"
-                    : "Step 2: Paste share URLs"}
+                    ? " Upload CSV File"
+                    : " Paste share URLs"}
             </div>
             <div className="panel-body">
                 <div>
-                    <button className="btn btn-primary" style={{ width: "15%", backgroundColor: csvInput ? "lightgray" : "#333" }} onClick={() => setCsvInput(false)}> Text Input </button>
+                    <FormatButton label="Text Input" formatChange={setCsvInput} variable={csvInput} value={false} />
                     {" "}
                     {csvInput &&
-                        <button className="btn btn-primary" style={{ width: "15%", backgroundColor: csvText ? "lightgray" : "#333" }} onClick={() => setCsvText(false)}> Share IDs </button>}
+                        <FormatButton label="Share IDs" formatChange={setCsvText} variable={csvText} value={false} />}
                 </div>
                 <div>
-                    <button className="btn btn-primary" style={{ width: "15%", backgroundColor: !csvInput ? "lightgray" : "#333" }} onClick={() => setCsvInput(true)}> CSV Input </button>
+                    <FormatButton label="CSV Input" formatChange={setCsvInput} variable={csvInput} value={true} />
                     {" "}
                     {csvInput &&
-                        <button className="btn btn-primary" style={{ width: "15%", backgroundColor: !csvText ? "lightgray" : "#333" }} onClick={() => setCsvText(true)}> Source Code </button>}
+                    <FormatButton label="Source Code" formatChange={setCsvText} variable={csvText} value={true} />}
                 </div>
             </div>
             {csvInput
