@@ -35,8 +35,6 @@ class PitchshiftProcessor extends AudioWorkletProcessor {
         super()
         this.shifter = new Pitchshifter()
         this.port.onmessage = (e) => {
-            // TODO: We need to send this message when disposing of the AudioWorkletNode to avoid leaking buffers.
-            // (We should probably have some more discipline with our audio nodes in general - I suspect we are leaking nodes across scripts.)
             if (e.data === "destroy") {
                 this.shifter.destroy()
                 this.shifter = null

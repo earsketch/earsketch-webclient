@@ -12,10 +12,6 @@
 #include <string.h>
 #include <emscripten.h>
 
-const float PI = M_PI;
-const float TWOPI = 2 * M_PI;
-const float EPSILON = 1e-6;
-
 void multiply(float a[], float b[], float output[], int size, float scale) {
     for (int i = 0; i < size; i++) {
         output[i] = a[i] * b[i] * scale;
@@ -41,13 +37,12 @@ void overlapadd(float input[], float output[], int offset, int N) {
 }
 
 void bitreverse(float x[], int N) {
-    float rtemp, itemp;
     int i, j, m;
 
     for (i = j = 0; i < N; i += 2, j += m) {
         if (j > i) {
-            rtemp = x[j];
-            itemp = x[j + 1]; // complex exchange
+            float rtemp = x[j];
+            float itemp = x[j + 1]; // complex exchange
             x[j] = x[i];
             x[j + 1] = x[i + 1];
             x[i] = rtemp;
@@ -60,24 +55,22 @@ void bitreverse(float x[], int N) {
 }
 
 void cfft(float x[], int NC, int forward) {
-    float wr, wi;
-    float wpr, wpi;
-    float theta, scale;
-    int mmax, ND, m, i, j, delta;
+    int delta;
+    int ND = NC << 1;
 
-    ND = NC << 1;
     bitreverse(x, ND);
-    for (mmax = 2; mmax < ND; mmax = delta) {
+
+    for (int mmax = 2; mmax < ND; mmax = delta) {
         delta = mmax << 1;
-        theta = TWOPI / (forward ? mmax : -mmax);
-        wpr = -2. * pow(sin(0.5 * theta), 2.);
-        wpi = sin(theta);
-        wr = 1.;
-        wi = 0.;
-        for (m = 0; m < mmax; m += 2) {
+        float theta = 2*M_PI / (forward ? mmax : -mmax);
+        float wpr = -2. * pow(sin(0.5 * theta), 2.);
+        float wpi = sin(theta);
+        float wr = 1;
+        float wi = 0;
+        for (int m = 0; m < mmax; m += 2) {
             float rtemp, itemp;
-            for (i = m; i < ND; i += delta) {
-                j = i + mmax;
+            for (int i = m; i < ND; i += delta) {
+                int j = i + mmax;
                 rtemp = wr * x[j] - wi * x[j + 1];
                 itemp = wr * x[j + 1] + wi * x[j];
                 x[j] = x[i] - rtemp;
@@ -90,28 +83,19 @@ void cfft(float x[], int NC, int forward) {
         }
     }
 
-    scale = forward ? 1. / ND : 2.;
-    {
-        float *xi = x, *xe = x + ND;
-        while (xi < xe)
-            *xi++ *= scale;
+    float scale = forward ? 1. / ND : 2.;
+    for (int i = 0; i < ND; i++) {
+        x[i] *= scale;
     }
 }
 
 void rfft(float x[], int N, int forward) {
-    float c1, c2;
-    float h1r, h1i;
-    float h2r, h2i;
-    float wr, wi;
-    float wpr, wpi;
-    float temp, theta;
+    float theta = M_PI / N;
+    float wr = 1.;
+    float wi = 0.;
+    float c1 = 0.5, c2;
     float xr, xi;
-    int i, i1, i2, i3, i4, N2p1;
 
-    theta = PI / N;
-    wr = 1.;
-    wi = 0.;
-    c1 = 0.5;
     if (forward) {
         c2 = -0.5;
         cfft(x, N, forward);
@@ -124,58 +108,63 @@ void rfft(float x[], int N, int forward) {
         xi = 0.;
         x[1] = 0.;
     }
-    wpr = -2. * pow(sin(0.5 * theta), 2.);
-    wpi = sin(theta);
-    N2p1 = (N << 1) + 1;
-    for (i = 0; i <= N >> 1; i++) {
-        i1 = i << 1;
-        i2 = i1 + 1;
-        i3 = N2p1 - i2;
-        i4 = i3 + 1;
+
+    float wpr = -2. * pow(sin(0.5 * theta), 2.);
+    float wpi = sin(theta);
+    int N2p1 = (N << 1) + 1;
+
+    for (int i = 0; i <= N >> 1; i++) {
+        int i1 = i << 1;
+        int i2 = i1 + 1;
+        int i3 = N2p1 - i2;
+        int i4 = i3 + 1;
         if (i == 0) {
-            h1r = c1 * (x[i1] + xr);
-            h1i = c1 * (x[i2] - xi);
-            h2r = -c2 * (x[i2] + xi);
-            h2i = c2 * (x[i1] - xr);
+            float h1r = c1 * (x[i1] + xr);
+            float h1i = c1 * (x[i2] - xi);
+            float h2r = -c2 * (x[i2] + xi);
+            float h2i = c2 * (x[i1] - xr);
             x[i1] = h1r + wr * h2r - wi * h2i;
             x[i2] = h1i + wr * h2i + wi * h2r;
             xr = h1r - wr * h2r + wi * h2i;
             xi = -h1i + wr * h2i + wi * h2r;
         } else {
-            h1r = c1 * (x[i1] + x[i3]);
-            h1i = c1 * (x[i2] - x[i4]);
-            h2r = -c2 * (x[i2] + x[i4]);
-            h2i = c2 * (x[i1] - x[i3]);
+            float h1r = c1 * (x[i1] + x[i3]);
+            float h1i = c1 * (x[i2] - x[i4]);
+            float h2r = -c2 * (x[i2] + x[i4]);
+            float h2i = c2 * (x[i1] - x[i3]);
             x[i1] = h1r + wr * h2r - wi * h2i;
             x[i2] = h1i + wr * h2i + wi * h2r;
             x[i3] = h1r - wr * h2r + wi * h2i;
             x[i4] = -h1i + wr * h2i + wi * h2r;
         }
-        wr = (temp = wr) * wpr - wi * wpi + wr;
+        float temp = wr;
+        wr = wr * wpr - wi * wpi + wr;
         wi = wi * wpr + temp * wpi + wi;
     }
-    if (forward)
+
+    if (forward) {
         x[1] = xr;
-    else
+    } else {
         cfft(x, N, forward);
+    }
 }
 
 void convert(float S[], float C[], int N2, int D, float lastphase[]) {
-    float phase, phasediff;
-    float a, b;
-    int real, imag, amp, freq, i;
+    static const float EPSILON = 1e-6;
 
     // unravel rfft-format spectrum: note that N2+1 pairs of values are produced
-    for (i = 0; i <= N2; i++) {
-        imag = freq = (real = amp = i << 1) + 1;
-        a = (i == N2 ? S[1] : S[real]);
-        b = (i == 0 || i == N2 ? 0. : S[imag]);
+    for (int i = 0; i <= N2; i++) {
+        int real = i << 1, amp = real;
+        int imag = real + 1, freq = imag;
+        float a = (i == N2 ? S[1] : S[real]);
+        float b = (i == 0 || i == N2 ? 0. : S[imag]);
 
         // compute magnitude value from real and imaginary parts
         C[amp] = hypot(a, b);
 
         // compute phase value from real and imaginary parts and take
         // difference between this and previous value for each channel
+        float phase, phasediff;
         if ((C[amp] * (N2 << 1)) < EPSILON) {
             phase = 0;
             phasediff = phase - lastphase[i];
@@ -183,7 +172,7 @@ void convert(float S[], float C[], int N2, int D, float lastphase[]) {
         } else {
             if (fabsf(b) < EPSILON) {
                 if (a < 0) {
-                    phase = PI;
+                    phase = M_PI;
                 } else {
                     phase = 0;
                 }
@@ -194,18 +183,18 @@ void convert(float S[], float C[], int N2, int D, float lastphase[]) {
             lastphase[i] = phase;
 
             // unwrap phase differences
-            phasediff = phasediff - D * TWOPI * i / (N2 << 1);
+            phasediff = phasediff - D * 2*M_PI * i / (N2 << 1);
             if (phasediff > 0)
-                phasediff = fmodf(phasediff + PI, TWOPI) - PI;
+                phasediff = fmodf(phasediff + M_PI, 2*M_PI) - M_PI;
             else {
-                phasediff = fmodf(phasediff - PI, TWOPI) + PI;
-                if (phasediff == PI) {
-                    phasediff = -PI;
+                phasediff = fmodf(phasediff - M_PI, 2*M_PI) + M_PI;
+                if (phasediff == M_PI) {
+                    phasediff = -M_PI;
                 }
             }
         }
         // convert each phase difference to frequency in radians
-        C[freq] = TWOPI * i / (N2 << 1) + phasediff / D;
+        C[freq] = 2*M_PI * i / (N2 << 1) + phasediff / D;
     }
 }
 
@@ -214,24 +203,23 @@ void convert(float S[], float C[], int N2, int D, float lastphase[]) {
 // rfft format) in output array S; sampling rate R and interpolation factor I
 // are used to recompute phase values from frequencies
 void unconvert(float C[], float S[], int N2, int I, float accumphase[]) {
-    int i, real, imag, amp, freq;
-    float mag, phase;
-
     // subtract out frequencies associated with each channel,
     // compute phases in terms of radians per I samples, and
     // convert to complex form
-    for (i = 0; i <= N2; i++) {
-        imag = freq = (real = amp = i << 1) + 1;
+    for (int i = 0; i <= N2; i++) {
+        int real = i << 1, amp = real;
+        int imag = real + 1, freq = imag;
         if (i == N2)
             real = 1;
-        mag = C[amp];
+        float mag = C[amp];
         accumphase[i] += I * C[freq];
-        phase = accumphase[i];
+        float phase = accumphase[i];
         S[real] = mag * cos(phase);
         if (i != N2)
             S[imag] = -mag * sin(phase);
     }
 }
+
 
 #define WINDOW_SIZE 1024
 #define HOP_SIZE 128
@@ -245,7 +233,7 @@ EMSCRIPTEN_KEEPALIVE
 void setup() {
     // Generate Hann window.
     for (int i = 0; i < WINDOW_SIZE; i++) {
-        hannWindow[i] = 0.5 - 0.5 * cos(TWOPI * i / (WINDOW_SIZE - 1));
+        hannWindow[i] = 0.5 - 0.5 * cos(2*M_PI * i / (WINDOW_SIZE - 1));
     }
 }
 
