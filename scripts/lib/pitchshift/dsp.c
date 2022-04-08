@@ -7,10 +7,10 @@
 //  Extended for real-time operation within an AudioWorklet,
 //  and revised for style & clarity.
 
+#include <emscripten.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <emscripten.h>
 
 void multiply(float a[], float b[], float output[], int size, float scale) {
     for (int i = 0; i < size; i++) {
@@ -62,7 +62,7 @@ void cfft(float x[], int NC, int forward) {
 
     for (int mmax = 2; mmax < ND; mmax = delta) {
         delta = mmax << 1;
-        float theta = 2*M_PI / (forward ? mmax : -mmax);
+        float theta = 2 * M_PI / (forward ? mmax : -mmax);
         float wpr = -2. * pow(sin(0.5 * theta), 2.);
         float wpi = sin(theta);
         float wr = 1;
@@ -183,18 +183,18 @@ void convert(float S[], float C[], int N2, int D, float lastphase[]) {
             lastphase[i] = phase;
 
             // unwrap phase differences
-            phasediff = phasediff - D * 2*M_PI * i / (N2 << 1);
+            phasediff = phasediff - D * 2 * M_PI * i / (N2 << 1);
             if (phasediff > 0)
-                phasediff = fmodf(phasediff + M_PI, 2*M_PI) - M_PI;
+                phasediff = fmodf(phasediff + M_PI, 2 * M_PI) - M_PI;
             else {
-                phasediff = fmodf(phasediff - M_PI, 2*M_PI) + M_PI;
+                phasediff = fmodf(phasediff - M_PI, 2 * M_PI) + M_PI;
                 if (phasediff == M_PI) {
                     phasediff = -M_PI;
                 }
             }
         }
         // convert each phase difference to frequency in radians
-        C[freq] = 2*M_PI * i / (N2 << 1) + phasediff / D;
+        C[freq] = 2 * M_PI * i / (N2 << 1) + phasediff / D;
     }
 }
 
@@ -220,7 +220,6 @@ void unconvert(float C[], float S[], int N2, int I, float accumphase[]) {
     }
 }
 
-
 #define WINDOW_SIZE 1024
 #define HOP_SIZE 128
 
@@ -233,7 +232,7 @@ EMSCRIPTEN_KEEPALIVE
 void setup() {
     // Generate Hann window.
     for (int i = 0; i < WINDOW_SIZE; i++) {
-        hannWindow[i] = 0.5 - 0.5 * cos(2*M_PI * i / (WINDOW_SIZE - 1));
+        hannWindow[i] = 0.5 - 0.5 * cos(2 * M_PI * i / (WINDOW_SIZE - 1));
     }
 }
 

@@ -48,10 +48,13 @@ jobs:
         uses: docker://ghcr.io/github/super-linter:slim-v4.8.5
         env:
           VALIDATE_ALL_CODEBASE: false
+          VALIDATE_CPP: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.js
           TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.js
+          LINTER_COMMANDS_ARRAY:
+            clang-format: 'clang-format --Werror --dry-run --style=style="{BasedOnStyle: llvm, IndentWidth: 4}"'
           JSCPD_CONFIG_FILE: .jscpd.json
           VALIDATE_JAVASCRIPT_STANDARD: false
           VALIDATE_TYPESCRIPT_STANDARD: false
