@@ -4,8 +4,8 @@
 //  sligthly modified for EMSCRIPTEN support
 //
 //  Modified by Ian Clester around 4/7/2022.
-//  Revised for real-time operation within an AudioWorklet,
-//  and for style & clarity.
+//  Extended for real-time operation within an AudioWorklet,
+//  and revised for style & clarity.
 
 #include <math.h>
 #include <stdlib.h>
