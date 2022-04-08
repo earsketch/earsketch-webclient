@@ -1,7 +1,3 @@
-//
-//  main.c
-//  EMSCRPitchShift
-//
 //  Created by Juan Carlos Martinez on 6/26/15.
 //  Copyright (c) 2015 gtcmt. All rights reserved.
 //  FFT C Routines based on Richad Moore's Elements of Computer Music
@@ -14,57 +10,48 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-// #include <emscripten.h>
-#define EMSCRIPTEN_KEEPALIVE
+#include <emscripten.h>
 
 const float PI = M_PI;
 const float TWOPI = 2 * M_PI;
+const float EPSILON = 1e-6;
 
-#define ZEROAMP 0.000001
-
-void windowSignal(float output[], float a[], float b[], int N, float scale) {
-    for (int i = 0; i < N; i++) {
+void multiply(float a[], float b[], float output[], int size, float scale) {
+    for (int i = 0; i < size; i++) {
         output[i] = a[i] * b[i] * scale;
     }
 }
 
-void interpolateFit(float yvals[],float outvals[], int N, int NOUT, float inc) {
-    int yindex, count;
-    float min, max;
-    float findex;
-    findex = 0.0f;
-    count = 0;
-    while ((findex < N) &&(count<NOUT) ) {
-        yindex = floor(findex);
-        min = yvals[yindex];
-        max = yvals[yindex +1];
-        outvals[count] = min + (max-min)*(findex -yindex);
-        count++;
-        findex = findex + inc;
-    }
-    if (count<NOUT) {
-        for (int i=count; i<NOUT; i++) {
-            outvals[i] = yvals[N];
-        }
+void interpolate(float input[], float output[], int inputSize, int outputSize) {
+    float ratio = (float)inputSize / outputSize;
+
+    for (int i = 0; i < outputSize; i++) {
+        float fracIndex = i * ratio;
+        int prevIndex = floor(fracIndex);
+        float prev = input[prevIndex];
+        float next = input[prevIndex + 1];
+        output[i] = prev + (next - prev) * (fracIndex - prevIndex);
     }
 }
 
-void overlapadd(float xin[], float yoverlap[], int offset, int N) {
+void overlapadd(float input[], float output[], int offset, int N) {
     for (int i = 0; i < N; i++) {
-        yoverlap[offset+i] =  yoverlap[offset+i] + xin[i];
+        output[offset + i] = output[offset + i] + input[i];
     }
-
 }
 
 void bitreverse(float x[], int N) {
     float rtemp, itemp;
     int i, j, m;
-    
+
     for (i = j = 0; i < N; i += 2, j += m) {
         if (j > i) {
-            rtemp = x[j]; itemp = x[j+1]; /* complex exchange */
-            x[j] = x[i]; x[j+1] = x[i+1];
-            x[i] = rtemp; x[i+1] = itemp;
+            rtemp = x[j];
+            itemp = x[j + 1]; // complex exchange
+            x[j] = x[i];
+            x[j + 1] = x[i + 1];
+            x[i] = rtemp;
+            x[i + 1] = itemp;
         }
         for (m = N >> 1; m >= 2 && j >= m; m >>= 1) {
             j -= m;
@@ -72,67 +59,62 @@ void bitreverse(float x[], int N) {
     }
 }
 
-
-void cfft( float x[], int NC, int forward ) {
+void cfft(float x[], int NC, int forward) {
     float wr, wi;
     float wpr, wpi;
     float theta, scale;
     int mmax, ND, m, i, j, delta;
-    
-    ND = NC<<1;
-    bitreverse( x, ND );
-    for ( mmax = 2; mmax < ND; mmax = delta ) {
-        delta = mmax<<1;
-        theta = TWOPI/( forward? mmax : -mmax );
-        wpr = -2.*pow( sin( 0.5*theta ), 2. );
-        wpi = sin( theta );
+
+    ND = NC << 1;
+    bitreverse(x, ND);
+    for (mmax = 2; mmax < ND; mmax = delta) {
+        delta = mmax << 1;
+        theta = TWOPI / (forward ? mmax : -mmax);
+        wpr = -2. * pow(sin(0.5 * theta), 2.);
+        wpi = sin(theta);
         wr = 1.;
         wi = 0.;
-        for ( m = 0; m < mmax; m += 2 ) {
-             float rtemp, itemp;
-            for ( i = m; i < ND; i += delta ) {
+        for (m = 0; m < mmax; m += 2) {
+            float rtemp, itemp;
+            for (i = m; i < ND; i += delta) {
                 j = i + mmax;
-                rtemp = wr*x[j] - wi*x[j+1];
-                itemp = wr*x[j+1] + wi*x[j];
+                rtemp = wr * x[j] - wi * x[j + 1];
+                itemp = wr * x[j + 1] + wi * x[j];
                 x[j] = x[i] - rtemp;
-                x[j+1] = x[i+1] - itemp;
+                x[j + 1] = x[i + 1] - itemp;
                 x[i] += rtemp;
-                x[i+1] += itemp;
+                x[i + 1] += itemp;
             }
-            wr = (rtemp = wr)*wpr - wi*wpi + wr;
-            wi = wi*wpr + rtemp*wpi + wi;
+            wr = (rtemp = wr) * wpr - wi * wpi + wr;
+            wi = wi * wpr + rtemp * wpi + wi;
         }
     }
 
-    scale = forward ? 1./ND : 2.;
+    scale = forward ? 1. / ND : 2.;
     {
-        float *xi = x, *xe = x+ND;
+        float *xi = x, *xe = x + ND;
         while (xi < xe)
             *xi++ *= scale;
     }
 }
 
-
 void rfft(float x[], int N, int forward) {
-    float     c1,c2,
-    h1r,h1i,
-    h2r,h2i,
-    wr,wi,
-    wpr,wpi,
-    temp,
-    theta;
-    float     xr,xi;
-    int         i,
-    i1,i2,i3,i4,
-    N2p1;
-    
-    theta = PI/N;
+    float c1, c2;
+    float h1r, h1i;
+    float h2r, h2i;
+    float wr, wi;
+    float wpr, wpi;
+    float temp, theta;
+    float xr, xi;
+    int i, i1, i2, i3, i4, N2p1;
+
+    theta = PI / N;
     wr = 1.;
     wi = 0.;
     c1 = 0.5;
-    if ( forward ) {
+    if (forward) {
         c2 = -0.5;
-        cfft( x, N, forward );
+        cfft(x, N, forward);
         xr = x[0];
         xi = x[1];
     } else {
@@ -142,147 +124,112 @@ void rfft(float x[], int N, int forward) {
         xi = 0.;
         x[1] = 0.;
     }
-    wpr = -2.*pow( sin( 0.5*theta ), 2. );
-    wpi = sin( theta );
-    N2p1 = (N<<1) + 1;
-    for ( i = 0; i <= N>>1; i++ ) {
-        i1 = i<<1;
+    wpr = -2. * pow(sin(0.5 * theta), 2.);
+    wpi = sin(theta);
+    N2p1 = (N << 1) + 1;
+    for (i = 0; i <= N >> 1; i++) {
+        i1 = i << 1;
         i2 = i1 + 1;
         i3 = N2p1 - i2;
         i4 = i3 + 1;
-        if ( i == 0 ) {
-            h1r =  c1*(x[i1] + xr );
-            h1i =  c1*(x[i2] - xi );
-            h2r = -c2*(x[i2] + xi );
-            h2i =  c2*(x[i1] - xr );
-            x[i1] =  h1r + wr*h2r - wi*h2i;
-            x[i2] =  h1i + wr*h2i + wi*h2r;
-            xr =  h1r - wr*h2r + wi*h2i;
-            xi = -h1i + wr*h2i + wi*h2r;
+        if (i == 0) {
+            h1r = c1 * (x[i1] + xr);
+            h1i = c1 * (x[i2] - xi);
+            h2r = -c2 * (x[i2] + xi);
+            h2i = c2 * (x[i1] - xr);
+            x[i1] = h1r + wr * h2r - wi * h2i;
+            x[i2] = h1i + wr * h2i + wi * h2r;
+            xr = h1r - wr * h2r + wi * h2i;
+            xi = -h1i + wr * h2i + wi * h2r;
         } else {
-            h1r =  c1*(x[i1] + x[i3] );
-            h1i =  c1*(x[i2] - x[i4] );
-            h2r = -c2*(x[i2] + x[i4] );
-            h2i =  c2*(x[i1] - x[i3] );
-            x[i1] =  h1r + wr*h2r - wi*h2i;
-            x[i2] =  h1i + wr*h2i + wi*h2r;
-            x[i3] =  h1r - wr*h2r + wi*h2i;
-            x[i4] = -h1i + wr*h2i + wi*h2r;
+            h1r = c1 * (x[i1] + x[i3]);
+            h1i = c1 * (x[i2] - x[i4]);
+            h2r = -c2 * (x[i2] + x[i4]);
+            h2i = c2 * (x[i1] - x[i3]);
+            x[i1] = h1r + wr * h2r - wi * h2i;
+            x[i2] = h1i + wr * h2i + wi * h2r;
+            x[i3] = h1r - wr * h2r + wi * h2i;
+            x[i4] = -h1i + wr * h2i + wi * h2r;
         }
-        wr = (temp = wr)*wpr - wi*wpi + wr;
-        wi = wi*wpr + temp*wpi + wi;
+        wr = (temp = wr) * wpr - wi * wpi + wr;
+        wi = wi * wpr + temp * wpi + wi;
     }
-    if ( forward )
+    if (forward)
         x[1] = xr;
     else
-        cfft( x, N, forward );
+        cfft(x, N, forward);
 }
 
+void convert(float S[], float C[], int N2, int D, float lastphase[]) {
+    float phase, phasediff;
+    float a, b;
+    int real, imag, amp, freq, i;
 
-void convert( float S[], float C[], int N2, int D,float lastphase[])
-//float S[], C[]; int N2, D, R;
-{
-    
-    float   phase,phasediff;
-    int real,
-    imag,
-    amp,
-    freq;
-    float   a,
-    b;
-    int i;
-    
-    
-    
-    /* unravel rfft-format spectrum: note that N2+1 pairs of
-     values are produced */
-    
-    for ( i = 0; i <= N2; i++ ) {
-        imag = freq = ( real = amp = i<<1 ) + 1;
-        a = ( i == N2 ? S[1] : S[real] );
-        b = ( i == 0 || i == N2 ? 0. : S[imag] );
-        
-        /* compute magnitude value from real and imaginary parts */
-        
-        C[amp] = hypot( a, b );
-        
-        /* compute phase value from real and imaginary parts and take
-         difference between this and previous value for each channel */
-        
-        if ( (C[amp]*(N2<<1)) < ZEROAMP ){
-            phase =0;
+    // unravel rfft-format spectrum: note that N2+1 pairs of values are produced
+    for (i = 0; i <= N2; i++) {
+        imag = freq = (real = amp = i << 1) + 1;
+        a = (i == N2 ? S[1] : S[real]);
+        b = (i == 0 || i == N2 ? 0. : S[imag]);
+
+        // compute magnitude value from real and imaginary parts
+        C[amp] = hypot(a, b);
+
+        // compute phase value from real and imaginary parts and take
+        // difference between this and previous value for each channel
+        if ((C[amp] * (N2 << 1)) < EPSILON) {
+            phase = 0;
             phasediff = phase - lastphase[i];
             lastphase[i] = phase;
-        }
-        else {
-            if (fabsf(b)<ZEROAMP) {
-                if (a<0) {
+        } else {
+            if (fabsf(b) < EPSILON) {
+                if (a < 0) {
                     phase = PI;
-                }else{
-                    phase =0;
+                } else {
+                    phase = 0;
                 }
-                
-            }else{
-                phase = -atan2( b, a ) ;
+            } else {
+                phase = -atan2(b, a);
             }
             phasediff = phase - lastphase[i];
             lastphase[i] = phase;
-            
-            
-            /* unwrap phase differences */
-            phasediff = phasediff - D*TWOPI*i/(N2<<1);
-            if (phasediff>0)
-                phasediff = fmodf(phasediff+PI, TWOPI)-PI;
-            else{
-                phasediff =  fmodf(phasediff-PI, TWOPI)+PI;
-                if(phasediff == PI){
+
+            // unwrap phase differences
+            phasediff = phasediff - D * TWOPI * i / (N2 << 1);
+            if (phasediff > 0)
+                phasediff = fmodf(phasediff + PI, TWOPI) - PI;
+            else {
+                phasediff = fmodf(phasediff - PI, TWOPI) + PI;
+                if (phasediff == PI) {
                     phasediff = -PI;
                 }
             }
-            
-
         }
-        
-        /* convert each phase difference to frequency in radians */
-        
-        C[freq] = TWOPI*i/(N2<<1)  + phasediff/D;
+        // convert each phase difference to frequency in radians
+        C[freq] = TWOPI * i / (N2 << 1) + phasediff / D;
     }
-    
 }
 
+// unconvert essentially undoes what convert does, i.e., it turns N2+1 PAIRS of
+// amplitude and frequency values in C into N2 PAIR of complex spectrum data (in
+// rfft format) in output array S; sampling rate R and interpolation factor I
+// are used to recompute phase values from frequencies
+void unconvert(float C[], float S[], int N2, int I, float accumphase[]) {
+    int i, real, imag, amp, freq;
+    float mag, phase;
 
-/* unconvert essentially undoes what convert does, i.e., it
- turns N2+1 PAIRS of amplitude and frequency values in
- C into N2 PAIR of complex spectrum data (in rfft format)
- in output array S; sampling rate R and interpolation factor
- I are used to recompute phase values from frequencies */
-
-void unconvert( float C[], float S[], int N2, int I, float accumphase[] )
-//float C[], S[]; int N2, I, R;
-{
-
-    int         i,
-    real,
-    imag,
-    amp,
-    freq;
-    float   mag,phase;
-
-    /* subtract out frequencies associated with each channel,
-     compute phases in terms of radians per I samples, and
-     convert to complex form */
-    
-    for ( i = 0; i <= N2; i++ ) {
-        imag = freq = ( real = amp = i<<1 ) + 1;
-        if ( i == N2 )
+    // subtract out frequencies associated with each channel,
+    // compute phases in terms of radians per I samples, and
+    // convert to complex form
+    for (i = 0; i <= N2; i++) {
+        imag = freq = (real = amp = i << 1) + 1;
+        if (i == N2)
             real = 1;
         mag = C[amp];
-        //phaseCumulative = phaseCumulative + hopOut * trueFreq;
-        accumphase[i] += I*C[freq];
+        accumphase[i] += I * C[freq];
         phase = accumphase[i];
-        S[real] = mag*cos( phase );
-        if ( i != N2 )
-            S[imag] = -mag*sin( phase );
+        S[real] = mag * cos(phase);
+        if (i != N2)
+            S[imag] = -mag * sin(phase);
     }
 }
 
@@ -298,7 +245,7 @@ EMSCRIPTEN_KEEPALIVE
 void setup() {
     // Generate Hann window.
     for (int i = 0; i < WINDOW_SIZE; i++) {
-        hannWindow[i] = 0.5 - 0.5*cos(TWOPI*i/(WINDOW_SIZE - 1));
+        hannWindow[i] = 0.5 - 0.5 * cos(TWOPI * i / (WINDOW_SIZE - 1));
     }
 }
 
@@ -318,37 +265,39 @@ shifter *createShifter() {
 }
 
 EMSCRIPTEN_KEEPALIVE
-void destroyShifter(shifter *s) {
-    free(s);
-}
+void destroyShifter(shifter *s) { free(s); }
 
 // Process HOP_SIZE samples. Expects `input` and `output` to be HOP_SIZE long.
 EMSCRIPTEN_KEEPALIVE
 void processBlock(shifter *s, float input[], float output[], float factor) {
-    static float windowed[WINDOW_SIZE];
+    static float tmp[WINDOW_SIZE];
     static float magFreqPairs[WINDOW_SIZE + 2];
 
     float *inputWindow = s->inputWindow;
     float *overlapped = s->overlapped;
     float *lastPhase = s->lastPhase;
     float *accumPhase = s->accumPhase;
-    // Shift `input` (length HOP_SIZE) on to the end of `inputWindow` (length WINDOW_SIZE).
-    memmove(inputWindow, &inputWindow[HOP_SIZE], (WINDOW_SIZE - HOP_SIZE) * sizeof(float));
-    memcpy(&inputWindow[WINDOW_SIZE - HOP_SIZE], input, HOP_SIZE * sizeof(float));
+    // Shift `input` (HOP_SIZE) on to the end of `inputWindow` (WINDOW_SIZE).
+    memmove(inputWindow, &inputWindow[HOP_SIZE],
+            (WINDOW_SIZE - HOP_SIZE) * sizeof(float));
+    memcpy(&inputWindow[WINDOW_SIZE - HOP_SIZE], input,
+           HOP_SIZE * sizeof(float));
     int hopOut = round(factor * HOP_SIZE);
 
     // Phase vocoder.
-    windowSignal(windowed, inputWindow, hannWindow, WINDOW_SIZE, 1);
-    rfft(windowed, WINDOW_SIZE / 2, 1);
-    convert(windowed, magFreqPairs, WINDOW_SIZE / 2, HOP_SIZE, lastPhase);
-    unconvert(magFreqPairs, windowed, WINDOW_SIZE / 2, hopOut, accumPhase);
-    rfft(windowed, WINDOW_SIZE / 2, 0);
+    multiply(inputWindow, hannWindow, tmp, WINDOW_SIZE, 1);
+    rfft(tmp, WINDOW_SIZE / 2, 1);
+    convert(tmp, magFreqPairs, WINDOW_SIZE / 2, HOP_SIZE, lastPhase);
+    unconvert(magFreqPairs, tmp, WINDOW_SIZE / 2, hopOut, accumPhase);
+    rfft(tmp, WINDOW_SIZE / 2, 0);
     double scale = 1 / sqrt((double)WINDOW_SIZE / hopOut / 2);
-    windowSignal(windowed, windowed, hannWindow, WINDOW_SIZE, scale);
-    overlapadd(windowed, overlapped, 0, WINDOW_SIZE);
+    multiply(tmp, hannWindow, tmp, WINDOW_SIZE, scale);
+    overlapadd(tmp, overlapped, 0, WINDOW_SIZE);
 
-    // Shift `hopOut` samples from the beginning of `overlapped` and interpolate them back into `HOP_SIZE` samples.
-    interpolateFit(overlapped, output, hopOut, HOP_SIZE, (float)hopOut / HOP_SIZE);
-    memmove(overlapped, &overlapped[hopOut], (WINDOW_SIZE - hopOut) * sizeof(float));
+    // Shift `hopOut` samples from the beginning of `overlapped` and
+    // interpolate them back into `HOP_SIZE` samples.
+    interpolate(overlapped, output, hopOut, HOP_SIZE);
+    memmove(overlapped, &overlapped[hopOut],
+            (WINDOW_SIZE - hopOut) * sizeof(float));
     memset(&overlapped[WINDOW_SIZE - hopOut], 0, hopOut * sizeof(float));
 }
