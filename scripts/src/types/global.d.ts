@@ -44,7 +44,7 @@ declare module "dsp" {
     const WindowFunction: any
 }
 
-declare module "worklet" {
+declare module "pitchshiftWorklet" {
     const x: string
     export default x
 }

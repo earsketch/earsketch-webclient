@@ -679,9 +679,13 @@ export class PitchshiftEffect extends MixableEffect {
             shifter: new AudioWorkletNode(context, "pitchshifter"),
             ...super.create(context),
             destroy() {
-                this.shifter.port.postMessage("destroy")
-                this.shifter.disconnect()
-                this.shifter = null
+                if (this.shifter) {
+                    this.shifter.port.postMessage("destroy")
+                    this.shifter.disconnect()
+                    this.shifter = null
+                } else {
+                    console.error("destroy() called twice; should never happen.")
+                }
             },
         }
         node.input.connect(node.shifter)
