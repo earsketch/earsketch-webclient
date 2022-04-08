@@ -316,7 +316,7 @@
       this.destination = new AudioDestinationNode();
       this.listener = new AudioListener();
       this.audioWorklet = {
-        addModule: function() {}
+        addModule: async function() {}
       }
     }
 

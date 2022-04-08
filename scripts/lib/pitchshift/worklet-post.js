@@ -1,4 +1,4 @@
-const WINDOW_SIZE = 1024
+/* eslint-disable no-undef */
 const HOP_SIZE = 128
 
 Module._setup()
