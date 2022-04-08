@@ -1,5 +1,6 @@
 import * as ccState from "./complexityCalculatorState"
 import * as ccHelpers from "./complexityCalculatorHelperFunctions"
+
 // Parsing and analyzing abstract syntax trees without compiling the script, e.g. to measure code complexity.
 
 export interface Node {
@@ -7,6 +8,9 @@ export interface Node {
     colOffset: number,
 }
 
+export interface HasBodyNode extends Node{
+    body: StatementNode[],
+}
 export interface BinOpNode extends Node {
     _astname: "BinOp",
     left: BinOpNode | CallNode | NameNode | strNode | NumNode | SubscriptNode | ListNode,
@@ -18,10 +22,6 @@ export interface NameByReference {
     name: string,
     start: number,
     end: number,
-}
-
-export interface HasBodyNode extends Node {
-    body: StatementNode[],
 }
 
 export interface BoolOpNode extends Node {
@@ -93,25 +93,28 @@ export interface strNode extends Node {
 export interface SubscriptNode extends Node {
     _astname: "Subscript",
     value: AnyNode,
-    slice: AnyNode,
+    slice: SliceNode | IndexNode,
 }
 
-export interface ForNode extends HasBodyNode {
+export interface ForNode extends Node {
     _astname: "For",
+    body: StatementNode [],
     value: AnyNode,
     iter: StatementNode,
     target: NameNode,
 }
 
-export interface JsForNode extends HasBodyNode {
+export interface JsForNode extends Node {
     _astname: "JSFor",
+    body: StatementNode [],
     init?: AssignNode | AugAssignNode,
     test?: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
     update?: StatementNode,
 }
 
-export interface WhileNode extends HasBodyNode {
+export interface WhileNode extends Node {
     _astname: "While",
+    body: StatementNode [],
     test: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode,
 }
 
@@ -143,14 +146,13 @@ export interface opNode extends Node {
 
 export interface SliceNode extends Node {
     _astname: "Slice",
-    lower: AnyNode,
-    upper: AnyNode,
-    step: AnyNode,
+    lower: NumericalNode,
+    upper: NumericalNode,
 }
 
 export interface IndexNode extends Node {
     _astname: "Index",
-    value: AnyNode, // anything that can hold a numerical value
+    value: NumericalNode,
 }
 
 export interface NameNode extends Node {
@@ -160,11 +162,12 @@ export interface NameNode extends Node {
 
 export interface ReturnNode extends Node {
     _astname: "Return",
-    value: AnyNode,
+    value: BinOpNode | BoolOpNode | CompareNode | ListNode | CallNode | strNode | SubscriptNode | ExprNode | NumNode | NameNode | UnaryOpNode, // list possible return types
 }
 
-export interface ModuleNode extends HasBodyNode {
+export interface ModuleNode extends Node {
     _astname: "Module",
+    body: StatementNode [],
 }
 
 export type AnyNode = BinOpNode | BoolOpNode | CompareNode | ListNode | FunctionDefNode | IfNode | AttributeNode | CallNode | AssignNode | AugAssignNode |
@@ -177,6 +180,8 @@ export type ConditionalNode = BinOpNode | BoolOpNode | CompareNode | NameNode | 
 
 export type comparableNode = BinOpNode | strNode | NumNode | CompareNode | ListNode | CallNode | SubscriptNode | ExprNode | NameNode
 
+export type NumericalNode = BinOpNode | NumNode | NameNode | CallNode | SubscriptNode
+
 export interface Results {
     ast: AnyNode,
     codeFeatures: {
@@ -185,8 +190,8 @@ export interface Results {
         makeBeat: number,
         iteration: {
             whileLoops: number,
-            forLoopsRange: number,
-            forLoopsIterable: number,
+            forLoopsPY: number,
+            forLoopsJS: number,
             iterables: number,
             nesting: number,
         },
@@ -306,14 +311,6 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
             funcToCall(node, args)
             recursiveCallOnNodes(funcToCall, args, node)
         }
-    //     for (const child of Object.entries(ast)) {
-    //         if (child[1] && ((Array.isArray(child[1]) && ArrayKeys.includes(child[0])) || child[1]._astname)) {
-    //             if (child[1]._astname) {
-    //                 funcToCall(child[1], args)
-    //             }
-    //             recursiveCallOnNodes(funcToCall, args, child[1])
-    //         }
-    //     }
     }
 }
 
@@ -1242,6 +1239,8 @@ function findValueTrace(isVariable: Boolean,
         const thisNode = parentNodes[parentNodes.length - 1]
         // do uses
 
+        // console.log(name, nodeParent, secondParent);
+
         // is it in a func arg
         if (nodeParent && nodeParent[1] === "args") {
             isUse = true
@@ -1460,10 +1459,10 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
                     // check number of args
                     const numArgs = Array.isArray(node.iter.args) ? node.iter.args.length : 1
 
-                    if (results.codeFeatures.iteration.forLoopsRange < numArgs && !ccState.getProperty("isJavascript")) {
-                        results.codeFeatures.iteration.forLoopsRange = numArgs
+                    if (results.codeFeatures.iteration.forLoopsPY < numArgs && !ccState.getProperty("isJavascript")) {
+                        results.codeFeatures.iteration.forLoopsPY = numArgs
                     } else if (ccState.getProperty("isJavascript")) {
-                        results.codeFeatures.iteration.forLoopsIterable = 1
+                        results.codeFeatures.iteration.forLoopsJS = 1
                     }
                 }
             }
@@ -1477,7 +1476,7 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
             // mark loop
             const firstLine = lineNumber
             const lastLine = ccHelpers.getLastLine(node)
-            results.codeFeatures.iteration.forLoopsIterable = 1
+            results.codeFeatures.iteration.forLoopsJS = 1
             ccState.getProperty("loopLocations").push([firstLine, lastLine])
         } else if (node._astname === "If") {
             if (results.codeFeatures.conditionals.conditionals < 1) {
@@ -1556,6 +1555,7 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
                     calledOn = ccHelpers.estimateDataType(node.args[0])
                 }
             } else if (node.func._astname === "Attribute") {
+                // console.log(node.func._astname);
                 calledName = String(node.func.attr.v)
                 if ("value" in node.func) {
                     calledOn = ccHelpers.estimateDataType(node.func.value)
@@ -1695,6 +1695,7 @@ function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: Structura
             }
         }
     } else if (node._astname === "If") {
+        // returnObject.id = "If";
         const ifNode: StructuralNode = { id: "If", children: [], startline: node.lineno, endline: ccHelpers.getLastLine(node), parent: parentNode }
 
         for (const item of node.body) {
@@ -1775,7 +1776,7 @@ function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "Fun
 function getParentList(lineno: number, parentNode: StructuralNode, parentsList: StructuralNode[]) {
     // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
-    // first, is it a child of the parent node?
+    // first....is it a child of the parent node?
     if (typeof parentNode.startline !== "undefined" && parentNode.startline !== null && parentNode.endline && parentNode.startline <= lineno && parentNode.endline >= lineno) {
         parentsList.push(Object.assign({}, parentNode))
         // then, check children.
@@ -1819,8 +1820,8 @@ export function emptyResultsObject(ast: AnyNode): Results {
             makeBeat: 0,
             iteration: {
                 whileLoops: 0,
-                forLoopsRange: 0,
-                forLoopsIterable: 0,
+                forLoopsPY: 0,
+                forLoopsJS: 0,
                 iterables: 0,
                 nesting: 0,
             },
