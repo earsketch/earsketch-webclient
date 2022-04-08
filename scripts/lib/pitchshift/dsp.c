@@ -6,51 +6,34 @@
 //  Copyright (c) 2015 gtcmt. All rights reserved.
 //  FFT C Routines based on Richad Moore's Elements of Computer Music
 //  sligthly modified for EMSCRIPTEN support
-
+//
+//  Modified by Ian Clester around 4/7/2022.
+//  Revised for real-time operation within an AudioWorklet,
+//  and for style & clarity.
 
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <emscripten.h>
+// #include <emscripten.h>
+#define EMSCRIPTEN_KEEPALIVE
+
+const float PI = M_PI;
+const float TWOPI = 2 * M_PI;
 
 #define ZEROAMP 0.000001
 
-float TWOPI, PI;
-
-void initDSP(){
-    PI = 4.*atan( 1. );
-    TWOPI = 8.*atan( 1. );
-}
-//Hanning modified * 2 just for comparison with MATLAB
-//Put the original after testing
-void fillHann(float ww[], int N)
-{
-    int n2 = N*2 +1;
-    for (int n=0; n<N; n++) {
-        ww[n] = 0.5 - (0.5* cos(2*M_PI *(2*n+1)/(n2-1)));
-    }
-    
-}
-
-void windowSignal(float output[], float a[], float b[], int N) {
+void windowSignal(float output[], float a[], float b[], int N, float scale) {
     for (int i = 0; i < N; i++) {
-        output[i] = a[i] * b[i];
+        output[i] = a[i] * b[i] * scale;
     }
 }
 
-void windowSignalQ(float ww[],float xx[],  int N, float factor)
-{
-    for (int i=0; i<N; i++) {
-        xx[i] = factor*ww[i]*xx[i];
-    }
-}
-
-void interpolateFit(float yvals[],float outvals[],  int N,int NOUT,  float inc) {
+void interpolateFit(float yvals[],float outvals[], int N, int NOUT, float inc) {
     int yindex, count;
     float min, max;
     float findex;
     findex = 0.0f;
-    count =0;
+    count = 0;
     while ((findex < N) &&(count<NOUT) ) {
         yindex = floor(findex);
         min = yvals[yindex];
@@ -66,117 +49,108 @@ void interpolateFit(float yvals[],float outvals[],  int N,int NOUT,  float inc) 
     }
 }
 
-void overlapadd(float xin[],float yoverlap[],  int offset,int N)
-{
-    for (int i=0; i<N; i++) {
-        yoverlap[offset +i] =  yoverlap[offset +i] + xin[i];
+void overlapadd(float xin[], float yoverlap[], int offset, int N) {
+    for (int i = 0; i < N; i++) {
+        yoverlap[offset+i] =  yoverlap[offset+i] + xin[i];
     }
 
 }
 
-void bitreverse( float x[], int N )
-{
-    float 	rtemp,itemp;
-    int 		i,j,
-    m;
+void bitreverse(float x[], int N) {
+    float rtemp, itemp;
+    int i, j, m;
     
-    for ( i = j = 0; i < N; i += 2, j += m ) {
-        if ( j > i ) {
+    for (i = j = 0; i < N; i += 2, j += m) {
+        if (j > i) {
             rtemp = x[j]; itemp = x[j+1]; /* complex exchange */
             x[j] = x[i]; x[j+1] = x[i+1];
             x[i] = rtemp; x[i+1] = itemp;
         }
-        for ( m = N>>1; m >= 2 && j >= m; m >>= 1 )
+        for (m = N >> 1; m >= 2 && j >= m; m >>= 1) {
             j -= m;
+        }
     }
 }
 
 
-void cfft( float x[], int NC, int forward )
-{
-	float 	wr,wi,
-    wpr,wpi,
-    theta,
-    scale;
-	int 		mmax,
-    ND,
-    m,
-    i,j,
-    delta;
+void cfft( float x[], int NC, int forward ) {
+    float wr, wi;
+    float wpr, wpi;
+    float theta, scale;
+    int mmax, ND, m, i, j, delta;
     
-	ND = NC<<1;
-	bitreverse( x, ND );
-	for ( mmax = 2; mmax < ND; mmax = delta ) {
-		delta = mmax<<1;
-		theta = TWOPI/( forward? mmax : -mmax );
-		wpr = -2.*pow( sin( 0.5*theta ), 2. );
-		wpi = sin( theta );
-		wr = 1.;
-		wi = 0.;
-		for ( m = 0; m < mmax; m += 2 ) {
-	 		float rtemp, itemp;
+    ND = NC<<1;
+    bitreverse( x, ND );
+    for ( mmax = 2; mmax < ND; mmax = delta ) {
+        delta = mmax<<1;
+        theta = TWOPI/( forward? mmax : -mmax );
+        wpr = -2.*pow( sin( 0.5*theta ), 2. );
+        wpi = sin( theta );
+        wr = 1.;
+        wi = 0.;
+        for ( m = 0; m < mmax; m += 2 ) {
+             float rtemp, itemp;
             for ( i = m; i < ND; i += delta ) {
-				j = i + mmax;
-				rtemp = wr*x[j] - wi*x[j+1];
-				itemp = wr*x[j+1] + wi*x[j];
-				x[j] = x[i] - rtemp;
-				x[j+1] = x[i+1] - itemp;
-				x[i] += rtemp;
-				x[i+1] += itemp;
+                j = i + mmax;
+                rtemp = wr*x[j] - wi*x[j+1];
+                itemp = wr*x[j+1] + wi*x[j];
+                x[j] = x[i] - rtemp;
+                x[j+1] = x[i+1] - itemp;
+                x[i] += rtemp;
+                x[i+1] += itemp;
             }
             wr = (rtemp = wr)*wpr - wi*wpi + wr;
             wi = wi*wpr + rtemp*wpi + wi;
-		}
+        }
     }
-    
-    
+
     scale = forward ? 1./ND : 2.;
-    { float *xi=x, *xe=x+ND;
-        while ( xi < xe )
+    {
+        float *xi = x, *xe = x+ND;
+        while (xi < xe)
             *xi++ *= scale;
     }
 }
 
 
-void rfft( float x[], int N, int forward  )
-{
-    float 	c1,c2,
+void rfft(float x[], int N, int forward) {
+    float     c1,c2,
     h1r,h1i,
     h2r,h2i,
     wr,wi,
     wpr,wpi,
     temp,
     theta;
-    float 	xr,xi;
-    int 		i,
+    float     xr,xi;
+    int         i,
     i1,i2,i3,i4,
     N2p1;
     
-	theta = PI/N;
-	wr = 1.;
-	wi = 0.;
-	c1 = 0.5;
-	if ( forward ) {
-		c2 = -0.5;
-		cfft( x, N, forward );
-		xr = x[0];
-		xi = x[1];
+    theta = PI/N;
+    wr = 1.;
+    wi = 0.;
+    c1 = 0.5;
+    if ( forward ) {
+        c2 = -0.5;
+        cfft( x, N, forward );
+        xr = x[0];
+        xi = x[1];
     } else {
-		c2 = 0.5;
-		theta = -theta;
-		xr = x[1];
-		xi = 0.;
-		x[1] = 0.;
-	}
-	wpr = -2.*pow( sin( 0.5*theta ), 2. );
-	wpi = sin( theta );
-	N2p1 = (N<<1) + 1;
-	for ( i = 0; i <= N>>1; i++ ) {
-		i1 = i<<1;
-		i2 = i1 + 1;
-		i3 = N2p1 - i2;
-		i4 = i3 + 1;
-		if ( i == 0 ) {
+        c2 = 0.5;
+        theta = -theta;
+        xr = x[1];
+        xi = 0.;
+        x[1] = 0.;
+    }
+    wpr = -2.*pow( sin( 0.5*theta ), 2. );
+    wpi = sin( theta );
+    N2p1 = (N<<1) + 1;
+    for ( i = 0; i <= N>>1; i++ ) {
+        i1 = i<<1;
+        i2 = i1 + 1;
+        i3 = N2p1 - i2;
+        i4 = i3 + 1;
+        if ( i == 0 ) {
             h1r =  c1*(x[i1] + xr );
             h1i =  c1*(x[i2] - xi );
             h2r = -c2*(x[i2] + xi );
@@ -185,7 +159,7 @@ void rfft( float x[], int N, int forward  )
             x[i2] =  h1i + wr*h2i + wi*h2r;
             xr =  h1r - wr*h2r + wi*h2i;
             xi = -h1i + wr*h2i + wi*h2r;
-		} else {
+        } else {
             h1r =  c1*(x[i1] + x[i3] );
             h1i =  c1*(x[i2] - x[i4] );
             h2r = -c2*(x[i2] + x[i4] );
@@ -194,14 +168,14 @@ void rfft( float x[], int N, int forward  )
             x[i2] =  h1i + wr*h2i + wi*h2r;
             x[i3] =  h1r - wr*h2r + wi*h2i;
             x[i4] = -h1i + wr*h2i + wi*h2r;
-		}
-		wr = (temp = wr)*wpr - wi*wpi + wr;
-		wi = wi*wpr + temp*wpi + wi;
-	}
-	if ( forward )
-		x[1] = xr;
+        }
+        wr = (temp = wr)*wpr - wi*wpi + wr;
+        wi = wi*wpr + temp*wpi + wi;
+    }
+    if ( forward )
+        x[1] = xr;
     else
-		cfft( x, N, forward );
+        cfft( x, N, forward );
 }
 
 
@@ -322,8 +296,10 @@ float hannWindow[WINDOW_SIZE];
 
 EMSCRIPTEN_KEEPALIVE
 void setup() {
-    initDSP();
-    fillHann(hannWindow, WINDOW_SIZE);
+    // Generate Hann window.
+    for (int i = 0; i < WINDOW_SIZE; i++) {
+        hannWindow[i] = 0.5 - 0.5*cos(TWOPI*i/(WINDOW_SIZE - 1));
+    }
 }
 
 // Internal state for one pitchshifter instance.
@@ -362,13 +338,13 @@ void processBlock(shifter *s, float input[], float output[], float factor) {
     int hopOut = round(factor * HOP_SIZE);
 
     // Phase vocoder.
-    windowSignal(windowed, inputWindow, hannWindow, WINDOW_SIZE);
+    windowSignal(windowed, inputWindow, hannWindow, WINDOW_SIZE, 1);
     rfft(windowed, WINDOW_SIZE / 2, 1);
     convert(windowed, magFreqPairs, WINDOW_SIZE / 2, HOP_SIZE, lastPhase);
     unconvert(magFreqPairs, windowed, WINDOW_SIZE / 2, hopOut, accumPhase);
     rfft(windowed, WINDOW_SIZE / 2, 0);
     double scale = 1 / sqrt((double)WINDOW_SIZE / hopOut / 2);
-    windowSignalQ(hannWindow, windowed, WINDOW_SIZE, scale);
+    windowSignal(windowed, windowed, hannWindow, WINDOW_SIZE, scale);
     overlapadd(windowed, overlapped, 0, WINDOW_SIZE);
 
     // Shift `hopOut` samples from the beginning of `overlapped` and interpolate them back into `HOP_SIZE` samples.
