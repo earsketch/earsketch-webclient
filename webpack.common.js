@@ -32,7 +32,6 @@ module.exports = {
             aceJsWorker: path.resolve(__dirname, `${vendorDir}/ace/worker-javascript.js`),
 
             // Emscripten
-            esDSP: path.resolve(__dirname, `${libDir}/earsketch-dsp.js`),
             pitchshiftWorklet: path.resolve(__dirname, `${libDir}/pitchshift/worklet.js`),
 
             // Controllers
