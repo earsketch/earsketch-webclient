@@ -37,7 +37,7 @@ export const buildAudioNodeGraph = (
 
     // Only one effect is needed per automation track.
     // This keeps track of the effects we have already created.
-    const effectNodes: { [key: string]: any } = {}
+    track.effectNodes = {}
 
     // Audio node graph can be constructed like a linked list
     let firstNode: AudioNode | undefined
@@ -88,7 +88,7 @@ export const buildAudioNodeGraph = (
 
         // TODO: Resolve exceptions as soon as we determine it is safe to do so, and then simplify the logic here.
 
-        const createNewNode = effectNodes[effect.name] === undefined
+        const createNewNode = track.effectNodes[effect.name] === undefined
         if (createNewNode) {
             // Create node for effect. We only do this once per effect type.
             // Subsequent EffectRanges with the same name modify the existing effect.
@@ -106,10 +106,10 @@ export const buildAudioNodeGraph = (
                     }
                 }
             }
-            effectNodes[effect.name] = node
+            track.effectNodes[effect.name] = node
         }
 
-        const node = effectNodes[effect.name]
+        const node = track.effectNodes[effect.name]
 
         if (node === null) {
             // Dummy node, nothing to see here.

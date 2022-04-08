@@ -41,6 +41,7 @@ class PitchshiftProcessor extends AudioWorkletProcessor {
             // (We should probably have some more discipline with our audio nodes in general - I suspect we are leaking nodes across scripts.)
             if (e.data === "destroy") {
                 this.shifter.destroy()
+                this.shifter = null
             } else {
                 throw new Error(`Unexpected message '${e.data}'`)
             }
@@ -48,6 +49,9 @@ class PitchshiftProcessor extends AudioWorkletProcessor {
     }
 
     process(inputs, outputs, parameters) {
+        if (!this.shifter) {
+            return false
+        }
         const output = outputs[0][0]
         const input = inputs[0][0] ?? new Float32Array(output.length)
         const shift = parameters.shift[0]

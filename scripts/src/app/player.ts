@@ -42,6 +42,7 @@ export interface Track {
     clips: Clip[]
     effects: { [key: string]: Effect }
     analyser: AnalyserNode
+    effectNodes?: { [key: string]: any }
     label?: string | number
     visible?: boolean
     buttons?: boolean
@@ -362,6 +363,17 @@ const clearAudioGraph = (idx: number, delay = 0) => {
                 renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
             }
         }
+    }
+
+    const renderData = renderingDataQueue[idx]
+    if (renderData !== null) {
+        setTimeout(() => {
+            for (const track of renderData.tracks) {
+                for (const node of Object.values(track.effectNodes ?? {})) {
+                    node?.destroy()
+                }
+            }
+        }, delay)
     }
 }
 

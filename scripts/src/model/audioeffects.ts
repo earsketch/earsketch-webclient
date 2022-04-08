@@ -26,6 +26,7 @@ export class Effect {
             bypass: context.createGain(),
             bypassDry: context.createGain(),
             connect(target: AudioNode) { this.output.connect(target) },
+            destroy() {},
         }
         node.bypass.gain.value = 1
         node.bypassDry.gain.value = 0
@@ -677,6 +678,11 @@ export class PitchshiftEffect extends MixableEffect {
         const node = {
             shifter: new AudioWorkletNode(context, "pitchshifter"),
             ...super.create(context),
+            destroy() {
+                this.shifter.port.postMessage("destroy")
+                this.shifter.disconnect()
+                this.shifter = null
+            },
         }
         node.input.connect(node.shifter)
         node.shifter.connect(node.wetLevel)
