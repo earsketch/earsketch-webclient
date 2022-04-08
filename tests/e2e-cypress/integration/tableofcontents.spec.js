@@ -11,7 +11,7 @@ describe("Table of content", () => {
                 body: [],
             }
         )
-        cy.visit("http://localhost:8888")
+        cy.visit("/")
     })
 
     it("shows TOC", () => {
