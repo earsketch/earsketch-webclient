@@ -8,23 +8,15 @@ const levenshtein = require("fast-levenshtein")
 const AUDIOKEYS = Object.values(NUMBERS_AUDIOKEYS_)
 
 // TODO: Extract list of API functions from passthrough or api_doc rather than repeating it here.
-const PYTHON_AND_API = [
-    "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", "fitMedia",
-    "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBealSlice", "print", "readInput",
-    "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile",
-    "setEffect", "setTempo", "shuffleList", "shuffleString", "and", "as", "assert", "break", "del", "elif",
+const PYTHON_AND_API = ["and", "as", "assert", "break", "del", "elif",
     "class", "continue", "def", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "not", "or",
     "pass", "print", "raise", "return", "try", "while", "with", "yield",
-] as readonly string[]
+].concat(ccState.apiFunctions) as readonly string[]
 
-const JS_AND_API = [
-    "analyze", "analyzeForTime", "analyzeTrack", "analyzeTrackForTime", "createAudioSlice", "dur", "finish", "fitMedia",
-    "importImage", "importFile", "init", "insertMedia", "insertMediaSection", "makeBeat", "makeBealSlice", "readInput",
-    "replaceListElement", "replaceString", "reverseList", "reverseString", "rhythmEffects", "selectRandomFile",
-    "setEffect", "setTempo", "shuffleList", "shuffleString", "and", "as", "assert", "break", "del", "else if",
+const JS_AND_API = ["and", "as", "assert", "break", "del", "else if",
     "continue", "function", "else", "except", "exec", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "or",
     "pass", "println", "raise", "return", "try", "while", "with", "yield", "catch",
-] as readonly string[]
+].concat(ccState.apiFunctions) as readonly string[]
 
 let lastWorkingAST: any
 let lastWorkingStructure: any

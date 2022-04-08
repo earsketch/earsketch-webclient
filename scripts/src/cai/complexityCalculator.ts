@@ -190,8 +190,8 @@ export interface Results {
         makeBeat: number,
         iteration: {
             whileLoops: number,
-            forLoopsPY: number,
-            forLoopsJS: number,
+            forLoopsRange: number,
+            forLoopsIterable: number,
             iterables: number,
             nesting: number,
         },
@@ -246,6 +246,7 @@ export function getAllVariables() {
     return ccState.getProperty("allVariables")
 }
 
+// Walks AST nodes and calls a given function on all nodes.
 function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | string | NameByReference | ModuleNode)[], ast: AnyNode | AnyNode[]) {
     let nodesToRecurse: AnyNode [] = []
     if (Array.isArray(ast)) {
@@ -314,11 +315,13 @@ function recursiveCallOnNodes(funcToCall: Function, args: (Results | number | st
     }
 }
 
+// Recursively notes which code concepts are used in conditionals
 function analyzeConditionalTest(testNode: NameNode | BinOpNode | CompareNode | BoolOpNode | CallNode, tallyList: string[]) {
     tallyObjectsInConditional(testNode, tallyList)
     recursiveCallOnNodes(tallyObjectsInConditional, tallyList, testNode)
 }
 
+// Notes which code concepts are used in conditionals
 function tallyObjectsInConditional(node: ConditionalNode, tallyList: string[]) {
     if (node._astname === "Name") {
         // boolval or variable
@@ -348,7 +351,7 @@ function tallyObjectsInConditional(node: ConditionalNode, tallyList: string[]) {
     }
 }
 
-// recurses through AST and calls function info function on each node
+// recurses through AST and calls function info function on each node; updates results accordingly
 function functionPass(results: Results, rootAst: ModuleNode) {
     recursiveCallOnNodes(collectFunctionInfo, [results, rootAst], rootAst)
     // recursiveFunctionAnalysis(ast, results, rootAst);
@@ -555,6 +558,7 @@ function collectFunctionInfo(node: FunctionDefNode | NameNode | CallNode | Assig
     }
 }
 
+// handles complexity scoring for the makeBeat function
 function markMakeBeat(callNode: CallNode, results: Results) {
     if (results.codeFeatures.makeBeat < 1) {
         results.codeFeatures.makeBeat = 1
@@ -574,6 +578,7 @@ function markMakeBeat(callNode: CallNode, results: Results) {
     }
 }
 
+// does this binOp node return a string?
 function isBinopString(binOpNode: BinOpNode) {
     const leftNode = binOpNode.left
     const rightNode = binOpNode.right
@@ -800,6 +805,7 @@ function collectVariableInfo(node: AssignNode | AugAssignNode | NameNode | ForNo
     }
 }
 
+// attempts to determine original assignment of name or call value used on a given line
 function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): string {
     if (isVariable) {
         if (!ccState.getProperty("uncalledFunctionLines").includes(lineNo)) {
@@ -1023,6 +1029,7 @@ function reverseValueTrace(isVariable: Boolean, name: string, lineNo: number): s
     return ""
 }
 
+// attempts to determine datatype contained in an AST node
 function getTypeFromASTNode(node: ListNode | strNode | NumNode | CallNode | NameNode | SubscriptNode) {
     const autoReturns = ["List", "Str"]
     if (node._astname && autoReturns.includes(node._astname)) {
@@ -1062,6 +1069,7 @@ function getTypeFromASTNode(node: ListNode | strNode | NumNode | CallNode | Name
     return ""
 }
 
+// Recursive. Given a function or variable name, find out if it's used anywhere (e.g. in a fitMedia call)
 function valueTrace(isVariable: Boolean,
     name: string,
     ast: AnyNode,
@@ -1151,6 +1159,7 @@ function valueTrace(isVariable: Boolean,
     return false
 }
 
+//  Given a function or variable name, find out if it's used in this particular node.
 function findValueTrace(isVariable: Boolean,
     name: string,
     node: AnyNode,
@@ -1397,6 +1406,7 @@ function doComplexityOutput(results: Results, rootAst: ModuleNode) {
     }
 }
 
+// puts loop line arrays in order
 function sortLoopValues(a: number[], b: number[]) {
     const scoreA = a[1] - a[0]
     const scoreB = b[1] - b[0]
@@ -1404,6 +1414,7 @@ function sortLoopValues(a: number[], b: number[]) {
     return scoreB - scoreA
 }
 
+// calculates depth score using simplified AST structuralNode object
 function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { depth: number }, parentObj: StructuralNode | null) {
     if (!parentObj) {
         structureObj.depth = 0
@@ -1420,7 +1431,7 @@ function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { dep
     }
 }
 
-// Analyze a single node of a Python AST.
+// Analyze a single AST node.
 function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | SubscriptNode | BinOpNode | UnaryOpNode | CompareNode | WhileNode, resultInArray: Results[]) {
     const results: Results = resultInArray[0]
     let lineNumber = 0
@@ -1459,10 +1470,10 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
                     // check number of args
                     const numArgs = Array.isArray(node.iter.args) ? node.iter.args.length : 1
 
-                    if (results.codeFeatures.iteration.forLoopsPY < numArgs && !ccState.getProperty("isJavascript")) {
-                        results.codeFeatures.iteration.forLoopsPY = numArgs
+                    if (results.codeFeatures.iteration.forLoopsRange < numArgs && !ccState.getProperty("isJavascript")) {
+                        results.codeFeatures.iteration.forLoopsRange = numArgs
                     } else if (ccState.getProperty("isJavascript")) {
-                        results.codeFeatures.iteration.forLoopsJS = 1
+                        results.codeFeatures.iteration.forLoopsIterable = 1
                     }
                 }
             }
@@ -1476,7 +1487,7 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
             // mark loop
             const firstLine = lineNumber
             const lastLine = ccHelpers.getLastLine(node)
-            results.codeFeatures.iteration.forLoopsJS = 1
+            results.codeFeatures.iteration.forLoopsIterable = 1
             ccState.getProperty("loopLocations").push([firstLine, lastLine])
         } else if (node._astname === "If") {
             if (results.codeFeatures.conditionals.conditionals < 1) {
@@ -1600,12 +1611,13 @@ function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | Subscrip
     }
 }
 
-// Recursively analyze a python abstract syntax tree.
+// Recursively analyze an abstract syntax tree.
 function recursiveAnalyzeAST(ast: AnyNode, results: Results) {
     recursiveCallOnNodes(analyzeASTNode, [results], ast)
     return results
 }
 
+// lists all "orelse" components for an "if" node in a single array
 function appendOrElses(node: IfNode, orElseList: Node[][]) {
     if (node.orelse && node.orelse.length > 0) {
         if ("body" in node.orelse[0]) {
@@ -1619,6 +1631,7 @@ function appendOrElses(node: IfNode, orElseList: Node[][]) {
     }
 }
 
+// Creates a simplified version of the AST (StructuralNode) that we use to calculate depth score
 function buildStructuralRepresentation(nodeToUse: AnyNode, parentNode: StructuralNode, rootAst: ModuleNode) {
     let node = nodeToUse
     if (nodeToUse._astname === "Expr" && nodeToUse.value) {
@@ -1773,6 +1786,7 @@ function findFunctionArgumentName(node: FunctionDefNode | CallNode, args: [ "Fun
     }
 }
 
+// find all StructuralNode parents of a given StructuralNode
 function getParentList(lineno: number, parentNode: StructuralNode, parentsList: StructuralNode[]) {
     // recurse through ccState.getProperty("codeStructure"), drill down to thing, return
 
@@ -1811,6 +1825,7 @@ export function doAnalysis(ast: ModuleNode, results: Results) {
     doComplexityOutput(results, ast)
 }
 
+// generates empty results object
 export function emptyResultsObject(ast: AnyNode): Results {
     return {
         ast: ast,
@@ -1820,8 +1835,8 @@ export function emptyResultsObject(ast: AnyNode): Results {
             makeBeat: 0,
             iteration: {
                 whileLoops: 0,
-                forLoopsPY: 0,
-                forLoopsJS: 0,
+                forLoopsRange: 0,
+                forLoopsIterable: 0,
                 iterables: 0,
                 nesting: 0,
             },
