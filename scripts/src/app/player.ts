@@ -175,6 +175,7 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
     }
 
     const renderingData = renderingDataQueue[1]
+    const oldNodes: any[] = []
 
     const tempoMap = new TempoMap(renderingData)
     const startTime = tempoMap.measureToTime(startMes)
@@ -197,6 +198,9 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         esconsole("Bypassing effects: " + JSON.stringify(trackBypass), ["DEBUG", "PLAYER"])
 
         // construct the effect graph
+        if (track.effectNodes) {
+            oldNodes.push(...Object.values(track.effectNodes))
+        }
         const startNode = applyEffects.buildAudioNodeGraph(context, mix, track, t, tempoMap, startTime, renderingData.master, trackBypass, false)
 
         const trackGain = context.createGain()
@@ -276,6 +280,9 @@ export const play = (startMes: number, endMes: number, manualOffset = 0) => {
         waTimeStarted = waStartTime
         isPlaying = true
         callbacks.onStartedCallback()
+        for (const node of oldNodes) {
+            node?.destroy()
+        }
     }, manualOffset * 1000)
 
     // check the loop state and schedule loop near the end also cancel the onFinished callback
@@ -363,17 +370,6 @@ const clearAudioGraph = (idx: number, delay = 0) => {
                 renderData.master.gain.setValueAtTime(0, context.currentTime + delay)
             }
         }
-    }
-
-    const renderData = renderingDataQueue[idx]
-    if (renderData !== null) {
-        setTimeout(() => {
-            for (const track of renderData.tracks) {
-                for (const node of Object.values(track.effectNodes ?? {})) {
-                    node?.destroy()
-                }
-            }
-        }, delay)
     }
 }
 
@@ -500,6 +496,14 @@ export const setRenderingData = (result: DAWData) => {
     esconsole("setting new rendering data", ["player", "debug"])
 
     clearAudioGraph(0)
+    const renderData = renderingDataQueue[0]
+    if (renderData) {
+        for (const track of renderData.tracks) {
+            for (const node of Object.values(track.effectNodes ?? {})) {
+                node?.destroy()
+            }
+        }
+    }
     renderingDataQueue.shift()
     renderingDataQueue.push(result)
 

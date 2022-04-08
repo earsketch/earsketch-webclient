@@ -10,7 +10,6 @@ const scratchBuffer = new Float32Array(Module.HEAP32.buffer, Module._buffer, HOP
 class Pitchshifter {
     constructor() {
         this._shifter = Module._createShifter()
-        console.log("created shifter", this._shifter)
     }
 
     processBlock(input, output, factor) {
@@ -21,7 +20,6 @@ class Pitchshifter {
 
     destroy() {
         Module._destroyShifter(this._shifter)
-        console.log("destroyed shifter", this._shifter)
     }
 }
 
