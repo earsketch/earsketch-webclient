@@ -2,24 +2,55 @@ import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Menu } from "@headlessui/react"
 
-import { useTranslation } from "react-i18next"
+import { useTranslation, getI18n } from "react-i18next"
+import LanguageDetector from "i18next-browser-languagedetector"
 
 import * as appState from "../app/appState"
-import * as curriculumState from "../browser/curriculumState"
 import { AVAILABLE_LOCALES, ENGLISH_LOCALE } from "../locales/AvailableLocales"
+
+export const chooseDetectedLanguage = (detected: string | string[] | undefined) => {
+    if (!detected) return ENGLISH_LOCALE.localeCode
+    if (!Array.isArray(detected)) detected = [detected]
+    for (const locale of detected) {
+        const supportedLocale = getSupportedLocale(locale)
+        if (supportedLocale) return supportedLocale
+    }
+
+    return ENGLISH_LOCALE.localeCode
+}
+
+const getSupportedLocale = (localeCode: string) => {
+    localeCode = localeCode.toLowerCase()
+    if (Object.keys(AVAILABLE_LOCALES).includes(localeCode)) {
+        return localeCode
+    }
+    // we may support the main locale without the regional dialect, try searching for that before giving up
+    const nonRegionalCode = localeCode.split("-")[0]
+    if (Object.keys(AVAILABLE_LOCALES).includes(nonRegionalCode)) {
+        return nonRegionalCode
+    }
+
+    return undefined
+}
 
 export const LocaleSelector = () => {
     const dispatch = useDispatch()
     const { i18n } = useTranslation()
     const currentLocale = useSelector(appState.selectLocaleCode)
     const { t } = useTranslation()
+
     const changeLanguage = (lng: string) => {
         dispatch(appState.setLocaleCode(lng))
-        dispatch(curriculumState.fetchLocale({ }))
     }
 
     useEffect(() => {
-        if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
+        if (currentLocale === "") {
+            // locale hasn't been set yet, attempt to detect language
+            const languageDetector = new LanguageDetector(getI18n().services, { order: ["navigator"] })
+            const language = languageDetector.detect()
+            console.log("languages detected: ", language)
+            changeLanguage(chooseDetectedLanguage(language))
+        } else if (Object.keys(AVAILABLE_LOCALES).includes(currentLocale)) {
             i18n.changeLanguage(currentLocale)
         } else {
             changeLanguage(ENGLISH_LOCALE.localeCode)

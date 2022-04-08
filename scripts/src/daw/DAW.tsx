@@ -174,7 +174,7 @@ const Header = ({ playPosition, setPlayPosition }: { playPosition: number, setPl
                 {/* Play */}
                 {/* Prevent embedded mode race condition by waiting for embeddedScriptName to populate before showing */}
                 {!playing && (!embedMode || (embedMode && embeddedScriptName)) && <span className="daw-transport-button">
-                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"btn hover:opacity-70 text-green-500" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
+                    <button aria-label={t("daw.tooltip.play")} type="submit" className={"btn hover:opacity-70 text-green-600" + (needCompile ? " flashButton" : "")} title={t("daw.tooltip.play")} onClick={() => { play(); addUIClick("project - play") }}>
                         <span className="icon icon-play4"></span>
                     </button>
                 </span>}
@@ -236,7 +236,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
     return <div style={{ width: X_OFFSET + xScale(playLength) + "px" }}>
         <div className="dawTrackContainer" style={{ height: trackHeight + "px" }}>
             <div className="dawTrackCtrl" style={{ left: xScroll + "px" }}>
-                <div className="dawTrackName prevent-selection">{track.label}</div>
+                <div className="dawTrackName text-gray-700 prevent-selection">{track.label}</div>
                 {track.buttons &&
                 <>
                     <button className={"btn dark:text-white btn-default btn-xs dawSoloButton" + (soloMute === "solo" ? " active" : "")} onClick={() => toggleSoloMute("solo")} title={t("daw.tooltip.solo")}>{t("daw.abbreviation.solo")}</button>
@@ -252,7 +252,7 @@ const Track = ({ color, mute, soloMute, toggleSoloMute, bypass, toggleBypass, tr
             <div key={key} id="dawTrackEffectContainer" style={{ height: trackHeight + "px" }}>
                 <div className="dawEffectCtrl" style={{ left: xScroll + "px" }}>
                     <div className="dawTrackName"></div>
-                    <div className="dawTrackEffectName">{t("daw.effect")} {index + 1}</div>
+                    <div className="dawTrackEffectName text-gray-700">{t("daw.effect")} {index + 1}</div>
                     <button className={"btn dark:text-white btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)} disabled={mute}>
                         {t("daw.bypass")}
                     </button>
@@ -428,7 +428,7 @@ const MixTrack = ({ color, bypass, toggleBypass, track, xScroll }: {
                     <div className="dawTrackName"></div>
                     {key === "TEMPO-TEMPO"
                         ? <div className="grow text-center">TEMPO</div>
-                        : <div className="dawTrackEffectName">{t("daw.effect")} {index + effectOffset}</div>}
+                        : <div className="dawTrackEffectName  text-gray-700">{t("daw.effect")} {index + effectOffset}</div>}
                     {key !== "TEMPO-TEMPO" &&
                     <button className={"btn btn-default btn-xs dawEffectBypassButton" + (bypass.includes(key) ? " active" : "")} onClick={() => toggleBypass(key)}>
                         {t("daw.bypass")}

@@ -136,8 +136,10 @@ const FileTab = ({ close }: { close: () => void }) => {
 }
 
 const RecordTab = ({ close }: { close: () => void }) => {
+    const { t } = useTranslation()
+    const isMacFirefox = ESUtils.whichBrowser().includes("Firefox") && ESUtils.whichOS() === "MacOS"
     const [name, setName] = useState("")
-    const [error, setError] = useState("")
+    const [error, setError] = useState(isMacFirefox ? t("soundUploader.record.firefoxMacError") : "")
     const [progress, setProgress] = useState<number>()
     const [buffer, setBuffer] = useState(null as AudioBuffer | null)
 
@@ -148,7 +150,6 @@ const RecordTab = ({ close }: { close: () => void }) => {
     const [measures, setMeasures] = useState(2)
     const [micReady, setMicReady] = useState(false)
     const [beat, setBeat] = useState(0)
-    const { t } = useTranslation()
 
     const startRecording = () => {
         recorder.properties.bpm = tempo
@@ -189,7 +190,7 @@ const RecordTab = ({ close }: { close: () => void }) => {
                 (error
                     ? <input type="button" className="btn btn-primary block m-auto" onClick={() => { setError(""); recorder.init() }} value={t("soundUploader.record.mic.reenable") as string} />
                     : t("soundUploader.record.mic.waiting"))}
-            {micReady && <div>
+            {micReady && !isMacFirefox && <div>
                 <div className="modal-section-header">
                     <span>{t("soundUploader.record.measures.title")}</span>
                     {metronome &&
