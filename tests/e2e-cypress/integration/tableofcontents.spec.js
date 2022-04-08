@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 describe("Table of content", () => {
     beforeEach(() => {
-        cy.intercept(
+        cy.interceptAudioStandard(
             {
                 method: "GET",
                 hostname: "api-dev.ersktch.gatech.edu",
