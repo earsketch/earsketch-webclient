@@ -71,7 +71,7 @@ const ContestGrading = ({ results, contestResults, contestDict, options, setCont
         if (contestDict[result.script.shareid]) {
             contestDict[result.script.shareid].finished = true
         } else {
-            contestDict[result.script.shareid] = { id: 0, finished: true }
+            contestDict[result.script.shareid] = { id: "0", finished: true }
         }
     }
 

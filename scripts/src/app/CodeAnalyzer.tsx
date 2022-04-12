@@ -244,7 +244,7 @@ export interface Result {
     reports?: Reports
     error?: string
     version?: number
-    contestID?: string | number
+    contestID?: string
 }
 
 export interface DownloadOptions {

@@ -61,9 +61,6 @@ export function storeErrorInfo(errorMsg: any, codeText: string, language: string
             currentError.stack = errorMsg.stack
         }
         currentText = codeText
-        // incredibly annoying quote cleanup
-        currentText = currentText.replace(/[\u201C\u201D]/g, '"')
-        currentText = currentText.replace(/[\u2018\u2019]/g, "'")
         console.log(handleJavascriptError())
     } else {
         console.log(errorMsg)

@@ -1432,7 +1432,7 @@ function countStructuralDepth(structureObj: StructuralNode, depthCountObj: { dep
 }
 
 // Analyze a single AST node.
-function analyzeASTNode(node: ForNode | CallNode | JsForNode | IfNode | SubscriptNode | BinOpNode | UnaryOpNode | CompareNode | WhileNode, resultInArray: Results[]) {
+function analyzeASTNode(node: AnyNode, resultInArray: Results[]) {
     const results: Results = resultInArray[0]
     let lineNumber = 0
     if (node.lineno) {

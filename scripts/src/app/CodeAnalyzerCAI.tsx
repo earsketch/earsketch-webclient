@@ -122,7 +122,7 @@ export const Upload = ({ processing, options, seed, contestDict, setResults, set
                         if (values[shareIDColumn] !== "scriptid" && values[contestIDColumn] !== "Competitor ID") {
                             const match = values[shareIDColumn].match(/\?sharing=([^\s.,])+/g)
                             const shareid = match ? match[0].substring(9) : values[shareIDColumn]
-                            contestEntries[shareid] = { id: Number(values[contestIDColumn]), finished: false }
+                            contestEntries[shareid] = { id: values[contestIDColumn], finished: false }
                             urlList.push("?sharing=" + shareid)
                         }
                     }
@@ -358,7 +358,7 @@ export interface ReportOptions {
 
 export interface Entries {
     [key: string]: {
-        id: string | number
+        id: string
         finished: boolean
         sourceCode?: string
     }

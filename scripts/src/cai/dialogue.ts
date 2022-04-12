@@ -29,8 +29,8 @@ let complexityWait: { [key: string]: any } = { node: -1, complexity: {} }
 let currentError = ["", ""]
 
 let currentComplexity: { [key: string]: any } = {}
-let currentInstr: any = null
-let currentGenre: any = null
+let currentInstr: string | null = null
+let currentGenre: string | null = null
 
 let currentProperty: any = ""
 let currentPropertyValue: any = ""
@@ -313,6 +313,7 @@ export function setCodeObj(newCode: any) {
 // Creates label/value array from dialogue selection options available to current node.
 export function createButtons() {
     let buttons = []
+    // Node 34: BEGIN CODE SUGGESTION TREE
     if (currentTreeNode[activeProject].id === 34 && (currentSuggestion[activeProject] === null || (currentSuggestion[activeProject].explain === null || currentSuggestion[activeProject].explain === ""))) {
         currentSuggestion[activeProject] = null
         return []
@@ -358,7 +359,7 @@ export function createButtons() {
         }
     } else if (currentTreeNode[activeProject].options[0] !== null && currentTreeNode[activeProject].options[0].includes("SECTIONS") && codeSuggestion.getMusic() !== null) {
         const musicResults = codeSuggestion.getMusic()
-        if (musicResults !== {} && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
+        if (Object.keys(musicResults).length > 0 && musicResults.SOUNDPROFILE !== null && Object.keys(musicResults.SOUNDPROFILE).length > 0) {
             let highestNumber = 0
             for (const node of caiTree) {
                 if (node.id > highestNumber) {

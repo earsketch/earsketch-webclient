@@ -124,8 +124,7 @@ export function updateModel(property: string, value: string) {
         case "genre":
         case "code structure":
         case "instrument": {
-            const index = projectModel[activeProject][property].indexOf(value)
-            if (index === -1) {
+            if (projectModel[activeProject][property].includes(value)) {
                 projectModel[activeProject][property].push(value) // Unlimited number of genres/instruments.
             }
             break
@@ -152,7 +151,7 @@ export function clearProperty(property: string) {
 }
 
 // Remove single property from array.
-export function removeProperty(property: string, propertyValue: string | number) {
+export function removeProperty(property: string, propertyValue: string) {
     if (projectModel[activeProject][property]) {
         const index = projectModel[activeProject][property].indexOf(propertyValue)
         if (index > -1) {
